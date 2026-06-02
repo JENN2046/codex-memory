@@ -529,6 +529,14 @@ function buildP66FullImplementationGapAccounting({
   });
   const closureAuthorityStatus = closureAuthoritySummary.status;
   const nextClosureAuthority = closureAuthoritySummary.nextAuthority;
+  const acceptedRuntimeSummaryZeroGap =
+    acceptedRuntimeSummaryBound &&
+    effectiveRemainingGapsCleared &&
+    effectiveNonBaselineRemainingGapsAbsent;
+  const decisionPacketRouteStatus = acceptedRuntimeSummaryZeroGap
+    ? 'ready_for_rc9_decision_packet_not_cutover'
+    : 'rc_not_ready_blocked_remaining_gaps';
+  const readyToRequestRcCutoverApproval = acceptedRuntimeSummaryZeroGap;
 
   return {
     available: true,
@@ -570,6 +578,14 @@ function buildP66FullImplementationGapAccounting({
     closureAuthoritySummary,
     closureAuthorityStatus,
     nextClosureAuthority,
+    acceptedRuntimeSummaryZeroGap,
+    decisionPacketRouteStatus,
+    readyToRequestRcCutoverApproval,
+    rcCutoverApprovalRequired: true,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
     closureStatus,
     closureReady: false,
     closureCanClaimReady: false,
@@ -585,6 +601,9 @@ function buildP66FullImplementationGapAccounting({
       effectiveActionableLocalImplementationGapsCleared,
       effectiveA5GatedGapsCleared,
       effectiveRedLaneGapsCleared,
+      decisionPacketCanBePrepared: acceptedRuntimeSummaryZeroGap,
+      rcCutoverApprovalPresent: false,
+      rcCutoverExecutionAllowed: false,
       allBlockersCleared: totalBlockerCount === 0,
       readinessClaimAllowed: false
     },
@@ -599,6 +618,7 @@ function buildP66FullImplementationGapAccounting({
       ...(!effectiveActionableLocalImplementationGapsCleared ? ['effective_actionable_local_implementation_gaps_cleared'] : []),
       ...(!effectiveA5GatedGapsCleared ? ['effective_a5_gated_gaps_cleared'] : []),
       ...(!effectiveRedLaneGapsCleared ? ['effective_red_lane_gaps_cleared'] : []),
+      'rc_cutover_approval_present',
       'readiness_authority'
     ],
     acceptedRuntimeSummaryBound,
@@ -2777,6 +2797,16 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.closureStatus,
       p66ValidationAggregatorFullImplementationGapAccountingClosureReady:
         p66FullImplementationGapAccounting.closureReady,
+      p66ValidationAggregatorFullImplementationGapAccountingZeroGap:
+        p66FullImplementationGapAccounting.acceptedRuntimeSummaryZeroGap,
+      p66ValidationAggregatorFullImplementationGapAccountingDecisionPacketRouteStatus:
+        p66FullImplementationGapAccounting.decisionPacketRouteStatus,
+      p66ValidationAggregatorFullImplementationGapAccountingReadyToRequestRcCutoverApproval:
+        p66FullImplementationGapAccounting.readyToRequestRcCutoverApproval,
+      p66ValidationAggregatorFullImplementationGapAccountingRcCutoverApproved:
+        p66FullImplementationGapAccounting.rcCutoverApproved,
+      p66ValidationAggregatorFullImplementationGapAccountingRcCutoverExecutionAllowed:
+        p66FullImplementationGapAccounting.rcCutoverExecutionAllowed,
       p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady: false,
       p66ValidationAggregatorFullImplementationFixtureReadByAggregator: false,
       p66ValidationAggregatorFullImplementationTestExecutedByAggregator: false,
@@ -3798,6 +3828,20 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.closureAuthorityStatus,
         nextClosureAuthority:
           p66FullImplementationGapAccounting.nextClosureAuthority,
+        acceptedRuntimeSummaryZeroGap:
+          p66FullImplementationGapAccounting.acceptedRuntimeSummaryZeroGap,
+        decisionPacketRouteStatus:
+          p66FullImplementationGapAccounting.decisionPacketRouteStatus,
+        readyToRequestRcCutoverApproval:
+          p66FullImplementationGapAccounting.readyToRequestRcCutoverApproval,
+        rcCutoverApprovalRequired:
+          p66FullImplementationGapAccounting.rcCutoverApprovalRequired,
+        rcCutoverApproved:
+          p66FullImplementationGapAccounting.rcCutoverApproved,
+        rcCutoverExecuted:
+          p66FullImplementationGapAccounting.rcCutoverExecuted,
+        rcCutoverExecutionAllowed:
+          p66FullImplementationGapAccounting.rcCutoverExecutionAllowed,
         nextSafeClosureCandidates:
           p66FullImplementationGapAccounting.nextSafeClosureCandidates,
         acceptedRuntimeSummaryBound:

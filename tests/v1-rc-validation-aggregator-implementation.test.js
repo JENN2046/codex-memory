@@ -258,6 +258,22 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     'red_lane_authorization_required'
   );
   assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingZeroGap,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingDecisionPacketRouteStatus,
+    'rc_not_ready_blocked_remaining_gaps'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingReadyToRequestRcCutoverApproval,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRcCutoverExecutionAllowed,
+    false
+  );
+  assert.equal(
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingNextClosureAuthority,
     'explicit_red_lane_owner_approval'
   );
@@ -2581,6 +2597,22 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
     }
   );
   assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryZeroGap,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.decisionPacketRouteStatus,
+    'rc_not_ready_blocked_remaining_gaps'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.rcCutoverApproved,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.rcCutoverExecutionAllowed,
+    false
+  );
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.fullImplementationGapAccounting.fullImplementationReady,
     false
   );
@@ -2589,6 +2621,111 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(report.summary.finalRcMatrixReady, false);
   assert.equal(report.summary.rcReady, false);
   assert.equal(report.summary.runtimeEvidenceSummaryCanClaimV1RcReady, false);
+  assertNoSensitiveSurface(report);
+});
+
+test('zero-gap runtime evidence summary can route to RC-9 but cannot authorize RC cutover', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'abc1234def5678',
+      expectedCurrentHeadCommit: 'abc1234def5678',
+      evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
+      evidenceUnitIds: [
+        'A5-GAP-1',
+        'A5-GAP-2',
+        'A5-GAP-3',
+        'A5-GAP-4',
+        'A5-GAP-5'
+      ],
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      finalRcMatrixExecuted: false,
+      fullFinalRcMatrixExecuted: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      criticalGates: {
+        total: 12,
+        passed: 12,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
+      locallyEvidencedRuntimeGaps: [
+        'validation_aggregator_full_implementation_incomplete',
+        'governance_review_approval_audit_runtime_loop_not_executed',
+        'recall_isolation_runtime_proof_not_executed',
+        'migration_import_export_backup_restore_approval_execution_blocked',
+        'live_http_operation_readiness_not_claimed',
+        'mainline_strict_gate_not_executed_for_cutover',
+        'rc_cutover_not_executed'
+      ],
+      remainingRuntimeGaps: [],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        readsRealMemory: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
+  const definition = report.evidence.p66ValidationAggregatorFullImplementationDefinition;
+
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryRemainingGapCount, 0);
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingZeroGap,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingDecisionPacketRouteStatus,
+    'ready_for_rc9_decision_packet_not_cutover'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingReadyToRequestRcCutoverApproval,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRcCutoverApproved,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRcCutoverExecutionAllowed,
+    false
+  );
+  assert.equal(definition.acceptedRuntimeSummaryZeroGap, true);
+  assert.equal(definition.readyToRequestRcCutoverApproval, true);
+  assert.equal(definition.rcCutoverApprovalRequired, true);
+  assert.equal(definition.rcCutoverApproved, false);
+  assert.equal(definition.rcCutoverExecuted, false);
+  assert.equal(definition.rcCutoverExecutionAllowed, false);
+  assert.equal(definition.rcReady, false);
+  assert.equal(definition.closureCriteria.decisionPacketCanBePrepared, true);
+  assert.equal(definition.closureCriteria.rcCutoverApprovalPresent, false);
+  assert.equal(definition.closureCriteria.rcCutoverExecutionAllowed, false);
+  assert.equal(
+    definition.closureMissingCriteria.includes('effective_remaining_gaps_cleared'),
+    false
+  );
+  assert.equal(
+    definition.closureMissingCriteria.includes('rc_cutover_approval_present'),
+    true
+  );
+  assert.equal(report.summary.runtimeReady, false);
+  assert.equal(report.summary.finalRcMatrixReady, false);
+  assert.equal(report.summary.rcReady, false);
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assertNoSensitiveSurface(report);
 });
 
