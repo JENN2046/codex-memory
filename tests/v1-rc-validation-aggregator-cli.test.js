@@ -38,7 +38,7 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.summary.rc9DecisionPacketAvailable, true);
   assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
   assert.equal(report.summary.rc9DecisionPacketMarkdownAuditStatus, 'markdown_sections_complete_not_authorization');
-  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditSectionCount, 8);
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditSectionCount, 9);
   assert.equal(report.summary.rc9DecisionPacketMarkdownAuditMissingSectionCount, 0);
   assert.equal(report.summary.rc9DecisionPacketMarkdownAuditCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketRcCutoverApproved, false);
@@ -112,9 +112,21 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAudit.approvalAccepted, false);
   assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAudit.approvalExecuted, false);
   assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAuditCanClaimReadiness, false);
+  assert.equal(
+    report.summary.rc9DecisionPacketClosureMissingCriteriaCount,
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.length
+  );
+  assert.equal(report.summary.rc9DecisionPacketClosureMissingCriteriaIncludesRcCutoverApproval, true);
+  assert.equal(report.summary.rc9DecisionPacketClosureMissingCriteriaIncludesReadinessAuthority, true);
+  assert.equal(report.summary.rc9DecisionPacketClosureMissingCriteriaCanClaimReadiness, false);
+  assert.deepEqual(
+    report.evidence.rc9DecisionPacket.closureMissingCriteria,
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria
+  );
+  assert.equal(report.evidence.rc9DecisionPacket.closureMissingCriteriaCanClaimReadiness, false);
   assert.equal(report.evidence.rc9DecisionPacket.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
-  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.sectionCount, 8);
-  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.acceptedSectionCount, 8);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.sectionCount, 9);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.acceptedSectionCount, 9);
   assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.missingSectionCount, 0);
   assert.deepEqual(report.evidence.rc9DecisionPacket.markdownAudit.missingSectionIds, []);
   assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalGenerated, false);

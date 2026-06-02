@@ -5007,6 +5007,14 @@ function buildV1RcValidationAggregatorReport({
     rc9DecisionPacket.packetCloseoutAudit.missingRowCount;
   report.summary.rc9DecisionPacketCloseoutAuditCanClaimReadiness =
     rc9DecisionPacket.packetCloseoutAuditCanClaimReadiness;
+  report.summary.rc9DecisionPacketClosureMissingCriteriaCount =
+    rc9DecisionPacket.closureMissingCriteriaCount;
+  report.summary.rc9DecisionPacketClosureMissingCriteriaIncludesRcCutoverApproval =
+    rc9DecisionPacket.closureMissingCriteriaIncludesRcCutoverApproval;
+  report.summary.rc9DecisionPacketClosureMissingCriteriaIncludesReadinessAuthority =
+    rc9DecisionPacket.closureMissingCriteriaIncludesReadinessAuthority;
+  report.summary.rc9DecisionPacketClosureMissingCriteriaCanClaimReadiness =
+    rc9DecisionPacket.closureMissingCriteriaCanClaimReadiness;
   report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness =
     rc9DecisionPacket.remainingGapRouteCanClaimReadiness;
   report.summary.rc9DecisionPacketRcCutoverApproved =
@@ -5061,6 +5069,9 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     definition.readyToRequestRcCutoverApproval === true;
   const effectiveRemainingGapIds = Array.isArray(definition.effectiveRemainingFullImplementationGapIds)
     ? definition.effectiveRemainingFullImplementationGapIds
+    : [];
+  const closureMissingCriteria = Array.isArray(definition.closureMissingCriteria)
+    ? definition.closureMissingCriteria
     : [];
   const closureAuditMatrix = Array.isArray(definition.closureAuditMatrix)
     ? definition.closureAuditMatrix
@@ -5430,6 +5441,13 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     packetCloseoutAudit,
     packetCloseoutAuditStatus: packetCloseoutAudit.status,
     packetCloseoutAuditCanClaimReadiness: false,
+    closureMissingCriteria,
+    closureMissingCriteriaCount: closureMissingCriteria.length,
+    closureMissingCriteriaIncludesRcCutoverApproval:
+      closureMissingCriteria.includes('rc_cutover_approval_present'),
+    closureMissingCriteriaIncludesReadinessAuthority:
+      closureMissingCriteria.includes('readiness_authority'),
+    closureMissingCriteriaCanClaimReadiness: false,
     remainingGapRouteCanClaimReadiness: false,
     rcCutoverApprovalRequired: true,
     rcCutoverApprovalPresent: false,
@@ -5561,6 +5579,16 @@ function buildRc9MarkdownAudit(markdown = '') {
       ]
     },
     {
+      id: 'closure_missing_criteria',
+      requiredFragments: [
+        '## Closure Missing Criteria',
+        'closure_missing_criteria_count =',
+        'closure_missing_criteria_includes_rc_cutover_approval =',
+        'closure_missing_criteria_includes_readiness_authority =',
+        'closure_missing_criteria_can_claim_readiness = false'
+      ]
+    },
+    {
       id: 'boundary',
       requiredFragments: [
         '## Boundary',
@@ -5637,6 +5665,9 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     `accepted=${row.accepted === true}`,
     `can_claim_readiness=${row.canClaimReadiness === true}`
   ].join(' | '));
+  const closureMissingCriteriaLines = packet.closureMissingCriteria.length > 0
+    ? packet.closureMissingCriteria.map(id => `- ${safeEvidenceString(id, 'unknown_missing_criterion')}`)
+    : ['- none'];
   const markdown = [
     '# RC-9 RC Decision Packet',
     '',
@@ -5704,6 +5735,14 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     `packet_closeout_audit_approval_executed = ${packet.packetCloseoutAudit.approvalExecuted}`,
     `packet_closeout_audit_can_claim_readiness = ${packet.packetCloseoutAuditCanClaimReadiness}`,
     ...packetCloseoutAuditLines,
+    '',
+    '## Closure Missing Criteria',
+    '',
+    `closure_missing_criteria_count = ${packet.closureMissingCriteriaCount}`,
+    `closure_missing_criteria_includes_rc_cutover_approval = ${packet.closureMissingCriteriaIncludesRcCutoverApproval}`,
+    `closure_missing_criteria_includes_readiness_authority = ${packet.closureMissingCriteriaIncludesReadinessAuthority}`,
+    `closure_missing_criteria_can_claim_readiness = ${packet.closureMissingCriteriaCanClaimReadiness}`,
+    ...closureMissingCriteriaLines,
     '',
     '## Boundary',
     '',
