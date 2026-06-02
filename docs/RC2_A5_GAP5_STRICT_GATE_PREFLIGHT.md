@@ -2,15 +2,15 @@
 
 Date: 2026-06-02
 
-Mode: `A5-GAP-5 approval packet only`
+Mode: `A5-GAP-5 exact-approved strict gate evidence`
 
-Decision: `DRAFT_NOT_APPROVED`
+Decision: `TARGET_BOUND_STRICT_GATE_PASSED_NOT_RC_READY`
 
 ## Purpose
 
-Prepare the cutover-context strict gate approval boundary for the current RC route.
+Prepare and record the cutover-context strict gate approval boundary for the current RC route.
 
-This document does not approve or execute `npm run gate:mainline:strict`. It does not push, tag, release, deploy, switch config, install watchdog/startup entries, call providers, read or scan real memory stores, write durable memory/audit state, expand public MCP tools, execute RC cutover, or claim `RC_READY`.
+This document records exact-approved execution of `npm run gate:mainline:strict` for the target commit below. It does not push, tag, release, deploy, switch config, install watchdog/startup entries, call providers, read or scan real memory stores, write durable memory/audit state, expand public MCP tools, execute RC cutover, or claim `RC_READY`.
 
 ## Current Git Reality
 
@@ -18,12 +18,12 @@ Fresh preflight observed:
 
 ```text
 branch = main
-target_commit = b482006eec09015c67a56b8fcd4e424d4bf6692c
-origin_state = main ahead of origin/main by 1 local commit
-worktree_state = dirty only because this RC-2 preflight packet is being prepared
+target_commit = 9cb7df9b0aafc5951e8650f07633a4711cef7c55
+origin_state = main ahead of origin/main by 2 local commits
+worktree_state = clean before strict gate execution
 ```
 
-If this packet is committed before execution, the approval line must be regenerated for the new post-commit `HEAD`.
+Fresh preflight confirmed the local `HEAD` matched the exact approval target before execution.
 
 ## Requested Approval Unit
 
@@ -43,20 +43,20 @@ Allowed command after exact approval:
 npm run gate:mainline:strict
 ```
 
-Required exact approval line for the current target commit:
+Exact approval line consumed for this target commit:
 
 ```text
-I approve A5-GAP-5 for codex-memory on branch main at commit b482006eec09015c67a56b8fcd4e424d4bf6692c, running cutover-context strict gate only, no remote write.
+I approve A5-GAP-5 for codex-memory on branch main at commit 9cb7df9b0aafc5951e8650f07633a4711cef7c55, running cutover-context strict gate only, no remote write.
 ```
 
-## Execution Boundary
+## Execution Boundary Observed
 
-Allowed after exact approval:
+Executed after exact approval:
 
-- Verify branch and commit still match the approval line.
-- Verify worktree scope is understood.
-- Run `npm run gate:mainline:strict`.
-- Record target-bound strict gate result.
+- Verified branch and commit matched the approval line.
+- Verified the worktree was clean.
+- Ran `npm run gate:mainline:strict`.
+- Recorded target-bound strict gate result.
 
 Not allowed by this approval packet:
 
@@ -69,18 +69,30 @@ Not allowed by this approval packet:
 - public MCP expansion
 - readiness, reliability, production, release, or `RC_READY` claims
 
-## Exit Criteria
+## Strict Gate Result
 
-If approved and executed, a passing strict gate can only be recorded as:
+Command:
+
+```powershell
+npm run gate:mainline:strict
+```
+
+Result:
+
+```text
+status = ok
+mode = strict
+health = ok
+contract = 31/31 passed
+test = 2926/2926 passed
+compare = 43/43 matched
+rollback = 43/43 rollback-ready
+```
+
+Conclusion:
 
 ```text
 TARGET_BOUND_STRICT_GATE_PASSED_NOT_RC_READY
 ```
 
-If it fails, the result remains:
-
-```text
-STRICT_GATE_FAILED_RC_NOT_READY_BLOCKED
-```
-
-Either result remains evidence only. RC decision is deferred to later route steps.
+This result remains evidence only. RC decision is deferred to later route steps.

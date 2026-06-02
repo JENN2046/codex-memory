@@ -12,7 +12,7 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 ## RC-2 A5-GAP-5 Strict Gate Preflight
 
-Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_EXECUTED`
+Status: `TARGET_BOUND_STRICT_GATE_PASSED_NOT_RC_READY`
 
 Date: 2026-06-02
 
@@ -23,15 +23,16 @@ Packet: [docs/RC2_A5_GAP5_STRICT_GATE_PREFLIGHT.md](/A:/codex-memory/docs/RC2_A5
 Result:
 
 - Prepared exact A5-GAP-5 approval packet for the current RC route.
-- Allowed future command is only `npm run gate:mainline:strict`.
-- Required approval line is bound to target commit `b482006eec09015c67a56b8fcd4e424d4bf6692c`.
-- No strict gate was run.
+- Consumed exact approval for target commit `9cb7df9b0aafc5951e8650f07633a4711cef7c55`.
+- Fresh preflight matched branch `main`, target commit, and clean worktree.
+- Ran `npm run gate:mainline:strict`.
+- Strict gate passed: health ok, contract `31/31`, test `2926/2926`, compare `43/43`, rollback `43/43`.
 - No remote write, provider call, memory tool call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, release, deploy, or cutover action occurred.
 
 Next:
 
-- If this packet is committed before execution, regenerate or update the approval line for the new post-commit `HEAD`.
-- Do not run `npm run gate:mainline:strict` until exact A5-GAP-5 approval is provided.
+- Continue to RC-3 live HTTP / MCP no-write preflight.
+- Treat this as target-bound strict gate evidence only, not RC readiness.
 
 ## RC-1 Current-Head Local Baseline
 
