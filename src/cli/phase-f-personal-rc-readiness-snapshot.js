@@ -115,6 +115,15 @@ function detectPhaseFEvidence(cwd) {
     evidence.f3TrueLiveRecallNegativeControlAccepted = true;
   }
 
+  const f4Text = readTextIfExists(path.join(docsDir, 'CM1383_PHASE_F4_MINIMAL_DOGFOOD_WRITE_EVIDENCE.md'));
+  if (
+    f4Text.includes('Status: `COMPLETED_VALIDATED_F4_ACCEPTED_NOT_READY`') &&
+    f4Text.includes('- F4 evidence accepted: `true`') &&
+    f4Text.includes('PHASE_F4_SINGLE_RECORD_MEMORY_CALL_COMPLETED_SANITIZED_RESULT')
+  ) {
+    evidence.f4MinimalDogfoodWriteAccepted = true;
+  }
+
   return evidence;
 }
 

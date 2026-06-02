@@ -288,6 +288,73 @@ test('Phase F personal RC snapshot detects committed CM-1381 F3 evidence documen
   assert.equal(snapshot.approvalTemplates.f4MinimalDogfoodWriteTemplateCurrentlyUsable, true);
 });
 
+test('Phase F personal RC snapshot detects committed CM-1383 F4 evidence document', () => {
+  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'phase-f-evidence-'));
+  const docsDir = path.join(workspace, 'docs');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md'), [
+    '# CM-1377 Phase F1 Live No-Write Accepted Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY`',
+    '',
+    'PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY',
+    '',
+    '- F1 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+  fs.writeFileSync(path.join(docsDir, 'CM1379_PHASE_F2_A5_GAP6_AGGREGATION_EVIDENCE.md'), [
+    '# CM-1379 Phase F2 A5-GAP-6 Aggregation Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F2_ACCEPTED_NOT_READY`',
+    '',
+    'phase_f_f1_accepted_f2_aggregation_refresh_not_ready',
+    '',
+    '- F2 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+  fs.writeFileSync(path.join(docsDir, 'CM1381_PHASE_F3_TRUE_LIVE_RECALL_NEGATIVE_CONTROL_EVIDENCE.md'), [
+    '# CM-1381 Phase F3 True-Live Recall Negative-Control Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F3_ACCEPTED_NOT_READY`',
+    '',
+    'TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY',
+    '',
+    '- F3 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+  fs.writeFileSync(path.join(docsDir, 'CM1383_PHASE_F4_MINIMAL_DOGFOOD_WRITE_EVIDENCE.md'), [
+    '# CM-1383 Phase F4 Minimal Dogfood Write Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F4_ACCEPTED_NOT_READY`',
+    '',
+    'PHASE_F4_SINGLE_RECORD_MEMORY_CALL_COMPLETED_SANITIZED_RESULT',
+    '',
+    '- F4 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+
+  const evidence = detectPhaseFEvidence(workspace);
+  assert.equal(evidence.f1LiveNoWriteEvidenceAccepted, true);
+  assert.equal(evidence.f2A5Gap6AggregationAccepted, true);
+  assert.equal(evidence.f3TrueLiveRecallNegativeControlAccepted, true);
+  assert.equal(evidence.f4MinimalDogfoodWriteAccepted, true);
+
+  const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
+    syncPacket: {
+      branch: 'main',
+      currentHead: '13a3a313e99611b31ba671fadb63e0f61797b5aa',
+      originHead: '13a3a313e99611b31ba671fadb63e0f61797b5aa',
+      ahead: 0,
+      behind: 0,
+      worktreeClean: true
+    },
+    evidence
+  });
+
+  assert.equal(snapshot.phases[3].status, 'complete');
+  assert.equal(snapshot.blockingPhase.id, 'F5');
+  assert.equal(snapshot.nextRequiredAction, 'execute_closeout_after_f4');
+  assert.deepEqual(snapshot.missingPhases, ['F5']);
+  assert.equal(snapshot.approvalTemplates.f4MinimalDogfoodWriteTemplateCurrentlyUsable, false);
+  assert.equal(snapshot.targetCurrentlyAchieved, false);
+});
+
 test('Phase F personal RC snapshot can represent personal dogfood ready without RC ready', () => {
   const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
     syncPacket: {

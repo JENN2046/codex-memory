@@ -1,5 +1,39 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1383 Phase F4 Minimal Dogfood Write Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_F4_ACCEPTED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: exact-approved one-record sanitized `record_memory` dogfood write on clean synced `main@13a3a313e99611b31ba671fadb63e0f61797b5aa`, followed by local source/test/docs/board evidence recording. No `search_memory`, MCP/provider call, raw memory output, direct jsonl/raw audit read, broad real memory scan, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Executed exactly one `app.callTool('record_memory')` through `createCodexMemoryApplication({ allowExternalProvider:false })`.
+- Sanitized selected result status: `PHASE_F4_SINGLE_RECORD_MEMORY_CALL_COMPLETED_SANITIZED_RESULT`.
+- Decision: `accepted`.
+- Memory id: `codex-process-29237bc07e394bc08953a7533129293b`.
+- Target: `process`.
+- Shadow write status: `ok`; failure count `0`.
+- Idempotency status: `committed`; replayed `false`; authoritative store `sqlite`.
+- Lifecycle committed/projected/audited all `true`.
+
+Validation:
+
+- `node --check` for changed snapshot CLI/test.
+- Targeted Phase F snapshot tests.
+- Snapshot CLI self-check.
+- `git diff --check`.
+- Ledger consistency check.
+- Docs validation.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Proceed to F5 closeout only after CM-1383 evidence is committed/synced or otherwise stable.
+- Do not claim RC ready, broad write reliability, recall reliability, release readiness, or cutover readiness.
+
 ## CM-1382 Phase F4 Minimal Dogfood Write Approval Surface Checkpoint
 
 Status: `COMPLETED_VALIDATED_F4_APPROVAL_PACKET_SURFACED_NOT_READY`
