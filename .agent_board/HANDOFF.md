@@ -4,9 +4,9 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1397 Phase G runtime boundary closeout audit`.
-Current validation: `CMV-1515`.
-Current handoff: active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
+Current task: `CM-1398 Phase H client-scope boundary inventory`.
+Current validation: `CMV-1516`.
+Current handoff: CM-1398 opens Phase H with a local client-scope boundary inventory; active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

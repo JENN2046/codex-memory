@@ -15,13 +15,19 @@ PERSONAL_DOGFOOD_READY_NOT_RC_READY
 RC_READY_FALSE
 ```
 
-Phase F personal dogfood evidence chain is locally closed. The project now enters Phase G planning and execution:
+Phase F personal dogfood evidence chain is locally closed. Phase G runtime-boundary planning is also locally closed as `PHASE_G_RUNTIME_BOUNDARY_PLAN_CLOSED_NOT_RC_READY`.
+
+The project now enters Phase H planning and execution:
 
 ```text
-Phase G — memory governance / proposal / supersession / tombstone
+Phase H — Codex / Claude client-scope boundary
 ```
 
-The authoritative Phase G execution entrypoint is:
+The current Phase H inventory entrypoint is:
+
+[docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md)
+
+The completed Phase G execution entrypoint remains supporting context:
 
 [PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md)
 
@@ -29,22 +35,28 @@ Current route order:
 
 1. Keep current facts anchored in [STATUS.md](/A:/codex-memory/STATUS.md).
 2. Use this document only as the high-level next-phase route.
-3. Use [PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md) for Phase G execution scope and order.
+3. Use [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md) for the current Phase H inventory scope and next safe slice.
 4. Use [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) and [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md) for active task and validation state.
 
-First Phase G stage:
+First Phase H stage:
 
 ```text
-G1 — Memory Governance Runtime Boundary
+H1 — Client Scope Runtime Boundary
 ```
 
 First safe task:
 
 ```text
-CM-1389 Phase G governance runtime inventory
+CM-1398 Phase H client-scope boundary inventory
 ```
 
-CM-1389 should inspect current governance/lifecycle source, tests, fixtures, and docs, then produce `docs/PHASE_G_G1_GOVERNANCE_RUNTIME_INVENTORY.md`. It must not execute runtime governance actions, memory tools, provider calls, durable writes, broad real-memory reads, config/watchdog/startup changes, public MCP expansion, push, release, cutover, or readiness claims.
+Next safe task after CM-1398:
+
+```text
+CM-1399 Phase H boundary matrix and first no-apply slice selection
+```
+
+CM-1398 inspects current client/scope source, tests, fixtures, and docs, then produces `docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md`. It must not execute live client operations, memory tools, provider calls, bearer-token use, durable writes, broad real-memory reads, config/watchdog/startup changes, public MCP expansion, push, release, cutover, or readiness claims.
 
 ## Historical Route Snapshot
 

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-06-02",
-  "taskId": "CM-1397",
-  "validationId": "CMV-1515",
+  "taskId": "CM-1398",
+  "validationId": "CMV-1516",
   "branch": "main",
-  "localHead": "8f29ef961d6cd4e6916e1febad84ea54bb294d9b",
-  "originHead": "8f29ef961d6cd4e6916e1febad84ea54bb294d9b",
+  "localHead": "4c12628c8237bf68ca22754a2385a3fb9b93e2d8",
+  "originHead": "4c12628c8237bf68ca22754a2385a3fb9b93e2d8",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -25,8 +25,8 @@
   },
   "validationSummary": [
     {
-      "id": "CMV-1515",
-      "scope": "CM-1397 Phase G runtime boundary closeout audit",
+      "id": "CMV-1516",
+      "scope": "CM-1398 Phase H client-scope boundary inventory",
       "status": "COMPLETED_VALIDATED"
     }
   ],

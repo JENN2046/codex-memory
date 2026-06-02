@@ -9,7 +9,7 @@
 1. 操作地图：[README.md](/A:/codex-memory/README.md)
 2. 当前事实：[STATUS.md](/A:/codex-memory/STATUS.md)
 3. 后续路线：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
-4. 当前 Phase G 入口：[PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md)
+4. 当前 Phase H 入口：[docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md)
 5. 当前任务与验证：[.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) / [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)
 
 文档职责边界见：[DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)。
@@ -73,7 +73,7 @@
 - 如果目标是“继续稳定维护默认主链”：先看 [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 - 如果目标是“继续排优先级做后续精修”：先看 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
 - 如果目标是“收束文档事实源”：先看 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
-- 如果目标是“规划下一阶段”：先看 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)，再看 [PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md)
+- 如果目标是“规划下一阶段”：先看 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)，再看 [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md)
 - 如果目标是“设计 CI-safe gate”：先看 [GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)
 - 如果目标是“恢复最近决策和基线”：先看 [MEMORY.md](/A:/codex-memory/MEMORY.md)
 
@@ -84,6 +84,6 @@
 1. 看 [README.md](/A:/codex-memory/README.md)
 2. 看 [STATUS.md](/A:/codex-memory/STATUS.md)
 3. 看 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
-4. 看 [PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md)
+4. 看 [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md)
 5. 看 [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) 和 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)
 6. 如果要改文档入口，先看 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)

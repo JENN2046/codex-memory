@@ -4,13 +4,39 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1397 Phase G runtime boundary closeout audit`.
-Current validation: `CMV-1515`.
+Current checkpoint: `CM-1398 Phase H client-scope boundary inventory`.
+Current validation: `CMV-1516`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; older checkpoint entries below are historical.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Historical Checkpoint Archive
+
+### CM-1398 Phase H Client Scope Boundary Inventory Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY`
+
+Date: 2026-06-02
+
+Scope: local docs/source/test inventory over current Codex / Claude client-scope boundaries. No live client operation, bearer-token use, `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl`, raw audit, vector, candidate-cache, or store scan, durable memory/audit write, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md`.
+- Mapped current public scope schema, execution-context normalization, write effective scope, soft-read privacy, lifecycle scope read policy, governance suppression, HTTP/stdio context defaults, and historical client acceptance evidence.
+- Selected CM-1399 Phase H boundary matrix and first no-apply slice selection as the next safe local task.
+- Kept live client refresh, bearer-token use, real memory scans, cross-client runtime proof, public MCP expansion, and RC readiness blocked.
+
+Validation:
+
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Continue with CM-1399 Phase H boundary matrix and first no-apply slice selection, or review/commit this docs batch if requested.
 
 ### CM-1397 Phase G Runtime Boundary Closeout Audit Checkpoint
 
