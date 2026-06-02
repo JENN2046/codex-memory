@@ -94,6 +94,14 @@ const RUNTIME_EVIDENCE_SUMMARY_STATUSES = [
   'runtime_evidence_summary_rejected'
 ];
 
+const RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS = [
+  'A5-GAP-1',
+  'A5-GAP-2',
+  'A5-GAP-3',
+  'A5-GAP-4',
+  'A5-GAP-5'
+];
+
 const FORBIDDEN_EVIDENCE_FRAGMENTS = [
   'authorization:',
   'bearer ',
@@ -1542,6 +1550,50 @@ function normalizeEvidenceStringList(values) {
     .slice(0, 24);
 }
 
+function summarizeRuntimeEvidenceUnits(unitIds) {
+  const normalizedUnitIds = normalizeEvidenceStringList(unitIds);
+  const uniqueUnitIds = [...new Set(normalizedUnitIds)];
+  const missingRequiredUnitIds = RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS
+    .filter(id => !uniqueUnitIds.includes(id));
+  const unknownUnitIds = uniqueUnitIds
+    .filter(id => !RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS.includes(id));
+
+  return {
+    unitIds: normalizedUnitIds,
+    uniqueUnitIds,
+    duplicateUnitCount: normalizedUnitIds.length - uniqueUnitIds.length,
+    requiredUnitIds: [...RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS],
+    missingRequiredUnitIds,
+    unknownUnitIds,
+    complete:
+      missingRequiredUnitIds.length === 0 &&
+      unknownUnitIds.length === 0 &&
+      normalizedUnitIds.length === uniqueUnitIds.length
+  };
+}
+
+function buildRuntimeEvidenceUnitRejectedSummary(empty, evidenceUnitSummary, rejectReason) {
+  return {
+    ...empty,
+    status: 'runtime_evidence_summary_rejected',
+    rejected: true,
+    rejectReason,
+    summary: {
+      ...empty.summary,
+      evidenceUnitCount: evidenceUnitSummary.uniqueUnitIds.length,
+      requiredEvidenceUnitCount: evidenceUnitSummary.requiredUnitIds.length,
+      missingEvidenceUnitCount: evidenceUnitSummary.missingRequiredUnitIds.length,
+      unknownEvidenceUnitCount: evidenceUnitSummary.unknownUnitIds.length,
+      duplicateEvidenceUnitCount: evidenceUnitSummary.duplicateUnitCount,
+      evidenceUnitsComplete: false
+    },
+    evidenceUnitIds: evidenceUnitSummary.uniqueUnitIds,
+    requiredEvidenceUnitIds: evidenceUnitSummary.requiredUnitIds,
+    missingEvidenceUnitIds: evidenceUnitSummary.missingRequiredUnitIds,
+    unknownEvidenceUnitIds: evidenceUnitSummary.unknownUnitIds
+  };
+}
+
 function safeEvidenceNumber(value) {
   return Number.isFinite(value) && value >= 0 ? value : 0;
 }
@@ -1886,6 +1938,12 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       currentHeadBindingMatched: false,
       currentHeadCommit: '',
       expectedCurrentHeadCommit: '',
+      evidenceUnitCount: 0,
+      requiredEvidenceUnitCount: RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS.length,
+      missingEvidenceUnitCount: RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS.length,
+      unknownEvidenceUnitCount: 0,
+      duplicateEvidenceUnitCount: 0,
+      evidenceUnitsComplete: false,
       providerCalls: 0,
       mutated: false,
       noProvider: true,
@@ -1895,6 +1953,10 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
     },
     locallyEvidencedRuntimeGaps: [],
     remainingRuntimeGaps: [],
+    evidenceUnitIds: [],
+    requiredEvidenceUnitIds: [...RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS],
+    missingEvidenceUnitIds: [...RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS],
+    unknownEvidenceUnitIds: [],
     decisionImpact: 'none_report_only',
     canClaimRuntimeReady: false,
     canClaimFinalRcReady: false,
@@ -2011,6 +2073,31 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
   const currentHeadBindingStatus = currentHeadCommit && expectedCurrentHeadCommit
     ? 'matched'
     : (currentHeadCommit || expectedCurrentHeadCommit ? 'incomplete' : 'not_provided');
+  const evidenceUnitSummary = summarizeRuntimeEvidenceUnits(summary.evidenceUnitIds);
+
+  if (evidenceUnitSummary.duplicateUnitCount > 0) {
+    return buildRuntimeEvidenceUnitRejectedSummary(
+      empty,
+      evidenceUnitSummary,
+      'runtime_evidence_units_duplicate'
+    );
+  }
+
+  if (evidenceUnitSummary.unknownUnitIds.length > 0) {
+    return buildRuntimeEvidenceUnitRejectedSummary(
+      empty,
+      evidenceUnitSummary,
+      'runtime_evidence_units_unknown'
+    );
+  }
+
+  if (evidenceUnitSummary.missingRequiredUnitIds.length > 0) {
+    return buildRuntimeEvidenceUnitRejectedSummary(
+      empty,
+      evidenceUnitSummary,
+      'runtime_evidence_units_missing'
+    );
+  }
 
   return {
     ...empty,
@@ -2042,6 +2129,12 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       currentHeadBindingMatched: currentHeadBindingStatus === 'matched',
       currentHeadCommit,
       expectedCurrentHeadCommit,
+      evidenceUnitCount: evidenceUnitSummary.uniqueUnitIds.length,
+      requiredEvidenceUnitCount: evidenceUnitSummary.requiredUnitIds.length,
+      missingEvidenceUnitCount: evidenceUnitSummary.missingRequiredUnitIds.length,
+      unknownEvidenceUnitCount: evidenceUnitSummary.unknownUnitIds.length,
+      duplicateEvidenceUnitCount: evidenceUnitSummary.duplicateUnitCount,
+      evidenceUnitsComplete: evidenceUnitSummary.complete,
       providerCalls: 0,
       mutated: false,
       noProvider: true,
@@ -2050,7 +2143,11 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       noRemoteWrite: true
     },
     locallyEvidencedRuntimeGaps,
-    remainingRuntimeGaps
+    remainingRuntimeGaps,
+    evidenceUnitIds: evidenceUnitSummary.uniqueUnitIds,
+    requiredEvidenceUnitIds: evidenceUnitSummary.requiredUnitIds,
+    missingEvidenceUnitIds: evidenceUnitSummary.missingRequiredUnitIds,
+    unknownEvidenceUnitIds: evidenceUnitSummary.unknownUnitIds
   };
 }
 
@@ -2326,6 +2423,18 @@ function buildV1RcValidationAggregatorReport({
         runtimeEvidenceSummaryBridge.summary.currentHeadBindingStatus,
       runtimeEvidenceSummaryCurrentHeadBindingMatched:
         runtimeEvidenceSummaryBridge.summary.currentHeadBindingMatched,
+      runtimeEvidenceSummaryEvidenceUnitCount:
+        runtimeEvidenceSummaryBridge.summary.evidenceUnitCount,
+      runtimeEvidenceSummaryRequiredEvidenceUnitCount:
+        runtimeEvidenceSummaryBridge.summary.requiredEvidenceUnitCount,
+      runtimeEvidenceSummaryMissingEvidenceUnitCount:
+        runtimeEvidenceSummaryBridge.summary.missingEvidenceUnitCount,
+      runtimeEvidenceSummaryUnknownEvidenceUnitCount:
+        runtimeEvidenceSummaryBridge.summary.unknownEvidenceUnitCount,
+      runtimeEvidenceSummaryDuplicateEvidenceUnitCount:
+        runtimeEvidenceSummaryBridge.summary.duplicateEvidenceUnitCount,
+      runtimeEvidenceSummaryEvidenceUnitsComplete:
+        runtimeEvidenceSummaryBridge.summary.evidenceUnitsComplete,
       runtimeEvidenceSummaryCanClaimV1RcReady: false,
       validationAggregatorRuntimeProofCollectorImplemented:
         runtimeProofCollector.implemented,

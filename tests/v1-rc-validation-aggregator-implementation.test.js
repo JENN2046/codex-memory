@@ -2318,6 +2318,13 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
       decision: 'NOT_READY_BLOCKED',
       currentHeadCommit: 'abc1234def5678',
       expectedCurrentHeadCommit: 'abc1234def5678',
+      evidenceUnitIds: [
+        'A5-GAP-1',
+        'A5-GAP-2',
+        'A5-GAP-3',
+        'A5-GAP-4',
+        'A5-GAP-5'
+      ],
       runnerExecuted: true,
       commandsExecuted: true,
       localRuntimeEvidenceMatrixExecuted: true,
@@ -2390,6 +2397,21 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(bridge.summary.currentHeadBindingMatched, true);
   assert.equal(bridge.summary.currentHeadCommit, 'abc1234def5678');
   assert.equal(bridge.summary.expectedCurrentHeadCommit, 'abc1234def5678');
+  assert.equal(bridge.summary.evidenceUnitCount, 5);
+  assert.equal(bridge.summary.requiredEvidenceUnitCount, 5);
+  assert.equal(bridge.summary.missingEvidenceUnitCount, 0);
+  assert.equal(bridge.summary.unknownEvidenceUnitCount, 0);
+  assert.equal(bridge.summary.duplicateEvidenceUnitCount, 0);
+  assert.equal(bridge.summary.evidenceUnitsComplete, true);
+  assert.deepEqual(bridge.evidenceUnitIds, [
+    'A5-GAP-1',
+    'A5-GAP-2',
+    'A5-GAP-3',
+    'A5-GAP-4',
+    'A5-GAP-5'
+  ]);
+  assert.deepEqual(bridge.missingEvidenceUnitIds, []);
+  assert.deepEqual(bridge.unknownEvidenceUnitIds, []);
   assert.equal(bridge.summary.noProvider, true);
   assert.equal(bridge.summary.noDurableMemoryWrite, true);
   assert.equal(bridge.summary.noRealMemoryPreview, true);
@@ -2412,6 +2434,12 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(report.summary.runtimeEvidenceSummaryRemainingGapCount, 2);
   assert.equal(report.summary.runtimeEvidenceSummaryCurrentHeadBindingStatus, 'matched');
   assert.equal(report.summary.runtimeEvidenceSummaryCurrentHeadBindingMatched, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryEvidenceUnitCount, 5);
+  assert.equal(report.summary.runtimeEvidenceSummaryRequiredEvidenceUnitCount, 5);
+  assert.equal(report.summary.runtimeEvidenceSummaryMissingEvidenceUnitCount, 0);
+  assert.equal(report.summary.runtimeEvidenceSummaryUnknownEvidenceUnitCount, 0);
+  assert.equal(report.summary.runtimeEvidenceSummaryDuplicateEvidenceUnitCount, 0);
+  assert.equal(report.summary.runtimeEvidenceSummaryEvidenceUnitsComplete, true);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound, true);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryRemainingGapCount, 2);
   assert.equal(
@@ -2626,6 +2654,87 @@ test('validation aggregator runtime evidence summary fails closed on current-hea
   assertNoSensitiveSurface(malformed);
 });
 
+test('validation aggregator runtime evidence summary fails closed on evidence unit drift', () => {
+  const baseSummary = {
+    status: 'local_runtime_evidence_passed_rc_still_blocked',
+    decision: 'NOT_READY_BLOCKED',
+    currentHeadCommit: 'abc1234',
+    expectedCurrentHeadCommit: 'abc1234',
+    locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+    remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
+    safety: {
+      mutated: false,
+      providerCalls: 0,
+      serviceStarted: false,
+      writesDurableMemory: false,
+      realMemoryPreview: false,
+      remoteWrites: false,
+      configChanged: false,
+      migrationApplied: false,
+      importExportApplied: false
+    }
+  };
+  const missing = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-4', 'A5-GAP-5']
+    }
+  });
+  const unknown = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5', 'A5-GAP-99']
+    }
+  });
+  const duplicate = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5']
+    }
+  });
+
+  assert.equal(missing.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(missing.summary.runtimeEvidenceSummaryRejected, true);
+  assert.equal(
+    missing.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'runtime_evidence_units_missing'
+  );
+  assert.equal(missing.summary.runtimeEvidenceSummaryEvidenceUnitsComplete, false);
+  assert.equal(missing.summary.runtimeEvidenceSummaryEvidenceUnitCount, 4);
+  assert.equal(missing.summary.runtimeEvidenceSummaryMissingEvidenceUnitCount, 1);
+  assert.deepEqual(
+    missing.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.missingEvidenceUnitIds,
+    ['A5-GAP-3']
+  );
+
+  assert.equal(unknown.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(unknown.summary.runtimeEvidenceSummaryRejected, true);
+  assert.equal(
+    unknown.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'runtime_evidence_units_unknown'
+  );
+  assert.equal(unknown.summary.runtimeEvidenceSummaryUnknownEvidenceUnitCount, 1);
+  assert.deepEqual(
+    unknown.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.unknownEvidenceUnitIds,
+    ['A5-GAP-99']
+  );
+
+  assert.equal(duplicate.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(duplicate.summary.runtimeEvidenceSummaryRejected, true);
+  assert.equal(
+    duplicate.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'runtime_evidence_units_duplicate'
+  );
+  assert.equal(duplicate.summary.runtimeEvidenceSummaryDuplicateEvidenceUnitCount, 1);
+
+  assert.equal(missing.summary.runtimeReady, false);
+  assert.equal(unknown.summary.finalRcMatrixReady, false);
+  assert.equal(duplicate.summary.rcReady, false);
+  assertNoSensitiveSurface(missing);
+  assertNoSensitiveSurface(unknown);
+  assertNoSensitiveSurface(duplicate);
+});
+
 test('validation aggregator runtime evidence summary rejects readiness claims, side effects, and secrets', () => {
   const readinessClaim = buildV1RcValidationAggregatorReport({
     runtimeEvidenceSummary: {
@@ -2684,6 +2793,13 @@ test('effective gap accounting fails closed on non-baseline remaining gaps', () 
       finalRcMatrixReady: false,
       v1RcReady: false,
       rcReady: false,
+      evidenceUnitIds: [
+        'A5-GAP-1',
+        'A5-GAP-2',
+        'A5-GAP-3',
+        'A5-GAP-4',
+        'A5-GAP-5'
+      ],
       locallyEvidencedRuntimeGaps: [
         'runtime_schema_version_enforcement_not_fully_proven'
       ],
