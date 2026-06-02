@@ -764,6 +764,26 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveLocallyEvidencedFullImplementationGapIds,
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.locallyEvidencedRuntimeGaps
   );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutAuditCount,
+    1
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutAcceptedCount,
+    0
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutNotProvenCount,
+    1
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.localProofChainCloseoutNotProvenIds,
+    ['validation_aggregator_full_implementation_incomplete']
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.localProofChainCloseoutCanClaimReadiness,
+    false
+  );
   assert.deepEqual(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.staticBaselineClearedGapIds,
     []
@@ -2777,6 +2797,12 @@ test('zero-gap runtime evidence summary can route to RC-9 but cannot authorize R
   assert.equal(definition.closureAuditRequiresA5EvidenceCount, 0);
   assert.equal(definition.closureAuditRequiresRedLaneAuthorizationCount, 0);
   assert.equal(definition.closureAuditCanClaimReadiness, false);
+  assert.deepEqual(definition.localProofChainCloseoutAcceptedIds, [
+    'validation_aggregator_full_implementation_incomplete'
+  ]);
+  assert.equal(definition.localProofChainCloseoutAcceptedCount, 1);
+  assert.deepEqual(definition.localProofChainCloseoutNotProvenIds, []);
+  assert.equal(definition.localProofChainCloseoutCanClaimReadiness, false);
   assert.equal(
     definition.closureMissingCriteria.includes('effective_remaining_gaps_cleared'),
     false
@@ -2803,6 +2829,79 @@ test('zero-gap runtime evidence summary can route to RC-9 but cannot authorize R
   assert.equal(report.summary.finalRcMatrixReady, false);
   assert.equal(report.summary.rcReady, false);
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assertNoSensitiveSurface(report);
+});
+
+test('zero-gap closeout fails closed when local proof-chain gap is omitted without local evidence', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'abc1234def5678',
+      expectedCurrentHeadCommit: 'abc1234def5678',
+      evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
+      evidenceUnitIds: [
+        'A5-GAP-1',
+        'A5-GAP-2',
+        'A5-GAP-3',
+        'A5-GAP-4',
+        'A5-GAP-5'
+      ],
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      criticalGates: {
+        total: 12,
+        passed: 12,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
+      locallyEvidencedRuntimeGaps: [
+        'governance_review_approval_audit_runtime_loop_not_executed',
+        'recall_isolation_runtime_proof_not_executed',
+        'migration_import_export_backup_restore_approval_execution_blocked',
+        'live_http_operation_readiness_not_claimed',
+        'mainline_strict_gate_not_executed_for_cutover',
+        'rc_cutover_not_executed'
+      ],
+      remainingRuntimeGaps: [],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        readsRealMemory: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
+  const definition = report.evidence.p66ValidationAggregatorFullImplementationDefinition;
+
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, true);
+  assert.deepEqual(definition.acceptedRuntimeSummaryRemainingGapIds, []);
+  assert.deepEqual(definition.localProofChainCloseoutAcceptedIds, []);
+  assert.deepEqual(definition.localProofChainCloseoutNotProvenIds, [
+    'validation_aggregator_full_implementation_incomplete'
+  ]);
+  assert.deepEqual(definition.effectiveRemainingFullImplementationGapIds, [
+    'validation_aggregator_full_implementation_incomplete'
+  ]);
+  assert.equal(definition.acceptedRuntimeSummaryZeroGap, false);
+  assert.equal(definition.readyToRequestRcCutoverApproval, false);
+  assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, false);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapCount, 1);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapAuthorities[0].id, 'validation_aggregator_full_implementation_incomplete');
+  assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
   assertNoSensitiveSurface(report);
 });
 

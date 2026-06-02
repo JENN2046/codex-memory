@@ -444,12 +444,45 @@ function buildP66FullImplementationGapAccounting({
   const acceptedRuntimeSummaryLocallyEvidencedGapIds = acceptedRuntimeSummary
     ? acceptedRuntimeSummary.locallyEvidencedRuntimeGaps
     : [];
-  const effectiveRemainingFullImplementationGapIds = acceptedRuntimeSummary
-    ? acceptedRuntimeSummaryRemainingGapIds
-    : P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS;
+  const acceptedRuntimeSummaryBound = Boolean(acceptedRuntimeSummary);
   const effectiveLocallyEvidencedFullImplementationGapIds = acceptedRuntimeSummary
     ? acceptedRuntimeSummaryLocallyEvidencedGapIds
     : P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS;
+  const candidateEffectiveRemainingFullImplementationGapIds = acceptedRuntimeSummary
+    ? acceptedRuntimeSummaryRemainingGapIds
+    : P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS;
+  const localProofChainCloseoutAudit = P66_FULL_IMPLEMENTATION_LOCAL_PROOF_CHAIN_COMPLETE_GAPS.map(id => {
+    const includedInStaticBaseline = P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS.includes(id);
+    const locallyEvidenced = effectiveLocallyEvidencedFullImplementationGapIds.includes(id);
+    const omittedFromAcceptedRuntimeRemaining =
+      acceptedRuntimeSummaryBound &&
+      !acceptedRuntimeSummaryRemainingGapIds.includes(id);
+    const closeoutAccepted =
+      includedInStaticBaseline &&
+      locallyEvidenced &&
+      omittedFromAcceptedRuntimeRemaining;
+
+    return {
+      id,
+      includedInStaticBaseline,
+      locallyEvidenced,
+      omittedFromAcceptedRuntimeRemaining,
+      closeoutAccepted,
+      closeoutStatus: closeoutAccepted
+        ? 'local_proof_chain_closeout_accepted'
+        : 'local_proof_chain_closeout_not_proven',
+      mustRemainWhenNotProven: true,
+      canClaimReadiness: false
+    };
+  });
+  const localProofChainCloseoutNotProvenIds = localProofChainCloseoutAudit
+    .filter(item => item.closeoutAccepted !== true)
+    .map(item => item.id);
+  const effectiveRemainingFullImplementationGapIds = [
+    ...candidateEffectiveRemainingFullImplementationGapIds,
+    ...localProofChainCloseoutNotProvenIds
+      .filter(id => !candidateEffectiveRemainingFullImplementationGapIds.includes(id))
+  ];
   const staticBaselineClearedGapIds = P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS
     .filter(id => !effectiveRemainingFullImplementationGapIds.includes(id));
   const staticBaselineStillRemainingGapIds = P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS
@@ -502,7 +535,6 @@ function buildP66FullImplementationGapAccounting({
   const a5GatedBlockerIds = safeBlockers
     .filter(blocker => blocker.requiresA5 === true)
     .map(blocker => blocker.id);
-  const acceptedRuntimeSummaryBound = Boolean(acceptedRuntimeSummary);
   const validationEvidenceExplicitEvidenceUsable = validationEvidenceGateReadiness
     ? validationEvidenceGateReadiness.explicitEvidenceUsable === true
     : false;
@@ -606,6 +638,17 @@ function buildP66FullImplementationGapAccounting({
     effectiveLocallyEvidencedFullImplementationGapIds,
     effectiveLocallyEvidencedFullImplementationGapCount:
       effectiveLocallyEvidencedFullImplementationGapIds.length,
+    localProofChainCloseoutAudit,
+    localProofChainCloseoutAuditCount: localProofChainCloseoutAudit.length,
+    localProofChainCloseoutAcceptedIds: localProofChainCloseoutAudit
+      .filter(item => item.closeoutAccepted === true)
+      .map(item => item.id),
+    localProofChainCloseoutAcceptedCount: localProofChainCloseoutAudit
+      .filter(item => item.closeoutAccepted === true).length,
+    localProofChainCloseoutNotProvenIds,
+    localProofChainCloseoutNotProvenCount:
+      localProofChainCloseoutNotProvenIds.length,
+    localProofChainCloseoutCanClaimReadiness: false,
     staticBaselineClearedGapIds,
     staticBaselineClearedGapCount: staticBaselineClearedGapIds.length,
     staticBaselineStillRemainingGapIds,
@@ -2823,6 +2866,14 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.effectiveRemainingFullImplementationGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocallyEvidencedGapCount:
         p66FullImplementationGapAccounting.effectiveLocallyEvidencedFullImplementationGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutAuditCount:
+        p66FullImplementationGapAccounting.localProofChainCloseoutAuditCount,
+      p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutAcceptedCount:
+        p66FullImplementationGapAccounting.localProofChainCloseoutAcceptedCount,
+      p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutNotProvenCount:
+        p66FullImplementationGapAccounting.localProofChainCloseoutNotProvenCount,
+      p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutCanClaimReadiness:
+        false,
       p66ValidationAggregatorFullImplementationGapAccountingStaticBaselineClearedGapCount:
         p66FullImplementationGapAccounting.staticBaselineClearedGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingStaticBaselineStillRemainingGapCount:
@@ -3868,6 +3919,20 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.effectiveLocallyEvidencedFullImplementationGapIds,
         effectiveLocallyEvidencedFullImplementationGapCount:
           p66FullImplementationGapAccounting.effectiveLocallyEvidencedFullImplementationGapCount,
+        localProofChainCloseoutAudit:
+          p66FullImplementationGapAccounting.localProofChainCloseoutAudit,
+        localProofChainCloseoutAuditCount:
+          p66FullImplementationGapAccounting.localProofChainCloseoutAuditCount,
+        localProofChainCloseoutAcceptedIds:
+          p66FullImplementationGapAccounting.localProofChainCloseoutAcceptedIds,
+        localProofChainCloseoutAcceptedCount:
+          p66FullImplementationGapAccounting.localProofChainCloseoutAcceptedCount,
+        localProofChainCloseoutNotProvenIds:
+          p66FullImplementationGapAccounting.localProofChainCloseoutNotProvenIds,
+        localProofChainCloseoutNotProvenCount:
+          p66FullImplementationGapAccounting.localProofChainCloseoutNotProvenCount,
+        localProofChainCloseoutCanClaimReadiness:
+          p66FullImplementationGapAccounting.localProofChainCloseoutCanClaimReadiness,
         staticBaselineClearedGapIds:
           p66FullImplementationGapAccounting.staticBaselineClearedGapIds,
         staticBaselineClearedGapCount:

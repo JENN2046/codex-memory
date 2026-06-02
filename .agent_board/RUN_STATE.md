@@ -77,7 +77,9 @@ Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGRE
 
 Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_RC9_GAP_AUTHORITY_SLICE.md` records RC-9 decision packet remaining-gap authority support. The packet now carries closure status and next authority per remaining gap, while keeping cutover approval, cutover execution, and readiness false. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
 
-Next safe action is to validate and commit the RC-9 gap authority slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_ZERO_GAP_CLOSEOUT_AUDIT_SLICE.md` records fail-closed local proof-chain closeout auditing before aggregator zero-gap routing. A runtime summary cannot remove `validation_aggregator_full_implementation_incomplete` unless it also locally evidences that gap. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
+
+Next safe action is to validate and commit the zero-gap closeout audit slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
