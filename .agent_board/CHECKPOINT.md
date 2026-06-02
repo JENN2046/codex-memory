@@ -4,8 +4,8 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1400 Phase H client-scope private read consistency source/test`.
-Current validation: `CMV-1518`.
+Current checkpoint: `CM-1401 RC-10 A5-GAP-7 push-only no-op receipt and current facts repair`.
+Current validation: `CMV-1519`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; older checkpoint entries below are historical.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->

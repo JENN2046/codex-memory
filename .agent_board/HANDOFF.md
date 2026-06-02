@@ -4,9 +4,9 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1400 Phase H client-scope private read consistency source/test`.
-Current validation: `CMV-1518`.
-Current handoff: CM-1400 adds explicit-input/no-apply client-scope private read consistency source/test coverage; active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
+Current task: `CM-1401 RC-10 A5-GAP-7 push-only no-op receipt and current facts repair`.
+Current validation: `CMV-1519`.
+Current handoff: CM-1401 records the exact-approved A5-GAP-7 push-only action as `Everything up-to-date`, repairs current facts to the pushed head, and keeps `RC_NOT_READY_BLOCKED`; active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

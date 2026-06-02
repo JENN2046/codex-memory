@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1400",
-  "validationId": "CMV-1518",
+  "taskId": "CM-1401",
+  "validationId": "CMV-1519",
   "branch": "main",
-  "localHead": "e626edafdf1a41f2d525c945e8b9847fab13131a",
-  "originHead": "e626edafdf1a41f2d525c945e8b9847fab13131a",
+  "localHead": "66ad8a4facb21ea3b887e5a21ac0a577b4937b9e",
+  "originHead": "66ad8a4facb21ea3b887e5a21ac0a577b4937b9e",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -25,15 +25,23 @@
   },
   "validationSummary": [
     {
-      "id": "CMV-1518",
-      "scope": "CM-1400 Phase H client-scope private read consistency source/test",
-      "status": "COMPLETED_VALIDATED"
+      "id": "CMV-1519",
+      "scope": "CM-1401 RC-10 A5-GAP-7 push-only no-op receipt and current facts repair",
+      "status": "COMPLETED_VALIDATED_NOOP_PUSH"
+    },
+    {
+      "id": "RCV-10-TEST",
+      "scope": "current-head npm test",
+      "status": "PASSED_2936_OF_2936"
+    },
+    {
+      "id": "RCV-10-STRICT-GATE",
+      "scope": "current-head cutover-context strict mainline gate",
+      "status": "PASSED_HEALTH_CONTRACT_TEST_COMPARE_ROLLBACK"
     }
   ],
   "notValidated": [
-    "npm test",
     "npm run gate:mainline",
-    "npm run gate:mainline:strict",
     "provider smoke or benchmark",
     "real memory tools"
   ],

@@ -4,10 +4,10 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1400 Phase H client-scope private read consistency source/test`.
-Current validation: `CMV-1518`.
+Current task: `CM-1401 RC-10 A5-GAP-7 push-only no-op receipt and current facts repair`.
+Current validation: `CMV-1519`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase G runtime boundary plan closed locally -> Phase H client-scope private read consistency -> no readiness claim`.
+Current route: `RC route A5-GAP-7 push-only action completed as no-op -> no readiness claim`.
 Current rule: active status summaries must reference `.agent_board/CURRENT_FACTS.json` and must not repeat full commit hashes.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
