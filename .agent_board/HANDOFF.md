@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1374 PHASE_F1_RUNTIME_FRESHNESS_DIAGNOSTIC`.
+Goal: `CM-1375 PHASE_F1_RUNTIME_REFRESH_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local read-only Phase F1 runtime freshness diagnostic. CM-1374 adds `phase-f1-runtime-freshness`, which compares current HEAD commit time with the 7605 listener process start time. Current diagnostic identifies `runtime_process_started_before_head`, so the CM-1373 live no-token contract failure is routed to runtime freshness/alignment instead of source contract absence. No service restart, process kill, config/watchdog/startup change, token read, MCP/provider call, real memory read/write, durable write, readiness claim, or reliability claim occurred. Runtime refresh requires separate exact approval. F1 remains blocked. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for exact-approved local Phase F1 runtime refresh on `main@30a77afe092493e4891e945531c5526dfd261164`. The old 7605 listener matched `A:\codex-memory\scripts\serve-codex-memory-http.js`, was stopped, and the existing ensure script started PID `86084`. `/health` returned ok and `phase-f1-runtime-freshness` returned accepted with no fail-closed reasons before this evidence record was committed. No F1 harness rerun, MCP `tools/call`, provider call, real memory read/write, durable write, config/watchdog/startup modification, remote action, readiness claim, or reliability claim occurred. F1 remains blocked until current HEAD is synced, runtime freshness is accepted for that HEAD, exact A5-GAP-4 live-client no-write approval is provided, and evidence is accepted. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

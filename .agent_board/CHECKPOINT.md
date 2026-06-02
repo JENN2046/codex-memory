@@ -1,5 +1,28 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1375 Phase F1 Runtime Refresh Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: exact-approved local runtime refresh plus local evidence recording. No F1 harness rerun, MCP `tools/call`, provider call, real memory read/write, durable memory/audit write, config/watchdog/startup modification, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Confirmed old 7605 listener command line matched `A:\codex-memory\scripts\serve-codex-memory-http.js`.
+- Stopped the stale listener.
+- Ran existing local ensure script.
+- New listener PID: `86084`.
+- `/health` returned ok with auth required and no session hardening warnings.
+- `phase-f1-runtime-freshness` returned accepted with no fail-closed reasons.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Sync the evidence commit if needed.
+- Request exact A5-GAP-4 live-client no-write approval before rerunning F1.
+
 ## CM-1374 Phase F1 Runtime Freshness Diagnostic Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
