@@ -10,6 +10,168 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC-1 Current HEAD Local Baseline
+
+Status: `CURRENT_HEAD_LOCAL_BASELINE_PASSED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Target:
+
+```text
+branch = main
+HEAD = origin/main = 80af0b1f5a25c0b67f8e89c928cea61e053aca11
+```
+
+Validation:
+
+```text
+npm test
+npm run gate:mainline
+```
+
+Result:
+
+- `npm test` passed `2936/2936`.
+- `npm run gate:mainline` passed health, compare, and rollback.
+- Compare matched `43/43`.
+- Rollback ready `43/43`.
+
+Boundary:
+
+- This is a current-head local baseline only.
+- It is not RC readiness, release readiness, cutover readiness, production readiness, or `RC_READY`.
+- No tag, release, deploy, config/watchdog/startup change, provider call, MCP tool call, real memory scan, durable write, migration/import/export/backup/restore apply, public MCP expansion, or readiness claim occurred.
+
+## RC-2 A5-GAP-5 Cutover-Context Strict Gate
+
+Status: `TARGET_BOUND_STRICT_GATE_PASSED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Target:
+
+```text
+branch = main
+HEAD = origin/main = 80af0b1f5a25c0b67f8e89c928cea61e053aca11
+```
+
+Approval:
+
+```text
+A5-GAP-5 approval_line_exact_match
+```
+
+Validation:
+
+```text
+npm run gate:mainline:strict
+```
+
+Result:
+
+- strict gate status `ok`.
+- health `ok`.
+- contract passed `31/31`.
+- test passed `2936/2936`.
+- compare matched `43/43`.
+- rollback ready `43/43`.
+
+Boundary:
+
+- This is target-bound cutover-context strict gate evidence only.
+- It is not RC readiness, release readiness, cutover readiness, production readiness, or `RC_READY`.
+- No remote write, tag, release, deploy, config/watchdog/startup change, provider call, MCP tool call, real memory scan, durable write, migration/import/export/backup/restore apply, public MCP expansion, or readiness claim occurred.
+
+## RC-3 Runtime Freshness Preflight
+
+Status: `RUNTIME_FRESHNESS_REJECTED_FAIL_CLOSED`
+
+Date: 2026-06-03
+
+Target:
+
+```text
+branch = main
+HEAD = origin/main = 80af0b1f5a25c0b67f8e89c928cea61e053aca11
+endpoint = http://127.0.0.1:7605
+```
+
+Command:
+
+```text
+node .\src\cli\phase-f1-runtime-freshness.js --branch main --remote-ref origin/main --port 7605 --json --pretty
+```
+
+Result:
+
+- status `PHASE_F1_RUNTIME_FRESHNESS_REJECTED_FAIL_CLOSED`.
+- `runtimeFresh=false`.
+- listener process id `36820`.
+- listener command line matched `A:\codex-memory\scripts\serve-codex-memory-http.js`.
+- fail-closed reasons:
+  - `dirty_worktree`
+  - `runtime_process_started_before_runtime_affecting_commit`
+
+Next required action:
+
+```text
+obtain_exact_runtime_refresh_approval_then_restart_or_refresh_service
+```
+
+Boundary:
+
+- No service restart or refresh was executed.
+- No A5-GAP-4 live no-write evidence was executed or prepared as approved.
+- No token read/print/persist, MCP tool call, provider call, real memory read/write, durable memory/audit write, config/watchdog/startup change, remote action, or readiness claim occurred.
+
+## RC-3 Runtime Refresh
+
+Status: `RUNTIME_REFRESH_COMPLETED_FRESHNESS_STILL_DIRTY_WORKTREE_BLOCKED`
+
+Date: 2026-06-03
+
+Approved boundary:
+
+```text
+stop/restart only the existing local node process serving A:\codex-memory\scripts\serve-codex-memory-http.js or run the existing local ensure script if needed
+```
+
+Pre-refresh listener:
+
+```text
+pid = 36820
+commandLine = "C:\Program Files\nodejs\node.exe" A:\codex-memory\scripts\serve-codex-memory-http.js
+```
+
+Action:
+
+```text
+Stop-Process -Id 36820
+npm run start:http:ensure
+```
+
+Result:
+
+- existing matching listener was stopped.
+- ensure script started `pid=15608`.
+- `/health` returned `ok=true`, service `vcp_codex_memory`, auth required, and no session hardening warnings.
+- `writeReconcileWorker.available=true` and `running=false`.
+
+Post-refresh freshness:
+
+- status `PHASE_F1_RUNTIME_FRESHNESS_REJECTED_FAIL_CLOSED`.
+- `runtimeFresh=false`.
+- stale-runtime reason cleared.
+- remaining fail-closed reason:
+  - `dirty_worktree`
+
+Boundary:
+
+- No config/watchdog/startup install or modification occurred.
+- No provider call, MCP tools/call, token read/print/persist, real memory read/write, durable memory/audit write, remote action, or readiness claim occurred.
+- A5-GAP-4 live no-write evidence remains blocked until the worktree is clean and runtime freshness is accepted.
+
 ## RC ValidationAggregator RC-9 Closure Missing Criteria Packet Slice
 
 Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
