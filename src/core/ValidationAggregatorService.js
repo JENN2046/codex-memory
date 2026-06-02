@@ -4761,6 +4761,62 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
   };
 }
 
+function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}) {
+  const packet = buildRc9DecisionPacketFromAggregatorReport(report);
+  const generatedAt = safeEvidenceString(options.generatedAt || new Date().toISOString(), 'unknown');
+  const remainingGapLines = packet.remainingGapIds.length > 0
+    ? packet.remainingGapIds.map(gapId => `- ${safeEvidenceString(gapId, 'unknown_gap')}`)
+    : ['- none'];
+  const notExecutedLines = packet.notExecuted.map(action => `- ${safeEvidenceString(action, 'unknown_action')}`);
+  const rollbackLines = packet.rollbackPath.map(action => `- ${safeEvidenceString(action, 'unknown_rollback_action')}`);
+  const markdown = [
+    '# RC-9 RC Decision Packet',
+    '',
+    `Generated: ${generatedAt}`,
+    '',
+    `Decision: ${packet.decision}`,
+    `Status: ${packet.status}`,
+    '',
+    '## Route',
+    '',
+    `ready_to_request_rc_cutover_approval = ${packet.readyToRequestRcCutoverApproval}`,
+    `rc_ready = ${packet.rcReady}`,
+    `rc_cutover_approved = ${packet.rcCutoverApproved}`,
+    `rc_cutover_execution_allowed = ${packet.rcCutoverExecutionAllowed}`,
+    '',
+    '## Remaining Gaps',
+    '',
+    `remaining_gap_count = ${packet.remainingGapCount}`,
+    ...remainingGapLines,
+    '',
+    '## Not Executed',
+    '',
+    ...notExecutedLines,
+    '',
+    '## Rollback Path',
+    '',
+    ...rollbackLines,
+    '',
+    '## Boundary',
+    '',
+    '- decision packet only',
+    '- no release tag deploy push',
+    '- no config watchdog startup change',
+    '- no durable memory or audit write',
+    '- no MCP tool call',
+    '- no provider call',
+    '- no RC cutover',
+    '- no readiness claim'
+  ].join('\n');
+
+  return {
+    ...packet,
+    generatedAt,
+    format: 'markdown',
+    markdown
+  };
+}
+
 module.exports = {
   DECISION_LABELS,
   VALIDATION_EVIDENCE_COMMAND_COVERAGE_STATUSES,
@@ -4774,6 +4830,7 @@ module.exports = {
   VALIDATION_EVIDENCE_STATUSES,
   RUNTIME_EVIDENCE_SUMMARY_STATUSES,
   buildRc9DecisionPacketFromAggregatorReport,
+  renderRc9DecisionPacketFromAggregatorReport,
   buildV1RcValidationAggregatorReport,
   normalizeRuntimeEvidenceSummary,
   normalizeValidationEvidenceSources,

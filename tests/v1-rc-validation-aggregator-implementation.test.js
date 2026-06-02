@@ -16,7 +16,8 @@ const {
   RUNTIME_EVIDENCE_SUMMARY_STATUSES,
   buildRc9DecisionPacketFromAggregatorReport,
   buildV1RcValidationAggregatorReport,
-  normalizeValidationEvidenceSources
+  normalizeValidationEvidenceSources,
+  renderRc9DecisionPacketFromAggregatorReport
 } = require('../src/core/ValidationAggregatorService');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'v1-rc-validation-aggregator-v1.json');
@@ -2856,6 +2857,107 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
   assert.equal(invalidPacket.readyToRequestRcCutoverApproval, false);
   assert.equal(invalidPacket.rcReady, false);
   assertNoSensitiveSurface({ ...zeroGapReport, rc9DecisionPacket: zeroGapPacket });
+});
+
+test('RC-9 decision packet render keeps zero-gap reports blocked before cutover approval', () => {
+  const baseRuntimeEvidenceSummary = {
+    status: 'local_runtime_evidence_passed_rc_still_blocked',
+    decision: 'NOT_READY_BLOCKED',
+    currentHeadCommit: 'abc1234def5678',
+    expectedCurrentHeadCommit: 'abc1234def5678',
+    evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
+    evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
+    runnerExecuted: true,
+    commandsExecuted: true,
+    localRuntimeEvidenceMatrixExecuted: true,
+    allowlistedFinalRcEvidenceRunnerExecuted: true,
+    runtimeReady: false,
+    finalRcMatrixReady: false,
+    v1RcReady: false,
+    rcReady: false,
+    criticalGates: {
+      total: 12,
+      passed: 12,
+      failed: 0,
+      allCriticalCommandsPassed: true
+    },
+    locallyEvidencedRuntimeGaps: [
+      'validation_aggregator_full_implementation_incomplete',
+      'governance_review_approval_audit_runtime_loop_not_executed',
+      'recall_isolation_runtime_proof_not_executed',
+      'migration_import_export_backup_restore_approval_execution_blocked',
+      'live_http_operation_readiness_not_claimed',
+      'mainline_strict_gate_not_executed_for_cutover',
+      'rc_cutover_not_executed'
+    ],
+    safety: {
+      mutated: false,
+      providerCalls: 0,
+      serviceStarted: false,
+      readsRealMemory: false,
+      writesDurableMemory: false,
+      realMemoryPreview: false,
+      remoteWrites: false,
+      configChanged: false,
+      migrationApplied: false,
+      importExportApplied: false
+    }
+  };
+  const nonzeroGapReport = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseRuntimeEvidenceSummary,
+      locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+      remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete']
+    }
+  });
+  const zeroGapReport = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseRuntimeEvidenceSummary,
+      remainingRuntimeGaps: []
+    }
+  });
+
+  const nonzeroRender = renderRc9DecisionPacketFromAggregatorReport(nonzeroGapReport, {
+    generatedAt: '2026-05-18T02:05:00.000Z'
+  });
+  const zeroGapRender = renderRc9DecisionPacketFromAggregatorReport(zeroGapReport, {
+    generatedAt: '2026-05-18T02:05:00.000Z'
+  });
+  const invalidRender = renderRc9DecisionPacketFromAggregatorReport(null, {
+    generatedAt: '2026-05-18T02:05:00.000Z'
+  });
+
+  assert.equal(nonzeroRender.format, 'markdown');
+  assert.equal(nonzeroRender.decision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(nonzeroRender.readyToRequestRcCutoverApproval, false);
+  assert.equal(nonzeroRender.markdown.includes('Decision: RC_NOT_READY_BLOCKED'), true);
+  assert.equal(nonzeroRender.markdown.includes('ready_to_request_rc_cutover_approval = false'), true);
+  assert.equal(nonzeroRender.markdown.includes('- validation_aggregator_full_implementation_incomplete'), true);
+
+  assert.equal(zeroGapRender.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
+  assert.equal(zeroGapRender.readyToRequestRcCutoverApproval, true);
+  assert.equal(zeroGapRender.rcReady, false);
+  assert.equal(zeroGapRender.rcCutoverApproved, false);
+  assert.equal(zeroGapRender.rcCutoverExecutionAllowed, false);
+  assert.equal(zeroGapRender.markdown.includes('ready_to_request_rc_cutover_approval = true'), true);
+  assert.equal(zeroGapRender.markdown.includes('rc_ready = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('rc_cutover_approved = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('rc_cutover_execution_allowed = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('- rc_cutover'), true);
+  assert.equal(zeroGapRender.markdown.includes('- tag_creation'), true);
+  assert.equal(zeroGapRender.markdown.includes('- release_creation'), true);
+  assert.equal(zeroGapRender.markdown.includes('- deploy'), true);
+  assert.equal(zeroGapRender.markdown.includes('- no RC cutover'), true);
+  assert.equal(zeroGapRender.markdown.includes('- no readiness claim'), true);
+  assert.equal(zeroGapRender.markdown.includes('RC_READY'), false);
+
+  assert.equal(invalidRender.status, 'rc_not_ready_blocked');
+  assert.equal(invalidRender.readyToRequestRcCutoverApproval, false);
+  assert.equal(invalidRender.markdown.includes('ready_to_request_rc_cutover_approval = false'), true);
+  assert.equal(invalidRender.markdown.includes('rc_ready = false'), true);
+  assertNoSensitiveSurface({ ...zeroGapReport, rc9DecisionPacketRender: zeroGapRender });
 });
 
 test('validation aggregator runtime evidence summary fails closed on current-head binding mismatch', () => {
