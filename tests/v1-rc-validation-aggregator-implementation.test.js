@@ -3126,6 +3126,29 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
   assert.equal(zeroGapPacket.remainingGapCount, 0);
   assert.equal(zeroGapPacket.remainingGapAuthorityCount, 0);
   assert.equal(zeroGapPacket.remainingGapAuthorityCanClaimReadiness, false);
+  assert.equal(
+    zeroGapPacket.completenessChecklistStatus,
+    'complete_for_cutover_approval_request_not_rc_ready'
+  );
+  assert.equal(zeroGapPacket.completenessChecklistRequiredCount, 9);
+  assert.equal(zeroGapPacket.completenessChecklistAcceptedCount, 9);
+  assert.equal(zeroGapPacket.completenessChecklistMissingCount, 0);
+  assert.deepEqual(zeroGapPacket.completenessChecklistMissingIds, []);
+  assert.equal(zeroGapPacket.completenessChecklistCanClaimRcReady, false);
+  assert.deepEqual(
+    zeroGapPacket.completenessChecklist.map(item => [item.id, item.status, item.blocking]),
+    [
+      ['fresh_current_head', 'accepted', false],
+      ['strict_gate', 'accepted', false],
+      ['live_http_no_write', 'accepted', false],
+      ['governance_runtime', 'accepted', false],
+      ['recall_isolation', 'accepted', false],
+      ['migration_dry_run', 'accepted', false],
+      ['validation_aggregator_zero_gap', 'accepted', false],
+      ['not_executed_boundary', 'accepted', false],
+      ['rollback_path', 'accepted', false]
+    ]
+  );
   assert.equal(zeroGapPacket.rcCutoverApprovalRequired, true);
   assert.equal(zeroGapPacket.rcCutoverApprovalPresent, false);
   assert.equal(zeroGapPacket.rcCutoverApproved, false);
@@ -3180,6 +3203,22 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
 
   assert.equal(invalidPacket.status, 'rc_not_ready_blocked');
   assert.equal(invalidPacket.readyToRequestRcCutoverApproval, false);
+  assert.equal(
+    invalidPacket.completenessChecklistStatus,
+    'incomplete_missing_required_evidence'
+  );
+  assert.equal(invalidPacket.completenessChecklistRequiredCount, 9);
+  assert.equal(invalidPacket.completenessChecklistAcceptedCount, 2);
+  assert.equal(invalidPacket.completenessChecklistMissingCount, 7);
+  assert.deepEqual(invalidPacket.completenessChecklistMissingIds, [
+    'fresh_current_head',
+    'strict_gate',
+    'live_http_no_write',
+    'governance_runtime',
+    'recall_isolation',
+    'migration_dry_run',
+    'validation_aggregator_zero_gap'
+  ]);
   assert.equal(
     invalidPacket.cutoverApprovalBoundaryAuditStatus,
     'not_ready_for_cutover_approval_request'
@@ -3288,6 +3327,19 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
     zeroGapRender.markdown.includes('cutover_approval_boundary_can_claim_rc_ready = false'),
     true
   );
+  assert.equal(
+    zeroGapRender.markdown.includes('completeness_checklist_status = complete_for_cutover_approval_request_not_rc_ready'),
+    true
+  );
+  assert.equal(zeroGapRender.markdown.includes('completeness_checklist_missing_count = 0'), true);
+  assert.equal(zeroGapRender.markdown.includes('## Completeness Checklist'), true);
+  assert.equal(zeroGapRender.markdown.includes('- fresh_current_head | status=accepted | blocking=false | source=runtime_evidence_summary.currentHeadCommit'), true);
+  assert.equal(zeroGapRender.markdown.includes('- strict_gate | status=accepted | blocking=false | source=A5-GAP-5'), true);
+  assert.equal(zeroGapRender.markdown.includes('- live_http_no_write | status=accepted | blocking=false | source=A5-GAP-4'), true);
+  assert.equal(zeroGapRender.markdown.includes('- governance_runtime | status=accepted | blocking=false | source=A5-GAP-1'), true);
+  assert.equal(zeroGapRender.markdown.includes('- recall_isolation | status=accepted | blocking=false | source=A5-GAP-2'), true);
+  assert.equal(zeroGapRender.markdown.includes('- migration_dry_run | status=accepted | blocking=false | source=A5-GAP-3'), true);
+  assert.equal(zeroGapRender.markdown.includes('- validation_aggregator_zero_gap | status=accepted | blocking=false | source=A5-GAP-6'), true);
   assert.equal(zeroGapRender.markdown.includes('## Cutover Approval Boundary'), true);
   assert.equal(zeroGapRender.markdown.includes('exact_approval_required = true'), true);
   assert.equal(zeroGapRender.markdown.includes('approval_present = false'), true);

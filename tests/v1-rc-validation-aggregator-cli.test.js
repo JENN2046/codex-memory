@@ -52,9 +52,26 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
     report.summary.rc9DecisionPacketCutoverApprovalBoundaryAuditCanClaimRcReady,
     false
   );
+  assert.equal(
+    report.summary.rc9DecisionPacketCompletenessChecklistStatus,
+    'incomplete_missing_required_evidence'
+  );
+  assert.equal(report.summary.rc9DecisionPacketCompletenessChecklistRequiredCount, 9);
+  assert.equal(report.summary.rc9DecisionPacketCompletenessChecklistAcceptedCount, 2);
+  assert.equal(report.summary.rc9DecisionPacketCompletenessChecklistMissingCount, 7);
+  assert.equal(report.summary.rc9DecisionPacketCompletenessChecklistCanClaimRcReady, false);
   assert.equal(report.evidence.rc9DecisionPacket.decision, 'RC_NOT_READY_BLOCKED');
   assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
   assert.equal(report.evidence.rc9DecisionPacket.safety.remoteWrites, false);
+  assert.deepEqual(report.evidence.rc9DecisionPacket.completenessChecklistMissingIds, [
+    'fresh_current_head',
+    'strict_gate',
+    'live_http_no_write',
+    'governance_runtime',
+    'recall_isolation',
+    'migration_dry_run',
+    'validation_aggregator_zero_gap'
+  ]);
   assert.deepEqual(
     report.evidence.rc9DecisionPacket.cutoverApprovalBoundaryAudit.requiredApprovalFields,
     [

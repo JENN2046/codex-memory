@@ -4927,6 +4927,16 @@ function buildV1RcValidationAggregatorReport({
     rc9DecisionPacket.cutoverApprovalBoundaryAuditExecutionAllowed;
   report.summary.rc9DecisionPacketCutoverApprovalBoundaryAuditCanClaimRcReady =
     rc9DecisionPacket.cutoverApprovalBoundaryAuditCanClaimRcReady;
+  report.summary.rc9DecisionPacketCompletenessChecklistStatus =
+    rc9DecisionPacket.completenessChecklistStatus;
+  report.summary.rc9DecisionPacketCompletenessChecklistRequiredCount =
+    rc9DecisionPacket.completenessChecklistRequiredCount;
+  report.summary.rc9DecisionPacketCompletenessChecklistAcceptedCount =
+    rc9DecisionPacket.completenessChecklistAcceptedCount;
+  report.summary.rc9DecisionPacketCompletenessChecklistMissingCount =
+    rc9DecisionPacket.completenessChecklistMissingCount;
+  report.summary.rc9DecisionPacketCompletenessChecklistCanClaimRcReady =
+    rc9DecisionPacket.completenessChecklistCanClaimRcReady;
   report.evidence.rc9DecisionPacket = rc9DecisionPacket;
 
   return report;
@@ -4979,6 +4989,20 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
       canClaimReadiness: false
     };
   });
+  const runtimeEvidenceBridge = report &&
+    typeof report === 'object' &&
+    report.evidence &&
+    report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge &&
+    typeof report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge === 'object'
+    ? report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge
+    : {};
+  const runtimeEvidenceBridgeSummary = runtimeEvidenceBridge.summary &&
+    typeof runtimeEvidenceBridge.summary === 'object'
+    ? runtimeEvidenceBridge.summary
+    : {};
+  const runtimeEvidenceUnitIds = Array.isArray(runtimeEvidenceBridge.evidenceUnitIds)
+    ? runtimeEvidenceBridge.evidenceUnitIds
+    : [];
   const notExecuted = [
     'rc_cutover',
     'tag_creation',
@@ -4992,6 +5016,11 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     'durable_audit_write_for_rc',
     'migration_import_export_backup_restore_apply',
     'public_mcp_expansion'
+  ];
+  const rollbackPath = [
+    'leave_local_commits_in_place',
+    'create_backup_branch_before_future_history_operation',
+    'use_non_destructive_git_review_commands'
   ];
   const cutoverApprovalBoundaryAudit = {
     status: readyToRequestRcCutoverApproval
@@ -5021,6 +5050,106 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     authorizedActions: [],
     prohibitedActions: notExecuted
   };
+  const hasEvidenceUnit = unitId => runtimeEvidenceUnitIds.includes(unitId);
+  const buildCompletenessRow = ({
+    id,
+    label,
+    accepted,
+    sourceRef,
+    missingReason
+  }) => ({
+    id,
+    label,
+    required: true,
+    status: accepted ? 'accepted' : 'missing_or_not_accepted',
+    accepted,
+    blocking: !accepted,
+    sourceRef,
+    missingReason: accepted ? null : missingReason,
+    canClaimRcReady: false
+  });
+  const rc9PacketCompletenessChecklist = [
+    buildCompletenessRow({
+      id: 'fresh_current_head',
+      label: 'fresh current HEAD binding',
+      accepted:
+        runtimeEvidenceSummaryAccepted &&
+        runtimeEvidenceBridgeSummary.currentHeadBindingMatched === true,
+      sourceRef: 'runtime_evidence_summary.currentHeadCommit',
+      missingReason: 'current_head_binding_missing_or_not_matched'
+    }),
+    buildCompletenessRow({
+      id: 'strict_gate',
+      label: 'target-bound strict gate evidence',
+      accepted:
+        runtimeEvidenceSummaryAccepted &&
+        hasEvidenceUnit('A5-GAP-5') &&
+        runtimeEvidenceBridgeSummary.allCriticalCommandsPassed === true,
+      sourceRef: 'A5-GAP-5',
+      missingReason: 'a5_gap_5_strict_gate_evidence_missing_or_not_passed'
+    }),
+    buildCompletenessRow({
+      id: 'live_http_no_write',
+      label: 'live HTTP / MCP no-write evidence',
+      accepted: runtimeEvidenceSummaryAccepted && hasEvidenceUnit('A5-GAP-4'),
+      sourceRef: 'A5-GAP-4',
+      missingReason: 'a5_gap_4_live_http_no_write_evidence_missing'
+    }),
+    buildCompletenessRow({
+      id: 'governance_runtime',
+      label: 'governance runtime evidence',
+      accepted: runtimeEvidenceSummaryAccepted && hasEvidenceUnit('A5-GAP-1'),
+      sourceRef: 'A5-GAP-1',
+      missingReason: 'a5_gap_1_governance_evidence_missing'
+    }),
+    buildCompletenessRow({
+      id: 'recall_isolation',
+      label: 'recall isolation runtime evidence',
+      accepted: runtimeEvidenceSummaryAccepted && hasEvidenceUnit('A5-GAP-2'),
+      sourceRef: 'A5-GAP-2',
+      missingReason: 'a5_gap_2_recall_isolation_evidence_missing'
+    }),
+    buildCompletenessRow({
+      id: 'migration_dry_run',
+      label: 'migration/import/export dry-run evidence',
+      accepted: runtimeEvidenceSummaryAccepted && hasEvidenceUnit('A5-GAP-3'),
+      sourceRef: 'A5-GAP-3',
+      missingReason: 'a5_gap_3_migration_dry_run_evidence_missing'
+    }),
+    buildCompletenessRow({
+      id: 'validation_aggregator_zero_gap',
+      label: 'ValidationAggregator zero-gap aggregation',
+      accepted: readyToRequestRcCutoverApproval,
+      sourceRef: 'A5-GAP-6',
+      missingReason: 'aggregator_zero_gap_not_available'
+    }),
+    buildCompletenessRow({
+      id: 'not_executed_boundary',
+      label: 'not-executed release boundary',
+      accepted:
+        notExecuted.includes('rc_cutover') &&
+        notExecuted.includes('tag_creation') &&
+        notExecuted.includes('release_creation') &&
+        notExecuted.includes('deploy') &&
+        notExecuted.includes('push') &&
+        cutoverApprovalBoundaryAudit.executionAllowed === false,
+      sourceRef: 'rc9_decision_packet.notExecuted',
+      missingReason: 'not_executed_boundary_incomplete'
+    }),
+    buildCompletenessRow({
+      id: 'rollback_path',
+      label: 'rollback path documented for future cutover approval',
+      accepted: rollbackPath.length > 0,
+      sourceRef: 'rc9_decision_packet.rollbackPath',
+      missingReason: 'rollback_path_missing'
+    })
+  ];
+  const rc9PacketCompletenessMissingIds = rc9PacketCompletenessChecklist
+    .filter(item => item.accepted !== true)
+    .map(item => item.id);
+  const rc9PacketCompletenessStatus = rc9PacketCompletenessMissingIds.length === 0
+    ? 'complete_for_cutover_approval_request_not_rc_ready'
+    : 'incomplete_missing_required_evidence';
 
   return {
     status: readyToRequestRcCutoverApproval
@@ -5051,15 +5180,19 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     cutoverApprovalBoundaryAuditStatus: cutoverApprovalBoundaryAudit.status,
     cutoverApprovalBoundaryAuditExecutionAllowed: false,
     cutoverApprovalBoundaryAuditCanClaimRcReady: false,
+    completenessChecklist: rc9PacketCompletenessChecklist,
+    completenessChecklistStatus: rc9PacketCompletenessStatus,
+    completenessChecklistRequiredCount: rc9PacketCompletenessChecklist.length,
+    completenessChecklistAcceptedCount:
+      rc9PacketCompletenessChecklist.length - rc9PacketCompletenessMissingIds.length,
+    completenessChecklistMissingCount: rc9PacketCompletenessMissingIds.length,
+    completenessChecklistMissingIds: rc9PacketCompletenessMissingIds,
+    completenessChecklistCanClaimRcReady: false,
     rcReady: false,
     finalRcReady: false,
     runtimeReady: false,
     notExecuted,
-    rollbackPath: [
-      'leave_local_commits_in_place',
-      'create_backup_branch_before_future_history_operation',
-      'use_non_destructive_git_review_commands'
-    ],
+    rollbackPath,
     safety: {
       readsFiles: false,
       executesCommands: false,
@@ -5089,6 +5222,12 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     : ['- none'];
   const notExecutedLines = packet.notExecuted.map(action => `- ${safeEvidenceString(action, 'unknown_action')}`);
   const rollbackLines = packet.rollbackPath.map(action => `- ${safeEvidenceString(action, 'unknown_rollback_action')}`);
+  const completenessLines = packet.completenessChecklist.map(item => [
+    `- ${safeEvidenceString(item.id, 'unknown_check')}`,
+    `status=${safeEvidenceString(item.status, 'unknown_status')}`,
+    `blocking=${item.blocking === true}`,
+    `source=${safeEvidenceString(item.sourceRef, 'unknown_source')}`
+  ].join(' | '));
   const markdown = [
     '# RC-9 RC Decision Packet',
     '',
@@ -5106,6 +5245,8 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     `cutover_approval_boundary_status = ${packet.cutoverApprovalBoundaryAuditStatus}`,
     `cutover_approval_boundary_execution_allowed = ${packet.cutoverApprovalBoundaryAuditExecutionAllowed}`,
     `cutover_approval_boundary_can_claim_rc_ready = ${packet.cutoverApprovalBoundaryAuditCanClaimRcReady}`,
+    `completeness_checklist_status = ${packet.completenessChecklistStatus}`,
+    `completeness_checklist_missing_count = ${packet.completenessChecklistMissingCount}`,
     '',
     '## Remaining Gaps',
     '',
@@ -5131,6 +5272,10 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     '',
     ...packet.cutoverApprovalBoundaryAudit.requiredApprovalFields
       .map(field => `- ${safeEvidenceString(field, 'unknown_required_field')}`),
+    '',
+    '## Completeness Checklist',
+    '',
+    ...completenessLines,
     '',
     '## Boundary',
     '',
