@@ -10,6 +10,55 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC ValidationAggregator CLI Zero-Gap Closeout Slice
+
+Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Scope: verified the ValidationAggregator CLI JSON output exposes the zero-gap closeout audit from the core report. This is a local source/test slice for `validation_aggregator_full_implementation_incomplete`; it does not close the whole gap or claim RC readiness.
+
+Changed:
+
+- `src/cli/v1-rc-validation-aggregator.js`
+- `tests/v1-rc-validation-aggregator-cli.test.js`
+- `docs/RC_VALIDATION_AGGREGATOR_CLI_ZERO_GAP_CLOSEOUT_SLICE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- CLI normal JSON output exposes zero-gap closeout audit counts.
+- CLI strict JSON output remains blocked and exposes zero-gap closeout audit counts.
+- CLI rejected-flag JSON output remains fail-closed and exposes readiness denial.
+- Cutover approval/execution and readiness remain false.
+
+Validation:
+
+- `node --check src\cli\v1-rc-validation-aggregator.js`
+- `node --check tests\v1-rc-validation-aggregator-cli.test.js`
+- `node --test tests\v1-rc-validation-aggregator-cli.test.js` passed `13/13`
+- targeted ValidationAggregator/no-touch/A5 suite passed `68/68`
+- `git diff --check`
+- `node .\scripts\validate_current_facts_drift.js`
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Boundary:
+
+- No new CLI flag or file output was added.
+- No runtime evidence execution occurred.
+- No file/store scan occurred.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Commit this validated slice locally.
+- Continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`.
+
 ## RC ValidationAggregator Zero-Gap Closeout Audit Slice
 
 Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
