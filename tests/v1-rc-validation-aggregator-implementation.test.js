@@ -1087,6 +1087,18 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
       noRuntimeMutation: true
     }
   );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaCount,
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.length
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaIncludesRcCutoverApproval,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaIncludesReadinessAuthority,
+    true
+  );
   assert.deepEqual(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuthoritySummary,
     {
@@ -3069,6 +3081,18 @@ test('zero-gap runtime evidence summary can route to RC-9 but cannot authorize R
   );
   assert.equal(
     definition.closureMissingCriteria.includes('rc_cutover_approval_present'),
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaCount,
+    definition.closureMissingCriteria.length
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaIncludesRcCutoverApproval,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaIncludesReadinessAuthority,
     true
   );
   assert.equal(report.summary.rc9DecisionPacketAvailable, true);

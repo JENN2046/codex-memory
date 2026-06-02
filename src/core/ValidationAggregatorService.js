@@ -2994,6 +2994,12 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.closureAuthorityStatus,
       p66ValidationAggregatorFullImplementationGapAccountingNextClosureAuthority:
         p66FullImplementationGapAccounting.nextClosureAuthority,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaCount:
+        p66FullImplementationGapAccounting.closureMissingCriteria.length,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaIncludesRcCutoverApproval:
+        p66FullImplementationGapAccounting.closureMissingCriteria.includes('rc_cutover_approval_present'),
+      p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaIncludesReadinessAuthority:
+        p66FullImplementationGapAccounting.closureMissingCriteria.includes('readiness_authority'),
       p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditStatus:
         p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditStatus,
       p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditReadyToEnterRc9DecisionPacket:

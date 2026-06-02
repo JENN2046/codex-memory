@@ -198,6 +198,18 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutCanClaimReadiness,
     false
   );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaCount,
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.length
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaIncludesRcCutoverApproval,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureMissingCriteriaIncludesReadinessAuthority,
+    true
+  );
   assert.deepEqual(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.localProofChainCloseoutNotProvenIds,
     ['validation_aggregator_full_implementation_incomplete']
