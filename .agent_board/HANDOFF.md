@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1357 PHASE_F1_FRESH_SYNC_LIVE_PREFLIGHT`.
+Goal: `CM-1358 PHASE_F2_CONDITIONAL_A5_GAP6_PREFLIGHT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F1 fresh sync/live preflight. Observed state before CM-1357 was `HEAD=06cdd0e99267b5ae1c8e62b0d04bcbca704396c9`, `origin/main=be980d157cbc88b00fc2e641bc66a527538faae9`, `ahead 2 / behind 0`; this is a preflight snapshot only, not durable current Git truth. F1 live-client no-write execution remains blocked. CM-1357 records that old embedded approval packets must not be reused; push requires explicit normal non-force push approval, and live execution requires a fresh synced-head exact A5-GAP-4 approval line. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F2 conditional A5-GAP-6 preflight. F2 aggregation refresh remains blocked until F1 live-client no-write evidence capture is complete and recorded as `PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY`. CM-1358 provides only a non-authorizing A5-GAP-6 template and stop conditions; it does not execute ValidationAggregator or close any runtime gap. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

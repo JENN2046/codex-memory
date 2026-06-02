@@ -1,5 +1,28 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1358 Phase F2 Conditional A5-GAP-6 Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board preflight for Phase F2 aggregation refresh. No ValidationAggregator execution, file/store scan, live client refresh, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, push, readiness claim, or reliability claim.
+
+Result:
+
+- Prepared conditional A5-GAP-6 preflight for F2.
+- Locked sequence guard: F2 cannot execute before F1 live no-write evidence capture exists.
+- Added non-authorizing A5-GAP-6 approval template for a future fresh synced post-F1 head.
+- Kept `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- Docs/board changed-scope review, `git diff --check`, ledger consistency, and docs validation are required for closeout.
+
+Next:
+
+- Complete F1 first: explicit sync route, fresh synced-head A5-GAP-4 approval, bounded F1 live no-write execution.
+
 ## CM-1357 Phase F1 Fresh Sync And Live Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
