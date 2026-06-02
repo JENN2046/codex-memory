@@ -13,6 +13,16 @@ PERSONAL_DOGFOOD_READY_NOT_RC_READY
 RC_READY_FALSE
 ```
 
+当前权威后续路线：
+
+- 总路线入口：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
+- Phase G 执行入口：[PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md)
+- 当前阶段：`Phase G — memory governance / proposal / supersession / tombstone`
+- 当前阶段性目标：`G1 — Memory Governance Runtime Boundary`
+- 下一安全任务：`CM-1389 Phase G governance runtime inventory`
+
+CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
+
 原因：Phase F personal dogfood evidence chain 已在本地收口到 `PERSONAL_DOGFOOD_READY_NOT_RC_READY`，但这不是 `RC_READY`。不得把 docs-only、fixture-only、本地 proof、历史 gate、历史 HTTP evidence、bounded one-write dogfood 或 Phase F closeout 解释为 runtime readiness、RC readiness、broad write reliability、broad recall reliability、release readiness、cutover readiness 或 production readiness。
 
 `CM-1384 PHASE_F5_PERSONAL_RC_CLOSEOUT_EVIDENCE` 已完成本地 Phase F closeout evidence aggregation，结论为 `PERSONAL_DOGFOOD_READY_NOT_RC_READY`，且 `RC ready=false`。该 closeout 只聚合已接受的 F1/F2/F3/F4 证据：`CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md`、`CM1379_PHASE_F2_A5_GAP6_AGGREGATION_EVIDENCE.md`、`CM1381_PHASE_F3_TRUE_LIVE_RECALL_NEGATIVE_CONTROL_EVIDENCE.md`、`CM1383_PHASE_F4_MINIMAL_DOGFOOD_WRITE_EVIDENCE.md`。本次不执行 `record_memory` / `search_memory` / MCP / provider，不读取 raw memory/jsonl/raw audit，不做 broad real memory scan，不写 durable memory/audit，不启动服务，不改 config/watchdog/startup，不执行 remote action，不声明 RC ready、broad write reliability、broad recall reliability、release readiness、cutover readiness 或 production readiness。

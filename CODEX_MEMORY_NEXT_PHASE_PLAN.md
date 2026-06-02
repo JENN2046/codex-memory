@@ -1,32 +1,54 @@
 # codex-memory Next Phase Plan
 
-更新时间：2026-05-31
+更新时间：2026-06-02
 
 ## Purpose
 
-This active plan is the short routing document for the current post-P66 local-safe project-operator work. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
+This active plan is the short routing document for current post-Phase-F project-operator work. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
 
 ## Current Official Route
 
-The next project route is fixed in this order:
+Current control state:
 
-1. First execute the existing documentation-surface slimdown plan.
-   - This is the current highest-priority work.
-   - Goal: reduce the project to a small number of authoritative status entrypoints.
-   - Boundary: do not touch runtime behavior, do not expand public MCP tools, and do not claim readiness.
+```text
+PERSONAL_DOGFOOD_READY_NOT_RC_READY
+RC_READY_FALSE
+```
 
-2. Then do runtime gap closure.
-   - Close A5 / P66 runtime gaps one by one.
-   - Move from fixture-only evidence toward true runtime evidence.
-   - Each runtime or A5 action still requires the exact approval and evidence boundary required by the project rules.
+Phase F personal dogfood evidence chain is locally closed. The project now enters Phase G planning and execution:
 
-3. Finally do personal RC dogfood.
-   - Codex/Claude MCP connection.
-   - Minimal true end-to-end memory loop.
-   - Observe, rollback, audit, and repair based on real use.
-   - This is personal dogfood first, not public release, production readiness, or `RC_READY`.
+```text
+Phase G — memory governance / proposal / supersession / tombstone
+```
 
-Until the documentation-surface slimdown is complete, this document is the routing authority for next-phase order. The detailed P66/A5 sections below are retained as historical context and constraint inventory; they are not the current execution order.
+The authoritative Phase G execution entrypoint is:
+
+[PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md)
+
+Current route order:
+
+1. Keep current facts anchored in [STATUS.md](/A:/codex-memory/STATUS.md).
+2. Use this document only as the high-level next-phase route.
+3. Use [PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md) for Phase G execution scope and order.
+4. Use [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) and [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md) for active task and validation state.
+
+First Phase G stage:
+
+```text
+G1 — Memory Governance Runtime Boundary
+```
+
+First safe task:
+
+```text
+CM-1389 Phase G governance runtime inventory
+```
+
+CM-1389 should inspect current governance/lifecycle source, tests, fixtures, and docs, then produce `docs/PHASE_G_G1_GOVERNANCE_RUNTIME_INVENTORY.md`. It must not execute runtime governance actions, memory tools, provider calls, durable writes, broad real-memory reads, config/watchdog/startup changes, public MCP expansion, push, release, cutover, or readiness claims.
+
+## Historical Route Snapshot
+
+The detailed P66/A5 sections below are retained as historical context and constraint inventory. They are not the current execution order after Phase F personal dogfood closeout and CM-1387 post-push no-write refresh.
 
 ## Current Direction
 

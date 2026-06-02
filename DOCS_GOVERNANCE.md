@@ -34,6 +34,7 @@
 | [README.md](/A:/codex-memory/README.md) | operation map：能力入口、架构入口、命令入口、接入入口 | 低频 |
 | [STATUS.md](/A:/codex-memory/STATUS.md) | 当前事实状态：主线可用性、最新基线、关键能力摘要 | 中频 |
 | [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md) | 当前后续路线和阶段顺序，不承担详细任务队列 | 低频 |
+| [PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md) | 当前 Phase G 阶段执行入口；由 `CODEX_MEMORY_NEXT_PHASE_PLAN.md` 链接，不替代 `STATUS.md` 或 `.agent_board` | 低频 |
 | [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) | 当前 active/local task queue | 每批任务 |
 | [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md) | 本地验证 ledger 和 board-only gate 记录 | 每批验证 |
 | [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md) | 维护期候选任务池，不替代当前 active task queue | 中频 |

@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1387 POST_PUSH_A5_GAP4_LIVE_NO_WRITE_REFRESH`.
+Goal: `CM-1388 PHASE_G_AUTHORITATIVE_ROUTE_ENTRYPOINT`.
 
-Status: `COMPLETED_VALIDATED_POST_PUSH_A5_GAP4_LIVE_NO_WRITE_REFRESH` for exact-approved post-push A5-GAP-4 live-client no-write refresh at synced `main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496`. The bounded harness accepted health, initialize, tools/list, authenticated `memory_overview`, no-token selected `memory_overview`, and no-token `record_memory/search_memory` rejection reason codes. No provider call, durable write, config/watchdog/startup change, additional remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. After the guarded local commit containing this handoff, sync only with explicit approval; otherwise choose the next local phase from fresh Git facts. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_PHASE_G_AUTHORITATIVE_ENTRY` for local docs/board route authority. CM-1388 adds `PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md`, updates `CODEX_MEMORY_NEXT_PHASE_PLAN.md`, `PHASE_NAVIGATION.md`, `STATUS.md`, and `.agent_board` so the current route enters `Phase G -> G1 Memory Governance Runtime Boundary`; stale P66/P31-P34 material is supporting context, not the current execution order. Next safe task is `CM-1389 Phase G governance runtime inventory`. No runtime action, memory tool call, MCP/provider call, broad real memory scan, durable write, public MCP expansion, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. After the guarded local commit containing this handoff, sync only with explicit approval; otherwise begin CM-1389 from fresh Git facts. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
