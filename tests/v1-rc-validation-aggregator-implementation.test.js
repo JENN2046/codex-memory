@@ -2597,6 +2597,16 @@ test('validation aggregator runtime evidence summary fails closed on current-hea
     runtimeEvidenceSummary: {
       status: 'local_runtime_evidence_passed_rc_still_blocked',
       decision: 'NOT_READY_BLOCKED',
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      criticalGates: {
+        total: 1,
+        passed: 1,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
       evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
       locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
       remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
@@ -2618,6 +2628,16 @@ test('validation aggregator runtime evidence summary fails closed on current-hea
       status: 'local_runtime_evidence_passed_rc_still_blocked',
       decision: 'NOT_READY_BLOCKED',
       currentHeadCommit: 'abc1234',
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      criticalGates: {
+        total: 1,
+        passed: 1,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
       evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
       locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
       remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
@@ -2642,6 +2662,8 @@ test('validation aggregator runtime evidence summary fails closed on current-hea
       expectedCurrentHeadCommit: 'def5678',
       runnerExecuted: true,
       commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
       criticalGates: {
         total: 1,
         passed: 1,
@@ -2669,6 +2691,16 @@ test('validation aggregator runtime evidence summary fails closed on current-hea
       decision: 'NOT_READY_BLOCKED',
       currentHeadCommit: 'not-a-commit',
       expectedCurrentHeadCommit: 'abc1234',
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      criticalGates: {
+        total: 1,
+        passed: 1,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
       locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
       remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
       safety: {
@@ -2728,6 +2760,16 @@ test('validation aggregator runtime evidence summary fails closed on evidence un
     currentHeadCommit: 'abc1234',
     expectedCurrentHeadCommit: 'abc1234',
     evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
+    runnerExecuted: true,
+    commandsExecuted: true,
+    localRuntimeEvidenceMatrixExecuted: true,
+    allowlistedFinalRcEvidenceRunnerExecuted: true,
+    criticalGates: {
+      total: 1,
+      passed: 1,
+      failed: 0,
+      allCriticalCommandsPassed: true
+    },
     locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
     remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
     safety: {
@@ -2812,6 +2854,16 @@ test('validation aggregator runtime evidence summary fails closed on stale or ma
     decision: 'NOT_READY_BLOCKED',
     currentHeadCommit: 'abc1234',
     expectedCurrentHeadCommit: 'abc1234',
+    runnerExecuted: true,
+    commandsExecuted: true,
+    localRuntimeEvidenceMatrixExecuted: true,
+    allowlistedFinalRcEvidenceRunnerExecuted: true,
+    criticalGates: {
+      total: 1,
+      passed: 1,
+      failed: 0,
+      allCriticalCommandsPassed: true
+    },
     evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
     locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
     remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
@@ -2879,6 +2931,128 @@ test('validation aggregator runtime evidence summary fails closed on stale or ma
   assertNoSensitiveSurface(staleTimestamp);
 });
 
+test('validation aggregator runtime evidence summary requires source execution authority without final matrix authority', () => {
+  const baseSummary = {
+    status: 'local_runtime_evidence_passed_rc_still_blocked',
+    decision: 'NOT_READY_BLOCKED',
+    currentHeadCommit: 'abc1234',
+    expectedCurrentHeadCommit: 'abc1234',
+    evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
+    evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
+    runnerExecuted: true,
+    commandsExecuted: true,
+    localRuntimeEvidenceMatrixExecuted: true,
+    allowlistedFinalRcEvidenceRunnerExecuted: true,
+    criticalGates: {
+      total: 1,
+      passed: 1,
+      failed: 0,
+      allCriticalCommandsPassed: true
+    },
+    locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+    remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
+    safety: {
+      mutated: false,
+      providerCalls: 0,
+      serviceStarted: false,
+      writesDurableMemory: false,
+      realMemoryPreview: false,
+      remoteWrites: false,
+      configChanged: false,
+      migrationApplied: false,
+      importExportApplied: false
+    }
+  };
+  const withoutRunner = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      runnerExecuted: false
+    }
+  });
+  const withoutCommands = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      commandsExecuted: false
+    }
+  });
+  const withoutLocalMatrix = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      localRuntimeEvidenceMatrixExecuted: false
+    }
+  });
+  const withoutAllowlistedRunner = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      allowlistedFinalRcEvidenceRunnerExecuted: false
+    }
+  });
+  const failedCriticalGate = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      criticalGates: {
+        total: 1,
+        passed: 0,
+        failed: 1,
+        allCriticalCommandsPassed: false
+      }
+    }
+  });
+  const finalMatrixAuthorityClaim = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      finalRcMatrixExecuted: true
+    }
+  });
+
+  assert.equal(
+    withoutRunner.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'source_runner_execution_required'
+  );
+  assert.equal(
+    withoutCommands.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'source_command_execution_required'
+  );
+  assert.equal(
+    withoutLocalMatrix.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'source_runtime_matrix_execution_required'
+  );
+  assert.equal(
+    withoutAllowlistedRunner.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'allowlisted_final_rc_evidence_runner_required'
+  );
+  assert.equal(
+    failedCriticalGate.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'critical_gate_pass_required'
+  );
+  assert.equal(
+    finalMatrixAuthorityClaim.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'readiness_claim_rejected'
+  );
+
+  for (const report of [
+    withoutRunner,
+    withoutCommands,
+    withoutLocalMatrix,
+    withoutAllowlistedRunner,
+    failedCriticalGate,
+    finalMatrixAuthorityClaim
+  ]) {
+    assert.equal(report.summary.runtimeEvidenceSummaryAccepted, false);
+    assert.equal(report.summary.runtimeEvidenceSummaryRejected, true);
+    assert.equal(report.summary.runtimeReady, false);
+    assert.equal(report.summary.finalRcMatrixReady, false);
+    assert.equal(report.summary.rcReady, false);
+    assertNoSensitiveSurface(report);
+  }
+});
+
 test('validation aggregator runtime evidence summary rejects readiness claims, side effects, and secrets', () => {
   const readinessClaim = buildV1RcValidationAggregatorReport({
     runtimeEvidenceSummary: {
@@ -2937,6 +3111,16 @@ test('effective gap accounting fails closed on non-baseline remaining gaps', () 
       currentHeadCommit: 'abc1234',
       expectedCurrentHeadCommit: 'abc1234',
       evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      criticalGates: {
+        total: 1,
+        passed: 1,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
       runtimeReady: false,
       finalRcMatrixReady: false,
       v1RcReady: false,

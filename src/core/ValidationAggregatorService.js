@@ -2030,6 +2030,7 @@ function normalizeRuntimeEvidenceSummary(summary = null, {
   if (
     summary.runtimeReady === true ||
     summary.finalRcMatrixReady === true ||
+    summary.finalRcMatrixExecuted === true ||
     summary.fullFinalRcMatrixExecuted === true ||
     summary.v1RcReady === true ||
     summary.rcReady === true
@@ -2045,6 +2046,61 @@ function normalizeRuntimeEvidenceSummary(summary = null, {
   const criticalGates = summary.criticalGates && typeof summary.criticalGates === 'object'
     ? summary.criticalGates
     : {};
+  const sourceRunnerExecuted = summary.runnerExecuted === true;
+  const sourceCommandsExecuted = summary.commandsExecuted === true;
+  const sourceLocalRuntimeEvidenceMatrixExecuted =
+    summary.localRuntimeEvidenceMatrixExecuted === true;
+  const sourceAllowlistedFinalRcEvidenceRunnerExecuted =
+    summary.allowlistedFinalRcEvidenceRunnerExecuted === true;
+  const allCriticalCommandsPassed =
+    criticalGates.allCriticalCommandsPassed === true;
+  const criticalGateFailedCount = safeEvidenceNumber(criticalGates.failed);
+
+  if (!sourceRunnerExecuted) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'source_runner_execution_required'
+    };
+  }
+
+  if (!sourceCommandsExecuted) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'source_command_execution_required'
+    };
+  }
+
+  if (!sourceLocalRuntimeEvidenceMatrixExecuted) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'source_runtime_matrix_execution_required'
+    };
+  }
+
+  if (!sourceAllowlistedFinalRcEvidenceRunnerExecuted) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'allowlisted_final_rc_evidence_runner_required'
+    };
+  }
+
+  if (!allCriticalCommandsPassed || criticalGateFailedCount > 0) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'critical_gate_pass_required'
+    };
+  }
+
   const locallyEvidencedRuntimeGaps = normalizeEvidenceStringList(summary.locallyEvidencedRuntimeGaps);
   const remainingRuntimeGaps = normalizeEvidenceStringList(summary.remainingRuntimeGaps);
   const rawCurrentHeadCommit = typeof summary.currentHeadCommit === 'string'
@@ -2174,22 +2230,23 @@ function normalizeRuntimeEvidenceSummary(summary = null, {
       ...empty.summary,
       sourceStatus: safeEvidenceString(summary.status, 'unknown'),
       sourceDecision: safeEvidenceString(summary.decision, 'unknown'),
-      runnerExecuted: summary.runnerExecuted === true,
-      commandsExecutedBySource: summary.commandsExecuted === true,
+      runnerExecuted: sourceRunnerExecuted,
+      commandsExecutedBySource: sourceCommandsExecuted,
       commandsExecutedByAggregator: false,
-      localRuntimeEvidenceMatrixExecutedBySource: summary.localRuntimeEvidenceMatrixExecuted === true,
+      localRuntimeEvidenceMatrixExecutedBySource:
+        sourceLocalRuntimeEvidenceMatrixExecuted,
       allowlistedFinalRcEvidenceRunnerExecutedBySource:
-        summary.allowlistedFinalRcEvidenceRunnerExecuted === true,
+        sourceAllowlistedFinalRcEvidenceRunnerExecuted,
       finalRcMatrixExecutedBySource: false,
       fullFinalRcMatrixExecutedBySource: false,
       finalRcMatrixReady: false,
       runtimeReady: false,
       v1RcReady: false,
       rcReady: false,
-      allCriticalCommandsPassed: criticalGates.allCriticalCommandsPassed === true,
+      allCriticalCommandsPassed,
       criticalGateCount: safeEvidenceNumber(criticalGates.total),
       criticalGatePassedCount: safeEvidenceNumber(criticalGates.passed),
-      criticalGateFailedCount: safeEvidenceNumber(criticalGates.failed),
+      criticalGateFailedCount,
       locallyEvidencedRuntimeGapCount: locallyEvidencedRuntimeGaps.length,
       remainingRuntimeGapCount: remainingRuntimeGaps.length,
       currentHeadBindingStatus,

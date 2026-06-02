@@ -61,7 +61,9 @@ Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGRE
 
 Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_STALE_SUMMARY_INVALIDATION_SLICE.md` records stale-aware explicit runtime summary validation. Accepted summaries must include fresh `evidenceGeneratedAt`; missing, malformed, future, or stale timestamps fail closed. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
 
-Next safe action is to validate and commit the stale summary invalidation slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_FINAL_MATRIX_AUTHORITY_SLICE.md` records final-matrix authority separation for explicit runtime summaries. Accepted summaries must prove source-side approved evidence execution and passing critical gates, while aggregator-executed final matrix authority remains unclaimed. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
+
+Next safe action is to validate and commit the final matrix authority slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
