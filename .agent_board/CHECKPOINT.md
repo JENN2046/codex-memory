@@ -10,13 +10,13 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## RC-7 A5-GAP-3 Migration Dry-Run Preflight
+## RC-7 A5-GAP-3 Migration Dry-Run Evidence
 
-Status: `PREFLIGHT_PACKET_READY_NOT_APPROVED_NOT_RC_READY`
+Status: `DRY_RUN_EXECUTED_MIGRATION_STILL_BLOCKED_NOT_RC_READY`
 
 Date: 2026-06-02
 
-Scope: prepared a fresh-head `A5-GAP-3` fixture-only migration readiness dry-run approval boundary. No migration readiness command, migration, import, export, backup, restore, real memory scan, durable write, provider call, service startup, config/watchdog/startup change, remote action, cutover, or readiness claim occurred.
+Scope: exact-approved fresh-head `A5-GAP-3` fixture-only migration readiness dry-run. No migration, import, export, backup, restore, real memory scan, durable write, provider call, service startup, config/watchdog/startup change, remote action, cutover, or readiness claim occurred.
 
 Changed:
 
@@ -26,13 +26,14 @@ Changed:
 
 Result:
 
-- Existing `A5-GAP-3` dry-run evidence remains useful historical background, but it is bound to older commit `d3e87c7fe9f2f37c1659c815d874e8550dff4a32` and is not current-head evidence for `main@834896cf7842e36a421f4727395b7d7cd734ce09`.
-- The selected next boundary is `action dry-run`, target `vcp-memory:migration-readiness fixture-only readiness report`.
-- Future execution requires a fresh exact approval line bound to the post-packet commit.
+- Consumed exact A5-GAP-3 approval for `main@e17499294df14e7724307bb389387cd111a66797`.
+- Fresh preflight matched branch `main`, target commit, and clean worktree.
+- Ran `npm run vcp-memory:migration-readiness -- --json`.
+- Sanitized result: `status=blocked`, `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`, `noMigration=true`, `noSQLiteWrite=true`, `noDiaryWrite=true`, `noImportExportApply=true`, `noRealDbMemoryWrite=true`, `noMcpPublicToolExpansion=true`, `rawWorkspaceIdExposed=false`, and `rawSecretExposed=false`.
+- Public MCP tools remained `record_memory`, `search_memory`, and `memory_overview`.
 
 Boundary:
 
-- No migration readiness command was executed.
 - No apply/import/export/backup/restore action occurred.
 - No real memory/store scan or raw private content output occurred.
 - No MCP external call or provider call occurred.
@@ -42,8 +43,8 @@ Boundary:
 
 Next:
 
-- Validate and commit this RC-7 preflight packet locally.
-- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-3 for codex-memory on branch main at commit <FRESH_HEAD>, action dry-run, target vcp-memory:migration-readiness fixture-only readiness report, no apply, no import, no export, no backup, no restore, no durable write.`
+- Validate and commit this RC-7 evidence locally.
+- Continue to RC-8 ValidationAggregator aggregation preflight. Do not execute A5-GAP-6 without exact approval naming the evidence unit list.
 
 ## RC-6 A5-GAP-2 Recall Isolation No-Mutation Evidence
 
