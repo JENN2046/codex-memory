@@ -4675,6 +4675,92 @@ function buildV1RcValidationAggregatorReport({
   };
 }
 
+function buildRc9DecisionPacketFromAggregatorReport(report = null) {
+  const definition = report &&
+    typeof report === 'object' &&
+    report.evidence &&
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition &&
+    typeof report.evidence.p66ValidationAggregatorFullImplementationDefinition === 'object'
+    ? report.evidence.p66ValidationAggregatorFullImplementationDefinition
+    : {};
+  const summary = report &&
+    typeof report === 'object' &&
+    report.summary &&
+    typeof report.summary === 'object'
+    ? report.summary
+    : {};
+  const runtimeEvidenceSummaryAccepted =
+    summary.runtimeEvidenceSummaryAccepted === true;
+  const acceptedRuntimeSummaryZeroGap =
+    definition.acceptedRuntimeSummaryZeroGap === true ||
+    summary.p66ValidationAggregatorFullImplementationGapAccountingZeroGap === true;
+  const readyToRequestRcCutoverApproval =
+    runtimeEvidenceSummaryAccepted &&
+    acceptedRuntimeSummaryZeroGap &&
+    definition.readyToRequestRcCutoverApproval === true;
+  const effectiveRemainingGapIds = Array.isArray(definition.effectiveRemainingFullImplementationGapIds)
+    ? definition.effectiveRemainingFullImplementationGapIds
+    : [];
+
+  return {
+    status: readyToRequestRcCutoverApproval
+      ? 'ready_to_request_rc_cutover_approval_not_rc_ready'
+      : 'rc_not_ready_blocked',
+    mode: 'decision_packet_only',
+    sourceMode: 'aggregator_report_explicit_input_only',
+    decision: 'RC_NOT_READY_BLOCKED',
+    runtimeEvidenceSummaryAccepted,
+    acceptedRuntimeSummaryZeroGap,
+    readyToRequestRcCutoverApproval,
+    decisionPacketRouteStatus: typeof definition.decisionPacketRouteStatus === 'string'
+      ? definition.decisionPacketRouteStatus
+      : 'rc_not_ready_blocked_remaining_gaps',
+    remainingGapIds: effectiveRemainingGapIds,
+    remainingGapCount: effectiveRemainingGapIds.length,
+    rcCutoverApprovalRequired: true,
+    rcCutoverApprovalPresent: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    finalRcReady: false,
+    runtimeReady: false,
+    notExecuted: [
+      'rc_cutover',
+      'tag_creation',
+      'release_creation',
+      'deploy',
+      'push',
+      'config_watchdog_startup_change',
+      'provider_call',
+      'broad_real_memory_scan_export',
+      'durable_memory_write_for_rc',
+      'durable_audit_write_for_rc',
+      'migration_import_export_backup_restore_apply',
+      'public_mcp_expansion'
+    ],
+    rollbackPath: [
+      'leave_local_commits_in_place',
+      'create_backup_branch_before_future_history_operation',
+      'use_non_destructive_git_review_commands'
+    ],
+    safety: {
+      readsFiles: false,
+      executesCommands: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      changesConfigWatchdogStartup: false,
+      remoteWrites: false,
+      tagReleaseDeploy: false,
+      cutoverExecuted: false,
+      readinessClaimed: false
+    },
+    canClaimRcReady: false
+  };
+}
+
 module.exports = {
   DECISION_LABELS,
   VALIDATION_EVIDENCE_COMMAND_COVERAGE_STATUSES,
@@ -4687,6 +4773,7 @@ module.exports = {
   VALIDATION_EVIDENCE_SOURCE_TYPES,
   VALIDATION_EVIDENCE_STATUSES,
   RUNTIME_EVIDENCE_SUMMARY_STATUSES,
+  buildRc9DecisionPacketFromAggregatorReport,
   buildV1RcValidationAggregatorReport,
   normalizeRuntimeEvidenceSummary,
   normalizeValidationEvidenceSources,

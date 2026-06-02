@@ -65,7 +65,9 @@ Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGRE
 
 Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_ZERO_GAP_DECISION_SEMANTICS_SLICE.md` records zero-gap decision semantics for ValidationAggregator runtime evidence summaries. Nonzero gaps keep `RC_NOT_READY_BLOCKED`; zero gaps can route to RC-9 decision packet / cutover approval request, but cutover approval, cutover execution, and readiness remain false. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
 
-Next safe action is to validate and commit the zero-gap decision semantics slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_RC9_PACKET_SEMANTICS_SLICE.md` records pure RC-9 packet semantics over ValidationAggregator route fields. The helper can mark zero-gap reports as ready to request cutover approval, but cutover approval, cutover execution, and readiness remain false. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
+
+Next safe action is to validate and commit the RC-9 packet semantics slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

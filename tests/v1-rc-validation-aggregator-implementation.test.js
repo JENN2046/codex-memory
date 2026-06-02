@@ -14,6 +14,7 @@ const {
   VALIDATION_EVIDENCE_SOURCE_CLASSES,
   VALIDATION_EVIDENCE_SOURCE_TYPES,
   RUNTIME_EVIDENCE_SUMMARY_STATUSES,
+  buildRc9DecisionPacketFromAggregatorReport,
   buildV1RcValidationAggregatorReport,
   normalizeValidationEvidenceSources
 } = require('../src/core/ValidationAggregatorService');
@@ -2727,6 +2728,134 @@ test('zero-gap runtime evidence summary can route to RC-9 but cannot authorize R
   assert.equal(report.summary.rcReady, false);
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assertNoSensitiveSurface(report);
+});
+
+test('RC-9 decision packet consumes aggregator route fields without authorizing cutover', () => {
+  const nonzeroGapReport = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'abc1234def5678',
+      expectedCurrentHeadCommit: 'abc1234def5678',
+      evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
+      evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      criticalGates: {
+        total: 12,
+        passed: 12,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
+      locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+      remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        readsRealMemory: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
+  const zeroGapReport = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'abc1234def5678',
+      expectedCurrentHeadCommit: 'abc1234def5678',
+      evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
+      evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      criticalGates: {
+        total: 12,
+        passed: 12,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
+      locallyEvidencedRuntimeGaps: [
+        'validation_aggregator_full_implementation_incomplete',
+        'governance_review_approval_audit_runtime_loop_not_executed',
+        'recall_isolation_runtime_proof_not_executed',
+        'migration_import_export_backup_restore_approval_execution_blocked',
+        'live_http_operation_readiness_not_claimed',
+        'mainline_strict_gate_not_executed_for_cutover',
+        'rc_cutover_not_executed'
+      ],
+      remainingRuntimeGaps: [],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        readsRealMemory: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
+  const nonzeroPacket = buildRc9DecisionPacketFromAggregatorReport(nonzeroGapReport);
+  const zeroGapPacket = buildRc9DecisionPacketFromAggregatorReport(zeroGapReport);
+  const invalidPacket = buildRc9DecisionPacketFromAggregatorReport(null);
+
+  assert.equal(nonzeroPacket.status, 'rc_not_ready_blocked');
+  assert.equal(nonzeroPacket.decision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(nonzeroPacket.readyToRequestRcCutoverApproval, false);
+  assert.deepEqual(nonzeroPacket.remainingGapIds, [
+    'validation_aggregator_full_implementation_incomplete'
+  ]);
+
+  assert.equal(zeroGapPacket.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
+  assert.equal(zeroGapPacket.decision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(zeroGapPacket.readyToRequestRcCutoverApproval, true);
+  assert.equal(zeroGapPacket.remainingGapCount, 0);
+  assert.equal(zeroGapPacket.rcCutoverApprovalRequired, true);
+  assert.equal(zeroGapPacket.rcCutoverApprovalPresent, false);
+  assert.equal(zeroGapPacket.rcCutoverApproved, false);
+  assert.equal(zeroGapPacket.rcCutoverExecuted, false);
+  assert.equal(zeroGapPacket.rcCutoverExecutionAllowed, false);
+  assert.equal(zeroGapPacket.rcReady, false);
+  assert.equal(zeroGapPacket.finalRcReady, false);
+  assert.equal(zeroGapPacket.runtimeReady, false);
+  assert.equal(zeroGapPacket.canClaimRcReady, false);
+  assert.equal(zeroGapPacket.safety.readsFiles, false);
+  assert.equal(zeroGapPacket.safety.executesCommands, false);
+  assert.equal(zeroGapPacket.safety.callsMcpTools, false);
+  assert.equal(zeroGapPacket.safety.remoteWrites, false);
+  assert.equal(zeroGapPacket.safety.cutoverExecuted, false);
+  assert.equal(zeroGapPacket.safety.readinessClaimed, false);
+  assert.equal(zeroGapPacket.notExecuted.includes('rc_cutover'), true);
+  assert.equal(zeroGapPacket.notExecuted.includes('tag_creation'), true);
+  assert.equal(zeroGapPacket.notExecuted.includes('release_creation'), true);
+  assert.equal(zeroGapPacket.notExecuted.includes('deploy'), true);
+
+  assert.equal(invalidPacket.status, 'rc_not_ready_blocked');
+  assert.equal(invalidPacket.readyToRequestRcCutoverApproval, false);
+  assert.equal(invalidPacket.rcReady, false);
+  assertNoSensitiveSurface({ ...zeroGapReport, rc9DecisionPacket: zeroGapPacket });
 });
 
 test('validation aggregator runtime evidence summary fails closed on current-head binding mismatch', () => {
