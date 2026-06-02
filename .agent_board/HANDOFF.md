@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1386 PHASE_F_READINESS_CLAIM_SEMANTICS`.
+Goal: `CM-1387 POST_PUSH_A5_GAP4_LIVE_NO_WRITE_REFRESH`.
 
-Status: `COMPLETED_VALIDATED_PHASE_F_READINESS_CLAIM_SEMANTICS` for local Phase F readiness claim semantics. CM-1386 splits local evidence completion from clean-synced readiness claim allowance while keeping `RC_READY=false`; dirty/ahead local evidence can be complete without allowing a readiness claim. No `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. After the guarded local commit containing this handoff, sync only with explicit approval; otherwise choose the next local phase from fresh Git facts. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_POST_PUSH_A5_GAP4_LIVE_NO_WRITE_REFRESH` for exact-approved post-push A5-GAP-4 live-client no-write refresh at synced `main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496`. The bounded harness accepted health, initialize, tools/list, authenticated `memory_overview`, no-token selected `memory_overview`, and no-token `record_memory/search_memory` rejection reason codes. No provider call, durable write, config/watchdog/startup change, additional remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. After the guarded local commit containing this handoff, sync only with explicit approval; otherwise choose the next local phase from fresh Git facts. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
