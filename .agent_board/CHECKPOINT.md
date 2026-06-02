@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1370 Phase F1 Sync Blocker Status Summary Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local sync packet generator blocker-summary hardening. No push, pull, merge, rebase, F1 live rerun, MCP/provider call, real memory/audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Added `postPushA5UsabilityStatus`.
+- Added `syncBlocker`.
+- Text output now prints both fields.
+- Targeted tests cover clean-ahead push approval required, fail-closed dirty/remote-behind, and clean-synced post-push A5 usability.
+
+Validation:
+
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f1-sync-approval-packet.test.js` passed `3/3`.
+- `npm test` passed `2890/2890`.
+- `git diff --check` passed.
+- Ledger consistency passed.
+- Docs validation passed.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- After commit, rerun the generator from clean HEAD and use only fresh output for push/A5 approval.
+
 ## CM-1369 Phase F1 Post-Push A5 Usability Gate Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

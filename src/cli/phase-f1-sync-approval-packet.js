@@ -111,9 +111,11 @@ function renderText(packet) {
     '',
     'postPushA5Gap4ApprovalTemplate:',
     packet.postPushA5Gap4ApprovalTemplate,
+    `postPushA5UsabilityStatus: ${packet.postPushA5UsabilityStatus}`,
     `postPushA5Gap4TemplateCurrentlyUsable: ${packet.postPushA5Gap4TemplateCurrentlyUsable}`,
     `postPushFreshChecks: head=${packet.postPushFreshChecks?.requiredHead || ''}; currentEqualsRemote=${packet.postPushFreshChecks?.requireCurrentHeadEqualsRemoteHead}; ahead=${packet.postPushFreshChecks?.requireAhead}; behind=${packet.postPushFreshChecks?.requireBehind}; worktreeClean=${packet.postPushFreshChecks?.requireWorktreeClean}; currentlySatisfied=${packet.postPushFreshChecks?.currentlySatisfied}`,
     '',
+    `syncBlocker: status=${packet.syncBlocker?.status || ''}; reasons=${(packet.syncBlocker?.reasons || []).join(',') || 'none'}; redLaneActionRequired=${packet.syncBlocker?.redLaneActionRequired}; remoteActionApproved=${packet.syncBlocker?.remoteActionApproved}; remoteActionExecuted=${packet.syncBlocker?.remoteActionExecuted}`,
     `nextRequiredAction: ${packet.nextRequiredAction}`,
     `failClosedReasons: ${(packet.failClosedReasons || []).join(',') || 'none'}`
   ].join('\n') + '\n';

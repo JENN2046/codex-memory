@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1369 PHASE_F1_POST_PUSH_A5_USABILITY_GATE`.
+Goal: `CM-1370 PHASE_F1_SYNC_BLOCKER_STATUS_SUMMARY`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local sync packet generator usability-gate hardening. CM-1369 adds `postPushA5Gap4TemplateCurrentlyUsable` and `postPushFreshChecks`, so generated post-push A5-GAP-4 text is marked currently usable only when clean synced HEAD facts are satisfied. Targeted tests passed `3/3`; default `npm test` passed `2890/2890`. It did not push, pull, merge, rebase, rerun F1, call providers, call MCP, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness/reliability. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local sync packet blocker-summary hardening. CM-1370 adds `postPushA5UsabilityStatus` and `syncBlocker` to make the current F1 sync boundary machine-readable. Targeted tests passed `3/3`; default `npm test` passed `2890/2890`; docs validation passed. It did not push, pull, merge, rebase, rerun F1, call providers, call MCP, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness/reliability. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

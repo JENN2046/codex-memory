@@ -41,11 +41,17 @@ test('Phase F1 sync packet renders exact non-authorizing push approval template'
   assert.match(packet.postPushA5Gap4ApprovalTemplate, /A5-GAP-4 live-client no-write contract refresh/);
   assert.equal(packet.postPushA5Gap4TemplateUsableAfterSyncOnly, true);
   assert.equal(packet.postPushA5Gap4TemplateCurrentlyUsable, false);
+  assert.equal(packet.postPushA5UsabilityStatus, 'not_currently_usable_until_clean_synced_head');
   assert.equal(packet.postPushFreshChecks.requiredHead, '16b02bbdd5366b6108b8c476f91543c3c5e6f111');
   assert.equal(packet.postPushFreshChecks.requireAhead, 0);
   assert.equal(packet.postPushFreshChecks.requireBehind, 0);
   assert.equal(packet.postPushFreshChecks.requireWorktreeClean, true);
   assert.equal(packet.postPushFreshChecks.currentlySatisfied, false);
+  assert.equal(packet.syncBlocker.status, 'push_approval_required');
+  assert.deepEqual(packet.syncBlocker.reasons, ['local_branch_ahead_remote']);
+  assert.equal(packet.syncBlocker.redLaneActionRequired, true);
+  assert.equal(packet.syncBlocker.remoteActionApproved, false);
+  assert.equal(packet.syncBlocker.remoteActionExecuted, false);
 
   const a5Check = evaluateA5ApprovalLine({
     approvalLine: packet.postPushA5Gap4ApprovalTemplate,
@@ -79,6 +85,9 @@ test('Phase F1 sync packet fail-closes when remote has commits or worktree is di
   assert.equal(packet.f1LiveExecutionAllowed, false);
   assert.equal(packet.failClosedReasons.includes('remote_has_unmerged_commits'), true);
   assert.equal(packet.failClosedReasons.includes('dirty_worktree'), true);
+  assert.equal(packet.syncBlocker.status, 'fail_closed');
+  assert.equal(packet.syncBlocker.redLaneActionRequired, false);
+  assert.deepEqual(packet.syncBlocker.reasons, ['remote_has_unmerged_commits', 'dirty_worktree']);
   assert.equal(packet.nextRequiredAction, 'review_fail_closed_reasons_before_sync');
   assert.match(packet.postPushA5Gap4ApprovalTemplate, /16b02bbdd5366b6108b8c476f91543c3c5e6f111/);
 });
@@ -96,7 +105,10 @@ test('Phase F1 sync packet marks post-push A5 template usable only on clean sync
   });
 
   assert.equal(packet.postPushA5Gap4TemplateCurrentlyUsable, true);
+  assert.equal(packet.postPushA5UsabilityStatus, 'currently_usable_synced_head_verified');
   assert.equal(packet.postPushFreshChecks.currentlySatisfied, true);
   assert.equal(packet.failClosedReasons.includes('no_local_commits_to_sync'), true);
+  assert.equal(packet.syncBlocker.status, 'fail_closed');
+  assert.deepEqual(packet.syncBlocker.reasons, ['no_local_commits_to_sync']);
   assert.equal(packet.f1LiveExecutionAllowed, false);
 });

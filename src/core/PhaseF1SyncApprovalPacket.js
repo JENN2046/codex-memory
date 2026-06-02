@@ -67,6 +67,20 @@ function buildPhaseF1SyncApprovalPacket(input = {}) {
   if (behind > 0) failClosedReasons.push('remote_has_unmerged_commits');
   if (!worktreeClean) failClosedReasons.push('dirty_worktree');
   if (ahead <= 0) failClosedReasons.push('no_local_commits_to_sync');
+  const nextRequiredAction = failClosedReasons.length
+    ? 'review_fail_closed_reasons_before_sync'
+    : 'obtain_explicit_normal_non_force_push_approval';
+  const syncBlocker = {
+    status: failClosedReasons.length ? 'fail_closed' : 'push_approval_required',
+    nextRequiredAction,
+    reasons: failClosedReasons.length ? [...failClosedReasons] : ['local_branch_ahead_remote'],
+    redLaneActionRequired: failClosedReasons.length === 0,
+    remoteActionApproved: false,
+    remoteActionExecuted: false
+  };
+  const postPushA5UsabilityStatus = postPushA5Gap4TemplateCurrentlyUsable
+    ? 'currently_usable_synced_head_verified'
+    : 'not_currently_usable_until_clean_synced_head';
 
   const pushCommand = `git push origin ${branch}`;
   const approvalTemplate = buildApprovalTemplate({
@@ -100,6 +114,7 @@ function buildPhaseF1SyncApprovalPacket(input = {}) {
     postPushA5Gap4ApprovalTemplate,
     postPushA5Gap4TemplateUsableAfterSyncOnly: true,
     postPushA5Gap4TemplateCurrentlyUsable,
+    postPushA5UsabilityStatus,
     postPushFreshChecks: {
       requiredBranch: branch,
       requiredRemoteRef: remoteRef,
@@ -110,12 +125,11 @@ function buildPhaseF1SyncApprovalPacket(input = {}) {
       requireWorktreeClean: true,
       currentlySatisfied: postPushA5Gap4TemplateCurrentlyUsable
     },
+    syncBlocker,
     pushApproved: false,
     pushExecuted: false,
     f1LiveExecutionAllowed: false,
-    nextRequiredAction: failClosedReasons.length
-      ? 'review_fail_closed_reasons_before_sync'
-      : 'obtain_explicit_normal_non_force_push_approval',
+    nextRequiredAction,
     failClosedReasons,
     safetyCounters: {
       push: 0,
