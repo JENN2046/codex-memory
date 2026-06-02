@@ -111,6 +111,8 @@ function renderText(packet) {
     '',
     'postPushA5Gap4ApprovalTemplate:',
     packet.postPushA5Gap4ApprovalTemplate,
+    `postPushA5Gap4TemplateCurrentlyUsable: ${packet.postPushA5Gap4TemplateCurrentlyUsable}`,
+    `postPushFreshChecks: head=${packet.postPushFreshChecks?.requiredHead || ''}; currentEqualsRemote=${packet.postPushFreshChecks?.requireCurrentHeadEqualsRemoteHead}; ahead=${packet.postPushFreshChecks?.requireAhead}; behind=${packet.postPushFreshChecks?.requireBehind}; worktreeClean=${packet.postPushFreshChecks?.requireWorktreeClean}; currentlySatisfied=${packet.postPushFreshChecks?.currentlySatisfied}`,
     '',
     `nextRequiredAction: ${packet.nextRequiredAction}`,
     `failClosedReasons: ${(packet.failClosedReasons || []).join(',') || 'none'}`

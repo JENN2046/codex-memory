@@ -40,6 +40,12 @@ test('Phase F1 sync packet renders exact non-authorizing push approval template'
   assert.match(packet.approvalTemplate, /no MCP call, no real memory read\/write/);
   assert.match(packet.postPushA5Gap4ApprovalTemplate, /A5-GAP-4 live-client no-write contract refresh/);
   assert.equal(packet.postPushA5Gap4TemplateUsableAfterSyncOnly, true);
+  assert.equal(packet.postPushA5Gap4TemplateCurrentlyUsable, false);
+  assert.equal(packet.postPushFreshChecks.requiredHead, '16b02bbdd5366b6108b8c476f91543c3c5e6f111');
+  assert.equal(packet.postPushFreshChecks.requireAhead, 0);
+  assert.equal(packet.postPushFreshChecks.requireBehind, 0);
+  assert.equal(packet.postPushFreshChecks.requireWorktreeClean, true);
+  assert.equal(packet.postPushFreshChecks.currentlySatisfied, false);
 
   const a5Check = evaluateA5ApprovalLine({
     approvalLine: packet.postPushA5Gap4ApprovalTemplate,
@@ -75,4 +81,22 @@ test('Phase F1 sync packet fail-closes when remote has commits or worktree is di
   assert.equal(packet.failClosedReasons.includes('dirty_worktree'), true);
   assert.equal(packet.nextRequiredAction, 'review_fail_closed_reasons_before_sync');
   assert.match(packet.postPushA5Gap4ApprovalTemplate, /16b02bbdd5366b6108b8c476f91543c3c5e6f111/);
+});
+
+test('Phase F1 sync packet marks post-push A5 template usable only on clean synced head', () => {
+  const packet = buildPhaseF1SyncApprovalPacket({
+    workspace: 'A:\\codex-memory',
+    branch: 'main',
+    remoteRef: 'origin/main',
+    currentHead: '16b02bbdd5366b6108b8c476f91543c3c5e6f111',
+    originHead: '16b02bbdd5366b6108b8c476f91543c3c5e6f111',
+    ahead: 0,
+    behind: 0,
+    worktreeClean: true
+  });
+
+  assert.equal(packet.postPushA5Gap4TemplateCurrentlyUsable, true);
+  assert.equal(packet.postPushFreshChecks.currentlySatisfied, true);
+  assert.equal(packet.failClosedReasons.includes('no_local_commits_to_sync'), true);
+  assert.equal(packet.f1LiveExecutionAllowed, false);
 });

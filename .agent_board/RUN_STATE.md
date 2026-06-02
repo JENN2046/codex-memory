@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1368 dynamic post-push A5 template generator completed locally; push approval still required |
+| Current task | CM-1369 post-push A5 usability gate completed locally; push approval still required |
 | Current area | P4-http-runtime / P9-codex-claude-client-scope / P0-mainline-health |
 | Current route | Phase F1 current-head approval packet -> exact A5-GAP-4 live-client no-write execution -> A5-GAP-6 aggregation refresh -> true-live recall negative-control proof -> minimal personal dogfood write preflight -> closeout |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1368 lets `phase-f1-sync-approval-packet` dynamically render both the current-head push approval template and the post-push exact A5-GAP-4 F1 live no-write approval template. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, the push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. Do not proceed to F2/F3/F4/F5 until accepted F1 live evidence exists.
+CM-1369 lets `phase-f1-sync-approval-packet` distinguish generated post-push A5-GAP-4 text from currently usable A5 authorization by requiring clean synced HEAD facts. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, the push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. Do not proceed to F2/F3/F4/F5 until accepted F1 live evidence exists.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1369 Phase F1 Post-Push A5 Usability Gate Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local sync packet generator usability-gate hardening. No push, pull, merge, rebase, F1 live rerun, MCP/provider call, real memory/audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Added `postPushA5Gap4TemplateCurrentlyUsable`.
+- Added `postPushFreshChecks`.
+- Text output now prints current post-push A5 usability and fresh-sync requirements.
+- Targeted tests cover ahead/not-usable and clean-synced/usable states.
+
+Validation:
+
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f1-sync-approval-packet.test.js` passed `3/3`.
+- `npm test` passed `2890/2890`.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- After commit, rerun the generator from clean HEAD and use only fresh output for push/A5 approval.
+
 ## CM-1368 Phase F1 Dynamic Post-Push A5 Template Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

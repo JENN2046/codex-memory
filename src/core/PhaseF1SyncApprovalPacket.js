@@ -51,6 +51,15 @@ function buildPhaseF1SyncApprovalPacket(input = {}) {
   const behind = normalizeCount(input.behind);
   const worktreeClean = input.worktreeClean === true;
   const commits = Array.isArray(input.commits) ? input.commits.map(normalizeString).filter(Boolean) : [];
+  const syncedHead = currentHead && originHead && currentHead === originHead;
+  const postPushA5Gap4TemplateCurrentlyUsable = !!(
+    currentHead &&
+    originHead &&
+    syncedHead &&
+    ahead === 0 &&
+    behind === 0 &&
+    worktreeClean
+  );
 
   const failClosedReasons = [];
   if (!currentHead) failClosedReasons.push('missing_current_head');
@@ -90,6 +99,17 @@ function buildPhaseF1SyncApprovalPacket(input = {}) {
     approvalTemplate,
     postPushA5Gap4ApprovalTemplate,
     postPushA5Gap4TemplateUsableAfterSyncOnly: true,
+    postPushA5Gap4TemplateCurrentlyUsable,
+    postPushFreshChecks: {
+      requiredBranch: branch,
+      requiredRemoteRef: remoteRef,
+      requiredHead: currentHead,
+      requireCurrentHeadEqualsRemoteHead: true,
+      requireAhead: 0,
+      requireBehind: 0,
+      requireWorktreeClean: true,
+      currentlySatisfied: postPushA5Gap4TemplateCurrentlyUsable
+    },
     pushApproved: false,
     pushExecuted: false,
     f1LiveExecutionAllowed: false,
