@@ -1,5 +1,17 @@
 # codex-memory Status
 
+<!-- CURRENT-FACTS-ACTIVE-START -->
+
+Current facts source: `.agent_board/CURRENT_FACTS.json`.
+
+Current task: `CM-1389 current facts single source`.
+Current validation: `CMV-1507`.
+Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current route: `Phase G -> G1 Memory Governance Runtime Boundary`.
+Current rule: active status summaries must reference `.agent_board/CURRENT_FACTS.json` and must not repeat full commit hashes.
+
+<!-- CURRENT-FACTS-ACTIVE-END -->
+
 更新时间：2026-06-02
 
 ## 当前结论

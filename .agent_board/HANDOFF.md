@@ -1,5 +1,15 @@
 # HANDOFF.md - codex-memory
 
+<!-- CURRENT-FACTS-ACTIVE-START -->
+
+Current facts source: `.agent_board/CURRENT_FACTS.json`.
+
+Current task: `CM-1389 current facts single source`.
+Current validation: `CMV-1507`.
+Current handoff: active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
+
+<!-- CURRENT-FACTS-ACTIVE-END -->
+
 ## Current Handoff
 
 Goal: `CM-1388 PHASE_G_AUTHORITATIVE_ROUTE_ENTRYPOINT`.

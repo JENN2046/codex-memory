@@ -1,5 +1,16 @@
 # RUN_STATE.md - codex-memory
 
+<!-- CURRENT-FACTS-ACTIVE-START -->
+
+Current facts source: `.agent_board/CURRENT_FACTS.json`.
+
+Current task: `CM-1389 current facts single source`.
+Current validation: `CMV-1507`.
+Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Branch and HEAD values are intentionally not repeated here; read `.agent_board/CURRENT_FACTS.json` and fresh Git output.
+
+<!-- CURRENT-FACTS-ACTIVE-END -->
+
 | Field | Value |
 |---|---|
 | Workspace root | A:\codex-memory |

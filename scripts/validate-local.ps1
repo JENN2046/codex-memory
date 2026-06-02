@@ -69,6 +69,10 @@ switch ($Area) {
       Run-Step "node --check .\scripts\validate_autopilot_ledger_consistency.js" "node" @("--check", ".\scripts\validate_autopilot_ledger_consistency.js")
       Run-Step "node .\scripts\validate_autopilot_ledger_consistency.js" "node" @(".\scripts\validate_autopilot_ledger_consistency.js")
     }
+    if (Test-Path ".\scripts\validate_current_facts_drift.js") {
+      Run-Step "node --check .\scripts\validate_current_facts_drift.js" "node" @("--check", ".\scripts\validate_current_facts_drift.js")
+      Run-Step "node .\scripts\validate_current_facts_drift.js" "node" @(".\scripts\validate_current_facts_drift.js")
+    }
     if (Test-Path ".\scripts\validate_autopilot_goal_compiler.js") {
       Run-Step "node --check .\scripts\validate_autopilot_goal_compiler.js" "node" @("--check", ".\scripts\validate_autopilot_goal_compiler.js")
       Run-Step "node .\scripts\validate_autopilot_goal_compiler.js" "node" @(".\scripts\validate_autopilot_goal_compiler.js")
