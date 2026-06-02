@@ -41,7 +41,9 @@ RC-1 current-head local baseline is recorded in `.agent_board/CHECKPOINT.md` for
 
 RC-2 A5-GAP-5 strict gate evidence is recorded at `docs/RC2_A5_GAP5_STRICT_GATE_PREFLIGHT.md` for target commit `9cb7df9b0aafc5951e8650f07633a4711cef7c55`: `npm run gate:mainline:strict` passed with health ok, contract `31/31`, test `2926/2926`, compare `43/43`, and rollback `43/43`.
 
-Next safe action is RC-3 live HTTP / MCP no-write preflight: check local `7605` runtime freshness and prepare the appropriate A5-GAP-4 approval boundary. Do not execute live client operations beyond preflight, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+RC-3 live HTTP / MCP no-write preflight is prepared at `docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md`: local `/health` is reachable, but health does not expose a commit/build hash, so runtime commit freshness is not proven by health alone.
+
+Next safe action is either review/commit the RC-3 preflight packet, or provide a fresh A5-GAP-4 exact approval line after the packet is stabilized. Do not execute MCP initialize/tools-list, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

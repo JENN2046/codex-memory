@@ -10,6 +10,27 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC-3 A5-GAP-4 Live HTTP No-Write Preflight
+
+Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_EXECUTED`
+
+Date: 2026-06-02
+
+Packet: [docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md](/A:/codex-memory/docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md)
+
+Result:
+
+- Checked `http://127.0.0.1:7605/health` only.
+- Health was reachable and returned service `vcp_codex_memory`, version `0.1.0`, protocol `streamable-http`, path `/mcp/codex-memory`, and `auth.required=true`.
+- `/health` does not expose a Git commit or build hash, so runtime commit freshness is not proven by health alone.
+- Prepared A5-GAP-4 live HTTP / MCP no-write approval boundary.
+- No MCP `initialize`, MCP `tools/list`, memory tool call, bearer-token use, provider call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote write, readiness claim, release, deploy, or cutover action occurred.
+
+Next:
+
+- Review/commit the RC-3 preflight packet, then regenerate the A5-GAP-4 approval line for the new post-commit `HEAD`.
+- Do not execute live HTTP / MCP evidence beyond preflight without exact A5-GAP-4 approval.
+
 ## RC-2 A5-GAP-5 Strict Gate Preflight
 
 Status: `TARGET_BOUND_STRICT_GATE_PASSED_NOT_RC_READY`
