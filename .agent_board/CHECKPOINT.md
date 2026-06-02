@@ -1,5 +1,28 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1359 Phase F3 Conditional True-Live Recall Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board preflight for Phase F3 true-live recall negative-control proof. No `search_memory`, true-live proof execution, service start, MCP/provider call, `record_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, push, readiness claim, or reliability claim.
+
+Result:
+
+- Prepared conditional true-live recall preflight for F3.
+- Locked sequence guard: F3 cannot execute before F1 and F2 evidence exist.
+- Added non-authorizing approval template for a future fresh synced post-F2 head.
+- Kept `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- Docs/board changed-scope review, `git diff --check`, ledger consistency, and docs validation are required for closeout.
+
+Next:
+
+- Complete F1 and F2 first.
+
 ## CM-1358 Phase F2 Conditional A5-GAP-6 Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

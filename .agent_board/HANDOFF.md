@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1358 PHASE_F2_CONDITIONAL_A5_GAP6_PREFLIGHT`.
+Goal: `CM-1359 PHASE_F3_CONDITIONAL_TRUE_LIVE_RECALL_PREFLIGHT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F2 conditional A5-GAP-6 preflight. F2 aggregation refresh remains blocked until F1 live-client no-write evidence capture is complete and recorded as `PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY`. CM-1358 provides only a non-authorizing A5-GAP-6 template and stop conditions; it does not execute ValidationAggregator or close any runtime gap. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F3 conditional true-live recall preflight. F3 recall proof remains blocked until F1 live-client no-write evidence and F2 A5-GAP-6 aggregation evidence are complete. CM-1359 provides only a non-authorizing true-live negative-control approval template and stop conditions; it does not run `search_memory`, the true-live proof runner, or any recall reliability proof. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
