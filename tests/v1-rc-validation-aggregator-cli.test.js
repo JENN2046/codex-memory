@@ -72,6 +72,26 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
     'migration_dry_run',
     'validation_aggregator_zero_gap'
   ]);
+  assert.equal(
+    report.evidence.rc9DecisionPacket.completenessChecklist
+      .find(item => item.id === 'strict_gate').evidenceUnitId,
+    'A5-GAP-5'
+  );
+  assert.equal(
+    report.evidence.rc9DecisionPacket.completenessChecklist
+      .find(item => item.id === 'strict_gate').evidenceUnitPresent,
+    false
+  );
+  assert.equal(
+    report.evidence.rc9DecisionPacket.completenessChecklist
+      .find(item => item.id === 'strict_gate').currentHeadBound,
+    false
+  );
+  assert.equal(
+    report.evidence.rc9DecisionPacket.completenessChecklist
+      .find(item => item.id === 'strict_gate').evidenceFresh,
+    false
+  );
   assert.deepEqual(
     report.evidence.rc9DecisionPacket.cutoverApprovalBoundaryAudit.requiredApprovalFields,
     [

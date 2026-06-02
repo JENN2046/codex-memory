@@ -5054,20 +5054,48 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
   const buildCompletenessRow = ({
     id,
     label,
+    evidenceUnitId = null,
     accepted,
     sourceRef,
-    missingReason
-  }) => ({
-    id,
-    label,
-    required: true,
-    status: accepted ? 'accepted' : 'missing_or_not_accepted',
-    accepted,
-    blocking: !accepted,
-    sourceRef,
-    missingReason: accepted ? null : missingReason,
-    canClaimRcReady: false
-  });
+    missingReason,
+    bindingRequired = false
+  }) => {
+    const evidenceUnitPresent = evidenceUnitId
+      ? hasEvidenceUnit(evidenceUnitId)
+      : null;
+    const currentHeadBound =
+      runtimeEvidenceSummaryAccepted &&
+      runtimeEvidenceBridgeSummary.currentHeadBindingMatched === true;
+    const evidenceFresh =
+      runtimeEvidenceSummaryAccepted &&
+      runtimeEvidenceBridgeSummary.evidenceFreshnessStatus === 'fresh';
+    const acceptedWithBinding =
+      accepted &&
+      (!evidenceUnitId || evidenceUnitPresent === true) &&
+      (!bindingRequired || (currentHeadBound && evidenceFresh));
+
+    return {
+      id,
+      label,
+      required: true,
+      evidenceUnitId,
+      evidenceUnitPresent,
+      currentHeadBound,
+      bindingCommit: currentHeadBound
+        ? runtimeEvidenceBridgeSummary.currentHeadCommit
+        : null,
+      evidenceFresh,
+      evidenceGeneratedAt: evidenceFresh
+        ? runtimeEvidenceBridgeSummary.evidenceGeneratedAt
+        : null,
+      status: acceptedWithBinding ? 'accepted' : 'missing_or_not_accepted',
+      accepted: acceptedWithBinding,
+      blocking: !acceptedWithBinding,
+      sourceRef,
+      missingReason: acceptedWithBinding ? null : missingReason,
+      canClaimRcReady: false
+    };
+  };
   const rc9PacketCompletenessChecklist = [
     buildCompletenessRow({
       id: 'fresh_current_head',
@@ -5076,52 +5104,63 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
         runtimeEvidenceSummaryAccepted &&
         runtimeEvidenceBridgeSummary.currentHeadBindingMatched === true,
       sourceRef: 'runtime_evidence_summary.currentHeadCommit',
-      missingReason: 'current_head_binding_missing_or_not_matched'
+      missingReason: 'current_head_binding_missing_or_not_matched',
+      bindingRequired: true
     }),
     buildCompletenessRow({
       id: 'strict_gate',
       label: 'target-bound strict gate evidence',
+      evidenceUnitId: 'A5-GAP-5',
       accepted:
         runtimeEvidenceSummaryAccepted &&
-        hasEvidenceUnit('A5-GAP-5') &&
         runtimeEvidenceBridgeSummary.allCriticalCommandsPassed === true,
       sourceRef: 'A5-GAP-5',
-      missingReason: 'a5_gap_5_strict_gate_evidence_missing_or_not_passed'
+      missingReason: 'a5_gap_5_strict_gate_evidence_missing_or_not_passed',
+      bindingRequired: true
     }),
     buildCompletenessRow({
       id: 'live_http_no_write',
       label: 'live HTTP / MCP no-write evidence',
-      accepted: runtimeEvidenceSummaryAccepted && hasEvidenceUnit('A5-GAP-4'),
+      evidenceUnitId: 'A5-GAP-4',
+      accepted: runtimeEvidenceSummaryAccepted,
       sourceRef: 'A5-GAP-4',
-      missingReason: 'a5_gap_4_live_http_no_write_evidence_missing'
+      missingReason: 'a5_gap_4_live_http_no_write_evidence_missing',
+      bindingRequired: true
     }),
     buildCompletenessRow({
       id: 'governance_runtime',
       label: 'governance runtime evidence',
-      accepted: runtimeEvidenceSummaryAccepted && hasEvidenceUnit('A5-GAP-1'),
+      evidenceUnitId: 'A5-GAP-1',
+      accepted: runtimeEvidenceSummaryAccepted,
       sourceRef: 'A5-GAP-1',
-      missingReason: 'a5_gap_1_governance_evidence_missing'
+      missingReason: 'a5_gap_1_governance_evidence_missing',
+      bindingRequired: true
     }),
     buildCompletenessRow({
       id: 'recall_isolation',
       label: 'recall isolation runtime evidence',
-      accepted: runtimeEvidenceSummaryAccepted && hasEvidenceUnit('A5-GAP-2'),
+      evidenceUnitId: 'A5-GAP-2',
+      accepted: runtimeEvidenceSummaryAccepted,
       sourceRef: 'A5-GAP-2',
-      missingReason: 'a5_gap_2_recall_isolation_evidence_missing'
+      missingReason: 'a5_gap_2_recall_isolation_evidence_missing',
+      bindingRequired: true
     }),
     buildCompletenessRow({
       id: 'migration_dry_run',
       label: 'migration/import/export dry-run evidence',
-      accepted: runtimeEvidenceSummaryAccepted && hasEvidenceUnit('A5-GAP-3'),
+      evidenceUnitId: 'A5-GAP-3',
+      accepted: runtimeEvidenceSummaryAccepted,
       sourceRef: 'A5-GAP-3',
-      missingReason: 'a5_gap_3_migration_dry_run_evidence_missing'
+      missingReason: 'a5_gap_3_migration_dry_run_evidence_missing',
+      bindingRequired: true
     }),
     buildCompletenessRow({
       id: 'validation_aggregator_zero_gap',
       label: 'ValidationAggregator zero-gap aggregation',
       accepted: readyToRequestRcCutoverApproval,
       sourceRef: 'A5-GAP-6',
-      missingReason: 'aggregator_zero_gap_not_available'
+      missingReason: 'aggregator_zero_gap_not_available',
+      bindingRequired: true
     }),
     buildCompletenessRow({
       id: 'not_executed_boundary',
@@ -5226,7 +5265,11 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     `- ${safeEvidenceString(item.id, 'unknown_check')}`,
     `status=${safeEvidenceString(item.status, 'unknown_status')}`,
     `blocking=${item.blocking === true}`,
-    `source=${safeEvidenceString(item.sourceRef, 'unknown_source')}`
+    `source=${safeEvidenceString(item.sourceRef, 'unknown_source')}`,
+    `unit=${safeEvidenceString(item.evidenceUnitId || 'none', 'none')}`,
+    `unit_present=${item.evidenceUnitPresent === true}`,
+    `head_bound=${item.currentHeadBound === true}`,
+    `fresh=${item.evidenceFresh === true}`
   ].join(' | '));
   const markdown = [
     '# RC-9 RC Decision Packet',

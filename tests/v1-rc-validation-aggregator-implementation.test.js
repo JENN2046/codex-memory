@@ -3149,6 +3149,33 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
       ['rollback_path', 'accepted', false]
     ]
   );
+  for (const id of [
+    'fresh_current_head',
+    'strict_gate',
+    'live_http_no_write',
+    'governance_runtime',
+    'recall_isolation',
+    'migration_dry_run',
+    'validation_aggregator_zero_gap'
+  ]) {
+    const row = zeroGapPacket.completenessChecklist.find(item => item.id === id);
+    assert.equal(row.currentHeadBound, true, id);
+    assert.equal(row.bindingCommit, 'abc1234def5678', id);
+    assert.equal(row.evidenceFresh, true, id);
+    assert.equal(row.evidenceGeneratedAt, '2026-05-18T01:30:00.000Z', id);
+  }
+  assert.equal(
+    zeroGapPacket.completenessChecklist.find(item => item.id === 'strict_gate').evidenceUnitId,
+    'A5-GAP-5'
+  );
+  assert.equal(
+    zeroGapPacket.completenessChecklist.find(item => item.id === 'strict_gate').evidenceUnitPresent,
+    true
+  );
+  assert.equal(
+    zeroGapPacket.completenessChecklist.find(item => item.id === 'validation_aggregator_zero_gap').evidenceUnitId,
+    null
+  );
   assert.equal(zeroGapPacket.rcCutoverApprovalRequired, true);
   assert.equal(zeroGapPacket.rcCutoverApprovalPresent, false);
   assert.equal(zeroGapPacket.rcCutoverApproved, false);
@@ -3219,6 +3246,18 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
     'migration_dry_run',
     'validation_aggregator_zero_gap'
   ]);
+  assert.equal(
+    invalidPacket.completenessChecklist.find(item => item.id === 'strict_gate').evidenceUnitPresent,
+    false
+  );
+  assert.equal(
+    invalidPacket.completenessChecklist.find(item => item.id === 'strict_gate').currentHeadBound,
+    false
+  );
+  assert.equal(
+    invalidPacket.completenessChecklist.find(item => item.id === 'strict_gate').evidenceFresh,
+    false
+  );
   assert.equal(
     invalidPacket.cutoverApprovalBoundaryAuditStatus,
     'not_ready_for_cutover_approval_request'
@@ -3334,6 +3373,10 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(zeroGapRender.markdown.includes('completeness_checklist_missing_count = 0'), true);
   assert.equal(zeroGapRender.markdown.includes('## Completeness Checklist'), true);
   assert.equal(zeroGapRender.markdown.includes('- fresh_current_head | status=accepted | blocking=false | source=runtime_evidence_summary.currentHeadCommit'), true);
+  assert.equal(
+    zeroGapRender.markdown.includes('unit=A5-GAP-5 | unit_present=true | head_bound=true | fresh=true'),
+    true
+  );
   assert.equal(zeroGapRender.markdown.includes('- strict_gate | status=accepted | blocking=false | source=A5-GAP-5'), true);
   assert.equal(zeroGapRender.markdown.includes('- live_http_no_write | status=accepted | blocking=false | source=A5-GAP-4'), true);
   assert.equal(zeroGapRender.markdown.includes('- governance_runtime | status=accepted | blocking=false | source=A5-GAP-1'), true);
