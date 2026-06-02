@@ -1,11 +1,18 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "factsMode": "committed_status_snapshot",
+  "gitFactsSource": "fresh_git_commands",
+  "liveGitFactsCommitted": false,
+  "liveGitFactsPolicy": {
+    "currentHeadCommitted": false,
+    "originHeadCommitted": false,
+    "freshGitRequiredBeforeRemoteAction": true,
+    "freshGitRequiredBeforeRuntimeAction": true
+  },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1402",
-  "validationId": "CMV-1520",
+  "taskId": "CM-1403",
+  "validationId": "CMV-1521",
   "branch": "main",
-  "localHead": "b2dbdc326de19da5015a9e0943fc71428f0600b3",
-  "originHead": "b2dbdc326de19da5015a9e0943fc71428f0600b3",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -24,6 +31,16 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1521",
+      "scope": "CM-1403 current facts schema v2 non-self-referential semantics",
+      "status": "COMPLETED_VALIDATED_NO_APPLY"
+    },
+    {
+      "id": "CMV-1521-NPM-TEST",
+      "scope": "CM-1403 default npm test",
+      "status": "PASSED_2943_OF_2943"
+    },
     {
       "id": "CMV-1520",
       "scope": "CM-1402 Phase H Codex/Claude client integration runbook and acceptance preflight",
@@ -51,12 +68,15 @@
     "live client acceptance",
     "provider smoke or benchmark",
     "real memory tools",
-    "runtime freshness"
+    "runtime freshness",
+    "committed live Git head facts"
   ],
   "constraints": {
     "claudeMdUntrackedUntouched": true,
     "noProviderCalls": true,
     "noRealMemoryCalls": true,
-    "noPushWithoutExplicitAuthorization": true
+    "noPushWithoutExplicitAuthorization": true,
+    "noCommittedLiveGitHeads": true,
+    "freshGitFactsRequiredBeforeBranchSensitiveAction": true
   }
 }

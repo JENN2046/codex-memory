@@ -2,12 +2,12 @@
 
 <!-- CURRENT-FACTS-ACTIVE-START -->
 
-Current facts source: `.agent_board/CURRENT_FACTS.json`.
+Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1402 Phase H Codex/Claude client integration runbook and acceptance preflight`.
-Current validation: `CMV-1520`.
+Current task: `CM-1403 current facts schema v2 non-self-referential semantics`.
+Current validation: `CMV-1521`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Branch and HEAD values are intentionally not repeated here; read `.agent_board/CURRENT_FACTS.json` and fresh Git output.
+Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

@@ -9,6 +9,9 @@ const SHA40_RE = /^[0-9a-f]{40}$/;
 const SHA40_SCAN_RE = /\b[0-9a-f]{40}\b/gi;
 const CM_RE = /^CM-\d{4}$/;
 const CMV_RE = /^CMV-\d{4}$/;
+const SCHEMA_VERSION = 2;
+const FACTS_MODE = "committed_status_snapshot";
+const GIT_FACTS_SOURCE = "fresh_git_commands";
 const ACTIVE_START = "<!-- CURRENT-FACTS-ACTIVE-START -->";
 const ACTIVE_END = "<!-- CURRENT-FACTS-ACTIVE-END -->";
 const FACTS_PATH = ".agent_board/CURRENT_FACTS.json";
@@ -82,7 +85,29 @@ function validateCurrentFactsSchema(facts, failures) {
     return;
   }
 
-  if (facts.schemaVersion !== 1) failures.push("schemaVersion must be 1");
+  if (facts.schemaVersion !== SCHEMA_VERSION) failures.push(`schemaVersion must be ${SCHEMA_VERSION}`);
+  if (facts.factsMode !== FACTS_MODE) failures.push(`factsMode must be ${FACTS_MODE}`);
+  if (facts.gitFactsSource !== GIT_FACTS_SOURCE) failures.push(`gitFactsSource must be ${GIT_FACTS_SOURCE}`);
+  if (facts.liveGitFactsCommitted !== false) failures.push("liveGitFactsCommitted must be false");
+  if (Object.prototype.hasOwnProperty.call(facts, "localHead")) {
+    failures.push("schema v2 must not commit localHead; collect live git facts with fresh git commands");
+  }
+  if (Object.prototype.hasOwnProperty.call(facts, "originHead")) {
+    failures.push("schema v2 must not commit originHead; collect live git facts with fresh git commands");
+  }
+  const liveGitFactsPolicy = facts.liveGitFactsPolicy;
+  if (!liveGitFactsPolicy || typeof liveGitFactsPolicy !== "object" || Array.isArray(liveGitFactsPolicy)) {
+    failures.push("liveGitFactsPolicy object is required");
+  } else {
+    if (liveGitFactsPolicy.currentHeadCommitted !== false) failures.push("liveGitFactsPolicy.currentHeadCommitted must be false");
+    if (liveGitFactsPolicy.originHeadCommitted !== false) failures.push("liveGitFactsPolicy.originHeadCommitted must be false");
+    if (liveGitFactsPolicy.freshGitRequiredBeforeRemoteAction !== true) {
+      failures.push("liveGitFactsPolicy.freshGitRequiredBeforeRemoteAction must be true");
+    }
+    if (liveGitFactsPolicy.freshGitRequiredBeforeRuntimeAction !== true) {
+      failures.push("liveGitFactsPolicy.freshGitRequiredBeforeRuntimeAction must be true");
+    }
+  }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(facts.updatedAt || ""))) {
     failures.push("updatedAt must use YYYY-MM-DD");
   }
@@ -90,10 +115,6 @@ function validateCurrentFactsSchema(facts, failures) {
   if (!CMV_RE.test(String(facts.validationId || ""))) failures.push("validationId must look like CMV-0000");
   if (!facts.branch || typeof facts.branch !== "string") failures.push("branch is required");
   if (!facts.baseBranch || typeof facts.baseBranch !== "string") failures.push("baseBranch is required");
-  if (!SHA40_RE.test(String(facts.localHead || ""))) failures.push("localHead must be a 40-char lowercase SHA");
-  if (facts.originHead !== null && !SHA40_RE.test(String(facts.originHead || ""))) {
-    failures.push("originHead must be a 40-char lowercase SHA or null");
-  }
 
   const projectStatus = facts.status && facts.status.project;
   const rcStatus = facts.status && facts.status.rc;

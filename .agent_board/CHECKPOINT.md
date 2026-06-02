@@ -2,13 +2,59 @@
 
 <!-- CURRENT-FACTS-ACTIVE-START -->
 
-Current facts source: `.agent_board/CURRENT_FACTS.json`.
+Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1402 Phase H Codex/Claude client integration runbook and acceptance preflight`.
-Current validation: `CMV-1520`.
-Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; older checkpoint entries below are historical.
+Current checkpoint: `CM-1403 current facts schema v2 non-self-referential semantics`.
+Current validation: `CMV-1521`.
+Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1403 Current Facts Schema V2 Migration
+
+Status: `LOCAL_NO_APPLY_SCHEMA_V2_MIGRATED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Scope:
+
+```text
+local source/test/docs/governance validator slice only
+```
+
+Changed:
+
+- `.agent_board/CURRENT_FACTS.json` is now schema v2 and records a committed status/validation snapshot.
+- Schema v2 does not commit live `localHead` or `originHead`.
+- `scripts/validate_current_facts_drift.js` fails closed if schema v2 includes committed live head fields.
+- README, DOCS_GOVERNANCE, STATUS, and active board surfaces now require fresh Git commands for branch/head/origin/ahead-behind facts.
+
+Validation:
+
+```text
+node --check scripts\validate_current_facts_drift.js
+node --check tests\current-facts-drift-validator.test.js
+node --test tests\current-facts-drift-validator.test.js
+node scripts\validate_current_facts_drift.js
+node scripts\validate_autopilot_ledger_consistency.js
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+npm test
+```
+
+Result:
+
+- current-facts schema v2 semantics are represented in validator, tests, docs, and board surfaces.
+- committed current facts no longer include live Git head fields.
+- branch-sensitive, runtime-sensitive, or remote actions must collect live Git facts with fresh commands.
+- targeted current-facts validator tests passed `7/7`.
+- default `npm test` passed `2943/2943`.
+
+Boundary:
+
+- No commit yet.
+- No push.
+- No tag, release, deploy, cutover, config/watchdog/startup change, live client acceptance, token use, MCP memory tool call, provider call, durable write, readiness claim, or reliability claim.
 
 ## RC-1 Current HEAD Local Baseline
 

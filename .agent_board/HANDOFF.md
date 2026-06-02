@@ -2,11 +2,11 @@
 
 <!-- CURRENT-FACTS-ACTIVE-START -->
 
-Current facts source: `.agent_board/CURRENT_FACTS.json`.
+Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1402 Phase H Codex/Claude client integration runbook and acceptance preflight`.
-Current validation: `CMV-1520`.
-Current handoff: CM-1402 adds a local no-apply Codex/Claude client integration runbook plus explicit-input acceptance preflight helper and tests; no real config, token, MCP memory tool, provider, runtime, durable write, remote action, or readiness claim occurred; active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
+Current task: `CM-1403 current facts schema v2 non-self-referential semantics`.
+Current validation: `CMV-1521`.
+Current handoff: CM-1403 migrates the current-facts validator, tests, docs, and board surface to schema v2 committed status/validation snapshot semantics; live Git facts are not committed and must be collected with fresh Git commands; no runtime, provider, memory tool, durable write, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

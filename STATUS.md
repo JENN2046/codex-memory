@@ -2,17 +2,17 @@
 
 <!-- CURRENT-FACTS-ACTIVE-START -->
 
-Current facts source: `.agent_board/CURRENT_FACTS.json`.
+Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1402 Phase H Codex/Claude client integration runbook and acceptance preflight`.
-Current validation: `CMV-1520`.
+Current task: `CM-1403 current facts schema v2 non-self-referential semantics`.
+Current validation: `CMV-1521`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase H no-apply source/test slice -> no live client acceptance or readiness claim`.
-Current rule: active status summaries must reference `.agent_board/CURRENT_FACTS.json` and must not repeat full commit hashes.
+Current route: `Phase H local no-apply source/test/docs slice -> schema v2 status snapshot semantics`.
+Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-更新时间：2026-06-02
+更新时间：2026-06-03
 
 ## Historical Status Archive
 
@@ -33,7 +33,7 @@ RC_READY_FALSE
 - Phase G 支撑入口：[PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md)
 - 当前阶段：`Phase H — Codex / Claude client-scope boundary`
 - 当前阶段性目标：`H1 — Client Scope Runtime Boundary`
-- 下一安全任务：review accumulated CM-1399 and CM-1400 diff before staging/committing, or continue Phase H with another no-apply source/test slice.
+- 下一安全任务：完成并复查 `CM-1403` current-facts schema v2 no-apply source/test/docs slice；提交与 push 仍分别需要 guarded local decision 和 exact approval。
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 
