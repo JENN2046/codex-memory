@@ -124,6 +124,16 @@ function detectPhaseFEvidence(cwd) {
     evidence.f4MinimalDogfoodWriteAccepted = true;
   }
 
+  const f5Text = readTextIfExists(path.join(docsDir, 'CM1384_PHASE_F5_PERSONAL_RC_CLOSEOUT_EVIDENCE.md'));
+  if (
+    f5Text.includes('Status: `COMPLETED_VALIDATED_PERSONAL_DOGFOOD_READY_NOT_RC_READY`') &&
+    f5Text.includes('- F5 closeout accepted: `true`') &&
+    f5Text.includes('PERSONAL_DOGFOOD_READY_NOT_RC_READY') &&
+    f5Text.includes('RC ready: `false`')
+  ) {
+    evidence.f5CloseoutAccepted = true;
+  }
+
   return evidence;
 }
 

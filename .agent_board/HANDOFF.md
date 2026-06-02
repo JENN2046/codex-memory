@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1383 PHASE_F4_MINIMAL_DOGFOOD_WRITE_EVIDENCE`.
+Goal: `CM-1384 PHASE_F5_PERSONAL_RC_CLOSEOUT`.
 
-Status: `COMPLETED_VALIDATED_F4_ACCEPTED_NOT_READY` for exact-approved Phase F4 minimal dogfood write evidence. F1, F2, F3, and F4 evidence are accepted at the local evidence layer; F5 remains the blocking phase. CM-1383 executed exactly one sanitized `record_memory` call through `createCodexMemoryApplication({ allowExternalProvider:false })` on clean synced `main@13a3a313e99611b31ba671fadb63e0f61797b5aa`; selected result decision `accepted`, memory id `codex-process-29237bc07e394bc08953a7533129293b`, target `process`, shadow write status `ok`, idempotency `committed`, lifecycle committed/projected/audited true. No `search_memory`, MCP/provider call, raw memory output, direct jsonl/raw audit read, broad real memory scan, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Commit before F5 closeout. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_PERSONAL_DOGFOOD_READY_NOT_RC_READY` for local Phase F5 closeout. CM-1384 aggregates accepted F1/F2/F3/F4 evidence into `PERSONAL_DOGFOOD_READY_NOT_RC_READY` while keeping `RC_READY=false`. No `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. Commit locally if guarded conditions pass. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

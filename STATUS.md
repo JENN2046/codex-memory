@@ -6,14 +6,16 @@
 
 `codex-memory` 的目标是成为 Codex / Claude 可用的本地优先 VCP memory mainline：可审计、可回滚、provider-flexible、VCP-compatible，并保留稳定 MCP 工具契约。
 
-当前控制状态保持：
+当前 Phase F personal dogfood 控制状态：
 
 ```text
-NOT_READY_BLOCKED
-RC_NOT_READY_BLOCKED
+PERSONAL_DOGFOOD_READY_NOT_RC_READY
+RC_READY_FALSE
 ```
 
-原因：文档面正在瘦身；A5 / P66 runtime gaps 尚未逐项关闭；personal RC dogfood 尚未开始。不得把 docs-only、fixture-only、本地 proof、历史 gate 或历史 HTTP evidence 解释为 runtime readiness、RC readiness、write reliability 或 recall reliability。
+原因：Phase F personal dogfood evidence chain 已在本地收口到 `PERSONAL_DOGFOOD_READY_NOT_RC_READY`，但这不是 `RC_READY`。不得把 docs-only、fixture-only、本地 proof、历史 gate、历史 HTTP evidence、bounded one-write dogfood 或 Phase F closeout 解释为 runtime readiness、RC readiness、broad write reliability、broad recall reliability、release readiness、cutover readiness 或 production readiness。
+
+`CM-1384 PHASE_F5_PERSONAL_RC_CLOSEOUT_EVIDENCE` 已完成本地 Phase F closeout evidence aggregation，结论为 `PERSONAL_DOGFOOD_READY_NOT_RC_READY`，且 `RC ready=false`。该 closeout 只聚合已接受的 F1/F2/F3/F4 证据：`CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md`、`CM1379_PHASE_F2_A5_GAP6_AGGREGATION_EVIDENCE.md`、`CM1381_PHASE_F3_TRUE_LIVE_RECALL_NEGATIVE_CONTROL_EVIDENCE.md`、`CM1383_PHASE_F4_MINIMAL_DOGFOOD_WRITE_EVIDENCE.md`。本次不执行 `record_memory` / `search_memory` / MCP / provider，不读取 raw memory/jsonl/raw audit，不做 broad real memory scan，不写 durable memory/audit，不启动服务，不改 config/watchdog/startup，不执行 remote action，不声明 RC ready、broad write reliability、broad recall reliability、release readiness、cutover readiness 或 production readiness。
 
 `CM-1383 PHASE_F4_MINIMAL_DOGFOOD_WRITE_EVIDENCE` 已在用户 exact approval 下执行一次 bounded sanitized `record_memory` dogfood write，目标为 clean synced `main@13a3a313e99611b31ba671fadb63e0f61797b5aa`。执行路径为 `createCodexMemoryApplication({ allowExternalProvider:false }) -> app.callTool('record_memory')`，结果为 `PHASE_F4_SINGLE_RECORD_MEMORY_CALL_COMPLETED_SANITIZED_RESULT`：`recordMemoryCallCount=1`，`searchMemoryCallCount=0`，`providerCalls=0`，decision `accepted`，memory id `codex-process-29237bc07e394bc08953a7533129293b`，target `process`，shadow write status `ok`，idempotency status `committed`，authoritative store `sqlite`，lifecycle committed/projected/audited 均为 `true`。本次不打印 raw memory，不读取 direct jsonl/raw audit，不做 broad real memory scan，不启动服务，不改 config/watchdog/startup，不执行 remote action，不声明 write reliability/readiness/RC ready。F4 prerequisite 已接受；下一步是 F5 closeout。F5 closeout 仍不得声明 RC ready。
 

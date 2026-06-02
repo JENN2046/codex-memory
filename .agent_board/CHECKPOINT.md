@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1384 Phase F5 Personal RC Closeout Checkpoint
+
+Status: `COMPLETED_VALIDATED_PERSONAL_DOGFOOD_READY_NOT_RC_READY`
+
+Date: 2026-06-02
+
+Scope: local closeout aggregation over accepted F1/F2/F3/F4 evidence. No `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim.
+
+Result:
+
+- Added CM-1384 closeout evidence document.
+- Snapshot detection now recognizes F5 closeout evidence.
+- Target achieved locally: `PERSONAL_DOGFOOD_READY_NOT_RC_READY`.
+- RC ready remains `false`.
+
+Validation:
+
+- `node --check src\cli\phase-f-personal-rc-readiness-snapshot.js` passed.
+- `node --check tests\phase-f-personal-rc-readiness-snapshot.test.js` passed.
+- `node --test tests\phase-f-personal-rc-readiness-snapshot.test.js` passed `12/12`.
+- Phase F snapshot self-check reported `targetCurrentlyAchieved=true`, `readinessClaimAllowed=true`, and `rcReady=false`.
+- `git diff --check` passed.
+- Ledger consistency and docs validation passed after closeout status alignment.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Sync only if approved.
+
 ## CM-1383 Phase F4 Minimal Dogfood Write Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_F4_ACCEPTED_NOT_READY`
