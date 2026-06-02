@@ -1,5 +1,60 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1355 Phase F1 No-Write Evidence Harness Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local source/test/docs harness for future exact-approved Phase F1 evidence capture. Default mode is plan-only. No live client refresh, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added `PhaseF1LiveClientNoWriteEvidenceRunner`.
+- Added `src/cli/phase-f1-live-client-no-write.js`.
+- Added targeted injected tests.
+- Plan-only CLI accepts the current exact approval line and returns `PHASE_F1_LIVE_CLIENT_NO_WRITE_PLAN_READY_NOT_EXECUTED`.
+- Execution mode blocks before network if current Git facts are missing, dirty, out of sync, or if token is missing; it still requires exact approval.
+- Injected tests prove sanitized evidence capture shape without touching the live endpoint.
+
+Validation:
+
+- `node --check` passed for changed source/CLI/test.
+- Targeted harness tests passed `6/6`.
+- Plan-only CLI self-check passed and did not execute live HTTP.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1355 closeout.
+
+Next:
+
+- Request exact A5-GAP-4 approval before running the CLI with `--execute`.
+
+## CM-1354 Phase F1 Current-Head Approval Packet Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board packet refresh for Phase F1. No live client refresh, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Current fresh Git facts are clean synced `main@be980d157cbc88b00fc2e641bc66a527538faae9`.
+- Added `docs/CM1354_PHASE_F1_CURRENT_HEAD_APPROVAL_PACKET.md`.
+- The current exact A5-GAP-4 live-client no-write approval line is ready for user approval.
+- The verifier accepts the line while keeping `executesApprovedAction=false`, `runtimeReady=false`, and `rcReady=false`.
+- Phase F1 execution remains blocked until exact A5-GAP-4 user approval is provided.
+
+Validation:
+
+- Current-head `npm run a5:approval-check` self-check accepted the exact line.
+- Targeted A5/no-touch tests passed `29/29`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1354 closeout.
+
+Next:
+
+- Request exact A5-GAP-4 approval from `docs/CM1354_PHASE_F1_CURRENT_HEAD_APPROVAL_PACKET.md`.
+- After approval, execute only the bounded no-write live-client evidence path.
+
 ## CM-1353 A5-GAP-4 Live-Client No-Write Approval Pattern Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

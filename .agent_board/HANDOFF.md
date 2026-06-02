@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1353 A5_GAP4_LIVE_CLIENT_NO_WRITE_APPROVAL_PATTERN`.
+Goal: `CM-1355 PHASE_F1_NO_WRITE_EVIDENCE_HARNESS`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after adding the narrow `A5-GAP-4 live-client no-write contract refresh` approval pattern. `CM-1353` updated `src/core/A5ApprovalLineVerifier.js` and A5 approval tests so the checker can exact-match a Part 4 no-write live-client boundary covering current-session bearer token handling, `tools/call memory_overview`, no-token `record_memory/search_memory` rejection checks, no provider, no durable write, and no config/watchdog/startup change. The checker exposes parsed scope booleans but still does not execute approved actions. Targeted A5/no-touch tests passed `29/29`, and the current rendered CLI self-check returned `approvalAccepted=true`, `authorizationGranted=true`, `executesApprovedAction=false`. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after adding a Phase F1 live-client no-write evidence harness. `CM-1355` added `src/core/PhaseF1LiveClientNoWriteEvidenceRunner.js`, `src/cli/phase-f1-live-client-no-write.js`, `tests/phase-f1-live-client-no-write-runner.test.js`, and `docs/CM1355_PHASE_F1_NO_WRITE_EVIDENCE_HARNESS.md`. Default CLI mode is plan-only and returned `PHASE_F1_LIVE_CLIENT_NO_WRITE_PLAN_READY_NOT_EXECUTED`; targeted injected/current-facts tests passed `6/6`. `--execute` now fail-closes before network when current Git facts are missing, dirty, or origin-drifted. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
