@@ -67,6 +67,11 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteApprovalHintCount, 7);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteApprovalHintMissingCount, 0);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteManualReviewApprovalHintCount, 0);
+  assert.equal(
+    report.summary.rc9DecisionPacketRouteApprovalHintAuditStatus,
+    'approval_hints_complete_for_known_routes_not_authorization'
+  );
+  assert.equal(report.summary.rc9DecisionPacketRouteApprovalHintAuditCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness, false);
   assert.equal(report.evidence.rc9DecisionPacket.decision, 'RC_NOT_READY_BLOCKED');
   assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
@@ -78,6 +83,14 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteApprovalHintCount, 7);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteApprovalHintMissingCount, 0);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteManualReviewApprovalHintCount, 0);
+  assert.equal(
+    report.evidence.rc9DecisionPacket.routeApprovalHintAuditStatus,
+    'approval_hints_complete_for_known_routes_not_authorization'
+  );
+  assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalGenerated, false);
+  assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalAccepted, false);
+  assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalExecuted, false);
+  assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAuditCanClaimReadiness, false);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteCanClaimReadiness, false);
   assert.equal(
     report.evidence.rc9DecisionPacket.remainingGapAuthorities

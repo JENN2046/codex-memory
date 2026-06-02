@@ -945,6 +945,25 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteApprovalHintCount, 7);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteApprovalHintMissingCount, 0);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteManualReviewApprovalHintCount, 0);
+  assert.equal(
+    report.evidence.rc9DecisionPacket.routeApprovalHintAuditStatus,
+    'approval_hints_complete_for_known_routes_not_authorization'
+  );
+  assert.deepEqual(report.evidence.rc9DecisionPacket.routeApprovalHintAudit, {
+    status: 'approval_hints_complete_for_known_routes_not_authorization',
+    sourceMode: 'remaining_gap_route_rows_only',
+    remainingGapCount: 7,
+    approvalHintCount: 7,
+    approvalHintMissingCount: 0,
+    manualReviewApprovalHintCount: 0,
+    allRemainingGapsHaveApprovalHints: true,
+    manualReviewFallbackPresent: false,
+    approvalGenerated: false,
+    approvalAccepted: false,
+    approvalExecuted: false,
+    canClaimReadiness: false
+  });
+  assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAuditCanClaimReadiness, false);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteMappedCount, 7);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteMissingCount, 0);
@@ -953,6 +972,11 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteApprovalHintCount, 7);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteApprovalHintMissingCount, 0);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteManualReviewApprovalHintCount, 0);
+  assert.equal(
+    report.summary.rc9DecisionPacketRouteApprovalHintAuditStatus,
+    'approval_hints_complete_for_known_routes_not_authorization'
+  );
+  assert.equal(report.summary.rc9DecisionPacketRouteApprovalHintAuditCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness, false);
   assert.equal(
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditStatus,
@@ -3212,6 +3236,10 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
   assert.equal(nonzeroPacket.remainingGapRouteMissingCount, 0);
   assert.equal(nonzeroPacket.remainingGapRouteExactApprovalCount, 0);
   assert.equal(nonzeroPacket.remainingGapRouteAutomaticCount, 1);
+  assert.equal(
+    nonzeroPacket.routeApprovalHintAuditStatus,
+    'approval_hints_complete_for_known_routes_not_authorization'
+  );
   assert.equal(nonzeroPacket.remainingGapRouteCanClaimReadiness, false);
 
   assert.equal(zeroGapPacket.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
@@ -3219,6 +3247,22 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
   assert.equal(zeroGapPacket.readyToRequestRcCutoverApproval, true);
   assert.equal(zeroGapPacket.remainingGapCount, 0);
   assert.equal(zeroGapPacket.remainingGapAuthorityCount, 0);
+  assert.equal(zeroGapPacket.routeApprovalHintAuditStatus, 'no_remaining_gaps_no_approval_hint_needed');
+  assert.deepEqual(zeroGapPacket.routeApprovalHintAudit, {
+    status: 'no_remaining_gaps_no_approval_hint_needed',
+    sourceMode: 'remaining_gap_route_rows_only',
+    remainingGapCount: 0,
+    approvalHintCount: 0,
+    approvalHintMissingCount: 0,
+    manualReviewApprovalHintCount: 0,
+    allRemainingGapsHaveApprovalHints: true,
+    manualReviewFallbackPresent: false,
+    approvalGenerated: false,
+    approvalAccepted: false,
+    approvalExecuted: false,
+    canClaimReadiness: false
+  });
+  assert.equal(zeroGapPacket.routeApprovalHintAuditCanClaimReadiness, false);
   assert.equal(zeroGapPacket.remainingGapAuthorityCanClaimReadiness, false);
   assert.equal(
     zeroGapPacket.completenessChecklistStatus,
@@ -3556,6 +3600,22 @@ test('RC-9 decision packet fails closed when remaining gaps lack closure audit a
   assert.equal(packet.remainingGapRouteApprovalHintCount, 1);
   assert.equal(packet.remainingGapRouteApprovalHintMissingCount, 0);
   assert.equal(packet.remainingGapRouteManualReviewApprovalHintCount, 1);
+  assert.equal(packet.routeApprovalHintAuditStatus, 'manual_review_approval_hint_fallback_present');
+  assert.deepEqual(packet.routeApprovalHintAudit, {
+    status: 'manual_review_approval_hint_fallback_present',
+    sourceMode: 'remaining_gap_route_rows_only',
+    remainingGapCount: 1,
+    approvalHintCount: 1,
+    approvalHintMissingCount: 0,
+    manualReviewApprovalHintCount: 1,
+    allRemainingGapsHaveApprovalHints: true,
+    manualReviewFallbackPresent: true,
+    approvalGenerated: false,
+    approvalAccepted: false,
+    approvalExecuted: false,
+    canClaimReadiness: false
+  });
+  assert.equal(packet.routeApprovalHintAuditCanClaimReadiness, false);
   assert.equal(packet.canClaimRcReady, false);
   assertNoSensitiveSurface({
     forbiddenFragments: [

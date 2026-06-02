@@ -4981,6 +4981,10 @@ function buildV1RcValidationAggregatorReport({
     rc9DecisionPacket.remainingGapRouteApprovalHintMissingCount;
   report.summary.rc9DecisionPacketRemainingGapRouteManualReviewApprovalHintCount =
     rc9DecisionPacket.remainingGapRouteManualReviewApprovalHintCount;
+  report.summary.rc9DecisionPacketRouteApprovalHintAuditStatus =
+    rc9DecisionPacket.routeApprovalHintAuditStatus;
+  report.summary.rc9DecisionPacketRouteApprovalHintAuditCanClaimReadiness =
+    rc9DecisionPacket.routeApprovalHintAuditCanClaimReadiness;
   report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness =
     rc9DecisionPacket.remainingGapRouteCanClaimReadiness;
   report.summary.rc9DecisionPacketRcCutoverApproved =
@@ -5085,6 +5089,27 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
   const remainingGapRouteManualReviewApprovalHintCount = remainingGapAuthorities
     .filter(row => row.rcRouteApprovalTemplateHint === 'manual_review_required_before_approval_template')
     .length;
+  const routeApprovalHintAuditStatus = remainingGapAuthorities.length === 0
+    ? 'no_remaining_gaps_no_approval_hint_needed'
+    : remainingGapRouteApprovalHintMissingCount > 0
+      ? 'approval_hint_missing_manual_review_required'
+      : remainingGapRouteManualReviewApprovalHintCount > 0
+        ? 'manual_review_approval_hint_fallback_present'
+        : 'approval_hints_complete_for_known_routes_not_authorization';
+  const routeApprovalHintAudit = {
+    status: routeApprovalHintAuditStatus,
+    sourceMode: 'remaining_gap_route_rows_only',
+    remainingGapCount: remainingGapAuthorities.length,
+    approvalHintCount: remainingGapRouteApprovalHintCount,
+    approvalHintMissingCount: remainingGapRouteApprovalHintMissingCount,
+    manualReviewApprovalHintCount: remainingGapRouteManualReviewApprovalHintCount,
+    allRemainingGapsHaveApprovalHints: remainingGapRouteApprovalHintMissingCount === 0,
+    manualReviewFallbackPresent: remainingGapRouteManualReviewApprovalHintCount > 0,
+    approvalGenerated: false,
+    approvalAccepted: false,
+    approvalExecuted: false,
+    canClaimReadiness: false
+  };
   const runtimeEvidenceBridge = report &&
     typeof report === 'object' &&
     report.evidence &&
@@ -5313,6 +5338,9 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     remainingGapRouteApprovalHintCount,
     remainingGapRouteApprovalHintMissingCount,
     remainingGapRouteManualReviewApprovalHintCount,
+    routeApprovalHintAudit,
+    routeApprovalHintAuditStatus,
+    routeApprovalHintAuditCanClaimReadiness: false,
     remainingGapRouteCanClaimReadiness: false,
     rcCutoverApprovalRequired: true,
     rcCutoverApprovalPresent: false,
@@ -5397,6 +5425,7 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     `cutover_approval_boundary_can_claim_rc_ready = ${packet.cutoverApprovalBoundaryAuditCanClaimRcReady}`,
     `completeness_checklist_status = ${packet.completenessChecklistStatus}`,
     `completeness_checklist_missing_count = ${packet.completenessChecklistMissingCount}`,
+    `route_approval_hint_audit_status = ${packet.routeApprovalHintAuditStatus}`,
     '',
     '## Remaining Gaps',
     '',
