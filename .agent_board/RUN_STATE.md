@@ -57,7 +57,9 @@ Post-RC-9 local source/test slice is in progress: `docs/RC_VALIDATION_AGGREGATOR
 
 Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_EVIDENCE_UNIT_COMPLETENESS_SLICE.md` records explicit A5 evidence unit completeness validation for ValidationAggregator runtime evidence summaries. Required units are `A5-GAP-1` through `A5-GAP-5`; missing, unknown, or duplicate unit ids fail closed. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
 
-Next safe action is to validate and commit the evidence unit completeness slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_CURRENT_HEAD_REQUIRED_SLICE.md` records mandatory current-head binding for ValidationAggregator runtime evidence summaries. Accepted summaries must include matching `currentHeadCommit` and `expectedCurrentHeadCommit`; missing or one-sided binding fails closed. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
+
+Next safe action is to validate and commit the current-head required slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

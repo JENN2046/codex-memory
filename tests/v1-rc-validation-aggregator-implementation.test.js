@@ -2587,6 +2587,47 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
 });
 
 test('validation aggregator runtime evidence summary fails closed on current-head binding mismatch', () => {
+  const missing = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
+      locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+      remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
+  const incomplete = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'abc1234',
+      evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
+      locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+      remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
   const mismatch = buildV1RcValidationAggregatorReport({
     runtimeEvidenceSummary: {
       status: 'local_runtime_evidence_passed_rc_still_blocked',
@@ -2631,6 +2672,24 @@ test('validation aggregator runtime evidence summary fails closed on current-hea
     }
   });
 
+  assert.equal(missing.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(missing.summary.runtimeEvidenceSummaryRejected, true);
+  assert.equal(
+    missing.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'current_head_binding_required'
+  );
+  assert.equal(missing.summary.runtimeEvidenceSummaryCurrentHeadBindingStatus, 'not_provided');
+  assert.equal(missing.summary.runtimeEvidenceSummaryCurrentHeadBindingMatched, false);
+
+  assert.equal(incomplete.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(incomplete.summary.runtimeEvidenceSummaryRejected, true);
+  assert.equal(
+    incomplete.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'current_head_binding_required'
+  );
+  assert.equal(incomplete.summary.runtimeEvidenceSummaryCurrentHeadBindingStatus, 'incomplete');
+  assert.equal(incomplete.summary.runtimeEvidenceSummaryCurrentHeadBindingMatched, false);
+
   assert.equal(mismatch.summary.runtimeEvidenceSummaryAccepted, false);
   assert.equal(mismatch.summary.runtimeEvidenceSummaryRejected, true);
   assert.equal(
@@ -2652,6 +2711,8 @@ test('validation aggregator runtime evidence summary fails closed on current-hea
   );
   assertNoSensitiveSurface(mismatch);
   assertNoSensitiveSurface(malformed);
+  assertNoSensitiveSurface(missing);
+  assertNoSensitiveSurface(incomplete);
 });
 
 test('validation aggregator runtime evidence summary fails closed on evidence unit drift', () => {
@@ -2789,6 +2850,8 @@ test('effective gap accounting fails closed on non-baseline remaining gaps', () 
     runtimeEvidenceSummary: {
       status: 'local_runtime_evidence_passed_rc_still_blocked',
       decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'abc1234',
+      expectedCurrentHeadCommit: 'abc1234',
       runtimeReady: false,
       finalRcMatrixReady: false,
       v1RcReady: false,

@@ -2073,6 +2073,23 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
   const currentHeadBindingStatus = currentHeadCommit && expectedCurrentHeadCommit
     ? 'matched'
     : (currentHeadCommit || expectedCurrentHeadCommit ? 'incomplete' : 'not_provided');
+
+  if (currentHeadBindingStatus !== 'matched') {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'current_head_binding_required',
+      summary: {
+        ...empty.summary,
+        currentHeadBindingStatus,
+        currentHeadBindingMatched: false,
+        currentHeadCommit,
+        expectedCurrentHeadCommit
+      }
+    };
+  }
+
   const evidenceUnitSummary = summarizeRuntimeEvidenceUnits(summary.evidenceUnitIds);
 
   if (evidenceUnitSummary.duplicateUnitCount > 0) {
