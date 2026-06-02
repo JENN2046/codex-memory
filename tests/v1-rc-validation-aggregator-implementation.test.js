@@ -82,6 +82,10 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.rc9DecisionPacketAvailable, true);
   assert.equal(report.summary.rc9DecisionPacketStatus, 'rc_not_ready_blocked');
   assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditSectionCount, 7);
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditMissingSectionCount, 0);
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, false);
   assert.equal(report.summary.rc9DecisionPacketRcCutoverApproved, false);
   assert.equal(report.summary.rc9DecisionPacketRcCutoverExecutionAllowed, false);
@@ -3475,6 +3479,27 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   });
 
   assert.equal(nonzeroRender.format, 'markdown');
+  assert.equal(nonzeroRender.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(nonzeroRender.markdownAudit.sectionCount, 7);
+  assert.equal(nonzeroRender.markdownAudit.acceptedSectionCount, 7);
+  assert.equal(nonzeroRender.markdownAudit.missingSectionCount, 0);
+  assert.deepEqual(nonzeroRender.markdownAudit.missingSectionIds, []);
+  assert.equal(nonzeroRender.markdownAudit.approvalGenerated, false);
+  assert.equal(nonzeroRender.markdownAudit.approvalAccepted, false);
+  assert.equal(nonzeroRender.markdownAudit.approvalExecuted, false);
+  assert.equal(nonzeroRender.markdownAuditCanClaimReadiness, false);
+  assert.deepEqual(
+    nonzeroRender.markdownAudit.sections.map(section => [section.id, section.accepted, section.missingFragmentCount]),
+    [
+      ['route', true, 0],
+      ['remaining_gaps', true, 0],
+      ['not_executed', true, 0],
+      ['rollback_path', true, 0],
+      ['cutover_approval_boundary', true, 0],
+      ['completeness_checklist', true, 0],
+      ['boundary', true, 0]
+    ]
+  );
   assert.equal(nonzeroRender.decision, 'RC_NOT_READY_BLOCKED');
   assert.equal(nonzeroRender.readyToRequestRcCutoverApproval, false);
   assert.equal(nonzeroRender.markdown.includes('Decision: RC_NOT_READY_BLOCKED'), true);
@@ -3501,6 +3526,9 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(nonzeroRender.markdown.includes('route_approval_hint_can_claim_readiness = false'), true);
 
   assert.equal(zeroGapRender.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
+  assert.equal(zeroGapRender.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(zeroGapRender.markdownAudit.missingSectionCount, 0);
+  assert.equal(zeroGapRender.markdownAuditCanClaimReadiness, false);
   assert.equal(zeroGapRender.readyToRequestRcCutoverApproval, true);
   assert.equal(zeroGapRender.rcReady, false);
   assert.equal(zeroGapRender.rcCutoverApproved, false);
@@ -3568,6 +3596,9 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(invalidRender.status, 'rc_not_ready_blocked');
   assert.equal(invalidRender.readyToRequestRcCutoverApproval, false);
   assert.equal(invalidRender.markdown.includes('ready_to_request_rc_cutover_approval = false'), true);
+  assert.equal(invalidRender.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(invalidRender.markdownAudit.missingSectionCount, 0);
+  assert.equal(invalidRender.markdownAuditCanClaimReadiness, false);
   assert.equal(invalidRender.markdown.includes('rc_ready = false'), true);
   assertNoSensitiveSurface({ ...zeroGapReport, rc9DecisionPacketRender: zeroGapRender });
 });

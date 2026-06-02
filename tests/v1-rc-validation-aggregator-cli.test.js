@@ -37,6 +37,10 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.evidence.p24Aggregator.zeroGapCloseoutAuditEmbedded, true);
   assert.equal(report.summary.rc9DecisionPacketAvailable, true);
   assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditSectionCount, 7);
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditMissingSectionCount, 0);
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketRcCutoverApproved, false);
   assert.equal(report.summary.rc9DecisionPacketRcCutoverExecutionAllowed, false);
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
@@ -91,6 +95,15 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalAccepted, false);
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalExecuted, false);
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAuditCanClaimReadiness, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.sectionCount, 7);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.acceptedSectionCount, 7);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.missingSectionCount, 0);
+  assert.deepEqual(report.evidence.rc9DecisionPacket.markdownAudit.missingSectionIds, []);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalGenerated, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalAccepted, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalExecuted, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAuditCanClaimReadiness, false);
   assert.equal(
     report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_audit_status = approval_hints_complete_for_known_routes_not_authorization'),
     true
