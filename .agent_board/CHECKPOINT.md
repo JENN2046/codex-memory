@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1363 Phase F1 Sync Packet Generator Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local source/test/docs generator for Phase F1 sync approval packets. No push, pull, merge, rebase, F1/F2/F3/F4/F5 execution, strict gate, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Added `PhaseF1SyncApprovalPacket` core helper.
+- Added `src/cli/phase-f1-sync-approval-packet.js`.
+- Added targeted tests for non-authorizing template rendering and fail-closed dirty/behind facts.
+- Current CLI run returned `dirty_worktree` while CM-1363 files were uncommitted, as expected.
+
+Validation:
+
+- `node --check` passed for changed source/CLI/test.
+- Targeted tests passed `2/2`.
+- CLI JSON self-check ran read-only and did not push.
+- Default `npm test` was attempted. Ambient provider environment produced `security-profile-config` failures; after clearing provider-related variables in the child process, the full suite still failed two LightMemo CLI cases from SQLite ExperimentalWarning output, while targeted LightMemo rerun passed `3/3`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are required for closeout.
+
+Next:
+
+- Stabilize CM-1363, then regenerate the current clean sync packet from fresh facts.
+
 ## CM-1362 Phase F1 Sync Approval Packet Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
