@@ -4,8 +4,8 @@
   "taskId": "CM-1400",
   "validationId": "CMV-1518",
   "branch": "main",
-  "localHead": "4ff2b2af8b34c792f4e683c966207889775904f2",
-  "originHead": "4ff2b2af8b34c792f4e683c966207889775904f2",
+  "localHead": "9021d38fe0098c6c5f490e6bcce0d0d812dff3a3",
+  "originHead": "9021d38fe0098c6c5f490e6bcce0d0d812dff3a3",
   "baseBranch": "main",
   "pr": {
     "number": null,
