@@ -10,6 +10,41 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC-8 A5-GAP-6 ValidationAggregator Aggregation Preflight
+
+Status: `PREFLIGHT_PACKET_READY_NOT_APPROVED_NOT_RC_READY`
+
+Date: 2026-06-02
+
+Scope: prepared a fresh-head `A5-GAP-6` evidence-only ValidationAggregator aggregation approval boundary. No aggregator execution, file/store scan, raw content output, MCP tool call, provider call, durable write, config/watchdog/startup change, remote action, cutover, or readiness claim occurred.
+
+Changed:
+
+- `docs/RC8_A5_GAP6_AGGREGATION_PREFLIGHT.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- Selected evidence units: `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
+- Selected evidence sources: RC-5 governance readonly, RC-6 recall isolation no-mutation, RC-7 migration dry-run, RC-4 live HTTP/MCP no-write, and RC-2 strict gate.
+- Future execution requires a fresh exact approval line bound to the post-packet commit.
+
+Boundary:
+
+- No ValidationAggregator execution occurred.
+- No files/stores were scanned for evidence.
+- No raw memory/private content was output.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Validate and commit this RC-8 preflight packet locally.
+- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.`
+
 ## RC-7 A5-GAP-3 Migration Dry-Run Evidence
 
 Status: `DRY_RUN_EXECUTED_MIGRATION_STILL_BLOCKED_NOT_RC_READY`

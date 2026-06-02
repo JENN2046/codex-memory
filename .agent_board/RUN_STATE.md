@@ -49,7 +49,9 @@ RC-6 A5-GAP-2 recall isolation no-mutation evidence is recorded at `docs/RC6_A5_
 
 RC-7 A5-GAP-3 migration dry-run evidence is recorded at `docs/RC7_A5_GAP3_MIGRATION_DRY_RUN_PREFLIGHT.md` for target commit `e17499294df14e7724307bb389387cd111a66797`: `npm run vcp-memory:migration-readiness -- --json` returned `status=blocked`, `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`, no migration/import/export/backup/restore apply, no durable write, no public MCP expansion, no raw workspace id, and no raw secret exposure.
 
-Next safe action is to validate and commit the RC-7 evidence locally, then prepare RC-8 ValidationAggregator aggregation preflight. Do not execute A5-GAP-6 aggregation, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+RC-8 A5-GAP-6 ValidationAggregator aggregation preflight is prepared at `docs/RC8_A5_GAP6_AGGREGATION_PREFLIGHT.md`: selected evidence units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`, using only sanitized RC-5/6/7/4/2 evidence, with no aggregator execution until exact approval.
+
+Next safe action is to validate and commit the RC-8 preflight packet locally, then request exact fresh-HEAD A5-GAP-6 approval. Do not execute A5-GAP-6 aggregation, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
