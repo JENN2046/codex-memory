@@ -4,13 +4,15 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1389 current facts single source`.
-Current validation: `CMV-1507`.
+Current checkpoint: `CM-1390 current facts active surface binding`.
+Current validation: `CMV-1508`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; older checkpoint entries below are historical.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1385 Phase F Snapshot Review Fix Checkpoint
+## Historical Checkpoint Archive
+
+### CM-1385 Phase F Snapshot Review Fix Checkpoint
 
 Status: `COMPLETED_VALIDATED_PHASE_F_SNAPSHOT_REVIEW_FIX`
 

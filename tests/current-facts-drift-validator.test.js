@@ -14,7 +14,7 @@ const {
   validateCurrentFactsDrift
 } = require("../scripts/validate_current_facts_drift");
 
-const SHA = "fde340796255505602eeca856785c6398fd805bf";
+const SHA = "28353d83884483b989d0d5631091b7e777cc7ccf";
 
 function writeFile(root, relativePath, text) {
   const fullPath = path.join(root, relativePath);
@@ -29,6 +29,8 @@ function activeDoc(name = "active") {
     ACTIVE_START,
     "",
     `Current facts source: \`${FACTS_PATH}\`.`,
+    "Current task: `CM-1390 current facts active surface binding`.",
+    "Current validation: `CMV-1508`.",
     "",
     ACTIVE_END,
     "",
@@ -42,6 +44,7 @@ function taskQueue() {
     "",
     "| ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |",
     "|---|---:|---|---|---|---|---|---|---|---|---|",
+    "| CM-1390 | 1390 | done | P6-docs-drift | Green | `.agent_board/CURRENT_FACTS.json` | Current facts active surface binding | docs validation | none | no | done |",
     "| CM-1389 | 1389 | done | P6-docs-drift | Green | `.agent_board/CURRENT_FACTS.json` | Current facts single source | docs validation | none | no | done |",
     "| CM-1388 | 1388 | done | P6-docs-drift | Green | `STATUS.md` | Older task | docs validation | none | no | done |"
   ].join("\n");
@@ -53,6 +56,7 @@ function validationLog() {
     "",
     "| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |",
     "|---|---|---|---|---|---|---|---|",
+    "| CMV-1508 | docs validation | P6-docs-drift | CM-1390 current facts active surface binding | COMPLETED_VALIDATED_CM1390 | ok | none | 2026-06-02 |",
     "| CMV-1507 | docs validation | P6-docs-drift | CM-1389 current facts single source | COMPLETED_VALIDATED_CM1389 | ok | none | 2026-06-02 |",
     "| CMV-1506 | docs validation | P6-docs-drift | CM-1388 older task | COMPLETED_VALIDATED_CM1388 | ok | none | 2026-06-02 |"
   ].join("\n");
@@ -62,9 +66,9 @@ function facts() {
   return {
     schemaVersion: 1,
     updatedAt: "2026-06-02",
-    taskId: "CM-1389",
-    validationId: "CMV-1507",
-    branch: "docs/current-facts-single-source",
+    taskId: "CM-1390",
+    validationId: "CMV-1508",
+    branch: "docs/current-facts-active-slimdown",
     localHead: SHA,
     originHead: SHA,
     baseBranch: "main",
@@ -141,5 +145,24 @@ test("current facts validator rejects latest task drift", () => {
   writeFile(root, FACTS_PATH, `${JSON.stringify(changedFacts, null, 2)}\n`);
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);
-  assert.match(result.failures.join("\n"), /latest done task CM-1389/);
+  assert.match(result.failures.join("\n"), /latest done task CM-1390/);
+});
+
+test("current facts validator rejects active block task binding drift", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/RUN_STATE.md",
+    [
+      "# run state",
+      ACTIVE_START,
+      `Current facts source: \`${FACTS_PATH}\`.`,
+      "Current task: `CM-1389 current facts single source`.",
+      "Current validation: `CMV-1508`.",
+      ACTIVE_END
+    ].join("\n")
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /active block must include current facts taskId CM-1390/);
 });

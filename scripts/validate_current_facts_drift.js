@@ -142,6 +142,20 @@ function validateActiveBlocks(root, failures) {
   }
 }
 
+function validateActiveBlockBindings(root, facts, failures) {
+  for (const relativePath of REQUIRED_ACTIVE_FILES) {
+    const text = readText(root, relativePath, failures);
+    const active = extractActiveBlock(text, relativePath, failures);
+    if (!active) continue;
+    if (!active.includes(facts.taskId)) {
+      failures.push(`${relativePath} active block must include current facts taskId ${facts.taskId}`);
+    }
+    if (!active.includes(facts.validationId)) {
+      failures.push(`${relativePath} active block must include current facts validationId ${facts.validationId}`);
+    }
+  }
+}
+
 function validateLatestIds(root, facts, failures) {
   const taskQueue = parseMarkdownTable(readText(root, ".agent_board/TASK_QUEUE.md", failures));
   const validationLog = parseMarkdownTable(readText(root, ".agent_board/VALIDATION_LOG.md", failures));
@@ -178,6 +192,7 @@ function validateCurrentFactsDrift(root = process.cwd()) {
   validateCurrentFactsSchema(facts, failures);
   if (facts) {
     validateActiveBlocks(root, failures);
+    validateActiveBlockBindings(root, facts, failures);
     validateLatestIds(root, facts, failures);
   }
   return { ok: failures.length === 0, failures, facts };
