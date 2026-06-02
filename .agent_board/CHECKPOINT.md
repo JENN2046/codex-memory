@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1365 Phase F1 Live No-Write Rejected Evidence Checkpoint
+
+Status: `BLOCKED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: exact-approved bounded F1 live-client no-write evidence attempt on clean synced `main@546915bec01fd8ffd0fd974f59b6fc95966218a4`. No service start, provider call, successful `record_memory`, authenticated `search_memory`, raw memory/audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Exact A5-GAP-4 approval line accepted for `main@546915bec01fd8ffd0fd974f59b6fc95966218a4`.
+- F1 harness executed in `executed_bounded_no_write` mode.
+- Health, initialize, tools/list, and authorized overview evidence succeeded.
+- Public MCP tools remained exactly `memory_overview`, `record_memory`, `search_memory`.
+- Evidence was rejected fail-closed because no-token overview did not return selected projection and no-token record/search rejection reason codes were missing.
+
+Validation / evidence:
+
+- Fresh Git facts: branch `main`, HEAD and `origin/main` both `546915b`, dirty status line count `0`.
+- `a5:approval-check` returned `approvalAccepted=true` and `authorizationGranted=true`.
+- F1 harness returned `PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_REJECTED_FAIL_CLOSED`.
+- Source inspection found the likely boundary in `src/adapters/codex-mcp/http.js`: detailed no-token JSON-RPC rejection handling is gated by server bearer-token configuration.
+
+Next:
+
+- Do not proceed to F2/F3/F4/F5.
+- Next safe task is local source/test hardening for the authenticated HTTP no-token selected overview/rejection-code contract, or explicit operator decision for another bounded runtime path.
+
 ## CM-1364 Validation Env Isolation Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1364 VALIDATION_ENV_ISOLATION`.
+Goal: `CM-1365 PHASE_F1_LIVE_NO_WRITE_REJECTED_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local test-only validation env isolation. CM-1364 closes the CM-1363 full-suite validation gap by isolating security-profile tests from ambient provider/rerank env and isolating LightMemo CLI child processes into temporary data/logs/diary paths. Default `npm test` now passes `2889/2889` in the current shell. It does not push, pull, merge, rebase, run gates, start runtime, call MCP tools/providers, read real memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, or claim readiness/reliability. F1 live-client no-write execution remains blocked until an explicit normal non-force push approval syncs local `main`, then a fresh synced-head A5-GAP-4 approval is provided. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `BLOCKED_NOT_READY` for exact-approved F1 live no-write evidence. CM-1365 executed the bounded harness on clean synced `main@546915bec01fd8ffd0fd974f59b6fc95966218a4`; health, initialize, tools/list, and authorized overview succeeded, but evidence was rejected fail-closed because no-token overview did not return selected projection and no-token record/search rejections did not expose expected reason codes. It did not start services, call providers, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness/reliability. F1 remains blocked and F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
