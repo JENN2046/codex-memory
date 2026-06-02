@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1359 PHASE_F3_CONDITIONAL_TRUE_LIVE_RECALL_PREFLIGHT`.
+Goal: `CM-1360 PHASE_F4_CONDITIONAL_PERSONAL_DOGFOOD_WRITE_PREFLIGHT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F3 conditional true-live recall preflight. F3 recall proof remains blocked until F1 live-client no-write evidence and F2 A5-GAP-6 aggregation evidence are complete. CM-1359 provides only a non-authorizing true-live negative-control approval template and stop conditions; it does not run `search_memory`, the true-live proof runner, or any recall reliability proof. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F4 conditional minimal personal dogfood write preflight. F4 dogfood write remains blocked until F1 live-client no-write evidence, F2 A5-GAP-6 aggregation evidence, and F3 true-live recall negative-control evidence are complete. CM-1360 provides only a non-authorizing one-write `record_memory` approval template and stop conditions; it does not run `record_memory`, `search_memory`, the true-live proof runner, or any reliability proof. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

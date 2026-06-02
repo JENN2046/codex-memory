@@ -1,5 +1,28 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1360 Phase F4 Conditional Personal Dogfood Write Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board preflight for Phase F4 minimal personal dogfood write. No `record_memory`, `search_memory`, true-live proof execution, service start, MCP/provider call, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, push, readiness claim, or reliability claim.
+
+Result:
+
+- Prepared conditional minimal personal dogfood write preflight for F4.
+- Locked sequence guard: F4 cannot execute before F1, F2, and F3 evidence exist.
+- Added non-authorizing one-write `record_memory` approval template for a future fresh synced post-F3 head.
+- Kept `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- Docs/board changed-scope review, `git diff --check`, ledger consistency, and docs validation are required for closeout.
+
+Next:
+
+- Complete F1, F2, and F3 first.
+
 ## CM-1359 Phase F3 Conditional True-Live Recall Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
