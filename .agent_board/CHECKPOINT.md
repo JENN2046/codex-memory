@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1371 Phase F Personal RC Readiness Snapshot Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local read-only Phase F personal RC evidence readiness snapshot. No push, pull, merge, rebase, F1 live rerun, F2/F3/F4/F5 execution, MCP/provider call, real memory/audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Added `PhaseFPersonalRcReadinessSnapshot`.
+- Added `phase-f-personal-rc-readiness-snapshot` CLI.
+- Added tests for F1 blocker, F2 missing evidence, full personal-dogfood-not-RC state, and side-effect flag rejection.
+
+Validation:
+
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f-personal-rc-readiness-snapshot.test.js` passed `4/4`.
+- CLI side-effect flag rejection passed.
+- `npm test` passed `2894/2894`.
+- `git diff --check` passed.
+- Ledger consistency passed.
+- Docs validation passed.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- After commit, rerun the F1 sync generator from clean HEAD and use only fresh output for push/A5 approval.
+
 ## CM-1370 Phase F1 Sync Blocker Status Summary Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
