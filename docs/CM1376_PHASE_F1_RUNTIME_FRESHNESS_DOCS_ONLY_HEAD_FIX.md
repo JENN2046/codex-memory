@@ -24,13 +24,24 @@ That created a needless push/refresh loop.
 Runtime-affecting paths used by the CLI:
 
 ```text
-src
+src/http-index.js
+src/app.js
+src/config
+src/adapters/codex-mcp
+src/adapters/vcp-passive-memory
+src/adapters/vcp-active-memory
+src/adapters/vcp-light-memory
+src/core
+src/storage
+src/recall
+:(exclude)src/core/PhaseF1RuntimeFreshnessDiagnostic.js
 scripts/serve-codex-memory-http.js
+scripts/bootstrap-user-env.js
 package.json
 package-lock.json
 ```
 
-Docs/status/board-only commits can still make Git unsynced, but they no longer imply the already-refreshed runtime is stale.
+Docs/status/board-only commits and diagnostic-only maintenance commits can still make Git unsynced, but they no longer imply the already-refreshed runtime is stale.
 
 ## Validation
 

@@ -11,9 +11,9 @@ Scope: local source/CLI/test/docs fix for runtime freshness diagnostic. No servi
 Result:
 
 - Freshness now compares listener start time against latest runtime-affecting commit time.
-- Runtime-affecting paths are `src`, `scripts/serve-codex-memory-http.js`, `package.json`, and `package-lock.json`.
-- Docs/status/board-only commits no longer imply runtime stale.
-- Current CLI self-check no longer reports runtime stale for the docs-only evidence HEAD; it only fails closed because worktree is dirty and local branch is ahead.
+- Runtime-affecting paths are the HTTP runtime service paths, excluding the Phase F1 diagnostic implementation itself.
+- Docs/status/board-only commits and diagnostic-only maintenance commits no longer imply runtime stale.
+- Current CLI self-check no longer reports runtime stale for the docs-only or diagnostic-only evidence HEAD; it only fails closed because local branch is ahead.
 
 Validation:
 
