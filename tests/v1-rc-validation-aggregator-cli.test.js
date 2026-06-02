@@ -322,7 +322,15 @@ test('minimal validation aggregator CLI strict mode exits 1 for current blocked 
   assert.equal(report.summary.finalRcMatrixReady, false);
   assert.equal(report.summary.rcReady, false);
   assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditCanClaimReadiness, false);
   assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.missingSectionCount, 0);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalGenerated, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalAccepted, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalExecuted, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAuditCanClaimReadiness, false);
   assert.equal(report.evidence.p24Aggregator.zeroGapCloseoutAuditEmbedded, true);
   assert.equal(
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutNotProvenCount,
@@ -361,6 +369,9 @@ test('minimal validation aggregator CLI strict mode does not execute A5-gated ch
   assert.equal(report.evidence.p24Aggregator.rc9DecisionPacketEmbedded, true);
   assert.equal(report.evidence.p24Aggregator.zeroGapCloseoutAuditEmbedded, true);
   assert.equal(report.evidence.rc9DecisionPacket.safety.remoteWrites, false);
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditStatus, 'markdown_sections_complete_not_authorization');
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.missingSectionCount, 0);
+  assert.equal(report.evidence.rc9DecisionPacket.markdownAuditCanClaimReadiness, false);
 });
 
 test('minimal validation aggregator CLI help mode exits 0 without JSON report or live checks', () => {
@@ -448,8 +459,16 @@ test('minimal validation aggregator CLI rejects live or side-effect flags', () =
     assert.equal(report.evidence.p24Aggregator.zeroGapCloseoutAuditEmbedded, true, flag);
     assert.equal(report.evidence.p24Aggregator.rejectedFlagContractHardening, true, flag);
     assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED', flag);
+    assert.equal(report.summary.rc9DecisionPacketMarkdownAuditStatus, 'markdown_sections_complete_not_authorization', flag);
+    assert.equal(report.summary.rc9DecisionPacketMarkdownAuditCanClaimReadiness, false, flag);
     assert.equal(report.evidence.rc9DecisionPacket.rcReady, false, flag);
     assert.equal(report.evidence.rc9DecisionPacket.rcCutoverExecutionAllowed, false, flag);
+    assert.equal(report.evidence.rc9DecisionPacket.markdownAuditStatus, 'markdown_sections_complete_not_authorization', flag);
+    assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.missingSectionCount, 0, flag);
+    assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalGenerated, false, flag);
+    assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalAccepted, false, flag);
+    assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.approvalExecuted, false, flag);
+    assert.equal(report.evidence.rc9DecisionPacket.markdownAuditCanClaimReadiness, false, flag);
     assert.equal(
       report.summary.p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutCanClaimReadiness,
       false,
@@ -469,6 +488,16 @@ test('minimal validation aggregator rejected report preserves normal top-level c
   assert.equal(rejectedReport.decision, normalReport.decision);
   assert.deepEqual(rejectedReport.public_mcp_tools, normalReport.public_mcp_tools);
   assert.deepEqual(Object.keys(rejectedReport.evidence_sources).sort(), Object.keys(normalReport.evidence_sources).sort());
+  assert.equal(
+    rejectedReport.summary.rc9DecisionPacketMarkdownAuditStatus,
+    normalReport.summary.rc9DecisionPacketMarkdownAuditStatus
+  );
+  assert.equal(rejectedReport.summary.rc9DecisionPacketMarkdownAuditCanClaimReadiness, false);
+  assert.deepEqual(
+    rejectedReport.evidence.rc9DecisionPacket.markdownAudit,
+    normalReport.evidence.rc9DecisionPacket.markdownAudit
+  );
+  assert.equal(rejectedReport.evidence.rc9DecisionPacket.markdownAuditCanClaimReadiness, false);
   assert.equal(rejectedReport.safety.mutated, false);
   assert.equal(rejectedReport.rejectedFlag, '--provider');
   assert.match(rejectedReport.error, /outside the minimal validation aggregator CLI boundary/);
