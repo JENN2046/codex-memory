@@ -10,6 +10,50 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC ValidationAggregator Stale Summary Invalidation Slice
+
+Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Scope: made explicit runtime evidence summaries stale-aware for ValidationAggregator. This is a local source/test slice for `validation_aggregator_full_implementation_incomplete`; it does not close the whole gap or claim RC readiness.
+
+Changed:
+
+- `src/core/ValidationAggregatorService.js`
+- `tests/v1-rc-validation-aggregator-implementation.test.js`
+- `docs/RC_VALIDATION_AGGREGATOR_STALE_SUMMARY_INVALIDATION_SLICE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- Runtime summaries must include parseable `evidenceGeneratedAt`.
+- Missing, malformed, future, or stale timestamps fail closed.
+- Fresh summaries expose `evidenceFreshnessStatus=fresh`.
+- Readiness remains false.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --check tests\v1-rc-validation-aggregator-implementation.test.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js` passed `21/21`
+
+Boundary:
+
+- No Git read was performed by the aggregator.
+- No runtime evidence execution occurred.
+- No file/store scan occurred.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Continue local implementation slices for `validation_aggregator_full_implementation_incomplete`.
+- Keep `rc_cutover_not_executed` blocked behind zero-gap evidence and separate exact RC cutover approval.
+
 ## RC ValidationAggregator Current-Head Required Slice
 
 Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`

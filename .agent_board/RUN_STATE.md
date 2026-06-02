@@ -59,7 +59,9 @@ Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGRE
 
 Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_CURRENT_HEAD_REQUIRED_SLICE.md` records mandatory current-head binding for ValidationAggregator runtime evidence summaries. Accepted summaries must include matching `currentHeadCommit` and `expectedCurrentHeadCommit`; missing or one-sided binding fails closed. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
 
-Next safe action is to validate and commit the current-head required slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_STALE_SUMMARY_INVALIDATION_SLICE.md` records stale-aware explicit runtime summary validation. Accepted summaries must include fresh `evidenceGeneratedAt`; missing, malformed, future, or stale timestamps fail closed. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
+
+Next safe action is to validate and commit the stale summary invalidation slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

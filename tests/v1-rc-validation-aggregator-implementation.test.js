@@ -2318,6 +2318,7 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
       decision: 'NOT_READY_BLOCKED',
       currentHeadCommit: 'abc1234def5678',
       expectedCurrentHeadCommit: 'abc1234def5678',
+      evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
       evidenceUnitIds: [
         'A5-GAP-1',
         'A5-GAP-2',
@@ -2397,6 +2398,9 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(bridge.summary.currentHeadBindingMatched, true);
   assert.equal(bridge.summary.currentHeadCommit, 'abc1234def5678');
   assert.equal(bridge.summary.expectedCurrentHeadCommit, 'abc1234def5678');
+  assert.equal(bridge.summary.evidenceGeneratedAt, '2026-05-18T01:30:00.000Z');
+  assert.equal(bridge.summary.evidenceFreshnessStatus, 'fresh');
+  assert.equal(bridge.summary.evidenceAgeHours, 0.5);
   assert.equal(bridge.summary.evidenceUnitCount, 5);
   assert.equal(bridge.summary.requiredEvidenceUnitCount, 5);
   assert.equal(bridge.summary.missingEvidenceUnitCount, 0);
@@ -2434,6 +2438,8 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(report.summary.runtimeEvidenceSummaryRemainingGapCount, 2);
   assert.equal(report.summary.runtimeEvidenceSummaryCurrentHeadBindingStatus, 'matched');
   assert.equal(report.summary.runtimeEvidenceSummaryCurrentHeadBindingMatched, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryEvidenceFreshnessStatus, 'fresh');
+  assert.equal(report.summary.runtimeEvidenceSummaryEvidenceGeneratedAt, '2026-05-18T01:30:00.000Z');
   assert.equal(report.summary.runtimeEvidenceSummaryEvidenceUnitCount, 5);
   assert.equal(report.summary.runtimeEvidenceSummaryRequiredEvidenceUnitCount, 5);
   assert.equal(report.summary.runtimeEvidenceSummaryMissingEvidenceUnitCount, 0);
@@ -2721,6 +2727,7 @@ test('validation aggregator runtime evidence summary fails closed on evidence un
     decision: 'NOT_READY_BLOCKED',
     currentHeadCommit: 'abc1234',
     expectedCurrentHeadCommit: 'abc1234',
+    evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
     locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
     remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
     safety: {
@@ -2736,18 +2743,21 @@ test('validation aggregator runtime evidence summary fails closed on evidence un
     }
   };
   const missing = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
     runtimeEvidenceSummary: {
       ...baseSummary,
       evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-4', 'A5-GAP-5']
     }
   });
   const unknown = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
     runtimeEvidenceSummary: {
       ...baseSummary,
       evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5', 'A5-GAP-99']
     }
   });
   const duplicate = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
     runtimeEvidenceSummary: {
       ...baseSummary,
       evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5']
@@ -2794,6 +2804,79 @@ test('validation aggregator runtime evidence summary fails closed on evidence un
   assertNoSensitiveSurface(missing);
   assertNoSensitiveSurface(unknown);
   assertNoSensitiveSurface(duplicate);
+});
+
+test('validation aggregator runtime evidence summary fails closed on stale or malformed timestamps', () => {
+  const baseSummary = {
+    status: 'local_runtime_evidence_passed_rc_still_blocked',
+    decision: 'NOT_READY_BLOCKED',
+    currentHeadCommit: 'abc1234',
+    expectedCurrentHeadCommit: 'abc1234',
+    evidenceUnitIds: ['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-3', 'A5-GAP-4', 'A5-GAP-5'],
+    locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+    remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
+    safety: {
+      mutated: false,
+      providerCalls: 0,
+      serviceStarted: false,
+      writesDurableMemory: false,
+      realMemoryPreview: false,
+      remoteWrites: false,
+      configChanged: false,
+      migrationApplied: false,
+      importExportApplied: false
+    }
+  };
+  const missingTimestamp = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: baseSummary
+  });
+  const malformedTimestamp = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      evidenceGeneratedAt: 'not-a-timestamp'
+    }
+  });
+  const futureTimestamp = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      evidenceGeneratedAt: '2026-05-18T03:00:00.000Z'
+    }
+  });
+  const staleTimestamp = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      ...baseSummary,
+      evidenceGeneratedAt: '2026-05-10T01:59:00.000Z'
+    }
+  });
+
+  assert.equal(missingTimestamp.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(
+    missingTimestamp.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'runtime_evidence_summary_timestamp_required'
+  );
+  assert.equal(
+    malformedTimestamp.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'runtime_evidence_summary_timestamp_malformed'
+  );
+  assert.equal(
+    futureTimestamp.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'runtime_evidence_summary_timestamp_future'
+  );
+  assert.equal(
+    staleTimestamp.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'runtime_evidence_summary_stale'
+  );
+  assert.equal(staleTimestamp.summary.runtimeReady, false);
+  assert.equal(staleTimestamp.summary.finalRcMatrixReady, false);
+  assert.equal(staleTimestamp.summary.rcReady, false);
+  assertNoSensitiveSurface(missingTimestamp);
+  assertNoSensitiveSurface(malformedTimestamp);
+  assertNoSensitiveSurface(futureTimestamp);
+  assertNoSensitiveSurface(staleTimestamp);
 });
 
 test('validation aggregator runtime evidence summary rejects readiness claims, side effects, and secrets', () => {
@@ -2847,11 +2930,13 @@ test('validation aggregator runtime evidence summary rejects readiness claims, s
 
 test('effective gap accounting fails closed on non-baseline remaining gaps', () => {
   const report = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
     runtimeEvidenceSummary: {
       status: 'local_runtime_evidence_passed_rc_still_blocked',
       decision: 'NOT_READY_BLOCKED',
       currentHeadCommit: 'abc1234',
       expectedCurrentHeadCommit: 'abc1234',
+      evidenceGeneratedAt: '2026-05-18T01:30:00.000Z',
       runtimeReady: false,
       finalRcMatrixReady: false,
       v1RcReady: false,

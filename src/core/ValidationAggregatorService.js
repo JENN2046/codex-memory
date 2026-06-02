@@ -87,6 +87,7 @@ const VALIDATION_EVIDENCE_CONFIDENCE_POSTURE_STATUSES = [
 ];
 
 const VALIDATION_EVIDENCE_STALE_AFTER_HOURS = 168;
+const RUNTIME_EVIDENCE_SUMMARY_STALE_AFTER_HOURS = 168;
 
 const RUNTIME_EVIDENCE_SUMMARY_STATUSES = [
   'no_explicit_runtime_evidence_summary',
@@ -1891,7 +1892,10 @@ function hasUnsafeEvidenceSideEffect(source) {
     safety.deployed === true;
 }
 
-function normalizeRuntimeEvidenceSummary(summary = null) {
+function normalizeRuntimeEvidenceSummary(summary = null, {
+  generatedAt = new Date().toISOString(),
+  staleAfterHours = RUNTIME_EVIDENCE_SUMMARY_STALE_AFTER_HOURS
+} = {}) {
   const contract = {
     sourceMode: 'explicit_sanitized_summary_only',
     readsFiles: false,
@@ -1938,6 +1942,9 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       currentHeadBindingMatched: false,
       currentHeadCommit: '',
       expectedCurrentHeadCommit: '',
+      evidenceGeneratedAt: '',
+      evidenceFreshnessStatus: 'not_provided',
+      evidenceAgeHours: null,
       evidenceUnitCount: 0,
       requiredEvidenceUnitCount: RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS.length,
       missingEvidenceUnitCount: RUNTIME_EVIDENCE_SUMMARY_REQUIRED_UNIT_IDS.length,
@@ -2090,6 +2097,49 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
     };
   }
 
+  const rawEvidenceGeneratedAt = typeof summary.evidenceGeneratedAt === 'string'
+    ? summary.evidenceGeneratedAt.trim()
+    : '';
+  if (!rawEvidenceGeneratedAt) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'runtime_evidence_summary_timestamp_required'
+    };
+  }
+
+  const evidenceGeneratedAt = parseEvidenceTimestamp(rawEvidenceGeneratedAt);
+  const reportGeneratedAt = parseEvidenceTimestamp(generatedAt);
+  if (!evidenceGeneratedAt || !reportGeneratedAt) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'runtime_evidence_summary_timestamp_malformed'
+    };
+  }
+
+  const evidenceAgeMs = reportGeneratedAt.getTime() - evidenceGeneratedAt.getTime();
+  if (evidenceAgeMs < 0) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'runtime_evidence_summary_timestamp_future'
+    };
+  }
+
+  const evidenceAgeHours = evidenceAgeMs / (60 * 60 * 1000);
+  if (evidenceAgeHours > staleAfterHours) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'runtime_evidence_summary_stale'
+    };
+  }
+
   const evidenceUnitSummary = summarizeRuntimeEvidenceUnits(summary.evidenceUnitIds);
 
   if (evidenceUnitSummary.duplicateUnitCount > 0) {
@@ -2146,6 +2196,9 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       currentHeadBindingMatched: currentHeadBindingStatus === 'matched',
       currentHeadCommit,
       expectedCurrentHeadCommit,
+      evidenceGeneratedAt: rawEvidenceGeneratedAt,
+      evidenceFreshnessStatus: 'fresh',
+      evidenceAgeHours: evidenceAgeHours,
       evidenceUnitCount: evidenceUnitSummary.uniqueUnitIds.length,
       requiredEvidenceUnitCount: evidenceUnitSummary.requiredUnitIds.length,
       missingEvidenceUnitCount: evidenceUnitSummary.missingRequiredUnitIds.length,
@@ -2311,7 +2364,9 @@ function buildV1RcValidationAggregatorReport({
   v11HardeningEvidence = null
 } = {}) {
   const validationEvidenceReader = normalizeValidationEvidenceSources(validationEvidenceSources);
-  const runtimeEvidenceSummaryBridge = normalizeRuntimeEvidenceSummary(runtimeEvidenceSummary);
+  const runtimeEvidenceSummaryBridge = normalizeRuntimeEvidenceSummary(runtimeEvidenceSummary, {
+    generatedAt
+  });
   const runtimeProofCollector = collectValidationAggregatorRuntimeProofUnits(
     runtimeProofInputs || {}
   );
@@ -2440,6 +2495,10 @@ function buildV1RcValidationAggregatorReport({
         runtimeEvidenceSummaryBridge.summary.currentHeadBindingStatus,
       runtimeEvidenceSummaryCurrentHeadBindingMatched:
         runtimeEvidenceSummaryBridge.summary.currentHeadBindingMatched,
+      runtimeEvidenceSummaryEvidenceFreshnessStatus:
+        runtimeEvidenceSummaryBridge.summary.evidenceFreshnessStatus,
+      runtimeEvidenceSummaryEvidenceGeneratedAt:
+        runtimeEvidenceSummaryBridge.summary.evidenceGeneratedAt,
       runtimeEvidenceSummaryEvidenceUnitCount:
         runtimeEvidenceSummaryBridge.summary.evidenceUnitCount,
       runtimeEvidenceSummaryRequiredEvidenceUnitCount:
