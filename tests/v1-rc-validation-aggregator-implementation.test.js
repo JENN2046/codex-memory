@@ -3488,6 +3488,17 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
     true
   );
   assert.equal(nonzeroRender.markdown.includes('approval_hint=none_local_source_test'), true);
+  assert.equal(
+    nonzeroRender.markdown.includes('route_approval_hint_audit_status = approval_hints_complete_for_known_routes_not_authorization'),
+    true
+  );
+  assert.equal(nonzeroRender.markdown.includes('route_approval_hint_count = 1'), true);
+  assert.equal(nonzeroRender.markdown.includes('route_approval_hint_missing_count = 0'), true);
+  assert.equal(nonzeroRender.markdown.includes('route_approval_hint_manual_review_count = 0'), true);
+  assert.equal(nonzeroRender.markdown.includes('route_approval_hint_approval_generated = false'), true);
+  assert.equal(nonzeroRender.markdown.includes('route_approval_hint_approval_accepted = false'), true);
+  assert.equal(nonzeroRender.markdown.includes('route_approval_hint_approval_executed = false'), true);
+  assert.equal(nonzeroRender.markdown.includes('route_approval_hint_can_claim_readiness = false'), true);
 
   assert.equal(zeroGapRender.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
   assert.equal(zeroGapRender.readyToRequestRcCutoverApproval, true);
@@ -3514,6 +3525,15 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
     zeroGapRender.markdown.includes('completeness_checklist_status = complete_for_cutover_approval_request_not_rc_ready'),
     true
   );
+  assert.equal(
+    zeroGapRender.markdown.includes('route_approval_hint_audit_status = no_remaining_gaps_no_approval_hint_needed'),
+    true
+  );
+  assert.equal(zeroGapRender.markdown.includes('route_approval_hint_count = 0'), true);
+  assert.equal(zeroGapRender.markdown.includes('route_approval_hint_approval_generated = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('route_approval_hint_approval_accepted = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('route_approval_hint_approval_executed = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('route_approval_hint_can_claim_readiness = false'), true);
   assert.equal(zeroGapRender.markdown.includes('completeness_checklist_missing_count = 0'), true);
   assert.equal(zeroGapRender.markdown.includes('## Completeness Checklist'), true);
   assert.equal(zeroGapRender.markdown.includes('- fresh_current_head | status=accepted | blocking=false | source=runtime_evidence_summary.currentHeadCommit'), true);

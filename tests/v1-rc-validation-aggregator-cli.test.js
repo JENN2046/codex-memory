@@ -91,6 +91,17 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalAccepted, false);
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalExecuted, false);
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAuditCanClaimReadiness, false);
+  assert.equal(
+    report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_audit_status = approval_hints_complete_for_known_routes_not_authorization'),
+    true
+  );
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_count = 7'), true);
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_missing_count = 0'), true);
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_manual_review_count = 0'), true);
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_approval_generated = false'), true);
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_approval_accepted = false'), true);
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_approval_executed = false'), true);
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('route_approval_hint_can_claim_readiness = false'), true);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteCanClaimReadiness, false);
   assert.equal(
     report.evidence.rc9DecisionPacket.remainingGapAuthorities
