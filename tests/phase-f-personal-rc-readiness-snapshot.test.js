@@ -9,6 +9,7 @@ const test = require('node:test');
 const {
   buildF2A5Gap6ApprovalTemplate,
   buildF3TrueLiveRecallApprovalTemplate,
+  buildF4MinimalDogfoodWriteApprovalTemplate,
   buildPhaseFPersonalRcReadinessSnapshot
 } = require('../src/core/PhaseFPersonalRcReadinessSnapshot');
 const {
@@ -209,6 +210,23 @@ test('Phase F personal RC snapshot F3 approval template is head-bound and non-em
   assert.match(template, /no readiness or reliability claim/);
 });
 
+test('Phase F personal RC snapshot F4 approval template is head-bound and bounded to one sanitized write', () => {
+  const commit = 'e564b5c67093f93657ecf3a8841d9daf2ec90051';
+  const template = buildF4MinimalDogfoodWriteApprovalTemplate({
+    branch: 'main',
+    currentHead: commit
+  });
+
+  assert.match(template, new RegExp(`commit ${commit}`));
+  assert.match(template, /exactly one sanitized record_memory call/);
+  assert.match(template, /current local codex-memory real store/);
+  assert.match(template, /allow only the durable memory\/audit write required for that single sanitized dogfood record/);
+  assert.match(template, /no provider call/);
+  assert.match(template, /no search_memory call/);
+  assert.match(template, /no broad real memory scan/);
+  assert.match(template, /no readiness or reliability claim/);
+});
+
 test('Phase F personal RC snapshot detects committed CM-1381 F3 evidence document', () => {
   const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'phase-f-evidence-'));
   const docsDir = path.join(workspace, 'docs');
@@ -263,6 +281,11 @@ test('Phase F personal RC snapshot detects committed CM-1381 F3 evidence documen
   assert.equal(snapshot.nextRequiredAction, 'obtain_exact_minimal_dogfood_write_approval_after_f3');
   assert.deepEqual(snapshot.missingPhases, ['F4', 'F5']);
   assert.equal(snapshot.approvalTemplates.f3TrueLiveRecallTemplateCurrentlyUsable, false);
+  assert.match(
+    snapshot.approvalTemplates.f4MinimalDogfoodWriteApprovalTemplate,
+    /MEMORY_WRITE_MINIMAL_PERSONAL_DOGFOOD_EXECUTION_ONCE/
+  );
+  assert.equal(snapshot.approvalTemplates.f4MinimalDogfoodWriteTemplateCurrentlyUsable, true);
 });
 
 test('Phase F personal RC snapshot can represent personal dogfood ready without RC ready', () => {
@@ -306,6 +329,7 @@ test('Phase F personal RC snapshot CLI helpers render blocked state and reject s
   assert.match(text, /pushApprovalTemplate: I approve pushing local main commits/);
   assert.match(text, /f2A5Gap6ApprovalTemplate:/);
   assert.match(text, /f3TrueLiveRecallApprovalTemplate:/);
+  assert.match(text, /f4MinimalDogfoodWriteApprovalTemplate:/);
   assert.match(text, /readinessClaimAllowed: false/);
   assert.throws(() => parseArgs(['--push']), /unsupported side-effect flag/);
   assert.throws(() => parseArgs(['--record-memory']), /unsupported side-effect flag/);

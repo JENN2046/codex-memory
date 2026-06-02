@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1382 Phase F4 Minimal Dogfood Write Approval Surface Checkpoint
+
+Status: `COMPLETED_VALIDATED_F4_APPROVAL_PACKET_SURFACED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local source/CLI/test/docs/board approval surface only after synced `main@e564b5c67093f93657ecf3a8841d9daf2ec90051`. No F4 execution, `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Phase F snapshot now renders `f4MinimalDogfoodWriteApprovalTemplate`.
+- The template is head-bound to fresh Git facts and limits future F4 to exactly one sanitized `record_memory` dogfood write.
+- `f4MinimalDogfoodWriteTemplateCurrentlyUsable` requires F1/F2/F3 accepted, F4 missing, clean synced `HEAD == origin/main`, and ahead/behind `0/0`.
+
+Validation:
+
+- `node --check` for changed snapshot source/CLI/test.
+- Targeted Phase F snapshot tests.
+- Snapshot CLI self-check.
+- `git diff --check`.
+- Ledger consistency check.
+- Docs validation.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Sync only if approved, then use fresh snapshot-rendered exact F4 approval line before any F4 execution.
+- Do not proceed to F5 until F4 evidence is accepted.
+
 ## CM-1381 Phase F3 True-Live Recall Negative-Control Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_F3_ACCEPTED_NOT_READY`

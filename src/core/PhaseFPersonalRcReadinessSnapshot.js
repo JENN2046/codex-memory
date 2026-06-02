@@ -62,6 +62,21 @@ function buildF3TrueLiveRecallApprovalTemplate({ currentHead = '' } = {}) {
   return buildHeadBoundApprovalLine(normalizedHead);
 }
 
+function buildF4MinimalDogfoodWriteApprovalTemplate({ currentHead = '', branch = 'main' } = {}) {
+  const normalizedHead = normalizeString(currentHead);
+  const normalizedBranch = normalizeString(branch) || 'main';
+  if (!normalizedHead) return '';
+  return [
+    `I approve MEMORY_WRITE_MINIMAL_PERSONAL_DOGFOOD_EXECUTION_ONCE for codex-memory on branch ${normalizedBranch} at commit ${normalizedHead},`,
+    'limited to exactly one sanitized record_memory call against the current local codex-memory real store for Phase F4 personal dogfood proof,',
+    'using current-session bearer token if already present, without printing or persisting token material,',
+    'allow only the durable memory/audit write required for that single sanitized dogfood record,',
+    'with no provider call, no search_memory call, no raw memory output, no direct .jsonl read, no broad real memory scan,',
+    'no migration/import/export/backup/restore apply, no config/watchdog/startup change, no public MCP expansion,',
+    'no package/lockfile change, no tag/release/deploy/cutover, and no readiness or reliability claim.'
+  ].join(' ');
+}
+
 function buildPhaseStatus({ id, requirement, evidence, completedPrereqs, syncPacket }) {
   const complete = phaseComplete(evidence, id);
   if (complete) {
@@ -176,6 +191,19 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
         syncPacket.worktreeClean === true &&
         Number(syncPacket.ahead || 0) === 0 &&
         Number(syncPacket.behind || 0) === 0 &&
+        normalizeString(syncPacket.currentHead) === normalizeString(syncPacket.originHead),
+      f4MinimalDogfoodWriteApprovalTemplate: buildF4MinimalDogfoodWriteApprovalTemplate({
+        currentHead: syncPacket.currentHead,
+        branch: syncPacket.branch
+      }),
+      f4MinimalDogfoodWriteTemplateCurrentlyUsable:
+        phaseComplete(evidence, 'F1') &&
+        phaseComplete(evidence, 'F2') &&
+        phaseComplete(evidence, 'F3') &&
+        !phaseComplete(evidence, 'F4') &&
+        syncPacket.worktreeClean === true &&
+        Number(syncPacket.ahead || 0) === 0 &&
+        Number(syncPacket.behind || 0) === 0 &&
         normalizeString(syncPacket.currentHead) === normalizeString(syncPacket.originHead)
     },
     completionCriteria: {
@@ -206,5 +234,6 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
 module.exports = {
   buildF2A5Gap6ApprovalTemplate,
   buildF3TrueLiveRecallApprovalTemplate,
+  buildF4MinimalDogfoodWriteApprovalTemplate,
   buildPhaseFPersonalRcReadinessSnapshot
 };

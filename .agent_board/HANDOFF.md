@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1381 PHASE_F3_TRUE_LIVE_RECALL_NEGATIVE_CONTROL_EVIDENCE`.
+Goal: `CM-1382 PHASE_F4_MINIMAL_DOGFOOD_WRITE_APPROVAL_SURFACE`.
 
-Status: `COMPLETED_VALIDATED_F3_ACCEPTED_NOT_READY` for exact-approved Phase F3 true-live recall negative-control evidence. F1, F2, and F3 evidence are accepted; F4 remains the blocking phase. The proof ran exactly four read-only `search_memory` calls through the internal runner/adapter path and all four stricter negative-control queries returned zero sanitized results with zero side-effect counters. No `record_memory`, provider call, raw memory/jsonl/raw audit read, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F4 minimal personal dogfood write requires separate exact approval after CM-1381 is committed/synced. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_F4_APPROVAL_PACKET_SURFACED_NOT_READY` for local Phase F4 minimal dogfood write approval surface preparation. F1, F2, and F3 evidence are accepted and synced at `main@e564b5c67093f93657ecf3a8841d9daf2ec90051`; F4 remains the blocking phase. CM-1382 adds a dynamic snapshot-rendered F4 exact approval template and usability flag. No F4 execution, `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F4 requires the operator to send the fresh exact approval line after CM-1382 is committed/synced and `f4MinimalDogfoodWriteTemplateCurrentlyUsable=true`. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

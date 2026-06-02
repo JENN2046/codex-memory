@@ -151,6 +151,8 @@ function renderText(snapshot) {
     `f2A5Gap6TemplateCurrentlyUsable: ${snapshot.approvalTemplates.f2A5Gap6TemplateCurrentlyUsable}`,
     `f3TrueLiveRecallApprovalTemplate: ${snapshot.approvalTemplates.f3TrueLiveRecallApprovalTemplate || ''}`,
     `f3TrueLiveRecallTemplateCurrentlyUsable: ${snapshot.approvalTemplates.f3TrueLiveRecallTemplateCurrentlyUsable}`,
+    `f4MinimalDogfoodWriteApprovalTemplate: ${snapshot.approvalTemplates.f4MinimalDogfoodWriteApprovalTemplate || ''}`,
+    `f4MinimalDogfoodWriteTemplateCurrentlyUsable: ${snapshot.approvalTemplates.f4MinimalDogfoodWriteTemplateCurrentlyUsable}`,
     '',
     `readinessClaimAllowed: ${snapshot.readinessClaimAllowed}`,
     `rcReady: ${snapshot.rcReady}`
