@@ -143,6 +143,8 @@ function renderText(snapshot) {
     `operatorState: ${snapshot.operatorState}`,
     `target: ${snapshot.target}`,
     `targetCurrentlyAchieved: ${snapshot.targetCurrentlyAchieved}`,
+    `localEvidenceComplete: ${snapshot.localEvidenceComplete}`,
+    `cleanSyncedHead: ${snapshot.cleanSyncedHead}`,
     `branch: ${snapshot.branch}`,
     `HEAD: ${snapshot.currentHead}`,
     `origin: ${snapshot.originHead}`,

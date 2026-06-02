@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1385 PHASE_F_SNAPSHOT_REVIEW_FIX`.
+Goal: `CM-1386 PHASE_F_READINESS_CLAIM_SEMANTICS`.
 
-Status: `COMPLETED_VALIDATED_PHASE_F_SNAPSHOT_REVIEW_FIX` for local Phase F snapshot review fix. CM-1385 removes manual `--f*-accepted` CLI evidence overrides, preserves docs-only detection, and cleans stale post-closeout operator wording while keeping `RC_READY=false`. No `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. After the guarded local commit containing this handoff, sync only with explicit approval; otherwise choose the next local phase from fresh Git facts. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_PHASE_F_READINESS_CLAIM_SEMANTICS` for local Phase F readiness claim semantics. CM-1386 splits local evidence completion from clean-synced readiness claim allowance while keeping `RC_READY=false`; dirty/ahead local evidence can be complete without allowing a readiness claim. No `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. After the guarded local commit containing this handoff, sync only with explicit approval; otherwise choose the next local phase from fresh Git facts. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

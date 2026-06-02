@@ -428,6 +428,8 @@ test('Phase F personal RC snapshot detects committed CM-1384 F5 closeout documen
   assert.equal(snapshot.decision, 'PERSONAL_DOGFOOD_READY_NOT_RC_READY');
   assert.equal(snapshot.operatorState, 'PERSONAL_DOGFOOD_READY_NOT_RC_READY');
   assert.equal(snapshot.targetCurrentlyAchieved, true);
+  assert.equal(snapshot.localEvidenceComplete, true);
+  assert.equal(snapshot.cleanSyncedHead, true);
   assert.equal(snapshot.readinessClaimAllowed, true);
   assert.equal(snapshot.rcReady, false);
   assert.equal(snapshot.blockingPhase, null);
@@ -456,12 +458,42 @@ test('Phase F personal RC snapshot can represent personal dogfood ready without 
   assert.equal(snapshot.decision, 'PERSONAL_DOGFOOD_READY_NOT_RC_READY');
   assert.equal(snapshot.operatorState, 'PERSONAL_DOGFOOD_READY_NOT_RC_READY');
   assert.equal(snapshot.targetCurrentlyAchieved, true);
+  assert.equal(snapshot.localEvidenceComplete, true);
+  assert.equal(snapshot.cleanSyncedHead, true);
   assert.equal(snapshot.readinessClaimAllowed, true);
   assert.equal(snapshot.rcReady, false);
   assert.equal(snapshot.blockingPhase, null);
   assert.deepEqual(snapshot.missingPhases, []);
   assert.equal(snapshot.safetyCounters.readinessClaims, 0);
   assert.equal(snapshot.safetyCounters.reliabilityClaims, 0);
+});
+
+test('Phase F personal RC snapshot separates local evidence completion from clean-synced readiness claim', () => {
+  const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
+    syncPacket: {
+      branch: 'main',
+      currentHead: '2141987309d157e9d758c22694d84735bfb6b10c',
+      originHead: '688b527086bff9d2e1ff194705d8943acab9ca39',
+      ahead: 1,
+      behind: 0,
+      worktreeClean: true
+    },
+    evidence: {
+      f1LiveNoWriteEvidenceAccepted: true,
+      f2A5Gap6AggregationAccepted: true,
+      f3TrueLiveRecallNegativeControlAccepted: true,
+      f4MinimalDogfoodWriteAccepted: true,
+      f5CloseoutAccepted: true
+    }
+  });
+
+  assert.equal(snapshot.decision, 'PERSONAL_DOGFOOD_READY_NOT_RC_READY');
+  assert.equal(snapshot.targetCurrentlyAchieved, true);
+  assert.equal(snapshot.localEvidenceComplete, true);
+  assert.equal(snapshot.cleanSyncedHead, false);
+  assert.equal(snapshot.readinessClaimAllowed, false);
+  assert.equal(snapshot.rcReady, false);
+  assert.deepEqual(snapshot.missingPhases, []);
 });
 
 test('Phase F personal RC snapshot CLI helpers render blocked state and reject side-effect flags', () => {
@@ -476,6 +508,8 @@ test('Phase F personal RC snapshot CLI helpers render blocked state and reject s
   assert.match(text, /f2A5Gap6ApprovalTemplate:/);
   assert.match(text, /f3TrueLiveRecallApprovalTemplate:/);
   assert.match(text, /f4MinimalDogfoodWriteApprovalTemplate:/);
+  assert.match(text, /localEvidenceComplete: false/);
+  assert.match(text, /cleanSyncedHead: false/);
   assert.match(text, /readinessClaimAllowed: false/);
   assert.throws(() => parseArgs(['--push']), /unsupported side-effect flag/);
   assert.throws(() => parseArgs(['--record-memory']), /unsupported side-effect flag/);

@@ -152,6 +152,12 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
   const missingPhases = phases.filter(phase => phase.status !== 'complete').map(phase => phase.id);
   const blockingPhase = phases.find(phase => phase.status !== 'complete') || null;
   const allEvidenceAccepted = missingPhases.length === 0;
+  const currentHead = normalizeString(syncPacket.currentHead);
+  const originHead = normalizeString(syncPacket.originHead);
+  const worktreeClean = syncPacket.worktreeClean === true;
+  const ahead = Number(syncPacket.ahead || 0);
+  const behind = Number(syncPacket.behind || 0);
+  const cleanSyncedHead = worktreeClean && ahead === 0 && behind === 0 && currentHead === originHead;
 
   return {
     status: 'PHASE_F_PERSONAL_RC_EVIDENCE_READINESS_SNAPSHOT',
@@ -159,14 +165,16 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
     operatorState: allEvidenceAccepted ? 'PERSONAL_DOGFOOD_READY_NOT_RC_READY' : 'RC_NOT_READY_BLOCKED',
     target: 'PERSONAL_DOGFOOD_READY_NOT_RC_READY',
     targetCurrentlyAchieved: allEvidenceAccepted,
-    readinessClaimAllowed: allEvidenceAccepted,
+    localEvidenceComplete: allEvidenceAccepted,
+    cleanSyncedHead,
+    readinessClaimAllowed: allEvidenceAccepted && cleanSyncedHead,
     rcReady: false,
     branch: normalizeString(syncPacket.branch) || 'main',
-    currentHead: normalizeString(syncPacket.currentHead),
-    originHead: normalizeString(syncPacket.originHead),
-    worktreeClean: syncPacket.worktreeClean === true,
-    ahead: Number(syncPacket.ahead || 0),
-    behind: Number(syncPacket.behind || 0),
+    currentHead,
+    originHead,
+    worktreeClean,
+    ahead,
+    behind,
     phases,
     missingPhases,
     blockingPhase,
@@ -188,10 +196,7 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
         phaseComplete(evidence, 'F1') &&
         phaseComplete(evidence, 'F2') &&
         !phaseComplete(evidence, 'F3') &&
-        syncPacket.worktreeClean === true &&
-        Number(syncPacket.ahead || 0) === 0 &&
-        Number(syncPacket.behind || 0) === 0 &&
-        normalizeString(syncPacket.currentHead) === normalizeString(syncPacket.originHead),
+        cleanSyncedHead,
       f4MinimalDogfoodWriteApprovalTemplate: buildF4MinimalDogfoodWriteApprovalTemplate({
         currentHead: syncPacket.currentHead,
         branch: syncPacket.branch
@@ -201,10 +206,7 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
         phaseComplete(evidence, 'F2') &&
         phaseComplete(evidence, 'F3') &&
         !phaseComplete(evidence, 'F4') &&
-        syncPacket.worktreeClean === true &&
-        Number(syncPacket.ahead || 0) === 0 &&
-        Number(syncPacket.behind || 0) === 0 &&
-        normalizeString(syncPacket.currentHead) === normalizeString(syncPacket.originHead)
+        cleanSyncedHead
     },
     completionCriteria: {
       f1LiveNoWriteEvidenceAccepted: normalizeBoolean(evidence.f1LiveNoWriteEvidenceAccepted),
