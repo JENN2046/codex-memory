@@ -4,13 +4,71 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1398 Phase H client-scope boundary inventory`.
-Current validation: `CMV-1516`.
+Current checkpoint: `CM-1400 Phase H client-scope private read consistency source/test`.
+Current validation: `CMV-1518`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; older checkpoint entries below are historical.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Historical Checkpoint Archive
+
+### CM-1400 Phase H Client Scope Private Read Consistency Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_H_CLIENT_SCOPE_PRIVATE_READ_CONSISTENCY`
+
+Date: 2026-06-02
+
+Scope: local explicit-input/no-apply source/test over client-scope private read consistency. No live client operation, bearer-token use, `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl`, raw audit, vector, candidate-cache, or store scan, durable memory/audit write, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `src/core/ClientScopePrivateReadConsistency.js`.
+- Added `tests/client-scope-private-read-consistency.test.js`.
+- Same-client private candidates are accepted.
+- Cross-client private, ownerless private, and missing-request-identity private candidates fail closed.
+- Caller-supplied scope remains candidate filtering only and does not become current identity authority.
+- Lifecycle current scope is derived from execution context.
+- Suppressed metadata is sanitized and no-apply invariants are enforced.
+
+Validation:
+
+- `node --check src\core\ClientScopePrivateReadConsistency.js` passed.
+- `node --check tests\client-scope-private-read-consistency.test.js` passed.
+- `node --test tests\client-scope-private-read-consistency.test.js tests\governance-lifecycle-read-policy-isolation.test.js tests\memory-lifecycle-scope-runtime-integration.test.js tests\policy-read-preflight.test.js` passed `24/24`.
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Review accumulated CM-1399 and CM-1400 diff before staging/committing, or continue Phase H with another no-apply source/test slice.
+
+### CM-1399 Phase H Boundary Matrix Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX`
+
+Date: 2026-06-02
+
+Scope: local docs/no-apply boundary matrix over current Codex / Claude client-scope boundaries. No live client operation, bearer-token use, `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl`, raw audit, vector, candidate-cache, or store scan, durable memory/audit write, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md`.
+- Classified public MCP surface, record/search scope schemas, execution-context authority, write effective scope, soft-read private policy, lifecycle read policy, governance suppression, HTTP/stdio defaults, historical client acceptance evidence, broad real-store scans, and public client-scope MCP expansion.
+- Selected `CM-1400 Phase H client-scope private read consistency source/test` as the first no-apply source/test slice.
+- Kept live clients, bearer tokens, real memory scans, durable writes, public MCP expansion, and readiness claims blocked.
+
+Validation:
+
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Continue with CM-1400 as explicit-input no-apply source/test work, or review/commit this docs batch if requested.
 
 ### CM-1398 Phase H Client Scope Boundary Inventory Checkpoint
 

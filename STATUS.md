@@ -4,10 +4,10 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1398 Phase H client-scope boundary inventory`.
-Current validation: `CMV-1516`.
+Current task: `CM-1400 Phase H client-scope private read consistency source/test`.
+Current validation: `CMV-1518`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase G runtime boundary plan closed locally -> Phase H client-scope boundary inventory -> no readiness claim`.
+Current route: `Phase G runtime boundary plan closed locally -> Phase H client-scope private read consistency -> no readiness claim`.
 Current rule: active status summaries must reference `.agent_board/CURRENT_FACTS.json` and must not repeat full commit hashes.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -28,11 +28,12 @@ RC_READY_FALSE
 当前权威后续路线：
 
 - 总路线入口：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
-- Phase H 执行入口：[docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md)
+- Phase H 执行入口：[docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md)
+- Phase H 库存支撑：[docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md)
 - Phase G 支撑入口：[PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md)
 - 当前阶段：`Phase H — Codex / Claude client-scope boundary`
 - 当前阶段性目标：`H1 — Client Scope Runtime Boundary`
-- 下一安全任务：`CM-1399 Phase H boundary matrix and first no-apply slice selection`
+- 下一安全任务：review accumulated CM-1399 and CM-1400 diff before staging/committing, or continue Phase H with another no-apply source/test slice.
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 

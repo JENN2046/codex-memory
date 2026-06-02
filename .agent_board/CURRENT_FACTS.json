@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-06-02",
-  "taskId": "CM-1398",
-  "validationId": "CMV-1516",
+  "taskId": "CM-1400",
+  "validationId": "CMV-1518",
   "branch": "main",
-  "localHead": "4c12628c8237bf68ca22754a2385a3fb9b93e2d8",
-  "originHead": "4c12628c8237bf68ca22754a2385a3fb9b93e2d8",
+  "localHead": "4ff2b2af8b34c792f4e683c966207889775904f2",
+  "originHead": "4ff2b2af8b34c792f4e683c966207889775904f2",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -25,8 +25,8 @@
   },
   "validationSummary": [
     {
-      "id": "CMV-1516",
-      "scope": "CM-1398 Phase H client-scope boundary inventory",
+      "id": "CMV-1518",
+      "scope": "CM-1400 Phase H client-scope private read consistency source/test",
       "status": "COMPLETED_VALIDATED"
     }
   ],

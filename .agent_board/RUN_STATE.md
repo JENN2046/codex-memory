@@ -4,8 +4,8 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1398 Phase H client-scope boundary inventory`.
-Current validation: `CMV-1516`.
+Current task: `CM-1400 Phase H client-scope private read consistency source/test`.
+Current validation: `CMV-1518`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here; read `.agent_board/CURRENT_FACTS.json` and fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here; read `.agent_board/C
 
 ## Next Safe Action
 
-CM-1398 opens Phase H locally with a client-scope boundary inventory. Next safe local task is CM-1399 Phase H boundary matrix and first no-apply slice selection. Do not execute live client operations, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+CM-1400 adds explicit-input/no-apply client-scope private read consistency source/test coverage. Next safe action is to review accumulated CM-1399 and CM-1400 diff before staging/committing, or continue Phase H with another no-apply source/test slice. Do not execute live client operations, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

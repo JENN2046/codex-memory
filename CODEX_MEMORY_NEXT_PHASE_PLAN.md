@@ -23,7 +23,11 @@ The project now enters Phase H planning and execution:
 Phase H — Codex / Claude client-scope boundary
 ```
 
-The current Phase H inventory entrypoint is:
+The current Phase H matrix entrypoint is:
+
+[docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md)
+
+The Phase H inventory support document is:
 
 [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md)
 
@@ -35,7 +39,7 @@ Current route order:
 
 1. Keep current facts anchored in [STATUS.md](/A:/codex-memory/STATUS.md).
 2. Use this document only as the high-level next-phase route.
-3. Use [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md) for the current Phase H inventory scope and next safe slice.
+3. Use [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md) for the current Phase H boundary matrix and next safe slice.
 4. Use [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) and [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md) for active task and validation state.
 
 First Phase H stage:
@@ -44,19 +48,35 @@ First Phase H stage:
 H1 — Client Scope Runtime Boundary
 ```
 
-First safe task:
+Completed first safe task:
 
 ```text
 CM-1398 Phase H client-scope boundary inventory
 ```
 
-Next safe task after CM-1398:
+Completed second safe task:
 
 ```text
 CM-1399 Phase H boundary matrix and first no-apply slice selection
 ```
 
 CM-1398 inspects current client/scope source, tests, fixtures, and docs, then produces `docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md`. It must not execute live client operations, memory tools, provider calls, bearer-token use, durable writes, broad real-memory reads, config/watchdog/startup changes, public MCP expansion, push, release, cutover, or readiness claims.
+
+CM-1399 converts that inventory into `docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md` and selects the first no-apply source/test slice. It also does not execute live client operations, memory tools, provider calls, bearer-token use, durable writes, broad real-memory reads, config/watchdog/startup changes, public MCP expansion, push, release, cutover, or readiness claims.
+
+Completed first no-apply source/test task:
+
+```text
+CM-1400 Phase H client-scope private read consistency source/test
+```
+
+CM-1400 adds a pure explicit-input/no-apply helper and targeted tests. Same-client private candidates are accepted, cross-client/ownerless/no-context private candidates fail closed, caller scope remains candidate filtering only, lifecycle current scope is execution-context-derived, and suppressed metadata stays sanitized.
+
+Next safe action after CM-1400:
+
+```text
+Review accumulated CM-1399 and CM-1400 diff before staging/committing, or continue Phase H with another no-apply source/test slice.
+```
 
 ## Historical Route Snapshot
 
