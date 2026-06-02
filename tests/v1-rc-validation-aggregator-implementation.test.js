@@ -84,7 +84,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.rc9DecisionPacketStatus, 'rc_not_ready_blocked');
   assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
   assert.equal(report.summary.rc9DecisionPacketMarkdownAuditStatus, 'markdown_sections_complete_not_authorization');
-  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditSectionCount, 7);
+  assert.equal(report.summary.rc9DecisionPacketMarkdownAuditSectionCount, 8);
   assert.equal(report.summary.rc9DecisionPacketMarkdownAuditMissingSectionCount, 0);
   assert.equal(report.summary.rc9DecisionPacketMarkdownAuditCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, false);
@@ -3537,8 +3537,8 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
 
   assert.equal(nonzeroRender.format, 'markdown');
   assert.equal(nonzeroRender.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
-  assert.equal(nonzeroRender.markdownAudit.sectionCount, 7);
-  assert.equal(nonzeroRender.markdownAudit.acceptedSectionCount, 7);
+  assert.equal(nonzeroRender.markdownAudit.sectionCount, 8);
+  assert.equal(nonzeroRender.markdownAudit.acceptedSectionCount, 8);
   assert.equal(nonzeroRender.markdownAudit.missingSectionCount, 0);
   assert.deepEqual(nonzeroRender.markdownAudit.missingSectionIds, []);
   assert.equal(nonzeroRender.markdownAudit.approvalGenerated, false);
@@ -3554,6 +3554,7 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
       ['rollback_path', true, 0],
       ['cutover_approval_boundary', true, 0],
       ['completeness_checklist', true, 0],
+      ['packet_closeout_audit', true, 0],
       ['boundary', true, 0]
     ]
   );
@@ -3581,6 +3582,20 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(nonzeroRender.markdown.includes('route_approval_hint_approval_accepted = false'), true);
   assert.equal(nonzeroRender.markdown.includes('route_approval_hint_approval_executed = false'), true);
   assert.equal(nonzeroRender.markdown.includes('route_approval_hint_can_claim_readiness = false'), true);
+  assert.equal(
+    nonzeroRender.markdown.includes('packet_closeout_audit_status = packet_subaudits_complete_not_authorization'),
+    true
+  );
+  assert.equal(nonzeroRender.markdown.includes('packet_closeout_audit_row_count = 5'), true);
+  assert.equal(nonzeroRender.markdown.includes('packet_closeout_audit_missing_count = 0'), true);
+  assert.equal(nonzeroRender.markdown.includes('packet_closeout_audit_approval_generated = false'), true);
+  assert.equal(nonzeroRender.markdown.includes('packet_closeout_audit_approval_accepted = false'), true);
+  assert.equal(nonzeroRender.markdown.includes('packet_closeout_audit_approval_executed = false'), true);
+  assert.equal(nonzeroRender.markdown.includes('packet_closeout_audit_can_claim_readiness = false'), true);
+  assert.equal(
+    nonzeroRender.markdown.includes('- route_approval_hint_audit | status=approval_hints_complete_for_known_routes_not_authorization | accepted=true | can_claim_readiness=false'),
+    true
+  );
 
   assert.equal(zeroGapRender.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
   assert.equal(zeroGapRender.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
@@ -3632,6 +3647,25 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(zeroGapRender.markdown.includes('- recall_isolation | status=accepted | blocking=false | source=A5-GAP-2'), true);
   assert.equal(zeroGapRender.markdown.includes('- migration_dry_run | status=accepted | blocking=false | source=A5-GAP-3'), true);
   assert.equal(zeroGapRender.markdown.includes('- validation_aggregator_zero_gap | status=accepted | blocking=false | source=A5-GAP-6'), true);
+  assert.equal(zeroGapRender.markdown.includes('## Packet Closeout Audit'), true);
+  assert.equal(
+    zeroGapRender.markdown.includes('packet_closeout_audit_status = packet_subaudits_complete_not_authorization'),
+    true
+  );
+  assert.equal(zeroGapRender.markdown.includes('packet_closeout_audit_row_count = 5'), true);
+  assert.equal(zeroGapRender.markdown.includes('packet_closeout_audit_missing_count = 0'), true);
+  assert.equal(zeroGapRender.markdown.includes('packet_closeout_audit_approval_generated = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('packet_closeout_audit_approval_accepted = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('packet_closeout_audit_approval_executed = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('packet_closeout_audit_can_claim_readiness = false'), true);
+  assert.equal(
+    zeroGapRender.markdown.includes('- route_approval_hint_audit | status=no_remaining_gaps_no_approval_hint_needed | accepted=true | can_claim_readiness=false'),
+    true
+  );
+  assert.equal(
+    zeroGapRender.markdown.includes('- cutover_approval_boundary | status=approval_required_not_present_execution_blocked | accepted=true | can_claim_readiness=false'),
+    true
+  );
   assert.equal(zeroGapRender.markdown.includes('## Cutover Approval Boundary'), true);
   assert.equal(zeroGapRender.markdown.includes('exact_approval_required = true'), true);
   assert.equal(zeroGapRender.markdown.includes('approval_present = false'), true);
@@ -3690,6 +3724,20 @@ test('RC-9 markdown audit fails closed when required sections or fragments are m
     '- not_executed_boundary',
     '- rollback_path',
     '',
+    '## Packet Closeout Audit',
+    'packet_closeout_audit_status = packet_subaudits_complete_not_authorization',
+    'packet_closeout_audit_row_count = 5',
+    'packet_closeout_audit_missing_count = 0',
+    'packet_closeout_audit_approval_generated = false',
+    'packet_closeout_audit_approval_accepted = false',
+    'packet_closeout_audit_approval_executed = false',
+    'packet_closeout_audit_can_claim_readiness = false',
+    '- route_approval_hint_audit',
+    '- cutover_approval_boundary',
+    '- completeness_checklist',
+    '- not_executed_boundary',
+    '- rollback_path',
+    '',
     '## Boundary',
     '- decision packet only',
     '- no release tag deploy push',
@@ -3705,8 +3753,8 @@ test('RC-9 markdown audit fails closed when required sections or fragments are m
     missingRouteAndCutover.status,
     'markdown_sections_incomplete_manual_review_required'
   );
-  assert.equal(missingRouteAndCutover.sectionCount, 7);
-  assert.equal(missingRouteAndCutover.acceptedSectionCount, 5);
+  assert.equal(missingRouteAndCutover.sectionCount, 8);
+  assert.equal(missingRouteAndCutover.acceptedSectionCount, 6);
   assert.equal(missingRouteAndCutover.missingSectionCount, 2);
   assert.deepEqual(missingRouteAndCutover.missingSectionIds, [
     'route',

@@ -5537,6 +5537,24 @@ function buildRc9MarkdownAudit(markdown = '') {
       ]
     },
     {
+      id: 'packet_closeout_audit',
+      requiredFragments: [
+        '## Packet Closeout Audit',
+        'packet_closeout_audit_status =',
+        'packet_closeout_audit_row_count =',
+        'packet_closeout_audit_missing_count =',
+        'packet_closeout_audit_approval_generated = false',
+        'packet_closeout_audit_approval_accepted = false',
+        'packet_closeout_audit_approval_executed = false',
+        'packet_closeout_audit_can_claim_readiness = false',
+        '- route_approval_hint_audit',
+        '- cutover_approval_boundary',
+        '- completeness_checklist',
+        '- not_executed_boundary',
+        '- rollback_path'
+      ]
+    },
+    {
       id: 'boundary',
       requiredFragments: [
         '## Boundary',
@@ -5607,6 +5625,12 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     `head_bound=${item.currentHeadBound === true}`,
     `fresh=${item.evidenceFresh === true}`
   ].join(' | '));
+  const packetCloseoutAuditLines = packet.packetCloseoutAudit.rows.map(row => [
+    `- ${safeEvidenceString(row.id, 'unknown_closeout_row')}`,
+    `status=${safeEvidenceString(row.status, 'unknown_status')}`,
+    `accepted=${row.accepted === true}`,
+    `can_claim_readiness=${row.canClaimReadiness === true}`
+  ].join(' | '));
   const markdown = [
     '# RC-9 RC Decision Packet',
     '',
@@ -5663,6 +5687,17 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     '## Completeness Checklist',
     '',
     ...completenessLines,
+    '',
+    '## Packet Closeout Audit',
+    '',
+    `packet_closeout_audit_status = ${packet.packetCloseoutAuditStatus}`,
+    `packet_closeout_audit_row_count = ${packet.packetCloseoutAudit.rowCount}`,
+    `packet_closeout_audit_missing_count = ${packet.packetCloseoutAudit.missingRowCount}`,
+    `packet_closeout_audit_approval_generated = ${packet.packetCloseoutAudit.approvalGenerated}`,
+    `packet_closeout_audit_approval_accepted = ${packet.packetCloseoutAudit.approvalAccepted}`,
+    `packet_closeout_audit_approval_executed = ${packet.packetCloseoutAudit.approvalExecuted}`,
+    `packet_closeout_audit_can_claim_readiness = ${packet.packetCloseoutAuditCanClaimReadiness}`,
+    ...packetCloseoutAuditLines,
     '',
     '## Boundary',
     '',
