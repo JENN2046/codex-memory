@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1356 PHASE_F1_POST_COMMIT_SYNC_BLOCKER`.
+Goal: `CM-1357 PHASE_F1_FRESH_SYNC_LIVE_PREFLIGHT`.
 
-Status: `BLOCKED_NOT_READY` for Phase F1 live-client no-write execution after local guarded commit `6adde163b68b4fc90343c7d79d8e5e6c49a6ba81`. `main` is ahead of `origin/main` by one commit, so CM-1354's clean-synced approval packet is historical for `be980d157cbc88b00fc2e641bc66a527538faae9`, and CM-1355 `--execute` will fail closed until current head and origin head match. No exact A5-GAP-4 user approval has been provided for the current local head. Push is Red Lane and has not been authorized. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F1 fresh sync/live preflight. Observed state before CM-1357 was `HEAD=06cdd0e99267b5ae1c8e62b0d04bcbca704396c9`, `origin/main=be980d157cbc88b00fc2e641bc66a527538faae9`, `ahead 2 / behind 0`; this is a preflight snapshot only, not durable current Git truth. F1 live-client no-write execution remains blocked. CM-1357 records that old embedded approval packets must not be reused; push requires explicit normal non-force push approval, and live execution requires a fresh synced-head exact A5-GAP-4 approval line. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

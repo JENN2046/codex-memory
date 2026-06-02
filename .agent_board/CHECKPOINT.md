@@ -1,5 +1,29 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1357 Phase F1 Fresh Sync And Live Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board preflight defining the fresh sync/live route for F1. No push, live client refresh, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Recorded current observed facts: `HEAD=06cdd0e99267b5ae1c8e62b0d04bcbca704396c9`, `origin/main=be980d157cbc88b00fc2e641bc66a527538faae9`, `ahead 2 / behind 0`.
+- Added a fresh preflight route for sync and F1 live evidence capture.
+- Added non-authorizing templates for Red Lane push approval and A5-GAP-4 live no-write approval.
+- Kept F1 live execution blocked until explicit sync route plus fresh synced-head exact A5-GAP-4 approval.
+
+Validation:
+
+- Fresh Git facts inspected.
+- Docs/board changed-scope review, `git diff --check`, ledger consistency, and docs validation are required for closeout.
+
+Next:
+
+- Obtain explicit normal non-force push authorization, or stay local and continue only non-live Phase F preparation.
+
 ## CM-1356 Phase F1 Post-Commit Sync Blocker Checkpoint
 
 Status: `BLOCKED_NOT_READY`
