@@ -479,4 +479,6 @@ test('Phase F personal RC snapshot CLI helpers render blocked state and reject s
   assert.match(text, /readinessClaimAllowed: false/);
   assert.throws(() => parseArgs(['--push']), /unsupported side-effect flag/);
   assert.throws(() => parseArgs(['--record-memory']), /unsupported side-effect flag/);
+  assert.throws(() => parseArgs(['--f1-accepted']), /unsupported side-effect flag/);
+  assert.throws(() => parseArgs(['--f5-accepted']), /unsupported side-effect flag/);
 });

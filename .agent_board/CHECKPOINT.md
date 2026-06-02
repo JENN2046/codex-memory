@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1385 Phase F Snapshot Review Fix Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_F_SNAPSHOT_REVIEW_FIX`
+
+Date: 2026-06-02
+
+Scope: local CLI/test/docs/board review fix. No `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim.
+
+Result:
+
+- Removed manual `--f1-accepted` through `--f5-accepted` evidence overrides from the Phase F snapshot CLI.
+- Snapshot CLI now derives accepted evidence only from local evidence documents.
+- Reworded stale CM-1361 historical status text.
+- Updated handoff/run-state away from stale post-closeout commit wording.
+
+Validation:
+
+- `node --check src\cli\phase-f-personal-rc-readiness-snapshot.js` passed.
+- `node --check tests\phase-f-personal-rc-readiness-snapshot.test.js` passed.
+- `node --test tests\phase-f-personal-rc-readiness-snapshot.test.js` passed `12/12`.
+- Snapshot CLI self-check still reports `PERSONAL_DOGFOOD_READY_NOT_RC_READY` and `rcReady=false` from evidence docs.
+- `node src\cli\phase-f-personal-rc-readiness-snapshot.js --f1-accepted` rejects with `unsupported side-effect flag`.
+- `git diff --check`, ledger consistency, and docs validation passed.
+
+Next:
+
+- After the guarded local commit containing this checkpoint, sync only if approved.
+- Otherwise choose the next local phase from fresh Git facts.
+
 ## CM-1384 Phase F5 Personal RC Closeout Checkpoint
 
 Status: `COMPLETED_VALIDATED_PERSONAL_DOGFOOD_READY_NOT_RC_READY`

@@ -21,8 +21,7 @@ function parseArgs(argv = []) {
     remoteRef: 'origin/main',
     json: false,
     pretty: false,
-    help: false,
-    evidence: {}
+    help: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -45,11 +44,6 @@ function parseArgs(argv = []) {
       index += 1;
       continue;
     }
-    if (token === '--f1-accepted') { options.evidence.f1LiveNoWriteEvidenceAccepted = true; continue; }
-    if (token === '--f2-accepted') { options.evidence.f2A5Gap6AggregationAccepted = true; continue; }
-    if (token === '--f3-accepted') { options.evidence.f3TrueLiveRecallNegativeControlAccepted = true; continue; }
-    if (token === '--f4-accepted') { options.evidence.f4MinimalDogfoodWriteAccepted = true; continue; }
-    if (token === '--f5-accepted') { options.evidence.f5CloseoutAccepted = true; continue; }
     if ([
       '--execute',
       '--push',
@@ -58,7 +52,12 @@ function parseArgs(argv = []) {
       '--record-memory',
       '--search-memory',
       '--provider',
-      '--readiness-claim'
+      '--readiness-claim',
+      '--f1-accepted',
+      '--f2-accepted',
+      '--f3-accepted',
+      '--f4-accepted',
+      '--f5-accepted'
     ].includes(token)) {
       throw new Error(`unsupported side-effect flag: ${token}`);
     }
@@ -190,10 +189,7 @@ function run(argv = process.argv.slice(2), stdout = process.stdout) {
   const detectedEvidence = detectPhaseFEvidence(options.cwd);
   const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
     syncPacket,
-    evidence: {
-      ...detectedEvidence,
-      ...options.evidence
-    }
+    evidence: detectedEvidence
   });
 
   if (options.json) {

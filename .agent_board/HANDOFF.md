@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1384 PHASE_F5_PERSONAL_RC_CLOSEOUT`.
+Goal: `CM-1385 PHASE_F_SNAPSHOT_REVIEW_FIX`.
 
-Status: `COMPLETED_VALIDATED_PERSONAL_DOGFOOD_READY_NOT_RC_READY` for local Phase F5 closeout. CM-1384 aggregates accepted F1/F2/F3/F4 evidence into `PERSONAL_DOGFOOD_READY_NOT_RC_READY` while keeping `RC_READY=false`. No `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. Commit locally if guarded conditions pass. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_PHASE_F_SNAPSHOT_REVIEW_FIX` for local Phase F snapshot review fix. CM-1385 removes manual `--f*-accepted` CLI evidence overrides, preserves docs-only detection, and cleans stale post-closeout operator wording while keeping `RC_READY=false`. No `record_memory`, `search_memory`, MCP/provider call, raw memory/jsonl/raw audit read, broad real memory scan, durable write, config/watchdog/startup change, remote action, RC_READY claim, broad reliability claim, release readiness claim, or cutover readiness claim occurred. After the guarded local commit containing this handoff, sync only with explicit approval; otherwise choose the next local phase from fresh Git facts. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
