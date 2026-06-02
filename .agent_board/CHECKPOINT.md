@@ -1,5 +1,28 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1367 Phase F1 Post-Fix Sync And Approval Packet Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board sync and approval packet. No push, pull, merge, rebase, F1 live rerun, MCP/provider call, real memory/audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Fresh Git facts show clean `main@c6804d676105f8051a329e46bd031847ef2aaa08`.
+- `origin/main` remains `546915bec01fd8ffd0fd974f59b6fc95966218a4`.
+- Local branch is ahead `2` and behind `0`.
+- Sync packet generator returned `PHASE_F1_SYNC_APPROVAL_PACKET_READY_NOT_EXECUTED`.
+- Exact normal non-force push approval template is recorded.
+- Post-push exact A5-GAP-4 F1 live no-write approval template is recorded.
+
+Next:
+
+- Wait for explicit operator approval before any `git push origin main`.
+- After push, verify fresh synced HEAD.
+- Then require exact A5-GAP-4 approval bound to `c6804d676105f8051a329e46bd031847ef2aaa08` before any F1 live rerun.
+
 ## CM-1366 Authenticated HTTP No-Token Contract Hardening Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
