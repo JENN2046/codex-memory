@@ -12,7 +12,7 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 ## RC-5 A5-GAP-1 Governance Runtime Gap Preflight
 
-Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_EXECUTED`
+Status: `GOVERNANCE_READONLY_EVIDENCE_ACCEPTED_NOT_RC_READY`
 
 Date: 2026-06-02
 
@@ -20,16 +20,19 @@ Packet: [docs/RC5_A5_GAP1_GOVERNANCE_READONLY_PREFLIGHT.md](/A:/codex-memory/doc
 
 Result:
 
-- Reviewed current `A5-GAP-1` truth-table evidence.
-- Existing governance evidence is present but bound to older commits, so it does not prove the current RC target commit.
-- Prepared a narrow A5-GAP-1 read-only governance report approval boundary for `npm run governance:report -- --json`.
-- Durable write is explicitly `no`.
-- No governance report, governance runtime loop, governed action, durable audit write, durable memory write, provider call, memory tool call, real-memory scan, public MCP expansion, config/watchdog/startup change, remote write, readiness claim, release, deploy, or cutover action occurred.
+- Consumed exact A5-GAP-1 approval for `main@aadd8eca5eb6374e657b195e6c6210aade23e16a`, subject `rc5-governance-readonly-current-head sanitized report`, with durable write `no`.
+- Fresh preflight matched branch `main`, target commit, and clean worktree.
+- Ran `npm run governance:report -- --json`.
+- Sanitized governance report summary: `summary.status=ok`, `totalRecords=17`, proposal/tombstone/supersession/stale counts all `0`.
+- Sanitized read policy summary: `readPolicy.status=ok`, source `config-and-recent-recall-audit`, config evidence and audit evidence available, recent read-policy audit/applied counts `2/2`, recent lifecycle applied count `2`, recent hidden-by-lifecycle count `1`, recent stale result count `0`, raw workspace id not exposed.
+- Report flags remained read-only: `destructive=false`, `readPolicy.noProvider=true`, `readPolicy.mutated=false`, `readPolicy.migrationApplied=false`.
+- Auto-authorization remained fail-closed: `blocked_fail_closed / RC_NOT_READY_BLOCKED`.
+- No governance runtime loop, governed action, durable audit write, durable memory write, provider call, memory tool call, public MCP expansion, config/watchdog/startup change, remote write, readiness claim, release, deploy, or cutover action occurred.
 
 Next:
 
-- Review/commit the RC-5 preflight packet, then regenerate the A5-GAP-1 approval line for the new post-commit `HEAD`.
-- Do not execute `npm run governance:report -- --json` without exact A5-GAP-1 approval.
+- Continue to RC-6 recall isolation runtime gap preflight.
+- Treat this as read-only governance evidence only, not runtime or RC readiness.
 
 ## RC-3 A5-GAP-4 Live HTTP No-Write Preflight
 

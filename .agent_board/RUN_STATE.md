@@ -43,9 +43,9 @@ RC-2 A5-GAP-5 strict gate evidence is recorded at `docs/RC2_A5_GAP5_STRICT_GATE_
 
 RC-4 A5-GAP-4 live HTTP / MCP no-write evidence is recorded at `docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md` for target commit `d843d9b9778aeaa149cfba4ac80fa0e0aab87f1f`: `/health`, no-token MCP `initialize`, no-token `tools/list`, no-token selected `memory_overview`, no-token `record_memory` rejection, and no-token `search_memory` rejection passed the endpoint-bound no-write contract. Authenticated `memory_overview` was not executed because bearer-token use was not authorized.
 
-RC-5 governance runtime gap preflight is prepared at `docs/RC5_A5_GAP1_GOVERNANCE_READONLY_PREFLIGHT.md`: existing A5-GAP-1 evidence is present but bound to older commits, so current HEAD needs fresh read-only governance evidence.
+RC-5 A5-GAP-1 read-only governance evidence is recorded at `docs/RC5_A5_GAP1_GOVERNANCE_READONLY_PREFLIGHT.md` for target commit `aadd8eca5eb6374e657b195e6c6210aade23e16a`: `npm run governance:report -- --json` passed with summary `ok`, readPolicy `ok`, no provider, no mutation, no migration apply, and auto-authorization still fail-closed as `RC_NOT_READY_BLOCKED`.
 
-Next safe action is either review/commit the RC-5 preflight packet, or provide a fresh A5-GAP-1 exact approval line after the packet is stabilized. Do not execute `npm run governance:report -- --json`, governance runtime actions, durable writes, bearer-token use, memory tools, provider calls, real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Next safe action is RC-6 recall isolation runtime gap preflight: compare existing A5-GAP-2 evidence freshness against the current route and prepare a narrow no-mutation or bounded-sample A5-GAP-2 approval boundary if fresh evidence is still needed. Do not execute recall isolation proofs, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

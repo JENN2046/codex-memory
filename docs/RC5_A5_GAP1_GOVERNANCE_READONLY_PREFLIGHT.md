@@ -2,15 +2,15 @@
 
 Date: 2026-06-02
 
-Mode: `A5-GAP-1 approval packet only`
+Mode: `A5-GAP-1 exact-approved read-only governance evidence`
 
-Decision: `DRAFT_NOT_APPROVED`
+Decision: `GOVERNANCE_READONLY_EVIDENCE_ACCEPTED_NOT_RC_READY`
 
 ## Purpose
 
-Prepare the narrow governance runtime gap evidence boundary for the current RC route.
+Prepare and record the narrow governance runtime gap evidence boundary for the current RC route.
 
-This document does not approve or execute `npm run governance:report -- --json`, a governance runtime loop, a governed action, durable audit write, durable memory write, provider call, real-memory scan, memory tool call, public MCP expansion, config/watchdog/startup change, remote write, RC cutover, or `RC_READY` claim.
+This document records exact-approved execution of `npm run governance:report -- --json` for the target commit below. It does not record a governance runtime loop, a governed action, durable audit write, durable memory write, provider call, memory tool call, public MCP expansion, config/watchdog/startup change, remote write, RC cutover, or `RC_READY` claim.
 
 ## Current Git Reality
 
@@ -20,10 +20,10 @@ Fresh preflight observed before this packet was edited:
 branch = main
 local_head = 353e7fc0e7c07a08c824f6ec124dbd4cd4121fbd
 origin_state = main ahead of origin/main by 5 local commits
-worktree_state = clean before RC-5 packet edit
+worktree_state = clean before RC-5 read-only governance report execution
 ```
 
-If this packet is committed before A5-GAP-1 execution, the approval line must be regenerated for the new post-commit `HEAD`.
+Fresh preflight confirmed the local `HEAD` matched the exact approval target before execution.
 
 ## Existing Evidence Freshness Review
 
@@ -75,20 +75,20 @@ Durable write:
 no
 ```
 
-Required exact approval line for the current target commit:
+Exact approval line consumed:
 
 ```text
 I approve A5-GAP-1 for codex-memory on branch main at commit 353e7fc0e7c07a08c824f6ec124dbd4cd4121fbd, limited to rc5-governance-readonly-current-head sanitized report, with durable write no, running read-only governance report only.
 ```
 
-## Execution Boundary
+## Execution Boundary Observed
 
-Allowed after exact approval:
+Executed after exact approval:
 
-- Verify branch and commit still match the approval line.
-- Verify the worktree scope is understood.
-- Run `npm run governance:report -- --json`.
-- Record sanitized read-only governance summary, review, read-policy status, and no-mutation flags.
+- Verified branch and commit matched the approval line.
+- Verified the worktree was clean.
+- Ran `npm run governance:report -- --json`.
+- Recorded sanitized read-only governance summary, review, read-policy status, and no-mutation flags.
 
 Not allowed by this packet:
 
@@ -103,16 +103,57 @@ Not allowed by this packet:
 - remote write, PR, tag, release, deploy, or RC cutover
 - readiness, reliability, production, release, or `RC_READY` claims
 
-## Exit Criteria
+## Sanitized Governance Report Result
 
-If approved and executed successfully, the result can only be recorded as:
+Command:
+
+```powershell
+npm run governance:report -- --json
+```
+
+Sanitized observed result:
+
+```text
+mode = governance-report
+destructive = false
+summary.status = ok
+summary.totalRecords = 17
+summary.proposalCount = 0
+summary.tombstonedCount = 0
+summary.supersededCount = 0
+summary.stale30d = 0
+summary.stale90d = 0
+readPolicy.status = ok
+readPolicy.source = config-and-recent-recall-audit
+readPolicy.configEvidenceAvailable = true
+readPolicy.auditEvidenceAvailable = true
+readPolicy.recentReadPolicyAuditCount = 2
+readPolicy.recentReadPolicyAppliedCount = 2
+readPolicy.recentLifecyclePolicyAppliedCount = 2
+readPolicy.recentHiddenByLifecycleCount = 1
+readPolicy.recentStaleResultCount = 0
+readPolicy.rawWorkspaceIdExposed = false
+readPolicy.noProvider = true
+readPolicy.mutated = false
+readPolicy.migrationApplied = false
+autoAuthorization.status = blocked_fail_closed
+autoAuthorization.decision = RC_NOT_READY_BLOCKED
+```
+
+Conclusion:
 
 ```text
 GOVERNANCE_READONLY_EVIDENCE_ACCEPTED_NOT_RC_READY
 ```
 
-If the report fails or exposes a governance blocker, the result remains:
+Limitations:
 
 ```text
-GOVERNANCE_GAP_STILL_BLOCKED_RC_NOT_READY
+governance_runtime_loop_not_executed
+governed_action_not_executed
+durable_audit_write_not_executed
+validation_aggregator_not_refreshed_with_rc5_evidence
+release_cutover_not_executed
+runtime_ready_not_claimed
+rc_ready_not_claimed
 ```
