@@ -37,7 +37,9 @@ Branch and HEAD values are intentionally not repeated here; read `.agent_board/C
 
 ## Next Safe Action
 
-CM-1400 adds explicit-input/no-apply client-scope private read consistency source/test coverage. Next safe action is to review accumulated CM-1399 and CM-1400 diff before staging/committing, or continue Phase H with another no-apply source/test slice. Do not execute live client operations, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+RC-1 current-head local baseline is recorded in `.agent_board/CHECKPOINT.md` for target commit `fe39bdc8e95fa34084ac179e3da2113e0ac7c538`: `npm test` passed, and `npm run gate:mainline` passed after local HTTP MCP was started with `npm run start:http:ensure`.
+
+Next safe local action is RC-2 preflight only: prepare an A5-GAP-5 strict-gate approval packet bound to a fresh `HEAD`. Do not run `npm run gate:mainline:strict`, live client operations, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

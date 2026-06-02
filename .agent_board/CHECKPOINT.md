@@ -10,6 +10,34 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC-1 Current-Head Local Baseline
+
+Status: `COMPLETED_VALIDATED_NOT_RC_READY`
+
+Date: 2026-06-02
+
+Target commit: `fe39bdc8e95fa34084ac179e3da2113e0ac7c538`
+
+Scope: current `main` local validation baseline only. This is target-bound evidence for the commit above; it is not strict-gate approval, live authenticated MCP evidence, provider evidence, write reliability evidence, recall reliability evidence, release readiness, or cutover readiness.
+
+Validation:
+
+- `npm test` passed: `2926/2926`.
+- Initial `npm run gate:mainline` failed only because local HTTP health at `http://127.0.0.1:7605/health` was unavailable; compare and rollback passed.
+- Read-only inspection of `scripts/ensure-codex-memory-http.ps1` found no config, watchdog, startup, or dependency change path.
+- `npm run start:http:ensure` started the local HTTP MCP process at `http://127.0.0.1:7605/health`.
+- Rerun `npm run gate:mainline` passed for health, compare, and rollback.
+
+Boundary:
+
+- No strict gate was run.
+- No authenticated MCP `tools/list` or `tools/call` was run.
+- No provider call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, dependency change, remote action, readiness claim, release, deploy, or cutover action occurred.
+
+Next:
+
+- RC-2 is the next route step: prepare the A5-GAP-5 strict-gate approval packet bound to a fresh `HEAD`. Do not run `npm run gate:mainline:strict` until exact approval is provided.
+
 ## Historical Checkpoint Archive
 
 ### CM-1400 Phase H Client Scope Private Read Consistency Checkpoint
