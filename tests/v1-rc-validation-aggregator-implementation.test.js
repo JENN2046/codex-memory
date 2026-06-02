@@ -79,6 +79,16 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.validationEvidenceCommandCoverageStatus, 'no_explicit_evidence');
   assert.equal(report.summary.validationEvidenceCommandCount, 0);
   assert.equal(report.summary.validationEvidenceRejectionStatus, 'no_rejections');
+  assert.equal(report.summary.rc9DecisionPacketAvailable, true);
+  assert.equal(report.summary.rc9DecisionPacketStatus, 'rc_not_ready_blocked');
+  assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, false);
+  assert.equal(report.summary.rc9DecisionPacketRcCutoverApproved, false);
+  assert.equal(report.summary.rc9DecisionPacketRcCutoverExecutionAllowed, false);
+  assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
+  assert.equal(report.evidence.rc9DecisionPacket.decision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('rc_ready = false'), true);
   assert.equal(report.summary.validationEvidenceRejectedCount, 0);
   assert.equal(report.summary.validationEvidenceConfidencePostureStatus, 'no_explicit_evidence');
   assert.equal(report.summary.validationEvidenceConfidenceCanClaimV1RcReady, false);
@@ -2724,6 +2734,20 @@ test('zero-gap runtime evidence summary can route to RC-9 but cannot authorize R
     definition.closureMissingCriteria.includes('rc_cutover_approval_present'),
     true
   );
+  assert.equal(report.summary.rc9DecisionPacketAvailable, true);
+  assert.equal(
+    report.summary.rc9DecisionPacketStatus,
+    'ready_to_request_rc_cutover_approval_not_rc_ready'
+  );
+  assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, true);
+  assert.equal(report.summary.rc9DecisionPacketRcCutoverApproved, false);
+  assert.equal(report.summary.rc9DecisionPacketRcCutoverExecutionAllowed, false);
+  assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
+  assert.equal(
+    report.evidence.rc9DecisionPacket.markdown.includes('ready_to_request_rc_cutover_approval = true'),
+    true
+  );
+  assert.equal(report.evidence.rc9DecisionPacket.markdown.includes('rc_ready = false'), true);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
   assert.equal(report.summary.rcReady, false);

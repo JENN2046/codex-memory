@@ -2518,7 +2518,7 @@ function buildV1RcValidationAggregatorReport({
       blockers
     });
 
-  return {
+  const report = {
     schemaVersion: 'v1-rc-validation-aggregator-v1',
     version: 'v1',
     phase: 'P24.2-validation-aggregator-minimal-implementation',
@@ -4673,6 +4673,28 @@ function buildV1RcValidationAggregatorReport({
       'productionMemorySnippet'
     ]
   };
+  const rc9DecisionPacket = renderRc9DecisionPacketFromAggregatorReport(report, {
+    generatedAt
+  });
+
+  report.summary.rc9DecisionPacketAvailable = true;
+  report.summary.rc9DecisionPacketSourceMode = rc9DecisionPacket.sourceMode;
+  report.summary.rc9DecisionPacketStatus = rc9DecisionPacket.status;
+  report.summary.rc9DecisionPacketDecision = rc9DecisionPacket.decision;
+  report.summary.rc9DecisionPacketFormat = rc9DecisionPacket.format;
+  report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval =
+    rc9DecisionPacket.readyToRequestRcCutoverApproval;
+  report.summary.rc9DecisionPacketRemainingGapCount =
+    rc9DecisionPacket.remainingGapCount;
+  report.summary.rc9DecisionPacketRcCutoverApproved =
+    rc9DecisionPacket.rcCutoverApproved;
+  report.summary.rc9DecisionPacketRcCutoverExecutionAllowed =
+    rc9DecisionPacket.rcCutoverExecutionAllowed;
+  report.summary.rc9DecisionPacketCanClaimRcReady =
+    rc9DecisionPacket.canClaimRcReady;
+  report.evidence.rc9DecisionPacket = rc9DecisionPacket;
+
+  return report;
 }
 
 function buildRc9DecisionPacketFromAggregatorReport(report = null) {
