@@ -64,7 +64,7 @@ function usage() {
     'Usage: node src/cli/phase-f1-runtime-freshness.js [--cwd PATH] [--branch main] [--remote-ref origin/main] [--port 7605] [--json] [--pretty]',
     '',
     'Read-only diagnostic for Phase F1 live endpoint freshness.',
-    'It compares current Git HEAD commit time with the listening HTTP process start time.',
+    'It compares the latest runtime-affecting commit time with the listening HTTP process start time.',
     'It does not restart services, read tokens, call MCP tools, or touch memory state.'
   ].join('\n');
 }
@@ -89,6 +89,17 @@ function readGitFacts({ cwd, branch, remoteRef }) {
   const [aheadRaw, behindRaw] = aheadBehindRaw.split(/\s+/);
   const statusShort = runCommand('git', ['status', '--short'], { cwd });
   const headCommitTime = runCommand('git', ['show', '-s', '--format=%cI', 'HEAD'], { cwd });
+  const runtimeAffectingRaw = runCommand('git', [
+    'log',
+    '-1',
+    '--format=%H%n%cI',
+    '--',
+    'src',
+    'scripts/serve-codex-memory-http.js',
+    'package.json',
+    'package-lock.json'
+  ], { cwd });
+  const [runtimeAffectingCommit = '', runtimeAffectingCommitTime = ''] = runtimeAffectingRaw.split(/\r?\n/);
 
   return {
     currentHead,
@@ -96,7 +107,9 @@ function readGitFacts({ cwd, branch, remoteRef }) {
     ahead: Number(aheadRaw || 0),
     behind: Number(behindRaw || 0),
     worktreeClean: statusShort.length === 0,
-    headCommitTime
+    headCommitTime,
+    runtimeAffectingCommit,
+    runtimeAffectingCommitTime
   };
 }
 
@@ -127,6 +140,8 @@ function renderText(report) {
     `ahead/behind: ${report.ahead}/${report.behind}`,
     `worktreeClean: ${report.worktreeClean}`,
     `headCommitTime: ${report.headCommitTime}`,
+    `runtimeAffectingCommit: ${report.runtimeAffectingCommit}`,
+    `runtimeAffectingCommitTime: ${report.runtimeAffectingCommitTime}`,
     `listenerProcessId: ${report.listener?.processId || ''}`,
     `listenerCreationDate: ${report.listener?.creationDate || ''}`,
     `commandLineMatchesExpectedScript: ${report.listener?.commandLineMatchesExpectedScript ?? ''}`,

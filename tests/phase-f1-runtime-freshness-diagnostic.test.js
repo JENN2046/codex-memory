@@ -18,6 +18,8 @@ function baseInput(overrides = {}) {
     behind: 0,
     worktreeClean: true,
     headCommitTime: '2026-06-02T17:49:29+08:00',
+    runtimeAffectingCommit: HEAD,
+    runtimeAffectingCommitTime: '2026-06-02T17:49:29+08:00',
     expectedScriptPath: 'A:\\codex-memory\\scripts\\serve-codex-memory-http.js',
     listener: {
       processId: 18568,
@@ -44,7 +46,7 @@ test('runtime freshness accepts synced clean head with listener after head commi
   assert.equal(report.safetyCounters.mcpCalls, 0);
 });
 
-test('runtime freshness rejects listener that started before current head', () => {
+test('runtime freshness rejects listener that started before runtime-affecting commit', () => {
   const report = evaluatePhaseF1RuntimeFreshness(baseInput({
     listener: {
       processId: 18568,
@@ -55,8 +57,24 @@ test('runtime freshness rejects listener that started before current head', () =
 
   assert.equal(report.status, 'PHASE_F1_RUNTIME_FRESHNESS_REJECTED_FAIL_CLOSED');
   assert.equal(report.runtimeFresh, false);
-  assert.ok(report.failClosedReasons.includes('runtime_process_started_before_head'));
+  assert.ok(report.failClosedReasons.includes('runtime_process_started_before_runtime_affecting_commit'));
   assert.equal(report.nextRequiredAction, 'obtain_exact_runtime_refresh_approval_then_restart_or_refresh_service');
+});
+
+test('runtime freshness accepts docs-only head after listener when runtime-affecting commit is older', () => {
+  const report = evaluatePhaseF1RuntimeFreshness(baseInput({
+    headCommitTime: '2026-06-02T18:02:35+08:00',
+    runtimeAffectingCommitTime: '2026-06-02T17:56:53+08:00',
+    listener: {
+      processId: 86084,
+      creationDate: '2026-06-02T17:58:47+08:00',
+      commandLine: '"C:\\Program Files\\nodejs\\node.exe" A:\\codex-memory\\scripts\\serve-codex-memory-http.js'
+    }
+  }));
+
+  assert.equal(report.status, 'PHASE_F1_RUNTIME_FRESHNESS_ACCEPTED');
+  assert.equal(report.runtimeFresh, true);
+  assert.deepEqual(report.failClosedReasons, []);
 });
 
 test('runtime freshness rejects unsynced or dirty Git facts', () => {

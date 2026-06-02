@@ -30,6 +30,8 @@ function evaluatePhaseF1RuntimeFreshness({
   endpoint = 'http://127.0.0.1:7605',
   expectedScriptPath = 'A:\\codex-memory\\scripts\\serve-codex-memory-http.js',
   headCommitTime = '',
+  runtimeAffectingCommit = '',
+  runtimeAffectingCommitTime = '',
   listener = null
 } = {}) {
   const normalizedCurrentHead = normalizeString(currentHead);
@@ -39,6 +41,7 @@ function evaluatePhaseF1RuntimeFreshness({
   const normalizedAhead = normalizeInteger(ahead) ?? 0;
   const normalizedBehind = normalizeInteger(behind) ?? 0;
   const headCommitMs = parseTimestamp(headCommitTime);
+  const runtimeAffectingCommitMs = parseTimestamp(runtimeAffectingCommitTime);
   const listenerProcessId = normalizeInteger(listener?.processId);
   const listenerStartedMs = parseTimestamp(listener?.creationDate);
   const listenerCommandLine = normalizeString(listener?.commandLine);
@@ -54,13 +57,14 @@ function evaluatePhaseF1RuntimeFreshness({
   if (normalizedBehind !== 0) failClosedReasons.push('local_branch_behind_remote');
   if (worktreeClean !== true) failClosedReasons.push('dirty_worktree');
   if (!headCommitMs) failClosedReasons.push('missing_or_invalid_head_commit_time');
+  if (!runtimeAffectingCommitMs) failClosedReasons.push('missing_or_invalid_runtime_affecting_commit_time');
   if (!listenerProcessId) failClosedReasons.push('missing_listener_process');
   if (!listenerStartedMs) failClosedReasons.push('missing_or_invalid_listener_creation_time');
   if (normalizedExpectedScriptPath && normalizedCommandLine && !normalizedCommandLine.includes(normalizedExpectedScriptPath)) {
     failClosedReasons.push('listener_command_line_unexpected');
   }
-  if (headCommitMs && listenerStartedMs && listenerStartedMs < headCommitMs) {
-    failClosedReasons.push('runtime_process_started_before_head');
+  if (runtimeAffectingCommitMs && listenerStartedMs && listenerStartedMs < runtimeAffectingCommitMs) {
+    failClosedReasons.push('runtime_process_started_before_runtime_affecting_commit');
   }
 
   const fresh = failClosedReasons.length === 0;
@@ -77,6 +81,8 @@ function evaluatePhaseF1RuntimeFreshness({
     behind: normalizedBehind,
     worktreeClean: worktreeClean === true,
     headCommitTime: normalizeString(headCommitTime),
+    runtimeAffectingCommit: normalizeString(runtimeAffectingCommit),
+    runtimeAffectingCommitTime: normalizeString(runtimeAffectingCommitTime),
     listener: listenerProcessId
       ? {
           processId: listenerProcessId,
@@ -90,7 +96,7 @@ function evaluatePhaseF1RuntimeFreshness({
     failClosedReasons,
     nextRequiredAction: fresh
       ? 'run_exact_approved_f1_live_no_write_harness'
-      : failClosedReasons.includes('runtime_process_started_before_head')
+      : failClosedReasons.includes('runtime_process_started_before_runtime_affecting_commit')
         ? 'obtain_exact_runtime_refresh_approval_then_restart_or_refresh_service'
         : 'review_runtime_freshness_fail_closed_reasons',
     safetyCounters: {

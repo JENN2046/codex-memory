@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1376 Phase F1 Runtime Freshness Docs-Only HEAD Fix Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local source/CLI/test/docs fix for runtime freshness diagnostic. No service restart, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Freshness now compares listener start time against latest runtime-affecting commit time.
+- Runtime-affecting paths are `src`, `scripts/serve-codex-memory-http.js`, `package.json`, and `package-lock.json`.
+- Docs/status/board-only commits no longer imply runtime stale.
+- Current CLI self-check no longer reports runtime stale for the docs-only evidence HEAD; it only fails closed because worktree is dirty and local branch is ahead.
+
+Validation:
+
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f1-runtime-freshness-diagnostic.test.js` passed `5/5`.
+- CLI read-only self-check ran.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Sync if approved.
+- Rerun freshness on clean synced HEAD before exact A5-GAP-4 F1 rerun.
+
 ## CM-1375 Phase F1 Runtime Refresh Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

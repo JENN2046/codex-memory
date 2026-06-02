@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1375 PHASE_F1_RUNTIME_REFRESH_EVIDENCE`.
+Goal: `CM-1376 PHASE_F1_RUNTIME_FRESHNESS_DOCS_ONLY_HEAD_FIX`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for exact-approved local Phase F1 runtime refresh on `main@30a77afe092493e4891e945531c5526dfd261164`. The old 7605 listener matched `A:\codex-memory\scripts\serve-codex-memory-http.js`, was stopped, and the existing ensure script started PID `86084`. `/health` returned ok and `phase-f1-runtime-freshness` returned accepted with no fail-closed reasons before this evidence record was committed. No F1 harness rerun, MCP `tools/call`, provider call, real memory read/write, durable write, config/watchdog/startup modification, remote action, readiness claim, or reliability claim occurred. F1 remains blocked until current HEAD is synced, runtime freshness is accepted for that HEAD, exact A5-GAP-4 live-client no-write approval is provided, and evidence is accepted. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local Phase F1 runtime freshness docs-only HEAD fix. Freshness now compares listener start time with latest runtime-affecting commit time (`src`, `scripts/serve-codex-memory-http.js`, `package.json`, `package-lock.json`) rather than arbitrary `HEAD` time. This prevents docs/status/board evidence commits from making a freshly restarted runtime appear stale. Current self-check still fails closed while worktree is dirty/local branch ahead, but no longer reports runtime stale. No service restart, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F1 remains blocked until current HEAD is synced, runtime freshness is accepted, exact A5-GAP-4 live-client no-write approval is provided, and evidence is accepted. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
