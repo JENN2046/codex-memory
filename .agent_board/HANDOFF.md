@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1355 PHASE_F1_NO_WRITE_EVIDENCE_HARNESS`.
+Goal: `CM-1356 PHASE_F1_POST_COMMIT_SYNC_BLOCKER`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after adding a Phase F1 live-client no-write evidence harness. `CM-1355` added `src/core/PhaseF1LiveClientNoWriteEvidenceRunner.js`, `src/cli/phase-f1-live-client-no-write.js`, `tests/phase-f1-live-client-no-write-runner.test.js`, and `docs/CM1355_PHASE_F1_NO_WRITE_EVIDENCE_HARNESS.md`. Default CLI mode is plan-only and returned `PHASE_F1_LIVE_CLIENT_NO_WRITE_PLAN_READY_NOT_EXECUTED`; targeted injected/current-facts tests passed `6/6`. `--execute` now fail-closes before network when current Git facts are missing, dirty, or origin-drifted. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `BLOCKED_NOT_READY` for Phase F1 live-client no-write execution after local guarded commit `6adde163b68b4fc90343c7d79d8e5e6c49a6ba81`. `main` is ahead of `origin/main` by one commit, so CM-1354's clean-synced approval packet is historical for `be980d157cbc88b00fc2e641bc66a527538faae9`, and CM-1355 `--execute` will fail closed until current head and origin head match. No exact A5-GAP-4 user approval has been provided for the current local head. Push is Red Lane and has not been authorized. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

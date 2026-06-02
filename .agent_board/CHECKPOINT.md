@@ -1,5 +1,30 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1356 Phase F1 Post-Commit Sync Blocker Checkpoint
+
+Status: `BLOCKED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board blocker record after guarded commit `6adde163b68b4fc90343c7d79d8e5e6c49a6ba81`. No live client refresh, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Fresh Git facts before this record showed `main` ahead of `origin/main` by one commit.
+- This docs/board blocker record leaves the worktree dirty until it is stabilized.
+- CM-1354 approval packet is historical for `be980d157cbc88b00fc2e641bc66a527538faae9`.
+- CM-1355 `--execute` will fail closed while `HEAD` and `origin/main` differ.
+- F1 live-client no-write execution remains blocked pending explicit sync route plus exact A5-GAP-4 approval.
+
+Validation:
+
+- Fresh Git facts inspected.
+- Docs/board changed-scope review, `git diff --check`, ledger consistency, and docs validation are required for closeout.
+
+Next:
+
+- Either obtain explicit sync/push authorization and then refresh exact A5-GAP-4 approval for the synced head, or stay local and continue only non-live Phase F preparation.
+
 ## CM-1355 Phase F1 No-Write Evidence Harness Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
