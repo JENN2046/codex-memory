@@ -63,6 +63,16 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.evidence.rc9DecisionPacket.decision, 'RC_NOT_READY_BLOCKED');
   assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
   assert.equal(report.evidence.rc9DecisionPacket.safety.remoteWrites, false);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteMappedCount, 7);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteMissingCount, 0);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteExactApprovalCount, 6);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteAutomaticCount, 1);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteCanClaimReadiness, false);
+  assert.equal(
+    report.evidence.rc9DecisionPacket.remainingGapAuthorities
+      .find(item => item.id === 'rc_cutover_not_executed').rcRouteStep,
+    'RC-10'
+  );
   assert.deepEqual(report.evidence.rc9DecisionPacket.completenessChecklistMissingIds, [
     'fresh_current_head',
     'strict_gate',

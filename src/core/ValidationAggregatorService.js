@@ -331,6 +331,51 @@ const P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP = {
   }
 };
 
+const RC_ROUTE_NEXT_ACTION_BY_GAP_ID = {
+  validation_aggregator_full_implementation_incomplete: {
+    rcRouteStep: 'LOCAL-AGGREGATOR-SOURCE-TEST',
+    rcRouteAction: 'continue_local_validation_aggregator_source_test_slices',
+    requiresExactApproval: false,
+    canProceedAutomatically: true
+  },
+  governance_review_approval_audit_runtime_loop_not_executed: {
+    rcRouteStep: 'RC-5',
+    rcRouteAction: 'refresh_a5_gap_1_governance_runtime_evidence',
+    requiresExactApproval: true,
+    canProceedAutomatically: false
+  },
+  recall_isolation_runtime_proof_not_executed: {
+    rcRouteStep: 'RC-6',
+    rcRouteAction: 'refresh_a5_gap_2_recall_isolation_runtime_evidence',
+    requiresExactApproval: true,
+    canProceedAutomatically: false
+  },
+  migration_import_export_backup_restore_approval_execution_blocked: {
+    rcRouteStep: 'RC-7',
+    rcRouteAction: 'refresh_a5_gap_3_migration_fixture_dry_run_or_exact_real_action',
+    requiresExactApproval: true,
+    canProceedAutomatically: false
+  },
+  live_http_operation_readiness_not_claimed: {
+    rcRouteStep: 'RC-4',
+    rcRouteAction: 'refresh_a5_gap_4_live_http_mcp_no_write_evidence',
+    requiresExactApproval: true,
+    canProceedAutomatically: false
+  },
+  mainline_strict_gate_not_executed_for_cutover: {
+    rcRouteStep: 'RC-2',
+    rcRouteAction: 'refresh_a5_gap_5_target_bound_strict_gate',
+    requiresExactApproval: true,
+    canProceedAutomatically: false
+  },
+  rc_cutover_not_executed: {
+    rcRouteStep: 'RC-10',
+    rcRouteAction: 'request_exact_rc_cutover_approval_before_release_actions',
+    requiresExactApproval: true,
+    canProceedAutomatically: false
+  }
+};
+
 const P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS = [
   'runtime_schema_version_enforcement_not_fully_proven',
   'final_rc_matrix_runner_not_executed_as_real_matrix'
@@ -4973,6 +5018,12 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     : [];
   const remainingGapAuthorities = effectiveRemainingGapIds.map(gapId => {
     const closureAuditRow = closureAuditMatrix.find(row => row && row.id === gapId) || {};
+    const routeAction = RC_ROUTE_NEXT_ACTION_BY_GAP_ID[gapId] || {
+      rcRouteStep: 'manual_review',
+      rcRouteAction: 'model_missing_gap_before_route_selection',
+      requiresExactApproval: true,
+      canProceedAutomatically: false
+    };
     return {
       id: gapId,
       status: typeof closureAuditRow.status === 'string'
@@ -4986,9 +5037,19 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
       redLane: closureAuditRow.redLane === true,
       localProofChainComplete: closureAuditRow.localProofChainComplete === true,
       canCloseAutomatically: closureAuditRow.canCloseAutomatically === true,
+      rcRouteStep: routeAction.rcRouteStep,
+      rcRouteAction: routeAction.rcRouteAction,
+      rcRouteRequiresExactApproval: routeAction.requiresExactApproval,
+      rcRouteCanProceedAutomatically: routeAction.canProceedAutomatically,
       canClaimReadiness: false
     };
   });
+  const remainingGapRouteMissingCount = remainingGapAuthorities
+    .filter(row => row.rcRouteStep === 'manual_review').length;
+  const remainingGapRouteExactApprovalCount = remainingGapAuthorities
+    .filter(row => row.rcRouteRequiresExactApproval === true).length;
+  const remainingGapRouteAutomaticCount = remainingGapAuthorities
+    .filter(row => row.rcRouteCanProceedAutomatically === true).length;
   const runtimeEvidenceBridge = report &&
     typeof report === 'object' &&
     report.evidence &&
@@ -5210,6 +5271,11 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     remainingGapAuthorityMissingCount: remainingGapAuthorities
       .filter(row => row.status === 'missing_closure_audit_row').length,
     remainingGapAuthorityCanClaimReadiness: false,
+    remainingGapRouteMappedCount: remainingGapAuthorities.length - remainingGapRouteMissingCount,
+    remainingGapRouteMissingCount,
+    remainingGapRouteExactApprovalCount,
+    remainingGapRouteAutomaticCount,
+    remainingGapRouteCanClaimReadiness: false,
     rcCutoverApprovalRequired: true,
     rcCutoverApprovalPresent: false,
     rcCutoverApproved: false,
@@ -5256,7 +5322,9 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     ? packet.remainingGapAuthorities.map(gap => [
       `- ${safeEvidenceString(gap.id, 'unknown_gap')}`,
       `status=${safeEvidenceString(gap.status, 'unknown_status')}`,
-      `next=${safeEvidenceString(gap.nextAuthority, 'unknown_next_authority')}`
+      `next=${safeEvidenceString(gap.nextAuthority, 'unknown_next_authority')}`,
+      `route=${safeEvidenceString(gap.rcRouteStep, 'unknown_route')}`,
+      `action=${safeEvidenceString(gap.rcRouteAction, 'unknown_action')}`
     ].join(' | '))
     : ['- none'];
   const notExecutedLines = packet.notExecuted.map(action => `- ${safeEvidenceString(action, 'unknown_action')}`);

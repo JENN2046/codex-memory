@@ -87,9 +87,11 @@ Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGRE
 
 Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_CHECKLIST_BINDING_FRESHNESS_SLICE.md` records per-row evidence unit, current-head binding, and freshness metadata in the RC-9 packet completeness checklist. A5 rows now require the relevant unit plus current-head-bound fresh evidence before accepted. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
 
+Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_REMAINING_GAP_ROUTE_MAP_SLICE.md` records deterministic remaining-gap to RC-route next-action mapping in the embedded RC-9 decision packet. Known gaps map to local aggregator source/test or RC-2/RC-4/RC-5/RC-6/RC-7/RC-10; unknown gaps fail closed to manual review. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
+
 Post-RC-9 local source/test slice is also in progress: `docs/RC_VALIDATION_AGGREGATOR_CLI_ZERO_GAP_CLOSEOUT_SLICE.md` records ValidationAggregator CLI JSON coverage for zero-gap closeout audit counts and readiness denial. Normal, strict, and rejected-flag CLI output keep cutover approval, cutover execution, and readiness false. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
 
-Next safe action is to commit the checklist binding/freshness slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Next safe action is to commit the remaining-gap route map slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

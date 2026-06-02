@@ -870,6 +870,71 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.nextClosureAuthority,
     'explicit_red_lane_owner_approval'
   );
+  assert.deepEqual(
+    report.evidence.rc9DecisionPacket.remainingGapAuthorities.map(item => [
+      item.id,
+      item.rcRouteStep,
+      item.rcRouteAction,
+      item.rcRouteRequiresExactApproval,
+      item.rcRouteCanProceedAutomatically
+    ]),
+    [
+      [
+        'validation_aggregator_full_implementation_incomplete',
+        'LOCAL-AGGREGATOR-SOURCE-TEST',
+        'continue_local_validation_aggregator_source_test_slices',
+        false,
+        true
+      ],
+      [
+        'governance_review_approval_audit_runtime_loop_not_executed',
+        'RC-5',
+        'refresh_a5_gap_1_governance_runtime_evidence',
+        true,
+        false
+      ],
+      [
+        'recall_isolation_runtime_proof_not_executed',
+        'RC-6',
+        'refresh_a5_gap_2_recall_isolation_runtime_evidence',
+        true,
+        false
+      ],
+      [
+        'migration_import_export_backup_restore_approval_execution_blocked',
+        'RC-7',
+        'refresh_a5_gap_3_migration_fixture_dry_run_or_exact_real_action',
+        true,
+        false
+      ],
+      [
+        'live_http_operation_readiness_not_claimed',
+        'RC-4',
+        'refresh_a5_gap_4_live_http_mcp_no_write_evidence',
+        true,
+        false
+      ],
+      [
+        'mainline_strict_gate_not_executed_for_cutover',
+        'RC-2',
+        'refresh_a5_gap_5_target_bound_strict_gate',
+        true,
+        false
+      ],
+      [
+        'rc_cutover_not_executed',
+        'RC-10',
+        'request_exact_rc_cutover_approval_before_release_actions',
+        true,
+        false
+      ]
+    ]
+  );
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteMappedCount, 7);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteMissingCount, 0);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteExactApprovalCount, 6);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteAutomaticCount, 1);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteCanClaimReadiness, false);
   assert.equal(
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditStatus,
     'not_ready_remaining_authority_gaps'
@@ -3116,9 +3181,18 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
       redLane: false,
       localProofChainComplete: true,
       canCloseAutomatically: true,
+      rcRouteStep: 'LOCAL-AGGREGATOR-SOURCE-TEST',
+      rcRouteAction: 'continue_local_validation_aggregator_source_test_slices',
+      rcRouteRequiresExactApproval: false,
+      rcRouteCanProceedAutomatically: true,
       canClaimReadiness: false
     }
   ]);
+  assert.equal(nonzeroPacket.remainingGapRouteMappedCount, 1);
+  assert.equal(nonzeroPacket.remainingGapRouteMissingCount, 0);
+  assert.equal(nonzeroPacket.remainingGapRouteExactApprovalCount, 0);
+  assert.equal(nonzeroPacket.remainingGapRouteAutomaticCount, 1);
+  assert.equal(nonzeroPacket.remainingGapRouteCanClaimReadiness, false);
 
   assert.equal(zeroGapPacket.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
   assert.equal(zeroGapPacket.decision, 'RC_NOT_READY_BLOCKED');
@@ -3344,6 +3418,11 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(nonzeroRender.markdown.includes('- validation_aggregator_full_implementation_incomplete'), true);
   assert.equal(nonzeroRender.markdown.includes('status=closed_by_local_proof_chain'), true);
   assert.equal(nonzeroRender.markdown.includes('next=none_local_proof_chain_complete'), true);
+  assert.equal(nonzeroRender.markdown.includes('route=LOCAL-AGGREGATOR-SOURCE-TEST'), true);
+  assert.equal(
+    nonzeroRender.markdown.includes('action=continue_local_validation_aggregator_source_test_slices'),
+    true
+  );
 
   assert.equal(zeroGapRender.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
   assert.equal(zeroGapRender.readyToRequestRcCutoverApproval, true);
@@ -3441,9 +3520,17 @@ test('RC-9 decision packet fails closed when remaining gaps lack closure audit a
       redLane: false,
       localProofChainComplete: false,
       canCloseAutomatically: false,
+      rcRouteStep: 'manual_review',
+      rcRouteAction: 'model_missing_gap_before_route_selection',
+      rcRouteRequiresExactApproval: true,
+      rcRouteCanProceedAutomatically: false,
       canClaimReadiness: false
     }
   ]);
+  assert.equal(packet.remainingGapRouteMappedCount, 0);
+  assert.equal(packet.remainingGapRouteMissingCount, 1);
+  assert.equal(packet.remainingGapRouteExactApprovalCount, 1);
+  assert.equal(packet.remainingGapRouteAutomaticCount, 0);
   assert.equal(packet.canClaimRcReady, false);
   assertNoSensitiveSurface({
     forbiddenFragments: [

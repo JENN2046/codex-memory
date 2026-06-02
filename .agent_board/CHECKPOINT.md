@@ -10,6 +10,52 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC ValidationAggregator Remaining Gap Route Map Slice
+
+Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Scope: added deterministic remaining-gap to RC-route next-action mapping in the embedded RC-9 decision packet. This is a local source/test slice for `validation_aggregator_full_implementation_incomplete`; it does not close the whole gap or claim RC readiness.
+
+Changed:
+
+- `src/core/ValidationAggregatorService.js`
+- `tests/v1-rc-validation-aggregator-implementation.test.js`
+- `tests/v1-rc-validation-aggregator-cli.test.js`
+- `docs/RC_VALIDATION_AGGREGATOR_REMAINING_GAP_ROUTE_MAP_SLICE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- Remaining gap rows now expose `rcRouteStep`, `rcRouteAction`, `rcRouteRequiresExactApproval`, and `rcRouteCanProceedAutomatically`.
+- Known RC-route gaps map back to RC-2/RC-4/RC-5/RC-6/RC-7/RC-10 or local aggregator source/test.
+- Unknown gaps fail closed to `manual_review`.
+- Route mapping does not execute or authorize any RC step.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --check tests\v1-rc-validation-aggregator-implementation.test.js`
+- `node --check tests\v1-rc-validation-aggregator-cli.test.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js` passed `27/27`
+- `node --test tests\v1-rc-validation-aggregator-cli.test.js` passed `13/13`
+
+Boundary:
+
+- No runtime evidence execution occurred.
+- No file/store scan occurred.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Commit this validated slice locally.
+- Continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`.
+
 ## RC ValidationAggregator Checklist Binding Freshness Slice
 
 Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
