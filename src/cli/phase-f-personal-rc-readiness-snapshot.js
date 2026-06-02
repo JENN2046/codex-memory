@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
+const fs = require('node:fs');
+const path = require('node:path');
+
 const {
   buildPhaseFPersonalRcReadinessSnapshot
 } = require('../core/PhaseFPersonalRcReadinessSnapshot');
@@ -73,6 +76,29 @@ function usage() {
   ].join('\n');
 }
 
+function readTextIfExists(filePath) {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch (error) {
+    if (error && error.code === 'ENOENT') return '';
+    throw error;
+  }
+}
+
+function detectPhaseFEvidence(cwd) {
+  const docsDir = path.join(cwd, 'docs');
+  const evidence = {};
+  const f1Text = readTextIfExists(path.join(docsDir, 'CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md'));
+  if (
+    f1Text.includes('Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY`') &&
+    f1Text.includes('- F1 evidence accepted: `true`') &&
+    f1Text.includes('PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY')
+  ) {
+    evidence.f1LiveNoWriteEvidenceAccepted = true;
+  }
+  return evidence;
+}
+
 function renderText(snapshot) {
   return [
     `status: ${snapshot.status}`,
@@ -102,6 +128,8 @@ function renderText(snapshot) {
     `postPushA5Gap4ApprovalTemplate: ${snapshot.approvalTemplates.postPushA5Gap4ApprovalTemplate || ''}`,
     `postPushA5Gap4TemplateCurrentlyUsable: ${snapshot.approvalTemplates.postPushA5Gap4TemplateCurrentlyUsable}`,
     `postPushA5UsabilityStatus: ${snapshot.approvalTemplates.postPushA5UsabilityStatus || ''}`,
+    `f2A5Gap6ApprovalTemplate: ${snapshot.approvalTemplates.f2A5Gap6ApprovalTemplate || ''}`,
+    `f2A5Gap6TemplateCurrentlyUsable: ${snapshot.approvalTemplates.f2A5Gap6TemplateCurrentlyUsable}`,
     '',
     `readinessClaimAllowed: ${snapshot.readinessClaimAllowed}`,
     `rcReady: ${snapshot.rcReady}`
@@ -117,9 +145,13 @@ function run(argv = process.argv.slice(2), stdout = process.stdout) {
 
   const facts = readGitFacts(options);
   const syncPacket = buildPhaseF1SyncApprovalPacket(facts);
+  const detectedEvidence = detectPhaseFEvidence(options.cwd);
   const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
     syncPacket,
-    evidence: options.evidence
+    evidence: {
+      ...detectedEvidence,
+      ...options.evidence
+    }
   });
 
   if (options.json) {
@@ -141,6 +173,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  detectPhaseFEvidence,
   parseArgs,
   renderText,
   run

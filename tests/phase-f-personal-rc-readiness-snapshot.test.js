@@ -1,12 +1,20 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 const test = require('node:test');
 
 const {
+  buildF2A5Gap6ApprovalTemplate,
   buildPhaseFPersonalRcReadinessSnapshot
 } = require('../src/core/PhaseFPersonalRcReadinessSnapshot');
 const {
+  evaluateA5ApprovalLine
+} = require('../src/core/A5ApprovalLineVerifier');
+const {
+  detectPhaseFEvidence,
   parseArgs,
   renderText
 } = require('../src/cli/phase-f-personal-rc-readiness-snapshot');
@@ -72,6 +80,71 @@ test('Phase F personal RC snapshot blocks F2 until aggregation evidence exists',
   assert.equal(snapshot.blockingPhase.nextAction, 'obtain_exact_a5_gap6_approval_after_f1');
   assert.equal(snapshot.phases[0].status, 'complete');
   assert.deepEqual(snapshot.missingPhases, ['F2', 'F3', 'F4', 'F5']);
+  assert.match(snapshot.approvalTemplates.f2A5Gap6ApprovalTemplate, /A5-GAP-6/);
+  assert.equal(snapshot.approvalTemplates.f2A5Gap6TemplateCurrentlyUsable, true);
+});
+
+test('Phase F personal RC snapshot F2 approval template is accepted by A5 verifier', () => {
+  const commit = 'dc6d0ffec259f3364899ecb8a14cb6ab26543e96';
+  const template = buildF2A5Gap6ApprovalTemplate({
+    branch: 'main',
+    currentHead: commit
+  });
+  const result = evaluateA5ApprovalLine({
+    approvalLine: template,
+    expectedUnit: 'A5-GAP-6',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, true);
+  assert.equal(result.authorizationGranted, true);
+  assert.deepEqual(result.parsedApprovalScope.approvedEvidenceUnits, [
+    'A5-GAP-1',
+    'A5-GAP-2',
+    'A5-GAP-3',
+    'A5-GAP-4',
+    'A5-GAP-5'
+  ]);
+  assert.equal(
+    result.parsedApprovalScope.includedEvidenceFile,
+    'CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md'
+  );
+  assert.equal(result.parsedApprovalScope.noNewRuntimeAction, true);
+});
+
+test('Phase F personal RC snapshot detects committed CM-1377 F1 evidence document', () => {
+  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'phase-f-evidence-'));
+  const docsDir = path.join(workspace, 'docs');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md'), [
+    '# CM-1377 Phase F1 Live No-Write Accepted Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY`',
+    '',
+    'PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY',
+    '',
+    '- F1 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+
+  const evidence = detectPhaseFEvidence(workspace);
+  assert.equal(evidence.f1LiveNoWriteEvidenceAccepted, true);
+
+  const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
+    syncPacket: {
+      branch: 'main',
+      currentHead: 'dc6d0ffec259f3364899ecb8a14cb6ab26543e96',
+      originHead: 'dc6d0ffec259f3364899ecb8a14cb6ab26543e96',
+      ahead: 0,
+      behind: 0,
+      worktreeClean: true
+    },
+    evidence
+  });
+
+  assert.equal(snapshot.phases[0].status, 'complete');
+  assert.equal(snapshot.blockingPhase.id, 'F2');
+  assert.equal(snapshot.nextRequiredAction, 'obtain_exact_a5_gap6_approval_after_f1');
 });
 
 test('Phase F personal RC snapshot can represent personal dogfood ready without RC ready', () => {
@@ -113,6 +186,7 @@ test('Phase F personal RC snapshot CLI helpers render blocked state and reject s
   assert.match(text, /blockingPhase: F1/);
   assert.match(text, /approvalTemplates:/);
   assert.match(text, /pushApprovalTemplate: I approve pushing local main commits/);
+  assert.match(text, /f2A5Gap6ApprovalTemplate:/);
   assert.match(text, /readinessClaimAllowed: false/);
   assert.throws(() => parseArgs(['--push']), /unsupported side-effect flag/);
   assert.throws(() => parseArgs(['--record-memory']), /unsupported side-effect flag/);

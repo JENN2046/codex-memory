@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1377 PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE`.
+Goal: `CM-1378 PHASE_F2_A5_GAP6_APPROVAL_PACKET`.
 
-Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY` for exact-approved Phase F1 live-client no-write evidence at synced `main@bbb9f2a5104cf0d0f3a0e9447ac5faaf7edd6182`. Runtime freshness was accepted, approval verifier accepted the exact A5-GAP-4 line, and the bounded harness returned `evidenceAccepted=true`. No provider call, durable memory/audit write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F2 is now the next prerequisite but requires separate exact A5-GAP-6 approval using sanitized approved evidence only. F3/F4/F5 must not proceed until F2 evidence is accepted. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local Phase F2 A5-GAP-6 approval packet preparation. The Phase F snapshot now detects committed CM-1377 F1 evidence, reports F1 complete, blocks at F2, and exposes the current A5-GAP-6 approval template. No F2 execution, ValidationAggregator execution, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F2 requires separate exact A5-GAP-6 approval for the current synced commit. F3/F4/F5 must not proceed until F2 evidence is accepted. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

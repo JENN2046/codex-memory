@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1378 Phase F2 A5-GAP-6 Approval Packet Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local source/CLI/test/docs/board alignment so Phase F snapshot recognizes committed CM-1377 F1 evidence and exposes the current F2 A5-GAP-6 exact approval template. No F2 execution, ValidationAggregator execution, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Snapshot detects `docs/CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md`.
+- Snapshot reports F1 `complete`.
+- Snapshot reports F2 as the blocking phase.
+- Snapshot exposes an A5-GAP-6 exact approval template for current `HEAD`.
+
+Validation:
+
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f-personal-rc-readiness-snapshot.test.js` passed `6/6`.
+- Snapshot CLI self-check reports F1 complete and F2 missing.
+
+Next:
+
+- Commit and sync CM-1378 if guarded/approved.
+- Execute F2 only after exact A5-GAP-6 approval for the current synced commit.
+
 ## CM-1377 Phase F1 Live No-Write Accepted Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY`

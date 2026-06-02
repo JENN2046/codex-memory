@@ -41,6 +41,17 @@ function phaseComplete(evidence, id) {
   return false;
 }
 
+function buildF2A5Gap6ApprovalTemplate({ currentHead = '', branch = 'main' } = {}) {
+  const normalizedHead = normalizeString(currentHead);
+  const normalizedBranch = normalizeString(branch) || 'main';
+  if (!normalizedHead) return '';
+  return [
+    `I approve A5-GAP-6 for codex-memory on branch ${normalizedBranch} at commit ${normalizedHead},`,
+    'using only evidence from approved A5-GAP units A5-GAP-1, A5-GAP-2, A5-GAP-3, A5-GAP-4, A5-GAP-5,',
+    'including CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md, no new runtime action.'
+  ].join(' ');
+}
+
 function buildPhaseStatus({ id, requirement, evidence, completedPrereqs, syncPacket }) {
   const complete = phaseComplete(evidence, id);
   if (complete) {
@@ -139,7 +150,12 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
       pushApprovalTemplate: normalizeString(syncPacket.approvalTemplate),
       postPushA5Gap4ApprovalTemplate: normalizeString(syncPacket.postPushA5Gap4ApprovalTemplate),
       postPushA5Gap4TemplateCurrentlyUsable: syncPacket.postPushA5Gap4TemplateCurrentlyUsable === true,
-      postPushA5UsabilityStatus: normalizeString(syncPacket.postPushA5UsabilityStatus)
+      postPushA5UsabilityStatus: normalizeString(syncPacket.postPushA5UsabilityStatus),
+      f2A5Gap6ApprovalTemplate: buildF2A5Gap6ApprovalTemplate({
+        currentHead: syncPacket.currentHead,
+        branch: syncPacket.branch
+      }),
+      f2A5Gap6TemplateCurrentlyUsable: phaseComplete(evidence, 'F1') && !phaseComplete(evidence, 'F2')
     },
     completionCriteria: {
       f1LiveNoWriteEvidenceAccepted: normalizeBoolean(evidence.f1LiveNoWriteEvidenceAccepted),
@@ -167,5 +183,6 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
 }
 
 module.exports = {
+  buildF2A5Gap6ApprovalTemplate,
   buildPhaseFPersonalRcReadinessSnapshot
 };
