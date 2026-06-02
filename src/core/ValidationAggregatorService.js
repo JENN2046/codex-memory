@@ -4921,6 +4921,12 @@ function buildV1RcValidationAggregatorReport({
     rc9DecisionPacket.rcCutoverExecutionAllowed;
   report.summary.rc9DecisionPacketCanClaimRcReady =
     rc9DecisionPacket.canClaimRcReady;
+  report.summary.rc9DecisionPacketCutoverApprovalBoundaryAuditStatus =
+    rc9DecisionPacket.cutoverApprovalBoundaryAuditStatus;
+  report.summary.rc9DecisionPacketCutoverApprovalBoundaryAuditExecutionAllowed =
+    rc9DecisionPacket.cutoverApprovalBoundaryAuditExecutionAllowed;
+  report.summary.rc9DecisionPacketCutoverApprovalBoundaryAuditCanClaimRcReady =
+    rc9DecisionPacket.cutoverApprovalBoundaryAuditCanClaimRcReady;
   report.evidence.rc9DecisionPacket = rc9DecisionPacket;
 
   return report;
@@ -4973,6 +4979,48 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
       canClaimReadiness: false
     };
   });
+  const notExecuted = [
+    'rc_cutover',
+    'tag_creation',
+    'release_creation',
+    'deploy',
+    'push',
+    'config_watchdog_startup_change',
+    'provider_call',
+    'broad_real_memory_scan_export',
+    'durable_memory_write_for_rc',
+    'durable_audit_write_for_rc',
+    'migration_import_export_backup_restore_apply',
+    'public_mcp_expansion'
+  ];
+  const cutoverApprovalBoundaryAudit = {
+    status: readyToRequestRcCutoverApproval
+      ? 'approval_required_not_present_execution_blocked'
+      : 'not_ready_for_cutover_approval_request',
+    sourceMode: 'decision_packet_boundary_only',
+    exactApprovalRequired: true,
+    approvalRequired: true,
+    approvalPresent: false,
+    approvalPacketAccepted: false,
+    approvalBoundToCommit: false,
+    remoteReleaseTagDeployActionsAuthorized: false,
+    configWatchdogStartupChangeAuthorized: false,
+    rollbackPathDocumentedForExecution: false,
+    validationCommandsAuthorized: false,
+    executionAllowed: false,
+    executionPerformed: false,
+    rcReady: false,
+    canClaimRcReady: false,
+    requiredApprovalFields: [
+      'commit',
+      'remote_release_tag_deploy_action_list',
+      'config_watchdog_startup_change_scope',
+      'rollback_path',
+      'validation_commands'
+    ],
+    authorizedActions: [],
+    prohibitedActions: notExecuted
+  };
 
   return {
     status: readyToRequestRcCutoverApproval
@@ -4999,23 +5047,14 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     rcCutoverApproved: false,
     rcCutoverExecuted: false,
     rcCutoverExecutionAllowed: false,
+    cutoverApprovalBoundaryAudit,
+    cutoverApprovalBoundaryAuditStatus: cutoverApprovalBoundaryAudit.status,
+    cutoverApprovalBoundaryAuditExecutionAllowed: false,
+    cutoverApprovalBoundaryAuditCanClaimRcReady: false,
     rcReady: false,
     finalRcReady: false,
     runtimeReady: false,
-    notExecuted: [
-      'rc_cutover',
-      'tag_creation',
-      'release_creation',
-      'deploy',
-      'push',
-      'config_watchdog_startup_change',
-      'provider_call',
-      'broad_real_memory_scan_export',
-      'durable_memory_write_for_rc',
-      'durable_audit_write_for_rc',
-      'migration_import_export_backup_restore_apply',
-      'public_mcp_expansion'
-    ],
+    notExecuted,
     rollbackPath: [
       'leave_local_commits_in_place',
       'create_backup_branch_before_future_history_operation',
@@ -5064,6 +5103,9 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     `rc_ready = ${packet.rcReady}`,
     `rc_cutover_approved = ${packet.rcCutoverApproved}`,
     `rc_cutover_execution_allowed = ${packet.rcCutoverExecutionAllowed}`,
+    `cutover_approval_boundary_status = ${packet.cutoverApprovalBoundaryAuditStatus}`,
+    `cutover_approval_boundary_execution_allowed = ${packet.cutoverApprovalBoundaryAuditExecutionAllowed}`,
+    `cutover_approval_boundary_can_claim_rc_ready = ${packet.cutoverApprovalBoundaryAuditCanClaimRcReady}`,
     '',
     '## Remaining Gaps',
     '',
@@ -5077,6 +5119,18 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     '## Rollback Path',
     '',
     ...rollbackLines,
+    '',
+    '## Cutover Approval Boundary',
+    '',
+    `exact_approval_required = ${packet.cutoverApprovalBoundaryAudit.exactApprovalRequired}`,
+    `approval_present = ${packet.cutoverApprovalBoundaryAudit.approvalPresent}`,
+    `approval_packet_accepted = ${packet.cutoverApprovalBoundaryAudit.approvalPacketAccepted}`,
+    `execution_performed = ${packet.cutoverApprovalBoundaryAudit.executionPerformed}`,
+    '',
+    'Required exact approval fields:',
+    '',
+    ...packet.cutoverApprovalBoundaryAudit.requiredApprovalFields
+      .map(field => `- ${safeEvidenceString(field, 'unknown_required_field')}`),
     '',
     '## Boundary',
     '',

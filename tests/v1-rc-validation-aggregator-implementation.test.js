@@ -3131,6 +3131,38 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
   assert.equal(zeroGapPacket.rcCutoverApproved, false);
   assert.equal(zeroGapPacket.rcCutoverExecuted, false);
   assert.equal(zeroGapPacket.rcCutoverExecutionAllowed, false);
+  assert.deepEqual(zeroGapPacket.cutoverApprovalBoundaryAudit, {
+    status: 'approval_required_not_present_execution_blocked',
+    sourceMode: 'decision_packet_boundary_only',
+    exactApprovalRequired: true,
+    approvalRequired: true,
+    approvalPresent: false,
+    approvalPacketAccepted: false,
+    approvalBoundToCommit: false,
+    remoteReleaseTagDeployActionsAuthorized: false,
+    configWatchdogStartupChangeAuthorized: false,
+    rollbackPathDocumentedForExecution: false,
+    validationCommandsAuthorized: false,
+    executionAllowed: false,
+    executionPerformed: false,
+    rcReady: false,
+    canClaimRcReady: false,
+    requiredApprovalFields: [
+      'commit',
+      'remote_release_tag_deploy_action_list',
+      'config_watchdog_startup_change_scope',
+      'rollback_path',
+      'validation_commands'
+    ],
+    authorizedActions: [],
+    prohibitedActions: zeroGapPacket.notExecuted
+  });
+  assert.equal(
+    zeroGapPacket.cutoverApprovalBoundaryAuditStatus,
+    'approval_required_not_present_execution_blocked'
+  );
+  assert.equal(zeroGapPacket.cutoverApprovalBoundaryAuditExecutionAllowed, false);
+  assert.equal(zeroGapPacket.cutoverApprovalBoundaryAuditCanClaimRcReady, false);
   assert.equal(zeroGapPacket.rcReady, false);
   assert.equal(zeroGapPacket.finalRcReady, false);
   assert.equal(zeroGapPacket.runtimeReady, false);
@@ -3148,6 +3180,10 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
 
   assert.equal(invalidPacket.status, 'rc_not_ready_blocked');
   assert.equal(invalidPacket.readyToRequestRcCutoverApproval, false);
+  assert.equal(
+    invalidPacket.cutoverApprovalBoundaryAuditStatus,
+    'not_ready_for_cutover_approval_request'
+  );
   assert.equal(invalidPacket.rcReady, false);
   assertNoSensitiveSurface({ ...zeroGapReport, rc9DecisionPacket: zeroGapPacket });
 });
@@ -3240,6 +3276,28 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(zeroGapRender.markdown.includes('rc_ready = false'), true);
   assert.equal(zeroGapRender.markdown.includes('rc_cutover_approved = false'), true);
   assert.equal(zeroGapRender.markdown.includes('rc_cutover_execution_allowed = false'), true);
+  assert.equal(
+    zeroGapRender.markdown.includes('cutover_approval_boundary_status = approval_required_not_present_execution_blocked'),
+    true
+  );
+  assert.equal(
+    zeroGapRender.markdown.includes('cutover_approval_boundary_execution_allowed = false'),
+    true
+  );
+  assert.equal(
+    zeroGapRender.markdown.includes('cutover_approval_boundary_can_claim_rc_ready = false'),
+    true
+  );
+  assert.equal(zeroGapRender.markdown.includes('## Cutover Approval Boundary'), true);
+  assert.equal(zeroGapRender.markdown.includes('exact_approval_required = true'), true);
+  assert.equal(zeroGapRender.markdown.includes('approval_present = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('approval_packet_accepted = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('execution_performed = false'), true);
+  assert.equal(zeroGapRender.markdown.includes('- commit'), true);
+  assert.equal(zeroGapRender.markdown.includes('- remote_release_tag_deploy_action_list'), true);
+  assert.equal(zeroGapRender.markdown.includes('- config_watchdog_startup_change_scope'), true);
+  assert.equal(zeroGapRender.markdown.includes('- rollback_path'), true);
+  assert.equal(zeroGapRender.markdown.includes('- validation_commands'), true);
   assert.equal(zeroGapRender.markdown.includes('- rc_cutover'), true);
   assert.equal(zeroGapRender.markdown.includes('- tag_creation'), true);
   assert.equal(zeroGapRender.markdown.includes('- release_creation'), true);

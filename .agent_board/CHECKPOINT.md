@@ -10,6 +10,52 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC ValidationAggregator Cutover Approval Boundary Slice
+
+Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Scope: added an explicit cutover approval boundary audit to the embedded RC-9 decision packet. This is a local source/test slice for `validation_aggregator_full_implementation_incomplete`; it does not close the whole gap or claim RC readiness.
+
+Changed:
+
+- `src/core/ValidationAggregatorService.js`
+- `tests/v1-rc-validation-aggregator-implementation.test.js`
+- `tests/v1-rc-validation-aggregator-cli.test.js`
+- `docs/RC_VALIDATION_AGGREGATOR_CUTOVER_APPROVAL_BOUNDARY_SLICE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- RC-9 packet now exposes `cutoverApprovalBoundaryAudit`.
+- Default blocked packets report `not_ready_for_cutover_approval_request`.
+- Zero-gap packets report `approval_required_not_present_execution_blocked`.
+- Exact RC-10 approval fields are listed, but approval/execution/readiness remain false.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --check tests\v1-rc-validation-aggregator-implementation.test.js`
+- `node --check tests\v1-rc-validation-aggregator-cli.test.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js` passed `27/27`
+- `node --test tests\v1-rc-validation-aggregator-cli.test.js` passed `13/13`
+
+Boundary:
+
+- No runtime evidence execution occurred.
+- No file/store scan occurred.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Commit this validated slice locally.
+- Continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`.
+
 ## RC ValidationAggregator RC-8 / RC-9 Readiness Evidence Audit Slice
 
 Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`

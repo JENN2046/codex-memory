@@ -40,9 +40,31 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.summary.rc9DecisionPacketRcCutoverApproved, false);
   assert.equal(report.summary.rc9DecisionPacketRcCutoverExecutionAllowed, false);
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
+  assert.equal(
+    report.summary.rc9DecisionPacketCutoverApprovalBoundaryAuditStatus,
+    'not_ready_for_cutover_approval_request'
+  );
+  assert.equal(
+    report.summary.rc9DecisionPacketCutoverApprovalBoundaryAuditExecutionAllowed,
+    false
+  );
+  assert.equal(
+    report.summary.rc9DecisionPacketCutoverApprovalBoundaryAuditCanClaimRcReady,
+    false
+  );
   assert.equal(report.evidence.rc9DecisionPacket.decision, 'RC_NOT_READY_BLOCKED');
   assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
   assert.equal(report.evidence.rc9DecisionPacket.safety.remoteWrites, false);
+  assert.deepEqual(
+    report.evidence.rc9DecisionPacket.cutoverApprovalBoundaryAudit.requiredApprovalFields,
+    [
+      'commit',
+      'remote_release_tag_deploy_action_list',
+      'config_watchdog_startup_change_scope',
+      'rollback_path',
+      'validation_commands'
+    ]
+  );
   assert.equal(
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingLocalProofChainCloseoutAuditCount,
     1
