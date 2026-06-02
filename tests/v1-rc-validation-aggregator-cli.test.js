@@ -60,6 +60,11 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.summary.rc9DecisionPacketCompletenessChecklistAcceptedCount, 2);
   assert.equal(report.summary.rc9DecisionPacketCompletenessChecklistMissingCount, 7);
   assert.equal(report.summary.rc9DecisionPacketCompletenessChecklistCanClaimRcReady, false);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteMappedCount, 7);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteMissingCount, 0);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteExactApprovalCount, 6);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteAutomaticCount, 1);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness, false);
   assert.equal(report.evidence.rc9DecisionPacket.decision, 'RC_NOT_READY_BLOCKED');
   assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
   assert.equal(report.evidence.rc9DecisionPacket.safety.remoteWrites, false);

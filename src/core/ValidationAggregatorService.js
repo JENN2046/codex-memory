@@ -4960,6 +4960,16 @@ function buildV1RcValidationAggregatorReport({
     rc9DecisionPacket.readyToRequestRcCutoverApproval;
   report.summary.rc9DecisionPacketRemainingGapCount =
     rc9DecisionPacket.remainingGapCount;
+  report.summary.rc9DecisionPacketRemainingGapRouteMappedCount =
+    rc9DecisionPacket.remainingGapRouteMappedCount;
+  report.summary.rc9DecisionPacketRemainingGapRouteMissingCount =
+    rc9DecisionPacket.remainingGapRouteMissingCount;
+  report.summary.rc9DecisionPacketRemainingGapRouteExactApprovalCount =
+    rc9DecisionPacket.remainingGapRouteExactApprovalCount;
+  report.summary.rc9DecisionPacketRemainingGapRouteAutomaticCount =
+    rc9DecisionPacket.remainingGapRouteAutomaticCount;
+  report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness =
+    rc9DecisionPacket.remainingGapRouteCanClaimReadiness;
   report.summary.rc9DecisionPacketRcCutoverApproved =
     rc9DecisionPacket.rcCutoverApproved;
   report.summary.rc9DecisionPacketRcCutoverExecutionAllowed =
