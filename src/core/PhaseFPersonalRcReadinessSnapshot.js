@@ -1,5 +1,9 @@
 'use strict';
 
+const {
+  buildHeadBoundApprovalLine
+} = require('./RecallProofExecutionPreflight');
+
 const PHASES = [
   ['F1', 'live_client_no_write_contract_refresh'],
   ['F2', 'a5_gap6_aggregation_refresh'],
@@ -50,6 +54,12 @@ function buildF2A5Gap6ApprovalTemplate({ currentHead = '', branch = 'main' } = {
     'using only evidence from approved A5-GAP units A5-GAP-1, A5-GAP-2, A5-GAP-3, A5-GAP-4, A5-GAP-5,',
     'including CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md, no new runtime action.'
   ].join(' ');
+}
+
+function buildF3TrueLiveRecallApprovalTemplate({ currentHead = '' } = {}) {
+  const normalizedHead = normalizeString(currentHead);
+  if (!normalizedHead) return '';
+  return buildHeadBoundApprovalLine(normalizedHead);
 }
 
 function buildPhaseStatus({ id, requirement, evidence, completedPrereqs, syncPacket }) {
@@ -155,7 +165,18 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
         currentHead: syncPacket.currentHead,
         branch: syncPacket.branch
       }),
-      f2A5Gap6TemplateCurrentlyUsable: phaseComplete(evidence, 'F1') && !phaseComplete(evidence, 'F2')
+      f2A5Gap6TemplateCurrentlyUsable: phaseComplete(evidence, 'F1') && !phaseComplete(evidence, 'F2'),
+      f3TrueLiveRecallApprovalTemplate: buildF3TrueLiveRecallApprovalTemplate({
+        currentHead: syncPacket.currentHead
+      }),
+      f3TrueLiveRecallTemplateCurrentlyUsable:
+        phaseComplete(evidence, 'F1') &&
+        phaseComplete(evidence, 'F2') &&
+        !phaseComplete(evidence, 'F3') &&
+        syncPacket.worktreeClean === true &&
+        Number(syncPacket.ahead || 0) === 0 &&
+        Number(syncPacket.behind || 0) === 0 &&
+        normalizeString(syncPacket.currentHead) === normalizeString(syncPacket.originHead)
     },
     completionCriteria: {
       f1LiveNoWriteEvidenceAccepted: normalizeBoolean(evidence.f1LiveNoWriteEvidenceAccepted),
@@ -184,5 +205,6 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
 
 module.exports = {
   buildF2A5Gap6ApprovalTemplate,
+  buildF3TrueLiveRecallApprovalTemplate,
   buildPhaseFPersonalRcReadinessSnapshot
 };

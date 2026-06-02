@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1379 PHASE_F2_A5_GAP6_AGGREGATION_EVIDENCE`.
+Goal: `CM-1380 PHASE_F3_TRUE_LIVE_RECALL_APPROVAL_SURFACE`.
 
-Status: `COMPLETED_VALIDATED_F2_ACCEPTED_NOT_READY` for exact-approved Phase F2 A5-GAP-6 aggregation evidence. The aggregation used only approved A5-GAP-1..5 evidence plus `CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md`, accepted the explicit runtime evidence summary, and kept `decision=NOT_READY_BLOCKED`. No new runtime action, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F3 requires separate exact true-live recall negative-control approval for the current synced commit. F4/F5 must not proceed until F3 evidence is accepted. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_F3_APPROVAL_PACKET_SURFACED_NOT_READY` for local read-only Phase F3 approval surface preparation. F1 and F2 evidence are accepted and synced. Pre-edit `recall-proof-current-facts-preflight` was ready-not-executed on clean synced `main@171cfb14e70af8665d3349be6e0b02d0f119b7e1`; CM-1380 surfaces the F3 exact template dynamically through the Phase F snapshot. Because the CM-1380 commit moves `HEAD`, regenerate the exact approval line after commit/sync and use it only when `f3TrueLiveRecallTemplateCurrentlyUsable=true`. No F3 execution, `search_memory`, MCP/provider call, real memory/jsonl/raw audit read, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F3 requires the operator to send the fresh exact approval line before execution. F4/F5 must not proceed until F3 evidence is accepted. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

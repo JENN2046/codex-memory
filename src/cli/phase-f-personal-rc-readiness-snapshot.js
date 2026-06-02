@@ -140,6 +140,8 @@ function renderText(snapshot) {
     `postPushA5UsabilityStatus: ${snapshot.approvalTemplates.postPushA5UsabilityStatus || ''}`,
     `f2A5Gap6ApprovalTemplate: ${snapshot.approvalTemplates.f2A5Gap6ApprovalTemplate || ''}`,
     `f2A5Gap6TemplateCurrentlyUsable: ${snapshot.approvalTemplates.f2A5Gap6TemplateCurrentlyUsable}`,
+    `f3TrueLiveRecallApprovalTemplate: ${snapshot.approvalTemplates.f3TrueLiveRecallApprovalTemplate || ''}`,
+    `f3TrueLiveRecallTemplateCurrentlyUsable: ${snapshot.approvalTemplates.f3TrueLiveRecallTemplateCurrentlyUsable}`,
     '',
     `readinessClaimAllowed: ${snapshot.readinessClaimAllowed}`,
     `rcReady: ${snapshot.rcReady}`

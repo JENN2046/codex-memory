@@ -8,6 +8,7 @@ const test = require('node:test');
 
 const {
   buildF2A5Gap6ApprovalTemplate,
+  buildF3TrueLiveRecallApprovalTemplate,
   buildPhaseFPersonalRcReadinessSnapshot
 } = require('../src/core/PhaseFPersonalRcReadinessSnapshot');
 const {
@@ -191,6 +192,21 @@ test('Phase F personal RC snapshot detects committed CM-1379 F2 aggregation evid
   assert.equal(snapshot.blockingPhase.id, 'F3');
   assert.equal(snapshot.nextRequiredAction, 'obtain_exact_true_live_recall_approval_after_f2');
   assert.deepEqual(snapshot.missingPhases, ['F3', 'F4', 'F5']);
+  assert.match(
+    snapshot.approvalTemplates.f3TrueLiveRecallApprovalTemplate,
+    /MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_EXECUTION_ONCE/
+  );
+  assert.equal(snapshot.approvalTemplates.f3TrueLiveRecallTemplateCurrentlyUsable, true);
+});
+
+test('Phase F personal RC snapshot F3 approval template is head-bound and non-empty', () => {
+  const commit = '171cfb14e70af8665d3349be6e0b02d0f119b7e1';
+  const template = buildF3TrueLiveRecallApprovalTemplate({ currentHead: commit });
+
+  assert.match(template, new RegExp(`commit ${commit}`));
+  assert.match(template, /exactly four read-only true live search_memory calls/);
+  assert.match(template, /CM-0814 stricter negative-control query family/);
+  assert.match(template, /no readiness or reliability claim/);
 });
 
 test('Phase F personal RC snapshot can represent personal dogfood ready without RC ready', () => {
@@ -233,6 +249,7 @@ test('Phase F personal RC snapshot CLI helpers render blocked state and reject s
   assert.match(text, /approvalTemplates:/);
   assert.match(text, /pushApprovalTemplate: I approve pushing local main commits/);
   assert.match(text, /f2A5Gap6ApprovalTemplate:/);
+  assert.match(text, /f3TrueLiveRecallApprovalTemplate:/);
   assert.match(text, /readinessClaimAllowed: false/);
   assert.throws(() => parseArgs(['--push']), /unsupported side-effect flag/);
   assert.throws(() => parseArgs(['--record-memory']), /unsupported side-effect flag/);

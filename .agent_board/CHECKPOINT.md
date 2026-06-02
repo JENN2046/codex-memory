@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1380 Phase F3 True-Live Recall Approval Surface Checkpoint
+
+Status: `COMPLETED_VALIDATED_F3_APPROVAL_PACKET_SURFACED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local read-only current-facts preflight plus dynamic approval surface preparation after accepted F1/F2 evidence. Pre-edit current facts were clean synced `main@171cfb14e70af8665d3349be6e0b02d0f119b7e1`, but CM-1380 will move `HEAD`; exact execution approval must be regenerated after commit/sync. No F3 execution, `search_memory`, MCP/provider call, real memory/jsonl/raw audit read, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `recall-proof-current-facts-preflight` returned `RECALL_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Clean synced main, head-bound approval, CM-0814 query family, proof seam, and boundary flags are bound.
+- Phase F snapshot now surfaces the F3 exact approval template and marks it currently usable only on clean synced post-F2 facts.
+- Static pre-edit approval text is not reusable after CM-1380 commit movement.
+
+Validation:
+
+- Fresh Git preflight.
+- Read-only F3 current-facts preflight.
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f-personal-rc-readiness-snapshot.test.js` passed `8/8`.
+- `git diff --check`, ledger consistency, and docs validation passed.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Sync if approved, regenerate the fresh F3 approval line from the snapshot, then execute F3 only after exact true-live recall negative-control approval.
+- Do not proceed to F4/F5 until F3 evidence is accepted.
+
 ## CM-1379 Phase F2 A5-GAP-6 Aggregation Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_F2_ACCEPTED_NOT_READY`
