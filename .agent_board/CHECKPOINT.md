@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1374 Phase F1 Runtime Freshness Diagnostic Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local read-only runtime freshness diagnostic. No service restart, process kill, config/watchdog/startup change, MCP/provider call, memory read/write, durable write, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added `PhaseF1RuntimeFreshnessDiagnostic`.
+- Added `phase-f1-runtime-freshness` CLI.
+- Added targeted tests for fresh runtime, stale runtime, and unsynced/dirty Git fail-closed states.
+- Current diagnostic identifies `runtime_process_started_before_head` for the 7605 listener.
+
+Validation:
+
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f1-runtime-freshness-diagnostic.test.js` passed `4/4`.
+- CLI read-only self-check returned fail-closed as expected for current dirty development state and stale runtime.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Runtime refresh requires separate exact approval.
+- Do not proceed to F2/F3/F4/F5 until F1 evidence is accepted.
+
 ## CM-1373 Phase F1 Live No-Write Rerun Rejected Checkpoint
 
 Status: `COMPLETED_WITH_BLOCKED_F1_NOT_READY`

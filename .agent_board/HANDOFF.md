@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1373 PHASE_F1_LIVE_NO_WRITE_RERUN_REJECTED`.
+Goal: `CM-1374 PHASE_F1_RUNTIME_FRESHNESS_DIAGNOSTIC`.
 
-Status: `COMPLETED_WITH_BLOCKED_F1_NOT_READY` for exact-approved Phase F1 live-client no-write rerun. Fresh synced `main@dd5018dfbc564975e0e6a93aebdeba38821760a0` preflight passed, the A5-GAP-4 approval verifier passed, and the bounded harness executed. Health, initialize, tools/list, and authenticated `memory_overview` succeeded; public tools remained exactly `memory_overview`, `record_memory`, `search_memory`. Evidence was rejected fail-closed because no-token `memory_overview` did not return selected projection and no-token `record_memory/search_memory` rejections did not expose expected reason codes. No provider call, durable memory/audit write, config/watchdog/startup change, token print/persist, readiness claim, or reliability claim occurred. F1 remains blocked. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local read-only Phase F1 runtime freshness diagnostic. CM-1374 adds `phase-f1-runtime-freshness`, which compares current HEAD commit time with the 7605 listener process start time. Current diagnostic identifies `runtime_process_started_before_head`, so the CM-1373 live no-token contract failure is routed to runtime freshness/alignment instead of source contract absence. No service restart, process kill, config/watchdog/startup change, token read, MCP/provider call, real memory read/write, durable write, readiness claim, or reliability claim occurred. Runtime refresh requires separate exact approval. F1 remains blocked. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
