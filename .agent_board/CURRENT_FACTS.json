@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-06-02",
-  "taskId": "CM-1390",
-  "validationId": "CMV-1508",
-  "branch": "docs/current-facts-active-slimdown",
-  "localHead": "28353d83884483b989d0d5631091b7e777cc7ccf",
-  "originHead": "28353d83884483b989d0d5631091b7e777cc7ccf",
+  "taskId": "CM-1393",
+  "validationId": "CMV-1511",
+  "branch": "main",
+  "localHead": "42de0535b785a17759702171f5cba6c8607bfc06",
+  "originHead": "42de0535b785a17759702171f5cba6c8607bfc06",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -25,8 +25,8 @@
   },
   "validationSummary": [
     {
-      "id": "CMV-1508",
-      "scope": "CM-1390 current facts active surface binding",
+      "id": "CMV-1511",
+      "scope": "CM-1393 Phase G G1.3 governance mutation preview consistency",
       "status": "COMPLETED_VALIDATED"
     }
   ],

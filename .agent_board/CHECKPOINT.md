@@ -4,13 +4,91 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1390 current facts active surface binding`.
-Current validation: `CMV-1508`.
+Current checkpoint: `CM-1393 Phase G G1.3 governance mutation preview consistency`.
+Current validation: `CMV-1511`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; older checkpoint entries below are historical.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Historical Checkpoint Archive
+
+### CM-1393 Phase G G1.3 Governance Mutation Preview Consistency Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_G_G1_3_PREVIEW_CONSISTENCY`
+
+Date: 2026-06-02
+
+Scope: local source/test helper for temp-local/no-apply preview consistency. No `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl` or raw audit read, durable memory/audit write, runtime governance action, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `src/core/GovernanceMutationPreviewConsistency.js`.
+- Added `tests/governance-mutation-preview-consistency.test.js`.
+- Shared summary now checks tombstone and supersede preview plans for target ids, lifecycle transition, audit phases, projection/invalidation fields, exact approval requirement, blockers, and no-apply side-effect invariants.
+
+Validation:
+
+- `node --check` changed source/test files passed.
+- `node --test .\tests\governance-mutation-preview-consistency.test.js .\tests\durable-governance-tombstone-runtime-prep-helper.test.js .\tests\memory-supersede-runtime-prep-helper.test.js` passed.
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Review the accumulated CM-1391 through CM-1393 diff before staging or committing.
+
+### CM-1392 Phase G G1 Boundary Matrix Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_G_G1_BOUNDARY_MATRIX`
+
+Date: 2026-06-02
+
+Scope: docs-only boundary matrix and first no-apply slice selection. No `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl` or raw audit read, durable memory/audit write, runtime governance action, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `docs/PHASE_G_G1_BOUNDARY_MATRIX.md`.
+- Classified proposal, approval, review, deferred governance, durable mutation dry-run, tombstone, supersede, lifecycle read policy, audit evidence, shadow projection, candidate-cache invalidation, and blocked public/runtime surfaces.
+- Selected `governance mutation preview consistency` as the first G1.3 no-apply slice.
+- Identified `CM-1393 Phase G G1.3 governance mutation preview consistency` as the next local-safe source/test task.
+
+Validation:
+
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Continue with CM-1393 only as temp-local/no-apply source and targeted test work.
+
+### CM-1391 Phase G G1 Governance Runtime Inventory Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_G_G1_GOVERNANCE_RUNTIME_INVENTORY`
+
+Date: 2026-06-02
+
+Scope: docs-only inventory plus board/current-facts updates. No `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl` or raw audit read, durable memory/audit write, runtime governance action, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `docs/PHASE_G_G1_GOVERNANCE_RUNTIME_INVENTORY.md`.
+- Mapped proposal, approval, supersession, tombstone, forget/exclusion, lifecycle audit, read policy, shadow projection, and candidate-cache invalidation surfaces.
+- Identified `CM-1392 Phase G G1 boundary matrix and first slice selection` as the next local-safe task.
+
+Validation:
+
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Continue with CM-1392 boundary matrix and first no-apply slice selection.
 
 ### CM-1385 Phase F Snapshot Review Fix Checkpoint
 

@@ -4,8 +4,8 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1390 current facts active surface binding`.
-Current validation: `CMV-1508`.
+Current task: `CM-1393 Phase G G1.3 governance mutation preview consistency`.
+Current validation: `CMV-1511`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here; read `.agent_board/CURRENT_FACTS.json` and fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here; read `.agent_board/C
 
 ## Next Safe Action
 
-CM-1388 establishes `PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md` as the current Phase G execution entrypoint after Phase F personal dogfood closeout. Next safe local task is CM-1389 governance runtime inventory. After the guarded local commit containing this state, sync only with explicit approval; otherwise begin CM-1389 from fresh Git facts. Do not execute memory tools, provider calls, runtime governance actions, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate scope.
+CM-1393 adds a shared no-apply preview consistency summary for tombstone and supersede runtime-prep plans. Next safe local task is a changed-scope review, then either commit this local batch if requested or continue with a narrow follow-up selected from Phase G. Do not execute memory tools, provider calls, runtime governance actions, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
