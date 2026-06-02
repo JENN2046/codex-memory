@@ -23,16 +23,18 @@
 瘦身后的恢复路径应尽量只依赖少数入口：
 
 1. [README.md](/A:/codex-memory/README.md)：操作地图和能力/命令入口。
-2. [STATUS.md](/A:/codex-memory/STATUS.md)：当前事实摘要，不承载完整历史。
-3. [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)：当前后续路线。
-4. [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) 与 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)：当前任务和验证 ledger。
+2. [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json)：当前 Git / PR / review / validation 事实的唯一机器可校验来源。
+3. [STATUS.md](/A:/codex-memory/STATUS.md)：当前事实的人类摘要，不承载完整历史，也不重复完整当前 commit hash。
+4. [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)：当前后续路线。
+5. [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) 与 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)：当前任务和验证 ledger。
 
 ## 事实源分工
 
 | 文件 | 职责 | 更新频率 |
 |---|---|---|
 | [README.md](/A:/codex-memory/README.md) | operation map：能力入口、架构入口、命令入口、接入入口 | 低频 |
-| [STATUS.md](/A:/codex-memory/STATUS.md) | 当前事实状态：主线可用性、最新基线、关键能力摘要 | 中频 |
+| [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json) | 当前 Git / PR / review / validation 事实的单一机器可校验事实源 | 每批任务 |
+| [STATUS.md](/A:/codex-memory/STATUS.md) | 当前事实的人类摘要；active block 必须引用 `.agent_board/CURRENT_FACTS.json` | 中频 |
 | [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md) | 当前后续路线和阶段顺序，不承担详细任务队列 | 低频 |
 | [PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md) | 当前 Phase G 阶段执行入口；由 `CODEX_MEMORY_NEXT_PHASE_PLAN.md` 链接，不替代 `STATUS.md` 或 `.agent_board` | 低频 |
 | [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) | 当前 active/local task queue | 每批任务 |
@@ -76,8 +78,18 @@ STATUS 应该说明：
 - 当前 health / compare / rollback 结论
 - 当前重要接入状态，例如 Claude MCP
 - 下一阶段入口
+- 当前 active block 引用 `.agent_board/CURRENT_FACTS.json`
 
 STATUS 不应该重复整条 Phase D/E 历史。历史细节进入 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)。
+
+STATUS、`.agent_board/RUN_STATE.md`、`.agent_board/HANDOFF.md`、`.agent_board/CHECKPOINT.md`、`.agent_board/TASK_QUEUE.md`、`.agent_board/VALIDATION_LOG.md` 和 `.agent_board/AUTOPILOT_LEDGER.md` 的 active block 必须：
+
+- 包含 `<!-- CURRENT-FACTS-ACTIVE-START -->` / `<!-- CURRENT-FACTS-ACTIVE-END -->`
+- 引用 `.agent_board/CURRENT_FACTS.json`
+- 包含当前 facts 的 `taskId` 和 `validationId`
+- 不写完整 40 位 commit hash
+
+完整当前 commit hash 只应出现在 `.agent_board/CURRENT_FACTS.json` 或历史归档区。
 
 如果 STATUS 已经存在长历史，后续瘦身应只保留当前摘要，把历史 CM/Pxx 链接移入归档或索引；不要再在 README、PHASE_NAVIGATION、`.agent_board/HANDOFF.md` 中复制同一段状态正文。
 
@@ -164,6 +176,7 @@ docs-only commit 前至少执行：
 
 ```powershell
 git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
 如果文档新增或修改 npm script 引用，确认脚本存在于 `package.json`。

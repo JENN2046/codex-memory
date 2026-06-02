@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-06-02",
-  "taskId": "CM-1389",
-  "validationId": "CMV-1507",
-  "branch": "docs/current-facts-single-source",
-  "localHead": "fde340796255505602eeca856785c6398fd805bf",
-  "originHead": "fde340796255505602eeca856785c6398fd805bf",
+  "taskId": "CM-1390",
+  "validationId": "CMV-1508",
+  "branch": "docs/current-facts-active-slimdown",
+  "localHead": "28353d83884483b989d0d5631091b7e777cc7ccf",
+  "originHead": "28353d83884483b989d0d5631091b7e777cc7ccf",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -25,8 +25,8 @@
   },
   "validationSummary": [
     {
-      "id": "CMV-1507",
-      "scope": "CM-1389 current facts single source",
+      "id": "CMV-1508",
+      "scope": "CM-1390 current facts active surface binding",
       "status": "COMPLETED_VALIDATED"
     }
   ],

@@ -23,6 +23,11 @@ const REQUIRED_ACTIVE_FILES = [
   ".agent_board/AUTOPILOT_LEDGER.md"
 ];
 
+const REQUIRED_DOC_REFERENCES = [
+  "README.md",
+  "DOCS_GOVERNANCE.md"
+];
+
 function readText(root, relativePath, failures) {
   const fullPath = path.join(root, relativePath);
   if (!fs.existsSync(fullPath)) {
@@ -142,6 +147,20 @@ function validateActiveBlocks(root, failures) {
   }
 }
 
+function validateActiveBlockBindings(root, facts, failures) {
+  for (const relativePath of REQUIRED_ACTIVE_FILES) {
+    const text = readText(root, relativePath, failures);
+    const active = extractActiveBlock(text, relativePath, failures);
+    if (!active) continue;
+    if (!active.includes(facts.taskId)) {
+      failures.push(`${relativePath} active block must include current facts taskId ${facts.taskId}`);
+    }
+    if (!active.includes(facts.validationId)) {
+      failures.push(`${relativePath} active block must include current facts validationId ${facts.validationId}`);
+    }
+  }
+}
+
 function validateLatestIds(root, facts, failures) {
   const taskQueue = parseMarkdownTable(readText(root, ".agent_board/TASK_QUEUE.md", failures));
   const validationLog = parseMarkdownTable(readText(root, ".agent_board/VALIDATION_LOG.md", failures));
@@ -172,13 +191,24 @@ function validateLatestIds(root, facts, failures) {
   }
 }
 
+function validateReferenceDocs(root, failures) {
+  for (const relativePath of REQUIRED_DOC_REFERENCES) {
+    const text = readText(root, relativePath, failures);
+    if (!text.includes(FACTS_PATH)) {
+      failures.push(`${relativePath} must reference ${FACTS_PATH}`);
+    }
+  }
+}
+
 function validateCurrentFactsDrift(root = process.cwd()) {
   const failures = [];
   const facts = readJson(root, FACTS_PATH, failures);
   validateCurrentFactsSchema(facts, failures);
   if (facts) {
     validateActiveBlocks(root, failures);
+    validateActiveBlockBindings(root, facts, failures);
     validateLatestIds(root, facts, failures);
+    validateReferenceDocs(root, failures);
   }
   return { ok: failures.length === 0, failures, facts };
 }
@@ -199,6 +229,7 @@ module.exports = {
   ACTIVE_END,
   ACTIVE_START,
   FACTS_PATH,
+  REQUIRED_DOC_REFERENCES,
   REQUIRED_ACTIVE_FILES,
   extractActiveBlock,
   validateCurrentFactsDrift

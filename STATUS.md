@@ -4,8 +4,8 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1389 current facts single source`.
-Current validation: `CMV-1507`.
+Current task: `CM-1390 current facts active surface binding`.
+Current validation: `CMV-1508`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Current route: `Phase G -> G1 Memory Governance Runtime Boundary`.
 Current rule: active status summaries must reference `.agent_board/CURRENT_FACTS.json` and must not repeat full commit hashes.
@@ -14,7 +14,7 @@ Current rule: active status summaries must reference `.agent_board/CURRENT_FACTS
 
 更新时间：2026-06-02
 
-## 当前结论
+## Historical Status Archive
 
 `codex-memory` 的目标是成为 Codex / Claude 可用的本地优先 VCP memory mainline：可审计、可回滚、provider-flexible、VCP-compatible，并保留稳定 MCP 工具契约。
 
