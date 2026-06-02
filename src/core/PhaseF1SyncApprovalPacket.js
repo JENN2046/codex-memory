@@ -29,6 +29,18 @@ function buildApprovalTemplate({ workspace, branch, currentHead }) {
   ].join(' ');
 }
 
+function buildPostPushA5Gap4ApprovalTemplate({ branch, currentHead, endpoint = 'http://127.0.0.1:7605' }) {
+  const targetHead = normalizeString(currentHead);
+  const targetEndpoint = normalizeString(endpoint) || 'http://127.0.0.1:7605';
+  return [
+    `I approve A5-GAP-4 live-client no-write contract refresh for codex-memory on branch ${branch} at commit ${targetHead},`,
+    `endpoint ${targetEndpoint},`,
+    'using current-session bearer token if already present, without printing or persisting token material,',
+    'allow tools/call memory_overview and no-token rejection checks for record_memory/search_memory only,',
+    'no provider, no durable write, no config/watchdog/startup change.'
+  ].join(' ');
+}
+
 function buildPhaseF1SyncApprovalPacket(input = {}) {
   const workspace = normalizeString(input.workspace) || DEFAULT_WORKSPACE;
   const branch = normalizeString(input.branch) || DEFAULT_BRANCH;
@@ -53,6 +65,11 @@ function buildPhaseF1SyncApprovalPacket(input = {}) {
     branch,
     currentHead
   });
+  const postPushA5Gap4ApprovalTemplate = buildPostPushA5Gap4ApprovalTemplate({
+    branch,
+    currentHead,
+    endpoint: input.endpoint
+  });
 
   return {
     status: 'PHASE_F1_SYNC_APPROVAL_PACKET_READY_NOT_EXECUTED',
@@ -71,6 +88,8 @@ function buildPhaseF1SyncApprovalPacket(input = {}) {
     commits,
     pushCommand,
     approvalTemplate,
+    postPushA5Gap4ApprovalTemplate,
+    postPushA5Gap4TemplateUsableAfterSyncOnly: true,
     pushApproved: false,
     pushExecuted: false,
     f1LiveExecutionAllowed: false,
@@ -101,5 +120,6 @@ function buildPhaseF1SyncApprovalPacket(input = {}) {
 
 module.exports = {
   buildApprovalTemplate,
+  buildPostPushA5Gap4ApprovalTemplate,
   buildPhaseF1SyncApprovalPacket
 };

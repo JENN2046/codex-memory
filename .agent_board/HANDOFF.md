@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1367 PHASE_F1_POST_FIX_SYNC_AND_APPROVAL_PACKET`.
+Goal: `CM-1368 PHASE_F1_DYNAMIC_POST_PUSH_A5_TEMPLATE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local post-fix sync and approval packet. Current clean `main@c6804d676105f8051a329e46bd031847ef2aaa08` is ahead of `origin/main@546915bec01fd8ffd0fd974f59b6fc95966218a4` by 2 commits and behind 0. CM-1367 records the exact normal non-force push approval template and the post-push exact A5-GAP-4 F1 live no-write approval template. It did not push, pull, merge, rebase, rerun F1, call providers, call MCP, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness/reliability. F1 remains blocked until explicit push approval, successful push, fresh synced HEAD verification, and exact A5-GAP-4 approval. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local sync packet generator enhancement. CM-1368 makes `phase-f1-sync-approval-packet` dynamically emit both the current-head normal non-force push approval template and the post-push exact A5-GAP-4 F1 live no-write approval template; tests verify the generated A5 line against the existing A5 verifier. Targeted tests and default `npm test` passed. It did not push, pull, merge, rebase, rerun F1, call providers, call MCP, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness/reliability. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

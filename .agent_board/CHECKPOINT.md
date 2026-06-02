@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1368 Phase F1 Dynamic Post-Push A5 Template Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local sync packet generator source/CLI/test/docs hardening. No push, pull, merge, rebase, F1 live rerun, MCP/provider call, real memory/audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- `PhaseF1SyncApprovalPacket` now generates `postPushA5Gap4ApprovalTemplate`.
+- CLI supports `--endpoint URL`.
+- Text output includes the post-push A5-GAP-4 template.
+- Tests verify the generated A5-GAP-4 line against the existing A5 verifier.
+- CLI self-check during development correctly fail-closed on dirty worktree.
+
+Validation:
+
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f1-sync-approval-packet.test.js` passed `2/2`.
+- `npm test` passed `2889/2889`.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- After commit, rerun the generator from clean HEAD and use only that fresh output for any future push approval.
+
 ## CM-1367 Phase F1 Post-Fix Sync And Approval Packet Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -12,6 +12,7 @@ function parseArgs(argv = []) {
     cwd: process.cwd(),
     branch: 'main',
     remoteRef: 'origin/main',
+    endpoint: 'http://127.0.0.1:7605',
     json: false,
     pretty: false,
     help: false
@@ -35,6 +36,11 @@ function parseArgs(argv = []) {
     if (token === '--remote-ref') {
       options.remoteRef = argv[index + 1] || options.remoteRef;
       index += 1;
+      continue;
+    }
+    if (token === '--endpoint') {
+      options.endpoint = argv[index + 1] || options.endpoint;
+      index += 1;
     }
   }
 
@@ -43,7 +49,7 @@ function parseArgs(argv = []) {
 
 function usage() {
   return [
-    'Usage: node src/cli/phase-f1-sync-approval-packet.js [--cwd PATH] [--branch main] [--remote-ref origin/main] [--json] [--pretty]',
+    'Usage: node src/cli/phase-f1-sync-approval-packet.js [--cwd PATH] [--branch main] [--remote-ref origin/main] [--endpoint URL] [--json] [--pretty]',
     '',
     'Reads local Git facts and renders a non-authorizing normal non-force push approval packet.',
     'This command does not push, pull, merge, rebase, call MCP, or touch runtime/memory state.'
@@ -103,6 +109,9 @@ function renderText(packet) {
     'approvalTemplate:',
     packet.approvalTemplate,
     '',
+    'postPushA5Gap4ApprovalTemplate:',
+    packet.postPushA5Gap4ApprovalTemplate,
+    '',
     `nextRequiredAction: ${packet.nextRequiredAction}`,
     `failClosedReasons: ${(packet.failClosedReasons || []).join(',') || 'none'}`
   ].join('\n') + '\n';
@@ -116,7 +125,10 @@ function run(argv = process.argv.slice(2), stdout = process.stdout) {
   }
 
   const facts = readGitFacts(options);
-  const packet = buildPhaseF1SyncApprovalPacket(facts);
+  const packet = buildPhaseF1SyncApprovalPacket({
+    ...facts,
+    endpoint: options.endpoint
+  });
 
   if (options.json) {
     stdout.write(`${JSON.stringify(packet, null, options.pretty ? 2 : 0)}\n`);
