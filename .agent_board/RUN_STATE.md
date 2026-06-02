@@ -51,7 +51,9 @@ RC-7 A5-GAP-3 migration dry-run evidence is recorded at `docs/RC7_A5_GAP3_MIGRAT
 
 RC-8 A5-GAP-6 ValidationAggregator aggregation evidence is recorded at `docs/RC8_A5_GAP6_AGGREGATION_PREFLIGHT.md` for target commit `ea51fe0a7a09fc23b314e4e0ab83adc5776151e6`: exact-approved in-memory aggregation accepted sanitized `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5` summary, `runtimeEvidenceSummaryAccepted=true`, locally evidenced gap count `5`, remaining gap count `2`, remaining gaps `validation_aggregator_full_implementation_incomplete` and `rc_cutover_not_executed`, `closureReady=false`, and `rcReady=false`.
 
-Next safe action is to validate and commit the RC-8 evidence locally, then address `validation_aggregator_full_implementation_incomplete` as the next non-cutover route blocker. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+RC-9 decision packet is prepared at `docs/RC9_RC_DECISION_PACKET.md`: current decision is `RC_NOT_READY_BLOCKED`, `ready_to_request_rc_cutover_approval=false`, and no release/tag/deploy/push/config/watchdog/startup/cutover action occurred.
+
+Next safe action is to validate and commit the RC-9 decision packet locally, then address `validation_aggregator_full_implementation_incomplete` as the next non-cutover route blocker. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

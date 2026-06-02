@@ -10,6 +10,42 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC-9 RC Decision Packet
+
+Status: `RC_NOT_READY_BLOCKED`
+
+Date: 2026-06-02
+
+Scope: prepared a docs-only RC decision packet after RC-8 aggregation evidence. No release, tag, deploy, push, config/watchdog/startup change, provider call, MCP tool call, durable write, migration/import/export/backup/restore, or RC cutover occurred.
+
+Changed:
+
+- `docs/RC9_RC_DECISION_PACKET.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- Decision packet records fresh route evidence through RC-8.
+- RC-8 remaining gap count is `2`.
+- Remaining gaps are `validation_aggregator_full_implementation_incomplete` and `rc_cutover_not_executed`.
+- Current decision remains `RC_NOT_READY_BLOCKED`.
+- `ready_to_request_rc_cutover_approval=false`.
+
+Boundary:
+
+- No remote action occurred.
+- No release/tag/deploy/cutover occurred.
+- No config/watchdog/startup change occurred.
+- No durable memory/audit write occurred.
+- No public MCP expansion occurred.
+- No readiness claim occurred.
+
+Next:
+
+- Continue with the next non-cutover blocker: `validation_aggregator_full_implementation_incomplete`.
+- Keep `rc_cutover_not_executed` blocked until remaining gaps are zero and a separate exact RC cutover approval names the commit and remote/release/tag/deploy actions.
+
 ## RC-8 A5-GAP-6 ValidationAggregator Aggregation Evidence
 
 Status: `EVIDENCE_AGGREGATED_NOT_RC_READY`
