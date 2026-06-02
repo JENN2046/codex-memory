@@ -619,6 +619,46 @@ function buildP66FullImplementationGapAccounting({
     ? 'ready_for_rc9_decision_packet_not_cutover'
     : 'rc_not_ready_blocked_remaining_gaps';
   const readyToRequestRcCutoverApproval = acceptedRuntimeSummaryZeroGap;
+  const closureMissingCriteria = [
+    ...(!acceptedRuntimeSummaryBound ? ['accepted_runtime_summary'] : []),
+    ...(!validationEvidenceExplicitEvidenceUsable ? ['usable_validation_evidence'] : []),
+    ...(validationBlockerIds.length > 0 ? ['validation_blockers_cleared'] : []),
+    ...(runtimeRequiredBlockerIds.length > 0 ? ['runtime_required_blockers_cleared'] : []),
+    ...(a5GatedBlockerIds.length > 0 ? ['a5_gated_blockers_cleared'] : []),
+    ...(!effectiveRemainingGapsCleared ? ['effective_remaining_gaps_cleared'] : []),
+    ...(!effectiveNonBaselineRemainingGapsAbsent ? ['effective_non_baseline_remaining_gaps_absent'] : []),
+    ...(!effectiveActionableLocalImplementationGapsCleared ? ['effective_actionable_local_implementation_gaps_cleared'] : []),
+    ...(!effectiveA5GatedGapsCleared ? ['effective_a5_gated_gaps_cleared'] : []),
+    ...(!effectiveRedLaneGapsCleared ? ['effective_red_lane_gaps_cleared'] : []),
+    'rc_cutover_approval_present',
+    'readiness_authority'
+  ];
+  const rc8Rc9ReadinessEvidenceAudit = {
+    status: acceptedRuntimeSummaryZeroGap
+      ? 'ready_to_request_rc_cutover_approval_not_rc_ready'
+      : 'not_ready_remaining_authority_gaps',
+    sourceMode: 'aggregator_gap_accounting_only',
+    rc8AggregationAccepted: acceptedRuntimeSummaryBound,
+    validationEvidenceUsable: validationEvidenceExplicitEvidenceUsable,
+    localProofChainCloseoutAccepted:
+      localProofChainCloseoutNotProvenIds.length === 0,
+    closureAuditMatrixCount: closureAuditMatrix.length,
+    remainingAuthorityGapIds: effectiveRemainingFullImplementationGapIds,
+    remainingAuthorityGapCount: effectiveRemainingFullImplementationGapIds.length,
+    closureAuthorityStatus,
+    nextClosureAuthority,
+    readyToEnterRc9DecisionPacket: acceptedRuntimeSummaryZeroGap,
+    readyToRequestRcCutoverApproval,
+    rcCutoverApprovalRequired: true,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    canClaimReadiness: false,
+    missingCriteria: closureMissingCriteria,
+    noRemoteWrite: true,
+    noRuntimeMutation: true
+  };
 
   return {
     available: true,
@@ -689,6 +729,15 @@ function buildP66FullImplementationGapAccounting({
     closureAuthoritySummary,
     closureAuthorityStatus,
     nextClosureAuthority,
+    rc8Rc9ReadinessEvidenceAudit,
+    rc8Rc9ReadinessEvidenceAuditStatus: rc8Rc9ReadinessEvidenceAudit.status,
+    rc8Rc9ReadinessEvidenceAuditReadyToEnterRc9DecisionPacket:
+      rc8Rc9ReadinessEvidenceAudit.readyToEnterRc9DecisionPacket,
+    rc8Rc9ReadinessEvidenceAuditReadyToRequestRcCutoverApproval:
+      rc8Rc9ReadinessEvidenceAudit.readyToRequestRcCutoverApproval,
+    rc8Rc9ReadinessEvidenceAuditRemainingAuthorityGapCount:
+      rc8Rc9ReadinessEvidenceAudit.remainingAuthorityGapCount,
+    rc8Rc9ReadinessEvidenceAuditCanClaimReadiness: false,
     acceptedRuntimeSummaryZeroGap,
     decisionPacketRouteStatus,
     readyToRequestRcCutoverApproval,
@@ -718,20 +767,7 @@ function buildP66FullImplementationGapAccounting({
       allBlockersCleared: totalBlockerCount === 0,
       readinessClaimAllowed: false
     },
-    closureMissingCriteria: [
-      ...(!acceptedRuntimeSummaryBound ? ['accepted_runtime_summary'] : []),
-      ...(!validationEvidenceExplicitEvidenceUsable ? ['usable_validation_evidence'] : []),
-      ...(validationBlockerIds.length > 0 ? ['validation_blockers_cleared'] : []),
-      ...(runtimeRequiredBlockerIds.length > 0 ? ['runtime_required_blockers_cleared'] : []),
-      ...(a5GatedBlockerIds.length > 0 ? ['a5_gated_blockers_cleared'] : []),
-      ...(!effectiveRemainingGapsCleared ? ['effective_remaining_gaps_cleared'] : []),
-      ...(!effectiveNonBaselineRemainingGapsAbsent ? ['effective_non_baseline_remaining_gaps_absent'] : []),
-      ...(!effectiveActionableLocalImplementationGapsCleared ? ['effective_actionable_local_implementation_gaps_cleared'] : []),
-      ...(!effectiveA5GatedGapsCleared ? ['effective_a5_gated_gaps_cleared'] : []),
-      ...(!effectiveRedLaneGapsCleared ? ['effective_red_lane_gaps_cleared'] : []),
-      'rc_cutover_approval_present',
-      'readiness_authority'
-    ],
+    closureMissingCriteria,
     acceptedRuntimeSummaryBound,
     acceptedRuntimeSummaryStatus: acceptedRuntimeSummary
       ? acceptedRuntimeSummary.status
@@ -2906,6 +2942,16 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.closureAuthorityStatus,
       p66ValidationAggregatorFullImplementationGapAccountingNextClosureAuthority:
         p66FullImplementationGapAccounting.nextClosureAuthority,
+      p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditStatus:
+        p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditStatus,
+      p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditReadyToEnterRc9DecisionPacket:
+        p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditReadyToEnterRc9DecisionPacket,
+      p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditReadyToRequestRcCutoverApproval:
+        p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditReadyToRequestRcCutoverApproval,
+      p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditRemainingAuthorityGapCount:
+        p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditRemainingAuthorityGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditCanClaimReadiness:
+        false,
       p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount:
         p66FullImplementationGapAccounting.nextSafeClosureCandidateCount,
       p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound:
@@ -3999,6 +4045,18 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.closureAuthorityStatus,
         nextClosureAuthority:
           p66FullImplementationGapAccounting.nextClosureAuthority,
+        rc8Rc9ReadinessEvidenceAudit:
+          p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAudit,
+        rc8Rc9ReadinessEvidenceAuditStatus:
+          p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditStatus,
+        rc8Rc9ReadinessEvidenceAuditReadyToEnterRc9DecisionPacket:
+          p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditReadyToEnterRc9DecisionPacket,
+        rc8Rc9ReadinessEvidenceAuditReadyToRequestRcCutoverApproval:
+          p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditReadyToRequestRcCutoverApproval,
+        rc8Rc9ReadinessEvidenceAuditRemainingAuthorityGapCount:
+          p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditRemainingAuthorityGapCount,
+        rc8Rc9ReadinessEvidenceAuditCanClaimReadiness:
+          p66FullImplementationGapAccounting.rc8Rc9ReadinessEvidenceAuditCanClaimReadiness,
         acceptedRuntimeSummaryZeroGap:
           p66FullImplementationGapAccounting.acceptedRuntimeSummaryZeroGap,
         decisionPacketRouteStatus:

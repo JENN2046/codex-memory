@@ -870,6 +870,54 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.nextClosureAuthority,
     'explicit_red_lane_owner_approval'
   );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditStatus,
+    'not_ready_remaining_authority_gaps'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditReadyToEnterRc9DecisionPacket,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditReadyToRequestRcCutoverApproval,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditRemainingAuthorityGapCount,
+    7
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditCanClaimReadiness,
+    false
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.rc8Rc9ReadinessEvidenceAudit,
+    {
+      status: 'not_ready_remaining_authority_gaps',
+      sourceMode: 'aggregator_gap_accounting_only',
+      rc8AggregationAccepted: false,
+      validationEvidenceUsable: false,
+      localProofChainCloseoutAccepted: false,
+      closureAuditMatrixCount: 7,
+      remainingAuthorityGapIds:
+        report.evidence.p66ValidationAggregatorFullImplementationDefinition.remainingRuntimeGaps,
+      remainingAuthorityGapCount: 7,
+      closureAuthorityStatus: 'red_lane_authorization_required',
+      nextClosureAuthority: 'explicit_red_lane_owner_approval',
+      readyToEnterRc9DecisionPacket: false,
+      readyToRequestRcCutoverApproval: false,
+      rcCutoverApprovalRequired: true,
+      rcCutoverApproved: false,
+      rcCutoverExecuted: false,
+      rcCutoverExecutionAllowed: false,
+      rcReady: false,
+      canClaimReadiness: false,
+      missingCriteria:
+        report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria,
+      noRemoteWrite: true,
+      noRuntimeMutation: true
+    }
+  );
   assert.deepEqual(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuthoritySummary,
     {
@@ -2804,6 +2852,49 @@ test('zero-gap runtime evidence summary can route to RC-9 but cannot authorize R
   assert.deepEqual(definition.localProofChainCloseoutNotProvenIds, []);
   assert.equal(definition.localProofChainCloseoutCanClaimReadiness, false);
   assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditStatus,
+    'ready_to_request_rc_cutover_approval_not_rc_ready'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditReadyToEnterRc9DecisionPacket,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditReadyToRequestRcCutoverApproval,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditRemainingAuthorityGapCount,
+    0
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditCanClaimReadiness,
+    false
+  );
+  assert.deepEqual(definition.rc8Rc9ReadinessEvidenceAudit, {
+    status: 'ready_to_request_rc_cutover_approval_not_rc_ready',
+    sourceMode: 'aggregator_gap_accounting_only',
+    rc8AggregationAccepted: true,
+    validationEvidenceUsable: false,
+    localProofChainCloseoutAccepted: true,
+    closureAuditMatrixCount: 0,
+    remainingAuthorityGapIds: [],
+    remainingAuthorityGapCount: 0,
+    closureAuthorityStatus: 'blocker_clearance_required',
+    nextClosureAuthority: 'clear_existing_blockers',
+    readyToEnterRc9DecisionPacket: true,
+    readyToRequestRcCutoverApproval: true,
+    rcCutoverApprovalRequired: true,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    canClaimReadiness: false,
+    missingCriteria: definition.closureMissingCriteria,
+    noRemoteWrite: true,
+    noRuntimeMutation: true
+  });
+  assert.equal(
     definition.closureMissingCriteria.includes('effective_remaining_gaps_cleared'),
     false
   );
@@ -2898,6 +2989,17 @@ test('zero-gap closeout fails closed when local proof-chain gap is omitted witho
   ]);
   assert.equal(definition.acceptedRuntimeSummaryZeroGap, false);
   assert.equal(definition.readyToRequestRcCutoverApproval, false);
+  assert.equal(
+    definition.rc8Rc9ReadinessEvidenceAudit.status,
+    'not_ready_remaining_authority_gaps'
+  );
+  assert.equal(definition.rc8Rc9ReadinessEvidenceAudit.readyToEnterRc9DecisionPacket, false);
+  assert.equal(definition.rc8Rc9ReadinessEvidenceAudit.readyToRequestRcCutoverApproval, false);
+  assert.equal(definition.rc8Rc9ReadinessEvidenceAudit.remainingAuthorityGapCount, 1);
+  assert.deepEqual(definition.rc8Rc9ReadinessEvidenceAudit.remainingAuthorityGapIds, [
+    'validation_aggregator_full_implementation_incomplete'
+  ]);
+  assert.equal(definition.rc8Rc9ReadinessEvidenceAudit.canClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, false);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapCount, 1);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapAuthorities[0].id, 'validation_aggregator_full_implementation_incomplete');
