@@ -1,5 +1,35 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1377 Phase F1 Live No-Write Accepted Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: exact-approved A5-GAP-4 live-client no-write contract refresh at synced `main@bbb9f2a5104cf0d0f3a0e9447ac5faaf7edd6182`. No provider, durable memory/audit write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Runtime freshness was accepted before execution.
+- Approval verifier accepted the exact A5-GAP-4 line.
+- F1 bounded harness returned `PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY`.
+- `evidenceAccepted=true`.
+- No-token `memory_overview` selected projection was returned.
+- No-token `record_memory/search_memory` rejection reason codes matched expected contract.
+
+Validation:
+
+- Fresh Git preflight.
+- `phase-f1-runtime-freshness`.
+- `npm run a5:approval-check`.
+- Exact-approved F1 harness.
+
+Next:
+
+- Run docs/ledger validation and commit evidence locally if guarded conditions pass.
+- Request exact A5-GAP-6 aggregation refresh approval for F2.
+- Do not proceed to F3/F4/F5 until F2 evidence is accepted.
+
 ## CM-1376 Phase F1 Runtime Freshness Docs-Only HEAD Fix Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1376 PHASE_F1_RUNTIME_FRESHNESS_DOCS_ONLY_HEAD_FIX`.
+Goal: `CM-1377 PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local Phase F1 runtime freshness docs-only HEAD fix. Freshness now compares listener start time with latest HTTP-runtime-affecting commit time rather than arbitrary `HEAD` time, and excludes the Phase F1 diagnostic implementation itself. This prevents docs/status/board evidence commits and diagnostic-only maintenance commits from making a freshly restarted runtime appear stale. Current self-check still fails closed while local branch is ahead, but no longer reports runtime stale. No service restart, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F1 remains blocked until current HEAD is synced, runtime freshness is accepted, exact A5-GAP-4 live-client no-write approval is provided, and evidence is accepted. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY` for exact-approved Phase F1 live-client no-write evidence at synced `main@bbb9f2a5104cf0d0f3a0e9447ac5faaf7edd6182`. Runtime freshness was accepted, approval verifier accepted the exact A5-GAP-4 line, and the bounded harness returned `evidenceAccepted=true`. No provider call, durable memory/audit write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F2 is now the next prerequisite but requires separate exact A5-GAP-6 approval using sanitized approved evidence only. F3/F4/F5 must not proceed until F2 evidence is accepted. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
