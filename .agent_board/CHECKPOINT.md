@@ -10,6 +10,54 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC ValidationAggregator RC-9 Gap Authority Slice
+
+Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Scope: connected closure audit matrix rows to the RC-9 decision packet remaining-gap section. This is a local source/test slice for `validation_aggregator_full_implementation_incomplete`; it does not close the whole gap or claim RC readiness.
+
+Changed:
+
+- `src/core/ValidationAggregatorService.js`
+- `tests/v1-rc-validation-aggregator-implementation.test.js`
+- `docs/RC_VALIDATION_AGGREGATOR_RC9_GAP_AUTHORITY_SLICE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- RC-9 packet remaining gaps now include status and next authority.
+- Missing closure audit rows fail closed with manual review authority.
+- Markdown remaining gaps include `status=` and `next=`.
+- Readiness remains false.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --check tests\v1-rc-validation-aggregator-implementation.test.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js` passed `26/26`
+- targeted ValidationAggregator/no-touch/A5 suite passed `67/67`
+- `git diff --check`
+- `node .\scripts\validate_current_facts_drift.js`
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Boundary:
+
+- No runtime evidence execution occurred.
+- No file/store scan occurred.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Commit this validated slice locally.
+- Continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`.
+
 ## RC ValidationAggregator Closure Audit Matrix Slice
 
 Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`

@@ -4829,6 +4829,27 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
   const effectiveRemainingGapIds = Array.isArray(definition.effectiveRemainingFullImplementationGapIds)
     ? definition.effectiveRemainingFullImplementationGapIds
     : [];
+  const closureAuditMatrix = Array.isArray(definition.closureAuditMatrix)
+    ? definition.closureAuditMatrix
+    : [];
+  const remainingGapAuthorities = effectiveRemainingGapIds.map(gapId => {
+    const closureAuditRow = closureAuditMatrix.find(row => row && row.id === gapId) || {};
+    return {
+      id: gapId,
+      status: typeof closureAuditRow.status === 'string'
+        ? closureAuditRow.status
+        : 'missing_closure_audit_row',
+      nextAuthority: typeof closureAuditRow.nextAuthority === 'string'
+        ? closureAuditRow.nextAuthority
+        : 'manual_review_for_missing_closure_audit_row',
+      requiresLocalImplementation: closureAuditRow.requiresLocalImplementation === true,
+      requiresA5: closureAuditRow.requiresA5 === true,
+      redLane: closureAuditRow.redLane === true,
+      localProofChainComplete: closureAuditRow.localProofChainComplete === true,
+      canCloseAutomatically: closureAuditRow.canCloseAutomatically === true,
+      canClaimReadiness: false
+    };
+  });
 
   return {
     status: readyToRequestRcCutoverApproval
@@ -4845,6 +4866,11 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
       : 'rc_not_ready_blocked_remaining_gaps',
     remainingGapIds: effectiveRemainingGapIds,
     remainingGapCount: effectiveRemainingGapIds.length,
+    remainingGapAuthorities,
+    remainingGapAuthorityCount: remainingGapAuthorities.length,
+    remainingGapAuthorityMissingCount: remainingGapAuthorities
+      .filter(row => row.status === 'missing_closure_audit_row').length,
+    remainingGapAuthorityCanClaimReadiness: false,
     rcCutoverApprovalRequired: true,
     rcCutoverApprovalPresent: false,
     rcCutoverApproved: false,
@@ -4893,7 +4919,11 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
   const packet = buildRc9DecisionPacketFromAggregatorReport(report);
   const generatedAt = safeEvidenceString(options.generatedAt || new Date().toISOString(), 'unknown');
   const remainingGapLines = packet.remainingGapIds.length > 0
-    ? packet.remainingGapIds.map(gapId => `- ${safeEvidenceString(gapId, 'unknown_gap')}`)
+    ? packet.remainingGapAuthorities.map(gap => [
+      `- ${safeEvidenceString(gap.id, 'unknown_gap')}`,
+      `status=${safeEvidenceString(gap.status, 'unknown_status')}`,
+      `next=${safeEvidenceString(gap.nextAuthority, 'unknown_next_authority')}`
+    ].join(' | '))
     : ['- none'];
   const notExecutedLines = packet.notExecuted.map(action => `- ${safeEvidenceString(action, 'unknown_action')}`);
   const rollbackLines = packet.rollbackPath.map(action => `- ${safeEvidenceString(action, 'unknown_rollback_action')}`);

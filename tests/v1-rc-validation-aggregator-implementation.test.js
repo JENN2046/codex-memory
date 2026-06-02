@@ -2903,11 +2903,28 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
   assert.deepEqual(nonzeroPacket.remainingGapIds, [
     'validation_aggregator_full_implementation_incomplete'
   ]);
+  assert.equal(nonzeroPacket.remainingGapAuthorityCount, 1);
+  assert.equal(nonzeroPacket.remainingGapAuthorityMissingCount, 0);
+  assert.deepEqual(nonzeroPacket.remainingGapAuthorities, [
+    {
+      id: 'validation_aggregator_full_implementation_incomplete',
+      status: 'closed_by_local_proof_chain',
+      nextAuthority: 'none_local_proof_chain_complete',
+      requiresLocalImplementation: true,
+      requiresA5: false,
+      redLane: false,
+      localProofChainComplete: true,
+      canCloseAutomatically: true,
+      canClaimReadiness: false
+    }
+  ]);
 
   assert.equal(zeroGapPacket.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
   assert.equal(zeroGapPacket.decision, 'RC_NOT_READY_BLOCKED');
   assert.equal(zeroGapPacket.readyToRequestRcCutoverApproval, true);
   assert.equal(zeroGapPacket.remainingGapCount, 0);
+  assert.equal(zeroGapPacket.remainingGapAuthorityCount, 0);
+  assert.equal(zeroGapPacket.remainingGapAuthorityCanClaimReadiness, false);
   assert.equal(zeroGapPacket.rcCutoverApprovalRequired, true);
   assert.equal(zeroGapPacket.rcCutoverApprovalPresent, false);
   assert.equal(zeroGapPacket.rcCutoverApproved, false);
@@ -3010,6 +3027,8 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(nonzeroRender.markdown.includes('Decision: RC_NOT_READY_BLOCKED'), true);
   assert.equal(nonzeroRender.markdown.includes('ready_to_request_rc_cutover_approval = false'), true);
   assert.equal(nonzeroRender.markdown.includes('- validation_aggregator_full_implementation_incomplete'), true);
+  assert.equal(nonzeroRender.markdown.includes('status=closed_by_local_proof_chain'), true);
+  assert.equal(nonzeroRender.markdown.includes('next=none_local_proof_chain_complete'), true);
 
   assert.equal(zeroGapRender.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
   assert.equal(zeroGapRender.readyToRequestRcCutoverApproval, true);
@@ -3033,6 +3052,57 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(invalidRender.markdown.includes('ready_to_request_rc_cutover_approval = false'), true);
   assert.equal(invalidRender.markdown.includes('rc_ready = false'), true);
   assertNoSensitiveSurface({ ...zeroGapReport, rc9DecisionPacketRender: zeroGapRender });
+});
+
+test('RC-9 decision packet fails closed when remaining gaps lack closure audit authority rows', () => {
+  const report = {
+    summary: {
+      runtimeEvidenceSummaryAccepted: true,
+      p66ValidationAggregatorFullImplementationGapAccountingZeroGap: false
+    },
+    evidence: {
+      p66ValidationAggregatorFullImplementationDefinition: {
+        acceptedRuntimeSummaryZeroGap: false,
+        readyToRequestRcCutoverApproval: false,
+        decisionPacketRouteStatus: 'rc_not_ready_blocked_remaining_gaps',
+        effectiveRemainingFullImplementationGapIds: ['unmapped_gap_without_authority'],
+        closureAuditMatrix: []
+      }
+    }
+  };
+
+  const packet = buildRc9DecisionPacketFromAggregatorReport(report);
+
+  assert.equal(packet.status, 'rc_not_ready_blocked');
+  assert.equal(packet.remainingGapCount, 1);
+  assert.equal(packet.remainingGapAuthorityCount, 1);
+  assert.equal(packet.remainingGapAuthorityMissingCount, 1);
+  assert.deepEqual(packet.remainingGapAuthorities, [
+    {
+      id: 'unmapped_gap_without_authority',
+      status: 'missing_closure_audit_row',
+      nextAuthority: 'manual_review_for_missing_closure_audit_row',
+      requiresLocalImplementation: false,
+      requiresA5: false,
+      redLane: false,
+      localProofChainComplete: false,
+      canCloseAutomatically: false,
+      canClaimReadiness: false
+    }
+  ]);
+  assert.equal(packet.canClaimRcReady, false);
+  assertNoSensitiveSurface({
+    forbiddenFragments: [
+      'authorization:',
+      'bearer ',
+      'set-cookie',
+      'api_key',
+      'providerapikey',
+      'workspace_id',
+      '.env='
+    ],
+    rc9DecisionPacket: packet
+  });
 });
 
 test('validation aggregator runtime evidence summary fails closed on current-head binding mismatch', () => {
