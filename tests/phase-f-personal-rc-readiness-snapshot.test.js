@@ -147,6 +147,52 @@ test('Phase F personal RC snapshot detects committed CM-1377 F1 evidence documen
   assert.equal(snapshot.nextRequiredAction, 'obtain_exact_a5_gap6_approval_after_f1');
 });
 
+test('Phase F personal RC snapshot detects committed CM-1379 F2 aggregation evidence document', () => {
+  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'phase-f-evidence-'));
+  const docsDir = path.join(workspace, 'docs');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md'), [
+    '# CM-1377 Phase F1 Live No-Write Accepted Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY`',
+    '',
+    'PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY',
+    '',
+    '- F1 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+  fs.writeFileSync(path.join(docsDir, 'CM1379_PHASE_F2_A5_GAP6_AGGREGATION_EVIDENCE.md'), [
+    '# CM-1379 Phase F2 A5-GAP-6 Aggregation Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F2_ACCEPTED_NOT_READY`',
+    '',
+    'phase_f_f1_accepted_f2_aggregation_refresh_not_ready',
+    '',
+    '- F2 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+
+  const evidence = detectPhaseFEvidence(workspace);
+  assert.equal(evidence.f1LiveNoWriteEvidenceAccepted, true);
+  assert.equal(evidence.f2A5Gap6AggregationAccepted, true);
+
+  const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
+    syncPacket: {
+      branch: 'main',
+      currentHead: 'e032444e93a207e83e7628acd3c69227ad8fcb28',
+      originHead: 'e032444e93a207e83e7628acd3c69227ad8fcb28',
+      ahead: 0,
+      behind: 0,
+      worktreeClean: true
+    },
+    evidence
+  });
+
+  assert.equal(snapshot.phases[0].status, 'complete');
+  assert.equal(snapshot.phases[1].status, 'complete');
+  assert.equal(snapshot.blockingPhase.id, 'F3');
+  assert.equal(snapshot.nextRequiredAction, 'obtain_exact_true_live_recall_approval_after_f2');
+  assert.deepEqual(snapshot.missingPhases, ['F3', 'F4', 'F5']);
+});
+
 test('Phase F personal RC snapshot can represent personal dogfood ready without RC ready', () => {
   const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
     syncPacket: {

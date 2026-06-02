@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1378 PHASE_F2_A5_GAP6_APPROVAL_PACKET`.
+Goal: `CM-1379 PHASE_F2_A5_GAP6_AGGREGATION_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local Phase F2 A5-GAP-6 approval packet preparation. The Phase F snapshot now detects committed CM-1377 F1 evidence, reports F1 complete, blocks at F2, and exposes the current A5-GAP-6 approval template. No F2 execution, ValidationAggregator execution, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F2 requires separate exact A5-GAP-6 approval for the current synced commit. F3/F4/F5 must not proceed until F2 evidence is accepted. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_F2_ACCEPTED_NOT_READY` for exact-approved Phase F2 A5-GAP-6 aggregation evidence. The aggregation used only approved A5-GAP-1..5 evidence plus `CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md`, accepted the explicit runtime evidence summary, and kept `decision=NOT_READY_BLOCKED`. No new runtime action, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F3 requires separate exact true-live recall negative-control approval for the current synced commit. F4/F5 must not proceed until F3 evidence is accepted. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

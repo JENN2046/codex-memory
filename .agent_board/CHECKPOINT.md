@@ -1,5 +1,37 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1379 Phase F2 A5-GAP-6 Aggregation Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_F2_ACCEPTED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: exact-approved A5-GAP-6 evidence-only in-memory aggregation at synced `main@e032444e93a207e83e7628acd3c69227ad8fcb28`. Input was limited to approved A5-GAP-1..5 and `CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md`. No new runtime action, MCP/provider call, real memory read/write, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Approval verifier accepted the exact A5-GAP-6 line.
+- `ValidationAggregator` accepted the explicit runtime evidence summary.
+- Decision remains `NOT_READY_BLOCKED`.
+- Locally evidenced gap count is `5`.
+- Remaining Phase F blockers are F3/F4/F5.
+
+Validation:
+
+- Fresh Git preflight.
+- A5 approval verifier.
+- In-memory `buildV1RcValidationAggregatorReport`.
+- `node --check` changed CLI/test.
+- `node --test tests\phase-f-personal-rc-readiness-snapshot.test.js` passed `7/7`.
+- Snapshot CLI self-check reports F1/F2 complete and F3 missing.
+- `git diff --check`, ledger consistency, and docs validation passed.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Request exact F3 true-live recall negative-control approval before executing F3.
+- Do not proceed to F4/F5 until F3 evidence is accepted.
+
 ## CM-1378 Phase F2 A5-GAP-6 Approval Packet Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

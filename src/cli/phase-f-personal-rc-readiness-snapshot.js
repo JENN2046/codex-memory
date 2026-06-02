@@ -96,6 +96,16 @@ function detectPhaseFEvidence(cwd) {
   ) {
     evidence.f1LiveNoWriteEvidenceAccepted = true;
   }
+
+  const f2Text = readTextIfExists(path.join(docsDir, 'CM1379_PHASE_F2_A5_GAP6_AGGREGATION_EVIDENCE.md'));
+  if (
+    f2Text.includes('Status: `COMPLETED_VALIDATED_F2_ACCEPTED_NOT_READY`') &&
+    f2Text.includes('- F2 evidence accepted: `true`') &&
+    f2Text.includes('phase_f_f1_accepted_f2_aggregation_refresh_not_ready')
+  ) {
+    evidence.f2A5Gap6AggregationAccepted = true;
+  }
+
   return evidence;
 }
 
