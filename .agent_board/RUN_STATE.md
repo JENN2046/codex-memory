@@ -7,14 +7,14 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1361 Phase F5 conditional closeout matrix prepared; F5 remains blocked until F1/F2/F3/F4 evidence exists |
+| Current task | CM-1362 Phase F1 sync approval packet prepared; F1 remains blocked until exact normal non-force push approval syncs local main |
 | Current area | P8-memory-governance / P0-mainline-health |
 | Current route | Phase F1 current-head approval packet -> exact A5-GAP-4 live-client no-write execution -> A5-GAP-6 aggregation refresh -> true-live recall negative-control proof -> minimal personal dogfood write preflight -> closeout |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
 | Untracked files left untouched | `CLAUDE.md`; `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` |
-| Runtime/source touched by current task | none in CM-1361; docs/board closeout matrix only |
+| Runtime/source touched by current task | none in CM-1362; docs/board sync approval packet only |
 | Provider/API calls by current task | no |
 | Real memory tools by current task | no |
 | Durable memory/audit writes by current task | no |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1361 records a conditional F5 closeout matrix, but F5 remains blocked until F1 live-client no-write evidence, F2 A5-GAP-6 aggregation evidence, F3 true-live recall negative-control evidence, and F4 one-write personal dogfood evidence all exist on the same fresh synced `HEAD`. Do not claim `PERSONAL_DOGFOOD_READY_NOT_RC_READY` from docs/source/test evidence alone. Next safe action remains explicit normal non-force push authorization for F1 sync, followed by fresh synced-head A5-GAP-4 approval and bounded F1 live no-write execution. Before dogfood write, strict gate refresh, closeout, or RC work, require the separate exact boundary for that action.
+CM-1362 records the current exact sync packet for F1: local `main` is clean and ahead of `origin/main` by seven commits through `c28170a`, so F1 live-client no-write execution remains blocked until the user explicitly approves a normal non-force `git push origin main`. After an approved sync, run fresh Git checks, generate a synced-head A5-GAP-4 approval line, and only then consider bounded F1 live no-write execution. Before dogfood write, strict gate refresh, closeout, or RC work, require the separate exact boundary for that action.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

@@ -1,5 +1,28 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1362 Phase F1 Sync Approval Packet Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board approval packet for normal non-force sync before Phase F1. No push, pull, merge, rebase, F1/F2/F3/F4/F5 execution, strict gate, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Recorded fresh Git facts: local `main` clean, `HEAD=c28170a`, `origin/main=be980d1`, ahead `7`, behind `0`.
+- Listed the seven local commits that must be synced before F1 can resume.
+- Added a non-authorizing exact normal non-force push approval template.
+- Kept `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- Docs/board changed-scope review, `git diff --check`, ledger consistency, and docs validation are required for closeout.
+
+Next:
+
+- Obtain explicit normal non-force push approval, then run fresh post-push Git checks.
+
 ## CM-1361 Phase F5 Conditional Closeout Matrix Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
