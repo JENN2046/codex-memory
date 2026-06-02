@@ -875,6 +875,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
       item.id,
       item.rcRouteStep,
       item.rcRouteAction,
+      item.rcRouteApprovalTemplateHint,
       item.rcRouteRequiresExactApproval,
       item.rcRouteCanProceedAutomatically
     ]),
@@ -883,6 +884,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
         'validation_aggregator_full_implementation_incomplete',
         'LOCAL-AGGREGATOR-SOURCE-TEST',
         'continue_local_validation_aggregator_source_test_slices',
+        'none_local_source_test',
         false,
         true
       ],
@@ -890,6 +892,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
         'governance_review_approval_audit_runtime_loop_not_executed',
         'RC-5',
         'refresh_a5_gap_1_governance_runtime_evidence',
+        'A5-GAP-1 governance readonly current-head sanitized report approval',
         true,
         false
       ],
@@ -897,6 +900,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
         'recall_isolation_runtime_proof_not_executed',
         'RC-6',
         'refresh_a5_gap_2_recall_isolation_runtime_evidence',
+        'A5-GAP-2 bounded recall isolation no-mutation approval',
         true,
         false
       ],
@@ -904,6 +908,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
         'migration_import_export_backup_restore_approval_execution_blocked',
         'RC-7',
         'refresh_a5_gap_3_migration_fixture_dry_run_or_exact_real_action',
+        'A5-GAP-3 migration fixture-only dry-run no-apply approval',
         true,
         false
       ],
@@ -911,6 +916,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
         'live_http_operation_readiness_not_claimed',
         'RC-4',
         'refresh_a5_gap_4_live_http_mcp_no_write_evidence',
+        'A5-GAP-4 live HTTP MCP no-write contract approval',
         true,
         false
       ],
@@ -918,6 +924,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
         'mainline_strict_gate_not_executed_for_cutover',
         'RC-2',
         'refresh_a5_gap_5_target_bound_strict_gate',
+        'A5-GAP-5 cutover-context strict gate only approval',
         true,
         false
       ],
@@ -925,6 +932,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
         'rc_cutover_not_executed',
         'RC-10',
         'request_exact_rc_cutover_approval_before_release_actions',
+        'RC-10 exact cutover approval with commit actions config rollback validation',
         true,
         false
       ]
@@ -3188,6 +3196,7 @@ test('RC-9 decision packet consumes aggregator route fields without authorizing 
       canCloseAutomatically: true,
       rcRouteStep: 'LOCAL-AGGREGATOR-SOURCE-TEST',
       rcRouteAction: 'continue_local_validation_aggregator_source_test_slices',
+      rcRouteApprovalTemplateHint: 'none_local_source_test',
       rcRouteRequiresExactApproval: false,
       rcRouteCanProceedAutomatically: true,
       canClaimReadiness: false
@@ -3428,6 +3437,7 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
     nonzeroRender.markdown.includes('action=continue_local_validation_aggregator_source_test_slices'),
     true
   );
+  assert.equal(nonzeroRender.markdown.includes('approval_hint=none_local_source_test'), true);
 
   assert.equal(zeroGapRender.status, 'ready_to_request_rc_cutover_approval_not_rc_ready');
   assert.equal(zeroGapRender.readyToRequestRcCutoverApproval, true);
@@ -3527,6 +3537,7 @@ test('RC-9 decision packet fails closed when remaining gaps lack closure audit a
       canCloseAutomatically: false,
       rcRouteStep: 'manual_review',
       rcRouteAction: 'model_missing_gap_before_route_selection',
+      rcRouteApprovalTemplateHint: 'manual_review_required_before_approval_template',
       rcRouteRequiresExactApproval: true,
       rcRouteCanProceedAutomatically: false,
       canClaimReadiness: false

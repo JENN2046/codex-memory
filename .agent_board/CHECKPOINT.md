@@ -10,6 +10,52 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC ValidationAggregator Route Approval Hint Slice
+
+Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
+
+Date: 2026-06-03
+
+Scope: added approval-template hints to remaining-gap RC route rows in the embedded RC-9 decision packet. This is a local source/test slice for `validation_aggregator_full_implementation_incomplete`; it does not close the whole gap or claim RC readiness.
+
+Changed:
+
+- `src/core/ValidationAggregatorService.js`
+- `tests/v1-rc-validation-aggregator-implementation.test.js`
+- `tests/v1-rc-validation-aggregator-cli.test.js`
+- `docs/RC_VALIDATION_AGGREGATOR_ROUTE_APPROVAL_HINT_SLICE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- Remaining gap route rows now expose `rcRouteApprovalTemplateHint`.
+- A5 route rows point to A5-GAP-1/2/3/4/5 approval families.
+- RC-10 route rows point to exact cutover approval requirements.
+- Hints do not generate, accept, or execute approval.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --check tests\v1-rc-validation-aggregator-implementation.test.js`
+- `node --check tests\v1-rc-validation-aggregator-cli.test.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js` passed `27/27`
+- `node --test tests\v1-rc-validation-aggregator-cli.test.js` passed `13/13`
+
+Boundary:
+
+- No runtime evidence execution occurred.
+- No file/store scan occurred.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Commit this validated slice locally.
+- Continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`.
+
 ## RC ValidationAggregator Route Map Summary Slice
 
 Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`

@@ -78,6 +78,11 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
       .find(item => item.id === 'rc_cutover_not_executed').rcRouteStep,
     'RC-10'
   );
+  assert.equal(
+    report.evidence.rc9DecisionPacket.remainingGapAuthorities
+      .find(item => item.id === 'rc_cutover_not_executed').rcRouteApprovalTemplateHint,
+    'RC-10 exact cutover approval with commit actions config rollback validation'
+  );
   assert.deepEqual(report.evidence.rc9DecisionPacket.completenessChecklistMissingIds, [
     'fresh_current_head',
     'strict_gate',

@@ -335,42 +335,49 @@ const RC_ROUTE_NEXT_ACTION_BY_GAP_ID = {
   validation_aggregator_full_implementation_incomplete: {
     rcRouteStep: 'LOCAL-AGGREGATOR-SOURCE-TEST',
     rcRouteAction: 'continue_local_validation_aggregator_source_test_slices',
+    approvalTemplateHint: 'none_local_source_test',
     requiresExactApproval: false,
     canProceedAutomatically: true
   },
   governance_review_approval_audit_runtime_loop_not_executed: {
     rcRouteStep: 'RC-5',
     rcRouteAction: 'refresh_a5_gap_1_governance_runtime_evidence',
+    approvalTemplateHint: 'A5-GAP-1 governance readonly current-head sanitized report approval',
     requiresExactApproval: true,
     canProceedAutomatically: false
   },
   recall_isolation_runtime_proof_not_executed: {
     rcRouteStep: 'RC-6',
     rcRouteAction: 'refresh_a5_gap_2_recall_isolation_runtime_evidence',
+    approvalTemplateHint: 'A5-GAP-2 bounded recall isolation no-mutation approval',
     requiresExactApproval: true,
     canProceedAutomatically: false
   },
   migration_import_export_backup_restore_approval_execution_blocked: {
     rcRouteStep: 'RC-7',
     rcRouteAction: 'refresh_a5_gap_3_migration_fixture_dry_run_or_exact_real_action',
+    approvalTemplateHint: 'A5-GAP-3 migration fixture-only dry-run no-apply approval',
     requiresExactApproval: true,
     canProceedAutomatically: false
   },
   live_http_operation_readiness_not_claimed: {
     rcRouteStep: 'RC-4',
     rcRouteAction: 'refresh_a5_gap_4_live_http_mcp_no_write_evidence',
+    approvalTemplateHint: 'A5-GAP-4 live HTTP MCP no-write contract approval',
     requiresExactApproval: true,
     canProceedAutomatically: false
   },
   mainline_strict_gate_not_executed_for_cutover: {
     rcRouteStep: 'RC-2',
     rcRouteAction: 'refresh_a5_gap_5_target_bound_strict_gate',
+    approvalTemplateHint: 'A5-GAP-5 cutover-context strict gate only approval',
     requiresExactApproval: true,
     canProceedAutomatically: false
   },
   rc_cutover_not_executed: {
     rcRouteStep: 'RC-10',
     rcRouteAction: 'request_exact_rc_cutover_approval_before_release_actions',
+    approvalTemplateHint: 'RC-10 exact cutover approval with commit actions config rollback validation',
     requiresExactApproval: true,
     canProceedAutomatically: false
   }
@@ -5031,6 +5038,7 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     const routeAction = RC_ROUTE_NEXT_ACTION_BY_GAP_ID[gapId] || {
       rcRouteStep: 'manual_review',
       rcRouteAction: 'model_missing_gap_before_route_selection',
+      approvalTemplateHint: 'manual_review_required_before_approval_template',
       requiresExactApproval: true,
       canProceedAutomatically: false
     };
@@ -5049,6 +5057,7 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
       canCloseAutomatically: closureAuditRow.canCloseAutomatically === true,
       rcRouteStep: routeAction.rcRouteStep,
       rcRouteAction: routeAction.rcRouteAction,
+      rcRouteApprovalTemplateHint: routeAction.approvalTemplateHint,
       rcRouteRequiresExactApproval: routeAction.requiresExactApproval,
       rcRouteCanProceedAutomatically: routeAction.canProceedAutomatically,
       canClaimReadiness: false
@@ -5334,7 +5343,8 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
       `status=${safeEvidenceString(gap.status, 'unknown_status')}`,
       `next=${safeEvidenceString(gap.nextAuthority, 'unknown_next_authority')}`,
       `route=${safeEvidenceString(gap.rcRouteStep, 'unknown_route')}`,
-      `action=${safeEvidenceString(gap.rcRouteAction, 'unknown_action')}`
+      `action=${safeEvidenceString(gap.rcRouteAction, 'unknown_action')}`,
+      `approval_hint=${safeEvidenceString(gap.rcRouteApprovalTemplateHint, 'unknown_approval_hint')}`
     ].join(' | '))
     : ['- none'];
   const notExecutedLines = packet.notExecuted.map(action => `- ${safeEvidenceString(action, 'unknown_action')}`);
