@@ -4975,6 +4975,12 @@ function buildV1RcValidationAggregatorReport({
     rc9DecisionPacket.remainingGapRouteExactApprovalCount;
   report.summary.rc9DecisionPacketRemainingGapRouteAutomaticCount =
     rc9DecisionPacket.remainingGapRouteAutomaticCount;
+  report.summary.rc9DecisionPacketRemainingGapRouteApprovalHintCount =
+    rc9DecisionPacket.remainingGapRouteApprovalHintCount;
+  report.summary.rc9DecisionPacketRemainingGapRouteApprovalHintMissingCount =
+    rc9DecisionPacket.remainingGapRouteApprovalHintMissingCount;
+  report.summary.rc9DecisionPacketRemainingGapRouteManualReviewApprovalHintCount =
+    rc9DecisionPacket.remainingGapRouteManualReviewApprovalHintCount;
   report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness =
     rc9DecisionPacket.remainingGapRouteCanClaimReadiness;
   report.summary.rc9DecisionPacketRcCutoverApproved =
@@ -5069,6 +5075,16 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     .filter(row => row.rcRouteRequiresExactApproval === true).length;
   const remainingGapRouteAutomaticCount = remainingGapAuthorities
     .filter(row => row.rcRouteCanProceedAutomatically === true).length;
+  const remainingGapRouteApprovalHintCount = remainingGapAuthorities
+    .filter(row =>
+      typeof row.rcRouteApprovalTemplateHint === 'string' &&
+      row.rcRouteApprovalTemplateHint.trim().length > 0
+    ).length;
+  const remainingGapRouteApprovalHintMissingCount =
+    remainingGapAuthorities.length - remainingGapRouteApprovalHintCount;
+  const remainingGapRouteManualReviewApprovalHintCount = remainingGapAuthorities
+    .filter(row => row.rcRouteApprovalTemplateHint === 'manual_review_required_before_approval_template')
+    .length;
   const runtimeEvidenceBridge = report &&
     typeof report === 'object' &&
     report.evidence &&
@@ -5294,6 +5310,9 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     remainingGapRouteMissingCount,
     remainingGapRouteExactApprovalCount,
     remainingGapRouteAutomaticCount,
+    remainingGapRouteApprovalHintCount,
+    remainingGapRouteApprovalHintMissingCount,
+    remainingGapRouteManualReviewApprovalHintCount,
     remainingGapRouteCanClaimReadiness: false,
     rcCutoverApprovalRequired: true,
     rcCutoverApprovalPresent: false,

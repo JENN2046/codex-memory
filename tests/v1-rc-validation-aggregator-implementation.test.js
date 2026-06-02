@@ -942,11 +942,17 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteMissingCount, 0);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteExactApprovalCount, 6);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteAutomaticCount, 1);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteApprovalHintCount, 7);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteApprovalHintMissingCount, 0);
+  assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteManualReviewApprovalHintCount, 0);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteMappedCount, 7);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteMissingCount, 0);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteExactApprovalCount, 6);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteAutomaticCount, 1);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteApprovalHintCount, 7);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteApprovalHintMissingCount, 0);
+  assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteManualReviewApprovalHintCount, 0);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness, false);
   assert.equal(
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditStatus,
@@ -3547,6 +3553,9 @@ test('RC-9 decision packet fails closed when remaining gaps lack closure audit a
   assert.equal(packet.remainingGapRouteMissingCount, 1);
   assert.equal(packet.remainingGapRouteExactApprovalCount, 1);
   assert.equal(packet.remainingGapRouteAutomaticCount, 0);
+  assert.equal(packet.remainingGapRouteApprovalHintCount, 1);
+  assert.equal(packet.remainingGapRouteApprovalHintMissingCount, 0);
+  assert.equal(packet.remainingGapRouteManualReviewApprovalHintCount, 1);
   assert.equal(packet.canClaimRcReady, false);
   assertNoSensitiveSurface({
     forbiddenFragments: [
