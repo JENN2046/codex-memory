@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-06-02",
+  "taskId": "CM-1389",
+  "validationId": "CMV-1507",
+  "branch": "docs/current-facts-single-source",
+  "localHead": "fde340796255505602eeca856785c6398fd805bf",
+  "originHead": "fde340796255505602eeca856785c6398fd805bf",
+  "baseBranch": "main",
+  "pr": {
+    "number": null,
+    "head": null,
+    "base": "main",
+    "url": null
+  },
+  "reviewedObject": {
+    "commit": null,
+    "parent": null,
+    "source": "none",
+    "presentInLocalCheckout": null
+  },
+  "status": {
+    "project": "NOT_READY_BLOCKED",
+    "rc": "RC_NOT_READY_BLOCKED"
+  },
+  "validationSummary": [
+    {
+      "id": "CMV-1507",
+      "scope": "CM-1389 current facts single source",
+      "status": "COMPLETED_VALIDATED"
+    }
+  ],
+  "notValidated": [
+    "npm test",
+    "npm run gate:mainline",
+    "npm run gate:mainline:strict",
+    "provider smoke or benchmark",
+    "real memory tools"
+  ],
+  "constraints": {
+    "claudeMdUntrackedUntouched": true,
+    "noProviderCalls": true,
+    "noRealMemoryCalls": true,
+    "noPushWithoutExplicitAuthorization": true
+  }
+}

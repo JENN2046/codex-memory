@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+<!-- CURRENT-FACTS-ACTIVE-START -->
+
+Current facts source: `.agent_board/CURRENT_FACTS.json`.
+
+Current checkpoint: `CM-1389 current facts single source`.
+Current validation: `CMV-1507`.
+Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; older checkpoint entries below are historical.
+
+<!-- CURRENT-FACTS-ACTIVE-END -->
+
 ## CM-1385 Phase F Snapshot Review Fix Checkpoint
 
 Status: `COMPLETED_VALIDATED_PHASE_F_SNAPSHOT_REVIEW_FIX`

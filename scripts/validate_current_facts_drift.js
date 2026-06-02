@@ -1,0 +1,205 @@
+#!/usr/bin/env node
+"use strict";
+
+const fs = require("fs");
+const path = require("path");
+const { parseMarkdownTable } = require("./validate_autopilot_ledger_consistency");
+
+const SHA40_RE = /^[0-9a-f]{40}$/;
+const SHA40_SCAN_RE = /\b[0-9a-f]{40}\b/gi;
+const CM_RE = /^CM-\d{4}$/;
+const CMV_RE = /^CMV-\d{4}$/;
+const ACTIVE_START = "<!-- CURRENT-FACTS-ACTIVE-START -->";
+const ACTIVE_END = "<!-- CURRENT-FACTS-ACTIVE-END -->";
+const FACTS_PATH = ".agent_board/CURRENT_FACTS.json";
+
+const REQUIRED_ACTIVE_FILES = [
+  "STATUS.md",
+  ".agent_board/RUN_STATE.md",
+  ".agent_board/HANDOFF.md",
+  ".agent_board/CHECKPOINT.md",
+  ".agent_board/TASK_QUEUE.md",
+  ".agent_board/VALIDATION_LOG.md",
+  ".agent_board/AUTOPILOT_LEDGER.md"
+];
+
+function readText(root, relativePath, failures) {
+  const fullPath = path.join(root, relativePath);
+  if (!fs.existsSync(fullPath)) {
+    failures.push(`Missing file: ${relativePath}`);
+    return "";
+  }
+  return fs.readFileSync(fullPath, "utf8");
+}
+
+function readJson(root, relativePath, failures) {
+  const text = readText(root, relativePath, failures);
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    failures.push(`Invalid JSON in ${relativePath}: ${error.message}`);
+    return null;
+  }
+}
+
+function extractActiveBlock(text, relativePath, failures) {
+  const start = text.indexOf(ACTIVE_START);
+  const end = text.indexOf(ACTIVE_END);
+  if (start === -1 || end === -1 || end < start) {
+    failures.push(`${relativePath} missing CURRENT-FACTS active markers`);
+    return "";
+  }
+  return text.slice(start + ACTIVE_START.length, end);
+}
+
+function cmId(value) {
+  const match = String(value || "").match(/\bCM-\d{4}\b/);
+  return match ? match[0] : null;
+}
+
+function cmNumber(value) {
+  const id = cmId(value);
+  return id ? Number(id.slice(3)) : null;
+}
+
+function latestByCm(rows, fieldName, filter) {
+  return rows
+    .filter(filter)
+    .map((row) => ({ row, id: cmId(row[fieldName]), number: cmNumber(row[fieldName]) }))
+    .filter((item) => item.id && Number.isFinite(item.number))
+    .sort((left, right) => right.number - left.number)[0] || null;
+}
+
+function validateCurrentFactsSchema(facts, failures) {
+  if (!facts || typeof facts !== "object" || Array.isArray(facts)) {
+    failures.push(`${FACTS_PATH} must contain a JSON object`);
+    return;
+  }
+
+  if (facts.schemaVersion !== 1) failures.push("schemaVersion must be 1");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(facts.updatedAt || ""))) {
+    failures.push("updatedAt must use YYYY-MM-DD");
+  }
+  if (!CM_RE.test(String(facts.taskId || ""))) failures.push("taskId must look like CM-0000");
+  if (!CMV_RE.test(String(facts.validationId || ""))) failures.push("validationId must look like CMV-0000");
+  if (!facts.branch || typeof facts.branch !== "string") failures.push("branch is required");
+  if (!facts.baseBranch || typeof facts.baseBranch !== "string") failures.push("baseBranch is required");
+  if (!SHA40_RE.test(String(facts.localHead || ""))) failures.push("localHead must be a 40-char lowercase SHA");
+  if (facts.originHead !== null && !SHA40_RE.test(String(facts.originHead || ""))) {
+    failures.push("originHead must be a 40-char lowercase SHA or null");
+  }
+
+  const projectStatus = facts.status && facts.status.project;
+  const rcStatus = facts.status && facts.status.rc;
+  if (!["NOT_READY_BLOCKED", "READY", "BLOCKED"].includes(projectStatus)) {
+    failures.push("status.project must be NOT_READY_BLOCKED, READY, or BLOCKED");
+  }
+  if (!["RC_NOT_READY_BLOCKED", "RC_READY", "RC_BLOCKED"].includes(rcStatus)) {
+    failures.push("status.rc must be RC_NOT_READY_BLOCKED, RC_READY, or RC_BLOCKED");
+  }
+
+  const pr = facts.pr;
+  if (!pr || typeof pr !== "object" || Array.isArray(pr)) failures.push("pr object is required");
+  const reviewed = facts.reviewedObject;
+  if (!reviewed || typeof reviewed !== "object" || Array.isArray(reviewed)) {
+    failures.push("reviewedObject object is required");
+  } else {
+    if (reviewed.commit !== null && !SHA40_RE.test(String(reviewed.commit || ""))) {
+      failures.push("reviewedObject.commit must be a 40-char lowercase SHA or null");
+    }
+    if (reviewed.parent !== null && !SHA40_RE.test(String(reviewed.parent || ""))) {
+      failures.push("reviewedObject.parent must be a 40-char lowercase SHA or null");
+    }
+    if (
+      reviewed.commit &&
+      reviewed.presentInLocalCheckout === false &&
+      reviewed.source === "local_git"
+    ) {
+      failures.push("reviewedObject absent from checkout cannot use source=local_git");
+    }
+  }
+
+  if (!Array.isArray(facts.validationSummary)) failures.push("validationSummary must be an array");
+  if (!Array.isArray(facts.notValidated)) failures.push("notValidated must be an array");
+  if (!facts.constraints || typeof facts.constraints !== "object" || Array.isArray(facts.constraints)) {
+    failures.push("constraints object is required");
+  }
+}
+
+function validateActiveBlocks(root, failures) {
+  for (const relativePath of REQUIRED_ACTIVE_FILES) {
+    const text = readText(root, relativePath, failures);
+    const active = extractActiveBlock(text, relativePath, failures);
+    if (!active) continue;
+    if (!active.includes(FACTS_PATH)) {
+      failures.push(`${relativePath} active block must reference ${FACTS_PATH}`);
+    }
+    const matches = active.match(SHA40_SCAN_RE) || [];
+    if (matches.length > 0) {
+      failures.push(`${relativePath} active block contains full 40-char SHA: ${matches[0]}`);
+    }
+  }
+}
+
+function validateLatestIds(root, facts, failures) {
+  const taskQueue = parseMarkdownTable(readText(root, ".agent_board/TASK_QUEUE.md", failures));
+  const validationLog = parseMarkdownTable(readText(root, ".agent_board/VALIDATION_LOG.md", failures));
+
+  const latestDoneTask = latestByCm(
+    taskQueue,
+    "ID",
+    (row) => String(row.Status || "").toLowerCase() === "done"
+  );
+  const latestValidation = latestByCm(
+    validationLog,
+    "Scope",
+    (row) => String(row.Result || "").toUpperCase().startsWith("COMPLETED")
+  );
+
+  if (!latestDoneTask) failures.push("No completed CM task found in .agent_board/TASK_QUEUE.md");
+  if (!latestValidation) failures.push("No completed CM validation scope found in .agent_board/VALIDATION_LOG.md");
+  if (latestDoneTask && latestDoneTask.id !== facts.taskId) {
+    failures.push(`latest done task ${latestDoneTask.id} does not match current facts taskId ${facts.taskId}`);
+  }
+  if (latestValidation && latestValidation.id !== facts.taskId) {
+    failures.push(`latest validation scope ${latestValidation.id} does not match current facts taskId ${facts.taskId}`);
+  }
+
+  const validationIds = new Set(validationLog.map((row) => String(row.ID || "").replace(/`/g, "").trim()));
+  if (!validationIds.has(facts.validationId)) {
+    failures.push(`current facts validationId ${facts.validationId} is missing from VALIDATION_LOG`);
+  }
+}
+
+function validateCurrentFactsDrift(root = process.cwd()) {
+  const failures = [];
+  const facts = readJson(root, FACTS_PATH, failures);
+  validateCurrentFactsSchema(facts, failures);
+  if (facts) {
+    validateActiveBlocks(root, failures);
+    validateLatestIds(root, facts, failures);
+  }
+  return { ok: failures.length === 0, failures, facts };
+}
+
+if (require.main === module) {
+  const result = validateCurrentFactsDrift();
+  if (!result.ok) {
+    console.error("CURRENT FACTS DRIFT VALIDATION FAILED");
+    for (const failure of result.failures) console.error(`- ${failure}`);
+    process.exit(1);
+  }
+
+  console.log("CURRENT FACTS DRIFT VALIDATION PASSED");
+  console.log(`task=${result.facts.taskId} validation=${result.facts.validationId} facts=${FACTS_PATH}`);
+}
+
+module.exports = {
+  ACTIVE_END,
+  ACTIVE_START,
+  FACTS_PATH,
+  REQUIRED_ACTIVE_FILES,
+  extractActiveBlock,
+  validateCurrentFactsDrift
+};
