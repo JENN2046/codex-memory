@@ -520,6 +520,56 @@ function buildP66FullImplementationGapAccounting({
     effectiveActionableLocalImplementationGapIds.length === 0;
   const effectiveA5GatedGapsCleared = effectiveA5GatedGapIds.length === 0;
   const effectiveRedLaneGapsCleared = effectiveRedLaneGapIds.length === 0;
+  const closureAuditMatrix = effectiveRemainingGapClosureItems.map(item => {
+    let status = 'unmodeled_manual_review';
+    let nextAuthority = 'manual_review_for_unmodeled_gap';
+    const isModeledGap = Object.hasOwn(P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP, item.id);
+
+    if (!isModeledGap) {
+      status = 'unmodeled_manual_review';
+      nextAuthority = 'manual_review_for_unmodeled_gap';
+    } else if (item.localProofChainComplete === true) {
+      status = 'closed_by_local_proof_chain';
+      nextAuthority = 'none_local_proof_chain_complete';
+    } else if (item.redLane === true) {
+      status = 'requires_red_lane_authorization';
+      nextAuthority = 'explicit_red_lane_owner_approval';
+    } else if (item.requiresA5 === true) {
+      status = 'requires_a5_evidence';
+      nextAuthority = 'exact_a5_owner_approval';
+    } else if (item.requiresLocalImplementation === true) {
+      status = 'requires_local_source_test_implementation';
+      nextAuthority = 'local_source_test_implementation';
+    }
+
+    return {
+      id: item.id,
+      category: item.category,
+      status,
+      nextAuthority,
+      requiresLocalImplementation: item.requiresLocalImplementation,
+      requiresA5: item.requiresA5,
+      redLane: item.redLane,
+      localProofChainComplete: item.localProofChainComplete,
+      canCloseAutomatically: status === 'closed_by_local_proof_chain',
+      canClaimReadiness: false
+    };
+  });
+  const closureAuditClosedByLocalProofChainIds = closureAuditMatrix
+    .filter(item => item.status === 'closed_by_local_proof_chain')
+    .map(item => item.id);
+  const closureAuditRequiresLocalImplementationIds = closureAuditMatrix
+    .filter(item => item.status === 'requires_local_source_test_implementation')
+    .map(item => item.id);
+  const closureAuditRequiresA5EvidenceIds = closureAuditMatrix
+    .filter(item => item.status === 'requires_a5_evidence')
+    .map(item => item.id);
+  const closureAuditRequiresRedLaneAuthorizationIds = closureAuditMatrix
+    .filter(item => item.status === 'requires_red_lane_authorization')
+    .map(item => item.id);
+  const closureAuditUnmodeledManualReviewIds = closureAuditMatrix
+    .filter(item => item.status === 'unmodeled_manual_review')
+    .map(item => item.id);
   const closureAuthoritySummary = buildP66ClosureAuthoritySummary({
     effectiveActionableLocalImplementationGapIds,
     effectiveA5GatedGapIds,
@@ -575,6 +625,24 @@ function buildP66FullImplementationGapAccounting({
     effectiveA5GatedGapCount: effectiveA5GatedGapIds.length,
     effectiveRedLaneGapIds,
     effectiveRedLaneGapCount: effectiveRedLaneGapIds.length,
+    closureAuditMatrix,
+    closureAuditMatrixCount: closureAuditMatrix.length,
+    closureAuditClosedByLocalProofChainIds,
+    closureAuditClosedByLocalProofChainCount:
+      closureAuditClosedByLocalProofChainIds.length,
+    closureAuditRequiresLocalImplementationIds,
+    closureAuditRequiresLocalImplementationCount:
+      closureAuditRequiresLocalImplementationIds.length,
+    closureAuditRequiresA5EvidenceIds,
+    closureAuditRequiresA5EvidenceCount:
+      closureAuditRequiresA5EvidenceIds.length,
+    closureAuditRequiresRedLaneAuthorizationIds,
+    closureAuditRequiresRedLaneAuthorizationCount:
+      closureAuditRequiresRedLaneAuthorizationIds.length,
+    closureAuditUnmodeledManualReviewIds,
+    closureAuditUnmodeledManualReviewCount:
+      closureAuditUnmodeledManualReviewIds.length,
+    closureAuditCanClaimReadiness: false,
     closureAuthoritySummary,
     closureAuthorityStatus,
     nextClosureAuthority,
@@ -2771,6 +2839,18 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.effectiveA5GatedGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingEffectiveRedLaneGapCount:
         p66FullImplementationGapAccounting.effectiveRedLaneGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureAuditMatrixCount:
+        p66FullImplementationGapAccounting.closureAuditMatrixCount,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureAuditClosedByLocalProofChainCount:
+        p66FullImplementationGapAccounting.closureAuditClosedByLocalProofChainCount,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureAuditRequiresA5EvidenceCount:
+        p66FullImplementationGapAccounting.closureAuditRequiresA5EvidenceCount,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureAuditRequiresRedLaneAuthorizationCount:
+        p66FullImplementationGapAccounting.closureAuditRequiresRedLaneAuthorizationCount,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureAuditUnmodeledManualReviewCount:
+        p66FullImplementationGapAccounting.closureAuditUnmodeledManualReviewCount,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureAuditCanClaimReadiness:
+        false,
       p66ValidationAggregatorFullImplementationGapAccountingClosureAuthorityStatus:
         p66FullImplementationGapAccounting.closureAuthorityStatus,
       p66ValidationAggregatorFullImplementationGapAccountingNextClosureAuthority:
@@ -3822,6 +3902,32 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.effectiveRedLaneGapIds,
         effectiveRedLaneGapCount:
           p66FullImplementationGapAccounting.effectiveRedLaneGapCount,
+        closureAuditMatrix:
+          p66FullImplementationGapAccounting.closureAuditMatrix,
+        closureAuditMatrixCount:
+          p66FullImplementationGapAccounting.closureAuditMatrixCount,
+        closureAuditClosedByLocalProofChainIds:
+          p66FullImplementationGapAccounting.closureAuditClosedByLocalProofChainIds,
+        closureAuditClosedByLocalProofChainCount:
+          p66FullImplementationGapAccounting.closureAuditClosedByLocalProofChainCount,
+        closureAuditRequiresLocalImplementationIds:
+          p66FullImplementationGapAccounting.closureAuditRequiresLocalImplementationIds,
+        closureAuditRequiresLocalImplementationCount:
+          p66FullImplementationGapAccounting.closureAuditRequiresLocalImplementationCount,
+        closureAuditRequiresA5EvidenceIds:
+          p66FullImplementationGapAccounting.closureAuditRequiresA5EvidenceIds,
+        closureAuditRequiresA5EvidenceCount:
+          p66FullImplementationGapAccounting.closureAuditRequiresA5EvidenceCount,
+        closureAuditRequiresRedLaneAuthorizationIds:
+          p66FullImplementationGapAccounting.closureAuditRequiresRedLaneAuthorizationIds,
+        closureAuditRequiresRedLaneAuthorizationCount:
+          p66FullImplementationGapAccounting.closureAuditRequiresRedLaneAuthorizationCount,
+        closureAuditUnmodeledManualReviewIds:
+          p66FullImplementationGapAccounting.closureAuditUnmodeledManualReviewIds,
+        closureAuditUnmodeledManualReviewCount:
+          p66FullImplementationGapAccounting.closureAuditUnmodeledManualReviewCount,
+        closureAuditCanClaimReadiness:
+          p66FullImplementationGapAccounting.closureAuditCanClaimReadiness,
         closureAuthoritySummary:
           p66FullImplementationGapAccounting.closureAuthoritySummary,
         closureAuthorityStatus:

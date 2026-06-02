@@ -797,6 +797,52 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     ]
   );
   assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureAuditMatrixCount,
+    7
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureAuditClosedByLocalProofChainCount,
+    1
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureAuditRequiresA5EvidenceCount,
+    4
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureAuditRequiresRedLaneAuthorizationCount,
+    2
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureAuditCanClaimReadiness,
+    false
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuditClosedByLocalProofChainIds,
+    ['validation_aggregator_full_implementation_incomplete']
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuditRequiresRedLaneAuthorizationIds,
+    [
+      'mainline_strict_gate_not_executed_for_cutover',
+      'rc_cutover_not_executed'
+    ]
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuditMatrix
+      .find(item => item.id === 'validation_aggregator_full_implementation_incomplete').status,
+    'closed_by_local_proof_chain'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuditMatrix
+      .find(item => item.id === 'governance_review_approval_audit_runtime_loop_not_executed').status,
+    'requires_a5_evidence'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuditMatrix
+      .find(item => item.id === 'rc_cutover_not_executed').status,
+    'requires_red_lane_authorization'
+  );
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuthorityStatus,
     'red_lane_authorization_required'
   );
@@ -2726,6 +2772,11 @@ test('zero-gap runtime evidence summary can route to RC-9 but cannot authorize R
   assert.equal(definition.closureCriteria.decisionPacketCanBePrepared, true);
   assert.equal(definition.closureCriteria.rcCutoverApprovalPresent, false);
   assert.equal(definition.closureCriteria.rcCutoverExecutionAllowed, false);
+  assert.equal(definition.closureAuditMatrixCount, 0);
+  assert.equal(definition.closureAuditClosedByLocalProofChainCount, 0);
+  assert.equal(definition.closureAuditRequiresA5EvidenceCount, 0);
+  assert.equal(definition.closureAuditRequiresRedLaneAuthorizationCount, 0);
+  assert.equal(definition.closureAuditCanClaimReadiness, false);
   assert.equal(
     definition.closureMissingCriteria.includes('effective_remaining_gaps_cleared'),
     false
@@ -3554,6 +3605,16 @@ test('effective gap accounting fails closed on non-baseline remaining gaps', () 
     'future_unmodeled_runtime_gap'
   ]);
   assert.equal(definition.effectiveNonBaselineRemainingGapCount, 1);
+  assert.equal(definition.closureAuditMatrixCount, 2);
+  assert.deepEqual(definition.closureAuditUnmodeledManualReviewIds, [
+    'future_unmodeled_runtime_gap'
+  ]);
+  assert.equal(definition.closureAuditUnmodeledManualReviewCount, 1);
+  assert.equal(
+    definition.closureAuditMatrix.find(item => item.id === 'future_unmodeled_runtime_gap').status,
+    'unmodeled_manual_review'
+  );
+  assert.equal(definition.closureAuditCanClaimReadiness, false);
   assert.equal(definition.closureAuthorityStatus, 'local_implementation_required');
   assert.equal(definition.nextClosureAuthority, 'local_source_test_implementation');
   assert.equal(definition.closureAuthoritySummary.manualGapModelingRequired, true);
