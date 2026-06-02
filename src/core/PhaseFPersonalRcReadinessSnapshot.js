@@ -135,6 +135,12 @@ function buildPhaseFPersonalRcReadinessSnapshot(input = {}) {
     missingPhases,
     blockingPhase,
     nextRequiredAction: blockingPhase ? blockingPhase.nextAction : 'none',
+    approvalTemplates: {
+      pushApprovalTemplate: normalizeString(syncPacket.approvalTemplate),
+      postPushA5Gap4ApprovalTemplate: normalizeString(syncPacket.postPushA5Gap4ApprovalTemplate),
+      postPushA5Gap4TemplateCurrentlyUsable: syncPacket.postPushA5Gap4TemplateCurrentlyUsable === true,
+      postPushA5UsabilityStatus: normalizeString(syncPacket.postPushA5UsabilityStatus)
+    },
     completionCriteria: {
       f1LiveNoWriteEvidenceAccepted: normalizeBoolean(evidence.f1LiveNoWriteEvidenceAccepted),
       f2A5Gap6AggregationAccepted: normalizeBoolean(evidence.f2A5Gap6AggregationAccepted),

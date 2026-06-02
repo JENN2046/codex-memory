@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1371 Phase F personal RC readiness snapshot completed locally; push approval still required |
+| Current task | CM-1372 Phase F snapshot approval-template surfacing completed locally; push approval still required |
 | Current area | P4-http-runtime / P9-codex-claude-client-scope / P0-mainline-health |
 | Current route | Phase F1 current-head approval packet -> exact A5-GAP-4 live-client no-write execution -> A5-GAP-6 aggregation refresh -> true-live recall negative-control proof -> minimal personal dogfood write preflight -> closeout |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1371 adds a read-only Phase F personal RC readiness snapshot, so F1-F5 evidence status and blockers are machine-readable without executing runtime work. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, the push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. Do not proceed to F2/F3/F4/F5 until accepted F1 live evidence exists.
+CM-1372 surfaces the current F1 sync approval templates inside the read-only Phase F snapshot, so one local command can show both the blocking phase and the non-authorizing next approval text. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, the push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. Do not proceed to F2/F3/F4/F5 until accepted F1 live evidence exists.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

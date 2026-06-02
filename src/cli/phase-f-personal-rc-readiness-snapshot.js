@@ -96,6 +96,13 @@ function renderText(snapshot) {
     '',
     `blockingPhase: ${snapshot.blockingPhase ? snapshot.blockingPhase.id : 'none'}`,
     `nextRequiredAction: ${snapshot.nextRequiredAction}`,
+    '',
+    'approvalTemplates:',
+    `pushApprovalTemplate: ${snapshot.approvalTemplates.pushApprovalTemplate || ''}`,
+    `postPushA5Gap4ApprovalTemplate: ${snapshot.approvalTemplates.postPushA5Gap4ApprovalTemplate || ''}`,
+    `postPushA5Gap4TemplateCurrentlyUsable: ${snapshot.approvalTemplates.postPushA5Gap4TemplateCurrentlyUsable}`,
+    `postPushA5UsabilityStatus: ${snapshot.approvalTemplates.postPushA5UsabilityStatus || ''}`,
+    '',
     `readinessClaimAllowed: ${snapshot.readinessClaimAllowed}`,
     `rcReady: ${snapshot.rcReady}`
   ].join('\n') + '\n';

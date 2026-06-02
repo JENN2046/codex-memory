@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1372 Phase F Snapshot Approval Template Surfacing Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local read-only Phase F snapshot approval-template surfacing. No push, pull, merge, rebase, F1 live rerun, F2/F3/F4/F5 execution, MCP/provider call, real memory/audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, approval grant, readiness claim, or reliability claim.
+
+Result:
+
+- Added `approvalTemplates.pushApprovalTemplate`.
+- Added `approvalTemplates.postPushA5Gap4ApprovalTemplate`.
+- Added `approvalTemplates.postPushA5Gap4TemplateCurrentlyUsable`.
+- Added `approvalTemplates.postPushA5UsabilityStatus`.
+- Text output now prints the same non-authorizing template fields.
+
+Validation:
+
+- `node --check` changed source/CLI/test.
+- `node --test tests\phase-f-personal-rc-readiness-snapshot.test.js` passed `4/4`.
+- CLI JSON/text self-check passed in development dirty-worktree state.
+- `npm test` passed `2894/2894`.
+- `git diff --check` passed.
+- Ledger consistency passed.
+- Docs validation passed.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- After commit, rerun the F1 sync generator from clean HEAD and use only fresh output for push/A5 approval.
+
 ## CM-1371 Phase F Personal RC Readiness Snapshot Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

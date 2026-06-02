@@ -20,6 +20,10 @@ function cleanAheadSyncPacket() {
     behind: 0,
     worktreeClean: true,
     nextRequiredAction: 'obtain_explicit_normal_non_force_push_approval',
+    approvalTemplate: 'I approve pushing local main commits through f68b9ffa505f12e4f3b944e30f3b26e71f3e462f to origin/main for codex-memory from A:\\codex-memory, using a normal non-force push to origin main only, with no tags, no PR, no deploy, no release, no merge, no rebase, no config/watchdog/startup change, no provider call, no MCP call, no real memory read/write, and no readiness or reliability claim.',
+    postPushA5Gap4ApprovalTemplate: 'I approve A5-GAP-4 live-client no-write contract refresh for codex-memory on branch main at commit f68b9ffa505f12e4f3b944e30f3b26e71f3e462f, endpoint http://127.0.0.1:7605, using current-session bearer token if already present, without printing or persisting token material, allow tools/call memory_overview and no-token rejection checks for record_memory/search_memory only, no provider, no durable write, no config/watchdog/startup change.',
+    postPushA5Gap4TemplateCurrentlyUsable: false,
+    postPushA5UsabilityStatus: 'not_currently_usable_until_clean_synced_head',
     syncBlocker: {
       status: 'push_approval_required',
       reasons: ['local_branch_ahead_remote'],
@@ -44,6 +48,10 @@ test('Phase F personal RC snapshot blocks at F1 when sync push approval is requi
   assert.equal(snapshot.blockingPhase.status, 'push_approval_required');
   assert.equal(snapshot.blockingPhase.blocker, 'local_branch_ahead_remote');
   assert.equal(snapshot.nextRequiredAction, 'obtain_explicit_normal_non_force_push_approval');
+  assert.match(snapshot.approvalTemplates.pushApprovalTemplate, /normal non-force push/);
+  assert.match(snapshot.approvalTemplates.postPushA5Gap4ApprovalTemplate, /A5-GAP-4 live-client no-write contract refresh/);
+  assert.equal(snapshot.approvalTemplates.postPushA5Gap4TemplateCurrentlyUsable, false);
+  assert.equal(snapshot.approvalTemplates.postPushA5UsabilityStatus, 'not_currently_usable_until_clean_synced_head');
   assert.deepEqual(snapshot.missingPhases, ['F1', 'F2', 'F3', 'F4', 'F5']);
   assert.equal(snapshot.safetyCounters.push, 0);
   assert.equal(snapshot.safetyCounters.mcpCalls, 0);
@@ -103,6 +111,8 @@ test('Phase F personal RC snapshot CLI helpers render blocked state and reject s
   const text = renderText(snapshot);
 
   assert.match(text, /blockingPhase: F1/);
+  assert.match(text, /approvalTemplates:/);
+  assert.match(text, /pushApprovalTemplate: I approve pushing local main commits/);
   assert.match(text, /readinessClaimAllowed: false/);
   assert.throws(() => parseArgs(['--push']), /unsupported side-effect flag/);
   assert.throws(() => parseArgs(['--record-memory']), /unsupported side-effect flag/);

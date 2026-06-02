@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1371 PHASE_F_PERSONAL_RC_READINESS_SNAPSHOT`.
+Goal: `CM-1372 PHASE_F_SNAPSHOT_APPROVAL_TEMPLATE_SURFACING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local Phase F personal RC readiness snapshot. CM-1371 adds a read-only snapshot core/CLI so F1-F5 evidence status and blockers can be inspected without runtime action. Targeted tests passed `4/4`; default `npm test` passed `2894/2894`; docs validation passed. It did not push, pull, merge, rebase, rerun F1, execute F2/F3/F4/F5, call providers, call MCP, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness/reliability. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local Phase F snapshot approval-template surfacing. CM-1372 adds non-authorizing F1 sync approval template fields to the read-only snapshot. Targeted tests passed `4/4`; default `npm test` passed `2894/2894`; docs validation passed. It did not push, pull, merge, rebase, rerun F1, execute F2/F3/F4/F5, call providers, call MCP, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, grant approval, or claim readiness/reliability. F1 remains blocked until the generator is rerun from clean committed HEAD, explicit push approval is provided, push succeeds, fresh synced HEAD is verified, and exact A5-GAP-4 approval is provided. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
