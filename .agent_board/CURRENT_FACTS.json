@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1401",
-  "validationId": "CMV-1519",
+  "taskId": "CM-1402",
+  "validationId": "CMV-1520",
   "branch": "main",
-  "localHead": "66ad8a4facb21ea3b887e5a21ac0a577b4937b9e",
-  "originHead": "66ad8a4facb21ea3b887e5a21ac0a577b4937b9e",
+  "localHead": "b2dbdc326de19da5015a9e0943fc71428f0600b3",
+  "originHead": "b2dbdc326de19da5015a9e0943fc71428f0600b3",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -25,6 +25,11 @@
   },
   "validationSummary": [
     {
+      "id": "CMV-1520",
+      "scope": "CM-1402 Phase H Codex/Claude client integration runbook and acceptance preflight",
+      "status": "COMPLETED_VALIDATED_NO_APPLY"
+    },
+    {
       "id": "CMV-1519",
       "scope": "CM-1401 RC-10 A5-GAP-7 push-only no-op receipt and current facts repair",
       "status": "COMPLETED_VALIDATED_NOOP_PUSH"
@@ -42,8 +47,11 @@
   ],
   "notValidated": [
     "npm run gate:mainline",
+    "npm run gate:mainline:strict",
+    "live client acceptance",
     "provider smoke or benchmark",
-    "real memory tools"
+    "real memory tools",
+    "runtime freshness"
   ],
   "constraints": {
     "claudeMdUntrackedUntouched": true,

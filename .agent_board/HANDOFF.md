@@ -4,9 +4,9 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1401 RC-10 A5-GAP-7 push-only no-op receipt and current facts repair`.
-Current validation: `CMV-1519`.
-Current handoff: CM-1401 records the exact-approved A5-GAP-7 push-only action as `Everything up-to-date`, repairs current facts to the pushed head, and keeps `RC_NOT_READY_BLOCKED`; active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
+Current task: `CM-1402 Phase H Codex/Claude client integration runbook and acceptance preflight`.
+Current validation: `CMV-1520`.
+Current handoff: CM-1402 adds a local no-apply Codex/Claude client integration runbook plus explicit-input acceptance preflight helper and tests; no real config, token, MCP memory tool, provider, runtime, durable write, remote action, or readiness claim occurred; active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
