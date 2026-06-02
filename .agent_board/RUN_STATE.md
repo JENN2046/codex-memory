@@ -45,9 +45,9 @@ RC-4 A5-GAP-4 live HTTP / MCP no-write evidence is recorded at `docs/RC3_A5_GAP4
 
 RC-5 A5-GAP-1 read-only governance evidence is recorded at `docs/RC5_A5_GAP1_GOVERNANCE_READONLY_PREFLIGHT.md` for target commit `aadd8eca5eb6374e657b195e6c6210aade23e16a`: `npm run governance:report -- --json` passed with summary `ok`, readPolicy `ok`, no provider, no mutation, no migration apply, and auto-authorization still fail-closed as `RC_NOT_READY_BLOCKED`.
 
-RC-6 A5-GAP-2 recall isolation no-mutation preflight is prepared at `docs/RC6_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_PREFLIGHT.md`: historical A5-GAP-2 evidence is useful background but not fresh current-head evidence, so the selected next boundary is an exact-approved no-mutation proof over `real_diary`, `real_sqlite`, `real_vector_index`, `real_candidate_cache`, and `real_recall_audit`.
+RC-6 A5-GAP-2 recall isolation no-mutation evidence is recorded at `docs/RC6_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_PREFLIGHT.md` for target commit `e117f6f25e67a178a7d097d9b9b857b27b61f926`: approved stores were read in no-mutation mode, `storeSnapshotsUnchanged=true`, `projectionLeakageTotal=0`, no raw content output, no recall pipeline execution, no MCP tools call, no provider call, no durable memory/audit write, and limitation `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`.
 
-Next safe action is to validate and commit the RC-6 preflight packet locally, then request exact fresh-HEAD A5-GAP-2 approval. Do not execute recall isolation proofs, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Next safe action is RC-7 migration/import/export/backup/restore gap preflight. Default to fixture/dry-run readiness only. Do not execute real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

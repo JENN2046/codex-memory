@@ -10,13 +10,13 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## RC-6 A5-GAP-2 Recall Isolation No-Mutation Preflight
+## RC-6 A5-GAP-2 Recall Isolation No-Mutation Evidence
 
-Status: `PREFLIGHT_PACKET_READY_NOT_APPROVED_NOT_RC_READY`
+Status: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION_NOT_RC_READY`
 
 Date: 2026-06-02
 
-Scope: prepared a fresh-head `A5-GAP-2` recall isolation no-mutation approval boundary. No recall isolation proof, store scan, raw content output, MCP tool call, provider call, durable write, config/watchdog/startup change, remote action, cutover, or readiness claim occurred.
+Scope: exact-approved fresh-head `A5-GAP-2` recall isolation no-mutation proof over `real_diary`, `real_sqlite`, `real_vector_index`, `real_candidate_cache`, and `real_recall_audit`. No raw content output, MCP tool call, provider call, durable write, config/watchdog/startup change, remote action, cutover, or readiness claim occurred.
 
 Changed:
 
@@ -26,13 +26,14 @@ Changed:
 
 Result:
 
-- Existing `A5-GAP-2` evidence remains useful historical background, but it is bound to older commits and is not current-head evidence for `main@b15fe1abe1a7b7f61c5f22e0eefaf923c87f3102`.
-- The selected next boundary is no-mutation proof over exactly `real_diary`, `real_sqlite`, `real_vector_index`, `real_candidate_cache`, and `real_recall_audit`.
-- Future execution requires a fresh exact approval line bound to the post-packet commit.
+- Consumed exact A5-GAP-2 approval for `main@e117f6f25e67a178a7d097d9b9b857b27b61f926`.
+- Fresh preflight matched branch `main`, target commit, and clean worktree.
+- Approved stores were read in no-mutation mode and evidence was sanitized.
+- `storeSnapshotsUnchanged=true`, `projectionLeakageTotal=0`, `rawContentOutput=false`, `recallPipelineExecuted=false`, `mcpToolsCallExecuted=false`, `providerCalled=false`, `durableMemoryWritten=false`, and `durableAuditWritten=false`.
+- Limitation remains `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`.
 
 Boundary:
 
-- No approved stores were read or scanned.
 - No raw memory/private content was output.
 - No bearer token was used.
 - No MCP external call or provider call occurred.
@@ -42,8 +43,8 @@ Boundary:
 
 Next:
 
-- Validate and commit this preflight packet locally.
-- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-2 for codex-memory on branch main at commit <FRESH_HEAD>, limited to stores real_diary, real_sqlite, real_vector_index, real_candidate_cache, real_recall_audit, no mutation.`
+- Validate and commit this RC-6 evidence locally.
+- Continue to RC-7 migration/import/export/backup/restore gap preflight. Default action is fixture/dry-run readiness only; real apply/import/export/backup/restore remains blocked without separate exact approval.
 
 ## RC-5 A5-GAP-1 Governance Runtime Gap Preflight
 
