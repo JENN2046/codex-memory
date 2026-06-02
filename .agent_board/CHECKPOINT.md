@@ -1,5 +1,28 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1361 Phase F5 Conditional Closeout Matrix Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local docs/board closeout matrix for Phase F5 `PERSONAL_DOGFOOD_READY_NOT_RC_READY`. No F1/F2/F3/F4 execution, strict gate, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, push, readiness claim, or reliability claim.
+
+Result:
+
+- Prepared conditional F5 closeout matrix.
+- Locked closeout target to `PERSONAL_DOGFOOD_READY_NOT_RC_READY`, not `RC_READY`.
+- Required F1-F4 evidence on the same fresh synced `HEAD`.
+- Kept `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- Docs/board changed-scope review, `git diff --check`, ledger consistency, and docs validation are required for closeout.
+
+Next:
+
+- Complete F1 first.
+
 ## CM-1360 Phase F4 Conditional Personal Dogfood Write Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

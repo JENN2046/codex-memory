@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1360 PHASE_F4_CONDITIONAL_PERSONAL_DOGFOOD_WRITE_PREFLIGHT`.
+Goal: `CM-1361 PHASE_F5_CONDITIONAL_CLOSEOUT_MATRIX`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F4 conditional minimal personal dogfood write preflight. F4 dogfood write remains blocked until F1 live-client no-write evidence, F2 A5-GAP-6 aggregation evidence, and F3 true-live recall negative-control evidence are complete. CM-1360 provides only a non-authorizing one-write `record_memory` approval template and stop conditions; it does not run `record_memory`, `search_memory`, the true-live proof runner, or any reliability proof. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local docs/board F5 conditional closeout matrix. F5 closeout remains blocked until F1 live-client no-write evidence, F2 A5-GAP-6 aggregation evidence, F3 true-live recall negative-control evidence, and F4 one-write personal dogfood evidence are complete on the same synced `HEAD`. CM-1361 provides only a non-authorizing closeout review template and stop conditions; it does not run gates, runtime, MCP tools, providers, `record_memory`, `search_memory`, the true-live proof runner, or any reliability proof. No service start, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
