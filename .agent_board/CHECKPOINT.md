@@ -10,6 +10,49 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC ValidationAggregator Current-Head Binding Slice
+
+Status: `SOURCE_TEST_SLICE_ACCEPTED_NOT_RC_READY`
+
+Date: 2026-06-02
+
+Scope: added explicit current-head binding validation for ValidationAggregator runtime evidence summaries. This is a local source/test slice for `validation_aggregator_full_implementation_incomplete`; it does not close the whole gap or claim RC readiness.
+
+Changed:
+
+- `src/core/ValidationAggregatorService.js`
+- `tests/v1-rc-validation-aggregator-implementation.test.js`
+- `docs/RC_VALIDATION_AGGREGATOR_CURRENT_HEAD_BINDING_SLICE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- Matching `currentHeadCommit` / `expectedCurrentHeadCommit` keeps explicit sanitized runtime summary accepted and exposes `currentHeadBindingStatus=matched`.
+- Mismatched commits fail closed with `current_head_binding_mismatch`.
+- Malformed commit strings fail closed with `current_head_binding_malformed`.
+- Readiness remains false.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --check tests\v1-rc-validation-aggregator-implementation.test.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js` passed `19/19`
+
+Boundary:
+
+- No runtime evidence execution occurred.
+- No file/store scan occurred.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Continue local implementation slices for `validation_aggregator_full_implementation_incomplete`.
+- Keep `rc_cutover_not_executed` blocked behind zero-gap evidence and separate exact RC cutover approval.
+
 ## RC-9 RC Decision Packet
 
 Status: `RC_NOT_READY_BLOCKED`

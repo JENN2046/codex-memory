@@ -1508,6 +1508,13 @@ function safeEvidenceString(value, fallback = '') {
   return value.trim().slice(0, 240);
 }
 
+function normalizeEvidenceCommit(value) {
+  const normalized = safeEvidenceString(value).toLowerCase();
+  if (!normalized) return '';
+  if (!/^[0-9a-f]{7,40}$/.test(normalized)) return '';
+  return normalized;
+}
+
 function deriveValidationEvidenceClass(source) {
   if (typeof source.evidence_class === 'string' && source.evidence_class.trim() !== '') {
     return safeEvidenceString(source.evidence_class);
@@ -1875,6 +1882,10 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       criticalGateFailedCount: 0,
       locallyEvidencedRuntimeGapCount: 0,
       remainingRuntimeGapCount: 0,
+      currentHeadBindingStatus: 'not_provided',
+      currentHeadBindingMatched: false,
+      currentHeadCommit: '',
+      expectedCurrentHeadCommit: '',
       providerCalls: 0,
       mutated: false,
       noProvider: true,
@@ -1967,6 +1978,39 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
     : {};
   const locallyEvidencedRuntimeGaps = normalizeEvidenceStringList(summary.locallyEvidencedRuntimeGaps);
   const remainingRuntimeGaps = normalizeEvidenceStringList(summary.remainingRuntimeGaps);
+  const rawCurrentHeadCommit = typeof summary.currentHeadCommit === 'string'
+    ? summary.currentHeadCommit.trim()
+    : '';
+  const rawExpectedCurrentHeadCommit = typeof summary.expectedCurrentHeadCommit === 'string'
+    ? summary.expectedCurrentHeadCommit.trim()
+    : '';
+  const currentHeadCommit = normalizeEvidenceCommit(rawCurrentHeadCommit);
+  const expectedCurrentHeadCommit = normalizeEvidenceCommit(rawExpectedCurrentHeadCommit);
+
+  if (
+    (rawCurrentHeadCommit && !currentHeadCommit) ||
+    (rawExpectedCurrentHeadCommit && !expectedCurrentHeadCommit)
+  ) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'current_head_binding_malformed'
+    };
+  }
+
+  if (currentHeadCommit && expectedCurrentHeadCommit && currentHeadCommit !== expectedCurrentHeadCommit) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'current_head_binding_mismatch'
+    };
+  }
+
+  const currentHeadBindingStatus = currentHeadCommit && expectedCurrentHeadCommit
+    ? 'matched'
+    : (currentHeadCommit || expectedCurrentHeadCommit ? 'incomplete' : 'not_provided');
 
   return {
     ...empty,
@@ -1994,6 +2038,10 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       criticalGateFailedCount: safeEvidenceNumber(criticalGates.failed),
       locallyEvidencedRuntimeGapCount: locallyEvidencedRuntimeGaps.length,
       remainingRuntimeGapCount: remainingRuntimeGaps.length,
+      currentHeadBindingStatus,
+      currentHeadBindingMatched: currentHeadBindingStatus === 'matched',
+      currentHeadCommit,
+      expectedCurrentHeadCommit,
       providerCalls: 0,
       mutated: false,
       noProvider: true,
@@ -2274,6 +2322,10 @@ function buildV1RcValidationAggregatorReport({
         runtimeEvidenceSummaryBridge.summary.locallyEvidencedRuntimeGapCount,
       runtimeEvidenceSummaryRemainingGapCount:
         runtimeEvidenceSummaryBridge.summary.remainingRuntimeGapCount,
+      runtimeEvidenceSummaryCurrentHeadBindingStatus:
+        runtimeEvidenceSummaryBridge.summary.currentHeadBindingStatus,
+      runtimeEvidenceSummaryCurrentHeadBindingMatched:
+        runtimeEvidenceSummaryBridge.summary.currentHeadBindingMatched,
       runtimeEvidenceSummaryCanClaimV1RcReady: false,
       validationAggregatorRuntimeProofCollectorImplemented:
         runtimeProofCollector.implemented,

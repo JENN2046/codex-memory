@@ -2316,6 +2316,8 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
     runtimeEvidenceSummary: {
       status: 'local_runtime_evidence_passed_rc_still_blocked',
       decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'abc1234def5678',
+      expectedCurrentHeadCommit: 'abc1234def5678',
       runnerExecuted: true,
       commandsExecuted: true,
       localRuntimeEvidenceMatrixExecuted: true,
@@ -2384,6 +2386,10 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(bridge.summary.criticalGateFailedCount, 0);
   assert.equal(bridge.summary.locallyEvidencedRuntimeGapCount, 2);
   assert.equal(bridge.summary.remainingRuntimeGapCount, 2);
+  assert.equal(bridge.summary.currentHeadBindingStatus, 'matched');
+  assert.equal(bridge.summary.currentHeadBindingMatched, true);
+  assert.equal(bridge.summary.currentHeadCommit, 'abc1234def5678');
+  assert.equal(bridge.summary.expectedCurrentHeadCommit, 'abc1234def5678');
   assert.equal(bridge.summary.noProvider, true);
   assert.equal(bridge.summary.noDurableMemoryWrite, true);
   assert.equal(bridge.summary.noRealMemoryPreview, true);
@@ -2404,6 +2410,8 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(report.summary.runtimeEvidenceSummaryRejected, false);
   assert.equal(report.summary.runtimeEvidenceSummaryLocallyEvidencedGapCount, 2);
   assert.equal(report.summary.runtimeEvidenceSummaryRemainingGapCount, 2);
+  assert.equal(report.summary.runtimeEvidenceSummaryCurrentHeadBindingStatus, 'matched');
+  assert.equal(report.summary.runtimeEvidenceSummaryCurrentHeadBindingMatched, true);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound, true);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryRemainingGapCount, 2);
   assert.equal(
@@ -2548,6 +2556,74 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(report.summary.rcReady, false);
   assert.equal(report.summary.runtimeEvidenceSummaryCanClaimV1RcReady, false);
   assertNoSensitiveSurface(report);
+});
+
+test('validation aggregator runtime evidence summary fails closed on current-head binding mismatch', () => {
+  const mismatch = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'abc1234',
+      expectedCurrentHeadCommit: 'def5678',
+      runnerExecuted: true,
+      commandsExecuted: true,
+      criticalGates: {
+        total: 1,
+        passed: 1,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
+      locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+      remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
+  const malformed = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      currentHeadCommit: 'not-a-commit',
+      expectedCurrentHeadCommit: 'abc1234',
+      locallyEvidencedRuntimeGaps: ['live_http_operation_readiness_not_claimed'],
+      remainingRuntimeGaps: ['validation_aggregator_full_implementation_incomplete'],
+      safety: {
+        mutated: false,
+        providerCalls: 0
+      }
+    }
+  });
+
+  assert.equal(mismatch.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(mismatch.summary.runtimeEvidenceSummaryRejected, true);
+  assert.equal(
+    mismatch.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'current_head_binding_mismatch'
+  );
+  assert.equal(mismatch.summary.runtimeEvidenceSummaryCurrentHeadBindingStatus, 'not_provided');
+  assert.equal(mismatch.summary.runtimeEvidenceSummaryCurrentHeadBindingMatched, false);
+  assert.equal(mismatch.summary.runtimeEvidenceSummaryLocallyEvidencedGapCount, 0);
+  assert.equal(mismatch.summary.runtimeReady, false);
+  assert.equal(mismatch.summary.finalRcMatrixReady, false);
+  assert.equal(mismatch.summary.rcReady, false);
+
+  assert.equal(malformed.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(malformed.summary.runtimeEvidenceSummaryRejected, true);
+  assert.equal(
+    malformed.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'current_head_binding_malformed'
+  );
+  assertNoSensitiveSurface(mismatch);
+  assertNoSensitiveSurface(malformed);
 });
 
 test('validation aggregator runtime evidence summary rejects readiness claims, side effects, and secrets', () => {

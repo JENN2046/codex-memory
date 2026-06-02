@@ -53,7 +53,9 @@ RC-8 A5-GAP-6 ValidationAggregator aggregation evidence is recorded at `docs/RC8
 
 RC-9 decision packet is prepared at `docs/RC9_RC_DECISION_PACKET.md`: current decision is `RC_NOT_READY_BLOCKED`, `ready_to_request_rc_cutover_approval=false`, and no release/tag/deploy/push/config/watchdog/startup/cutover action occurred.
 
-Next safe action is to validate and commit the RC-9 decision packet locally, then address `validation_aggregator_full_implementation_incomplete` as the next non-cutover route blocker. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Post-RC-9 local source/test slice is in progress: `docs/RC_VALIDATION_AGGREGATOR_CURRENT_HEAD_BINDING_SLICE.md` records explicit current-head binding validation for ValidationAggregator runtime evidence summaries. Matching explicit commits are accepted and mismatched/malformed commits fail closed. This advances the `validation_aggregator_full_implementation_incomplete` blocker but does not close it or claim readiness.
+
+Next safe action is to validate and commit the current-head binding slice locally, then continue additional local implementation slices for `validation_aggregator_full_implementation_incomplete`. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
