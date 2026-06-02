@@ -147,6 +147,10 @@ test('CM-1393 summarizes tombstone runtime-prep as accepted no-apply preview con
     toStatus: 'tombstoned'
   });
   assert.equal(summary.auditPlan.phasesComplete, true);
+  assert.equal(summary.auditPlan.failedEventPresent, false);
+  assert.equal(summary.auditPlan.failureHandledByCancelledEvent, true);
+  assert.equal(summary.auditPlan.failureDurableAuditWritten, false);
+  assert.equal(summary.auditPlan.distinguishesFailedFromCancelled, true);
   assert.equal(summary.projectionPlan.shadowUpdatePlanPresent, true);
   assert.equal(summary.invalidationPlan.projectedRevisionTokenPresent, true);
   assert.equal(summary.approval.exactApprovalRequiredForApply, true);
@@ -179,6 +183,10 @@ test('CM-1393 summarizes supersede runtime-prep as accepted no-apply preview con
   ]);
   assert.equal(summary.auditPlan.eventFamily, 'memory_supersede');
   assert.equal(summary.auditPlan.phasesComplete, true);
+  assert.equal(summary.auditPlan.failedEventPresent, false);
+  assert.equal(summary.auditPlan.failureHandledByCancelledEvent, true);
+  assert.equal(summary.auditPlan.failureDurableAuditWritten, false);
+  assert.equal(summary.auditPlan.distinguishesFailedFromCancelled, true);
   assert.equal(summary.projectionPlan.shadowUpdatePlanPresent, true);
   assert.equal(summary.safety.callsProviders, false);
   assert.equal(summary.safety.scansRealMemory, false);
@@ -209,11 +217,25 @@ test('CM-1393 fails closed when required preview shape is missing or side effect
     ...buildTombstonePlan(),
     mutated: true
   });
+  const failedAuditWrite = summarizeGovernanceMutationPreviewConsistency({
+    ...buildTombstonePlan(),
+    auditPlan: {
+      ...buildTombstonePlan().auditPlan,
+      failureDurableAuditWritten: true
+    }
+  });
 
   assert.equal(missingShape.acceptedForPreviewConsistency, false);
   assert.equal(missingShape.blockers.missingRequiredPreviewShape.includes('changed_memory_ids_missing'), true);
   assert.equal(missingShape.blockers.missingRequiredPreviewShape.includes('audit_phases_incomplete'), true);
+  assert.equal(missingShape.blockers.missingRequiredPreviewShape.includes('audit_failure_distinction_missing'), true);
   assert.equal(sideEffect.acceptedForPreviewConsistency, false);
   assert.equal(sideEffect.noApplyInvariant, false);
   assert.equal(sideEffect.mutated, false);
+  assert.equal(failedAuditWrite.acceptedForPreviewConsistency, false);
+  assert.equal(failedAuditWrite.auditPlan.failureDurableAuditWritten, true);
+  assert.equal(
+    failedAuditWrite.blockers.missingRequiredPreviewShape.includes('audit_failure_durable_write_not_allowed'),
+    true
+  );
 });

@@ -4,10 +4,10 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1393 Phase G G1.3 governance mutation preview consistency`.
-Current validation: `CMV-1511`.
+Current task: `CM-1397 Phase G runtime boundary closeout audit`.
+Current validation: `CMV-1515`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase G -> G1 Memory Governance Runtime Boundary`.
+Current route: `Phase G runtime boundary plan closed locally -> no readiness claim`.
 Current rule: active status summaries must reference `.agent_board/CURRENT_FACTS.json` and must not repeat full commit hashes.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->

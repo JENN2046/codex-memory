@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-06-02",
-  "taskId": "CM-1393",
-  "validationId": "CMV-1511",
+  "taskId": "CM-1397",
+  "validationId": "CMV-1515",
   "branch": "main",
-  "localHead": "42de0535b785a17759702171f5cba6c8607bfc06",
-  "originHead": "42de0535b785a17759702171f5cba6c8607bfc06",
+  "localHead": "8f29ef961d6cd4e6916e1febad84ea54bb294d9b",
+  "originHead": "8f29ef961d6cd4e6916e1febad84ea54bb294d9b",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -25,8 +25,8 @@
   },
   "validationSummary": [
     {
-      "id": "CMV-1511",
-      "scope": "CM-1393 Phase G G1.3 governance mutation preview consistency",
+      "id": "CMV-1515",
+      "scope": "CM-1397 Phase G runtime boundary closeout audit",
       "status": "COMPLETED_VALIDATED"
     }
   ],

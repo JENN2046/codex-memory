@@ -4,13 +4,123 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1393 Phase G G1.3 governance mutation preview consistency`.
-Current validation: `CMV-1511`.
+Current checkpoint: `CM-1397 Phase G runtime boundary closeout audit`.
+Current validation: `CMV-1515`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; older checkpoint entries below are historical.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Historical Checkpoint Archive
+
+### CM-1397 Phase G Runtime Boundary Closeout Audit Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_G_RUNTIME_BOUNDARY_CLOSEOUT_AUDIT`
+
+Date: 2026-06-02
+
+Scope: local docs closeout audit over current Phase G runtime-boundary evidence. No `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl` or raw audit read, durable memory/audit write, runtime governance action, candidate cache clear, durable projection apply, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `docs/PHASE_G_RUNTIME_BOUNDARY_CLOSEOUT_AUDIT.md`.
+- Mapped Phase G exit criteria to `CM-1391` through `CM-1396` evidence.
+- Closed local Phase G runtime-boundary planning as `PHASE_G_RUNTIME_BOUNDARY_PLAN_CLOSED_NOT_RC_READY`.
+- Kept exact-approved durable mutation, public MCP expansion, broad real-memory scan/export/import, candidate cache clear, durable projection apply, and RC readiness as blocked future work.
+
+Validation:
+
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Review accumulated CM-1394 through CM-1397 diff before staging or committing, or return to the broader phase queue.
+
+### CM-1396 Phase G Invalidation Boundary Consistency Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_G_INVALIDATION_BOUNDARY_CONSISTENCY`
+
+Date: 2026-06-02
+
+Scope: local source/test no-apply invalidation boundary summary over explicit projection and policy inputs. No `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl` or raw audit read, durable memory/audit write, runtime governance action, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `src/core/GovernanceInvalidationBoundaryConsistency.js`.
+- Added `tests/governance-invalidation-boundary-consistency.test.js`.
+- Shadow projection changed ids and projected revision token are now linked to candidate-cache invalidation policy in one no-apply boundary summary.
+- Candidate cache clear and durable projection apply remain blocked and fail closed if asserted.
+
+Validation:
+
+- `node --check` changed source/test files passed.
+- `node --test .\tests\governance-invalidation-boundary-consistency.test.js .\tests\deferred-governance-candidate-cache-invalidation-policy.test.js .\tests\durable-governance-shadow-projection-preview.test.js` passed.
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Review accumulated CM-1394 through CM-1396 diff before staging or committing, or prepare a Phase G closeout audit.
+
+### CM-1395 Phase G Lifecycle Read-Policy Isolation Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_G_LIFECYCLE_READ_POLICY_ISOLATION`
+
+Date: 2026-06-02
+
+Scope: local source/test no-apply lifecycle read-policy isolation summary over explicit candidates. No `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl` or raw audit read, durable memory/audit write, runtime governance action, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Added `src/core/GovernanceLifecycleReadPolicyIsolation.js`.
+- Added `tests/governance-lifecycle-read-policy-isolation.test.js`.
+- Unsafe lifecycle states are suppressed from normal recall proof output while an active control candidate remains accepted.
+- Suppressed audit metadata remains sanitized and does not expose raw candidate content, snippets, text, or source paths.
+
+Validation:
+
+- `node --check` changed source/test files passed.
+- `node --test .\tests\governance-lifecycle-read-policy-isolation.test.js .\tests\deferred-governance-scope-pollution-read-policy.test.js .\tests\memory-lifecycle-scope-runtime-integration.test.js` passed.
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Continue Phase G with candidate cache / shadow invalidation boundary validation.
+
+### CM-1394 Phase G Preview Audit Failure Distinction Checkpoint
+
+Status: `COMPLETED_VALIDATED_PHASE_G_PREVIEW_AUDIT_FAILURE_DISTINCTION`
+
+Date: 2026-06-02
+
+Scope: local source/test hardening for temp-local/no-apply preview consistency. No `record_memory`, `search_memory`, `memory_overview`, MCP/provider call, real memory scan, raw `.jsonl` or raw audit read, durable memory/audit write, runtime governance action, public MCP expansion, config/watchdog/startup change, dependency change, remote action, readiness claim, reliability claim, release, deploy, or cutover action.
+
+Result:
+
+- Updated `src/core/GovernanceMutationPreviewConsistency.js`.
+- Updated `tests/governance-mutation-preview-consistency.test.js`.
+- Shared preview consistency now distinguishes pending, committed, cancelled, and failed audit outcomes while preserving no-apply behavior.
+- Cancelled audit preview is treated as the no-apply failure handler; asserted failed durable audit writes fail closed.
+
+Validation:
+
+- `node --check` changed source/test files passed.
+- `node --test .\tests\governance-mutation-preview-consistency.test.js .\tests\durable-governance-tombstone-runtime-prep-helper.test.js .\tests\memory-supersede-runtime-prep-helper.test.js` passed.
+- `git diff --check` passed.
+- `node .\scripts\validate_current_facts_drift.js` passed.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+Next:
+
+- Continue Phase G with lifecycle read-policy isolation or candidate cache/shadow invalidation boundary validation.
 
 ### CM-1393 Phase G G1.3 Governance Mutation Preview Consistency Checkpoint
 

@@ -4,8 +4,8 @@
 
 Current facts source: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1393 Phase G G1.3 governance mutation preview consistency`.
-Current validation: `CMV-1511`.
+Current task: `CM-1397 Phase G runtime boundary closeout audit`.
+Current validation: `CMV-1515`.
 Current handoff: active Git, PR, review, and validation facts are maintained in `.agent_board/CURRENT_FACTS.json`; historical prose below is advisory.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->

@@ -22,6 +22,18 @@ function auditPhasePresent(event, expectedPhase) {
   return isPlainObject(event) && event.audit_phase === expectedPhase;
 }
 
+function hasFailureSignal(event) {
+  if (!isPlainObject(event)) {
+    return false;
+  }
+
+  return auditPhasePresent(event, 'failed') ||
+    normalizeString(event.status) === 'failed' ||
+    normalizeString(event.outcome) === 'failed' ||
+    normalizeString(event.audit_status) === 'failed' ||
+    Boolean(normalizeString(event.failure_reason));
+}
+
 function summarizeTargeting(plan) {
   const invalidationChangedIds = cloneArray(plan.invalidationPlan?.changedMemoryIds)
     .map(normalizeString)
@@ -90,15 +102,26 @@ function summarizeLifecycleTransition(plan) {
 
 function summarizeAuditPlan(plan) {
   const auditPlan = isPlainObject(plan.auditPlan) ? plan.auditPlan : {};
+  const failedEvent = auditPlan.failedEvent || auditPlan.failureEvent || null;
+  const intentPresent = auditPhasePresent(auditPlan.intentEvent, 'pending');
+  const committedPresent = auditPhasePresent(auditPlan.committedEvent, 'committed');
+  const cancelledPresent = auditPhasePresent(auditPlan.cancelledEvent, 'cancelled');
+  const failedEventPresent = hasFailureSignal(failedEvent);
+  const failureHandledByCancelledEvent = cancelledPresent && failedEventPresent === false;
+
   return {
     eventFamily: normalizeString(auditPlan.eventFamily),
-    intentPresent: auditPhasePresent(auditPlan.intentEvent, 'pending'),
-    committedPresent: auditPhasePresent(auditPlan.committedEvent, 'committed'),
-    cancelledPresent: auditPhasePresent(auditPlan.cancelledEvent, 'cancelled'),
+    intentPresent,
+    committedPresent,
+    cancelledPresent,
+    failedEventPresent,
+    failureHandledByCancelledEvent,
+    failureDurableAuditWritten: normalizeBoolean(auditPlan.failureDurableAuditWritten),
+    distinguishesFailedFromCancelled: failureHandledByCancelledEvent || failedEventPresent,
     durableAuditWritten: normalizeBoolean(plan.durableAuditWritten),
-    phasesComplete: auditPhasePresent(auditPlan.intentEvent, 'pending') &&
-      auditPhasePresent(auditPlan.committedEvent, 'committed') &&
-      auditPhasePresent(auditPlan.cancelledEvent, 'cancelled')
+    phasesComplete: intentPresent &&
+      committedPresent &&
+      cancelledPresent
   };
 }
 
@@ -157,6 +180,8 @@ function summarizeGovernanceMutationPreviewConsistency(plan = {}) {
     targeting.changedMemoryIdsPresent &&
     lifecycleTransition.present &&
     auditPlan.phasesComplete &&
+    auditPlan.distinguishesFailedFromCancelled &&
+    auditPlan.failureDurableAuditWritten === false &&
     projectionPlan.shadowUpdatePlanPresent &&
     projectionPlan.projectedRevisionTokenPresent;
 
@@ -196,6 +221,8 @@ function summarizeGovernanceMutationPreviewConsistency(plan = {}) {
         !targeting.changedMemoryIdsPresent ? 'changed_memory_ids_missing' : null,
         !lifecycleTransition.present ? 'lifecycle_transition_missing' : null,
         !auditPlan.phasesComplete ? 'audit_phases_incomplete' : null,
+        !auditPlan.distinguishesFailedFromCancelled ? 'audit_failure_distinction_missing' : null,
+        auditPlan.failureDurableAuditWritten ? 'audit_failure_durable_write_not_allowed' : null,
         !projectionPlan.shadowUpdatePlanPresent ? 'shadow_update_plan_missing' : null,
         !projectionPlan.projectedRevisionTokenPresent ? 'projected_revision_token_missing' : null
       ].filter(Boolean)
