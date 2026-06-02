@@ -4993,6 +4993,14 @@ function buildV1RcValidationAggregatorReport({
     rc9DecisionPacket.routeApprovalHintAuditStatus;
   report.summary.rc9DecisionPacketRouteApprovalHintAuditCanClaimReadiness =
     rc9DecisionPacket.routeApprovalHintAuditCanClaimReadiness;
+  report.summary.rc9DecisionPacketCloseoutAuditStatus =
+    rc9DecisionPacket.packetCloseoutAuditStatus;
+  report.summary.rc9DecisionPacketCloseoutAuditRowCount =
+    rc9DecisionPacket.packetCloseoutAudit.rowCount;
+  report.summary.rc9DecisionPacketCloseoutAuditMissingRowCount =
+    rc9DecisionPacket.packetCloseoutAudit.missingRowCount;
+  report.summary.rc9DecisionPacketCloseoutAuditCanClaimReadiness =
+    rc9DecisionPacket.packetCloseoutAuditCanClaimReadiness;
   report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness =
     rc9DecisionPacket.remainingGapRouteCanClaimReadiness;
   report.summary.rc9DecisionPacketRcCutoverApproved =
@@ -5318,6 +5326,70 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
   const rc9PacketCompletenessStatus = rc9PacketCompletenessMissingIds.length === 0
     ? 'complete_for_cutover_approval_request_not_rc_ready'
     : 'incomplete_missing_required_evidence';
+  const packetCloseoutAuditRows = [
+    {
+      id: 'route_approval_hint_audit',
+      status: routeApprovalHintAudit.status,
+      accepted: routeApprovalHintAudit.status === 'approval_hints_complete_for_known_routes_not_authorization' ||
+        routeApprovalHintAudit.status === 'no_remaining_gaps_no_approval_hint_needed',
+      canClaimReadiness: false
+    },
+    {
+      id: 'cutover_approval_boundary',
+      status: cutoverApprovalBoundaryAudit.status,
+      accepted:
+        cutoverApprovalBoundaryAudit.exactApprovalRequired === true &&
+        cutoverApprovalBoundaryAudit.approvalPresent === false &&
+        cutoverApprovalBoundaryAudit.executionAllowed === false &&
+        cutoverApprovalBoundaryAudit.rcReady === false,
+      canClaimReadiness: false
+    },
+    {
+      id: 'completeness_checklist',
+      status: rc9PacketCompletenessStatus,
+      accepted:
+        rc9PacketCompletenessStatus === 'complete_for_cutover_approval_request_not_rc_ready' ||
+        rc9PacketCompletenessStatus === 'incomplete_missing_required_evidence',
+      canClaimReadiness: false
+    },
+    {
+      id: 'not_executed_boundary',
+      status: 'not_executed_boundary_preserved',
+      accepted:
+        notExecuted.includes('rc_cutover') &&
+        notExecuted.includes('tag_creation') &&
+        notExecuted.includes('release_creation') &&
+        notExecuted.includes('deploy') &&
+        notExecuted.includes('push'),
+      canClaimReadiness: false
+    },
+    {
+      id: 'rollback_path',
+      status: rollbackPath.length > 0
+        ? 'rollback_path_documented_for_future_cutover'
+        : 'rollback_path_missing',
+      accepted: rollbackPath.length > 0,
+      canClaimReadiness: false
+    }
+  ];
+  const packetCloseoutAuditMissingIds = packetCloseoutAuditRows
+    .filter(row => row.accepted !== true)
+    .map(row => row.id);
+  const packetCloseoutAudit = {
+    status: packetCloseoutAuditMissingIds.length === 0
+      ? 'packet_subaudits_complete_not_authorization'
+      : 'packet_subaudits_incomplete_manual_review_required',
+    sourceMode: 'packet_subaudit_summary_only',
+    rowCount: packetCloseoutAuditRows.length,
+    acceptedRowCount: packetCloseoutAuditRows.length - packetCloseoutAuditMissingIds.length,
+    missingRowCount: packetCloseoutAuditMissingIds.length,
+    missingIds: packetCloseoutAuditMissingIds,
+    rows: packetCloseoutAuditRows,
+    approvalGenerated: false,
+    approvalAccepted: false,
+    approvalExecuted: false,
+    canClaimReadiness: false
+  };
 
   return {
     status: readyToRequestRcCutoverApproval
@@ -5349,6 +5421,9 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
     routeApprovalHintAudit,
     routeApprovalHintAuditStatus,
     routeApprovalHintAuditCanClaimReadiness: false,
+    packetCloseoutAudit,
+    packetCloseoutAuditStatus: packetCloseoutAudit.status,
+    packetCloseoutAuditCanClaimReadiness: false,
     remainingGapRouteCanClaimReadiness: false,
     rcCutoverApprovalRequired: true,
     rcCutoverApprovalPresent: false,

@@ -95,6 +95,23 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalAccepted, false);
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAudit.approvalExecuted, false);
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAuditCanClaimReadiness, false);
+  assert.equal(
+    report.summary.rc9DecisionPacketCloseoutAuditStatus,
+    'packet_subaudits_complete_not_authorization'
+  );
+  assert.equal(report.summary.rc9DecisionPacketCloseoutAuditRowCount, 5);
+  assert.equal(report.summary.rc9DecisionPacketCloseoutAuditMissingRowCount, 0);
+  assert.equal(report.summary.rc9DecisionPacketCloseoutAuditCanClaimReadiness, false);
+  assert.equal(
+    report.evidence.rc9DecisionPacket.packetCloseoutAuditStatus,
+    'packet_subaudits_complete_not_authorization'
+  );
+  assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAudit.rowCount, 5);
+  assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAudit.missingRowCount, 0);
+  assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAudit.approvalGenerated, false);
+  assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAudit.approvalAccepted, false);
+  assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAudit.approvalExecuted, false);
+  assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAuditCanClaimReadiness, false);
   assert.equal(report.evidence.rc9DecisionPacket.markdownAuditStatus, 'markdown_sections_complete_not_authorization');
   assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.sectionCount, 7);
   assert.equal(report.evidence.rc9DecisionPacket.markdownAudit.acceptedSectionCount, 7);

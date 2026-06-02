@@ -969,6 +969,55 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     canClaimReadiness: false
   });
   assert.equal(report.evidence.rc9DecisionPacket.routeApprovalHintAuditCanClaimReadiness, false);
+  assert.equal(
+    report.evidence.rc9DecisionPacket.packetCloseoutAuditStatus,
+    'packet_subaudits_complete_not_authorization'
+  );
+  assert.deepEqual(report.evidence.rc9DecisionPacket.packetCloseoutAudit, {
+    status: 'packet_subaudits_complete_not_authorization',
+    sourceMode: 'packet_subaudit_summary_only',
+    rowCount: 5,
+    acceptedRowCount: 5,
+    missingRowCount: 0,
+    missingIds: [],
+    rows: [
+      {
+        id: 'route_approval_hint_audit',
+        status: 'approval_hints_complete_for_known_routes_not_authorization',
+        accepted: true,
+        canClaimReadiness: false
+      },
+      {
+        id: 'cutover_approval_boundary',
+        status: 'not_ready_for_cutover_approval_request',
+        accepted: true,
+        canClaimReadiness: false
+      },
+      {
+        id: 'completeness_checklist',
+        status: 'incomplete_missing_required_evidence',
+        accepted: true,
+        canClaimReadiness: false
+      },
+      {
+        id: 'not_executed_boundary',
+        status: 'not_executed_boundary_preserved',
+        accepted: true,
+        canClaimReadiness: false
+      },
+      {
+        id: 'rollback_path',
+        status: 'rollback_path_documented_for_future_cutover',
+        accepted: true,
+        canClaimReadiness: false
+      }
+    ],
+    approvalGenerated: false,
+    approvalAccepted: false,
+    approvalExecuted: false,
+    canClaimReadiness: false
+  });
+  assert.equal(report.evidence.rc9DecisionPacket.packetCloseoutAuditCanClaimReadiness, false);
   assert.equal(report.evidence.rc9DecisionPacket.remainingGapRouteCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteMappedCount, 7);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteMissingCount, 0);
@@ -982,6 +1031,13 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     'approval_hints_complete_for_known_routes_not_authorization'
   );
   assert.equal(report.summary.rc9DecisionPacketRouteApprovalHintAuditCanClaimReadiness, false);
+  assert.equal(
+    report.summary.rc9DecisionPacketCloseoutAuditStatus,
+    'packet_subaudits_complete_not_authorization'
+  );
+  assert.equal(report.summary.rc9DecisionPacketCloseoutAuditRowCount, 5);
+  assert.equal(report.summary.rc9DecisionPacketCloseoutAuditMissingRowCount, 0);
+  assert.equal(report.summary.rc9DecisionPacketCloseoutAuditCanClaimReadiness, false);
   assert.equal(report.summary.rc9DecisionPacketRemainingGapRouteCanClaimReadiness, false);
   assert.equal(
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingRc8Rc9ReadinessAuditStatus,
