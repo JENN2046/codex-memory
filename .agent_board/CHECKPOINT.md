@@ -10,6 +10,41 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC-6 A5-GAP-2 Recall Isolation No-Mutation Preflight
+
+Status: `PREFLIGHT_PACKET_READY_NOT_APPROVED_NOT_RC_READY`
+
+Date: 2026-06-02
+
+Scope: prepared a fresh-head `A5-GAP-2` recall isolation no-mutation approval boundary. No recall isolation proof, store scan, raw content output, MCP tool call, provider call, durable write, config/watchdog/startup change, remote action, cutover, or readiness claim occurred.
+
+Changed:
+
+- `docs/RC6_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_PREFLIGHT.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/RUN_STATE.md`
+
+Result:
+
+- Existing `A5-GAP-2` evidence remains useful historical background, but it is bound to older commits and is not current-head evidence for `main@b15fe1abe1a7b7f61c5f22e0eefaf923c87f3102`.
+- The selected next boundary is no-mutation proof over exactly `real_diary`, `real_sqlite`, `real_vector_index`, `real_candidate_cache`, and `real_recall_audit`.
+- Future execution requires a fresh exact approval line bound to the post-packet commit.
+
+Boundary:
+
+- No approved stores were read or scanned.
+- No raw memory/private content was output.
+- No bearer token was used.
+- No MCP external call or provider call occurred.
+- No durable memory/audit write occurred.
+- No config/watchdog/startup change occurred.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim occurred.
+
+Next:
+
+- Validate and commit this preflight packet locally.
+- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-2 for codex-memory on branch main at commit <FRESH_HEAD>, limited to stores real_diary, real_sqlite, real_vector_index, real_candidate_cache, real_recall_audit, no mutation.`
+
 ## RC-5 A5-GAP-1 Governance Runtime Gap Preflight
 
 Status: `GOVERNANCE_READONLY_EVIDENCE_ACCEPTED_NOT_RC_READY`
