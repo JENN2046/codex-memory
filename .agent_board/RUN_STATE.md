@@ -43,7 +43,9 @@ RC-2 A5-GAP-5 strict gate evidence is recorded at `docs/RC2_A5_GAP5_STRICT_GATE_
 
 RC-4 A5-GAP-4 live HTTP / MCP no-write evidence is recorded at `docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md` for target commit `d843d9b9778aeaa149cfba4ac80fa0e0aab87f1f`: `/health`, no-token MCP `initialize`, no-token `tools/list`, no-token selected `memory_overview`, no-token `record_memory` rejection, and no-token `search_memory` rejection passed the endpoint-bound no-write contract. Authenticated `memory_overview` was not executed because bearer-token use was not authorized.
 
-Next safe action is RC-5 governance runtime gap preflight: compare the current truth table and existing governance evidence freshness against the current route, then prepare a narrow A5-GAP-1 approval boundary if fresh evidence is still needed. Do not execute governance runtime actions, durable writes, bearer-token use, memory tools, provider calls, real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+RC-5 governance runtime gap preflight is prepared at `docs/RC5_A5_GAP1_GOVERNANCE_READONLY_PREFLIGHT.md`: existing A5-GAP-1 evidence is present but bound to older commits, so current HEAD needs fresh read-only governance evidence.
+
+Next safe action is either review/commit the RC-5 preflight packet, or provide a fresh A5-GAP-1 exact approval line after the packet is stabilized. Do not execute `npm run governance:report -- --json`, governance runtime actions, durable writes, bearer-token use, memory tools, provider calls, real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
