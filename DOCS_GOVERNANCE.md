@@ -179,6 +179,18 @@ git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
+Docs validation 默认使用瘦身输出，不打印完整 npm script 清单。PowerShell 与 Bash 等价日常入口：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
+```bash
+bash ./scripts/validate-local.sh docs
+```
+
+其他 area 如需跳过完整 npm script 清单，PowerShell 可追加 `-QuietScripts`，Bash 可追加 `--quiet-scripts`。
+
 如果文档新增或修改 npm script 引用，确认脚本存在于 `package.json`。
 
 如果当前基线、gate 结果、mainline 状态或验证入口变化，执行：

@@ -10,9 +10,9 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1403",
-  "validationId": "CMV-1521",
-  "branch": "main",
+  "taskId": "CM-1404",
+  "validationId": "CMV-1522",
+  "branch": "integrate/local-validation-polish",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1522",
+      "scope": "CM-1404 local validation polish divergence integration",
+      "status": "COMPLETED_VALIDATED_NO_APPLY"
+    },
     {
       "id": "CMV-1521",
       "scope": "CM-1403 current facts schema v2 non-self-referential semantics",
