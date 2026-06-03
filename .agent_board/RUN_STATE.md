@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1435 corrected scoped record_memory write accepted evidence closeout`.
-Current validation: `CMV-1546`.
+Current task: `CM-1436 scoped write follow-up search validation scope packet`.
+Current validation: `CMV-1547`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1435` records already executed CM-1432 corrected scoped `record_memory` write proof accepted evidence. Evidence: `main == origin/main == da1caa25302b2cf7b233a162bcbec00d48602040`, runtime freshness accepted, listener PID `16804`, public tools unchanged (`memory_overview`, `record_memory`, `search_memory`), corrected payload hash matched `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`, exactly one authenticated public HTTP MCP `record_memory` call executed, `target=process`, required scope fields present, synthetic governance-safe marker, `Checkpoint` process signal present, `decision=accepted`, `shadowWriteStatus=ok`, `idempotencyStatus=committed`, `memoryIdReturned=true` as boolean only, memory id value not printed, raw response not printed or persisted, no `search_memory`, no `memory_overview`, no provider/API, no raw store scan, no follow-up validation, and no readiness / `RC_READY` claim. CM-1435 itself performs no new live probe, memory tool call, bearer-token use, provider/API, real memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim. Next safe action is commit/push only if separately authorized; any follow-up search, additional write, runtime gate, or readiness route requires fresh exact approval.
+`CM-1436` prepares `docs/CM1436_SCOPED_WRITE_FOLLOW_UP_SEARCH_VALIDATION_SCOPE_PACKET.md` for future CM-1437 scoped write follow-up bounded `search_memory` validation. Future CM-1437 is limited to exactly one authenticated public HTTP MCP `search_memory` call with query `Checkpoint: CM-1432 scoped write proof marker`, `target=process`, `limit=1`, `include_content=false`, expected `resultCount>=1`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, and `snippetsReturned=false`. CM-1436 itself performs no live `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API, real memory read/write, raw store scan, memoryId lookup, raw response print/persist, durable write, runtime action, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim. Next safe action is commit/push only if separately authorized; future CM-1437 requires runtime refresh and fresh exact one-call approval after packet commit/push.
 
 ## Historical Run Notes
 

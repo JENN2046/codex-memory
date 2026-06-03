@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1435",
-  "validationId": "CMV-1546",
+  "taskId": "CM-1436",
+  "validationId": "CMV-1547",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1547",
+      "scope": "CM-1436 scoped write follow-up search validation scope packet",
+      "status": "COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED"
+    },
     {
       "id": "CMV-1546",
       "scope": "CM-1435 corrected scoped record_memory write accepted evidence closeout",

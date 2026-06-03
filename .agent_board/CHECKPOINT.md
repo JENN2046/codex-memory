@@ -4,67 +4,58 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1435 corrected scoped record_memory write accepted evidence closeout`.
-Current validation: `CMV-1546`.
+Current checkpoint: `CM-1436 scoped write follow-up search validation scope packet`.
+Current validation: `CMV-1547`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1435 Corrected Scoped Record Memory Write Accepted Evidence Closeout
+## CM-1436 Scoped Write Follow-Up Search Validation Scope Packet
 
-Status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1432_CORRECTED_RECORD_MEMORY_WRITE_ACCEPTED`
+Status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`
 
 Scope:
 
 ```text
-docs-only closeout of already executed corrected scoped record_memory write proof
+docs-only scope packet for future bounded follow-up search validation
 ```
 
 Recorded:
 
-- `main == origin/main == da1caa25302b2cf7b233a162bcbec00d48602040`.
-- Runtime freshness accepted.
-- Listener PID `16804`.
-- Public tools unchanged: `memory_overview`, `record_memory`, `search_memory`.
-- Corrected payload hash matched `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`.
-- Exactly one authenticated public HTTP MCP `record_memory` call executed in CM-1432 corrected.
-- `target=process`.
-- Required scope fields present.
-- Synthetic governance-safe marker.
-- `Checkpoint` process signal present.
-- `decision=accepted`.
-- `shadowWriteStatus=ok`.
-- `idempotencyStatus=committed`.
-- `memoryIdReturned=true` as boolean only.
-- Memory id value not printed.
-- Raw response not printed or persisted.
-- No `search_memory`.
-- No `memory_overview`.
-- No provider/API.
-- No raw store scan.
-- No follow-up validation.
-- No readiness / `RC_READY` claim.
+- Packet path: `docs/CM1436_SCOPED_WRITE_FOLLOW_UP_SEARCH_VALIDATION_SCOPE_PACKET.md`.
+- Baseline before packet: `main == origin/main == a9b41de`.
+- Future gate: `CM-1437 scoped write follow-up search validation`.
+- Future query: `Checkpoint: CM-1432 scoped write proof marker`.
+- Query source: committed public/governance-safe phrase from `docs/CM1434_CORRECTED_SCOPED_RECORD_MEMORY_WRITE_PROOF_PACKET.md`.
+- Future search: exactly one authenticated public HTTP MCP `search_memory` call.
+- Future search shape: `target=process`, `limit=1`, `include_content=false`.
+- Future expected shape: `resultCount>=1`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`.
+- Future CM-1437 requires runtime refresh and fresh exact one-call approval after this packet is committed and pushed.
+- No live `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API, true memory read/write, raw store scan, memoryId lookup, raw response print/persist, runtime action, public MCP expansion, remote action, or readiness / `RC_READY` claim occurred in CM-1436.
 
 Boundary:
 
-- No new live probe in CM-1435.
-- No `record_memory` in CM-1435.
+- No new live probe in CM-1436.
+- No `record_memory`.
 - No `search_memory`.
 - No `memory_overview`.
 - No provider/API call.
 - No bearer-token use.
 - No raw memory/audit/store scan.
-- No durable memory/audit write in CM-1435.
+- No memoryId lookup.
+- No raw response print or persistence.
+- No durable memory/audit write.
 - No config/watchdog/startup change.
 - No public MCP expansion.
 - No remote action.
 - No readiness, reliability, release, cutover, or `RC_READY` claim.
 
-Validation: `CMV-1546` docs-only validation.
+Validation: `CMV-1547` docs-only validation.
 
 ## Recent Checkpoint References
 
 - `CM-1420`: context intake and status-surface compaction.
+- `CM-1435`: corrected scoped `record_memory` write accepted evidence closeout.
 - `CM-1434`: corrected scoped `record_memory` write proof packet.
 - `CM-1433`: `record_memory` rejection reason investigation.
 - `CM-1431`: scoped `record_memory` write proof scope packet.

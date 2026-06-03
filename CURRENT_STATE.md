@@ -9,9 +9,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1435 corrected scoped record_memory write accepted evidence closeout` |
-| Current validation | `CMV-1546` |
-| Current route | CM-1432 corrected scoped `record_memory` write proof accepted; docs-only closeout |
+| Current task | `CM-1436 scoped write follow-up search validation scope packet` |
+| Current validation | `CMV-1547` |
+| Current route | Future CM-1437 bounded `search_memory` follow-up validation packet prepared; no live search |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -40,6 +40,8 @@ Side-effect evidence for the CM-1428 execution: no `record_memory`, no `memory_o
 
 The sanitized accepted evidence was `decision=accepted`, `shadowWriteStatus=ok`, `idempotencyStatus=committed`, and `memoryIdReturned=true` as a boolean only. The memory id value was not printed; raw response was not printed or persisted. Side-effect evidence for the CM-1432 corrected execution: no `search_memory`, no `memory_overview`, no provider/API call, no raw store scan, no follow-up validation, and no readiness or `RC_READY` claim. CM-1435 itself is docs-only and performs no new live probe, bearer-token use, memory tool call, real memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim.
 
+`CM-1436` prepares `docs/CM1436_SCOPED_WRITE_FOLLOW_UP_SEARCH_VALIDATION_SCOPE_PACKET.md` for a future CM-1437 bounded follow-up `search_memory` validation of the CM-1432 accepted write. The packet is docs-only and does not execute `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API calls, runtime refresh, real memory read/write, raw store scan, memoryId lookup, raw response print/persist, public MCP expansion, remote action, readiness claim, or `RC_READY` claim. Future CM-1437 is limited to exactly one authenticated public HTTP MCP `search_memory` call with query `Checkpoint: CM-1432 scoped write proof marker`, `target=process`, `limit=1`, `include_content=false`, expected `resultCount>=1`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, and no raw/id/path/title/snippet leakage.
+
 Latest local validation before CM-1420:
 
 - `npm test` passed `2992/2992`.
@@ -49,7 +51,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1435 is a docs-only evidence closeout. Commit/push only if separately authorized. Do not run follow-up `search_memory` or any additional `record_memory` without fresh exact approval.
+CM-1436 is a docs-only scope packet. Commit/push only if separately authorized. Do not run follow-up `search_memory`; CM-1437 still requires runtime refresh and fresh exact one-call approval.
 
 ## Boundaries
 
