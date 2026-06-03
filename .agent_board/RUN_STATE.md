@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1421 Phase H search_memory negative-control scope packet for CM-1419`.
-Current validation: `CMV-1535`.
+Current task: `CM-1424 search_memory authenticated bounded/noRawContentRead projection patch`.
+Current validation: `CMV-1537`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1421` exact scope preparation for the `CM-1419` thread is complete locally. Future execution is `CM-1422` and requires commit/sync plus a fresh exact approval line from `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md`.
+`CM-1424` source/test/hardening validation is complete locally. Next safe action is review/commit/push of the patch, then runtime refresh and fresh exact approval before any CM-1422 live rerun.
 
 ## Historical Run Notes
 

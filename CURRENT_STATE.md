@@ -9,16 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1421 Phase H search_memory negative-control scope packet for CM-1419` |
-| Current validation | `CMV-1535` |
-| Current route | Phase H bounded `search_memory` negative-control exact scope prepared, not executed |
+| Current task | `CM-1424 search_memory authenticated bounded/noRawContentRead projection patch` |
+| Current validation | `CMV-1537` |
+| Current route | Phase H authenticated HTTP `search_memory` bounded projection implemented locally; no live rerun |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
 
-`CM-1421` prepared the exact future scope for the `CM-1419 Phase H search_memory negative-control` thread: two bounded readonly public HTTP MCP `search_memory` negative-control calls. It did not execute `search_memory`, use bearer token material, call providers, read raw stores, write durable state, change config/watchdog/startup, expand public MCP, or claim readiness.
+`CM-1424` implemented a source-side authenticated HTTP `search_memory` bounded projection. HTTP bearer `search_memory` now runs read-only/noRawContentRead, rejects `include_content=true` before search execution, and returns only bounded non-identifying count/score/target-style result fields. It strips `sourceFile`, `filePath`, `path`, `title`, `memoryId`, `snippet`, `text`, `content`, `raw_text`, and path/store metadata from public HTTP structured output. Direct app/internal search behavior remains separate.
 
 Latest local validation before CM-1420:
 
@@ -29,7 +29,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-If the operator wants execution, use `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md` to provide the exact approval line after the packet is committed and synced. Otherwise continue only local docs/source/test work.
+After this patch is committed, pushed, and the runtime is refreshed, CM-1422 rerun can be considered with fresh exact approval. Do not rerun it from the dirty local worktree.
 
 ## Boundaries
 

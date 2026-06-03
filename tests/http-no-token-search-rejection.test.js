@@ -34,6 +34,21 @@ const NO_TOKEN_OVERVIEW_ACCESS_KEYS = [
   'selectedProjectionVersion'
 ];
 
+function collectObjectKeys(value, keys = new Set()) {
+  if (Array.isArray(value)) {
+    for (const item of value) collectObjectKeys(item, keys);
+    return keys;
+  }
+  if (!value || typeof value !== 'object') {
+    return keys;
+  }
+  for (const [key, child] of Object.entries(value)) {
+    keys.add(key);
+    collectObjectKeys(child, keys);
+  }
+  return keys;
+}
+
 async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
   const app = createCodexMemoryApplication({
@@ -259,9 +274,37 @@ test('no-token HTTP initialize and ping are allowed', async () => {
   });
 });
 
-test('bearer token HTTP search_memory is allowed', async () => {
+test('bearer token HTTP search_memory returns bounded projection', async () => {
   const bearerToken = 'test-token-12345';
-  await withHttpServer(async ({ address }) => {
+  await withHttpServer(async ({ app, address }) => {
+    let searchOptions = null;
+    app.services.passiveRecallService.search = async options => {
+      searchOptions = options;
+      return [{
+        target: 'process',
+        score: 0.75,
+        baseScore: 0.5,
+        rerankScore: 0.6,
+        titleHitCount: 1,
+        tagHitCount: 2,
+        contentHitCount: 3,
+        evidenceHitCount: 4,
+        exactCoreTagCount: 5,
+        tagMemoSurfaceScore: 0.7,
+        dynamicCoreWeight: 0.8,
+        sourceKinds: ['synthetic'],
+        sourceFile: 'synthetic/source.md',
+        filePath: 'synthetic/file.md',
+        path: 'synthetic/path.md',
+        title: 'synthetic title',
+        memoryId: 'synthetic-memory-id',
+        snippet: 'synthetic snippet',
+        text: 'synthetic text',
+        content: 'synthetic content',
+        raw_text: 'synthetic raw text'
+      }];
+    };
+
     const response = await fetch(address.url, {
       method: 'POST',
       headers: {
@@ -279,10 +322,68 @@ test('bearer token HTTP search_memory is allowed', async () => {
       })
     });
     const payload = await response.json();
+    const structured = payload.result.structuredContent;
+    const serialized = JSON.stringify(structured);
 
-    // With token, search should be allowed (may return empty results, not 403)
-    assert.notEqual(response.status, 403);
-    assert.notEqual(payload.error?.code, -32001);
+    assert.equal(response.status, 200);
+    assert.equal(payload.result.isError, false);
+    assert.equal(searchOptions.readOnly, true);
+    assert.equal(searchOptions.noRawContentRead, true);
+    assert.equal(searchOptions.includeContent, false);
+    assert.equal(structured.access.mode, 'authenticated_bounded_search');
+    assert.equal(structured.access.selectedProjection, true);
+    assert.equal(structured.access.rawContentReturned, false);
+    assert.equal(structured.access.pathsReturned, false);
+    assert.equal(structured.access.memoryIdsReturned, false);
+    assert.equal(structured.resultCount, 1);
+    assert.equal(structured.results.length, 1);
+    assert.equal(structured.results[0].target, 'process');
+    assert.equal(structured.results[0].score, 0.75);
+    assert.doesNotMatch(serialized, /synthetic\/source|synthetic\/file|synthetic title|synthetic-memory-id|synthetic snippet|synthetic text|synthetic content|synthetic raw text/);
+    const keys = collectObjectKeys(structured);
+    for (const forbiddenKey of ['sourceFile', 'filePath', 'path', 'title', 'memoryId', 'snippet', 'text', 'content', 'raw_text']) {
+      assert.equal(keys.has(forbiddenKey), false, `${forbiddenKey} should be stripped`);
+    }
+  }, { bearerToken });
+});
+
+test('bearer token HTTP search_memory rejects include_content=true in bounded projection', async () => {
+  const bearerToken = 'test-token-12345';
+  await withHttpServer(async ({ app, address }) => {
+    let searchCalled = false;
+    app.services.passiveRecallService.search = async () => {
+      searchCalled = true;
+      return [];
+    };
+
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${bearerToken}`
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 10,
+        method: 'tools/call',
+        params: {
+          name: 'search_memory',
+          arguments: {
+            query: 'test',
+            target: 'process',
+            limit: 3,
+            include_content: true
+          }
+        }
+      })
+    });
+    const payload = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(payload.result.isError, true);
+    assert.equal(payload.result.structuredContent.decision, 'rejected');
+    assert.equal(payload.result.structuredContent.access.mode, 'authenticated_bounded_search');
+    assert.equal(searchCalled, false);
   }, { bearerToken });
 });
 

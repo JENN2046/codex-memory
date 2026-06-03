@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1421 Phase H search_memory negative-control scope packet for CM-1419`.
-Current validation: `CMV-1535`.
+Current task: `CM-1424 search_memory authenticated bounded/noRawContentRead projection patch`.
+Current validation: `CMV-1537`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase H bounded search_memory negative-control exact scope prepared, not executed`.
+Current route: `Phase H authenticated search_memory bounded projection patched locally; no live rerun`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -41,7 +41,10 @@ RC_READY_FALSE
 - 编号注意：Phase H source/test closeout aggregator 使用 `CM-1404` through `CM-1407` 作为 no-apply evidence-unit labels；当前 active board 的 `CM-1404` / `CM-1405` 是后续 docs/validation governance tasks。后续 agent 不应把这两组编号混成同一个任务。
 - 当前治理切片：`CM-1420` 已将默认上下文收敛到 fresh Git facts、`CURRENT_STATE.md`、`.agent_board/CURRENT_FACTS.json`、changed files、validation output、boundary declaration 和 requested decision；长 checkpoint / handoff / validation / task / autopilot ledger 历史改为 archive index 和 Git history 引用。
 - 当前精确范围包：`CM-1421` 已为 `CM-1419 Phase H search_memory negative-control` 准备 `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md`，未来执行仅限两个 public HTTP MCP `search_memory` negative-control calls：CM-0814 NC1/NC2, `target=both`, `limit=1`, `include_content=false`, expected `resultCount=0`, sanitized output only.
-- 下一安全任务：若要执行，先 commit/sync CM-1421 packet，再进入 `CM-1422` exact-approved execution；禁止 `record_memory`、provider/API、raw store scan、broad export、config/startup/watchdog、public MCP expansion、push/release/cutover/readiness claim.
+- CM-1422 live gate fail-closed：前置条件和 runtime freshness accepted 后，只执行了 authenticated `initialize`、`tools/list`、以及 NC1 一次 `search_memory`；NC2 未执行。临时 sanitizer 因 possible raw/sensitive output shape 停止，未打印 raw response。
+- CM-1423 调查结论：MCP wrapper `result.content[0].text` 是 wrapper text，不应被当作 raw memory；但普通 authenticated `include_content=false` 的非空 result shape 可含 `sourceFile`、`snippet`、`text`、`title`、`memoryId` 等字段。CM-1422 的临时 regex 最可能由 `result.structuredContent.results[0].sourceFile` key path 触发。新增 synthetic sanitizer helper/tests，不读取真实 memory，不打印 NC1 raw response。
+- CM-1424 本地 patch：authenticated HTTP `search_memory` 进入 bounded projection，强制 read-only/noRawContentRead，`include_content=true` 在该 path 下 rejected 且不调用 search；public structured output 只保留 bounded count/score/target-style fields，strip `sourceFile`、`filePath`、`path`、`title`、`memoryId`、`snippet`、`text`、`content`、`raw_text`。no-token `search_memory` 仍 rejected；public tools unchanged。
+- 下一安全任务：审阅并提交/推送 CM-1424；随后刷新 runtime，才可用 fresh exact approval 重新进入 CM-1422 rerun。禁止 `record_memory`、provider/API、raw store scan、broad export、config/startup/watchdog、public MCP expansion、push/release/cutover/readiness claim，除非单独授权。
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 

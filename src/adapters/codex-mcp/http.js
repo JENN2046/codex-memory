@@ -629,7 +629,8 @@ function createStreamableHttpServer({
         sessionId: requestSessionId || undefined,
         executionContext: defaultExecutionContext,
         noTokenReadOnly: !authorized || !bearerToken,
-        authenticatedBoundedOverview: authorized && !!bearerToken
+        authenticatedBoundedOverview: authorized && !!bearerToken,
+        authenticatedBoundedSearch: authorized && !!bearerToken
       });
 
       if (result.sessionId) {

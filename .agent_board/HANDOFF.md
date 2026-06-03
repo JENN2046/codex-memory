@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1421 Phase H search_memory negative-control scope packet for CM-1419`.
-Current validation: `CMV-1535`.
-Current handoff: CM-1421 prepared an exact future scope packet for the CM-1419 thread: two bounded readonly public HTTP MCP `search_memory` negative-control calls using CM-0814 NC1/NC2, with `target=both`, `limit=1`, `include_content=false`, sanitized output only, expected zero results, and no execution. Future execution is CM-1422 and requires a fresh exact approval line after packet commit/sync.
+Current task: `CM-1424 search_memory authenticated bounded/noRawContentRead projection patch`.
+Current validation: `CMV-1537`.
+Current handoff: CM-1424 implemented authenticated HTTP `search_memory` bounded projection locally. It runs read-only/noRawContentRead, rejects `include_content=true` before search execution, strips identifying/raw/path fields, keeps no-token search rejected, and keeps public tools unchanged. No live rerun was performed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: prepare exact bounded Phase H `search_memory` negative-control scope without executing it.
+Goal: patch authenticated HTTP `search_memory` projection after CM-1422 fail-closed.
 
-Current status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`.
+Current status: `COMPLETED_VALIDATED_SOURCE_TESTS_HARDENING_NO_LIVE_RERUN`.
 
 Workspace: `A:\codex-memory`.
 
@@ -22,18 +22,23 @@ Current entrypoints:
 
 - `CURRENT_STATE.md`
 - `.agent_board/CURRENT_FACTS.json`
-- `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md`
+- `src/app.js`
+- `src/adapters/codex-mcp/http.js`
+- `src/core/SearchMemoryResponseSanitizer.js`
+- `tests/http-no-token-search-rejection.test.js`
+- `tests/search-memory-response-sanitizer.test.js`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `CURRENT_STATE.md`
 
 Completed in this slice:
 
-- Exact future search query envelope prepared.
-- Read-only current-facts recall preflight reported ready-not-executed.
-- No live `search_memory`, token use, provider/API call, raw store scan, durable write, runtime change, or readiness claim occurred.
+- Implemented authenticated HTTP bounded search projection.
+- Added/updated synthetic sanitizer and HTTP projection tests.
+- Verified no-token `search_memory` stays rejected and public tools remain unchanged.
+- No live `search_memory`, token use against live 7605, provider/API call, real memory read/write, raw store scan, durable write, runtime change, raw NC1 output print/persistence, or readiness claim occurred in CM-1424.
 
-Validation: `CMV-1535` docs/board validation.
+Validation: `CMV-1537` source/test/hardening validation.
 
 Boundaries:
 
@@ -41,7 +46,7 @@ Boundaries:
 
 Next safe action:
 
-If the operator wants execution, commit/sync this packet first, then use its exact approval template for CM-1422. Otherwise continue local docs/source/test work.
+Commit and push CM-1424, refresh runtime, then request fresh exact approval before any CM-1422 live rerun.
 
 ## Historical Handoff Archive
 

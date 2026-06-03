@@ -4,37 +4,38 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1421 Phase H search_memory negative-control scope packet for CM-1419`.
-Current validation: `CMV-1535`.
+Current checkpoint: `CM-1424 search_memory authenticated bounded/noRawContentRead projection patch`.
+Current validation: `CMV-1537`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1421 Phase H Search Memory Negative-Control Scope Packet For CM-1419
+## CM-1424 Search Memory Authenticated Bounded Projection Patch
 
-Status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_HARDENING_NO_LIVE_RERUN`
 
 Scope:
 
 ```text
-docs/board-only exact scope packet plus read-only current-facts preflight
+local source/test HTTP boundary patch; no live rerun
 ```
 
 Changed:
 
-- Added `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md`.
-- Bound the future execution envelope to exactly two public HTTP MCP `search_memory` calls.
-- Chose fixed CM-0814 NC1/NC2 negative-control query slots.
-- Required `target=both`, `limit=1`, `include_content=false`, sanitized output only, and expected zero results.
-- Ran read-only current-facts recall preflight, which returned `RECALL_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Added authenticated HTTP `search_memory` bounded projection in `src/app.js`.
+- Marked authenticated HTTP search requests in `src/adapters/codex-mcp/http.js`.
+- Kept no-token `search_memory` rejected.
+- Rejected `include_content=true` before search execution for authenticated bounded HTTP search.
+- Added synthetic/key-path sanitizer tests and HTTP contract tests for the bounded projection.
 
 Boundary:
 
 - No runtime action.
-- No live MCP `tools/call`.
-- No `search_memory` execution.
+- No live MCP `tools/call` in CM-1424.
+- No live `search_memory` rerun in CM-1424.
 - No provider/API call.
 - No bearer-token use.
+- No raw NC1 response print or persistence.
 - No raw memory/audit/store scan.
 - No durable memory/audit write.
 - No config/watchdog/startup change.
@@ -42,7 +43,7 @@ Boundary:
 - No remote action.
 - No readiness, reliability, release, cutover, or `RC_READY` claim.
 
-Validation: `CMV-1535` docs/board validation.
+Validation: `CMV-1537` source/test/hardening validation.
 
 ## Recent Checkpoint References
 
@@ -63,3 +64,5 @@ Historical checkpoint text is available through Git history and the archive inde
 - `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`
 
 Repository reality and fresh Git output override historical checkpoint text.
+- `CM-1421`: Phase H `search_memory` negative-control scope packet.
+- `CM-1423`: search_memory response sanitizer shape investigation.

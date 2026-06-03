@@ -241,6 +241,9 @@ function normalizeInternalPrecisionPolicyContext(requestContext = {}) {
 
 function normalizeInternalNoRawContentRead(requestContext = {}) {
   const executionContext = requestContext.executionContext || {};
+  if (requestContext.authenticatedBoundedSearch === true) {
+    return true;
+  }
   if (!Object.prototype.hasOwnProperty.call(executionContext, 'noRawContentRead')) {
     return false;
   }
@@ -250,6 +253,62 @@ function normalizeInternalNoRawContentRead(requestContext = {}) {
     throw new Error('internal noRawContentRead context must be true');
   }
   return true;
+}
+
+function isAuthenticatedBoundedSearchRequest(requestContext = {}) {
+  return requestContext.authenticatedBoundedSearch === true;
+}
+
+function projectBoundedSearchResult(item = {}) {
+  return {
+    target: item.target || null,
+    score: Number.isFinite(item.score) ? item.score : null,
+    baseScore: Number.isFinite(item.baseScore) ? item.baseScore : null,
+    rerankScore: Number.isFinite(item.rerankScore) ? item.rerankScore : null,
+    titleHitCount: Number(item.titleHitCount || 0),
+    tagHitCount: Number(item.tagHitCount || 0),
+    contentHitCount: Number(item.contentHitCount || 0),
+    evidenceHitCount: Number(item.evidenceHitCount || 0),
+    exactCoreTagCount: Number(item.exactCoreTagCount || 0),
+    tagMemoSurfaceScore: Number(item.tagMemoSurfaceScore || 0),
+    dynamicCoreWeight: Number(item.dynamicCoreWeight || 0),
+    sourceKinds: Array.isArray(item.sourceKinds)
+      ? [...new Set(item.sourceKinds.map(value => String(value || '').trim()).filter(Boolean))]
+      : []
+  };
+}
+
+function projectAuthenticatedBoundedSearchResponse(results = []) {
+  const safeResults = Array.isArray(results) ? results.map(projectBoundedSearchResult) : [];
+  return {
+    access: {
+      mode: 'authenticated_bounded_search',
+      selectedProjection: true,
+      selectedProjectionVersion: 1,
+      includeContent: false,
+      rawContentReturned: false,
+      pathsReturned: false,
+      memoryIdsReturned: false,
+      titlesReturned: false,
+      snippetsReturned: false
+    },
+    resultCount: safeResults.length,
+    results: safeResults
+  };
+}
+
+function buildAuthenticatedBoundedSearchRejected(reason) {
+  return {
+    decision: 'rejected',
+    reason,
+    access: {
+      mode: 'authenticated_bounded_search',
+      selectedProjection: true,
+      includeContent: false,
+      rawContentReturned: false
+    },
+    results: []
+  };
 }
 
 function normalizeScopeValue(value) {
@@ -675,7 +734,11 @@ function createCodexMemoryApplication(overrides = {}) {
 
   async function executeSearchMemory(args = {}, requestContext = {}, { signal = null } = {}) {
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
-    const readOnly = requestContext.noTokenReadOnly === true;
+    const authenticatedBoundedSearch = isAuthenticatedBoundedSearchRequest(requestContext);
+    if (authenticatedBoundedSearch && args.include_content === true) {
+      return buildAuthenticatedBoundedSearchRejected('authenticated bounded search does not allow include_content=true.');
+    }
+    const readOnly = requestContext.noTokenReadOnly === true || authenticatedBoundedSearch;
     const precisionPolicyContext = normalizeInternalPrecisionPolicyContext(requestContext);
     const noRawContentRead = normalizeInternalNoRawContentRead(requestContext);
     const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
@@ -737,6 +800,9 @@ function createCodexMemoryApplication(overrides = {}) {
         scopeAudit,
         policyAudit
       });
+    }
+    if (authenticatedBoundedSearch) {
+      return projectAuthenticatedBoundedSearchResponse(policyFiltered);
     }
     return { results: policyFiltered };
   }
