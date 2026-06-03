@@ -452,6 +452,18 @@ function createStreamableHttpServer({
           version: app.config.serverVersion,
           protocol: 'streamable-http',
           path: pathname,
+          access: {
+            mode: 'health_low_disclosure',
+            selectedProjection: true,
+            selectedProjectionVersion: 1,
+            bearerTokenRequiredForMcpTools: !!bearerToken,
+            tokenMaterialReturned: false,
+            filesystemPathsReturned: false,
+            rawStoreFieldsReturned: false,
+            rawMemoryFieldsReturned: false,
+            embeddingFingerprintReturned: false,
+            runtimeDetailLevel: 'bounded'
+          },
           auth: {
             required: !!bearerToken,
             warning: authWarning

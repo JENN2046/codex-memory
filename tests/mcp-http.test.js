@@ -32,6 +32,19 @@ const NO_TOKEN_OVERVIEW_ACCESS_KEYS = [
   'selectedProjectionVersion'
 ];
 
+const HEALTH_ACCESS_KEYS = [
+  'bearerTokenRequiredForMcpTools',
+  'embeddingFingerprintReturned',
+  'filesystemPathsReturned',
+  'mode',
+  'rawMemoryFieldsReturned',
+  'rawStoreFieldsReturned',
+  'runtimeDetailLevel',
+  'selectedProjection',
+  'selectedProjectionVersion',
+  'tokenMaterialReturned'
+];
+
 async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
   const app = createCodexMemoryApplication({
@@ -102,8 +115,28 @@ test('HTTP MCP should expose health and tools/list', async () => {
     const healthPayload = await health.json();
     assert.equal(health.status, 200);
     assert.equal(healthPayload.ok, true);
+    assert.deepEqual(Object.keys(healthPayload.access).sort(), HEALTH_ACCESS_KEYS);
+    assert.equal(healthPayload.access.mode, 'health_low_disclosure');
+    assert.equal(healthPayload.access.selectedProjection, true);
+    assert.equal(healthPayload.access.selectedProjectionVersion, 1);
+    assert.equal(healthPayload.access.bearerTokenRequiredForMcpTools, false);
+    assert.equal(healthPayload.access.tokenMaterialReturned, false);
+    assert.equal(healthPayload.access.filesystemPathsReturned, false);
+    assert.equal(healthPayload.access.rawStoreFieldsReturned, false);
+    assert.equal(healthPayload.access.rawMemoryFieldsReturned, false);
+    assert.equal(healthPayload.access.embeddingFingerprintReturned, false);
+    assert.equal(healthPayload.access.runtimeDetailLevel, 'bounded');
     assert.equal(healthPayload.auth.required, false);
     assert.match(healthPayload.auth.warning, /loopback host without a bearer token/);
+    const serializedHealth = JSON.stringify(healthPayload);
+    assert.doesNotMatch(serializedHealth, /test-token/i);
+    assert.doesNotMatch(serializedHealth, /"embeddingProfile"\s*:/);
+    assert.doesNotMatch(serializedHealth, /"fingerprint"\s*:/);
+    assert.doesNotMatch(serializedHealth, /memoryId/i);
+    assert.doesNotMatch(serializedHealth, /auditLogPath/i);
+    assert.doesNotMatch(serializedHealth, /processDiaryPath/i);
+    assert.doesNotMatch(serializedHealth, /knowledgeDiaryPath/i);
+    assert.doesNotMatch(serializedHealth, /candidateCachePath/i);
     assert.deepEqual(Object.keys(healthPayload.runtime).sort(), ['writeReconcileWorker']);
     assert.deepEqual(Object.keys(healthPayload.runtime.writeReconcileWorker).sort(), [
       'available',
@@ -141,6 +174,36 @@ test('HTTP MCP should expose health and tools/list', async () => {
     const payload = await tools.json();
     assert.equal(payload.result.tools.length, 3);
   });
+});
+
+test('HTTP MCP bearer-configured no-token health remains low disclosure', async () => {
+  await withHttpServer(async ({ address }) => {
+    const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'));
+    const healthPayload = await health.json();
+    const serializedHealth = JSON.stringify(healthPayload);
+
+    assert.equal(health.status, 200);
+    assert.equal(healthPayload.ok, true);
+    assert.equal(healthPayload.access.mode, 'health_low_disclosure');
+    assert.equal(healthPayload.access.selectedProjection, true);
+    assert.equal(healthPayload.access.selectedProjectionVersion, 1);
+    assert.equal(healthPayload.access.bearerTokenRequiredForMcpTools, true);
+    assert.equal(healthPayload.access.tokenMaterialReturned, false);
+    assert.equal(healthPayload.access.filesystemPathsReturned, false);
+    assert.equal(healthPayload.access.rawStoreFieldsReturned, false);
+    assert.equal(healthPayload.access.rawMemoryFieldsReturned, false);
+    assert.equal(healthPayload.access.embeddingFingerprintReturned, false);
+    assert.equal(healthPayload.auth.required, true);
+    assert.equal(healthPayload.auth.warning, null);
+    assert.doesNotMatch(serializedHealth, /test-token/i);
+    assert.doesNotMatch(serializedHealth, /"embeddingProfile"\s*:/);
+    assert.doesNotMatch(serializedHealth, /"fingerprint"\s*:/);
+    assert.doesNotMatch(serializedHealth, /memoryId/i);
+    assert.doesNotMatch(serializedHealth, /auditLogPath/i);
+    assert.doesNotMatch(serializedHealth, /processDiaryPath/i);
+    assert.doesNotMatch(serializedHealth, /knowledgeDiaryPath/i);
+    assert.doesNotMatch(serializedHealth, /candidateCachePath/i);
+  }, { bearerToken: 'test-token' });
 });
 
 test('HTTP MCP health should sanitize write reconcile worker last result summary with allowlist', async () => {

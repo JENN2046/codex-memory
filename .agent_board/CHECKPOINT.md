@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1412 record_memory scope schema maxLength`.
-Current validation: `CMV-1527`.
+Current checkpoint: `CM-1413 health endpoint no-token low-disclosure`.
+Current validation: `CMV-1528`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1413 Health Endpoint No-Token Low-Disclosure
+
+Status: `COMPLETED_VALIDATED_CM1413_HEALTH_ENDPOINT_NO_TOKEN_LOW_DISCLOSURE`
+
+Scope: local source/test HTTP contract hardening. Targeted tests use temp-local HTTP servers only. No live 7605 probe, provider/API call, live client action, bearer-token material use, real memory tool call, real store scan, durable write outside temp test stores, config/watchdog/startup change, dependency change, public MCP tool expansion, remote action, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Added `/health` `access.mode=health_low_disclosure` marker and selected projection version.
+- Added explicit false disclosure flags for token material, filesystem paths, raw store/memory fields, and embedding fingerprints.
+- Added no-token and bearer-configured health response redaction tests.
+- Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1413` / `CMV-1528`.
+
+Validation:
+
+- `node --check src\adapters\codex-mcp\http.js`
+- `node --check tests\mcp-http.test.js`
+- `node --test tests\mcp-http.test.js`
+- `node --test tests\http-no-token-search-rejection.test.js`
+
+Result: `/health` has an explicit low-disclosure contract while preserving the bounded runtime health summary.
 
 ## CM-1412 Record Memory Scope Schema MaxLength
 

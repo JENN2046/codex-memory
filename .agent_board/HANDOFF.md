@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1412 record_memory scope schema maxLength`.
-Current validation: `CMV-1527`.
-Current handoff: CM-1412 adds `maxLength: 200` to public `record_memory` scope fields and locks it with validator, MCP tools/list schema, and governance schema tests. Targeted schema/contract tests passed. No provider/API call, live client action, bearer token use, real memory tool, real-store scan, durable write outside temp test stores, config/watchdog/startup change, public MCP tool expansion, remote action, or readiness claim occurred.
+Current task: `CM-1413 health endpoint no-token low-disclosure`.
+Current validation: `CMV-1528`.
+Current handoff: CM-1413 adds `/health` `access.mode=health_low_disclosure` plus explicit false disclosure flags for token material, filesystem paths, raw store/memory fields, and embedding fingerprints. Temp-local HTTP tests passed. No live 7605 probe, provider/API call, live client action, bearer token material use, real memory tool, real-store scan, durable write outside temp test stores, config/watchdog/startup change, public MCP tool expansion, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
