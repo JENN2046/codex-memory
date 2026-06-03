@@ -170,6 +170,29 @@ checkpoint 是重要阶段记录，不是普通 gate 流水。
 
 如果 README 与 source 冲突，以 source/tests 为准，然后更新 README。
 
+## Tiered Governance Logging
+
+治理记录按风险分层，不按文件数量机械放大。
+
+```text
+Tier 0 — Read / Explain
+Tier 1 — Light Local
+Tier 2 — Governed Local
+Tier 3 — Runtime / Red Lane
+```
+
+记录规则：
+
+- Tier 0：不需要 `.agent_board` 或 validation log；如果回答包含需要证明的状态结论，引用 fresh command output。
+- Tier 1：通常不需要 `.agent_board` 或 validation log；最终报告说明 diff inspection 和任何 targeted validation。
+- Tier 2：当改动影响 route、status、phase plan、validation policy、current-facts schema、AGENTS、docs governance 或 sustained task state 时，必须更新 `.agent_board/CURRENT_FACTS.json`、active blocks、task queue、validation log 和 ledger，使 `scripts/validate_current_facts_drift.js` 与 `scripts/validate_autopilot_ledger_consistency.js` 继续通过。
+- Tier 3：必须保留 exact approval、validation、blocker、rollback / cleanup 记录；不得把 docs-only、fixture-only、no-apply 或 committed current-facts snapshot 解释成 runtime readiness。
+
+最低 tier 规则：
+
+- `AGENTS.md`、`STATUS.md`、`DOCS_GOVERNANCE.md`、`CODEX_MEMORY_NEXT_PHASE_PLAN.md`、`PHASE_*_PLAN.md`、`.agent_board/*`、`scripts/validate*`、`scripts/*gate*`、`scripts/*approval*` 是 Tier 2 minimum。
+- `.env`、secrets、provider/profile real calls、real memory/raw store access、startup/watchdog/config、public MCP expansion、migration/import/export/apply、push/release/deploy/cutover 是 Tier 3.
+
 ## Validation Before Docs Commit
 
 docs-only commit 前至少执行：

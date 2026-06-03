@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1404 local validation polish divergence integration`.
-Current validation: `CMV-1522`.
-Current handoff: CM-1404 integrates the useful local validation quiet-output polish onto the current `origin/main` schema v2 route; stale local route-guard commits remain preserved on `backup/local-ahead-5-before-origin-sync` and were not replayed; no runtime, provider, memory tool, durable write, remote action, or readiness claim occurred.
+Current task: `CM-1405 schema v2 tier governance docs`.
+Current validation: `CMV-1523`.
+Current handoff: CM-1405 adds schema v2-compatible tier governance docs to `AGENTS.md` and `DOCS_GOVERNANCE.md`; no stale route guard, `docs-lite`, runtime, provider, memory tool, durable write, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
