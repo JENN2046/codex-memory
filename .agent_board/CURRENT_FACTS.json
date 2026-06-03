@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1414",
-  "validationId": "CMV-1529",
+  "taskId": "CM-1415",
+  "validationId": "CMV-1530",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1530",
+      "scope": "CM-1415 real query quality temp DB gate",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS"
+    },
     {
       "id": "CMV-1529",
       "scope": "CM-1414 audit_memory readonly public tool draft",
@@ -110,6 +115,7 @@
     "live provider/API calls",
     "real memory tools",
     "real record_memory scope write",
+    "real query quality proof",
     "live HTTP health probe",
     "public audit_memory registration",
     "raw audit or broad store scan",

@@ -4,11 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1414 audit_memory readonly public tool draft`.
-Current validation: `CMV-1529`.
+Current checkpoint: `CM-1415 real query quality temp DB gate`.
+Current validation: `CMV-1530`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1415 Real Query Quality Temp DB Gate
+
+Status: `COMPLETED_VALIDATED_CM1415_REAL_QUERY_QUALITY_TEMP_DB_GATE`
+
+Scope: local source/test/temp-db gate only. Uses isolated temp app/sqlite/vector/chunks and synthetic records. No provider/API call, live MCP call, bearer-token use, real memory read/write, raw store scan, durable audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Added `QueryQualityTempDbGate` core runner.
+- Added `query-quality-temp-db-gate` CLI and `query:quality:temp-db` npm script.
+- Added tests for passing synthetic recall, bad `topKOrder` failure, tombstoned/cross-client private suppression, CLI JSON, and temp cleanup.
+- Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1415` / `CMV-1530`.
+
+Validation:
+
+- `node --check src\core\QueryQualityTempDbGate.js`
+- `node --check src\cli\query-quality-temp-db-gate.js`
+- `node --check tests\query-quality-temp-db-gate.test.js`
+- `node --test tests\query-quality-temp-db-gate.test.js`
+- `npm run query:quality:temp-db -- --json`
+
+Result: temp DB query quality now exercises the recall pipeline against synthetic local sqlite/chunk/vector data without touching real memory or live runtime.
 
 ## CM-1414 Audit Memory Readonly Public Tool Draft
 

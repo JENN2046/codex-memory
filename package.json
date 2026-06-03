@@ -61,6 +61,7 @@
     "validate-memory": "node ./src/cli/validate-memory.js",
     "real-query-suite": "node ./src/cli/real-query-suite.js",
     "query:quality": "node ./src/cli/query-quality-report.js",
+    "query:quality:temp-db": "node ./src/cli/query-quality-temp-db-gate.js",
     "provider-smoke": "node ./src/cli/provider-smoke.js",
     "provider-benchmark": "node ./src/cli/provider-benchmark.js",
     "test": "node ./src/cli/run-default-tests.js",
