@@ -14,6 +14,12 @@ This file is the project constitution, not the live project journal. Keep durabl
 
 Use the smallest governance tier that fits the work, but never below the minimum tier implied by touched files, systems, or evidence claims.
 
+## Context Intake Contract
+
+Default project context must stay small and current. Use [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md), [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json), fresh Git output, changed files, validation output, explicit boundary declaration, and the requested decision before loading historical logs.
+
+Long historical surfaces such as `.agent_board/CHECKPOINT.md`, `.agent_board/HANDOFF.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/TASK_QUEUE.md`, and `STATUS.md` archives are not default context. Load them by targeted task id, validation id, evidence path, or archive index only when the current decision requires exact historical detail. The governing intake rules live in [docs/CONTEXT_INTAKE_CONTRACT.md](/A:/codex-memory/docs/CONTEXT_INTAKE_CONTRACT.md).
+
 ### Tier 0 — Read / Explain
 
 Use for read-only scans, explanations, summaries, and command-output reporting.

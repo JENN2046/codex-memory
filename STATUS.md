@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1418 Phase H bounded memory_overview live no-mutation evidence closeout`.
-Current validation: `CMV-1533`.
+Current task: `CM-1420 context intake and status-surface compaction`.
+Current validation: `CMV-1534`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase H live bounded memory_overview evidence closed; next search_memory negative-control`.
+Current route: `Phase H context governance and status-surface compaction before bounded search_memory negative-control`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -27,6 +27,8 @@ RC_READY_FALSE
 
 当前权威后续路线：
 
+- 当前短状态入口：[CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md)
+- 默认上下文合同：[docs/CONTEXT_INTAKE_CONTRACT.md](/A:/codex-memory/docs/CONTEXT_INTAKE_CONTRACT.md)
 - 总路线入口：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
 - Phase H 执行入口：[docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md)
 - Phase H 库存支撑：[docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_INVENTORY.md)
@@ -37,7 +39,8 @@ RC_READY_FALSE
 - 当前已完成 live no-mutation evidence：`main == origin/main == b94e5691be5e416183e15afff9b56eac1688e41a`、worktree clean、7605 runtime freshness accepted after stale PID `43728` refresh to PID `74996`、no-token `/health` strict low-disclosure、invalid-token `/health` rejected、authorized `/health` bounded full payload、MCP `initialize`、`tools/list`、no-token `memory_overview` selected projection、authenticated `memory_overview` bounded projection；public tools remained `memory_overview`, `record_memory`, `search_memory`; no forbidden path/audit/file/link/profile/provider/token/raw-memory fields observed in bounded overview outputs.
 - 当前剩余边界：live `search_memory` negative-control、live Codex/Claude client refresh、real cross-client private recall proof、real scoped write proof、broad client-scope store scan、public MCP expansion、client config/watchdog/startup change、readiness/cutover/`RC_READY` claim。
 - 编号注意：Phase H source/test closeout aggregator 使用 `CM-1404` through `CM-1407` 作为 no-apply evidence-unit labels；当前 active board 的 `CM-1404` / `CM-1405` 是后续 docs/validation governance tasks。后续 agent 不应把这两组编号混成同一个任务。
-- 下一安全任务：准备并执行 `CM-1419 Phase H search_memory negative-control` only if exact scope is preserved: bounded live `search_memory` negative-control only, no `record_memory`, no provider/API, no raw store scan, no broad export, no config/startup/watchdog, no public MCP expansion, no push/release/cutover/readiness claim.
+- 当前治理切片：`CM-1420` 已将默认上下文收敛到 fresh Git facts、`CURRENT_STATE.md`、`.agent_board/CURRENT_FACTS.json`、changed files、validation output、boundary declaration 和 requested decision；长 checkpoint / handoff / validation / task / autopilot ledger 历史改为 archive index 和 Git history 引用。
+- 下一安全任务：回到 `CM-1419 Phase H search_memory negative-control`，且只能在 exact bounded readonly scope 下执行：bounded live `search_memory` negative-control only, no `record_memory`, no provider/API, no raw store scan, no broad export, no config/startup/watchdog, no public MCP expansion, no push/release/cutover/readiness claim.
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 

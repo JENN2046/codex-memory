@@ -12,27 +12,35 @@
 
 当前文档治理的优先级是先收束状态入口，再处理 runtime gap，最后进入 personal RC dogfood。
 
+当前上下文治理入口：
+
+- [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md)：短人类当前态入口。
+- [docs/CONTEXT_INTAKE_CONTRACT.md](/A:/codex-memory/docs/CONTEXT_INTAKE_CONTRACT.md)：每轮默认上下文合同。
+- [docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md](/A:/codex-memory/docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md)：CM-1420 压缩状态面的历史索引。
+
 第一阶段只做文档面瘦身：
 
 - 不改 runtime 行为。
 - 不扩展 public MCP tools。
 - 不声明 readiness、write reliability 或 recall reliability。
-- 不新增并行的 root/current-state 状态源。
+- 不新增会与 `.agent_board/CURRENT_FACTS.json` 竞争的 live Git facts 状态源；`CURRENT_STATE.md` 只做短人类摘要，不提交 live head/origin/ahead-behind。
 - 不把历史 CM/Pxx 审查流水继续复制到多个文件。
 
 瘦身后的恢复路径应尽量只依赖少数入口：
 
 1. [README.md](/A:/codex-memory/README.md)：操作地图和能力/命令入口。
-2. [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json)：提交到仓库的当前状态/验证快照；live Git facts 必须来自 fresh Git 命令。
-3. [STATUS.md](/A:/codex-memory/STATUS.md)：当前事实的人类摘要，不承载完整历史，也不重复完整当前 commit hash。
-4. [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)：当前后续路线。
-5. [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) 与 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)：当前任务和验证 ledger。
+2. [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md)：短人类当前态和下一安全动作。
+3. [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json)：提交到仓库的当前状态/验证快照；live Git facts 必须来自 fresh Git 命令。
+4. [STATUS.md](/A:/codex-memory/STATUS.md)：当前事实的人类摘要，不承载完整历史，也不重复完整当前 commit hash。
+5. [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)：当前后续路线。
+6. [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) 与 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)：短当前任务和验证 ledger；历史通过 archive index / Git history 引用。
 
 ## 事实源分工
 
 | 文件 | 职责 | 更新频率 |
 |---|---|---|
 | [README.md](/A:/codex-memory/README.md) | operation map：能力入口、架构入口、命令入口、接入入口 | 低频 |
+| [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md) | 短人类当前态入口；不提交 live `HEAD` / `origin/main` / ahead-behind | 每批任务 |
 | [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json) | 当前状态/验证快照；不提交 live `HEAD` / `origin/main`，branch/head/origin/ahead-behind 必须由 fresh Git 命令采集 | 每批任务 |
 | [STATUS.md](/A:/codex-memory/STATUS.md) | 当前事实的人类摘要；active block 必须引用 `.agent_board/CURRENT_FACTS.json` | 中频 |
 | [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md) | 当前后续路线和阶段顺序，不承担详细任务队列 | 低频 |
@@ -44,6 +52,20 @@
 | [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) | 只做导航，不承载实时状态正文 | 低频 |
 | [MEMORY.md](/A:/codex-memory/MEMORY.md) | 历史阶段记忆索引；不作为当前状态源 | 低频 |
 | [PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md) | 主项目收官记录，默认冻结 | 极低频 |
+
+## Context Intake 规则
+
+默认上下文只带：
+
+- fresh Git facts
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- 当前 changed files
+- 当前 validation output
+- boundary declaration
+- requested decision
+
+不要默认灌入完整 checkpoint、handoff、validation log、task queue、历史 STATUS 正文或 raw memory/audit/store 内容。历史证据先用 task id、validation id、commit id、evidence path、archive index 引用；只有当前判断需要精确历史文字时才打开全文。
 
 ## README 规则
 

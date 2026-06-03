@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1418 Phase H bounded memory_overview live no-mutation evidence closeout`.
-Current validation: `CMV-1533`.
+Current task: `CM-1420 context intake and status-surface compaction`.
+Current validation: `CMV-1534`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -24,18 +24,22 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 | Historical area at archive time | P8-memory-governance / P9-codex-claude-client-scope / P10-observability-admin / P6-docs-drift |
 | Historical route at archive time | Phase G -> G1 Memory Governance Runtime Boundary -> CM-1389 governance runtime inventory |
 | Historical status at archive time | `PERSONAL_DOGFOOD_READY_NOT_RC_READY / RC_READY=false` |
-| Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
+| Historical active entrypoints at archive time | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
 | Untracked files left untouched | `CLAUDE.md`; `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` |
-| Runtime/source touched by current task | local docs/board route authority only; no runtime mutation |
-| Provider/API calls by current task | no |
-| Real memory tools by current task | none |
-| Durable memory/audit writes by current task | no |
-| Public MCP expansion by current task | no |
-| Push/tag/release/deploy by current task | no |
-| Readiness/reliability claim by current task | no |
+| Runtime/source touched by historical task | local docs/board route authority only; no runtime mutation |
+| Provider/API calls by historical task | no |
+| Real memory tools by historical task | none |
+| Durable memory/audit writes by historical task | no |
+| Public MCP expansion by historical task | no |
+| Push/tag/release/deploy by historical task | no |
+| Readiness/reliability claim by historical task | no |
 
 ## Next Safe Action
+
+`CM-1420` docs/board validation is complete locally. Return to `CM-1419 Phase H search_memory negative-control` only if an exact bounded readonly scope and fresh Git/runtime preflight are available.
+
+## Historical Run Notes
 
 RC-1 current-head local baseline is recorded in `.agent_board/CHECKPOINT.md` for target commit `fe39bdc8e95fa34084ac179e3da2113e0ac7c538`: `npm test` passed, and `npm run gate:mainline` passed after local HTTP MCP was started with `npm run start:http:ensure`.
 

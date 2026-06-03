@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1418",
-  "validationId": "CMV-1533",
+  "taskId": "CM-1420",
+  "validationId": "CMV-1534",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1534",
+      "scope": "CM-1420 context intake and status-surface compaction",
+      "status": "COMPLETED_VALIDATED_DOCS_BOARD_CONTEXT_GOVERNANCE"
+    },
     {
       "id": "CMV-1533",
       "scope": "CM-1418 Phase H bounded memory_overview live no-mutation evidence closeout",
