@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1430 bounded positive search_memory shape evidence closeout`.
-Current validation: `CMV-1542`.
-Current handoff: CM-1430 records already executed CM-1428 bounded positive `search_memory` shape pass evidence. No new live probe, token use, real memory read, or raw store scan occurred in CM-1430.
+Current task: `CM-1431 scoped record_memory write proof scope packet`.
+Current validation: `CMV-1543`.
+Current handoff: CM-1431 prepares a docs-only future CM-1432 scoped `record_memory` write proof packet. No live write, token use, real memory read, or raw store scan occurred in CM-1431.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: docs-only closeout for CM-1428 bounded positive `search_memory` shape pass evidence.
+Goal: docs-only scope packet for future CM-1432 scoped `record_memory` write proof.
 
-Current status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1428_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_PASSED`.
+Current status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,22 +28,23 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Recorded `main == origin/main == 75cd937e7bdc607dc1b7df561a15aef9c36314db`, runtime freshness accepted, listener PID `15112`, and public tools unchanged.
-- Recorded exactly one authenticated `search_memory` call in CM-1428 with query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`, `access.mode=authenticated_bounded_search`.
-- Recorded `resultCount=1`, `resultsLength=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`, `wrapperContentIgnored=true`.
-- Recorded bounded result keys only: `baseScore`, `contentHitCount`, `dynamicCoreWeight`, `evidenceHitCount`, `exactCoreTagCount`, `rerankScore`, `score`, `sourceKinds`, `tagHitCount`, `tagMemoSurfaceScore`, `target`, `titleHitCount`.
-- Recorded no `record_memory`, no `memory_overview`, no provider/API, no raw store scan, no durable write, no public MCP expansion, and no readiness / `RC_READY` claim.
-- No live `search_memory`, `record_memory`, `memory_overview`, token use, provider/API call, real memory read/write, raw store scan, durable write, runtime change, or readiness claim occurred in CM-1430.
+- Added `docs/CM1431_SCOPED_RECORD_MEMORY_WRITE_PROOF_SCOPE_PACKET.md`.
+- Fixed the future CM-1432 write shape to exactly one authenticated public HTTP MCP `record_memory` call with `target=process`.
+- Fixed the future payload as synthetic governance-safe marker content only, with required fields `project_id`, `client_id`, `visibility`, `task_id`, and `retention_policy`.
+- Recorded payload SHA-256 `015df43d6ca44197da9a3811a02c39c1696f1d27661a399c6ecc421ba9a757fb`.
+- Wrote the future exact approval template into the packet.
+- Recorded that CM-1432 requires packet commit/push, fresh clean synced commit, runtime refresh, freshness acceptance, and fresh exact one-write approval.
+- No live `record_memory`, `search_memory`, `memory_overview`, token use, provider/API call, real memory read/write, raw store scan, durable write, runtime change, or readiness claim occurred in CM-1431.
 
-Validation: `CMV-1542` docs-only validation.
+Validation: `CMV-1543` docs-only validation.
 
 Boundaries:
 
-- No runtime action, memory tool call, provider/API call, token use, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1430.
+- No runtime action, memory tool call, provider/API call, token use, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1431.
 
 Next safe action:
 
-Commit/push CM-1430 docs-only closeout only if separately authorized. Any further live client/write/provider/readiness work requires separate exact approval.
+Commit/push CM-1431 docs-only packet only if separately authorized. After commit/push, CM-1432 still requires runtime refresh and a fresh exact one-write approval before any `record_memory` call.
 
 ## Historical Handoff Archive
 

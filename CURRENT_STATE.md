@@ -9,9 +9,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1430 bounded positive search_memory shape evidence closeout` |
-| Current validation | `CMV-1542` |
-| Current route | Phase H bounded positive `search_memory` shape gate passed; docs-only closeout |
+| Current task | `CM-1431 scoped record_memory write proof scope packet` |
+| Current validation | `CMV-1543` |
+| Current route | Phase H scoped `record_memory` write proof packet prepared; no live write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -30,6 +30,8 @@ Side-effect evidence for the CM-1422 execution: no `record_memory`, no `memory_o
 
 Side-effect evidence for the CM-1428 execution: no `record_memory`, no `memory_overview`, no provider/API call, no raw store scan, no durable write, no public MCP expansion, and no readiness or `RC_READY` claim.
 
+`CM-1431` prepares `docs/CM1431_SCOPED_RECORD_MEMORY_WRITE_PROOF_SCOPE_PACKET.md` for a future `CM-1432` scoped `record_memory` write proof. The packet is docs-only and does not execute `record_memory`, `search_memory`, `memory_overview`, bearer-token use, provider/API calls, runtime refresh, real memory read/write, raw store scans, public MCP expansion, remote action, readiness claim, or `RC_READY` claim. Future CM-1432 is limited to exactly one authenticated public HTTP MCP `record_memory` call with `target=process`, synthetic governance-safe marker content only, required scope fields `project_id`, `client_id`, `visibility`, `task_id`, and `retention_policy`, payload SHA-256 `015df43d6ca44197da9a3811a02c39c1696f1d27661a399c6ecc421ba9a757fb`, and no follow-up search unless separately authorized.
+
 Latest local validation before CM-1420:
 
 - `npm test` passed `2992/2992`.
@@ -39,7 +41,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1430 is a docs-only closeout. Do not rerun live `search_memory` from this closeout task. Any further live client, write, provider, or readiness work requires a separate exact approval.
+CM-1431 is a docs-only scope packet. Commit/push only when explicitly authorized. After the CM-1431 packet is committed and pushed, CM-1432 still requires runtime refresh and a fresh exact one-write approval before any `record_memory` call.
 
 ## Boundaries
 

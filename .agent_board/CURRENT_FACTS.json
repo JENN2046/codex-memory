@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1430",
-  "validationId": "CMV-1542",
+  "taskId": "CM-1431",
+  "validationId": "CMV-1543",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1543",
+      "scope": "CM-1431 scoped record_memory write proof scope packet",
+      "status": "COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED"
+    },
     {
       "id": "CMV-1542",
       "scope": "CM-1430 bounded positive search_memory shape evidence closeout",
@@ -174,6 +179,7 @@
     "provider smoke or benchmark",
     "live provider/API calls",
     "real record_memory scope write",
+    "CM-1432 scoped record_memory write proof execution",
     "real query quality proof",
     "public audit_memory registration",
     "raw audit or broad store scan",

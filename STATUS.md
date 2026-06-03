@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1430 bounded positive search_memory shape evidence closeout`.
-Current validation: `CMV-1542`.
+Current task: `CM-1431 scoped record_memory write proof scope packet`.
+Current validation: `CMV-1543`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase H bounded positive search_memory shape gate passed; docs-only closeout`.
+Current route: `Phase H scoped record_memory write proof packet prepared; no live write`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -53,6 +53,7 @@ RC_READY_FALSE
 - CM-1429 investigation：未 rerun live search，未读取真实 memory/raw store。Source review shows bounded projection sets `access.memoryIdsReturned=false` and strips result `memoryId`; HTTP authenticated bounded search path is covered by synthetic tests. Root cause is likely evidence collector false positive: it inferred `memoryIdsReturned=true` from key path `structuredContent.access.memoryIdsReturned` instead of boolean value / actual result item fields. Added `inspectBoundedSearchEvidenceShape(...)` key-path/access-flag-only helper and tests.
 - CM-1428 bounded positive rerun after CM-1429：`main == origin/main == 75cd937e7bdc607dc1b7df561a15aef9c36314db`，worktree clean，runtime freshness accepted，listener PID `15112`，public tools unchanged (`memory_overview`, `record_memory`, `search_memory`)。Exactly one authenticated `search_memory` call executed: query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`, `access.mode=authenticated_bounded_search`。Sanitized receipt passed with `resultCount=1`, `resultsLength=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`, `wrapperContentIgnored=true`。Bounded result keys only: `baseScore`, `contentHitCount`, `dynamicCoreWeight`, `evidenceHitCount`, `exactCoreTagCount`, `rerankScore`, `score`, `sourceKinds`, `tagHitCount`, `tagMemoSurfaceScore`, `target`, `titleHitCount`。无 `record_memory`，无 `memory_overview`，无 provider/API，未做 raw store scan，无 durable write，无 public MCP expansion，无 readiness / `RC_READY` claim。
 - 当前 closeout：CM-1430 仅记录上述已经执行过的证据，不执行新的 live probe。禁止 `search_memory`、`record_memory`、`memory_overview`、bearer token use、provider/API、raw store scan、config/startup/watchdog、public MCP expansion、push/release/cutover/readiness claim，除非单独授权。
+- CM-1431 scope packet：`docs/CM1431_SCOPED_RECORD_MEMORY_WRITE_PROOF_SCOPE_PACKET.md` 已准备 future CM-1432 scoped `record_memory` write proof。当前不执行 live `record_memory` / `search_memory` / `memory_overview`，不使用 bearer token，不读取真实 memory，不扫描 raw store，不刷新 runtime，不调用 provider/API，不做 durable write。Future gate 仅限 exactly one authenticated public HTTP MCP `record_memory` call，`target=process`，synthetic governance-safe marker content only，required scope fields `project_id`, `client_id`, `visibility`, `task_id`, `retention_policy`，payload SHA-256 `015df43d6ca44197da9a3811a02c39c1696f1d27661a399c6ecc421ba9a757fb`。CM-1432 必须在 CM-1431 commit/push 后重新确认 clean synced commit、runtime refresh、runtime freshness accepted 和 fresh exact one-write approval；follow-up search 只能单独授权。
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 
