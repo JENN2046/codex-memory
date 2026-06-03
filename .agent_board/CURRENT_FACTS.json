@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1417",
-  "validationId": "CMV-1532",
+  "taskId": "CM-1418",
+  "validationId": "CMV-1533",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1533",
+      "scope": "CM-1418 Phase H bounded memory_overview live no-mutation evidence closeout",
+      "status": "COMPLETED_VALIDATED_DOCS_ONLY"
+    },
     {
       "id": "CMV-1532",
       "scope": "CM-1417 authenticated memory_overview bounded projection",
@@ -123,14 +128,12 @@
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
-    "real memory tools",
+    "live search_memory negative-control",
     "real record_memory scope write",
     "real query quality proof",
-    "live HTTP health probe",
     "public audit_memory registration",
     "raw audit or broad store scan",
-    "runtime freshness",
-    "phase h live validation execution",
+    "phase h record_memory scoped-write execution",
     "committed live Git head facts"
   ],
   "constraints": {

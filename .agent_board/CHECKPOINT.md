@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1417 authenticated memory_overview bounded projection`.
-Current validation: `CMV-1532`.
+Current checkpoint: `CM-1418 Phase H bounded memory_overview live no-mutation evidence closeout`.
+Current validation: `CMV-1533`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1418 Phase H Bounded Memory Overview Live No-Mutation Evidence Closeout
+
+Status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1418_MEMORY_OVERVIEW_LIVE_NO_MUTATION_CLOSEOUT`
+
+Scope: docs-only evidence closeout for the already executed Phase H runtime refresh + bounded `memory_overview` live no-mutation gate. CM-1418 did not run a new live probe, MCP call, memory tool call, provider/API call, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim.
+
+Recorded evidence:
+
+- Fresh Git/runtime basis was `main == origin/main == b94e5691be5e416183e15afff9b56eac1688e41a`.
+- Stale listener PID `43728` was refreshed to PID `74996` using the existing ensure script before this docs closeout.
+- Runtime freshness returned `PHASE_F1_RUNTIME_FRESHNESS_ACCEPTED`.
+- `/health` no-token was strict low-disclosure.
+- invalid-token `/health` returned `401` before full payload.
+- authorized `/health` returned bounded full payload.
+- MCP `initialize` and `tools/list` passed.
+- Public tools remained `memory_overview`, `record_memory`, and `search_memory`.
+- no-token `memory_overview` returned `no_token_selected_overview`.
+- authenticated `memory_overview` returned `authenticated_bounded_overview`.
+- Bounded overview outputs did not expose paths, recent audit rows, memory links, recent files, embedding profile, provider endpoint, token material, raw memory fields, `.jsonl`, `.sqlite`, or filesystem path metadata.
+
+Next: `CM-1419 Phase H search_memory negative-control`, only with exact bounded readonly scope and side-effect counters.
 
 ## CM-1417 Authenticated Memory Overview Bounded Projection
 

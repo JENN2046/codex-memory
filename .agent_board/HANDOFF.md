@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1417 authenticated memory_overview bounded projection`.
-Current validation: `CMV-1532`.
-Current handoff: CM-1417 patches the Phase H bounded `memory_overview` gate failure by making HTTP bearer-token `memory_overview` default to `authenticated_bounded_overview`, preserving no-token selected projection and internal full overview, and locking HTTP/MCP tests so default authenticated HTTP no longer returns paths, recent audit rows, memory links, recent files, embedding profile/fingerprint, provider endpoint, token material, or raw memory fields. It also lets `http-observe` authenticate default configured health probes without forwarding bearer material to explicit `--health-url`. Validation used local source/tests/docs and temp-local HTTP servers only; requested `tests/mcp-http.test.js` includes existing temp-local record/search contract cases. No live 7605 probe, live or real `record_memory`, live or real `search_memory`, provider/API call, real memory read/write, raw audit/store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1418 Phase H bounded memory_overview live no-mutation evidence closeout`.
+Current validation: `CMV-1533`.
+Current handoff: CM-1418 records the accepted Phase H runtime refresh + bounded `memory_overview` live no-mutation evidence from the pushed CM-1417 head; collect exact live Git hashes with fresh Git commands. Evidence: stale listener PID `43728` was refreshed to PID `74996`, runtime freshness accepted, no-token `/health` was strict low-disclosure, invalid-token `/health` rejected, authorized `/health` bounded full payload passed, MCP `initialize` and `tools/list` passed, public tools stayed `memory_overview` / `record_memory` / `search_memory`, no-token `memory_overview` returned `no_token_selected_overview`, authenticated `memory_overview` returned `authenticated_bounded_overview`, and bounded overview outputs did not expose forbidden path/audit/file/link/profile/provider/token/raw-memory metadata. CM-1418 itself is docs-only and performed no new runtime probe, memory tool call, provider/API call, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim. Next safe task is `CM-1419 Phase H search_memory negative-control` only with exact bounded readonly scope; keep `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

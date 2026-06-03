@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1417 authenticated memory_overview bounded projection`.
-Current validation: `CMV-1532`.
+Current task: `CM-1418 Phase H bounded memory_overview live no-mutation evidence closeout`.
+Current validation: `CMV-1533`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
