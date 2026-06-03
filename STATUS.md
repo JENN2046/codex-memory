@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1425 search_memory negative-control precision / no-result policy patch`.
-Current validation: `CMV-1538`.
+Current task: `CM-1426 Phase H bounded search_memory negative-control evidence closeout`.
+Current validation: `CMV-1539`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase H authenticated search_memory high-entropy negative-control proofNoResultMode patched locally; no live rerun`.
+Current route: `Phase H authenticated search_memory bounded negative-control passed; docs-only closeout`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -46,7 +46,8 @@ RC_READY_FALSE
 - CM-1424 本地 patch：authenticated HTTP `search_memory` 进入 bounded projection，强制 read-only/noRawContentRead，`include_content=true` 在该 path 下 rejected 且不调用 search；public structured output 只保留 bounded count/score/target-style fields，strip `sourceFile`、`filePath`、`path`、`title`、`memoryId`、`snippet`、`text`、`content`、`raw_text`。no-token `search_memory` 仍 rejected；public tools unchanged。
 - CM-1422 rerun after CM-1424：runtime refreshed to `80b0c62`; exact NC1/NC2 authenticated `search_memory` calls returned bounded sanitized shape with forbidden key paths `0`, but both returned `resultCount=1` because ordinary recall accepted positive vector/hash score candidates.
 - CM-1425 本地 patch：authenticated HTTP high-entropy negative-control `search_memory` now receives `proofNoResultMode` precision policy under the exact bounded shape (`target=both`, `limit=1`, `include_content=false`). Ordinary authenticated bounded search remains unchanged. No live rerun in CM-1425.
-- 下一安全任务：审阅并提交/推送 CM-1425；随后刷新 runtime，才可用 fresh exact approval 重新进入 CM-1422 rerun。禁止 `record_memory`、provider/API、raw store scan、broad export、config/startup/watchdog、public MCP expansion、push/release/cutover/readiness claim，除非单独授权。
+- CM-1422 rerun after CM-1425：`main == origin/main == b7e20cc`，worktree clean，runtime freshness accepted，listener PID `4296`，public tools unchanged (`memory_overview`, `record_memory`, `search_memory`)。NC1 `xqzv-9137-lomdra-kepv-azmuth` 和 NC2 `nareth-48291-pluvox-darnel-kiv` 均使用 `target=both`, `limit=1`, `include_content=false`，`access.mode=authenticated_bounded_search`，`resultCount=0`。forbidden key paths `0`，`rawContentReturned=false`，`pathsReturned=false`，`memoryIdsReturned=false`。无 `record_memory`，无 provider/API，未做 raw store scan，未观察到 durable write，无 readiness / `RC_READY` claim。
+- 当前 closeout：CM-1426 仅记录上述已经执行过的证据，不执行新的 live probe。禁止 `search_memory`、`record_memory`、`memory_overview`、provider/API、raw store scan、config/startup/watchdog、public MCP expansion、push/release/cutover/readiness claim，除非单独授权。
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 

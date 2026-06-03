@@ -4,34 +4,41 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1425 search_memory negative-control precision / no-result policy patch`.
-Current validation: `CMV-1538`.
+Current checkpoint: `CM-1426 Phase H bounded search_memory negative-control evidence closeout`.
+Current validation: `CMV-1539`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1425 Search Memory Negative-Control Precision Patch
+## CM-1426 Phase H Bounded Search Memory Negative-Control Evidence Closeout
 
-Status: `COMPLETED_VALIDATED_SOURCE_TESTS_HARDENING_NO_LIVE_RERUN`
+Status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1422_SEARCH_MEMORY_NEGATIVE_CONTROL_PASSED`
 
 Scope:
 
 ```text
-local source/test HTTP precision policy patch; no live rerun
+docs-only evidence closeout; no new live probe
 ```
 
-Changed:
+Recorded:
 
-- Added high-entropy nonce negative-control detection in `src/app.js`.
-- Authenticated bounded HTTP `search_memory` now passes `proofNoResultMode` for exact nonce-style `target=both`, `limit=1`, `include_content=false` calls.
-- Ordinary authenticated bounded search remains without precision policy.
-- Added HTTP contract coverage proving the negative-control path receives `proofNoResultMode`.
+- `main == origin/main == b7e20cc`.
+- Runtime freshness accepted.
+- Listener PID `4296`.
+- Public tools unchanged: `memory_overview`, `record_memory`, `search_memory`.
+- NC1 and NC2 both returned `resultCount=0`.
+- Both used `target=both`, `limit=1`, `include_content=false`.
+- `access.mode=authenticated_bounded_search`.
+- Forbidden key paths `0`.
+- `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`.
+- No `record_memory`, provider/API, raw store scan, durable write observed, or readiness / `RC_READY` claim.
 
 Boundary:
 
-- No runtime action.
-- No live MCP `tools/call` in CM-1425.
-- No live `search_memory` rerun in CM-1425.
+- No runtime action in CM-1426.
+- No live MCP `tools/call` in CM-1426.
+- No live `search_memory` rerun in CM-1426.
+- No `memory_overview`.
 - No provider/API call.
 - No bearer-token use.
 - No raw memory/audit/store scan.
@@ -41,11 +48,12 @@ Boundary:
 - No remote action.
 - No readiness, reliability, release, cutover, or `RC_READY` claim.
 
-Validation: `CMV-1538` source/test/hardening validation.
+Validation: `CMV-1539` docs-only validation.
 
 ## Recent Checkpoint References
 
 - `CM-1420`: context intake and status-surface compaction.
+- `CM-1425`: `search_memory` negative-control precision / no-result policy patch.
 - `CM-1424`: authenticated `search_memory` bounded/noRawContentRead projection patch.
 - `CM-1418`: Phase H bounded `memory_overview` live no-mutation evidence closeout, docs-only closeout of already executed live evidence.
 - `CM-1417`: authenticated `memory_overview` bounded projection source/test/docs hardening.
