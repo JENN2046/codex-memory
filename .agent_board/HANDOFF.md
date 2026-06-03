@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1409 Phase H status reconciliation`.
-Current validation: `CMV-1524`.
-Current handoff: CM-1409 reconciles Phase H docs/board status after later docs/governance work. It separates Phase H source/test closeout evidence-unit labels `CM-1404..CM-1407` from active board task IDs, lists completed local no-apply Phase H slices, and preserves approval boundaries for live clients, bearer tokens, real memory, config/startup/watchdog, public MCP expansion, remote action, and readiness/cutover. No runtime, provider, memory tool, durable write, remote action, or readiness claim occurred.
+Current task: `CM-1410 Phase H live validation approval packet`.
+Current validation: `CMV-1525`.
+Current handoff: CM-1410 prepares a docs/board-only exact approval packet for future Phase H live validation. It allows a later exact-approved health/initialize/tools-list/readonly overview/bounded readonly sanitized search scope, while forbidding record_memory, real scoped write proof, broad store scan, raw data exposure, provider calls, config/startup/watchdog changes, public MCP expansion, remote action, and readiness/RC_READY claims. No runtime, bearer token use, provider, memory tool, durable write, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

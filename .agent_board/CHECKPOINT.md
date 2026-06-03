@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1409 Phase H status reconciliation`.
-Current validation: `CMV-1524`.
+Current checkpoint: `CM-1410 Phase H live validation approval packet`.
+Current validation: `CMV-1525`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1410 Phase H Live Validation Approval Packet
+
+Status: `COMPLETED_VALIDATED_CM1410_PHASE_H_LIVE_VALIDATION_APPROVAL_PACKET`
+
+Scope: docs/board-only approval packet preparation. No live client operation, bearer-token use, memory tool call, provider call, real memory/store scan, durable write, config/watchdog/startup change, public MCP expansion, dependency change, remote action, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Added `docs/CM1410_PHASE_H_LIVE_VALIDATION_APPROVAL_PACKET.md`.
+- Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1410` / `CMV-1525`.
+- Prepared a future exact approval template for health, initialize, tools/list, readonly `memory_overview`, and at most two bounded readonly sanitized `search_memory` calls.
+- Kept `record_memory`, real scoped write proof, broad store scan, raw data exposure, provider calls, config/startup changes, public MCP expansion, remote actions, and readiness/`RC_READY` claims forbidden.
+
+Validation:
+
+- `git diff --check`
+- `node scripts\validate_current_facts_drift.js`
+- `node scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Result: approval packet prepared, not approved and not executed. Future live validation still requires a fresh exact approval line after commit/sync and fresh Git facts.
 
 ## CM-1409 Phase H Status Reconciliation
 

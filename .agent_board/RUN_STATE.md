@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1409 Phase H status reconciliation`.
-Current validation: `CMV-1524`.
+Current task: `CM-1410 Phase H live validation approval packet`.
+Current validation: `CMV-1525`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -125,4 +125,4 @@ git log --oneline --decorate -n 10
 ```
 
 Repository reality overrides this file.
-Current reconciliation: `CM-1409` updates docs/board status so Phase H local no-apply source/test evidence-unit labels `CM-1404..CM-1407` are not confused with active board docs/governance task IDs. Runtime, provider, memory tools, real stores, config/watchdog/startup, public MCP expansion, remote action, and readiness/cutover remain out of scope without fresh exact approval.
+Current packet: `CM-1410` prepares a docs-only exact approval surface for future Phase H live validation. It does not execute health probes, client commands, bearer-token use, memory tools, provider calls, real-store reads, config/watchdog/startup changes, public MCP expansion, remote action, or readiness/cutover. Future execution requires a fresh exact approval line after commit/sync and fresh Git facts.

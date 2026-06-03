@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1409",
-  "validationId": "CMV-1524",
+  "taskId": "CM-1410",
+  "validationId": "CMV-1525",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1525",
+      "scope": "CM-1410 Phase H live validation approval packet",
+      "status": "COMPLETED_VALIDATED_NO_APPLY"
+    },
     {
       "id": "CMV-1524",
       "scope": "CM-1409 Phase H status reconciliation",
@@ -84,6 +89,7 @@
     "provider smoke or benchmark",
     "real memory tools",
     "runtime freshness",
+    "phase h live validation execution",
     "committed live Git head facts"
   ],
   "constraints": {
