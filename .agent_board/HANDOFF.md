@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1413 health endpoint no-token low-disclosure`.
-Current validation: `CMV-1528`.
-Current handoff: CM-1413 adds `/health` `access.mode=health_low_disclosure` plus explicit false disclosure flags for token material, filesystem paths, raw store/memory fields, and embedding fingerprints. Temp-local HTTP tests passed. No live 7605 probe, provider/API call, live client action, bearer token material use, real memory tool, real-store scan, durable write outside temp test stores, config/watchdog/startup change, public MCP tool expansion, remote action, or readiness claim occurred.
+Current task: `CM-1414 audit_memory readonly public tool draft`.
+Current validation: `CMV-1529`.
+Current handoff: CM-1414 adds an internal `audit_memory` readonly draft report/schema and targeted tests proving it is draft-only, low-disclosure, bounded, and absent from static `TOOL_DEFINITIONS` plus MCP `tools/list`. No public MCP registration, live client action, provider/API call, bearer token material use, real memory tool, raw audit read, real-store scan, durable write, config/watchdog/startup change, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

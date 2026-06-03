@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1413",
-  "validationId": "CMV-1528",
+  "taskId": "CM-1414",
+  "validationId": "CMV-1529",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1529",
+      "scope": "CM-1414 audit_memory readonly public tool draft",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS"
+    },
     {
       "id": "CMV-1528",
       "scope": "CM-1413 health endpoint no-token low-disclosure",
@@ -106,6 +111,8 @@
     "real memory tools",
     "real record_memory scope write",
     "live HTTP health probe",
+    "public audit_memory registration",
+    "raw audit or broad store scan",
     "runtime freshness",
     "phase h live validation execution",
     "committed live Git head facts"

@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1413 health endpoint no-token low-disclosure`.
-Current validation: `CMV-1528`.
+Current checkpoint: `CM-1414 audit_memory readonly public tool draft`.
+Current validation: `CMV-1529`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1414 Audit Memory Readonly Public Tool Draft
+
+Status: `COMPLETED_VALIDATED_CM1414_AUDIT_MEMORY_READONLY_TOOL_DRAFT`
+
+Scope: local source/test draft only. No public MCP registration, live client action, provider/API call, bearer-token material use, real memory tool call, raw audit read, real store scan, durable write, config/watchdog/startup change, dependency change, remote action, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Added internal `audit_memory` readonly draft report/schema.
+- Locked draft invariants: draft-only, selected low-disclosure projection, bounded input, raw output blocked, and exact approval required before public exposure.
+- Added tests proving `audit_memory` is absent from static `TOOL_DEFINITIONS` and MCP `tools/list`.
+- Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1414` / `CMV-1529`.
+
+Validation:
+
+- `node --check src\core\AuditMemoryReadonlyToolDraft.js`
+- `node --check tests\audit-memory-readonly-tool-draft.test.js`
+- `node --test tests\audit-memory-readonly-tool-draft.test.js tests\mcp-contract.test.js`
+
+Result: `audit_memory` now has an internal readonly draft boundary without expanding public MCP tools.
 
 ## CM-1413 Health Endpoint No-Token Low-Disclosure
 

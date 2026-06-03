@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1413 health endpoint no-token low-disclosure`.
-Current validation: `CMV-1528`.
+Current task: `CM-1414 audit_memory readonly public tool draft`.
+Current validation: `CMV-1529`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -125,4 +125,4 @@ git log --oneline --decorate -n 10
 ```
 
 Repository reality overrides this file.
-Current source/test slice: `CM-1413` adds an explicit low-disclosure marker to `/health` and locks no-token/bearer-configured health redaction with temp-local HTTP tests. No live 7605 probe, provider/API call, live client action, bearer-token material use, real memory tool call, real-store read, config/watchdog/startup change, public MCP tool expansion, remote action, or readiness/cutover occurred.
+Current source/test slice: `CM-1414` adds an internal `audit_memory` readonly draft and locks public-tool-freeze behavior with temp-local MCP contract tests. No public MCP registration, live client action, provider/API call, bearer-token material use, real memory tool call, raw audit read, real-store read, config/watchdog/startup change, public MCP tool expansion, remote action, or readiness/cutover occurred.
