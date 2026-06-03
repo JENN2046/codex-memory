@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1426 Phase H bounded search_memory negative-control evidence closeout`.
-Current validation: `CMV-1539`.
+Current task: `CM-1427 bounded positive search_memory shape gate scope packet`.
+Current validation: `CMV-1540`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1426` records already completed CM-1422 Phase H bounded authenticated `search_memory` negative-control evidence only. Evidence recorded: `main == origin/main == b7e20cc`, runtime freshness accepted, listener PID `4296`, public tools unchanged, NC1 and NC2 `resultCount=0`, both `target=both`, `limit=1`, `include_content=false`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, no `record_memory`, no provider/API, no raw store scan, no durable write observed, and no readiness / `RC_READY` claim. Next safe action is review/commit/push of this docs-only closeout only with separate explicit authorization; no new live probe is authorized by CM-1426.
+`CM-1427` prepared `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md` for future CM-1428 bounded positive `search_memory` shape gate. It is docs-only: no runtime action, live probe, bearer-token use, memory tool call, provider/API call, real memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred. Next safe action is review/commit/push of this docs-only packet only with separate explicit authorization; future CM-1428 requires runtime refresh and fresh exact approval.
 
 ## Historical Run Notes
 

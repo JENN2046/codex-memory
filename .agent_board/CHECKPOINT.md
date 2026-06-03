@@ -4,40 +4,38 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1426 Phase H bounded search_memory negative-control evidence closeout`.
-Current validation: `CMV-1539`.
+Current checkpoint: `CM-1427 bounded positive search_memory shape gate scope packet`.
+Current validation: `CMV-1540`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1426 Phase H Bounded Search Memory Negative-Control Evidence Closeout
+## CM-1427 Bounded Positive Search Memory Shape Scope Packet
 
-Status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1422_SEARCH_MEMORY_NEGATIVE_CONTROL_PASSED`
+Status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`
 
 Scope:
 
 ```text
-docs-only evidence closeout; no new live probe
+docs-only scope packet; no live execution
 ```
 
 Recorded:
 
-- `main == origin/main == b7e20cc`.
-- Runtime freshness accepted.
-- Listener PID `4296`.
-- Public tools unchanged: `memory_overview`, `record_memory`, `search_memory`.
-- NC1 and NC2 both returned `resultCount=0`.
-- Both used `target=both`, `limit=1`, `include_content=false`.
-- `access.mode=authenticated_bounded_search`.
-- Forbidden key paths `0`.
-- `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`.
-- No `record_memory`, provider/API, raw store scan, durable write observed, or readiness / `RC_READY` claim.
+- Prepared `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md`.
+- Baseline recorded as fresh Git facts: `main == origin/main == 1b840e5`.
+- Future CM-1428 requires runtime refresh, runtime freshness accepted, and fresh exact approval.
+- Future live execution is exactly one authenticated HTTP `search_memory` call.
+- Future query is `Phase H bounded search_memory negative-control evidence`.
+- Future call shape is `target=both`, `limit=1`, `include_content=false`.
+- Expected positive shape is `resultCount>=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`.
+- Query source is public/governance-safe status wording, not raw memory/store discovery.
 
 Boundary:
 
-- No runtime action in CM-1426.
-- No live MCP `tools/call` in CM-1426.
-- No live `search_memory` rerun in CM-1426.
+- No runtime action in CM-1427.
+- No live MCP `tools/call` in CM-1427.
+- No live `search_memory` in CM-1427.
 - No `memory_overview`.
 - No provider/API call.
 - No bearer-token use.
@@ -48,11 +46,12 @@ Boundary:
 - No remote action.
 - No readiness, reliability, release, cutover, or `RC_READY` claim.
 
-Validation: `CMV-1539` docs-only validation.
+Validation: `CMV-1540` docs-only validation.
 
 ## Recent Checkpoint References
 
 - `CM-1420`: context intake and status-surface compaction.
+- `CM-1426`: Phase H bounded `search_memory` negative-control evidence closeout.
 - `CM-1425`: `search_memory` negative-control precision / no-result policy patch.
 - `CM-1424`: authenticated `search_memory` bounded/noRawContentRead projection patch.
 - `CM-1418`: Phase H bounded `memory_overview` live no-mutation evidence closeout, docs-only closeout of already executed live evidence.

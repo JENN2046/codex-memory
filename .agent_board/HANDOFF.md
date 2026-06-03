@@ -4,23 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1426 Phase H bounded search_memory negative-control evidence closeout`.
-Current validation: `CMV-1539`.
-Current handoff: CM-1426 records already executed CM-1422 bounded authenticated `search_memory` negative-control evidence: NC1/NC2 both returned `resultCount=0` with bounded sanitized output and no forbidden key paths. No new live probe was performed in CM-1426.
+Current task: `CM-1427 bounded positive search_memory shape gate scope packet`.
+Current validation: `CMV-1540`.
+Current handoff: CM-1427 prepared a docs-only scope packet for future CM-1428 bounded positive `search_memory` shape gate. No live probe, token use, real memory read, or raw store scan occurred in CM-1427.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: docs-only closeout for CM-1422 Phase H bounded `search_memory` negative-control pass evidence.
+Goal: prepare docs-only scope packet for future CM-1428 bounded positive `search_memory` shape gate.
 
-Current status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1422_SEARCH_MEMORY_NEGATIVE_CONTROL_PASSED`.
+Current status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`.
 
 Workspace: `A:\codex-memory`.
 
 Current entrypoints:
 
 - `CURRENT_STATE.md`
+- `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md`
 - `.agent_board/CURRENT_FACTS.json`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
@@ -28,21 +29,21 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Recorded `main == origin/main == b7e20cc`, runtime freshness accepted, listener PID `4296`, and public tools unchanged.
-- Recorded NC1 and NC2 both `resultCount=0`, `target=both`, `limit=1`, `include_content=false`, `access.mode=authenticated_bounded_search`.
-- Recorded forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`.
-- Recorded no `record_memory`, no provider/API, no raw store scan, no durable write observed, and no readiness / `RC_READY` claim.
-- No live `search_memory`, `record_memory`, `memory_overview`, token use, provider/API call, real memory read/write, raw store scan, durable write, runtime change, or readiness claim occurred in CM-1426.
+- Prepared `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md`.
+- Fixed future CM-1428 to exactly one authenticated HTTP `search_memory` call, query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`.
+- Future acceptance requires `resultCount>=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`.
+- Query source is public/governance-safe status wording and was not discovered from real memory or raw stores.
+- No live `search_memory`, `record_memory`, `memory_overview`, token use, provider/API call, real memory read/write, raw store scan, durable write, runtime change, or readiness claim occurred in CM-1427.
 
-Validation: `CMV-1539` docs-only validation.
+Validation: `CMV-1540` docs-only validation.
 
 Boundaries:
 
-- No runtime action, memory tool call, provider/API call, token use, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1426.
+- No runtime action, memory tool call, provider/API call, token use, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1427.
 
 Next safe action:
 
-Commit/push CM-1426 docs-only closeout only if separately authorized. Any further live client/write/provider/readiness work requires separate exact approval.
+Commit/push CM-1427 docs-only packet only if separately authorized. Future CM-1428 requires fresh exact approval and runtime refresh; if the packet query is not acceptable as a safe positive query, prepare a replacement packet or use a temp/live-like fixture gate.
 
 ## Historical Handoff Archive
 

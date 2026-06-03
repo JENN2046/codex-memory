@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1426",
-  "validationId": "CMV-1539",
+  "taskId": "CM-1427",
+  "validationId": "CMV-1540",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1540",
+      "scope": "CM-1427 bounded positive search_memory shape gate scope packet",
+      "status": "COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED"
+    },
     {
       "id": "CMV-1539",
       "scope": "CM-1426 Phase H bounded search_memory negative-control evidence closeout",
@@ -158,6 +163,7 @@
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
+    "CM-1428 bounded positive search_memory shape live execution",
     "real record_memory scope write",
     "real query quality proof",
     "public audit_memory registration",

@@ -9,9 +9,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1426 Phase H bounded search_memory negative-control evidence closeout` |
-| Current validation | `CMV-1539` |
-| Current route | Phase H authenticated HTTP `search_memory` negative-control passed with bounded sanitized no-result evidence |
+| Current task | `CM-1427 bounded positive search_memory shape gate scope packet` |
+| Current validation | `CMV-1540` |
+| Current route | Phase H bounded positive `search_memory` shape gate prepared as docs-only scope packet; no live execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -22,6 +22,8 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 Side-effect evidence for the CM-1422 execution: no `record_memory`, no `memory_overview`, no provider/API call, no raw store scan, no durable write observed, no public MCP expansion, and no readiness or `RC_READY` claim.
 
+`CM-1427` prepares `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md` for a future `CM-1428` bounded positive `search_memory` shape gate. The packet is docs-only and does not execute live `search_memory`, use bearer token, read real memory, or scan raw stores. Future CM-1428 is limited to exactly one authenticated public HTTP MCP `search_memory` call with query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`, expected `resultCount>=1`, forbidden key paths `0`, and no raw/id/path/title/snippet leakage.
+
 Latest local validation before CM-1420:
 
 - `npm test` passed `2992/2992`.
@@ -31,7 +33,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1426 is a docs-only closeout. Do not rerun live `search_memory` from this closeout task. Any further live client, write, provider, or readiness work requires a separate exact approval.
+Commit/push CM-1427 docs-only packet only if separately authorized. Future CM-1428 live execution requires fresh exact approval, runtime refresh, and the packet's exact query/boundary.
 
 ## Boundaries
 
