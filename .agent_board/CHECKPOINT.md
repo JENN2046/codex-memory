@@ -4,11 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1404 local validation polish divergence integration`.
-Current validation: `CMV-1522`.
+Current checkpoint: `CM-1405 schema v2 tier governance docs`.
+Current validation: `CMV-1523`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1405 Schema V2 Tier Governance Docs
+
+Status: `COMPLETED_VALIDATED_CM1405_SCHEMA_V2_TIER_GOVERNANCE_DOCS`
+
+Date: 2026-06-03
+
+Scope:
+
+- Added a schema v2-compatible Task Tier Matrix to `AGENTS.md`.
+- Added Tiered Governance Logging rules to `DOCS_GOVERNANCE.md`.
+- Kept `.agent_board/CURRENT_FACTS.json` as the committed status/validation snapshot and fresh Git commands as the source for live branch/head facts.
+- Clarified that Tier 3 provider/profile and real-memory bullets do not cancel exact/bounded Smart Standing Authorization v3 Amber exceptions.
+- Did not restore `validate_agents_route_consistency.js`, `docs-lite`, or stale Phase G route authority.
+
+Validation:
+
+- `git diff --check` passed.
+- `node scripts\validate_current_facts_drift.js` passed.
+- `node scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+
+No runtime action, provider call, memory tool call, durable memory/audit write, dependency change, config/watchdog/startup change, remote action, readiness claim, release, deploy, or cutover occurred.
 
 ## CM-1404 Local Validation Polish Divergence Integration
 

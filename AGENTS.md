@@ -10,6 +10,60 @@ This file is the project constitution, not the live project journal. Keep durabl
 
 ---
 
+## Task Tier Matrix
+
+Use the smallest governance tier that fits the work, but never below the minimum tier implied by touched files, systems, or evidence claims.
+
+### Tier 0 — Read / Explain
+
+Use for read-only scans, explanations, summaries, and command-output reporting.
+No file writes, `.agent_board` update, or validation ledger entry is required unless the answer makes a claim that needs proof.
+
+### Tier 1 — Light Local
+
+Use for small local changes that do not alter route, status, validation policy, runtime behavior, memory behavior, public contracts, current-facts schema, or external state.
+Examples include typo-level docs edits, narrow non-governance wording fixes, and tiny local helper comments.
+Use Git status, diff inspection, and targeted validation when useful.
+`.agent_board` and validation log updates are not required by default.
+
+### Tier 2 — Governed Local
+
+Tier 2 is the minimum for changes to:
+
+- `AGENTS.md`
+- `STATUS.md`
+- `DOCS_GOVERNANCE.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `PHASE_*_PLAN.md`
+- `.agent_board/*`
+- `.agent_board/CURRENT_FACTS.json`
+- `scripts/validate*`
+- `scripts/*gate*`
+- `scripts/*approval*`
+- package scripts
+- tests or fixtures that change governance, readiness, route, runtime policy, current-facts schema, or validation policy
+
+Tier 2 requires relevant validation and a validation log entry when the change affects route, status, validation gates, current-facts snapshot semantics, or sustained task state.
+For current status snapshots, keep schema v2 rules: `.agent_board/CURRENT_FACTS.json` is a committed status/validation snapshot, while live branch/head/origin/ahead-behind facts must come from fresh Git commands.
+
+### Tier 3 — Runtime / Red Lane
+
+Tier 3 covers hard-stop or exact-approval work. This tier does not cancel the Smart Standing Authorization v3 Amber exceptions in section 7.1.1; bounded/exact Amber work may proceed only when that section's scope, budget, validation, and receipt requirements are satisfied.
+
+- `.env`, secrets, tokens, provider keys, or credentials
+- provider/profile real calls, except task-relevant bounded provider smoke/benchmark calls that fit the v3 Amber envelope
+- real memory reads/writes, except exact `search_memory` / `memory_overview`, exact sanitized `record_memory`, and exact real-memory read queries that fit the v3 Amber envelope
+- raw `.jsonl`, raw audit, or real store access
+- startup/watchdog/config changes
+- public MCP tool or schema expansion
+- migration/import/export/apply/restore
+- durable memory/audit mutation outside temp-local test stores
+- push, PR, release, deploy, tag, cutover, or readiness claims
+
+Tier 3 requires exact approval where project gates require it, full validation evidence, and explicit blocker/rollback reporting.
+
+---
+
 ## 0. Plain Meaning
 
 `codex-memory` is already alive.
