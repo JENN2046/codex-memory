@@ -1476,6 +1476,56 @@ const P66_RECALL_ISOLATION_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const PHASE_H_CLIENT_SCOPE_CLOSEOUT_EVIDENCE_UNIT_IDS = [
+  'CM-1400',
+  'CM-1402',
+  'CM-1404',
+  'CM-1405',
+  'CM-1406',
+  'CM-1407'
+];
+
+const PHASE_H_CLIENT_SCOPE_CLOSEOUT_BOUNDARY_SURFACES = [
+  'private_read_boundary',
+  'client_integration_preflight',
+  'search_lifecycle_boundary',
+  'write_effective_scope_boundary',
+  'execution_context_authority_boundary',
+  'visibility_boundary'
+];
+
+const PHASE_H_CLIENT_SCOPE_CLOSEOUT_REMAINING_APPROVAL_BOUNDARIES = [
+  'live_codex_claude_client_refresh',
+  'bearer_credential_mcp_refresh',
+  'real_cross_client_recall_proof',
+  'real_scoped_write_proof',
+  'broad_client_scope_store_scan',
+  'public_mcp_expansion',
+  'client_config_watchdog_startup_change',
+  'readiness_or_cutover_claim'
+];
+
+const PHASE_H_CLIENT_SCOPE_CLOSEOUT_DISALLOWED_WORK = [
+  'live_client_acceptance',
+  'bearer_token_use',
+  'mcp_memory_tool_call',
+  'record_memory_call',
+  'search_memory_call',
+  'memory_overview_call',
+  'provider_call',
+  'real_memory_scan',
+  'runtime_store_scan',
+  'durable_memory_write',
+  'durable_audit_write',
+  'client_config_change',
+  'watchdog_startup_change',
+  'public_mcp_expansion',
+  'readiness_claim',
+  'cutover_execution',
+  'tag_release_deploy',
+  'remote_write'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1681,6 +1731,19 @@ const EVIDENCE_SOURCES = {
     testExecutedByAggregator: false,
     helperExecutedByAggregator: false,
     runnerExecutedByAggregator: false,
+    observedFromRuntime: false
+  },
+  phase_h_client_scope_closeout_bridge: {
+    source_type: 'static_aggregator_report_shape',
+    source_ref: 'ValidationAggregatorService evidence.phaseHClientScopeCloseoutBridge',
+    status: 'static_report_shape_added_not_executed',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    helperImportedByAggregator: false,
+    helperExecutedByAggregator: false,
+    evidenceFileReadByAggregator: false,
+    commandExecutedByAggregator: false,
+    mcpToolsCalledByAggregator: false,
     observedFromRuntime: false
   }
 };
@@ -3250,6 +3313,32 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorRecallIsolationCanClaimV1RcReady: false,
       p66ValidationAggregatorRecallIsolationCanClaimRcReady: false,
       p66ValidationAggregatorRecallIsolationCanClaimCutoverReady: false,
+      phaseHClientScopeCloseoutBridgeAvailable: true,
+      phaseHClientScopeCloseoutBridgeSourceMode: 'static_report_shape_only',
+      phaseHClientScopeCloseoutBridgeHelperCapabilityOnly: true,
+      phaseHClientScopeCloseoutRequiredEvidenceUnitCount:
+        PHASE_H_CLIENT_SCOPE_CLOSEOUT_EVIDENCE_UNIT_IDS.length,
+      phaseHClientScopeCloseoutBoundarySurfaceCount:
+        PHASE_H_CLIENT_SCOPE_CLOSEOUT_BOUNDARY_SURFACES.length,
+      phaseHClientScopeCloseoutRemainingApprovalBoundaryCount:
+        PHASE_H_CLIENT_SCOPE_CLOSEOUT_REMAINING_APPROVAL_BOUNDARIES.length,
+      phaseHClientScopeCloseoutDisallowedWorkCount:
+        PHASE_H_CLIENT_SCOPE_CLOSEOUT_DISALLOWED_WORK.length,
+      phaseHClientScopeCloseoutHelperImportedByAggregator: false,
+      phaseHClientScopeCloseoutHelperExecutedByAggregator: false,
+      phaseHClientScopeCloseoutEvidenceFileReadByAggregator: false,
+      phaseHClientScopeCloseoutCommandExecutedByAggregator: false,
+      phaseHClientScopeCloseoutMcpToolsCalledByAggregator: false,
+      phaseHClientScopeCloseoutBearerTokenUsedByAggregator: false,
+      phaseHClientScopeCloseoutLiveClientAcceptedByAggregator: false,
+      phaseHClientScopeCloseoutAcceptedByAggregator: false,
+      phaseHClientScopeCloseoutRuntimeImplemented: false,
+      phaseHClientScopeCloseoutFullImplementationComplete: false,
+      phaseHClientScopeCloseoutCanClaimRuntimeReady: false,
+      phaseHClientScopeCloseoutCanClaimFinalRcReady: false,
+      phaseHClientScopeCloseoutCanClaimV1RcReady: false,
+      phaseHClientScopeCloseoutCanClaimRcReady: false,
+      phaseHClientScopeCloseoutCanClaimCutoverReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -3406,6 +3495,13 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true,
         evidence: 'P53 surfaces the ValidationAggregator inventory posture from static report-shape entries only; it does not read the P53 fixture, execute helpers/gates/runners, refresh live MCP, scan runtime stores, or claim full aggregator/runtime/RC readiness.'
       }),
+      phaseHClientScopeCloseoutBridge: createCheck({
+        status: 'static_report_shape_added_not_executed',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'CM-1410 surfaces Phase H client-scope closeout posture from static report-shape entries only; it does not import or execute the closeout helper, call MCP tools, use credential material, refresh live clients, or claim runtime/RC readiness.'
+      }),
       validationAggregatorExecutable: createCheck({
         status: 'minimal_implemented',
         requiredBeforeV1Rc: true,
@@ -3469,6 +3565,7 @@ function buildV1RcValidationAggregatorReport({
       'p36P40EvidenceSourceMap',
       'p45FinalRcMatrixEvaluatorPosture',
       'p53ValidationAggregatorEvidenceInventory',
+      'phaseHClientScopeCloseoutBridge',
       'clientBoundaryDocsReview',
       'migrationImportExportBoundaryDocsReview',
       'rcChecklistAlignmentReview',
@@ -4880,6 +4977,83 @@ function buildV1RcValidationAggregatorReport({
         canClaimRcReady: false,
         canClaimCutoverReady: false
       },
+      phaseHClientScopeCloseoutBridge: {
+        status: 'static_report_shape_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        helper: 'src/core/ClientScopePhaseHCloseoutAggregator.js',
+        test: 'tests/client-scope-phase-h-closeout-aggregator.test.js',
+        schemaVersion: 'phase-h-client-scope-closeout-aggregator-v1',
+        sourcePlan: 'CM-1410-phase-h-validation-aggregator-static-bridge',
+        phase: 'Phase H',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        metadataOnly: true,
+        publicToolsFrozen: true,
+        requiredEvidenceUnits:
+          PHASE_H_CLIENT_SCOPE_CLOSEOUT_EVIDENCE_UNIT_IDS.map(id => ({
+            id,
+            required: true,
+            currentStatus:
+              'source_test_slice_available_not_revalidated_by_aggregator',
+            acceptedByAggregator: false
+          })),
+        boundarySurfaces:
+          PHASE_H_CLIENT_SCOPE_CLOSEOUT_BOUNDARY_SURFACES.map(id => ({
+            id,
+            required: true,
+            sourceMode: 'static_reference_only',
+            liveProofRequiredForReadiness: true
+          })),
+        remainingApprovalBoundaries:
+          PHASE_H_CLIENT_SCOPE_CLOSEOUT_REMAINING_APPROVAL_BOUNDARIES,
+        disallowedWork: PHASE_H_CLIENT_SCOPE_CLOSEOUT_DISALLOWED_WORK,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        closeoutComputedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        mcpToolsCalledByAggregator: false,
+        memoryToolsCalledByAggregator: false,
+        recordMemoryCalledByAggregator: false,
+        searchMemoryCalledByAggregator: false,
+        memoryOverviewCalledByAggregator: false,
+        liveClientAcceptedByAggregator: false,
+        bearerTokenUsedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        validateMemoryPublic: false,
+        configMutated: false,
+        startupWatchdogOperated: false,
+        tagReleaseDeploy: false,
+        remoteWritePerformed: false,
+        runtimeMutationImplemented: false,
+        phaseHCloseoutAcceptedByAggregator: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        v1RcReady: false,
+        rcReady: false,
+        cutoverReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false,
+        canClaimRcReady: false,
+        canClaimCutoverReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -4914,7 +5088,8 @@ function buildV1RcValidationAggregatorReport({
       'P66.21 missing or stale evidence fail-closed helper capability is static and is not executed by the aggregator.',
       'P66.33 readiness overclaim rejection helper capability is static and is not executed by the aggregator.',
       'P66.39 governance runtime loop gap helper capability is static and is not executed by the aggregator.',
-      'P66.44 recall isolation runtime proof helper capability is static and is not executed by the aggregator.'
+      'P66.44 recall isolation runtime proof helper capability is static and is not executed by the aggregator.',
+      'Phase H client-scope closeout bridge is static report-shape only and is not executed by the aggregator.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',

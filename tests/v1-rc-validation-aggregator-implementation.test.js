@@ -2538,9 +2538,131 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimV1RcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimCutoverReady, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutBridgeAvailable, true);
+  assert.equal(
+    report.summary.phaseHClientScopeCloseoutBridgeSourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(report.summary.phaseHClientScopeCloseoutBridgeHelperCapabilityOnly, true);
+  assert.equal(report.summary.phaseHClientScopeCloseoutRequiredEvidenceUnitCount, 6);
+  assert.equal(report.summary.phaseHClientScopeCloseoutBoundarySurfaceCount, 6);
+  assert.equal(report.summary.phaseHClientScopeCloseoutRemainingApprovalBoundaryCount, 8);
+  assert.equal(report.summary.phaseHClientScopeCloseoutDisallowedWorkCount, 18);
+  assert.equal(report.summary.phaseHClientScopeCloseoutHelperImportedByAggregator, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutHelperExecutedByAggregator, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutEvidenceFileReadByAggregator, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutCommandExecutedByAggregator, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutMcpToolsCalledByAggregator, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutBearerTokenUsedByAggregator, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutLiveClientAcceptedByAggregator, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutAcceptedByAggregator, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutRuntimeImplemented, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutFullImplementationComplete, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutCanClaimRuntimeReady, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutCanClaimFinalRcReady, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutCanClaimV1RcReady, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutCanClaimRcReady, false);
+  assert.equal(report.summary.phaseHClientScopeCloseoutCanClaimCutoverReady, false);
+  assert.equal(
+    report.evidence.phaseHClientScopeCloseoutBridge.status,
+    'static_report_shape_added_not_executed'
+  );
+  assert.equal(
+    report.evidence.phaseHClientScopeCloseoutBridge.sourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.evidence.phaseHClientScopeCloseoutBridge.helper,
+    'src/core/ClientScopePhaseHCloseoutAggregator.js'
+  );
+  assert.equal(
+    report.evidence.phaseHClientScopeCloseoutBridge.test,
+    'tests/client-scope-phase-h-closeout-aggregator.test.js'
+  );
+  assert.equal(
+    report.evidence.phaseHClientScopeCloseoutBridge.schemaVersion,
+    'phase-h-client-scope-closeout-aggregator-v1'
+  );
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.helperCapabilityOnly, true);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.explicitInputOnly, true);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.metadataOnly, true);
+  assert.deepEqual(
+    report.evidence.phaseHClientScopeCloseoutBridge.requiredEvidenceUnits.map(unit => unit.id),
+    ['CM-1400', 'CM-1402', 'CM-1404', 'CM-1405', 'CM-1406', 'CM-1407']
+  );
+  assert.equal(
+    report.evidence.phaseHClientScopeCloseoutBridge.requiredEvidenceUnits
+      .every(unit => unit.acceptedByAggregator === false),
+    true
+  );
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.boundarySurfaces.length, 6);
+  assert.equal(
+    report.evidence.phaseHClientScopeCloseoutBridge.boundarySurfaces
+      .every(surface => surface.liveProofRequiredForReadiness === true),
+    true
+  );
+  assert.deepEqual(
+    report.evidence.phaseHClientScopeCloseoutBridge.remainingApprovalBoundaries,
+    [
+      'live_codex_claude_client_refresh',
+      'bearer_credential_mcp_refresh',
+      'real_cross_client_recall_proof',
+      'real_scoped_write_proof',
+      'broad_client_scope_store_scan',
+      'public_mcp_expansion',
+      'client_config_watchdog_startup_change',
+      'readiness_or_cutover_claim'
+    ]
+  );
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.disallowedWork.length, 18);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.helperImportedByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.helperExecutedByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.closeoutComputedByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.evidenceFileReadByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.commandExecutedByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.mcpToolsCalledByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.memoryToolsCalledByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.recordMemoryCalledByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.searchMemoryCalledByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.memoryOverviewCalledByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.liveClientAcceptedByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.bearerTokenUsedByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.callsProviders, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.startsServices, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.readsFiles, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.scansRealMemory, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.readsRuntimeStores, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.durableMemoryTouched, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.durableAuditWritten, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.publicMcpExpanded, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.validateMemoryPublic, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.configMutated, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.startupWatchdogOperated, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.tagReleaseDeploy, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.remoteWritePerformed, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.runtimeMutationImplemented, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.phaseHCloseoutAcceptedByAggregator, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.runtimeReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.finalRcMatrixReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.v1RcReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.rcReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.cutoverReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.decisionImpact, 'none_report_only');
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.blockedDecisionRequired, true);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.canClaimV1RcReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.canClaimRcReady, false);
+  assert.equal(report.evidence.phaseHClientScopeCloseoutBridge.canClaimCutoverReady, false);
   assert.ok(
     report.warnings.includes(
       'P66.44 recall isolation runtime proof helper capability is static and is not executed by the aggregator.'
+    )
+  );
+  assert.ok(
+    report.warnings.includes(
+      'Phase H client-scope closeout bridge is static report-shape only and is not executed by the aggregator.'
     )
   );
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
@@ -4572,6 +4694,16 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.runnerExecutedByAggregator, false);
   assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.observedFromRuntime, false);
   assert.match(report.evidence_sources.p53_validation_aggregator_evidence_inventory.source_ref, /ValidationAggregatorService evidence\.p53ValidationAggregatorEvidenceInventory/);
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.source_type, 'static_aggregator_report_shape');
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.acceptedForPlanning, false);
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.helperImportedByAggregator, false);
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.helperExecutedByAggregator, false);
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.evidenceFileReadByAggregator, false);
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.commandExecutedByAggregator, false);
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.mcpToolsCalledByAggregator, false);
+  assert.equal(report.evidence_sources.phase_h_client_scope_closeout_bridge.observedFromRuntime, false);
+  assert.match(report.evidence_sources.phase_h_client_scope_closeout_bridge.source_ref, /ValidationAggregatorService evidence\.phaseHClientScopeCloseoutBridge/);
   assert.equal(report.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
@@ -5120,6 +5252,9 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.checks.p45FinalRcMatrixEvaluatorPosture.status, 'static_report_shape_added_not_executed');
   assert.equal(report.checks.p45FinalRcMatrixEvaluatorPosture.a4Safe, true);
   assert.equal(report.checks.p45FinalRcMatrixEvaluatorPosture.blocksV1Rc, undefined);
+  assert.equal(report.checks.phaseHClientScopeCloseoutBridge.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.checks.phaseHClientScopeCloseoutBridge.a4Safe, true);
+  assert.equal(report.checks.phaseHClientScopeCloseoutBridge.blocksV1Rc, undefined);
   assert.equal(report.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
   assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), false);
   assert.equal(report.a5_gated.includes('providerExecution'), true);
@@ -5137,6 +5272,7 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.a4_safe.includes('memoryGovernanceReviewSurfaceContractHelper'), true);
   assert.equal(report.a4_safe.includes('p36P40EvidenceSourceMap'), true);
   assert.equal(report.a4_safe.includes('p45FinalRcMatrixEvaluatorPosture'), true);
+  assert.equal(report.a4_safe.includes('phaseHClientScopeCloseoutBridge'), true);
   assert.equal(report.conditional_live.includes('health'), true);
 
   for (const key of [
