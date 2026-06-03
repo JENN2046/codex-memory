@@ -4,25 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1429 positive bounded search memoryIdsReturned flag investigation`.
-Current validation: `CMV-1541`.
-Current handoff: CM-1429 investigated the CM-1428 positive bounded `memoryIdsReturned=true` flag using source review and synthetic tests only. No live rerun, token use, real memory read, or raw store scan occurred in CM-1429.
+Current task: `CM-1430 bounded positive search_memory shape evidence closeout`.
+Current validation: `CMV-1542`.
+Current handoff: CM-1430 records already executed CM-1428 bounded positive `search_memory` shape pass evidence. No new live probe, token use, real memory read, or raw store scan occurred in CM-1430.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: determine whether CM-1428 `memoryIdsReturned=true` came from source projection, result item leakage, wrapper text, collector inference, or runtime mismatch.
+Goal: docs-only closeout for CM-1428 bounded positive `search_memory` shape pass evidence.
 
-Current status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RERUN`.
+Current status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1428_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_PASSED`.
 
 Workspace: `A:\codex-memory`.
 
 Current entrypoints:
 
 - `CURRENT_STATE.md`
-- `src/core/SearchMemoryResponseSanitizer.js`
-- `tests/search-memory-response-sanitizer.test.js`
 - `.agent_board/CURRENT_FACTS.json`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
@@ -30,22 +28,22 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Source projection sets `access.memoryIdsReturned=false` and strips `memoryId` from non-empty bounded results.
-- HTTP authenticated bounded path uses `requestContext.authenticatedBoundedSearch=true` for bearer requests.
-- MCP wrapper text is ignored by the synthetic collector helper.
-- Root cause is likely collector false positive: the ad hoc CM-1428 collector inferred `memoryIdsReturned=true` from the safe key path `structuredContent.access.memoryIdsReturned` instead of checking that flag's boolean value or actual result item fields.
-- Added `inspectBoundedSearchEvidenceShape(...)` and tests covering safe access flag keys, true access flag failure, and result-item `memoryId` failure.
-- No live `search_memory`, `record_memory`, `memory_overview`, token use, provider/API call, real memory read/write, raw store scan, durable write, runtime change, or readiness claim occurred in CM-1429.
+- Recorded `main == origin/main == 75cd937e7bdc607dc1b7df561a15aef9c36314db`, runtime freshness accepted, listener PID `15112`, and public tools unchanged.
+- Recorded exactly one authenticated `search_memory` call in CM-1428 with query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`, `access.mode=authenticated_bounded_search`.
+- Recorded `resultCount=1`, `resultsLength=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`, `wrapperContentIgnored=true`.
+- Recorded bounded result keys only: `baseScore`, `contentHitCount`, `dynamicCoreWeight`, `evidenceHitCount`, `exactCoreTagCount`, `rerankScore`, `score`, `sourceKinds`, `tagHitCount`, `tagMemoSurfaceScore`, `target`, `titleHitCount`.
+- Recorded no `record_memory`, no `memory_overview`, no provider/API, no raw store scan, no durable write, no public MCP expansion, and no readiness / `RC_READY` claim.
+- No live `search_memory`, `record_memory`, `memory_overview`, token use, provider/API call, real memory read/write, raw store scan, durable write, runtime change, or readiness claim occurred in CM-1430.
 
-Validation: `CMV-1541` source/test/docs validation.
+Validation: `CMV-1542` docs-only validation.
 
 Boundaries:
 
-- No runtime action, memory tool call, provider/API call, token use, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1429.
+- No runtime action, memory tool call, provider/API call, token use, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1430.
 
 Next safe action:
 
-Commit/push CM-1429 only if separately authorized. CM-1428 rerun becomes eligible only after commit/push/runtime refresh and fresh exact approval.
+Commit/push CM-1430 docs-only closeout only if separately authorized. Any further live client/write/provider/readiness work requires separate exact approval.
 
 ## Historical Handoff Archive
 

@@ -4,36 +4,44 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1429 positive bounded search memoryIdsReturned flag investigation`.
-Current validation: `CMV-1541`.
+Current checkpoint: `CM-1430 bounded positive search_memory shape evidence closeout`.
+Current validation: `CMV-1542`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1429 Positive Bounded Search MemoryIdsReturned Flag Investigation
+## CM-1430 Bounded Positive Search Memory Shape Evidence Closeout
 
-Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RERUN`
+Status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1428_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_PASSED`
 
 Scope:
 
 ```text
-local source/test investigation; no live rerun
+docs-only evidence closeout; no new live probe
 ```
 
 Recorded:
 
-- CM-1428 fail-closed receipt had `resultCount=1`, forbidden key paths `0`, and `memoryIdsReturned=true`.
-- Source projection `projectAuthenticatedBoundedSearchResponse(...)` sets `access.memoryIdsReturned=false`.
-- HTTP authenticated bounded path injects `requestContext.authenticatedBoundedSearch=true` for bearer requests.
-- Existing synthetic HTTP projection test proves non-empty bounded projection strips `memoryId` and returns `access.memoryIdsReturned=false`.
-- Root cause is likely evidence collector false positive from key path `structuredContent.access.memoryIdsReturned`, not source projection leakage.
-- Added `inspectBoundedSearchEvidenceShape(...)` to distinguish safe access flag keys from true access flag value or result item leakage.
+- `main == origin/main == 75cd937e7bdc607dc1b7df561a15aef9c36314db`.
+- Runtime freshness accepted.
+- Listener PID `15112`.
+- Public tools unchanged: `memory_overview`, `record_memory`, `search_memory`.
+- Exactly one authenticated `search_memory` call executed in CM-1428.
+- Query exact: `Phase H bounded search_memory negative-control evidence`.
+- `target=both`, `limit=1`, `include_content=false`.
+- `access.mode=authenticated_bounded_search`.
+- `resultCount=1`, `resultsLength=1`.
+- Forbidden key paths `0`.
+- `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`.
+- `wrapperContentIgnored=true`.
+- Bounded result shape keys only: `baseScore`, `contentHitCount`, `dynamicCoreWeight`, `evidenceHitCount`, `exactCoreTagCount`, `rerankScore`, `score`, `sourceKinds`, `tagHitCount`, `tagMemoSurfaceScore`, `target`, `titleHitCount`.
+- No `record_memory`, `memory_overview`, provider/API, raw store scan, durable write, public MCP expansion, or readiness / `RC_READY` claim.
 
 Boundary:
 
-- No runtime action in CM-1429.
-- No live MCP `tools/call` in CM-1429.
-- No live `search_memory` rerun in CM-1429.
+- No runtime action in CM-1430.
+- No live MCP `tools/call` in CM-1430.
+- No live `search_memory` rerun in CM-1430.
 - No `memory_overview`.
 - No provider/API call.
 - No bearer-token use.
@@ -44,11 +52,12 @@ Boundary:
 - No remote action.
 - No readiness, reliability, release, cutover, or `RC_READY` claim.
 
-Validation: `CMV-1541` source/test/docs validation.
+Validation: `CMV-1542` docs-only validation.
 
 ## Recent Checkpoint References
 
 - `CM-1420`: context intake and status-surface compaction.
+- `CM-1429`: positive bounded `search_memory` `memoryIdsReturned` flag investigation.
 - `CM-1427`: bounded positive `search_memory` shape gate scope packet.
 - `CM-1426`: Phase H bounded `search_memory` negative-control evidence closeout.
 - `CM-1425`: `search_memory` negative-control precision / no-result policy patch.

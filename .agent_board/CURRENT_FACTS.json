@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-06-03",
-  "taskId": "CM-1429",
-  "validationId": "CMV-1541",
+  "updatedAt": "2026-06-04",
+  "taskId": "CM-1430",
+  "validationId": "CMV-1542",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1542",
+      "scope": "CM-1430 bounded positive search_memory shape evidence closeout",
+      "status": "COMPLETED_VALIDATED_DOCS_ONLY_CM1428_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_PASSED"
+    },
     {
       "id": "CMV-1541",
       "scope": "CM-1429 positive bounded search memoryIdsReturned flag investigation",
@@ -168,7 +173,6 @@
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
-    "CM-1428 bounded positive search_memory shape rerun after CM-1429 commit/push/runtime refresh",
     "real record_memory scope write",
     "real query quality proof",
     "public audit_memory registration",

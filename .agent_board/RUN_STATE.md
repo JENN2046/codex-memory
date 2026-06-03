@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1429 positive bounded search memoryIdsReturned flag investigation`.
-Current validation: `CMV-1541`.
+Current task: `CM-1430 bounded positive search_memory shape evidence closeout`.
+Current validation: `CMV-1542`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1429` investigated CM-1428 positive bounded `memoryIdsReturned=true` using source review and synthetic tests only. Root cause is evidence collector false positive from safe key path `structuredContent.access.memoryIdsReturned`, not source projection leakage or HTTP bounded path mismatch. No runtime action, live probe, bearer-token use, memory tool call, provider/API call, real memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred in CM-1429. Next safe action is commit/push only with separate explicit authorization.
+`CM-1430` records already completed CM-1428 bounded positive authenticated `search_memory` shape evidence only. Evidence recorded: `main == origin/main == 75cd937e7bdc607dc1b7df561a15aef9c36314db`, runtime freshness accepted, listener PID `15112`, public tools unchanged, exactly one authenticated `search_memory`, query exact `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`, `access.mode=authenticated_bounded_search`, `resultCount=1`, `resultsLength=1`, forbidden key paths `0`, no raw/id/path/title/snippet leakage, wrapper content ignored, bounded keys only, no durable write, and no readiness / `RC_READY` claim. Next safe action is review/commit/push of this docs-only closeout only with separate explicit authorization; no new live probe is authorized by CM-1430.
 
 ## Historical Run Notes
 

@@ -9,9 +9,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1429 positive bounded search memoryIdsReturned flag investigation` |
-| Current validation | `CMV-1541` |
-| Current route | Phase H bounded positive `search_memory` collector flag false-positive investigated locally; no live rerun |
+| Current task | `CM-1430 bounded positive search_memory shape evidence closeout` |
+| Current validation | `CMV-1542` |
+| Current route | Phase H bounded positive `search_memory` shape gate passed; docs-only closeout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -26,6 +26,10 @@ Side-effect evidence for the CM-1422 execution: no `record_memory`, no `memory_o
 
 `CM-1429` investigates the CM-1428 `memoryIdsReturned=true` fail-closed receipt without rerunning live search or reading raw memory. Source review shows `projectAuthenticatedBoundedSearchResponse(...)` sets `access.memoryIdsReturned=false` and strips result `memoryId` fields in bounded projection. The likely root cause is evidence collector false positive: the ad hoc CM-1428 collector inferred `memoryIdsReturned=true` from the safe key path `structuredContent.access.memoryIdsReturned` instead of checking that access flag's boolean value or actual result item fields. Added `inspectBoundedSearchEvidenceShape(...)` synthetic tests to distinguish safe access flag keys from true access-flag or result-item leakage.
 
+`CM-1430` records the already executed CM-1428 bounded positive `search_memory` shape gate pass evidence. Fresh prerequisites were `main == origin/main == 75cd937e7bdc607dc1b7df561a15aef9c36314db`, worktree clean, listener PID `15112`, runtime freshness accepted, and public tools unchanged as `memory_overview`, `record_memory`, `search_memory`. Exactly one authenticated `search_memory` call executed with query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`, and `access.mode=authenticated_bounded_search`. The sanitized result was `resultCount=1`, `resultsLength=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`, and `wrapperContentIgnored=true`. Bounded result shape keys were only `baseScore`, `contentHitCount`, `dynamicCoreWeight`, `evidenceHitCount`, `exactCoreTagCount`, `rerankScore`, `score`, `sourceKinds`, `tagHitCount`, `tagMemoSurfaceScore`, `target`, and `titleHitCount`.
+
+Side-effect evidence for the CM-1428 execution: no `record_memory`, no `memory_overview`, no provider/API call, no raw store scan, no durable write, no public MCP expansion, and no readiness or `RC_READY` claim.
+
 Latest local validation before CM-1420:
 
 - `npm test` passed `2992/2992`.
@@ -35,7 +39,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-Commit/push CM-1429 only if separately authorized. CM-1428 rerun should wait until this investigation patch is committed/pushed and runtime refreshed, with fresh exact approval.
+CM-1430 is a docs-only closeout. Do not rerun live `search_memory` from this closeout task. Any further live client, write, provider, or readiness work requires a separate exact approval.
 
 ## Boundaries
 
