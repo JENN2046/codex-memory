@@ -4,11 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1405 schema v2 tier governance docs`.
-Current validation: `CMV-1523`.
+Current checkpoint: `CM-1409 Phase H status reconciliation`.
+Current validation: `CMV-1524`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1409 Phase H Status Reconciliation
+
+Status: `COMPLETED_VALIDATED_CM1409_PHASE_H_STATUS_RECONCILIATION`
+
+Scope: docs/board-only reconciliation. No runtime action, provider call, memory tool call, real memory/store scan, durable write, config/watchdog/startup change, dependency change, remote action, public MCP expansion, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Updated `CODEX_MEMORY_NEXT_PHASE_PLAN.md` to list completed Phase H local no-apply slices after CM-1400.
+- Updated `STATUS.md` to record current Phase H remaining approval boundaries.
+- Updated `.agent_board/TASK_QUEUE.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/AUTOPILOT_LEDGER.md`, and `.agent_board/CURRENT_FACTS.json` to use `CM-1409` / `CMV-1524`.
+- Clarified that Phase H source/test closeout evidence-unit labels `CM-1404..CM-1407` are not the same as active board docs/governance task IDs `CM-1404` / `CM-1405`.
+- Fixed diff-review finding by changing the stale `CODEX_MEMORY_NEXT_PHASE_PLAN.md` `## Current Task` P66 section into a historical snapshot and removing current Git-fact wording from that block.
+
+Validation:
+
+- `git diff --check`
+- `node scripts\validate_current_facts_drift.js`
+- `node scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Result: Phase H status surfaces are reconciled as docs/board-only evidence. Remaining live client, bearer-token, real memory, broad store scan, config/startup, public MCP expansion, push/release/cutover, and readiness boundaries still require fresh exact approval.
 
 ## CM-1405 Schema V2 Tier Governance Docs
 

@@ -1,6 +1,6 @@
 # codex-memory Next Phase Plan
 
-更新时间：2026-06-02
+更新时间：2026-06-03
 
 ## Purpose
 
@@ -39,7 +39,7 @@ Current route order:
 
 1. Keep current facts anchored in [STATUS.md](/A:/codex-memory/STATUS.md).
 2. Use this document only as the high-level next-phase route.
-3. Use [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md) for the current Phase H boundary matrix and next safe slice.
+3. Use [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md) for the Phase H boundary matrix and original no-apply slice selection.
 4. Use [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) and [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md) for active task and validation state.
 
 First Phase H stage:
@@ -72,10 +72,39 @@ CM-1400 Phase H client-scope private read consistency source/test
 
 CM-1400 adds a pure explicit-input/no-apply helper and targeted tests. Same-client private candidates are accepted, cross-client/ownerless/no-context private candidates fail closed, caller scope remains candidate filtering only, lifecycle current scope is execution-context-derived, and suppressed metadata stays sanitized.
 
-Next safe action after CM-1400:
+Completed additional Phase H local no-apply slices:
 
 ```text
-Review accumulated CM-1399 and CM-1400 diff before staging/committing, or continue Phase H with another no-apply source/test slice.
+CM-1402 Phase H Codex/Claude client integration runbook and acceptance preflight
+client-scope search lifecycle consistency
+client-scope write effective scope consistency
+client-scope execution-context authority consistency
+client-scope visibility boundary consistency
+Phase H client-scope closeout aggregator / static bridge side-effect gates
+```
+
+Task-number reconciliation:
+
+- The Phase H closeout aggregator uses `CM-1404` through `CM-1407` as evidence-unit labels for local no-apply client-scope slices.
+- The active board later reused `CM-1404` and `CM-1405` for docs/validation governance tasks after PR integration.
+- Treat the source/test evidence-unit labels as local Phase H closeout labels, not as current active board task IDs.
+- Treat `.agent_board/TASK_QUEUE.md` and `.agent_board/VALIDATION_LOG.md` as the current task ledger for post-merge work.
+
+Current Phase H remaining approval boundaries:
+
+- live Codex / Claude client refresh
+- bearer-token MCP refresh
+- real cross-client private recall proof
+- real scoped write proof
+- broad client-scope store scan
+- public MCP expansion
+- client config, watchdog, or startup change
+- readiness, cutover, release, deploy, or `RC_READY` claim
+
+Next safe local action:
+
+```text
+Continue only with a small docs/board reconciliation or another explicit-input/no-apply source/test slice, unless the user gives a fresh exact approval package for a named Phase H runtime boundary.
 ```
 
 ## Historical Route Snapshot
@@ -136,16 +165,16 @@ The detailed P66/A5 sections below are retained as historical context and constr
 - P50 no-touch boundary regression suite: complete and pushed in `97a43d4`.
 - P50 review hardening for no-touch/redaction regressions: complete and pushed in `1ae4286`.
 
-## Current Task
+## Historical P66 Task Snapshot
 
 A5-GAP-2 no-mutation recall isolation runtime proof evidence:
 
-- Current local `main` contains `6faa8baa375e7496dcf62cb4443668dd9f67f712 docs: record p66 a5 gap1 governance evidence` and is ahead of `origin/main = a9177d5` by 7 commits before this evidence slice; exact state must be rechecked before approval or execution.
+- At that historical snapshot, local `main` contained `6faa8baa375e7496dcf62cb4443668dd9f67f712 docs: record p66 a5 gap1 governance evidence` and was ahead of `origin/main = a9177d5` by 7 commits before that evidence slice. Do not reuse those Git facts; exact state must be rechecked before approval or execution.
 - PASS_WITH_PATCH_RECOMMENDED review patch is pushed in `a9177d5`.
 - P66 local proof chain is complete as local evidence organization only; four runtime gaps remain open after bounded `A5-GAP-1`, `A5-GAP-2`, `A5-GAP-4`, and `A5-GAP-5` evidence records. `A5-GAP-2` has executed, but it failed closed with contamination markers and does not close recall isolation.
-- [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md) is the current runtime-gap dashboard.
+- [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md) was the runtime-gap dashboard for that historical P66 snapshot.
 - [docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) is the local A4.8 control protocol for choosing and validating future safe work.
-- Current local work records the approved A5-GAP-2 recall isolation runtime proof evidence. It did not execute push, tag, release, deploy, config/watchdog/startup changes, provider calls, search pipeline, memory mutation, migration/import-export/backup/restore apply, durable writes, public MCP expansion, cutover, or `RC_READY`.
+- That local work recorded the approved A5-GAP-2 recall isolation runtime proof evidence. It did not execute push, tag, release, deploy, config/watchdog/startup changes, provider calls, search pipeline, memory mutation, migration/import-export/backup/restore apply, durable writes, public MCP expansion, cutover, or `RC_READY`.
 - Preserve `NOT_READY_BLOCKED`; do not infer final-RC/push/release/deploy/config/watchdog/cutover readiness from P46-P66 local evidence, P63/P64 local runner evidence, the P66 truth table, the Supreme Commander protocol, the A5 approval packet, the subject-bound A5-GAP-1 no-durable evidence, the fail-closed A5-GAP-2 contamination evidence, the endpoint-bound A5-GAP-4 HTTP evidence, or the target-bound A5-GAP-5 gate evidence.
 
 ## Boundaries

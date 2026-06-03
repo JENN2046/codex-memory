@@ -10,9 +10,9 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1405",
-  "validationId": "CMV-1523",
-  "branch": "docs/tier-governance-schema-v2",
+  "taskId": "CM-1409",
+  "validationId": "CMV-1524",
+  "branch": "main",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1524",
+      "scope": "CM-1409 Phase H status reconciliation",
+      "status": "COMPLETED_VALIDATED_NO_APPLY"
+    },
     {
       "id": "CMV-1523",
       "scope": "CM-1405 schema v2 tier governance docs",

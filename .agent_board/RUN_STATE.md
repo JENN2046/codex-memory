@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1405 schema v2 tier governance docs`.
-Current validation: `CMV-1523`.
+Current task: `CM-1409 Phase H status reconciliation`.
+Current validation: `CMV-1524`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -20,10 +20,10 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1388 Phase G authoritative route entrypoint |
-| Current area | P8-memory-governance / P9-codex-claude-client-scope / P10-observability-admin / P6-docs-drift |
-| Current route | Phase G -> G1 Memory Governance Runtime Boundary -> CM-1389 governance runtime inventory |
-| Current status | `PERSONAL_DOGFOOD_READY_NOT_RC_READY / RC_READY=false` |
+| Historical task at archive time | CM-1388 Phase G authoritative route entrypoint |
+| Historical area at archive time | P8-memory-governance / P9-codex-claude-client-scope / P10-observability-admin / P6-docs-drift |
+| Historical route at archive time | Phase G -> G1 Memory Governance Runtime Boundary -> CM-1389 governance runtime inventory |
+| Historical status at archive time | `PERSONAL_DOGFOOD_READY_NOT_RC_READY / RC_READY=false` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
 | Untracked files left untouched | `CLAUDE.md`; `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` |
@@ -125,3 +125,4 @@ git log --oneline --decorate -n 10
 ```
 
 Repository reality overrides this file.
+Current reconciliation: `CM-1409` updates docs/board status so Phase H local no-apply source/test evidence-unit labels `CM-1404..CM-1407` are not confused with active board docs/governance task IDs. Runtime, provider, memory tools, real stores, config/watchdog/startup, public MCP expansion, remote action, and readiness/cutover remain out of scope without fresh exact approval.
