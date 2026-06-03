@@ -186,12 +186,12 @@ Tier 3 — Runtime / Red Lane
 - Tier 0：不需要 `.agent_board` 或 validation log；如果回答包含需要证明的状态结论，引用 fresh command output。
 - Tier 1：通常不需要 `.agent_board` 或 validation log；最终报告说明 diff inspection 和任何 targeted validation。
 - Tier 2：当改动影响 route、status、phase plan、validation policy、current-facts schema、AGENTS、docs governance 或 sustained task state 时，必须更新 `.agent_board/CURRENT_FACTS.json`、active blocks、task queue、validation log 和 ledger，使 `scripts/validate_current_facts_drift.js` 与 `scripts/validate_autopilot_ledger_consistency.js` 继续通过。
-- Tier 3：必须保留 exact approval、validation、blocker、rollback / cleanup 记录；不得把 docs-only、fixture-only、no-apply 或 committed current-facts snapshot 解释成 runtime readiness。
+- Tier 3：必须保留 exact approval 或 Smart Standing Authorization v3 Amber receipt、validation、blocker、rollback / cleanup 记录；不得把 docs-only、fixture-only、no-apply 或 committed current-facts snapshot 解释成 runtime readiness。
 
 最低 tier 规则：
 
 - `AGENTS.md`、`STATUS.md`、`DOCS_GOVERNANCE.md`、`CODEX_MEMORY_NEXT_PHASE_PLAN.md`、`PHASE_*_PLAN.md`、`.agent_board/*`、`scripts/validate*`、`scripts/*gate*`、`scripts/*approval*` 是 Tier 2 minimum。
-- `.env`、secrets、provider/profile real calls、real memory/raw store access、startup/watchdog/config、public MCP expansion、migration/import/export/apply、push/release/deploy/cutover 是 Tier 3.
+- `.env`、secrets、provider/profile real calls、real memory/raw store access、startup/watchdog/config、public MCP expansion、migration/import/export/apply、push/release/deploy/cutover 是 Tier 3；但 task-relevant bounded provider smoke/benchmark、exact `search_memory` / `memory_overview`、exact sanitized `record_memory`、exact real-memory read query 等已在 AGENTS Smart Standing Authorization v3 中列明的 Amber exception，可按该 envelope 的 scope、budget、validation、receipt 要求执行。
 
 ## Validation Before Docs Commit
 

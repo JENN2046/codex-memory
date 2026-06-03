@@ -48,11 +48,11 @@ For current status snapshots, keep schema v2 rules: `.agent_board/CURRENT_FACTS.
 
 ### Tier 3 — Runtime / Red Lane
 
-Tier 3 covers hard-stop or exact-approval work:
+Tier 3 covers hard-stop or exact-approval work. This tier does not cancel the Smart Standing Authorization v3 Amber exceptions in section 7.1.1; bounded/exact Amber work may proceed only when that section's scope, budget, validation, and receipt requirements are satisfied.
 
 - `.env`, secrets, tokens, provider keys, or credentials
-- provider/profile real calls
-- real memory reads/writes
+- provider/profile real calls, except task-relevant bounded provider smoke/benchmark calls that fit the v3 Amber envelope
+- real memory reads/writes, except exact `search_memory` / `memory_overview`, exact sanitized `record_memory`, and exact real-memory read queries that fit the v3 Amber envelope
 - raw `.jsonl`, raw audit, or real store access
 - startup/watchdog/config changes
 - public MCP tool or schema expansion

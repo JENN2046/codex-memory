@@ -21,6 +21,7 @@ Scope:
 - Added a schema v2-compatible Task Tier Matrix to `AGENTS.md`.
 - Added Tiered Governance Logging rules to `DOCS_GOVERNANCE.md`.
 - Kept `.agent_board/CURRENT_FACTS.json` as the committed status/validation snapshot and fresh Git commands as the source for live branch/head facts.
+- Clarified that Tier 3 provider/profile and real-memory bullets do not cancel exact/bounded Smart Standing Authorization v3 Amber exceptions.
 - Did not restore `validate_agents_route_consistency.js`, `docs-lite`, or stale Phase G route authority.
 
 Validation:
