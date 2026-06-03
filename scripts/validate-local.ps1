@@ -1,7 +1,8 @@
 param(
   [ValidateSet("auto","docs","test","mainline","strict","http","active","ordering","provider","profile","rollback")]
   [string]$Area = "auto",
-  [switch]$Strict
+  [switch]$Strict,
+  [switch]$QuietScripts
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,12 +38,24 @@ Write-Step "codex-memory validate-local.ps1"
 Write-Host "Area: $Area"
 Write-Host "Workspace: $((Get-Location).Path)"
 
+if ($Area -eq "docs") {
+  $QuietScripts = $true
+}
+
 if (Test-Path ".git") {
   Run-Step "git status --short" "git" @("status", "--short")
 }
 
 if (!(Test-Path "package.json")) {
   $failures.Add("package.json not found; this does not look like the codex-memory project root.")
+} elseif ($QuietScripts) {
+  Write-Step "Available npm scripts"
+  $pkg = Get-Content "package.json" -Raw | ConvertFrom-Json
+  $scriptCount = 0
+  if ($pkg.scripts) {
+    $scriptCount = @($pkg.scripts.PSObject.Properties).Count
+  }
+  Write-Host "QuietScripts: skipped full npm run listing ($scriptCount scripts detected)."
 } else {
   Write-Step "Available npm scripts"
   npm run

@@ -1,10 +1,31 @@
 #!/usr/bin/env bash
 set -u
 
-AREA="${1:-auto}"
-STRICT="${2:-}"
-
+AREA="auto"
+STRICT=""
+QUIET_SCRIPTS=false
 failures=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --strict)
+      STRICT="--strict"
+      shift
+      ;;
+    --quiet-scripts|--quietScripts|--quiet)
+      QUIET_SCRIPTS=true
+      shift
+      ;;
+    *)
+      if [[ "$AREA" == "auto" ]]; then
+        AREA="$1"
+      else
+        failures+=("Unknown argument: $1")
+      fi
+      shift
+      ;;
+  esac
+done
 
 step() {
   echo
@@ -38,9 +59,21 @@ run_npm_script() {
   fi
 }
 
+run_optional_node_script() {
+  local script="$1"
+  if [[ -f "$script" ]]; then
+    run_step "node --check $script" node --check "$script"
+    run_step "node $script" node "$script"
+  fi
+}
+
 step "codex-memory validate-local.sh"
 echo "Area: $AREA"
 echo "Workspace: $(pwd)"
+
+if [[ "$AREA" == "docs" ]]; then
+  QUIET_SCRIPTS=true
+fi
 
 if [[ -d ".git" ]]; then
   run_step "git status --short" git status --short
@@ -48,6 +81,10 @@ fi
 
 if [[ ! -f "package.json" ]]; then
   failures+=("package.json not found; this does not look like the codex-memory project root.")
+elif [[ "$QUIET_SCRIPTS" == true ]]; then
+  step "Available npm scripts"
+  script_count="$(node -e "const p=require('./package.json'); console.log(p.scripts ? Object.keys(p.scripts).length : 0)")"
+  echo "QuietScripts: skipped full npm run listing (${script_count} scripts detected)."
 else
   step "Available npm scripts"
   npm run || true
@@ -57,6 +94,21 @@ case "$AREA" in
   docs)
     step "Docs validation"
     echo "Docs-only validation requires diff inspection by the agent."
+    run_optional_node_script "./scripts/validate_autopilot_governance_kernel.js"
+    run_optional_node_script "./scripts/validate_autopilot_ledger_consistency.js"
+    run_optional_node_script "./scripts/validate_current_facts_drift.js"
+    run_optional_node_script "./scripts/validate_autopilot_goal_compiler.js"
+    run_optional_node_script "./scripts/validate_autopilot_closed_loop.js"
+    run_optional_node_script "./scripts/validate_autopilot_controller.js"
+    run_optional_node_script "./scripts/validate_autopilot_state_store_draft.js"
+    run_optional_node_script "./scripts/validate_autopilot_action_adapter_contract.js"
+    run_optional_node_script "./scripts/validate_autopilot_validation_planner.js"
+    run_optional_node_script "./scripts/validate_autopilot_replay_harness.js"
+    run_optional_node_script "./scripts/validate_autopilot_operator_console.js"
+    run_optional_node_script "./scripts/validate_autopilot_controlled_green_executor_entry.js"
+    run_optional_node_script "./scripts/validate_autopilot_fixture_green_executor.js"
+    run_optional_node_script "./scripts/validate_autopilot_green_file_write_boundary.js"
+    run_optional_node_script "./scripts/validate_autopilot_green_file_write_executor_contract.js"
     ;;
   test)
     run_npm_script "test"

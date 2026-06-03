@@ -4,11 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1403 current facts schema v2 non-self-referential semantics`.
-Current validation: `CMV-1521`.
+Current checkpoint: `CM-1404 local validation polish divergence integration`.
+Current validation: `CMV-1522`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1404 Local Validation Polish Divergence Integration
+
+Status: `COMPLETED_VALIDATED_CM1404_LOCAL_VALIDATION_POLISH_INTEGRATION`
+
+Date: 2026-06-03
+
+Scope:
+
+- Preserved the old local ahead-5 branch as `backup/local-ahead-5-before-origin-sync`.
+- Based integration work on current `origin/main` via `integrate/local-validation-polish`.
+- Did not replay stale `validate_agents_route_consistency.js` route-guard work.
+- Migrated only the useful validation quiet-output behavior into current PowerShell and Bash validation scripts.
+- Kept current facts schema v2 / `validate_current_facts_drift.js` as the active docs drift guard.
+
+Validation:
+
+- `git diff --check` passed.
+- `node scripts\validate_current_facts_drift.js` passed.
+- `node scripts\validate_autopilot_ledger_consistency.js` passed.
+- `bash -n ./scripts/validate-local.sh` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `bash ./scripts/validate-local.sh docs` passed.
+
+No runtime action, provider call, memory tool call, durable memory/audit write, dependency change, config/watchdog/startup change, remote action, readiness claim, release, deploy, or cutover occurred.
 
 ## CM-1403 Current Facts Schema V2 Migration
 

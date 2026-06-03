@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1403 current facts schema v2 non-self-referential semantics`.
-Current validation: `CMV-1521`.
-Current handoff: CM-1403 migrates the current-facts validator, tests, docs, and board surface to schema v2 committed status/validation snapshot semantics; live Git facts are not committed and must be collected with fresh Git commands; no runtime, provider, memory tool, durable write, remote action, or readiness claim occurred.
+Current task: `CM-1404 local validation polish divergence integration`.
+Current validation: `CMV-1522`.
+Current handoff: CM-1404 integrates the useful local validation quiet-output polish onto the current `origin/main` schema v2 route; stale local route-guard commits remain preserved on `backup/local-ahead-5-before-origin-sync` and were not replayed; no runtime, provider, memory tool, durable write, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

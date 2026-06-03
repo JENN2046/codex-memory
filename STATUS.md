@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1403 current facts schema v2 non-self-referential semantics`.
-Current validation: `CMV-1521`.
+Current task: `CM-1404 local validation polish divergence integration`.
+Current validation: `CMV-1522`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase H local no-apply source/test/docs slice -> schema v2 status snapshot semantics`.
+Current route: `Phase H local no-apply source/test/docs slice -> local validation polish integration`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
