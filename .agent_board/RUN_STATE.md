@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1424 search_memory authenticated bounded/noRawContentRead projection patch`.
-Current validation: `CMV-1537`.
+Current task: `CM-1425 search_memory negative-control precision / no-result policy patch`.
+Current validation: `CMV-1538`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1424` source/test/hardening validation is complete locally. Next safe action is review/commit/push of the patch, then runtime refresh and fresh exact approval before any CM-1422 live rerun.
+`CM-1425` source/test/hardening validation is complete locally. Next safe action is review/commit/push only with explicit authorization; after runtime refresh, fresh exact approval is required before any CM-1422 live rerun.
 
 ## Historical Run Notes
 

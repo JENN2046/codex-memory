@@ -330,6 +330,7 @@ test('bearer token HTTP search_memory returns bounded projection', async () => {
     assert.equal(searchOptions.readOnly, true);
     assert.equal(searchOptions.noRawContentRead, true);
     assert.equal(searchOptions.includeContent, false);
+    assert.equal(searchOptions.precisionPolicyContext, null);
     assert.equal(structured.access.mode, 'authenticated_bounded_search');
     assert.equal(structured.access.selectedProjection, true);
     assert.equal(structured.access.rawContentReturned, false);
@@ -344,6 +345,56 @@ test('bearer token HTTP search_memory returns bounded projection', async () => {
     for (const forbiddenKey of ['sourceFile', 'filePath', 'path', 'title', 'memoryId', 'snippet', 'text', 'content', 'raw_text']) {
       assert.equal(keys.has(forbiddenKey), false, `${forbiddenKey} should be stripped`);
     }
+  }, { bearerToken });
+});
+
+test('bearer token HTTP high-entropy negative-control search enables no-result precision policy', async () => {
+  const bearerToken = 'test-token-12345';
+  await withHttpServer(async ({ app, address }) => {
+    let searchOptions = null;
+    app.services.passiveRecallService.search = async options => {
+      searchOptions = options;
+      return [];
+    };
+
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${bearerToken}`
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 11,
+        method: 'tools/call',
+        params: {
+          name: 'search_memory',
+          arguments: {
+            query: 'xqzv-9137-lomdra-kepv-azmuth',
+            target: 'both',
+            limit: 1,
+            include_content: false
+          }
+        }
+      })
+    });
+    const payload = await response.json();
+    const structured = payload.result.structuredContent;
+
+    assert.equal(response.status, 200);
+    assert.equal(payload.result.isError, false);
+    assert.equal(searchOptions.readOnly, true);
+    assert.equal(searchOptions.noRawContentRead, true);
+    assert.deepEqual(searchOptions.precisionPolicyContext, {
+      enabled: true,
+      queryFamily: 'authenticated_bounded_high_entropy_negative_control',
+      proofNoResultMode: true,
+      minimumScore: 0.12,
+      highConfidenceScore: 0.62
+    });
+    assert.equal(structured.access.mode, 'authenticated_bounded_search');
+    assert.equal(structured.resultCount, 0);
+    assert.deepEqual(structured.results, []);
   }, { bearerToken });
 });
 

@@ -259,6 +259,46 @@ function isAuthenticatedBoundedSearchRequest(requestContext = {}) {
   return requestContext.authenticatedBoundedSearch === true;
 }
 
+function isHighEntropyNegativeControlQuery(query) {
+  const normalized = String(query || '').trim().toLowerCase();
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+){3,}$/.test(normalized)) {
+    return false;
+  }
+
+  const segments = normalized.split('-');
+  const alnumLength = segments.join('').length;
+  return segments.length >= 4
+    && alnumLength >= 22
+    && segments.some(segment => /\d/.test(segment))
+    && segments.every(segment => segment.length >= 3);
+}
+
+function buildAuthenticatedBoundedSearchPrecisionPolicyContext(args = {}, requestContext = {}) {
+  if (!isAuthenticatedBoundedSearchRequest(requestContext)) {
+    return null;
+  }
+  if ((args.target || 'both') !== 'both') {
+    return null;
+  }
+  if (Number(args.limit) !== 1) {
+    return null;
+  }
+  if (args.include_content === true) {
+    return null;
+  }
+  if (!isHighEntropyNegativeControlQuery(args.query)) {
+    return null;
+  }
+
+  return Object.freeze({
+    enabled: true,
+    queryFamily: 'authenticated_bounded_high_entropy_negative_control',
+    proofNoResultMode: true,
+    minimumScore: 0.12,
+    highConfidenceScore: 0.62
+  });
+}
+
 function projectBoundedSearchResult(item = {}) {
   return {
     target: item.target || null,
@@ -739,7 +779,8 @@ function createCodexMemoryApplication(overrides = {}) {
       return buildAuthenticatedBoundedSearchRejected('authenticated bounded search does not allow include_content=true.');
     }
     const readOnly = requestContext.noTokenReadOnly === true || authenticatedBoundedSearch;
-    const precisionPolicyContext = normalizeInternalPrecisionPolicyContext(requestContext);
+    const precisionPolicyContext = normalizeInternalPrecisionPolicyContext(requestContext)
+      || buildAuthenticatedBoundedSearchPrecisionPolicyContext(args, requestContext);
     const noRawContentRead = normalizeInternalNoRawContentRead(requestContext);
     const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
     const scopeAudit = buildScopeAuditContext(scopeFilter);

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1424",
-  "validationId": "CMV-1537",
+  "taskId": "CM-1425",
+  "validationId": "CMV-1538",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1538",
+      "scope": "CM-1425 search_memory negative-control precision / no-result policy patch",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_HARDENING_NO_LIVE_RERUN"
+    },
     {
       "id": "CMV-1537",
       "scope": "CM-1424 search_memory authenticated bounded/noRawContentRead projection patch",
@@ -148,7 +153,7 @@
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
-    "CM-1422 exact-approved live search_memory rerun for CM-1419 after commit/push/runtime refresh",
+    "CM-1422 exact-approved live search_memory rerun for CM-1419 after CM-1425 commit/push/runtime refresh",
     "complete two-query live search_memory negative-control",
     "real record_memory scope write",
     "real query quality proof",

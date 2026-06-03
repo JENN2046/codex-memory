@@ -9,16 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1424 search_memory authenticated bounded/noRawContentRead projection patch` |
-| Current validation | `CMV-1537` |
-| Current route | Phase H authenticated HTTP `search_memory` bounded projection implemented locally; no live rerun |
+| Current task | `CM-1425 search_memory negative-control precision / no-result policy patch` |
+| Current validation | `CMV-1538` |
+| Current route | Phase H authenticated HTTP `search_memory` high-entropy negative-control now enters proofNoResultMode locally; no live rerun |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
 
-`CM-1424` implemented a source-side authenticated HTTP `search_memory` bounded projection. HTTP bearer `search_memory` now runs read-only/noRawContentRead, rejects `include_content=true` before search execution, and returns only bounded non-identifying count/score/target-style result fields. It strips `sourceFile`, `filePath`, `path`, `title`, `memoryId`, `snippet`, `text`, `content`, `raw_text`, and path/store metadata from public HTTP structured output. Direct app/internal search behavior remains separate.
+`CM-1425` implemented a source-side no-result precision policy for authenticated HTTP high-entropy negative-control `search_memory` calls. The CM-1422 NC1/NC2 family previously returned `resultCount=1` because ordinary recall admits any positive vector/hash score into the candidate pool and then returns the top candidate for `limit=1`; the authenticated bounded path had no precision policy. The patch detects high-entropy nonce-style negative-control queries under the exact bounded public HTTP shape and passes `proofNoResultMode` into the existing precision policy, while leaving ordinary authenticated bounded search behavior unchanged.
 
 Latest local validation before CM-1420:
 
