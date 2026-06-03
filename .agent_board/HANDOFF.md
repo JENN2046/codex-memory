@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1415 real query quality temp DB gate`.
-Current validation: `CMV-1530`.
-Current handoff: CM-1415 adds `QueryQualityTempDbGate`, CLI `query-quality-temp-db-gate`, npm script `query:quality:temp-db`, and targeted tests. The gate creates an isolated temp app/sqlite/vector/chunk store, seeds six synthetic records, runs read-only recall pipeline checks, validates `mustContain`/`mustNotContain`/`topKOrder` plus tombstoned and cross-client private suppression, and cleans up the temp directory. No provider/API call, live MCP call, bearer token use, real memory read/write, raw audit/store scan, durable audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1416 health endpoint strict no-token split`.
+Current validation: `CMV-1531`.
+Current handoff: CM-1416 patches post-push review findings by making `/health` no-token response strictly low disclosure, allowing full bounded health only for valid bearer requests, rejecting invalid bearer before full payload, and correcting `.env.example` to match no-token selected `memory_overview` behavior. Validation used local temp HTTP tests only. No live 7605 probe, provider/API call, live client action, real bearer token material use, real memory tool call, raw audit/store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

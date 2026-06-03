@@ -434,6 +434,54 @@ function createStreamableHttpServer({
     return Boolean(getSingleHeaderValue(req.headers.authorization).trim());
   }
 
+  function createLowDisclosureHealthPayload() {
+    return {
+      ok: true,
+      name: app.config.serverVersion ? 'vcp_codex_memory' : 'codex-memory',
+      version: app.config.serverVersion,
+      protocol: 'streamable-http',
+      path: pathname,
+      auth: {
+        required: !!bearerToken
+      }
+    };
+  }
+
+  function createFullHealthPayload() {
+    return {
+      ok: true,
+      name: app.config.serverVersion ? 'vcp_codex_memory' : 'codex-memory',
+      version: app.config.serverVersion,
+      protocol: 'streamable-http',
+      path: pathname,
+      access: {
+        mode: 'health_full',
+        selectedProjection: false,
+        selectedProjectionVersion: 1,
+        bearerTokenRequiredForMcpTools: !!bearerToken,
+        tokenMaterialReturned: false,
+        filesystemPathsReturned: false,
+        rawStoreFieldsReturned: false,
+        rawMemoryFieldsReturned: false,
+        embeddingFingerprintReturned: false,
+        runtimeDetailLevel: 'bounded'
+      },
+      auth: {
+        required: !!bearerToken,
+        warning: authWarning
+      },
+      sessionHardening: {
+        absoluteTtlMs: sessionHardening.absoluteTtlMs,
+        idleTtlMs: sessionHardening.idleTtlMs,
+        maxSessions: sessionHardening.maxSessions,
+        maxStreamsPerSession: sessionHardening.maxStreamsPerSession,
+        cleanupIntervalMs: sessionHardening.cleanupIntervalMs,
+        warnings: sessionHardening.warnings
+      },
+      runtime: buildRuntimeHealth(app)
+    };
+  }
+
   const cleanupTimer = setInterval(() => cleanupExpiredSessions(), sessionHardening.cleanupIntervalMs);
   if (typeof cleanupTimer.unref === 'function') {
     cleanupTimer.unref();
@@ -446,38 +494,17 @@ function createStreamableHttpServer({
       const requestPathname = normalizePathname(url.pathname);
 
       if (matchesRoute(requestPathname, healthPathname)) {
-        return writeJson(res, 200, {
-          ok: true,
-          name: app.config.serverVersion ? 'vcp_codex_memory' : 'codex-memory',
-          version: app.config.serverVersion,
-          protocol: 'streamable-http',
-          path: pathname,
-          access: {
-            mode: 'health_low_disclosure',
-            selectedProjection: true,
-            selectedProjectionVersion: 1,
-            bearerTokenRequiredForMcpTools: !!bearerToken,
-            tokenMaterialReturned: false,
-            filesystemPathsReturned: false,
-            rawStoreFieldsReturned: false,
-            rawMemoryFieldsReturned: false,
-            embeddingFingerprintReturned: false,
-            runtimeDetailLevel: 'bounded'
-          },
-          auth: {
-            required: !!bearerToken,
-            warning: authWarning
-          },
-          sessionHardening: {
-            absoluteTtlMs: sessionHardening.absoluteTtlMs,
-            idleTtlMs: sessionHardening.idleTtlMs,
-            maxSessions: sessionHardening.maxSessions,
-            maxStreamsPerSession: sessionHardening.maxStreamsPerSession,
-            cleanupIntervalMs: sessionHardening.cleanupIntervalMs,
-            warnings: sessionHardening.warnings
-          },
-          runtime: buildRuntimeHealth(app)
-        });
+        const healthAuthorized = authorize(req);
+        const healthHasBearerHeader = hasBearerHeader(req);
+        if (bearerToken && healthHasBearerHeader && !healthAuthorized) {
+          return writeJson(res, 401, createUnauthorizedPayload(), {
+            'WWW-Authenticate': 'Bearer'
+          });
+        }
+        if (bearerToken && healthAuthorized && healthHasBearerHeader) {
+          return writeJson(res, 200, createFullHealthPayload());
+        }
+        return writeJson(res, 200, createLowDisclosureHealthPayload());
       }
 
       if (!matchesRoute(requestPathname, pathname)) {

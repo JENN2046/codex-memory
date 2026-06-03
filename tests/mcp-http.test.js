@@ -45,6 +45,15 @@ const HEALTH_ACCESS_KEYS = [
   'tokenMaterialReturned'
 ];
 
+const LOW_DISCLOSURE_HEALTH_KEYS = [
+  'auth',
+  'name',
+  'ok',
+  'path',
+  'protocol',
+  'version'
+];
+
 async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
   const app = createCodexMemoryApplication({
@@ -115,21 +124,15 @@ test('HTTP MCP should expose health and tools/list', async () => {
     const healthPayload = await health.json();
     assert.equal(health.status, 200);
     assert.equal(healthPayload.ok, true);
-    assert.deepEqual(Object.keys(healthPayload.access).sort(), HEALTH_ACCESS_KEYS);
-    assert.equal(healthPayload.access.mode, 'health_low_disclosure');
-    assert.equal(healthPayload.access.selectedProjection, true);
-    assert.equal(healthPayload.access.selectedProjectionVersion, 1);
-    assert.equal(healthPayload.access.bearerTokenRequiredForMcpTools, false);
-    assert.equal(healthPayload.access.tokenMaterialReturned, false);
-    assert.equal(healthPayload.access.filesystemPathsReturned, false);
-    assert.equal(healthPayload.access.rawStoreFieldsReturned, false);
-    assert.equal(healthPayload.access.rawMemoryFieldsReturned, false);
-    assert.equal(healthPayload.access.embeddingFingerprintReturned, false);
-    assert.equal(healthPayload.access.runtimeDetailLevel, 'bounded');
+    assert.deepEqual(Object.keys(healthPayload).sort(), LOW_DISCLOSURE_HEALTH_KEYS);
+    assert.deepEqual(Object.keys(healthPayload.auth).sort(), ['required']);
     assert.equal(healthPayload.auth.required, false);
-    assert.match(healthPayload.auth.warning, /loopback host without a bearer token/);
     const serializedHealth = JSON.stringify(healthPayload);
     assert.doesNotMatch(serializedHealth, /test-token/i);
+    assert.doesNotMatch(serializedHealth, /loopback host without a bearer token/i);
+    assert.equal(healthPayload.access, undefined);
+    assert.equal(healthPayload.sessionHardening, undefined);
+    assert.equal(healthPayload.runtime, undefined);
     assert.doesNotMatch(serializedHealth, /"embeddingProfile"\s*:/);
     assert.doesNotMatch(serializedHealth, /"fingerprint"\s*:/);
     assert.doesNotMatch(serializedHealth, /memoryId/i);
@@ -137,26 +140,6 @@ test('HTTP MCP should expose health and tools/list', async () => {
     assert.doesNotMatch(serializedHealth, /processDiaryPath/i);
     assert.doesNotMatch(serializedHealth, /knowledgeDiaryPath/i);
     assert.doesNotMatch(serializedHealth, /candidateCachePath/i);
-    assert.deepEqual(Object.keys(healthPayload.runtime).sort(), ['writeReconcileWorker']);
-    assert.deepEqual(Object.keys(healthPayload.runtime.writeReconcileWorker).sort(), [
-      'available',
-      'dryRun',
-      'intervalMs',
-      'lastResultSummary',
-      'limit',
-      'maxRuns',
-      'runCount',
-      'running',
-      'tickInFlight',
-      'timerScheduled'
-    ]);
-    assert.equal(healthPayload.runtime.writeReconcileWorker.available, true);
-    assert.equal(healthPayload.runtime.writeReconcileWorker.running, false);
-    assert.equal(healthPayload.runtime.writeReconcileWorker.timerScheduled, false);
-    assert.equal(healthPayload.runtime.writeReconcileWorker.tickInFlight, false);
-    assert.equal(healthPayload.runtime.writeReconcileWorker.runCount, 0);
-    assert.equal(healthPayload.runtime.writeReconcileWorker.lastResultSummary, null);
-    assert.equal(JSON.stringify(healthPayload.runtime.writeReconcileWorker).includes('memoryId'), false);
     assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
 
     const tools = await fetch(address.url, {
@@ -184,17 +167,12 @@ test('HTTP MCP bearer-configured no-token health remains low disclosure', async 
 
     assert.equal(health.status, 200);
     assert.equal(healthPayload.ok, true);
-    assert.equal(healthPayload.access.mode, 'health_low_disclosure');
-    assert.equal(healthPayload.access.selectedProjection, true);
-    assert.equal(healthPayload.access.selectedProjectionVersion, 1);
-    assert.equal(healthPayload.access.bearerTokenRequiredForMcpTools, true);
-    assert.equal(healthPayload.access.tokenMaterialReturned, false);
-    assert.equal(healthPayload.access.filesystemPathsReturned, false);
-    assert.equal(healthPayload.access.rawStoreFieldsReturned, false);
-    assert.equal(healthPayload.access.rawMemoryFieldsReturned, false);
-    assert.equal(healthPayload.access.embeddingFingerprintReturned, false);
+    assert.deepEqual(Object.keys(healthPayload).sort(), LOW_DISCLOSURE_HEALTH_KEYS);
+    assert.deepEqual(Object.keys(healthPayload.auth).sort(), ['required']);
     assert.equal(healthPayload.auth.required, true);
-    assert.equal(healthPayload.auth.warning, null);
+    assert.equal(healthPayload.access, undefined);
+    assert.equal(healthPayload.sessionHardening, undefined);
+    assert.equal(healthPayload.runtime, undefined);
     assert.doesNotMatch(serializedHealth, /test-token/i);
     assert.doesNotMatch(serializedHealth, /"embeddingProfile"\s*:/);
     assert.doesNotMatch(serializedHealth, /"fingerprint"\s*:/);
@@ -203,6 +181,74 @@ test('HTTP MCP bearer-configured no-token health remains low disclosure', async 
     assert.doesNotMatch(serializedHealth, /processDiaryPath/i);
     assert.doesNotMatch(serializedHealth, /knowledgeDiaryPath/i);
     assert.doesNotMatch(serializedHealth, /candidateCachePath/i);
+  }, { bearerToken: 'test-token' });
+});
+
+test('HTTP MCP bearer health returns full bounded payload with valid token only', async () => {
+  await withHttpServer(async ({ app, address }) => {
+    const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'), {
+      headers: {
+        Authorization: 'Bearer test-token'
+      }
+    });
+    const healthPayload = await health.json();
+    const serializedHealth = JSON.stringify(healthPayload);
+
+    assert.equal(health.status, 200);
+    assert.equal(healthPayload.ok, true);
+    assert.deepEqual(Object.keys(healthPayload.access).sort(), HEALTH_ACCESS_KEYS);
+    assert.equal(healthPayload.access.mode, 'health_full');
+    assert.equal(healthPayload.access.selectedProjection, false);
+    assert.equal(healthPayload.access.selectedProjectionVersion, 1);
+    assert.equal(healthPayload.access.bearerTokenRequiredForMcpTools, true);
+    assert.equal(healthPayload.access.tokenMaterialReturned, false);
+    assert.equal(healthPayload.access.filesystemPathsReturned, false);
+    assert.equal(healthPayload.access.rawStoreFieldsReturned, false);
+    assert.equal(healthPayload.access.rawMemoryFieldsReturned, false);
+    assert.equal(healthPayload.access.embeddingFingerprintReturned, false);
+    assert.equal(healthPayload.access.runtimeDetailLevel, 'bounded');
+    assert.equal(healthPayload.auth.required, true);
+    assert.equal(healthPayload.auth.warning, null);
+    assert.deepEqual(Object.keys(healthPayload.runtime).sort(), ['writeReconcileWorker']);
+    assert.deepEqual(Object.keys(healthPayload.runtime.writeReconcileWorker).sort(), [
+      'available',
+      'dryRun',
+      'intervalMs',
+      'lastResultSummary',
+      'limit',
+      'maxRuns',
+      'runCount',
+      'running',
+      'tickInFlight',
+      'timerScheduled'
+    ]);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.available, true);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.running, false);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.timerScheduled, false);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.tickInFlight, false);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.runCount, 0);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.lastResultSummary, null);
+    assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+    assert.doesNotMatch(serializedHealth, /test-token/i);
+    assert.doesNotMatch(serializedHealth, /memoryId/i);
+    assert.doesNotMatch(serializedHealth, /auditLogPath/i);
+  }, { bearerToken: 'test-token' });
+});
+
+test('HTTP MCP bearer-configured health rejects invalid token before full payload', async () => {
+  await withHttpServer(async ({ address }) => {
+    const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'), {
+      headers: {
+        Authorization: 'Bearer wrong-token'
+      }
+    });
+    const healthPayload = await health.json();
+
+    assert.equal(health.status, 401);
+    assert.equal(healthPayload.error, 'Unauthorized');
+    assert.equal(healthPayload.runtime, undefined);
+    assert.equal(healthPayload.sessionHardening, undefined);
+    assert.equal(healthPayload.access, undefined);
   }, { bearerToken: 'test-token' });
 });
 
@@ -239,7 +285,11 @@ test('HTTP MCP health should sanitize write reconcile worker last result summary
     });
 
     try {
-      const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'));
+      const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'), {
+        headers: {
+          Authorization: 'Bearer test-token'
+        }
+      });
       const payload = await health.json();
       const worker = payload.runtime.writeReconcileWorker;
 
@@ -269,7 +319,7 @@ test('HTTP MCP health should sanitize write reconcile worker last result summary
     } finally {
       app.services.memoryWriteReconcileWorker.getStatus = originalGetStatus;
     }
-  });
+  }, { bearerToken: 'test-token' });
 });
 
 test('HTTP MCP should reject browser-origin no-token POST writes', async () => {
@@ -942,13 +992,18 @@ test('HTTP MCP session hardening should reject max streams plus one and allow af
 
 test('HTTP MCP session hardening should expose sanitized warning metadata on health', async () => {
   await withHttpServer(async ({ address }) => {
-    const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'));
+    const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'), {
+      headers: {
+        Authorization: 'Bearer test-token'
+      }
+    });
     const payload = await health.json();
     assert.equal(health.status, 200);
     assert.equal(payload.sessionHardening.maxSessions, 64);
     assert.equal(payload.sessionHardening.warnings[0].key, 'CODEX_MEMORY_HTTP_MAX_SESSIONS');
     assert.equal(Object.hasOwn(payload.sessionHardening.warnings[0], 'raw'), false);
   }, {
+    bearerToken: 'test-token',
     sessionHardeningEnv: {
       CODEX_MEMORY_HTTP_MAX_SESSIONS: '999'
     }

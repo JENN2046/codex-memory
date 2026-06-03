@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1415",
-  "validationId": "CMV-1530",
+  "taskId": "CM-1416",
+  "validationId": "CMV-1531",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -32,6 +32,11 @@
   },
   "validationSummary": [
     {
+      "id": "CMV-1531",
+      "scope": "CM-1416 health endpoint strict no-token split",
+      "status": "COMPLETED_VALIDATED_SOURCE_TEST_DOCS"
+    },
+    {
       "id": "CMV-1530",
       "scope": "CM-1415 real query quality temp DB gate",
       "status": "COMPLETED_VALIDATED_SOURCE_TESTS"
@@ -43,7 +48,7 @@
     },
     {
       "id": "CMV-1528",
-      "scope": "CM-1413 health endpoint no-token low-disclosure",
+      "scope": "CM-1413 health endpoint bounded projection",
       "status": "COMPLETED_VALIDATED_SOURCE_TESTS"
     },
     {

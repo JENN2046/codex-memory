@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1415 real query quality temp DB gate`.
-Current validation: `CMV-1530`.
+Current checkpoint: `CM-1416 health endpoint strict no-token split`.
+Current validation: `CMV-1531`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1416 Health Endpoint Strict No-Token Split
+
+Status: `COMPLETED_VALIDATED_CM1416_HEALTH_ENDPOINT_STRICT_NO_TOKEN_SPLIT`
+
+Scope: local source/test/docs patch. Targeted tests use temp-local HTTP servers only. No live 7605 probe, provider/API call, live client action, real bearer token material use, real memory tool call, real store scan, durable write outside temp test stores, config/watchdog/startup change, dependency change, public MCP expansion, remote action, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Split `/health` into strict no-token low-disclosure and authorized full bounded payloads.
+- No-token `/health` now exposes only `ok`, `name`, `version`, `protocol`, `path`, and `auth.required`.
+- Valid bearer `/health` retains full bounded health details; invalid bearer is rejected before full payload.
+- Corrected `.env.example` to say no-token `memory_overview` returns selected low-disclosure overview.
+- Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1416` / `CMV-1531`.
+
+Validation:
+
+- `node --check src\adapters\codex-mcp\http.js`
+- `node --check tests\mcp-http.test.js`
+- `node --test tests\mcp-http.test.js tests\http-no-token-search-rejection.test.js`
+
+Result: post-push review patch closes the strict no-token health split without claiming live runtime readiness.
 
 ## CM-1415 Real Query Quality Temp DB Gate
 
@@ -54,16 +76,17 @@ Validation:
 
 Result: `audit_memory` now has an internal readonly draft boundary without expanding public MCP tools.
 
-## CM-1413 Health Endpoint No-Token Low-Disclosure
+## CM-1413 Health Endpoint Bounded Projection
 
-Status: `COMPLETED_VALIDATED_CM1413_HEALTH_ENDPOINT_NO_TOKEN_LOW_DISCLOSURE`
+Status: `COMPLETED_VALIDATED_CM1413_HEALTH_ENDPOINT_BOUNDED_PROJECTION_SUPERSEDED_BY_CM1416`
 
 Scope: local source/test HTTP contract hardening. Targeted tests use temp-local HTTP servers only. No live 7605 probe, provider/API call, live client action, bearer-token material use, real memory tool call, real store scan, durable write outside temp test stores, config/watchdog/startup change, dependency change, public MCP tool expansion, remote action, readiness claim, release, deploy, or cutover action.
 
 Changed:
 
-- Added `/health` `access.mode=health_low_disclosure` marker and selected projection version.
+- Added bounded `/health` projection flags and selected projection version.
 - Added explicit false disclosure flags for token material, filesystem paths, raw store/memory fields, and embedding fingerprints.
+- Later review accepted this only as bounded projection evidence; CM-1416 supersedes it with the strict no-token split.
 - Added no-token and bearer-configured health response redaction tests.
 - Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1413` / `CMV-1528`.
 
@@ -74,7 +97,7 @@ Validation:
 - `node --test tests\mcp-http.test.js`
 - `node --test tests\http-no-token-search-rejection.test.js`
 
-Result: `/health` has an explicit low-disclosure contract while preserving the bounded runtime health summary.
+Result: CM-1413 established bounded projection evidence, but CM-1416 is the current strict no-token health contract.
 
 ## CM-1412 Record Memory Scope Schema MaxLength
 
