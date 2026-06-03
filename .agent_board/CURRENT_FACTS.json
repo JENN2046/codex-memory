@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1434",
-  "validationId": "CMV-1545",
+  "taskId": "CM-1435",
+  "validationId": "CMV-1546",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1546",
+      "scope": "CM-1435 corrected scoped record_memory write accepted evidence closeout",
+      "status": "COMPLETED_VALIDATED_DOCS_ONLY_CM1432_CORRECTED_RECORD_MEMORY_WRITE_ACCEPTED"
+    },
     {
       "id": "CMV-1545",
       "scope": "CM-1434 corrected scoped record_memory write proof packet",
@@ -188,8 +193,8 @@
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
-    "real record_memory scope write",
-    "CM-1432 scoped record_memory write proof execution",
+    "broad record_memory reliability",
+    "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
     "public audit_memory registration",
     "raw audit or broad store scan",

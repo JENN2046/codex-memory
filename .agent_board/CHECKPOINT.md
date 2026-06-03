@@ -4,57 +4,68 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1434 corrected scoped record_memory write proof packet`.
-Current validation: `CMV-1545`.
+Current checkpoint: `CM-1435 corrected scoped record_memory write accepted evidence closeout`.
+Current validation: `CMV-1546`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1434 Corrected Scoped Record Memory Write Proof Packet
+## CM-1435 Corrected Scoped Record Memory Write Accepted Evidence Closeout
 
-Status: `COMPLETED_VALIDATED_CORRECTED_PACKET_NOT_EXECUTED`
+Status: `COMPLETED_VALIDATED_DOCS_ONLY_CM1432_CORRECTED_RECORD_MEMORY_WRITE_ACCEPTED`
 
 Scope:
 
 ```text
-docs/test corrected packet; no live write
+docs-only closeout of already executed corrected scoped record_memory write proof
 ```
 
 Recorded:
 
-- Corrected packet path: `docs/CM1434_CORRECTED_SCOPED_RECORD_MEMORY_WRITE_PROOF_PACKET.md`.
-- CM-1432 fail-closed fact remains preserved.
-- CM-1433 root cause remains process-target semantic signal missing in CM-1431 payload.
-- Corrected payload remains synthetic governance-safe and `target=process`.
-- Corrected payload adds `Checkpoint:` in title/content.
-- Required scope fields remain present: `project_id`, `client_id`, `visibility`, `task_id`, `retention_policy`.
-- Corrected payload SHA-256: `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`.
-- Temp/synthetic validation accepted the corrected payload.
-- Future exact approval template included in the corrected packet.
-- No live `record_memory`, second live write attempt, `search_memory`, `memory_overview`, bearer-token use, provider/API, true memory read/write, raw store scan, runtime action, public MCP expansion, or readiness / `RC_READY` claim occurred in CM-1434.
+- `main == origin/main == da1caa25302b2cf7b233a162bcbec00d48602040`.
+- Runtime freshness accepted.
+- Listener PID `16804`.
+- Public tools unchanged: `memory_overview`, `record_memory`, `search_memory`.
+- Corrected payload hash matched `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`.
+- Exactly one authenticated public HTTP MCP `record_memory` call executed in CM-1432 corrected.
+- `target=process`.
+- Required scope fields present.
+- Synthetic governance-safe marker.
+- `Checkpoint` process signal present.
+- `decision=accepted`.
+- `shadowWriteStatus=ok`.
+- `idempotencyStatus=committed`.
+- `memoryIdReturned=true` as boolean only.
+- Memory id value not printed.
+- Raw response not printed or persisted.
+- No `search_memory`.
+- No `memory_overview`.
+- No provider/API.
+- No raw store scan.
+- No follow-up validation.
+- No readiness / `RC_READY` claim.
 
 Boundary:
 
-- No runtime action in CM-1434.
-- No live MCP `tools/call` in CM-1434.
-- No live `record_memory` in CM-1434.
-- No second live write attempt.
-- No live `search_memory`.
+- No new live probe in CM-1435.
+- No `record_memory` in CM-1435.
+- No `search_memory`.
 - No `memory_overview`.
 - No provider/API call.
 - No bearer-token use.
 - No raw memory/audit/store scan.
-- No durable memory/audit write.
+- No durable memory/audit write in CM-1435.
 - No config/watchdog/startup change.
 - No public MCP expansion.
 - No remote action.
 - No readiness, reliability, release, cutover, or `RC_READY` claim.
 
-Validation: `CMV-1545` docs/test validation.
+Validation: `CMV-1546` docs-only validation.
 
 ## Recent Checkpoint References
 
 - `CM-1420`: context intake and status-surface compaction.
+- `CM-1434`: corrected scoped `record_memory` write proof packet.
 - `CM-1433`: `record_memory` rejection reason investigation.
 - `CM-1431`: scoped `record_memory` write proof scope packet.
 - `CM-1430`: bounded positive `search_memory` shape evidence closeout.

@@ -9,9 +9,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1434 corrected scoped record_memory write proof packet` |
-| Current validation | `CMV-1545` |
-| Current route | Corrected CM-1432 scoped `record_memory` payload packet prepared; no live write |
+| Current task | `CM-1435 corrected scoped record_memory write accepted evidence closeout` |
+| Current validation | `CMV-1546` |
+| Current route | CM-1432 corrected scoped `record_memory` write proof accepted; docs-only closeout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -36,6 +36,10 @@ Side-effect evidence for the CM-1428 execution: no `record_memory`, no `memory_o
 
 `CM-1434` prepares `docs/CM1434_CORRECTED_SCOPED_RECORD_MEMORY_WRITE_PROOF_PACKET.md` for a future CM-1432 rerun. The corrected payload remains synthetic governance-safe, keeps `target=process`, preserves required scope fields, and adds `Checkpoint:` to title/content to satisfy the process-memory semantic rule. Corrected payload SHA-256 is `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`. Temp/synthetic validation accepts the corrected payload; no live `record_memory`, second live write, bearer token use, `search_memory`, `memory_overview`, provider/API, true memory read/write, raw store scan, runtime action, public MCP expansion, or readiness / `RC_READY` claim occurred in CM-1434.
 
+`CM-1435` records the already executed CM-1432 corrected scoped `record_memory` write proof accepted evidence. Fresh prerequisites were `main == origin/main == da1caa25302b2cf7b233a162bcbec00d48602040`, worktree clean, listener PID `16804`, runtime freshness accepted, and public tools unchanged as `memory_overview`, `record_memory`, `search_memory`. The corrected payload hash matched `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`. Exactly one authenticated public HTTP MCP `record_memory` call executed with `target=process`, required scope fields present, synthetic governance-safe marker content, and `Checkpoint` process signal present.
+
+The sanitized accepted evidence was `decision=accepted`, `shadowWriteStatus=ok`, `idempotencyStatus=committed`, and `memoryIdReturned=true` as a boolean only. The memory id value was not printed; raw response was not printed or persisted. Side-effect evidence for the CM-1432 corrected execution: no `search_memory`, no `memory_overview`, no provider/API call, no raw store scan, no follow-up validation, and no readiness or `RC_READY` claim. CM-1435 itself is docs-only and performs no new live probe, bearer-token use, memory tool call, real memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim.
+
 Latest local validation before CM-1420:
 
 - `npm test` passed `2992/2992`.
@@ -45,7 +49,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1434 is a docs/test corrected packet. Do not rerun CM-1432 from this task. After commit/push, a future rerun still requires runtime refresh and fresh exact one-write approval bound to the CM-1434 commit and payload hash.
+CM-1435 is a docs-only evidence closeout. Commit/push only if separately authorized. Do not run follow-up `search_memory` or any additional `record_memory` without fresh exact approval.
 
 ## Boundaries
 

@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1434 corrected scoped record_memory write proof packet`.
-Current validation: `CMV-1545`.
+Current task: `CM-1435 corrected scoped record_memory write accepted evidence closeout`.
+Current validation: `CMV-1546`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Corrected CM-1432 scoped record_memory payload packet prepared; no live write`.
+Current route: `CM-1432 corrected scoped record_memory write proof accepted; docs-only closeout`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -56,6 +56,7 @@ RC_READY_FALSE
 - CM-1431 scope packet：`docs/CM1431_SCOPED_RECORD_MEMORY_WRITE_PROOF_SCOPE_PACKET.md` 已准备 future CM-1432 scoped `record_memory` write proof。当前不执行 live `record_memory` / `search_memory` / `memory_overview`，不使用 bearer token，不读取真实 memory，不扫描 raw store，不刷新 runtime，不调用 provider/API，不做 durable write。Future gate 仅限 exactly one authenticated public HTTP MCP `record_memory` call，`target=process`，synthetic governance-safe marker content only，required scope fields `project_id`, `client_id`, `visibility`, `task_id`, `retention_policy`，payload SHA-256 `015df43d6ca44197da9a3811a02c39c1696f1d27661a399c6ecc421ba9a757fb`。CM-1432 必须在 CM-1431 commit/push 后重新确认 clean synced commit、runtime refresh、runtime freshness accepted 和 fresh exact one-write approval；follow-up search 只能单独授权。
 - CM-1433 investigation：未 rerun live `record_memory`，未使用 bearer token，未调用 `search_memory` / `memory_overview`，未读取真实 memory，未扫描 raw store，未打印或持久化 CM-1432 raw response。Source/temp synthetic test shows exact CM-1431 payload passes public schema / `ToolArgumentValidator` and required scope fields, then fails `MemoryWriteService` process-target semantic rule `validateProcessEntry(title, content)` because process memory must include `checkpoint`, `risk`, `todo`, `pending`, or `stage-conclusion` in title/content. Root cause is payload content rule mismatch, not public schema, ToolArgumentValidator, sensitivity/secret policy, target semantic target value, scope metadata, or write preflight.
 - CM-1434 corrected packet：`docs/CM1434_CORRECTED_SCOPED_RECORD_MEMORY_WRITE_PROOF_PACKET.md` 已准备 future CM-1432 rerun corrected payload。Payload 仍为 synthetic governance-safe marker，`target=process`，required scope fields preserved，并在 title/content 中加入 `Checkpoint:` process-memory signal。Corrected payload SHA-256 `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`。Temp/synthetic validation confirms public schema / `ToolArgumentValidator` / process write semantics accept corrected payload。当前未执行 live `record_memory`，无 second live write，未使用 bearer token，未调用 `search_memory` / `memory_overview`，无 provider/API，无真实 memory read/write，无 raw store scan，无 runtime/config/startup/watchdog change，无 public MCP expansion，无 readiness / `RC_READY` claim。
+- CM-1435 docs-only closeout：记录已经执行过的 CM-1432 corrected scoped `record_memory` write proof accepted evidence，不执行新的 live probe。证据：`main == origin/main == da1caa25302b2cf7b233a162bcbec00d48602040`，runtime freshness accepted，listener PID `16804`，public tools unchanged (`memory_overview`, `record_memory`, `search_memory`)，corrected payload hash matched `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`。Exactly one authenticated public HTTP MCP `record_memory` call executed，`target=process`，required scope fields present，synthetic governance-safe marker，`Checkpoint` process signal present，`decision=accepted`，`shadowWriteStatus=ok`，`idempotencyStatus=committed`，`memoryIdReturned=true` as boolean only。Memory id value not printed；raw response not printed or persisted。无 `search_memory`，无 `memory_overview`，无 provider/API，无 raw store scan，无 follow-up validation，无 readiness / `RC_READY` claim。
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 
