@@ -2,9 +2,10 @@
 
 const {
   isPlainObject,
-  normalizeSideEffectCounters,
   normalizeScopeTuple,
-  normalizeString
+  normalizeString,
+  sideEffectCounterFlagged,
+  sideEffectValueFlagged
 } = require('./FieldAliasNormalizer');
 
 const CLIENT_SCOPE_EXECUTION_CONTEXT_AUTHORITY_CONSISTENCY_VERSION =
@@ -121,25 +122,17 @@ function serializedIncludesRawPrivateScope(value) {
 
 function sideEffectFlagged(sideEffects = {}) {
   const safeSideEffects = isPlainObject(sideEffects) ? sideEffects : {};
-  const normalizedCounters = normalizeSideEffectCounters(safeSideEffects);
 
   function flag(...keys) {
-    return keys.some(key => safeSideEffects[key] === true);
+    return keys.some(key => sideEffectValueFlagged(safeSideEffects[key]));
   }
 
   function nonZero(...keys) {
-    return keys.some(key => {
-      const value = safeSideEffects[key];
-      return typeof value === 'number' && Number.isFinite(value) && value > 0;
-    });
+    return keys.some(key => sideEffectValueFlagged(safeSideEffects[key]));
   }
 
   function normalizedNonZero(...keys) {
-    return keys.some(key => {
-      const value = normalizedCounters[key];
-      return value === true ||
-        (typeof value === 'number' && Number.isFinite(value) && value > 0);
-    });
+    return sideEffectCounterFlagged(safeSideEffects, { counterKeys: keys });
   }
 
   return flag('runtimeApplied', 'runtime_applied') ||

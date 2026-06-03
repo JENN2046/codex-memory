@@ -5,7 +5,8 @@ const {
   firstNonEmptyAliasString,
   isPlainObject,
   normalizeScopeTuple,
-  normalizeString
+  normalizeString,
+  sideEffectValueFlagged
 } = require('./FieldAliasNormalizer');
 const {
   filterRecallCandidatesByLifecycleScope,
@@ -194,14 +195,11 @@ function sideEffectFlagged(sideEffects = {}) {
   const safeSideEffects = isPlainObject(sideEffects) ? sideEffects : {};
 
   function flag(...keys) {
-    return keys.some(key => safeSideEffects[key] === true);
+    return keys.some(key => sideEffectValueFlagged(safeSideEffects[key]));
   }
 
   function nonZero(...keys) {
-    return keys.some(key => {
-      const value = safeSideEffects[key];
-      return typeof value === 'number' && Number.isFinite(value) && value > 0;
-    });
+    return keys.some(key => sideEffectValueFlagged(safeSideEffects[key]));
   }
 
   return flag('runtimeApplied', 'runtime_applied') ||

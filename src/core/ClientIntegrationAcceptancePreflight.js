@@ -4,7 +4,9 @@ const {
   firstAliasBoolean,
   firstNonEmptyAliasString,
   isPlainObject,
-  normalizeString
+  normalizeString,
+  sideEffectAliasFlagged,
+  sideEffectValueFlagged
 } = require('./FieldAliasNormalizer');
 
 const CLIENT_INTEGRATION_ACCEPTANCE_PREFLIGHT_VERSION =
@@ -55,11 +57,19 @@ function anyTrue(sources = [], aliases = []) {
   return sources.some(source => firstTrue(source, aliases));
 }
 
+function anySideEffectFlagged(sources = [], aliases = []) {
+  return sources.some(source => sideEffectAliasFlagged(source, aliases));
+}
+
 function numericValue(source = {}, aliases = []) {
   const safeSource = isPlainObject(source) ? source : {};
   for (const alias of aliases) {
     const value = safeSource[alias];
     if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string') {
+      const numeric = Number(value.trim());
+      if (Number.isFinite(numeric)) return numeric;
+    }
   }
   return 0;
 }
@@ -139,7 +149,7 @@ function normalizeClientPreflight(rawClient = {}) {
     'no_memory_tool_policy_documented'
   ]);
 
-  const configChanged = anyTrue(sources, [
+  const configChanged = anySideEffectFlagged(sources, [
     'configChanged',
     'config_changed',
     'realConfigChanged',
@@ -147,19 +157,19 @@ function normalizeClientPreflight(rawClient = {}) {
     'clientConfigChanged',
     'client_config_changed'
   ]);
-  const watchdogStartupChanged = anyTrue(sources, [
+  const watchdogStartupChanged = anySideEffectFlagged(sources, [
     'watchdogStartupChanged',
     'watchdog_startup_changed',
     'startupChanged',
     'startup_changed'
   ]);
-  const tokenUsed = anyTrue(sources, [
+  const tokenUsed = anySideEffectFlagged(sources, [
     'tokenUsed',
     'token_used',
     'bearerTokenUsed',
     'bearer_token_used'
   ]);
-  const liveClientExecuted = anyTrue(sources, [
+  const liveClientExecuted = anySideEffectFlagged(sources, [
     'liveClientExecuted',
     'live_client_executed',
     'clientCommandExecuted',
@@ -171,7 +181,7 @@ function normalizeClientPreflight(rawClient = {}) {
     'interactiveMcpExecuted',
     'interactive_mcp_executed'
   ]);
-  const memoryToolsExecuted = anyTrue(sources, [
+  const memoryToolsExecuted = anySideEffectFlagged(sources, [
     'memoryToolsExecuted',
     'memory_tools_executed',
     'toolsCallExecuted',
@@ -189,13 +199,13 @@ function normalizeClientPreflight(rawClient = {}) {
     'providerCalls',
     'provider_calls'
   ]), 0);
-  const providerCallsExecuted = anyTrue(sources, [
+  const providerCallsExecuted = anySideEffectFlagged(sources, [
     'providerCalls',
     'provider_calls',
     'providerCallsExecuted',
     'provider_calls_executed'
   ]);
-  const durableMutationExecuted = anyTrue(sources, [
+  const durableMutationExecuted = anySideEffectFlagged(sources, [
     'durableMutationExecuted',
     'durable_mutation_executed',
     'durableMemoryWritten',
@@ -203,7 +213,7 @@ function normalizeClientPreflight(rawClient = {}) {
     'durableAuditWritten',
     'durable_audit_written'
   ]);
-  const readinessClaimed = anyTrue(sources, [
+  const readinessClaimed = anySideEffectFlagged(sources, [
     'readinessClaimed',
     'readiness_claimed',
     'rcReadyClaimed',
@@ -369,10 +379,13 @@ function summarizeClientIntegrationAcceptancePreflight(input = {}) {
 
   const tokenMaterialDetected = stringValuesContainSensitiveMaterial(safeInput);
   const topLevelNoApplyInvariant =
-    firstTrue(sideEffects, ['runtimeApplied', 'runtime_applied']) === false &&
-    firstTrue(sideEffects, ['configChanged', 'config_changed']) === false &&
-    firstTrue(sideEffects, ['watchdogStartupChanged', 'watchdog_startup_changed']) === false &&
-    firstTrue(sideEffects, [
+    anySideEffectFlagged([sideEffects], ['runtimeApplied', 'runtime_applied']) === false &&
+    anySideEffectFlagged([sideEffects], ['configChanged', 'config_changed']) === false &&
+    anySideEffectFlagged(
+      [sideEffects],
+      ['watchdogStartupChanged', 'watchdog_startup_changed']
+    ) === false &&
+    anySideEffectFlagged([sideEffects], [
       'memoryToolsExecuted',
       'memory_tools_executed',
       'toolsCallExecuted',
@@ -380,20 +393,20 @@ function summarizeClientIntegrationAcceptancePreflight(input = {}) {
       'mcpToolsCallExecuted',
       'mcp_tools_call_executed'
     ]) === false &&
-    firstTrue(sideEffects, [
+    anySideEffectFlagged([sideEffects], [
       'providerCalls',
       'provider_calls',
       'providerCallsExecuted',
       'provider_calls_executed'
     ]) === false &&
-    firstTrue(sideEffects, [
+    anySideEffectFlagged([sideEffects], [
       'durableMutationExecuted',
       'durable_mutation_executed',
       'durableAuditWritten',
       'durable_audit_written'
     ]) === false &&
-    firstTrue(sideEffects, ['realMemoryScanned', 'real_memory_scanned']) === false &&
-    firstTrue(sideEffects, ['readinessClaimed', 'readiness_claimed']) === false &&
+    anySideEffectFlagged([sideEffects], ['realMemoryScanned', 'real_memory_scanned']) === false &&
+    anySideEffectFlagged([sideEffects], ['readinessClaimed', 'readiness_claimed']) === false &&
     numericValue(sideEffects, ['providerCalls', 'provider_calls']) === 0;
 
   const blockingFindings = [

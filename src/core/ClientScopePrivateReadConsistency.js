@@ -5,7 +5,8 @@ const {
   firstNonEmptyAliasString,
   isPlainObject,
   normalizeScopeTuple,
-  normalizeString
+  normalizeString,
+  sideEffectValueFlagged
 } = require('./FieldAliasNormalizer');
 
 const CLIENT_SCOPE_PRIVATE_READ_CONSISTENCY_VERSION =
@@ -148,6 +149,54 @@ function serializedIncludesRawPrivateData(value) {
   return inspect(value);
 }
 
+function sideEffectFlagged(sideEffects = {}) {
+  const safeSideEffects = isPlainObject(sideEffects) ? sideEffects : {};
+  return [
+    'runtimeApplied',
+    'runtime_applied',
+    'memoryToolsExecuted',
+    'memory_tools_executed',
+    'mcpToolsCalled',
+    'mcp_tools_called',
+    'recordMemoryCalled',
+    'record_memory_called',
+    'searchMemoryCalled',
+    'search_memory_called',
+    'memoryOverviewCalled',
+    'memory_overview_called',
+    'providerCalls',
+    'provider_calls',
+    'providerCallsExecuted',
+    'provider_calls_executed',
+    'realMemoryScanned',
+    'real_memory_scanned',
+    'durableMutationExecuted',
+    'durable_mutation_executed',
+    'durableMemoryWrites',
+    'durable_memory_writes',
+    'durableAuditWritten',
+    'durable_audit_written',
+    'durableAuditWrites',
+    'durable_audit_writes',
+    'configChanged',
+    'config_changed',
+    'watchdogStartupChanged',
+    'watchdog_startup_changed',
+    'publicMcpExpanded',
+    'public_mcp_expanded',
+    'publicMcpExpansions',
+    'public_mcp_expansions',
+    'readinessClaimed',
+    'readiness_claimed',
+    'readinessClaims',
+    'readiness_claims',
+    'reliabilityClaimed',
+    'reliability_claimed',
+    'reliabilityClaims',
+    'reliability_claims'
+  ].some(key => sideEffectValueFlagged(safeSideEffects[key]));
+}
+
 function summarizeClientScopePrivateReadConsistency(input = {}) {
   const safeInput = isPlainObject(input) ? input : {};
   const sourceMode = normalizeLower(safeInput.sourceMode || 'explicit_input');
@@ -197,15 +246,7 @@ function summarizeClientScopePrivateReadConsistency(input = {}) {
     lifecycleClientId === requestClientId &&
     lifecycleClientId !== callerClientId;
   const rawSuppressedMetadataExposed = serializedIncludesRawPrivateData(suppressedPrivateCandidates);
-  const noApplyInvariant =
-    sideEffects.runtimeApplied !== true &&
-    sideEffects.durableMutationExecuted !== true &&
-    sideEffects.durableAuditWritten !== true &&
-    sideEffects.providerCalls !== true &&
-    sideEffects.realMemoryScanned !== true &&
-    sideEffects.publicMcpExpanded !== true &&
-    sideEffects.readinessClaimed !== true &&
-    sideEffects.reliabilityClaimed !== true;
+  const noApplyInvariant = sideEffectFlagged(sideEffects) === false;
 
   const acceptedForPrivateReadConsistency =
     sourceMode === 'explicit_input' &&

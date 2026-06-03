@@ -167,3 +167,28 @@ test('CM-1400 fails closed when no-apply invariant is violated', () => {
   assert.equal(summary.publicMcpExpanded, false);
   assert.equal(summary.readinessClaimed, false);
 });
+
+test('CM-1409 keeps CM-1400 fail-closed for string encoded side effects', () => {
+  const summary = summarizeClientScopePrivateReadConsistency({
+    sourceMode: 'explicit_input',
+    requestContext,
+    callerScope: callerScopeSpoof,
+    candidates: [
+      privateCandidate('mem-codex-private', 'codex'),
+      privateCandidate('mem-claude-private', 'claude'),
+      privateCandidate('mem-ownerless-private', '')
+    ],
+    missingRequestIdentityProbeCandidates: [
+      privateCandidate('mem-no-context-private', 'codex')
+    ],
+    sideEffects: {
+      provider_calls: '1',
+      durable_memory_writes: '1',
+      readiness_claims: '1'
+    }
+  });
+
+  assert.equal(summary.acceptedForPrivateReadConsistency, false);
+  assert.equal(summary.noApplyInvariant, false);
+  assert.equal(summary.blockers.blockingFindings.includes('no_apply_invariant_failed'), true);
+});

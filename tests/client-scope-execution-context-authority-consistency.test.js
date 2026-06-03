@@ -238,3 +238,24 @@ test('CM-1406 fails closed when no-apply invariant is violated', () => {
   assert.equal(summary.durableMutationExecuted, false);
   assert.equal(summary.readinessClaimed, false);
 });
+
+test('CM-1409 keeps CM-1406 fail-closed for string encoded side effects', () => {
+  const summary = summarizeClientScopeExecutionContextAuthorityConsistency(acceptedInput({
+    sideEffects: {
+      trueRecordMemoryCalls: false,
+      mcp_tools_called: '1',
+      true_record_memory_calls: '1',
+      providerCalls: false,
+      provider_calls: '1',
+      real_memory_reads: '1',
+      durable_memory_writes: '1',
+      config_watchdog_startup_changes: '1',
+      candidate_cache_writes: '1',
+      readiness_claims: '1'
+    }
+  }));
+
+  assert.equal(summary.acceptedForExecutionContextAuthorityConsistency, false);
+  assert.equal(summary.noApplyInvariant, false);
+  assert.equal(summary.blockers.blockingFindings.includes('no_apply_invariant_failed'), true);
+});

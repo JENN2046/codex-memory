@@ -131,6 +131,35 @@ function normalizeSideEffectCounters(counters = {}, {
   return normalized;
 }
 
+function sideEffectValueFlagged(value) {
+  if (value === true) return true;
+  if (typeof value === 'number') return Number.isFinite(value) && value > 0;
+  if (typeof value !== 'string') return false;
+
+  const normalized = value.trim().toLowerCase();
+  if (!normalized || normalized === '0' || normalized === 'false') return false;
+  const numericValue = Number(normalized);
+  if (Number.isFinite(numericValue)) return numericValue > 0;
+  return true;
+}
+
+function sideEffectAliasFlagged(source = {}, aliases = []) {
+  const safeSource = isPlainObject(source) ? source : {};
+  return aliases.some(alias => {
+    return Object.prototype.hasOwnProperty.call(safeSource, alias) &&
+      sideEffectValueFlagged(safeSource[alias]);
+  });
+}
+
+function sideEffectCounterFlagged(counters = {}, {
+  counterKeys = Object.keys(SIDE_EFFECT_COUNTER_ALIASES),
+  aliasesByKey = SIDE_EFFECT_COUNTER_ALIASES
+} = {}) {
+  return counterKeys.some(key => {
+    return sideEffectAliasFlagged(counters, aliasesByKey[key] || [key]);
+  });
+}
+
 function normalizeAuditSnapshotRef(source = {}) {
   const safeSource = isPlainObject(source) ? source : {};
   return {
@@ -160,5 +189,8 @@ module.exports = {
   normalizeScopeTuple,
   normalizeSideEffectCounters,
   normalizeString,
-  normalizeVisibilityPolicy
+  normalizeVisibilityPolicy,
+  sideEffectAliasFlagged,
+  sideEffectCounterFlagged,
+  sideEffectValueFlagged
 };

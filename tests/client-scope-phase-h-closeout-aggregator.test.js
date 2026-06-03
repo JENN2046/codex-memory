@@ -530,7 +530,9 @@ test('CM-1408 fails closed when top-level no-apply counters are non-zero', () =>
 test('CM-1408 fails closed when top-level no-apply counters are string encoded', () => {
   const summary = summarizeClientScopePhaseHCloseoutAggregator(acceptedCloseoutInput({
     sideEffects: {
+      trueSearchMemoryCalls: false,
       true_search_memory_calls: '1',
+      providerCalls: false,
       provider_calls: '1',
       durable_memory_writes: '1',
       config_watchdog_startup_changes: '1',

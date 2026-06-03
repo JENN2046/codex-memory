@@ -12,7 +12,10 @@ const {
   normalizeRecordId,
   normalizeScopeTuple,
   normalizeSideEffectCounters,
-  normalizeVisibilityPolicy
+  normalizeVisibilityPolicy,
+  sideEffectAliasFlagged,
+  sideEffectCounterFlagged,
+  sideEffectValueFlagged
 } = require('../src/core/FieldAliasNormalizer');
 
 test('firstNonEmptyNormalizedString skips blank aliases without treating numbers as strings', () => {
@@ -95,6 +98,33 @@ test('normalizes side effect counter aliases while preserving zero', () => {
     providerCalls: 0,
     durableMemoryWrites: 0
   });
+});
+
+test('flags string encoded side effect values conservatively', () => {
+  assert.equal(sideEffectValueFlagged(true), true);
+  assert.equal(sideEffectValueFlagged(1), true);
+  assert.equal(sideEffectValueFlagged('1'), true);
+  assert.equal(sideEffectValueFlagged(' true '), true);
+  assert.equal(sideEffectValueFlagged('unexpected'), true);
+  assert.equal(sideEffectValueFlagged(false), false);
+  assert.equal(sideEffectValueFlagged(0), false);
+  assert.equal(sideEffectValueFlagged('0'), false);
+  assert.equal(sideEffectValueFlagged(' false '), false);
+  assert.equal(sideEffectValueFlagged('   '), false);
+});
+
+test('flags side effect aliases even when an earlier alias is false', () => {
+  const counters = {
+    providerCalls: false,
+    provider_calls: '1',
+    readinessClaims: 0,
+    readiness_claims: '1'
+  };
+
+  assert.equal(sideEffectAliasFlagged(counters, ['providerCalls', 'provider_calls']), true);
+  assert.equal(sideEffectCounterFlagged(counters, {
+    counterKeys: ['providerCalls', 'readinessClaims']
+  }), true);
 });
 
 test('normalizes audit snapshot refs from record aliases', () => {

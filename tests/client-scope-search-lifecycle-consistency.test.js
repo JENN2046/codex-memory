@@ -236,3 +236,18 @@ test('CM-1404 fails closed when no-apply invariant is violated', () => {
   assert.equal(summary.durableMutationExecuted, false);
   assert.equal(summary.readinessClaimed, false);
 });
+
+test('CM-1409 keeps CM-1404 fail-closed for string encoded side effects', () => {
+  const summary = summarizeClientScopeSearchLifecycleConsistency(acceptedInput({
+    sideEffects: {
+      memory_tools_executed: '1',
+      provider_calls: '1',
+      durable_audit_writes: '1',
+      readiness_claims: '1'
+    }
+  }));
+
+  assert.equal(summary.acceptedForSearchLifecycleConsistency, false);
+  assert.equal(summary.noApplyInvariant, false);
+  assert.equal(summary.blockers.blockingFindings.includes('no_apply_invariant_failed'), true);
+});

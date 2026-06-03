@@ -211,6 +211,34 @@ test('CM-1402 fails closed on live client execution, memory tool execution, or r
   );
 });
 
+test('CM-1409 keeps CM-1402 fail-closed for string encoded side effects', () => {
+  const claude = clientFixture('claude');
+  claude.sideEffects.providerCalls = false;
+  claude.sideEffects.provider_calls = '1';
+  claude.sideEffects.memoryToolsExecuted = false;
+  claude.sideEffects.memory_tools_executed = '1';
+  const summary = summarizeClientIntegrationAcceptancePreflight(acceptedInput({
+    clients: [clientFixture('codex'), claude],
+    sideEffects: {
+      providerCalls: false,
+      provider_calls: '1',
+      toolsCallExecuted: false,
+      tools_call_executed: '1',
+      readiness_claimed: '1'
+    }
+  }));
+
+  assert.equal(summary.acceptedForClientIntegrationPreflight, false);
+  assert.equal(summary.noApplyInvariant, false);
+  assert.equal(summary.blockers.blockingFindings.includes('client_preflight_not_accepted'), true);
+  assert.equal(summary.blockers.blockingFindings.includes('claude:memory_tools_executed'), true);
+  assert.equal(summary.blockers.blockingFindings.includes('claude:provider_calls_detected'), true);
+  assert.equal(
+    summary.blockers.blockingFindings.includes('top_level_no_apply_invariant_failed'),
+    true
+  );
+});
+
 test('CM-1402 fails closed when token material is present in explicit input', () => {
   const summary = summarizeClientIntegrationAcceptancePreflight(acceptedInput({
     diagnosticText: 'Authorization: Bearer abcdef123456'

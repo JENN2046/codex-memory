@@ -2,8 +2,9 @@
 
 const {
   isPlainObject,
-  normalizeSideEffectCounters,
-  normalizeString
+  normalizeString,
+  sideEffectCounterFlagged,
+  sideEffectValueFlagged
 } = require('./FieldAliasNormalizer');
 
 const CLIENT_SCOPE_PHASE_H_CLOSEOUT_AGGREGATOR_VERSION =
@@ -126,18 +127,6 @@ function booleanFalse(source = {}, path = []) {
   return getNested(source, path) === false;
 }
 
-function sideEffectValueFlagged(value) {
-  if (value === true) return true;
-  if (typeof value === 'number') return Number.isFinite(value) && value > 0;
-  if (typeof value !== 'string') return false;
-
-  const normalized = value.trim().toLowerCase();
-  if (!normalized || normalized === '0' || normalized === 'false') return false;
-  const numericValue = Number(normalized);
-  if (Number.isFinite(numericValue)) return numericValue > 0;
-  return true;
-}
-
 function directSideEffectFlagged(source = {}) {
   const safeSource = isPlainObject(source) ? source : {};
   const booleanKeys = [
@@ -178,8 +167,8 @@ function directSideEffectFlagged(source = {}) {
 }
 
 function normalizedSideEffectFlagged(source = {}) {
-  const counters = normalizeSideEffectCounters(source);
-  return [
+  return sideEffectCounterFlagged(source, {
+    counterKeys: [
     'providerCalls',
     'apiCalls',
     'trueRecordMemoryCalls',
@@ -204,7 +193,8 @@ function normalizedSideEffectFlagged(source = {}) {
     'vectorFlushes',
     'readinessClaims',
     'reliabilityClaims'
-  ].some(key => sideEffectValueFlagged(counters[key]));
+    ]
+  });
 }
 
 function safetyFlagsAccepted(summary = {}) {
