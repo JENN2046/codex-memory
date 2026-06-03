@@ -4,11 +4,40 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1416 health endpoint strict no-token split`.
-Current validation: `CMV-1531`.
+Current checkpoint: `CM-1417 authenticated memory_overview bounded projection`.
+Current validation: `CMV-1532`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1417 Authenticated Memory Overview Bounded Projection
+
+Status: `COMPLETED_VALIDATED_CM1417_AUTHENTICATED_MEMORY_OVERVIEW_BOUNDED_PROJECTION`
+
+Scope: local source/test/docs patch. Uses temp-local test app/server only. No live 7605 probe, `record_memory`, `search_memory`, provider/API call, real memory read/write, raw SQLite/jsonl/vector/cache scan, broad export, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Added authenticated bounded overview projection in `MemoryOverviewService`.
+- HTTP authenticated `memory_overview` now defaults to `access.mode=authenticated_bounded_overview`.
+- Preserved existing no-token selected projection and internal full overview behavior.
+- Updated `http-observe` to use configured bearer auth only for the default configured health URL, with explicit `--health-url` token forwarding blocked.
+- Updated HTTP/MCP contract tests and client-facing docs.
+- Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1417` / `CMV-1532`.
+
+Validation:
+
+- `node --check` changed source/tests
+- `node --test tests\mcp-http.test.js tests\mcp-contract.test.js tests\http-no-token-search-rejection.test.js tests\memory-overview-no-token-selected-projection.test.js`
+- `node --test tests\http-observe-cli.test.js`
+- `git diff --check`
+- `npm test`
+- `npm run test:hardening`
+- `node scripts\validate_current_facts_drift.js`
+- `node scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Result: authenticated HTTP `memory_overview` no longer returns default full overview fields such as paths, recent audit rows, memory links, recent files, embedding profile/fingerprint, provider endpoint, token material, or raw memory fields.
 
 ## CM-1416 Health Endpoint Strict No-Token Split
 

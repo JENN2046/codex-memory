@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1416",
-  "validationId": "CMV-1531",
+  "taskId": "CM-1417",
+  "validationId": "CMV-1532",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1532",
+      "scope": "CM-1417 authenticated memory_overview bounded projection",
+      "status": "COMPLETED_VALIDATED_SOURCE_TEST_DOCS"
+    },
     {
       "id": "CMV-1531",
       "scope": "CM-1416 health endpoint strict no-token split",

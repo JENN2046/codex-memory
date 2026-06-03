@@ -58,10 +58,13 @@ const REPO_CM0595_EXECUTION_EVIDENCE_RECORD_PATH = path.join(
   'fixtures',
   'cm0650-cm0595-execution-evidence-record-v1.md'
 );
+const CURRENT_SOURCE_HTTP_TOKEN = 'cm1417-http-observe-current-source-token';
 
 async function startHealthServer(healthPayload = {}) {
+  const authorizationHeaders = [];
   const server = http.createServer((req, res) => {
     if (req.url === '/health') {
+      authorizationHeaders.push(req.headers.authorization || '');
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
         ok: true,
@@ -86,6 +89,9 @@ async function startHealthServer(healthPayload = {}) {
   const address = server.address();
   return {
     healthUrl: `http://127.0.0.1:${address.port}/health`,
+    getAuthorizationHeaders() {
+      return [...authorizationHeaders];
+    },
     async close() {
       await new Promise(resolve => server.close(resolve));
     }
@@ -107,7 +113,8 @@ async function withCurrentSourceHttpServer(handler) {
     app,
     host: '127.0.0.1',
     port: 0,
-    mcpPath: '/mcp/codex-memory'
+    mcpPath: '/mcp/codex-memory',
+    bearerToken: CURRENT_SOURCE_HTTP_TOKEN
   });
   const address = await httpServer.listen();
 
@@ -753,6 +760,34 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
   }
 });
 
+test('http-observe CLI should not send bearer token to explicit health-url', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-explicit-health-url-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--json', '--health-url', server.healthUrl],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: '7605',
+        CODEX_MEMORY_HTTP_TOKEN: CURRENT_SOURCE_HTTP_TOKEN
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.deepEqual(server.getAuthorizationHeaders(), ['']);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
 test('http-observe CLI should read worker status from a current-source HTTP server refresh', async () => {
   await withCurrentSourceHttpServer(async ({ app, address }) => {
     const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-current-artifacts-'));
@@ -770,7 +805,8 @@ test('http-observe CLI should read worker status from a current-source HTTP serv
           CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
           CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
           CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
-          CODEX_MEMORY_HTTP_PORT: String(address.port)
+          CODEX_MEMORY_HTTP_PORT: String(address.port),
+          CODEX_MEMORY_HTTP_TOKEN: CURRENT_SOURCE_HTTP_TOKEN
         }
       });
 
@@ -843,7 +879,8 @@ test('http-observe CLI should consume HTTP allowlisted worker last-result summar
           CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
           CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
           CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
-          CODEX_MEMORY_HTTP_PORT: String(address.port)
+          CODEX_MEMORY_HTTP_PORT: String(address.port),
+          CODEX_MEMORY_HTTP_TOKEN: CURRENT_SOURCE_HTTP_TOKEN
         }
       });
 
@@ -906,7 +943,8 @@ test('http-observe CLI should read bounded worker last-result summary after expl
           CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
           CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
           CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
-          CODEX_MEMORY_HTTP_PORT: String(address.port)
+          CODEX_MEMORY_HTTP_PORT: String(address.port),
+          CODEX_MEMORY_HTTP_TOKEN: CURRENT_SOURCE_HTTP_TOKEN
         }
       });
 
@@ -1015,7 +1053,8 @@ test('http-observe CLI should read bounded worker replay summary after explicit 
           CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
           CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
           CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
-          CODEX_MEMORY_HTTP_PORT: String(address.port)
+          CODEX_MEMORY_HTTP_PORT: String(address.port),
+          CODEX_MEMORY_HTTP_TOKEN: CURRENT_SOURCE_HTTP_TOKEN
         }
       });
 

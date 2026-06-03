@@ -169,10 +169,19 @@ function resolveHealthUrl(config, options) {
   return `http://${config.httpHost}:${config.httpPort}/health`;
 }
 
-async function runHealthCheck(url) {
+function resolveHealthBearerToken(config, options) {
+  if (options.healthUrl) return '';
+  return config.httpBearerToken;
+}
+
+async function runHealthCheck(url, { bearerToken = '' } = {}) {
   const startedAt = Date.now();
   try {
-    const response = await fetch(url);
+    const headers = {};
+    if (bearerToken) {
+      headers.Authorization = `Bearer ${bearerToken}`;
+    }
+    const response = await fetch(url, { headers });
     const text = await response.text();
     let payload = null;
     try {
@@ -839,7 +848,10 @@ async function main() {
   const config = createConfig();
   const auditLogStore = new AuditLogStore(config);
 
-  const health = await runHealthCheck(resolveHealthUrl(config, options));
+  const healthUrl = resolveHealthUrl(config, options);
+  const health = await runHealthCheck(healthUrl, {
+    bearerToken: resolveHealthBearerToken(config, options)
+  });
   const [httpSnapshot, watchdogSnapshot, writeStats, recallStats, writeEntries, recallEntries] = await Promise.all([
     readFileSnapshot(config.httpLogPath, options.logTail),
     readFileSnapshot(path.join(config.logsDir, 'codex-memory-http-watchdog.log'), options.logTail),

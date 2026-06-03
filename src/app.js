@@ -820,6 +820,11 @@ function createCodexMemoryApplication(overrides = {}) {
             auditWindow: args.auditWindow
           });
         }
+        if (requestContext.authenticatedBoundedOverview === true) {
+          return overviewService.getAuthenticatedBoundedOverview({
+            auditWindow: args.auditWindow
+          });
+        }
         return overviewService.getOverview({
           auditWindow: args.auditWindow,
           limit: args.limit

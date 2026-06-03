@@ -771,7 +771,7 @@ test('HTTP MCP bearer-configured missing-token tools/call should keep no-token c
   }, { bearerToken: 'test-token' });
 });
 
-test('HTTP MCP should execute memory_overview through authorized tools/call', async () => {
+test('HTTP MCP should execute authenticated memory_overview through bounded projection by default', async () => {
   await withHttpServer(async ({ address }) => {
     const initResponse = await fetch(address.url, {
       method: 'POST',
@@ -809,21 +809,47 @@ test('HTTP MCP should execute memory_overview through authorized tools/call', as
       })
     });
     const payload = await overview.json();
+    const structured = payload.result.structuredContent;
+    const serialized = JSON.stringify(structured);
 
     assert.equal(overview.status, 200);
     assert.equal(payload.jsonrpc, '2.0');
     assert.equal(payload.id, 12);
     assert.equal(payload.result.isError, false);
-    assert.equal(payload.result.structuredContent.shadowSync.available, true);
-    assert.equal(payload.result.structuredContent.access, undefined);
-    assert.ok(payload.result.structuredContent.paths);
-    assert.ok(payload.result.structuredContent.paths.auditLogPath);
-    assert.ok(payload.result.structuredContent.paths.processDiaryPath);
-    assert.ok(payload.result.structuredContent.paths.knowledgeDiaryPath);
-    assert.ok(payload.result.structuredContent.embeddingProfile);
-    assert.equal(typeof payload.result.structuredContent.embeddingProfile.fingerprint, 'string');
-    assert.ok(payload.result.structuredContent.embeddingProfile.fingerprint.length > 0);
-    assert.equal(payload.result.structuredContent.embeddingProfile.provider, 'local');
+    assert.equal(structured.access.mode, 'authenticated_bounded_overview');
+    assert.equal(structured.access.selectedProjection, true);
+    assert.equal(structured.access.selectedProjectionVersion, 1);
+    assert.equal(structured.access.bearerTokenRequiredForFullOverview, false);
+    assert.equal(structured.access.pathsReturned, false);
+    assert.equal(structured.access.embeddingFingerprintReturned, false);
+    assert.equal(structured.access.recentAuditReturned, false);
+    assert.equal(structured.access.recentFilesReturned, false);
+    assert.equal(structured.access.memoryLinksReturned, false);
+    assert.equal(structured.access.recallRecentReturned, false);
+    assert.equal(structured.access.rawMemoryFieldsReturned, false);
+    assert.deepEqual(Object.keys(structured).sort(), NO_TOKEN_OVERVIEW_KEYS);
+    assert.deepEqual(Object.keys(structured.access).sort(), NO_TOKEN_OVERVIEW_ACCESS_KEYS);
+    assert.equal(structured.shadowSync.available, true);
+    assert.equal(structured.paths, undefined);
+    assert.equal(structured.recentAudit, undefined);
+    assert.equal(structured.memoryLinks, undefined);
+    assert.equal(structured.recentFiles, undefined);
+    assert.equal(structured.embeddingProfile, undefined);
+    assert.doesNotMatch(serialized, /test-token/i);
+    assert.doesNotMatch(serialized, /"paths"\s*:/);
+    assert.doesNotMatch(serialized, /"recentAudit"\s*:/);
+    assert.doesNotMatch(serialized, /"recentFiles"\s*:/);
+    assert.doesNotMatch(serialized, /"memoryLinks"\s*:/);
+    assert.doesNotMatch(serialized, /"recent"\s*:/);
+    assert.doesNotMatch(serialized, /"memoryId"\s*:/);
+    assert.doesNotMatch(serialized, /"title"\s*:/);
+    assert.doesNotMatch(serialized, /"filePath"\s*:/);
+    assert.doesNotMatch(serialized, /"sourceFile"\s*:/);
+    assert.doesNotMatch(serialized, /"embeddingFingerprint"\s*:/);
+    assert.doesNotMatch(serialized, /"auditLogPath"\s*:/);
+    assert.doesNotMatch(serialized, /"providerEndpoint"\s*:/);
+    assert.doesNotMatch(serialized, /Authorization/i);
+    assert.doesNotMatch(serialized, /Bearer\s+/i);
   }, { bearerToken: 'test-token' });
 });
 

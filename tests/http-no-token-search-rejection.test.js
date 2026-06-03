@@ -222,7 +222,7 @@ test('no-token HTTP tools/list is allowed', async () => {
       memoryOverviewTool.description,
       /HTTP no-token calls return only a selected low-disclosure overview projection/
     );
-    assert.match(memoryOverviewTool.description, /bearer-token calls return the full overview/);
+    assert.match(memoryOverviewTool.description, /bearer-token HTTP calls return a bounded low-disclosure overview projection by default/);
   });
 });
 

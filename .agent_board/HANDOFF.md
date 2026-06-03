@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1416 health endpoint strict no-token split`.
-Current validation: `CMV-1531`.
-Current handoff: CM-1416 patches post-push review findings by making `/health` no-token response strictly low disclosure, allowing full bounded health only for valid bearer requests, rejecting invalid bearer before full payload, and correcting `.env.example` to match no-token selected `memory_overview` behavior. Validation used local temp HTTP tests only. No live 7605 probe, provider/API call, live client action, real bearer token material use, real memory tool call, raw audit/store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1417 authenticated memory_overview bounded projection`.
+Current validation: `CMV-1532`.
+Current handoff: CM-1417 patches the Phase H bounded `memory_overview` gate failure by making HTTP bearer-token `memory_overview` default to `authenticated_bounded_overview`, preserving no-token selected projection and internal full overview, and locking HTTP/MCP tests so default authenticated HTTP no longer returns paths, recent audit rows, memory links, recent files, embedding profile/fingerprint, provider endpoint, token material, or raw memory fields. It also lets `http-observe` authenticate default configured health probes without forwarding bearer material to explicit `--health-url`. Validation used local source/tests/docs and temp-local HTTP servers only; requested `tests/mcp-http.test.js` includes existing temp-local record/search contract cases. No live 7605 probe, live or real `record_memory`, live or real `search_memory`, provider/API call, real memory read/write, raw audit/store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

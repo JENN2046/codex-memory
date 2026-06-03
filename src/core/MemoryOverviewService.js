@@ -574,6 +574,46 @@ class MemoryOverviewService {
 
   async getNoTokenSelectedOverview({ auditWindow = DEFAULT_AUDIT_WINDOW } = {}) {
     const windowSize = toInt(auditWindow, DEFAULT_AUDIT_WINDOW, 10, 200);
+    return this.getSelectedOverview({
+      auditWindow: windowSize,
+      access: {
+        mode: 'no_token_selected_overview',
+        selectedProjection: true,
+        selectedProjectionVersion: 1,
+        bearerTokenRequiredForFullOverview: true,
+        pathsReturned: false,
+        embeddingFingerprintReturned: false,
+        recentAuditReturned: false,
+        recentFilesReturned: false,
+        memoryLinksReturned: false,
+        recallRecentReturned: false,
+        rawMemoryFieldsReturned: false
+      }
+    });
+  }
+
+  async getAuthenticatedBoundedOverview({ auditWindow = DEFAULT_AUDIT_WINDOW } = {}) {
+    const windowSize = toInt(auditWindow, DEFAULT_AUDIT_WINDOW, 10, 200);
+    return this.getSelectedOverview({
+      auditWindow: windowSize,
+      access: {
+        mode: 'authenticated_bounded_overview',
+        selectedProjection: true,
+        selectedProjectionVersion: 1,
+        bearerTokenRequiredForFullOverview: false,
+        pathsReturned: false,
+        embeddingFingerprintReturned: false,
+        recentAuditReturned: false,
+        recentFilesReturned: false,
+        memoryLinksReturned: false,
+        recallRecentReturned: false,
+        rawMemoryFieldsReturned: false
+      }
+    });
+  }
+
+  async getSelectedOverview({ auditWindow = DEFAULT_AUDIT_WINDOW, access }) {
+    const windowSize = toInt(auditWindow, DEFAULT_AUDIT_WINDOW, 10, 200);
     const writeEntries = await this.auditLogStore.readRecentWriteAudit(windowSize);
     const recallEntries = await this.auditLogStore.readRecentRecallAudit(windowSize);
     const recallSummary = buildRecallSummary(recallEntries);
@@ -588,19 +628,7 @@ class MemoryOverviewService {
       : { available: false, status: 'disabled' };
 
     return {
-      access: {
-        mode: 'no_token_selected_overview',
-        selectedProjection: true,
-        selectedProjectionVersion: 1,
-        bearerTokenRequiredForFullOverview: true,
-        pathsReturned: false,
-        embeddingFingerprintReturned: false,
-        recentAuditReturned: false,
-        recentFilesReturned: false,
-        memoryLinksReturned: false,
-        recallRecentReturned: false,
-        rawMemoryFieldsReturned: false
-      },
+      access,
       summary: buildNoTokenWriteSummary(buildWriteSummary(writeEntries)),
       recall: {
         ...buildRecallStatus(recallSummary),
