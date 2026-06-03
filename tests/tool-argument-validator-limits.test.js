@@ -131,6 +131,45 @@ test('validateToolArguments accepts valid tags array within limits', () => {
   );
 });
 
+test('validateToolArguments rejects record_memory scope fields exceeding maxLength', () => {
+  for (const field of ['project_id', 'workspace_id', 'task_id', 'conversation_id', 'retention_policy']) {
+    assert.throws(
+      () => validateToolArguments('record_memory', {
+        target: 'process',
+        title: 'valid title',
+        content: 'valid content',
+        evidence: 'valid evidence',
+        validated: true,
+        reusable: false,
+        sensitivity: 'none',
+        [field]: 'x'.repeat(201)
+      }),
+      (err) => err instanceof ToolArgumentValidationError && err.path === `arguments.${field}`
+    );
+  }
+});
+
+test('validateToolArguments accepts record_memory scope fields within limits', () => {
+  assert.doesNotThrow(
+    () => validateToolArguments('record_memory', {
+      target: 'process',
+      title: 'valid title',
+      content: 'valid content',
+      evidence: 'valid evidence',
+      validated: true,
+      reusable: false,
+      sensitivity: 'none',
+      project_id: 'p'.repeat(200),
+      workspace_id: 'w'.repeat(200),
+      client_id: 'codex',
+      visibility: 'project',
+      task_id: 't'.repeat(200),
+      conversation_id: 'c'.repeat(200),
+      retention_policy: 'r'.repeat(200)
+    })
+  );
+});
+
 test('validateToolArguments rejects search_memory query exceeding maxLength', () => {
   assert.throws(
     () => validateToolArguments('search_memory', {

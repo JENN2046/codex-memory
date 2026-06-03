@@ -160,6 +160,9 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
     assert.ok(schema.properties.workspace_id);
     assert.ok(schema.properties.client_id);
     assert.ok(schema.properties.visibility);
+    for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'task_id', 'conversation_id', 'retention_policy']) {
+      assert.equal(schema.properties[field].maxLength, 200, `${field} should have maxLength 200`);
+    }
     assert.deepEqual(schema.properties.client_id.enum, ['codex', 'claude', 'omc', 'manual']);
     assert.deepEqual(schema.properties.visibility.enum, ['private', 'workspace', 'project', 'shared']);
     assert.ok(schema.properties.task_id);

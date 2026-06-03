@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1411 provider default fail-closed`.
-Current validation: `CMV-1526`.
+Current task: `CM-1412 record_memory scope schema maxLength`.
+Current validation: `CMV-1527`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -125,4 +125,4 @@ git log --oneline --decorate -n 10
 ```
 
 Repository reality overrides this file.
-Current source/test slice: `CM-1411` makes provider defaults fail closed. Configured embedding/rerank endpoints stay inert unless `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=true` or `allowExternalProvider: true` is explicit. No provider/API call, runtime action, bearer-token use, memory tool call, real-store read, config/watchdog/startup change, public MCP expansion, remote action, or readiness/cutover occurred.
+Current source/test slice: `CM-1412` adds `maxLength: 200` to `record_memory` scope fields and locks it with validator, MCP schema, and governance schema tests. Targeted MCP contract tests used temp-local test stores only. No provider/API call, live client action, bearer-token use, real memory tool call, real-store read, config/watchdog/startup change, public MCP tool expansion, remote action, or readiness/cutover occurred.

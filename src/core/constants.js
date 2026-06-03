@@ -38,13 +38,13 @@ const TOOL_DEFINITIONS = [
           ]
         },
         sensitivity: { type: 'string', maxLength: 80 },
-        project_id: { type: 'string' },
-        workspace_id: { type: 'string' },
-        client_id: { type: 'string', enum: CLIENT_ID_VALUES },
-        visibility: { type: 'string', enum: VISIBILITY_VALUES },
-        task_id: { type: 'string' },
-        conversation_id: { type: 'string' },
-        retention_policy: { type: 'string' }
+        project_id: { type: 'string', maxLength: 200 },
+        workspace_id: { type: 'string', maxLength: 200 },
+        client_id: { type: 'string', enum: CLIENT_ID_VALUES, maxLength: 200 },
+        visibility: { type: 'string', enum: VISIBILITY_VALUES, maxLength: 200 },
+        task_id: { type: 'string', maxLength: 200 },
+        conversation_id: { type: 'string', maxLength: 200 },
+        retention_policy: { type: 'string', maxLength: 200 }
       },
       required: ['target', 'title', 'content', 'evidence', 'validated', 'reusable', 'sensitivity']
     }

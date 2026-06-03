@@ -254,6 +254,7 @@ test('governance schema: MCP schemas declare strict scope surfaces', () => {
   assert.equal(recordTool.inputSchema.additionalProperties, false);
   for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'task_id', 'conversation_id', 'retention_policy']) {
     assert.ok(recordTool.inputSchema.properties[field], `record_memory should declare ${field}`);
+    assert.equal(recordTool.inputSchema.properties[field].maxLength, 200, `record_memory ${field} should have maxLength 200`);
   }
 
   const scopeSchema = searchTool.inputSchema.properties.scope;

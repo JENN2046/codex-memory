@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1411",
-  "validationId": "CMV-1526",
+  "taskId": "CM-1412",
+  "validationId": "CMV-1527",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1527",
+      "scope": "CM-1412 record_memory scope schema maxLength",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS"
+    },
     {
       "id": "CMV-1526",
       "scope": "CM-1411 provider default fail-closed",
@@ -94,6 +99,7 @@
     "provider smoke or benchmark",
     "live provider/API calls",
     "real memory tools",
+    "real record_memory scope write",
     "runtime freshness",
     "phase h live validation execution",
     "committed live Git head facts"

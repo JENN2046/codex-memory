@@ -4,11 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1411 provider default fail-closed`.
-Current validation: `CMV-1526`.
+Current checkpoint: `CM-1412 record_memory scope schema maxLength`.
+Current validation: `CMV-1527`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1412 Record Memory Scope Schema MaxLength
+
+Status: `COMPLETED_VALIDATED_CM1412_RECORD_MEMORY_SCOPE_SCHEMA_MAXLENGTH`
+
+Scope: local source/test/schema hardening. Targeted MCP contract tests use temp-local test stores only. No provider/API call, live client action, bearer-token use, real memory tool call, real store scan, durable write outside temp test stores, config/watchdog/startup change, dependency change, public MCP tool expansion, remote action, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Added `maxLength: 200` to `record_memory` scope fields in `src/core/constants.js`.
+- Added validator regressions for overlong and boundary-length `record_memory` scope fields.
+- Added MCP tools/list and governance schema contract assertions for the new scope maxLength boundary.
+- Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1412` / `CMV-1527`.
+
+Validation:
+
+- `node --check src\core\constants.js`
+- `node --check tests\tool-argument-validator-limits.test.js`
+- `node --check tests\mcp-contract.test.js`
+- `node --check tests\governance-schema.test.js`
+- `node --test tests\tool-argument-validator-limits.test.js tests\mcp-contract.test.js tests\governance-schema.test.js`
+
+Result: `record_memory` scope schema and runtime argument validator now enforce the documented 200-character boundary.
 
 ## CM-1411 Provider Default Fail-Closed
 
