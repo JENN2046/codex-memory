@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1420 context intake and status-surface compaction`.
-Current validation: `CMV-1534`.
+Current task: `CM-1421 Phase H search_memory negative-control scope packet for CM-1419`.
+Current validation: `CMV-1535`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1420` docs/board validation is complete locally. Return to `CM-1419 Phase H search_memory negative-control` only if an exact bounded readonly scope and fresh Git/runtime preflight are available.
+`CM-1421` exact scope preparation for the `CM-1419` thread is complete locally. Future execution is `CM-1422` and requires commit/sync plus a fresh exact approval line from `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md`.
 
 ## Historical Run Notes
 

@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1420 context intake and status-surface compaction`.
-Current validation: `CMV-1534`.
+Current task: `CM-1421 Phase H search_memory negative-control scope packet for CM-1419`.
+Current validation: `CMV-1535`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase H context governance and status-surface compaction before bounded search_memory negative-control`.
+Current route: `Phase H bounded search_memory negative-control exact scope prepared, not executed`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -40,7 +40,8 @@ RC_READY_FALSE
 - 当前剩余边界：live `search_memory` negative-control、live Codex/Claude client refresh、real cross-client private recall proof、real scoped write proof、broad client-scope store scan、public MCP expansion、client config/watchdog/startup change、readiness/cutover/`RC_READY` claim。
 - 编号注意：Phase H source/test closeout aggregator 使用 `CM-1404` through `CM-1407` 作为 no-apply evidence-unit labels；当前 active board 的 `CM-1404` / `CM-1405` 是后续 docs/validation governance tasks。后续 agent 不应把这两组编号混成同一个任务。
 - 当前治理切片：`CM-1420` 已将默认上下文收敛到 fresh Git facts、`CURRENT_STATE.md`、`.agent_board/CURRENT_FACTS.json`、changed files、validation output、boundary declaration 和 requested decision；长 checkpoint / handoff / validation / task / autopilot ledger 历史改为 archive index 和 Git history 引用。
-- 下一安全任务：回到 `CM-1419 Phase H search_memory negative-control`，且只能在 exact bounded readonly scope 下执行：bounded live `search_memory` negative-control only, no `record_memory`, no provider/API, no raw store scan, no broad export, no config/startup/watchdog, no public MCP expansion, no push/release/cutover/readiness claim.
+- 当前精确范围包：`CM-1421` 已为 `CM-1419 Phase H search_memory negative-control` 准备 `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md`，未来执行仅限两个 public HTTP MCP `search_memory` negative-control calls：CM-0814 NC1/NC2, `target=both`, `limit=1`, `include_content=false`, expected `resultCount=0`, sanitized output only.
+- 下一安全任务：若要执行，先 commit/sync CM-1421 packet，再进入 `CM-1422` exact-approved execution；禁止 `record_memory`、provider/API、raw store scan、broad export、config/startup/watchdog、public MCP expansion、push/release/cutover/readiness claim.
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 

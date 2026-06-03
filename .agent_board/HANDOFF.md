@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1420 context intake and status-surface compaction`.
-Current validation: `CMV-1534`.
-Current handoff: implement context intake governance and compress default `.agent_board` status surfaces so future work loads `CURRENT_STATE.md`, `.agent_board/CURRENT_FACTS.json`, fresh Git facts, changed files, validation output, and exact requested decision instead of long historical logs.
+Current task: `CM-1421 Phase H search_memory negative-control scope packet for CM-1419`.
+Current validation: `CMV-1535`.
+Current handoff: CM-1421 prepared an exact future scope packet for the CM-1419 thread: two bounded readonly public HTTP MCP `search_memory` negative-control calls using CM-0814 NC1/NC2, with `target=both`, `limit=1`, `include_content=false`, sanitized output only, expected zero results, and no execution. Future execution is CM-1422 and requires a fresh exact approval line after packet commit/sync.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: reduce long-term context load while preserving auditability.
+Goal: prepare exact bounded Phase H `search_memory` negative-control scope without executing it.
 
-Current status: `COMPLETED_VALIDATED_DOCS_BOARD_CONTEXT_GOVERNANCE`.
+Current status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -22,19 +22,18 @@ Current entrypoints:
 
 - `CURRENT_STATE.md`
 - `.agent_board/CURRENT_FACTS.json`
-- `docs/CONTEXT_INTAKE_CONTRACT.md`
+- `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
-- `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md`
+- `CURRENT_STATE.md`
 
 Completed in this slice:
 
-- Context intake contract added.
-- Short current state entrypoint added.
-- Long checkpoint, handoff, validation, and task queue surfaces compressed into short active ledgers.
-- Historical evidence remains available by archive index and Git history.
+- Exact future search query envelope prepared.
+- Read-only current-facts recall preflight reported ready-not-executed.
+- No live `search_memory`, token use, provider/API call, raw store scan, durable write, runtime change, or readiness claim occurred.
 
-Validation: `CMV-1534` docs/board validation.
+Validation: `CMV-1535` docs/board validation.
 
 Boundaries:
 
@@ -42,7 +41,7 @@ Boundaries:
 
 Next safe action:
 
-Run docs validation, inspect diff, and update `CMV-1534` result.
+If the operator wants execution, commit/sync this packet first, then use its exact approval template for CM-1422. Otherwise continue local docs/source/test work.
 
 ## Historical Handoff Archive
 

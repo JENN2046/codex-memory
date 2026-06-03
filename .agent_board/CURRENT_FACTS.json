@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1420",
-  "validationId": "CMV-1534",
+  "taskId": "CM-1421",
+  "validationId": "CMV-1535",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1535",
+      "scope": "CM-1421 Phase H search_memory negative-control scope packet for CM-1419",
+      "status": "COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED"
+    },
     {
       "id": "CMV-1534",
       "scope": "CM-1420 context intake and status-surface compaction",
@@ -133,6 +138,7 @@
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
+    "CM-1422 exact-approved live search_memory execution for CM-1419",
     "live search_memory negative-control",
     "real record_memory scope write",
     "real query quality proof",

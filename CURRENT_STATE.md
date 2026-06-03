@@ -9,16 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1420 context intake and status-surface compaction` |
-| Current validation | `CMV-1534` |
-| Current route | Phase H state/context governance before bounded `search_memory` negative-control |
+| Current task | `CM-1421 Phase H search_memory negative-control scope packet for CM-1419` |
+| Current validation | `CMV-1535` |
+| Current route | Phase H bounded `search_memory` negative-control exact scope prepared, not executed |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
 
-`CM-1418` recorded docs-only closeout for the already executed Phase H runtime refresh plus bounded `memory_overview` live no-mutation gate. It did not run a new probe, memory tool call, provider/API call, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim.
+`CM-1421` prepared the exact future scope for the `CM-1419 Phase H search_memory negative-control` thread: two bounded readonly public HTTP MCP `search_memory` negative-control calls. It did not execute `search_memory`, use bearer token material, call providers, read raw stores, write durable state, change config/watchdog/startup, expand public MCP, or claim readiness.
 
 Latest local validation before CM-1420:
 
@@ -29,7 +29,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-`CM-1420` docs/board context-governance compaction is complete locally. The next planned Phase H runtime task remains `CM-1419 search_memory negative-control`, but it requires exact bounded readonly scope and fresh Git/runtime preflight.
+If the operator wants execution, use `docs/CM1419_PHASE_H_SEARCH_MEMORY_NEGATIVE_CONTROL_SCOPE_PACKET.md` to provide the exact approval line after the packet is committed and synced. Otherwise continue only local docs/source/test work.
 
 ## Boundaries
 
