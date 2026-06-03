@@ -4,11 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1410 Phase H live validation approval packet`.
-Current validation: `CMV-1525`.
+Current checkpoint: `CM-1411 provider default fail-closed`.
+Current validation: `CMV-1526`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1411 Provider Default Fail-Closed
+
+Status: `COMPLETED_VALIDATED_CM1411_PROVIDER_DEFAULT_FAIL_CLOSED`
+
+Scope: local source/test/docs/board only. No provider/API call, provider smoke/benchmark, live runtime action, bearer-token use, memory tool call, real memory/store scan, durable write, config/watchdog/startup change, dependency change, public MCP expansion, remote action, readiness claim, release, deploy, or cutover action.
+
+Changed:
+
+- Updated `src/config/createConfig.js` so configured embedding/rerank endpoints no longer auto-enable `allowExternalProvider`.
+- Updated `tests/security-profile-config.test.js` to assert fail-closed local defaults for configured embedding and rerank-only configs.
+- Updated `.env.example` and `README.md` to document explicit provider gate enablement.
+- Updated `STATUS.md` and `.agent_board` active surfaces to `CM-1411` / `CMV-1526`.
+
+Validation:
+
+- `node --test tests\external-provider-gate.test.js tests\security-profile-config.test.js`
+- `npm run test:hardening`
+- `git diff --check`
+- `node scripts\validate_current_facts_drift.js`
+- `node scripts\validate_autopilot_ledger_consistency.js`
+
+Result: provider default is fail-closed. Explicit true still enables configured provider endpoints; unset/default keeps local-hash fallback and empty endpoint list.
 
 ## CM-1410 Phase H Live Validation Approval Packet
 

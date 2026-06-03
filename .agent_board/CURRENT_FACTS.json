@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-03",
-  "taskId": "CM-1410",
-  "validationId": "CMV-1525",
+  "taskId": "CM-1411",
+  "validationId": "CMV-1526",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1526",
+      "scope": "CM-1411 provider default fail-closed",
+      "status": "COMPLETED_VALIDATED_SOURCE_TEST_DOCS"
+    },
     {
       "id": "CMV-1525",
       "scope": "CM-1410 Phase H live validation approval packet",
@@ -87,6 +92,7 @@
     "npm run gate:mainline:strict",
     "live client acceptance",
     "provider smoke or benchmark",
+    "live provider/API calls",
     "real memory tools",
     "runtime freshness",
     "phase h live validation execution",

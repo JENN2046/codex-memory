@@ -255,22 +255,13 @@ function createConfig(overrides = {}) {
   const configuredEmbeddingEndpoints = [];
   const seenEmbeddingEndpoints = new Set();
 
-  // Resolve allowExternalProvider: if endpoints are configured and the user
-  // has not explicitly set the gate, the local profile defaults to true
-  // (user intent to use the configured provider). Hardened profile keeps
-  // the default false unless CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER or an
-  // override explicitly enables the provider gate.
-  const anyRerankConfigured = !!(pickFirstNonEmpty(overrides.rerankUrl, process.env.CODEX_MEMORY_RERANK_URL)
-    && pickFirstNonEmpty(overrides.rerankModel, process.env.CODEX_MEMORY_RERANK_MODEL));
-  const anyEndpointConfigured = !!(legacyEmbeddingEndpoint || localEmbeddingEndpoint || fallbackEmbeddingEndpoint) || anyRerankConfigured;
-  const gateDefault = !isHardened
-    && overrides.allowExternalProvider === undefined
-    && process.env.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER === undefined
-    && anyEndpointConfigured;
+  // Resolve allowExternalProvider fail-closed. Configured endpoints are
+  // inert unless CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER or an override
+  // explicitly enables the provider gate.
   const allowExternalProvider = _resolveBool(
     overrides.allowExternalProvider,
     'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
-    gateDefault
+    false
   );
 
   for (const endpoint of [legacyEmbeddingEndpoint, localEmbeddingEndpoint, fallbackEmbeddingEndpoint]) {

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1410 Phase H live validation approval packet`.
-Current validation: `CMV-1525`.
-Current handoff: CM-1410 prepares a docs/board-only exact approval packet for future Phase H live validation. It allows a later exact-approved health/initialize/tools-list/readonly overview/bounded readonly sanitized search scope, while forbidding record_memory, real scoped write proof, broad store scan, raw data exposure, provider calls, config/startup/watchdog changes, public MCP expansion, remote action, and readiness/RC_READY claims. No runtime, bearer token use, provider, memory tool, durable write, remote action, or readiness claim occurred.
+Current task: `CM-1411 provider default fail-closed`.
+Current validation: `CMV-1526`.
+Current handoff: CM-1411 updates provider defaults so configured embedding/rerank endpoints stay inert unless `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=true` or `allowExternalProvider: true` is explicit. Targeted provider/security tests and hardening validation passed. No provider/API call, runtime action, bearer token use, memory tool, real-store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

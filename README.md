@@ -83,14 +83,15 @@ HTTP MCP 入口默认拒绝无 bearer token 的 `search_memory`、`record_memory
 
 `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER` 控制已配置的 embedding/rerank endpoint 是否允许参与索引和 fetch。
 
-**默认行为取决于 securityProfile：**
+**默认行为一律 fail-closed：**
 
 | Profile | 无 endpoint | 已配置 endpoint |
 |---|---|---|
-| `local`（默认） | `false` | `true`（向后兼容） |
+| `local`（默认） | `false` | `false` |
 | `hardened` | `false` | `false` |
 
-- `securityProfile=local` 且已配置 endpoint URL 时，未显式设置 gate 则默认允许，保持向后兼容
+- 只配置 endpoint URL 不会授权 provider fetch
+- 只有 `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=true` 或 `allowExternalProvider: true` 才允许已配置 endpoint 参与索引和 fetch
 - `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=false` 强制使用 local-hash 指纹和空 endpoint 列表
 - `securityProfile=hardened` 时即使已配置 endpoint 也默认拒绝；需显式 `=true` 才允许
 - `ExternalEmbeddingAdapter.isConfigured()` 和 `ExternalRerankAdapter.isConfigured()` 始终受此控制
@@ -905,6 +906,8 @@ $env:CODEX_MEMORY_FALLBACK_EMBEDDING_PROVIDER="nvidia"
 $env:CODEX_MEMORY_FALLBACK_EMBEDDING_URL="https://integrate.api.nvidia.com/"
 $env:CODEX_MEMORY_FALLBACK_EMBEDDING_API_KEY="<your-nvidia-key>"
 $env:CODEX_MEMORY_FALLBACK_EMBEDDING_MODEL="baai/bge-m3"
+# Provider endpoints stay inert unless this is explicitly enabled:
+# $env:CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER="true"
 ```
 
 兼容旧环境变量：

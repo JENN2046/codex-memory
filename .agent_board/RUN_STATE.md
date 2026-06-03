@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1410 Phase H live validation approval packet`.
-Current validation: `CMV-1525`.
+Current task: `CM-1411 provider default fail-closed`.
+Current validation: `CMV-1526`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -125,4 +125,4 @@ git log --oneline --decorate -n 10
 ```
 
 Repository reality overrides this file.
-Current packet: `CM-1410` prepares a docs-only exact approval surface for future Phase H live validation. It does not execute health probes, client commands, bearer-token use, memory tools, provider calls, real-store reads, config/watchdog/startup changes, public MCP expansion, remote action, or readiness/cutover. Future execution requires a fresh exact approval line after commit/sync and fresh Git facts.
+Current source/test slice: `CM-1411` makes provider defaults fail closed. Configured embedding/rerank endpoints stay inert unless `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=true` or `allowExternalProvider: true` is explicit. No provider/API call, runtime action, bearer-token use, memory tool call, real-store read, config/watchdog/startup change, public MCP expansion, remote action, or readiness/cutover occurred.

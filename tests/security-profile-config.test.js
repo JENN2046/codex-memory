@@ -202,7 +202,7 @@ test('enabled provider config uses provider fingerprint', () => {
   assert.match(config.embeddingFingerprint, /^bge-m3-local__1024__/);
 });
 
-test('configured endpoint with unset provider gate auto-enables allowExternalProvider', () => {
+test('configured endpoint with unset provider gate keeps allowExternalProvider false', () => {
   withEnv({ CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: undefined }, () => {
     const config = createConfig({
       localEmbeddingUrl: 'http://example.invalid',
@@ -210,9 +210,9 @@ test('configured endpoint with unset provider gate auto-enables allowExternalPro
       localEmbedDimensions: 1024
     });
 
-    assert.equal(config.allowExternalProvider, true);
-    assert.match(config.embeddingFingerprint, /^bge-m3-local__1024__/);
-    assert.equal(config.embeddingEndpoints.length, 1);
+    assert.equal(config.allowExternalProvider, false);
+    assert.match(config.embeddingFingerprint, /^local-hash__/);
+    assert.equal(config.embeddingEndpoints.length, 0);
   });
 });
 
@@ -257,16 +257,16 @@ test('string true provider gate enables provider endpoint and fingerprint', () =
   assert.equal(config.embeddingEndpoints.length, 1);
 });
 
-test('configured endpoint without explicit provider gate stores resolved allowExternalProvider true', () => {
+test('configured endpoint without explicit provider gate stores resolved allowExternalProvider false', () => {
   withEnv({ CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: undefined }, () => {
     const config = createConfig({
       embeddingUrl: 'http://example.invalid',
       embeddingModel: 'm'
     });
 
-    assert.equal(config.allowExternalProvider, true);
-    assert.match(config.embeddingFingerprint, /^m__64__v1$/);
-    assert.equal(config.embeddingEndpoints.length, 1);
+    assert.equal(config.allowExternalProvider, false);
+    assert.match(config.embeddingFingerprint, /^local-hash__/);
+    assert.equal(config.embeddingEndpoints.length, 0);
   });
 });
 
@@ -282,7 +282,7 @@ test('explicit false provider gate keeps configured endpoint out of profile', ()
   assert.equal(config.embeddingEndpoints.length, 0);
 });
 
-test('rerank-only config auto-enables allowExternalProvider in local profile', () => {
+test('rerank-only config keeps allowExternalProvider false in local profile', () => {
   withEnv({ CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: undefined }, () => {
     const config = createConfig({
       rerankUrl: 'http://example.invalid/rerank',
@@ -290,8 +290,7 @@ test('rerank-only config auto-enables allowExternalProvider in local profile', (
       rerankModel: 'rerank-model'
     });
 
-    assert.equal(config.allowExternalProvider, true);
+    assert.equal(config.allowExternalProvider, false);
     assert.equal(config.embeddingEndpoints.length, 0);
   });
 });
-
