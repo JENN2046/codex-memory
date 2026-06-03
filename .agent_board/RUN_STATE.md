@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1436 scoped write follow-up search validation scope packet`.
-Current validation: `CMV-1547`.
+Current task: `CM-1438 auth preflight envelope clarification`.
+Current validation: `CMV-1548`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1436` prepares `docs/CM1436_SCOPED_WRITE_FOLLOW_UP_SEARCH_VALIDATION_SCOPE_PACKET.md` for future CM-1437 scoped write follow-up bounded `search_memory` validation. Future CM-1437 is limited to exactly one authenticated public HTTP MCP `search_memory` call with query `Checkpoint: CM-1432 scoped write proof marker`, `target=process`, `limit=1`, `include_content=false`, expected `resultCount>=1`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, and `snippetsReturned=false`. CM-1436 itself performs no live `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API, real memory read/write, raw store scan, memoryId lookup, raw response print/persist, durable write, runtime action, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim. Next safe action is commit/push only if separately authorized; future CM-1437 requires runtime refresh and fresh exact one-call approval after packet commit/push.
+`CM-1438` records CM-1437 as `SEARCH_SHAPE_PASSED_BUT_BOUNDARY_DEVIATED`: the follow-up bounded `search_memory` shape was positive (`resultCount=1`, forbidden key paths `0`, no raw/id/path/title/snippet leakage), but bearer token was also used for authenticated MCP `initialize` session setup under approval wording that only named the single `search_memory` call. CM-1438 clarifies future authenticated MCP live gates may explicitly allow bearer token use for authenticated `initialize`, authenticated `tools/list` if required, and the exactly approved `tools/call`; extra tool calls, extra search, broad reads, raw response print/persist, provider/API, raw store scan, memoryId lookup, public MCP expansion, and readiness / `RC_READY` claim remain forbidden unless separately and exactly approved. CM-1438 itself performs no live action. Next safe action is commit/push only if separately authorized.
 
 ## Historical Run Notes
 

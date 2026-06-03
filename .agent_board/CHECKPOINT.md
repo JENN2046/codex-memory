@@ -4,43 +4,41 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1436 scoped write follow-up search validation scope packet`.
-Current validation: `CMV-1547`.
+Current checkpoint: `CM-1438 auth preflight envelope clarification`.
+Current validation: `CMV-1548`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1436 Scoped Write Follow-Up Search Validation Scope Packet
+## CM-1438 Auth Preflight Envelope Clarification
 
-Status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`
+Status: `COMPLETED_VALIDATED_DOCS_SOURCE_OF_TRUTH_CLARIFICATION_NOT_EXECUTED`
 
 Scope:
 
 ```text
-docs-only scope packet for future bounded follow-up search validation
+docs/source-of-truth clarification; no live execution
 ```
 
 Recorded:
 
-- Packet path: `docs/CM1436_SCOPED_WRITE_FOLLOW_UP_SEARCH_VALIDATION_SCOPE_PACKET.md`.
-- Baseline before packet: `main == origin/main == a9b41de`.
-- Future gate: `CM-1437 scoped write follow-up search validation`.
-- Future query: `Checkpoint: CM-1432 scoped write proof marker`.
-- Query source: committed public/governance-safe phrase from `docs/CM1434_CORRECTED_SCOPED_RECORD_MEMORY_WRITE_PROOF_PACKET.md`.
-- Future search: exactly one authenticated public HTTP MCP `search_memory` call.
-- Future search shape: `target=process`, `limit=1`, `include_content=false`.
-- Future expected shape: `resultCount>=1`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`.
-- Future CM-1437 requires runtime refresh and fresh exact one-call approval after this packet is committed and pushed.
-- No live `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API, true memory read/write, raw store scan, memoryId lookup, raw response print/persist, runtime action, public MCP expansion, remote action, or readiness / `RC_READY` claim occurred in CM-1436.
+- Clarification path: `docs/CM1438_AUTHENTICATED_MCP_PREFLIGHT_ENVELOPE_CLARIFICATION.md`.
+- Updated packet: `docs/CM1436_SCOPED_WRITE_FOLLOW_UP_SEARCH_VALIDATION_SCOPE_PACKET.md`.
+- CM-1437 classified as `SEARCH_SHAPE_PASSED_BUT_BOUNDARY_DEVIATED`.
+- CM-1437 sanitized shape evidence was positive: exactly one `search_memory`, `resultCount=1`, `resultsLength=1`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, no raw/id/path/title/snippet leakage.
+- Deviation reason: bearer token was used for authenticated MCP `initialize` session setup, while the approval wording allowed bearer token only for the one `search_memory` call.
+- Future authenticated MCP approvals may explicitly allow bearer token use for authenticated `initialize` session setup, authenticated `tools/list` if required, and the exactly approved `tools/call`.
+- Extra tool calls, extra search, broad reads, raw response output/persistence, provider/API, raw store scan, memoryId lookup, and readiness / `RC_READY` claims remain forbidden unless separately and exactly approved.
+- No live `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API, true memory read/write, raw store scan, memoryId lookup, raw response print/persist, runtime action, public MCP expansion, remote action, or readiness / `RC_READY` claim occurred in CM-1438.
 
 Boundary:
 
-- No new live probe in CM-1436.
+- No new live probe in CM-1438.
 - No `record_memory`.
 - No `search_memory`.
 - No `memory_overview`.
 - No provider/API call.
-- No bearer-token use.
+- No bearer-token use in CM-1438.
 - No raw memory/audit/store scan.
 - No memoryId lookup.
 - No raw response print or persistence.
@@ -50,11 +48,12 @@ Boundary:
 - No remote action.
 - No readiness, reliability, release, cutover, or `RC_READY` claim.
 
-Validation: `CMV-1547` docs-only validation.
+Validation: `CMV-1548` docs/source-of-truth validation.
 
 ## Recent Checkpoint References
 
 - `CM-1420`: context intake and status-surface compaction.
+- `CM-1436`: scoped write follow-up search validation scope packet.
 - `CM-1435`: corrected scoped `record_memory` write accepted evidence closeout.
 - `CM-1434`: corrected scoped `record_memory` write proof packet.
 - `CM-1433`: `record_memory` rejection reason investigation.

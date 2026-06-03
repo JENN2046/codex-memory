@@ -113,7 +113,7 @@ Before CM-1437 can execute, verify:
 - runtime freshness accepted
 - public tools unchanged: `memory_overview`, `record_memory`, `search_memory`
 - exact approval names this packet and exact query
-- bearer token may be used only for the single approved authenticated public HTTP MCP `search_memory` call and must not be printed, stored, copied into docs, or edited
+- bearer token use must be explicitly scoped. For future authenticated HTTP MCP gates, bearer token may be used for authenticated MCP `initialize` session setup, authenticated MCP `tools/list` if required to confirm public tools unchanged, and the single approved authenticated public HTTP MCP `search_memory` call. Token material must not be printed, stored, copied into docs, or edited.
 
 ## Future Forbidden Actions
 
@@ -156,7 +156,9 @@ Runtime prerequisite must be satisfied before the live call:
 - public tools unchanged: memory_overview, record_memory, search_memory
 
 Allowed actions:
-- use bearer token only for this one authorized authenticated public HTTP MCP search_memory call
+- use bearer token only for authenticated MCP initialize/session setup, authenticated MCP tools/list if required to confirm public tools unchanged, and this one authorized authenticated public HTTP MCP search_memory call
+- execute authenticated MCP initialize/session setup if required
+- execute authenticated MCP tools/list if required to confirm public tools unchanged
 - execute exactly one search_memory call:
   - query=Checkpoint: CM-1432 scoped write proof marker
   - target=process
@@ -176,6 +178,7 @@ Allowed actions:
 Forbidden actions:
 - record_memory
 - any second search_memory call
+- any extra tools/call beyond the exactly approved search_memory call
 - changing the query
 - retrying with a different query if resultCount=0
 - include_content=true

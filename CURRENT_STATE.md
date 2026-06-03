@@ -9,9 +9,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1436 scoped write follow-up search validation scope packet` |
-| Current validation | `CMV-1547` |
-| Current route | Future CM-1437 bounded `search_memory` follow-up validation packet prepared; no live search |
+| Current task | `CM-1438 auth preflight envelope clarification` |
+| Current validation | `CMV-1548` |
+| Current route | Authenticated MCP preflight envelope clarified; CM-1437 recorded as shape passed with boundary deviation |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -42,6 +42,8 @@ The sanitized accepted evidence was `decision=accepted`, `shadowWriteStatus=ok`,
 
 `CM-1436` prepares `docs/CM1436_SCOPED_WRITE_FOLLOW_UP_SEARCH_VALIDATION_SCOPE_PACKET.md` for a future CM-1437 bounded follow-up `search_memory` validation of the CM-1432 accepted write. The packet is docs-only and does not execute `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API calls, runtime refresh, real memory read/write, raw store scan, memoryId lookup, raw response print/persist, public MCP expansion, remote action, readiness claim, or `RC_READY` claim. Future CM-1437 is limited to exactly one authenticated public HTTP MCP `search_memory` call with query `Checkpoint: CM-1432 scoped write proof marker`, `target=process`, `limit=1`, `include_content=false`, expected `resultCount>=1`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, and no raw/id/path/title/snippet leakage.
 
+`CM-1438` records CM-1437 as `SEARCH_SHAPE_PASSED_BUT_BOUNDARY_DEVIATED`: sanitized follow-up `search_memory` shape was positive (`resultCount=1`, `resultsLength=1`, `access.mode=authenticated_bounded_search`, forbidden key paths `0`, no raw/id/path/title/snippet leakage), but the execution used bearer token for authenticated MCP `initialize` session setup while the approval wording said bearer token only for the one `search_memory` call. No retry or second `search_memory` occurred. CM-1438 clarifies that future authenticated MCP live gates may explicitly allow bearer token use for authenticated `initialize` session setup, authenticated `tools/list` if required, and the exactly approved `tools/call`; extra tool calls, extra search, broad reads, raw response output/persistence, provider/API, raw store scan, memoryId lookup, and readiness / `RC_READY` claims remain forbidden unless separately and exactly approved.
+
 Latest local validation before CM-1420:
 
 - `npm test` passed `2992/2992`.
@@ -51,7 +53,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1436 is a docs-only scope packet. Commit/push only if separately authorized. Do not run follow-up `search_memory`; CM-1437 still requires runtime refresh and fresh exact one-call approval.
+CM-1438 is a docs/source-of-truth clarification. Commit/push only if separately authorized. Future live gates should use the clarified authenticated MCP preflight envelope wording before execution.
 
 ## Boundaries
 

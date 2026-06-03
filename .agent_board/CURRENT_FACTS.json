@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1436",
-  "validationId": "CMV-1547",
+  "taskId": "CM-1438",
+  "validationId": "CMV-1548",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1548",
+      "scope": "CM-1438 auth preflight envelope clarification",
+      "status": "COMPLETED_VALIDATED_DOCS_SOURCE_OF_TRUTH_CLARIFICATION_NOT_EXECUTED"
+    },
     {
       "id": "CMV-1547",
       "scope": "CM-1436 scoped write follow-up search validation scope packet",
