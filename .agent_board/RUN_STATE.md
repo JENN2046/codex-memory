@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1431 scoped record_memory write proof scope packet`.
-Current validation: `CMV-1543`.
+Current task: `CM-1434 corrected scoped record_memory write proof packet`.
+Current validation: `CMV-1545`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1431` prepares a docs-only scope packet for future CM-1432 scoped `record_memory` write proof. Packet path: `docs/CM1431_SCOPED_RECORD_MEMORY_WRITE_PROOF_SCOPE_PACKET.md`. Future gate is limited to exactly one authenticated HTTP `record_memory` call with `target=process`, synthetic governance-safe marker content only, required scope fields `project_id`, `client_id`, `visibility`, `task_id`, `retention_policy`, and payload SHA-256 `015df43d6ca44197da9a3811a02c39c1696f1d27661a399c6ecc421ba9a757fb`. CM-1431 executes no live write, no live search, no token use, no provider/API, no raw store scan, no runtime action, no public MCP expansion, and no readiness / `RC_READY` claim. Next safe action is review/commit/push of this docs-only packet only with separate explicit authorization; after packet commit/push, CM-1432 still requires runtime refresh and fresh exact one-write approval.
+`CM-1434` prepares a corrected docs/test packet for future CM-1432 scoped `record_memory` write proof rerun. Corrected packet path: `docs/CM1434_CORRECTED_SCOPED_RECORD_MEMORY_WRITE_PROOF_PACKET.md`. Corrected payload remains synthetic governance-safe, keeps `target=process`, preserves required scope fields, adds `Checkpoint:` to satisfy process-memory semantics, and has SHA-256 `25a5f0bd9edd4ee011bff414f09a4d6f61f5dc1db31b9fc21695d9779678ba67`. Temp/synthetic validation accepts the corrected payload. No live `record_memory`, second live write, `search_memory`, `memory_overview`, token use, provider/API, true memory read/write, raw store scan, runtime action, public MCP expansion, or readiness / `RC_READY` claim occurred in CM-1434. Next safe action is commit/push only if separately authorized; future CM-1432 rerun requires runtime refresh and fresh exact one-write approval bound to the CM-1434 commit and corrected payload hash.
 
 ## Historical Run Notes
 

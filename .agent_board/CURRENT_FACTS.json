@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1431",
-  "validationId": "CMV-1543",
+  "taskId": "CM-1434",
+  "validationId": "CMV-1545",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,16 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1545",
+      "scope": "CM-1434 corrected scoped record_memory write proof packet",
+      "status": "COMPLETED_VALIDATED_CORRECTED_PACKET_NOT_EXECUTED"
+    },
+    {
+      "id": "CMV-1544",
+      "scope": "CM-1433 record_memory rejection reason investigation",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RERUN"
+    },
     {
       "id": "CMV-1543",
       "scope": "CM-1431 scoped record_memory write proof scope packet",
