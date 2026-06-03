@@ -9,9 +9,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1427 bounded positive search_memory shape gate scope packet` |
-| Current validation | `CMV-1540` |
-| Current route | Phase H bounded positive `search_memory` shape gate prepared as docs-only scope packet; no live execution |
+| Current task | `CM-1429 positive bounded search memoryIdsReturned flag investigation` |
+| Current validation | `CMV-1541` |
+| Current route | Phase H bounded positive `search_memory` collector flag false-positive investigated locally; no live rerun |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -24,6 +24,8 @@ Side-effect evidence for the CM-1422 execution: no `record_memory`, no `memory_o
 
 `CM-1427` prepares `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md` for a future `CM-1428` bounded positive `search_memory` shape gate. The packet is docs-only and does not execute live `search_memory`, use bearer token, read real memory, or scan raw stores. Future CM-1428 is limited to exactly one authenticated public HTTP MCP `search_memory` call with query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`, expected `resultCount>=1`, forbidden key paths `0`, and no raw/id/path/title/snippet leakage.
 
+`CM-1429` investigates the CM-1428 `memoryIdsReturned=true` fail-closed receipt without rerunning live search or reading raw memory. Source review shows `projectAuthenticatedBoundedSearchResponse(...)` sets `access.memoryIdsReturned=false` and strips result `memoryId` fields in bounded projection. The likely root cause is evidence collector false positive: the ad hoc CM-1428 collector inferred `memoryIdsReturned=true` from the safe key path `structuredContent.access.memoryIdsReturned` instead of checking that access flag's boolean value or actual result item fields. Added `inspectBoundedSearchEvidenceShape(...)` synthetic tests to distinguish safe access flag keys from true access-flag or result-item leakage.
+
 Latest local validation before CM-1420:
 
 - `npm test` passed `2992/2992`.
@@ -33,7 +35,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-Commit/push CM-1427 docs-only packet only if separately authorized. Future CM-1428 live execution requires fresh exact approval, runtime refresh, and the packet's exact query/boundary.
+Commit/push CM-1429 only if separately authorized. CM-1428 rerun should wait until this investigation patch is committed/pushed and runtime refreshed, with fresh exact approval.
 
 ## Boundaries
 

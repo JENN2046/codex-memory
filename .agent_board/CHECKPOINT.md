@@ -4,38 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1427 bounded positive search_memory shape gate scope packet`.
-Current validation: `CMV-1540`.
+Current checkpoint: `CM-1429 positive bounded search memoryIdsReturned flag investigation`.
+Current validation: `CMV-1541`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-1427 Bounded Positive Search Memory Shape Scope Packet
+## CM-1429 Positive Bounded Search MemoryIdsReturned Flag Investigation
 
-Status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RERUN`
 
 Scope:
 
 ```text
-docs-only scope packet; no live execution
+local source/test investigation; no live rerun
 ```
 
 Recorded:
 
-- Prepared `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md`.
-- Baseline recorded as fresh Git facts: `main == origin/main == 1b840e5`.
-- Future CM-1428 requires runtime refresh, runtime freshness accepted, and fresh exact approval.
-- Future live execution is exactly one authenticated HTTP `search_memory` call.
-- Future query is `Phase H bounded search_memory negative-control evidence`.
-- Future call shape is `target=both`, `limit=1`, `include_content=false`.
-- Expected positive shape is `resultCount>=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`.
-- Query source is public/governance-safe status wording, not raw memory/store discovery.
+- CM-1428 fail-closed receipt had `resultCount=1`, forbidden key paths `0`, and `memoryIdsReturned=true`.
+- Source projection `projectAuthenticatedBoundedSearchResponse(...)` sets `access.memoryIdsReturned=false`.
+- HTTP authenticated bounded path injects `requestContext.authenticatedBoundedSearch=true` for bearer requests.
+- Existing synthetic HTTP projection test proves non-empty bounded projection strips `memoryId` and returns `access.memoryIdsReturned=false`.
+- Root cause is likely evidence collector false positive from key path `structuredContent.access.memoryIdsReturned`, not source projection leakage.
+- Added `inspectBoundedSearchEvidenceShape(...)` to distinguish safe access flag keys from true access flag value or result item leakage.
 
 Boundary:
 
-- No runtime action in CM-1427.
-- No live MCP `tools/call` in CM-1427.
-- No live `search_memory` in CM-1427.
+- No runtime action in CM-1429.
+- No live MCP `tools/call` in CM-1429.
+- No live `search_memory` rerun in CM-1429.
 - No `memory_overview`.
 - No provider/API call.
 - No bearer-token use.
@@ -46,11 +44,12 @@ Boundary:
 - No remote action.
 - No readiness, reliability, release, cutover, or `RC_READY` claim.
 
-Validation: `CMV-1540` docs-only validation.
+Validation: `CMV-1541` source/test/docs validation.
 
 ## Recent Checkpoint References
 
 - `CM-1420`: context intake and status-surface compaction.
+- `CM-1427`: bounded positive `search_memory` shape gate scope packet.
 - `CM-1426`: Phase H bounded `search_memory` negative-control evidence closeout.
 - `CM-1425`: `search_memory` negative-control precision / no-result policy patch.
 - `CM-1424`: authenticated `search_memory` bounded/noRawContentRead projection patch.

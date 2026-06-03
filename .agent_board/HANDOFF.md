@@ -4,24 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1427 bounded positive search_memory shape gate scope packet`.
-Current validation: `CMV-1540`.
-Current handoff: CM-1427 prepared a docs-only scope packet for future CM-1428 bounded positive `search_memory` shape gate. No live probe, token use, real memory read, or raw store scan occurred in CM-1427.
+Current task: `CM-1429 positive bounded search memoryIdsReturned flag investigation`.
+Current validation: `CMV-1541`.
+Current handoff: CM-1429 investigated the CM-1428 positive bounded `memoryIdsReturned=true` flag using source review and synthetic tests only. No live rerun, token use, real memory read, or raw store scan occurred in CM-1429.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: prepare docs-only scope packet for future CM-1428 bounded positive `search_memory` shape gate.
+Goal: determine whether CM-1428 `memoryIdsReturned=true` came from source projection, result item leakage, wrapper text, collector inference, or runtime mismatch.
 
-Current status: `COMPLETED_VALIDATED_SCOPE_PACKET_NOT_EXECUTED`.
+Current status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RERUN`.
 
 Workspace: `A:\codex-memory`.
 
 Current entrypoints:
 
 - `CURRENT_STATE.md`
-- `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md`
+- `src/core/SearchMemoryResponseSanitizer.js`
+- `tests/search-memory-response-sanitizer.test.js`
 - `.agent_board/CURRENT_FACTS.json`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
@@ -29,21 +30,22 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Prepared `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md`.
-- Fixed future CM-1428 to exactly one authenticated HTTP `search_memory` call, query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`.
-- Future acceptance requires `resultCount>=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`.
-- Query source is public/governance-safe status wording and was not discovered from real memory or raw stores.
-- No live `search_memory`, `record_memory`, `memory_overview`, token use, provider/API call, real memory read/write, raw store scan, durable write, runtime change, or readiness claim occurred in CM-1427.
+- Source projection sets `access.memoryIdsReturned=false` and strips `memoryId` from non-empty bounded results.
+- HTTP authenticated bounded path uses `requestContext.authenticatedBoundedSearch=true` for bearer requests.
+- MCP wrapper text is ignored by the synthetic collector helper.
+- Root cause is likely collector false positive: the ad hoc CM-1428 collector inferred `memoryIdsReturned=true` from the safe key path `structuredContent.access.memoryIdsReturned` instead of checking that flag's boolean value or actual result item fields.
+- Added `inspectBoundedSearchEvidenceShape(...)` and tests covering safe access flag keys, true access flag failure, and result-item `memoryId` failure.
+- No live `search_memory`, `record_memory`, `memory_overview`, token use, provider/API call, real memory read/write, raw store scan, durable write, runtime change, or readiness claim occurred in CM-1429.
 
-Validation: `CMV-1540` docs-only validation.
+Validation: `CMV-1541` source/test/docs validation.
 
 Boundaries:
 
-- No runtime action, memory tool call, provider/API call, token use, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1427.
+- No runtime action, memory tool call, provider/API call, token use, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1429.
 
 Next safe action:
 
-Commit/push CM-1427 docs-only packet only if separately authorized. Future CM-1428 requires fresh exact approval and runtime refresh; if the packet query is not acceptable as a safe positive query, prepare a replacement packet or use a temp/live-like fixture gate.
+Commit/push CM-1429 only if separately authorized. CM-1428 rerun becomes eligible only after commit/push/runtime refresh and fresh exact approval.
 
 ## Historical Handoff Archive
 

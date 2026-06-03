@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 
 const {
+  inspectBoundedSearchEvidenceShape,
   inspectSearchMemoryResponseShape
 } = require('../src/core/SearchMemoryResponseSanitizer');
 
@@ -138,5 +139,104 @@ test('search memory sanitizer identifies exact key path for memory id and title 
   assert.deepEqual(violationPaths(result), [
     'result.structuredContent.results[0].memoryId',
     'result.structuredContent.results[0].title'
+  ]);
+});
+
+test('bounded search evidence collector does not infer memory ids from safe access flag key', () => {
+  const result = inspectBoundedSearchEvidenceShape(mcpResponse({
+    access: {
+      mode: 'authenticated_bounded_search',
+      selectedProjection: true,
+      includeContent: false,
+      rawContentReturned: false,
+      pathsReturned: false,
+      memoryIdsReturned: false,
+      titlesReturned: false,
+      snippetsReturned: false
+    },
+    resultCount: 1,
+    results: [
+      {
+        target: 'both',
+        score: 0.75,
+        baseScore: 0.7,
+        rerankScore: null,
+        titleHitCount: 0,
+        tagHitCount: 1,
+        contentHitCount: 0,
+        evidenceHitCount: 0,
+        exactCoreTagCount: 0,
+        tagMemoSurfaceScore: 0,
+        dynamicCoreWeight: 0,
+        sourceKinds: ['synthetic']
+      }
+    ]
+  }, '{"content":"wrapper text can mention memoryId without becoming evidence"}'));
+
+  assert.equal(result.accepted, true);
+  assert.equal(result.resultCount, 1);
+  assert.equal(result.resultsLength, 1);
+  assert.equal(result.wrapperContentIgnored, true);
+  assert.equal(result.flags.memoryIdsReturned, false);
+  assert.equal(result.flags.rawContentReturned, false);
+  assert.deepEqual(result.violations, []);
+  assert.equal(result.structuredKeyPaths.includes('result.structuredContent.access.memoryIdsReturned'), true);
+});
+
+test('bounded search evidence collector fails when structured access reports memory ids returned', () => {
+  const result = inspectBoundedSearchEvidenceShape(mcpResponse({
+    access: {
+      mode: 'authenticated_bounded_search',
+      selectedProjection: true,
+      includeContent: false,
+      rawContentReturned: false,
+      pathsReturned: false,
+      memoryIdsReturned: true,
+      titlesReturned: false,
+      snippetsReturned: false
+    },
+    resultCount: 1,
+    results: [
+      {
+        target: 'both',
+        score: 0.75,
+        sourceKinds: ['synthetic']
+      }
+    ]
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.flags.memoryIdsReturned, true);
+  assert.deepEqual(violationPaths(result), [
+    'result.structuredContent.access.memoryIdsReturned'
+  ]);
+});
+
+test('bounded search evidence collector fails when result item carries memory id field', () => {
+  const result = inspectBoundedSearchEvidenceShape(mcpResponse({
+    access: {
+      mode: 'authenticated_bounded_search',
+      selectedProjection: true,
+      includeContent: false,
+      rawContentReturned: false,
+      pathsReturned: false,
+      memoryIdsReturned: false,
+      titlesReturned: false,
+      snippetsReturned: false
+    },
+    resultCount: 1,
+    results: [
+      {
+        target: 'both',
+        score: 0.75,
+        memoryId: 'synthetic-id'
+      }
+    ]
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.flags.memoryIdsReturned, true);
+  assert.deepEqual(violationPaths(result), [
+    'result.structuredContent.results[0].memoryId'
   ]);
 });

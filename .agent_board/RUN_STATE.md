@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1427 bounded positive search_memory shape gate scope packet`.
-Current validation: `CMV-1540`.
+Current task: `CM-1429 positive bounded search memoryIdsReturned flag investigation`.
+Current validation: `CMV-1541`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1427` prepared `docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md` for future CM-1428 bounded positive `search_memory` shape gate. It is docs-only: no runtime action, live probe, bearer-token use, memory tool call, provider/API call, real memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred. Next safe action is review/commit/push of this docs-only packet only with separate explicit authorization; future CM-1428 requires runtime refresh and fresh exact approval.
+`CM-1429` investigated CM-1428 positive bounded `memoryIdsReturned=true` using source review and synthetic tests only. Root cause is evidence collector false positive from safe key path `structuredContent.access.memoryIdsReturned`, not source projection leakage or HTTP bounded path mismatch. No runtime action, live probe, bearer-token use, memory tool call, provider/API call, real memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim occurred in CM-1429. Next safe action is commit/push only with separate explicit authorization.
 
 ## Historical Run Notes
 

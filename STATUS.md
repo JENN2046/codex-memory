@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1427 bounded positive search_memory shape gate scope packet`.
-Current validation: `CMV-1540`.
+Current task: `CM-1429 positive bounded search memoryIdsReturned flag investigation`.
+Current validation: `CMV-1541`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Phase H bounded positive search_memory shape gate scope packet prepared; no live execution`.
+Current route: `Phase H bounded positive search_memory collector flag false-positive investigated locally; no live rerun`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -49,6 +49,8 @@ RC_READY_FALSE
 - CM-1422 rerun after CM-1425：`main == origin/main == b7e20cc`，worktree clean，runtime freshness accepted，listener PID `4296`，public tools unchanged (`memory_overview`, `record_memory`, `search_memory`)。NC1 `xqzv-9137-lomdra-kepv-azmuth` 和 NC2 `nareth-48291-pluvox-darnel-kiv` 均使用 `target=both`, `limit=1`, `include_content=false`，`access.mode=authenticated_bounded_search`，`resultCount=0`。forbidden key paths `0`，`rawContentReturned=false`，`pathsReturned=false`，`memoryIdsReturned=false`。无 `record_memory`，无 provider/API，未做 raw store scan，未观察到 durable write，无 readiness / `RC_READY` claim。
 - 当前 closeout：CM-1426 仅记录上述已经执行过的证据，不执行新的 live probe。禁止 `search_memory`、`record_memory`、`memory_overview`、provider/API、raw store scan、config/startup/watchdog、public MCP expansion、push/release/cutover/readiness claim，除非单独授权。
 - CM-1427 scope packet：`docs/CM1427_BOUNDED_POSITIVE_SEARCH_MEMORY_SHAPE_SCOPE_PACKET.md` 已准备 future CM-1428 bounded positive `search_memory` shape gate。当前不执行 live `search_memory`，不使用 bearer token，不读取真实 memory，不扫描 raw store。future gate 仅限 exactly one authenticated public HTTP MCP `search_memory` call：query `Phase H bounded search_memory negative-control evidence`, `target=both`, `limit=1`, `include_content=false`, expected `resultCount>=1`, forbidden key paths `0`, `rawContentReturned=false`, `pathsReturned=false`, `memoryIdsReturned=false`, `titlesReturned=false`, `snippetsReturned=false`。若该 query 未被 operator fresh exact approve，或无法作为安全 positive query，CM-1428 不得执行。
+- CM-1428 bounded positive live gate fail-closed：runtime freshness accepted 后 exactly one authenticated `search_memory` call returned `resultCount=1` and `forbiddenKeyPathCount=0`, but the sanitized receipt reported `memoryIdsReturned=true`; no retry, no query change, no second search, no raw response print/persist, no `record_memory`, no `memory_overview`, no provider/API, no raw store scan, no readiness claim.
+- CM-1429 investigation：未 rerun live search，未读取真实 memory/raw store。Source review shows bounded projection sets `access.memoryIdsReturned=false` and strips result `memoryId`; HTTP authenticated bounded search path is covered by synthetic tests. Root cause is likely evidence collector false positive: it inferred `memoryIdsReturned=true` from key path `structuredContent.access.memoryIdsReturned` instead of boolean value / actual result item fields. Added `inspectBoundedSearchEvidenceShape(...)` key-path/access-flag-only helper and tests.
 
 CM-1387 post-push A5-GAP-4 live no-write refresh 已在本地提交为 `69c1ae1312b160a008b394ce8114a3415c78e829`；CM-1388 开始时本地 `main` 比 `origin/main@8c0a9d22a60c5ce1dcb1f5ce0595b135a27a5496` ahead `1`。CM-1388 本地提交会继续移动 `HEAD`；具体 ahead/behind 以 fresh Git 输出为准。因此在这些本地证据/计划提交 push 前，fresh snapshot 应保持 `cleanSyncedHead=false`、`readinessClaimAllowed=false`、`rcReady=false`。
 

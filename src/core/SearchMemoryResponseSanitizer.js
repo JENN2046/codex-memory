@@ -102,6 +102,110 @@ function inspectStructuredContent(structuredContent, violations) {
   });
 }
 
+function collectKeyPaths(value, path = '') {
+  const paths = [];
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => {
+      const childPath = `${path}[${index}]`;
+      paths.push(childPath);
+      paths.push(...collectKeyPaths(item, childPath));
+    });
+    return paths;
+  }
+  if (!isPlainObject(value)) {
+    return paths;
+  }
+  for (const [key, child] of Object.entries(value)) {
+    const childPath = joinPath(path, key);
+    paths.push(childPath);
+    paths.push(...collectKeyPaths(child, childPath));
+  }
+  return paths;
+}
+
+function readAccessFlag(access, key) {
+  return isPlainObject(access) && access[key] === true;
+}
+
+function inspectBoundedSearchEvidenceShape(payload) {
+  const shape = inspectSearchMemoryResponseShape(payload);
+  const structuredContent = isPlainObject(payload)
+    ? payload?.result?.structuredContent
+    : null;
+  const access = isPlainObject(structuredContent?.access) ? structuredContent.access : {};
+  const results = Array.isArray(structuredContent?.results) ? structuredContent.results : [];
+  const structuredKeyPaths = isPlainObject(structuredContent)
+    ? collectKeyPaths(structuredContent, STRUCTURED_ROOT_PATH)
+    : [];
+
+  const resultItemMemoryIdPaths = [];
+  const resultItemPathPaths = [];
+  const resultItemTitlePaths = [];
+  const resultItemSnippetPaths = [];
+  const resultItemRawContentPaths = [];
+
+  results.forEach((item, index) => {
+    if (!isPlainObject(item)) return;
+    for (const key of Object.keys(item)) {
+      const keyPath = `${STRUCTURED_ROOT_PATH}.results[${index}].${key}`;
+      if (['memoryId', 'memoryIds', 'topMemoryId'].includes(key)) {
+        resultItemMemoryIdPaths.push(keyPath);
+      }
+      if (['path', 'filePath', 'sourceFile', 'sourceFiles', 'topSourceFile'].includes(key)) {
+        resultItemPathPaths.push(keyPath);
+      }
+      if (key === 'title') {
+        resultItemTitlePaths.push(keyPath);
+      }
+      if (key === 'snippet') {
+        resultItemSnippetPaths.push(keyPath);
+      }
+      if (['content', 'text', 'raw_text', 'rawText'].includes(key)) {
+        resultItemRawContentPaths.push(keyPath);
+      }
+    }
+  });
+
+  const rawContentReturned = readAccessFlag(access, 'rawContentReturned') || resultItemRawContentPaths.length > 0;
+  const pathsReturned = readAccessFlag(access, 'pathsReturned') || resultItemPathPaths.length > 0;
+  const memoryIdsReturned = readAccessFlag(access, 'memoryIdsReturned') || resultItemMemoryIdPaths.length > 0;
+  const titlesReturned = readAccessFlag(access, 'titlesReturned') || resultItemTitlePaths.length > 0;
+  const snippetsReturned = readAccessFlag(access, 'snippetsReturned') || resultItemSnippetPaths.length > 0;
+
+  const flagViolations = [];
+  if (readAccessFlag(access, 'rawContentReturned')) flagViolations.push({ path: `${STRUCTURED_ROOT_PATH}.access.rawContentReturned`, reason: 'access_flag_true' });
+  if (readAccessFlag(access, 'pathsReturned')) flagViolations.push({ path: `${STRUCTURED_ROOT_PATH}.access.pathsReturned`, reason: 'access_flag_true' });
+  if (readAccessFlag(access, 'memoryIdsReturned')) flagViolations.push({ path: `${STRUCTURED_ROOT_PATH}.access.memoryIdsReturned`, reason: 'access_flag_true' });
+  if (readAccessFlag(access, 'titlesReturned')) flagViolations.push({ path: `${STRUCTURED_ROOT_PATH}.access.titlesReturned`, reason: 'access_flag_true' });
+  if (readAccessFlag(access, 'snippetsReturned')) flagViolations.push({ path: `${STRUCTURED_ROOT_PATH}.access.snippetsReturned`, reason: 'access_flag_true' });
+
+  const resultCount = Number.isFinite(Number(structuredContent?.resultCount))
+    ? Number(structuredContent.resultCount)
+    : shape.resultCount;
+  const violations = [...shape.violations, ...flagViolations];
+
+  return {
+    accepted: violations.length === 0
+      && rawContentReturned === false
+      && pathsReturned === false
+      && memoryIdsReturned === false
+      && titlesReturned === false
+      && snippetsReturned === false,
+    resultCount,
+    resultsLength: results.length,
+    violations,
+    structuredKeyPaths,
+    wrapperContentIgnored: shape.wrapperContentIgnored,
+    flags: {
+      rawContentReturned,
+      pathsReturned,
+      memoryIdsReturned,
+      titlesReturned,
+      snippetsReturned
+    }
+  };
+}
+
 function inspectSearchMemoryResponseShape(payload) {
   const violations = [];
   if (!isPlainObject(payload)) {
@@ -131,5 +235,6 @@ function inspectSearchMemoryResponseShape(payload) {
 module.exports = {
   FORBIDDEN_RESULT_KEYS,
   SAFE_RESULT_KEYS,
+  inspectBoundedSearchEvidenceShape,
   inspectSearchMemoryResponseShape
 };
