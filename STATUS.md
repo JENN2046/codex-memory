@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1465 guarded lifecycle migrate command surface`.
-Current validation: `CMV-1571`.
+Current task: `CM-1466 real DB migration apply evidence closeout`.
+Current validation: `CMV-1572`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1465 command surface completed; future real apply remains exact-approval / Red-boundary work`.
+Current route: `CM-1466 real DB migration apply completed and validated at schema level; readiness and RC_READY remain blocked`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1465 command surface: added `package.json` script `lifecycle:sqlite:migrate` pointing to existing guarded CLI `node ./src/cli/lifecycle-sqlite-migrate.js`. Default behavior remains dry-run only; `--confirm` requires `--backup`; temp-DB tests cover guarded apply behavior. No `--confirm`, real DB apply, real backup apply, SQLite edit/delete, raw scan, provider/API, bearer token, live memory tool, readiness claim, `RC_READY` claim, remote action, or push occurred.
+CM-1466 closeout: real lifecycle SQLite migration apply completed under exact approval and is validated at schema level. Backup was moved outside the repo to `A:\codex-memory-backups\codex-memory.sqlite.cm1463-before-apply.2026-06-04.bak`, size `42725376`, SHA256 `FEE15BE4B4995F2B698750B319B77D54D967D9FD90EEAF08BC6E880C2B199C86`. Post-apply dry-run reports all lifecycle columns present, no missing columns, no would-add columns, `wouldBackfillStatus=0`, and `mutationRequired=false`. No backup was committed. No raw scan, provider/API, bearer token, live memory tool, readiness claim, `RC_READY` claim, remote action, or push occurred.
 
 更新时间：2026-06-04
 

@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1465 guarded lifecycle migrate command surface`.
-Current validation: `CMV-1571`.
+Current checkpoint: `CM-1466 real DB migration apply evidence closeout`.
+Current validation: `CMV-1572`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1466 Real DB Migration Apply Evidence Closeout
+
+Status: `REAL_DB_MIGRATION_APPLY_COMPLETED_VALIDATED`
+
+Recorded:
+
+- Moved the real DB backup out of the repository to `A:\codex-memory-backups\codex-memory.sqlite.cm1463-before-apply.2026-06-04.bak`.
+- Backup size is `42725376` bytes.
+- Backup SHA256 is `FEE15BE4B4995F2B698750B319B77D54D967D9FD90EEAF08BC6E880C2B199C86`.
+- Recorded sanitized apply result: `applyExecuted=true`, `mutated=true`, `backupCreated=true`, `backfilledStatus=0`, `migrationRequired=false`, `rollbackAvailable=true`, `readinessClaimed=false`, and `rcReadyClaimed=false`.
+- Added columns were `status_reason`, `supersedes_memory_id`, `superseded_by_memory_id`, `lifecycle_updated_at`, and `lifecycle_actor_client_id`.
+- Post-apply dry-run reports all lifecycle columns present, no missing columns, no would-add columns, `wouldBackfillStatus=0`, and `mutationRequired=false`.
+- No backup was committed.
+- No raw scan, provider/API, bearer token, live memory tool, readiness claim, `RC_READY` claim, remote action, or push occurred.
+
+Validation: `CMV-1572` closeout/docs validation.
 
 ## CM-1465 Guarded Lifecycle Migrate Command Surface
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1465",
-  "validationId": "CMV-1571",
+  "taskId": "CM-1466",
+  "validationId": "CMV-1572",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1572",
+      "scope": "CM-1466 real DB migration apply evidence closeout",
+      "status": "COMPLETED_VALIDATED_REAL_DB_MIGRATION_APPLY_CLOSEOUT"
+    },
     {
       "id": "CMV-1571",
       "scope": "CM-1465 guarded lifecycle migrate command surface",

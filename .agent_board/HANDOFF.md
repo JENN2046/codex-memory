@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1465 guarded lifecycle migrate command surface`.
-Current validation: `CMV-1571`.
-Current handoff: CM-1465 added the missing `lifecycle:sqlite:migrate` package script for the existing guarded migrate CLI; no real DB apply occurred, and future apply still requires exact approval plus backup evidence.
+Current task: `CM-1466 real DB migration apply evidence closeout`.
+Current validation: `CMV-1572`.
+Current handoff: CM-1466 recorded sanitized real lifecycle SQLite migration apply closeout evidence and moved the backup outside the repo; post dry-run reports `mutationRequired=false`, while readiness/`RC_READY` remains blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1465 added the missing `lifecycle:sqlite:migrate` package sc
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_MIGRATE_COMMAND_SURFACE_NO_REAL_DB_APPLY`.
+Current status: `REAL_DB_MIGRATION_APPLY_COMPLETED_VALIDATED`.
 
 Workspace: `A:\codex-memory`.
 
