@@ -457,12 +457,7 @@ test('P66.44 helper redacts sensitive normalized output', () => {
 });
 
 test('P66.44 helper exports required constants exactly', () => {
-  assert.deepEqual(PUBLIC_MCP_TOOLS, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(PUBLIC_MCP_TOOLS, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.ok(REQUIRED_ISOLATED_RECORD_FAMILIES.includes('readiness_reports'));
   assert.ok(REQUIRED_PROOF_SURFACES.includes('candidate_cache'));
   assert.ok(REQUIRED_RUNTIME_EVIDENCE_GROUPS.includes('machine_readable_contamination_report'));

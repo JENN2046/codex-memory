@@ -4,12 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p66-validation-aggregator-evidence-freshness-pr
 const EXPECTED_POLICY_VERSION = 'p66-validation-aggregator-evidence-freshness-proof-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p66-validation-aggregator-evidence-freshness-proof-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const REQUIRED_FRESHNESS_FIELDS = Object.freeze([
   'evidence_id',

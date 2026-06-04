@@ -8,7 +8,7 @@ const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 
 const REQUIRED_ENTRIES = ['CM-0673', 'CM-0674', 'CM-0675', 'CM-0676', 'CM-0677'];
 const REQUIRED_VALIDATIONS = ['CMV-0797', 'CMV-0798', 'CMV-0799', 'CMV-0800', 'CMV-0801'];
-const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'];
+const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 test('phase f fixture drift changelog keeps synthetic no-runtime boundary', () => {
   assert.equal(fixture.version, 'phase-f-fixture-drift-changelog-v1');

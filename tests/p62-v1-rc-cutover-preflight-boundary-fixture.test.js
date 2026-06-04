@@ -9,12 +9,7 @@ const fixturePath = path.join(
   'p62-v1-rc-cutover-preflight-boundary-v1.json'
 );
 
-const expectedPublicMcpTools = [
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-];
+const expectedPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 const expectedSourceEvidenceIds = [
   'p52_runtime_schema_version_enforcement_helper',

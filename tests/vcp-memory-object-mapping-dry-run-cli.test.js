@@ -56,12 +56,7 @@ test('JSON output parses and reports default mutated=false', () => {
   assert.equal(report.noChunkWrite, true);
   assert.equal(report.noImportExportFileGeneration, true);
   assert.equal(report.noMigration, true);
-  assert.deepEqual(report.publicTools, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(report.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('confirm apply and migrate flags are rejected', () => {

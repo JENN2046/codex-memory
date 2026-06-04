@@ -4,12 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p57-recall-isolation-runtime-proof-boundary-v1'
 const EXPECTED_POLICY_VERSION = 'p57-recall-isolation-runtime-proof-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p57-recall-isolation-runtime-proof-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const REQUIRED_SOURCE_EVIDENCE_IDS = Object.freeze([
   'p38_recall_isolation_fixture',

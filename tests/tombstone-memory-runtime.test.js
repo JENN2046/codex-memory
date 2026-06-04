@@ -503,8 +503,8 @@ test('memory_tombstone requires tombstone_reason lifecycle projection support', 
   });
 });
 
-test('memory_tombstone is internal and does not expand public MCP tools', () => {
+test('tombstone_memory is registered as an approved public MCP tool', () => {
   const toolNames = TOOL_DEFINITIONS.map(tool => tool.name).sort();
 
-  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
+  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
 });

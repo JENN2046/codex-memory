@@ -88,12 +88,7 @@ test('fixture parses and stays fixture-only', () => {
 });
 
 test('public MCP tools remain frozen', () => {
-  assert.deepEqual(fixture.publicTools, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('same-client private records remain visible', () => {

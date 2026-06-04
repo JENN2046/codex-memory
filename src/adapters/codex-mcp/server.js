@@ -117,7 +117,7 @@ class CodexMemoryMcpServer {
             name: SERVER_NAME,
             version: this.app.config.serverVersion
           },
-          instructions: 'Use record_memory for normal Codex memory writes, search_memory for Codex diary recall, memory_overview for bridge observability, and audit_memory for readonly bounded audit explanations.'
+          instructions: 'Use record_memory for normal Codex memory writes, search_memory for Codex diary recall, memory_overview for bridge observability, audit_memory for readonly bounded audit explanations, and validate_memory/tombstone_memory/supersede_memory only as dry-run bounded controlled mutation preflights unless a separate exact mutation approval exists.'
         })
       };
     }

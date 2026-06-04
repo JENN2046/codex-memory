@@ -6,8 +6,8 @@ const test = require('node:test');
 const fixturePath = path.join(__dirname, 'fixtures', 'phase-f-public-mcp-freeze-rollup-v1.json');
 const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 
-const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'];
-const FORBIDDEN_READY_CLAIMS = ['RC_READY', 'runtimeReady=true', 'public MCP expansion approved'];
+const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
+const FORBIDDEN_READY_CLAIMS = ['RC_READY', 'runtimeReady=true', 'additional public MCP expansion approved without exact approval'];
 
 test('phase f public mcp freeze rollup keeps synthetic green-lane boundary', () => {
   assert.equal(fixture.version, 'phase-f-public-mcp-freeze-rollup-v1');
@@ -22,7 +22,7 @@ test('phase f public mcp freeze rollup keeps synthetic green-lane boundary', () 
   assert.equal(fixture.v3Trial.receiptRequired, false);
 });
 
-test('phase f public mcp freeze rollup protects the exact three public tools', () => {
+test('phase f public mcp freeze rollup protects the approved seven public tools', () => {
   assert.deepEqual(fixture.publicMcpTools, REQUIRED_PUBLIC_MCP_TOOLS);
 
   const protectedNames = fixture.protectedPublicMcpTools.map((tool) => tool.name);
@@ -40,7 +40,9 @@ test('phase f public mcp freeze rollup rejects expansion and schema drift by def
 });
 
 test('phase f public mcp freeze rollup blocks common public mcp overreach cases', () => {
-  assert.ok(fixture.blockedPublicMcpChanges.includes('add validate_memory as public MCP'));
+  assert.ok(fixture.blockedPublicMcpChanges.includes('allow validate_memory confirmed mutation without exact approval'));
+  assert.ok(fixture.blockedPublicMcpChanges.includes('allow tombstone_memory confirmed mutation without exact approval'));
+  assert.ok(fixture.blockedPublicMcpChanges.includes('allow supersede_memory confirmed mutation without exact approval'));
   assert.ok(fixture.blockedPublicMcpChanges.includes('add admin_review as public MCP'));
   assert.ok(fixture.blockedPublicMcpChanges.includes('expose raw private memory content'));
   assert.ok(fixture.blockedPublicMcpChanges.includes('treat docs-only fixture evidence as runtime MCP proof'));

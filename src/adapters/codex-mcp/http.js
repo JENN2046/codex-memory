@@ -45,6 +45,7 @@ const SESSION_HARDENING_SPECS = {
 const NO_TOKEN_BLOCKED_TOOLS = new Set([
   'record_memory',
   'validate_memory',
+  'tombstone_memory',
   'update_memory',
   'forget_memory',
   'supersede_memory',

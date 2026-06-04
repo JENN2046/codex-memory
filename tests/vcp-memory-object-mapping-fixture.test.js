@@ -237,12 +237,7 @@ test('fixture parses', () => {
   assert.equal(fixture.runtimeMapperImplemented, false);
   assert.equal(fixture.trueDatabaseRead, false);
   assert.equal(fixture.trueDiaryRead, false);
-  assert.deepEqual(fixture.publicMcpTools, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('mapping preview keeps memory_id', () => {

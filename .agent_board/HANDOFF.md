@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1471 controlled mutation public registration operator decision`.
-Current validation: `CMV-1577`.
-Current handoff: CM-1471 recorded operator approval for future CM-1472 guarded registration without registering public MCP tools in CM-1471.
+Current task: `CM-1472 controlled mutation public registration guarded implementation`.
+Current validation: `CMV-1578`.
+Current handoff: CM-1472 registered the exact-approved controlled mutation public tools as dry-run bounded surfaces; confirmed mutation remains blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1471 recorded operator approval for future CM-1472 guarded r
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_OPERATOR_APPROVAL_DECISION_RECORDED_NO_REGISTRATION`.
+Current status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_DRY_RUN_GATED_NO_REAL_MUTATION`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1472 registered `validate_memory`, `tombstone_memory`, and `supersede_memory` as public MCP tools under exact approval, with public dry-run bounded projection and confirmed mutation rejection.
 - CM-1471 recorded `APPROVE_CONTROLLED_MUTATION_PUBLIC_REGISTRATION` for future CM-1472 guarded implementation.
 - CM-1470 reviewed CM-1469 and decided `GO_TO_OPERATOR_EXACT_APPROVAL_DECISION` / `NO_GO_FOR_AUTOMATIC_REGISTRATION`.
 - CM-1461 registered readonly bounded `audit_memory` in public MCP `TOOL_DEFINITIONS` and `app.callTool(...)` under exact approval.
@@ -40,18 +41,19 @@ Completed in this slice:
 - CM-1452 bridged the release gate matrix to default-safe runner exclusions without package script changes.
 - CM-1453 reinforced readonly `audit_memory` draft validation against mutation-like inputs without public MCP registration.
 - CM-1454 selected no further automatic local-safe slice.
-- Recorded CM-1450 through CM-1471 and CMV-1560 through CMV-1577 in `.agent_board`.
-- The only public MCP expansion in this slice is the exact-approved readonly bounded `audit_memory` registration. No live runtime, live memory tool call, bearer-token material use, provider/API call, true memory read/write, raw store scan, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
+- Recorded CM-1450 through CM-1472 and CMV-1560 through CMV-1578 in `.agent_board`.
+- The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1577`; CM-1471 docs/board/status validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1578`; CM-1472 source/test/docs validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
-- No runtime action, live memory tool call, provider/API call, token use, raw store scan, memoryId lookup, raw response print/persist, real durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1444.
+- Confirmed `validate_memory`, `tombstone_memory`, and `supersede_memory` mutation remains blocked without separate exact approval.
+- No raw scan, provider/API call, bearer token, config/watchdog/startup change, release/tag/deploy, remote action, readiness claim, or `RC_READY` claim is authorized.
 
 Next safe action:
 
-Next safe action is CM-1472 guarded public registration implementation under the exact CM-1471 scope. Confirmed mutation, real DB apply, live/runtime/memory/provider/bearer/raw/remote/readiness work remains forbidden unless separately and exactly approved.
+Next safe action is a guarded local commit for CM-1472 if final validation and diff review remain clean. Push requires separate explicit authorization. Confirmed mutation, real DB apply, live/runtime/memory/provider/bearer/raw/remote/readiness work remains forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 

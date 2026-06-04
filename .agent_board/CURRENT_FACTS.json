@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1471",
-  "validationId": "CMV-1577",
+  "taskId": "CM-1472",
+  "validationId": "CMV-1578",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1578",
+      "scope": "CM-1472 controlled mutation public registration guarded implementation",
+      "status": "COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_DRY_RUN_GATED_NO_REAL_MUTATION"
+    },
     {
       "id": "CMV-1577",
       "scope": "CM-1471 controlled mutation public registration operator decision",
@@ -343,7 +348,6 @@
     }
   ],
   "notValidated": [
-    "npm run gate:mainline",
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
@@ -351,7 +355,6 @@
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
     "startup/watchdog warning source change",
-    "real lifecycle SQLite migration apply against a durable memory DB",
     "raw audit or broad store scan",
     "phase h record_memory scoped-write execution",
     "committed live Git head facts"

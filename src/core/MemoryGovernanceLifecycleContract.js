@@ -1,9 +1,4 @@
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const EXPECTED_SCHEMA_VERSION = 'memory-governance-lifecycle-contract-v1';
 const EXPECTED_VERSION = 'v1';

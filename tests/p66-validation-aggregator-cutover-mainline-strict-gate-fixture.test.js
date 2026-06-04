@@ -131,12 +131,7 @@ test('P66.54 binds back to P66.53 without granting authority', () => {
 });
 
 test('P66.54 preserves public MCP freeze and internal validate_memory status', () => {
-  assert.deepEqual(fixture.publicTools, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.equal(fixture.publicToolsFrozen, true);
   assert.deepEqual(fixture.internalOnlyTools, ['validate_memory']);
 });

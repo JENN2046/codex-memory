@@ -34,12 +34,7 @@ function buildRebaselineSummary(overrides = {}) {
       'two_record_shadow_seam_not_implemented',
       'internal_supersede_service_not_implemented'
     ],
-    publicTools: [
-      'record_memory',
-      'search_memory',
-      'memory_overview',
-      'audit_memory'
-    ],
+    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
     deniedActions: REQUIRED_DENIED_ACTIONS,
     evidenceRefs: [
       '5923880 feat: add supersede shadow seam',
@@ -64,12 +59,7 @@ function buildInput(overrides = {}) {
       'liveGovernanceProof_not_committed_or_not_proven'
     ],
     rebaselineSummary: buildRebaselineSummary(),
-    publicTools: [
-      'record_memory',
-      'search_memory',
-      'memory_overview',
-      'audit_memory'
-    ],
+    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
     deniedActions: REQUIRED_DENIED_ACTIONS,
     candidateRefs: [
       'src/core/MemorySupersedeRuntimePrepHelper.js',

@@ -145,7 +145,7 @@ function acceptedIntegrationPreflightSummary(privateReadSummary = acceptedPrivat
       failureCriteriaDocumented: true,
       readinessNonClaimDocumented: true
     },
-    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'],
+    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
     scopeAcceptance: privateReadSummary,
     clients: [
       clientFixture('codex'),
@@ -292,7 +292,7 @@ function acceptedExecutionAuthoritySummary() {
         client_id: 'codex'
       }
     },
-    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory']
+    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']
   });
 }
 
@@ -472,7 +472,7 @@ test('CM-1408 fails closed when public MCP freeze evidence drifts', () => {
   const executionContextAuthorityConsistency = {
     ...acceptedExecutionAuthoritySummary(),
     publicTools: {
-      expected: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'],
+      expected: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
       observed: ['record_memory', 'search_memory', 'memory_overview', 'debug_scope'],
       frozen: false
     }

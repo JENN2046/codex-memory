@@ -60,12 +60,7 @@ test('P53 inventory does not claim full aggregator implementation, runtime readi
   assert.equal(fixture.finalRcMatrixReady, false);
   assert.equal(fixture.rcReady, false);
   assert.equal(fixture.publicToolsFrozen, true);
-  assert.deepEqual(fixture.publicTools, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('P53 source classes are exact and non-authoritative for readiness', () => {

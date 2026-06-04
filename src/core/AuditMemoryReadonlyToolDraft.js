@@ -12,7 +12,10 @@ const PUBLIC_MCP_TOOL_NAMES = Object.freeze([
   'record_memory',
   'search_memory',
   'memory_overview',
-  'audit_memory'
+  'audit_memory',
+  'validate_memory',
+  'tombstone_memory',
+  'supersede_memory'
 ]);
 
 const ALLOWED_AUDIT_FAMILIES = Object.freeze([

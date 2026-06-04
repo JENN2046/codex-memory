@@ -11,12 +11,7 @@ const fixturePath = path.join(__dirname, 'fixtures', 'memory-supersede-pair-outc
 const fixtureText = fs.readFileSync(fixturePath, 'utf8');
 const fixture = JSON.parse(fixtureText);
 
-const PUBLIC_MCP_TOOLS = [
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-];
+const PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 test('CM-0879 pair-outcome fixture locks top-level blocked state', () => {
   assert.equal(fixture.schemaVersion, 'memory-supersede-pair-outcome-v1');

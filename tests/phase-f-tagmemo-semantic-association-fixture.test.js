@@ -25,7 +25,7 @@ const REQUIRED_SCENARIOS = [
 
 test('phase f tagmemo semantic association fixture keeps a no-runtime boundary', () => {
   assert.equal(fixture.version, 'phase-f-tagmemo-semantic-association-v1');
-  assert.deepEqual(fixture.publicMcpToolsFrozen, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory']);
+  assert.deepEqual(fixture.publicMcpToolsFrozen, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.equal(fixture.runtimeExecution, false);
   assert.equal(fixture.realMemoryStoreRead, false);
   assert.equal(fixture.providerCall, false);

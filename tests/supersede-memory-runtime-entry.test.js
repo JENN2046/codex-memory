@@ -239,7 +239,7 @@ test('internal supersede runtime entry applies pair mutation when enabled and ap
   });
 });
 
-test('internal supersede runtime entry derives actor_client_id from execution context and keeps public MCP frozen', async () => {
+test('internal supersede runtime entry derives actor_client_id from execution context and keeps public MCP registration bounded', async () => {
   await withApp({
     internalSupersedeRuntimeEntryEnabled: true
   }, async ({ app }) => {
@@ -259,8 +259,12 @@ test('internal supersede runtime entry derives actor_client_id from execution co
     assert.equal(result.auditPlanPreview.pendingEvent.actor_client_id, 'codex');
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']
+      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
+    const publicResult = await app.callTool('supersede_memory', runtimeEntryPayload({ dry_run: false, confirm: true }), approvedRequestContext());
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.mutated, false);
+    assert.match(publicResult.reason, /separate exact mutation approval/);
     await assert.rejects(
       () => app.callTool('memory_supersede', {}, approvedRequestContext()),
       /Unknown tool: memory_supersede/

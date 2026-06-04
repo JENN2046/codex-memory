@@ -285,12 +285,7 @@ test('P66.17 helper redacts or rejects sensitive normalized output and summaries
 });
 
 test('P66.17 helper exports required constants exactly', () => {
-  assert.deepEqual(PUBLIC_MCP_TOOLS, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(PUBLIC_MCP_TOOLS, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.deepEqual(REQUIRED_SUMMARY_FIELDS, [
     'status',
     'decision',

@@ -4,12 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p62-a5-runtime-authorization-precondition-matri
 const EXPECTED_POLICY_VERSION = 'p62-authorization-precondition-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p62-authorization-precondition-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const REQUIRED_PRE_AUTHORIZATION_EVIDENCE_IDS = Object.freeze([
   'runtime_schema_version_enforcement_proof',

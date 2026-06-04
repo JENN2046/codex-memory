@@ -219,7 +219,10 @@
         "record_memory",
         "search_memory",
         "memory_overview",
-        "audit_memory"
+        "audit_memory",
+        "validate_memory",
+        "tombstone_memory",
+        "supersede_memory"
       ]
     },
     "safety": {

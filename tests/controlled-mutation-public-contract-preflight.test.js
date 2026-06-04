@@ -42,18 +42,18 @@ async function withApp(handler) {
   }
 }
 
-test('CM1468 controlled mutation preflight reports draft contract without public registration', () => {
+test('CM1468 controlled mutation preflight tracks CM1472 public registration', () => {
   const report = buildControlledMutationPublicContractPreflightReport();
 
   assert.equal(report.status, STATUS_ACCEPTED);
   assert.equal(report.acceptedForPlanning, true);
   assert.deepEqual(sorted(report.candidateToolNames), sorted(['validate_memory', 'tombstone_memory', 'supersede_memory']));
-  assert.equal(report.draftOnly, true);
-  assert.equal(report.registeredPublicly, false);
-  assert.equal(report.publicMcpExpanded, false);
+  assert.equal(report.draftOnly, false);
+  assert.equal(report.registeredPublicly, true);
+  assert.equal(report.publicMcpExpanded, true);
   assert.equal(report.publicToolsFrozen, true);
   assert.deepEqual(sorted(report.publicTools), sorted(PUBLIC_TOOL_NAMES_FROZEN));
-  assert.equal(report.approvalRequiredBeforeRegistration, true);
+  assert.equal(report.approvalRequiredBeforeRegistration, false);
   assert.deepEqual(report.publicExposureRequirements, PUBLIC_EXPOSURE_REQUIREMENTS);
   assert.equal(report.lowDisclosure, true);
   assert.equal(report.selectedProjection, true);
@@ -64,7 +64,7 @@ test('CM1468 controlled mutation preflight reports draft contract without public
     assert.equal(report.disclosure[flag], false, `${flag} should be false`);
   }
   for (const flag of SIDE_EFFECT_FLAGS) {
-    assert.equal(report.sideEffects[flag], false, `${flag} should be false`);
+    assert.equal(report.sideEffects[flag], flag === 'publicMcpExpanded', `${flag} should reflect only approved registration`);
   }
 });
 
@@ -73,7 +73,7 @@ test('CM1468 candidate schemas are bounded and reject additional properties', ()
 
   for (const tool of CANDIDATE_TOOL_DEFINITIONS) {
     assert.equal(CANDIDATE_TOOL_NAMES.includes(tool.name), true);
-    assert.match(tool.description, /Not registered as a public MCP tool in CM-1468/);
+    assert.match(tool.description, /registered in CM-1472/);
     assert.equal(tool.inputSchema.type, 'object');
     assert.equal(tool.inputSchema.additionalProperties, false);
     assert.equal(tool.inputSchema.properties.confirm.type, 'boolean');
@@ -97,13 +97,13 @@ test('CM1468 candidate schemas are bounded and reject additional properties', ()
   assert.equal(supersede.inputSchema.required.includes('superseded_by_link'), true);
 });
 
-test('CM1468 public MCP tools remain frozen and exclude controlled mutation candidates', async () => {
+test('CM1472 public MCP tools freeze includes controlled mutation candidates', async () => {
   const publicTools = TOOL_DEFINITIONS.map(tool => tool.name);
 
   assert.equal(publicToolsRemainFrozen(publicTools), true);
   assert.deepEqual(sorted(publicTools), sorted(PUBLIC_TOOL_NAMES_FROZEN));
   for (const candidate of CANDIDATE_TOOL_NAMES) {
-    assert.equal(publicTools.includes(candidate), false, `${candidate} must not be public`);
+    assert.equal(publicTools.includes(candidate), true, `${candidate} must be public after exact approval`);
   }
 
   await withApp(async ({ app }) => {
@@ -118,18 +118,18 @@ test('CM1468 public MCP tools remain frozen and exclude controlled mutation cand
     const toolNames = list.response.result.tools.map(tool => tool.name);
     assert.deepEqual(sorted(toolNames), sorted(PUBLIC_TOOL_NAMES_FROZEN));
     for (const candidate of CANDIDATE_TOOL_NAMES) {
-      assert.equal(toolNames.includes(candidate), false, `${candidate} must not appear in tools/list`);
+      assert.equal(toolNames.includes(candidate), true, `${candidate} must appear in tools/list`);
     }
   });
 });
 
-test('CM1468 app.callTool rejects controlled mutation candidates as unknown tools', async () => {
+test('CM1472 app.callTool accepts controlled mutation candidates as dry-run bounded public tools', async () => {
   await withApp(async ({ app }) => {
     for (const candidate of CANDIDATE_TOOL_NAMES) {
-      await assert.rejects(
-        () => app.callTool(candidate, {}),
-        new RegExp(`Unknown tool: ${candidate}`)
-      );
+      const result = await app.callTool(candidate, {});
+      assert.equal(result.decision, 'rejected');
+      assert.equal(result.mutated, false);
+      assert.equal(result.access.mode, 'controlled_mutation_public_bounded');
     }
   });
 });

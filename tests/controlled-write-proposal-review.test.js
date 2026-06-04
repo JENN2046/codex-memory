@@ -40,12 +40,7 @@ test('proposal review keeps public MCP tools frozen', () => {
 
   assert.equal(fixture.noMcpPublicToolExpansion, true);
   assert.equal(fixture.publicToolsFrozen, true);
-  assert.deepEqual(fixture.publicTools, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
   for (const decision of fixture.candidateDecisions) {
     assert.equal(decision.approvedAsPublicMcpTool, false, `${decision.toolCandidate} was approved too early`);

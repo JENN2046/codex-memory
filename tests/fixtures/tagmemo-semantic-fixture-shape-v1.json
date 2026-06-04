@@ -13,11 +13,14 @@
     "durableMemoryTouched": false,
     "runtimeTuning": false,
     "publicMcpTools": [
-      "record_memory",
-      "search_memory",
-      "memory_overview",
-      "audit_memory"
-    ],
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
     "validateMemoryPublicTool": false
   },
   "engineConfig": {

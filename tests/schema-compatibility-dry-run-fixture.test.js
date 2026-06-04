@@ -5,12 +5,7 @@ const path = require('node:path');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'schema-compatibility-dry-run-v1.json');
 
-const PUBLIC_MCP_TOOLS = [
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-];
+const PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 const REQUIRED_REPORT_FIELDS = [
   'schema',
@@ -144,7 +139,7 @@ test('safety flags stay dry-run and non-mutating', () => {
   assert.equal(safety.rawWorkspaceIdsExposed, false);
 });
 
-test('public MCP tools remain frozen to the three-tool contract', () => {
+test('public MCP tools remain frozen to the approved public tool contract', () => {
   const report = loadFixture().sampleReport;
 
   assert.equal(report.publicMcpTools.frozen, true);

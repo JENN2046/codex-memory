@@ -409,6 +409,96 @@ function buildInternalSupersedeRuntimePayload(args = {}, requestContext = {}, { 
   });
 }
 
+function buildPublicControlledMutationAccess() {
+  return {
+    mode: 'controlled_mutation_public_bounded',
+    selectedProjection: true,
+    selectedProjectionVersion: 1,
+    rawMemoryReturned: false,
+    rawAuditReturned: false,
+    filesystemPathsReturned: false,
+    tokenMaterialReturned: false,
+    providerPayloadReturned: false,
+    memoryContentReturned: false,
+    memoryIdsReturned: false,
+    titlesReturned: false,
+    snippetsReturned: false
+  };
+}
+
+function buildPublicControlledMutationPolicy() {
+  return {
+    lifecyclePolicyExplained: true,
+    scopePolicyExplained: true,
+    redactionApplied: true,
+    lowDisclosureProjection: true,
+    dryRunOnlyPublicPath: true,
+    confirmedMutationRequiresSeparateApproval: true,
+    rawStoreScanned: false,
+    providerCalled: false,
+    bearerTokenUsed: false,
+    durableMutationPerformed: false,
+    readinessClaimed: false,
+    rcReadyClaimed: false
+  };
+}
+
+function buildPublicControlledMutationConfirmGate(args = {}) {
+  return {
+    dryRunRequested: args.dry_run !== false,
+    confirmRequested: args.confirm === true,
+    confirmAccepted: false,
+    confirmedMutationAllowed: false,
+    mutationApprovalRequired: true
+  };
+}
+
+function projectPublicControlledMutationResult(toolName, result = {}, args = {}) {
+  return {
+    accepted: result.decision !== 'rejected',
+    decision: result.decision || 'rejected',
+    tool: toolName,
+    dryRun: true,
+    mutated: false,
+    fromStatus: result.fromStatus || result.oldFromStatus || null,
+    toStatus: result.toStatus || result.oldToStatus || null,
+    newFromStatus: result.newFromStatus || null,
+    newToStatus: result.newToStatus || null,
+    reasonCode: result.decision === 'rejected' ? 'rejected' : 'dry_run_projection',
+    reason: result.reason || null,
+    access: buildPublicControlledMutationAccess(),
+    policy: buildPublicControlledMutationPolicy(),
+    confirmGate: buildPublicControlledMutationConfirmGate(args),
+    approvalRequired: true,
+    readinessClaimed: false,
+    rcReadyClaimed: false
+  };
+}
+
+function buildPublicControlledMutationRejectedResult(toolName, args = {}, reason) {
+  return projectPublicControlledMutationResult(toolName, {
+    decision: 'rejected',
+    reason
+  }, args);
+}
+
+async function executePublicControlledMutationTool(toolName, args = {}, serviceCall) {
+  if (args.dry_run === false || args.confirm === true) {
+    return buildPublicControlledMutationRejectedResult(
+      toolName,
+      args,
+      'public confirmed controlled mutation requires separate exact mutation approval; this public MCP path is dry-run bounded only.'
+    );
+  }
+
+  const result = await serviceCall({
+    ...args,
+    dry_run: true,
+    confirm: false
+  });
+  return projectPublicControlledMutationResult(toolName, result, args);
+}
+
 async function getDefaultWritePreflightCandidates(shadowStore, request = {}) {
   return shadowStore.getWritePreflightCandidates({
     target: request?.proposedWrite?.target,
@@ -943,6 +1033,30 @@ function createCodexMemoryApplication(overrides = {}) {
 
       if (toolName === 'audit_memory') {
         return auditMemoryReadonlyService.run(args);
+      }
+
+      if (toolName === 'validate_memory') {
+        return executePublicControlledMutationTool(
+          toolName,
+          args,
+          payload => validateMemoryService.validate(payload)
+        );
+      }
+
+      if (toolName === 'tombstone_memory') {
+        return executePublicControlledMutationTool(
+          toolName,
+          args,
+          payload => tombstoneMemoryService.tombstone(payload)
+        );
+      }
+
+      if (toolName === 'supersede_memory') {
+        return executePublicControlledMutationTool(
+          toolName,
+          args,
+          payload => supersedeMemoryService.supersede(payload)
+        );
       }
 
       throw new Error(`Unknown tool: ${toolName}`);

@@ -16,6 +16,10 @@ const CANDIDATE_CACHE_FILE_NAME = 'candidate-cache.json';
 const CLIENT_ID_VALUES = ['codex', 'claude', 'omc', 'manual'];
 const VISIBILITY_VALUES = ['private', 'workspace', 'project', 'shared'];
 
+function boundedString(maxLength = 200) {
+  return { type: 'string', minLength: 1, maxLength };
+}
+
 const TOOL_DEFINITIONS = [
   {
     name: 'record_memory',
@@ -120,6 +124,76 @@ const TOOL_DEFINITIONS = [
         },
         include_raw: { type: 'boolean', enum: [false] }
       }
+    }
+  },
+  {
+    name: 'validate_memory',
+    title: 'Validate Memory',
+    description: 'Controlled mutation public MCP tool registered under exact approval. Public calls are dry-run bounded by default; confirmed durable mutation requires a separate exact mutation approval and is rejected on this public path.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        memory_id: boundedString(200),
+        reason: boundedString(1000),
+        evidence: boundedString(4000),
+        actor_client_id: boundedString(200),
+        request_source: boundedString(200),
+        dry_run: { type: 'boolean' },
+        confirm: { type: 'boolean' }
+      },
+      required: ['memory_id', 'reason', 'evidence', 'actor_client_id', 'request_source']
+    }
+  },
+  {
+    name: 'tombstone_memory',
+    title: 'Tombstone Memory',
+    description: 'Controlled mutation public MCP tool registered under exact approval. Public calls are dry-run bounded by default; confirmed durable tombstone mutation requires a separate exact mutation approval and is rejected on this public path.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        memory_id: boundedString(200),
+        reason: boundedString(1000),
+        evidence: boundedString(4000),
+        tombstone_reason: boundedString(1000),
+        actor_client_id: boundedString(200),
+        request_source: boundedString(200),
+        dry_run: { type: 'boolean' },
+        confirm: { type: 'boolean' }
+      },
+      required: ['memory_id', 'reason', 'evidence', 'tombstone_reason', 'actor_client_id', 'request_source']
+    }
+  },
+  {
+    name: 'supersede_memory',
+    title: 'Supersede Memory',
+    description: 'Controlled mutation public MCP tool registered under exact approval. Public calls are dry-run bounded by default; confirmed durable supersede mutation requires a separate exact mutation approval and is rejected on this public path.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        old_memory_id: boundedString(200),
+        new_memory_id: boundedString(200),
+        reason: boundedString(1000),
+        evidence: boundedString(4000),
+        supersedes_link: boundedString(200),
+        superseded_by_link: boundedString(200),
+        actor_client_id: boundedString(200),
+        request_source: boundedString(200),
+        dry_run: { type: 'boolean' },
+        confirm: { type: 'boolean' }
+      },
+      required: [
+        'old_memory_id',
+        'new_memory_id',
+        'reason',
+        'evidence',
+        'supersedes_link',
+        'superseded_by_link',
+        'actor_client_id',
+        'request_source'
+      ]
     }
   }
 ];

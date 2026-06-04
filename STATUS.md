@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1471 controlled mutation public registration operator decision`.
-Current validation: `CMV-1577`.
+Current task: `CM-1472 controlled mutation public registration guarded implementation`.
+Current validation: `CMV-1578`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1471 operator approval recorded; next safe action is CM-1472 guarded registration implementation under exact scope`.
+Current route: `CM-1472 registered bounded dry-run public controlled mutation tools; confirmed mutation and readiness remain blocked`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1471 controlled mutation public registration operator decision: recorded `APPROVE_CONTROLLED_MUTATION_PUBLIC_REGISTRATION` for future CM-1472 guarded implementation of exactly `validate_memory`, `tombstone_memory`, and `supersede_memory`. No public MCP registration occurred in CM-1471; public tools remain `record_memory / search_memory / memory_overview / audit_memory`, and mutation candidates remain unregistered. No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+CM-1472 controlled mutation public registration guarded implementation: registered exactly `validate_memory / tombstone_memory / supersede_memory` as public MCP tools under the CM-1471 exact approval. Public tools are now `record_memory / search_memory / memory_overview / audit_memory / validate_memory / tombstone_memory / supersede_memory`. Public controlled mutation calls are bounded dry-run projections; `dry_run=false` or `confirm=true` is rejected on the public path and requires separate exact mutation approval. No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
 
 更新时间：2026-06-04
 

@@ -208,6 +208,6 @@ test('MCP public tools remain record_memory, search_memory, and memory_overview'
     }, requestContext);
 
     const toolNames = response.response.result.tools.map(tool => tool.name).sort();
-    assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
+    assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
   });
 });

@@ -348,12 +348,7 @@ test('P66.33 helper redacts or rejects sensitive normalized output and metadata'
 });
 
 test('P66.33 helper exports required constants exactly', () => {
-  assert.deepEqual(PUBLIC_MCP_TOOLS, [
-    'record_memory',
-    'search_memory',
-    'memory_overview',
-    'audit_memory'
-  ]);
+  assert.deepEqual(PUBLIC_MCP_TOOLS, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.deepEqual(REQUIRED_READINESS_CLAIMS, [
     'validation-aggregator-full-implementation-ready',
     'runtime-ready',

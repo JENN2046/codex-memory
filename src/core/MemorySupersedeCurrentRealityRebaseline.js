@@ -2,12 +2,7 @@ const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
 const EXPECTED_SCHEMA_VERSION = 'memory-supersede-current-reality-rebaseline-v1';
 const EXPECTED_VERSION = 'v1';
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 const IMPLEMENTED_SURFACES = Object.freeze([
   'twoRecordShadowSeam',
   'internalSupersedeMutationService',

@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1471 controlled mutation public registration operator decision`.
-Current validation: `CMV-1577`.
+Current checkpoint: `CM-1472 controlled mutation public registration guarded implementation`.
+Current validation: `CMV-1578`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1472 Controlled Mutation Public Registration Guarded Implementation
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_DRY_RUN_GATED_NO_REAL_MUTATION`
+
+Recorded:
+
+- Registered exactly `validate_memory`, `tombstone_memory`, and `supersede_memory` as public MCP tools under the CM-1471 exact approval.
+- Public tools are now `record_memory`, `search_memory`, `memory_overview`, `audit_memory`, `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- Public controlled mutation dispatch uses existing internal services only through a low-disclosure dry-run projection.
+- Public `dry_run=false` and `confirm=true` attempts are rejected before mutation and require separate exact mutation approval.
+- Added `docs/CM1472_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_GUARDED_IMPLEMENTATION.md`.
+- No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1578` source/test/docs validation.
 
 ## CM-1471 Controlled Mutation Public Registration Operator Decision
 

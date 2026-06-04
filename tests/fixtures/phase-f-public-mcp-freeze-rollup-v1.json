@@ -10,7 +10,10 @@
     "record_memory",
     "search_memory",
     "memory_overview",
-    "audit_memory"
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
   ],
   "v3Trial": {
     "taskId": "CM-0673",
@@ -60,10 +63,33 @@
       "expansionAllowed": false,
       "schemaChangeAllowed": false,
       "requiredBoundary": "exact_readonly_bounded_audit_explanation_only_no_raw_or_mutation"
+    },
+    {
+      "name": "validate_memory",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "dry_run_bounded_validate_preflight_only_confirm_requires_exact_approval"
+    },
+    {
+      "name": "tombstone_memory",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "dry_run_bounded_tombstone_preflight_only_confirm_requires_exact_approval"
+    },
+    {
+      "name": "supersede_memory",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "dry_run_bounded_supersede_preflight_only_confirm_requires_exact_approval"
     }
   ],
   "blockedPublicMcpChanges": [
-    "add validate_memory as public MCP",
+    "allow validate_memory confirmed mutation without exact approval",
+    "allow tombstone_memory confirmed mutation without exact approval",
+    "allow supersede_memory confirmed mutation without exact approval",
     "add admin_review as public MCP",
     "rename record_memory",
     "remove search_memory",
@@ -85,8 +111,10 @@
     "cutover readiness"
   ],
   "forbiddenDefaults": [
-    "public MCP expansion approved",
-    "validate_memory public tool added",
+    "additional public MCP expansion approved without exact approval",
+    "validate_memory confirmed mutation allowed without exact approval",
+    "tombstone_memory confirmed mutation allowed without exact approval",
+    "supersede_memory confirmed mutation allowed without exact approval",
     "runtime tool list proven",
     "RC_READY",
     "runtimeReady=true",

@@ -14,12 +14,7 @@ const CLIENT_INTEGRATION_ACCEPTANCE_PREFLIGHT_VERSION =
 
 const EXPECTED_MCP_URL = 'http://127.0.0.1:7605/mcp/codex-memory';
 const EXPECTED_HEALTH_URL = 'http://127.0.0.1:7605/health';
-const EXPECTED_PUBLIC_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const EXPECTED_PUBLIC_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 const REQUIRED_CLIENTS = Object.freeze(['codex', 'claude']);
 
 const SENSITIVE_VALUE_PATTERNS = Object.freeze([

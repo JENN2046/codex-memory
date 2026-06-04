@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1471 controlled mutation public registration operator decision` |
-| Current validation | `CMV-1577` |
-| Current route | CM-1471 operator approval recorded; next safe action is CM-1472 guarded registration implementation under exact scope |
+| Current task | `CM-1472 controlled mutation public registration guarded implementation` |
+| Current validation | `CMV-1578` |
+| Current route | CM-1472 registered bounded dry-run public controlled mutation tools; confirmed mutation and readiness remain blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1472` registers exactly `validate_memory`, `tombstone_memory`, and `supersede_memory` as public MCP tools under the CM-1471 exact approval. `TOOL_DEFINITIONS`, MCP `tools/list`, and `app.callTool(...)` now expose these tools alongside `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`. Public controlled mutation dispatch is wrapped in a low-disclosure dry-run gate: `dry_run=false` or `confirm=true` is rejected on the public path and requires separate exact mutation approval. Targeted registration/MCP/runtime tests passed; `npm test` passed `3046/3046`; `npm run test:hardening` passed; `npm run gate:mainline:strict` passed health, contract `36/36`, test `3046/3046`, compare `43/43`, and rollback `43/43`. CM-1472 did not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 `CM-1471` added `docs/CM1471_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_OPERATOR_DECISION.md` as a docs-only operator decision record. Decision is `APPROVE_CONTROLLED_MUTATION_PUBLIC_REGISTRATION`, scoped to future CM-1472 guarded registration of exactly `validate_memory`, `tombstone_memory`, and `supersede_memory` against baseline `c2e6e1bc84af29674f41440f7d898b37dee16fa8`. CM-1471 did not register public MCP tools, execute real mutation, raw scan, call provider/API, use bearer token, claim readiness, claim `RC_READY`, release/tag/deploy, perform remote action, or push.
 

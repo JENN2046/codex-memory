@@ -205,7 +205,7 @@ test('internal tombstone runtime entry applies active record when enabled and ap
   });
 });
 
-test('internal tombstone runtime entry derives actor_client_id from execution context and keeps public MCP frozen', async () => {
+test('internal tombstone runtime entry derives actor_client_id from execution context and keeps public MCP registration bounded', async () => {
   await withApp({
     internalTombstoneRuntimeEntryEnabled: true
   }, async ({ app }) => {
@@ -224,8 +224,12 @@ test('internal tombstone runtime entry derives actor_client_id from execution co
     assert.equal(result.auditEventPreview.actor_client_id, 'codex');
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']
+      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
+    const publicResult = await app.callTool('tombstone_memory', runtimeEntryPayload({ dry_run: false, confirm: true }), approvedRequestContext());
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.mutated, false);
+    assert.match(publicResult.reason, /separate exact mutation approval/);
     await assert.rejects(
       () => app.callTool('memory_tombstone', {}, approvedRequestContext()),
       /Unknown tool: memory_tombstone/

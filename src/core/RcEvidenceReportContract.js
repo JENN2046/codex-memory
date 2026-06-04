@@ -4,12 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p61-mainline-strict-gate-rc-evidence-report-bou
 const EXPECTED_POLICY_VERSION = 'p61-rc-evidence-report-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p61-rc-evidence-report-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_fixture',

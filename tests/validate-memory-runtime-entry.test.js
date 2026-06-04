@@ -201,7 +201,7 @@ test('internal validate runtime entry applies proposal record when enabled and a
   });
 });
 
-test('internal validate runtime entry derives actor_client_id from execution context and keeps public MCP frozen', async () => {
+test('internal validate runtime entry derives actor_client_id from execution context and keeps public MCP registration bounded', async () => {
   await withApp({
     internalValidateRuntimeEntryEnabled: true
   }, async ({ app }) => {
@@ -220,11 +220,11 @@ test('internal validate runtime entry derives actor_client_id from execution con
     assert.equal(result.auditEventPreview.actor_client_id, 'codex');
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']
+      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
-    await assert.rejects(
-      () => app.callTool('validate_memory', {}, approvedRequestContext()),
-      /Unknown tool: validate_memory/
-    );
+    const publicResult = await app.callTool('validate_memory', runtimeEntryPayload({ dry_run: false, confirm: true }), approvedRequestContext());
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.mutated, false);
+    assert.match(publicResult.reason, /separate exact mutation approval/);
   });
 });

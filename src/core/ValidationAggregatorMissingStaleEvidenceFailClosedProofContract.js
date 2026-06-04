@@ -4,12 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p66-validation-aggregator-missing-stale-evidenc
 const EXPECTED_POLICY_VERSION = 'p66-validation-aggregator-missing-stale-evidence-fail-closed-proof-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p66-validation-aggregator-missing-stale-evidence-fail-closed-proof-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const REQUIRED_EVIDENCE_GROUPS = Object.freeze([
   'source_registry_exact_set_proof',

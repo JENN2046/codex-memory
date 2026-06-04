@@ -41,12 +41,7 @@ const expectedFailClosedStates = [
   'fixture_only'
 ];
 
-const expectedPublicMcpTools = [
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-];
+const expectedPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 function readFixtureText() {
   return fs.readFileSync(fixturePath, 'utf8');

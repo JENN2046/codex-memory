@@ -3,12 +3,7 @@ const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const EXPECTED_SCHEMA_VERSION = 'p45-final-rc-matrix-evaluator-v1';
 const EXPECTED_MODE = 'fixture-only-explicit-input';
 
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_fixture',

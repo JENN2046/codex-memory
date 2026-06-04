@@ -2,12 +2,7 @@ const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./Secre
 const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const { ToolArgumentValidationError, validateArgumentsAgainstSchema } = require('./ToolArgumentValidator');
 
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const GOVERNANCE_FAMILIES = Object.freeze([
   'memory_exclude',

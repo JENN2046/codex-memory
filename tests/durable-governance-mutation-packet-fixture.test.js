@@ -7,12 +7,7 @@ const fixturePath = path.join(__dirname, 'fixtures', 'durable-governance-mutatio
 const fixtureText = fs.readFileSync(fixturePath, 'utf8');
 const fixture = JSON.parse(fixtureText);
 
-const PUBLIC_MCP_TOOLS = [
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-];
+const PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 const REQUIRED_MUTATION_PACKET_IDS = [
   'memory_validate',

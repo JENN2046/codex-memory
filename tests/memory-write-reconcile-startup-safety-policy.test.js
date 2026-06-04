@@ -235,7 +235,7 @@ test('CM-1084 startup safety review accepts temp-local app initialization only w
     assert.equal(report.readinessClaimed, false);
     assert.equal(report.reliabilityClaimed, false);
     assert.equal(report.applyGate.startupEnablementExecuted, false);
-    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
     await assert.rejects(
       () => app.callTool('memory_write_reconcile_worker_startup', {}),
       /Unknown tool: memory_write_reconcile_worker_startup/
@@ -428,7 +428,7 @@ test('CM-1166 startup recovery preflight observes pending manifest without enabl
     assert.equal(report.boundedPlan.dryRunFirstRequired, true);
     assert.equal(report.boundedPlan.manualApprovalRequired, true);
     assert.equal(report.boundedPlan.startupEnablementRequiresA5Approval, true);
-    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
     await assert.rejects(
       () => app.callTool('memory_write_startup_recovery', {}),
       /Unknown tool: memory_write_startup_recovery/

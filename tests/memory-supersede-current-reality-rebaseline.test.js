@@ -31,12 +31,7 @@ function buildInput(overrides = {}) {
       'supersede_runtime_prep_not_implemented',
       'public_mcp_governance_expansion_not_approved'
     ],
-    publicTools: [
-      'record_memory',
-      'search_memory',
-      'memory_overview',
-      'audit_memory'
-    ],
+    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
     deniedActions: [
       'public_mcp_expansion',
       'true_record_memory',

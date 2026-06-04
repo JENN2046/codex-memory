@@ -4,12 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p55-evidence-to-runtime-enforcement-trace-v1';
 const EXPECTED_POLICY_VERSION = 'p55-evidence-to-runtime-enforcement-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p55-evidence-to-runtime-enforcement-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const REQUIRED_SOURCE_EVIDENCE_IDS = Object.freeze([
   'p52_schema_version_boundary_contract',

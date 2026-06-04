@@ -45,12 +45,7 @@ function buildInput(patch = {}) {
     decision: 'NOT_READY_BLOCKED',
     expectedTargetCommit: TARGET_COMMIT,
     validationAggregatorFullImplementation: false,
-    publicMcpTools: [
-      'record_memory',
-      'search_memory',
-      'memory_overview',
-      'audit_memory'
-    ],
+    publicMcpTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
     baselineBindings: [
       buildBinding()
     ],

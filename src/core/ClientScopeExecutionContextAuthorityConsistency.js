@@ -11,12 +11,7 @@ const {
 const CLIENT_SCOPE_EXECUTION_CONTEXT_AUTHORITY_CONSISTENCY_VERSION =
   'phase-h-client-scope-execution-context-authority-consistency-v1';
 
-const EXPECTED_PUBLIC_TOOLS = Object.freeze([
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-]);
+const EXPECTED_PUBLIC_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const AUTHORITY_FIELDS = Object.freeze([
   { key: 'projectId', publicValue: true },

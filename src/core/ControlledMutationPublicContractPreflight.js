@@ -4,13 +4,16 @@ const { TOOL_DEFINITIONS } = require('./constants');
 
 const TASK_ID = 'CM-1468';
 const SCHEMA_VERSION = 'controlled-mutation-public-contract-preflight-v1';
-const STATUS_ACCEPTED = 'CONTROLLED_MUTATION_PUBLIC_CONTRACT_PREFLIGHT_ACCEPTED_NOT_REGISTERED';
+const STATUS_ACCEPTED = 'CONTROLLED_MUTATION_PUBLIC_CONTRACT_REGISTERED_CM1472';
 
 const PUBLIC_TOOL_NAMES_FROZEN = Object.freeze([
   'record_memory',
   'search_memory',
   'memory_overview',
-  'audit_memory'
+  'audit_memory',
+  'validate_memory',
+  'tombstone_memory',
+  'supersede_memory'
 ]);
 
 const CANDIDATE_TOOL_NAMES = Object.freeze([
@@ -155,19 +158,19 @@ const CANDIDATE_TOOL_DEFINITIONS = Object.freeze([
   {
     name: 'validate_memory',
     title: 'Validate Memory',
-    description: 'Future controlled mutation contract draft for validating proposal/stale memory into active state. Not registered as a public MCP tool in CM-1468.',
+    description: 'Controlled mutation public MCP tool registered in CM-1472 for dry-run bounded validation preflights. Confirmed durable mutation requires separate exact mutation approval.',
     inputSchema: buildValidateMemorySchema()
   },
   {
     name: 'tombstone_memory',
     title: 'Tombstone Memory',
-    description: 'Future controlled mutation contract draft for tombstoning memory. Not registered as a public MCP tool in CM-1468.',
+    description: 'Controlled mutation public MCP tool registered in CM-1472 for dry-run bounded tombstone preflights. Confirmed durable mutation requires separate exact mutation approval.',
     inputSchema: buildTombstoneMemorySchema()
   },
   {
     name: 'supersede_memory',
     title: 'Supersede Memory',
-    description: 'Future controlled mutation contract draft for linking old and replacement memory. Not registered as a public MCP tool in CM-1468.',
+    description: 'Controlled mutation public MCP tool registered in CM-1472 for dry-run bounded supersede preflights. Confirmed durable mutation requires separate exact mutation approval.',
     inputSchema: buildSupersedeMemorySchema()
   }
 ]);
@@ -175,6 +178,8 @@ const CANDIDATE_TOOL_DEFINITIONS = Object.freeze([
 function buildControlledMutationPublicContractPreflightReport() {
   const publicTools = currentPublicToolNames();
   const publicMcpExpanded = CANDIDATE_TOOL_NAMES.some(name => publicTools.includes(name));
+  const sideEffects = falseFlagMap(SIDE_EFFECT_FLAGS);
+  sideEffects.publicMcpExpanded = publicMcpExpanded;
   return {
     taskId: TASK_ID,
     schemaVersion: SCHEMA_VERSION,
@@ -185,13 +190,13 @@ function buildControlledMutationPublicContractPreflightReport() {
     publicTools,
     publicToolsFrozen: publicToolsRemainFrozen(publicTools),
     publicMcpExpanded,
-    registeredPublicly: false,
-    draftOnly: true,
+    registeredPublicly: publicMcpExpanded,
+    draftOnly: !publicMcpExpanded,
     lowDisclosure: true,
     selectedProjection: true,
     disclosure: falseFlagMap(DISCLOSURE_FLAGS),
-    sideEffects: falseFlagMap(SIDE_EFFECT_FLAGS),
-    approvalRequiredBeforeRegistration: true,
+    sideEffects,
+    approvalRequiredBeforeRegistration: !publicMcpExpanded,
     publicExposureRequirements: PUBLIC_EXPOSURE_REQUIREMENTS,
     forbiddenPublicBehavior: FORBIDDEN_PUBLIC_BEHAVIOR,
     outputProjection: {
