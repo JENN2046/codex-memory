@@ -28,4 +28,3 @@ Remaining work now falls into one of these categories:
 ## Boundary
 
 CM-1454 did not execute runtime, memory tools, bearer-token paths, provider/API calls, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim.
-

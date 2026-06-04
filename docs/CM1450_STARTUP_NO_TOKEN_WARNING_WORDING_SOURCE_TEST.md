@@ -30,4 +30,3 @@ Passed:
 ## Boundary
 
 CM-1450 did not run live runtime, did not change startup/watchdog/config behavior, did not use bearer-token material, did not call memory tools, did not call provider/API, did not read or write true memory, did not scan raw stores, did not expand public MCP tools, did not perform remote actions, and did not claim readiness or `RC_READY`.
-

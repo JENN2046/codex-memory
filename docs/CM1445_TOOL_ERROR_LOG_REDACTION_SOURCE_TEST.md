@@ -34,4 +34,3 @@ Passed:
 ## Boundary
 
 CM-1445 did not execute runtime, live `record_memory`, live `search_memory`, `memory_overview`, bearer-token paths, provider/API calls, true memory read/write, raw store scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim.
-

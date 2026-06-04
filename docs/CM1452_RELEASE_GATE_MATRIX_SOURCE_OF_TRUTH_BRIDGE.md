@@ -31,4 +31,3 @@ Passed:
 ## Boundary
 
 CM-1452 did not change `package.json`, dependency manifests, CI, package scripts, runtime behavior, provider/API behavior, memory tools, public MCP tools, remote state, readiness status, or `RC_READY` status.
-

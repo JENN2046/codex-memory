@@ -33,4 +33,3 @@ CM-1448 intentionally does not add `npm run test:release-candidate`, `npm run te
 ## Boundary
 
 CM-1448 did not change dependencies, package scripts, CI, runtime, memory tools, provider behavior, startup/watchdog/config, public MCP tools, remote state, readiness status, or `RC_READY` status.
-

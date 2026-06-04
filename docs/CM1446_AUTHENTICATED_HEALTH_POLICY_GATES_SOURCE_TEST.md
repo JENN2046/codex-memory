@@ -40,4 +40,3 @@ Passed:
 ## Boundary
 
 CM-1446 did not use a live bearer token, did not call live HTTP MCP, did not call memory tools, did not call provider/API, did not read or write true memory, did not scan raw stores, did not alter config/watchdog/startup, did not expand public MCP tools, and did not claim readiness or `RC_READY`.
-

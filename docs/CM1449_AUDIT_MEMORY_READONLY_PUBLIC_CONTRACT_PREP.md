@@ -39,4 +39,3 @@ A future `audit_memory` public tool phase should, at minimum:
 ## Boundary
 
 CM-1449 did not modify public MCP registration, did not add a new tool, did not change runtime behavior, did not call memory tools, did not read raw audit or raw stores, did not use bearer token, did not call provider/API, did not alter config/watchdog/startup, did not perform remote actions, and did not claim readiness or `RC_READY`.
-

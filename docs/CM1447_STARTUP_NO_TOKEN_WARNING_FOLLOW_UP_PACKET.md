@@ -39,4 +39,3 @@ Docs-only validation for this packet is included in `CMV-1557`.
 ## Boundary
 
 CM-1447 is a docs-only follow-up packet. It did not execute runtime, memory tools, bearer-token paths, provider/API, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim.
-

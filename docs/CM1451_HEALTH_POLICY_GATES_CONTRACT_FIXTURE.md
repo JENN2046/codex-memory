@@ -34,4 +34,3 @@ Passed:
 ## Boundary
 
 CM-1451 did not run live HTTP runtime, did not use bearer-token material, did not call memory tools, did not call provider/API, did not read/write true memory, did not scan raw stores, did not change config/watchdog/startup, did not expand public MCP tools, and did not claim readiness or `RC_READY`.
-

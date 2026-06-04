@@ -35,4 +35,3 @@ Passed:
 ## Boundary
 
 CM-1453 did not register `audit_memory`, did not change `TOOL_DEFINITIONS`, did not call memory tools, did not read raw audit or raw stores, did not use bearer token, did not call provider/API, did not alter config/watchdog/startup, did not perform remote actions, and did not claim readiness or `RC_READY`.
-
