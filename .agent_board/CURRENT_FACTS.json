@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1461",
-  "validationId": "CMV-1567",
+  "taskId": "CM-1462",
+  "validationId": "CMV-1568",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1568",
+      "scope": "CM-1462 audit_memory bounded live no-mutation proof",
+      "status": "COMPLETED_VALIDATED_LIVE_MCP_AUDIT_MEMORY_BOUNDED_NO_MUTATION_PROOF"
+    },
     {
       "id": "CMV-1567",
       "scope": "CM-1461 audit_memory public MCP registration guarded implementation",
@@ -300,7 +305,6 @@
     "broad record_memory reliability",
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
-    "audit_memory bounded live no-mutation proof",
     "startup/watchdog warning source change",
     "real lifecycle SQLite migration apply against a durable memory DB",
     "raw audit or broad store scan",

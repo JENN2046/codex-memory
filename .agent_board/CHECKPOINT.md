@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1461 audit_memory public MCP registration guarded implementation`.
-Current validation: `CMV-1567`.
+Current checkpoint: `CM-1462 audit_memory bounded live no-mutation proof`.
+Current validation: `CMV-1568`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1462 audit_memory Bounded Live No-Mutation Proof
+
+Status: `COMPLETED_VALIDATED_LIVE_MCP_AUDIT_MEMORY_BOUNDED_NO_MUTATION_PROOF`
+
+Recorded:
+
+- Executed local in-process MCP JSON-RPC proof through `CodexMemoryMcpServer.handleJsonRpc(...)`.
+- `initialize` returned server `vcp_codex_memory`.
+- `tools/list` exposed exactly `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`.
+- One `tools/call audit_memory` accepted and returned access mode `audit_memory_readonly_bounded`.
+- Forbidden output key hits were `0`.
+- Raw memory, raw audit, filesystem paths, token material, provider payload, memory ids, title, snippet, and content were not returned.
+- Provider calls were `0`; durable mutation was false; readiness and `RC_READY` were false.
+- No bearer token, HTTP authenticated call, raw audit/store scan, real DB apply, durable memory/audit mutation, remote action, or push occurred.
+
+Validation: `CMV-1568` bounded live MCP no-mutation proof plus docs/board validation.
 
 ## CM-1461 audit_memory Public MCP Registration Guarded Implementation
 

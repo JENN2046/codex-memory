@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1461 audit_memory public MCP registration guarded implementation`.
-Current validation: `CMV-1567`.
-Current handoff: CM-1461 completed exact-approved readonly audit_memory public MCP registration; real DB migration apply, live/runtime/provider/memory, remote, and readiness work remain blocked without exact approval.
+Current task: `CM-1462 audit_memory bounded live no-mutation proof`.
+Current validation: `CMV-1568`.
+Current handoff: CM-1462 completed bounded live MCP proof that public `audit_memory` is visible and returns readonly low-disclosure output without mutation indicators; HTTP authenticated proof, real DB migration apply, provider, raw store, remote, and readiness work remain blocked without exact approval.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1461 completed exact-approved readonly audit_memory public M
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_PUBLIC_MCP_READONLY_BOUNDED_REGISTRATION`.
+Current status: `COMPLETED_VALIDATED_LIVE_MCP_AUDIT_MEMORY_BOUNDED_NO_MUTATION_PROOF`.
 
 Workspace: `A:\codex-memory`.
 

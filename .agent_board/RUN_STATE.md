@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1461 audit_memory public MCP registration guarded implementation`.
-Current validation: `CMV-1567`.
+Current task: `CM-1462 audit_memory bounded live no-mutation proof`.
+Current validation: `CMV-1568`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 

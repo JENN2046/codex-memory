@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1461 audit_memory public MCP registration guarded implementation` |
-| Current validation | `CMV-1567` |
-| Current route | CM-1461 public `audit_memory` readonly bounded registration completed under exact approval; real DB migration apply, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks |
+| Current task | `CM-1462 audit_memory bounded live no-mutation proof` |
+| Current validation | `CMV-1568` |
+| Current route | CM-1462 bounded live MCP proof completed for public `audit_memory`; HTTP authenticated proof, real DB migration apply, runtime/provider/live memory beyond this proof, push, and readiness work remain exact-approval or Red-boundary tasks |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1462` executed a bounded local in-process MCP JSON-RPC proof through `CodexMemoryMcpServer.handleJsonRpc(...)`: `initialize`, `tools/list`, and one `tools/call audit_memory`. The public MCP tool list exposed exactly `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`. The `audit_memory` call returned `audit_memory_readonly_bounded`, selected projection true, forbidden output key hits `0`, provider calls `0`, durable mutation false, readiness false, and `RC_READY` false. No bearer token, HTTP authenticated call, raw audit/store scan, real DB apply, durable memory/audit mutation, remote action, or push occurred.
 
 `CM-1461` registers `audit_memory` as a public MCP tool under exact approval. `TOOL_DEFINITIONS` and MCP `tools/list` now expose exactly `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`. `app.callTool('audit_memory')` dispatches only to `AuditMemoryReadonlyService.run(...)`, returning readonly bounded low-disclosure aggregate explanations. `include_raw=true` and mutation-like keys are rejected; output remains free of memory ids, title/content/snippet/path/raw/provider/token material. `npm run gate:mainline:strict` passed health, contract `36/36`, test `3036/3036`, compare `43/43`, and rollback `43/43`. CM-1461 does not execute real DB migration apply, durable memory mutation, live `record_memory`, live `search_memory`, bearer-token use, provider/API call, raw audit scan, raw SQLite broad scan, raw JSONL dump, remote action, readiness claim, or `RC_READY` claim.
 
@@ -93,7 +95,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1461 is closed as a guarded local commit. Push remains unexecuted and requires separate explicit authorization. Future real DB migration apply, live/runtime/memory/provider/bearer/raw/remote/readiness work requires fresh exact approval or Red-boundary authorization.
+CM-1462 evidence is local and bounded. Future HTTP authenticated `audit_memory` proof, real DB migration apply, live/runtime/memory/provider/bearer/raw/remote/readiness work requires fresh exact approval or Red-boundary authorization.
 
 ## Boundaries
 
