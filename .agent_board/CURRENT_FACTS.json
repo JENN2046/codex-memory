@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1463",
-  "validationId": "CMV-1569",
+  "taskId": "CM-1464",
+  "validationId": "CMV-1570",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1570",
+      "scope": "CM-1464 real DB migration dry-run evidence",
+      "status": "COMPLETED_VALIDATED_REAL_DB_MIGRATION_DRY_RUN_NO_APPLY"
+    },
     {
       "id": "CMV-1569",
       "scope": "CM-1463 real lifecycle SQLite migration apply approval packet",

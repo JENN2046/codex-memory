@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1463 real lifecycle SQLite migration apply approval packet` |
-| Current validation | `CMV-1569` |
-| Current route | CM-1463 approval packet completed for future real lifecycle SQLite migration apply; the future apply itself remains exact-approval / Red-boundary work |
+| Current task | `CM-1464 real DB migration dry-run evidence` |
+| Current validation | `CMV-1570` |
+| Current route | CM-1464 dry-run evidence completed against the observed lifecycle SQLite DB; future real apply remains exact-approval / Red-boundary work |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1464` executed `npm run lifecycle:sqlite:dry-run -- --json` after fresh Git preflight showed clean synced state. Sanitized dry-run evidence recorded `dryRun=true`, `mutated=false`, `applyExecuted=false`, `confirmUsed=false`, and `targetDbObserved=true`. Existing lifecycle columns were `status` and `tombstone_reason`; missing and would-add columns were `status_reason`, `supersedes_memory_id`, `superseded_by_memory_id`, `lifecycle_updated_at`, and `lifecycle_actor_client_id`. `wouldBackfillStatus=0`, `mutationRequired=true`, and `rollbackRequirement=sqlite-backup-required`. No raw memory content, raw audit rows, full SQLite dump, secrets/tokens, or provider payload were recorded. No `--confirm`, real DB apply, SQLite edit/delete, raw row/audit/JSONL scan, provider/API, bearer token, live memory tool, public MCP expansion, dependency/config/watchdog/startup change, readiness claim, `RC_READY` claim, remote action, or push occurred.
 
 `CM-1463` added `docs/CM1463_REAL_LIFECYCLE_SQLITE_MIGRATION_APPLY_APPROVAL_PACKET.md` as a docs-only approval packet for future real lifecycle SQLite migration apply. The packet defines expected lifecycle columns, pre-apply requirements, exact approval shape, dry-run/apply command wording, rollback plan, post-apply evidence, and explicit non-claims. CM-1463 did not execute real DB migration apply, run `--confirm`, edit or delete a durable SQLite DB, read raw memory rows broadly, scan raw audit, dump raw JSONL, call provider/API, use bearer token, call live MCP memory tools, register mutation tools, expand public MCP tools, change config/watchdog/startup, change dependencies, release/tag/deploy, push, or claim readiness / `RC_READY`.
 
@@ -97,7 +99,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1463 is an approval packet only. Future real lifecycle SQLite migration apply requires fresh exact approval naming one absolute target DB path and one absolute backup path, plus clean synced Git state, backup evidence, and dry-run receipt. HTTP authenticated `audit_memory` proof, live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
+CM-1464 is dry-run evidence only. Future real lifecycle SQLite migration apply requires CM-1463 exact approval naming one absolute target DB path and one absolute backup path, plus clean synced Git state, backup evidence, and operator acknowledgement. HTTP authenticated `audit_memory` proof, live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
 
 ## Boundaries
 

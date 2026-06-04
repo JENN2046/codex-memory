@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1463 real lifecycle SQLite migration apply approval packet`.
-Current validation: `CMV-1569`.
-Current handoff: CM-1463 completed the docs-only exact approval packet for future real lifecycle SQLite migration apply; no real DB apply occurred, and future apply still requires exact approval with a single target DB path and backup path.
+Current task: `CM-1464 real DB migration dry-run evidence`.
+Current validation: `CMV-1570`.
+Current handoff: CM-1464 completed sanitized lifecycle SQLite dry-run evidence against the observed target DB using existing script `lifecycle:sqlite:dry-run`; no `--confirm` or real DB apply occurred, and future apply still requires CM-1463 exact approval plus backup evidence.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1463 completed the docs-only exact approval packet for futur
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_APPROVAL_PACKET_NO_REAL_DB_APPLY`.
+Current status: `COMPLETED_VALIDATED_REAL_DB_MIGRATION_DRY_RUN_NO_APPLY`.
 
 Workspace: `A:\codex-memory`.
 

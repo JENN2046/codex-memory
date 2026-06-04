@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1463 real lifecycle SQLite migration apply approval packet`.
-Current validation: `CMV-1569`.
+Current checkpoint: `CM-1464 real DB migration dry-run evidence`.
+Current validation: `CMV-1570`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1464 Real DB Migration Dry-Run Evidence
+
+Status: `COMPLETED_VALIDATED_REAL_DB_MIGRATION_DRY_RUN_NO_APPLY`
+
+Recorded:
+
+- Preflight Git state was clean and synced with `origin/main` (`ahead/behind: 0 0`).
+- The original task-book command mismatch was left blocked; retry used existing script `lifecycle:sqlite:dry-run`.
+- Executed `npm run lifecycle:sqlite:dry-run -- --json`.
+- Dry-run evidence: `dryRun=true`, `mutated=false`, `applyExecuted=false`, `confirmUsed=false`, and `targetDbObserved=true`.
+- Existing lifecycle columns were `status` and `tombstone_reason`.
+- Missing and would-add columns were `status_reason`, `supersedes_memory_id`, `superseded_by_memory_id`, `lifecycle_updated_at`, and `lifecycle_actor_client_id`.
+- `wouldBackfillStatus=0`, `mutationRequired=true`, and `rollbackRequirement=sqlite-backup-required`.
+- No raw memory content, raw audit rows, full SQLite dump, secrets/tokens, or provider payload were recorded.
+- No `--confirm`, real DB apply, SQLite edit/delete, raw row/audit/JSONL scan, provider/API, bearer token, live memory tool, public MCP expansion, dependency/config/watchdog/startup change, readiness claim, `RC_READY` claim, remote action, or push occurred.
+
+Validation: `CMV-1570` dry-run/docs validation.
 
 ## CM-1463 Real Lifecycle SQLite Migration Apply Approval Packet
 

@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1463 real lifecycle SQLite migration apply approval packet`.
-Current validation: `CMV-1569`.
+Current task: `CM-1464 real DB migration dry-run evidence`.
+Current validation: `CMV-1570`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1463 approval packet completed for future real lifecycle SQLite migration apply; the future apply itself remains exact-approval / Red-boundary work`.
+Current route: `CM-1464 dry-run evidence completed against the observed lifecycle SQLite DB; future real apply remains exact-approval / Red-boundary work`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1463 approval packet: added `docs/CM1463_REAL_LIFECYCLE_SQLITE_MIGRATION_APPLY_APPROVAL_PACKET.md` for a future exact-approved real lifecycle SQLite migration apply. The packet defines target lifecycle columns, pre-apply requirements, exact approval shape, documented dry-run/apply commands, rollback plan, post-apply evidence, and explicit non-claims. No real DB migration apply, `--confirm`, durable SQLite edit/delete, raw memory/audit/JSONL scan, provider/API, bearer token, live memory tool call, mutation registration, public MCP expansion, config/watchdog/startup, dependency change, release/tag/deploy, readiness claim, `RC_READY` claim, remote action, or push occurred.
+CM-1464 dry-run evidence: executed `npm run lifecycle:sqlite:dry-run -- --json` against the observed lifecycle SQLite DB and recorded sanitized schema-level evidence only. Result: `dryRun=true`, `mutated=false`, `applyExecuted=false`, `confirmUsed=false`, `targetDbObserved=true`, existing columns `status/tombstone_reason`, missing and would-add columns `status_reason / supersedes_memory_id / superseded_by_memory_id / lifecycle_updated_at / lifecycle_actor_client_id`, `wouldBackfillStatus=0`, `mutationRequired=true`, rollback requirement `sqlite-backup-required`. No `--confirm`, real DB apply, SQLite edit/delete, raw row/audit/JSONL scan, provider/API, bearer token, live memory tool, public MCP expansion, dependency/config/watchdog/startup change, readiness claim, `RC_READY` claim, remote action, or push occurred.
 
 更新时间：2026-06-04
 
