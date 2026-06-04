@@ -9,6 +9,7 @@ const { CodexMemoryMcpServer } = require('../src/adapters/codex-mcp/server');
 const {
   DISCLOSURE_FLAGS,
   MUTATION_INPUT_KEYS,
+  PUBLIC_EXPOSURE_REQUIREMENTS,
   PUBLIC_MCP_TOOL_NAMES,
   RESULT_STATUS_ACCEPTED,
   SIDE_EFFECT_FLAGS,
@@ -58,6 +59,22 @@ test('CM1414 audit_memory readonly draft is accepted for planning but not public
   assert.equal(report.selectedProjectionVersion, 1);
   assert.equal(report.lowDisclosure, true);
   assert.equal(report.requiresExactApprovalBeforePublicExposure, true);
+  assert.equal(report.publicExposureApprovalPacket.status, 'required_before_registration');
+  assert.equal(report.publicExposureApprovalPacket.allowedPublicBehavior, 'bounded_readonly_selected_projection');
+  assert.deepEqual(
+    report.publicExposureApprovalPacket.requirements,
+    PUBLIC_EXPOSURE_REQUIREMENTS
+  );
+  for (const forbidden of [
+    'raw_memory_return',
+    'raw_audit_return',
+    'filesystem_path_return',
+    'provider_payload_return',
+    'durable_mutation',
+    'readiness_claim'
+  ]) {
+    assert.equal(report.publicExposureApprovalPacket.forbiddenPublicBehavior.includes(forbidden), true);
+  }
   assert.equal(report.readinessClaimed, false);
   assert.equal(report.rcReadyClaimed, false);
   assert.deepEqual(report.blockerReasons, []);

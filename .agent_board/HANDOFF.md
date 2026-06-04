@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1454 local-safe route closeout`.
-Current validation: `CMV-1564`.
-Current handoff: CM-1450 through CM-1454 completed local-safe hardening; live/runtime/public-MCP/remote/readiness work remains blocked without exact approval.
+Current task: `CM-1459 lifecycle migration and release gate source/test`.
+Current validation: `CMV-1565`.
+Current handoff: CM-1459 completed local source/test hardening; real DB migration apply, public MCP expansion, live/runtime/provider/memory, remote, and readiness work remain blocked without exact approval.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1450 through CM-1454 completed local-safe hardening; live/ru
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_ROUTE_SELECTION_NO_ACTIVE_LOCAL_SAFE_SLICE_SELECTED`.
+Current status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_REAL_DB_APPLY_NO_PUBLIC_MCP_EXPANSION`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,15 +28,16 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1459 added guarded lifecycle SQLite migrate CLI, local release gate scripts, and `audit_memory` approval packet reinforcement.
 - CM-1450 tightened no-token loopback warning wording without startup mutation.
 - CM-1451 added independent health `policyGates` low-disclosure contract coverage.
 - CM-1452 bridged the release gate matrix to default-safe runner exclusions without package script changes.
 - CM-1453 reinforced readonly `audit_memory` draft validation against mutation-like inputs without public MCP registration.
 - CM-1454 selected no further automatic local-safe slice.
-- Recorded CM-1450 through CM-1454 and CMV-1560 through CMV-1564 in `.agent_board`.
+- Recorded CM-1450 through CM-1459 and CMV-1560 through CMV-1565 in `.agent_board`.
 - No live runtime, live memory tool call, bearer-token material use, provider/API call, true memory read/write, raw store scan, durable memory/audit write, config/watchdog/startup mutation, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: `CMV-1560` through `CMV-1564`; targeted tests passed `33/33`; default `npm test` passed `3019/3019`; `git diff --check`, current facts drift, ledger consistency, and `scripts/validate-local.ps1 -Area docs` passed.
+Validation: `CMV-1560` through `CMV-1565`; CM-1459 targeted lifecycle/release scripts passed; final default `npm test` and docs validation recorded in `CMV-1565`.
 
 Boundaries:
 
@@ -44,7 +45,7 @@ Boundaries:
 
 Next safe action:
 
-Guarded local commit if final diff/secret/validation checks pass; otherwise stop and report blocker. Future live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval.
+Guarded local commit if final diff/secret/validation checks pass; otherwise stop and report blocker. Future real DB migration apply, public `audit_memory` registration, live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval.
 
 ## Historical Handoff Archive
 

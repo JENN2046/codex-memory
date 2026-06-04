@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1454",
-  "validationId": "CMV-1564",
+  "taskId": "CM-1459",
+  "validationId": "CMV-1565",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1565",
+      "scope": "CM-1459 lifecycle migration and release gate source/test",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_NO_REAL_DB_APPLY_NO_PUBLIC_MCP_EXPANSION"
+    },
     {
       "id": "CMV-1564",
       "scope": "CM-1454 local-safe route closeout",
@@ -288,7 +293,7 @@
     "real query quality proof",
     "public audit_memory registration",
     "startup/watchdog warning source change",
-    "release-candidate package script implementation",
+    "real lifecycle SQLite migration apply against a durable memory DB",
     "raw audit or broad store scan",
     "phase h record_memory scoped-write execution",
     "committed live Git head facts"

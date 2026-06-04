@@ -10,6 +10,10 @@ const {
   SELF_REFERENTIAL_FILES,
   resolveExcluded
 } = require('../src/cli/run-default-tests');
+const {
+  TEST_MODES,
+  buildContract
+} = require('../src/cli/run-release-gate-tests');
 
 test('CM1448 release test gate matrix matches default-safe excluded categories', () => {
   const matrix = fs.readFileSync(path.join(process.cwd(), 'docs', 'CM1448_RELEASE_TEST_GATE_MATRIX.md'), 'utf8');
@@ -29,8 +33,25 @@ test('CM1448 release test gate matrix matches default-safe excluded categories',
   }
 
   assert.match(matrix, /not release readiness/i);
-  assert.match(matrix, /does not add `npm run test:release-candidate`/i);
-  assert.equal(Object.prototype.hasOwnProperty.call(packageJson.scripts, 'test:release-candidate'), false);
-  assert.equal(Object.prototype.hasOwnProperty.call(packageJson.scripts, 'test:parity'), false);
-  assert.equal(Object.prototype.hasOwnProperty.call(packageJson.scripts, 'test:migration'), false);
+  assert.match(matrix, /adds `npm run test:release-candidate`/i);
+  assert.equal(packageJson.scripts['test:release-candidate'], 'node ./src/cli/run-release-gate-tests.js release-candidate');
+  assert.equal(packageJson.scripts['test:parity'], 'node ./src/cli/run-release-gate-tests.js parity');
+  assert.equal(packageJson.scripts['test:migration'], 'node ./src/cli/run-release-gate-tests.js migration');
+});
+
+test('CM1459 release gate scripts remain local and do not claim readiness', () => {
+  for (const mode of ['migration', 'parity', 'release-candidate']) {
+    const contract = buildContract(mode);
+
+    assert.deepEqual(contract.testFiles, TEST_MODES[mode]);
+    assert.equal(contract.providerCallsAllowed, false);
+    assert.equal(contract.daemonRequired, false);
+    assert.equal(contract.liveMemoryAllowed, false);
+    assert.equal(contract.rawStoreScanAllowed, false);
+    assert.equal(contract.publicMcpExpansionAllowed, false);
+    assert.equal(contract.readinessClaimed, false);
+    assert.equal(contract.rcReadyClaimed, false);
+  }
+
+  assert.equal(buildContract('release-candidate').status, 'RC_NOT_READY_BLOCKED');
 });

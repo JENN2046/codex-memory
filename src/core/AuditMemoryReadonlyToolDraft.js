@@ -58,6 +58,15 @@ const MUTATION_INPUT_KEYS = Object.freeze([
   'write'
 ]);
 
+const PUBLIC_EXPOSURE_REQUIREMENTS = Object.freeze([
+  'exact_public_contract_approval',
+  'tools_list_registration_test',
+  'low_disclosure_projection_test',
+  'mutation_input_negative_controls',
+  'raw_audit_store_exclusion_test',
+  'readiness_claim_exclusion_test'
+]);
+
 const inputSchema = Object.freeze({
   type: 'object',
   additionalProperties: false,
@@ -145,6 +154,19 @@ function buildAuditMemoryReadonlyToolDraftReport() {
     lowDisclosure: true,
     disclosure,
     sideEffects,
+    publicExposureApprovalPacket: {
+      status: 'required_before_registration',
+      requirements: PUBLIC_EXPOSURE_REQUIREMENTS,
+      allowedPublicBehavior: 'bounded_readonly_selected_projection',
+      forbiddenPublicBehavior: [
+        'raw_memory_return',
+        'raw_audit_return',
+        'filesystem_path_return',
+        'provider_payload_return',
+        'durable_mutation',
+        'readiness_claim'
+      ]
+    },
     requiresExactApprovalBeforePublicExposure: true,
     readinessClaimed: false,
     rcReadyClaimed: false,
@@ -186,6 +208,7 @@ module.exports = {
   ALLOWED_AUDIT_FAMILIES,
   DISCLOSURE_FLAGS,
   MUTATION_INPUT_KEYS,
+  PUBLIC_EXPOSURE_REQUIREMENTS,
   PUBLIC_MCP_TOOL_NAMES,
   RESULT_STATUS_ACCEPTED,
   RESULT_STATUS_BLOCKED,

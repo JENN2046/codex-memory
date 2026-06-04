@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1454 local-safe route closeout`.
-Current validation: `CMV-1564`.
+Current checkpoint: `CM-1459 lifecycle migration and release gate source/test`.
+Current validation: `CMV-1565`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1459 Lifecycle Migration and Release Gate Source/Test
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_REAL_DB_APPLY_NO_PUBLIC_MCP_EXPANSION`
+
+Recorded:
+
+- Added guarded `lifecycle-sqlite-migrate` CLI with temp-DB apply coverage.
+- Kept `lifecycle-sqlite-dry-run` read-only.
+- Added local `test:migration`, `test:parity`, and `test:release-candidate` scripts.
+- Reinforced `audit_memory` with future public exposure approval packet while keeping it unregistered.
+- Kept `test:release-candidate` as `RC_NOT_READY_BLOCKED` evidence only.
+- No real DB migration apply, memory tool call, bearer-token use, provider/API call, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1565` source/test validation.
 
 ## CM-1454 Local-Safe Route Closeout
 

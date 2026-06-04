@@ -65,6 +65,9 @@
     "provider-smoke": "node ./src/cli/provider-smoke.js",
     "provider-benchmark": "node ./src/cli/provider-benchmark.js",
     "test": "node ./src/cli/run-default-tests.js",
+    "test:migration": "node ./src/cli/run-release-gate-tests.js migration",
+    "test:parity": "node ./src/cli/run-release-gate-tests.js parity",
+    "test:release-candidate": "node ./src/cli/run-release-gate-tests.js release-candidate",
     "test:hardening": "node --test --test-concurrency=1 tests/http-no-token-search-rejection.test.js tests/security-profile-config.test.js tests/external-provider-gate.test.js tests/stdio-message-size-limit.test.js tests/tool-argument-validator-limits.test.js tests/json-rpc-error-redaction.test.js && node --test tests/gate-ci-env-override-evidence.test.js",
     "test:provider": "node ./src/cli/run-provider-tests.js",
     "test:all": "npm test && npm run test:hardening"

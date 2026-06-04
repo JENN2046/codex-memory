@@ -2,11 +2,13 @@
 
 Date: 2026-06-04
 
-Status: `COMPLETED_VALIDATED_DOCS_ONLY_CONTRACT`
+Status: `UPDATED_BY_CM1459_LOCAL_SCRIPT_CONTRACT`
 
 ## Purpose
 
-CM-1448 records the current test-gate contract without changing `package.json` or CI scripts.
+CM-1448 recorded the test-gate contract without changing `package.json` or CI scripts.
+
+CM-1459 adds local package-script entrypoints for migration, parity, and release-candidate gate subsets. These scripts are local source/test aggregation only; they do not authorize provider calls, daemon startup, live memory access, public MCP expansion, release, cutover, or readiness claims.
 
 This matrix prevents a common overclaim: default local tests are useful regression evidence, but they are not release readiness by themselves.
 
@@ -15,6 +17,9 @@ This matrix prevents a common overclaim: default local tests are useful regressi
 | Gate | Current Meaning | Release Claim Allowed |
 |---|---|---|
 | `npm test` | Default local safe regression suite through `src/cli/run-default-tests.js`; excludes known provider, daemon, self-referential, and fixture-drift classes | no |
+| `npm run test:migration` | Local migration-adjacent test subset through `src/cli/run-release-gate-tests.js migration`; temp DB and dry-run gates only | no |
+| `npm run test:parity` | Local parity/governance contract subset through `src/cli/run-release-gate-tests.js parity`; no provider, daemon, or public MCP expansion | no |
+| `npm run test:release-candidate` | Local release-candidate evidence subset through `src/cli/run-release-gate-tests.js release-candidate`; reports `RC_NOT_READY_BLOCKED` contract status | no |
 | targeted `node --test ...` | Slice-specific source/test evidence | no |
 | `git diff --check` | whitespace/diff hygiene | no |
 | current facts drift validator | status snapshot consistency | no |
@@ -28,8 +33,8 @@ This matrix prevents a common overclaim: default local tests are useful regressi
 
 Release, cutover, production readiness, broad memory reliability, provider readiness, and `RC_READY` remain blocked until a dedicated release/cutover gate explicitly authorizes the required evidence and the required evidence passes.
 
-CM-1448 intentionally does not add `npm run test:release-candidate`, `npm run test:parity`, or `npm run test:migration`. Those may be future implementation work, but package-script changes are outside this local docs-only matrix.
+CM-1459 adds `npm run test:release-candidate`, `npm run test:parity`, and `npm run test:migration` as local test aggregation scripts. These scripts are not release readiness, and a passing result must not be described as `RC_READY`.
 
 ## Boundary
 
-CM-1448 did not change dependencies, package scripts, CI, runtime, memory tools, provider behavior, startup/watchdog/config, public MCP tools, remote state, readiness status, or `RC_READY` status.
+CM-1459 changes package scripts and a local test runner only. It does not change dependencies, CI, runtime, memory tools, provider behavior, startup/watchdog/config, public MCP tools, remote state, readiness status, or `RC_READY` status.

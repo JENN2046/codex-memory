@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1454 local-safe route closeout` |
-| Current validation | `CMV-1564` |
-| Current route | CM-1450 through CM-1453 local-safe hardening slices completed; no further automatic local-safe slice is currently selected |
+| Current task | `CM-1459 lifecycle migration and release gate source/test` |
+| Current validation | `CMV-1565` |
+| Current route | CM-1459 local source/test slice completed; future real DB migration apply, public `audit_memory` registration, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1459` adds `src/cli/lifecycle-sqlite-migrate.js`, `tests/lifecycle-sqlite-migrate-cli.test.js`, and `src/cli/run-release-gate-tests.js`, and updates package scripts for `test:migration`, `test:parity`, and `test:release-candidate`. The existing lifecycle dry-run CLI remains read-only. The new migrate CLI defaults to dry-run and requires `--confirm --backup <path>` for apply; apply behavior is covered only with temp SQLite DB tests. `audit_memory` gains a future public exposure approval packet but remains unregistered, and public MCP tools remain frozen to `record_memory`, `search_memory`, and `memory_overview`. `test:release-candidate` reports `RC_NOT_READY_BLOCKED` contract status and does not create release readiness or `RC_READY`.
 
 `CM-1454` records local-safe route closeout in `docs/CM1454_LOCAL_SAFE_ROUTE_CLOSEOUT.md`. CM-1450 through CM-1453 are completed as local source/test or docs/contract slices, and no further automatic local-safe slice is selected. Remaining work requires either fresh exact approval for live/runtime/memory/bearer/provider boundaries, Red-boundary approval for push/public MCP/config/startup/release/readiness work, or a new user-selected local-safe task from another area.
 
@@ -87,7 +89,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-Finish final local validation and guarded local commit for CM-1450 through CM-1454 if eligible. Future live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval, or a new user-selected local-safe task from another phase/area.
+Finish final guarded local commit for CM-1459 if validation remains clean and commit guards pass. Future real DB migration apply, public `audit_memory` registration, live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval or Red-boundary authorization.
 
 ## Boundaries
 
