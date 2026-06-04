@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1440 Phase H next local-safe slice selection`.
-Current validation: `CMV-1550`.
+Current task: `CM-1441 Phase H governance scope suppression consistency source/test`.
+Current validation: `CMV-1551`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Next local-safe candidate selected: CM-1441 Phase H governance scope suppression consistency source/test`.
+Current route: `Governance scope suppression consistency source/test completed; future live gates remain exact-approval boundaries`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->

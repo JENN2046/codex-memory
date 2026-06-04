@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1440",
-  "validationId": "CMV-1550",
+  "taskId": "CM-1441",
+  "validationId": "CMV-1551",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1551",
+      "scope": "CM-1441 Phase H governance scope suppression consistency source/test",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_NO_APPLY"
+    },
     {
       "id": "CMV-1550",
       "scope": "CM-1440 Phase H next local-safe slice selection",

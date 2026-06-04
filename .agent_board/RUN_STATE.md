@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1440 Phase H next local-safe slice selection`.
-Current validation: `CMV-1550`.
+Current task: `CM-1441 Phase H governance scope suppression consistency source/test`.
+Current validation: `CMV-1551`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1440` selects `CM-1441 Phase H governance scope suppression consistency source/test` as the next local-safe candidate. CM-1440 is docs/board routing only: no source/runtime change, live memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim. Next safe action is to implement CM-1441 only as pure explicit-input/no-apply source/test work, or stop for exact approval before any runtime boundary.
+`CM-1441` adds a pure explicit-input/no-apply governance scope suppression consistency helper and targeted tests. It combines deferred scope-pollution policy and lifecycle read-policy isolation into one Phase H consistency surface, with fail-closed checks for missing deferred policy, incomplete lifecycle suppression coverage, raw suppressed metadata exposure, and no-apply invariant violations. No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is to choose another explicit local source/test slice or scoped board task; runtime boundaries require exact approval.
 
 ## Historical Run Notes
 

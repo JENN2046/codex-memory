@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1440 Phase H next local-safe slice selection` |
-| Current validation | `CMV-1550` |
-| Current route | Next local-safe candidate selected: `CM-1441 Phase H governance scope suppression consistency source/test` |
+| Current task | `CM-1441 Phase H governance scope suppression consistency source/test` |
+| Current validation | `CMV-1551` |
+| Current route | Governance scope suppression consistency source/test completed; future live gates remain exact-approval boundaries |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1441` adds `src/core/GovernanceScopeSuppressionConsistency.js` and `tests/governance-scope-suppression-consistency.test.js` as an explicit-input/no-apply consistency surface that combines deferred governance scope-pollution policy with lifecycle read-policy isolation. Targeted validation passed `13/13` across the new test and related existing governance suppression tests. It does not execute runtime, memory tools, bearer-token paths, provider/API calls, true memory reads/writes, raw store scans, durable writes, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
 
 `CM-1440` selects the next local-safe Phase H candidate after `CM-1439`: `CM-1441 Phase H governance scope suppression consistency source/test`. The selection is docs/board routing only and is recorded in `docs/CM1440_PHASE_H_NEXT_LOCAL_SAFE_SLICE_SELECTION.md`. It does not execute runtime, memory tools, bearer-token paths, provider/API calls, true memory reads/writes, raw store scans, durable writes, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
 
@@ -59,7 +61,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-Next candidate is `CM-1441 Phase H governance scope suppression consistency source/test`. Keep it pure explicit-input/no-apply unless a fresh exact approval package authorizes a named runtime boundary. Future live gates should use the clarified authenticated MCP preflight envelope wording and still require exact approval before execution.
+Choose the next explicit local source/test slice or scoped board task before implementation. Future live gates should use the clarified authenticated MCP preflight envelope wording and still require exact approval before execution.
 
 ## Boundaries
 

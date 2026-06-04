@@ -4,11 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1440 Phase H next local-safe slice selection`.
-Current validation: `CMV-1550`.
+Current checkpoint: `CM-1441 Phase H governance scope suppression consistency source/test`.
+Current validation: `CMV-1551`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1441 Phase H Governance Scope Suppression Consistency Source/Test
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_APPLY`
+
+Scope:
+
+```text
+local explicit-input/no-apply source/test helper; no runtime execution
+```
+
+Recorded:
+
+- Added `src/core/GovernanceScopeSuppressionConsistency.js`.
+- Added `tests/governance-scope-suppression-consistency.test.js`.
+- Added `docs/CM1441_GOVERNANCE_SCOPE_SUPPRESSION_CONSISTENCY_SOURCE_TEST.md`.
+- Targeted governance suppression validation passed `13/13`.
+- No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1551` source/test validation.
+
+Next safe action:
+
+- Choose another explicit local source/test slice or scoped board task before implementation.
+- Stop for exact approval before any runtime boundary.
 
 ## CM-1440 Phase H Next Local-Safe Slice Selection
 
