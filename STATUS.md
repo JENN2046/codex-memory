@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1459 lifecycle migration and release gate source/test`.
-Current validation: `CMV-1565`.
+Current task: `CM-1460 audit_memory readonly public contract implementation preflight`.
+Current validation: `CMV-1566`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1459 local source/test slice completed; real DB migration apply, public audit_memory registration, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks`.
+Current route: `CM-1460 local readonly contract preflight completed; public audit_memory registration, real DB migration apply, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1459 source/test closeout: added guarded lifecycle SQLite migrate CLI with temp-DB apply coverage, kept `lifecycle-sqlite-dry-run` read-only, added `audit_memory` future public exposure approval packet without public MCP registration, and added local `test:migration`, `test:parity`, and `test:release-candidate` scripts. `test:release-candidate` remains `RC_NOT_READY_BLOCKED` evidence only. No real DB migration apply, public MCP expansion, runtime/service start, bearer-token use, memory tool call, provider/API call, raw store scan, remote action, readiness claim, or `RC_READY` claim occurred.
+CM-1460 source/test preflight: added readonly bounded `AuditMemoryReadonlyService`, public-contract preflight tests, and `docs/CM1460_AUDIT_MEMORY_PUBLIC_READONLY_CONTRACT_APPROVAL_PACKET.md`. `audit_memory` remains unregistered, public tools remain `record_memory / search_memory / memory_overview`, and `app.callTool('audit_memory')` remains blocked. No real DB migration apply, durable memory mutation, live `record_memory`, live `search_memory`, bearer-token use, provider/API call, raw audit scan, raw SQLite broad scan, raw JSONL dump, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
 
-更新时间：2026-06-03
+更新时间：2026-06-04
 
 ## Historical Status Archive
 

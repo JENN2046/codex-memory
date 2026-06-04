@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1459 lifecycle migration and release gate source/test`.
-Current validation: `CMV-1565`.
+Current checkpoint: `CM-1460 audit_memory readonly public contract implementation preflight`.
+Current validation: `CMV-1566`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1460 audit_memory Readonly Public Contract Implementation Preflight
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_PUBLIC_REGISTRATION_NOT_EXECUTED`
+
+Recorded:
+
+- Added readonly bounded `AuditMemoryReadonlyService`.
+- Added service and public-contract preflight tests.
+- Kept `audit_memory` unregistered and outside MCP `tools/list`.
+- Kept `app.callTool('audit_memory')` blocked as `Unknown tool`.
+- Added `docs/CM1460_AUDIT_MEMORY_PUBLIC_READONLY_CONTRACT_APPROVAL_PACKET.md`.
+- No real DB migration apply, durable memory mutation, live memory tool call, bearer-token use, provider/API call, raw audit/SQLite/JSONL scan, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1566` source/test validation.
 
 ## CM-1459 Lifecycle Migration and Release Gate Source/Test
 

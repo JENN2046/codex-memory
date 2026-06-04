@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1459",
-  "validationId": "CMV-1565",
+  "taskId": "CM-1460",
+  "validationId": "CMV-1566",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1566",
+      "scope": "CM-1460 audit_memory readonly public contract implementation preflight",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_PUBLIC_REGISTRATION_NOT_EXECUTED"
+    },
     {
       "id": "CMV-1565",
       "scope": "CM-1459 lifecycle migration and release gate source/test",
@@ -292,6 +297,7 @@
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
     "public audit_memory registration",
+    "audit_memory bounded live no-mutation proof",
     "startup/watchdog warning source change",
     "real lifecycle SQLite migration apply against a durable memory DB",
     "raw audit or broad store scan",

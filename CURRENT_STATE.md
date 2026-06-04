@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1459 lifecycle migration and release gate source/test` |
-| Current validation | `CMV-1565` |
-| Current route | CM-1459 local source/test slice completed; future real DB migration apply, public `audit_memory` registration, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks |
+| Current task | `CM-1460 audit_memory readonly public contract implementation preflight` |
+| Current validation | `CMV-1566` |
+| Current route | CM-1460 local readonly contract preflight completed; public `audit_memory` registration, real DB migration apply, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1460` adds `src/core/AuditMemoryReadonlyService.js`, `tests/audit-memory-readonly-service.test.js`, `tests/audit-memory-public-contract-preflight.test.js`, and `docs/CM1460_AUDIT_MEMORY_PUBLIC_READONLY_CONTRACT_APPROVAL_PACKET.md`. The service returns only bounded low-disclosure aggregate explanation shape for visible/hidden/suppressed audit decisions. `audit_memory` remains unregistered, `TOOL_DEFINITIONS` remains frozen to `record_memory`, `search_memory`, and `memory_overview`, MCP `tools/list` excludes `audit_memory`, and `app.callTool('audit_memory')` remains blocked as `Unknown tool`. CM-1460 does not execute real DB migration apply, live memory tools, bearer-token use, provider/API calls, raw audit/SQLite/JSONL scans, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
 
 `CM-1459` adds `src/cli/lifecycle-sqlite-migrate.js`, `tests/lifecycle-sqlite-migrate-cli.test.js`, and `src/cli/run-release-gate-tests.js`, and updates package scripts for `test:migration`, `test:parity`, and `test:release-candidate`. The existing lifecycle dry-run CLI remains read-only. The new migrate CLI defaults to dry-run and requires `--confirm --backup <path>` for apply; apply behavior is covered only with temp SQLite DB tests. `audit_memory` gains a future public exposure approval packet but remains unregistered, and public MCP tools remain frozen to `record_memory`, `search_memory`, and `memory_overview`. `test:release-candidate` reports `RC_NOT_READY_BLOCKED` contract status and does not create release readiness or `RC_READY`.
 
@@ -89,7 +91,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-Finish final guarded local commit for CM-1459 if validation remains clean and commit guards pass. Future real DB migration apply, public `audit_memory` registration, live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval or Red-boundary authorization.
+Finish final guarded local commit for CM-1460 if validation remains clean and commit guards pass. Future public `audit_memory` registration, real DB migration apply, live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval or Red-boundary authorization.
 
 ## Boundaries
 

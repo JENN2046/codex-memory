@@ -13,6 +13,8 @@ const TEST_MODES = Object.freeze({
   ]),
   parity: Object.freeze([
     'audit-memory-readonly-tool-draft.test.js',
+    'audit-memory-readonly-service.test.js',
+    'audit-memory-public-contract-preflight.test.js',
     'controlled-write-dry-run-cli.test.js',
     'controlled-write-proposal-review.test.js',
     'controlled-write-tools-fixture.test.js',
@@ -21,6 +23,8 @@ const TEST_MODES = Object.freeze({
   'release-candidate': Object.freeze([
     'release-test-gate-matrix-contract.test.js',
     'audit-memory-readonly-tool-draft.test.js',
+    'audit-memory-readonly-service.test.js',
+    'audit-memory-public-contract-preflight.test.js',
     'lifecycle-sqlite-dry-run-cli.test.js',
     'lifecycle-sqlite-migrate-cli.test.js',
     'vcp-memory-migration-readiness-cli.test.js',
