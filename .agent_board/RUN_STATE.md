@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1472 controlled mutation public registration guarded implementation`.
-Current validation: `CMV-1578`.
+Current task: `CM-1473 controlled mutation bounded live dry-run proof`.
+Current validation: `CMV-1579`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1472` registered exactly `validate_memory`, `tombstone_memory`, and `supersede_memory` as public MCP tools under the CM-1471 exact approval. Public controlled mutation calls remain bounded dry-run projections, and public `dry_run=false` or `confirm=true` attempts are rejected before mutation. No real mutation, raw scan, provider/API, bearer-token material use, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is guarded local commit if final validation and diff review remain clean; push requires separate explicit authorization.
+`CM-1473` proved through in-process MCP `initialize`, `tools/list`, and one safe dry-run `tools/call` per controlled mutation tool that `validate_memory`, `tombstone_memory`, and `supersede_memory` are visible and return low-disclosure rejected dry-run projections. No `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API, bearer-token material use, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is guarded local commit if final validation and diff review remain clean; push requires separate explicit authorization.
 
 ## Historical Run Notes
 

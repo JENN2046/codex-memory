@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1472",
-  "validationId": "CMV-1578",
+  "taskId": "CM-1473",
+  "validationId": "CMV-1579",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1579",
+      "scope": "CM-1473 controlled mutation bounded live dry-run proof",
+      "status": "COMPLETED_VALIDATED_CONTROLLED_MUTATION_BOUNDED_LIVE_DRY_RUN_PROOF_NO_REAL_MUTATION"
+    },
     {
       "id": "CMV-1578",
       "scope": "CM-1472 controlled mutation public registration guarded implementation",

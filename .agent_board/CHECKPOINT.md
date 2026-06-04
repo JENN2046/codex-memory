@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1472 controlled mutation public registration guarded implementation`.
-Current validation: `CMV-1578`.
+Current checkpoint: `CM-1473 controlled mutation bounded live dry-run proof`.
+Current validation: `CMV-1579`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1473 Controlled Mutation Bounded Live Dry-Run Proof
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_BOUNDED_LIVE_DRY_RUN_PROOF_NO_REAL_MUTATION`
+
+Recorded:
+
+- Ran one in-process MCP `initialize`.
+- Ran one in-process MCP `tools/list`.
+- Proved public tools list includes exactly `record_memory`, `search_memory`, `memory_overview`, `audit_memory`, `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- Ran one safe dry-run `tools/call` for each controlled mutation tool.
+- Each controlled mutation call returned `decision=rejected`, `dryRun=true`, `mutated=false`, `access.mode=controlled_mutation_public_bounded`, and forbidden key hits `0`.
+- No `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1579` bounded proof/docs validation.
 
 ## CM-1472 Controlled Mutation Public Registration Guarded Implementation
 

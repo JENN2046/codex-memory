@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1472 controlled mutation public registration guarded implementation` |
-| Current validation | `CMV-1578` |
-| Current route | CM-1472 registered bounded dry-run public controlled mutation tools; confirmed mutation and readiness remain blocked |
+| Current task | `CM-1473 controlled mutation bounded live dry-run proof` |
+| Current validation | `CMV-1579` |
+| Current route | CM-1473 proved controlled mutation public tools are visible and return low-disclosure dry-run/rejected projections; confirmed mutation and readiness remain blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1473` executed an in-process MCP bounded proof: one `initialize`, one `tools/list`, and one safe dry-run `tools/call` each for `validate_memory`, `tombstone_memory`, and `supersede_memory`. `tools/list` exposed exactly `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`. Each controlled mutation call returned `decision=rejected`, `dryRun=true`, `mutated=false`, `access.mode=controlled_mutation_public_bounded`, forbidden key hits `0`, `rawMemoryReturned=false`, `rawAuditReturned=false`, `providerCalled=false`, `bearerTokenUsed=false`, `rawStoreScanned=false`, `durableMutationPerformed=false`, `readinessClaimed=false`, and `rcReadyClaimed=false`. CM-1473 did not use `dry_run=false`, did not use `confirm=true`, did not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 `CM-1472` registers exactly `validate_memory`, `tombstone_memory`, and `supersede_memory` as public MCP tools under the CM-1471 exact approval. `TOOL_DEFINITIONS`, MCP `tools/list`, and `app.callTool(...)` now expose these tools alongside `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`. Public controlled mutation dispatch is wrapped in a low-disclosure dry-run gate: `dry_run=false` or `confirm=true` is rejected on the public path and requires separate exact mutation approval. Targeted registration/MCP/runtime tests passed; `npm test` passed `3046/3046`; `npm run test:hardening` passed; `npm run gate:mainline:strict` passed health, contract `36/36`, test `3046/3046`, compare `43/43`, and rollback `43/43`. CM-1472 did not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 

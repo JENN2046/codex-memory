@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1472 controlled mutation public registration guarded implementation`.
-Current validation: `CMV-1578`.
+Current task: `CM-1473 controlled mutation bounded live dry-run proof`.
+Current validation: `CMV-1579`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1472 registered bounded dry-run public controlled mutation tools; confirmed mutation and readiness remain blocked`.
+Current route: `CM-1473 proved controlled mutation public tools are visible and return low-disclosure dry-run/rejected projections; confirmed mutation and readiness remain blocked`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1472 controlled mutation public registration guarded implementation: registered exactly `validate_memory / tombstone_memory / supersede_memory` as public MCP tools under the CM-1471 exact approval. Public tools are now `record_memory / search_memory / memory_overview / audit_memory / validate_memory / tombstone_memory / supersede_memory`. Public controlled mutation calls are bounded dry-run projections; `dry_run=false` or `confirm=true` is rejected on the public path and requires separate exact mutation approval. No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+CM-1473 controlled mutation bounded live dry-run proof: in-process MCP `initialize`, `tools/list`, and one safe dry-run `tools/call` each for `validate_memory`, `tombstone_memory`, and `supersede_memory` proved the controlled mutation tools are visible and return low-disclosure `controlled_mutation_public_bounded` rejected projections with `dryRun=true`, `mutated=false`, and forbidden key hits `0`. No `dry_run=false`, no `confirm=true`, no real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
 
 更新时间：2026-06-04
 
