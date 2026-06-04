@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1438 auth preflight envelope clarification`.
-Current validation: `CMV-1548`.
-Current handoff: CM-1438 records CM-1437 as shape passed with boundary deviation and clarifies future authenticated MCP preflight bearer wording.
+Current task: `CM-1439 post-fast-forward local health validation`.
+Current validation: `CMV-1549`.
+Current handoff: CM-1439 records post-fast-forward `npm test` health validation on synced `main`; future live gates still require exact approval.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: clarify the authenticated MCP preflight bearer envelope for future live gates.
+Goal: confirm the synced `f0bcdf5` checkout is locally healthy after fast-forward.
 
-Current status: `COMPLETED_VALIDATED_DOCS_SOURCE_OF_TRUTH_CLARIFICATION_NOT_EXECUTED`.
+Current status: `COMPLETED_VALIDATED_POST_FAST_FORWARD_LOCAL_HEALTH`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,24 +28,21 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/CM1438_AUTHENTICATED_MCP_PREFLIGHT_ENVELOPE_CLARIFICATION.md`.
-- Updated `docs/CM1436_SCOPED_WRITE_FOLLOW_UP_SEARCH_VALIDATION_SCOPE_PACKET.md` with clarified future approval wording.
-- Recorded CM-1437 as `SEARCH_SHAPE_PASSED_BUT_BOUNDARY_DEVIATED`.
-- Preserved CM-1437 positive sanitized shape evidence: exactly one `search_memory`, `resultCount=1`, forbidden key paths `0`, no raw/id/path/title/snippet leakage.
-- Recorded deviation reason: bearer token was used for authenticated MCP `initialize` under approval wording that only named the single `search_memory` call.
-- Clarified future authenticated MCP live gates may explicitly allow bearer token use for authenticated `initialize`, authenticated `tools/list` if required, and the exactly approved `tools/call`.
-- Kept extra tool calls, extra search, broad reads, raw response print/persist, provider/API, raw store scan, memoryId lookup, public MCP expansion, and readiness / `RC_READY` claim forbidden unless separately and exactly approved.
-- No live `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API, real memory read/write, raw store scan, memoryId lookup, raw response print/persist, runtime action, public MCP expansion, or readiness claim occurred in CM-1438.
+- Confirmed fresh Git status on synced `main`.
+- Ran `npm test`; result passed `3005/3005`.
+- Confirmed post-test worktree remained clean.
+- Recorded CM-1439 / CMV-1549 in `.agent_board`.
+- No source/runtime change, live memory tool call, bearer-token use, provider/API call, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: `CMV-1548` docs/source-of-truth validation.
+Validation: `CMV-1549` local health validation.
 
 Boundaries:
 
-- No runtime action, live memory tool call, provider/API call, token use, raw store scan, memoryId lookup, raw response print/persist, real durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1438.
+- No runtime action, live memory tool call, provider/API call, token use, raw store scan, memoryId lookup, raw response print/persist, real durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, or readiness claim in CM-1439.
 
 Next safe action:
 
-Commit/push CM-1438 clarification only if separately authorized. Future live gates should use the clarified authenticated MCP preflight envelope wording before execution.
+Choose an explicit local source/test slice or scoped board task before implementation. Future live gates should use the clarified authenticated MCP preflight envelope wording and still require exact approval before execution.
 
 ## Historical Handoff Archive
 

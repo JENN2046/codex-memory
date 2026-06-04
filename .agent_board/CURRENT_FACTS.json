@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1438",
-  "validationId": "CMV-1548",
+  "taskId": "CM-1439",
+  "validationId": "CMV-1549",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1549",
+      "scope": "CM-1439 post-fast-forward local health validation",
+      "status": "COMPLETED_VALIDATED_POST_FAST_FORWARD_LOCAL_HEALTH"
+    },
     {
       "id": "CMV-1548",
       "scope": "CM-1438 auth preflight envelope clarification",

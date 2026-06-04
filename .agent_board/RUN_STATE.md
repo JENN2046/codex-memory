@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1438 auth preflight envelope clarification`.
-Current validation: `CMV-1548`.
+Current task: `CM-1439 post-fast-forward local health validation`.
+Current validation: `CMV-1549`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1438` records CM-1437 as `SEARCH_SHAPE_PASSED_BUT_BOUNDARY_DEVIATED`: the follow-up bounded `search_memory` shape was positive (`resultCount=1`, forbidden key paths `0`, no raw/id/path/title/snippet leakage), but bearer token was also used for authenticated MCP `initialize` session setup under approval wording that only named the single `search_memory` call. CM-1438 clarifies future authenticated MCP live gates may explicitly allow bearer token use for authenticated `initialize`, authenticated `tools/list` if required, and the exactly approved `tools/call`; extra tool calls, extra search, broad reads, raw response print/persist, provider/API, raw store scan, memoryId lookup, public MCP expansion, and readiness / `RC_READY` claim remain forbidden unless separately and exactly approved. CM-1438 itself performs no live action. Next safe action is commit/push only if separately authorized.
+`CM-1439` records post-fast-forward local health validation after syncing to `f0bcdf5`: fresh Git status showed `main` synced with `origin/main`, `npm test` passed `3005/3005`, and post-test worktree remained clean. CM-1439 performs no source/runtime change, live memory tool call, bearer-token use, provider/API call, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim. Next safe action is to choose an explicit local source/test slice or scoped board task before implementation; live memory/client/provider/runtime gates remain exact-approval boundaries.
 
 ## Historical Run Notes
 

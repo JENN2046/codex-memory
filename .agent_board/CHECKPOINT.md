@@ -4,11 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1438 auth preflight envelope clarification`.
-Current validation: `CMV-1548`.
+Current checkpoint: `CM-1439 post-fast-forward local health validation`.
+Current validation: `CMV-1549`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1439 Post-Fast-Forward Local Health Validation
+
+Status: `COMPLETED_VALIDATED_POST_FAST_FORWARD_LOCAL_HEALTH`
+
+Scope:
+
+```text
+post-fast-forward local health validation; no source/runtime change
+```
+
+Recorded:
+
+- Local `main` was fast-forwarded to `origin/main` at short head `f0bcdf5`.
+- Fresh Git status before validation showed `main...origin/main` with a clean worktree.
+- `npm test` passed `3005/3005` with `0` failures.
+- Post-test Git status and diff check remained clean.
+- No live `search_memory`, `record_memory`, `memory_overview`, bearer-token use, provider/API, true memory read/write, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1549` local health validation.
+
+Next safe action:
+
+- Choose an explicit local source/test slice or scoped board task before implementation.
+- Live memory/client/provider/runtime gates remain exact-approval boundaries.
 
 ## CM-1438 Auth Preflight Envelope Clarification
 

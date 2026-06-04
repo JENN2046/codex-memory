@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1438 auth preflight envelope clarification`.
-Current validation: `CMV-1548`.
+Current task: `CM-1439 post-fast-forward local health validation`.
+Current validation: `CMV-1549`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Authenticated MCP preflight envelope clarified; CM-1437 recorded as search shape passed with boundary deviation`.
+Current route: `Post-fast-forward local health validation passed; future live gates remain exact-approval boundaries`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
