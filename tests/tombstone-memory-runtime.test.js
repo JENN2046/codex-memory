@@ -506,5 +506,5 @@ test('memory_tombstone requires tombstone_reason lifecycle projection support', 
 test('memory_tombstone is internal and does not expand public MCP tools', () => {
   const toolNames = TOOL_DEFINITIONS.map(tool => tool.name).sort();
 
-  assert.deepEqual(toolNames, ['memory_overview', 'record_memory', 'search_memory']);
+  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
 });

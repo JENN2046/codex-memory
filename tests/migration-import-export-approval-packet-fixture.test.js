@@ -10,7 +10,8 @@ const fixture = JSON.parse(fixtureText);
 const PUBLIC_MCP_TOOLS = [
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ];
 
 const REQUIRED_APPROVAL_PACKETS = [

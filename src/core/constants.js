@@ -96,6 +96,31 @@ const TOOL_DEFINITIONS = [
         limit: { type: 'integer', minimum: 1, maximum: 50 }
       }
     }
+  },
+  {
+    name: 'audit_memory',
+    title: 'Audit Memory Readonly',
+    description: 'Readonly bounded audit explanation for memory visibility, hidden, and suppression decisions. Returns only low-disclosure aggregate projection fields and never returns raw memory, raw audit rows, filesystem paths, provider payloads, token material, or memory content.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        audit_family: { type: 'string', enum: ['write', 'recall', 'governance', 'all'] },
+        window: { type: 'integer', minimum: 1, maximum: 200 },
+        scope: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            project_id: { type: 'string', maxLength: 200 },
+            workspace_id_present: { type: 'boolean' },
+            client_id: { type: 'string', maxLength: 200 },
+            visibility: { type: 'string', maxLength: 200 },
+            task_id: { type: 'string', maxLength: 200 }
+          }
+        },
+        include_raw: { type: 'boolean', enum: [false] }
+      }
+    }
   }
 ];
 

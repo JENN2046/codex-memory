@@ -6,7 +6,12 @@
   "providerCalled": false,
   "realMemoryStoreRead": false,
   "durableStateMutated": false,
-  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory"
+  ],
   "packs": [
     {
       "id": "tagmemo_semantic_association",
@@ -14,8 +19,15 @@
       "fixture": "tests/fixtures/phase-f-tagmemo-semantic-association-v1.json",
       "test": "tests/phase-f-tagmemo-semantic-association-fixture.test.js",
       "upstream": [],
-      "downstream": ["epa_residualpyramid_chain_metadata", "query_quality_dry_run_refresh"],
-      "nonClaims": ["real recall behavior", "runtime VCP parity", "provider quality"]
+      "downstream": [
+        "epa_residualpyramid_chain_metadata",
+        "query_quality_dry_run_refresh"
+      ],
+      "nonClaims": [
+        "real recall behavior",
+        "runtime VCP parity",
+        "provider quality"
+      ]
     },
     {
       "id": "observability_admin_review_surface",
@@ -23,8 +35,15 @@
       "fixture": "tests/fixtures/phase-f-observability-admin-review-surface-v1.json",
       "test": "tests/phase-f-observability-admin-review-surface-fixture.test.js",
       "upstream": [],
-      "downstream": ["admin_review_schema_hardening", "readiness_boundary_wording_guard"],
-      "nonClaims": ["live admin readiness", "production readiness", "cutover readiness"]
+      "downstream": [
+        "admin_review_schema_hardening",
+        "readiness_boundary_wording_guard"
+      ],
+      "nonClaims": [
+        "live admin readiness",
+        "production readiness",
+        "cutover readiness"
+      ]
     },
     {
       "id": "memory_governance_proposal",
@@ -32,35 +51,67 @@
       "fixture": "tests/fixtures/phase-f-memory-governance-proposal-v1.json",
       "test": "tests/phase-f-memory-governance-proposal-fixture.test.js",
       "upstream": [],
-      "downstream": ["memory_lifecycle_proposal_states", "admin_review_schema_hardening"],
-      "nonClaims": ["durable governance mutation", "approval granted", "runtime readiness"]
+      "downstream": [
+        "memory_lifecycle_proposal_states",
+        "admin_review_schema_hardening"
+      ],
+      "nonClaims": [
+        "durable governance mutation",
+        "approval granted",
+        "runtime readiness"
+      ]
     },
     {
       "id": "lightmemo_directory_semantics",
       "area": "P7-vcp-parity-hardening",
       "fixture": "tests/fixtures/phase-f-lightmemo-directory-semantics-v1.json",
       "test": "tests/phase-f-lightmemo-directory-semantics-fixture.test.js",
-      "upstream": ["tagmemo_semantic_association"],
-      "downstream": ["query_quality_dry_run_refresh"],
-      "nonClaims": ["real LightMemo recall", "real memory store read", "runtime parity"]
+      "upstream": [
+        "tagmemo_semantic_association"
+      ],
+      "downstream": [
+        "query_quality_dry_run_refresh"
+      ],
+      "nonClaims": [
+        "real LightMemo recall",
+        "real memory store read",
+        "runtime parity"
+      ]
     },
     {
       "id": "epa_residualpyramid_chain_metadata",
       "area": "P7-vcp-parity-hardening",
       "fixture": "tests/fixtures/phase-f-epa-residualpyramid-chain-metadata-v1.json",
       "test": "tests/phase-f-epa-residualpyramid-chain-metadata-fixture.test.js",
-      "upstream": ["tagmemo_semantic_association"],
-      "downstream": ["query_quality_dry_run_refresh"],
-      "nonClaims": ["real EPA recall", "real ResidualPyramid recall", "provider quality"]
+      "upstream": [
+        "tagmemo_semantic_association"
+      ],
+      "downstream": [
+        "query_quality_dry_run_refresh"
+      ],
+      "nonClaims": [
+        "real EPA recall",
+        "real ResidualPyramid recall",
+        "provider quality"
+      ]
     },
     {
       "id": "memory_lifecycle_proposal_states",
       "area": "P8-memory-governance",
       "fixture": "tests/fixtures/phase-f-memory-lifecycle-proposal-states-v1.json",
       "test": "tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js",
-      "upstream": ["memory_governance_proposal"],
-      "downstream": ["admin_review_schema_hardening", "query_quality_dry_run_refresh"],
-      "nonClaims": ["durable lifecycle implementation", "destructive deletion applied", "RC readiness"]
+      "upstream": [
+        "memory_governance_proposal"
+      ],
+      "downstream": [
+        "admin_review_schema_hardening",
+        "query_quality_dry_run_refresh"
+      ],
+      "nonClaims": [
+        "durable lifecycle implementation",
+        "destructive deletion applied",
+        "RC readiness"
+      ]
     },
     {
       "id": "query_quality_dry_run_refresh",
@@ -73,8 +124,14 @@
         "epa_residualpyramid_chain_metadata",
         "memory_lifecycle_proposal_states"
       ],
-      "downstream": ["fixture_pack_validation_surface"],
-      "nonClaims": ["real query quality", "provider benchmark", "real memory scan"]
+      "downstream": [
+        "fixture_pack_validation_surface"
+      ],
+      "nonClaims": [
+        "real query quality",
+        "provider benchmark",
+        "real memory scan"
+      ]
     },
     {
       "id": "admin_review_schema_hardening",
@@ -86,8 +143,15 @@
         "memory_governance_proposal",
         "memory_lifecycle_proposal_states"
       ],
-      "downstream": ["fixture_pack_validation_surface", "readiness_boundary_wording_guard"],
-      "nonClaims": ["admin production readiness", "cutover readiness", "public MCP expansion readiness"]
+      "downstream": [
+        "fixture_pack_validation_surface",
+        "readiness_boundary_wording_guard"
+      ],
+      "nonClaims": [
+        "admin production readiness",
+        "cutover readiness",
+        "public MCP expansion readiness"
+      ]
     },
     {
       "id": "fixture_pack_validation_surface",
@@ -104,8 +168,14 @@
         "query_quality_dry_run_refresh",
         "admin_review_schema_hardening"
       ],
-      "downstream": ["readiness_boundary_wording_guard"],
-      "nonClaims": ["runtime validation", "package script added", "readiness claim"]
+      "downstream": [
+        "readiness_boundary_wording_guard"
+      ],
+      "nonClaims": [
+        "runtime validation",
+        "package script added",
+        "readiness claim"
+      ]
     },
     {
       "id": "readiness_boundary_wording_guard",
@@ -117,8 +187,15 @@
         "admin_review_schema_hardening",
         "fixture_pack_validation_surface"
       ],
-      "downstream": ["public_mcp_freeze_rollup", "future_phase_f_docs"],
-      "nonClaims": ["runtime readiness", "RC readiness", "production readiness"]
+      "downstream": [
+        "public_mcp_freeze_rollup",
+        "future_phase_f_docs"
+      ],
+      "nonClaims": [
+        "runtime readiness",
+        "RC readiness",
+        "production readiness"
+      ]
     },
     {
       "id": "public_mcp_freeze_rollup",
@@ -129,26 +206,52 @@
         "fixture_pack_validation_surface",
         "readiness_boundary_wording_guard"
       ],
-      "downstream": ["fixture_drift_changelog", "future_phase_f_docs"],
-      "nonClaims": ["runtime public MCP schema proof", "public MCP expansion readiness", "RC readiness"]
+      "downstream": [
+        "fixture_drift_changelog",
+        "future_phase_f_docs"
+      ],
+      "nonClaims": [
+        "runtime public MCP schema proof",
+        "public MCP expansion readiness",
+        "RC readiness"
+      ]
     },
     {
       "id": "fixture_drift_changelog",
       "area": "P6-docs-drift",
       "fixture": "tests/fixtures/phase-f-fixture-drift-changelog-v1.json",
       "test": "tests/phase-f-fixture-drift-changelog-fixture.test.js",
-      "upstream": ["fixture_pack_validation_surface", "public_mcp_freeze_rollup"],
-      "downstream": ["v3_receipt_rollup", "future_phase_f_docs"],
-      "nonClaims": ["release note claim", "runtime implementation claim", "readiness claim"]
+      "upstream": [
+        "fixture_pack_validation_surface",
+        "public_mcp_freeze_rollup"
+      ],
+      "downstream": [
+        "v3_receipt_rollup",
+        "future_phase_f_docs"
+      ],
+      "nonClaims": [
+        "release note claim",
+        "runtime implementation claim",
+        "readiness claim"
+      ]
     },
     {
       "id": "v3_receipt_rollup",
       "area": "P6-docs-drift / P10-observability-admin",
       "fixture": "tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json",
       "test": "tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js",
-      "upstream": ["public_mcp_freeze_rollup", "fixture_drift_changelog"],
-      "downstream": ["future_phase_f_docs"],
-      "nonClaims": ["runtime receipt recorder implemented", "CLI receipt rollup implemented", "readiness claim"]
+      "upstream": [
+        "public_mcp_freeze_rollup",
+        "fixture_drift_changelog"
+      ],
+      "downstream": [
+        "future_phase_f_docs"
+      ],
+      "nonClaims": [
+        "runtime receipt recorder implemented",
+        "CLI receipt rollup implemented",
+        "readiness claim"
+      ]
     }
   ],
   "futureSyntheticContracts": [],

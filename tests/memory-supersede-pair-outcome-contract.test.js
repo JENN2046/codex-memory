@@ -14,7 +14,8 @@ const fixture = JSON.parse(fixtureText);
 const PUBLIC_MCP_TOOLS = [
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ];
 
 test('CM-0879 pair-outcome fixture locks top-level blocked state', () => {

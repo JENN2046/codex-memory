@@ -6,7 +6,7 @@ const test = require('node:test');
 const fixturePath = path.join(__dirname, 'fixtures', 'smart-standing-authorization-v3-receipt-rollup-v1.json');
 const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 
-const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview'];
+const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'];
 const REQUIRED_TASK_IDS = ['CM-0673', 'CM-0674', 'CM-0675', 'CM-0676'];
 const REQUIRED_VALIDATION_IDS = ['CMV-0797', 'CMV-0798', 'CMV-0799', 'CMV-0800'];
 const REQUIRED_BUDGET_KEYS = [

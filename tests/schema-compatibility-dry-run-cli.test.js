@@ -44,7 +44,8 @@ test('schema compatibility dry-run CLI preserves public MCP three-tool freeze', 
   assert.deepEqual(report.publicMcpTools.tools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.equal(report.safety.publicMcpExpanded, false);
 });

@@ -8,7 +8,8 @@ const fixturePath = path.join(__dirname, 'fixtures', 'schema-compatibility-dry-r
 const PUBLIC_MCP_TOOLS = [
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ];
 
 const REQUIRED_REPORT_FIELDS = [

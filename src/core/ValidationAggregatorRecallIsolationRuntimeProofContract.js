@@ -10,7 +10,8 @@ const EXPECTED_MANIFEST_VERSION =
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const REQUIRED_ISOLATED_RECORD_FAMILIES = Object.freeze([

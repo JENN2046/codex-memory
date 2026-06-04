@@ -144,7 +144,8 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.deepEqual(fixture.public_mcp_tools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 
@@ -720,15 +721,17 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   assert.equal(fixture.conditional_live.includes('health'), true);
 });
 
-test('public MCP tools remain exactly the frozen three-tool contract', () => {
+test('public MCP tools remain exactly the frozen readonly audit tool contract', () => {
   const fixture = loadFixture();
 
   assert.deepEqual(fixture.public_mcp_tools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.deepEqual(fixture.public_mcp_tools.slice().sort(), [
+    'audit_memory',
     'memory_overview',
     'record_memory',
     'search_memory'

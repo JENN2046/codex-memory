@@ -9,22 +9,24 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1460 audit_memory readonly public contract implementation preflight` |
-| Current validation | `CMV-1566` |
-| Current route | CM-1460 local readonly contract preflight completed; public `audit_memory` registration, real DB migration apply, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks |
+| Current task | `CM-1461 audit_memory public MCP registration guarded implementation` |
+| Current validation | `CMV-1567` |
+| Current route | CM-1461 public `audit_memory` readonly bounded registration completed under exact approval; real DB migration apply, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
 
-`CM-1460` adds `src/core/AuditMemoryReadonlyService.js`, `tests/audit-memory-readonly-service.test.js`, `tests/audit-memory-public-contract-preflight.test.js`, and `docs/CM1460_AUDIT_MEMORY_PUBLIC_READONLY_CONTRACT_APPROVAL_PACKET.md`. The service returns only bounded low-disclosure aggregate explanation shape for visible/hidden/suppressed audit decisions. `audit_memory` remains unregistered, `TOOL_DEFINITIONS` remains frozen to `record_memory`, `search_memory`, and `memory_overview`, MCP `tools/list` excludes `audit_memory`, and `app.callTool('audit_memory')` remains blocked as `Unknown tool`. CM-1460 does not execute real DB migration apply, live memory tools, bearer-token use, provider/API calls, raw audit/SQLite/JSONL scans, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
+`CM-1461` registers `audit_memory` as a public MCP tool under exact approval. `TOOL_DEFINITIONS` and MCP `tools/list` now expose exactly `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`. `app.callTool('audit_memory')` dispatches only to `AuditMemoryReadonlyService.run(...)`, returning readonly bounded low-disclosure aggregate explanations. `include_raw=true` and mutation-like keys are rejected; output remains free of memory ids, title/content/snippet/path/raw/provider/token material. `npm run gate:mainline:strict` passed health, contract `36/36`, test `3036/3036`, compare `43/43`, and rollback `43/43`. CM-1461 does not execute real DB migration apply, durable memory mutation, live `record_memory`, live `search_memory`, bearer-token use, provider/API call, raw audit scan, raw SQLite broad scan, raw JSONL dump, remote action, readiness claim, or `RC_READY` claim.
 
-`CM-1459` adds `src/cli/lifecycle-sqlite-migrate.js`, `tests/lifecycle-sqlite-migrate-cli.test.js`, and `src/cli/run-release-gate-tests.js`, and updates package scripts for `test:migration`, `test:parity`, and `test:release-candidate`. The existing lifecycle dry-run CLI remains read-only. The new migrate CLI defaults to dry-run and requires `--confirm --backup <path>` for apply; apply behavior is covered only with temp SQLite DB tests. `audit_memory` gains a future public exposure approval packet but remains unregistered, and public MCP tools remain frozen to `record_memory`, `search_memory`, and `memory_overview`. `test:release-candidate` reports `RC_NOT_READY_BLOCKED` contract status and does not create release readiness or `RC_READY`.
+`CM-1460` added `src/core/AuditMemoryReadonlyService.js`, `tests/audit-memory-readonly-service.test.js`, `tests/audit-memory-public-contract-preflight.test.js`, and `docs/CM1460_AUDIT_MEMORY_PUBLIC_READONLY_CONTRACT_APPROVAL_PACKET.md`. The service returned only bounded low-disclosure aggregate explanation shape for visible/hidden/suppressed audit decisions. At CM-1460 closeout time, `audit_memory` was still unregistered and `app.callTool('audit_memory')` was blocked as `Unknown tool`; CM-1461 supersedes that registration state. CM-1460 did not execute real DB migration apply, live memory tools, bearer-token use, provider/API calls, raw audit/SQLite/JSONL scans, remote actions, readiness claims, or `RC_READY` claims.
+
+`CM-1459` added `src/cli/lifecycle-sqlite-migrate.js`, `tests/lifecycle-sqlite-migrate-cli.test.js`, and `src/cli/run-release-gate-tests.js`, and updated package scripts for `test:migration`, `test:parity`, and `test:release-candidate`. The existing lifecycle dry-run CLI remains read-only. The new migrate CLI defaults to dry-run and requires `--confirm --backup <path>` for apply; apply behavior is covered only with temp SQLite DB tests. At CM-1459 closeout time, `audit_memory` had only a future public exposure approval packet; CM-1461 supersedes that registration state. `test:release-candidate` reports `RC_NOT_READY_BLOCKED` contract status and does not create release readiness or `RC_READY`.
 
 `CM-1454` records local-safe route closeout in `docs/CM1454_LOCAL_SAFE_ROUTE_CLOSEOUT.md`. CM-1450 through CM-1453 are completed as local source/test or docs/contract slices, and no further automatic local-safe slice is selected. Remaining work requires either fresh exact approval for live/runtime/memory/bearer/provider boundaries, Red-boundary approval for push/public MCP/config/startup/release/readiness work, or a new user-selected local-safe task from another area.
 
-`CM-1453` reinforces the readonly `audit_memory` draft contract in `src/core/AuditMemoryReadonlyToolDraft.js` and `tests/audit-memory-readonly-tool-draft.test.js`. Mutation-like input keys now fail closed; `audit_memory` remains unregistered, `TOOL_DEFINITIONS` remains frozen to `record_memory`, `search_memory`, and `memory_overview`, and MCP `tools/list` still excludes `audit_memory`.
+`CM-1453` reinforced the readonly `audit_memory` draft contract in `src/core/AuditMemoryReadonlyToolDraft.js` and `tests/audit-memory-readonly-tool-draft.test.js`. Mutation-like input keys fail closed. At CM-1453 closeout time, `audit_memory` was still unregistered; CM-1461 supersedes that registration state.
 
 `CM-1452` adds `tests/release-test-gate-matrix-contract.test.js`, binding `docs/CM1448_RELEASE_TEST_GATE_MATRIX.md` to the default-safe runner exclusion categories in `src/cli/run-default-tests.js`. It does not change `package.json`, CI, dependencies, or package scripts.
 
@@ -91,7 +93,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-Finish final guarded local commit for CM-1460 if validation remains clean and commit guards pass. Future public `audit_memory` registration, real DB migration apply, live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval or Red-boundary authorization.
+CM-1461 is closed as a guarded local commit. Push remains unexecuted and requires separate explicit authorization. Future real DB migration apply, live/runtime/memory/provider/bearer/raw/remote/readiness work requires fresh exact approval or Red-boundary authorization.
 
 ## Boundaries
 

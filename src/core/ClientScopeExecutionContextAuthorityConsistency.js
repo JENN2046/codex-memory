@@ -14,7 +14,8 @@ const CLIENT_SCOPE_EXECUTION_CONTEXT_AUTHORITY_CONSISTENCY_VERSION =
 const EXPECTED_PUBLIC_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const AUTHORITY_FIELDS = Object.freeze([

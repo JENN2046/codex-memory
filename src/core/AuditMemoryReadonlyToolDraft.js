@@ -11,7 +11,8 @@ const RESULT_STATUS_BLOCKED = 'AUDIT_MEMORY_READONLY_TOOL_DRAFT_BLOCKED_NOT_READ
 const PUBLIC_MCP_TOOL_NAMES = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const ALLOWED_AUDIT_FAMILIES = Object.freeze([
@@ -67,6 +68,8 @@ const PUBLIC_EXPOSURE_REQUIREMENTS = Object.freeze([
   'readiness_claim_exclusion_test'
 ]);
 
+const PUBLIC_EXPOSURE_APPROVAL_TASK_ID = 'CM-1461';
+
 const inputSchema = Object.freeze({
   type: 'object',
   additionalProperties: false,
@@ -94,7 +97,7 @@ const inputSchema = Object.freeze({
     },
     include_raw: {
       type: 'boolean',
-      const: false,
+      enum: [false],
       description: 'Raw audit, raw memory, raw jsonl, token material, and filesystem paths are outside this draft.'
     }
   }
@@ -102,8 +105,8 @@ const inputSchema = Object.freeze({
 
 const draftToolDefinition = Object.freeze({
   name: TOOL_NAME,
-  title: 'Audit Memory Readonly Draft',
-  description: 'Internal draft only. It describes a future bounded, low-disclosure audit summary surface and is not registered as a public MCP tool.',
+  title: 'Audit Memory Readonly',
+  description: 'Readonly bounded, low-disclosure audit summary surface registered through CM-1461 approval. It does not expose raw memory, raw audit rows, filesystem paths, provider payloads, token material, or mutation behavior.',
   inputSchema
 });
 
@@ -134,7 +137,7 @@ function buildAuditMemoryReadonlyToolDraftReport() {
   const blockers = [];
 
   if (!publicToolsFrozen) blockers.push('public_mcp_tool_freeze_drift');
-  if (registeredPublicly) blockers.push('audit_memory_registered_publicly_without_approval');
+  if (!registeredPublicly) blockers.push('audit_memory_not_registered_after_cm1461_approval');
 
   return {
     taskId: TASK_ID,
@@ -142,9 +145,10 @@ function buildAuditMemoryReadonlyToolDraftReport() {
     status: blockers.length === 0 ? RESULT_STATUS_ACCEPTED : RESULT_STATUS_BLOCKED,
     acceptedForPlanning: blockers.length === 0,
     toolName: TOOL_NAME,
-    draftOnly: true,
+    draftOnly: false,
     publicMcpRegistered: registeredPublicly,
     publicMcpExpanded: registeredPublicly,
+    publicExposureApprovalTaskId: PUBLIC_EXPOSURE_APPROVAL_TASK_ID,
     publicToolsFrozen,
     publicTools: currentPublicTools,
     draftToolDefinition,
@@ -155,7 +159,7 @@ function buildAuditMemoryReadonlyToolDraftReport() {
     disclosure,
     sideEffects,
     publicExposureApprovalPacket: {
-      status: 'required_before_registration',
+      status: registeredPublicly ? 'approved_and_registered_readonly_bounded' : 'required_before_registration',
       requirements: PUBLIC_EXPOSURE_REQUIREMENTS,
       allowedPublicBehavior: 'bounded_readonly_selected_projection',
       forbiddenPublicBehavior: [
@@ -167,7 +171,7 @@ function buildAuditMemoryReadonlyToolDraftReport() {
         'readiness_claim'
       ]
     },
-    requiresExactApprovalBeforePublicExposure: true,
+    requiresExactApprovalBeforePublicExposure: !registeredPublicly,
     readinessClaimed: false,
     rcReadyClaimed: false,
     blockerReasons: blockers

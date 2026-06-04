@@ -16,7 +16,8 @@
   "publicTools": [
     "record_memory",
     "search_memory",
-    "memory_overview"
+    "memory_overview",
+    "audit_memory"
   ],
   "reviewedArtifacts": [
     "tests/fixtures/controlled-write-tools-v1.json",

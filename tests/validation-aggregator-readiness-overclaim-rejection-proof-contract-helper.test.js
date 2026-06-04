@@ -351,7 +351,8 @@ test('P66.33 helper exports required constants exactly', () => {
   assert.deepEqual(PUBLIC_MCP_TOOLS, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.deepEqual(REQUIRED_READINESS_CLAIMS, [
     'validation-aggregator-full-implementation-ready',

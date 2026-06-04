@@ -11,7 +11,12 @@
   "configChanged": false,
   "dependencyChanged": false,
   "remoteActionExecuted": false,
-  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory"
+  ],
   "rollup": {
     "taskId": "CM-0677",
     "rollupId": "V3-RECEIPT-ROLLUP-CM-0677",
@@ -37,8 +42,18 @@
       "stop_reason",
       "non_claims"
     ],
-    "sourceTaskIds": ["CM-0673", "CM-0674", "CM-0675", "CM-0676"],
-    "sourceValidationIds": ["CMV-0797", "CMV-0798", "CMV-0799", "CMV-0800"]
+    "sourceTaskIds": [
+      "CM-0673",
+      "CM-0674",
+      "CM-0675",
+      "CM-0676"
+    ],
+    "sourceValidationIds": [
+      "CMV-0797",
+      "CMV-0798",
+      "CMV-0799",
+      "CMV-0800"
+    ]
   },
   "receiptRows": [
     {
@@ -60,7 +75,11 @@
       "validation_result": "COMPLETED_VALIDATED",
       "next_auto_step_allowed": true,
       "stop_reason": "none",
-      "non_claims": ["live MCP schema inspected", "runtime public tool list verified", "RC readiness"]
+      "non_claims": [
+        "live MCP schema inspected",
+        "runtime public tool list verified",
+        "RC readiness"
+      ]
     },
     {
       "task_id": "CM-0674",
@@ -81,7 +100,11 @@
       "validation_result": "COMPLETED_VALIDATED",
       "next_auto_step_allowed": true,
       "stop_reason": "none",
-      "non_claims": ["runtime dashboard implemented", "CLI recorder implemented", "readiness achieved"]
+      "non_claims": [
+        "runtime dashboard implemented",
+        "CLI recorder implemented",
+        "readiness achieved"
+      ]
     },
     {
       "task_id": "CM-0675",
@@ -102,7 +125,11 @@
       "validation_result": "COMPLETED_VALIDATED",
       "next_auto_step_allowed": true,
       "stop_reason": "none",
-      "non_claims": ["CLI parser implemented", "live board scan executed", "readiness achieved"]
+      "non_claims": [
+        "CLI parser implemented",
+        "live board scan executed",
+        "readiness achieved"
+      ]
     },
     {
       "task_id": "CM-0676",
@@ -123,7 +150,11 @@
       "validation_result": "COMPLETED_VALIDATED",
       "next_auto_step_allowed": true,
       "stop_reason": "none",
-      "non_claims": ["release note claim", "runtime implementation claim", "readiness claim"]
+      "non_claims": [
+        "release note claim",
+        "runtime implementation claim",
+        "readiness claim"
+      ]
     }
   ],
   "aggregateBudgetUsed": {

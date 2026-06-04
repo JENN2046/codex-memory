@@ -136,7 +136,8 @@ test('P62 authorization precondition matrix preserves public MCP freeze and forb
   assert.deepEqual(fixture.publicMcpTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 
   for (const claim of [

@@ -80,7 +80,8 @@ test('P17.4 query-family fixture declares no-side-effect boundaries', () => {
   assert.deepEqual(fixture.safety.publicMcpTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.equal(fixture.safety.validateMemoryPublicTool, false);
 });

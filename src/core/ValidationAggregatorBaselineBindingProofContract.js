@@ -7,7 +7,8 @@ const EXPECTED_MANIFEST_VERSION = 'p66-validation-aggregator-baseline-binding-pr
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const BASELINE_KINDS = Object.freeze([

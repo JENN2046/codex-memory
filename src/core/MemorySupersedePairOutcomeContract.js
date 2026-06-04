@@ -3,7 +3,8 @@ const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const EXPECTED_SCHEMA_VERSION = 'memory-supersede-pair-outcome-v1';

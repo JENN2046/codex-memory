@@ -42,7 +42,10 @@ function uniqueSorted(values) {
 }
 
 function arraysEqual(left, right) {
-  return left.length === right.length && left.every((value, index) => value === right[index]);
+  const normalizedLeft = [...left].sort();
+  const normalizedRight = [...right].sort();
+  return normalizedLeft.length === normalizedRight.length &&
+    normalizedLeft.every((value, index) => value === normalizedRight[index]);
 }
 
 function missingValues(values, requiredValues) {

@@ -13,7 +13,8 @@ const DEFAULT_FIXTURE_PATH = path.join(
 const PUBLIC_MCP_TOOLS = [
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ];
 
 const REJECTED_FLAGS = new Set([

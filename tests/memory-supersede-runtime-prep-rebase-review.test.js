@@ -37,7 +37,8 @@ function buildRebaselineSummary(overrides = {}) {
     publicTools: [
       'record_memory',
       'search_memory',
-      'memory_overview'
+      'memory_overview',
+      'audit_memory'
     ],
     deniedActions: REQUIRED_DENIED_ACTIONS,
     evidenceRefs: [
@@ -66,7 +67,8 @@ function buildInput(overrides = {}) {
     publicTools: [
       'record_memory',
       'search_memory',
-      'memory_overview'
+      'memory_overview',
+      'audit_memory'
     ],
     deniedActions: REQUIRED_DENIED_ACTIONS,
     candidateRefs: [
@@ -142,6 +144,7 @@ test('CM-0965 fails closed on public MCP drift', () => {
       'record_memory',
       'search_memory',
       'memory_overview',
+      'audit_memory',
       'memory_supersede'
     ]
   }));

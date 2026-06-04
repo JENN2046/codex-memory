@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1460 audit_memory readonly public contract implementation preflight`.
-Current validation: `CMV-1566`.
+Current task: `CM-1461 audit_memory public MCP registration guarded implementation`.
+Current validation: `CMV-1567`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1460 local readonly contract preflight completed; public audit_memory registration, real DB migration apply, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks`.
+Current route: `CM-1461 public audit_memory readonly bounded registration completed under exact approval; real DB migration apply, runtime/provider/live memory, push, and readiness work remain exact-approval or Red-boundary tasks`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1460 source/test preflight: added readonly bounded `AuditMemoryReadonlyService`, public-contract preflight tests, and `docs/CM1460_AUDIT_MEMORY_PUBLIC_READONLY_CONTRACT_APPROVAL_PACKET.md`. `audit_memory` remains unregistered, public tools remain `record_memory / search_memory / memory_overview`, and `app.callTool('audit_memory')` remains blocked. No real DB migration apply, durable memory mutation, live `record_memory`, live `search_memory`, bearer-token use, provider/API call, raw audit scan, raw SQLite broad scan, raw JSONL dump, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+CM-1461 guarded implementation: registered readonly bounded `audit_memory` as a public MCP tool under exact approval. Public tools are now `record_memory / search_memory / memory_overview / audit_memory`. `app.callTool('audit_memory')` dispatches only to `AuditMemoryReadonlyService.run(...)`; output remains low-disclosure and bounded. `include_raw=true` and mutation-like keys are rejected. `npm run gate:mainline:strict` passed health, contract `36/36`, test `3036/3036`, compare `43/43`, and rollback `43/43`. No real DB migration apply, durable memory mutation, live `record_memory`, live `search_memory`, bearer-token use, provider/API call, raw audit scan, raw SQLite broad scan, raw JSONL dump, remote action, readiness claim, or `RC_READY` claim occurred.
 
 更新时间：2026-06-04
 

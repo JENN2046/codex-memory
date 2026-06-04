@@ -6,7 +6,7 @@ const test = require('node:test');
 const fixturePath = path.join(__dirname, 'fixtures', 'phase-f-epa-residualpyramid-chain-metadata-v1.json');
 const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 
-const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview'];
+const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'];
 const REQUIRED_SCENARIOS = [
   'epa-expansion-bounded-scope',
   'epa-pruning-deterministic-stage',

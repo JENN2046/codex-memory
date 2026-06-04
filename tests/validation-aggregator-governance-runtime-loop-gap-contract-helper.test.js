@@ -494,7 +494,8 @@ test('P66.39 helper exports required constants exactly', () => {
   assert.deepEqual(PUBLIC_MCP_TOOLS, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.deepEqual(REQUIRED_STAGE_IDS, [
     'review_packet_intake',

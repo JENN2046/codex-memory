@@ -7,7 +7,8 @@ const EXPECTED_MANIFEST_VERSION = 'p66-validation-aggregator-governance-runtime-
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const REQUIRED_STAGE_IDS = Object.freeze([

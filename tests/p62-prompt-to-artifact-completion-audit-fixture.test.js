@@ -118,7 +118,8 @@ test('P62 prompt-to-artifact audit keeps public MCP frozen and A5 hard stops vis
   assert.deepEqual(fixture.publicMcpTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 
   for (const action of [

@@ -7,7 +7,8 @@ const EXPECTED_MANIFEST_VERSION = 'p62-authorization-precondition-manifest-v1';
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const REQUIRED_PRE_AUTHORIZATION_EVIDENCE_IDS = Object.freeze([

@@ -25,7 +25,8 @@ function buildInput(patch = {}) {
     publicMcpTools: [
       'record_memory',
       'search_memory',
-      'memory_overview'
+      'memory_overview',
+      'audit_memory'
     ],
     sourceRegistry: REQUIRED_SOURCE_REGISTRY_IDS.map(id => ({
       id,

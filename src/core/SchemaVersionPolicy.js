@@ -24,7 +24,8 @@ const WRITE_OPERATIONS = new Set([
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 function normalizeString(value) {

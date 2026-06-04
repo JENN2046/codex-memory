@@ -63,7 +63,8 @@ test('P53 inventory does not claim full aggregator implementation, runtime readi
   assert.deepEqual(fixture.publicTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 

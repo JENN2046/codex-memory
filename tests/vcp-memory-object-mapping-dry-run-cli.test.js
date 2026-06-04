@@ -59,7 +59,8 @@ test('JSON output parses and reports default mutated=false', () => {
   assert.deepEqual(report.publicTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 

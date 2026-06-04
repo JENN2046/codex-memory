@@ -80,7 +80,7 @@ function acceptedInput(overrides = {}) {
         client_id: 'codex'
       }
     },
-    publicTools: ['memory_overview', 'record_memory', 'search_memory'],
+    publicTools: ['audit_memory', 'memory_overview', 'record_memory', 'search_memory'],
     sideEffects: {
       runtime_applied: false,
       mcp_tools_called: 0,
@@ -121,7 +121,8 @@ test('CM-1406 accepts no-apply execution-context authority normalization consist
   assert.deepEqual(summary.publicTools.expected, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.deepEqual(summary.declaredScopes.map(scope => scope.identityMismatchBlocked), [
     true,

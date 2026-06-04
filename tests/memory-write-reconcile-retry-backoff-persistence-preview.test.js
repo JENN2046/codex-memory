@@ -234,5 +234,5 @@ test('CM-1083 preview rejects apply and does not expand public MCP tools', () =>
   assert.equal(report.accepted, false);
   assert.ok(report.blockerReasons.includes('apply_requested_but_not_allowed_in_cm1083'));
   assert.equal(report.applyGate.applyExecuted, false);
-  assert.deepEqual(publicToolNames(), ['memory_overview', 'record_memory', 'search_memory']);
+  assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
 });

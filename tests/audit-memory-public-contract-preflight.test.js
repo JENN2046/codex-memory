@@ -40,14 +40,14 @@ async function withApp(handler) {
   }
 }
 
-test('CM1460 public contract preflight keeps static TOOL_DEFINITIONS frozen', () => {
+test('CM1461 public contract registration exposes only approved TOOL_DEFINITIONS', () => {
   const toolNames = sorted(TOOL_DEFINITIONS.map(tool => tool.name));
 
   assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
-  assert.equal(toolNames.includes(TOOL_NAME), false);
+  assert.equal(toolNames.includes(TOOL_NAME), true);
 });
 
-test('CM1460 public contract preflight keeps MCP tools/list frozen', async () => {
+test('CM1461 public contract registration exposes audit_memory in MCP tools/list', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
     const list = await server.handleJsonRpc({
@@ -59,20 +59,111 @@ test('CM1460 public contract preflight keeps MCP tools/list frozen', async () =>
 
     const toolNames = sorted(list.response.result.tools.map(tool => tool.name));
     assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
-    assert.equal(toolNames.includes(TOOL_NAME), false);
+    assert.equal(toolNames.includes(TOOL_NAME), true);
+    const auditMemory = list.response.result.tools.find(tool => tool.name === TOOL_NAME);
+    assert.ok(auditMemory);
+    assert.match(auditMemory.description, /Readonly bounded audit explanation/);
+    assert.equal(auditMemory.inputSchema.additionalProperties, false);
+    assert.deepEqual(auditMemory.inputSchema.properties.audit_family.enum, ['write', 'recall', 'governance', 'all']);
+    assert.equal(auditMemory.inputSchema.properties.window.minimum, 1);
+    assert.equal(auditMemory.inputSchema.properties.window.maximum, 200);
+    assert.deepEqual(auditMemory.inputSchema.properties.include_raw.enum, [false]);
   });
 });
 
-test('CM1460 public contract preflight keeps app.callTool audit_memory blocked', async () => {
+test('CM1461 app.callTool audit_memory executes readonly bounded service', async () => {
   await withApp(async ({ app }) => {
-    await assert.rejects(
-      () => app.callTool('audit_memory', { audit_family: 'all', window: 10, include_raw: false }),
-      /Unknown tool/
-    );
+    const report = await app.callTool('audit_memory', { audit_family: 'all', window: 10, include_raw: false });
+
+    assert.equal(report.accepted, true);
+    assert.equal(report.access.mode, 'audit_memory_readonly_bounded');
+    assert.equal(report.access.rawMemoryReturned, false);
+    assert.equal(report.access.rawAuditReturned, false);
+    assert.equal(report.access.filesystemPathsReturned, false);
+    assert.equal(report.access.tokenMaterialReturned, false);
+    assert.equal(report.access.providerPayloadReturned, false);
+    assert.equal(report.policy.providerCalled, false);
+    assert.equal(report.policy.durableMutationPerformed, false);
+    assert.equal(report.policy.publicMcpExpanded, false);
+    assert.equal(report.policy.readinessClaimed, false);
+    assert.equal(report.policy.rcReadyClaimed, false);
   });
 });
 
-test('CM1460 public contract preflight proves service readiness without registration', async () => {
+test('CM1461 MCP tools/call audit_memory returns bounded low-disclosure projection', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'audit_memory',
+        arguments: {
+          audit_family: 'governance',
+          window: 25,
+          include_raw: false
+        }
+      }
+    });
+
+    const payload = result.response.result.structuredContent;
+    assert.equal(payload.accepted, true);
+    assert.equal(payload.access.mode, 'audit_memory_readonly_bounded');
+    assert.equal(payload.summary.requestedFamily, 'governance');
+    assert.equal(payload.summary.window, 25);
+    assert.equal(payload.access.rawMemoryReturned, false);
+    assert.equal(payload.access.rawAuditReturned, false);
+    assert.equal(payload.access.filesystemPathsReturned, false);
+    assert.equal(payload.access.tokenMaterialReturned, false);
+    assert.equal(payload.access.providerPayloadReturned, false);
+    assert.equal(payload.policy.rawAuditScanPerformed, false);
+    assert.equal(payload.policy.providerCalled, false);
+    assert.equal(payload.policy.durableMutationPerformed, false);
+    assert.equal(payload.policy.readinessClaimed, false);
+    assert.equal(payload.policy.rcReadyClaimed, false);
+  });
+});
+
+test('CM1461 MCP tools/call audit_memory rejects raw and mutation-like input at schema boundary', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const raw = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'audit_memory',
+        arguments: {
+          audit_family: 'all',
+          window: 10,
+          include_raw: true
+        }
+      }
+    });
+    assert.equal(raw.response.error.code, -32602);
+    assert.match(raw.response.error.data, /include_raw/);
+
+    const mutation = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'tools/call',
+      params: {
+        name: 'audit_memory',
+        arguments: {
+          audit_family: 'all',
+          window: 10,
+          include_raw: false,
+          forget: true
+        }
+      }
+    });
+    assert.equal(mutation.response.error.code, -32602);
+    assert.match(mutation.response.error.data, /forget/);
+  });
+});
+
+test('CM1461 public contract registration keeps readonly low-disclosure report semantics', async () => {
   const draft = buildAuditMemoryReadonlyToolDraftReport();
   const service = new AuditMemoryReadonlyService();
   const report = await service.run({
@@ -81,9 +172,9 @@ test('CM1460 public contract preflight proves service readiness without registra
     include_raw: false
   });
 
-  assert.equal(draft.requiresExactApprovalBeforePublicExposure, true);
+  assert.equal(draft.requiresExactApprovalBeforePublicExposure, false);
   assert.deepEqual(draft.publicExposureApprovalPacket.requirements, PUBLIC_EXPOSURE_REQUIREMENTS);
-  assert.equal(draft.publicMcpRegistered, false);
+  assert.equal(draft.publicMcpRegistered, true);
   assert.equal(report.accepted, true);
   assert.equal(report.summary.requestedFamily, 'governance');
   assert.equal(report.summary.window, 25);

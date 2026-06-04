@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1460 audit_memory readonly public contract implementation preflight`.
-Current validation: `CMV-1566`.
+Current checkpoint: `CM-1461 audit_memory public MCP registration guarded implementation`.
+Current validation: `CMV-1567`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1461 audit_memory Public MCP Registration Guarded Implementation
+
+Status: `COMPLETED_VALIDATED_PUBLIC_MCP_READONLY_BOUNDED_REGISTRATION`
+
+Recorded:
+
+- Registered `audit_memory` in public `TOOL_DEFINITIONS` under exact approval.
+- Added `app.callTool('audit_memory')` dispatch only to `AuditMemoryReadonlyService.run(...)`.
+- Updated MCP instructions to mention readonly bounded audit explanations.
+- Updated contract tests from the previous three-tool freeze to the four-tool approved freeze.
+- Proved `include_raw=true` and mutation-like keys are rejected.
+- No real DB migration apply, durable memory mutation, live memory tool call, bearer-token use, provider/API call, raw audit/SQLite/JSONL scan, config/watchdog/startup change, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1567` source/test validation.
 
 ## CM-1460 audit_memory Readonly Public Contract Implementation Preflight
 

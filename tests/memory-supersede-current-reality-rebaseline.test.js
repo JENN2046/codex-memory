@@ -34,7 +34,8 @@ function buildInput(overrides = {}) {
     publicTools: [
       'record_memory',
       'search_memory',
-      'memory_overview'
+      'memory_overview',
+      'audit_memory'
     ],
     deniedActions: [
       'public_mcp_expansion',
@@ -114,6 +115,7 @@ test('CM-0964 fails closed on public MCP drift', () => {
       'record_memory',
       'search_memory',
       'memory_overview',
+      'audit_memory',
       'memory_supersede'
     ]
   }));

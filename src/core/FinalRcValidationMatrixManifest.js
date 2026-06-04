@@ -1,7 +1,8 @@
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const REQUIRED_REJECTION_DEFAULTS = Object.freeze([

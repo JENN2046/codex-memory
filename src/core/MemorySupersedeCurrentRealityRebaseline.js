@@ -3,9 +3,10 @@ const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const EXPECTED_SCHEMA_VERSION = 'memory-supersede-current-reality-rebaseline-v1';
 const EXPECTED_VERSION = 'v1';
 const PUBLIC_MCP_TOOLS = Object.freeze([
-  'memory_overview',
   'record_memory',
-  'search_memory'
+  'search_memory',
+  'memory_overview',
+  'audit_memory'
 ]);
 const IMPLEMENTED_SURFACES = Object.freeze([
   'twoRecordShadowSeam',
@@ -68,7 +69,10 @@ function normalizeSurfaceBooleans(input = {}) {
 }
 
 function arraysEqual(left, right) {
-  return left.length === right.length && left.every((value, index) => value === right[index]);
+  const normalizedLeft = [...left].sort();
+  const normalizedRight = [...right].sort();
+  return normalizedLeft.length === normalizedRight.length &&
+    normalizedLeft.every((value, index) => value === normalizedRight[index]);
 }
 
 function uniqueSorted(values) {

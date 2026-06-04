@@ -292,7 +292,8 @@ test('P66.25 helper exports required constants exactly', () => {
   assert.deepEqual(PUBLIC_MCP_TOOLS, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.deepEqual(SUPPORTED_SOURCE_TYPES, [
     'committed_fixture',

@@ -62,7 +62,8 @@ test('public MCP tools remain frozen to the three-tool contract', () => {
   assert.deepEqual(fixture.publicTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 
   const families = familyMap(fixture);

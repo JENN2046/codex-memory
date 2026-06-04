@@ -12,6 +12,7 @@ const { DeferredGovernanceRuntimeEntryAdapter } = require('./core/DeferredGovern
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
+const { AuditMemoryReadonlyService } = require('./core/AuditMemoryReadonlyService');
 const {
   runSearchMemoryWithTimeout,
   throwIfSearchMemoryAborted
@@ -754,6 +755,7 @@ function createCodexMemoryApplication(overrides = {}) {
     candidateCacheStore,
     chatHistoryIndexStore
   });
+  const auditMemoryReadonlyService = new AuditMemoryReadonlyService();
 
   const vcpPassiveMemoryAdapter = new VcpPassiveMemoryAdapter({
     passiveRecallService,
@@ -868,7 +870,8 @@ function createCodexMemoryApplication(overrides = {}) {
       deferredGovernanceRuntimeEntryAdapter,
       passiveRecallService,
       activeRecallService,
-      overviewService
+      overviewService,
+      auditMemoryReadonlyService
     },
     adapters: {
       compatibilitySyntaxAdapter,
@@ -936,6 +939,10 @@ function createCodexMemoryApplication(overrides = {}) {
           auditWindow: args.auditWindow,
           limit: args.limit
         });
+      }
+
+      if (toolName === 'audit_memory') {
+        return auditMemoryReadonlyService.run(args);
       }
 
       throw new Error(`Unknown tool: ${toolName}`);

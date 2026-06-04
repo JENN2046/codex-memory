@@ -72,7 +72,8 @@ test('admin review surface fixture parses and locks top-level shape', () => {
   assert.deepEqual(fixture.publicMcpTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 

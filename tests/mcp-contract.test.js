@@ -61,7 +61,7 @@ test('codex-memory MCP should expose tools and execute record/search/overview', 
       method: 'tools/list',
       params: {}
     }, requestContext);
-    assert.equal(list.response.result.tools.length, 3);
+    assert.equal(list.response.result.tools.length, 4);
 
     const recordProcess = await server.handleJsonRpc({
       jsonrpc: '2.0',
@@ -151,7 +151,7 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
       jsonrpc: '2.0', id: 1, method: 'tools/list', params: {}
     });
     const tools = list.response.result.tools;
-    assert.deepEqual(tools.map(tool => tool.name).sort(), ['memory_overview', 'record_memory', 'search_memory']);
+    assert.deepEqual(tools.map(tool => tool.name).sort(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
     const recordMemory = tools.find(t => t.name === 'record_memory');
     assert.ok(recordMemory);
     const schema = recordMemory.inputSchema;

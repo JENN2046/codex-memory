@@ -7,7 +7,8 @@ const EXPECTED_MANIFEST_VERSION = 'p58-approval-framework-manifest-v1';
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const SAFE_SOURCE_TYPES = Object.freeze([

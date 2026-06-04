@@ -68,7 +68,8 @@ test('P66.16 preserves public MCP freeze and internal validate_memory status', (
   assert.deepEqual(fixture.publicTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.equal(fixture.publicToolsFrozen, true);
   assert.deepEqual(fixture.internalOnlyTools, ['validate_memory']);

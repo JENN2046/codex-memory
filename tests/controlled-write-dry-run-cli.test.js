@@ -52,7 +52,8 @@ test('controlled write dry-run reports all operations without mutation', () => {
   assert.deepEqual(report.publicTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.equal(report.operationCount, 7);
   assert.deepEqual(report.operations.map(operation => operation.toolName).sort(), [

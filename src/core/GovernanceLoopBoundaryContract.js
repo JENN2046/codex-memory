@@ -7,7 +7,8 @@ const EXPECTED_MANIFEST_VERSION = 'p56-governance-loop-manifest-v1';
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const REQUIRED_SOURCE_EVIDENCE_IDS = Object.freeze([

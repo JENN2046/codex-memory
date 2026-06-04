@@ -6,7 +6,8 @@ const EXPECTED_VERSION = 'v1';
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const DEFERRED_FAMILIES = Object.freeze([

@@ -6,31 +6,59 @@
   "providerCalled": false,
   "realMemoryStoreRead": false,
   "durableMemoryWritten": false,
-  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory"
+  ],
   "queryAssertions": [
     {
       "id": "qq-refresh-001",
       "area": "lifecycle-proposal-state",
       "query": "Which lifecycle fixture keeps proposal review separate from durable mutation?",
       "target": "memory_lifecycle_proposal_states",
-      "mustContain": ["proposal", "review-ready", "durable mutation"],
-      "mustNotContain": ["RC_READY", "providerCalled=true", "real memory store read"]
+      "mustContain": [
+        "proposal",
+        "review-ready",
+        "durable mutation"
+      ],
+      "mustNotContain": [
+        "RC_READY",
+        "providerCalled=true",
+        "real memory store read"
+      ]
     },
     {
       "id": "qq-refresh-002",
       "area": "forget-flow-boundary",
       "query": "Which fixture blocks forget flow from direct deletion without exact approval?",
       "target": "memory_lifecycle_forget_flow_boundary",
-      "mustContain": ["forget", "exact approval", "audit"],
-      "mustNotContain": ["destructive deletion already applied", "durable write completed"]
+      "mustContain": [
+        "forget",
+        "exact approval",
+        "audit"
+      ],
+      "mustNotContain": [
+        "destructive deletion already applied",
+        "durable write completed"
+      ]
     },
     {
       "id": "qq-refresh-003",
       "area": "admin-review-schema",
       "query": "Which admin review surface reports fixture pack status without claiming readiness?",
       "target": "admin_review_schema_hardening",
-      "mustContain": ["fixture pack status", "schema snapshot", "NOT_READY_BLOCKED"],
-      "mustNotContain": ["production readiness", "cutover readiness", "RC_READY"]
+      "mustContain": [
+        "fixture pack status",
+        "schema snapshot",
+        "NOT_READY_BLOCKED"
+      ],
+      "mustNotContain": [
+        "production readiness",
+        "cutover readiness",
+        "RC_READY"
+      ]
     }
   ],
   "dryRunReportShape": {

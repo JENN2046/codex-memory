@@ -252,7 +252,8 @@ test('P66.21 helper exports required constants exactly', () => {
   assert.deepEqual(PUBLIC_MCP_TOOLS, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.deepEqual(REQUIRED_EVIDENCE_GROUPS, [
     'source_registry_exact_set_proof',

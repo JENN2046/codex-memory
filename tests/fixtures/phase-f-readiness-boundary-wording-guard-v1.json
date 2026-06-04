@@ -6,7 +6,12 @@
   "providerCalled": false,
   "realMemoryStoreRead": false,
   "durableStateMutated": false,
-  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory"
+  ],
   "watchedDocs": [
     "docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md",
     "docs/PHASE_F_VCP_PARITY_FIXTURE_COVERAGE_GAP_REVIEW.md",

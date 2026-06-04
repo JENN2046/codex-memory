@@ -88,7 +88,8 @@ test('P62 completion audit preserves A5 hard stops and public MCP freeze', () =>
   assert.deepEqual(fixture.publicMcpTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 
   for (const action of [

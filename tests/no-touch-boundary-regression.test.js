@@ -7,7 +7,8 @@ const workspaceRoot = path.join(__dirname, '..');
 const frozenPublicMcpTools = [
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ];
 
 const noTouchTargets = [
@@ -199,7 +200,7 @@ test('P50 no-touch targets do not introduce scan, command, network, or durable-w
   assertAllTargetSourcesNoTouch();
 });
 
-test('P50 no-touch targets keep public MCP surface frozen to the three existing tools', () => {
+test('P50 no-touch targets keep public MCP surface frozen to the approved readonly audit tool set', () => {
   assertAllTargetSourcesNoTouch();
 
   for (const target of noTouchTargets) {

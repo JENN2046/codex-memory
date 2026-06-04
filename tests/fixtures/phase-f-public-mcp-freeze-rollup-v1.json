@@ -6,7 +6,12 @@
   "providerCalled": false,
   "realMemoryStoreRead": false,
   "durableStateMutated": false,
-  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory"
+  ],
   "v3Trial": {
     "taskId": "CM-0673",
     "lane": "Green",
@@ -48,6 +53,13 @@
       "expansionAllowed": false,
       "schemaChangeAllowed": false,
       "requiredBoundary": "exact_overview_only_no_public_schema_expansion"
+    },
+    {
+      "name": "audit_memory",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "exact_readonly_bounded_audit_explanation_only_no_raw_or_mutation"
     }
   ],
   "blockedPublicMcpChanges": [

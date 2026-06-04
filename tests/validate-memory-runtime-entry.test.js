@@ -220,7 +220,7 @@ test('internal validate runtime entry derives actor_client_id from execution con
     assert.equal(result.auditEventPreview.actor_client_id, 'codex');
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['memory_overview', 'record_memory', 'search_memory']
+      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']
     );
     await assert.rejects(
       () => app.callTool('validate_memory', {}, approvedRequestContext()),

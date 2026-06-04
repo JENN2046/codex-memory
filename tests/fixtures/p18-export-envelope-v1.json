@@ -14,7 +14,8 @@
   "publicTools": [
     "record_memory",
     "search_memory",
-    "memory_overview"
+    "memory_overview",
+    "audit_memory"
   ],
   "exportEnvelope": {
     "schema_version": "vNext-export-envelope-p18",

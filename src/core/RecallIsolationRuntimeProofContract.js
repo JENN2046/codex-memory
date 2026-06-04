@@ -7,7 +7,8 @@ const EXPECTED_MANIFEST_VERSION = 'p57-recall-isolation-runtime-proof-manifest-v
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const REQUIRED_SOURCE_EVIDENCE_IDS = Object.freeze([

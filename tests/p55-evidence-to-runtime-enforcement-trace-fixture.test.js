@@ -44,7 +44,8 @@ const expectedFailClosedStates = [
 const expectedPublicMcpTools = [
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ];
 
 function readFixtureText() {

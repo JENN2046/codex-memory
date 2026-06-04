@@ -310,7 +310,8 @@ test('minimal validation aggregator CLI preserves public MCP three-tool freeze',
   assert.deepEqual(report.public_mcp_tools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 
@@ -493,7 +494,8 @@ test('minimal validation aggregator CLI rejects live or side-effect flags', () =
     assert.deepEqual(report.public_mcp_tools, [
       'record_memory',
       'search_memory',
-      'memory_overview'
+      'memory_overview',
+      'audit_memory'
     ]);
     assert.ok(report.evidence_sources.decision, flag);
     assert.equal(report.evidence.p24Aggregator.rc9DecisionPacketEmbedded, true, flag);

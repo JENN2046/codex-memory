@@ -266,7 +266,7 @@ test('CM-1082 fails closed when store read returns malformed result or throws', 
 
 test('public MCP tool schemas remain frozen for CM-1082 store-backed dry-run preview', () => {
   const names = TOOL_DEFINITIONS.map(tool => tool.name).sort();
-  assert.deepEqual(names, ['memory_overview', 'record_memory', 'search_memory']);
+  assert.deepEqual(names, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
 
   const recordSchema = TOOL_DEFINITIONS.find(tool => tool.name === 'record_memory');
   const searchSchema = TOOL_DEFINITIONS.find(tool => tool.name === 'search_memory');

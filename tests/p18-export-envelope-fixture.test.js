@@ -45,7 +45,8 @@ test('public MCP tools remain frozen', () => {
   assert.deepEqual(fixture.publicTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 

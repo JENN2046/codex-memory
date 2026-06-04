@@ -460,7 +460,8 @@ test('P66.44 helper exports required constants exactly', () => {
   assert.deepEqual(PUBLIC_MCP_TOOLS, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.ok(REQUIRED_ISOLATED_RECORD_FAMILIES.includes('readiness_reports'));
   assert.ok(REQUIRED_PROOF_SURFACES.includes('candidate_cache'));

@@ -6,7 +6,12 @@
   "providerCalled": false,
   "realMemoryStoreRead": false,
   "durableStateMutated": false,
-  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory"
+  ],
   "schemaSnapshot": {
     "name": "phase_f_admin_review_local_safe_report_shape",
     "requiredTopLevelFields": [
@@ -42,7 +47,10 @@
       "primaryFixture": "tests/fixtures/phase-f-memory-lifecycle-proposal-states-v1.json",
       "primaryTest": "tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js",
       "status": "local_fixture_validatable",
-      "mustNotClaim": ["runtime governance readiness", "durable mutation applied"]
+      "mustNotClaim": [
+        "runtime governance readiness",
+        "durable mutation applied"
+      ]
     },
     {
       "packId": "query_quality_dry_run_refresh",
@@ -51,7 +59,10 @@
       "primaryFixture": "tests/fixtures/phase-f-query-quality-dry-run-refresh-v1.json",
       "primaryTest": "tests/phase-f-query-quality-dry-run-refresh-fixture.test.js",
       "status": "local_fixture_validatable",
-      "mustNotClaim": ["real query quality proven", "provider quality proven"]
+      "mustNotClaim": [
+        "real query quality proven",
+        "provider quality proven"
+      ]
     },
     {
       "packId": "admin_review_schema_hardening",
@@ -60,7 +71,10 @@
       "primaryFixture": "tests/fixtures/phase-f-admin-review-schema-hardening-v1.json",
       "primaryTest": "tests/phase-f-admin-review-schema-hardening-fixture.test.js",
       "status": "local_fixture_validatable",
-      "mustNotClaim": ["admin surface production ready", "cutover readiness"]
+      "mustNotClaim": [
+        "admin surface production ready",
+        "cutover readiness"
+      ]
     }
   ],
   "hardStops": [

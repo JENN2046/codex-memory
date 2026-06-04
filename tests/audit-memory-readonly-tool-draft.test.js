@@ -43,23 +43,24 @@ async function withApp(handler) {
   }
 }
 
-test('CM1414 audit_memory readonly draft is accepted for planning but not public', () => {
+test('CM1461 audit_memory readonly contract is approved and public as bounded readonly', () => {
   const report = buildAuditMemoryReadonlyToolDraftReport();
 
   assert.equal(report.status, RESULT_STATUS_ACCEPTED);
   assert.equal(report.acceptedForPlanning, true);
   assert.equal(report.toolName, TOOL_NAME);
-  assert.equal(report.draftOnly, true);
-  assert.equal(report.publicMcpRegistered, false);
-  assert.equal(report.publicMcpExpanded, false);
+  assert.equal(report.draftOnly, false);
+  assert.equal(report.publicMcpRegistered, true);
+  assert.equal(report.publicMcpExpanded, true);
+  assert.equal(report.publicExposureApprovalTaskId, 'CM-1461');
   assert.equal(report.publicToolsFrozen, true);
   assert.deepEqual(sorted(report.publicTools), sorted(PUBLIC_MCP_TOOL_NAMES));
   assert.equal(report.readonly, true);
   assert.equal(report.selectedProjection, true);
   assert.equal(report.selectedProjectionVersion, 1);
   assert.equal(report.lowDisclosure, true);
-  assert.equal(report.requiresExactApprovalBeforePublicExposure, true);
-  assert.equal(report.publicExposureApprovalPacket.status, 'required_before_registration');
+  assert.equal(report.requiresExactApprovalBeforePublicExposure, false);
+  assert.equal(report.publicExposureApprovalPacket.status, 'approved_and_registered_readonly_bounded');
   assert.equal(report.publicExposureApprovalPacket.allowedPublicBehavior, 'bounded_readonly_selected_projection');
   assert.deepEqual(
     report.publicExposureApprovalPacket.requirements,
@@ -87,17 +88,17 @@ test('CM1414 audit_memory readonly draft is accepted for planning but not public
   }
 });
 
-test('CM1414 audit_memory readonly draft schema is bounded and low-disclosure', () => {
+test('CM1461 audit_memory readonly draft schema remains bounded and low-disclosure', () => {
   assert.equal(draftToolDefinition.name, TOOL_NAME);
-  assert.match(draftToolDefinition.description, /Internal draft only/);
-  assert.match(draftToolDefinition.description, /not registered as a public MCP tool/);
+  assert.match(draftToolDefinition.description, /registered through CM-1461 approval/);
+  assert.match(draftToolDefinition.description, /does not expose raw memory/);
 
   const schema = draftToolDefinition.inputSchema;
   assert.equal(schema.additionalProperties, false);
   assert.deepEqual(schema.properties.audit_family.enum, ['write', 'recall', 'governance', 'all']);
   assert.equal(schema.properties.window.minimum, 1);
   assert.equal(schema.properties.window.maximum, 200);
-  assert.equal(schema.properties.include_raw.const, false);
+  assert.deepEqual(schema.properties.include_raw.enum, [false]);
   assert.equal(schema.properties.scope.additionalProperties, false);
   for (const field of ['project_id', 'client_id', 'visibility', 'task_id']) {
     assert.equal(schema.properties.scope.properties[field].maxLength, 200);
@@ -143,14 +144,14 @@ test('CM1414 audit_memory readonly draft rejects mutation-like input', () => {
   }
 });
 
-test('CM1414 audit_memory readonly draft does not change static public tool definitions', () => {
+test('CM1461 audit_memory readonly public registration changes only the approved tool definition', () => {
   const toolNames = sorted(TOOL_DEFINITIONS.map(tool => tool.name));
 
   assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
-  assert.equal(toolNames.includes(TOOL_NAME), false);
+  assert.equal(toolNames.includes(TOOL_NAME), true);
 });
 
-test('CM1414 audit_memory readonly draft does not appear in MCP tools/list', async () => {
+test('CM1461 audit_memory readonly public registration appears in MCP tools/list', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
     const list = await server.handleJsonRpc({
@@ -162,6 +163,6 @@ test('CM1414 audit_memory readonly draft does not appear in MCP tools/list', asy
 
     const toolNames = sorted(list.response.result.tools.map(tool => tool.name));
     assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
-    assert.equal(toolNames.includes(TOOL_NAME), false);
+    assert.equal(toolNames.includes(TOOL_NAME), true);
   });
 });

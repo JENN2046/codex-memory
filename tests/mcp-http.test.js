@@ -162,7 +162,7 @@ test('HTTP MCP should expose health and tools/list', async () => {
       })
     });
     const payload = await tools.json();
-    assert.equal(payload.result.tools.length, 3);
+    assert.equal(payload.result.tools.length, 4);
   });
 });
 

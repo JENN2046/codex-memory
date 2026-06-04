@@ -8,7 +8,8 @@ const fixturePath = path.join(__dirname, 'fixtures', 'p56-governance-executable-
 const expectedPublicMcpTools = [
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ];
 
 const expectedSourceEvidenceIds = [

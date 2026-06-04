@@ -6,7 +6,7 @@ const test = require('node:test');
 const fixturePath = path.join(__dirname, 'fixtures', 'phase-f-lightmemo-directory-semantics-v1.json');
 const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 
-const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview'];
+const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'];
 const REQUIRED_SCENARIOS = [
   'maid-basic-directory-scope',
   'folder-basic-directory-scope',

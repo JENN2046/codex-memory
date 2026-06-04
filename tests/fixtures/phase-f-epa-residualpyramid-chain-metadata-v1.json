@@ -3,7 +3,12 @@
   "decision": "NOT_READY_BLOCKED",
   "status": "synthetic_fixture_only",
   "evidenceClass": "fixture_contract_only",
-  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory"
+  ],
   "runtimeParityClaimed": false,
   "realRecallObserved": false,
   "providerCalled": false,
@@ -24,7 +29,10 @@
         "stageId": "epa_expansion",
         "sourceCandidateId": "candidate-alpha",
         "expansionReason": "explicit_semantic_axis_overlap",
-        "boundedExpansionScope": ["axis:governance", "axis:checkpoint"],
+        "boundedExpansionScope": [
+          "axis:governance",
+          "axis:checkpoint"
+        ],
         "candidateCountBefore": 1,
         "candidateCountAfter": 3
       },
@@ -117,7 +125,11 @@
       "expectedMetadata": {
         "stageId": "metadata_omission_guard",
         "accepted": false,
-        "missingFields": ["priorStageId", "candidateCountBefore", "candidateCountAfter"]
+        "missingFields": [
+          "priorStageId",
+          "candidateCountBefore",
+          "candidateCountAfter"
+        ]
       },
       "blockedClaims": [
         "metadata_omission_is_safe",

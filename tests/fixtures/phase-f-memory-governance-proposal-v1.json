@@ -2,7 +2,12 @@
   "version": "phase-f-memory-governance-proposal-v1",
   "decision": "NOT_READY_BLOCKED",
   "evidenceClass": "synthetic_fixture_only",
-  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory"
+  ],
   "durableMemoryWritten": false,
   "durableAuditWritten": false,
   "realMemoryStoreRead": false,

@@ -8,7 +8,8 @@
   "publicMcpTools": [
     "record_memory",
     "search_memory",
-    "memory_overview"
+    "memory_overview",
+    "audit_memory"
   ],
   "sqliteRecordFixture": {
     "memory_id": "mem-p13-map-001",

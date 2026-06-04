@@ -12,7 +12,8 @@
   "publicMcpTools": [
     "record_memory",
     "search_memory",
-    "memory_overview"
+    "memory_overview",
+    "audit_memory"
   ],
   "sourceContract": {
     "mode": "explicit_safe_inputs_only",

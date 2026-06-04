@@ -30,8 +30,17 @@
     ],
     "policyVersion": "Smart Standing Authorization v3 - Budgeted Autonomy Envelope",
     "projectState": "NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED",
-    "allowedLanes": ["Green", "Amber", "Red"],
-    "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+    "allowedLanes": [
+      "Green",
+      "Amber",
+      "Red"
+    ],
+    "publicMcpTools": [
+      "record_memory",
+      "search_memory",
+      "memory_overview",
+      "audit_memory"
+    ],
     "forbiddenSummaryFlags": {
       "pushAllowedAutomatically": false,
       "tagReleaseDeployAllowedAutomatically": false,
@@ -112,7 +121,12 @@
       "envelope_id": "V3-GREEN-CM-0673",
       "event_type": "green_no_amber_receipt",
       "action_performed": "phase_f_public_mcp_freeze_rollup",
-      "target_systems": ["local_docs", "local_fixtures", "local_tests", "agent_board"],
+      "target_systems": [
+        "local_docs",
+        "local_fixtures",
+        "local_tests",
+        "agent_board"
+      ],
       "calls_used": {
         "provider": 0,
         "api": 0,
@@ -145,7 +159,9 @@
       "envelope_id": "V3-RED-STOP-EXAMPLE",
       "event_type": "red_gate_stop",
       "action_performed": "public_mcp_expansion_requested",
-      "target_systems": ["public_mcp_contract"],
+      "target_systems": [
+        "public_mcp_contract"
+      ],
       "calls_used": {
         "provider": 0,
         "api": 0,

@@ -141,7 +141,8 @@ test('P52 blocked actions preserve A5 boundaries', () => {
   assert.deepEqual(fixture.publicTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 

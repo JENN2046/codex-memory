@@ -73,7 +73,7 @@ function runtimeSurface(overrides = {}) {
     readPolicySuppressionPreviewAvailable: true,
     rollbackCleanupPreviewAvailable: true,
     publicToolsFrozen: true,
-    publicTools: ['record_memory', 'search_memory', 'memory_overview'],
+    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'],
     ...overrides
   };
 }
@@ -304,7 +304,7 @@ test('CM-0925 adapter keeps public MCP frozen and does not perform filesystem re
 
     assert.equal(result.success, true);
     assert.equal(result.safety.readsFiles, false);
-    assert.deepEqual(publicToolNames(), ['memory_overview', 'record_memory', 'search_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
   } finally {
     fs.readFileSync = originalReadFileSync;
   }

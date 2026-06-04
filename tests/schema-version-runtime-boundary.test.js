@@ -73,7 +73,7 @@ test('record_memory public schema remains frozen without schema version argument
   assert.equal(Object.hasOwn(recordMemory.inputSchema.properties, 'schemaVersion'), false);
   assert.deepEqual(
     TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-    ['memory_overview', 'record_memory', 'search_memory']
+    ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']
   );
 });
 
@@ -123,7 +123,7 @@ test('explicit schema policy report proves write rejection without runtime integ
   assert.equal(report.errorCounts[SCHEMA_VERSION_POLICY_ERRORS.SCHEMA_VERSION_REQUIRED], 1);
   assert.equal(report.errorCounts[SCHEMA_VERSION_POLICY_ERRORS.UNSUPPORTED_SCHEMA_VERSION], 1);
   assert.equal(report.publicMcpTools.frozen, true);
-  assert.deepEqual(report.publicMcpTools.tools, ['record_memory', 'search_memory', 'memory_overview']);
+  assert.deepEqual(report.publicMcpTools.tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory']);
   assert.equal(report.readsFiles, false);
   assert.equal(report.executesCommands, false);
   assert.equal(report.startsServices, false);

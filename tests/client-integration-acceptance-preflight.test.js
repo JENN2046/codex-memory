@@ -99,7 +99,7 @@ function acceptedInput(overrides = {}) {
       failureCriteriaDocumented: true,
       readinessNonClaimDocumented: true
     },
-    publicTools: ['record_memory', 'search_memory', 'memory_overview'],
+    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'],
     scopeAcceptance: acceptedScopeSummary(),
     clients: [
       clientFixture('codex'),
@@ -128,7 +128,8 @@ test('CM-1402 accepts no-apply Codex/Claude client integration acceptance prefli
   assert.deepEqual(summary.publicTools.expected, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.equal(summary.clientScopeAcceptance.acceptedForPrivateReadConsistency, true);
   assert.equal(summary.runbook.runbookComplete, true);

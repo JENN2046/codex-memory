@@ -2757,13 +2757,14 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.canClaimV1RcReady, false);
 });
 
-test('minimal implementation preserves public MCP three-tool freeze', () => {
+test('minimal implementation preserves public MCP readonly audit tool freeze', () => {
   const report = buildV1RcValidationAggregatorReport();
 
   assert.deepEqual(report.public_mcp_tools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 
@@ -4711,7 +4712,8 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.deepEqual(report.public_mcp_tools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 });
 

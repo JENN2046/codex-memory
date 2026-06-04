@@ -7,7 +7,8 @@ const EXPECTED_OUTPUT_SCHEMA_VERSION = 'p54-final-rc-runner-output-v1';
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
-  'memory_overview'
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const SAFE_COMMAND_CLASSES = Object.freeze([

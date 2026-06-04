@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1460 audit_memory readonly public contract implementation preflight`.
-Current validation: `CMV-1566`.
+Current task: `CM-1461 audit_memory public MCP registration guarded implementation`.
+Current validation: `CMV-1567`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1460` completed readonly `audit_memory` contract preflight: bounded low-disclosure service, service tests, public-contract preflight tests, and approval packet. `audit_memory` remains unregistered, public tools remain frozen, and `app.callTool('audit_memory')` remains blocked. No real DB migration apply, live runtime, memory tool call, bearer-token material use, provider/API call, true memory read/write, raw audit/SQLite/JSONL scan, config/watchdog/startup mutation, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is final guarded local commit if eligible, or stop before any public MCP registration, real DB apply, live/runtime/memory/provider/bearer/raw/remote/readiness boundary.
+`CM-1461` completed exact-approved readonly bounded `audit_memory` public MCP registration. Public tools are now frozen to `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`; `app.callTool('audit_memory')` dispatches only to `AuditMemoryReadonlyService.run(...)`. No real DB migration apply, live runtime, memory tool call, bearer-token material use, provider/API call, true memory read/write, raw audit/SQLite/JSONL scan, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is final guarded local commit if eligible, or stop before any real DB apply, live/runtime/memory/provider/bearer/raw/remote/readiness boundary.
 
 ## Historical Run Notes
 

@@ -6,7 +6,7 @@ const test = require('node:test');
 const fixturePath = path.join(__dirname, 'fixtures', 'phase-f-memory-lifecycle-proposal-states-v1.json');
 const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 
-const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview'];
+const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory'];
 const REQUIRED_OBJECTS = ['proposal', 'supersession', 'tombstone', 'forget-flow'];
 const REQUIRED_EXACT_APPROVAL_TRANSITIONS = [
   'proposal-to-approved-exact',

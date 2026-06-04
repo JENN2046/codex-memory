@@ -43,7 +43,8 @@ test('proposal review keeps public MCP tools frozen', () => {
   assert.deepEqual(fixture.publicTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
 
   for (const decision of fixture.candidateDecisions) {

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1460",
-  "validationId": "CMV-1566",
+  "taskId": "CM-1461",
+  "validationId": "CMV-1567",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1567",
+      "scope": "CM-1461 audit_memory public MCP registration guarded implementation",
+      "status": "COMPLETED_VALIDATED_PUBLIC_MCP_READONLY_BOUNDED_REGISTRATION"
+    },
     {
       "id": "CMV-1566",
       "scope": "CM-1460 audit_memory readonly public contract implementation preflight",
@@ -289,14 +294,12 @@
   ],
   "notValidated": [
     "npm run gate:mainline",
-    "npm run gate:mainline:strict",
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
     "broad record_memory reliability",
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
-    "public audit_memory registration",
     "audit_memory bounded live no-mutation proof",
     "startup/watchdog warning source change",
     "real lifecycle SQLite migration apply against a durable memory DB",

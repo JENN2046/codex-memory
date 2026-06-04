@@ -103,7 +103,7 @@ test('CM-0927 app exposes deferred governance adapter service without public MCP
     assert.equal(typeof app.executeInternalMemoryForget, 'function');
     assert.equal(typeof app.previewInternalMemoryExcludeApplyPlan, 'function');
     assert.equal(typeof app.previewInternalMemoryForgetApplyPlan, 'function');
-    assert.deepEqual(publicToolNames(), ['memory_overview', 'record_memory', 'search_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
     await assert.rejects(
       () => app.callTool('memory_exclude', {}, approvedContext('memory_exclude')),
       /Unknown tool: memory_exclude/
@@ -134,7 +134,7 @@ test('CM-0931 app-level apply-plan preview entries are default-disabled and side
     assert.equal(result.runtimeEntryMounted, false);
     assert.equal(result.runtimeApplyBlocked, true);
     assert.equal(result.publicMcpExpanded, false);
-    assert.deepEqual(publicToolNames(), ['memory_overview', 'record_memory', 'search_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
   });
 });
 
@@ -183,7 +183,7 @@ test('CM-0931 app-level apply-plan preview routes enabled approved calls without
       'governance_suppressed'
     ]);
     assert.equal(forget.applyPlanPreview.auditPreview.durableAuditWritten, false);
-    assert.deepEqual(publicToolNames(), ['memory_overview', 'record_memory', 'search_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory']);
   });
 });
 

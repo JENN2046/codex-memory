@@ -207,6 +207,7 @@ test('P54 command result helper fails closed for malformed input and unsafe inve
           'record_memory',
           'search_memory',
           'memory_overview',
+          'audit_memory',
           'memory_admin'
         ]
       },

@@ -150,7 +150,8 @@ test('P17.2 fixture declares no-side-effect diagnostic boundaries', () => {
   assert.deepEqual(fixture.safety.publicMcpTools, [
     'record_memory',
     'search_memory',
-    'memory_overview'
+    'memory_overview',
+    'audit_memory'
   ]);
   assert.equal(fixture.safety.validateMemoryPublicTool, false);
 });
