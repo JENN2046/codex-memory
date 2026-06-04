@@ -4,11 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1439 post-fast-forward local health validation`.
-Current validation: `CMV-1549`.
+Current checkpoint: `CM-1440 Phase H next local-safe slice selection`.
+Current validation: `CMV-1550`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1440 Phase H Next Local-Safe Slice Selection
+
+Status: `COMPLETED_VALIDATED_SCOPE_SELECTION_NOT_EXECUTED`
+
+Scope:
+
+```text
+docs/board route selection only; no source/runtime execution
+```
+
+Recorded:
+
+- Reviewed Phase H boundary matrix and inventory.
+- Added `docs/CM1440_PHASE_H_NEXT_LOCAL_SAFE_SLICE_SELECTION.md`.
+- Selected `CM-1441 Phase H governance scope suppression consistency source/test` as the next local-safe candidate.
+- Added a `CM-1441` todo row to `.agent_board/TASK_QUEUE.md`.
+- No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1550` docs/board validation.
+
+Next safe action:
+
+- Implement CM-1441 only as pure explicit-input/no-apply source/test work.
+- Stop for exact approval before any runtime boundary.
 
 ## CM-1439 Post-Fast-Forward Local Health Validation
 

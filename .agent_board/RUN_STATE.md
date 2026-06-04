@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1439 post-fast-forward local health validation`.
-Current validation: `CMV-1549`.
+Current task: `CM-1440 Phase H next local-safe slice selection`.
+Current validation: `CMV-1550`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1439` records post-fast-forward local health validation after syncing to `f0bcdf5`: fresh Git status showed `main` synced with `origin/main`, `npm test` passed `3005/3005`, and post-test worktree remained clean. CM-1439 performs no source/runtime change, live memory tool call, bearer-token use, provider/API call, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim. Next safe action is to choose an explicit local source/test slice or scoped board task before implementation; live memory/client/provider/runtime gates remain exact-approval boundaries.
+`CM-1440` selects `CM-1441 Phase H governance scope suppression consistency source/test` as the next local-safe candidate. CM-1440 is docs/board routing only: no source/runtime change, live memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim. Next safe action is to implement CM-1441 only as pure explicit-input/no-apply source/test work, or stop for exact approval before any runtime boundary.
 
 ## Historical Run Notes
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1439",
-  "validationId": "CMV-1549",
+  "taskId": "CM-1440",
+  "validationId": "CMV-1550",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1550",
+      "scope": "CM-1440 Phase H next local-safe slice selection",
+      "status": "COMPLETED_VALIDATED_SCOPE_SELECTION_NOT_EXECUTED"
+    },
     {
       "id": "CMV-1549",
       "scope": "CM-1439 post-fast-forward local health validation",
