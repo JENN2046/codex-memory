@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1467 post-migration read-only health proof` |
-| Current validation | `CMV-1573` |
-| Current route | CM-1467 post-migration read-only health proof completed; readiness and `RC_READY` remain blocked |
+| Current task | `CM-1468 controlled mutation public contract preflight` |
+| Current validation | `CMV-1574` |
+| Current route | CM-1468 controlled mutation public contract preflight completed without registration; public expansion remains exact-approval / Red-boundary work |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1468` added `src/core/ControlledMutationPublicContractPreflight.js`, `tests/controlled-mutation-public-contract-preflight.test.js`, and `docs/CM1468_CONTROLLED_MUTATION_PUBLIC_CONTRACT_PREFLIGHT.md`. The preflight prepares bounded, low-disclosure public contract drafts for future `validate_memory`, `tombstone_memory`, and `supersede_memory` tools. Tests verify public MCP tools remain frozen to `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`; the controlled mutation candidates are absent from `TOOL_DEFINITIONS`, absent from `tools/list`, and rejected by `app.callTool(...)` as unknown. No public MCP expansion, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, remote action, or push occurred.
 
 `CM-1467` ran post-migration read-only health validation. `npm run lifecycle:sqlite:dry-run -- --json` returned `mutated=false`, all lifecycle columns present, `missingLifecycleColumns=[]`, `wouldAddColumns=[]`, `wouldBackfillStatus=0`, and `mutationRequired=false`. `npm run gate:mainline:strict` passed health, contract `36/36`, test `3036/3036`, compare `43/43`, and rollback `43/43`; contract coverage includes the readonly `audit_memory` public surface. No raw scan, provider/API, bearer token, mutation tool call, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
 
@@ -105,7 +107,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1467 completed post-migration read-only health proof. Future live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
+CM-1468 completed controlled mutation public contract preflight only. Future public MCP expansion, live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
 
 ## Boundaries
 

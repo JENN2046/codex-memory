@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1467 post-migration read-only health proof`.
-Current validation: `CMV-1573`.
-Current handoff: CM-1467 completed post-migration lifecycle dry-run and strict mainline health proof; lifecycle mutationRequired=false and strict gate passed, while readiness/`RC_READY` remains blocked.
+Current task: `CM-1468 controlled mutation public contract preflight`.
+Current validation: `CMV-1574`.
+Current handoff: CM-1468 prepared validate/tombstone/supersede public contract preflight without registering public MCP tools; future registration remains exact-approval / Red-boundary work.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1467 completed post-migration lifecycle dry-run and strict m
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_POST_MIGRATION_READ_ONLY_HEALTH_PROOF`.
+Current status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_CONTRACT_PREFLIGHT_NO_REGISTRATION`.
 
 Workspace: `A:\codex-memory`.
 

@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1467 post-migration read-only health proof`.
-Current validation: `CMV-1573`.
+Current task: `CM-1468 controlled mutation public contract preflight`.
+Current validation: `CMV-1574`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1467 post-migration read-only health proof completed; readiness and RC_READY remain blocked`.
+Current route: `CM-1468 controlled mutation public contract preflight completed without registration; public expansion remains exact-approval / Red-boundary work`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1467 read-only health proof: post-migration lifecycle dry-run reports all lifecycle columns present and `mutationRequired=false`. `npm run gate:mainline:strict` passed health, contract `36/36`, test `3036/3036`, compare `43/43`, and rollback `43/43`; contract coverage includes readonly `audit_memory`. No raw scan, provider/API, bearer token, mutation tool call, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+CM-1468 controlled mutation preflight: added bounded, low-disclosure public contract drafts and tests for future `validate_memory`, `tombstone_memory`, and `supersede_memory`. No public MCP registration occurred; public tools remain `record_memory / search_memory / memory_overview / audit_memory`, and mutation candidates remain unknown tools. No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, remote action, or push occurred.
 
 更新时间：2026-06-04
 

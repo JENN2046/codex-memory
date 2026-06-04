@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1467",
-  "validationId": "CMV-1573",
+  "taskId": "CM-1468",
+  "validationId": "CMV-1574",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1574",
+      "scope": "CM-1468 controlled mutation public contract preflight",
+      "status": "COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_CONTRACT_PREFLIGHT_NO_REGISTRATION"
+    },
     {
       "id": "CMV-1573",
       "scope": "CM-1467 post-migration read-only health proof",

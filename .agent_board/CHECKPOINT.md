@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1467 post-migration read-only health proof`.
-Current validation: `CMV-1573`.
+Current checkpoint: `CM-1468 controlled mutation public contract preflight`.
+Current validation: `CMV-1574`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1468 Controlled Mutation Public Contract Preflight
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_CONTRACT_PREFLIGHT_NO_REGISTRATION`
+
+Recorded:
+
+- Added `src/core/ControlledMutationPublicContractPreflight.js`.
+- Added `tests/controlled-mutation-public-contract-preflight.test.js`.
+- Added `docs/CM1468_CONTROLLED_MUTATION_PUBLIC_CONTRACT_PREFLIGHT.md`.
+- Prepared candidate contracts for `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- Public MCP tools remain frozen to `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`.
+- Candidate mutation tools remain absent from `TOOL_DEFINITIONS`, absent from `tools/list`, and rejected by `app.callTool(...)` as unknown.
+- No public MCP expansion, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, remote action, or push occurred.
+
+Validation: `CMV-1574` source/test/docs validation.
 
 ## CM-1467 Post-Migration Read-Only Health Proof
 
