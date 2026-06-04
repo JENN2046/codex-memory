@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1466 real DB migration apply evidence closeout`.
-Current validation: `CMV-1572`.
+Current checkpoint: `CM-1467 post-migration read-only health proof`.
+Current validation: `CMV-1573`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1467 Post-Migration Read-Only Health Proof
+
+Status: `COMPLETED_VALIDATED_POST_MIGRATION_READ_ONLY_HEALTH_PROOF`
+
+Recorded:
+
+- Ran `npm run lifecycle:sqlite:dry-run -- --json`.
+- Lifecycle dry-run returned `mutated=false`, all lifecycle columns present, `missingLifecycleColumns=[]`, `wouldAddColumns=[]`, `wouldBackfillStatus=0`, and `mutationRequired=false`.
+- Ran `npm run gate:mainline:strict`.
+- Strict mainline gate passed health, contract `36/36`, test `3036/3036`, compare `43/43`, and rollback `43/43`.
+- Contract coverage includes the readonly `audit_memory` public surface.
+- No raw scan, provider/API, bearer token, mutation tool call, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1573` read-only health validation.
 
 ## CM-1466 Real DB Migration Apply Evidence Closeout
 

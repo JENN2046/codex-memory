@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1466 real DB migration apply evidence closeout`.
-Current validation: `CMV-1572`.
-Current handoff: CM-1466 recorded sanitized real lifecycle SQLite migration apply closeout evidence and moved the backup outside the repo; post dry-run reports `mutationRequired=false`, while readiness/`RC_READY` remains blocked.
+Current task: `CM-1467 post-migration read-only health proof`.
+Current validation: `CMV-1573`.
+Current handoff: CM-1467 completed post-migration lifecycle dry-run and strict mainline health proof; lifecycle mutationRequired=false and strict gate passed, while readiness/`RC_READY` remains blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1466 recorded sanitized real lifecycle SQLite migration appl
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `REAL_DB_MIGRATION_APPLY_COMPLETED_VALIDATED`.
+Current status: `COMPLETED_VALIDATED_POST_MIGRATION_READ_ONLY_HEALTH_PROOF`.
 
 Workspace: `A:\codex-memory`.
 

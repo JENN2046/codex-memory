@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1466 real DB migration apply evidence closeout` |
-| Current validation | `CMV-1572` |
-| Current route | CM-1466 real DB migration apply completed and validated at schema level; readiness and `RC_READY` remain blocked |
+| Current task | `CM-1467 post-migration read-only health proof` |
+| Current validation | `CMV-1573` |
+| Current route | CM-1467 post-migration read-only health proof completed; readiness and `RC_READY` remain blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1467` ran post-migration read-only health validation. `npm run lifecycle:sqlite:dry-run -- --json` returned `mutated=false`, all lifecycle columns present, `missingLifecycleColumns=[]`, `wouldAddColumns=[]`, `wouldBackfillStatus=0`, and `mutationRequired=false`. `npm run gate:mainline:strict` passed health, contract `36/36`, test `3036/3036`, compare `43/43`, and rollback `43/43`; contract coverage includes the readonly `audit_memory` public surface. No raw scan, provider/API, bearer token, mutation tool call, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
 
 `CM-1466` recorded sanitized real lifecycle SQLite migration apply closeout evidence and moved the backup outside the repository. Backup location is `A:\codex-memory-backups\codex-memory.sqlite.cm1463-before-apply.2026-06-04.bak`, size `42725376`, SHA256 `FEE15BE4B4995F2B698750B319B77D54D967D9FD90EEAF08BC6E880C2B199C86`. Apply evidence recorded `applyExecuted=true`, `mutated=true`, `backupCreated=true`, added columns `status_reason`, `supersedes_memory_id`, `superseded_by_memory_id`, `lifecycle_updated_at`, and `lifecycle_actor_client_id`, `backfilledStatus=0`, `migrationRequired=false`, `rollbackAvailable=true`, `readinessClaimed=false`, and `rcReadyClaimed=false`. Post-apply dry-run reports all lifecycle columns present, no missing columns, no would-add columns, `wouldBackfillStatus=0`, and `mutationRequired=false`. No backup was committed. No raw scan, provider/API, bearer token, live memory tool, readiness claim, `RC_READY` claim, remote action, or push occurred.
 
@@ -103,7 +105,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1466 completed real lifecycle SQLite migration apply schema-level closeout. Future HTTP authenticated `audit_memory` proof, live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
+CM-1467 completed post-migration read-only health proof. Future live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
 
 ## Boundaries
 

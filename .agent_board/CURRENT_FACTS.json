@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1466",
-  "validationId": "CMV-1572",
+  "taskId": "CM-1467",
+  "validationId": "CMV-1573",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1573",
+      "scope": "CM-1467 post-migration read-only health proof",
+      "status": "COMPLETED_VALIDATED_POST_MIGRATION_READ_ONLY_HEALTH_PROOF"
+    },
     {
       "id": "CMV-1572",
       "scope": "CM-1466 real DB migration apply evidence closeout",
