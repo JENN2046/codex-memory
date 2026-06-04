@@ -132,6 +132,7 @@ test('HTTP MCP should expose health and tools/list', async () => {
     assert.doesNotMatch(serializedHealth, /loopback host without a bearer token/i);
     assert.equal(healthPayload.access, undefined);
     assert.equal(healthPayload.sessionHardening, undefined);
+    assert.equal(healthPayload.policyGates, undefined);
     assert.equal(healthPayload.runtime, undefined);
     assert.doesNotMatch(serializedHealth, /"embeddingProfile"\s*:/);
     assert.doesNotMatch(serializedHealth, /"fingerprint"\s*:/);
@@ -172,6 +173,7 @@ test('HTTP MCP bearer-configured no-token health remains low disclosure', async 
     assert.equal(healthPayload.auth.required, true);
     assert.equal(healthPayload.access, undefined);
     assert.equal(healthPayload.sessionHardening, undefined);
+    assert.equal(healthPayload.policyGates, undefined);
     assert.equal(healthPayload.runtime, undefined);
     assert.doesNotMatch(serializedHealth, /test-token/i);
     assert.doesNotMatch(serializedHealth, /"embeddingProfile"\s*:/);
@@ -209,6 +211,18 @@ test('HTTP MCP bearer health returns full bounded payload with valid token only'
     assert.equal(healthPayload.access.runtimeDetailLevel, 'bounded');
     assert.equal(healthPayload.auth.required, true);
     assert.equal(healthPayload.auth.warning, null);
+    assert.deepEqual(Object.keys(healthPayload.policyGates).sort(), [
+      'externalProviderAllowed',
+      'lifecycleReadPolicyEnabled',
+      'securityProfile',
+      'softReadPolicyEnabled',
+      'writePreflightEnabled'
+    ]);
+    assert.equal(healthPayload.policyGates.securityProfile, 'hardened');
+    assert.equal(healthPayload.policyGates.softReadPolicyEnabled, true);
+    assert.equal(healthPayload.policyGates.lifecycleReadPolicyEnabled, false);
+    assert.equal(healthPayload.policyGates.writePreflightEnabled, true);
+    assert.equal(healthPayload.policyGates.externalProviderAllowed, false);
     assert.deepEqual(Object.keys(healthPayload.runtime).sort(), ['writeReconcileWorker']);
     assert.deepEqual(Object.keys(healthPayload.runtime.writeReconcileWorker).sort(), [
       'available',
@@ -230,9 +244,17 @@ test('HTTP MCP bearer health returns full bounded payload with valid token only'
     assert.equal(healthPayload.runtime.writeReconcileWorker.lastResultSummary, null);
     assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
     assert.doesNotMatch(serializedHealth, /test-token/i);
+    assert.doesNotMatch(serializedHealth, /example\.invalid/i);
     assert.doesNotMatch(serializedHealth, /memoryId/i);
     assert.doesNotMatch(serializedHealth, /auditLogPath/i);
-  }, { bearerToken: 'test-token' });
+  }, { bearerToken: 'test-token' }, {
+    securityProfile: 'hardened',
+    enableLifecycleReadPolicy: false,
+    enableWritePreflight: true,
+    allowExternalProvider: false,
+    embeddingUrl: 'http://example.invalid',
+    embeddingModel: 'private-model'
+  });
 });
 
 test('HTTP MCP bearer-configured health rejects invalid token before full payload', async () => {
@@ -248,6 +270,7 @@ test('HTTP MCP bearer-configured health rejects invalid token before full payloa
     assert.equal(healthPayload.error, 'Unauthorized');
     assert.equal(healthPayload.runtime, undefined);
     assert.equal(healthPayload.sessionHardening, undefined);
+    assert.equal(healthPayload.policyGates, undefined);
     assert.equal(healthPayload.access, undefined);
   }, { bearerToken: 'test-token' });
 });

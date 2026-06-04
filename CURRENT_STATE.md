@@ -9,14 +9,24 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1444 Phase H local-safe space exhaustion route selection` |
-| Current validation | `CMV-1554` |
-| Current route | No new Phase H local-safe source/test slice selected; remaining Phase H work is exact-approval or Red boundary space |
+| Current task | `CM-1449 audit_memory readonly public contract prep` |
+| Current validation | `CMV-1559` |
+| Current route | Static-review plan implemented through bounded local slices CM-1445 through CM-1449; public MCP tools remain frozen and live/runtime boundaries remain exact-approval or Red |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1449` records readonly `audit_memory` public-contract prep in `docs/CM1449_AUDIT_MEMORY_READONLY_PUBLIC_CONTRACT_PREP.md` without registering a public MCP tool. Public tools remain `record_memory`, `search_memory`, and `memory_overview`. Future `audit_memory` public registration remains exact public-contract work requiring schema/tests, `tools/list` coverage, low-disclosure readonly explainability, and explicit approval. CM-1449 does not execute runtime, memory tools, bearer-token paths, provider/API calls, raw audit reads, raw store scans, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
+
+`CM-1448` records the release test gate matrix in `docs/CM1448_RELEASE_TEST_GATE_MATRIX.md` without changing `package.json`, CI, dependencies, runtime, provider behavior, memory tools, public MCP tools, remote state, readiness status, or `RC_READY` status. The matrix distinguishes local validation evidence from release readiness and keeps `npm test`, targeted tests, docs validators, provider gates, mainline gates, and live client acceptance from becoming standalone readiness claims.
+
+`CM-1447` records `docs/CM1447_STARTUP_NO_TOKEN_WARNING_FOLLOW_UP_PACKET.md` as a docs-only future route for no-token loopback warning wording. It intentionally avoids startup/watchdog/config/script mutation and defers any wording source/test work to a future selected slice.
+
+`CM-1446` adds bounded authenticated full `/health` policy gate visibility in `src/adapters/codex-mcp/http.js` and tests in `tests/mcp-http.test.js`. The authenticated full payload now includes `policyGates` booleans/profile label for soft read policy, lifecycle read policy, write preflight, external provider allowance, and security profile. No-token `/health` remains low-disclosure and omits `policyGates`. Targeted validation passed `68/68`; default `npm test` passed `3017/3017`. This is source/test evidence only, not live runtime evidence.
+
+`CM-1445` redacts tool error log stack/message persistence in `src/adapters/codex-mcp/server.js` with `redactSensitiveFragments(...)` and adds temp-log regression coverage in `tests/json-rpc-error-redaction.test.js`. Targeted validation passed `10/10`; default `npm test` passed `3017/3017`. This is source/test evidence only, not live runtime evidence.
 
 `CM-1444` reviews Phase H after `CM-1443` and selects no new local-safe source/test slice. `CM-1443` consumed the last selected local-safe source/test candidate, and the only active `todo` row, `CM-1422`, is exact bounded live `search_memory` rather than default local-safe source/test work. The decision is recorded in `docs/CM1444_PHASE_H_LOCAL_SAFE_SPACE_EXHAUSTION_ROUTE_SELECTION.md`. CM-1444 does not execute runtime, memory tools, bearer-token paths, provider/API calls, true memory reads/writes, raw store scans, durable writes, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
 
@@ -67,7 +77,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-No further Phase H local-safe source/test slice is currently selected. Optional guarded local commit may be considered only if separately requested and eligible. Future Phase H live/runtime/memory/provider/bearer/raw/remote/readiness work requires fresh exact approval, or a new user-selected local-safe task from another phase/area.
+Finish final local validation and guarded local commit for CM-1445 through CM-1449 if eligible. Future live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval, or a new user-selected local-safe task from another phase/area.
 
 ## Boundaries
 

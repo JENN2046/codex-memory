@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1444 Phase H local-safe space exhaustion route selection`.
-Current validation: `CMV-1554`.
+Current task: `CM-1449 audit_memory readonly public contract prep`.
+Current validation: `CMV-1559`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1444` reviewed Phase H after `CM-1443` and selected no new local-safe source/test slice. `CM-1443` consumed the last selected local-safe source/test candidate; the remaining active `CM-1422` row is exact bounded live `search_memory`, not default local-safe source/test work. No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is optional guarded local commit if separately requested and eligible, or stop for exact approval before any live/runtime/memory/provider/bearer/raw/remote/readiness boundary.
+`CM-1445` through `CM-1449` implemented the static-review plan as bounded local slices: tool error log redaction source/test, authenticated full `/health` policy gate visibility source/test, startup no-token warning follow-up packet, release test gate matrix, and readonly `audit_memory` public-contract prep without registration. No live runtime, memory tool call, bearer-token material use, provider/API call, true memory read/write, raw store scan, config/watchdog/startup mutation, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is final guarded local commit if eligible, or stop before any live/runtime/memory/provider/bearer/raw/remote/readiness boundary.
 
 ## Historical Run Notes
 

@@ -47,7 +47,7 @@ function appendToolErrorLog(app, toolName, error) {
   const logPath = app?.config?.httpLogPath;
   if (!logPath) return;
 
-  const message = error?.stack || error?.message || String(error);
+  const message = redactSensitiveFragments(error?.stack || error?.message || String(error));
   const line = `[${new Date().toISOString()}] ERROR tool ${toolName} failed: ${message}\n`;
   try {
     fs.mkdirSync(path.dirname(logPath), { recursive: true });

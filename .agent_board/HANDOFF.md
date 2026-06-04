@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1444 Phase H local-safe space exhaustion route selection`.
-Current validation: `CMV-1554`.
-Current handoff: CM-1444 confirms no new Phase H local-safe source/test slice is currently selected.
+Current task: `CM-1449 audit_memory readonly public contract prep`.
+Current validation: `CMV-1559`.
+Current handoff: CM-1445 through CM-1449 implement the static-review plan locally; live/runtime/public-MCP expansion remains blocked without exact approval.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: perform CM-1444 route selection after CM-1443 and decide whether another Phase H local-safe source/test slice remains.
+Goal: implement the optimized static-review plan through bounded local source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_SCOPE_SELECTION_NO_LOCAL_SAFE_SOURCE_TEST_REMAINS`.
+Current status: `COMPLETED_VALIDATED_DOCS_ONLY_CONTRACT_PREP_NO_PUBLIC_MCP_EXPANSION`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,15 +28,15 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/CM1444_PHASE_H_LOCAL_SAFE_SPACE_EXHAUSTION_ROUTE_SELECTION.md`.
-- Reviewed active queue, current state, Phase H route docs, `CM-1442`, and `CM-1443`.
-- Confirmed `CM-1443` consumed the last selected local-safe Phase H source/test candidate.
-- Confirmed active `CM-1422` remains exact bounded live `search_memory`, not default local-safe source/test work.
-- Selected no new local-safe Phase H source/test slice.
-- Recorded CM-1444 / CMV-1554 in `.agent_board`.
-- No runtime action, live memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+- CM-1445 redacted tool error log stack/message persistence and added regression coverage.
+- CM-1446 added authenticated full `/health` policy gate visibility while preserving no-token low-disclosure health.
+- CM-1447 recorded startup no-token warning wording as a future source/test slice without startup mutation.
+- CM-1448 recorded release test gate matrix and default-test overclaim boundaries without package script changes.
+- CM-1449 recorded readonly `audit_memory` public-contract prep without public MCP registration.
+- Recorded CM-1445 through CM-1449 and CMV-1555 through CMV-1559 in `.agent_board`.
+- No live runtime, live memory tool call, bearer-token material use, provider/API call, true memory read/write, raw store scan, durable memory/audit write, config/watchdog/startup mutation, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: `CMV-1554` docs/board route validation.
+Validation: `CMV-1555` through `CMV-1559`; targeted tests passed `10/10` and `68/68`; default `npm test` passed `3017/3017`; `git diff --check`, current facts drift, ledger consistency, and `scripts/validate-local.ps1 -Area docs` passed.
 
 Boundaries:
 
@@ -44,7 +44,7 @@ Boundaries:
 
 Next safe action:
 
-Optional guarded local commit if separately requested and eligible; otherwise stop for exact approval before any live/runtime/memory/provider/bearer/raw/remote/readiness boundary, or wait for a new user-selected local-safe task from another phase/area.
+Guarded local commit if final diff/secret/validation checks pass; otherwise stop and report blocker. Future live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval.
 
 ## Historical Handoff Archive
 

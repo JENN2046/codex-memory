@@ -2,14 +2,18 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
 
 const { CodexMemoryMcpServer, jsonRpcError } = require('../src/adapters/codex-mcp/server');
 
-function createMockApp() {
+function createMockApp(configOverrides = {}) {
   return {
     config: {
       defaultAgentId: 'test-agent',
-      defaultRequestSource: 'test'
+      defaultRequestSource: 'test',
+      ...configOverrides
     },
     callTool: async (name, args) => {
       if (name === 'search_memory') {
@@ -26,6 +30,11 @@ function createMockApp() {
         if (q.includes('stack_leak')) {
           const err = new Error('deep internal error');
           err.stack = 'Error: deep internal error\n    at Object.callTool (C:\\project\\src\\file.js:42:17)\n    at async handleJsonRpc (C:\\project\\src\\server.js:100:5)';
+          throw err;
+        }
+        if (q.includes('log_leak')) {
+          const err = new Error('Authorization failed for bearer sk-logsecret1234567890 at http://internal.provider.test/v1/embeddings using C:\\Users\\admin\\.env');
+          err.stack = 'Error: Authorization failed for bearer sk-logsecret1234567890\n    at Object.callTool (C:\\Users\\admin\\.env:1:1)\n    at async fetchProvider (http://internal.provider.test/v1/embeddings)';
           throw err;
         }
         if (q.includes('json_rpc_code')) {
@@ -126,6 +135,39 @@ test('internal error response does not contain stack traces', async () => {
   assert.doesNotMatch(serialized, /file\.js/);
   assert.doesNotMatch(serialized, /server\.js/);
   assert.ok(result.response.error.data.requestId);
+});
+
+test('tool error log redacts sensitive stack and message fragments', async () => {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-error-log-'));
+  const logPath = path.join(tempDir, 'http.log');
+  const server = new CodexMemoryMcpServer({
+    app: createMockApp({ httpLogPath: logPath })
+  });
+
+  try {
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 8,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: { query: 'log_leak_test', target: 'process', limit: 3 }
+      }
+    });
+    const responseText = JSON.stringify(result.response);
+    const logText = await fs.readFile(logPath, 'utf8');
+
+    assert.equal(result.response.error.code, -32603);
+    assert.doesNotMatch(responseText, /sk-logsecret/i);
+    assert.doesNotMatch(logText, /sk-logsecret/i);
+    assert.doesNotMatch(logText, /bearer\s+sk/i);
+    assert.doesNotMatch(logText, /internal\.provider/i);
+    assert.doesNotMatch(logText, /C:\\Users/i);
+    assert.doesNotMatch(logText, /\.env/i);
+    assert.match(logText, /<redacted>/);
+  } finally {
+    await fs.rm(tempDir, { recursive: true, force: true });
+  }
 });
 
 test('jsonRpcCode errors preserve structured data with requestId', async () => {

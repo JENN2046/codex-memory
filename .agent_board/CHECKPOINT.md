@@ -4,11 +4,78 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1444 Phase H local-safe space exhaustion route selection`.
-Current validation: `CMV-1554`.
+Current checkpoint: `CM-1449 audit_memory readonly public contract prep`.
+Current validation: `CMV-1559`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1449 audit_memory Readonly Public Contract Prep
+
+Status: `COMPLETED_VALIDATED_DOCS_ONLY_CONTRACT_PREP_NO_PUBLIC_MCP_EXPANSION`
+
+Scope:
+
+```text
+docs-only public-contract prep; no public MCP registration
+```
+
+Recorded:
+
+- Added `docs/CM1449_AUDIT_MEMORY_READONLY_PUBLIC_CONTRACT_PREP.md`.
+- Preserved public tools as `record_memory`, `search_memory`, and `memory_overview`.
+- Confirmed future `audit_memory` public registration remains exact-approval public-contract work.
+- No runtime action, memory tool call, bearer-token use, provider/API call, raw audit read, raw store scan, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1559` docs/board contract validation.
+
+## CM-1448 Release Test Gate Matrix
+
+Status: `COMPLETED_VALIDATED_DOCS_ONLY_CONTRACT_NO_PACKAGE_SCRIPT_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1448_RELEASE_TEST_GATE_MATRIX.md`.
+- Documented default-test and release-readiness overclaim boundary.
+- No `package.json`, CI, dependency, runtime, provider, memory tool, public MCP, remote, readiness, or `RC_READY` change occurred.
+
+Validation: `CMV-1558` docs/board contract validation.
+
+## CM-1447 Startup No-Token Warning Follow-Up Packet
+
+Status: `COMPLETED_VALIDATED_DOCS_ONLY_NOT_EXECUTED`
+
+Recorded:
+
+- Added `docs/CM1447_STARTUP_NO_TOKEN_WARNING_FOLLOW_UP_PACKET.md`.
+- Deferred no-token loopback warning wording to a future bounded source/test slice.
+- No startup/watchdog/config/script mutation or runtime action occurred.
+
+Validation: `CMV-1557` docs/board validation.
+
+## CM-1446 Authenticated Health Policy Gates Source/Test
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RUNTIME`
+
+Recorded:
+
+- Added bounded authenticated full `/health` `policyGates` summary.
+- Kept no-token `/health` low-disclosure.
+- Targeted tests passed `68/68`; default `npm test` passed `3017/3017`.
+
+Validation: `CMV-1556` source/test validation.
+
+## CM-1445 Tool Error Log Redaction Source/Test
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RUNTIME`
+
+Recorded:
+
+- Redacted tool error log stack/message persistence through `redactSensitiveFragments(...)`.
+- Added temp-log regression coverage.
+- Targeted tests passed `10/10`; default `npm test` passed `3017/3017`.
+
+Validation: `CMV-1555` source/test validation.
 
 ## CM-1444 Phase H Local-Safe Space Exhaustion Route Selection
 

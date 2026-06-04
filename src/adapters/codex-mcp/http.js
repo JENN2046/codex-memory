@@ -222,6 +222,17 @@ function buildRuntimeHealth(app) {
   };
 }
 
+function buildPolicyGateSummary(app) {
+  const config = app?.config || {};
+  return {
+    securityProfile: typeof config.securityProfile === 'string' ? config.securityProfile : 'unknown',
+    softReadPolicyEnabled: config.enableSoftReadPolicy === true,
+    lifecycleReadPolicyEnabled: config.enableLifecycleReadPolicy === true,
+    writePreflightEnabled: config.enableWritePreflight === true,
+    externalProviderAllowed: config.allowExternalProvider === true
+  };
+}
+
 function isLoopbackHost(host) {
   const normalized = String(host || '').trim().toLowerCase();
   return normalized === 'localhost'
@@ -478,6 +489,7 @@ function createStreamableHttpServer({
         cleanupIntervalMs: sessionHardening.cleanupIntervalMs,
         warnings: sessionHardening.warnings
       },
+      policyGates: buildPolicyGateSummary(app),
       runtime: buildRuntimeHealth(app)
     };
   }
@@ -697,6 +709,7 @@ module.exports = {
   SESSION_HEADER,
   createStreamableHttpServer,
   buildRuntimeHealth,
+  buildPolicyGateSummary,
   getHttpAuthWarning,
   isLoopbackHost,
   normalizePathname,
