@@ -8,6 +8,7 @@ const { createCodexMemoryApplication } = require('../src/app');
 const { CodexMemoryMcpServer } = require('../src/adapters/codex-mcp/server');
 const {
   DISCLOSURE_FLAGS,
+  MUTATION_INPUT_KEYS,
   PUBLIC_MCP_TOOL_NAMES,
   RESULT_STATUS_ACCEPTED,
   SIDE_EFFECT_FLAGS,
@@ -109,6 +110,20 @@ test('CM1414 audit_memory readonly draft rejects raw and unbounded input', () =>
       'window_out_of_bounds'
     ]
   });
+});
+
+test('CM1414 audit_memory readonly draft rejects mutation-like input', () => {
+  for (const key of MUTATION_INPUT_KEYS) {
+    const result = validateAuditMemoryReadonlyDraftInput({
+      audit_family: 'governance',
+      window: 10,
+      include_raw: false,
+      [key]: true
+    });
+
+    assert.equal(result.accepted, false, key);
+    assert.deepEqual(result.blockerReasons, ['mutation_input_not_allowed']);
+  }
 });
 
 test('CM1414 audit_memory readonly draft does not change static public tool definitions', () => {

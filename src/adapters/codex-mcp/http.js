@@ -248,7 +248,7 @@ function getHttpAuthWarning({ host, bearerToken }) {
   if (!isLoopbackHost(host)) {
     throw new Error('CODEX_MEMORY_HTTP_TOKEN is required when CODEX_MEMORY_HTTP_HOST is not loopback.');
   }
-  return 'HTTP MCP is bound to a loopback host without a bearer token; this is allowed for local development only.';
+  return 'HTTP MCP is bound to loopback without CODEX_MEMORY_HTTP_TOKEN; local development only. Do not expose this listener beyond this machine.';
 }
 
 function getSingleHeaderValue(value) {

@@ -5,7 +5,13 @@ const os = require('node:os');
 const path = require('node:path');
 
 const { createCodexMemoryApplication } = require('../src/app');
-const { createStreamableHttpServer, SESSION_HEADER, createSessionHardeningConfig } = require('../src/adapters/codex-mcp/http');
+const {
+  createStreamableHttpServer,
+  SESSION_HEADER,
+  buildPolicyGateSummary,
+  createSessionHardeningConfig,
+  getHttpAuthWarning
+} = require('../src/adapters/codex-mcp/http');
 
 const NO_TOKEN_OVERVIEW_KEYS = [
   'access',
@@ -184,6 +190,58 @@ test('HTTP MCP bearer-configured no-token health remains low disclosure', async 
     assert.doesNotMatch(serializedHealth, /knowledgeDiaryPath/i);
     assert.doesNotMatch(serializedHealth, /candidateCachePath/i);
   }, { bearerToken: 'test-token' });
+});
+
+test('HTTP MCP no-token loopback warning is explicit and non-loopback remains fail closed', () => {
+  const warning = getHttpAuthWarning({ host: '127.0.0.1', bearerToken: '' });
+
+  assert.match(warning, /loopback/i);
+  assert.match(warning, /CODEX_MEMORY_HTTP_TOKEN/);
+  assert.match(warning, /local development only/i);
+  assert.match(warning, /Do not expose this listener beyond this machine/i);
+  assert.doesNotMatch(warning, /ready/i);
+  assert.doesNotMatch(warning, /safe for production/i);
+  assert.equal(getHttpAuthWarning({ host: '127.0.0.1', bearerToken: 'test-token' }), null);
+  assert.throws(
+    () => getHttpAuthWarning({ host: '0.0.0.0', bearerToken: '' }),
+    /CODEX_MEMORY_HTTP_TOKEN is required/
+  );
+});
+
+test('HTTP MCP policy gate summary is bounded and omits provider, path, and token material', () => {
+  const summary = buildPolicyGateSummary({
+    config: {
+      securityProfile: 'hardened',
+      enableSoftReadPolicy: true,
+      enableLifecycleReadPolicy: false,
+      enableWritePreflight: true,
+      allowExternalProvider: false,
+      embeddingUrl: 'https://provider.example.test/v1/embeddings',
+      embeddingModel: 'private-model',
+      httpLogPath: 'C:\\Users\\admin\\.env',
+      bearerToken: 'test-token'
+    }
+  });
+  const serialized = JSON.stringify(summary);
+
+  assert.deepEqual(Object.keys(summary).sort(), [
+    'externalProviderAllowed',
+    'lifecycleReadPolicyEnabled',
+    'securityProfile',
+    'softReadPolicyEnabled',
+    'writePreflightEnabled'
+  ]);
+  assert.deepEqual(summary, {
+    securityProfile: 'hardened',
+    softReadPolicyEnabled: true,
+    lifecycleReadPolicyEnabled: false,
+    writePreflightEnabled: true,
+    externalProviderAllowed: false
+  });
+  assert.doesNotMatch(serialized, /provider\.example/i);
+  assert.doesNotMatch(serialized, /private-model/i);
+  assert.doesNotMatch(serialized, /C:\\Users/i);
+  assert.doesNotMatch(serialized, /test-token/i);
 });
 
 test('HTTP MCP bearer health returns full bounded payload with valid token only', async () => {

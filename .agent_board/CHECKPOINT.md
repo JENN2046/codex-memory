@@ -4,11 +4,71 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1449 audit_memory readonly public contract prep`.
-Current validation: `CMV-1559`.
+Current checkpoint: `CM-1454 local-safe route closeout`.
+Current validation: `CMV-1564`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1454 Local-Safe Route Closeout
+
+Status: `COMPLETED_VALIDATED_ROUTE_SELECTION_NO_ACTIVE_LOCAL_SAFE_SLICE_SELECTED`
+
+Recorded:
+
+- Added `docs/CM1454_LOCAL_SAFE_ROUTE_CLOSEOUT.md`.
+- Closed CM-1450 through CM-1453 as completed local-safe hardening slices.
+- Selected no further automatic local-safe slice.
+- No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1564` route closeout validation.
+
+## CM-1453 audit_memory Readonly Draft Contract Reinforcement
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_PUBLIC_MCP_EXPANSION`
+
+Recorded:
+
+- Added mutation-like input rejection to `AuditMemoryReadonlyToolDraft`.
+- Kept `audit_memory` unregistered and outside MCP `tools/list`.
+- Targeted tests passed `33/33`.
+
+Validation: `CMV-1563` source/test validation.
+
+## CM-1452 Release Gate Matrix Source-of-Truth Bridge
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_PACKAGE_SCRIPT_CHANGE`
+
+Recorded:
+
+- Added `tests/release-test-gate-matrix-contract.test.js`.
+- Linked CM-1448 matrix to default-safe runner exclusion categories.
+- Confirmed no release/parity/migration package scripts were added.
+
+Validation: `CMV-1562` source/test validation.
+
+## CM-1451 Health Policy Gates Contract Fixture
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RUNTIME`
+
+Recorded:
+
+- Added independent `buildPolicyGateSummary(...)` low-disclosure test coverage.
+- Confirmed provider URL/model, paths, and token material are omitted.
+
+Validation: `CMV-1561` source/test validation.
+
+## CM-1450 Startup No-Token Warning Wording Source/Test
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_STARTUP_MUTATION`
+
+Recorded:
+
+- Tightened loopback/no-token warning wording.
+- Confirmed non-loopback/no-token still fails closed.
+- No startup/watchdog/config behavior changed.
+
+Validation: `CMV-1560` source/test validation.
 
 ## CM-1449 audit_memory Readonly Public Contract Prep
 

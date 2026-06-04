@@ -9,14 +9,24 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1449 audit_memory readonly public contract prep` |
-| Current validation | `CMV-1559` |
-| Current route | Static-review plan implemented through bounded local slices CM-1445 through CM-1449; public MCP tools remain frozen and live/runtime boundaries remain exact-approval or Red |
+| Current task | `CM-1454 local-safe route closeout` |
+| Current validation | `CMV-1564` |
+| Current route | CM-1450 through CM-1453 local-safe hardening slices completed; no further automatic local-safe slice is currently selected |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1454` records local-safe route closeout in `docs/CM1454_LOCAL_SAFE_ROUTE_CLOSEOUT.md`. CM-1450 through CM-1453 are completed as local source/test or docs/contract slices, and no further automatic local-safe slice is selected. Remaining work requires either fresh exact approval for live/runtime/memory/bearer/provider boundaries, Red-boundary approval for push/public MCP/config/startup/release/readiness work, or a new user-selected local-safe task from another area.
+
+`CM-1453` reinforces the readonly `audit_memory` draft contract in `src/core/AuditMemoryReadonlyToolDraft.js` and `tests/audit-memory-readonly-tool-draft.test.js`. Mutation-like input keys now fail closed; `audit_memory` remains unregistered, `TOOL_DEFINITIONS` remains frozen to `record_memory`, `search_memory`, and `memory_overview`, and MCP `tools/list` still excludes `audit_memory`.
+
+`CM-1452` adds `tests/release-test-gate-matrix-contract.test.js`, binding `docs/CM1448_RELEASE_TEST_GATE_MATRIX.md` to the default-safe runner exclusion categories in `src/cli/run-default-tests.js`. It does not change `package.json`, CI, dependencies, or package scripts.
+
+`CM-1451` adds independent `buildPolicyGateSummary(...)` low-disclosure coverage in `tests/mcp-http.test.js`. The helper is locked to five bounded policy fields and does not expose provider URL/model, paths, or token material.
+
+`CM-1450` tightens `getHttpAuthWarning(...)` wording in `src/adapters/codex-mcp/http.js` and adds tests proving loopback/no-token warning text is explicit while non-loopback/no-token still fails closed. No startup/watchdog/config behavior changed.
 
 `CM-1449` records readonly `audit_memory` public-contract prep in `docs/CM1449_AUDIT_MEMORY_READONLY_PUBLIC_CONTRACT_PREP.md` without registering a public MCP tool. Public tools remain `record_memory`, `search_memory`, and `memory_overview`. Future `audit_memory` public registration remains exact public-contract work requiring schema/tests, `tools/list` coverage, low-disclosure readonly explainability, and explicit approval. CM-1449 does not execute runtime, memory tools, bearer-token paths, provider/API calls, raw audit reads, raw store scans, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
 
@@ -77,7 +87,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-Finish final local validation and guarded local commit for CM-1445 through CM-1449 if eligible. Future live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval, or a new user-selected local-safe task from another phase/area.
+Finish final local validation and guarded local commit for CM-1450 through CM-1454 if eligible. Future live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness work requires fresh exact approval, or a new user-selected local-safe task from another phase/area.
 
 ## Boundaries
 

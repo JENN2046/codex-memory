@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1449",
-  "validationId": "CMV-1559",
+  "taskId": "CM-1454",
+  "validationId": "CMV-1564",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,31 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1564",
+      "scope": "CM-1454 local-safe route closeout",
+      "status": "COMPLETED_VALIDATED_ROUTE_SELECTION_NO_ACTIVE_LOCAL_SAFE_SLICE_SELECTED"
+    },
+    {
+      "id": "CMV-1563",
+      "scope": "CM-1453 audit_memory readonly draft contract reinforcement",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_NO_PUBLIC_MCP_EXPANSION"
+    },
+    {
+      "id": "CMV-1562",
+      "scope": "CM-1452 release gate matrix source-of-truth bridge",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_NO_PACKAGE_SCRIPT_CHANGE"
+    },
+    {
+      "id": "CMV-1561",
+      "scope": "CM-1451 health policy gates contract fixture",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_NO_LIVE_RUNTIME"
+    },
+    {
+      "id": "CMV-1560",
+      "scope": "CM-1450 startup no-token warning wording source/test",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_NO_STARTUP_MUTATION"
+    },
     {
       "id": "CMV-1559",
       "scope": "CM-1449 audit_memory readonly public contract prep",

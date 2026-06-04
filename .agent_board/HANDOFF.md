@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1449 audit_memory readonly public contract prep`.
-Current validation: `CMV-1559`.
-Current handoff: CM-1445 through CM-1449 implement the static-review plan locally; live/runtime/public-MCP expansion remains blocked without exact approval.
+Current task: `CM-1454 local-safe route closeout`.
+Current validation: `CMV-1564`.
+Current handoff: CM-1450 through CM-1454 completed local-safe hardening; live/runtime/public-MCP/remote/readiness work remains blocked without exact approval.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: implement the optimized static-review plan through bounded local source/test and docs/contract slices.
+Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_DOCS_ONLY_CONTRACT_PREP_NO_PUBLIC_MCP_EXPANSION`.
+Current status: `COMPLETED_VALIDATED_ROUTE_SELECTION_NO_ACTIVE_LOCAL_SAFE_SLICE_SELECTED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,15 +28,15 @@ Current entrypoints:
 
 Completed in this slice:
 
-- CM-1445 redacted tool error log stack/message persistence and added regression coverage.
-- CM-1446 added authenticated full `/health` policy gate visibility while preserving no-token low-disclosure health.
-- CM-1447 recorded startup no-token warning wording as a future source/test slice without startup mutation.
-- CM-1448 recorded release test gate matrix and default-test overclaim boundaries without package script changes.
-- CM-1449 recorded readonly `audit_memory` public-contract prep without public MCP registration.
-- Recorded CM-1445 through CM-1449 and CMV-1555 through CMV-1559 in `.agent_board`.
+- CM-1450 tightened no-token loopback warning wording without startup mutation.
+- CM-1451 added independent health `policyGates` low-disclosure contract coverage.
+- CM-1452 bridged the release gate matrix to default-safe runner exclusions without package script changes.
+- CM-1453 reinforced readonly `audit_memory` draft validation against mutation-like inputs without public MCP registration.
+- CM-1454 selected no further automatic local-safe slice.
+- Recorded CM-1450 through CM-1454 and CMV-1560 through CMV-1564 in `.agent_board`.
 - No live runtime, live memory tool call, bearer-token material use, provider/API call, true memory read/write, raw store scan, durable memory/audit write, config/watchdog/startup mutation, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: `CMV-1555` through `CMV-1559`; targeted tests passed `10/10` and `68/68`; default `npm test` passed `3017/3017`; `git diff --check`, current facts drift, ledger consistency, and `scripts/validate-local.ps1 -Area docs` passed.
+Validation: `CMV-1560` through `CMV-1564`; targeted tests passed `33/33`; default `npm test` passed `3019/3019`; `git diff --check`, current facts drift, ledger consistency, and `scripts/validate-local.ps1 -Area docs` passed.
 
 Boundaries:
 

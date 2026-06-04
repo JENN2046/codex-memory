@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1449 audit_memory readonly public contract prep`.
-Current validation: `CMV-1559`.
+Current task: `CM-1454 local-safe route closeout`.
+Current validation: `CMV-1564`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1445` through `CM-1449` implemented the static-review plan as bounded local slices: tool error log redaction source/test, authenticated full `/health` policy gate visibility source/test, startup no-token warning follow-up packet, release test gate matrix, and readonly `audit_memory` public-contract prep without registration. No live runtime, memory tool call, bearer-token material use, provider/API call, true memory read/write, raw store scan, config/watchdog/startup mutation, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is final guarded local commit if eligible, or stop before any live/runtime/memory/provider/bearer/raw/remote/readiness boundary.
+`CM-1450` through `CM-1454` completed local-safe hardening: no-token loopback warning wording source/test, health `policyGates` contract fixture, release gate matrix source-of-truth bridge, readonly `audit_memory` draft contract reinforcement, and local-safe route closeout. No live runtime, memory tool call, bearer-token material use, provider/API call, true memory read/write, raw store scan, config/watchdog/startup mutation, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is final guarded local commit if eligible, or stop before any live/runtime/memory/provider/bearer/raw/public-MCP/remote/readiness boundary.
 
 ## Historical Run Notes
 

@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1449 audit_memory readonly public contract prep`.
-Current validation: `CMV-1559`.
+Current task: `CM-1454 local-safe route closeout`.
+Current validation: `CMV-1564`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `Static review plan implemented through bounded local slices CM-1445 through CM-1449; public MCP tools remain frozen and runtime/live gates remain exact-approval or Red boundary space`.
+Current route: `CM-1450 through CM-1453 local-safe hardening slices completed; no further automatic local-safe slice is currently selected`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->

@@ -45,6 +45,19 @@ const SIDE_EFFECT_FLAGS = Object.freeze([
   'claimsReadiness'
 ]);
 
+const MUTATION_INPUT_KEYS = Object.freeze([
+  'apply',
+  'confirm',
+  'delete',
+  'forget',
+  'mutate',
+  'record_memory',
+  'supersede',
+  'tombstone',
+  'update',
+  'write'
+]);
+
 const inputSchema = Object.freeze({
   type: 'object',
   additionalProperties: false,
@@ -156,6 +169,12 @@ function validateAuditMemoryReadonlyDraftInput(input = {}) {
   ) {
     blockers.push('window_out_of_bounds');
   }
+  for (const key of MUTATION_INPUT_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(safeInput, key)) {
+      blockers.push('mutation_input_not_allowed');
+      break;
+    }
+  }
 
   return {
     accepted: blockers.length === 0,
@@ -166,6 +185,7 @@ function validateAuditMemoryReadonlyDraftInput(input = {}) {
 module.exports = {
   ALLOWED_AUDIT_FAMILIES,
   DISCLOSURE_FLAGS,
+  MUTATION_INPUT_KEYS,
   PUBLIC_MCP_TOOL_NAMES,
   RESULT_STATUS_ACCEPTED,
   RESULT_STATUS_BLOCKED,
