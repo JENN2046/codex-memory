@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1441",
-  "validationId": "CMV-1551",
+  "taskId": "CM-1444",
+  "validationId": "CMV-1554",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,21 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1554",
+      "scope": "CM-1444 Phase H local-safe space exhaustion route selection",
+      "status": "COMPLETED_VALIDATED_SCOPE_SELECTION_NO_LOCAL_SAFE_SOURCE_TEST_REMAINS"
+    },
+    {
+      "id": "CMV-1553",
+      "scope": "CM-1443 Phase H governance suppression recall evidence bridge source/test",
+      "status": "COMPLETED_VALIDATED_SOURCE_TESTS_NO_APPLY"
+    },
+    {
+      "id": "CMV-1552",
+      "scope": "CM-1442 Phase H post-CM-1441 local-safe space review",
+      "status": "COMPLETED_VALIDATED_SCOPE_SELECTION_NOT_EXECUTED"
+    },
     {
       "id": "CMV-1551",
       "scope": "CM-1441 Phase H governance scope suppression consistency source/test",

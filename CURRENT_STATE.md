@@ -9,14 +9,20 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1441 Phase H governance scope suppression consistency source/test` |
-| Current validation | `CMV-1551` |
-| Current route | Governance scope suppression consistency source/test completed; future live gates remain exact-approval boundaries |
+| Current task | `CM-1444 Phase H local-safe space exhaustion route selection` |
+| Current validation | `CMV-1554` |
+| Current route | No new Phase H local-safe source/test slice selected; remaining Phase H work is exact-approval or Red boundary space |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1444` reviews Phase H after `CM-1443` and selects no new local-safe source/test slice. `CM-1443` consumed the last selected local-safe source/test candidate, and the only active `todo` row, `CM-1422`, is exact bounded live `search_memory` rather than default local-safe source/test work. The decision is recorded in `docs/CM1444_PHASE_H_LOCAL_SAFE_SPACE_EXHAUSTION_ROUTE_SELECTION.md`. CM-1444 does not execute runtime, memory tools, bearer-token paths, provider/API calls, true memory reads/writes, raw store scans, durable writes, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
+
+`CM-1443` adds `src/core/GovernanceSuppressionRecallEvidenceBridge.js` and `tests/governance-suppression-recall-evidence-bridge.test.js` as an explicit-input/no-apply bridge from CM-1441 governance suppression consistency evidence to sanitized recall/bounded-search evidence shape. Targeted validation passed `20/20` across the new test, CM-1441 consistency test, and search memory sanitizer test; default `npm test` passed `3016/3016`. It does not execute runtime, memory tools, bearer-token paths, provider/API calls, true memory reads/writes, raw store scans, durable writes, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
+
+`CM-1442` reviews the current Phase H route after `CM-1441` and selects `CM-1443 Phase H governance suppression recall evidence bridge source/test` as the next local-safe candidate. The selection is docs/board routing only and is recorded in `docs/CM1442_PHASE_H_POST_CM1441_LOCAL_SAFE_SPACE_REVIEW.md`. It does not execute runtime, memory tools, bearer-token paths, provider/API calls, true memory reads/writes, raw store scans, durable writes, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
 
 `CM-1441` adds `src/core/GovernanceScopeSuppressionConsistency.js` and `tests/governance-scope-suppression-consistency.test.js` as an explicit-input/no-apply consistency surface that combines deferred governance scope-pollution policy with lifecycle read-policy isolation. Targeted validation passed `13/13` across the new test and related existing governance suppression tests. It does not execute runtime, memory tools, bearer-token paths, provider/API calls, true memory reads/writes, raw store scans, durable writes, config/watchdog/startup changes, public MCP expansion, remote actions, readiness claims, or `RC_READY` claims.
 
@@ -61,7 +67,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-Choose the next explicit local source/test slice or scoped board task before implementation. Future live gates should use the clarified authenticated MCP preflight envelope wording and still require exact approval before execution.
+No further Phase H local-safe source/test slice is currently selected. Optional guarded local commit may be considered only if separately requested and eligible. Future Phase H live/runtime/memory/provider/bearer/raw/remote/readiness work requires fresh exact approval, or a new user-selected local-safe task from another phase/area.
 
 ## Boundaries
 

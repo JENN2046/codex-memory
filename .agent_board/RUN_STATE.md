@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1441 Phase H governance scope suppression consistency source/test`.
-Current validation: `CMV-1551`.
+Current task: `CM-1444 Phase H local-safe space exhaustion route selection`.
+Current validation: `CMV-1554`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1441` adds a pure explicit-input/no-apply governance scope suppression consistency helper and targeted tests. It combines deferred scope-pollution policy and lifecycle read-policy isolation into one Phase H consistency surface, with fail-closed checks for missing deferred policy, incomplete lifecycle suppression coverage, raw suppressed metadata exposure, and no-apply invariant violations. No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is to choose another explicit local source/test slice or scoped board task; runtime boundaries require exact approval.
+`CM-1444` reviewed Phase H after `CM-1443` and selected no new local-safe source/test slice. `CM-1443` consumed the last selected local-safe source/test candidate; the remaining active `CM-1422` row is exact bounded live `search_memory`, not default local-safe source/test work. No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is optional guarded local commit if separately requested and eligible, or stop for exact approval before any live/runtime/memory/provider/bearer/raw/remote/readiness boundary.
 
 ## Historical Run Notes
 

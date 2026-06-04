@@ -4,11 +4,88 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1441 Phase H governance scope suppression consistency source/test`.
-Current validation: `CMV-1551`.
+Current checkpoint: `CM-1444 Phase H local-safe space exhaustion route selection`.
+Current validation: `CMV-1554`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1444 Phase H Local-Safe Space Exhaustion Route Selection
+
+Status: `COMPLETED_VALIDATED_SCOPE_SELECTION_NO_LOCAL_SAFE_SOURCE_TEST_REMAINS`
+
+Scope:
+
+```text
+docs/board route selection only; no source/runtime execution
+```
+
+Recorded:
+
+- Added `docs/CM1444_PHASE_H_LOCAL_SAFE_SPACE_EXHAUSTION_ROUTE_SELECTION.md`.
+- Reviewed active queue, current state, Phase H route docs, `CM-1442`, and `CM-1443`.
+- Confirmed `CM-1443` consumed the last selected local-safe Phase H source/test candidate.
+- Confirmed active `CM-1422` remains exact bounded live `search_memory`, not default local-safe source/test work.
+- Selected no new local-safe Phase H source/test slice.
+- No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1554` docs/board route validation.
+
+Next safe action:
+
+- Optional guarded local commit if separately requested and eligible.
+- Stop for exact approval before any live/runtime/memory/provider/bearer/raw/remote/readiness boundary.
+
+## CM-1443 Phase H Governance Suppression Recall Evidence Bridge Source/Test
+
+Status: `COMPLETED_VALIDATED_SOURCE_TESTS_NO_APPLY`
+
+Scope:
+
+```text
+local explicit-input/no-apply source/test helper; no runtime execution
+```
+
+Recorded:
+
+- Added `src/core/GovernanceSuppressionRecallEvidenceBridge.js`.
+- Added `tests/governance-suppression-recall-evidence-bridge.test.js`.
+- Added `docs/CM1443_GOVERNANCE_SUPPRESSION_RECALL_EVIDENCE_BRIDGE_SOURCE_TEST.md`.
+- Targeted bridge / CM-1441 consistency / sanitizer validation passed `20/20`.
+- Default `npm test` passed `3016/3016`.
+- No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1553` source/test validation.
+
+Next safe action:
+
+- Choose another explicit local source/test slice or scoped board task before implementation.
+- Stop for exact approval before any runtime boundary.
+
+## CM-1442 Phase H Post-CM-1441 Local-Safe Space Review
+
+Status: `COMPLETED_VALIDATED_SCOPE_SELECTION_NOT_EXECUTED`
+
+Scope:
+
+```text
+docs/board route reconciliation only; no source/runtime execution
+```
+
+Recorded:
+
+- Reviewed Phase H route and CM-1441 closeout state.
+- Added `docs/CM1442_PHASE_H_POST_CM1441_LOCAL_SAFE_SPACE_REVIEW.md`.
+- Selected `CM-1443 Phase H governance suppression recall evidence bridge source/test` as the next local-safe candidate.
+- Added a `CM-1443` todo row to `.agent_board/TASK_QUEUE.md`.
+- No runtime action, memory tool call, bearer-token use, provider/API call, true memory read/write, raw store scan, durable write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1552` docs/board validation.
+
+Next safe action:
+
+- Implement CM-1443 only as pure explicit-input/no-apply source/test work.
+- Stop for exact approval before any runtime boundary.
 
 ## CM-1441 Phase H Governance Scope Suppression Consistency Source/Test
 
