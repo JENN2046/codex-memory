@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1462 audit_memory bounded live no-mutation proof`.
-Current validation: `CMV-1568`.
+Current checkpoint: `CM-1463 real lifecycle SQLite migration apply approval packet`.
+Current validation: `CMV-1569`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1463 Real Lifecycle SQLite Migration Apply Approval Packet
+
+Status: `COMPLETED_VALIDATED_APPROVAL_PACKET_NO_REAL_DB_APPLY`
+
+Recorded:
+
+- Added `docs/CM1463_REAL_LIFECYCLE_SQLITE_MIGRATION_APPLY_APPROVAL_PACKET.md`.
+- Defined the future exact approval shape for one real lifecycle SQLite migration apply.
+- Listed expected lifecycle columns: `status`, `status_reason`, `supersedes_memory_id`, `superseded_by_memory_id`, `tombstone_reason`, `lifecycle_updated_at`, and `lifecycle_actor_client_id`.
+- Required fresh synced Git state, clean worktree, single target DB path, fresh backup path, backup existence evidence, dry-run report, exact operator approval, and no broad raw export/provider/API/MCP memory tools before future apply.
+- Documented dry-run and apply commands without running either apply path.
+- Documented rollback and post-apply evidence requirements.
+- Preserved explicit non-claims: no `RC_READY`, release readiness, mutation tool approval, raw audit/store approval, or provider/bearer/live runtime boundary approval.
+- No real DB apply, `--confirm`, durable SQLite edit/delete, raw memory/audit/JSONL scan, provider/API, bearer token, live memory tool, public MCP expansion, remote action, push, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1569` docs/board validation.
 
 ## CM-1462 audit_memory Bounded Live No-Mutation Proof
 

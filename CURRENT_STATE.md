@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1462 audit_memory bounded live no-mutation proof` |
-| Current validation | `CMV-1568` |
-| Current route | CM-1462 bounded live MCP proof completed for public `audit_memory`; HTTP authenticated proof, real DB migration apply, runtime/provider/live memory beyond this proof, push, and readiness work remain exact-approval or Red-boundary tasks |
+| Current task | `CM-1463 real lifecycle SQLite migration apply approval packet` |
+| Current validation | `CMV-1569` |
+| Current route | CM-1463 approval packet completed for future real lifecycle SQLite migration apply; the future apply itself remains exact-approval / Red-boundary work |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1463` added `docs/CM1463_REAL_LIFECYCLE_SQLITE_MIGRATION_APPLY_APPROVAL_PACKET.md` as a docs-only approval packet for future real lifecycle SQLite migration apply. The packet defines expected lifecycle columns, pre-apply requirements, exact approval shape, dry-run/apply command wording, rollback plan, post-apply evidence, and explicit non-claims. CM-1463 did not execute real DB migration apply, run `--confirm`, edit or delete a durable SQLite DB, read raw memory rows broadly, scan raw audit, dump raw JSONL, call provider/API, use bearer token, call live MCP memory tools, register mutation tools, expand public MCP tools, change config/watchdog/startup, change dependencies, release/tag/deploy, push, or claim readiness / `RC_READY`.
 
 `CM-1462` executed a bounded local in-process MCP JSON-RPC proof through `CodexMemoryMcpServer.handleJsonRpc(...)`: `initialize`, `tools/list`, and one `tools/call audit_memory`. The public MCP tool list exposed exactly `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`. The `audit_memory` call returned `audit_memory_readonly_bounded`, selected projection true, forbidden output key hits `0`, provider calls `0`, durable mutation false, readiness false, and `RC_READY` false. No bearer token, HTTP authenticated call, raw audit/store scan, real DB apply, durable memory/audit mutation, remote action, or push occurred.
 
@@ -95,7 +97,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1462 evidence is local and bounded. Future HTTP authenticated `audit_memory` proof, real DB migration apply, live/runtime/memory/provider/bearer/raw/remote/readiness work requires fresh exact approval or Red-boundary authorization.
+CM-1463 is an approval packet only. Future real lifecycle SQLite migration apply requires fresh exact approval naming one absolute target DB path and one absolute backup path, plus clean synced Git state, backup evidence, and dry-run receipt. HTTP authenticated `audit_memory` proof, live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
 
 ## Boundaries
 

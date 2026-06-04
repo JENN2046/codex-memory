@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1462 audit_memory bounded live no-mutation proof`.
-Current validation: `CMV-1568`.
-Current handoff: CM-1462 completed bounded live MCP proof that public `audit_memory` is visible and returns readonly low-disclosure output without mutation indicators; HTTP authenticated proof, real DB migration apply, provider, raw store, remote, and readiness work remain blocked without exact approval.
+Current task: `CM-1463 real lifecycle SQLite migration apply approval packet`.
+Current validation: `CMV-1569`.
+Current handoff: CM-1463 completed the docs-only exact approval packet for future real lifecycle SQLite migration apply; no real DB apply occurred, and future apply still requires exact approval with a single target DB path and backup path.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1462 completed bounded live MCP proof that public `audit_mem
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_LIVE_MCP_AUDIT_MEMORY_BOUNDED_NO_MUTATION_PROOF`.
+Current status: `COMPLETED_VALIDATED_APPROVAL_PACKET_NO_REAL_DB_APPLY`.
 
 Workspace: `A:\codex-memory`.
 
