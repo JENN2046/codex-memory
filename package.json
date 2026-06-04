@@ -55,6 +55,7 @@
     "scope:acceptance": "node ./src/cli/scope-acceptance.js",
     "scope:backfill:dry-run": "node ./src/cli/scope-backfill-dry-run.js",
     "lifecycle:sqlite:dry-run": "node ./src/cli/lifecycle-sqlite-dry-run.js",
+    "lifecycle:sqlite:migrate": "node ./src/cli/lifecycle-sqlite-migrate.js",
     "vcp-memory:mapping:dry-run": "node ./src/cli/vcp-memory-object-mapping-dry-run.js",
     "vcp-memory:migration-readiness": "node ./src/cli/vcp-memory-migration-readiness.js",
     "controlled-write:dry-run": "node ./src/cli/controlled-write-dry-run.js",

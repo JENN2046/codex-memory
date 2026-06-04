@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1464 real DB migration dry-run evidence`.
-Current validation: `CMV-1570`.
+Current task: `CM-1465 guarded lifecycle migrate command surface`.
+Current validation: `CMV-1571`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 

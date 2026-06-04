@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1464 real DB migration dry-run evidence`.
-Current validation: `CMV-1570`.
+Current checkpoint: `CM-1465 guarded lifecycle migrate command surface`.
+Current validation: `CMV-1571`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1465 Guarded Lifecycle Migrate Command Surface
+
+Status: `COMPLETED_VALIDATED_MIGRATE_COMMAND_SURFACE_NO_REAL_DB_APPLY`
+
+Recorded:
+
+- Confirmed `src/cli/lifecycle-sqlite-migrate.js` already exists.
+- Confirmed `tests/lifecycle-sqlite-migrate-cli.test.js` already exists and uses temp SQLite DBs for apply coverage.
+- Added `package.json` script `lifecycle:sqlite:migrate`.
+- Command surface now supports future exact-approved shape `npm run lifecycle:sqlite:migrate -- --confirm --backup <backup_path>`.
+- Default behavior remains dry-run only; `--confirm` requires `--backup`.
+- No `--confirm`, real DB apply, real backup apply, SQLite edit/delete, raw scan, provider/API, bearer token, live memory tool, readiness claim, `RC_READY` claim, remote action, or push occurred.
+
+Validation: `CMV-1571` source/test/docs validation.
 
 ## CM-1464 Real DB Migration Dry-Run Evidence
 

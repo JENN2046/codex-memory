@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1464 real DB migration dry-run evidence`.
-Current validation: `CMV-1570`.
-Current handoff: CM-1464 completed sanitized lifecycle SQLite dry-run evidence against the observed target DB using existing script `lifecycle:sqlite:dry-run`; no `--confirm` or real DB apply occurred, and future apply still requires CM-1463 exact approval plus backup evidence.
+Current task: `CM-1465 guarded lifecycle migrate command surface`.
+Current validation: `CMV-1571`.
+Current handoff: CM-1465 added the missing `lifecycle:sqlite:migrate` package script for the existing guarded migrate CLI; no real DB apply occurred, and future apply still requires exact approval plus backup evidence.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1464 completed sanitized lifecycle SQLite dry-run evidence a
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_REAL_DB_MIGRATION_DRY_RUN_NO_APPLY`.
+Current status: `COMPLETED_VALIDATED_MIGRATE_COMMAND_SURFACE_NO_REAL_DB_APPLY`.
 
 Workspace: `A:\codex-memory`.
 
