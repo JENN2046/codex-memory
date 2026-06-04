@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1469 controlled mutation public registration approval packet`.
-Current validation: `CMV-1575`.
+Current checkpoint: `CM-1470 controlled mutation public registration exact approval review`.
+Current validation: `CMV-1576`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1470 Controlled Mutation Public Registration Approval Readiness Review
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_APPROVAL_READINESS_REVIEW_NO_REGISTRATION`
+
+Recorded:
+
+- Added `docs/CM1470_CONTROLLED_MUTATION_REGISTRATION_APPROVAL_READINESS_REVIEW.md`.
+- Reviewed CM-1469 approval packet against checklist, risk table, future approval shape, and non-claim boundaries.
+- Decision: `GO_TO_OPERATOR_EXACT_APPROVAL_DECISION` and `NO_GO_FOR_AUTOMATIC_REGISTRATION`.
+- No public MCP expansion, `validate_memory` / `tombstone_memory` / `supersede_memory` registration, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1576` docs/board/status validation.
 
 ## CM-1469 Controlled Mutation Public Registration Approval Packet
 
