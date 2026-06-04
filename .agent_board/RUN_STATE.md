@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1470 controlled mutation public registration exact approval review`.
-Current validation: `CMV-1576`.
+Current task: `CM-1471 controlled mutation public registration operator decision`.
+Current validation: `CMV-1577`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1470` reviewed CM-1469 approval readiness and concluded the packet is ready for an operator exact approval decision, but automatic registration remains NO-GO. No public MCP expansion, controlled mutation tool registration, real mutation, raw scan, provider/API, bearer-token material use, live memory tool call, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred. Next action after commit is to stop before controlled mutation public registration unless a fresh exact approval explicitly authorizes guarded implementation.
+`CM-1471` recorded operator decision `APPROVE_CONTROLLED_MUTATION_PUBLIC_REGISTRATION` for future CM-1472 guarded implementation. CM-1471 itself did not register public MCP tools. No public MCP expansion, controlled mutation tool registration, real mutation, raw scan, provider/API, bearer-token material use, live memory tool call, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action after commit is CM-1472 guarded implementation under the exact CM-1471 scope; confirmed mutation remains separately forbidden.
 
 ## Historical Run Notes
 

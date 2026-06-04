@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-04",
-  "taskId": "CM-1470",
-  "validationId": "CMV-1576",
+  "taskId": "CM-1471",
+  "validationId": "CMV-1577",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1577",
+      "scope": "CM-1471 controlled mutation public registration operator decision",
+      "status": "COMPLETED_VALIDATED_OPERATOR_APPROVAL_DECISION_RECORDED_NO_REGISTRATION"
+    },
     {
       "id": "CMV-1576",
       "scope": "CM-1470 controlled mutation public registration exact approval review",

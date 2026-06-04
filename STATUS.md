@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1470 controlled mutation public registration exact approval review`.
-Current validation: `CMV-1576`.
+Current task: `CM-1471 controlled mutation public registration operator decision`.
+Current validation: `CMV-1577`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1470 review completed; CM-1469 packet is ready for operator exact approval decision, but automatic registration remains NO-GO`.
+Current route: `CM-1471 operator approval recorded; next safe action is CM-1472 guarded registration implementation under exact scope`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1470 controlled mutation registration approval readiness review: added docs-only review of CM-1469. Decision is `GO_TO_OPERATOR_EXACT_APPROVAL_DECISION` and `NO_GO_FOR_AUTOMATIC_REGISTRATION`. No public MCP registration occurred; public tools remain `record_memory / search_memory / memory_overview / audit_memory`, and mutation candidates remain unregistered. No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+CM-1471 controlled mutation public registration operator decision: recorded `APPROVE_CONTROLLED_MUTATION_PUBLIC_REGISTRATION` for future CM-1472 guarded implementation of exactly `validate_memory`, `tombstone_memory`, and `supersede_memory`. No public MCP registration occurred in CM-1471; public tools remain `record_memory / search_memory / memory_overview / audit_memory`, and mutation candidates remain unregistered. No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
 
 更新时间：2026-06-04
 

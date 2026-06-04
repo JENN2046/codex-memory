@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1470 controlled mutation public registration exact approval review` |
-| Current validation | `CMV-1576` |
-| Current route | CM-1470 review completed; CM-1469 packet is ready for operator exact approval decision, but automatic registration remains NO-GO |
+| Current task | `CM-1471 controlled mutation public registration operator decision` |
+| Current validation | `CMV-1577` |
+| Current route | CM-1471 operator approval recorded; next safe action is CM-1472 guarded registration implementation under exact scope |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1471` added `docs/CM1471_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_OPERATOR_DECISION.md` as a docs-only operator decision record. Decision is `APPROVE_CONTROLLED_MUTATION_PUBLIC_REGISTRATION`, scoped to future CM-1472 guarded registration of exactly `validate_memory`, `tombstone_memory`, and `supersede_memory` against baseline `c2e6e1bc84af29674f41440f7d898b37dee16fa8`. CM-1471 did not register public MCP tools, execute real mutation, raw scan, call provider/API, use bearer token, claim readiness, claim `RC_READY`, release/tag/deploy, perform remote action, or push.
 
 `CM-1470` added `docs/CM1470_CONTROLLED_MUTATION_REGISTRATION_APPROVAL_READINESS_REVIEW.md` as a docs-only review of the CM-1469 approval packet. Decision is `GO_TO_OPERATOR_EXACT_APPROVAL_DECISION` and `NO_GO_FOR_AUTOMATIC_REGISTRATION`. The review records approval checklist, risk table, future approval shape, and boundary receipt. No public MCP expansion, `validate_memory` / `tombstone_memory` / `supersede_memory` registration, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
 
@@ -111,7 +113,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1470 completed the controlled mutation public registration approval readiness review only. Future public MCP expansion, controlled mutation implementation, live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
+CM-1471 completed the operator approval decision record only. Next safe action is CM-1472 guarded controlled mutation public registration implementation under the exact CM-1471 scope. Confirmed mutation, live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
 
 ## Boundaries
 

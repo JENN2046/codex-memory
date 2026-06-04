@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1470 controlled mutation public registration exact approval review`.
-Current validation: `CMV-1576`.
+Current checkpoint: `CM-1471 controlled mutation public registration operator decision`.
+Current validation: `CMV-1577`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1471 Controlled Mutation Public Registration Operator Decision
+
+Status: `COMPLETED_VALIDATED_OPERATOR_APPROVAL_DECISION_RECORDED_NO_REGISTRATION`
+
+Recorded:
+
+- Added `docs/CM1471_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_OPERATOR_DECISION.md`.
+- Recorded operator decision `APPROVE_CONTROLLED_MUTATION_PUBLIC_REGISTRATION`.
+- Bound the approval to baseline `c2e6e1bc84af29674f41440f7d898b37dee16fa8`.
+- Approval permits future CM-1472 guarded registration of exactly `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- CM-1471 did not register public MCP tools or execute implementation.
+- No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1577` docs/board/status validation.
 
 ## CM-1470 Controlled Mutation Public Registration Approval Readiness Review
 
