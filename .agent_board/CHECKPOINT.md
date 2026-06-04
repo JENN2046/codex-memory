@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1468 controlled mutation public contract preflight`.
-Current validation: `CMV-1574`.
+Current checkpoint: `CM-1469 controlled mutation public registration approval packet`.
+Current validation: `CMV-1575`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1469 Controlled Mutation Public Registration Approval Packet
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_APPROVAL_PACKET_NO_REGISTRATION`
+
+Recorded:
+
+- Added `docs/CM1469_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_APPROVAL_PACKET.md`.
+- Prepared exact approval shape for future public registration of `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- Recorded schema exposure checklist, low-disclosure output contract, dry-run/confirm gate policy, rollback plan, required tests, and explicit non-claims.
+- No public MCP expansion, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1575` docs/board/status validation.
 
 ## CM-1468 Controlled Mutation Public Contract Preflight
 

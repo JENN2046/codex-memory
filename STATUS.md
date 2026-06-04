@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1468 controlled mutation public contract preflight`.
-Current validation: `CMV-1574`.
+Current task: `CM-1469 controlled mutation public registration approval packet`.
+Current validation: `CMV-1575`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1468 controlled mutation public contract preflight completed without registration; public expansion remains exact-approval / Red-boundary work`.
+Current route: `CM-1469 approval packet prepared; controlled mutation public registration remains exact-approval / Red-boundary work`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1468 controlled mutation preflight: added bounded, low-disclosure public contract drafts and tests for future `validate_memory`, `tombstone_memory`, and `supersede_memory`. No public MCP registration occurred; public tools remain `record_memory / search_memory / memory_overview / audit_memory`, and mutation candidates remain unknown tools. No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, remote action, or push occurred.
+CM-1469 controlled mutation registration approval packet: added docs-only exact approval packet for future public registration of `validate_memory`, `tombstone_memory`, and `supersede_memory`. No public MCP registration occurred; public tools remain `record_memory / search_memory / memory_overview / audit_memory`, and mutation candidates remain unregistered. No real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
 
 更新时间：2026-06-04
 

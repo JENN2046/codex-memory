@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1468 controlled mutation public contract preflight`.
-Current validation: `CMV-1574`.
-Current handoff: CM-1468 prepared validate/tombstone/supersede public contract preflight without registering public MCP tools; future registration remains exact-approval / Red-boundary work.
+Current task: `CM-1469 controlled mutation public registration approval packet`.
+Current validation: `CMV-1575`.
+Current handoff: CM-1469 prepared the exact approval packet for future validate/tombstone/supersede public registration without registering public MCP tools; future implementation remains exact-approval / Red-boundary work.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1468 prepared validate/tombstone/supersede public contract p
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_CONTRACT_PREFLIGHT_NO_REGISTRATION`.
+Current status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_REGISTRATION_APPROVAL_PACKET_NO_REGISTRATION`.
 
 Workspace: `A:\codex-memory`.
 
@@ -29,6 +29,8 @@ Current entrypoints:
 Completed in this slice:
 
 - CM-1461 registered readonly bounded `audit_memory` in public MCP `TOOL_DEFINITIONS` and `app.callTool(...)` under exact approval.
+- CM-1469 prepared the controlled mutation public registration approval packet without registering public MCP tools.
+- CM-1468 added controlled mutation public contract preflight source/test without registration.
 - CM-1460 added readonly bounded `AuditMemoryReadonlyService`, service tests, public-contract preflight tests, and approval packet without public registration.
 - CM-1459 added guarded lifecycle SQLite migrate CLI, local release gate scripts, and `audit_memory` approval packet reinforcement.
 - CM-1450 tightened no-token loopback warning wording without startup mutation.
@@ -36,10 +38,10 @@ Completed in this slice:
 - CM-1452 bridged the release gate matrix to default-safe runner exclusions without package script changes.
 - CM-1453 reinforced readonly `audit_memory` draft validation against mutation-like inputs without public MCP registration.
 - CM-1454 selected no further automatic local-safe slice.
-- Recorded CM-1450 through CM-1461 and CMV-1560 through CMV-1567 in `.agent_board`.
+- Recorded CM-1450 through CM-1469 and CMV-1560 through CMV-1575 in `.agent_board`.
 - The only public MCP expansion in this slice is the exact-approved readonly bounded `audit_memory` registration. No live runtime, live memory tool call, bearer-token material use, provider/API call, true memory read/write, raw store scan, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: `CMV-1560` through `CMV-1567`; CM-1461 targeted audit/MCP tests and broader validation recorded in `CMV-1567`.
+Validation: latest `CMV-1575`; CM-1469 required docs/board/status and broader validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
@@ -47,7 +49,7 @@ Boundaries:
 
 Next safe action:
 
-Guarded local commit if final diff/secret/validation checks pass; otherwise stop and report blocker. Future real DB migration apply, live/runtime/memory/provider/bearer/raw/remote/readiness work requires fresh exact approval.
+Future controlled mutation public registration, confirmed mutation, real DB apply, live/runtime/memory/provider/bearer/raw/remote/readiness work requires fresh exact approval.
 
 ## Historical Handoff Archive
 

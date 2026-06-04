@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1468 controlled mutation public contract preflight`.
-Current validation: `CMV-1574`.
+Current task: `CM-1469 controlled mutation public registration approval packet`.
+Current validation: `CMV-1575`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1461` completed exact-approved readonly bounded `audit_memory` public MCP registration. Public tools are now frozen to `record_memory`, `search_memory`, `memory_overview`, and `audit_memory`; `app.callTool('audit_memory')` dispatches only to `AuditMemoryReadonlyService.run(...)`. No real DB migration apply, live runtime, memory tool call, bearer-token material use, provider/API call, true memory read/write, raw audit/SQLite/JSONL scan, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is final guarded local commit if eligible, or stop before any real DB apply, live/runtime/memory/provider/bearer/raw/remote/readiness boundary.
+`CM-1469` prepared an exact approval packet for future public registration of `validate_memory`, `tombstone_memory`, and `supersede_memory`. No public MCP expansion, real mutation, raw scan, provider/API, bearer-token material use, live memory tool call, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred. Next action after commit is to stop before controlled mutation public registration unless a fresh exact approval explicitly authorizes guarded implementation.
 
 ## Historical Run Notes
 
