@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-06-04",
-  "taskId": "CM-1473",
-  "validationId": "CMV-1579",
+  "updatedAt": "2026-06-09",
+  "taskId": "CM-1475",
+  "validationId": "CMV-1581",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,16 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1581",
+      "scope": "CM-1475 controlled mutation confirmed apply approval packet",
+      "status": "COMPLETED_VALIDATED_CONTROLLED_MUTATION_CONFIRMED_APPLY_APPROVAL_PACKET_NO_MUTATION"
+    },
+    {
+      "id": "CMV-1580",
+      "scope": "CM-1474 status surface drift reconciliation",
+      "status": "COMPLETED_VALIDATED_STATUS_SURFACE_DRIFT_RECONCILIATION"
+    },
     {
       "id": "CMV-1579",
       "scope": "CM-1473 controlled mutation bounded live dry-run proof",

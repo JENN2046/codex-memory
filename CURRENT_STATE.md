@@ -9,14 +9,18 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1473 controlled mutation bounded live dry-run proof` |
-| Current validation | `CMV-1579` |
-| Current route | CM-1473 proved controlled mutation public tools are visible and return low-disclosure dry-run/rejected projections; confirmed mutation and readiness remain blocked |
+| Current task | `CM-1475 controlled mutation confirmed apply approval packet` |
+| Current validation | `CMV-1581` |
+| Current route | CM-1475 prepares a docs-only exact approval packet for a future single confirmed mutation apply; no mutation is executed and readiness remains blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1475` adds `docs/CM1475_CONTROLLED_MUTATION_CONFIRMED_APPLY_APPROVAL_PACKET.md` as a docs-only exact approval packet for a future single confirmed controlled mutation apply. The packet defines exact approval schema, pre-mutation checklist, rollback plan, post-mutation evidence checklist, validation requirements, and explicit non-claims. CM-1475 does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
+
+`CM-1474` is a docs/board status drift reconciliation. Fresh Git checks showed a clean `main...origin/main` state before edits. The stale next-action text that still pointed at CM-1472 or a pending CM-1473 local commit is superseded: CM-1472 and CM-1473 are already completed and recorded. CM-1474 performs no source/runtime change, no MCP call, no memory read/write, no provider/API call, no bearer-token use, no raw scan, no dependency/config/watchdog/startup change, no public MCP expansion, no readiness claim, no `RC_READY` claim, no release/tag/deploy, no remote action, and no push.
 
 `CM-1473` executed an in-process MCP bounded proof: one `initialize`, one `tools/list`, and one safe dry-run `tools/call` each for `validate_memory`, `tombstone_memory`, and `supersede_memory`. `tools/list` exposed exactly `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`. Each controlled mutation call returned `decision=rejected`, `dryRun=true`, `mutated=false`, `access.mode=controlled_mutation_public_bounded`, forbidden key hits `0`, `rawMemoryReturned=false`, `rawAuditReturned=false`, `providerCalled=false`, `bearerTokenUsed=false`, `rawStoreScanned=false`, `durableMutationPerformed=false`, `readinessClaimed=false`, and `rcReadyClaimed=false`. CM-1473 did not use `dry_run=false`, did not use `confirm=true`, did not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
@@ -117,7 +121,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1471 completed the operator approval decision record only. Next safe action is CM-1472 guarded controlled mutation public registration implementation under the exact CM-1471 scope. Confirmed mutation, live/runtime/memory/provider/bearer/raw/remote/readiness work remains exact-approval or Red-boundary work.
+CM-1475 prepares only the approval packet. The next safe action is guarded local commit with message `docs: add controlled mutation apply approval packet` after validation and diff review pass. Any future confirmed mutation execution remains exact-approval / Red-boundary work.
 
 ## Boundaries
 

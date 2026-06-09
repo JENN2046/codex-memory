@@ -4,11 +4,37 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1473 controlled mutation bounded live dry-run proof`.
-Current validation: `CMV-1579`.
+Current checkpoint: `CM-1475 controlled mutation confirmed apply approval packet`.
+Current validation: `CMV-1581`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1475 Controlled Mutation Confirmed Apply Approval Packet
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_CONFIRMED_APPLY_APPROVAL_PACKET_NO_MUTATION`
+
+Recorded:
+
+- Added `docs/CM1475_CONTROLLED_MUTATION_CONFIRMED_APPLY_APPROVAL_PACKET.md`.
+- Prepared exact approval schema for a future single confirmed controlled mutation apply.
+- Recorded pre-mutation checklist, rollback plan, post-mutation evidence checklist, validation requirements, and explicit non-claims.
+- No `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1581` docs/board approval packet validation.
+
+## CM-1474 Status Surface Drift Reconciliation
+
+Status: `COMPLETED_VALIDATED_STATUS_SURFACE_DRIFT_RECONCILIATION`
+
+Recorded:
+
+- Reconciled stale status entrypoints after CM-1473 completion.
+- Superseded old next-action wording that still pointed at CM-1472 implementation or a pending CM-1473 local commit.
+- Preserved the current project status as `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- No source/runtime change, MCP tool call, memory read/write, provider/API call, bearer-token use, raw scan, dependency/config/watchdog/startup change, public MCP expansion, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1580` docs/board status drift validation.
 
 ## CM-1473 Controlled Mutation Bounded Live Dry-Run Proof
 

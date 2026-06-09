@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1473 controlled mutation bounded live dry-run proof`.
-Current validation: `CMV-1579`.
+Current task: `CM-1475 controlled mutation confirmed apply approval packet`.
+Current validation: `CMV-1581`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1473` proved through in-process MCP `initialize`, `tools/list`, and one safe dry-run `tools/call` per controlled mutation tool that `validate_memory`, `tombstone_memory`, and `supersede_memory` are visible and return low-disclosure rejected dry-run projections. No `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API, bearer-token material use, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred. Next safe action is guarded local commit if final validation and diff review remain clean; push requires separate explicit authorization.
+`CM-1475` prepares a docs-only exact approval packet for a future single confirmed controlled mutation apply. No `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred. Next safe action is guarded local commit with message `docs: add controlled mutation apply approval packet` after validation and diff review pass.
 
 ## Historical Run Notes
 
