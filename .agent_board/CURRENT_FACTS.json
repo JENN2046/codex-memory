@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1541",
-  "validationId": "CMV-1645",
+  "taskId": "CM-1542",
+  "validationId": "CMV-1646",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1646",
+      "scope": "CM-1542 effective write reliability proof closeout audit/decision",
+      "status": "COMPLETED_VALIDATED_SCOPED_EFFECTIVE_WRITE_RELIABILITY_BLOCKER_CLOSED_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1645",
       "scope": "CM-1541 effective write reliability proof",
@@ -686,9 +691,9 @@
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
-    "effective write reliability closure",
-    "CM-1541 effective write proof closeout audit/decision",
     "broad record_memory reliability",
+    "production write reliability",
+    "final RC readiness review",
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
     "startup/watchdog warning source change",

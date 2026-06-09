@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1541 effective write reliability proof`.
-Current validation: `CMV-1645`.
+Current checkpoint: `CM-1542 effective write reliability proof closeout audit/decision`.
+Current validation: `CMV-1646`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1542 Effective Write Reliability Proof Closeout Audit/Decision
+
+Status: `COMPLETED_VALIDATED_SCOPED_EFFECTIVE_WRITE_RELIABILITY_BLOCKER_CLOSED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1542_EFFECTIVE_WRITE_RELIABILITY_PROOF_CLOSEOUT_AUDIT_DECISION.md`.
+- Reviewed CM-1541 evidence without executing another proof or write.
+- Confirmed CM-1541 was exact-approved by `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF`.
+- Confirmed `recordMemoryCalls=1`, `acceptedMemoryWrites=1`, `durableMemoryWrites=1`, and `durableAuditWrites=1`.
+- Confirmed public MCP surface remains exactly seven tools.
+- Confirmed zero provider/API calls, bearer-token use, `search_memory`, `memory_overview`, raw memory/audit/jsonl reads, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claims, and `RC_READY` claims.
+- Closed only the scoped effective write reliability proof blocker.
+- Broad `record_memory` reliability and production write reliability are not claimed.
+- `RC_READY` remains `BLOCKED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- No second `record_memory` write, provider/API call, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1542.
+
+Validation: `CMV-1646` docs closeout audit validation.
 
 ## CM-1541 Effective Write Reliability Proof
 

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1541 effective write reliability proof`.
-Current validation: `CMV-1645`.
+Current task: `CM-1542 effective write reliability proof closeout audit/decision`.
+Current validation: `CMV-1646`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1541` executed one exact-approved bounded effective `record_memory` proof through the opt-in app seam and recorded accepted/not-ready evidence. Effective write evidence is a closeout candidate only; broad `record_memory` reliability is not claimed, `RC_READY` remains blocked, and overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a separate effective write proof closeout audit/decision.
+`CM-1542` closed only the scoped effective write reliability proof blocker after reviewing CM-1541 evidence. Broad `record_memory` reliability and production write reliability are not claimed, `RC_READY` remains blocked, and overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a separate final RC blocker/readiness review before any readiness claim.
 
 ## Historical Run Notes
 

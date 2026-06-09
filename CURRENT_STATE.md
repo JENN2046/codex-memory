@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1541 effective write reliability proof` |
-| Current validation | `CMV-1645` |
-| Current route | effective write proof accepted as closeout candidate; no broad write reliability or readiness claim |
+| Current task | `CM-1542 effective write reliability proof closeout audit/decision` |
+| Current validation | `CMV-1646` |
+| Current route | scoped effective write proof blocker closed; no broad or production write reliability claim; no `RC_READY` claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1542` adds `docs/CM1542_EFFECTIVE_WRITE_RELIABILITY_PROOF_CLOSEOUT_AUDIT_DECISION.md` and records a docs-only closeout audit of CM-1541. Confirmed: CM-1541 was exact-approved by `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF`; `recordMemoryCalls=1`; `acceptedMemoryWrites=1`; `durableMemoryWrites=1`; `durableAuditWrites=1`; public MCP surface remained exactly seven tools; and CM-1541 recorded zero provider/API calls, bearer-token use, `search_memory`, `memory_overview`, raw memory/audit/jsonl reads, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claims, and `RC_READY` claims. CM-1542 closes only the scoped effective write reliability proof blocker. Broad `record_memory` reliability and production write reliability are not claimed. `RC_READY` remains `BLOCKED`, and overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. CM-1542 does not execute another `record_memory` write, provider/API call, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, or readiness / `RC_READY` claim.
 
 `CM-1541` adds `docs/CM1541_EFFECTIVE_WRITE_RELIABILITY_PROOF.md` and records the exact-approved effective write reliability proof. Approval `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF` was received. Fresh local preflight confirmed clean synced `main` at `7faa80ba0ef47d6c347217c40aa5613c1c4a4a82`; read-only write current-facts preflight returned `WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED` with exact basis, seam, scope, and boundary flags bound. The proof executed exactly one in-process `record_memory` call through `createCodexMemoryApplication -> enableWritePreflight=true -> callTool(record_memory)`. Sanitized result: `decision=accepted`, `success=true`, `target=process`, `shadowWriteStatus=ok`, `idempotencyStatus=committed`, `idempotencyReplayed=false`, `proofMemoryApplied=true`, and `WriteProofExecutionResultBoundary` returned `WRITE_PROOF_RESULT_BOUNDARY_ACCEPTED_NOT_READY` with no blockers. Side-effect counters: `recordMemoryCalls=1`, `acceptedMemoryWrites=1`, `durableMemoryWrites=1`, `durableAuditWrites=1`, and zero `searchMemory`, provider/API, raw memory/audit/jsonl reads, `memoryOverview`, public MCP expansion, config/watchdog/startup change, release/tag/deploy, readiness, or reliability claims. Public MCP surface remains exactly seven tools. CM-1541 is an effective-write closeout candidate only: broad `record_memory` reliability is not claimed, effective-write blocker closure still requires a separate closeout audit/decision, `RC_READY` remains `BLOCKED`, and overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -249,7 +251,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1541 executed one exact-approved bounded effective `record_memory` proof and recorded accepted/not-ready evidence. Next safe action is a separate closeout audit/decision for the effective write evidence blocker. Broad `record_memory` reliability is not claimed; `RC_READY` remains blocked.
+CM-1542 closes only the scoped effective write reliability proof blocker after reviewing CM-1541 evidence. Broad `record_memory` reliability and production write reliability are not claimed. `RC_READY` remains blocked. Next safe action is a separate final RC blocker/readiness review before any readiness claim.
 
 ## Boundaries
 
