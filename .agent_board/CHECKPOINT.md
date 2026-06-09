@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1489 public contract evidence bundle audit and blocker closure decision`.
-Current validation: `CMV-1594`.
+Current checkpoint: `CM-1490 select next RC must-fix blocker after first closure`.
+Current validation: `CMV-1595`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1490 Next RC Must-Fix Blocker Selection
+
+Status: `COMPLETED_VALIDATED_NEXT_MUST_FIX_SELECTED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1490_NEXT_RC_MUST_FIX_BLOCKER_SELECTION.md`.
+- Selected `Live client / integration evidence is not current for the post-closeout seven-tool surface` as the next must-fix blocker.
+- Recorded updated blocker table, acceptance criteria, validation matrix, and go/no-go decision.
+- Recommended `CM-1491 live client integration evidence exact preflight`.
+- No live client/integration proof, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, `RC_READY` claim, or effective `record_memory` write occurred.
+
+Validation: `CMV-1595` docs/board next must-fix selection validation.
 
 ## CM-1489 Public Contract Evidence Bundle Blocker Closure Audit
 

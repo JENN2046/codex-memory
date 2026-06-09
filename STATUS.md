@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1489 public contract evidence bundle audit and blocker closure decision`.
-Current validation: `CMV-1594`.
+Current task: `CM-1490 select next RC must-fix blocker after first closure`.
+Current validation: `CMV-1595`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1489 closes the first must-fix blocker only for bundled seven-tool public contract evidence; remaining blockers stay open`.
+Current route: `CM-1490 selects live client / integration evidence as the next must-fix blocker without executing it`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1490 select next RC must-fix blocker after first closure: added `docs/CM1490_NEXT_RC_MUST_FIX_BLOCKER_SELECTION.md`. Selected next must-fix blocker is `Live client / integration evidence is not current for the post-closeout seven-tool surface`. CM-1490 records acceptance criteria, validation matrix, blocker table update, and recommended `CM-1491 live client integration evidence exact preflight`. It does not execute live client/integration proof. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
 CM-1489 public contract evidence bundle audit and blocker closure decision: added `docs/CM1489_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_BLOCKER_CLOSURE_AUDIT.md`. Decision is `first_must_fix: CLOSED` only for the CM-1486 blocker `Fresh post-closeout public contract evidence is not bundled for the seven-tool surface`. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client/integration evidence, confirmed mutation, release/cutover, provider/API, bearer-token, effective write, and new public MCP expansion blockers remain open. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 

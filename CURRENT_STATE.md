@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1489 public contract evidence bundle audit and blocker closure decision` |
-| Current validation | `CMV-1594` |
-| Current route | CM-1489 audits CM-1488 evidence and closes the first must-fix blocker only, without readiness claim |
+| Current task | `CM-1490 select next RC must-fix blocker after first closure` |
+| Current validation | `CMV-1595` |
+| Current route | CM-1490 selects live client / integration evidence as the next must-fix blocker without executing it |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1490` adds `docs/CM1490_NEXT_RC_MUST_FIX_BLOCKER_SELECTION.md` and selects `Live client / integration evidence is not current for the post-closeout seven-tool surface` as the next RC must-fix blocker after CM-1489 closed the first evidence-bundle blocker. CM-1490 is docs triage only and does not execute live client/integration proof. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. CM-1490 does not claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, perform raw scan, call provider/API, use bearer token material, expand public MCP tools, execute live client calls, or perform an effective `record_memory` write.
 
 `CM-1489` adds `docs/CM1489_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_BLOCKER_CLOSURE_AUDIT.md` and audits CM-1488 against the CM-1485 / CM-1486 blocker inventory. Decision is `first_must_fix: CLOSED` only for the bundled seven-tool public contract evidence gap, while overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Live client/integration evidence, confirmed mutation, release/cutover, provider/API, bearer-token, and new public MCP expansion remain blocked. CM-1489 does not claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, use `dry_run=false`, use `confirm=true`, perform raw scan, call provider/API, use bearer token material, expand public MCP tools, execute live client calls, or perform an effective `record_memory` write.
 
@@ -147,7 +149,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1489 closes the first CM-1486 must-fix blocker only for evidence-bundle completeness. The next safe action is selecting the next remaining RC blocker route without live calls or readiness claims. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
+CM-1490 selects live client / integration evidence as the next must-fix blocker. The next safe action is a docs-only exact preflight for that live/integration evidence route. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
 
 ## Boundaries
 
