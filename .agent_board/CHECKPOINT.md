@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1513 evidence vocabulary grouping fixture/test execution`.
-Current validation: `CMV-1618`.
+Current checkpoint: `CM-1514 evidence vocabulary grouping closeout and next backlog selection`.
+Current validation: `CMV-1619`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1514 Evidence Vocabulary Grouping Closeout And Next Backlog Selection
+
+Status: `COMPLETED_VALIDATED_EVIDENCE_VOCABULARY_GROUPING_BACKLOG_CLOSED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1514_EVIDENCE_VOCABULARY_GROUPING_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`.
+- Closed `evidence vocabulary grouping` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`.
+- Registered CM-1513 targeted test evidence: `node --test tests\evidence-vocabulary-grouping-fixture.test.js` passed `5/5`.
+- Selected `search quality evaluation` as the next non-RC backlog item.
+- Recommended `CM-1515 search quality evaluation preflight`.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1619` docs/board closeout validation.
 
 ## CM-1513 Evidence Vocabulary Grouping Regression Coverage
 
