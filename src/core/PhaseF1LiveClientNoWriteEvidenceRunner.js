@@ -63,6 +63,21 @@ function summarizeHealth(payload = {}, expectedRuntimeSourceFingerprint = '') {
   };
 }
 
+function summarizeBlockedHealth(healthSummary = {}) {
+  return {
+    ok: healthSummary.ok === true,
+    service: normalizeString(healthSummary.service),
+    authRequired: healthSummary.authRequired === true,
+    hasRuntime: healthSummary.hasRuntime === true,
+    runtimeFreshness: {
+      sourceFileCount: Number.isInteger(healthSummary.runtimeFreshness?.sourceFileCount)
+        ? healthSummary.runtimeFreshness.sourceFileCount
+        : null,
+      matchesExpected: healthSummary.runtimeFreshness?.matchesExpected === true
+    }
+  };
+}
+
 function summarizeInitialize(payload = {}) {
   const result = payload.result || {};
   return {
@@ -352,6 +367,25 @@ async function runPhaseF1LiveClientNoWriteEvidence({
   }
 
   const health = await healthClient({ endpoint });
+  const healthSummary = summarizeHealth(health.payload, expectedRuntimeSourceFingerprint);
+  if (!healthSummary.ok || healthSummary.runtimeFreshness.matchesExpected !== true) {
+    return {
+      ...plan,
+      status: 'PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED',
+      executionMode: 'blocked_before_proof_requests',
+      liveClientRefreshExecuted: false,
+      evidenceAccepted: false,
+      failClosedReasons: [...plan.failClosedReasons, 'runtime_source_fingerprint_mismatch'],
+      evidence: {
+        health: summarizeBlockedHealth(healthSummary)
+      },
+      safetyCounters: buildSafetyCounters(),
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      rcReady: false
+    };
+  }
+
   const mcpUrl = resolveMcpUrl(endpoint);
   const initialize = await httpJsonClient({
     url: mcpUrl,
@@ -414,7 +448,7 @@ async function runPhaseF1LiveClientNoWriteEvidence({
   });
 
   const evidence = {
-    health: summarizeHealth(health.payload, expectedRuntimeSourceFingerprint),
+    health: healthSummary,
     initialize: summarizeInitialize(initialize.payload),
     toolsList: summarizeToolsList(toolsList.payload),
     authorizedOverview: summarizeAuthorizedOverview(authorizedOverview.payload),

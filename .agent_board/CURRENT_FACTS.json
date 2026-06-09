@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1533",
-  "validationId": "CMV-1637",
+  "taskId": "CM-1534",
+  "validationId": "CMV-1638",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1638",
+      "scope": "CM-1534 Phase F1 runner freshness mismatch short-circuit",
+      "status": "COMPLETED_VALIDATED_PHASE_F1_RUNTIME_FRESHNESS_MISMATCH_SHORT_CIRCUIT_NO_LIVE_PROOF"
+    },
     {
       "id": "CMV-1637",
       "scope": "CM-1533 CM-1532 live HTTP runtime freshness guard source audit",

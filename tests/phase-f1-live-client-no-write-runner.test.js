@@ -158,6 +158,57 @@ test('Phase F1 execution blocks before network when runtime fingerprint expectat
   assert.equal(report.failClosedReasons.includes('missing_expected_runtime_source_fingerprint'), true);
 });
 
+test('Phase F1 execution short-circuits before proof requests when runtime fingerprint mismatches', async () => {
+  const calls = [];
+  const report = await runPhaseF1LiveClientNoWriteEvidence({
+    branch: 'main',
+    commit: COMMIT,
+    endpoint: ENDPOINT,
+    approvalLine: APPROVAL,
+    currentFacts: CLEAN_CURRENT_FACTS,
+    execute: true,
+    expectedRuntimeSourceFingerprint: 'expected-runtime-fingerprint',
+    bearerToken: 'secret-token-that-must-not-appear',
+    healthClient: async () => ({
+      status: 200,
+      payload: {
+        ok: true,
+        service: 'vcp_codex_memory',
+        auth: { required: true },
+        runtimeFreshness: {
+          sourceFingerprint: 'stale-runtime-fingerprint',
+          sourceFileCount: 7
+        },
+        runtime: { writeReconcileWorker: { running: false } }
+      }
+    }),
+    httpJsonClient: async request => {
+      calls.push(request);
+      throw new Error('should not call HTTP JSON client after stale runtime health');
+    }
+  });
+
+  const serializedReport = JSON.stringify(report);
+  assert.equal(report.status, 'PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED');
+  assert.equal(report.executionMode, 'blocked_before_proof_requests');
+  assert.equal(report.liveClientRefreshExecuted, false);
+  assert.equal(report.evidenceAccepted, false);
+  assert.equal(report.failClosedReasons.includes('runtime_source_fingerprint_mismatch'), true);
+  assert.deepEqual(calls, []);
+  assert.equal(serializedReport.includes('secret-token-that-must-not-appear'), false);
+  assert.equal(serializedReport.includes('expected-runtime-fingerprint'), false);
+  assert.equal(serializedReport.includes('stale-runtime-fingerprint'), false);
+  assert.equal(/"Authorization"\s*:\s*"Bearer/i.test(serializedReport), false);
+  assert.equal(/"Authorization"\s*:|OPENAI_API_KEY|ANTHROPIC_API_KEY|providerUrl|C:\\|A:\\/i.test(serializedReport), false);
+  assert.equal(report.evidence.health.runtimeFreshness.matchesExpected, false);
+  assert.equal(report.evidence.health.runtimeFreshness.sourceFileCount, 7);
+  assert.equal(report.safetyCounters.providerCalls, 0);
+  assert.equal(report.safetyCounters.durableMemoryWrites, 0);
+  assert.equal(report.safetyCounters.durableAuditWrites, 0);
+  assert.equal(report.runtimeReady, false);
+  assert.equal(report.rcReady, false);
+});
+
 test('Phase F1 injected execution captures sanitized no-write evidence', async () => {
   const calls = [];
   const report = await runPhaseF1LiveClientNoWriteEvidence({

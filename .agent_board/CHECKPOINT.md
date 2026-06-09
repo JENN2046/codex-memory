@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1533 CM-1532 live HTTP runtime freshness guard source audit`.
-Current validation: `CMV-1637`.
+Current checkpoint: `CM-1534 Phase F1 runner freshness mismatch short-circuit`.
+Current validation: `CMV-1638`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1534 Phase F1 Runner Freshness Mismatch Short-Circuit
+
+Status: `COMPLETED_VALIDATED_PHASE_F1_RUNTIME_FRESHNESS_MISMATCH_SHORT_CIRCUIT_NO_LIVE_PROOF`
+
+Recorded:
+
+- Added `docs/CM1534_PHASE_F1_RUNNER_FRESHNESS_MISMATCH_SHORT_CIRCUIT.md`.
+- Updated `src/core/PhaseF1LiveClientNoWriteEvidenceRunner.js` so `/health.runtimeFreshness` is checked before proof requests.
+- Added a low-disclosure blocked-health summary that omits actual/expected fingerprints, bearer-token material, Authorization header material, local paths, provider/API details, raw memory, and raw audit content.
+- Updated `tests/phase-f1-live-client-no-write-runner.test.js` with a mismatch regression proving no HTTP JSON proof request is issued after stale health freshness.
+- Confirmed the stale runtime mismatch path returns `PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED`, `executionMode=blocked_before_proof_requests`, `evidenceAccepted=false`, and does not continue to `initialize`, `tools/list`, or `tools/call`.
+- Confirmed public MCP surface remains exactly seven tools.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1638` source/test/docs/board validation.
 
 ## CM-1533 Audit of CM-1532 Live HTTP Runtime Freshness Guard
 
