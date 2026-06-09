@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1495 live client proof rejection closeout and blocker path review`.
-Current validation: `CMV-1600`.
+Current task: `CM-1496 select next actionable RC blocker after live proof defer`.
+Current validation: `CMV-1601`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1495` keeps the live client integration evidence blocker open and selects `DEFER_UNTIL_OPERATOR_EXACT_APPROVAL`. Next safe action after local commit is either a future exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` and binds to CM-1493, or an operator-selected docs/local-safe route to another blocker. Push requires separate explicit authorization.
+`CM-1496` selects `CM-1497 audit/search/write governance blocker classification` as the next docs-local route after live proof defer. Live client evidence remains open and deferred until exact operator approval. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 

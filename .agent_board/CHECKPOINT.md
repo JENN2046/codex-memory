@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1495 live client proof rejection closeout and blocker path review`.
-Current validation: `CMV-1600`.
+Current checkpoint: `CM-1496 select next actionable RC blocker after live proof defer`.
+Current validation: `CMV-1601`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1496 Select Next Actionable RC Blocker After Live Proof Defer
+
+Status: `COMPLETED_VALIDATED_NEXT_ACTIONABLE_BLOCKER_SELECTED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1496_NEXT_ACTIONABLE_RC_BLOCKER_AFTER_LIVE_PROOF_DEFER.md`.
+- Selected `audit_search_write_governance_hardening_not_sorted_into_rc_blocking_vs_backlog` as the next actionable blocker.
+- Recommended next route: `CM-1497 audit/search/write governance blocker classification`.
+- Kept live client evidence blocker `STILL_OPEN_DEFERRED`.
+- Kept confirmed mutation, provider/API, bearer-token, release/cutover, and public expansion routes blocked.
+- Closed no RC blocker and made no readiness / `RC_READY` claim.
+- No live client call, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, or effective `record_memory` write occurred.
+
+Validation: `CMV-1601` docs/board next actionable blocker selection validation.
 
 ## CM-1495 Live Client Proof Rejection Closeout And Blocker Path Review
 

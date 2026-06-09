@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1495 live client proof rejection closeout and blocker path review`.
-Current validation: `CMV-1600`.
+Current task: `CM-1496 select next actionable RC blocker after live proof defer`.
+Current validation: `CMV-1601`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1495 keeps live client evidence blocker open and defers until operator exact approval`.
+Current route: `CM-1496 selects audit/search/write governance blocker classification as next actionable docs-local route`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1496 select next actionable RC blocker after live proof defer: added `docs/CM1496_NEXT_ACTIONABLE_RC_BLOCKER_AFTER_LIVE_PROOF_DEFER.md`. Selected next actionable blocker is `audit_search_write_governance_hardening_not_sorted_into_rc_blocking_vs_backlog`, with recommended next route `CM-1497 audit/search/write governance blocker classification`. Live client evidence remains `STILL_OPEN_DEFERRED`; confirmed mutation, provider/API, bearer-token, release/cutover, and public expansion routes remain blocked. CM-1496 does not close any RC blocker. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
 CM-1495 live client proof rejection closeout and blocker path review: added `docs/CM1495_LIVE_CLIENT_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_PATH_REVIEW.md`. Decision is `LIVE_CLIENT_INTEGRATION_EVIDENCE_BLOCKER_STILL_OPEN` and `NEXT_ROUTE: DEFER_UNTIL_OPERATOR_EXACT_APPROVAL`. CM-1495 records that CM-1493 is available but inactive, no approval-envelope repair is selected, retry requires a future exact `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` decision, and turning to another blocker is deferred unless the operator selects that route. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 

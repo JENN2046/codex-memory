@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1495",
-  "validationId": "CMV-1600",
+  "taskId": "CM-1496",
+  "validationId": "CMV-1601",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1601",
+      "scope": "CM-1496 select next actionable RC blocker after live proof defer",
+      "status": "COMPLETED_VALIDATED_NEXT_ACTIONABLE_BLOCKER_SELECTED_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1600",
       "scope": "CM-1495 live client proof rejection closeout and blocker path review",

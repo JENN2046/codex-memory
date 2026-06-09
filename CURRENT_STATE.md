@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1495 live client proof rejection closeout and blocker path review` |
-| Current validation | `CMV-1600` |
-| Current route | CM-1495 keeps live client evidence blocker open and defers until operator exact approval |
+| Current task | `CM-1496 select next actionable RC blocker after live proof defer` |
+| Current validation | `CMV-1601` |
+| Current route | CM-1496 selects audit/search/write governance blocker classification as next actionable docs-local route |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1496` adds `docs/CM1496_NEXT_ACTIONABLE_RC_BLOCKER_AFTER_LIVE_PROOF_DEFER.md` and selects `audit_search_write_governance_hardening_not_sorted_into_rc_blocking_vs_backlog` as the next actionable blocker after CM-1495 deferred the live client evidence blocker. Recommended next route is `CM-1497 audit/search/write governance blocker classification`. CM-1496 keeps live client evidence `STILL_OPEN_DEFERRED`, keeps confirmed mutation, provider/API, bearer-token, release/cutover, and public expansion routes blocked, and does not close any RC blocker. CM-1496 does not execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, perform an effective `record_memory` write, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1495` adds `docs/CM1495_LIVE_CLIENT_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_PATH_REVIEW.md` and closes out the CM-1494 rejection decision without closing the live client integration evidence blocker. Decision is `LIVE_CLIENT_INTEGRATION_EVIDENCE_BLOCKER_STILL_OPEN` and `NEXT_ROUTE: DEFER_UNTIL_OPERATOR_EXACT_APPROVAL`. CM-1495 records that CM-1493 is an available but inactive no-bearer envelope, no concrete envelope repair is selected, retry is allowed only with a future exact `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` decision, and turning to another blocker is deferred unless the operator selects that route. CM-1495 does not execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, perform an effective `record_memory` write, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -159,7 +161,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1495 keeps the live client evidence blocker open and selects waiting for operator exact approval as the current route. The next safe action is either a new exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` and binds to CM-1493, or an operator-selected docs/local-safe route to another blocker. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
+CM-1496 selects `CM-1497 audit/search/write governance blocker classification` as the next docs-local route. Live client evidence remains open and deferred until exact operator approval. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
 
 ## Boundaries
 
