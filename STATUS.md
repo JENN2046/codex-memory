@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1538 bounded local HTTP runtime refresh for live proof`.
-Current validation: `CMV-1642`.
+Current task: `CM-1539 no-bearer live client proof rerun after runtime refresh`.
+Current validation: `CMV-1643`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `RUNTIME_REFRESHED_FRESHNESS_MATCHED; live proof not executed`.
+Current route: `NO_BEARER_LIVE_PROOF_LOW_DISCLOSURE_PASS; closeout candidate review recorded; no readiness claim`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1539 no-bearer live client proof rerun after runtime refresh: added `docs/CM1539_NO_BEARER_LIVE_CLIENT_PROOF_RERUN_AFTER_RUNTIME_REFRESH.md`. Exact approval `APPROVE_NO_BEARER_LIVE_CLIENT_PROOF_RERUN_AFTER_RUNTIME_REFRESH` was received for a no-bearer bounded live client proof only. Fresh Git preflight confirmed clean synced `main` at `8408ef17a961dd650f6239e0b1415281505d3094`; `/health.runtimeFreshness` was present, bounded, and matched the expected current runtime source fingerprint. The proof executed exactly one no-bearer `initialize`, one no-bearer `tools/list`, and seven no-bearer bounded `tools/call` operations. `tools/list` returned exactly seven public tools. Six restricted no-token calls failed closed with low-disclosure `PUBLIC_REQUEST_BLOCKED`, and no-token `memory_overview` returned `public_selected_overview` projection version `2` without detail keys, paths, memory links, recent audit, recent recall, or raw fields in persisted evidence. Live client evidence closeout candidate review is `PASS_REVIEW_READY`; effective write reliability remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, effective-write blocker closure, readiness claim, or `RC_READY` claim occurred in CM-1539.
 
 CM-1538 bounded local HTTP runtime refresh for live proof: added `docs/CM1538_BOUNDED_LOCAL_HTTP_RUNTIME_REFRESH_FOR_LIVE_PROOF.md`. Exact approval `APPROVE_BOUNDED_LOCAL_HTTP_RUNTIME_REFRESH_FOR_LIVE_PROOF` was received for local runtime refresh/restart and runtimeFreshness verification only. The stale listener on `127.0.0.1:7605` was stopped, `npm run start:http:ensure` returned healthy-and-fresh, and post-refresh `/health.runtimeFreshness` matched the expected current runtime source fingerprint with bounded metadata only. The evidence persists no actual fingerprint values, local filesystem paths, Authorization/Bearer material, token material, provider/API details, raw memory, or raw audit material. No live MCP proof was executed: no `initialize`, no `tools/list`, and no `tools/call`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, live/effective-write blocker closure, readiness claim, or `RC_READY` claim occurred in CM-1538.
 

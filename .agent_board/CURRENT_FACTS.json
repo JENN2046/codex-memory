@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1538",
-  "validationId": "CMV-1642",
+  "taskId": "CM-1539",
+  "validationId": "CMV-1643",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1643",
+      "scope": "CM-1539 no-bearer live client proof rerun after runtime refresh",
+      "status": "COMPLETED_VALIDATED_NO_BEARER_LIVE_PROOF_LOW_DISCLOSURE_PASS_CLOSEOUT_CANDIDATE_RECORDED"
+    },
     {
       "id": "CMV-1642",
       "scope": "CM-1538 bounded local HTTP runtime refresh for live proof",
@@ -668,8 +673,7 @@
     }
   ],
   "notValidated": [
-    "CM-1538 live MCP proof after runtime refresh",
-    "CM-1537 live client proof rerun after freshness guard",
+    "CM-1539 live client evidence blocker final closure decision",
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
@@ -684,7 +688,9 @@
   "constraints": {
     "claudeMdUntrackedUntouched": true,
     "noProviderCalls": true,
-    "noRealMemoryCalls": true,
+    "noRawMemoryAccess": true,
+    "noEffectiveMemoryWrites": true,
+    "noBearerTokenUse": true,
     "noPushWithoutExplicitAuthorization": true,
     "noCommittedLiveGitHeads": true,
     "freshGitFactsRequiredBeforeBranchSensitiveAction": true

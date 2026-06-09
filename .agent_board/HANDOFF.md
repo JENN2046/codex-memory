@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1538 bounded local HTTP runtime refresh for live proof`.
-Current validation: `CMV-1642`.
-Current handoff: local HTTP runtime was refreshed and runtimeFreshness now matches current runtime source; live proof remains not executed.
+Current task: `CM-1539 no-bearer live client proof rerun after runtime refresh`.
+Current validation: `CMV-1643`.
+Current handoff: no-bearer live proof executed and low-disclosure pass evidence recorded; live client closeout candidate review is ready.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: local HTTP runtime was refreshed and runtimeFreshness now match
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_RUNTIME_REFRESHED_FRESHNESS_MATCHED_NO_LIVE_PROOF / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current status: `COMPLETED_VALIDATED_NO_BEARER_LIVE_PROOF_LOW_DISCLOSURE_PASS_CLOSEOUT_CANDIDATE_RECORDED / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1539 added `docs/CM1539_NO_BEARER_LIVE_CLIENT_PROOF_RERUN_AFTER_RUNTIME_REFRESH.md` and recorded the exact-approved no-bearer live client proof rerun after runtime refresh. Fresh Git preflight passed on clean synced `main` at `8408ef17a961dd650f6239e0b1415281505d3094`, and pre-proof `/health.runtimeFreshness` was present, bounded, and matched the expected current runtime source fingerprint. The proof executed exactly one no-bearer `initialize`, one no-bearer `tools/list`, and seven no-bearer bounded `tools/call` operations. `tools/list` returned exactly seven public tools. Six restricted no-token calls failed closed with low-disclosure `PUBLIC_REQUEST_BLOCKED`; no-token `memory_overview` returned `public_selected_overview` projection version `2` without detail keys, paths, memory links, recent audit, recent recall, or raw fields in persisted evidence. Live client evidence closeout candidate review is `PASS_REVIEW_READY`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
 - CM-1538 added `docs/CM1538_BOUNDED_LOCAL_HTTP_RUNTIME_REFRESH_FOR_LIVE_PROOF.md` and recorded exact-approved bounded local HTTP runtime refresh/restart evidence. The stale listener on `127.0.0.1:7605` was stopped, `npm run start:http:ensure` returned healthy-and-fresh, and post-refresh `/health.runtimeFreshness` matched the expected current runtime source fingerprint with bounded metadata only. The evidence persists no actual fingerprint values, local filesystem paths, Authorization/Bearer material, token material, provider/API details, raw memory, or raw audit material. No live MCP proof was executed: no `initialize`, no `tools/list`, and no `tools/call`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, live/effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
 - CM-1537 added `docs/CM1537_LIVE_CLIENT_INTEGRATION_PROOF_RERUN_AFTER_FRESHNESS_GUARD.md` and recorded the exact-approved no-bearer rerun attempt. Fresh Git preflight passed on clean synced `main` at `40eba239edadd879070a35903965a0fb7b9a2dec`. Runtime freshness preflight failed closed because the live HTTP runtime was healthy but current-source runtime freshness evidence was missing or mismatched. The rerun stopped before proof requests, so no `initialize`, no `tools/list`, and no `tools/call` were sent. No acceptable live proof evidence was generated. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
 - CM-1536 added `docs/CM1536_LIVE_PROOF_RERUN_READINESS_DECISION_AFTER_FRESHNESS_GUARD_AUDIT.md` and recorded decision `READY_TO_REQUEST_EXACT_OPERATOR_APPROVAL_FOR_LIVE_PROOF_RERUN` with `execution_status=NOT_EXECUTED` and `approval_status=NOT_GRANTED_BY_CM_1536`. Runtime freshness guard is audited by CM-1532/CM-1533; runner stale fingerprint short-circuit is audited by CM-1534/CM-1535. Future proof rerun must reference `docs/CM1493_LIVE_CLIENT_PROOF_APPROVAL_ENVELOPE.md`, remain no-bearer unless separately re-approved, and add a pre-proof runtime freshness match requirement with fail-closed `blocked_before_proof_requests` behavior on mismatch. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
@@ -117,7 +118,7 @@ Boundaries:
 
 Next safe action:
 
-Next safe action after local commit is either push review for CM-1536 or an operator exact approval decision for the bounded no-bearer live proof rerun under the referenced envelope plus freshness precondition. Confirmed mutation, valid write, raw/provider/bearer, public MCP expansion, release, live client proof, and readiness work remains forbidden unless separately and exactly approved.
+Next safe action after local commit is either push review for CM-1539 or a separate docs/source audit / operator closeout decision for the live client evidence blocker using CM-1539 evidence. Confirmed mutation, valid write, raw/provider/bearer, public MCP expansion, release, effective-write proof, and readiness work remains forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 

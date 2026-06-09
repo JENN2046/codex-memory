@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1538 bounded local HTTP runtime refresh for live proof`.
-Current validation: `CMV-1642`.
+Current checkpoint: `CM-1539 no-bearer live client proof rerun after runtime refresh`.
+Current validation: `CMV-1643`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1539 No-Bearer Live Client Proof Rerun After Runtime Refresh
+
+Status: `COMPLETED_VALIDATED_NO_BEARER_LIVE_PROOF_LOW_DISCLOSURE_PASS_CLOSEOUT_CANDIDATE_RECORDED`
+
+Recorded:
+
+- Added `docs/CM1539_NO_BEARER_LIVE_CLIENT_PROOF_RERUN_AFTER_RUNTIME_REFRESH.md`.
+- Recorded exact approval `APPROVE_NO_BEARER_LIVE_CLIENT_PROOF_RERUN_AFTER_RUNTIME_REFRESH`.
+- Fresh Git preflight passed on clean synced `main` at `8408ef17a961dd650f6239e0b1415281505d3094`.
+- Confirmed pre-proof `/health.runtimeFreshness` is present, bounded, and matches the expected current runtime source fingerprint.
+- Executed the exact no-bearer proof budget: `initialize=1`, `tools/list=1`, `tools/call=7`.
+- Confirmed `tools/list` returns exactly seven public tools: `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`.
+- Confirmed six restricted no-token calls fail closed with low-disclosure `PUBLIC_REQUEST_BLOCKED`.
+- Confirmed no-token `memory_overview` returns `public_selected_overview` projection version `2` without detail keys, paths, memory links, recent audit, recent recall, or raw fields in persisted evidence.
+- Recorded live client evidence closeout candidate review as `PASS_REVIEW_READY`.
+- Persisted no raw JSON-RPC responses, session header value, actual/expected fingerprint values, local filesystem paths, bearer/Authorization material, token material, provider/API details, raw memory, raw audit, memory ids, titles, snippets, or content.
+- Effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`; no readiness claim occurred.
+- No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1643` proof evidence plus docs/board/source validation.
 
 ## CM-1538 Bounded Local HTTP Runtime Refresh For Live Proof
 
