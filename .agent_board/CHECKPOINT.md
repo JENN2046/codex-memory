@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1521 non-RC backlog hardening lane final closeout`.
-Current validation: `CMV-1626`.
+Current checkpoint: `CM-1523 live client integration proof approval`.
+Current validation: `CMV-1627`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1523 Live Client Integration Proof Approval
+
+Status: `COMPLETED_VALIDATED_APPROVAL_RECORDED_NO_LIVE_CALL`
+
+Recorded:
+
+- Added `docs/CM1523_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL.md`.
+- Recorded operator exact approval `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF`.
+- Activated the CM-1493 no-bearer live client proof envelope for CM-1524 through CM-1526.
+- Kept proof execution separate from CM-1523.
+- No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, `dry_run=false`, `confirm=true`, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1523.
+
+Validation: `CMV-1627` docs/board approval-record validation.
 
 ## CM-1521 Non-RC Backlog Hardening Lane Closeout
 

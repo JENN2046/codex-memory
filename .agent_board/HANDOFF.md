@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1521 non-RC backlog hardening lane final closeout`.
-Current validation: `CMV-1626`.
-Current handoff: non-RC backlog hardening lane completed; RC blockers remain open/deferred.
+Current task: `CM-1523 live client integration proof approval`.
+Current validation: `CMV-1627`.
+Current handoff: live client integration proof lane approved; CM-1524 proof execution pending.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: non-RC backlog hardening lane completed; RC blockers remain ope
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current status: `LIVE_CLIENT_INTEGRATION_PROOF_LANE_APPROVED / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1523 added `docs/CM1523_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL.md` and recorded operator exact approval `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` for the CM-1523 to CM-1526 live client integration proof lane. The approval activates the CM-1493 no-bearer live client proof envelope only. CM-1523 performed no live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim.
 - CM-1521 added `docs/CM1521_NON_RC_BACKLOG_HARDENING_LANE_CLOSEOUT.md` and closed the full non-RC backlog hardening lane as `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED`. Completed items are bounded search projection regression, audit readonly refinements, audit evidence rollup, evidence vocabulary grouping, search quality evaluation, and write-preflight polish. Live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 - CM-1520 added `docs/CM1520_WRITE_PREFLIGHT_POLISH_CLOSEOUT.md`, closed `write-preflight polish` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1519 targeted test evidence `5/5`, and recorded all task-book non-RC backlog hardening items complete pending CM-1521 final lane closeout. No effective `record_memory`, live client call, provider/API, bearer token, raw memory/audit/broad scan, confirmed mutation, public MCP expansion, release/tag/deploy, source change, test change, readiness / `RC_READY` claim, or RC blocker closure occurred.
 - CM-1519 added `tests/fixtures/write-preflight-polish-cm1519-v1.json`, `tests/write-preflight-polish-fixture.test.js`, and `docs/CM1519_WRITE_PREFLIGHT_POLISH_REGRESSION_COVERAGE.md`. Fixture/test-only coverage proves invalid write and schema rejection fail closed without durable write, no-op and dry-run guards do not produce effective writes, effective write and confirmed mutation payloads are forbidden and not executed, rejection output remains low-disclosure, and public MCP surface remains exactly seven tools. No production source finding opened. No effective `record_memory`, live client call, provider/API, bearer token, raw memory/audit/broad scan, confirmed mutation, public MCP expansion, release/tag/deploy, production source change, readiness / `RC_READY` claim, or RC blocker closure occurred.

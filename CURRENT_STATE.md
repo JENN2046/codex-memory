@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1521 non-RC backlog hardening lane final closeout` |
-| Current validation | `CMV-1626` |
-| Current route | non-RC backlog hardening lane completed; RC blockers remain open/deferred |
+| Current task | `CM-1523 live client integration proof approval` |
+| Current validation | `CMV-1627` |
+| Current route | live client integration proof lane approved; proof execution pending CM-1524 |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1523` adds `docs/CM1523_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL.md` and records the operator exact approval string `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` for the CM-1523 to CM-1526 live client integration proof lane. The approval activates only the CM-1493 no-bearer live client proof envelope: `tools/list`, bounded `tools/call`, redacted evidence, and subsequent blocker closeout/fail-finding review. CM-1523 itself does not execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 
 `CM-1521` adds `docs/CM1521_NON_RC_BACKLOG_HARDENING_LANE_CLOSEOUT.md` and closes the entire non-RC backlog hardening lane as `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED`. Completed backlog items are bounded search projection regression, audit readonly refinements, audit evidence rollup, evidence vocabulary grouping, search quality evaluation, and write-preflight polish. Live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. CM-1521 does not claim readiness / `RC_READY`, close RC blockers, execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests beyond docs/board/status.
 

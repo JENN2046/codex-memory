@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1521 non-RC backlog hardening lane final closeout`.
-Current validation: `CMV-1626`.
+Current task: `CM-1523 live client integration proof approval`.
+Current validation: `CMV-1627`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED; RC blockers remain open/deferred`.
+Current route: `LIVE_CLIENT_INTEGRATION_PROOF_LANE_APPROVED; CM-1524 proof execution pending`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1523 live client integration proof approval: added `docs/CM1523_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL.md`. Recorded operator exact approval `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` for the CM-1523 to CM-1526 live client integration proof lane and bound execution to the CM-1493 no-bearer proof envelope. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1523.
 
 CM-1521 non-RC backlog hardening lane final closeout: added `docs/CM1521_NON_RC_BACKLOG_HARDENING_LANE_CLOSEOUT.md`. Closed the non-RC backlog hardening lane as `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED` and registered completed backlog items: bounded search projection regression, audit readonly refinements, audit evidence rollup, evidence vocabulary grouping, search quality evaluation, and write-preflight polish. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 
