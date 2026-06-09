@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1480 controlled mutation same-actor target probing policy review` |
-| Current validation | `CMV-1586` |
-| Current route | CM-1480 decides same-actor public controlled mutation dry-run must not expose `accepted` or lifecycle transition metadata; future source/test hardening should unify public projection to low disclosure |
+| Current task | `CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening` |
+| Current validation | `CMV-1587` |
+| Current route | CM-1481 changes public controlled mutation dry-run projection so same-actor allowed transitions no longer expose target existence, eligibility, or lifecycle metadata |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1481` updates `src/app.js` and `tests/controlled-mutation-public-registration.test.js` so public controlled mutation dry-run projection is uniformly low-disclosure. Public projection now always returns `accepted=false` and `decision=rejected`, keeps `dryRun=true` and `mutated=false`, uses `reasonCode=public_dry_run_low_disclosure`, and no longer returns `fromStatus`, `toStatus`, `newFromStatus`, or `newToStatus`. Tests cover same-actor existing allowed-transition records and assert they do not leak lifecycle metadata, while preserving context-bound actor behavior, cross-client low-disclosure rejection, and independent `dry_run=false` / `confirm=true` fail-closed handling. CM-1481 does not execute confirmed mutation, does not execute `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 `CM-1480` adds `docs/CM1480_CONTROLLED_MUTATION_SAME_ACTOR_TARGET_PROBING_POLICY_REVIEW.md` as a docs-only policy review of the CM-1479 same-actor public dry-run projection. Decision is `NO_GO_FOR_EXPOSING_ACCEPTED_AND_STATUS_TRANSITIONS_ON_PUBLIC_SAME_ACTOR_DRY_RUN`, `GO_FOR_FUTURE_UNIFIED_LOW_DISCLOSURE_PUBLIC_DRY_RUN_PROJECTION`, and `NO_RUNTIME_CHANGE_IN_CM_1480`. Same-actor actor binding remains required, but public dry-run should not expose `accepted=true`, `decision=dry-run`, `fromStatus`, `toStatus`, `newFromStatus`, or `newToStatus` because those fields can become target existence, eligibility, and lifecycle metadata probes. CM-1480 records a source risk table, tests gap list, go/no-go decision, rollback/evidence checklist, and explicit non-claims. It does not execute confirmed mutation, does not execute `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 

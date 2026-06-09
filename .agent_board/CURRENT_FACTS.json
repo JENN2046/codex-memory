@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1480",
-  "validationId": "CMV-1586",
+  "taskId": "CM-1481",
+  "validationId": "CMV-1587",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1587",
+      "scope": "CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening",
+      "status": "COMPLETED_VALIDATED_PUBLIC_DRY_RUN_UNIFORMLY_LOW_DISCLOSURE"
+    },
     {
       "id": "CMV-1586",
       "scope": "CM-1480 controlled mutation same-actor target probing policy review",

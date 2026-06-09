@@ -473,18 +473,16 @@ function sanitizePublicControlledMutationReason(reason) {
 }
 
 function projectPublicControlledMutationResult(toolName, result = {}, args = {}) {
+  const safeReason = sanitizePublicControlledMutationReason(result.reason)
+    || 'public controlled mutation dry-run requires separate exact review.';
   return {
-    accepted: result.decision !== 'rejected',
-    decision: result.decision || 'rejected',
+    accepted: false,
+    decision: 'rejected',
     tool: toolName,
     dryRun: true,
     mutated: false,
-    fromStatus: result.fromStatus || result.oldFromStatus || null,
-    toStatus: result.toStatus || result.oldToStatus || null,
-    newFromStatus: result.newFromStatus || null,
-    newToStatus: result.newToStatus || null,
-    reasonCode: result.decision === 'rejected' ? 'rejected' : 'dry_run_projection',
-    reason: sanitizePublicControlledMutationReason(result.reason),
+    reasonCode: 'public_dry_run_low_disclosure',
+    reason: safeReason,
     access: buildPublicControlledMutationAccess(),
     policy: buildPublicControlledMutationPolicy(),
     confirmGate: buildPublicControlledMutationConfirmGate(args),

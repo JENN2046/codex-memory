@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1480 controlled mutation same-actor target probing policy review`.
-Current validation: `CMV-1586`.
+Current task: `CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening`.
+Current validation: `CMV-1587`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1480` records a docs-only policy review deciding that same-actor public controlled mutation dry-run should not expose `accepted=true`, `decision=dry-run`, `fromStatus`, `toStatus`, `newFromStatus`, or `newToStatus`. Next safe action is guarded local commit with message `docs: review controlled mutation same-actor probing policy` after validation and diff review pass. Future source/test hardening should unify the public dry-run projection to low disclosure without weakening CM-1479 context-bound actor and fail-closed flag gates.
+`CM-1481` hardens public controlled mutation dry-run projection so same-actor allowed transitions do not expose target existence, eligibility, or lifecycle metadata. Next safe action is guarded local commit with message `fix: make controlled mutation public dry-run uniformly low-disclosure` after validation and diff review pass. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 

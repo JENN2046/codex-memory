@@ -177,7 +177,13 @@ function assertLowDisclosureProjection(payload, toolName) {
     'auditEventPreview',
     'auditPlanPreview',
     'providerUrl',
-    'embeddingFingerprint'
+    'embeddingFingerprint',
+    'fromStatus',
+    'toStatus',
+    'oldFromStatus',
+    'oldToStatus',
+    'newFromStatus',
+    'newToStatus'
   ]) {
     assert.equal(hasKey(payload, forbidden), false, `${toolName} leaked ${forbidden}`);
   }
@@ -241,9 +247,37 @@ test('public controlled mutation dry-run binds actor_client_id to request contex
       actor_client_id: 'claude'
     }), publicRequestContext({ clientId: 'codex' }));
 
-    assert.equal(payload.decision, 'dry-run');
-    assert.equal(payload.accepted, true);
+    assert.equal(payload.decision, 'rejected');
+    assert.equal(payload.accepted, false);
+    assert.equal(payload.reasonCode, 'public_dry_run_low_disclosure');
     assertLowDisclosureProjection(payload, 'validate_memory');
+  });
+});
+
+test('public controlled mutation allowed-transition record does not leak lifecycle metadata', async () => {
+  await withApp(async ({ app }) => {
+    insertRecord(app.config.dbPath, {
+      memoryId: 'mem-public-dry-run',
+      status: 'proposal',
+      clientId: 'codex',
+      visibility: 'private'
+    });
+
+    const validatePayload = await app.callTool('validate_memory', validArgs('validate_memory'), publicRequestContext({
+      clientId: 'codex'
+    }));
+    assert.equal(validatePayload.accepted, false);
+    assert.equal(validatePayload.decision, 'rejected');
+    assert.equal(validatePayload.reasonCode, 'public_dry_run_low_disclosure');
+    assertLowDisclosureProjection(validatePayload, 'validate_memory');
+
+    const tombstonePayload = await app.callTool('tombstone_memory', validArgs('tombstone_memory'), publicRequestContext({
+      clientId: 'codex'
+    }));
+    assert.equal(tombstonePayload.accepted, false);
+    assert.equal(tombstonePayload.decision, 'rejected');
+    assert.equal(tombstonePayload.reasonCode, 'public_dry_run_low_disclosure');
+    assertLowDisclosureProjection(tombstonePayload, 'tombstone_memory');
   });
 });
 

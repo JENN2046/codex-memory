@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1480 controlled mutation same-actor target probing policy review`.
-Current validation: `CMV-1586`.
+Current checkpoint: `CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening`.
+Current validation: `CMV-1587`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1481 Controlled Mutation Public Dry-Run Uniform Low-Disclosure Runtime Hardening
+
+Status: `COMPLETED_VALIDATED_PUBLIC_DRY_RUN_UNIFORMLY_LOW_DISCLOSURE`
+
+Recorded:
+
+- Updated `src/app.js` public controlled mutation projection.
+- Public projection now always returns `accepted=false`.
+- Public projection now always returns `decision=rejected`.
+- Public projection no longer returns `fromStatus`, `toStatus`, `newFromStatus`, or `newToStatus`.
+- Public projection uses `reasonCode=public_dry_run_low_disclosure`.
+- Same-actor existing allowed-transition dry-run records are projected with the same low-disclosure public shape.
+- Updated `tests/controlled-mutation-public-registration.test.js` to cover same-actor allowed-transition records and assert no lifecycle metadata leakage.
+- Preserved context-bound actor binding, private/cross-client low-disclosure rejection, and independent `dry_run=false` / `confirm=true` fail-closed tests.
+- No confirmed mutation, `dry_run=false` execution, `confirm=true` execution, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1587` source/test/docs validation.
 
 ## CM-1480 Controlled Mutation Same-Actor Target Probing Policy Review
 
