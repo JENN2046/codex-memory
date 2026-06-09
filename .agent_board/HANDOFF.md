@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1493 live client proof exact approval envelope completion packet`.
-Current validation: `CMV-1598`.
-Current handoff: CM-1493 completes no-bearer exact approval envelope shape; readiness remains unclaimed.
+Current task: `CM-1494 operator exact approval decision for live client proof`.
+Current validation: `CMV-1599`.
+Current handoff: CM-1494 rejects live client proof execution; readiness remains unclaimed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1493 completes no-bearer exact approval envelope shape; read
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_LIVE_CLIENT_PROOF_APPROVAL_ENVELOPE_NO_LIVE_CALL`.
+Current status: `COMPLETED_VALIDATED_LIVE_CLIENT_PROOF_DECISION_REJECTED_NO_LIVE_CALL`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1494 added `docs/CM1494_LIVE_CLIENT_PROOF_EXACT_APPROVAL_DECISION.md` and recorded `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` because no exact `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` operator decision was provided. It references the CM-1493 no-bearer command envelope but does not activate it. No live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or effective write occurred.
 - CM-1493 added `docs/CM1493_LIVE_CLIENT_PROOF_APPROVAL_ENVELOPE.md` and completed a no-bearer local HTTP MCP candidate envelope for future live client integration proof. It records exact command list, transcript redaction rules, abort criteria, allowed/forbidden proof boundaries, and expected evidence artifact checklist. It does not approve execution and does not execute live calls.
 - CM-1492 added `docs/CM1492_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL_DECISION.md` and recorded `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` because no complete exact approval envelope was provided for live execution. It preserves future approval requirements and abort criteria. No live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or effective write occurred.
 - CM-1491 added `docs/CM1491_LIVE_CLIENT_INTEGRATION_EVIDENCE_PREFLIGHT.md` as a docs-only exact-proof preflight for future live client integration evidence over the post-closeout seven-tool public surface. It defines exact approval requirements, expected live client command / transcript shapes, low-disclosure assertions, forbidden output keys, failure / rollback / abort criteria, and future evidence checklist. No live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or effective write occurred.
@@ -64,7 +65,7 @@ Completed in this slice:
 - Recorded CM-1450 through CM-1488 and CMV-1560 through CMV-1593 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1598`; CM-1493 docs/board live client proof envelope validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1599`; CM-1494 docs/board live client proof decision validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 

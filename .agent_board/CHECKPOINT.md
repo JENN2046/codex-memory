@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1493 live client proof exact approval envelope completion packet`.
-Current validation: `CMV-1598`.
+Current checkpoint: `CM-1494 operator exact approval decision for live client proof`.
+Current validation: `CMV-1599`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1494 Live Client Proof Exact Approval Decision
+
+Status: `COMPLETED_VALIDATED_LIVE_CLIENT_PROOF_DECISION_REJECTED_NO_LIVE_CALL`
+
+Recorded:
+
+- Added `docs/CM1494_LIVE_CLIENT_PROOF_EXACT_APPROVAL_DECISION.md`.
+- Decision: `REJECT_LIVE_CLIENT_INTEGRATION_PROOF`.
+- Rationale: no exact `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` operator decision was provided.
+- Referenced the CM-1493 no-bearer command envelope without activating it.
+- Preserved the live client evidence blocker as still blocked.
+- No live client call, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, `RC_READY` claim, or effective `record_memory` write occurred.
+
+Validation: `CMV-1599` docs/board live client proof decision validation.
 
 ## CM-1493 Live Client Proof Exact Approval Envelope Completion Packet
 

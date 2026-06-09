@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1493 live client proof exact approval envelope completion packet`.
-Current validation: `CMV-1598`.
+Current task: `CM-1494 operator exact approval decision for live client proof`.
+Current validation: `CMV-1599`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1493` completes the no-bearer exact approval envelope shape without approving or executing live calls. Next safe action after local commit is either a future exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` and binds to CM-1493, or selection of another docs/local-safe blocker route. Push requires separate explicit authorization.
+`CM-1494` rejects live client proof execution because no exact `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` operator decision was provided. Next safe action after local commit is either a future exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` and binds to CM-1493, or selection of another docs/local-safe blocker route. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 

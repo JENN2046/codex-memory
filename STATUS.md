@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1493 live client proof exact approval envelope completion packet`.
-Current validation: `CMV-1598`.
+Current task: `CM-1494 operator exact approval decision for live client proof`.
+Current validation: `CMV-1599`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1493 completes a no-bearer exact approval envelope without approving or executing live calls`.
+Current route: `CM-1494 rejects live client proof execution because no exact approve decision was provided`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1494 operator exact approval decision for live client proof: added `docs/CM1494_LIVE_CLIENT_PROOF_EXACT_APPROVAL_DECISION.md`. Decision is `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` because the current operator task requested a decision record but did not provide the exact approval decision string `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF`. CM-1493 is referenced as the candidate envelope but not activated. The live client evidence blocker remains blocked. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
 CM-1493 live client proof exact approval envelope completion packet: added `docs/CM1493_LIVE_CLIENT_PROOF_APPROVAL_ENVELOPE.md`. The packet completes a no-bearer exact approval envelope shape for a future local HTTP MCP live client integration proof, including exact command list, transcript redaction rules, abort criteria, allowed/forbidden proof boundaries, and expected evidence artifact checklist. It does not approve execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
