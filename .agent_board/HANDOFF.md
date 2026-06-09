@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1500 effective write proof rejection closeout and blocker route review`.
-Current validation: `CMV-1605`.
-Current handoff: CM-1500 keeps effective write reliability blocker open after rejection and defers until exact approval or next blocker selection.
+Current task: `CM-1501 RC blocker route freeze after dual proof defer`.
+Current validation: `CMV-1606`.
+Current handoff: CM-1501 freezes the RC blocker route after live client proof and effective write proof are both deferred; operator action is needed before any ready route can progress.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1500 keeps effective write reliability blocker open after re
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_NO_WRITE`.
+Current status: `COMPLETED_VALIDATED_RC_BLOCKER_ROUTE_FREEZE_NO_READY_CLAIM`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1501 added `docs/CM1501_RC_BLOCKER_ROUTE_FREEZE_AFTER_DUAL_PROOF_DEFER.md` and froze the RC blocker route as `FROZEN_OPERATOR_ACTION_NEEDED`. Live client proof remains `DEFERRED_UNTIL_OPERATOR_EXACT_APPROVAL`; effective write proof remains `DEFERRED_UNTIL_OPERATOR_EXACT_APPROVAL`; ready route remains `BLOCKED_NO_READY_CLAIM`. Remaining RC blockers and exact approval options are listed. No blocker closure, readiness / `RC_READY` claim, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, source repair, release/tag/deploy, invalid-write proof, or no-op / dry-run proof occurred.
 - CM-1500 added `docs/CM1500_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_ROUTE_REVIEW.md` and closed out CM-1499 rejection. Effective write reliability blocker remains `STILL_OPEN_DEFERRED`; CM-1498 preflight remains available but not activated; default route is defer until operator exact approval or select another blocker. No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1499 added `docs/CM1499_EFFECTIVE_WRITE_RELIABILITY_PROOF_APPROVAL_DECISION.md` and recorded `REJECT_EFFECTIVE_WRITE_RELIABILITY_PROOF` because no exact `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF` approval string was provided. CM-1498 is referenced but not activated. Effective write reliability blocker remains open. No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1498 added `docs/CM1498_EFFECTIVE_WRITE_RELIABILITY_EVIDENCE_PREFLIGHT.md` as a docs-only evidence preflight for effective write reliability and scoped write follow-up. It defines expected evidence units, scoped write acceptance criteria, invalid-write / no-op / dry-run proof design, validation matrix, and future `CM-1499 scoped write evidence exact approval packet`. CM-1498 does not close the effective write reliability blocker. No valid `record_memory`, live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, source repair, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
@@ -71,7 +72,7 @@ Completed in this slice:
 - Recorded CM-1450 through CM-1488 and CMV-1560 through CMV-1593 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1605`; CM-1500 docs/board effective write proof rejection closeout validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1606`; CM-1501 docs/board RC blocker route freeze validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 

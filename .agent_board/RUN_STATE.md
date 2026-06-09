@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1500 effective write proof rejection closeout and blocker route review`.
-Current validation: `CMV-1605`.
+Current task: `CM-1501 RC blocker route freeze after dual proof defer`.
+Current validation: `CMV-1606`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1500` recommends `CM-1501 select next actionable RC blocker after effective write proof defer` as the next docs-local route. Live client evidence remains open and deferred until exact operator approval. Effective write reliability remains open until separately approved evidence is executed and audited. Push requires separate explicit authorization.
+`CM-1501` recommends `CM-1502 operator action decision after RC blocker route freeze` as the next docs-local route. Live client evidence and effective write reliability remain open and deferred until exact operator approval. Any live client proof, effective write proof, bearer-token use, provider/API call, confirmed mutation, public MCP expansion, release/tag/deploy, or readiness claim remains separate exact-approval / Red-boundary work.
 
 ## Historical Run Notes
 

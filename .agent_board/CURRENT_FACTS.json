@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1500",
-  "validationId": "CMV-1605",
+  "taskId": "CM-1501",
+  "validationId": "CMV-1606",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1606",
+      "scope": "CM-1501 RC blocker route freeze after dual proof defer",
+      "status": "COMPLETED_VALIDATED_RC_BLOCKER_ROUTE_FREEZE_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1605",
       "scope": "CM-1500 effective write proof rejection closeout and blocker route review",

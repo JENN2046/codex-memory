@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1500 effective write proof rejection closeout and blocker route review`.
-Current validation: `CMV-1605`.
+Current checkpoint: `CM-1501 RC blocker route freeze after dual proof defer`.
+Current validation: `CMV-1606`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1501 RC Blocker Route Freeze After Dual Proof Defer
+
+Status: `COMPLETED_VALIDATED_RC_BLOCKER_ROUTE_FREEZE_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1501_RC_BLOCKER_ROUTE_FREEZE_AFTER_DUAL_PROOF_DEFER.md`.
+- Froze RC blocker route as `FROZEN_OPERATOR_ACTION_NEEDED`.
+- Recorded live client proof and effective write proof as deferred until operator exact approval.
+- Recorded ready route as blocked with no readiness claim.
+- Listed remaining RC blockers and exact approval options.
+- Recommended `CM-1502 operator action decision after RC blocker route freeze`.
+- No blocker closure, readiness / `RC_READY` claim, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, source repair, release/tag/deploy, invalid-write proof, or no-op / dry-run proof occurred.
+
+Validation: `CMV-1606` docs/board route freeze validation.
 
 ## CM-1500 Effective Write Proof Rejection Closeout And Blocker Route Review
 
