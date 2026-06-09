@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1527 source hardening for no-token low-disclosure`.
-Current validation: `CMV-1631`.
+Current checkpoint: `CM-1528 no-token low-disclosure hardening source audit`.
+Current validation: `CMV-1632`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1528 No-Token Low-Disclosure Hardening Source Audit
+
+Status: `COMPLETED_VALIDATED_SOURCE_AUDIT_WITH_RESIDUAL_EVIDENCE_RUNNER_FINDING`
+
+Recorded:
+
+- Added `docs/CM1528_NO_TOKEN_LOW_DISCLOSURE_HARDENING_SOURCE_AUDIT.md`.
+- Audited CM-1527 commit `d0f0b6252da0e7e13945654ded7d7d2d7ab382a2`.
+- Runtime no-token rejection shape passes changed-scope audit.
+- Public `memory_overview` projection metadata passes changed-scope audit.
+- Runtime HTTP MCP regression coverage still asserts the seven-tool public surface.
+- Residual finding recorded: `PhaseF1LiveClientNoWriteEvidenceRunner` still expects the older three-tool public surface and should be separately hardened before proof retry if that runner is used.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1632` changed-scope source audit and docs/board validation.
 
 ## CM-1527 Source Hardening For No-Token Low-Disclosure
 

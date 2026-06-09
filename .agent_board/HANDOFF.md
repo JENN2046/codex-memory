@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1527 source hardening for no-token low-disclosure`.
-Current validation: `CMV-1631`.
-Current handoff: no-token public low-disclosure source hardening completed locally; proof retry or blocker closeout remains separate.
+Current task: `CM-1528 no-token low-disclosure hardening source audit`.
+Current validation: `CMV-1632`.
+Current handoff: CM-1527 source audit completed with residual evidence-runner public-tool-contract finding; proof retry or blocker closeout remains separate.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: no-token public low-disclosure source hardening completed local
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING_COMPLETED_LOCALLY / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current status: `SOURCE_AUDIT_COMPLETED_WITH_RESIDUAL_EVIDENCE_RUNNER_FINDING / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1528 added `docs/CM1528_NO_TOKEN_LOW_DISCLOSURE_HARDENING_SOURCE_AUDIT.md` and completed a read-only changed-scope source audit of CM-1527. Runtime no-token rejection and public `memory_overview` projection hardening pass within changed scope. Runtime HTTP MCP tests still assert seven tools. Residual finding: `PhaseF1LiveClientNoWriteEvidenceRunner` still expects the older three-tool public surface and should be separately hardened before proof retry if that runner is used. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1527 added `docs/CM1527_NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING.md` and hardened no-token public rejection plus public selected `memory_overview` projection metadata. No-token rejection paths now return generic `Forbidden` / `rejected` / `blocked` output with `PUBLIC_REQUEST_BLOCKED`; public selected `memory_overview` uses projection version `2`, `public_selected_overview`, and `detailFieldsReturned=false`. Targeted validation passed `43/43`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1526 added `docs/CM1526_LIVE_CLIENT_INTEGRATION_PROOF_CLOSEOUT.md` and closed out the proof lane with `live client evidence blocker: STILL_OPEN`, finding recorded, next route source hardening or proof retry, and `RC_READY: BLOCKED`. Effective write reliability blocker remains `OPEN / DEFERRED`. No new live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1525 added `docs/CM1525_LIVE_CLIENT_INTEGRATION_PROOF_EVIDENCE.md` and recorded the CM-1524 proof evidence bundle: command list, redacted transcript summary, tools/list result, tools/call result summary, pass/fail matrix, forbidden-boundary confirmation, and finding `LIVE_CLIENT_LOW_DISCLOSURE_NOT_FULLY_PROVEN`. No additional live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred. Live client evidence blocker remains pending CM-1526 closeout.

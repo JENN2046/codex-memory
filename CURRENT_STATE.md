@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1527 source hardening for no-token low-disclosure` |
-| Current validation | `CMV-1631` |
-| Current route | no-token public response low-disclosure hardening completed locally; live proof retry or closeout remains separate |
+| Current task | `CM-1528 no-token low-disclosure hardening source audit` |
+| Current validation | `CMV-1632` |
+| Current route | CM-1527 source audit completed with residual evidence-runner public-tool-contract finding |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1528` adds `docs/CM1528_NO_TOKEN_LOW_DISCLOSURE_HARDENING_SOURCE_AUDIT.md` and records an independent changed-scope source audit of CM-1527. Runtime no-token rejection and public `memory_overview` projection hardening pass within changed scope; runtime HTTP MCP regression coverage still asserts the seven-tool public surface. The audit records one residual evidence-runner finding: `src/core/PhaseF1LiveClientNoWriteEvidenceRunner.js` still carries an older three-tool `REQUIRED_PUBLIC_TOOLS` expectation, so future proof retry using that runner may need separate hardening. CM-1528 does not execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, claim readiness / `RC_READY`, or close live/effective-write blockers. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 
 `CM-1527` adds `docs/CM1527_NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING.md` and hardens no-token public rejection plus `memory_overview` public selected projection metadata. No-token rejection paths now use generic blocked/rejected output and JSON-RPC code `PUBLIC_REQUEST_BLOCKED`; public selected `memory_overview` projection now uses `public_selected_overview`, projection version `2`, and `detailFieldsReturned=false` without raw/private/lifecycle/mutation/client-boundary metadata. Targeted regression validation passed `43/43`. CM-1527 does not execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, claim readiness / `RC_READY`, or close the live client/effective-write blockers. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 
