@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const { createCodexMemoryApplication } = require('./app');
 const { createStreamableHttpServer } = require('./adapters/codex-mcp/http');
+const { computeRuntimeSourceFingerprint } = require('./core/RuntimeFreshness');
 
 function appendLogLine(logPath, level, message) {
   const line = `[${new Date().toISOString()}] ${level.toUpperCase()} ${message}\n`;
@@ -42,7 +43,11 @@ async function main() {
     host: app.config.httpHost,
     port: app.config.httpPort,
     mcpPath: app.config.httpMcpPath,
-    bearerToken: app.config.httpBearerToken
+    bearerToken: app.config.httpBearerToken,
+    runtimeFreshness: {
+      ...computeRuntimeSourceFingerprint(),
+      startedAt: new Date().toISOString()
+    }
   });
 
   const address = await httpServer.listen();

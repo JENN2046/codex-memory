@@ -136,6 +136,28 @@ test('Phase F1 execution blocks before network when current facts drift', async 
   assert.equal(report.failClosedReasons.includes('dirty_worktree'), true);
 });
 
+test('Phase F1 execution blocks before network when runtime fingerprint expectation is missing', async () => {
+  const report = await runPhaseF1LiveClientNoWriteEvidence({
+    branch: 'main',
+    commit: COMMIT,
+    endpoint: ENDPOINT,
+    approvalLine: APPROVAL,
+    currentFacts: CLEAN_CURRENT_FACTS,
+    execute: true,
+    bearerToken: 'present-token',
+    httpJsonClient: async () => {
+      throw new Error('should not call HTTP JSON client');
+    },
+    healthClient: async () => {
+      throw new Error('should not call health client');
+    }
+  });
+
+  assert.equal(report.status, 'PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED');
+  assert.equal(report.liveClientRefreshExecuted, false);
+  assert.equal(report.failClosedReasons.includes('missing_expected_runtime_source_fingerprint'), true);
+});
+
 test('Phase F1 injected execution captures sanitized no-write evidence', async () => {
   const calls = [];
   const report = await runPhaseF1LiveClientNoWriteEvidence({
@@ -145,6 +167,7 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
     approvalLine: APPROVAL,
     currentFacts: CLEAN_CURRENT_FACTS,
     execute: true,
+    expectedRuntimeSourceFingerprint: 'expected-runtime-fingerprint',
     bearerToken: 'secret-token-that-must-not-appear',
     healthClient: async () => ({
       status: 200,
@@ -152,6 +175,10 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
         ok: true,
         service: 'vcp_codex_memory',
         auth: { required: true },
+        runtimeFreshness: {
+          sourceFingerprint: 'expected-runtime-fingerprint',
+          sourceFileCount: 7
+        },
         runtime: { writeReconcileWorker: { running: false } }
       }
     }),
@@ -251,6 +278,7 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
 
   assert.equal(report.status, 'PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY');
   assert.equal(report.evidenceAccepted, true);
+  assert.equal(report.evidence.health.runtimeFreshness.matchesExpected, true);
   assert.equal(report.liveClientRefreshExecuted, true);
   assert.equal(report.tokenMaterialPrinted, false);
   assert.equal(report.tokenMaterialPersisted, false);

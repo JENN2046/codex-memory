@@ -11,19 +11,14 @@ if ($env:CODEX_MEMORY_HTTP_PORT -and [int]::TryParse($env:CODEX_MEMORY_HTTP_PORT
 $healthUrl = "http://$hostName`:$port/health"
 $projectDir = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $entryPath = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'serve-codex-memory-http.js')).Path
+$fingerprintPath = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'print-runtime-fingerprint.js')).Path
 
-function Test-Health([string]$url) {
+function Get-HealthPayload([string]$url) {
   try {
-    $resp = Invoke-RestMethod -Uri $url -Method Get -TimeoutSec 2
-    return $resp -and $resp.ok -eq $true
+    return Invoke-RestMethod -Uri $url -Method Get -TimeoutSec 2
   } catch {
-    return $false
+    return $null
   }
-}
-
-if (Test-Health -url $healthUrl) {
-  Write-Output "codex-memory HTTP MCP already healthy at $healthUrl"
-  exit 0
 }
 
 $nodePath = $null
@@ -41,13 +36,45 @@ if (-not $nodePath) {
   exit 1
 }
 
+function Get-ExpectedRuntimeFingerprint() {
+  $value = (& $nodePath $fingerprintPath 2>$null)
+  if (-not $value) {
+    Write-Error 'Unable to compute codex-memory runtime source fingerprint.'
+    exit 1
+  }
+  return [string]$value.Trim()
+}
+
+function Test-RuntimeFreshness([object]$payload, [string]$expected) {
+  if (-not $payload -or -not $payload.ok) {
+    return $false
+  }
+  $actual = $payload.runtimeFreshness.sourceFingerprint
+  if (-not $actual) {
+    return $false
+  }
+  return [string]$actual -eq [string]$expected
+}
+
+$expectedFingerprint = Get-ExpectedRuntimeFingerprint
+$existingHealth = Get-HealthPayload -url $healthUrl
+if ($existingHealth -and $existingHealth.ok -eq $true) {
+  if (Test-RuntimeFreshness -payload $existingHealth -expected $expectedFingerprint) {
+    Write-Output "codex-memory HTTP MCP already healthy and fresh at $healthUrl"
+    exit 0
+  }
+  Write-Error "codex-memory HTTP MCP is healthy but runtime freshness does not match current source fingerprint at $healthUrl"
+  exit 1
+}
+
 $process = Start-Process -FilePath $nodePath -ArgumentList @($entryPath) -WorkingDirectory $projectDir -WindowStyle Hidden -PassThru
 
 $deadline = (Get-Date).AddSeconds(20)
 while ((Get-Date) -lt $deadline) {
   Start-Sleep -Milliseconds 500
-  if (Test-Health -url $healthUrl) {
-    Write-Output "codex-memory HTTP MCP started (pid=$($process.Id)) at $healthUrl"
+  $startedHealth = Get-HealthPayload -url $healthUrl
+  if (Test-RuntimeFreshness -payload $startedHealth -expected $expectedFingerprint) {
+    Write-Output "codex-memory HTTP MCP started fresh (pid=$($process.Id)) at $healthUrl"
     exit 0
   }
   if ($process.HasExited) {

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1531 diagnose live runtime low-disclosure mismatch`.
-Current validation: `CMV-1635`.
+Current task: `CM-1532 live HTTP runtime freshness guard hardening`.
+Current validation: `CMV-1636`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1531` diagnosed the CM-1530 live low-disclosure mismatch. Current source/tests use `PUBLIC_REQUEST_BLOCKED` and `public_selected_overview` v2, while the live `7605` endpoint observed old shapes. The primary hypothesis is stale live HTTP runtime process freshness: `ensure-codex-memory-http.ps1` exits on healthy `/health` and does not validate current `HEAD` or loaded source freshness. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is an exact runtime refresh/freshness envelope or a bounded freshness probe before another proof retry.
+`CM-1532` added live HTTP runtime freshness guard hardening. `/health` exposes bounded `runtimeFreshness` source fingerprint metadata; `ensure-codex-memory-http.ps1` fails closed when a healthy runtime does not match current source fingerprint; Phase F1 runner requires a matching expected runtime source fingerprint before accepting evidence. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is an exact runtime refresh/no-bearer proof retry envelope; do not rerun proof or close blockers without it.
 
 ## Historical Run Notes
 

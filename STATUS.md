@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1531 diagnose live runtime low-disclosure mismatch`.
-Current validation: `CMV-1635`.
+Current task: `CM-1532 live HTTP runtime freshness guard hardening`.
+Current validation: `CMV-1636`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `STALE_LIVE_HTTP_RUNTIME_PRIMARY_HYPOTHESIS; live client evidence blocker remains open`.
+Current route: `RUNTIME_FRESHNESS_GUARD_ADDED; live proof retry remains separate`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1532 live HTTP runtime freshness guard hardening: added `docs/CM1532_LIVE_HTTP_RUNTIME_FRESHNESS_GUARD_HARDENING.md`, `src/core/RuntimeFreshness.js`, `scripts/print-runtime-fingerprint.js`, and `tests/live-http-runtime-freshness-guard.test.js`; updated HTTP health/startup, `scripts/ensure-codex-memory-http.ps1`, Phase F1 runner, and related tests. Live HTTP `/health` now exposes bounded `runtimeFreshness`; `ensure` fails closed when a healthy runtime is not fresh against the current source fingerprint; Phase F1 runner requires an expected runtime source fingerprint before execution and accepts evidence only if `/health` matches it. Public MCP tools remain seven. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1532.
 
 CM-1531 diagnose live runtime low-disclosure mismatch: added `docs/CM1531_LIVE_RUNTIME_LOW_DISCLOSURE_MISMATCH_DIAGNOSIS.md` and `tests/live-runtime-low-disclosure-mismatch-diagnosis.test.js`. Diagnosis decision is `STALE_LIVE_HTTP_RUNTIME_IS_PRIMARY_HYPOTHESIS`: current source and source-side HTTP tests use the new low-disclosure no-token rejection and `memory_overview` projection v2, but CM-1530 live endpoint still observed old shapes. Runtime inspection found the `7605` listener running `scripts/serve-codex-memory-http.js`; the startup helper `scripts/ensure-codex-memory-http.ps1` exits when `/health` is already healthy and does not validate current `HEAD` or source freshness. Finding: `CM-1531_FINDING: LIVE_RUNTIME_PROCESS_FRESHNESS_NOT_PROVEN`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live proof closeout, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1531.
 

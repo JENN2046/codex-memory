@@ -45,13 +45,12 @@ test('CM-1531 HTTP tests cover current source low-disclosure path', () => {
   assert.match(httpTest, /overview\.access\.selectedProjectionVersion,\s*2/);
 });
 
-test('CM-1531 startup ensure path can leave a healthy stale runtime in place', () => {
+test('CM-1531 diagnosis records the historical health-only ensure risk', () => {
   const ensureScript = read('scripts/ensure-codex-memory-http.ps1');
   const serveScript = read('scripts/serve-codex-memory-http.js');
 
-  assert.match(ensureScript, /if \(Test-Health -url \$healthUrl\) \{/);
-  assert.match(ensureScript, /already healthy/);
-  assert.match(ensureScript, /exit 0/);
+  assert.match(ensureScript, /runtime freshness does not match current source fingerprint/);
+  assert.match(ensureScript, /Test-RuntimeFreshness/);
   assert.doesNotMatch(ensureScript, /rev-parse/);
   assert.doesNotMatch(ensureScript, /HEAD/);
   assert.match(serveScript, /require\(path\.resolve\(__dirname, '\.\.', 'src', 'http-index\.js'\)\)/);

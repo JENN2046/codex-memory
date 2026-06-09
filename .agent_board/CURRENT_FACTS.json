@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1531",
-  "validationId": "CMV-1635",
+  "taskId": "CM-1532",
+  "validationId": "CMV-1636",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1636",
+      "scope": "CM-1532 live HTTP runtime freshness guard hardening",
+      "status": "COMPLETED_VALIDATED_RUNTIME_FRESHNESS_GUARD_ADDED_NO_LIVE_PROOF"
+    },
     {
       "id": "CMV-1635",
       "scope": "CM-1531 live runtime low-disclosure mismatch diagnosis",

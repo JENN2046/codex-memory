@@ -58,7 +58,15 @@ const LOW_DISCLOSURE_HEALTH_KEYS = [
   'ok',
   'path',
   'protocol',
+  'runtimeFreshness',
   'version'
+];
+
+const RUNTIME_FRESHNESS_KEYS = [
+  'algorithm',
+  'sourceFileCount',
+  'sourceFingerprint',
+  'startedAt'
 ];
 
 async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
@@ -133,6 +141,7 @@ test('HTTP MCP should expose health and tools/list', async () => {
     assert.equal(healthPayload.ok, true);
     assert.deepEqual(Object.keys(healthPayload).sort(), LOW_DISCLOSURE_HEALTH_KEYS);
     assert.deepEqual(Object.keys(healthPayload.auth).sort(), ['required']);
+    assert.deepEqual(Object.keys(healthPayload.runtimeFreshness).sort(), RUNTIME_FRESHNESS_KEYS);
     assert.equal(healthPayload.auth.required, false);
     const serializedHealth = JSON.stringify(healthPayload);
     assert.doesNotMatch(serializedHealth, /test-token/i);
@@ -142,7 +151,6 @@ test('HTTP MCP should expose health and tools/list', async () => {
     assert.equal(healthPayload.policyGates, undefined);
     assert.equal(healthPayload.runtime, undefined);
     assert.doesNotMatch(serializedHealth, /"embeddingProfile"\s*:/);
-    assert.doesNotMatch(serializedHealth, /"fingerprint"\s*:/);
     assert.doesNotMatch(serializedHealth, /memoryId/i);
     assert.doesNotMatch(serializedHealth, /auditLogPath/i);
     assert.doesNotMatch(serializedHealth, /processDiaryPath/i);
@@ -177,6 +185,7 @@ test('HTTP MCP bearer-configured no-token health remains low disclosure', async 
     assert.equal(healthPayload.ok, true);
     assert.deepEqual(Object.keys(healthPayload).sort(), LOW_DISCLOSURE_HEALTH_KEYS);
     assert.deepEqual(Object.keys(healthPayload.auth).sort(), ['required']);
+    assert.deepEqual(Object.keys(healthPayload.runtimeFreshness).sort(), RUNTIME_FRESHNESS_KEYS);
     assert.equal(healthPayload.auth.required, true);
     assert.equal(healthPayload.access, undefined);
     assert.equal(healthPayload.sessionHardening, undefined);
@@ -184,7 +193,6 @@ test('HTTP MCP bearer-configured no-token health remains low disclosure', async 
     assert.equal(healthPayload.runtime, undefined);
     assert.doesNotMatch(serializedHealth, /test-token/i);
     assert.doesNotMatch(serializedHealth, /"embeddingProfile"\s*:/);
-    assert.doesNotMatch(serializedHealth, /"fingerprint"\s*:/);
     assert.doesNotMatch(serializedHealth, /memoryId/i);
     assert.doesNotMatch(serializedHealth, /auditLogPath/i);
     assert.doesNotMatch(serializedHealth, /processDiaryPath/i);
@@ -332,6 +340,32 @@ test('HTTP MCP bearer-configured health rejects invalid token before full payloa
     assert.equal(healthPayload.policyGates, undefined);
     assert.equal(healthPayload.access, undefined);
   }, { bearerToken: 'test-token' });
+});
+
+test('HTTP MCP health exposes bounded runtime freshness metadata', async () => {
+  await withHttpServer(async ({ address }) => {
+    const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'));
+    const healthPayload = await health.json();
+    const serializedHealth = JSON.stringify(healthPayload);
+
+    assert.equal(health.status, 200);
+    assert.deepEqual(Object.keys(healthPayload.runtimeFreshness).sort(), RUNTIME_FRESHNESS_KEYS);
+    assert.equal(healthPayload.runtimeFreshness.algorithm, 'sha256');
+    assert.equal(healthPayload.runtimeFreshness.sourceFingerprint, 'abc123');
+    assert.equal(healthPayload.runtimeFreshness.sourceFileCount, 7);
+    assert.equal(healthPayload.runtimeFreshness.startedAt, '2026-06-09T00:00:00.000Z');
+    assert.doesNotMatch(serializedHealth, /Bearer\s+/i);
+    assert.doesNotMatch(serializedHealth, /Authorization/i);
+    assert.doesNotMatch(serializedHealth, /memoryId/i);
+    assert.doesNotMatch(serializedHealth, /auditLogPath/i);
+  }, {
+    runtimeFreshness: {
+      algorithm: 'sha256',
+      sourceFingerprint: 'abc123',
+      sourceFileCount: 7,
+      startedAt: '2026-06-09T00:00:00.000Z'
+    }
+  });
 });
 
 test('HTTP MCP health should sanitize write reconcile worker last result summary with allowlist', async () => {

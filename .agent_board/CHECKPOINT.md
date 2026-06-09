@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1531 diagnose live runtime low-disclosure mismatch`.
-Current validation: `CMV-1635`.
+Current checkpoint: `CM-1532 live HTTP runtime freshness guard hardening`.
+Current validation: `CMV-1636`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1532 Live HTTP Runtime Freshness Guard Hardening
+
+Status: `COMPLETED_VALIDATED_RUNTIME_FRESHNESS_GUARD_ADDED_NO_LIVE_PROOF`
+
+Recorded:
+
+- Added `docs/CM1532_LIVE_HTTP_RUNTIME_FRESHNESS_GUARD_HARDENING.md`.
+- Added `src/core/RuntimeFreshness.js` and `scripts/print-runtime-fingerprint.js`.
+- Updated `/health` to expose bounded `runtimeFreshness` metadata.
+- Updated `src/http-index.js` to compute runtime source fingerprint at process startup.
+- Updated `scripts/ensure-codex-memory-http.ps1` so healthy runtime must match current source fingerprint or fail closed.
+- Updated `PhaseF1LiveClientNoWriteEvidenceRunner` to require expected runtime source fingerprint and accept evidence only when `/health` matches it.
+- Added `tests/live-http-runtime-freshness-guard.test.js`; updated HTTP / Phase F1 / CM-1531 diagnosis tests.
+- Validation passed: freshness guard `4/4`; Phase F1 runner `8/8`; HTTP MCP `27/27`; CM-1531 diagnosis `4/4`.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1636` source/script/test/docs/board validation.
 
 ## CM-1531 Live Runtime Low-Disclosure Mismatch Diagnosis
 

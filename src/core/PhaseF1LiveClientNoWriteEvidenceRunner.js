@@ -45,12 +45,21 @@ function resolveHealthUrl(endpoint) {
   return normalized.replace(/\/mcp\/codex-memory$/i, '') + '/health';
 }
 
-function summarizeHealth(payload = {}) {
+function summarizeHealth(payload = {}, expectedRuntimeSourceFingerprint = '') {
+  const sourceFingerprint = normalizeString(payload.runtimeFreshness?.sourceFingerprint);
+  const expectedFingerprint = normalizeString(expectedRuntimeSourceFingerprint);
   return {
     ok: payload.ok === true,
     service: normalizeString(payload.service || payload.name),
     authRequired: payload.auth?.required === true,
-    hasRuntime: Boolean(payload.runtime && typeof payload.runtime === 'object')
+    hasRuntime: Boolean(payload.runtime && typeof payload.runtime === 'object'),
+    runtimeFreshness: {
+      sourceFingerprint,
+      sourceFileCount: Number.isInteger(payload.runtimeFreshness?.sourceFileCount)
+        ? payload.runtimeFreshness.sourceFileCount
+        : null,
+      matchesExpected: Boolean(expectedFingerprint) && sourceFingerprint === expectedFingerprint
+    }
   };
 }
 
@@ -296,6 +305,7 @@ async function runPhaseF1LiveClientNoWriteEvidence({
   approvalLine = '',
   execute = false,
   currentFacts = {},
+  expectedRuntimeSourceFingerprint = '',
   bearerToken = '',
   httpJsonClient = defaultHttpJsonClient,
   healthClient = defaultHealthClient
@@ -329,6 +339,15 @@ async function runPhaseF1LiveClientNoWriteEvidence({
       executionMode: 'blocked_before_execution',
       liveClientRefreshExecuted: false,
       failClosedReasons: [...plan.failClosedReasons, 'missing_current_session_bearer_token']
+    };
+  }
+  if (!normalizeString(expectedRuntimeSourceFingerprint)) {
+    return {
+      ...plan,
+      status: 'PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED',
+      executionMode: 'blocked_before_execution',
+      liveClientRefreshExecuted: false,
+      failClosedReasons: [...plan.failClosedReasons, 'missing_expected_runtime_source_fingerprint']
     };
   }
 
@@ -395,7 +414,7 @@ async function runPhaseF1LiveClientNoWriteEvidence({
   });
 
   const evidence = {
-    health: summarizeHealth(health.payload),
+    health: summarizeHealth(health.payload, expectedRuntimeSourceFingerprint),
     initialize: summarizeInitialize(initialize.payload),
     toolsList: summarizeToolsList(toolsList.payload),
     authorizedOverview: summarizeAuthorizedOverview(authorizedOverview.payload),
@@ -405,6 +424,7 @@ async function runPhaseF1LiveClientNoWriteEvidence({
   };
 
   const evidenceAccepted = evidence.health.ok &&
+    evidence.health.runtimeFreshness.matchesExpected === true &&
     evidence.initialize.ok &&
     evidence.toolsList.ok &&
     evidence.authorizedOverview.ok &&

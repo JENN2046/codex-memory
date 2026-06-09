@@ -224,6 +224,15 @@ function buildRuntimeHealth(app) {
   };
 }
 
+function buildRuntimeFreshness(freshness = {}) {
+  return {
+    algorithm: typeof freshness.algorithm === 'string' ? freshness.algorithm : 'sha256',
+    sourceFingerprint: typeof freshness.sourceFingerprint === 'string' ? freshness.sourceFingerprint : null,
+    sourceFileCount: Number.isInteger(freshness.sourceFileCount) ? freshness.sourceFileCount : null,
+    startedAt: typeof freshness.startedAt === 'string' ? freshness.startedAt : null
+  };
+}
+
 function buildPolicyGateSummary(app) {
   const config = app?.config || {};
   return {
@@ -344,6 +353,7 @@ function createStreamableHttpServer({
   mcpPath = '/mcp/codex-memory',
   bearerToken = '',
   baseRequestContext = {},
+  runtimeFreshness = {},
   sessionHardeningEnv = process.env,
   sessionClock = () => Date.now()
 }) {
@@ -451,6 +461,7 @@ function createStreamableHttpServer({
       version: app.config.serverVersion,
       protocol: 'streamable-http',
       path: pathname,
+      runtimeFreshness: buildRuntimeFreshness(runtimeFreshness),
       auth: {
         required: !!bearerToken
       }
@@ -480,6 +491,7 @@ function createStreamableHttpServer({
         required: !!bearerToken,
         warning: authWarning
       },
+      runtimeFreshness: buildRuntimeFreshness(runtimeFreshness),
       sessionHardening: {
         absoluteTtlMs: sessionHardening.absoluteTtlMs,
         idleTtlMs: sessionHardening.idleTtlMs,
@@ -708,6 +720,7 @@ module.exports = {
   createForbiddenJsonRpcPayload,
   validateNoTokenJsonRpcRequest,
   buildRuntimeHealth,
+  buildRuntimeFreshness,
   buildPolicyGateSummary,
   getHttpAuthWarning,
   isLoopbackHost,
