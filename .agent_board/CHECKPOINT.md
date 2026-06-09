@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1540 live client evidence blocker closeout audit/decision`.
-Current validation: `CMV-1644`.
+Current checkpoint: `CM-1541 effective write reliability proof`.
+Current validation: `CMV-1645`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1541 Effective Write Reliability Proof
+
+Status: `COMPLETED_VALIDATED_EFFECTIVE_WRITE_PROOF_ACCEPTED_NOT_READY_CLOSEOUT_CANDIDATE`
+
+Recorded:
+
+- Added `docs/CM1541_EFFECTIVE_WRITE_RELIABILITY_PROOF.md`.
+- Received exact approval `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF`.
+- Confirmed clean synced `main` at `7faa80ba0ef47d6c347217c40aa5613c1c4a4a82`.
+- Ran read-only write current-facts preflight: `WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Executed exactly one in-process `record_memory` call through `createCodexMemoryApplication -> enableWritePreflight=true -> callTool(record_memory)`.
+- Sanitized result: accepted process proof memory, `shadowWriteStatus=ok`, `idempotencyStatus=committed`, and `idempotencyReplayed=false`.
+- `WriteProofExecutionResultBoundary` returned `WRITE_PROOF_RESULT_BOUNDARY_ACCEPTED_NOT_READY` with no blockers.
+- Side effects: one accepted durable memory write and one durable audit append.
+- Confirmed zero search, provider/API, bearer-token use, raw memory/audit/jsonl read, memory_overview call, public MCP expansion, config/watchdog/startup change, release/tag/deploy, readiness claim, or reliability claim.
+- Public MCP surface remains exactly seven tools.
+- Effective write evidence is a closeout candidate only; broad `record_memory` reliability is not claimed; effective-write blocker closure still requires a separate closeout audit/decision; `RC_READY` remains `BLOCKED`.
+
+Validation: `CMV-1645` proof/docs/board validation.
 
 ## CM-1540 Live Client Evidence Blocker Closeout Audit/Decision
 

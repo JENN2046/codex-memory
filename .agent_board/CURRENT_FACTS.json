@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1540",
-  "validationId": "CMV-1644",
+  "taskId": "CM-1541",
+  "validationId": "CMV-1645",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1645",
+      "scope": "CM-1541 effective write reliability proof",
+      "status": "COMPLETED_VALIDATED_EFFECTIVE_WRITE_PROOF_ACCEPTED_NOT_READY_CLOSEOUT_CANDIDATE"
+    },
     {
       "id": "CMV-1644",
       "scope": "CM-1540 live client evidence blocker closeout audit/decision",
@@ -682,6 +687,7 @@
     "provider smoke or benchmark",
     "live provider/API calls",
     "effective write reliability closure",
+    "CM-1541 effective write proof closeout audit/decision",
     "broad record_memory reliability",
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
@@ -694,7 +700,7 @@
     "claudeMdUntrackedUntouched": true,
     "noProviderCalls": true,
     "noRawMemoryAccess": true,
-    "noEffectiveMemoryWrites": true,
+    "noEffectiveMemoryWrites": false,
     "noBearerTokenUse": true,
     "noPushWithoutExplicitAuthorization": true,
     "noCommittedLiveGitHeads": true,

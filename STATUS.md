@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1540 live client evidence blocker closeout audit/decision`.
-Current validation: `CMV-1644`.
+Current task: `CM-1541 effective write reliability proof`.
+Current validation: `CMV-1645`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `LIVE_CLIENT_EVIDENCE_BLOCKER_CLOSED; effective write remains open; no readiness claim`.
+Current route: `EFFECTIVE_WRITE_PROOF_ACCEPTED_NOT_READY_CLOSEOUT_CANDIDATE; no broad write reliability or readiness claim`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1541 effective write reliability proof: added `docs/CM1541_EFFECTIVE_WRITE_RELIABILITY_PROOF.md`. Exact approval `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF` was received. Fresh local preflight confirmed clean synced `main` at `7faa80ba0ef47d6c347217c40aa5613c1c4a4a82`; read-only write current-facts preflight returned `WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED` with exact basis, seam, scope, and boundary flags bound. The proof executed exactly one in-process `record_memory` call through `createCodexMemoryApplication -> enableWritePreflight=true -> callTool(record_memory)`. Sanitized result was accepted with `shadowWriteStatus=ok`, `idempotencyStatus=committed`, `idempotencyReplayed=false`, proof-memory policy applied, and `WriteProofExecutionResultBoundary` accepted the result as `WRITE_PROOF_RESULT_BOUNDARY_ACCEPTED_NOT_READY`. Counters: `recordMemoryCalls=1`, `acceptedMemoryWrites=1`, `durableMemoryWrites=1`, `durableAuditWrites=1`; zero `searchMemory`, provider/API, raw memory/audit/jsonl reads, `memoryOverview`, public MCP expansion, config/watchdog/startup change, release/tag/deploy, readiness, or reliability claims. Public MCP surface remains exactly seven tools. Effective write evidence is now a closeout candidate only; broad `record_memory` reliability is not claimed; effective-write blocker closure still requires a separate closeout audit/decision; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked.
 
 CM-1540 live client evidence blocker closeout audit/decision: added `docs/CM1540_LIVE_CLIENT_EVIDENCE_BLOCKER_CLOSEOUT_AUDIT_DECISION.md`. Reviewed CM-1539 no-bearer proof evidence and closed the live client evidence blocker. Confirmed `runtimeFreshness` matched before proof requests, CM-1539 was docs/board/status-only after the proof baseline, proof budget was exactly `initialize=1`, `tools/list=1`, `tools/call=7`, public MCP surface remained seven tools, all six restricted no-token calls returned low-disclosure `PUBLIC_REQUEST_BLOCKED`, and no-token `memory_overview` returned `public_selected_overview` projection version `2`. Persisted evidence contains no token/raw/lifecycle/provider/API-shaped leakage; no effective `record_memory` write, confirmed mutation, or public MCP expansion occurred. Effective write reliability remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No provider/API call, bearer-token use, raw memory/audit/broad scan, live proof rerun, effective write reliability blocker closure, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1540.
 
