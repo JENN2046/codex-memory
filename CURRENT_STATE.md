@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1535 Phase F1 runner freshness short-circuit source audit` |
-| Current validation | `CMV-1639` |
-| Current route | independent source audit completed for CM-1534 runner freshness short-circuit; live proof retry remains separate |
+| Current task | `CM-1536 live proof rerun readiness decision after freshness guard audit` |
+| Current validation | `CMV-1640` |
+| Current route | decision recorded: ready to request exact operator approval for live proof rerun; live proof not executed |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1536` adds `docs/CM1536_LIVE_PROOF_RERUN_READINESS_DECISION_AFTER_FRESHNESS_GUARD_AUDIT.md` and records the post-CM-1532/CM-1534/CM-1535 decision point. Decision: `READY_TO_REQUEST_EXACT_OPERATOR_APPROVAL_FOR_LIVE_PROOF_RERUN`, with `execution_status=NOT_EXECUTED` and `approval_status=NOT_GRANTED_BY_CM_1536`. Runtime freshness guard is audited; runner stale fingerprint short-circuit is audited; future rerun must use the existing no-bearer CM-1493 envelope plus a required pre-proof runtime freshness match and fail-closed `blocked_before_proof_requests` behavior on mismatch. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. CM-1536 does not execute live proof, close blockers, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1535` adds `docs/CM1535_PHASE_F1_RUNNER_FRESHNESS_SHORT_CIRCUIT_SOURCE_AUDIT.md` and records an independent changed-scope source audit of CM-1534 without executing live proof. Confirmed within changed scope: fingerprint mismatch returns `PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED` with `executionMode=blocked_before_proof_requests`; the return happens before `resolveMcpUrl`, `initialize`, `tools/list`, or any `tools/call`; the regression test proves no HTTP JSON proof request is made after stale health freshness; failure reason uses low-disclosure `runtime_source_fingerprint_mismatch`; blocked evidence omits actual/expected fingerprints, bearer-token material, Authorization header material, local paths, provider/API keys or endpoints, raw memory, and raw audit content; public MCP surface remains exactly seven tools; and no live proof automatic execution was introduced. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. CM-1535 does not execute live proof, close blockers, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1535 Phase F1 runner freshness short-circuit source audit`.
-Current validation: `CMV-1639`.
+Current task: `CM-1536 live proof rerun readiness decision after freshness guard audit`.
+Current validation: `CMV-1640`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1535` independently audited the CM-1534 Phase F1 runner freshness short-circuit. Fingerprint mismatch now returns `blocked_before_proof_requests` before `resolveMcpUrl`, `initialize`, `tools/list`, or `tools/call`; regression evidence proves no HTTP JSON proof request continues after stale health freshness; failure reason is low-disclosure; blocked evidence omits fingerprints/token/header/path/provider/API/raw data; public MCP surface remains seven tools; and no live proof automatic execution was introduced. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is push review for CM-1535 or a separately approved runtime refresh/no-bearer proof retry envelope; do not rerun proof or close blockers without exact approval.
+`CM-1536` recorded the live proof rerun readiness decision after freshness guard audit. Decision is `READY_TO_REQUEST_EXACT_OPERATOR_APPROVAL_FOR_LIVE_PROOF_RERUN`; execution was not performed and approval was not granted by CM-1536. Runtime freshness guard is audited; runner stale fingerprint short-circuit is audited; future proof rerun must use the CM-1493 no-bearer envelope plus required pre-proof runtime freshness match and fail-closed `blocked_before_proof_requests` mismatch behavior. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is push review for CM-1536 or an operator exact approval decision for the bounded no-bearer live proof rerun; do not rerun proof or close blockers without exact approval.
 
 ## Historical Run Notes
 

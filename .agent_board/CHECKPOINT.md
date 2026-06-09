@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1535 Phase F1 runner freshness short-circuit source audit`.
-Current validation: `CMV-1639`.
+Current checkpoint: `CM-1536 live proof rerun readiness decision after freshness guard audit`.
+Current validation: `CMV-1640`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1536 Live Proof Rerun Readiness Decision After Freshness Guard Audit
+
+Status: `COMPLETED_VALIDATED_RERUN_READINESS_DECISION_RECORDED_NO_LIVE_PROOF`
+
+Recorded:
+
+- Added `docs/CM1536_LIVE_PROOF_RERUN_READINESS_DECISION_AFTER_FRESHNESS_GUARD_AUDIT.md`.
+- Recorded decision `READY_TO_REQUEST_EXACT_OPERATOR_APPROVAL_FOR_LIVE_PROOF_RERUN`.
+- Recorded `execution_status=NOT_EXECUTED` and `approval_status=NOT_GRANTED_BY_CM_1536`.
+- Confirmed runtime freshness guard is audited by CM-1532/CM-1533.
+- Confirmed runner stale fingerprint short-circuit is audited by CM-1534/CM-1535.
+- Referenced the exact no-bearer allowed command envelope in `docs/CM1493_LIVE_CLIENT_PROOF_APPROVAL_ENVELOPE.md`.
+- Added the future pre-proof runtime freshness match requirement and mismatch fail-closed behavior `blocked_before_proof_requests`.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1640` docs decision validation.
 
 ## CM-1535 Audit of Phase F1 Runner Freshness Short-Circuit
 
