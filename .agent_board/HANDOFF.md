@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1488 post-closeout public contract evidence bundle exact proof`.
-Current validation: `CMV-1593`.
-Current handoff: CM-1488 records in-process MCP seven-tool public contract evidence; readiness remains unclaimed.
+Current task: `CM-1489 public contract evidence bundle audit and blocker closure decision`.
+Current validation: `CMV-1594`.
+Current handoff: CM-1489 closes the first must-fix evidence-bundle blocker only; readiness remains unclaimed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1488 records in-process MCP seven-tool public contract evide
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_NO_READY_CLAIM`.
+Current status: `COMPLETED_VALIDATED_FIRST_MUST_FIX_CLOSED_NO_READY_CLAIM`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1489 added `docs/CM1489_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_BLOCKER_CLOSURE_AUDIT.md` and audited CM-1488 against CM-1485 / CM-1486. Decision is `first_must_fix: CLOSED` only for bundled seven-tool public contract evidence. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client/integration, confirmed mutation, release/cutover, provider/API, bearer-token, effective write, and public expansion blockers remain open.
 - CM-1488 added `docs/CM1488_POST_CLOSEOUT_PUBLIC_CONTRACT_EVIDENCE_BUNDLE.md` and recorded fresh in-process MCP proof for seven public tools: `initialize`, `tools/list`, invalid-args rejections, readonly bounded `audit_memory`, and public dry-run low-disclosure controlled mutation tools. No valid write, confirmed mutation, raw/provider/bearer, expansion, release, or readiness claim occurred.
 - CM-1487 added `docs/CM1487_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_PREFLIGHT.md`, defining expected seven-tool `tools/list` contract, expected `tools/call` low-disclosure assertions, evidence checklist design, validation matrix, and future exact proof boundary. It executed no live MCP calls and performed no source fix.
 - CM-1486 added `docs/CM1486_RC_BLOCKER_PRIORITIZATION_AND_FIRST_MUST_FIX_SELECTION.md`, prioritized CM-1485 must-fix blockers, and selected the post-closeout seven-tool public contract evidence bundle gap as the first future must-fix repair target. Recommended next route is `CM-1487 post-closeout public contract evidence bundle preflight`.
@@ -59,7 +60,7 @@ Completed in this slice:
 - Recorded CM-1450 through CM-1488 and CMV-1560 through CMV-1593 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1593`; CM-1488 in-process MCP evidence plus source/test/docs validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1594`; CM-1489 docs/board blocker closure audit validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
@@ -68,7 +69,7 @@ Boundaries:
 
 Next safe action:
 
-Next safe action is guarded local commit with message `docs: record post-closeout public contract evidence bundle` after validation and diff review pass. Push requires separate explicit authorization. Confirmed mutation, valid write, raw/provider/bearer, public MCP expansion, release, and readiness work remains forbidden unless separately and exactly approved.
+Next safe action is guarded local commit with message `docs: audit public contract evidence bundle blocker closure` after validation and diff review pass. Push requires separate explicit authorization. Confirmed mutation, valid write, raw/provider/bearer, public MCP expansion, release, live client proof, and readiness work remains forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 

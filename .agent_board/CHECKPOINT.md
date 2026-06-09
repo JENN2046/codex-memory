@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1488 post-closeout public contract evidence bundle exact proof`.
-Current validation: `CMV-1593`.
+Current checkpoint: `CM-1489 public contract evidence bundle audit and blocker closure decision`.
+Current validation: `CMV-1594`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1489 Public Contract Evidence Bundle Blocker Closure Audit
+
+Status: `COMPLETED_VALIDATED_FIRST_MUST_FIX_CLOSED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1489_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_BLOCKER_CLOSURE_AUDIT.md`.
+- Audited CM-1488 against CM-1485 / CM-1486 blocker inventory.
+- Decision: first CM-1486 must-fix blocker is `CLOSED` only for the bundled seven-tool public contract evidence gap.
+- Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Live client/integration, confirmed mutation, release/cutover, provider/API, bearer-token, effective write, and new public MCP expansion blockers remain open.
+- No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer-token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
+
+Validation: `CMV-1594` docs/board blocker closure audit validation.
 
 ## CM-1488 Post-Closeout Public Contract Evidence Bundle
 

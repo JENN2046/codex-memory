@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1488 post-closeout public contract evidence bundle exact proof` |
-| Current validation | `CMV-1593` |
-| Current route | CM-1488 records in-process MCP seven-tool public contract evidence bundle without readiness claim |
+| Current task | `CM-1489 public contract evidence bundle audit and blocker closure decision` |
+| Current validation | `CMV-1594` |
+| Current route | CM-1489 audits CM-1488 evidence and closes the first must-fix blocker only, without readiness claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1489` adds `docs/CM1489_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_BLOCKER_CLOSURE_AUDIT.md` and audits CM-1488 against the CM-1485 / CM-1486 blocker inventory. Decision is `first_must_fix: CLOSED` only for the bundled seven-tool public contract evidence gap, while overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Live client/integration evidence, confirmed mutation, release/cutover, provider/API, bearer-token, and new public MCP expansion remain blocked. CM-1489 does not claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, use `dry_run=false`, use `confirm=true`, perform raw scan, call provider/API, use bearer token material, expand public MCP tools, execute live client calls, or perform an effective `record_memory` write.
 
 `CM-1488` adds `docs/CM1488_POST_CLOSEOUT_PUBLIC_CONTRACT_EVIDENCE_BUNDLE.md` and records a fresh in-process MCP proof for the seven-tool public contract. Proof executed one `initialize`, one `tools/list`, three invalid-args `tools/call` rejections for `record_memory`, `search_memory`, and `memory_overview`, one readonly bounded `audit_memory` call, and safe public dry-run low-disclosure calls for `validate_memory`, `tombstone_memory`, and `supersede_memory`. `tools/list` returned exactly seven tools. `record_memory` was not called with valid write arguments. No confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer-token use, new public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 
@@ -145,7 +147,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1476 prepares only the target-selection packet. The next safe action is guarded local commit with message `docs: prepare confirmed mutation target selection packet` after validation and diff review pass. Any future target selection with a real memory id, dry-run projection, or confirmed mutation execution remains exact-approval / Red-boundary work.
+CM-1489 closes the first CM-1486 must-fix blocker only for evidence-bundle completeness. The next safe action is selecting the next remaining RC blocker route without live calls or readiness claims. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
 
 ## Boundaries
 

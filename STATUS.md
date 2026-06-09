@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1488 post-closeout public contract evidence bundle exact proof`.
-Current validation: `CMV-1593`.
+Current task: `CM-1489 public contract evidence bundle audit and blocker closure decision`.
+Current validation: `CMV-1594`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1488 records in-process MCP seven-tool public contract evidence bundle without readiness claim`.
+Current route: `CM-1489 closes the first must-fix blocker only for bundled seven-tool public contract evidence; remaining blockers stay open`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1489 public contract evidence bundle audit and blocker closure decision: added `docs/CM1489_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_BLOCKER_CLOSURE_AUDIT.md`. Decision is `first_must_fix: CLOSED` only for the CM-1486 blocker `Fresh post-closeout public contract evidence is not bundled for the seven-tool surface`. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client/integration evidence, confirmed mutation, release/cutover, provider/API, bearer-token, effective write, and new public MCP expansion blockers remain open. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
 CM-1488 post-closeout public contract evidence bundle exact proof: added `docs/CM1488_POST_CLOSEOUT_PUBLIC_CONTRACT_EVIDENCE_BUNDLE.md` and recorded a fresh in-process MCP proof for the seven-tool public contract. Proof executed one `initialize`, one `tools/list`, three invalid-args `tools/call` rejections for `record_memory`, `search_memory`, and `memory_overview`, one readonly bounded `audit_memory` call, and safe public dry-run low-disclosure calls for `validate_memory`, `tombstone_memory`, and `supersede_memory`. `tools/list` returned exactly seven tools. `record_memory` was not called with valid write arguments. No confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer token use, new public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 

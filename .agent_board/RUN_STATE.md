@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1488 post-closeout public contract evidence bundle exact proof`.
-Current validation: `CMV-1593`.
+Current task: `CM-1489 public contract evidence bundle audit and blocker closure decision`.
+Current validation: `CMV-1594`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1488` records a fresh in-process MCP seven-tool public contract evidence bundle without readiness claim. Next safe action is guarded local commit with message `docs: record post-closeout public contract evidence bundle` after validation and diff review pass. Push requires separate explicit authorization.
+`CM-1489` audits CM-1488 against the CM-1485 / CM-1486 blocker inventory and closes the first must-fix blocker only for bundled seven-tool public contract evidence. Next safe action is guarded local commit with message `docs: audit public contract evidence bundle blocker closure` after validation and diff review pass. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 
