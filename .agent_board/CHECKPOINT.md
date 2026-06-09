@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1543 final RC blocker inventory and readiness review preflight`.
-Current validation: `CMV-1647`.
+Current checkpoint: `CM-1544 final independent RC blocker inventory review`.
+Current validation: `CMV-1648`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1544 Final Independent RC Blocker Inventory Review
+
+Status: `COMPLETED_VALIDATED_FINAL_RC_BLOCKER_INVENTORY_REVIEW_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1544_FINAL_RC_BLOCKER_INVENTORY_REVIEW.md`.
+- Reviewed CM-1543 final blocker inventory preflight, CM-1542 scoped effective write closeout, and CM-1540 live client evidence closeout.
+- Confirmed live client evidence blocker is `CLOSED`.
+- Confirmed scoped effective write reliability proof blocker is `CLOSED`.
+- Confirmed broad `record_memory` reliability is `NOT_CLAIMED`.
+- Confirmed production write reliability is `NOT_CLAIMED`.
+- Confirmed raw audit / broad scan, confirmed mutation, and public MCP expansion remain `DEFERRED`.
+- Confirmed public MCP surface remains exactly seven tools.
+- Confirmed no release/tag/deploy and no readiness / `RC_READY` claim before the separate decision record.
+- Identified no new RC evidence blocker within review scope.
+- Recorded CM-1545 as the next separate RC readiness decision record.
+- No live proof, provider/API call, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, second effective `record_memory` write, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1648` final blocker inventory review validation.
 
 ## CM-1543 Final RC Blocker Inventory And Readiness Review Preflight
 
