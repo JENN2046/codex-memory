@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1502 operator action needed handoff after RC route freeze`.
-Current validation: `CMV-1607`.
+Current checkpoint: `CM-1503 non-RC backlog hardening lane activation`.
+Current validation: `CMV-1608`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1503 Non-RC Backlog Hardening Lane Activation
+
+Status: `COMPLETED_VALIDATED_NON_RC_BACKLOG_LANE_ACTIVATED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1503_NON_RC_BACKLOG_HARDENING_LANE_ACTIVATION.md`.
+- Activated `NON_RC_BACKLOG_HARDENING` lane.
+- Selected `bounded search projection regression` as the first safe backlog item.
+- Recorded acceptance criteria, fixture plan, test-only hardening plan, and execution boundaries.
+- Recommended `CM-1504 bounded search projection regression fixture/test plan execution`.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1608` docs/board non-RC backlog lane activation validation.
 
 ## CM-1502 Operator Action Needed Handoff After RC Route Freeze
 

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1502 operator action needed handoff after RC route freeze`.
-Current validation: `CMV-1607`.
+Current task: `CM-1503 non-RC backlog hardening lane activation`.
+Current validation: `CMV-1608`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1502` records `OPERATOR_ACTION_NEEDED` as the current Hard Stop handoff. Next movement requires operator choice: exact approval for one proof route, docs-only envelope repair, another local-safe blocker selection, or continued pause. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1503` selects `bounded search projection regression` as the first non-RC backlog hardening item. Next safe route is `CM-1504 bounded search projection regression fixture/test plan execution`, staying fixture-only / test-only unless the operator explicitly changes scope. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

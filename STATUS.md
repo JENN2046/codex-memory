@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1502 operator action needed handoff after RC route freeze`.
-Current validation: `CMV-1607`.
+Current task: `CM-1503 non-RC backlog hardening lane activation`.
+Current validation: `CMV-1608`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1502 records Hard Stop / operator action needed after RC route freeze`.
+Current route: `CM-1503 activates non-RC backlog lane and selects bounded search projection regression`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1503 non-RC backlog hardening lane activation: added `docs/CM1503_NON_RC_BACKLOG_HARDENING_LANE_ACTIVATION.md`. Selected first non-RC backlog item is `bounded search projection regression`, with acceptance criteria, fixture plan, test-only hardening plan, and execution boundaries. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, blocker closure, live client call, effective `record_memory` write, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 
 CM-1502 operator action needed handoff after RC route freeze: added `docs/CM1502_OPERATOR_ACTION_NEEDED_HANDOFF_AFTER_RC_ROUTE_FREEZE.md`. Decision is `ROUTE_STATE: HARD_STOP_OPERATOR_ACTION_NEEDED`; live client evidence blocker is `OPEN / DEFERRED`; effective write reliability blocker is `OPEN / DEFERRED`; `RC_READY` is `BLOCKED`; no further RC readiness progression is allowed without exact approval. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No blocker closure, live client call, effective `record_memory` write, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 

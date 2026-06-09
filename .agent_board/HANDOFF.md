@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1502 operator action needed handoff after RC route freeze`.
-Current validation: `CMV-1607`.
-Current handoff: CM-1502 records Hard Stop / operator action needed; no further RC readiness progression is allowed without exact approval.
+Current task: `CM-1503 non-RC backlog hardening lane activation`.
+Current validation: `CMV-1608`.
+Current handoff: CM-1503 activates the non-RC backlog hardening lane and selects bounded search projection regression as the first safe backlog item.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1502 records Hard Stop / operator action needed; no further 
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_OPERATOR_ACTION_NEEDED_HANDOFF_NO_READY_CLAIM`.
+Current status: `COMPLETED_VALIDATED_NON_RC_BACKLOG_LANE_ACTIVATED_NO_READY_CLAIM`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1503 added `docs/CM1503_NON_RC_BACKLOG_HARDENING_LANE_ACTIVATION.md`, activated the `NON_RC_BACKLOG_HARDENING` lane, and selected `bounded search projection regression` as the first safe backlog item. It records acceptance criteria, fixture plan, test-only hardening plan, and boundaries. No readiness / `RC_READY` claim, RC blocker closure, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1502 added `docs/CM1502_OPERATOR_ACTION_NEEDED_HANDOFF_AFTER_RC_ROUTE_FREEZE.md` and recorded `ROUTE_STATE: HARD_STOP_OPERATOR_ACTION_NEEDED`. Live client evidence blocker is `OPEN / DEFERRED`; effective write reliability blocker is `OPEN / DEFERRED`; `RC_READY` is `BLOCKED`; no further RC readiness progression is allowed without exact approval. No blocker closure, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1501 added `docs/CM1501_RC_BLOCKER_ROUTE_FREEZE_AFTER_DUAL_PROOF_DEFER.md` and froze the RC blocker route as `FROZEN_OPERATOR_ACTION_NEEDED`. Live client proof remains `DEFERRED_UNTIL_OPERATOR_EXACT_APPROVAL`; effective write proof remains `DEFERRED_UNTIL_OPERATOR_EXACT_APPROVAL`; ready route remains `BLOCKED_NO_READY_CLAIM`. Remaining RC blockers and exact approval options are listed. No blocker closure, readiness / `RC_READY` claim, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, source repair, release/tag/deploy, invalid-write proof, or no-op / dry-run proof occurred.
 - CM-1500 added `docs/CM1500_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_ROUTE_REVIEW.md` and closed out CM-1499 rejection. Effective write reliability blocker remains `STILL_OPEN_DEFERRED`; CM-1498 preflight remains available but not activated; default route is defer until operator exact approval or select another blocker. No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
@@ -73,7 +74,7 @@ Completed in this slice:
 - Recorded CM-1450 through CM-1488 and CMV-1560 through CMV-1593 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1607`; CM-1502 docs/board operator-action-needed handoff validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1608`; CM-1503 docs/board non-RC backlog lane activation validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
