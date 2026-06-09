@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1539 no-bearer live client proof rerun after runtime refresh` |
-| Current validation | `CMV-1643` |
-| Current route | no-bearer live proof executed; low-disclosure pass recorded; closeout candidate review recorded; no readiness claim |
+| Current task | `CM-1540 live client evidence blocker closeout audit/decision` |
+| Current validation | `CMV-1644` |
+| Current route | live client evidence blocker closed from CM-1539 proof evidence; effective write remains open; no readiness claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1540` adds `docs/CM1540_LIVE_CLIENT_EVIDENCE_BLOCKER_CLOSEOUT_AUDIT_DECISION.md` and records a docs-only closeout audit of CM-1539 no-bearer live proof evidence. Confirmed: runtime freshness matched before proof requests; CM-1539 changed only docs/board/status after proof baseline and did not alter runtime source fingerprint inputs; exact proof budget was `initialize=1`, `tools/list=1`, `tools/call=7`; public MCP surface remained exactly seven tools; all six restricted no-token calls failed closed with low-disclosure `PUBLIC_REQUEST_BLOCKED`; no-token `memory_overview` returned `public_selected_overview` selected projection version `2`; persisted evidence contains no token/raw/lifecycle/provider/API-shaped leakage, no effective `record_memory`, no confirmed mutation, and no public MCP expansion. Decision: live client evidence blocker is `CLOSED`. Effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. CM-1540 does not execute live proof, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, close the effective-write blocker, or claim readiness / `RC_READY`.
 
 `CM-1539` adds `docs/CM1539_NO_BEARER_LIVE_CLIENT_PROOF_RERUN_AFTER_RUNTIME_REFRESH.md` and records the exact-approved no-bearer local HTTP MCP proof rerun after CM-1538 runtime refresh. Fresh Git preflight confirmed clean synced `main` at `8408ef17a961dd650f6239e0b1415281505d3094`; `/health.runtimeFreshness` was present, bounded, and matched the expected current runtime source fingerprint. The proof executed exactly one no-bearer `initialize`, one no-bearer `tools/list`, and seven no-bearer bounded `tools/call` operations. `tools/list` returned exactly seven public tools: `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`. Six restricted no-token calls failed closed with low-disclosure `PUBLIC_REQUEST_BLOCKED`; no-token `memory_overview` returned `public_selected_overview` projection version `2` without detail keys, paths, memory links, recent audit, recent recall, or raw fields in persisted evidence. Live client evidence closeout candidate review is `PASS_REVIEW_READY`, but CM-1539 does not claim readiness or `RC_READY`. Effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. CM-1539 does not call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, close the effective-write blocker, or claim readiness / `RC_READY`.
 
@@ -245,7 +247,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1539 executed the exact-approved no-bearer live proof and recorded low-disclosure pass evidence plus a live-client closeout candidate review. Next safe action is a separate docs/source audit or operator closeout decision for the live client evidence blocker. Effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked.
+CM-1540 closed the live client evidence blocker from CM-1539 evidence. Next safe action is an effective write reliability decision/preflight path, if separately approved. Effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Boundaries
 

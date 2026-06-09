@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1539 no-bearer live client proof rerun after runtime refresh`.
-Current validation: `CMV-1643`.
+Current checkpoint: `CM-1540 live client evidence blocker closeout audit/decision`.
+Current validation: `CMV-1644`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1540 Live Client Evidence Blocker Closeout Audit/Decision
+
+Status: `COMPLETED_VALIDATED_LIVE_CLIENT_EVIDENCE_BLOCKER_CLOSED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1540_LIVE_CLIENT_EVIDENCE_BLOCKER_CLOSEOUT_AUDIT_DECISION.md`.
+- Reviewed CM-1539 no-bearer live proof evidence without rerunning proof.
+- Confirmed runtime freshness matched before proof requests and CM-1539 changed only docs/board/status after the proof baseline.
+- Confirmed exact proof budget `initialize=1`, `tools/list=1`, and `tools/call=7`.
+- Confirmed public MCP surface remained exactly seven tools.
+- Confirmed all six restricted no-token calls returned low-disclosure `PUBLIC_REQUEST_BLOCKED`.
+- Confirmed no-token `memory_overview` returned `public_selected_overview` projection version `2`.
+- Confirmed persisted evidence contains no token/raw/lifecycle/provider/API-shaped leakage.
+- Confirmed no effective `record_memory`, no confirmed mutation, and no public MCP expansion.
+- Closed the live client evidence blocker.
+- Effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live proof rerun, provider/API call, bearer-token use, raw memory/audit/broad scan, effective write, confirmed mutation, release/tag/deploy, effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1644` docs closeout audit validation.
 
 ## CM-1539 No-Bearer Live Client Proof Rerun After Runtime Refresh
 

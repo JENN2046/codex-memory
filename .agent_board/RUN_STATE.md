@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1539 no-bearer live client proof rerun after runtime refresh`.
-Current validation: `CMV-1643`.
+Current task: `CM-1540 live client evidence blocker closeout audit/decision`.
+Current validation: `CMV-1644`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1539` executed the exact-approved no-bearer live client proof after runtime refresh. Pre-proof `/health.runtimeFreshness` matched the expected current runtime source fingerprint. The proof used the exact budget `initialize=1`, `tools/list=1`, and `tools/call=7`; `tools/list` returned exactly seven public tools; six restricted no-token calls failed closed with low-disclosure `PUBLIC_REQUEST_BLOCKED`; and no-token `memory_overview` returned selected projection v2 without persisted path/raw/audit/detail fields. Live client evidence closeout candidate review is `PASS_REVIEW_READY`, but effective write reliability remains `OPEN / DEFERRED`, `RC_READY` remains blocked, and overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a separate docs/source audit or operator closeout decision; do not claim readiness from CM-1539 alone.
+`CM-1540` closed the live client evidence blocker from CM-1539 no-bearer proof evidence. Effective write reliability remains `OPEN / DEFERRED`, `RC_READY` remains blocked, and overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is an effective write reliability decision/preflight path if separately approved; do not claim readiness from live client evidence closure alone.
 
 ## Historical Run Notes
 

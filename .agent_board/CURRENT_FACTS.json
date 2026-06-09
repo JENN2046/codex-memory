@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1539",
-  "validationId": "CMV-1643",
+  "taskId": "CM-1540",
+  "validationId": "CMV-1644",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1644",
+      "scope": "CM-1540 live client evidence blocker closeout audit/decision",
+      "status": "COMPLETED_VALIDATED_LIVE_CLIENT_EVIDENCE_BLOCKER_CLOSED_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1643",
       "scope": "CM-1539 no-bearer live client proof rerun after runtime refresh",
@@ -673,10 +678,10 @@
     }
   ],
   "notValidated": [
-    "CM-1539 live client evidence blocker final closure decision",
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",
+    "effective write reliability closure",
     "broad record_memory reliability",
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
