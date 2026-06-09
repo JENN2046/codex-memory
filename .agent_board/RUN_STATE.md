@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1491 live client integration evidence exact-proof preflight`.
-Current validation: `CMV-1596`.
+Current task: `CM-1492 operator exact approval decision for live client proof`.
+Current validation: `CMV-1597`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1491` prepares the docs-only exact-proof preflight for future live client integration evidence. Next safe action after local commit is a separate exact approval decision for one selected transport and auth boundary before any live proof. Push requires separate explicit authorization.
+`CM-1492` records `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` without executing live calls. Next safe action after local commit is either a future exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF`, or selection of another docs/local-safe blocker route. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 

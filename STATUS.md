@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1491 live client integration evidence exact-proof preflight`.
-Current validation: `CMV-1596`.
+Current task: `CM-1492 operator exact approval decision for live client proof`.
+Current validation: `CMV-1597`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1491 prepares docs-only exact-proof preflight for future live client integration evidence without executing live calls`.
+Current route: `CM-1492 records REJECT_LIVE_CLIENT_INTEGRATION_PROOF without executing live calls`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1492 operator exact approval decision for live client proof: added `docs/CM1492_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL_DECISION.md`. Decision is `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` because the current operator message did not provide a complete exact approval envelope for live execution. The live client evidence blocker remains blocked. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
 CM-1491 live client integration evidence exact-proof preflight: added `docs/CM1491_LIVE_CLIENT_INTEGRATION_EVIDENCE_PREFLIGHT.md`. The preflight defines exact approval requirements, expected live client commands / transcript shape, low-disclosure assertion checklist, forbidden output keys, failure / rollback / abort criteria, future evidence checklist, and recommended `CM-1492 live client integration evidence exact approval decision`. It does not execute live client calls. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
