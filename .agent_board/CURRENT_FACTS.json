@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1528",
-  "validationId": "CMV-1632",
+  "taskId": "CM-1529",
+  "validationId": "CMV-1633",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1633",
+      "scope": "CM-1529 Phase F1 runner public tools expectation hardening",
+      "status": "COMPLETED_VALIDATED_PHASE_F1_RUNNER_PUBLIC_TOOLS_EXPECTATION_ALIGNED"
+    },
     {
       "id": "CMV-1632",
       "scope": "CM-1528 no-token low-disclosure hardening source audit",

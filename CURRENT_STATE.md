@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1528 no-token low-disclosure hardening source audit` |
-| Current validation | `CMV-1632` |
-| Current route | CM-1527 source audit completed with residual evidence-runner public-tool-contract finding |
+| Current task | `CM-1529 Phase F1 runner public tools expectation hardening` |
+| Current validation | `CMV-1633` |
+| Current route | Phase F1 runner public tools expectation aligned to seven-tool surface; live proof retry remains separate |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1529` adds `docs/CM1529_PHASE_F1_RUNNER_PUBLIC_TOOLS_EXPECTATION_HARDENING.md` and aligns `PhaseF1LiveClientNoWriteEvidenceRunner` with the current seven-tool public MCP surface: `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`. Regression tests assert the runner no longer uses the old three-tool expectation, the injected proof fixture reports `publicToolCount=7`, and HTTP MCP `tools/list` remains seven tools. Targeted validation passed `7/7` for the runner and `26/26` for HTTP MCP. CM-1529 does not execute live client proof, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, claim readiness / `RC_READY`, or close live/effective-write blockers. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 
 `CM-1528` adds `docs/CM1528_NO_TOKEN_LOW_DISCLOSURE_HARDENING_SOURCE_AUDIT.md` and records an independent changed-scope source audit of CM-1527. Runtime no-token rejection and public `memory_overview` projection hardening pass within changed scope; runtime HTTP MCP regression coverage still asserts the seven-tool public surface. The audit records one residual evidence-runner finding: `src/core/PhaseF1LiveClientNoWriteEvidenceRunner.js` still carries an older three-tool `REQUIRED_PUBLIC_TOOLS` expectation, so future proof retry using that runner may need separate hardening. CM-1528 does not execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, claim readiness / `RC_READY`, or close live/effective-write blockers. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 

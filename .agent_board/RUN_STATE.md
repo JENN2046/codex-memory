@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1528 no-token low-disclosure hardening source audit`.
-Current validation: `CMV-1632`.
+Current task: `CM-1529 Phase F1 runner public tools expectation hardening`.
+Current validation: `CMV-1633`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1528` completed a read-only changed-scope source audit of CM-1527 and recorded a residual evidence-runner public-tool-contract finding. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is separate source hardening for the evidence runner or a future proof retry only after fresh evidence.
+`CM-1529` aligned the Phase F1 runner public tools expectation to the current seven-tool public MCP surface. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a future live proof retry or closeout only with fresh evidence and explicit scope.
 
 ## Historical Run Notes
 

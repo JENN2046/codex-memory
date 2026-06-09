@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 
 const {
+  REQUIRED_PUBLIC_TOOLS,
   buildPhaseF1Plan,
   runPhaseF1LiveClientNoWriteEvidence
 } = require('../src/core/PhaseF1LiveClientNoWriteEvidenceRunner');
@@ -17,6 +18,18 @@ const CLEAN_CURRENT_FACTS = {
   originHead: COMMIT,
   dirtyStatusLineCount: 0
 };
+
+test('Phase F1 runner public tools expectation matches current seven-tool surface', () => {
+  assert.deepEqual(REQUIRED_PUBLIC_TOOLS, [
+    'audit_memory',
+    'memory_overview',
+    'record_memory',
+    'search_memory',
+    'supersede_memory',
+    'tombstone_memory',
+    'validate_memory'
+  ]);
+});
 
 test('Phase F1 plan accepts current exact no-write approval without executing', () => {
   const plan = buildPhaseF1Plan({
@@ -165,9 +178,13 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
           payload: {
             result: {
               tools: [
+                { name: 'audit_memory' },
+                { name: 'memory_overview' },
                 { name: 'record_memory' },
                 { name: 'search_memory' },
-                { name: 'memory_overview' }
+                { name: 'supersede_memory' },
+                { name: 'tombstone_memory' },
+                { name: 'validate_memory' }
               ]
             }
           }
@@ -239,6 +256,8 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
   assert.equal(report.tokenMaterialPersisted, false);
   assert.equal(JSON.stringify(report).includes('secret-token-that-must-not-appear'), false);
   assert.equal(report.evidence.toolsList.publicToolsFrozen, true);
+  assert.equal(report.evidence.toolsList.publicToolCount, 7);
+  assert.deepEqual(report.evidence.toolsList.publicTools, REQUIRED_PUBLIC_TOOLS);
   assert.equal(report.evidence.noTokenOverview.ok, true);
   assert.equal(report.evidence.noTokenRecordMemory.rejected, true);
   assert.equal(report.evidence.noTokenSearchMemory.rejected, true);

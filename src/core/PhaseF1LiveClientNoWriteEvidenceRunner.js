@@ -4,9 +4,13 @@ const { evaluateA5ApprovalLine } = require('./A5ApprovalLineVerifier');
 const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
 const REQUIRED_PUBLIC_TOOLS = Object.freeze([
+  'audit_memory',
   'memory_overview',
   'record_memory',
-  'search_memory'
+  'search_memory',
+  'supersede_memory',
+  'tombstone_memory',
+  'validate_memory'
 ]);
 
 function normalizeBoolean(value) {
