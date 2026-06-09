@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1479 controlled mutation public dry-run privacy gate hardening`.
-Current validation: `CMV-1585`.
+Current task: `CM-1480 controlled mutation same-actor target probing policy review`.
+Current validation: `CMV-1586`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1479` hardens controlled mutation public dry-run privacy gates. Public path now binds `actor_client_id` to request context, rejects missing context-bound actor, masks private/cross-client rejects, and keeps `dry_run=false` / `confirm=true` fail-closed before mutation. Next safe action is guarded local commit with message `fix: harden controlled mutation public dry-run privacy gates` after validation and diff review pass.
+`CM-1480` records a docs-only policy review deciding that same-actor public controlled mutation dry-run should not expose `accepted=true`, `decision=dry-run`, `fromStatus`, `toStatus`, `newFromStatus`, or `newToStatus`. Next safe action is guarded local commit with message `docs: review controlled mutation same-actor probing policy` after validation and diff review pass. Future source/test hardening should unify the public dry-run projection to low disclosure without weakening CM-1479 context-bound actor and fail-closed flag gates.
 
 ## Historical Run Notes
 

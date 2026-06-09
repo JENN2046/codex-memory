@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1479",
-  "validationId": "CMV-1585",
+  "taskId": "CM-1480",
+  "validationId": "CMV-1586",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1586",
+      "scope": "CM-1480 controlled mutation same-actor target probing policy review",
+      "status": "COMPLETED_VALIDATED_POLICY_REVIEW_NO_RUNTIME_CHANGE"
+    },
     {
       "id": "CMV-1585",
       "scope": "CM-1479 controlled mutation public dry-run privacy gate hardening",

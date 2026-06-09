@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1479 controlled mutation public dry-run privacy gate hardening` |
-| Current validation | `CMV-1585` |
-| Current route | CM-1479 hardens public controlled mutation dry-run so actor identity is bound to request context and private/cross-client targets fail closed with low disclosure |
+| Current task | `CM-1480 controlled mutation same-actor target probing policy review` |
+| Current validation | `CMV-1586` |
+| Current route | CM-1480 decides same-actor public controlled mutation dry-run must not expose `accepted` or lifecycle transition metadata; future source/test hardening should unify public projection to low disclosure |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1480` adds `docs/CM1480_CONTROLLED_MUTATION_SAME_ACTOR_TARGET_PROBING_POLICY_REVIEW.md` as a docs-only policy review of the CM-1479 same-actor public dry-run projection. Decision is `NO_GO_FOR_EXPOSING_ACCEPTED_AND_STATUS_TRANSITIONS_ON_PUBLIC_SAME_ACTOR_DRY_RUN`, `GO_FOR_FUTURE_UNIFIED_LOW_DISCLOSURE_PUBLIC_DRY_RUN_PROJECTION`, and `NO_RUNTIME_CHANGE_IN_CM_1480`. Same-actor actor binding remains required, but public dry-run should not expose `accepted=true`, `decision=dry-run`, `fromStatus`, `toStatus`, `newFromStatus`, or `newToStatus` because those fields can become target existence, eligibility, and lifecycle metadata probes. CM-1480 records a source risk table, tests gap list, go/no-go decision, rollback/evidence checklist, and explicit non-claims. It does not execute confirmed mutation, does not execute `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 `CM-1479` hardens the public controlled mutation dry-run path in `src/app.js` and `tests/controlled-mutation-public-registration.test.js`. Public `validate_memory`, `tombstone_memory`, and `supersede_memory` no longer trust `args.actor_client_id`; they require a request-context-bound actor client id, overwrite the service payload actor from that context, keep public confirmed mutation attempts blocked, and mask private/cross-client rejects behind a low-disclosure privacy-gate reason. Tests cover existing record allowed dry-run, actor spoofing resistance, cross-client private low-disclosure rejection, and independent `dry_run=false` / `confirm=true` fail-closed attempts. Targeted validation passed and `npm test` passed `3050/3050`. CM-1479 does not execute confirmed mutation, does not execute `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 

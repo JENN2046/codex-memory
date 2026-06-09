@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1479 controlled mutation public dry-run privacy gate hardening`.
-Current validation: `CMV-1585`.
+Current checkpoint: `CM-1480 controlled mutation same-actor target probing policy review`.
+Current validation: `CMV-1586`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1480 Controlled Mutation Same-Actor Target Probing Policy Review
+
+Status: `COMPLETED_VALIDATED_POLICY_REVIEW_NO_RUNTIME_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1480_CONTROLLED_MUTATION_SAME_ACTOR_TARGET_PROBING_POLICY_REVIEW.md`.
+- Decision is `NO_GO_FOR_EXPOSING_ACCEPTED_AND_STATUS_TRANSITIONS_ON_PUBLIC_SAME_ACTOR_DRY_RUN`.
+- Decision is `GO_FOR_FUTURE_UNIFIED_LOW_DISCLOSURE_PUBLIC_DRY_RUN_PROJECTION`.
+- Decision is `NO_RUNTIME_CHANGE_IN_CM_1480`.
+- Kept CM-1479 context-bound actor derivation and private/cross-client low-disclosure rejection as required safeguards.
+- Identified same-actor `accepted=true` / `decision=dry-run` projection as a target existence and eligibility oracle.
+- Identified `fromStatus`, `toStatus`, `newFromStatus`, and `newToStatus` as public lifecycle metadata disclosure.
+- Recorded source risk table, tests gap list, go/no-go table, rollback/evidence checklist, and explicit non-claims.
+- No confirmed mutation, `dry_run=false` execution, `confirm=true` execution, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1586` docs/board policy review validation.
 
 ## CM-1479 Controlled Mutation Public Dry-Run Privacy Gate Hardening
 
