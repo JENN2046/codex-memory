@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1514 evidence vocabulary grouping closeout and next backlog selection` |
-| Current validation | `CMV-1619` |
-| Current route | CM-1514 closes evidence vocabulary grouping and selects search quality evaluation |
+| Current task | `CM-1515 search quality evaluation preflight` |
+| Current validation | `CMV-1620` |
+| Current route | CM-1515 prepares fixture/static bounded search quality evaluation boundaries |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1515` adds `docs/CM1515_SEARCH_QUALITY_EVALUATION_PREFLIGHT.md` as a docs/board preflight for the non-RC backlog item `search quality evaluation`. It defines fixture/static bounded search result quality criteria, ranking/filtering/low-disclosure acceptance criteria, public MCP surface criteria, and the future CM-1516 fixture/test plan. CM-1515 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live search or live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1514` adds `docs/CM1514_EVIDENCE_VOCABULARY_GROUPING_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closes the non-RC backlog item `evidence vocabulary grouping` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, and selects `search quality evaluation` as the next non-RC backlog item. This closeout is docs-only and registers CM-1513 targeted test evidence `5/5`. CM-1514 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

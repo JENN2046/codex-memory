@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1514 evidence vocabulary grouping closeout and next backlog selection`.
-Current validation: `CMV-1619`.
-Current handoff: CM-1514 closed evidence vocabulary grouping and selected search quality evaluation next.
+Current task: `CM-1515 search quality evaluation preflight`.
+Current validation: `CMV-1620`.
+Current handoff: CM-1515 prepared fixture/static bounded search quality evaluation boundaries; next safe route is CM-1516.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1514 closed evidence vocabulary grouping and selected search
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_EVIDENCE_VOCABULARY_GROUPING_BACKLOG_CLOSED_NO_READY_CLAIM`.
+Current status: `COMPLETED_VALIDATED_SEARCH_QUALITY_EVALUATION_PREFLIGHT_NO_READY_CLAIM`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1515 added `docs/CM1515_SEARCH_QUALITY_EVALUATION_PREFLIGHT.md` as a docs/board preflight for `search quality evaluation`. It defines fixture/static bounded search result quality criteria, ranking/filtering/low-disclosure acceptance criteria, public MCP surface criteria, and future CM-1516 fixture/test plan. No readiness / `RC_READY` claim, RC blocker closure, live search, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1514 added `docs/CM1514_EVIDENCE_VOCABULARY_GROUPING_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closed `evidence vocabulary grouping` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1513 targeted test evidence `5/5`, and selected `search quality evaluation` as the next non-RC backlog item. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1513 added `tests/fixtures/evidence-vocabulary-grouping-cm1513-v1.json`, `tests/evidence-vocabulary-grouping-fixture.test.js`, and `docs/CM1513_EVIDENCE_VOCABULARY_GROUPING_REGRESSION_COVERAGE.md`. Fixture/test-only coverage proves bounded evidence groups exclude forbidden families and synthetic raw/private fields, forbidden evidence maps to `forbidden_or_unavailable_evidence`, deferred RC proof is not marked completed, live/effective-write blockers remain `OPEN / DEFERRED`, and public MCP surface remains exactly seven tools. No production source finding opened. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 - CM-1512 added `docs/CM1512_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT.md` as a docs/board preflight for `evidence vocabulary grouping`. It defines evidence group names, allowed evidence families, forbidden evidence families, low-disclosure grouping rules, fixture/test plan, and acceptance criteria for CM-1513. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.

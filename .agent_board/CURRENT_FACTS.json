@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1514",
-  "validationId": "CMV-1619",
+  "taskId": "CM-1515",
+  "validationId": "CMV-1620",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1620",
+      "scope": "CM-1515 search quality evaluation preflight",
+      "status": "COMPLETED_VALIDATED_SEARCH_QUALITY_EVALUATION_PREFLIGHT_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1619",
       "scope": "CM-1514 evidence vocabulary grouping closeout and next backlog selection",

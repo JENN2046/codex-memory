@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1514 evidence vocabulary grouping closeout and next backlog selection`.
-Current validation: `CMV-1619`.
+Current task: `CM-1515 search quality evaluation preflight`.
+Current validation: `CMV-1620`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1514` closed evidence vocabulary grouping only as non-RC test-only backlog hardening and selected `search quality evaluation` as the next non-RC backlog item. Next safe route is `CM-1515 search quality evaluation preflight`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1515` prepared search quality evaluation as fixture/static bounded search evidence only. Next safe route is `CM-1516 search quality evaluation fixture/test execution`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

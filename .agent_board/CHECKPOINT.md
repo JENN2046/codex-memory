@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1514 evidence vocabulary grouping closeout and next backlog selection`.
-Current validation: `CMV-1619`.
+Current checkpoint: `CM-1515 search quality evaluation preflight`.
+Current validation: `CMV-1620`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1515 Search Quality Evaluation Preflight
+
+Status: `COMPLETED_VALIDATED_SEARCH_QUALITY_EVALUATION_PREFLIGHT_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1515_SEARCH_QUALITY_EVALUATION_PREFLIGHT.md`.
+- Defined fixture/static bounded search result quality criteria.
+- Defined ranking, filtering, low-disclosure, and public MCP surface acceptance criteria.
+- Defined future CM-1516 fixture/test plan.
+- No live search, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, test change, readiness / `RC_READY` claim, or RC blocker closure occurred.
+
+Validation: `CMV-1620` docs/board preflight validation.
 
 ## CM-1514 Evidence Vocabulary Grouping Closeout And Next Backlog Selection
 
