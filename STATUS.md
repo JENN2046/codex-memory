@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1506 audit readonly refinements fixture/test preflight`.
-Current validation: `CMV-1611`.
+Current task: `CM-1507 audit readonly refinements fixture/test execution`.
+Current validation: `CMV-1612`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1506 prepares audit readonly refinement fixture/test preflight`.
+Current route: `CM-1507 adds audit readonly refinement regression coverage`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1507 audit readonly refinements fixture/test execution: updated `tests/audit-memory-readonly-service.test.js` and `tests/audit-memory-public-contract-preflight.test.js`, and added `docs/CM1507_AUDIT_READONLY_REFINEMENT_REGRESSION_COVERAGE.md`. Added fixture/test-only coverage proving accepted `audit_memory` readonly output strips synthetic raw private/provider/token/API-shaped fields, rejected service paths remain low-disclosure and no-mutation, MCP schema rejection does not echo sensitive fixture values, and the public MCP surface remains exactly seven tools. Targeted validation `node --test tests\audit-memory-readonly-service.test.js tests\audit-memory-public-contract-preflight.test.js` passed `14/14`. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 
 CM-1506 audit readonly refinements fixture/test preflight: added `docs/CM1506_AUDIT_READONLY_REFINEMENT_EVIDENCE_PREFLIGHT.md`. Recorded existing audit readonly service/test surfaces, acceptance criteria, fixture/test plan, source-finding policy, and validation matrix for future CM-1507 fixture/test execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 

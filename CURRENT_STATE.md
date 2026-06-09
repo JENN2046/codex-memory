@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1506 audit readonly refinements fixture/test preflight` |
-| Current validation | `CMV-1611` |
-| Current route | CM-1506 prepares audit readonly refinement fixture/test preflight |
+| Current task | `CM-1507 audit readonly refinements fixture/test execution` |
+| Current validation | `CMV-1612` |
+| Current route | CM-1507 adds audit readonly refinement regression coverage |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1507` updates `tests/audit-memory-readonly-service.test.js` and `tests/audit-memory-public-contract-preflight.test.js`, and adds `docs/CM1507_AUDIT_READONLY_REFINEMENT_REGRESSION_COVERAGE.md`. The fixture/test-only regression proves accepted `audit_memory` readonly output strips synthetic raw private/provider/token/API-shaped fields, rejected service paths remain low-disclosure and no-mutation, MCP schema rejection does not echo sensitive fixture values, and the public MCP surface remains exactly seven tools. Targeted validation `node --test tests\audit-memory-readonly-service.test.js tests\audit-memory-public-contract-preflight.test.js` passed `14/14`. CM-1507 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify production source. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1506` adds `docs/CM1506_AUDIT_READONLY_REFINEMENT_EVIDENCE_PREFLIGHT.md` as a docs/board preflight for the non-RC backlog item `audit readonly refinements`. It records the existing audit readonly service/test surfaces, acceptance criteria, fixture/test plan, source-finding policy, and validation matrix for future CM-1507 fixture/test execution. CM-1506 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

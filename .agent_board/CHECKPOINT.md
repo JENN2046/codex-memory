@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1506 audit readonly refinements fixture/test preflight`.
-Current validation: `CMV-1611`.
+Current checkpoint: `CM-1507 audit readonly refinements fixture/test execution`.
+Current validation: `CMV-1612`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1507 Audit Readonly Refinement Regression Coverage
+
+Status: `COMPLETED_VALIDATED_AUDIT_READONLY_REFINEMENT_TEST_ONLY`
+
+Recorded:
+
+- Updated `tests/audit-memory-readonly-service.test.js`.
+- Updated `tests/audit-memory-public-contract-preflight.test.js`.
+- Added `docs/CM1507_AUDIT_READONLY_REFINEMENT_REGRESSION_COVERAGE.md`.
+- Added accepted-path synthetic fixture coverage for raw private/provider/token/API-shaped decision fields.
+- Added rejected-path low-disclosure / no-mutation service coverage.
+- Added MCP schema rejection low-disclosure coverage.
+- Added public MCP tool count assertion for exactly seven tools.
+- Ran `node --test tests\audit-memory-readonly-service.test.js tests\audit-memory-public-contract-preflight.test.js`: `14/14` passed.
+- No production source finding opened.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
+
+Validation: `CMV-1612` targeted audit readonly regression plus docs/board validation.
 
 ## CM-1506 Audit Readonly Refinement Evidence Preflight
 

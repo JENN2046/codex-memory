@@ -27,6 +27,45 @@ function collectKeys(value, keys = []) {
   return keys;
 }
 
+const CM1507_FORBIDDEN_OUTPUT_KEYS = Object.freeze([
+  ...FORBIDDEN_OUTPUT_KEYS,
+  'apiKey',
+  'api_key',
+  'bearer',
+  'bearerToken',
+  'providerPayload',
+  'providerApi',
+  'providerAPI',
+  'requestHeaders',
+  'authorizationHeader'
+]);
+
+const CM1507_PRIVATE_FIXTURE_VALUES = Object.freeze([
+  'cm1507-memory-id-must-not-leak',
+  'cm1507-title-must-not-leak',
+  'cm1507-content-must-not-leak',
+  'cm1507-snippet-must-not-leak',
+  'A:/cm1507/must/not/leak',
+  'cm1507-raw-audit-must-not-leak',
+  'cm1507-provider-url-must-not-leak',
+  'cm1507-provider-payload-must-not-leak',
+  'cm1507-api-key-must-not-leak',
+  'cm1507-bearer-token-must-not-leak',
+  'cm1507-authorization-must-not-leak'
+]);
+
+function assertNoCm1507PrivateFixtureLeak(report) {
+  const outputKeys = collectKeys(report);
+  for (const forbidden of CM1507_FORBIDDEN_OUTPUT_KEYS) {
+    assert.equal(outputKeys.includes(forbidden), false, forbidden);
+  }
+
+  const serialized = JSON.stringify(report);
+  for (const value of CM1507_PRIVATE_FIXTURE_VALUES) {
+    assert.equal(serialized.includes(value), false, value);
+  }
+}
+
 test('CM1460 audit_memory readonly service returns bounded empty projection by default', async () => {
   const service = new AuditMemoryReadonlyService();
   const report = await service.run({
@@ -215,4 +254,105 @@ test('CM1460 audit_memory readonly output key guard rejects forbidden keys recur
     () => ensureNoForbiddenOutputKeys({ findings: [{ nested: { memoryId: 'x' } }] }),
     /Forbidden audit_memory output key/
   );
+});
+
+test('CM1507 audit_memory readonly projection strips raw private provider token fixture fields', async () => {
+  let providerCalls = 0;
+  const oldFetch = global.fetch;
+
+  global.fetch = async () => {
+    providerCalls += 1;
+    throw new Error('provider must not be called');
+  };
+
+  try {
+    const service = new AuditMemoryReadonlyService({
+      decisionProvider: () => [
+        {
+          auditFamily: 'write',
+          decision: 'visible',
+          reasonCode: 'scope_visible',
+          lifecyclePolicy: 'active_visible',
+          scopePolicy: 'project_scope_match',
+          memoryId: 'cm1507-memory-id-must-not-leak',
+          title: 'cm1507-title-must-not-leak',
+          content: 'cm1507-content-must-not-leak',
+          snippet: 'cm1507-snippet-must-not-leak',
+          filePath: 'A:/cm1507/must/not/leak',
+          rawAudit: 'cm1507-raw-audit-must-not-leak',
+          providerUrl: 'cm1507-provider-url-must-not-leak',
+          providerPayload: 'cm1507-provider-payload-must-not-leak',
+          apiKey: 'cm1507-api-key-must-not-leak',
+          bearerToken: 'cm1507-bearer-token-must-not-leak',
+          authorization: 'cm1507-authorization-must-not-leak'
+        }
+      ]
+    });
+
+    const report = await service.run({
+      audit_family: 'write',
+      window: 1,
+      include_raw: false
+    });
+
+    assert.equal(report.status, SERVICE_STATUS_ACCEPTED);
+    assert.equal(report.access.mode, ACCESS_MODE);
+    assert.equal(report.access.selectedProjection, true);
+    assert.equal(report.access.rawMemoryReturned, false);
+    assert.equal(report.access.rawAuditReturned, false);
+    assert.equal(report.access.filesystemPathsReturned, false);
+    assert.equal(report.access.tokenMaterialReturned, false);
+    assert.equal(report.access.providerPayloadReturned, false);
+    assert.equal(report.access.memoryIdsReturned, false);
+    assert.equal(report.policy.rawAuditScanPerformed, false);
+    assert.equal(report.policy.providerCalled, false);
+    assert.equal(report.policy.durableMutationPerformed, false);
+    assert.equal(providerCalls, 0);
+    assert.deepEqual(report.findings, [
+      {
+        auditFamily: 'write',
+        decision: 'visible',
+        reasonCode: 'scope_visible',
+        lifecyclePolicy: 'active_visible',
+        scopePolicy: 'project_scope_match',
+        redacted: true
+      }
+    ]);
+    assertNoCm1507PrivateFixtureLeak(report);
+  } finally {
+    global.fetch = oldFetch;
+  }
+});
+
+test('CM1507 audit_memory rejected path stays low-disclosure and no-mutation', async () => {
+  const service = new AuditMemoryReadonlyService();
+  const report = await service.run({
+    audit_family: 'raw',
+    window: 999,
+    include_raw: true,
+    write: true,
+    bearerToken: 'cm1507-bearer-token-must-not-leak',
+    providerPayload: 'cm1507-provider-payload-must-not-leak',
+    rawAudit: 'cm1507-raw-audit-must-not-leak'
+  });
+
+  assert.equal(report.status, SERVICE_STATUS_REJECTED);
+  assert.equal(report.accepted, false);
+  assert.deepEqual(report.blockerReasons, [
+    'include_raw_not_allowed',
+    'audit_family_not_allowed',
+    'window_out_of_bounds',
+    'mutation_input_not_allowed'
+  ]);
+  assert.equal(report.access.selectedProjection, true);
+  assert.equal(report.access.rawMemoryReturned, false);
+  assert.equal(report.access.rawAuditReturned, false);
+  assert.equal(report.access.filesystemPathsReturned, false);
+  assert.equal(report.access.tokenMaterialReturned, false);
+  assert.equal(report.access.providerPayloadReturned, false);
+  assert.equal(report.policy.rawAuditScanPerformed, false);
+  assert.equal(report.policy.providerCalled, false);
+  assert.equal(report.policy.durableMutationPerformed, false);
+  assert.deepEqual(report.findings, []);
+  assertNoCm1507PrivateFixtureLeak(report);
 });

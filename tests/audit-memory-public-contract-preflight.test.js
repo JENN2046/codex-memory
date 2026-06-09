@@ -21,6 +21,8 @@ function sorted(values) {
   return [...values].sort();
 }
 
+const PUBLIC_TOOL_COUNT = 7;
+
 async function withApp(handler) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-audit-public-preflight-'));
   const app = createCodexMemoryApplication({
@@ -43,6 +45,7 @@ async function withApp(handler) {
 test('CM1461 public contract registration exposes only approved TOOL_DEFINITIONS', () => {
   const toolNames = sorted(TOOL_DEFINITIONS.map(tool => tool.name));
 
+  assert.equal(toolNames.length, PUBLIC_TOOL_COUNT);
   assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
   assert.equal(toolNames.includes(TOOL_NAME), true);
 });
@@ -58,6 +61,7 @@ test('CM1461 public contract registration exposes audit_memory in MCP tools/list
     });
 
     const toolNames = sorted(list.response.result.tools.map(tool => tool.name));
+    assert.equal(toolNames.length, PUBLIC_TOOL_COUNT);
     assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
     assert.equal(toolNames.includes(TOOL_NAME), true);
     const auditMemory = list.response.result.tools.find(tool => tool.name === TOOL_NAME);
@@ -183,4 +187,34 @@ test('CM1461 public contract registration keeps readonly low-disclosure report s
   assert.equal(report.policy.publicMcpExpanded, false);
   assert.equal(report.policy.readinessClaimed, false);
   assert.equal(report.policy.rcReadyClaimed, false);
+});
+
+test('CM1507 MCP tools/call audit_memory rejection remains low-disclosure', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 5,
+      method: 'tools/call',
+      params: {
+        name: 'audit_memory',
+        arguments: {
+          audit_family: 'all',
+          window: 10,
+          include_raw: true,
+          authorization: 'cm1507-authorization-must-not-leak',
+          bearerToken: 'cm1507-bearer-token-must-not-leak',
+          providerPayload: 'cm1507-provider-payload-must-not-leak'
+        }
+      }
+    });
+
+    assert.equal(result.response.error.code, -32602);
+    const serialized = JSON.stringify(result.response);
+    assert.equal(serialized.includes('cm1507-authorization-must-not-leak'), false);
+    assert.equal(serialized.includes('cm1507-bearer-token-must-not-leak'), false);
+    assert.equal(serialized.includes('cm1507-provider-payload-must-not-leak'), false);
+    assert.equal(serialized.includes('rawAudit'), false);
+    assert.equal(serialized.includes('memoryId'), false);
+  });
 });

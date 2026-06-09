@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1506 audit readonly refinements fixture/test preflight`.
-Current validation: `CMV-1611`.
+Current task: `CM-1507 audit readonly refinements fixture/test execution`.
+Current validation: `CMV-1612`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1506` prepared the audit readonly refinement fixture/test preflight. Next safe route is `CM-1507 audit readonly refinements fixture/test execution`, remaining fixture/test-only unless a production source finding is recorded and routed separately. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1507` added audit readonly fixture/test-only regression coverage. Next safe route is `CM-1508 audit readonly refinement regression closeout and next backlog selection`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

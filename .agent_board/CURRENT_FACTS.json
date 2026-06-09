@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1506",
-  "validationId": "CMV-1611",
+  "taskId": "CM-1507",
+  "validationId": "CMV-1612",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1612",
+      "scope": "CM-1507 audit readonly refinements fixture/test execution",
+      "status": "COMPLETED_VALIDATED_AUDIT_READONLY_REFINEMENT_TEST_ONLY"
+    },
     {
       "id": "CMV-1611",
       "scope": "CM-1506 audit readonly refinements fixture/test preflight",
