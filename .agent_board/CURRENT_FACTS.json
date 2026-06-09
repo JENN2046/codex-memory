@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1490",
-  "validationId": "CMV-1595",
+  "taskId": "CM-1491",
+  "validationId": "CMV-1596",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1596",
+      "scope": "CM-1491 live client integration evidence exact-proof preflight",
+      "status": "COMPLETED_VALIDATED_LIVE_CLIENT_INTEGRATION_PREFLIGHT_NO_LIVE_CALL"
+    },
     {
       "id": "CMV-1595",
       "scope": "CM-1490 select next RC must-fix blocker after first closure",

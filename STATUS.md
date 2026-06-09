@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1490 select next RC must-fix blocker after first closure`.
-Current validation: `CMV-1595`.
+Current task: `CM-1491 live client integration evidence exact-proof preflight`.
+Current validation: `CMV-1596`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1490 selects live client / integration evidence as the next must-fix blocker without executing it`.
+Current route: `CM-1491 prepares docs-only exact-proof preflight for future live client integration evidence without executing live calls`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1491 live client integration evidence exact-proof preflight: added `docs/CM1491_LIVE_CLIENT_INTEGRATION_EVIDENCE_PREFLIGHT.md`. The preflight defines exact approval requirements, expected live client commands / transcript shape, low-disclosure assertion checklist, forbidden output keys, failure / rollback / abort criteria, future evidence checklist, and recommended `CM-1492 live client integration evidence exact approval decision`. It does not execute live client calls. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
 CM-1490 select next RC must-fix blocker after first closure: added `docs/CM1490_NEXT_RC_MUST_FIX_BLOCKER_SELECTION.md`. Selected next must-fix blocker is `Live client / integration evidence is not current for the post-closeout seven-tool surface`. CM-1490 records acceptance criteria, validation matrix, blocker table update, and recommended `CM-1491 live client integration evidence exact preflight`. It does not execute live client/integration proof. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 

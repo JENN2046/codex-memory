@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1490 select next RC must-fix blocker after first closure`.
-Current validation: `CMV-1595`.
+Current checkpoint: `CM-1491 live client integration evidence exact-proof preflight`.
+Current validation: `CMV-1596`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1491 Live Client Integration Evidence Exact-Proof Preflight
+
+Status: `COMPLETED_VALIDATED_LIVE_CLIENT_INTEGRATION_PREFLIGHT_NO_LIVE_CALL`
+
+Recorded:
+
+- Added `docs/CM1491_LIVE_CLIENT_INTEGRATION_EVIDENCE_PREFLIGHT.md`.
+- Defined exact approval requirements for future live client integration evidence.
+- Defined expected live client command / transcript shapes for one selected transport.
+- Recorded low-disclosure assertions, forbidden output keys, failure / rollback / abort criteria, and future evidence checklist.
+- Recommended `CM-1492 live client integration evidence exact approval decision`.
+- No live client call, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, `RC_READY` claim, or effective `record_memory` write occurred.
+
+Validation: `CMV-1596` docs/board live client integration preflight validation.
 
 ## CM-1490 Next RC Must-Fix Blocker Selection
 
