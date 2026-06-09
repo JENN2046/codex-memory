@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1516 search quality evaluation fixture/test execution`.
-Current validation: `CMV-1621`.
+Current checkpoint: `CM-1517 search quality evaluation closeout and next backlog selection`.
+Current validation: `CMV-1622`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1517 Search Quality Evaluation Closeout And Next Backlog Selection
+
+Status: `COMPLETED_VALIDATED_SEARCH_QUALITY_EVALUATION_BACKLOG_CLOSED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1517_SEARCH_QUALITY_EVALUATION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`.
+- Closed `search quality evaluation` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`.
+- Registered CM-1516 targeted test evidence: `node --test tests\search-quality-evaluation-fixture.test.js` passed `5/5`.
+- Selected `write-preflight polish` as the next non-RC backlog item.
+- Recommended `CM-1518 write-preflight polish preflight`.
+- No readiness / `RC_READY` claim, RC blocker closure, live search, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1622` docs/board closeout validation.
 
 ## CM-1516 Search Quality Evaluation Regression Coverage
 

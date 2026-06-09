@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1516 search quality evaluation fixture/test execution` |
-| Current validation | `CMV-1621` |
-| Current route | CM-1516 adds fixture/test-only search quality evaluation coverage |
+| Current task | `CM-1517 search quality evaluation closeout and next backlog selection` |
+| Current validation | `CMV-1622` |
+| Current route | CM-1517 closes search quality evaluation and selects write-preflight polish |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1517` adds `docs/CM1517_SEARCH_QUALITY_EVALUATION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closes the non-RC backlog item `search quality evaluation` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, and selects `write-preflight polish` as the next non-RC backlog item. This closeout is docs-only and registers CM-1516 targeted test evidence `5/5`. CM-1517 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live search or live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1516` adds `tests/fixtures/search-quality-evaluation-cm1516-v1.json`, `tests/search-quality-evaluation-fixture.test.js`, and `docs/CM1516_SEARCH_QUALITY_EVALUATION_REGRESSION_COVERAGE.md`. The fixture/test-only regression proves query matching uses bounded fixture projection, filtered/private results do not echo sensitive fixture values, ranking metadata excludes raw/private source fields, client boundary mismatch is low-disclosure, and public MCP surface remains exactly seven tools. CM-1516 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live search or live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify production source. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

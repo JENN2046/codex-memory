@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1516 search quality evaluation fixture/test execution`.
-Current validation: `CMV-1621`.
+Current task: `CM-1517 search quality evaluation closeout and next backlog selection`.
+Current validation: `CMV-1622`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1516` added fixture/test-only search quality evaluation regression coverage. Next safe route is `CM-1517 search quality evaluation closeout`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1517` closed search quality evaluation only as non-RC test-only backlog hardening and selected `write-preflight polish` as the next non-RC backlog item. Next safe route is `CM-1518 write-preflight polish preflight`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

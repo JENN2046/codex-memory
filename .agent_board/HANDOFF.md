@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1516 search quality evaluation fixture/test execution`.
-Current validation: `CMV-1621`.
-Current handoff: CM-1516 added fixture/test-only search quality evaluation coverage; next safe route is CM-1517.
+Current task: `CM-1517 search quality evaluation closeout and next backlog selection`.
+Current validation: `CMV-1622`.
+Current handoff: CM-1517 closed search quality evaluation and selected write-preflight polish next.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1516 added fixture/test-only search quality evaluation cover
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_SEARCH_QUALITY_EVALUATION_TEST_ONLY`.
+Current status: `COMPLETED_VALIDATED_SEARCH_QUALITY_EVALUATION_BACKLOG_CLOSED_NO_READY_CLAIM`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1517 added `docs/CM1517_SEARCH_QUALITY_EVALUATION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closed `search quality evaluation` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1516 targeted test evidence `5/5`, and selected `write-preflight polish` as the next non-RC backlog item. No readiness / `RC_READY` claim, RC blocker closure, live search, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1516 added `tests/fixtures/search-quality-evaluation-cm1516-v1.json`, `tests/search-quality-evaluation-fixture.test.js`, and `docs/CM1516_SEARCH_QUALITY_EVALUATION_REGRESSION_COVERAGE.md`. Fixture/test-only coverage proves query matching uses bounded fixture projection, filtered/private results do not echo sensitive fixture values, ranking metadata excludes raw/private source fields, client boundary mismatch is low-disclosure, and public MCP surface remains exactly seven tools. No production source finding opened. No readiness / `RC_READY` claim, RC blocker closure, live search, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 - CM-1515 added `docs/CM1515_SEARCH_QUALITY_EVALUATION_PREFLIGHT.md` as a docs/board preflight for `search quality evaluation`. It defines fixture/static bounded search result quality criteria, ranking/filtering/low-disclosure acceptance criteria, public MCP surface criteria, and future CM-1516 fixture/test plan. No readiness / `RC_READY` claim, RC blocker closure, live search, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1514 added `docs/CM1514_EVIDENCE_VOCABULARY_GROUPING_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closed `evidence vocabulary grouping` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1513 targeted test evidence `5/5`, and selected `search quality evaluation` as the next non-RC backlog item. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
