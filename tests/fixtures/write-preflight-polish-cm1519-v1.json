@@ -1,0 +1,86 @@
+{
+  "version": "write-preflight-polish-cm1519-v1",
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "cases": [
+    {
+      "caseId": "invalid-schema",
+      "kind": "schema_rejection",
+      "input": {
+        "tool": "record_memory",
+        "payload": {
+          "content": "cm1519-schema-content-must-not-leak",
+          "apiKey": "cm1519-api-key-must-not-leak"
+        }
+      },
+      "expectedReason": "schema_rejection"
+    },
+    {
+      "caseId": "invalid-write",
+      "kind": "invalid_write",
+      "input": {
+        "tool": "record_memory",
+        "payload": {
+          "text": "",
+          "bearerToken": "cm1519-bearer-token-must-not-leak"
+        }
+      },
+      "expectedReason": "invalid_write_rejected"
+    },
+    {
+      "caseId": "no-op-guard",
+      "kind": "no_op_guard",
+      "input": {
+        "tool": "record_memory",
+        "payload": {
+          "text": "cm1519-no-op-content-must-not-leak",
+          "no_op": true
+        }
+      },
+      "expectedReason": "no_op_guard"
+    },
+    {
+      "caseId": "dry-run-guard",
+      "kind": "dry_run_guard",
+      "input": {
+        "tool": "record_memory",
+        "payload": {
+          "text": "cm1519-dry-run-content-must-not-leak",
+          "dry_run": true
+        }
+      },
+      "expectedReason": "dry_run_guard"
+    },
+    {
+      "caseId": "effective-write-forbidden",
+      "kind": "effective_write_payload",
+      "input": {
+        "tool": "record_memory",
+        "payload": {
+          "text": "cm1519-effective-write-content-must-not-leak",
+          "dry_run": false
+        }
+      },
+      "expectedReason": "effective_write_forbidden"
+    },
+    {
+      "caseId": "confirmed-mutation-forbidden",
+      "kind": "confirmed_mutation_payload",
+      "input": {
+        "tool": "validate_memory",
+        "payload": {
+          "memory_id": "cm1519-memory-id-must-not-leak",
+          "confirm": true
+        }
+      },
+      "expectedReason": "confirmed_mutation_forbidden"
+    }
+  ]
+}

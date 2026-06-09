@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1518 write-preflight polish preflight`.
-Current validation: `CMV-1623`.
+Current task: `CM-1519 write-preflight polish fixture/test execution`.
+Current validation: `CMV-1624`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1518` prepared write-preflight polish as invalid-write/no-op/dry-run guard planning only, without proof execution or effective write. Next safe route is `CM-1519 write-preflight polish fixture/test execution`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1519` added fixture/test-only write-preflight polish regression coverage without effective write. Next safe route is `CM-1520 write-preflight polish closeout`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

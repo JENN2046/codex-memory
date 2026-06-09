@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1518 write-preflight polish preflight`.
-Current validation: `CMV-1623`.
+Current task: `CM-1519 write-preflight polish fixture/test execution`.
+Current validation: `CMV-1624`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1518 prepares invalid-write/no-op/dry-run fixture boundaries without effective write`.
+Current route: `CM-1519 adds fixture/test-only write-preflight polish coverage without effective write`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1519 write-preflight polish fixture/test execution: added `tests/fixtures/write-preflight-polish-cm1519-v1.json`, `tests/write-preflight-polish-fixture.test.js`, and `docs/CM1519_WRITE_PREFLIGHT_POLISH_REGRESSION_COVERAGE.md`. Added fixture/test-only coverage proving invalid write and schema rejection fail closed without durable write, no-op and dry-run guards do not produce effective writes, effective write and confirmed mutation payloads are forbidden and not executed, rejection output remains low-disclosure, and public MCP surface remains exactly seven tools. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, effective `record_memory` write, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 
 CM-1518 write-preflight polish preflight: added `docs/CM1518_WRITE_PREFLIGHT_POLISH_PREFLIGHT.md`. Defined invalid-write, schema rejection, no-op, dry-run, low-disclosure, and seven-tool public-surface acceptance criteria for future CM-1519 fixture/test execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, invalid-write proof, no-op proof, dry-run proof, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 

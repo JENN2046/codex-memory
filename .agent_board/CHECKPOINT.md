@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1518 write-preflight polish preflight`.
-Current validation: `CMV-1623`.
+Current checkpoint: `CM-1519 write-preflight polish fixture/test execution`.
+Current validation: `CMV-1624`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1519 Write-Preflight Polish Regression Coverage
+
+Status: `COMPLETED_VALIDATED_WRITE_PREFLIGHT_POLISH_TEST_ONLY_NO_WRITE`
+
+Recorded:
+
+- Added `tests/fixtures/write-preflight-polish-cm1519-v1.json`.
+- Added `tests/write-preflight-polish-fixture.test.js`.
+- Added `docs/CM1519_WRITE_PREFLIGHT_POLISH_REGRESSION_COVERAGE.md`.
+- Added fixture/test-only coverage for invalid write, schema rejection, no-op guard, dry-run guard, forbidden effective write payload, forbidden confirmed mutation payload, low-disclosure rejection, and seven-tool public MCP surface stability.
+- No production source finding opened.
+- No effective `record_memory`, live client call, provider/API, bearer token, raw memory/audit/broad scan, confirmed mutation, public MCP expansion, release/tag/deploy, production source change, readiness / `RC_READY` claim, or RC blocker closure occurred.
+
+Validation: `CMV-1624` targeted fixture test plus docs/board validation.
 
 ## CM-1518 Write-Preflight Polish Preflight
 
