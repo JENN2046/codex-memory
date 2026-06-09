@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-06-09",
-  "taskId": "CM-1542",
-  "validationId": "CMV-1646",
+  "updatedAt": "2026-06-10",
+  "taskId": "CM-1543",
+  "validationId": "CMV-1647",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1647",
+      "scope": "CM-1543 final RC blocker inventory and readiness review preflight",
+      "status": "COMPLETED_VALIDATED_FINAL_RC_BLOCKER_INVENTORY_PREFLIGHT_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1646",
       "scope": "CM-1542 effective write reliability proof closeout audit/decision",
@@ -688,17 +693,19 @@
     }
   ],
   "notValidated": [
-    "live client acceptance",
+    "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
     "live provider/API calls",
     "broad record_memory reliability",
     "production write reliability",
-    "final RC readiness review",
+    "final independent RC readiness review",
+    "release/tag/deploy/cutover",
+    "confirmed mutation",
+    "public MCP expansion beyond current seven-tool surface",
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
     "startup/watchdog warning source change",
     "raw audit or broad store scan",
-    "phase h record_memory scoped-write execution",
     "committed live Git head facts"
   ],
   "constraints": {

@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1542 effective write reliability proof closeout audit/decision`.
-Current validation: `CMV-1646`.
+Current checkpoint: `CM-1543 final RC blocker inventory and readiness review preflight`.
+Current validation: `CMV-1647`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1543 Final RC Blocker Inventory And Readiness Review Preflight
+
+Status: `COMPLETED_VALIDATED_FINAL_RC_BLOCKER_INVENTORY_PREFLIGHT_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1543_FINAL_RC_BLOCKER_INVENTORY_READINESS_REVIEW_PREFLIGHT.md`.
+- Confirmed live client evidence blocker is `CLOSED`.
+- Confirmed scoped effective write reliability proof blocker is `CLOSED`.
+- Recorded broad `record_memory` reliability as `NOT_CLAIMED`.
+- Recorded production write reliability as `NOT_CLAIMED`.
+- Recorded raw audit / broad scan, confirmed mutation, and public MCP expansion as `DEFERRED`.
+- Recorded `RC_READY` as `BLOCKED_PENDING_FINAL_INDEPENDENT_REVIEW`.
+- Prepared exact final review input checklist and remaining risk table.
+- No live proof, provider/API call, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, second effective `record_memory` write, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1647` docs inventory/preflight validation.
 
 ## CM-1542 Effective Write Reliability Proof Closeout Audit/Decision
 
