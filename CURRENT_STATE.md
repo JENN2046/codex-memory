@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1492 operator exact approval decision for live client proof` |
-| Current validation | `CMV-1597` |
-| Current route | CM-1492 records `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` without executing live calls |
+| Current task | `CM-1493 live client proof exact approval envelope completion packet` |
+| Current validation | `CMV-1598` |
+| Current route | CM-1493 completes a no-bearer exact approval envelope without approving or executing live calls |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1493` adds `docs/CM1493_LIVE_CLIENT_PROOF_APPROVAL_ENVELOPE.md` and completes the exact approval envelope shape for a future no-bearer local HTTP MCP live client integration proof. It fixes the candidate endpoint to `http://127.0.0.1:7605`, auth boundary to `no_bearer_token`, exact call budget to one initialize, one tools/list, and seven tools/call operations, and records transcript redaction rules, abort criteria, allowed/forbidden proof boundaries, and expected evidence artifact checklist. CM-1493 does not approve execution, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, perform an effective `record_memory` write, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1492` adds `docs/CM1492_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL_DECISION.md` and records `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` because no complete exact approval envelope was provided for a live proof. The live client evidence blocker remains blocked, and any future approval must explicitly select one transport, auth boundary, call sequence, call budget, sanitizer, and abort criteria. CM-1492 does not execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, perform an effective `record_memory` write, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -153,7 +155,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1492 rejects live client integration proof execution for now because no complete exact approval envelope was provided. The next safe action is either a new exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF`, or selection of another docs/local-safe blocker route. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
+CM-1493 completes the no-bearer exact approval envelope shape but does not approve execution. The next safe action is either a new exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` and binds to CM-1493, or selection of another docs/local-safe blocker route. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
 
 ## Boundaries
 

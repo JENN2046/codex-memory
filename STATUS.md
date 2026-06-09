@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1492 operator exact approval decision for live client proof`.
-Current validation: `CMV-1597`.
+Current task: `CM-1493 live client proof exact approval envelope completion packet`.
+Current validation: `CMV-1598`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1492 records REJECT_LIVE_CLIENT_INTEGRATION_PROOF without executing live calls`.
+Current route: `CM-1493 completes a no-bearer exact approval envelope without approving or executing live calls`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1493 live client proof exact approval envelope completion packet: added `docs/CM1493_LIVE_CLIENT_PROOF_APPROVAL_ENVELOPE.md`. The packet completes a no-bearer exact approval envelope shape for a future local HTTP MCP live client integration proof, including exact command list, transcript redaction rules, abort criteria, allowed/forbidden proof boundaries, and expected evidence artifact checklist. It does not approve execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
 CM-1492 operator exact approval decision for live client proof: added `docs/CM1492_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL_DECISION.md`. Decision is `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` because the current operator message did not provide a complete exact approval envelope for live execution. The live client evidence blocker remains blocked. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
