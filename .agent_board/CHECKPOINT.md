@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1494 operator exact approval decision for live client proof`.
-Current validation: `CMV-1599`.
+Current checkpoint: `CM-1495 live client proof rejection closeout and blocker path review`.
+Current validation: `CMV-1600`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1495 Live Client Proof Rejection Closeout And Blocker Path Review
+
+Status: `COMPLETED_VALIDATED_LIVE_CLIENT_PROOF_REJECTION_CLOSEOUT_NO_LIVE_CALL`
+
+Recorded:
+
+- Added `docs/CM1495_LIVE_CLIENT_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_PATH_REVIEW.md`.
+- Decision: `LIVE_CLIENT_INTEGRATION_EVIDENCE_BLOCKER_STILL_OPEN`.
+- Selected route: `DEFER_UNTIL_OPERATOR_EXACT_APPROVAL`.
+- Recorded CM-1493 envelope as available but not activated.
+- Recorded no envelope repair selection and no next-blocker selection in CM-1495.
+- No live client call, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, `RC_READY` claim, or effective `record_memory` write occurred.
+
+Validation: `CMV-1600` docs/board live client proof rejection closeout validation.
 
 ## CM-1494 Live Client Proof Exact Approval Decision
 

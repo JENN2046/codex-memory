@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1494 operator exact approval decision for live client proof`.
-Current validation: `CMV-1599`.
+Current task: `CM-1495 live client proof rejection closeout and blocker path review`.
+Current validation: `CMV-1600`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1494 rejects live client proof execution because no exact approve decision was provided`.
+Current route: `CM-1495 keeps live client evidence blocker open and defers until operator exact approval`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1495 live client proof rejection closeout and blocker path review: added `docs/CM1495_LIVE_CLIENT_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_PATH_REVIEW.md`. Decision is `LIVE_CLIENT_INTEGRATION_EVIDENCE_BLOCKER_STILL_OPEN` and `NEXT_ROUTE: DEFER_UNTIL_OPERATOR_EXACT_APPROVAL`. CM-1495 records that CM-1493 is available but inactive, no approval-envelope repair is selected, retry requires a future exact `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` decision, and turning to another blocker is deferred unless the operator selects that route. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 
 CM-1494 operator exact approval decision for live client proof: added `docs/CM1494_LIVE_CLIENT_PROOF_EXACT_APPROVAL_DECISION.md`. Decision is `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` because the current operator task requested a decision record but did not provide the exact approval decision string `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF`. CM-1493 is referenced as the candidate envelope but not activated. The live client evidence blocker remains blocked. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 

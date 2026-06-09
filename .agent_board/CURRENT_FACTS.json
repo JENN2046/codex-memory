@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1494",
-  "validationId": "CMV-1599",
+  "taskId": "CM-1495",
+  "validationId": "CMV-1600",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1600",
+      "scope": "CM-1495 live client proof rejection closeout and blocker path review",
+      "status": "COMPLETED_VALIDATED_LIVE_CLIENT_PROOF_REJECTION_CLOSEOUT_NO_LIVE_CALL"
+    },
     {
       "id": "CMV-1599",
       "scope": "CM-1494 operator exact approval decision for live client proof",

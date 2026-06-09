@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1494 operator exact approval decision for live client proof` |
-| Current validation | `CMV-1599` |
-| Current route | CM-1494 rejects live client proof execution because no exact approve decision was provided |
+| Current task | `CM-1495 live client proof rejection closeout and blocker path review` |
+| Current validation | `CMV-1600` |
+| Current route | CM-1495 keeps live client evidence blocker open and defers until operator exact approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1495` adds `docs/CM1495_LIVE_CLIENT_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_PATH_REVIEW.md` and closes out the CM-1494 rejection decision without closing the live client integration evidence blocker. Decision is `LIVE_CLIENT_INTEGRATION_EVIDENCE_BLOCKER_STILL_OPEN` and `NEXT_ROUTE: DEFER_UNTIL_OPERATOR_EXACT_APPROVAL`. CM-1495 records that CM-1493 is an available but inactive no-bearer envelope, no concrete envelope repair is selected, retry is allowed only with a future exact `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` decision, and turning to another blocker is deferred unless the operator selects that route. CM-1495 does not execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, perform an effective `record_memory` write, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1494` adds `docs/CM1494_LIVE_CLIENT_PROOF_EXACT_APPROVAL_DECISION.md` and records `REJECT_LIVE_CLIENT_INTEGRATION_PROOF` because the operator task requested a decision record but did not provide the exact approval decision string `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF`. The CM-1493 envelope is referenced but not activated. The live client evidence blocker remains blocked, and any future execution still requires a separate exact approval bound to CM-1493 or an approved replacement envelope. CM-1494 does not execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, perform an effective `record_memory` write, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -157,7 +159,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1494 rejects live client proof execution and leaves the live client evidence blocker open. The next safe action is either a new exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` and binds to CM-1493, or selection of another docs/local-safe blocker route. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
+CM-1495 keeps the live client evidence blocker open and selects waiting for operator exact approval as the current route. The next safe action is either a new exact approval decision that explicitly switches to `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` and binds to CM-1493, or an operator-selected docs/local-safe route to another blocker. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
 
 ## Boundaries
 
