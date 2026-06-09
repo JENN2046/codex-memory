@@ -7,6 +7,7 @@ const {
   inspectBoundedSearchEvidenceShape,
   inspectSearchMemoryResponseShape
 } = require('../src/core/SearchMemoryResponseSanitizer');
+const { TOOL_DEFINITIONS } = require('../src/core/constants');
 
 function mcpResponse(structuredContent, wrapperText = '{"results":[]}') {
   return {
@@ -27,6 +28,10 @@ function mcpResponse(structuredContent, wrapperText = '{"results":[]}') {
 
 function violationPaths(result) {
   return result.violations.map(item => item.path);
+}
+
+function publicToolNames() {
+  return TOOL_DEFINITIONS.map(tool => tool.name);
 }
 
 test('search memory sanitizer allows MCP wrapper content when structuredContent is safe', () => {
@@ -238,5 +243,97 @@ test('bounded search evidence collector fails when result item carries memory id
   assert.equal(result.flags.memoryIdsReturned, true);
   assert.deepEqual(violationPaths(result), [
     'result.structuredContent.results[0].memoryId'
+  ]);
+});
+
+test('bounded search projection regression rejects lifecycle and mutation status fields', () => {
+  const result = inspectBoundedSearchEvidenceShape(mcpResponse({
+    access: {
+      mode: 'authenticated_bounded_search',
+      selectedProjection: true,
+      includeContent: false,
+      rawContentReturned: false,
+      pathsReturned: false,
+      memoryIdsReturned: false,
+      titlesReturned: false,
+      snippetsReturned: false
+    },
+    resultCount: 1,
+    results: [
+      {
+        target: 'both',
+        score: 0.75,
+        lifecycleStatus: 'active',
+        mutationStatus: 'pending',
+        fromStatus: 'proposal',
+        toStatus: 'active',
+        newFromStatus: 'stale',
+        newToStatus: 'active',
+        accepted: true,
+        decision: 'dry-run'
+      }
+    ]
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.deepEqual(violationPaths(result), [
+    'result.structuredContent.results[0].lifecycleStatus',
+    'result.structuredContent.results[0].mutationStatus',
+    'result.structuredContent.results[0].fromStatus',
+    'result.structuredContent.results[0].toStatus',
+    'result.structuredContent.results[0].newFromStatus',
+    'result.structuredContent.results[0].newToStatus',
+    'result.structuredContent.results[0].accepted',
+    'result.structuredContent.results[0].decision'
+  ]);
+});
+
+test('bounded search projection regression rejects client boundary fields in result items', () => {
+  const result = inspectBoundedSearchEvidenceShape(mcpResponse({
+    access: {
+      mode: 'authenticated_bounded_search',
+      selectedProjection: true,
+      includeContent: false,
+      rawContentReturned: false,
+      pathsReturned: false,
+      memoryIdsReturned: false,
+      titlesReturned: false,
+      snippetsReturned: false
+    },
+    resultCount: 1,
+    results: [
+      {
+        target: 'project',
+        score: 0.5,
+        clientId: 'codex',
+        client_id: 'codex',
+        actorClientId: 'codex',
+        workspaceId: 'A:/codex-memory',
+        projectId: 'codex-memory',
+        visibility: 'private'
+      }
+    ]
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.deepEqual(violationPaths(result), [
+    'result.structuredContent.results[0].clientId',
+    'result.structuredContent.results[0].client_id',
+    'result.structuredContent.results[0].actorClientId',
+    'result.structuredContent.results[0].workspaceId',
+    'result.structuredContent.results[0].projectId',
+    'result.structuredContent.results[0].visibility'
+  ]);
+});
+
+test('bounded search projection regression keeps public MCP surface unchanged', () => {
+  assert.deepEqual(publicToolNames(), [
+    'record_memory',
+    'search_memory',
+    'memory_overview',
+    'audit_memory',
+    'validate_memory',
+    'tombstone_memory',
+    'supersede_memory'
   ]);
 });

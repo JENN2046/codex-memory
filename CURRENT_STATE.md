@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1503 non-RC backlog hardening lane activation` |
-| Current validation | `CMV-1608` |
-| Current route | CM-1503 activates non-RC backlog lane and selects bounded search projection regression |
+| Current task | `CM-1504 bounded search projection regression fixture/test execution` |
+| Current validation | `CMV-1609` |
+| Current route | CM-1504 records fixture/test-only bounded search projection regression coverage |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1504` updates `tests/search-memory-response-sanitizer.test.js` and adds `docs/CM1504_BOUNDED_SEARCH_PROJECTION_REGRESSION_FIXTURE_TEST_EVIDENCE.md`. The fixture-only regression now rejects bounded search result lifecycle / mutation status fields, rejects client boundary fields in result items, and confirms the public MCP surface remains exactly seven tools. Targeted validation `node --test tests\search-memory-response-sanitizer.test.js` passed `12/12`. CM-1504 does not execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, claim readiness / `RC_READY`, close live client evidence blocker, close effective write reliability blocker, release/tag/deploy, or change production source. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1503` adds `docs/CM1503_NON_RC_BACKLOG_HARDENING_LANE_ACTIVATION.md` and activates a non-RC backlog hardening lane after the RC blocker route freeze. First selected item is `bounded search projection regression`. The lane is limited to docs, fixtures, test-only regression coverage, and static code hardening that preserves the current public MCP surface. CM-1503 does not claim readiness / `RC_READY`, close live client evidence blocker, close effective write reliability blocker, execute live client calls, perform effective `record_memory`, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -175,7 +177,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1503 recommends `CM-1504 bounded search projection regression fixture/test plan execution` as the next non-RC backlog hardening slice. Any CM-1504 work should remain fixture-only / test-only unless the operator explicitly changes scope. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+CM-1504 recommends `CM-1505 bounded search projection regression evidence audit or source-hardening decision` as the next non-RC backlog hardening slice. Any production source hardening remains separate and should be selected explicitly. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Boundaries
 

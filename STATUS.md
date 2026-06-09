@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1503 non-RC backlog hardening lane activation`.
-Current validation: `CMV-1608`.
+Current task: `CM-1504 bounded search projection regression fixture/test execution`.
+Current validation: `CMV-1609`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1503 activates non-RC backlog lane and selects bounded search projection regression`.
+Current route: `CM-1504 records fixture/test-only bounded search projection regression coverage`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1504 bounded search projection regression fixture/test execution: updated `tests/search-memory-response-sanitizer.test.js` and added `docs/CM1504_BOUNDED_SEARCH_PROJECTION_REGRESSION_FIXTURE_TEST_EVIDENCE.md`. Added fixture-only regression coverage for lifecycle / mutation status leakage, client boundary field leakage, and public MCP surface count. Targeted test `node --test tests\search-memory-response-sanitizer.test.js` passed `12/12`. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, readiness or `RC_READY` claim, RC blocker closure, release/tag/deploy, or production source change occurred.
 
 CM-1503 non-RC backlog hardening lane activation: added `docs/CM1503_NON_RC_BACKLOG_HARDENING_LANE_ACTIVATION.md`. Selected first non-RC backlog item is `bounded search projection regression`, with acceptance criteria, fixture plan, test-only hardening plan, and execution boundaries. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, blocker closure, live client call, effective `record_memory` write, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 

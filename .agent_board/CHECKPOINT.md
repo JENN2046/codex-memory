@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1503 non-RC backlog hardening lane activation`.
-Current validation: `CMV-1608`.
+Current checkpoint: `CM-1504 bounded search projection regression fixture/test execution`.
+Current validation: `CMV-1609`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1504 Bounded Search Projection Regression Fixture/Test Execution
+
+Status: `COMPLETED_VALIDATED_BOUNDED_SEARCH_PROJECTION_REGRESSION_TEST_ONLY`
+
+Recorded:
+
+- Updated `tests/search-memory-response-sanitizer.test.js`.
+- Added `docs/CM1504_BOUNDED_SEARCH_PROJECTION_REGRESSION_FIXTURE_TEST_EVIDENCE.md`.
+- Added fixture-only coverage for lifecycle / mutation status leakage.
+- Added fixture-only coverage for client boundary field leakage.
+- Added static coverage that public MCP tools remain exactly seven.
+- Ran `node --test tests\search-memory-response-sanitizer.test.js`: `12/12` passed.
+- No live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, readiness / `RC_READY` claim, RC blocker closure, release/tag/deploy, or production source change occurred.
+
+Validation: `CMV-1609` targeted test/docs-board validation.
 
 ## CM-1503 Non-RC Backlog Hardening Lane Activation
 
