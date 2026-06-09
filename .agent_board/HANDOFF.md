@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1478 operator exact target decision packet`.
-Current validation: `CMV-1584`.
-Current handoff: CM-1478 records the placeholder-only operator target decision surface; no target id or mutation type is selected and confirmed mutation remains blocked.
+Current task: `CM-1479 controlled mutation public dry-run privacy gate hardening`.
+Current validation: `CMV-1585`.
+Current handoff: CM-1479 hardens public controlled mutation dry-run privacy gates; confirmed mutation remains blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1478 records the placeholder-only operator target decision s
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_TARGET_DECISION_PACKET_NO_TARGET_SELECTED_NO_MUTATION`.
+Current status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_DRY_RUN_PRIVACY_GATE_HARDENING`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1479 updated `src/app.js` and `tests/controlled-mutation-public-registration.test.js` so public controlled mutation dry-run binds actor identity to request context, rejects missing context actor, masks private/cross-client rejects, and tests existing record allowed dry-run plus independent `dry_run=false` / `confirm=true` fail-closed attempts.
 - CM-1478 added `docs/CM1478_CONTROLLED_MUTATION_TARGET_DECISION_PACKET.md` with required operator fields, `<OPERATOR_PROVIDED_EXACT_TARGET_ID>` placeholder, mutation type constrained to exactly one of `validate_memory`, `tombstone_memory`, or `supersede_memory`, rollback/evidence checklists, and explicit non-claims. No target id or mutation type is selected.
 - CM-1477 added `docs/CM1477_CONFIRMED_MUTATION_TARGET_SELECTION_READINESS_REVIEW.md` with a go/no-go table, rollback readiness checklist, post-apply evidence checklist, and explicit non-claims. Decision is `GO_FOR_NEXT_NO_APPLY_OPERATOR_NAMED_CANDIDATE_OR_DRY_RUN_PROJECTION_PACKET`, `NO_GO_FOR_CONFIRMED_MUTATION`, and `NO_GO_FOR_AGENT_SELECTED_REAL_TARGET_ID`.
 - CM-1476 added `docs/CM1476_CONFIRMED_MUTATION_TARGET_SELECTION_PACKET.md` with minimum safe target class, candidate requirements, exact target approval fields, no-apply preflight, rollback checklist, evidence checklist, and explicit non-claims.
@@ -47,10 +48,10 @@ Completed in this slice:
 - CM-1452 bridged the release gate matrix to default-safe runner exclusions without package script changes.
 - CM-1453 reinforced readonly `audit_memory` draft validation against mutation-like inputs without public MCP registration.
 - CM-1454 selected no further automatic local-safe slice.
-- Recorded CM-1450 through CM-1478 and CMV-1560 through CMV-1584 in `.agent_board`.
+- Recorded CM-1450 through CM-1479 and CMV-1560 through CMV-1585 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1584`; CM-1478 docs/board target decision packet validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1585`; CM-1479 source/test privacy gate hardening validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
@@ -59,7 +60,7 @@ Boundaries:
 
 Next safe action:
 
-Next safe action is guarded local commit with message `docs: record controlled mutation target decision packet` after validation and diff review pass. Push requires separate explicit authorization. Operator-provided real target id value, mutation type choice, dry-run projection, confirmed mutation, real DB apply, raw/memory/provider/bearer/remote/readiness work remains forbidden unless separately and exactly approved.
+Next safe action is guarded local commit with message `fix: harden controlled mutation public dry-run privacy gates` after validation and diff review pass. Push requires separate explicit authorization. Confirmed mutation, real DB apply, raw/memory/provider/bearer/remote/readiness work remains forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 

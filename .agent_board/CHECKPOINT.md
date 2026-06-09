@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1478 operator exact target decision packet`.
-Current validation: `CMV-1584`.
+Current checkpoint: `CM-1479 controlled mutation public dry-run privacy gate hardening`.
+Current validation: `CMV-1585`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1479 Controlled Mutation Public Dry-Run Privacy Gate Hardening
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_DRY_RUN_PRIVACY_GATE_HARDENING`
+
+Recorded:
+
+- Updated `src/app.js` public controlled mutation path.
+- Public dry-run no longer trusts `args.actor_client_id`.
+- Public dry-run requires actor identity from `requestContext.executionContext`.
+- Public dry-run overwrites service payload `actor_client_id` with the context-bound actor.
+- Private/cross-client rejections are masked behind a low-disclosure privacy-gate reason.
+- Added tests for existing record allowed dry-run, spoofed actor mismatch, cross-client private low-disclosure rejection, and independent `dry_run=false` / `confirm=true` fail-closed attempts.
+- Targeted validation passed and `npm test` passed `3050/3050`.
+- No confirmed mutation, `dry_run=false` execution, `confirm=true` execution, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1585` source/test privacy gate hardening validation.
 
 ## CM-1478 Operator Exact Target Decision Packet
 

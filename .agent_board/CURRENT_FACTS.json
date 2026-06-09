@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1478",
-  "validationId": "CMV-1584",
+  "taskId": "CM-1479",
+  "validationId": "CMV-1585",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1585",
+      "scope": "CM-1479 controlled mutation public dry-run privacy gate hardening",
+      "status": "COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_DRY_RUN_PRIVACY_GATE_HARDENING"
+    },
     {
       "id": "CMV-1584",
       "scope": "CM-1478 operator exact target decision packet",

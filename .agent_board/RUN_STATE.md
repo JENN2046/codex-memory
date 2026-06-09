@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1478 operator exact target decision packet`.
-Current validation: `CMV-1584`.
+Current task: `CM-1479 controlled mutation public dry-run privacy gate hardening`.
+Current validation: `CMV-1585`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1478` records the placeholder-only operator decision packet for a future exact target id and mutation type. No target id or mutation type was selected, and no agent target lookup, `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred. Next safe action is guarded local commit with message `docs: record controlled mutation target decision packet` after validation and diff review pass.
+`CM-1479` hardens controlled mutation public dry-run privacy gates. Public path now binds `actor_client_id` to request context, rejects missing context-bound actor, masks private/cross-client rejects, and keeps `dry_run=false` / `confirm=true` fail-closed before mutation. Next safe action is guarded local commit with message `fix: harden controlled mutation public dry-run privacy gates` after validation and diff review pass.
 
 ## Historical Run Notes
 

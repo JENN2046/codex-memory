@@ -453,6 +453,25 @@ function buildPublicControlledMutationConfirmGate(args = {}) {
   };
 }
 
+function buildPublicControlledMutationActorContext(requestContext = {}) {
+  const actorClientId = inferRequestClientId(requestContext);
+  return {
+    ok: Boolean(actorClientId),
+    actorClientId,
+    reason: actorClientId
+      ? null
+      : 'public controlled mutation dry-run requires a request context bound actor client id.'
+  };
+}
+
+function sanitizePublicControlledMutationReason(reason) {
+  const normalized = String(reason || '');
+  if (/cross-client|private/i.test(normalized)) {
+    return 'public controlled mutation dry-run rejected by privacy gate.';
+  }
+  return reason || null;
+}
+
 function projectPublicControlledMutationResult(toolName, result = {}, args = {}) {
   return {
     accepted: result.decision !== 'rejected',
@@ -465,7 +484,7 @@ function projectPublicControlledMutationResult(toolName, result = {}, args = {})
     newFromStatus: result.newFromStatus || null,
     newToStatus: result.newToStatus || null,
     reasonCode: result.decision === 'rejected' ? 'rejected' : 'dry_run_projection',
-    reason: result.reason || null,
+    reason: sanitizePublicControlledMutationReason(result.reason),
     access: buildPublicControlledMutationAccess(),
     policy: buildPublicControlledMutationPolicy(),
     confirmGate: buildPublicControlledMutationConfirmGate(args),
@@ -482,7 +501,7 @@ function buildPublicControlledMutationRejectedResult(toolName, args = {}, reason
   }, args);
 }
 
-async function executePublicControlledMutationTool(toolName, args = {}, serviceCall) {
+async function executePublicControlledMutationTool(toolName, args = {}, requestContext = {}, serviceCall) {
   if (args.dry_run === false || args.confirm === true) {
     return buildPublicControlledMutationRejectedResult(
       toolName,
@@ -491,8 +510,14 @@ async function executePublicControlledMutationTool(toolName, args = {}, serviceC
     );
   }
 
+  const actorContext = buildPublicControlledMutationActorContext(requestContext);
+  if (!actorContext.ok) {
+    return buildPublicControlledMutationRejectedResult(toolName, args, actorContext.reason);
+  }
+
   const result = await serviceCall({
     ...args,
+    actor_client_id: actorContext.actorClientId,
     dry_run: true,
     confirm: false
   });
@@ -1039,6 +1064,7 @@ function createCodexMemoryApplication(overrides = {}) {
         return executePublicControlledMutationTool(
           toolName,
           args,
+          requestContext,
           payload => validateMemoryService.validate(payload)
         );
       }
@@ -1047,6 +1073,7 @@ function createCodexMemoryApplication(overrides = {}) {
         return executePublicControlledMutationTool(
           toolName,
           args,
+          requestContext,
           payload => tombstoneMemoryService.tombstone(payload)
         );
       }
@@ -1055,6 +1082,7 @@ function createCodexMemoryApplication(overrides = {}) {
         return executePublicControlledMutationTool(
           toolName,
           args,
+          requestContext,
           payload => supersedeMemoryService.supersede(payload)
         );
       }

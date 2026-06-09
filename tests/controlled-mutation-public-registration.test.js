@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+const { DatabaseSync } = require('node:sqlite');
 
 const { createCodexMemoryApplication } = require('../src/app');
 const { CodexMemoryMcpServer } = require('../src/adapters/codex-mcp/server');
@@ -26,6 +27,60 @@ const CONTROLLED_MUTATION_TOOLS = [
 
 function sorted(values) {
   return [...values].sort();
+}
+
+function publicRequestContext(overrides = {}) {
+  return {
+    executionContext: {
+      clientId: 'codex',
+      agentAlias: 'codex',
+      requestSource: 'controlled-mutation-public-registration-test',
+      ...overrides
+    }
+  };
+}
+
+function insertRecord(dbPath, {
+  memoryId,
+  status = 'proposal',
+  clientId = 'codex',
+  visibility = 'project',
+  title = 'Controlled mutation public dry-run candidate'
+} = {}) {
+  const db = new DatabaseSync(dbPath);
+  try {
+    const columns = db.prepare('PRAGMA table_info(memory_records)').all().map(column => column.name);
+    for (const [column, type] of [
+      ['status', 'TEXT'],
+      ['status_reason', 'TEXT'],
+      ['supersedes_memory_id', 'TEXT'],
+      ['superseded_by_memory_id', 'TEXT'],
+      ['tombstone_reason', 'TEXT'],
+      ['lifecycle_updated_at', 'TEXT'],
+      ['lifecycle_actor_client_id', 'TEXT']
+    ]) {
+      if (!columns.includes(column)) {
+        db.exec(`ALTER TABLE memory_records ADD COLUMN ${column} ${type}`);
+      }
+    }
+
+    db.prepare(`
+      INSERT INTO memory_records (
+        memory_id, target, title, content, evidence, tags_json,
+        validated, reusable, sensitivity, file_path, relative_path, raw_text,
+        created_at, updated_at, project_id, workspace_id, client_id, task_id,
+        conversation_id, visibility, retention_policy, status
+      ) VALUES (
+        ?, 'process', ?, 'Type: checkpoint\\ncontrolled mutation public dry-run candidate',
+        'synthetic public dry-run evidence', '[]',
+        1, 0, 'none', NULL, NULL, NULL,
+        '2026-06-09T00:00:00.000Z', '2026-06-09T00:00:00.000Z',
+        'project-a', 'workspace-a', ?, NULL, NULL, ?, NULL, ?
+      )
+    `).run(memoryId, title, clientId, visibility, status);
+  } finally {
+    db.close();
+  }
 }
 
 async function withApp(handler) {
@@ -166,24 +221,92 @@ test('CM1472 registers only approved controlled mutation public MCP tools', asyn
 test('CM1472 public controlled mutation calls return bounded dry-run low-disclosure projection', async () => {
   await withApp(async ({ app }) => {
     for (const toolName of CONTROLLED_MUTATION_TOOLS) {
-      const payload = await app.callTool(toolName, validArgs(toolName));
+      const payload = await app.callTool(toolName, validArgs(toolName), publicRequestContext());
       assert.equal(payload.decision, 'rejected');
       assertLowDisclosureProjection(payload, toolName);
     }
   });
 });
 
-test('CM1472 public controlled mutation confirm attempts are rejected before mutation', async () => {
+test('public controlled mutation dry-run binds actor_client_id to request context', async () => {
+  await withApp(async ({ app }) => {
+    insertRecord(app.config.dbPath, {
+      memoryId: 'mem-public-dry-run',
+      status: 'proposal',
+      clientId: 'codex',
+      visibility: 'private'
+    });
+
+    const payload = await app.callTool('validate_memory', validArgs('validate_memory', {
+      actor_client_id: 'claude'
+    }), publicRequestContext({ clientId: 'codex' }));
+
+    assert.equal(payload.decision, 'dry-run');
+    assert.equal(payload.accepted, true);
+    assertLowDisclosureProjection(payload, 'validate_memory');
+  });
+});
+
+test('public controlled mutation rejects payload actor without request context actor', async () => {
+  await withApp(async ({ app }) => {
+    const payload = await app.callTool('validate_memory', validArgs('validate_memory', {
+      actor_client_id: 'codex'
+    }));
+
+    assert.equal(payload.decision, 'rejected');
+    assert.equal(payload.accepted, false);
+    assert.match(payload.reason, /request context bound actor client id/);
+    assertLowDisclosureProjection(payload, 'validate_memory');
+  });
+});
+
+test('public controlled mutation cross-client private dry-run is low-disclosure rejected', async () => {
+  await withApp(async ({ app }) => {
+    insertRecord(app.config.dbPath, {
+      memoryId: 'mem-private-claude',
+      status: 'proposal',
+      clientId: 'claude',
+      visibility: 'private'
+    });
+
+    const payload = await app.callTool('validate_memory', validArgs('validate_memory', {
+      memory_id: 'mem-private-claude',
+      actor_client_id: 'claude'
+    }), publicRequestContext({ clientId: 'codex' }));
+
+    assert.equal(payload.decision, 'rejected');
+    assert.equal(payload.accepted, false);
+    assert.equal(payload.reason, 'public controlled mutation dry-run rejected by privacy gate.');
+    assert.doesNotMatch(JSON.stringify(payload), /claude|cross-client private/i);
+    assertLowDisclosureProjection(payload, 'validate_memory');
+  });
+});
+
+test('CM1472 public controlled mutation dry_run false attempts are rejected before mutation', async () => {
   await withApp(async ({ app }) => {
     for (const toolName of CONTROLLED_MUTATION_TOOLS) {
       const payload = await app.callTool(toolName, validArgs(toolName, {
-        dry_run: false,
+        dry_run: false
+      }), publicRequestContext());
+      assert.equal(payload.decision, 'rejected');
+      assert.match(payload.reason, /separate exact mutation approval/);
+      assert.equal(payload.confirmGate.confirmRequested, false);
+      assert.equal(payload.confirmGate.dryRunRequested, false);
+      assertLowDisclosureProjection(payload, toolName);
+    }
+  });
+});
+
+test('CM1472 public controlled mutation confirm true attempts are rejected before mutation', async () => {
+  await withApp(async ({ app }) => {
+    for (const toolName of CONTROLLED_MUTATION_TOOLS) {
+      const payload = await app.callTool(toolName, validArgs(toolName, {
         confirm: true
-      }));
+      }), publicRequestContext());
       assert.equal(payload.decision, 'rejected');
       assert.match(payload.reason, /separate exact mutation approval/);
       assert.equal(payload.confirmGate.confirmRequested, true);
-      assert.equal(payload.confirmGate.dryRunRequested, false);
+      assert.equal(payload.confirmGate.dryRunRequested, true);
       assertLowDisclosureProjection(payload, toolName);
     }
   });
@@ -201,7 +324,7 @@ test('CM1472 MCP tools/call validates schema and preserves low-disclosure result
         name: 'validate_memory',
         arguments: validArgs('validate_memory')
       }
-    });
+    }, publicRequestContext());
     assert.equal(valid.response.result.isError, true);
     assertLowDisclosureProjection(valid.response.result.structuredContent, 'validate_memory');
 

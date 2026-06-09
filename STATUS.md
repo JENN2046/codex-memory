@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1478 operator exact target decision packet`.
-Current validation: `CMV-1584`.
+Current task: `CM-1479 controlled mutation public dry-run privacy gate hardening`.
+Current validation: `CMV-1585`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1478 records the placeholder-only operator decision surface for an exact target id and mutation type; no target id or mutation type is selected and confirmed mutation remains blocked`.
+Current route: `CM-1479 hardens public controlled mutation dry-run so actor identity is bound to request context and private/cross-client targets fail closed with low disclosure`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1479 controlled mutation public dry-run privacy gate hardening: updated `src/app.js` and `tests/controlled-mutation-public-registration.test.js`. Public controlled mutation dry-run no longer trusts `args.actor_client_id`; it requires a request-context-bound actor client id, overwrites the service payload actor from request context, and masks private/cross-client rejects behind a low-disclosure privacy-gate reason. Tests cover existing record allowed dry-run, actor spoofing resistance, cross-client private low-disclosure rejection, and independent `dry_run=false` / `confirm=true` fail-closed attempts. Targeted validation passed and `npm test` passed `3050/3050`. CM-1479 does not execute confirmed mutation, does not execute `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 CM-1478 operator exact target decision packet: added docs-only decision packet for a future operator-provided exact target id and mutation type. The packet records `<OPERATOR_PROVIDED_EXACT_TARGET_ID>` as a placeholder, constrains mutation type to exactly one of `validate_memory`, `tombstone_memory`, or `supersede_memory`, and states that no target id or mutation type value is selected in CM-1478. CM-1478 does not let the agent look up or select a target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
