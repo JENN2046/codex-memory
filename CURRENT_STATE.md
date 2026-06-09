@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1520 write-preflight polish closeout` |
-| Current validation | `CMV-1625` |
-| Current route | CM-1520 closes write-preflight polish and prepares final non-RC backlog lane closeout |
+| Current task | `CM-1521 non-RC backlog hardening lane final closeout` |
+| Current validation | `CMV-1626` |
+| Current route | non-RC backlog hardening lane completed; RC blockers remain open/deferred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1521` adds `docs/CM1521_NON_RC_BACKLOG_HARDENING_LANE_CLOSEOUT.md` and closes the entire non-RC backlog hardening lane as `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED`. Completed backlog items are bounded search projection regression, audit readonly refinements, audit evidence rollup, evidence vocabulary grouping, search quality evaluation, and write-preflight polish. Live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. CM-1521 does not claim readiness / `RC_READY`, close RC blockers, execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests beyond docs/board/status.
 
 `CM-1520` adds `docs/CM1520_WRITE_PREFLIGHT_POLISH_CLOSEOUT.md`, closes the non-RC backlog item `write-preflight polish` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, and records that the task-book non-RC backlog items are complete pending CM-1521 final lane closeout. This closeout is docs-only and registers CM-1519 targeted test evidence `5/5`. CM-1520 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute effective `record_memory`, execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

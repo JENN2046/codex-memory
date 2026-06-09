@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1520 write-preflight polish closeout`.
-Current validation: `CMV-1625`.
+Current checkpoint: `CM-1521 non-RC backlog hardening lane final closeout`.
+Current validation: `CMV-1626`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1521 Non-RC Backlog Hardening Lane Closeout
+
+Status: `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED`
+
+Recorded:
+
+- Added `docs/CM1521_NON_RC_BACKLOG_HARDENING_LANE_CLOSEOUT.md`.
+- Registered completed items: bounded search projection regression, audit readonly refinements, audit evidence rollup, evidence vocabulary grouping, search quality evaluation, and write-preflight polish.
+- Recorded final lane state: `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED`.
+- Kept live client evidence blocker `OPEN / DEFERRED`.
+- Kept effective write reliability blocker `OPEN / DEFERRED`.
+- Kept `RC_READY: BLOCKED`.
+- Kept overall status `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
+
+Validation: `CMV-1626` final docs/board and targeted fixture validation.
 
 ## CM-1520 Write-Preflight Polish Closeout
 

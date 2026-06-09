@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1520",
-  "validationId": "CMV-1625",
+  "taskId": "CM-1521",
+  "validationId": "CMV-1626",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1626",
+      "scope": "CM-1521 non-RC backlog hardening lane final closeout",
+      "status": "COMPLETED_VALIDATED_NON_RC_BACKLOG_HARDENING_LANE_COMPLETED_RC_READY_BLOCKED"
+    },
     {
       "id": "CMV-1625",
       "scope": "CM-1520 write-preflight polish closeout",

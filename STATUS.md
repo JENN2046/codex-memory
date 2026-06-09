@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1520 write-preflight polish closeout`.
-Current validation: `CMV-1625`.
+Current task: `CM-1521 non-RC backlog hardening lane final closeout`.
+Current validation: `CMV-1626`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1520 closes write-preflight polish and prepares final non-RC backlog lane closeout`.
+Current route: `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED; RC blockers remain open/deferred`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1521 non-RC backlog hardening lane final closeout: added `docs/CM1521_NON_RC_BACKLOG_HARDENING_LANE_CLOSEOUT.md`. Closed the non-RC backlog hardening lane as `NON_RC_BACKLOG_HARDENING_LANE_COMPLETED` and registered completed backlog items: bounded search projection regression, audit readonly refinements, audit evidence rollup, evidence vocabulary grouping, search quality evaluation, and write-preflight polish. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 
 CM-1520 write-preflight polish closeout: added `docs/CM1520_WRITE_PREFLIGHT_POLISH_CLOSEOUT.md`. Closed the non-RC backlog item `write-preflight polish` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1519 targeted test evidence `5/5`, and recorded that task-book non-RC backlog items are complete pending CM-1521 final lane closeout. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, effective `record_memory` write, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 
