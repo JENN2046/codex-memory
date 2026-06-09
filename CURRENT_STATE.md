@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1496 select next actionable RC blocker after live proof defer` |
-| Current validation | `CMV-1601` |
-| Current route | CM-1496 selects audit/search/write governance blocker classification as next actionable docs-local route |
+| Current task | `CM-1497 audit/search/write governance blocker classification` |
+| Current validation | `CMV-1602` |
+| Current route | CM-1497 classifies audit/search/write governance hardening into RC blocker, post-RC backlog, and deferred research |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1497` adds `docs/CM1497_AUDIT_SEARCH_WRITE_GOVERNANCE_BLOCKER_CLASSIFICATION.md` and sorts audit/search/write governance hardening into RC blockers, post-RC backlog, and deferred research. Decision is `CLASSIFICATION_RESULT: GOVERNANCE_ITEMS_SORTED`, with live client integration evidence and effective write reliability kept as RC blockers, six governance polish items moved to post-RC backlog, and five raw/broad/expansion/mutation items deferred. CM-1497 closes no live, write, mutation, release, provider, bearer, public expansion, or readiness blocker. It does not repair source, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, perform an effective `record_memory` write, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1496` adds `docs/CM1496_NEXT_ACTIONABLE_RC_BLOCKER_AFTER_LIVE_PROOF_DEFER.md` and selects `audit_search_write_governance_hardening_not_sorted_into_rc_blocking_vs_backlog` as the next actionable blocker after CM-1495 deferred the live client evidence blocker. Recommended next route is `CM-1497 audit/search/write governance blocker classification`. CM-1496 keeps live client evidence `STILL_OPEN_DEFERRED`, keeps confirmed mutation, provider/API, bearer-token, release/cutover, and public expansion routes blocked, and does not close any RC blocker. CM-1496 does not execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, perform an effective `record_memory` write, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -161,7 +163,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1496 selects `CM-1497 audit/search/write governance blocker classification` as the next docs-local route. Live client evidence remains open and deferred until exact operator approval. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
+CM-1497 recommends `CM-1498 audit/search/write governance classification closure audit` as the next docs-local route. Live client evidence remains open and deferred until exact operator approval. Effective write reliability remains a separate exact-approval route. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
 
 ## Boundaries
 

@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1496 select next actionable RC blocker after live proof defer`.
-Current validation: `CMV-1601`.
+Current checkpoint: `CM-1497 audit/search/write governance blocker classification`.
+Current validation: `CMV-1602`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1497 Audit/Search/Write Governance Blocker Classification
+
+Status: `COMPLETED_VALIDATED_AUDIT_SEARCH_WRITE_GOVERNANCE_CLASSIFICATION_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1497_AUDIT_SEARCH_WRITE_GOVERNANCE_BLOCKER_CLASSIFICATION.md`.
+- Classified audit/search/write governance hardening into RC blockers, post-RC backlog, and deferred research.
+- Kept live client integration evidence and effective write reliability as RC blockers.
+- Classified six governance polish items as post-RC backlog.
+- Classified five raw/broad/expansion/mutation items as deferred or separate exact-approval work.
+- Closed no live, write, mutation, release, provider, bearer, public expansion, or readiness blocker.
+- No source repair, live client call, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or effective `record_memory` write occurred.
+
+Validation: `CMV-1602` docs/board governance classification validation.
 
 ## CM-1496 Select Next Actionable RC Blocker After Live Proof Defer
 

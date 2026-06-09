@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1496",
-  "validationId": "CMV-1601",
+  "taskId": "CM-1497",
+  "validationId": "CMV-1602",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1602",
+      "scope": "CM-1497 audit/search/write governance blocker classification",
+      "status": "COMPLETED_VALIDATED_AUDIT_SEARCH_WRITE_GOVERNANCE_CLASSIFICATION_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1601",
       "scope": "CM-1496 select next actionable RC blocker after live proof defer",
