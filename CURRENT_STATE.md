@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1476 confirmed mutation target-selection no-apply preflight` |
-| Current validation | `CMV-1582` |
-| Current route | CM-1476 prepares a docs-only target-selection packet for future confirmed mutation; no live target is selected and no mutation is executed |
+| Current task | `CM-1477 confirmed mutation target-selection readiness review` |
+| Current validation | `CMV-1583` |
+| Current route | CM-1477 reviews the CM-1476 target-selection protocol as small, rollbackable, and auditable only under no-apply conditions; no live target is selected and confirmed mutation remains blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1477` adds `docs/CM1477_CONFIRMED_MUTATION_TARGET_SELECTION_READINESS_REVIEW.md` as a docs-only readiness review of the CM-1476 target-selection protocol. Decision is `GO_FOR_NEXT_NO_APPLY_OPERATOR_NAMED_CANDIDATE_OR_DRY_RUN_PROJECTION_PACKET`, `NO_GO_FOR_CONFIRMED_MUTATION`, and `NO_GO_FOR_AGENT_SELECTED_REAL_TARGET_ID`. CM-1477 records a go/no-go table, rollback readiness checklist, post-apply evidence checklist, and explicit non-claims. It does not choose a real live target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 `CM-1476` adds `docs/CM1476_CONFIRMED_MUTATION_TARGET_SELECTION_PACKET.md` as a docs-only no-apply target-selection packet. The packet defines the minimum safe target class, candidate requirements, exact target approval fields, no-apply preflight, rollback checklist, evidence checklist, and explicit non-claims. CM-1476 does not choose a real live target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 

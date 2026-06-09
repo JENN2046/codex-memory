@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1476 confirmed mutation target-selection no-apply preflight`.
-Current validation: `CMV-1582`.
+Current task: `CM-1477 confirmed mutation target-selection readiness review`.
+Current validation: `CMV-1583`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1476 prepares a docs-only target-selection packet for future confirmed mutation; no live target is selected and no mutation is executed`.
+Current route: `CM-1477 reviews the CM-1476 target-selection protocol as small, rollbackable, and auditable only under no-apply conditions; no live target is selected and confirmed mutation remains blocked`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1477 confirmed mutation target-selection readiness review: added docs-only readiness review of the CM-1476 target-selection protocol. Decision is `GO_FOR_NEXT_NO_APPLY_OPERATOR_NAMED_CANDIDATE_OR_DRY_RUN_PROJECTION_PACKET`, `NO_GO_FOR_CONFIRMED_MUTATION`, and `NO_GO_FOR_AGENT_SELECTED_REAL_TARGET_ID`. The review records a go/no-go table, rollback readiness checklist, post-apply evidence checklist, and explicit non-claims. CM-1477 does not choose a real live target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 CM-1476 confirmed mutation target-selection no-apply preflight: added docs-only target-selection packet for a future confirmed controlled mutation. The packet defines the minimum safe target class, candidate requirements, exact target approval fields, no-apply preflight, rollback checklist, evidence checklist, and explicit non-claims. CM-1476 does not choose a real live target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 

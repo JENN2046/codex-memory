@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1476 confirmed mutation target-selection no-apply preflight`.
-Current validation: `CMV-1582`.
+Current checkpoint: `CM-1477 confirmed mutation target-selection readiness review`.
+Current validation: `CMV-1583`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1477 Confirmed Mutation Target-Selection Readiness Review
+
+Status: `COMPLETED_VALIDATED_CONFIRMED_MUTATION_TARGET_SELECTION_READINESS_REVIEW_NO_APPLY`
+
+Recorded:
+
+- Added `docs/CM1477_CONFIRMED_MUTATION_TARGET_SELECTION_READINESS_REVIEW.md`.
+- Reviewed the CM-1476 target-selection protocol for minimality, rollback readiness, and auditability.
+- Decision is `GO_FOR_NEXT_NO_APPLY_OPERATOR_NAMED_CANDIDATE_OR_DRY_RUN_PROJECTION_PACKET`, `NO_GO_FOR_CONFIRMED_MUTATION`, and `NO_GO_FOR_AGENT_SELECTED_REAL_TARGET_ID`.
+- Recorded go/no-go table, rollback readiness checklist, post-apply evidence checklist, and explicit non-claims.
+- Did not select a live target id.
+- No `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1583` docs/board target-selection readiness review validation.
 
 ## CM-1476 Confirmed Mutation Target-Selection No-Apply Preflight
 
