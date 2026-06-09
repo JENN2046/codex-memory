@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1498 effective write reliability / scoped write follow-up evidence preflight`.
-Current validation: `CMV-1603`.
+Current checkpoint: `CM-1499 effective write reliability proof approval decision`.
+Current validation: `CMV-1604`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1499 Effective Write Reliability Proof Approval Decision
+
+Status: `COMPLETED_VALIDATED_EFFECTIVE_WRITE_RELIABILITY_PROOF_DECISION_REJECTED_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1499_EFFECTIVE_WRITE_RELIABILITY_PROOF_APPROVAL_DECISION.md`.
+- Decision: `REJECT_EFFECTIVE_WRITE_RELIABILITY_PROOF`.
+- Rationale: no exact `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF` operator approval string was provided.
+- Referenced CM-1498 as preflight only and did not activate it.
+- Preserved the effective write reliability blocker as open.
+- No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1604` docs/board effective write reliability proof decision validation.
 
 ## CM-1498 Effective Write Reliability Evidence Preflight
 

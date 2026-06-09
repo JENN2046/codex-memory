@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1498 effective write reliability / scoped write follow-up evidence preflight` |
-| Current validation | `CMV-1603` |
-| Current route | CM-1498 prepares effective write reliability evidence preflight without executing a write |
+| Current task | `CM-1499 effective write reliability proof approval decision` |
+| Current validation | `CMV-1604` |
+| Current route | CM-1499 records rejected effective write reliability proof approval decision without executing a write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1499` adds `docs/CM1499_EFFECTIVE_WRITE_RELIABILITY_PROOF_APPROVAL_DECISION.md` and records `REJECT_EFFECTIVE_WRITE_RELIABILITY_PROOF` because the current instruction did not provide the exact approval string `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF`. CM-1498 remains a preflight reference only and is not activated. The effective write reliability blocker remains open. CM-1499 does not execute effective `record_memory`, invalid-write proof, no-op / dry-run proof, live client calls, provider/API calls, bearer-token use, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, or readiness / `RC_READY` claim. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1498` adds `docs/CM1498_EFFECTIVE_WRITE_RELIABILITY_EVIDENCE_PREFLIGHT.md` as a docs-only evidence preflight for effective write reliability and scoped write follow-up. It defines expected evidence units, scoped write acceptance criteria, invalid-write / no-op / dry-run proof design, validation matrix, go/no-go decisions, and a future exact approval route. CM-1498 does not execute valid `record_memory`, live client calls, provider/API calls, bearer-token use, raw scan, confirmed mutation, public MCP expansion, source repair, release/tag/deploy, or readiness / `RC_READY` claim. It does not close the effective write reliability blocker. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -165,7 +167,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1498 recommends `CM-1499 scoped write evidence exact approval packet` as the next docs-local route. Live client evidence remains open and deferred until exact operator approval. Effective write reliability remains open until separately approved evidence is executed and audited. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
+CM-1499 recommends `CM-1500 effective write proof rejection closeout and blocker path review` as the next docs-local route. Live client evidence remains open and deferred until exact operator approval. Effective write reliability remains open until separately approved evidence is executed and audited. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
 
 ## Boundaries
 

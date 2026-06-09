@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1498 effective write reliability / scoped write follow-up evidence preflight`.
-Current validation: `CMV-1603`.
+Current task: `CM-1499 effective write reliability proof approval decision`.
+Current validation: `CMV-1604`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1498 prepares effective write reliability evidence preflight without executing a write`.
+Current route: `CM-1499 records rejected effective write reliability proof approval decision without executing a write`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1499 effective write reliability proof approval decision: added `docs/CM1499_EFFECTIVE_WRITE_RELIABILITY_PROOF_APPROVAL_DECISION.md`. Decision is `REJECT_EFFECTIVE_WRITE_RELIABILITY_PROOF` because no exact `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF` operator approval string was provided. CM-1498 is referenced as a preflight envelope but not activated. The effective write reliability blocker remains open. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 
 CM-1498 effective write reliability / scoped write follow-up evidence preflight: added `docs/CM1498_EFFECTIVE_WRITE_RELIABILITY_EVIDENCE_PREFLIGHT.md`. Prepared expected evidence checklist, scoped write acceptance criteria, invalid-write / no-op / dry-run proof design, validation matrix, and recommended future `CM-1499 scoped write evidence exact approval packet`. CM-1498 does not close the effective write reliability blocker. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No valid `record_memory`, live client call, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, source repair, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 

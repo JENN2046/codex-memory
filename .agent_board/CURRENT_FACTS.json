@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1498",
-  "validationId": "CMV-1603",
+  "taskId": "CM-1499",
+  "validationId": "CMV-1604",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1604",
+      "scope": "CM-1499 effective write reliability proof approval decision",
+      "status": "COMPLETED_VALIDATED_EFFECTIVE_WRITE_RELIABILITY_PROOF_DECISION_REJECTED_NO_WRITE"
+    },
     {
       "id": "CMV-1603",
       "scope": "CM-1498 effective write reliability / scoped write follow-up evidence preflight",
