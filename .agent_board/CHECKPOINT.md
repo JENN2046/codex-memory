@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1537 live client integration proof rerun after freshness guard`.
-Current validation: `CMV-1641`.
+Current checkpoint: `CM-1538 bounded local HTTP runtime refresh for live proof`.
+Current validation: `CMV-1642`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1538 Bounded Local HTTP Runtime Refresh For Live Proof
+
+Status: `COMPLETED_VALIDATED_RUNTIME_REFRESHED_FRESHNESS_MATCHED_NO_LIVE_PROOF`
+
+Recorded:
+
+- Added `docs/CM1538_BOUNDED_LOCAL_HTTP_RUNTIME_REFRESH_FOR_LIVE_PROOF.md`.
+- Recorded exact approval `APPROVE_BOUNDED_LOCAL_HTTP_RUNTIME_REFRESH_FOR_LIVE_PROOF`.
+- Stopped the stale local listener on `127.0.0.1:7605`.
+- Ran `npm run start:http:ensure`; result was healthy-and-fresh.
+- Confirmed post-refresh `/health.runtimeFreshness` is present, bounded, and matches the expected current runtime source fingerprint.
+- Persisted no actual fingerprint values, local filesystem paths, Authorization/Bearer material, token material, provider/API details, raw memory, or raw audit material.
+- No live MCP proof was executed: no `initialize`, no `tools/list`, and no `tools/call`.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, live/effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1642` runtime freshness refresh evidence plus docs/board validation.
 
 ## CM-1537 Live Client Integration Proof Rerun After Freshness Guard
 

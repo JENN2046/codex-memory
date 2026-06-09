@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1537 live client integration proof rerun after freshness guard`.
-Current validation: `CMV-1641`.
-Current handoff: exact approval received, but live proof rerun is blocked before proof requests by missing/mismatched runtime freshness.
+Current task: `CM-1538 bounded local HTTP runtime refresh for live proof`.
+Current validation: `CMV-1642`.
+Current handoff: local HTTP runtime was refreshed and runtimeFreshness now matches current runtime source; live proof remains not executed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: exact approval received, but live proof rerun is blocked before
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_PREPROOF_RUNTIME_FRESHNESS_BLOCKED_NO_LIVE_MCP_OPERATIONS / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current status: `COMPLETED_VALIDATED_RUNTIME_REFRESHED_FRESHNESS_MATCHED_NO_LIVE_PROOF / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1538 added `docs/CM1538_BOUNDED_LOCAL_HTTP_RUNTIME_REFRESH_FOR_LIVE_PROOF.md` and recorded exact-approved bounded local HTTP runtime refresh/restart evidence. The stale listener on `127.0.0.1:7605` was stopped, `npm run start:http:ensure` returned healthy-and-fresh, and post-refresh `/health.runtimeFreshness` matched the expected current runtime source fingerprint with bounded metadata only. The evidence persists no actual fingerprint values, local filesystem paths, Authorization/Bearer material, token material, provider/API details, raw memory, or raw audit material. No live MCP proof was executed: no `initialize`, no `tools/list`, and no `tools/call`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, live/effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
 - CM-1537 added `docs/CM1537_LIVE_CLIENT_INTEGRATION_PROOF_RERUN_AFTER_FRESHNESS_GUARD.md` and recorded the exact-approved no-bearer rerun attempt. Fresh Git preflight passed on clean synced `main` at `40eba239edadd879070a35903965a0fb7b9a2dec`. Runtime freshness preflight failed closed because the live HTTP runtime was healthy but current-source runtime freshness evidence was missing or mismatched. The rerun stopped before proof requests, so no `initialize`, no `tools/list`, and no `tools/call` were sent. No acceptable live proof evidence was generated. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
 - CM-1536 added `docs/CM1536_LIVE_PROOF_RERUN_READINESS_DECISION_AFTER_FRESHNESS_GUARD_AUDIT.md` and recorded decision `READY_TO_REQUEST_EXACT_OPERATOR_APPROVAL_FOR_LIVE_PROOF_RERUN` with `execution_status=NOT_EXECUTED` and `approval_status=NOT_GRANTED_BY_CM_1536`. Runtime freshness guard is audited by CM-1532/CM-1533; runner stale fingerprint short-circuit is audited by CM-1534/CM-1535. Future proof rerun must reference `docs/CM1493_LIVE_CLIENT_PROOF_APPROVAL_ENVELOPE.md`, remain no-bearer unless separately re-approved, and add a pre-proof runtime freshness match requirement with fail-closed `blocked_before_proof_requests` behavior on mismatch. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1535 added `docs/CM1535_PHASE_F1_RUNNER_FRESHNESS_SHORT_CIRCUIT_SOURCE_AUDIT.md` and completed an independent changed-scope source audit of CM-1534 without live proof execution. Confirmed fingerprint mismatch returns `PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED` with `executionMode=blocked_before_proof_requests` before `resolveMcpUrl`, `initialize`, `tools/list`, or any `tools/call`; regression evidence proves no HTTP JSON proof request continues after stale health freshness; failure reason is low-disclosure `runtime_source_fingerprint_mismatch`; blocked evidence omits actual/expected fingerprints, bearer-token material, Authorization header material, local paths, provider/API details, raw memory, and raw audit content; public MCP surface remains exactly seven tools; and no live proof automatic execution was introduced. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.

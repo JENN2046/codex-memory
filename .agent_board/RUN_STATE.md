@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1537 live client integration proof rerun after freshness guard`.
-Current validation: `CMV-1641`.
+Current task: `CM-1538 bounded local HTTP runtime refresh for live proof`.
+Current validation: `CMV-1642`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1537` received exact approval for the bounded no-bearer live proof rerun, but pre-proof runtime freshness failed closed. Fresh Git preflight passed on clean synced `main`, then `npm run start:http:ensure` reported a healthy live HTTP runtime whose current-source runtime freshness evidence was missing or mismatched. The rerun stopped before `initialize`, `tools/list`, or `tools/call`; live MCP operation count is `0`, and no acceptable proof evidence was generated. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a separate exact decision for local HTTP runtime refresh/restart or another bounded freshness remediation path; do not rerun proof or close blockers until runtime freshness matches current source on clean synced `main`.
+`CM-1538` refreshed the local HTTP runtime under exact approval and verified `/health.runtimeFreshness` now matches the expected current runtime source fingerprint. No MCP proof request was sent: `initialize=0`, `tools/list=0`, and `tools/call=0`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a separate exact decision for no-bearer live proof rerun; do not execute proof requests or close blockers from the runtime refresh evidence alone.
 
 ## Historical Run Notes
 

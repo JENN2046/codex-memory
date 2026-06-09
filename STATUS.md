@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1537 live client integration proof rerun after freshness guard`.
-Current validation: `CMV-1641`.
+Current task: `CM-1538 bounded local HTTP runtime refresh for live proof`.
+Current validation: `CMV-1642`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `BLOCKED_BEFORE_PROOF_REQUESTS_STALE_RUNTIME_FRESHNESS; live proof not executed`.
+Current route: `RUNTIME_REFRESHED_FRESHNESS_MATCHED; live proof not executed`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1538 bounded local HTTP runtime refresh for live proof: added `docs/CM1538_BOUNDED_LOCAL_HTTP_RUNTIME_REFRESH_FOR_LIVE_PROOF.md`. Exact approval `APPROVE_BOUNDED_LOCAL_HTTP_RUNTIME_REFRESH_FOR_LIVE_PROOF` was received for local runtime refresh/restart and runtimeFreshness verification only. The stale listener on `127.0.0.1:7605` was stopped, `npm run start:http:ensure` returned healthy-and-fresh, and post-refresh `/health.runtimeFreshness` matched the expected current runtime source fingerprint with bounded metadata only. The evidence persists no actual fingerprint values, local filesystem paths, Authorization/Bearer material, token material, provider/API details, raw memory, or raw audit material. No live MCP proof was executed: no `initialize`, no `tools/list`, and no `tools/call`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, live/effective-write blocker closure, readiness claim, or `RC_READY` claim occurred in CM-1538.
 
 CM-1537 live client integration proof rerun after freshness guard: added `docs/CM1537_LIVE_CLIENT_INTEGRATION_PROOF_RERUN_AFTER_FRESHNESS_GUARD.md`. The exact approval `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF_RERUN_AFTER_FRESHNESS_GUARD` was received, and fresh Git preflight confirmed clean synced `main` at `40eba239edadd879070a35903965a0fb7b9a2dec` with ahead/behind `0 0`. The runtime freshness preflight `npm run start:http:ensure` failed closed because the live HTTP endpoint was healthy but current-source runtime freshness evidence was missing or mismatched. The rerun stopped as `blocked_before_proof_requests`; no `initialize`, no `tools/list`, and no `tools/call` were sent, so no acceptable live proof evidence was generated. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, effective-write blocker closure, readiness claim, or `RC_READY` claim occurred in CM-1537.
 
