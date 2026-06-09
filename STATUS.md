@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1509 audit evidence rollup preflight`.
-Current validation: `CMV-1614`.
+Current task: `CM-1510 audit evidence rollup fixture/doc execution`.
+Current validation: `CMV-1615`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1509 prepares audit evidence rollup vocabulary, low-disclosure boundary, and fixture/doc plan`.
+Current route: `CM-1510 adds audit evidence rollup fixture/test-only regression coverage`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1510 audit evidence rollup fixture/doc execution: added `tests/fixtures/audit-evidence-rollup-cm1510-v1.json`, `tests/audit-evidence-rollup-fixture.test.js`, and `docs/CM1510_AUDIT_EVIDENCE_ROLLUP_REGRESSION_COVERAGE.md`. Added fixture/test-only coverage proving audit evidence rollup uses only bounded evidence vocabulary, strips synthetic raw private/provider/token/API-shaped fields, projects unavailable evidence as low-disclosure `blocked/deferred`, records no raw scan/write/mutation/readiness side effects, and preserves the seven-tool public MCP surface. Targeted validation `node --test tests\audit-evidence-rollup-fixture.test.js` passed `5/5`. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 
 CM-1509 audit evidence rollup preflight: added `docs/CM1509_AUDIT_EVIDENCE_ROLLUP_PREFLIGHT.md`. Defined bounded evidence rollup scope, evidence vocabulary, acceptance criteria, fixture/test plan, forbidden output families, and validation matrix for future CM-1510 fixture/doc execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 

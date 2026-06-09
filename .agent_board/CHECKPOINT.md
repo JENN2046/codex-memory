@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1509 audit evidence rollup preflight`.
-Current validation: `CMV-1614`.
+Current checkpoint: `CM-1510 audit evidence rollup fixture/doc execution`.
+Current validation: `CMV-1615`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1510 Audit Evidence Rollup Regression Coverage
+
+Status: `COMPLETED_VALIDATED_AUDIT_EVIDENCE_ROLLUP_TEST_ONLY`
+
+Recorded:
+
+- Added `tests/fixtures/audit-evidence-rollup-cm1510-v1.json`.
+- Added `tests/audit-evidence-rollup-fixture.test.js`.
+- Added `docs/CM1510_AUDIT_EVIDENCE_ROLLUP_REGRESSION_COVERAGE.md`.
+- Added fixture/test-only coverage for bounded evidence vocabulary.
+- Added projection checks that strip synthetic raw private/provider/token/API-shaped fields.
+- Added unavailable evidence low-disclosure checks.
+- Added no raw scan/write/mutation/readiness side-effect checks.
+- Added seven-tool public MCP surface check.
+- Ran `node --test tests\audit-evidence-rollup-fixture.test.js`: `5/5` passed.
+- No production source finding opened.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
+
+Validation: `CMV-1615` targeted audit evidence rollup fixture test plus docs/board validation.
 
 ## CM-1509 Audit Evidence Rollup Preflight
 

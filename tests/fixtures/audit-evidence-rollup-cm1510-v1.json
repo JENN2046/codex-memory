@@ -1,0 +1,131 @@
+{
+  "version": "audit-evidence-rollup-cm1510-v1",
+  "taskId": "CM-1510",
+  "status": "fixture_test_only",
+  "projectStatus": "NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED",
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "rollup": {
+    "allowedEvidenceTypes": [
+      "docs-only",
+      "fixture/test-only",
+      "in-process proof",
+      "blocked/deferred"
+    ],
+    "excludedEvidenceTypes": [
+      "live-runtime",
+      "effective write"
+    ],
+    "requiredRollupFields": [
+      "taskId",
+      "validationId",
+      "evidenceType",
+      "commandSummary",
+      "result",
+      "nonActions",
+      "blockerState"
+    ],
+    "sourceUnits": [
+      {
+        "taskId": "CM-1509",
+        "validationId": "CMV-1614",
+        "evidenceType": "docs-only",
+        "commandSummary": "docs preflight validation",
+        "result": "pass",
+        "nonActions": [
+          "no live client call",
+          "no provider/API",
+          "no bearer token",
+          "no raw scan",
+          "no effective record_memory",
+          "no confirmed mutation",
+          "no public MCP expansion",
+          "no readiness / RC_READY claim"
+        ],
+        "blockerState": {
+          "liveClientEvidence": "OPEN / DEFERRED",
+          "effectiveWriteReliability": "OPEN / DEFERRED"
+        }
+      },
+      {
+        "taskId": "CM-1507",
+        "validationId": "CMV-1612",
+        "evidenceType": "fixture/test-only",
+        "commandSummary": "node --test tests\\audit-memory-readonly-service.test.js tests\\audit-memory-public-contract-preflight.test.js",
+        "result": "pass 14/14",
+        "nonActions": [
+          "no production source change",
+          "no live client call",
+          "no provider/API",
+          "no bearer token",
+          "no raw scan",
+          "no effective record_memory",
+          "no confirmed mutation",
+          "no public MCP expansion",
+          "no readiness / RC_READY claim"
+        ],
+        "blockerState": {
+          "liveClientEvidence": "OPEN / DEFERRED",
+          "effectiveWriteReliability": "OPEN / DEFERRED"
+        }
+      },
+      {
+        "taskId": "CM-1488",
+        "validationId": "CMV-1593",
+        "evidenceType": "in-process proof",
+        "commandSummary": "in-process MCP public contract evidence bundle",
+        "result": "pass seven-tool bounded proof",
+        "nonActions": [
+          "no valid record_memory write",
+          "no confirmed mutation",
+          "no raw scan",
+          "no provider/API",
+          "no bearer token",
+          "no public MCP expansion",
+          "no readiness / RC_READY claim"
+        ],
+        "blockerState": {
+          "liveClientEvidence": "OPEN / DEFERRED",
+          "effectiveWriteReliability": "OPEN / DEFERRED"
+        }
+      },
+      {
+        "taskId": "LIVE-CLIENT-EVIDENCE",
+        "validationId": null,
+        "evidenceType": "blocked/deferred",
+        "commandSummary": "not executed",
+        "result": "blocked/deferred until exact approval",
+        "nonActions": [
+          "no live client call",
+          "no bearer token",
+          "no readiness / RC_READY claim"
+        ],
+        "blockerState": {
+          "liveClientEvidence": "OPEN / DEFERRED",
+          "effectiveWriteReliability": "OPEN / DEFERRED"
+        }
+      }
+    ]
+  },
+  "safety": {
+    "boundedEvidenceOnly": true,
+    "rawAuditScanPerformed": false,
+    "broadMemoryScanPerformed": false,
+    "providerApiCalled": false,
+    "bearerTokenUsed": false,
+    "effectiveRecordMemoryWrite": false,
+    "confirmedMutationExecuted": false,
+    "publicMcpExpanded": false,
+    "readinessClaimed": false,
+    "rcReadyClaimed": false,
+    "liveClientEvidenceBlocker": "OPEN / DEFERRED",
+    "effectiveWriteReliabilityBlocker": "OPEN / DEFERRED"
+  }
+}
