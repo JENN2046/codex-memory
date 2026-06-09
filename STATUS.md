@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1499 effective write reliability proof approval decision`.
-Current validation: `CMV-1604`.
+Current task: `CM-1500 effective write proof rejection closeout and blocker route review`.
+Current validation: `CMV-1605`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1499 records rejected effective write reliability proof approval decision without executing a write`.
+Current route: `CM-1500 closes out rejected effective write proof decision and defers blocker until exact approval or new route`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1500 effective write proof rejection closeout and blocker route review: added `docs/CM1500_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_ROUTE_REVIEW.md`. Decision is `EFFECTIVE_WRITE_RELIABILITY_BLOCKER_STATUS: STILL_OPEN`, `CM1499_DECISION: REJECT_EFFECTIVE_WRITE_RELIABILITY_PROOF`, `CM1498_PREFLIGHT_STATUS: AVAILABLE_NOT_ACTIVATED`, and `NEXT_ROUTE: DEFER_UNTIL_OPERATOR_EXACT_APPROVAL_OR_SELECT_ANOTHER_BLOCKER`. Effective write reliability blocker remains open and deferred. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 
 CM-1499 effective write reliability proof approval decision: added `docs/CM1499_EFFECTIVE_WRITE_RELIABILITY_PROOF_APPROVAL_DECISION.md`. Decision is `REJECT_EFFECTIVE_WRITE_RELIABILITY_PROOF` because no exact `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF` operator approval string was provided. CM-1498 is referenced as a preflight envelope but not activated. The effective write reliability blocker remains open. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 

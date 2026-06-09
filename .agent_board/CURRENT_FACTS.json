@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1499",
-  "validationId": "CMV-1604",
+  "taskId": "CM-1500",
+  "validationId": "CMV-1605",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1605",
+      "scope": "CM-1500 effective write proof rejection closeout and blocker route review",
+      "status": "COMPLETED_VALIDATED_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_NO_WRITE"
+    },
     {
       "id": "CMV-1604",
       "scope": "CM-1499 effective write reliability proof approval decision",

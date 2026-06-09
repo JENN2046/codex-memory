@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1499 effective write reliability proof approval decision`.
-Current validation: `CMV-1604`.
-Current handoff: CM-1499 rejects effective write reliability proof execution because exact approval was absent; readiness remains unclaimed.
+Current task: `CM-1500 effective write proof rejection closeout and blocker route review`.
+Current validation: `CMV-1605`.
+Current handoff: CM-1500 keeps effective write reliability blocker open after rejection and defers until exact approval or next blocker selection.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1499 rejects effective write reliability proof execution bec
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_EFFECTIVE_WRITE_RELIABILITY_PROOF_DECISION_REJECTED_NO_WRITE`.
+Current status: `COMPLETED_VALIDATED_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_NO_WRITE`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1500 added `docs/CM1500_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_ROUTE_REVIEW.md` and closed out CM-1499 rejection. Effective write reliability blocker remains `STILL_OPEN_DEFERRED`; CM-1498 preflight remains available but not activated; default route is defer until operator exact approval or select another blocker. No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1499 added `docs/CM1499_EFFECTIVE_WRITE_RELIABILITY_PROOF_APPROVAL_DECISION.md` and recorded `REJECT_EFFECTIVE_WRITE_RELIABILITY_PROOF` because no exact `APPROVE_EFFECTIVE_WRITE_RELIABILITY_PROOF` approval string was provided. CM-1498 is referenced but not activated. Effective write reliability blocker remains open. No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1498 added `docs/CM1498_EFFECTIVE_WRITE_RELIABILITY_EVIDENCE_PREFLIGHT.md` as a docs-only evidence preflight for effective write reliability and scoped write follow-up. It defines expected evidence units, scoped write acceptance criteria, invalid-write / no-op / dry-run proof design, validation matrix, and future `CM-1499 scoped write evidence exact approval packet`. CM-1498 does not close the effective write reliability blocker. No valid `record_memory`, live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, source repair, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1497 added `docs/CM1497_AUDIT_SEARCH_WRITE_GOVERNANCE_BLOCKER_CLASSIFICATION.md` and classified audit/search/write governance hardening into RC blockers, post-RC backlog, and deferred research. Live client integration evidence and effective write reliability remain RC blockers; audit readonly policy refinements, audit evidence rollup, bounded search projection regression matrix, search quality evaluation, write-preflight polish, and evidence vocabulary grouping are post-RC backlog; broad raw audit, broad memory search, batch write stress, confirmed mutation apply, and public MCP expansion are deferred or exact-approval work. CM-1497 closes no live, write, mutation, release, provider, bearer, public expansion, or readiness blocker. No source repair, live client call, bearer-token use, provider/API, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or effective write occurred.
@@ -70,7 +71,7 @@ Completed in this slice:
 - Recorded CM-1450 through CM-1488 and CMV-1560 through CMV-1593 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1604`; CM-1499 docs/board effective write reliability proof decision validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1605`; CM-1500 docs/board effective write proof rejection closeout validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
@@ -79,7 +80,7 @@ Boundaries:
 
 Next safe action:
 
-Next safe action after local commit is `CM-1500 effective write proof rejection closeout and blocker path review`, unless the operator selects a different route. Push requires separate explicit authorization. Confirmed mutation, valid write, raw/provider/bearer, public MCP expansion, release, live client proof, and readiness work remains forbidden unless separately and exactly approved.
+Next safe action after local commit is `CM-1501 select next actionable RC blocker after effective write proof defer`, unless the operator selects a different route. Push requires separate explicit authorization. Confirmed mutation, valid write, raw/provider/bearer, public MCP expansion, release, live client proof, and readiness work remains forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 

@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1499 effective write reliability proof approval decision`.
-Current validation: `CMV-1604`.
+Current checkpoint: `CM-1500 effective write proof rejection closeout and blocker route review`.
+Current validation: `CMV-1605`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1500 Effective Write Proof Rejection Closeout And Blocker Route Review
+
+Status: `COMPLETED_VALIDATED_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1500_EFFECTIVE_WRITE_PROOF_REJECTION_CLOSEOUT_AND_BLOCKER_ROUTE_REVIEW.md`.
+- Closed out CM-1499 rejection decision.
+- Recorded effective write reliability blocker as `STILL_OPEN_DEFERRED`.
+- Recorded CM-1498 preflight as available but not activated.
+- Selected default route: defer until operator exact approval or select another blocker.
+- Recommended `CM-1501 select next actionable RC blocker after effective write proof defer`.
+- No valid `record_memory`, invalid-write proof, no-op / dry-run proof, live client call, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1605` docs/board effective write proof rejection closeout validation.
 
 ## CM-1499 Effective Write Reliability Proof Approval Decision
 
