@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1475 controlled mutation confirmed apply approval packet`.
-Current validation: `CMV-1581`.
+Current checkpoint: `CM-1476 confirmed mutation target-selection no-apply preflight`.
+Current validation: `CMV-1582`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1476 Confirmed Mutation Target-Selection No-Apply Preflight
+
+Status: `COMPLETED_VALIDATED_CONFIRMED_MUTATION_TARGET_SELECTION_PACKET_NO_APPLY`
+
+Recorded:
+
+- Added `docs/CM1476_CONFIRMED_MUTATION_TARGET_SELECTION_PACKET.md`.
+- Prepared minimum safe target class, candidate requirements, exact target approval fields, no-apply preflight, rollback checklist, evidence checklist, and explicit non-claims.
+- Did not select a live target id.
+- No `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1582` docs/board target-selection packet validation.
 
 ## CM-1475 Controlled Mutation Confirmed Apply Approval Packet
 

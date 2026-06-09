@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1475 controlled mutation confirmed apply approval packet`.
-Current validation: `CMV-1581`.
+Current task: `CM-1476 confirmed mutation target-selection no-apply preflight`.
+Current validation: `CMV-1582`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1475` prepares a docs-only exact approval packet for a future single confirmed controlled mutation apply. No `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred. Next safe action is guarded local commit with message `docs: add controlled mutation apply approval packet` after validation and diff review pass.
+`CM-1476` prepares a docs-only target-selection no-apply preflight packet for future confirmed mutation. No live target id was selected, and no `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred. Next safe action is guarded local commit with message `docs: prepare confirmed mutation target selection packet` after validation and diff review pass.
 
 ## Historical Run Notes
 

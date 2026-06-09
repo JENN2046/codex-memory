@@ -4,15 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1475 controlled mutation confirmed apply approval packet`.
-Current validation: `CMV-1581`.
+Current task: `CM-1476 confirmed mutation target-selection no-apply preflight`.
+Current validation: `CMV-1582`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1475 prepares a docs-only exact approval packet for a future single confirmed mutation apply; no mutation is executed and readiness remains blocked`.
+Current route: `CM-1476 prepares a docs-only target-selection packet for future confirmed mutation; no live target is selected and no mutation is executed`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-1475 controlled mutation confirmed apply approval packet: added docs-only exact approval packet for a future single confirmed controlled mutation apply. The packet defines approval schema, pre-mutation checklist, rollback plan, post-mutation evidence checklist, validation requirements, and explicit non-claims. CM-1475 does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
+CM-1476 confirmed mutation target-selection no-apply preflight: added docs-only target-selection packet for a future confirmed controlled mutation. The packet defines the minimum safe target class, candidate requirements, exact target approval fields, no-apply preflight, rollback checklist, evidence checklist, and explicit non-claims. CM-1476 does not choose a real live target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer token, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 更新时间：2026-06-09
 

@@ -9,16 +9,18 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1475 controlled mutation confirmed apply approval packet` |
-| Current validation | `CMV-1581` |
-| Current route | CM-1475 prepares a docs-only exact approval packet for a future single confirmed mutation apply; no mutation is executed and readiness remains blocked |
+| Current task | `CM-1476 confirmed mutation target-selection no-apply preflight` |
+| Current validation | `CMV-1582` |
+| Current route | CM-1476 prepares a docs-only target-selection packet for future confirmed mutation; no live target is selected and no mutation is executed |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
 
-`CM-1475` adds `docs/CM1475_CONTROLLED_MUTATION_CONFIRMED_APPLY_APPROVAL_PACKET.md` as a docs-only exact approval packet for a future single confirmed controlled mutation apply. The packet defines exact approval schema, pre-mutation checklist, rollback plan, post-mutation evidence checklist, validation requirements, and explicit non-claims. CM-1475 does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
+`CM-1476` adds `docs/CM1476_CONFIRMED_MUTATION_TARGET_SELECTION_PACKET.md` as a docs-only no-apply target-selection packet. The packet defines the minimum safe target class, candidate requirements, exact target approval fields, no-apply preflight, rollback checklist, evidence checklist, and explicit non-claims. CM-1476 does not choose a real live target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
+
+`CM-1475` adds `docs/CM1475_CONTROLLED_MUTATION_CONFIRMED_APPLY_APPROVAL_PACKET.md` as a docs-only exact approval packet for a future single confirmed controlled mutation apply. The packet defines exact approval schema, pre-mutation checklist, rollback plan, post-mutation evidence checklist, validation requirements, and explicit non-claims. CM-1475 was pushed to `origin/main` as `87d27e178483dd0d7b5302074196b569161a8671`; post-push verification showed `HEAD == origin/main`, clean worktree, and ahead/behind `0 0`. CM-1475 does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, or remote action beyond the explicitly authorized push.
 
 `CM-1474` is a docs/board status drift reconciliation. Fresh Git checks showed a clean `main...origin/main` state before edits. The stale next-action text that still pointed at CM-1472 or a pending CM-1473 local commit is superseded: CM-1472 and CM-1473 are already completed and recorded. CM-1474 performs no source/runtime change, no MCP call, no memory read/write, no provider/API call, no bearer-token use, no raw scan, no dependency/config/watchdog/startup change, no public MCP expansion, no readiness claim, no `RC_READY` claim, no release/tag/deploy, no remote action, and no push.
 
@@ -121,7 +123,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1475 prepares only the approval packet. The next safe action is guarded local commit with message `docs: add controlled mutation apply approval packet` after validation and diff review pass. Any future confirmed mutation execution remains exact-approval / Red-boundary work.
+CM-1476 prepares only the target-selection packet. The next safe action is guarded local commit with message `docs: prepare confirmed mutation target selection packet` after validation and diff review pass. Any future target selection with a real memory id, dry-run projection, or confirmed mutation execution remains exact-approval / Red-boundary work.
 
 ## Boundaries
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1475",
-  "validationId": "CMV-1581",
+  "taskId": "CM-1476",
+  "validationId": "CMV-1582",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1582",
+      "scope": "CM-1476 confirmed mutation target-selection no-apply preflight",
+      "status": "COMPLETED_VALIDATED_CONFIRMED_MUTATION_TARGET_SELECTION_PACKET_NO_APPLY"
+    },
     {
       "id": "CMV-1581",
       "scope": "CM-1475 controlled mutation confirmed apply approval packet",
