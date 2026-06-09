@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1508 audit readonly refinements closeout and next backlog selection`.
-Current validation: `CMV-1613`.
+Current task: `CM-1509 audit evidence rollup preflight`.
+Current validation: `CMV-1614`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1508 closes audit readonly refinements as non-RC test-only backlog hardening and selects audit evidence rollup`.
+Current route: `CM-1509 prepares audit evidence rollup vocabulary, low-disclosure boundary, and fixture/doc plan`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1509 audit evidence rollup preflight: added `docs/CM1509_AUDIT_EVIDENCE_ROLLUP_PREFLIGHT.md`. Defined bounded evidence rollup scope, evidence vocabulary, acceptance criteria, fixture/test plan, forbidden output families, and validation matrix for future CM-1510 fixture/doc execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 
 CM-1508 audit readonly refinements closeout and next backlog selection: added `docs/CM1508_AUDIT_READONLY_REFINEMENT_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`. Closed the non-RC backlog item `audit readonly refinements` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1507 targeted test evidence `14/14`, and selected `audit evidence rollup` as the next non-RC backlog item. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 

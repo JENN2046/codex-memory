@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1508 audit readonly refinements closeout and next backlog selection`.
-Current validation: `CMV-1613`.
+Current checkpoint: `CM-1509 audit evidence rollup preflight`.
+Current validation: `CMV-1614`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1509 Audit Evidence Rollup Preflight
+
+Status: `COMPLETED_VALIDATED_AUDIT_EVIDENCE_ROLLUP_PREFLIGHT_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1509_AUDIT_EVIDENCE_ROLLUP_PREFLIGHT.md`.
+- Defined bounded evidence rollup scope.
+- Defined evidence vocabulary and grouping labels.
+- Defined acceptance criteria for no raw audit/broad scan, no bearer/token/provider/API leakage, no raw private fields, no write/mutation, public surface stability, and RC blocker isolation.
+- Defined future fixture/test plan and forbidden output families.
+- Recommended `CM-1510 audit evidence rollup fixture/doc execution`.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1614` docs/board preflight validation.
 
 ## CM-1508 Audit Readonly Refinement Closeout And Next Backlog Selection
 

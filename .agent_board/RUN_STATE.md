@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1508 audit readonly refinements closeout and next backlog selection`.
-Current validation: `CMV-1613`.
+Current task: `CM-1509 audit evidence rollup preflight`.
+Current validation: `CMV-1614`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1508` closed audit readonly refinements only as non-RC test-only backlog hardening and selected `audit evidence rollup` as the next non-RC backlog item. Next safe route is `CM-1509 audit evidence rollup fixture/doc preflight`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1509` prepared audit evidence rollup vocabulary, low-disclosure boundary, and fixture/doc plan. Next safe route is `CM-1510 audit evidence rollup fixture/doc execution`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

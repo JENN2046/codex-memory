@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1508",
-  "validationId": "CMV-1613",
+  "taskId": "CM-1509",
+  "validationId": "CMV-1614",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1614",
+      "scope": "CM-1509 audit evidence rollup preflight",
+      "status": "COMPLETED_VALIDATED_AUDIT_EVIDENCE_ROLLUP_PREFLIGHT_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1613",
       "scope": "CM-1508 audit readonly refinements closeout and next backlog selection",
