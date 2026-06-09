@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1524 live client integration proof execution`.
-Current validation: `CMV-1628`.
+Current checkpoint: `CM-1525 live client integration proof evidence`.
+Current validation: `CMV-1629`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1525 Live Client Integration Proof Evidence
+
+Status: `COMPLETED_VALIDATED_EVIDENCE_RECORDED_WITH_FINDING_NO_BLOCKER_CLOSE`
+
+Recorded:
+
+- Added `docs/CM1525_LIVE_CLIENT_INTEGRATION_PROOF_EVIDENCE.md`.
+- Recorded command list, redacted transcript summary, tools/list result, each tools/call result, pass/fail matrix, forbidden-boundary confirmation, and finding.
+- Finding is `LIVE_CLIENT_LOW_DISCLOSURE_NOT_FULLY_PROVEN`.
+- No additional live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, `dry_run=false`, `confirm=true`, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1525.
+- Live client evidence blocker remains pending CM-1526 closeout.
+
+Validation: `CMV-1629` docs/board evidence validation.
 
 ## CM-1524 Live Client Integration Proof Execution
 

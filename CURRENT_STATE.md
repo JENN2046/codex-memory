@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1524 live client integration proof execution` |
-| Current validation | `CMV-1628` |
-| Current route | live client integration proof executed with finding; evidence recording and closeout pending |
+| Current task | `CM-1525 live client integration proof evidence` |
+| Current validation | `CMV-1629` |
+| Current route | live client integration proof evidence recorded; blocker closeout pending CM-1526 |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1525` adds `docs/CM1525_LIVE_CLIENT_INTEGRATION_PROOF_EVIDENCE.md` and records the redacted evidence bundle for the CM-1524 no-bearer local HTTP MCP proof. Evidence records the command list, tools/list result, each bounded tools/call result, pass/fail matrix, forbidden-boundary confirmation, and finding `LIVE_CLIENT_LOW_DISCLOSURE_NOT_FULLY_PROVEN`. The proof confirms exact seven-tool public surface and no effective write/mutation/expansion/provider/bearer/raw-scan/release/readiness side effects, but does not close the live client evidence blocker because low-disclosure was not fully proven and deeper audit/controlled-mutation projection paths were unreachable without crossing the bearer-token boundary. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 
 `CM-1524` adds `docs/CM1524_LIVE_CLIENT_INTEGRATION_PROOF_EXECUTION.md` and records execution of the approved no-bearer local HTTP MCP proof. Fresh Git preflight confirmed `HEAD == origin/main == 49aefe12de34d1b75d4c59b677f8a663641ec6c5`, clean worktree, and ahead/behind `0 0` before proof. The proof executed one `initialize`, one `tools/list`, and seven bounded `tools/call` operations. `tools/list` returned exactly the seven-tool public surface. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred. Result is `PROOF_EXECUTED_WITH_FINDING`: `memory_overview` and no-token rejection summaries exposed token/raw/lifecycle-shaped wording, and no-token gating prevented deeper audit/controlled-mutation public dry-run projection proof. Live client evidence blocker is not closed by CM-1524.
 

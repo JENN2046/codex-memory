@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1524 live client integration proof execution`.
-Current validation: `CMV-1628`.
+Current task: `CM-1525 live client integration proof evidence`.
+Current validation: `CMV-1629`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1524` executed the approved no-bearer live client integration proof. The seven-tool public surface was confirmed, but the proof produced a low-disclosure finding, so the live client evidence blocker is not closed by CM-1524. Next safe step is CM-1525 evidence recording and CM-1526 blocker closeout/fail-route review. Effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+`CM-1525` recorded the redacted evidence bundle for the CM-1524 no-bearer live proof. The seven-tool public surface was confirmed, but low-disclosure was not fully proven, so the live client evidence blocker remains pending CM-1526 closeout. Effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 ## Historical Run Notes
 

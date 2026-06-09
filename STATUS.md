@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1524 live client integration proof execution`.
-Current validation: `CMV-1628`.
+Current task: `CM-1525 live client integration proof evidence`.
+Current validation: `CMV-1629`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `LIVE_CLIENT_INTEGRATION_PROOF_EXECUTED_WITH_FINDING; evidence recording and closeout pending`.
+Current route: `LIVE_CLIENT_INTEGRATION_PROOF_EVIDENCE_RECORDED_WITH_FINDING; blocker closeout pending CM-1526`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1525 live client integration proof evidence: added `docs/CM1525_LIVE_CLIENT_INTEGRATION_PROOF_EVIDENCE.md`. Recorded redacted transcript summary, tools/list result, each tools/call result, pass/fail matrix, forbidden-boundary confirmation, and finding `LIVE_CLIENT_LOW_DISCLOSURE_NOT_FULLY_PROVEN`. Live client evidence blocker remains pending CM-1526 closeout and is not closed by CM-1525. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No additional live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1525.
 
 CM-1524 live client integration proof execution: added `docs/CM1524_LIVE_CLIENT_INTEGRATION_PROOF_EXECUTION.md`. Executed the approved no-bearer local HTTP MCP proof after fresh synced-main preflight. `tools/list` returned exactly seven public tools: `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`. The proof did not fully pass because `memory_overview` and no-token rejection summaries exposed token/raw/lifecycle-shaped wording, and no-token gating prevented deeper audit/controlled-mutation public dry-run projection proof. Live client evidence blocker is not closed by CM-1524. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 
