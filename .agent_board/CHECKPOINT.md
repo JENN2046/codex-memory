@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1510 audit evidence rollup fixture/doc execution`.
-Current validation: `CMV-1615`.
+Current checkpoint: `CM-1511 audit evidence rollup closeout and next backlog selection`.
+Current validation: `CMV-1616`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1511 Audit Evidence Rollup Closeout And Next Backlog Selection
+
+Status: `COMPLETED_VALIDATED_AUDIT_EVIDENCE_ROLLUP_BACKLOG_CLOSED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1511_AUDIT_EVIDENCE_ROLLUP_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`.
+- Closed `audit evidence rollup` as `COMPLETED_FIXTURE_TEST_DOC_BACKLOG_HARDENING`.
+- Registered CM-1510 targeted test evidence: `node --test tests\audit-evidence-rollup-fixture.test.js` passed `5/5`.
+- Selected `evidence vocabulary grouping` as the next non-RC backlog item.
+- Recommended `CM-1512 evidence vocabulary grouping preflight`.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1616` docs/board closeout validation.
 
 ## CM-1510 Audit Evidence Rollup Regression Coverage
 

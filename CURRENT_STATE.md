@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1510 audit evidence rollup fixture/doc execution` |
-| Current validation | `CMV-1615` |
-| Current route | CM-1510 adds audit evidence rollup fixture/test-only regression coverage |
+| Current task | `CM-1511 audit evidence rollup closeout and next backlog selection` |
+| Current validation | `CMV-1616` |
+| Current route | CM-1511 closes audit evidence rollup as non-RC fixture/test/doc hardening and selects evidence vocabulary grouping |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1511` adds `docs/CM1511_AUDIT_EVIDENCE_ROLLUP_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closes the non-RC backlog item `audit evidence rollup` as `COMPLETED_FIXTURE_TEST_DOC_BACKLOG_HARDENING`, and selects `evidence vocabulary grouping` as the next non-RC backlog item. This closeout is docs-only and registers CM-1510 targeted test evidence `5/5`. CM-1511 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1510` adds `tests/fixtures/audit-evidence-rollup-cm1510-v1.json`, `tests/audit-evidence-rollup-fixture.test.js`, and `docs/CM1510_AUDIT_EVIDENCE_ROLLUP_REGRESSION_COVERAGE.md`. The fixture/test-only regression proves the audit evidence rollup uses only bounded evidence vocabulary, strips synthetic raw private/provider/token/API-shaped fields, projects unavailable evidence as low-disclosure `blocked/deferred`, records no raw scan/write/mutation/readiness side effects, and preserves the seven-tool public MCP surface. Targeted validation `node --test tests\audit-evidence-rollup-fixture.test.js` passed `5/5`. CM-1510 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify production source. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

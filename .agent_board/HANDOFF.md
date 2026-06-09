@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1510 audit evidence rollup fixture/doc execution`.
-Current validation: `CMV-1615`.
-Current handoff: CM-1510 added audit evidence rollup fixture/test-only regression coverage and selected CM-1511 closeout as the next safe route.
+Current task: `CM-1511 audit evidence rollup closeout and next backlog selection`.
+Current validation: `CMV-1616`.
+Current handoff: CM-1511 closed audit evidence rollup as non-RC fixture/test/doc hardening and selected evidence vocabulary grouping next.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1510 added audit evidence rollup fixture/test-only regressio
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_AUDIT_EVIDENCE_ROLLUP_TEST_ONLY`.
+Current status: `COMPLETED_VALIDATED_AUDIT_EVIDENCE_ROLLUP_BACKLOG_CLOSED_NO_READY_CLAIM`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1511 added `docs/CM1511_AUDIT_EVIDENCE_ROLLUP_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closed `audit evidence rollup` as `COMPLETED_FIXTURE_TEST_DOC_BACKLOG_HARDENING`, registered CM-1510 targeted test evidence `5/5`, and selected `evidence vocabulary grouping` as the next non-RC backlog item. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1510 added `tests/fixtures/audit-evidence-rollup-cm1510-v1.json`, `tests/audit-evidence-rollup-fixture.test.js`, and `docs/CM1510_AUDIT_EVIDENCE_ROLLUP_REGRESSION_COVERAGE.md`. Fixture/test-only coverage proves audit evidence rollup uses only bounded evidence vocabulary, strips synthetic raw private/provider/token/API-shaped fields, projects unavailable evidence as low-disclosure `blocked/deferred`, records no raw scan/write/mutation/readiness side effects, and preserves the seven-tool public MCP surface. Targeted validation `node --test tests\audit-evidence-rollup-fixture.test.js` passed `5/5`. No production source finding opened. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 - CM-1509 added `docs/CM1509_AUDIT_EVIDENCE_ROLLUP_PREFLIGHT.md` as a docs/board preflight for `audit evidence rollup`. It defines bounded evidence rollup scope, evidence vocabulary/grouping, acceptance criteria, fixture/test plan, forbidden output families, and validation matrix. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1508 added `docs/CM1508_AUDIT_READONLY_REFINEMENT_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closed `audit readonly refinements` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1507 targeted test evidence `14/14`, and selected `audit evidence rollup` as the next non-RC backlog item. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
@@ -81,7 +82,7 @@ Completed in this slice:
 - Recorded CM-1450 through CM-1488 and CMV-1560 through CMV-1593 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1615`; CM-1510 targeted audit evidence rollup fixture test and docs/board validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1616`; CM-1511 docs/board closeout validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
