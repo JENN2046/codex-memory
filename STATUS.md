@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1545 RC readiness decision record`.
-Current validation: `CMV-1649`.
+Current task: `CM-1546 scoped RC_READY closeout receipt`.
+Current validation: `CMV-1650`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `SCOPED_RC_READY_DECISION_RECORDED; release/production/cutover still require separate exact approval`.
+Current route: `SCOPED_RC_READY_MILESTONE_CLOSED_AND_ARCHIVED; release/production/cutover still require separate exact approval`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1546 scoped RC_READY closeout receipt: added `docs/CM1546_SCOPED_RC_READY_CLOSEOUT_RECEIPT.md` and archived the scoped RC line as `CLOSED / READY`. It records `SCOPED_RC_READY: YES`, `READY_DECISION: RC_READY`, and `RC_READY: SCOPED_ONLY`; production ready, release ready, and cutover ready remain `NO`. Deferred or non-claimed areas remain production readiness, release readiness, cutover readiness, complete VCP V8 implementation, broad `record_memory` reliability, production write reliability, raw audit / broad scan, confirmed mutation apply, public MCP expansion, and provider readiness. CM-1546 did not execute live proof, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, cutover, or another effective `record_memory` write.
 
 CM-1545 RC readiness decision record: added `docs/CM1545_RC_READINESS_DECISION_RECORD.md`. Decision: `READY_DECISION: RC_READY` as scoped RC readiness only. Confirmed live client evidence blocker is `CLOSED`, scoped effective write reliability proof blocker is `CLOSED`, public MCP surface remains exactly seven tools, broad `record_memory` reliability is `NOT_CLAIMED`, production write reliability is `NOT_CLAIMED`, and raw audit / broad scan, confirmed mutation apply, and public MCP expansion remain `DEFERRED`. No release/tag/deploy, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, or second effective `record_memory` write occurred. CM-1545 does not claim production readiness, release readiness, cutover readiness, provider readiness, broad memory reliability, or broad write reliability.
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1545",
-  "validationId": "CMV-1649",
+  "taskId": "CM-1546",
+  "validationId": "CMV-1650",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1650",
+      "scope": "CM-1546 scoped RC_READY closeout receipt",
+      "status": "COMPLETED_VALIDATED_SCOPED_RC_READY_MILESTONE_CLOSED_AND_ARCHIVED_NOT_RELEASE_READY"
+    },
     {
       "id": "CMV-1649",
       "scope": "CM-1545 RC readiness decision record",

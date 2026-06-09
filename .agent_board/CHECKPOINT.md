@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1545 RC readiness decision record`.
-Current validation: `CMV-1649`.
+Current checkpoint: `CM-1546 scoped RC_READY closeout receipt`.
+Current validation: `CMV-1650`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1546 Scoped RC_READY Closeout Receipt
+
+Status: `COMPLETED_VALIDATED_SCOPED_RC_READY_MILESTONE_CLOSED_AND_ARCHIVED_NOT_RELEASE_READY`
+
+Recorded:
+
+- Added `docs/CM1546_SCOPED_RC_READY_CLOSEOUT_RECEIPT.md`.
+- Recorded `codex-memory scoped RC line: CLOSED / READY`.
+- Preserved `SCOPED_RC_READY: YES`, `READY_DECISION: RC_READY`, and `RC_READY: SCOPED_ONLY`.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- Recorded closed evidence chain: live client evidence blocker, scoped effective write reliability blocker, final blocker inventory review, scoped RC readiness decision, and non-RC backlog hardening lane.
+- Recorded deferred risks: production readiness, release readiness, cutover readiness, complete VCP V8 implementation, broad `record_memory` reliability, production write reliability, raw audit / broad scan, confirmed mutation apply, public MCP expansion, and provider readiness.
+- Listed future route options without selecting or executing them.
+- No live proof, provider/API call, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, cutover, or second effective `record_memory` write occurred.
+
+Validation: `CMV-1650` scoped RC closeout validation.
 
 ## CM-1545 RC Readiness Decision Record
 

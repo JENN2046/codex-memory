@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1545 RC readiness decision record`.
-Current validation: `CMV-1649`.
+Current task: `CM-1546 scoped RC_READY closeout receipt`.
+Current validation: `CMV-1650`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1545` recorded `READY_DECISION: RC_READY` as scoped RC readiness only. Live client evidence blocker and scoped effective write reliability proof blocker are closed, and the public MCP surface remains seven tools. Broad `record_memory` reliability and production write reliability are not claimed; raw audit / broad scan, confirmed mutation apply, public MCP expansion, release/tag/deploy/cutover, provider/API, bearer-token path, additional effective writes, and production-readiness claims remain separately approval-bound.
+`CM-1546` closed and archived the scoped RC milestone. `SCOPED_RC_READY: YES`, `READY_DECISION: RC_READY`, and `RC_READY: SCOPED_ONLY` are recorded. Production ready, release ready, and cutover ready remain `NO`; complete VCP V8, broad `record_memory` reliability, production write reliability, raw audit / broad scan, confirmed mutation apply, public MCP expansion, provider readiness, release/tag/deploy/cutover, bearer-token path, and additional effective writes remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 
