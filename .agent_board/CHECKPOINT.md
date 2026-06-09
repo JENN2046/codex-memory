@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1501 RC blocker route freeze after dual proof defer`.
-Current validation: `CMV-1606`.
+Current checkpoint: `CM-1502 operator action needed handoff after RC route freeze`.
+Current validation: `CMV-1607`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1502 Operator Action Needed Handoff After RC Route Freeze
+
+Status: `COMPLETED_VALIDATED_OPERATOR_ACTION_NEEDED_HANDOFF_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1502_OPERATOR_ACTION_NEEDED_HANDOFF_AFTER_RC_ROUTE_FREEZE.md`.
+- Recorded route state as `HARD_STOP_OPERATOR_ACTION_NEEDED`.
+- Recorded live client evidence blocker as `OPEN / DEFERRED`.
+- Recorded effective write reliability blocker as `OPEN / DEFERRED`.
+- Recorded `RC_READY` as `BLOCKED`.
+- Recorded that no further RC readiness progression is allowed without exact approval.
+- Listed exact approval options, remaining RC blockers, and allowed next operator choices.
+- No blocker closure, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1607` docs/board operator-action-needed handoff validation.
 
 ## CM-1501 RC Blocker Route Freeze After Dual Proof Defer
 

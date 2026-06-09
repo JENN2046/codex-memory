@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1501",
-  "validationId": "CMV-1606",
+  "taskId": "CM-1502",
+  "validationId": "CMV-1607",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1607",
+      "scope": "CM-1502 operator action needed handoff after RC route freeze",
+      "status": "COMPLETED_VALIDATED_OPERATOR_ACTION_NEEDED_HANDOFF_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1606",
       "scope": "CM-1501 RC blocker route freeze after dual proof defer",

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1501 RC blocker route freeze after dual proof defer`.
-Current validation: `CMV-1606`.
+Current task: `CM-1502 operator action needed handoff after RC route freeze`.
+Current validation: `CMV-1607`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1501` recommends `CM-1502 operator action decision after RC blocker route freeze` as the next docs-local route. Live client evidence and effective write reliability remain open and deferred until exact operator approval. Any live client proof, effective write proof, bearer-token use, provider/API call, confirmed mutation, public MCP expansion, release/tag/deploy, or readiness claim remains separate exact-approval / Red-boundary work.
+`CM-1502` records `OPERATOR_ACTION_NEEDED` as the current Hard Stop handoff. Next movement requires operator choice: exact approval for one proof route, docs-only envelope repair, another local-safe blocker selection, or continued pause. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

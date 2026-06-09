@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1501 RC blocker route freeze after dual proof defer`.
-Current validation: `CMV-1606`.
+Current task: `CM-1502 operator action needed handoff after RC route freeze`.
+Current validation: `CMV-1607`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1501 freezes RC blocker route until operator exact approval or local-safe blocker selection`.
+Current route: `CM-1502 records Hard Stop / operator action needed after RC route freeze`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1502 operator action needed handoff after RC route freeze: added `docs/CM1502_OPERATOR_ACTION_NEEDED_HANDOFF_AFTER_RC_ROUTE_FREEZE.md`. Decision is `ROUTE_STATE: HARD_STOP_OPERATOR_ACTION_NEEDED`; live client evidence blocker is `OPEN / DEFERRED`; effective write reliability blocker is `OPEN / DEFERRED`; `RC_READY` is `BLOCKED`; no further RC readiness progression is allowed without exact approval. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No blocker closure, live client call, effective `record_memory` write, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 
 CM-1501 RC blocker route freeze after dual proof defer: added `docs/CM1501_RC_BLOCKER_ROUTE_FREEZE_AFTER_DUAL_PROOF_DEFER.md`. Decision is `RC_BLOCKER_ROUTE_STATUS: FROZEN_OPERATOR_ACTION_NEEDED`, `LIVE_CLIENT_PROOF_STATUS: DEFERRED_UNTIL_OPERATOR_EXACT_APPROVAL`, `EFFECTIVE_WRITE_PROOF_STATUS: DEFERRED_UNTIL_OPERATOR_EXACT_APPROVAL`, and `READY_ROUTE_STATUS: BLOCKED_NO_READY_CLAIM`. Remaining RC blockers and exact approval options are listed. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No blocker closure, readiness or `RC_READY` claim, live client call, effective `record_memory` write, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, source repair, or release/tag/deploy occurred.
 

@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1501 RC blocker route freeze after dual proof defer` |
-| Current validation | `CMV-1606` |
-| Current route | CM-1501 freezes RC blocker route until operator exact approval or local-safe blocker selection |
+| Current task | `CM-1502 operator action needed handoff after RC route freeze` |
+| Current validation | `CMV-1607` |
+| Current route | CM-1502 records Hard Stop / operator action needed after RC route freeze |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1502` adds `docs/CM1502_OPERATOR_ACTION_NEEDED_HANDOFF_AFTER_RC_ROUTE_FREEZE.md` and records the post-freeze handoff. Decision is `ROUTE_STATE: HARD_STOP_OPERATOR_ACTION_NEEDED`, `LIVE_CLIENT_EVIDENCE_BLOCKER: OPEN / DEFERRED`, `EFFECTIVE_WRITE_RELIABILITY_BLOCKER: OPEN / DEFERRED`, `RC_READY: BLOCKED`, and `NO_FURTHER_RC_READINESS_PROGRESSION_WITHOUT_EXACT_APPROVAL: true`. CM-1502 does not close blockers, execute live client calls, perform effective `record_memory`, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1501` adds `docs/CM1501_RC_BLOCKER_ROUTE_FREEZE_AFTER_DUAL_PROOF_DEFER.md` and freezes the RC blocker route after both live client proof and effective write proof were deferred. Decision is `RC_BLOCKER_ROUTE_STATUS: FROZEN_OPERATOR_ACTION_NEEDED`, `LIVE_CLIENT_PROOF_STATUS: DEFERRED_UNTIL_OPERATOR_EXACT_APPROVAL`, `EFFECTIVE_WRITE_PROOF_STATUS: DEFERRED_UNTIL_OPERATOR_EXACT_APPROVAL`, and `READY_ROUTE_STATUS: BLOCKED_NO_READY_CLAIM`. CM-1501 does not close blockers, claim readiness / `RC_READY`, execute live client calls, perform effective `record_memory`, call provider/API, use bearer-token material, perform raw scan, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or source repair. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -171,7 +173,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1501 recommends `CM-1502 operator action decision after RC blocker route freeze` as the next docs-local route. Live client evidence and effective write reliability remain open and deferred until exact operator approval. Any live client/integration proof, bearer-token use, provider/API call, confirmed mutation, release/cutover, public MCP expansion, or effective memory write remains separate exact-approval / Red-boundary work.
+CM-1502 records `OPERATOR_ACTION_NEEDED` as the current handoff. Next movement requires an operator choice: exact approval for one proof route, docs-only envelope repair, another local-safe blocker selection, or continued pause. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Boundaries
 
