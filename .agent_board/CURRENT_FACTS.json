@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1487",
-  "validationId": "CMV-1592",
+  "taskId": "CM-1488",
+  "validationId": "CMV-1593",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1593",
+      "scope": "CM-1488 post-closeout public contract evidence bundle exact proof",
+      "status": "COMPLETED_VALIDATED_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1592",
       "scope": "CM-1487 post-closeout public contract evidence bundle preflight",

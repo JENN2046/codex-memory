@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1487 post-closeout public contract evidence bundle preflight`.
-Current validation: `CMV-1592`.
+Current checkpoint: `CM-1488 post-closeout public contract evidence bundle exact proof`.
+Current validation: `CMV-1593`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1488 Post-Closeout Public Contract Evidence Bundle
+
+Status: `COMPLETED_VALIDATED_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1488_POST_CLOSEOUT_PUBLIC_CONTRACT_EVIDENCE_BUNDLE.md`.
+- Executed one in-process MCP `initialize`.
+- Executed one in-process MCP `tools/list`; result matched exactly seven expected public tools.
+- Executed invalid-args rejections for `record_memory`, `search_memory`, and `memory_overview`.
+- Executed readonly bounded `audit_memory`.
+- Executed safe public dry-run low-disclosure `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- No valid `record_memory` write, confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer-token use, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1593` in-process MCP evidence plus required source/test/docs validation.
 
 ## CM-1487 Public Contract Evidence Bundle Preflight
 

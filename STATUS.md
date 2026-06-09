@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1487 post-closeout public contract evidence bundle preflight`.
-Current validation: `CMV-1592`.
+Current task: `CM-1488 post-closeout public contract evidence bundle exact proof`.
+Current validation: `CMV-1593`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1487 prepares the seven-tool public contract evidence bundle preflight without live MCP calls`.
+Current route: `CM-1488 records in-process MCP seven-tool public contract evidence bundle without readiness claim`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1488 post-closeout public contract evidence bundle exact proof: added `docs/CM1488_POST_CLOSEOUT_PUBLIC_CONTRACT_EVIDENCE_BUNDLE.md` and recorded a fresh in-process MCP proof for the seven-tool public contract. Proof executed one `initialize`, one `tools/list`, three invalid-args `tools/call` rejections for `record_memory`, `search_memory`, and `memory_overview`, one readonly bounded `audit_memory` call, and safe public dry-run low-disclosure calls for `validate_memory`, `tombstone_memory`, and `supersede_memory`. `tools/list` returned exactly seven tools. `record_memory` was not called with valid write arguments. No confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer token use, new public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 
 CM-1487 post-closeout public contract evidence bundle preflight: added `docs/CM1487_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_PREFLIGHT.md`. The preflight defines expected `tools/list` contract, expected `tools/call` low-disclosure assertions, evidence checklist shape, validation matrix, and future exact proof boundary. CM-1487 does not execute live MCP `tools/list` or `tools/call`, fix source, expand public MCP tools, execute confirmed mutation, use `dry_run=false`, use `confirm=true`, perform raw scan, call provider/API, use bearer token material, or claim readiness / `RC_READY`.
 

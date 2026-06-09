@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1487 post-closeout public contract evidence bundle preflight`.
-Current validation: `CMV-1592`.
+Current task: `CM-1488 post-closeout public contract evidence bundle exact proof`.
+Current validation: `CMV-1593`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1487` records docs-only public contract evidence bundle preflight for the seven-tool surface. It defines expected `tools/list`, expected `tools/call` low-disclosure assertions, evidence checklist design, and future exact proof boundary without live MCP calls. Next safe action is guarded local commit with message `docs: prepare public contract evidence bundle preflight` after validation and diff review pass. Push requires separate explicit authorization.
+`CM-1488` records a fresh in-process MCP seven-tool public contract evidence bundle without readiness claim. Next safe action is guarded local commit with message `docs: record post-closeout public contract evidence bundle` after validation and diff review pass. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 
