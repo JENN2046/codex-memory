@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1511",
-  "validationId": "CMV-1616",
+  "taskId": "CM-1512",
+  "validationId": "CMV-1617",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1617",
+      "scope": "CM-1512 evidence vocabulary grouping preflight",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1616",
       "scope": "CM-1511 audit evidence rollup closeout and next backlog selection",

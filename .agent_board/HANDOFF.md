@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1511 audit evidence rollup closeout and next backlog selection`.
-Current validation: `CMV-1616`.
-Current handoff: CM-1511 closed audit evidence rollup as non-RC fixture/test/doc hardening and selected evidence vocabulary grouping next.
+Current task: `CM-1512 evidence vocabulary grouping preflight`.
+Current validation: `CMV-1617`.
+Current handoff: CM-1512 prepared evidence vocabulary grouping fixture/test boundaries; next safe route is CM-1513.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1511 closed audit evidence rollup as non-RC fixture/test/doc
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_AUDIT_EVIDENCE_ROLLUP_BACKLOG_CLOSED_NO_READY_CLAIM`.
+Current status: `COMPLETED_VALIDATED_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT_NO_READY_CLAIM`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1512 added `docs/CM1512_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT.md` as a docs/board preflight for `evidence vocabulary grouping`. It defines evidence group names, allowed evidence families, forbidden evidence families, low-disclosure grouping rules, fixture/test plan, and acceptance criteria for CM-1513. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1511 added `docs/CM1511_AUDIT_EVIDENCE_ROLLUP_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closed `audit evidence rollup` as `COMPLETED_FIXTURE_TEST_DOC_BACKLOG_HARDENING`, registered CM-1510 targeted test evidence `5/5`, and selected `evidence vocabulary grouping` as the next non-RC backlog item. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1510 added `tests/fixtures/audit-evidence-rollup-cm1510-v1.json`, `tests/audit-evidence-rollup-fixture.test.js`, and `docs/CM1510_AUDIT_EVIDENCE_ROLLUP_REGRESSION_COVERAGE.md`. Fixture/test-only coverage proves audit evidence rollup uses only bounded evidence vocabulary, strips synthetic raw private/provider/token/API-shaped fields, projects unavailable evidence as low-disclosure `blocked/deferred`, records no raw scan/write/mutation/readiness side effects, and preserves the seven-tool public MCP surface. Targeted validation `node --test tests\audit-evidence-rollup-fixture.test.js` passed `5/5`. No production source finding opened. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 - CM-1509 added `docs/CM1509_AUDIT_EVIDENCE_ROLLUP_PREFLIGHT.md` as a docs/board preflight for `audit evidence rollup`. It defines bounded evidence rollup scope, evidence vocabulary/grouping, acceptance criteria, fixture/test plan, forbidden output families, and validation matrix. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.

@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1511 audit evidence rollup closeout and next backlog selection` |
-| Current validation | `CMV-1616` |
-| Current route | CM-1511 closes audit evidence rollup as non-RC fixture/test/doc hardening and selects evidence vocabulary grouping |
+| Current task | `CM-1512 evidence vocabulary grouping preflight` |
+| Current validation | `CMV-1617` |
+| Current route | CM-1512 prepares evidence vocabulary grouping fixture/test boundaries for the non-RC backlog lane |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1512` adds `docs/CM1512_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT.md` as a docs/board preflight for the non-RC backlog item `evidence vocabulary grouping`. It defines evidence group names, allowed evidence families, forbidden evidence families, low-disclosure grouping rules, fixture/test plan, and acceptance criteria for future CM-1513 fixture/test execution. CM-1512 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1511` adds `docs/CM1511_AUDIT_EVIDENCE_ROLLUP_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closes the non-RC backlog item `audit evidence rollup` as `COMPLETED_FIXTURE_TEST_DOC_BACKLOG_HARDENING`, and selects `evidence vocabulary grouping` as the next non-RC backlog item. This closeout is docs-only and registers CM-1510 targeted test evidence `5/5`. CM-1511 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

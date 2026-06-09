@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1511 audit evidence rollup closeout and next backlog selection`.
-Current validation: `CMV-1616`.
+Current task: `CM-1512 evidence vocabulary grouping preflight`.
+Current validation: `CMV-1617`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1511` closed audit evidence rollup only as non-RC fixture/test/doc hardening and selected `evidence vocabulary grouping` as the next non-RC backlog item. Next safe route is `CM-1512 evidence vocabulary grouping preflight`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1512` prepared evidence vocabulary grouping as a docs/board preflight for future fixture/test-only execution. Next safe route is `CM-1513 evidence vocabulary grouping fixture/test execution`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

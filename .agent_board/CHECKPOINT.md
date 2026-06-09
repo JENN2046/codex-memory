@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1511 audit evidence rollup closeout and next backlog selection`.
-Current validation: `CMV-1616`.
+Current checkpoint: `CM-1512 evidence vocabulary grouping preflight`.
+Current validation: `CMV-1617`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1512 Evidence Vocabulary Grouping Preflight
+
+Status: `COMPLETED_VALIDATED_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1512_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT.md`.
+- Defined seven evidence groups for bounded public contract, readonly audit, bounded search projection, audit rollup, write preflight, deferred RC proof, and forbidden/unavailable evidence.
+- Defined allowed and forbidden evidence families.
+- Defined low-disclosure grouping rules and future CM-1513 fixture/test plan.
+- Kept live client evidence blocker `OPEN / DEFERRED`.
+- Kept effective write reliability blocker `OPEN / DEFERRED`.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1617` docs/board preflight validation.
 
 ## CM-1511 Audit Evidence Rollup Closeout And Next Backlog Selection
 
