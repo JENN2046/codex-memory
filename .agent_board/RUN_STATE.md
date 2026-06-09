@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1497 audit/search/write governance blocker classification`.
-Current validation: `CMV-1602`.
+Current task: `CM-1498 effective write reliability / scoped write follow-up evidence preflight`.
+Current validation: `CMV-1603`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1497` recommends `CM-1498 audit/search/write governance classification closure audit` as the next docs-local route. Live client evidence remains open and deferred until exact operator approval. Effective write reliability remains separate exact-approval work. Push requires separate explicit authorization.
+`CM-1498` recommends `CM-1499 scoped write evidence exact approval packet` as the next docs-local route. Live client evidence remains open and deferred until exact operator approval. Effective write reliability remains open until separately approved evidence is executed and audited. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 

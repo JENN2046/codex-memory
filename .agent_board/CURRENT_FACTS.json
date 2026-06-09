@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1497",
-  "validationId": "CMV-1602",
+  "taskId": "CM-1498",
+  "validationId": "CMV-1603",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1603",
+      "scope": "CM-1498 effective write reliability / scoped write follow-up evidence preflight",
+      "status": "COMPLETED_VALIDATED_EFFECTIVE_WRITE_RELIABILITY_PREFLIGHT_NO_WRITE"
+    },
     {
       "id": "CMV-1602",
       "scope": "CM-1497 audit/search/write governance blocker classification",

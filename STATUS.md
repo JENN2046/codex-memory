@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1497 audit/search/write governance blocker classification`.
-Current validation: `CMV-1602`.
+Current task: `CM-1498 effective write reliability / scoped write follow-up evidence preflight`.
+Current validation: `CMV-1603`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1497 classifies audit/search/write governance hardening into RC blocker, post-RC backlog, and deferred research`.
+Current route: `CM-1498 prepares effective write reliability evidence preflight without executing a write`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1498 effective write reliability / scoped write follow-up evidence preflight: added `docs/CM1498_EFFECTIVE_WRITE_RELIABILITY_EVIDENCE_PREFLIGHT.md`. Prepared expected evidence checklist, scoped write acceptance criteria, invalid-write / no-op / dry-run proof design, validation matrix, and recommended future `CM-1499 scoped write evidence exact approval packet`. CM-1498 does not close the effective write reliability blocker. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No valid `record_memory`, live client call, provider/API call, bearer-token use, raw scan, confirmed mutation, public MCP expansion, source repair, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 
 CM-1497 audit/search/write governance blocker classification: added `docs/CM1497_AUDIT_SEARCH_WRITE_GOVERNANCE_BLOCKER_CLASSIFICATION.md`. Classified audit/search/write governance hardening into RC blockers, post-RC backlog, and deferred research. Live client integration evidence and effective write reliability remain RC blockers; audit readonly policy refinements, audit evidence rollup, bounded search projection regression matrix, search quality evaluation, write-preflight polish, and evidence vocabulary grouping are post-RC backlog; broad raw audit, broad memory search, batch write stress, confirmed mutation apply, and public MCP expansion are deferred or exact-approval work. CM-1497 closes no live, write, mutation, release, provider, bearer, public expansion, or readiness blocker. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No source repair, readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer token use, public MCP expansion, live client call, or effective `record_memory` write occurred.
 

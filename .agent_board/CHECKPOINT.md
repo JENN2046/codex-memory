@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1497 audit/search/write governance blocker classification`.
-Current validation: `CMV-1602`.
+Current checkpoint: `CM-1498 effective write reliability / scoped write follow-up evidence preflight`.
+Current validation: `CMV-1603`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1498 Effective Write Reliability Evidence Preflight
+
+Status: `COMPLETED_VALIDATED_EFFECTIVE_WRITE_RELIABILITY_PREFLIGHT_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1498_EFFECTIVE_WRITE_RELIABILITY_EVIDENCE_PREFLIGHT.md`.
+- Defined expected evidence checklist for invalid-write rejection, no-op / dry-run proof, scoped payload approval packet, post-write follow-up search packet, and closeout audit.
+- Defined scoped write acceptance criteria: synthetic governance-safe payload, exact scope fields, one declared target, process signal where applicable, one-write limit, sanitized output, separate follow-up approval, and scoped-only claim boundary.
+- Defined invalid-write / no-op / dry-run proof design without executing any write.
+- Recommended future `CM-1499 scoped write evidence exact approval packet`.
+- Did not close the effective write reliability blocker.
+- No valid `record_memory`, live client call, bearer-token use, provider/API call, confirmed mutation, raw scan, public MCP expansion, source repair, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1603` docs/board effective write reliability preflight validation.
 
 ## CM-1497 Audit/Search/Write Governance Blocker Classification
 
