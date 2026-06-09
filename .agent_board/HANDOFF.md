@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening`.
-Current validation: `CMV-1587`.
-Current handoff: CM-1481 makes public controlled mutation dry-run uniformly low disclosure; confirmed mutation remains blocked.
+Current task: `CM-1483 controlled mutation public surface closeout receipt`.
+Current validation: `CMV-1588`.
+Current handoff: CM-1483 closes controlled mutation public surface stage; confirmed mutation remains blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1481 makes public controlled mutation dry-run uniformly low 
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_PUBLIC_DRY_RUN_UNIFORMLY_LOW_DISCLOSURE`.
+Current status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_SURFACE_CLOSEOUT_NO_MUTATION`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1483 added `docs/CM1483_CONTROLLED_MUTATION_PUBLIC_SURFACE_CLOSEOUT_RECEIPT.md`, recorded the seven-tool public MCP contract, completed controlled mutation public-surface capabilities, remaining blockers, and next-phase prerequisites. Confirmed mutation remains separate exact approval work.
 - CM-1481 updated `src/app.js` and `tests/controlled-mutation-public-registration.test.js` so public controlled mutation dry-run no longer exposes `accepted=true`, `decision=dry-run`, `fromStatus`, `toStatus`, `newFromStatus`, or `newToStatus`, including for same-actor existing allowed-transition records.
 - CM-1480 added `docs/CM1480_CONTROLLED_MUTATION_SAME_ACTOR_TARGET_PROBING_POLICY_REVIEW.md` and decided same-actor public controlled mutation dry-run must not expose `accepted=true`, `decision=dry-run`, `fromStatus`, `toStatus`, `newFromStatus`, or `newToStatus`; future source/test hardening should unify public projection to low disclosure. No runtime/source change occurred in CM-1480.
 - CM-1479 updated `src/app.js` and `tests/controlled-mutation-public-registration.test.js` so public controlled mutation dry-run binds actor identity to request context, rejects missing context actor, masks private/cross-client rejects, and tests existing record allowed dry-run plus independent `dry_run=false` / `confirm=true` fail-closed attempts.
@@ -50,10 +51,10 @@ Completed in this slice:
 - CM-1452 bridged the release gate matrix to default-safe runner exclusions without package script changes.
 - CM-1453 reinforced readonly `audit_memory` draft validation against mutation-like inputs without public MCP registration.
 - CM-1454 selected no further automatic local-safe slice.
-- Recorded CM-1450 through CM-1481 and CMV-1560 through CMV-1587 in `.agent_board`.
+- Recorded CM-1450 through CM-1483 and CMV-1560 through CMV-1588 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1587`; CM-1481 source/test/docs validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1588`; CM-1483 docs/board closeout validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
@@ -62,7 +63,7 @@ Boundaries:
 
 Next safe action:
 
-Next safe action is guarded local commit with message `fix: make controlled mutation public dry-run uniformly low-disclosure` after validation and diff review pass. Push requires separate explicit authorization. Confirmed mutation, real DB apply, raw/memory/provider/bearer/remote/readiness work remains forbidden unless separately and exactly approved.
+Next safe action is guarded local commit with message `docs: close out controlled mutation public surface` after validation and diff review pass. Push requires separate explicit authorization. Confirmed mutation, real DB apply, raw/memory/provider/bearer/remote/readiness work remains forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 

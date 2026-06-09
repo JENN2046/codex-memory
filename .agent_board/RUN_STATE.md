@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening`.
-Current validation: `CMV-1587`.
+Current task: `CM-1483 controlled mutation public surface closeout receipt`.
+Current validation: `CMV-1588`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1481` hardens public controlled mutation dry-run projection so same-actor allowed transitions do not expose target existence, eligibility, or lifecycle metadata. Next safe action is guarded local commit with message `fix: make controlled mutation public dry-run uniformly low-disclosure` after validation and diff review pass. Push requires separate explicit authorization.
+`CM-1483` records a docs-only controlled mutation public surface closeout receipt. The current public MCP contract is seven tools, and confirmed mutation remains blocked pending separate exact approval. Next safe action is guarded local commit with message `docs: close out controlled mutation public surface` after validation and diff review pass. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 

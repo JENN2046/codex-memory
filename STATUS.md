@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening`.
-Current validation: `CMV-1587`.
+Current task: `CM-1483 controlled mutation public surface closeout receipt`.
+Current validation: `CMV-1588`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1481 makes public controlled mutation dry-run projection uniformly low disclosure so same-actor allowed transitions do not expose accepted/status transition metadata`.
+Current route: `CM-1483 closes controlled mutation public surface stage as docs-only evidence; seven-tool public contract recorded and confirmed mutation remains separate exact approval`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1483 controlled mutation public surface closeout receipt: added `docs/CM1483_CONTROLLED_MUTATION_PUBLIC_SURFACE_CLOSEOUT_RECEIPT.md`. The closeout records the current seven-tool public MCP contract: `record_memory`, `search_memory`, `memory_overview`, `audit_memory`, `validate_memory`, `tombstone_memory`, and `supersede_memory`. It records completed public-surface capabilities, remaining blocked items, and next-phase prerequisites. Confirmed mutation remains blocked and requires separate exact approval naming one operator-provided target id and one mutation type. CM-1483 does not execute confirmed mutation, does not execute `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening: updated `src/app.js` and `tests/controlled-mutation-public-registration.test.js`. Public controlled mutation dry-run projection now always reports `accepted=false` and `decision=rejected`, keeps `dryRun=true` and `mutated=false`, uses `reasonCode=public_dry_run_low_disclosure`, and suppresses `fromStatus`, `toStatus`, `newFromStatus`, and `newToStatus`. Tests cover same-actor existing allowed-transition records and assert no lifecycle metadata leakage, while preserving request-context actor binding, private/cross-client low-disclosure rejection, and independent `dry_run=false` / `confirm=true` fail-closed handling. CM-1481 does not execute confirmed mutation, does not execute `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 

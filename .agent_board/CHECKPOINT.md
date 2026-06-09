@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening`.
-Current validation: `CMV-1587`.
+Current checkpoint: `CM-1483 controlled mutation public surface closeout receipt`.
+Current validation: `CMV-1588`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1483 Controlled Mutation Public Surface Closeout Receipt
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_SURFACE_CLOSEOUT_NO_MUTATION`
+
+Recorded:
+
+- Added `docs/CM1483_CONTROLLED_MUTATION_PUBLIC_SURFACE_CLOSEOUT_RECEIPT.md`.
+- Recorded current public MCP contract as exactly seven tools: `record_memory`, `search_memory`, `memory_overview`, `audit_memory`, `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- Recorded completed controlled mutation public-surface capabilities from CM-1468 through CM-1482.
+- Recorded remaining blocked items, including confirmed mutation, `dry_run=false`, `confirm=true`, target selection by agent, raw scan, provider/API, bearer token, release/tag/deploy, and readiness/`RC_READY` claims.
+- Recorded next-phase prerequisites for any future confirmed controlled mutation: exact operator-provided target id, exact mutation type, exact approval, rollback plan, evidence checklist, and validation plan.
+- No confirmed mutation, `dry_run=false` execution, `confirm=true` execution, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1588` docs/board closeout validation.
 
 ## CM-1481 Controlled Mutation Public Dry-Run Uniform Low-Disclosure Runtime Hardening
 

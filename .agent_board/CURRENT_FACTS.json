@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1481",
-  "validationId": "CMV-1587",
+  "taskId": "CM-1483",
+  "validationId": "CMV-1588",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1588",
+      "scope": "CM-1483 controlled mutation public surface closeout receipt",
+      "status": "COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_SURFACE_CLOSEOUT_NO_MUTATION"
+    },
     {
       "id": "CMV-1587",
       "scope": "CM-1481 controlled mutation public dry-run uniform low-disclosure runtime hardening",
