@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1517 search quality evaluation closeout and next backlog selection`.
-Current validation: `CMV-1622`.
+Current checkpoint: `CM-1518 write-preflight polish preflight`.
+Current validation: `CMV-1623`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1518 Write-Preflight Polish Preflight
+
+Status: `COMPLETED_VALIDATED_WRITE_PREFLIGHT_POLISH_PREFLIGHT_NO_WRITE_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1518_WRITE_PREFLIGHT_POLISH_PREFLIGHT.md`.
+- Defined invalid-write, schema rejection, no-op, dry-run, low-disclosure, and public MCP surface acceptance criteria for future CM-1519 fixture/test execution.
+- No effective `record_memory`, invalid-write proof, no-op proof, dry-run proof, live client call, provider/API, bearer token, raw memory/audit/broad scan, confirmed mutation, `dry_run=false`, `confirm=true`, public MCP expansion, release/tag/deploy, source change, test change, readiness / `RC_READY` claim, or RC blocker closure occurred.
+
+Validation: `CMV-1623` docs/board preflight validation.
 
 ## CM-1517 Search Quality Evaluation Closeout And Next Backlog Selection
 

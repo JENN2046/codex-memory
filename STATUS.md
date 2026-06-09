@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1517 search quality evaluation closeout and next backlog selection`.
-Current validation: `CMV-1622`.
+Current task: `CM-1518 write-preflight polish preflight`.
+Current validation: `CMV-1623`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1517 closes search quality evaluation and selects write-preflight polish`.
+Current route: `CM-1518 prepares invalid-write/no-op/dry-run fixture boundaries without effective write`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1518 write-preflight polish preflight: added `docs/CM1518_WRITE_PREFLIGHT_POLISH_PREFLIGHT.md`. Defined invalid-write, schema rejection, no-op, dry-run, low-disclosure, and seven-tool public-surface acceptance criteria for future CM-1519 fixture/test execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, invalid-write proof, no-op proof, dry-run proof, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 
 CM-1517 search quality evaluation closeout and next backlog selection: added `docs/CM1517_SEARCH_QUALITY_EVALUATION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`. Closed the non-RC backlog item `search quality evaluation` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1516 targeted test evidence `5/5`, and selected `write-preflight polish` as the next non-RC backlog item. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live search, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 

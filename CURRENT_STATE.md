@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1517 search quality evaluation closeout and next backlog selection` |
-| Current validation | `CMV-1622` |
-| Current route | CM-1517 closes search quality evaluation and selects write-preflight polish |
+| Current task | `CM-1518 write-preflight polish preflight` |
+| Current validation | `CMV-1623` |
+| Current route | CM-1518 prepares invalid-write/no-op/dry-run fixture boundaries without effective write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1518` adds `docs/CM1518_WRITE_PREFLIGHT_POLISH_PREFLIGHT.md` as a docs/board preflight for the non-RC backlog item `write-preflight polish`. It defines invalid-write, schema rejection, no-op, dry-run, low-disclosure, and seven-tool public-surface acceptance criteria for future CM-1519 fixture/test execution. CM-1518 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute invalid-write proof, no-op proof, dry-run proof, live client calls, provider/API calls, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1517` adds `docs/CM1517_SEARCH_QUALITY_EVALUATION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closes the non-RC backlog item `search quality evaluation` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, and selects `write-preflight polish` as the next non-RC backlog item. This closeout is docs-only and registers CM-1516 targeted test evidence `5/5`. CM-1517 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live search or live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1517 search quality evaluation closeout and next backlog selection`.
-Current validation: `CMV-1622`.
+Current task: `CM-1518 write-preflight polish preflight`.
+Current validation: `CMV-1623`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1517` closed search quality evaluation only as non-RC test-only backlog hardening and selected `write-preflight polish` as the next non-RC backlog item. Next safe route is `CM-1518 write-preflight polish preflight`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1518` prepared write-preflight polish as invalid-write/no-op/dry-run guard planning only, without proof execution or effective write. Next safe route is `CM-1519 write-preflight polish fixture/test execution`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 
