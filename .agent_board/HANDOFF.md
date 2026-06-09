@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1504 bounded search projection regression fixture/test execution`.
-Current validation: `CMV-1609`.
-Current handoff: CM-1504 completed fixture/test-only bounded search projection regression coverage; next safe route is evidence audit or source-hardening decision.
+Current task: `CM-1505 bounded search projection regression closeout and next backlog selection`.
+Current validation: `CMV-1610`.
+Current handoff: CM-1505 closed bounded search projection regression as non-RC test-only backlog hardening and selected audit readonly refinements next.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1504 completed fixture/test-only bounded search projection r
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_BOUNDED_SEARCH_PROJECTION_REGRESSION_TEST_ONLY`.
+Current status: `COMPLETED_VALIDATED_BOUNDED_SEARCH_PROJECTION_BACKLOG_CLOSED_NO_READY_CLAIM`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1505 added `docs/CM1505_BOUNDED_SEARCH_PROJECTION_REGRESSION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closed `bounded search projection regression` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, registered CM-1504 targeted test evidence, and selected `audit readonly refinements` as the next non-RC backlog item. No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1504 updated `tests/search-memory-response-sanitizer.test.js` and added `docs/CM1504_BOUNDED_SEARCH_PROJECTION_REGRESSION_FIXTURE_TEST_EVIDENCE.md`. Fixture-only coverage now rejects lifecycle / mutation status fields and client boundary fields in bounded search result items, and confirms the public MCP surface remains seven tools. Targeted validation `node --test tests\search-memory-response-sanitizer.test.js` passed `12/12`. No live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, readiness / `RC_READY` claim, RC blocker closure, release/tag/deploy, or production source change occurred.
 - CM-1503 added `docs/CM1503_NON_RC_BACKLOG_HARDENING_LANE_ACTIVATION.md`, activated the `NON_RC_BACKLOG_HARDENING` lane, and selected `bounded search projection regression` as the first safe backlog item. It records acceptance criteria, fixture plan, test-only hardening plan, and boundaries. No readiness / `RC_READY` claim, RC blocker closure, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 - CM-1502 added `docs/CM1502_OPERATOR_ACTION_NEEDED_HANDOFF_AFTER_RC_ROUTE_FREEZE.md` and recorded `ROUTE_STATE: HARD_STOP_OPERATOR_ACTION_NEEDED`. Live client evidence blocker is `OPEN / DEFERRED`; effective write reliability blocker is `OPEN / DEFERRED`; `RC_READY` is `BLOCKED`; no further RC readiness progression is allowed without exact approval. No blocker closure, live client call, effective `record_memory`, provider/API, bearer token, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
@@ -75,7 +76,7 @@ Completed in this slice:
 - Recorded CM-1450 through CM-1488 and CMV-1560 through CMV-1593 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1609`; CM-1504 targeted test/docs-board validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1610`; CM-1505 docs/board closeout validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 

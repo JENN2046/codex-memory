@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1504",
-  "validationId": "CMV-1609",
+  "taskId": "CM-1505",
+  "validationId": "CMV-1610",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1610",
+      "scope": "CM-1505 bounded search projection regression closeout and next backlog selection",
+      "status": "COMPLETED_VALIDATED_BOUNDED_SEARCH_PROJECTION_BACKLOG_CLOSED_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-1609",
       "scope": "CM-1504 bounded search projection regression fixture/test execution",

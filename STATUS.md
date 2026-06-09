@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1504 bounded search projection regression fixture/test execution`.
-Current validation: `CMV-1609`.
+Current task: `CM-1505 bounded search projection regression closeout and next backlog selection`.
+Current validation: `CMV-1610`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1504 records fixture/test-only bounded search projection regression coverage`.
+Current route: `CM-1505 closes non-RC bounded search projection backlog item and selects audit readonly refinements`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1505 bounded search projection regression closeout and next backlog selection: added `docs/CM1505_BOUNDED_SEARCH_PROJECTION_REGRESSION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`. Closed the non-RC backlog item `bounded search projection regression` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING` and selected `audit readonly refinements` as the next non-RC backlog item. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 
 CM-1504 bounded search projection regression fixture/test execution: updated `tests/search-memory-response-sanitizer.test.js` and added `docs/CM1504_BOUNDED_SEARCH_PROJECTION_REGRESSION_FIXTURE_TEST_EVIDENCE.md`. Added fixture-only regression coverage for lifecycle / mutation status leakage, client boundary field leakage, and public MCP surface count. Targeted test `node --test tests\search-memory-response-sanitizer.test.js` passed `12/12`. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, readiness or `RC_READY` claim, RC blocker closure, release/tag/deploy, or production source change occurred.
 

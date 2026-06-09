@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1504 bounded search projection regression fixture/test execution`.
-Current validation: `CMV-1609`.
+Current task: `CM-1505 bounded search projection regression closeout and next backlog selection`.
+Current validation: `CMV-1610`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1504` completed fixture/test-only bounded search projection regression coverage. Next safe route is `CM-1505 bounded search projection regression evidence audit or source-hardening decision`. Production source hardening remains separate; live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+`CM-1505` closed `bounded search projection regression` only as a non-RC test-only backlog hardening item and selected `audit readonly refinements` as the next non-RC backlog item. Next safe route is `CM-1506 audit readonly refinements fixture/test preflight`. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Historical Run Notes
 

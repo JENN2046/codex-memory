@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1504 bounded search projection regression fixture/test execution` |
-| Current validation | `CMV-1609` |
-| Current route | CM-1504 records fixture/test-only bounded search projection regression coverage |
+| Current task | `CM-1505 bounded search projection regression closeout and next backlog selection` |
+| Current validation | `CMV-1610` |
+| Current route | CM-1505 closes non-RC bounded search projection backlog item and selects audit readonly refinements |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1505` adds `docs/CM1505_BOUNDED_SEARCH_PROJECTION_REGRESSION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closes the non-RC backlog item `bounded search projection regression` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, and selects `audit readonly refinements` as the next non-RC backlog item. This closeout is docs-only. CM-1505 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1504` updates `tests/search-memory-response-sanitizer.test.js` and adds `docs/CM1504_BOUNDED_SEARCH_PROJECTION_REGRESSION_FIXTURE_TEST_EVIDENCE.md`. The fixture-only regression now rejects bounded search result lifecycle / mutation status fields, rejects client boundary fields in result items, and confirms the public MCP surface remains exactly seven tools. Targeted validation `node --test tests\search-memory-response-sanitizer.test.js` passed `12/12`. CM-1504 does not execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, claim readiness / `RC_READY`, close live client evidence blocker, close effective write reliability blocker, release/tag/deploy, or change production source. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -177,7 +179,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1504 recommends `CM-1505 bounded search projection regression evidence audit or source-hardening decision` as the next non-RC backlog hardening slice. Any production source hardening remains separate and should be selected explicitly. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+CM-1505 recommends `CM-1506 audit readonly refinements fixture/test preflight` as the next non-RC backlog hardening slice. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Boundaries
 

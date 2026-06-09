@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1504 bounded search projection regression fixture/test execution`.
-Current validation: `CMV-1609`.
+Current checkpoint: `CM-1505 bounded search projection regression closeout and next backlog selection`.
+Current validation: `CMV-1610`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1505 Bounded Search Projection Regression Closeout And Next Backlog Selection
+
+Status: `COMPLETED_VALIDATED_BOUNDED_SEARCH_PROJECTION_BACKLOG_CLOSED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1505_BOUNDED_SEARCH_PROJECTION_REGRESSION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`.
+- Closed `bounded search projection regression` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`.
+- Registered CM-1504 targeted test evidence: `node --test tests\search-memory-response-sanitizer.test.js` passed `12/12`.
+- Selected `audit readonly refinements` as the next non-RC backlog item.
+- Recommended `CM-1506 audit readonly refinements fixture/test preflight`.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1610` docs/board closeout validation.
 
 ## CM-1504 Bounded Search Projection Regression Fixture/Test Execution
 
