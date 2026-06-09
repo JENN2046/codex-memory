@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1507 audit readonly refinements fixture/test execution`.
-Current validation: `CMV-1612`.
+Current checkpoint: `CM-1508 audit readonly refinements closeout and next backlog selection`.
+Current validation: `CMV-1613`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1508 Audit Readonly Refinement Closeout And Next Backlog Selection
+
+Status: `COMPLETED_VALIDATED_AUDIT_READONLY_REFINEMENT_BACKLOG_CLOSED_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1508_AUDIT_READONLY_REFINEMENT_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`.
+- Closed `audit readonly refinements` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`.
+- Registered CM-1507 targeted test evidence: `node --test tests\audit-memory-readonly-service.test.js tests\audit-memory-public-contract-preflight.test.js` passed `14/14`.
+- Selected `audit evidence rollup` as the next non-RC backlog item.
+- Recommended `CM-1509 audit evidence rollup fixture/doc preflight`.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1613` docs/board closeout validation.
 
 ## CM-1507 Audit Readonly Refinement Regression Coverage
 
