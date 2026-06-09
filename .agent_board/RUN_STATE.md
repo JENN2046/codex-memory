@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1532 live HTTP runtime freshness guard hardening`.
-Current validation: `CMV-1636`.
+Current task: `CM-1533 CM-1532 live HTTP runtime freshness guard source audit`.
+Current validation: `CMV-1637`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1532` added live HTTP runtime freshness guard hardening. `/health` exposes bounded `runtimeFreshness` source fingerprint metadata; `ensure-codex-memory-http.ps1` fails closed when a healthy runtime does not match current source fingerprint; Phase F1 runner requires a matching expected runtime source fingerprint before accepting evidence. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is an exact runtime refresh/no-bearer proof retry envelope; do not rerun proof or close blockers without it.
+`CM-1533` audited CM-1532 live HTTP runtime freshness guard changed scope without live proof execution. `/health.runtimeFreshness` remains bounded; `ensure-codex-memory-http.ps1` fails closed on healthy stale runtime; `scripts/serve-codex-memory-http.js` loads `src/http-index.js` startup fingerprint metadata; public MCP surface remains seven tools; no live proof automatic execution was introduced. Residual finding: `CM-1533_FINDING: PHASE_F1_RUNTIME_FRESHNESS_MATCH_NOT_SHORT_CIRCUITED_BEFORE_PROOF_REQUESTS`. Phase F1 rejects stale evidence at final acceptance but does not currently short-circuit immediately after mismatched health freshness before subsequent proof requests. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is local source/test hardening for the Phase F1 mismatch short-circuit, or an exact runtime refresh/no-bearer proof retry envelope after separate approval; do not rerun proof or close blockers without it.
 
 ## Historical Run Notes
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1532 live HTTP runtime freshness guard hardening`.
-Current validation: `CMV-1636`.
+Current task: `CM-1533 CM-1532 live HTTP runtime freshness guard source audit`.
+Current validation: `CMV-1637`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `RUNTIME_FRESHNESS_GUARD_ADDED; live proof retry remains separate`.
+Current route: `CM1532_SOURCE_AUDIT_COMPLETED_WITH_RESIDUAL_RUNNER_FRESHNESS_ORDERING_FINDING; live proof retry remains separate`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1533 audit of CM-1532 live HTTP runtime freshness guard: added `docs/CM1533_CM1532_LIVE_HTTP_RUNTIME_FRESHNESS_GUARD_SOURCE_AUDIT.md`. Independent changed-scope source audit confirmed `/health.runtimeFreshness` remains bounded to `algorithm`, `sourceFingerprint`, `sourceFileCount`, and `startedAt`; health freshness does not expose sensitive paths, token material, provider/API details, raw memory/audit, or memory ids; `scripts/ensure-codex-memory-http.ps1` no longer accepts healthy-only stale runtime and fails closed when runtime freshness is missing or mismatched; `scripts/serve-codex-memory-http.js` loads `src/http-index.js`, which computes startup source fingerprint metadata; public MCP surface remains exactly seven tools; and this audit introduced no live proof automatic execution. Residual finding recorded: `CM-1533_FINDING: PHASE_F1_RUNTIME_FRESHNESS_MATCH_NOT_SHORT_CIRCUITED_BEFORE_PROOF_REQUESTS`. The Phase F1 runner requires an expected fingerprint and rejects stale evidence at final acceptance, but current source does not short-circuit immediately after mismatched `/health.runtimeFreshness.sourceFingerprint` before subsequent proof requests. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1533.
 
 CM-1532 live HTTP runtime freshness guard hardening: added `docs/CM1532_LIVE_HTTP_RUNTIME_FRESHNESS_GUARD_HARDENING.md`, `src/core/RuntimeFreshness.js`, `scripts/print-runtime-fingerprint.js`, and `tests/live-http-runtime-freshness-guard.test.js`; updated HTTP health/startup, `scripts/ensure-codex-memory-http.ps1`, Phase F1 runner, and related tests. Live HTTP `/health` now exposes bounded `runtimeFreshness`; `ensure` fails closed when a healthy runtime is not fresh against the current source fingerprint; Phase F1 runner requires an expected runtime source fingerprint before execution and accepts evidence only if `/health` matches it. Public MCP tools remain seven. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1532.
 

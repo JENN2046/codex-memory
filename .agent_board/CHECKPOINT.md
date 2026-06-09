@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1532 live HTTP runtime freshness guard hardening`.
-Current validation: `CMV-1636`.
+Current checkpoint: `CM-1533 CM-1532 live HTTP runtime freshness guard source audit`.
+Current validation: `CMV-1637`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1533 Audit of CM-1532 Live HTTP Runtime Freshness Guard
+
+Status: `COMPLETED_VALIDATED_SOURCE_AUDIT_WITH_RESIDUAL_RUNNER_FRESHNESS_ORDERING_FINDING`
+
+Recorded:
+
+- Added `docs/CM1533_CM1532_LIVE_HTTP_RUNTIME_FRESHNESS_GUARD_SOURCE_AUDIT.md`.
+- Reviewed changed-scope source/test/docs for CM-1532 without executing live proof.
+- Confirmed `/health.runtimeFreshness` is bounded to `algorithm`, `sourceFingerprint`, `sourceFileCount`, and `startedAt`, and does not expose sensitive paths, token material, provider/API details, raw memory/audit, or memory ids.
+- Confirmed `scripts/ensure-codex-memory-http.ps1` computes the expected runtime source fingerprint and fails closed when an already healthy runtime is missing or mismatches freshness metadata.
+- Confirmed `scripts/serve-codex-memory-http.js` loads `src/http-index.js`, which computes startup fingerprint metadata.
+- Confirmed public MCP surface remains exactly seven tools.
+- Confirmed no live proof automatic execution was introduced by this audit.
+- Residual finding recorded: `CM-1533_FINDING: PHASE_F1_RUNTIME_FRESHNESS_MATCH_NOT_SHORT_CIRCUITED_BEFORE_PROOF_REQUESTS`.
+- The Phase F1 runner requires an expected fingerprint and rejects stale evidence at final acceptance, but does not currently short-circuit immediately after mismatched health freshness before subsequent proof requests.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1637` source audit/docs/board validation.
 
 ## CM-1532 Live HTTP Runtime Freshness Guard Hardening
 
