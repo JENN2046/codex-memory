@@ -1,0 +1,112 @@
+{
+  "version": "evidence-vocabulary-grouping-cm1513-v1",
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "groups": [
+    "public_contract_evidence",
+    "readonly_audit_evidence",
+    "bounded_search_projection_evidence",
+    "audit_rollup_evidence",
+    "write_preflight_evidence",
+    "deferred_rc_proof_evidence",
+    "forbidden_or_unavailable_evidence"
+  ],
+  "forbiddenFamilies": [
+    "raw_audit",
+    "raw_memory_scan",
+    "broad_memory_scan",
+    "bearer_token",
+    "provider_api_payload",
+    "effective_write_payload",
+    "confirmed_mutation_payload",
+    "live_client_transcript_unredacted"
+  ],
+  "evidenceUnits": [
+    {
+      "taskId": "CM-1488",
+      "validationId": "CMV-1593",
+      "family": "in_process_bounded_proof",
+      "requestedGroup": "public_contract_evidence",
+      "status": "completed",
+      "summary": "seven public tools listed and low-disclosure calls recorded"
+    },
+    {
+      "taskId": "CM-1507",
+      "validationId": "CMV-1612",
+      "family": "fixture_test_evidence",
+      "requestedGroup": "readonly_audit_evidence",
+      "status": "completed",
+      "summary": "audit readonly fixture tests passed"
+    },
+    {
+      "taskId": "CM-1504",
+      "validationId": "CMV-1609",
+      "family": "fixture_test_evidence",
+      "requestedGroup": "bounded_search_projection_evidence",
+      "status": "completed",
+      "summary": "bounded search projection regression passed"
+    },
+    {
+      "taskId": "CM-1510",
+      "validationId": "CMV-1615",
+      "family": "fixture_test_evidence",
+      "requestedGroup": "audit_rollup_evidence",
+      "status": "completed",
+      "summary": "audit evidence rollup fixture tests passed"
+    },
+    {
+      "taskId": "CM-1498",
+      "validationId": "CMV-1603",
+      "family": "invalid_write_rejection",
+      "requestedGroup": "write_preflight_evidence",
+      "status": "planned",
+      "summary": "write preflight proof remains no-effective-write"
+    },
+    {
+      "taskId": "CM-1495",
+      "validationId": "CMV-1600",
+      "family": "blocked_deferred_proof",
+      "requestedGroup": "deferred_rc_proof_evidence",
+      "status": "open_deferred",
+      "summary": "live client evidence remains deferred",
+      "blockerState": {
+        "liveClientEvidence": "OPEN / DEFERRED",
+        "effectiveWriteReliability": "OPEN / DEFERRED"
+      }
+    },
+    {
+      "taskId": "CM-1513-FORBIDDEN-RAW-AUDIT",
+      "validationId": null,
+      "family": "raw_audit",
+      "requestedGroup": "readonly_audit_evidence",
+      "status": "forbidden",
+      "summary": "synthetic raw audit family must be quarantined",
+      "rawAudit": "cm1513-raw-audit-must-not-leak"
+    },
+    {
+      "taskId": "CM-1513-FORBIDDEN-TOKEN",
+      "validationId": null,
+      "family": "bearer_token",
+      "requestedGroup": "public_contract_evidence",
+      "status": "forbidden",
+      "summary": "synthetic token family must be quarantined",
+      "bearerToken": "cm1513-bearer-token-must-not-leak"
+    },
+    {
+      "taskId": "CM-1513-FORBIDDEN-WRITE",
+      "validationId": null,
+      "family": "effective_write_payload",
+      "requestedGroup": "write_preflight_evidence",
+      "status": "forbidden",
+      "summary": "synthetic effective write payload must be quarantined",
+      "content": "cm1513-effective-write-content-must-not-leak"
+    }
+  ]
+}

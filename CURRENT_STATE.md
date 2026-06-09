@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1512 evidence vocabulary grouping preflight` |
-| Current validation | `CMV-1617` |
-| Current route | CM-1512 prepares evidence vocabulary grouping fixture/test boundaries for the non-RC backlog lane |
+| Current task | `CM-1513 evidence vocabulary grouping fixture/test execution` |
+| Current validation | `CMV-1618` |
+| Current route | CM-1513 adds fixture/test-only evidence vocabulary grouping regression coverage |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1513` adds `tests/fixtures/evidence-vocabulary-grouping-cm1513-v1.json`, `tests/evidence-vocabulary-grouping-fixture.test.js`, and `docs/CM1513_EVIDENCE_VOCABULARY_GROUPING_REGRESSION_COVERAGE.md`. The fixture/test-only regression proves bounded evidence groups exclude forbidden families and synthetic raw/private fields, forbidden evidence maps to `forbidden_or_unavailable_evidence`, deferred RC proof is not marked completed, live/effective-write blockers remain `OPEN / DEFERRED`, and the public MCP surface remains exactly seven tools. CM-1513 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, release/tag/deploy, or modify production source. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1512` adds `docs/CM1512_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT.md` as a docs/board preflight for the non-RC backlog item `evidence vocabulary grouping`. It defines evidence group names, allowed evidence families, forbidden evidence families, low-disclosure grouping rules, fixture/test plan, and acceptance criteria for future CM-1513 fixture/test execution. CM-1512 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

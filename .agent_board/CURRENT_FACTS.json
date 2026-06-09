@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1512",
-  "validationId": "CMV-1617",
+  "taskId": "CM-1513",
+  "validationId": "CMV-1618",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1618",
+      "scope": "CM-1513 evidence vocabulary grouping fixture/test execution",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_VOCABULARY_GROUPING_TEST_ONLY"
+    },
     {
       "id": "CMV-1617",
       "scope": "CM-1512 evidence vocabulary grouping preflight",

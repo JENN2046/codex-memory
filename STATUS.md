@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1512 evidence vocabulary grouping preflight`.
-Current validation: `CMV-1617`.
+Current task: `CM-1513 evidence vocabulary grouping fixture/test execution`.
+Current validation: `CMV-1618`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1512 prepares evidence vocabulary grouping fixture/test boundaries for the non-RC backlog lane`.
+Current route: `CM-1513 adds fixture/test-only evidence vocabulary grouping regression coverage`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1513 evidence vocabulary grouping fixture/test execution: added `tests/fixtures/evidence-vocabulary-grouping-cm1513-v1.json`, `tests/evidence-vocabulary-grouping-fixture.test.js`, and `docs/CM1513_EVIDENCE_VOCABULARY_GROUPING_REGRESSION_COVERAGE.md`. Added fixture/test-only coverage proving bounded evidence groups exclude forbidden families and synthetic raw/private fields, forbidden evidence maps to `forbidden_or_unavailable_evidence`, deferred RC proof is not marked completed, live/effective-write blockers remain `OPEN / DEFERRED`, and public MCP surface remains exactly seven tools. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 
 CM-1512 evidence vocabulary grouping preflight: added `docs/CM1512_EVIDENCE_VOCABULARY_GROUPING_PREFLIGHT.md`. Defined evidence group names, allowed evidence families, forbidden evidence families, low-disclosure grouping rules, fixture/test plan, and acceptance criteria for future CM-1513 fixture/test execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 

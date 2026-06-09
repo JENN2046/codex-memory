@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1512 evidence vocabulary grouping preflight`.
-Current validation: `CMV-1617`.
+Current checkpoint: `CM-1513 evidence vocabulary grouping fixture/test execution`.
+Current validation: `CMV-1618`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1513 Evidence Vocabulary Grouping Regression Coverage
+
+Status: `COMPLETED_VALIDATED_EVIDENCE_VOCABULARY_GROUPING_TEST_ONLY`
+
+Recorded:
+
+- Added `tests/fixtures/evidence-vocabulary-grouping-cm1513-v1.json`.
+- Added `tests/evidence-vocabulary-grouping-fixture.test.js`.
+- Added `docs/CM1513_EVIDENCE_VOCABULARY_GROUPING_REGRESSION_COVERAGE.md`.
+- Added fixture/test-only coverage for bounded group purity, forbidden family quarantine, deferred RC proof status, blocker preservation, and seven-tool public MCP surface stability.
+- No production source finding opened.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
+
+Validation: `CMV-1618` targeted fixture test plus docs/board validation.
 
 ## CM-1512 Evidence Vocabulary Grouping Preflight
 
