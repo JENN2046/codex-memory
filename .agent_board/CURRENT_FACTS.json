@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1477",
-  "validationId": "CMV-1583",
+  "taskId": "CM-1478",
+  "validationId": "CMV-1584",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1584",
+      "scope": "CM-1478 operator exact target decision packet",
+      "status": "COMPLETED_VALIDATED_CONTROLLED_MUTATION_TARGET_DECISION_PACKET_NO_TARGET_SELECTED_NO_MUTATION"
+    },
     {
       "id": "CMV-1583",
       "scope": "CM-1477 confirmed mutation target-selection readiness review",

@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1477 confirmed mutation target-selection readiness review`.
-Current validation: `CMV-1583`.
+Current checkpoint: `CM-1478 operator exact target decision packet`.
+Current validation: `CMV-1584`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1478 Operator Exact Target Decision Packet
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_TARGET_DECISION_PACKET_NO_TARGET_SELECTED_NO_MUTATION`
+
+Recorded:
+
+- Added `docs/CM1478_CONTROLLED_MUTATION_TARGET_DECISION_PACKET.md`.
+- Recorded required operator decision fields with `<OPERATOR_PROVIDED_EXACT_TARGET_ID>` placeholder.
+- Constrained mutation type to exactly one of `validate_memory`, `tombstone_memory`, or `supersede_memory`.
+- Recorded rollback checklist, evidence checklist, and explicit non-claims.
+- Did not select a target id.
+- Did not choose a mutation type.
+- No agent target lookup, `dry_run=false`, `confirm=true`, real mutation, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1584` docs/board target decision packet validation.
 
 ## CM-1477 Confirmed Mutation Target-Selection Readiness Review
 

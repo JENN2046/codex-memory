@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1477 confirmed mutation target-selection readiness review` |
-| Current validation | `CMV-1583` |
-| Current route | CM-1477 reviews the CM-1476 target-selection protocol as small, rollbackable, and auditable only under no-apply conditions; no live target is selected and confirmed mutation remains blocked |
+| Current task | `CM-1478 operator exact target decision packet` |
+| Current validation | `CMV-1584` |
+| Current route | CM-1478 records the placeholder-only operator decision surface for an exact target id and mutation type; no target id or mutation type is selected and confirmed mutation remains blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1478` adds `docs/CM1478_CONTROLLED_MUTATION_TARGET_DECISION_PACKET.md` as a docs-only operator decision packet for a future exact target id and mutation type. The packet records `<OPERATOR_PROVIDED_EXACT_TARGET_ID>` as a placeholder, constrains mutation type to exactly one of `validate_memory`, `tombstone_memory`, or `supersede_memory`, and states that no target id or mutation type value is selected in CM-1478. CM-1478 does not let the agent look up or select a target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 `CM-1477` adds `docs/CM1477_CONFIRMED_MUTATION_TARGET_SELECTION_READINESS_REVIEW.md` as a docs-only readiness review of the CM-1476 target-selection protocol. Decision is `GO_FOR_NEXT_NO_APPLY_OPERATOR_NAMED_CANDIDATE_OR_DRY_RUN_PROJECTION_PACKET`, `NO_GO_FOR_CONFIRMED_MUTATION`, and `NO_GO_FOR_AGENT_SELECTED_REAL_TARGET_ID`. CM-1477 records a go/no-go table, rollback readiness checklist, post-apply evidence checklist, and explicit non-claims. It does not choose a real live target id, does not use `dry_run=false`, does not use `confirm=true`, does not execute real mutation, raw scan, provider/API, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
