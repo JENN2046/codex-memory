@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1526",
-  "validationId": "CMV-1630",
+  "taskId": "CM-1527",
+  "validationId": "CMV-1631",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1631",
+      "scope": "CM-1527 source hardening for no-token low-disclosure",
+      "status": "COMPLETED_VALIDATED_NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING"
+    },
     {
       "id": "CMV-1630",
       "scope": "CM-1526 live client integration proof closeout",

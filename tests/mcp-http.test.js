@@ -8,6 +8,7 @@ const { createCodexMemoryApplication } = require('../src/app');
 const {
   createStreamableHttpServer,
   SESSION_HEADER,
+  PUBLIC_REQUEST_BLOCKED,
   buildPolicyGateSummary,
   createSessionHardeningConfig,
   getHttpAuthWarning
@@ -25,12 +26,12 @@ const NO_TOKEN_OVERVIEW_KEYS = [
 ];
 
 const NO_TOKEN_OVERVIEW_ACCESS_KEYS = [
-  'bearerTokenRequiredForFullOverview',
+  'detailFieldsReturned',
   'embeddingFingerprintReturned',
   'memoryLinksReturned',
   'mode',
   'pathsReturned',
-  'rawMemoryFieldsReturned',
+  'publicAccess',
   'recallRecentReturned',
   'recentAuditReturned',
   'recentFilesReturned',
@@ -423,7 +424,13 @@ test('HTTP MCP should reject browser-origin no-token POST writes', async () => {
 
     assert.equal(response.status, 403);
     assert.equal(payload.error, 'Forbidden');
-    assert.match(payload.message, /bearer token/i);
+    assert.equal(payload.status, 'rejected');
+    assert.equal(payload.reason, 'blocked');
+    const serialized = JSON.stringify(payload);
+    assert.doesNotMatch(serialized, /bearer/i);
+    assert.doesNotMatch(serialized, /token/i);
+    assert.doesNotMatch(serialized, /origin/i);
+    assert.doesNotMatch(serialized, /client/i);
   });
 });
 
@@ -445,7 +452,13 @@ test('HTTP MCP should reject no-token simple POST content types', async () => {
 
     assert.equal(response.status, 403);
     assert.equal(payload.error, 'Forbidden');
-    assert.match(payload.message, /application\/json/i);
+    assert.equal(payload.status, 'rejected');
+    assert.equal(payload.reason, 'blocked');
+    const serialized = JSON.stringify(payload);
+    assert.doesNotMatch(serialized, /application\/json/i);
+    assert.doesNotMatch(serialized, /content-type/i);
+    assert.doesNotMatch(serialized, /raw/i);
+    assert.doesNotMatch(serialized, /api/i);
   });
 });
 
@@ -540,9 +553,9 @@ test('HTTP MCP should reject no-token mutation tool calls', async () => {
       assert.equal(payload.id, 5 + index);
       assert.equal(payload.error.code, -32001);
       assert.equal(payload.error.message, 'Forbidden');
-      assert.equal(payload.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
-      assert.match(payload.error.data.reason, /no-token/i);
-      assert.match(payload.error.data.reason, /mutation/i);
+      assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+      assert.equal(payload.error.data.status, 'rejected');
+      assert.equal(payload.error.data.reason, 'blocked');
     }
 
     const responseWithoutId = await fetch(address.url, {
@@ -563,9 +576,9 @@ test('HTTP MCP should reject no-token mutation tool calls', async () => {
     assert.equal(payloadWithoutId.id, null);
     assert.equal(payloadWithoutId.error.code, -32001);
     assert.equal(payloadWithoutId.error.message, 'Forbidden');
-    assert.equal(payloadWithoutId.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
-    assert.match(payloadWithoutId.error.data.reason, /no-token/i);
-    assert.match(payloadWithoutId.error.data.reason, /mutation/i);
+    assert.equal(payloadWithoutId.error.data.code, PUBLIC_REQUEST_BLOCKED);
+    assert.equal(payloadWithoutId.error.data.status, 'rejected');
+    assert.equal(payloadWithoutId.error.data.reason, 'blocked');
   });
 });
 
@@ -597,8 +610,9 @@ test('HTTP MCP no-token search_memory should be rejected', async () => {
     assert.equal(payload.jsonrpc, '2.0');
     assert.equal(payload.id, 7);
     assert.equal(payload.error.code, -32001);
-    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
-    assert.ok(payload.error.data.reason.includes('bearer token'));
+    assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+    assert.equal(payload.error.data.status, 'rejected');
+    assert.equal(payload.error.data.reason, 'blocked');
   });
 });
 
@@ -628,7 +642,7 @@ test('HTTP MCP no-token search_memory should not call external embedding when ca
 
     assert.equal(response.status, 403);
     assert.equal(payload.error.code, -32001);
-    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
+    assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
   }, {}, { enableEmbeddingCache: false });
 });
 
@@ -658,7 +672,7 @@ test('HTTP MCP no-token search_memory should not call external rerank provider',
 
     assert.equal(response.status, 403);
     assert.equal(payload.error.code, -32001);
-    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
+    assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
   });
 });
 
@@ -691,8 +705,9 @@ test('HTTP MCP no-token search_memory should reject include_content raw reads', 
     assert.equal(payload.id, 10);
     assert.equal(payload.error.code, -32001);
     assert.equal(payload.error.message, 'Forbidden');
-    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
-    assert.match(payload.error.data.reason, /bearer token/i);
+    assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+    assert.equal(payload.error.data.status, 'rejected');
+    assert.equal(payload.error.data.reason, 'blocked');
   });
 });
 
@@ -729,22 +744,30 @@ test('HTTP MCP no-token memory_overview should return selected safe overview wit
       assert.equal(payload.jsonrpc, '2.0');
       assert.equal(payload.id, 11);
       assert.equal(payload.result.isError, false);
-      assert.equal(overview.access.mode, 'no_token_selected_overview');
+      assert.equal(overview.access.mode, 'public_selected_overview');
       assert.equal(overview.access.selectedProjection, true);
-      assert.equal(overview.access.selectedProjectionVersion, 1);
+      assert.equal(overview.access.selectedProjectionVersion, 2);
       assert.deepEqual(Object.keys(overview).sort(), NO_TOKEN_OVERVIEW_KEYS);
       assert.deepEqual(Object.keys(overview.access).sort(), NO_TOKEN_OVERVIEW_ACCESS_KEYS);
-      assert.equal(overview.access.bearerTokenRequiredForFullOverview, true);
+      assert.equal(overview.access.publicAccess, 'blocked');
       assert.equal(overview.access.pathsReturned, false);
       assert.equal(overview.access.embeddingFingerprintReturned, false);
       assert.equal(overview.access.recentAuditReturned, false);
       assert.equal(overview.access.recentFilesReturned, false);
       assert.equal(overview.access.memoryLinksReturned, false);
       assert.equal(overview.access.recallRecentReturned, false);
-      assert.equal(overview.access.rawMemoryFieldsReturned, false);
+      assert.equal(overview.access.detailFieldsReturned, false);
       assert.equal(overview.summary.latestAcceptedAt, undefined);
       assert.equal(overview.summary.latestRejectedAt, undefined);
       assert.equal(overview.shadowSync.available, true);
+      assert.doesNotMatch(serialized, /bearer/i);
+      assert.doesNotMatch(serialized, /token/i);
+      assert.doesNotMatch(serialized, /raw/i);
+      assert.doesNotMatch(serialized, /lifecycle/i);
+      assert.doesNotMatch(serialized, /mutation/i);
+      assert.doesNotMatch(serialized, /provider/i);
+      assert.doesNotMatch(serialized, /api/i);
+      assert.doesNotMatch(serialized, /client/i);
       assert.doesNotMatch(serialized, /"paths"\s*:/);
       assert.doesNotMatch(serialized, /"latestAcceptedAt"\s*:/);
       assert.doesNotMatch(serialized, /"latestRejectedAt"\s*:/);
@@ -791,9 +814,10 @@ test('HTTP MCP bearer-configured missing-token tools/call should keep no-token c
 
       assert.equal(overviewResponse.status, 200);
       assert.equal(overviewPayload.result.isError, false);
-      assert.equal(overview.access.mode, 'no_token_selected_overview');
+      assert.equal(overview.access.mode, 'public_selected_overview');
       assert.equal(overview.access.selectedProjection, true);
-      assert.equal(overview.access.selectedProjectionVersion, 1);
+      assert.equal(overview.access.selectedProjectionVersion, 2);
+      assert.doesNotMatch(JSON.stringify(overview), /bearer|token|raw|lifecycle|mutation|provider|api|client/i);
 
       const recordResponse = await fetch(address.url, {
         method: 'POST',
@@ -821,7 +845,8 @@ test('HTTP MCP bearer-configured missing-token tools/call should keep no-token c
       const recordPayload = await recordResponse.json();
 
       assert.equal(recordResponse.status, 403);
-      assert.equal(recordPayload.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
+      assert.equal(recordPayload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+      assert.doesNotMatch(JSON.stringify(recordPayload), /bearer|token|raw|lifecycle|mutation|provider|api|client/i);
 
       const searchResponse = await fetch(address.url, {
         method: 'POST',
@@ -845,7 +870,8 @@ test('HTTP MCP bearer-configured missing-token tools/call should keep no-token c
       const searchPayload = await searchResponse.json();
 
       assert.equal(searchResponse.status, 403);
-      assert.equal(searchPayload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
+      assert.equal(searchPayload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+      assert.doesNotMatch(JSON.stringify(searchPayload), /bearer|token|raw|lifecycle|mutation|provider|api|client/i);
     } finally {
       app.services.overviewService.getOverview = originalGetOverview;
     }
@@ -899,15 +925,15 @@ test('HTTP MCP should execute authenticated memory_overview through bounded proj
     assert.equal(payload.result.isError, false);
     assert.equal(structured.access.mode, 'authenticated_bounded_overview');
     assert.equal(structured.access.selectedProjection, true);
-    assert.equal(structured.access.selectedProjectionVersion, 1);
-    assert.equal(structured.access.bearerTokenRequiredForFullOverview, false);
+    assert.equal(structured.access.selectedProjectionVersion, 2);
+    assert.equal(structured.access.publicAccess, 'bounded');
     assert.equal(structured.access.pathsReturned, false);
     assert.equal(structured.access.embeddingFingerprintReturned, false);
     assert.equal(structured.access.recentAuditReturned, false);
     assert.equal(structured.access.recentFilesReturned, false);
     assert.equal(structured.access.memoryLinksReturned, false);
     assert.equal(structured.access.recallRecentReturned, false);
-    assert.equal(structured.access.rawMemoryFieldsReturned, false);
+    assert.equal(structured.access.detailFieldsReturned, false);
     assert.deepEqual(Object.keys(structured).sort(), NO_TOKEN_OVERVIEW_KEYS);
     assert.deepEqual(Object.keys(structured.access).sort(), NO_TOKEN_OVERVIEW_ACCESS_KEYS);
     assert.equal(structured.shadowSync.available, true);

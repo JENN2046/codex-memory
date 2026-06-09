@@ -149,9 +149,9 @@ test('no-token selected overview sanitizes core overview dependencies directly',
   const overview = await service.getNoTokenSelectedOverview();
   const serialized = JSON.stringify(overview);
 
-  assert.equal(overview.access.mode, 'no_token_selected_overview');
+  assert.equal(overview.access.mode, 'public_selected_overview');
   assert.equal(overview.access.selectedProjection, true);
-  assert.equal(overview.access.selectedProjectionVersion, 1);
+  assert.equal(overview.access.selectedProjectionVersion, 2);
   assert.deepEqual(Object.keys(overview).sort(), [
     'access',
     'activeMemoryHealth',
@@ -163,12 +163,12 @@ test('no-token selected overview sanitizes core overview dependencies directly',
     'summary'
   ]);
   assert.deepEqual(Object.keys(overview.access).sort(), [
-    'bearerTokenRequiredForFullOverview',
+    'detailFieldsReturned',
     'embeddingFingerprintReturned',
     'memoryLinksReturned',
     'mode',
     'pathsReturned',
-    'rawMemoryFieldsReturned',
+    'publicAccess',
     'recallRecentReturned',
     'recentAuditReturned',
     'recentFilesReturned',
@@ -211,7 +211,7 @@ test('no-token selected overview sanitizes core overview dependencies directly',
   assert.equal(overview.summary.latestRejectedAt, undefined);
   assert.equal(overview.recall.summary.totalHits, 1);
   assert.equal(overview.recall.summary.scopedRecallCount, 1);
-  assert.equal(overview.shadowSync.schemaStartupGate.currentVersion, 1);
+  assert.equal(overview.shadowSync.schemaGate.currentVersion, 1);
   assert.equal(overview.cacheHealth.candidate.governanceStateRevisionTargetCount, 1);
 
   assert.doesNotMatch(serialized, /"paths"\s*:/);
@@ -239,4 +239,12 @@ test('no-token selected overview sanitizes core overview dependencies directly',
   assert.doesNotMatch(serialized, /client-id-should-not-leak/);
   assert.doesNotMatch(serialized, /2026-06-01T01:00:00\.000Z/);
   assert.doesNotMatch(serialized, /2026-06-01T02:00:00\.000Z/);
+  assert.doesNotMatch(serialized, /bearer/i);
+  assert.doesNotMatch(serialized, /token/i);
+  assert.doesNotMatch(serialized, /raw/i);
+  assert.doesNotMatch(serialized, /lifecycle/i);
+  assert.doesNotMatch(serialized, /mutation/i);
+  assert.doesNotMatch(serialized, /provider/i);
+  assert.doesNotMatch(serialized, /api/i);
+  assert.doesNotMatch(serialized, /client/i);
 });

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1526 live client integration proof closeout`.
-Current validation: `CMV-1630`.
+Current task: `CM-1527 source hardening for no-token low-disclosure`.
+Current validation: `CMV-1631`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1526` closed out the live client integration proof lane with finding recorded. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a separate source hardening lane or revised proof retry envelope.
+`CM-1527` completed local source/test hardening for no-token public low-disclosure. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a separate live proof retry or blocker closeout only with fresh evidence.
 
 ## Historical Run Notes
 

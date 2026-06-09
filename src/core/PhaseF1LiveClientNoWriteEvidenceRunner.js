@@ -89,9 +89,9 @@ function summarizeNoTokenOverview(payload = {}) {
   const access = structured.access || {};
   return {
     ok: payload.result?.isError !== true &&
-      access.mode === 'no_token_selected_overview' &&
+      access.mode === 'public_selected_overview' &&
       access.selectedProjection === true &&
-      access.selectedProjectionVersion === 1,
+      access.selectedProjectionVersion === 2,
     mode: normalizeString(access.mode),
     selectedProjection: access.selectedProjection === true,
     selectedProjectionVersion: access.selectedProjectionVersion || null,
@@ -99,7 +99,7 @@ function summarizeNoTokenOverview(payload = {}) {
     recentAuditReturned: access.recentAuditReturned === true,
     memoryLinksReturned: access.memoryLinksReturned === true,
     recallRecentReturned: access.recallRecentReturned === true,
-    rawMemoryFieldsReturned: access.rawMemoryFieldsReturned === true
+    detailFieldsReturned: access.detailFieldsReturned === true
   };
 }
 
@@ -396,8 +396,8 @@ async function runPhaseF1LiveClientNoWriteEvidence({
     toolsList: summarizeToolsList(toolsList.payload),
     authorizedOverview: summarizeAuthorizedOverview(authorizedOverview.payload),
     noTokenOverview: summarizeNoTokenOverview(noTokenOverview.payload),
-    noTokenRecordMemory: summarizeRejectedToolCall(noTokenRecord.payload, 'NO_TOKEN_MUTATION_REJECTED'),
-    noTokenSearchMemory: summarizeRejectedToolCall(noTokenSearch.payload, 'NO_TOKEN_SEARCH_REJECTED')
+    noTokenRecordMemory: summarizeRejectedToolCall(noTokenRecord.payload, 'PUBLIC_REQUEST_BLOCKED'),
+    noTokenSearchMemory: summarizeRejectedToolCall(noTokenSearch.payload, 'PUBLIC_REQUEST_BLOCKED')
   };
 
   const evidenceAccepted = evidence.health.ok &&
@@ -410,12 +410,12 @@ async function runPhaseF1LiveClientNoWriteEvidence({
     evidence.noTokenOverview.recentAuditReturned === false &&
     evidence.noTokenOverview.memoryLinksReturned === false &&
     evidence.noTokenOverview.recallRecentReturned === false &&
-    evidence.noTokenOverview.rawMemoryFieldsReturned === false &&
+    evidence.noTokenOverview.detailFieldsReturned === false &&
     evidence.noTokenRecordMemory.rejected &&
-    evidence.noTokenRecordMemory.reasonCode === 'NO_TOKEN_MUTATION_REJECTED' &&
+    evidence.noTokenRecordMemory.reasonCode === 'PUBLIC_REQUEST_BLOCKED' &&
     evidence.noTokenRecordMemory.rawContentReturned === false &&
     evidence.noTokenSearchMemory.rejected &&
-    evidence.noTokenSearchMemory.reasonCode === 'NO_TOKEN_SEARCH_REJECTED' &&
+    evidence.noTokenSearchMemory.reasonCode === 'PUBLIC_REQUEST_BLOCKED' &&
     evidence.noTokenSearchMemory.rawContentReturned === false;
 
   return {

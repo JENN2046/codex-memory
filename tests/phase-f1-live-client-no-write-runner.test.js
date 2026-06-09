@@ -195,14 +195,14 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
               isError: false,
               structuredContent: {
                 access: {
-                  mode: 'no_token_selected_overview',
+                  mode: 'public_selected_overview',
                   selectedProjection: true,
-                  selectedProjectionVersion: 1,
+                  selectedProjectionVersion: 2,
                   pathsReturned: false,
                   recentAuditReturned: false,
                   memoryLinksReturned: false,
                   recallRecentReturned: false,
-                  rawMemoryFieldsReturned: false
+                  detailFieldsReturned: false
                 }
               }
             }
@@ -215,7 +215,7 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
           payload: {
             error: {
               code: -32001,
-              data: { code: 'NO_TOKEN_MUTATION_REJECTED' }
+              data: { code: 'PUBLIC_REQUEST_BLOCKED' }
             }
           }
         };
@@ -225,7 +225,7 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
         payload: {
           error: {
             code: -32001,
-            data: { code: 'NO_TOKEN_SEARCH_REJECTED' }
+            data: { code: 'PUBLIC_REQUEST_BLOCKED' }
           }
         }
       };

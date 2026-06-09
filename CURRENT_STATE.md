@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1526 live client integration proof closeout` |
-| Current validation | `CMV-1630` |
-| Current route | live client evidence blocker still open; source hardening or proof retry route needed |
+| Current task | `CM-1527 source hardening for no-token low-disclosure` |
+| Current validation | `CMV-1631` |
+| Current route | no-token public response low-disclosure hardening completed locally; live proof retry or closeout remains separate |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1527` adds `docs/CM1527_NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING.md` and hardens no-token public rejection plus `memory_overview` public selected projection metadata. No-token rejection paths now use generic blocked/rejected output and JSON-RPC code `PUBLIC_REQUEST_BLOCKED`; public selected `memory_overview` projection now uses `public_selected_overview`, projection version `2`, and `detailFieldsReturned=false` without raw/private/lifecycle/mutation/client-boundary metadata. Targeted regression validation passed `43/43`. CM-1527 does not execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, claim readiness / `RC_READY`, or close the live client/effective-write blockers. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 
 `CM-1526` adds `docs/CM1526_LIVE_CLIENT_INTEGRATION_PROOF_CLOSEOUT.md` and closes out the CM-1523 to CM-1526 proof lane as `LIVE_CLIENT_EVIDENCE_BLOCKER_STILL_OPEN_FINDING_RECORDED`. The live client proof executed and confirmed the exact seven-tool public surface, but did not fully prove low-disclosure behavior. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Recommended next route is a separate source hardening lane or a revised proof retry envelope. CM-1526 does not call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, execute effective write reliability proof, release/tag/deploy, or claim readiness / `RC_READY`.
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1526 live client integration proof closeout`.
-Current validation: `CMV-1630`.
+Current task: `CM-1527 source hardening for no-token low-disclosure`.
+Current validation: `CMV-1631`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `LIVE_CLIENT_EVIDENCE_BLOCKER_STILL_OPEN_FINDING_RECORDED; source hardening or proof retry route needed`.
+Current route: `NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING_COMPLETED_LOCALLY; live proof retry or blocker closeout remains separate`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1527 source hardening for no-token low-disclosure: added `docs/CM1527_NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING.md`; updated no-token public rejection and selected `memory_overview` projection source/tests. No-token rejection paths now return generic low-disclosure blocked/rejected output with `PUBLIC_REQUEST_BLOCKED`; public selected `memory_overview` projection uses version `2`, `public_selected_overview`, and `detailFieldsReturned=false`. Targeted validation passed `43/43`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1527.
 
 CM-1526 live client integration proof closeout: added `docs/CM1526_LIVE_CLIENT_INTEGRATION_PROOF_CLOSEOUT.md`. Decision is `live client evidence blocker: STILL_OPEN`, finding recorded, next route source hardening or proof retry, and `RC_READY: BLOCKED`. Effective write reliability blocker remains `OPEN / DEFERRED`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1526.
 

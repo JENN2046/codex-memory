@@ -7,7 +7,10 @@ const os = require('node:os');
 const path = require('node:path');
 
 const { createCodexMemoryApplication } = require('../src/app');
-const { createStreamableHttpServer } = require('../src/adapters/codex-mcp/http');
+const {
+  createStreamableHttpServer,
+  PUBLIC_REQUEST_BLOCKED
+} = require('../src/adapters/codex-mcp/http');
 
 const NO_TOKEN_OVERVIEW_KEYS = [
   'access',
@@ -21,12 +24,12 @@ const NO_TOKEN_OVERVIEW_KEYS = [
 ];
 
 const NO_TOKEN_OVERVIEW_ACCESS_KEYS = [
-  'bearerTokenRequiredForFullOverview',
+  'detailFieldsReturned',
   'embeddingFingerprintReturned',
   'memoryLinksReturned',
   'mode',
   'pathsReturned',
-  'rawMemoryFieldsReturned',
+  'publicAccess',
   'recallRecentReturned',
   'recentAuditReturned',
   'recentFilesReturned',
@@ -102,8 +105,10 @@ test('no-token HTTP search_memory returns 403 Forbidden', async () => {
     assert.equal(payload.id, 1);
     assert.equal(payload.error.code, -32001);
     assert.equal(payload.error.message, 'Forbidden');
-    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
-    assert.ok(payload.error.data.reason.includes('bearer token'));
+    assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+    assert.equal(payload.error.data.status, 'rejected');
+    assert.equal(payload.error.data.reason, 'blocked');
+    assert.doesNotMatch(JSON.stringify(payload), /bearer|token|raw|lifecycle|mutation|provider|api|client/i);
   });
 });
 
@@ -185,12 +190,13 @@ test('no-token HTTP memory_overview returns selected safe overview', async () =>
 
     assert.equal(response.status, 200);
     assert.equal(payload.result.isError, false);
-    assert.equal(overview.access.mode, 'no_token_selected_overview');
+    assert.equal(overview.access.mode, 'public_selected_overview');
     assert.equal(overview.access.selectedProjection, true);
-    assert.equal(overview.access.selectedProjectionVersion, 1);
+    assert.equal(overview.access.selectedProjectionVersion, 2);
     assert.deepEqual(Object.keys(overview).sort(), NO_TOKEN_OVERVIEW_KEYS);
     assert.deepEqual(Object.keys(overview.access).sort(), NO_TOKEN_OVERVIEW_ACCESS_KEYS);
-    assert.equal(overview.access.bearerTokenRequiredForFullOverview, true);
+    assert.equal(overview.access.publicAccess, 'blocked');
+    assert.equal(overview.access.detailFieldsReturned, false);
     assert.equal(overview.access.pathsReturned, false);
     assert.equal(overview.access.recentAuditReturned, false);
     assert.equal(overview.access.memoryLinksReturned, false);
@@ -198,6 +204,7 @@ test('no-token HTTP memory_overview returns selected safe overview', async () =>
     assert.equal(overview.summary.latestAcceptedAt, undefined);
     assert.equal(overview.summary.latestRejectedAt, undefined);
     assert.equal(overview.shadowSync.available, true);
+    assert.doesNotMatch(serialized, /bearer|token|raw|lifecycle|mutation|provider|api|client/i);
     assert.doesNotMatch(serialized, /"paths"\s*:/);
     assert.doesNotMatch(serialized, /"latestAcceptedAt"\s*:/);
     assert.doesNotMatch(serialized, /"latestRejectedAt"\s*:/);
@@ -461,6 +468,7 @@ test('no-token HTTP search_memory with include_content=true is rejected', async 
     const payload = await response.json();
 
     assert.equal(response.status, 403);
-    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
+    assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+    assert.doesNotMatch(JSON.stringify(payload), /bearer|token|raw|lifecycle|mutation|provider|api|client/i);
   });
 });

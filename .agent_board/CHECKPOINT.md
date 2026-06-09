@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1526 live client integration proof closeout`.
-Current validation: `CMV-1630`.
+Current checkpoint: `CM-1527 source hardening for no-token low-disclosure`.
+Current validation: `CMV-1631`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1527 Source Hardening For No-Token Low-Disclosure
+
+Status: `COMPLETED_VALIDATED_NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING`
+
+Recorded:
+
+- Added `docs/CM1527_NO_TOKEN_PUBLIC_LOW_DISCLOSURE_HARDENING.md`.
+- Hardened no-token public rejection payloads to generic `Forbidden` / `rejected` / `blocked` output and JSON-RPC code `PUBLIC_REQUEST_BLOCKED`.
+- Hardened public selected `memory_overview` metadata to `public_selected_overview`, selected projection version `2`, and `detailFieldsReturned=false`.
+- Updated Phase F1 evidence runner expectations for low-disclosure rejection and selected projection v2.
+- Updated regression tests for no-token record/search rejection, browser-origin/simple-content-type rejection, no-token `memory_overview`, and Phase F1 no-write evidence runner.
+- Targeted validation passed `43/43`.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1631` source/test/docs/board validation.
 
 ## CM-1526 Live Client Integration Proof Closeout
 

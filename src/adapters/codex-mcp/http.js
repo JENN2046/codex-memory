@@ -8,8 +8,7 @@ const { CodexMemoryMcpServer, jsonRpcError } = require('./server');
 const SESSION_HEADER = 'Mcp-Session-Id';
 const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
 const HTTP_SESSION_STREAM_LIMIT_ERROR = 'HTTP_SESSION_STREAM_LIMIT_EXCEEDED';
-const NO_TOKEN_MUTATION_REJECTED = 'NO_TOKEN_MUTATION_REJECTED';
-const NO_TOKEN_SEARCH_REJECTED = 'NO_TOKEN_SEARCH_REJECTED';
+const PUBLIC_REQUEST_BLOCKED = 'PUBLIC_REQUEST_BLOCKED';
 const SESSION_HARDENING_SPECS = {
   absoluteTtlMs: {
     envKey: 'CODEX_MEMORY_HTTP_SESSION_TTL_MS',
@@ -94,17 +93,19 @@ function createUnauthorizedPayload() {
   };
 }
 
-function createForbiddenPayload(reason) {
+function createForbiddenPayload() {
   return {
     error: 'Forbidden',
-    message: reason
+    status: 'rejected',
+    reason: 'blocked'
   };
 }
 
-function createForbiddenJsonRpcPayload(body, reason, code = NO_TOKEN_MUTATION_REJECTED) {
+function createForbiddenJsonRpcPayload(body) {
   return jsonRpcError(body?.id ?? null, -32001, 'Forbidden', {
-    code,
-    reason
+    code: PUBLIC_REQUEST_BLOCKED,
+    status: 'rejected',
+    reason: 'blocked'
   });
 }
 
@@ -268,16 +269,16 @@ function validateNoTokenWriteRequest(req) {
 
   const origin = getSingleHeaderValue(req.headers.origin).trim();
   if (origin) {
-    return 'Browser-origin writes require bearer token authorization.';
+    return true;
   }
 
   const secFetchSite = getSingleHeaderValue(req.headers['sec-fetch-site']).trim().toLowerCase();
   if (secFetchSite && secFetchSite !== 'none') {
-    return 'Browser fetch writes require bearer token authorization.';
+    return true;
   }
 
   if (req.method === 'POST' && !isJsonContentType(getSingleHeaderValue(req.headers['content-type']))) {
-    return 'No-token POST requests must use an application/json content type.';
+    return true;
   }
 
   return null;
@@ -289,13 +290,10 @@ function validateNoTokenJsonRpcRequest(body) {
   }
 
   if (body.method === 'tools/call' && NO_TOKEN_BLOCKED_TOOLS.has(body.params?.name)) {
-    return 'No-token HTTP MCP requests cannot call mutation tools.';
+    return true;
   }
   if (body.method === 'tools/call' && body.params?.name === 'search_memory') {
-    return {
-      code: NO_TOKEN_SEARCH_REJECTED,
-      reason: 'No-token HTTP MCP search_memory requires bearer token authorization.'
-    };
+    return true;
   }
 
   return null;
@@ -625,10 +623,7 @@ function createStreamableHttpServer({
       if (!authorized || !bearerToken) {
         const noTokenJsonRpcRejection = validateNoTokenJsonRpcRequest(body);
         if (noTokenJsonRpcRejection) {
-          const rejection = typeof noTokenJsonRpcRejection === 'string'
-            ? { reason: noTokenJsonRpcRejection, code: NO_TOKEN_MUTATION_REJECTED }
-            : noTokenJsonRpcRejection;
-          return writeJson(res, 403, createForbiddenJsonRpcPayload(body, rejection.reason, rejection.code));
+          return writeJson(res, 403, createForbiddenJsonRpcPayload(body));
         }
       }
 
@@ -708,7 +703,10 @@ function createStreamableHttpServer({
 }
 module.exports = {
   SESSION_HEADER,
+  PUBLIC_REQUEST_BLOCKED,
   createStreamableHttpServer,
+  createForbiddenJsonRpcPayload,
+  validateNoTokenJsonRpcRequest,
   buildRuntimeHealth,
   buildPolicyGateSummary,
   getHttpAuthWarning,

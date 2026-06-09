@@ -232,32 +232,17 @@ function sanitizeNoTokenShadowHealth(health) {
     chunkCount: Number.isFinite(health?.chunkCount) ? health.chunkCount : 0,
     totalChunkCount: Number.isFinite(health?.totalChunkCount) ? health.totalChunkCount : 0,
     reconcileCount: Number.isFinite(health?.reconcileCount) ? health.reconcileCount : 0,
-    authoritativeStore: typeof health?.authoritativeStore === 'string' ? health.authoritativeStore : null,
-    schemaStartupGate: sanitizeSchemaStartupGate(health?.schemaStartupGate),
-    writeManifest: {
+    schemaGate: sanitizeSchemaStartupGate(health?.schemaStartupGate),
+    writeSummary: {
       total: Number.isFinite(health?.writeManifest?.total) ? health.writeManifest.total : 0,
       pending: Number.isFinite(health?.writeManifest?.pending) ? health.writeManifest.pending : 0,
       committed: Number.isFinite(health?.writeManifest?.committed) ? health.writeManifest.committed : 0,
       degraded: Number.isFinite(health?.writeManifest?.degraded) ? health.writeManifest.degraded : 0,
       repaired: Number.isFinite(health?.writeManifest?.repaired) ? health.writeManifest.repaired : 0,
       cancelled: Number.isFinite(health?.writeManifest?.cancelled) ? health.writeManifest.cancelled : 0,
-      failed: Number.isFinite(health?.writeManifest?.failed) ? health.writeManifest.failed : 0,
-      lifecycle: {
-        sqliteCommitted: Number.isFinite(health?.writeManifest?.lifecycle?.sqliteCommitted)
-          ? health.writeManifest.lifecycle.sqliteCommitted
-          : 0,
-        projected: Number.isFinite(health?.writeManifest?.lifecycle?.projected)
-          ? health.writeManifest.lifecycle.projected
-          : 0,
-        audited: Number.isFinite(health?.writeManifest?.lifecycle?.audited)
-          ? health.writeManifest.lifecycle.audited
-          : 0,
-        pendingRecovery: Number.isFinite(health?.writeManifest?.lifecycle?.pendingRecovery)
-          ? health.writeManifest.lifecycle.pendingRecovery
-          : 0
-      }
+      failed: Number.isFinite(health?.writeManifest?.failed) ? health.writeManifest.failed : 0
     },
-    jsonCorruption: {
+    dataQuality: {
       totalMalformed: Number.isFinite(health?.jsonCorruption?.totalMalformed)
         ? health.jsonCorruption.totalMalformed
         : 0
@@ -577,17 +562,17 @@ class MemoryOverviewService {
     return this.getSelectedOverview({
       auditWindow: windowSize,
       access: {
-        mode: 'no_token_selected_overview',
+        mode: 'public_selected_overview',
         selectedProjection: true,
-        selectedProjectionVersion: 1,
-        bearerTokenRequiredForFullOverview: true,
+        selectedProjectionVersion: 2,
+        publicAccess: 'blocked',
         pathsReturned: false,
         embeddingFingerprintReturned: false,
         recentAuditReturned: false,
         recentFilesReturned: false,
         memoryLinksReturned: false,
         recallRecentReturned: false,
-        rawMemoryFieldsReturned: false
+        detailFieldsReturned: false
       }
     });
   }
@@ -599,15 +584,15 @@ class MemoryOverviewService {
       access: {
         mode: 'authenticated_bounded_overview',
         selectedProjection: true,
-        selectedProjectionVersion: 1,
-        bearerTokenRequiredForFullOverview: false,
+        selectedProjectionVersion: 2,
+        publicAccess: 'bounded',
         pathsReturned: false,
         embeddingFingerprintReturned: false,
         recentAuditReturned: false,
         recentFilesReturned: false,
         memoryLinksReturned: false,
         recallRecentReturned: false,
-        rawMemoryFieldsReturned: false
+        detailFieldsReturned: false
       }
     });
   }
