@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1546 scoped RC_READY closeout receipt`.
-Current validation: `CMV-1650`.
-Current handoff: scoped RC milestone closed and archived; release/production/cutover still require separate exact approval.
+Current task: `CM-1547 V8 deep recall / TagMemo capability lane activation`.
+Current validation: `CMV-1651`.
+Current handoff: V8 deep recall / TagMemo capability lane activated as docs-only baseline and gap map; release/production/cutover still require separate exact approval.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: scoped RC milestone closed and archived; release/production/cut
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_SCOPED_RC_READY_MILESTONE_CLOSED_AND_ARCHIVED_NOT_RELEASE_READY / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATED_DOCS_ONLY_NO_ALGORITHM_IMPLEMENTATION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1547 added `docs/CM1547_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATION.md` and activated the post-scoped-RC V8 deep recall / TagMemo capability lane as docs/status/board evidence only. It records source baseline and gaps for TagMemo / tag extraction, memory importance scoring, recall ranking, time decay / recency weighting, relation graph / association recall, deep recall query expansion, memory consolidation, reflection / metacognitive memory, recall quality evaluation, and bounded projection compatibility. It preserves scoped RC closeout while keeping production ready, release ready, and cutover ready as `NO`. CM-1547 did not implement complex V8 algorithms, tune runtime ranking, call provider/API, use bearer-token paths, run raw scans, execute confirmed mutation, expand public MCP tools, perform a second effective `record_memory` write, release/tag/deploy, cut over, or claim production/release/cutover readiness.
 - CM-1546 added `docs/CM1546_SCOPED_RC_READY_CLOSEOUT_RECEIPT.md` and closed/archived the scoped RC milestone. It records `codex-memory scoped RC line: CLOSED / READY`, `SCOPED_RC_READY: YES`, `READY_DECISION: RC_READY`, and `RC_READY: SCOPED_ONLY`. Production ready, release ready, and cutover ready remain `NO`. Deferred or non-claimed areas remain production readiness, release readiness, cutover readiness, complete VCP V8 implementation, broad `record_memory` reliability, production write reliability, raw audit / broad scan, confirmed mutation apply, public MCP expansion, and provider readiness. Route options are listed but not selected or executed. CM-1546 did not execute live proof, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, cutover, or another effective `record_memory` write.
 - CM-1545 added `docs/CM1545_RC_READINESS_DECISION_RECORD.md` and recorded `READY_DECISION: RC_READY` as scoped RC readiness only. Confirmed live client evidence blocker is `CLOSED`; scoped effective write reliability proof blocker is `CLOSED`; public MCP surface remains exactly seven tools; broad `record_memory` reliability is `NOT_CLAIMED`; production write reliability is `NOT_CLAIMED`; raw audit / broad scan, confirmed mutation apply, and public MCP expansion remain `DEFERRED`; no release/tag/deploy, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, or second effective `record_memory` write occurred. CM-1545 does not claim production readiness, release readiness, cutover readiness, provider readiness, broad memory reliability, or broad write reliability. Future release/tag/deploy/cutover/provider/raw/confirmed-mutation/public-expansion/additional-write work remains separately approval-bound.
 - CM-1544 added `docs/CM1544_FINAL_RC_BLOCKER_INVENTORY_REVIEW.md` and completed a docs/status/board-only independent review of the final RC blocker inventory. Confirmed live client evidence blocker is `CLOSED`; scoped effective write reliability proof blocker is `CLOSED`; broad `record_memory` reliability is `NOT_CLAIMED`; production write reliability is `NOT_CLAIMED`; raw audit / broad scan, confirmed mutation, and public MCP expansion remain `DEFERRED`; public MCP surface remains exactly seven tools; no release/tag/deploy or readiness / `RC_READY` claim is present before the separate decision record. No new RC evidence blocker was identified within review scope. Next route is `CM-1545 RC readiness decision record`; CM-1544 does not decide readiness and does not execute live proof, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, second effective `record_memory`, readiness claim, or `RC_READY` claim.
@@ -125,7 +126,7 @@ Boundaries:
 
 Next safe action:
 
-Next safe action after local commit is push review for CM-1546 if separately authorized, or a new separately scoped route selection. Additional valid writes, confirmed mutation, raw/provider/bearer, public MCP expansion, release/tag/deploy/cutover, and production/release readiness work remain forbidden unless separately and exactly approved.
+Next safe action after local commit is push review for CM-1547 if separately authorized, or `CM-1548 TagMemo / V8 capability fixture inventory` as a separate local-safe fixture/docs slice. Additional valid writes, confirmed mutation, raw/provider/bearer, public MCP expansion, complex V8 algorithm implementation, runtime ranking tuning, release/tag/deploy/cutover, and production/release readiness work remain forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 

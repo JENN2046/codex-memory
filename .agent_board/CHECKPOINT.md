@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1546 scoped RC_READY closeout receipt`.
-Current validation: `CMV-1650`.
+Current checkpoint: `CM-1547 V8 deep recall / TagMemo capability lane activation`.
+Current validation: `CMV-1651`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1547 V8 Deep Recall / TagMemo Capability Lane Activation
+
+Status: `COMPLETED_VALIDATED_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATED_DOCS_ONLY_NO_ALGORITHM_IMPLEMENTATION`
+
+Recorded:
+
+- Added `docs/CM1547_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATION.md`.
+- Activated the post-scoped-RC V8 deep recall / TagMemo capability lane as docs/status/board evidence only.
+- Recorded source baseline for TagMemo analysis, EPA, ResidualPyramid, candidate generation, recall pipeline, rerank, recall enhancement, context vectors, recall precision, P16/P17 diagnostics, and bounded projection compatibility.
+- Recorded capability gaps for TagMemo / tag extraction, memory importance scoring, recall ranking, time decay / recency weighting, relation graph / association recall, deep recall query expansion, memory consolidation, reflection / metacognitive memory, recall quality evaluation, and bounded projection compatibility.
+- Preserved scoped RC closeout: `SCOPED_RC_READY: YES`, production ready `NO`, release ready `NO`, and cutover ready `NO`.
+- No complex V8 algorithm implementation, runtime ranking tuning, provider/API call, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, cutover, or second effective `record_memory` write occurred.
+
+Validation: `CMV-1651` docs/source-baseline changed-scope validation.
 
 ## CM-1546 Scoped RC_READY Closeout Receipt
 

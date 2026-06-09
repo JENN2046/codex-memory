@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1546 scoped RC_READY closeout receipt`.
-Current validation: `CMV-1650`.
+Current task: `CM-1547 V8 deep recall / TagMemo capability lane activation`.
+Current validation: `CMV-1651`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `SCOPED_RC_READY_MILESTONE_CLOSED_AND_ARCHIVED; release/production/cutover still require separate exact approval`.
+Current route: `V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATED_DOCS_ONLY; scoped RC remains closed; release/production/cutover still require separate exact approval`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1547 V8 deep recall / TagMemo capability lane activation: added `docs/CM1547_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATION.md` and activated the post-scoped-RC capability lane as docs/status/board evidence only. The route records current baseline and gaps for TagMemo / tag extraction, memory importance scoring, recall ranking, time decay / recency weighting, relation graph / association recall, deep recall query expansion, memory consolidation, reflection / metacognitive memory, recall quality evaluation, and bounded projection compatibility. It preserves `SCOPED_RC_READY: YES` and keeps production ready, release ready, and cutover ready as `NO`. CM-1547 did not implement complex V8 algorithms, tune runtime ranking, call provider/API, use bearer-token paths, run raw scans, execute confirmed mutation, expand public MCP tools, perform a second effective `record_memory` write, release/tag/deploy, cut over, or claim production/release/cutover readiness.
 
 CM-1546 scoped RC_READY closeout receipt: added `docs/CM1546_SCOPED_RC_READY_CLOSEOUT_RECEIPT.md` and archived the scoped RC line as `CLOSED / READY`. It records `SCOPED_RC_READY: YES`, `READY_DECISION: RC_READY`, and `RC_READY: SCOPED_ONLY`; production ready, release ready, and cutover ready remain `NO`. Deferred or non-claimed areas remain production readiness, release readiness, cutover readiness, complete VCP V8 implementation, broad `record_memory` reliability, production write reliability, raw audit / broad scan, confirmed mutation apply, public MCP expansion, and provider readiness. CM-1546 did not execute live proof, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, cutover, or another effective `record_memory` write.
 

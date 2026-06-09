@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1546",
-  "validationId": "CMV-1650",
+  "taskId": "CM-1547",
+  "validationId": "CMV-1651",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1651",
+      "scope": "CM-1547 V8 deep recall / TagMemo capability lane activation",
+      "status": "COMPLETED_VALIDATED_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATED_DOCS_ONLY_NO_ALGORITHM_IMPLEMENTATION"
+    },
     {
       "id": "CMV-1650",
       "scope": "CM-1546 scoped RC_READY closeout receipt",
