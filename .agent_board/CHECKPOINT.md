@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1529 Phase F1 runner public tools expectation hardening`.
-Current validation: `CMV-1633`.
+Current checkpoint: `CM-1530 rerun live client integration proof after hardening`.
+Current validation: `CMV-1634`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1530 Live Client Integration Proof After Hardening
+
+Status: `COMPLETED_VALIDATED_PROOF_EXECUTED_WITH_FINDING_LIVE_RUNTIME_LOW_DISCLOSURE_STILL_NOT_OBSERVED`
+
+Recorded:
+
+- Added `docs/CM1530_LIVE_CLIENT_INTEGRATION_PROOF_AFTER_HARDENING.md`.
+- Fresh Git preflight before proof confirmed local `main` synced with `origin/main` at `7add1bba91fb2e05d5438a0b2b651957379b7b39`.
+- Executed one no-bearer `initialize`, one no-bearer `tools/list`, and seven no-bearer bounded `tools/call` operations.
+- `tools/list` returned exactly seven public tools.
+- Finding recorded: live endpoint still returned old no-token rejection code/reason shapes and old `memory_overview` selected projection metadata after hardening.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, `dry_run=false`, `confirm=true`, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1634` proof execution and docs/board validation.
 
 ## CM-1529 Phase F1 Runner Public Tools Expectation Hardening
 

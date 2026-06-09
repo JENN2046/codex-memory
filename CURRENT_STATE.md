@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1529 Phase F1 runner public tools expectation hardening` |
-| Current validation | `CMV-1633` |
-| Current route | Phase F1 runner public tools expectation aligned to seven-tool surface; live proof retry remains separate |
+| Current task | `CM-1530 rerun live client integration proof after hardening` |
+| Current validation | `CMV-1634` |
+| Current route | live proof rerun executed with finding; live client evidence blocker remains open |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1530` adds `docs/CM1530_LIVE_CLIENT_INTEGRATION_PROOF_AFTER_HARDENING.md` and reruns the approved no-bearer local HTTP MCP proof after CM-1527 low-disclosure hardening and CM-1529 runner alignment were pushed. Fresh Git preflight confirmed local `main` synced with `origin/main` at `7add1bba91fb2e05d5438a0b2b651957379b7b39` before the proof. The proof executed one no-bearer `initialize`, one no-bearer `tools/list`, and seven no-bearer bounded `tools/call` operations. `tools/list` returned exactly seven public tools, but the proof failed the low-disclosure checks because the live endpoint still returned old no-token rejection code/reason shapes and old `memory_overview` selected projection metadata. Finding: `CM-1530_FINDING: LIVE_RUNTIME_LOW_DISCLOSURE_STILL_NOT_OBSERVED_AFTER_HARDENING`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. CM-1530 does not call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1529` adds `docs/CM1529_PHASE_F1_RUNNER_PUBLIC_TOOLS_EXPECTATION_HARDENING.md` and aligns `PhaseF1LiveClientNoWriteEvidenceRunner` with the current seven-tool public MCP surface: `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`. Regression tests assert the runner no longer uses the old three-tool expectation, the injected proof fixture reports `publicToolCount=7`, and HTTP MCP `tools/list` remains seven tools. Targeted validation passed `7/7` for the runner and `26/26` for HTTP MCP. CM-1529 does not execute live client proof, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, claim readiness / `RC_READY`, or close live/effective-write blockers. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 

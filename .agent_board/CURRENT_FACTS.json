@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1529",
-  "validationId": "CMV-1633",
+  "taskId": "CM-1530",
+  "validationId": "CMV-1634",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1634",
+      "scope": "CM-1530 live client integration proof after hardening",
+      "status": "COMPLETED_VALIDATED_PROOF_EXECUTED_WITH_FINDING_LIVE_RUNTIME_LOW_DISCLOSURE_STILL_NOT_OBSERVED"
+    },
     {
       "id": "CMV-1633",
       "scope": "CM-1529 Phase F1 runner public tools expectation hardening",
