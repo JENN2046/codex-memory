@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1519 write-preflight polish fixture/test execution`.
-Current validation: `CMV-1624`.
+Current checkpoint: `CM-1520 write-preflight polish closeout`.
+Current validation: `CMV-1625`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1520 Write-Preflight Polish Closeout
+
+Status: `COMPLETED_VALIDATED_WRITE_PREFLIGHT_POLISH_BACKLOG_CLOSED_NO_WRITE_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1520_WRITE_PREFLIGHT_POLISH_CLOSEOUT.md`.
+- Closed `write-preflight polish` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`.
+- Registered CM-1519 targeted test evidence: `node --test tests\write-preflight-polish-fixture.test.js` passed `5/5`.
+- Recorded all task-book non-RC backlog hardening items complete pending CM-1521 final lane closeout.
+- No effective `record_memory`, live client call, provider/API, bearer token, raw memory/audit/broad scan, confirmed mutation, public MCP expansion, release/tag/deploy, source change, test change, readiness / `RC_READY` claim, or RC blocker closure occurred.
+
+Validation: `CMV-1625` docs/board closeout validation.
 
 ## CM-1519 Write-Preflight Polish Regression Coverage
 
