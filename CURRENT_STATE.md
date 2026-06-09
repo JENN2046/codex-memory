@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1486 RC blocker prioritization and first must-fix selection` |
-| Current validation | `CMV-1591` |
-| Current route | CM-1486 selects the first must-fix blocker for a future docs/preflight evidence bundle without executing a fix |
+| Current task | `CM-1487 post-closeout public contract evidence bundle preflight` |
+| Current validation | `CMV-1592` |
+| Current route | CM-1487 prepares the seven-tool public contract evidence bundle preflight without live MCP calls |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1487` adds `docs/CM1487_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_PREFLIGHT.md` as docs-only preflight for a future seven-tool public contract evidence bundle. It defines expected `tools/list` contract, expected `tools/call` low-disclosure assertions, evidence checklist shape, validation matrix, and future exact proof boundary. CM-1487 does not execute live MCP `tools/list` or `tools/call`, fix source, expand public MCP tools, execute confirmed mutation, use `dry_run=false`, use `confirm=true`, perform raw scan, call provider/API, use bearer-token material, or claim readiness / `RC_READY`.
 
 `CM-1486` adds `docs/CM1486_RC_BLOCKER_PRIORITIZATION_AND_FIRST_MUST_FIX_SELECTION.md` as docs-only triage. It orders CM-1485 must-fix blockers and selects `Fresh post-closeout public contract evidence is not bundled for the seven-tool surface` as the first future must-fix repair target. Recommended next route is `CM-1487 post-closeout public contract evidence bundle preflight`. CM-1486 does not directly fix source, clear blockers, claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, perform raw scan, call provider/API, use bearer-token material, or expand public MCP tools.
 

@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1486 RC blocker prioritization and first must-fix selection`.
-Current validation: `CMV-1591`.
+Current checkpoint: `CM-1487 post-closeout public contract evidence bundle preflight`.
+Current validation: `CMV-1592`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1487 Public Contract Evidence Bundle Preflight
+
+Status: `COMPLETED_VALIDATED_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_PREFLIGHT_NO_LIVE_CALLS`
+
+Recorded:
+
+- Added `docs/CM1487_PUBLIC_CONTRACT_EVIDENCE_BUNDLE_PREFLIGHT.md`.
+- Defined expected seven-tool `tools/list` contract.
+- Defined expected `tools/call` low-disclosure assertions.
+- Designed the evidence checklist shape for a future bundle.
+- Recorded validation matrix and future exact proof boundary.
+- No live MCP `tools/list` or `tools/call`, source fix, public MCP expansion, confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer-token use, or readiness / `RC_READY` claim occurred.
+
+Validation: `CMV-1592` docs/board public contract evidence bundle preflight validation.
 
 ## CM-1486 RC Blocker Prioritization And First Must-Fix Selection
 
