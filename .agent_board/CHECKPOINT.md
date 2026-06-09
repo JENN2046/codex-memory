@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1525 live client integration proof evidence`.
-Current validation: `CMV-1629`.
+Current checkpoint: `CM-1526 live client integration proof closeout`.
+Current validation: `CMV-1630`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1526 Live Client Integration Proof Closeout
+
+Status: `COMPLETED_VALIDATED_LIVE_CLIENT_EVIDENCE_BLOCKER_STILL_OPEN_FINDING_RECORDED`
+
+Recorded:
+
+- Added `docs/CM1526_LIVE_CLIENT_INTEGRATION_PROOF_CLOSEOUT.md`.
+- Decision: live client evidence blocker remains `STILL_OPEN`.
+- Finding recorded: low-disclosure was not fully proven by the CM-1524 no-bearer proof.
+- Effective write reliability blocker remains `OPEN / DEFERRED`.
+- `RC_READY` remains `BLOCKED`.
+- Recommended next route: separate source hardening lane or revised proof retry envelope.
+- No new live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, `dry_run=false`, `confirm=true`, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1526.
+
+Validation: `CMV-1630` docs/board closeout validation.
 
 ## CM-1525 Live Client Integration Proof Evidence
 

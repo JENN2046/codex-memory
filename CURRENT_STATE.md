@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1525 live client integration proof evidence` |
-| Current validation | `CMV-1629` |
-| Current route | live client integration proof evidence recorded; blocker closeout pending CM-1526 |
+| Current task | `CM-1526 live client integration proof closeout` |
+| Current validation | `CMV-1630` |
+| Current route | live client evidence blocker still open; source hardening or proof retry route needed |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1526` adds `docs/CM1526_LIVE_CLIENT_INTEGRATION_PROOF_CLOSEOUT.md` and closes out the CM-1523 to CM-1526 proof lane as `LIVE_CLIENT_EVIDENCE_BLOCKER_STILL_OPEN_FINDING_RECORDED`. The live client proof executed and confirmed the exact seven-tool public surface, but did not fully prove low-disclosure behavior. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Recommended next route is a separate source hardening lane or a revised proof retry envelope. CM-1526 does not call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, execute effective write reliability proof, release/tag/deploy, or claim readiness / `RC_READY`.
 
 `CM-1525` adds `docs/CM1525_LIVE_CLIENT_INTEGRATION_PROOF_EVIDENCE.md` and records the redacted evidence bundle for the CM-1524 no-bearer local HTTP MCP proof. Evidence records the command list, tools/list result, each bounded tools/call result, pass/fail matrix, forbidden-boundary confirmation, and finding `LIVE_CLIENT_LOW_DISCLOSURE_NOT_FULLY_PROVEN`. The proof confirms exact seven-tool public surface and no effective write/mutation/expansion/provider/bearer/raw-scan/release/readiness side effects, but does not close the live client evidence blocker because low-disclosure was not fully proven and deeper audit/controlled-mutation projection paths were unreachable without crossing the bearer-token boundary. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1525 live client integration proof evidence`.
-Current validation: `CMV-1629`.
+Current task: `CM-1526 live client integration proof closeout`.
+Current validation: `CMV-1630`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `LIVE_CLIENT_INTEGRATION_PROOF_EVIDENCE_RECORDED_WITH_FINDING; blocker closeout pending CM-1526`.
+Current route: `LIVE_CLIENT_EVIDENCE_BLOCKER_STILL_OPEN_FINDING_RECORDED; source hardening or proof retry route needed`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1526 live client integration proof closeout: added `docs/CM1526_LIVE_CLIENT_INTEGRATION_PROOF_CLOSEOUT.md`. Decision is `live client evidence blocker: STILL_OPEN`, finding recorded, next route source hardening or proof retry, and `RC_READY: BLOCKED`. Effective write reliability blocker remains `OPEN / DEFERRED`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1526.
 
 CM-1525 live client integration proof evidence: added `docs/CM1525_LIVE_CLIENT_INTEGRATION_PROOF_EVIDENCE.md`. Recorded redacted transcript summary, tools/list result, each tools/call result, pass/fail matrix, forbidden-boundary confirmation, and finding `LIVE_CLIENT_LOW_DISCLOSURE_NOT_FULLY_PROVEN`. Live client evidence blocker remains pending CM-1526 closeout and is not closed by CM-1525. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No additional live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1525.
 

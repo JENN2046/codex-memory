@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1525",
-  "validationId": "CMV-1629",
+  "taskId": "CM-1526",
+  "validationId": "CMV-1630",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1630",
+      "scope": "CM-1526 live client integration proof closeout",
+      "status": "COMPLETED_VALIDATED_LIVE_CLIENT_EVIDENCE_BLOCKER_STILL_OPEN_FINDING_RECORDED"
+    },
     {
       "id": "CMV-1629",
       "scope": "CM-1525 live client integration proof evidence",
