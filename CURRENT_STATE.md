@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1544 final independent RC blocker inventory review` |
-| Current validation | `CMV-1648` |
-| Current route | final RC blocker inventory reviewed; CM-1545 readiness decision record still required; no `RC_READY` claim |
+| Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
+| Current task | `CM-1545 RC readiness decision record` |
+| Current validation | `CMV-1649` |
+| Current route | scoped RC readiness decision recorded; release/production/cutover still require separate exact approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1545` adds `docs/CM1545_RC_READINESS_DECISION_RECORD.md` and records `READY_DECISION: RC_READY` as a scoped RC readiness decision only. Confirmed: live client evidence blocker is `CLOSED`; scoped effective write reliability blocker is `CLOSED`; public MCP surface remains exactly seven tools; broad `record_memory` reliability is `NOT_CLAIMED`; production write reliability is `NOT_CLAIMED`; raw audit / broad scan, confirmed mutation apply, and public MCP expansion remain `DEFERRED`; no release/tag/deploy, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, or second effective `record_memory` write occurred. CM-1545 does not claim production readiness, release readiness, cutover readiness, provider readiness, broad memory reliability, or broad write reliability. Future release/tag/deploy/cutover/provider/raw/confirmed-mutation/public-expansion work remains separately approval-bound.
 
 `CM-1544` adds `docs/CM1544_FINAL_RC_BLOCKER_INVENTORY_REVIEW.md` and records a docs/status/board-only independent review of the final RC blocker inventory. Confirmed: live client evidence blocker is `CLOSED`; scoped effective write reliability blocker is `CLOSED`; broad `record_memory` reliability is `NOT_CLAIMED`; production write reliability is `NOT_CLAIMED`; raw audit / broad scan, confirmed mutation, and public MCP expansion remain `DEFERRED`; public MCP surface remains exactly seven tools; no release/tag/deploy or readiness / `RC_READY` claim is present before the separate decision record. CM-1544 identifies no new RC evidence blocker within review scope, but it does not decide readiness. Next route is `CM-1545 RC readiness decision record`. CM-1544 does not execute live proof, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, a second effective `record_memory` write, readiness claim, or `RC_READY` claim.
 
@@ -255,7 +257,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1544 reviewed the final RC blocker inventory and found no new RC evidence blocker within scope. Next safe action is `CM-1545 RC readiness decision record`. Broad `record_memory` reliability and production write reliability remain not claimed; raw audit / broad scan, confirmed mutation, and public MCP expansion remain deferred; `RC_READY` remains blocked until a separate decision record.
+CM-1545 recorded scoped RC readiness. Next safe action is push review for CM-1545 if separately authorized. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, and production-readiness claims remain separate approval-bound work.
 
 ## Boundaries
 

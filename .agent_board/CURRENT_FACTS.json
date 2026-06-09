@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1544",
-  "validationId": "CMV-1648",
+  "taskId": "CM-1545",
+  "validationId": "CMV-1649",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -27,10 +27,15 @@
     "presentInLocalCheckout": null
   },
   "status": {
-    "project": "NOT_READY_BLOCKED",
-    "rc": "RC_NOT_READY_BLOCKED"
+    "project": "READY",
+    "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1649",
+      "scope": "CM-1545 RC readiness decision record",
+      "status": "COMPLETED_VALIDATED_SCOPED_RC_READY_DECISION_RECORDED_NOT_RELEASE_READY"
+    },
     {
       "id": "CMV-1648",
       "scope": "CM-1544 final independent RC blocker inventory review",
@@ -703,7 +708,9 @@
     "live provider/API calls",
     "broad record_memory reliability",
     "production write reliability",
-    "CM-1545 RC readiness decision record",
+    "production readiness",
+    "release readiness",
+    "cutover readiness",
     "release/tag/deploy/cutover",
     "confirmed mutation",
     "public MCP expansion beyond current seven-tool surface",

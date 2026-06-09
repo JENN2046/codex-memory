@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1544 final independent RC blocker inventory review`.
-Current validation: `CMV-1648`.
-Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `FINAL_RC_BLOCKER_INVENTORY_REVIEWED; CM-1545 readiness decision record still required; no RC_READY claim`.
+Current task: `CM-1545 RC readiness decision record`.
+Current validation: `CMV-1649`.
+Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current route: `SCOPED_RC_READY_DECISION_RECORDED; release/production/cutover still require separate exact approval`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1545 RC readiness decision record: added `docs/CM1545_RC_READINESS_DECISION_RECORD.md`. Decision: `READY_DECISION: RC_READY` as scoped RC readiness only. Confirmed live client evidence blocker is `CLOSED`, scoped effective write reliability proof blocker is `CLOSED`, public MCP surface remains exactly seven tools, broad `record_memory` reliability is `NOT_CLAIMED`, production write reliability is `NOT_CLAIMED`, and raw audit / broad scan, confirmed mutation apply, and public MCP expansion remain `DEFERRED`. No release/tag/deploy, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, or second effective `record_memory` write occurred. CM-1545 does not claim production readiness, release readiness, cutover readiness, provider readiness, broad memory reliability, or broad write reliability.
 
 CM-1544 final independent RC blocker inventory review: added `docs/CM1544_FINAL_RC_BLOCKER_INVENTORY_REVIEW.md`. This docs/status/board-only review confirms live client evidence blocker is `CLOSED`, scoped effective write reliability proof blocker is `CLOSED`, broad `record_memory` reliability is `NOT_CLAIMED`, production write reliability is `NOT_CLAIMED`, and raw audit / broad scan, confirmed mutation, and public MCP expansion remain `DEFERRED`. Public MCP surface remains exactly seven tools. No new RC evidence blocker was identified within review scope, but CM-1544 does not decide readiness; `CM-1545 RC readiness decision record` remains required before any readiness decision. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. CM-1544 did not execute live proof, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, a second effective `record_memory` write, readiness claim, or `RC_READY` claim.
 

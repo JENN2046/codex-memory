@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1544 final independent RC blocker inventory review`.
-Current validation: `CMV-1648`.
-Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current task: `CM-1545 RC readiness decision record`.
+Current validation: `CMV-1649`.
+Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1544` reviewed the final RC blocker inventory and identified no new RC evidence blocker within scope. Live client evidence blocker and scoped effective write reliability proof blocker are closed. Broad `record_memory` reliability and production write reliability are not claimed; raw audit / broad scan, confirmed mutation, and public MCP expansion remain deferred. `RC_READY` remains blocked pending `CM-1545 RC readiness decision record`. Next safe route is CM-1545 before any readiness claim.
+`CM-1545` recorded `READY_DECISION: RC_READY` as scoped RC readiness only. Live client evidence blocker and scoped effective write reliability proof blocker are closed, and the public MCP surface remains seven tools. Broad `record_memory` reliability and production write reliability are not claimed; raw audit / broad scan, confirmed mutation apply, public MCP expansion, release/tag/deploy/cutover, provider/API, bearer-token path, additional effective writes, and production-readiness claims remain separately approval-bound.
 
 ## Historical Run Notes
 
