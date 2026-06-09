@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1515",
-  "validationId": "CMV-1620",
+  "taskId": "CM-1516",
+  "validationId": "CMV-1621",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1621",
+      "scope": "CM-1516 search quality evaluation fixture/test execution",
+      "status": "COMPLETED_VALIDATED_SEARCH_QUALITY_EVALUATION_TEST_ONLY"
+    },
     {
       "id": "CMV-1620",
       "scope": "CM-1515 search quality evaluation preflight",

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1515 search quality evaluation preflight`.
-Current validation: `CMV-1620`.
+Current task: `CM-1516 search quality evaluation fixture/test execution`.
+Current validation: `CMV-1621`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1515 prepares fixture/static bounded search quality evaluation boundaries`.
+Current route: `CM-1516 adds fixture/test-only search quality evaluation coverage`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1516 search quality evaluation fixture/test execution: added `tests/fixtures/search-quality-evaluation-cm1516-v1.json`, `tests/search-quality-evaluation-fixture.test.js`, and `docs/CM1516_SEARCH_QUALITY_EVALUATION_REGRESSION_COVERAGE.md`. Added fixture/test-only coverage proving query matching uses bounded fixture projection, filtered/private results do not echo sensitive fixture values, ranking metadata excludes raw/private source fields, client boundary mismatch is low-disclosure filtered output, and public MCP surface remains exactly seven tools. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live search, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
 
 CM-1515 search quality evaluation preflight: added `docs/CM1515_SEARCH_QUALITY_EVALUATION_PREFLIGHT.md`. Defined fixture/static bounded search result quality criteria, ranking/filtering/low-disclosure acceptance criteria, public MCP surface criteria, and the future CM-1516 fixture/test plan. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live search, live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 

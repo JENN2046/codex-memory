@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1515 search quality evaluation preflight`.
-Current validation: `CMV-1620`.
+Current checkpoint: `CM-1516 search quality evaluation fixture/test execution`.
+Current validation: `CMV-1621`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1516 Search Quality Evaluation Regression Coverage
+
+Status: `COMPLETED_VALIDATED_SEARCH_QUALITY_EVALUATION_TEST_ONLY`
+
+Recorded:
+
+- Added `tests/fixtures/search-quality-evaluation-cm1516-v1.json`.
+- Added `tests/search-quality-evaluation-fixture.test.js`.
+- Added `docs/CM1516_SEARCH_QUALITY_EVALUATION_REGRESSION_COVERAGE.md`.
+- Added fixture/test-only coverage for bounded query projection, filtered/private low disclosure, bounded ranking metadata, client boundary mismatch handling, and seven-tool public MCP surface stability.
+- No production source finding opened.
+- No readiness / `RC_READY` claim, RC blocker closure, live search, live client call, provider/API, bearer token, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, or production source change occurred.
+
+Validation: `CMV-1621` targeted fixture test plus docs/board validation.
 
 ## CM-1515 Search Quality Evaluation Preflight
 

@@ -1,0 +1,61 @@
+{
+  "version": "search-quality-evaluation-cm1516-v1",
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "queries": [
+    {
+      "queryId": "CM1516-Q1",
+      "clientId": "client-alpha",
+      "target": "both",
+      "limit": 3
+    }
+  ],
+  "results": [
+    {
+      "resultId": "fixture-bounded-1",
+      "clientId": "client-alpha",
+      "visibility": "public",
+      "target": "both",
+      "score": 0.91,
+      "ranking": {
+        "baseScore": 0.72,
+        "rerankScore": 0.19,
+        "matchCount": 3,
+        "tagHitCount": 2,
+        "recencyBucket": "recent",
+        "reasonCodes": [
+          "bounded_keyword_match",
+          "bounded_tag_match"
+        ]
+      }
+    },
+    {
+      "resultId": "fixture-private-filtered",
+      "clientId": "client-alpha",
+      "visibility": "private",
+      "target": "both",
+      "score": 0.87,
+      "memoryId": "cm1516-memory-id-must-not-leak",
+      "title": "cm1516-title-must-not-leak",
+      "content": "cm1516-content-must-not-leak",
+      "snippet": "cm1516-snippet-must-not-leak",
+      "sourceFile": "A:/cm1516/must/not/leak.md"
+    },
+    {
+      "resultId": "fixture-cross-client",
+      "clientId": "client-beta",
+      "visibility": "private",
+      "target": "both",
+      "score": 0.83,
+      "clientPrivateField": "cm1516-client-private-must-not-leak",
+      "content": "cm1516-cross-client-content-must-not-leak"
+    }
+  ]
+}
