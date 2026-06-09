@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1484 post controlled mutation closeout route review`.
-Current validation: `CMV-1589`.
+Current checkpoint: `CM-1485 RC blocker inventory after controlled mutation public surface closeout`.
+Current validation: `CMV-1590`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1485 RC Blocker Inventory After Controlled Mutation Public Surface Closeout
+
+Status: `COMPLETED_VALIDATED_RC_BLOCKER_INVENTORY_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1485_RC_BLOCKER_INVENTORY_AFTER_CONTROLLED_MUTATION_CLOSEOUT.md`.
+- Classified current blockers into must-fix, should-fix, and deferred groups.
+- Recorded remaining evidence gaps without clearing blockers.
+- Recommended `CM-1486 RC blocker disposition and next-slice selection`.
+- Preserved `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- No readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer-token use, or new public MCP expansion occurred.
+
+Validation: `CMV-1590` docs/board blocker inventory validation.
 
 ## CM-1484 Post Controlled Mutation Closeout Route Review
 

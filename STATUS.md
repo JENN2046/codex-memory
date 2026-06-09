@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1484 post controlled mutation closeout route review`.
-Current validation: `CMV-1589`.
+Current task: `CM-1485 RC blocker inventory after controlled mutation public surface closeout`.
+Current validation: `CMV-1590`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1484 selects RC blocker inventory as the next major route after controlled mutation public surface closeout`.
+Current route: `CM-1485 inventories current RC blockers without clearing blockers or claiming readiness`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1485 RC blocker inventory after controlled mutation public surface closeout: added `docs/CM1485_RC_BLOCKER_INVENTORY_AFTER_CONTROLLED_MUTATION_CLOSEOUT.md`. The inventory classifies blockers as must-fix, should-fix, and deferred; records remaining evidence gaps; and recommends `CM-1486 RC blocker disposition and next-slice selection`. CM-1485 does not clear blockers, claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, perform raw scan, call provider/API, use bearer token material, or expand public MCP tools.
 
 CM-1484 post controlled mutation closeout route review: added `docs/CM1484_POST_CONTROLLED_MUTATION_CLOSEOUT_ROUTE_REVIEW.md`. Decision is `GO_FOR_RC_BLOCKER_INVENTORY`, `NO_GO_FOR_CONFIRMED_MUTATION_CHAIN_AS_NEXT_DEFAULT_ROUTE`, `DEFER_VCP_INTEGRATION_READINESS_UNTIL_BLOCKERS_ARE_INVENTORIED`, and `DEFER_AUDIT_SEARCH_WRITE_GOVERNANCE_HARDENING_SELECTION_UNTIL_BLOCKERS_ARE_INVENTORIED`. Recommended next route is `CM-1485 RC blocker inventory after controlled mutation public surface closeout`. CM-1484 does not execute confirmed mutation, does not use `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
