@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1523 live client integration proof approval`.
-Current validation: `CMV-1627`.
+Current checkpoint: `CM-1524 live client integration proof execution`.
+Current validation: `CMV-1628`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1524 Live Client Integration Proof Execution
+
+Status: `COMPLETED_VALIDATED_PROOF_EXECUTED_WITH_FINDING_NO_BLOCKER_CLOSE`
+
+Recorded:
+
+- Added `docs/CM1524_LIVE_CLIENT_INTEGRATION_PROOF_EXECUTION.md`.
+- Fresh Git preflight before proof confirmed synced `main`.
+- Executed one no-bearer `initialize`, one no-bearer `tools/list`, and seven no-bearer bounded `tools/call` operations.
+- Confirmed `tools/list` returned exactly seven public tools.
+- Recorded finding: `memory_overview` and no-token rejection summaries exposed token/raw/lifecycle-shaped wording, and no-token gating prevented deeper audit/controlled-mutation public dry-run projection proof.
+- No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, `dry_run=false`, `confirm=true`, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+- Live client evidence blocker is not closed by CM-1524.
+
+Validation: `CMV-1628` proof execution and docs/board validation.
 
 ## CM-1523 Live Client Integration Proof Approval
 

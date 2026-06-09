@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1523 live client integration proof approval`.
-Current validation: `CMV-1627`.
+Current task: `CM-1524 live client integration proof execution`.
+Current validation: `CMV-1628`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `LIVE_CLIENT_INTEGRATION_PROOF_LANE_APPROVED; CM-1524 proof execution pending`.
+Current route: `LIVE_CLIENT_INTEGRATION_PROOF_EXECUTED_WITH_FINDING; evidence recording and closeout pending`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1524 live client integration proof execution: added `docs/CM1524_LIVE_CLIENT_INTEGRATION_PROOF_EXECUTION.md`. Executed the approved no-bearer local HTTP MCP proof after fresh synced-main preflight. `tools/list` returned exactly seven public tools: `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`. The proof did not fully pass because `memory_overview` and no-token rejection summaries exposed token/raw/lifecycle-shaped wording, and no-token gating prevented deeper audit/controlled-mutation public dry-run projection proof. Live client evidence blocker is not closed by CM-1524. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 
 CM-1523 live client integration proof approval: added `docs/CM1523_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL.md`. Recorded operator exact approval `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` for the CM-1523 to CM-1526 live client integration proof lane and bound execution to the CM-1493 no-bearer proof envelope. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1523.
 

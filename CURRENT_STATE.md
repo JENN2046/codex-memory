@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1523 live client integration proof approval` |
-| Current validation | `CMV-1627` |
-| Current route | live client integration proof lane approved; proof execution pending CM-1524 |
+| Current task | `CM-1524 live client integration proof execution` |
+| Current validation | `CMV-1628` |
+| Current route | live client integration proof executed with finding; evidence recording and closeout pending |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1524` adds `docs/CM1524_LIVE_CLIENT_INTEGRATION_PROOF_EXECUTION.md` and records execution of the approved no-bearer local HTTP MCP proof. Fresh Git preflight confirmed `HEAD == origin/main == 49aefe12de34d1b75d4c59b677f8a663641ec6c5`, clean worktree, and ahead/behind `0 0` before proof. The proof executed one `initialize`, one `tools/list`, and seven bounded `tools/call` operations. `tools/list` returned exactly the seven-tool public surface. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred. Result is `PROOF_EXECUTED_WITH_FINDING`: `memory_overview` and no-token rejection summaries exposed token/raw/lifecycle-shaped wording, and no-token gating prevented deeper audit/controlled-mutation public dry-run projection proof. Live client evidence blocker is not closed by CM-1524.
 
 `CM-1523` adds `docs/CM1523_LIVE_CLIENT_INTEGRATION_PROOF_APPROVAL.md` and records the operator exact approval string `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF` for the CM-1523 to CM-1526 live client integration proof lane. The approval activates only the CM-1493 no-bearer live client proof envelope: `tools/list`, bounded `tools/call`, redacted evidence, and subsequent blocker closeout/fail-finding review. CM-1523 itself does not execute live client calls, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains `BLOCKED`.
 
