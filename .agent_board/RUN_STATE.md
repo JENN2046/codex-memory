@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1485 RC blocker inventory after controlled mutation public surface closeout`.
-Current validation: `CMV-1590`.
+Current task: `CM-1486 RC blocker prioritization and first must-fix selection`.
+Current validation: `CMV-1591`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1485` records a docs-only RC blocker inventory after controlled mutation public surface closeout. It classifies blockers as must-fix, should-fix, and deferred, records remaining evidence gaps, and keeps project status `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe action is guarded local commit with message `docs: inventory RC blockers after controlled mutation closeout` after validation and diff review pass. Push requires separate explicit authorization.
+`CM-1486` records docs-only RC blocker prioritization and selects the first future must-fix target: post-closeout public contract evidence bundle gap for the seven-tool surface. Next safe action is guarded local commit with message `docs: prioritize RC blockers and select first must-fix` after validation and diff review pass. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 

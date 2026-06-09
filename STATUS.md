@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1485 RC blocker inventory after controlled mutation public surface closeout`.
-Current validation: `CMV-1590`.
+Current task: `CM-1486 RC blocker prioritization and first must-fix selection`.
+Current validation: `CMV-1591`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1485 inventories current RC blockers without clearing blockers or claiming readiness`.
+Current route: `CM-1486 selects the first must-fix blocker for a future docs/preflight evidence bundle without executing a fix`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1486 RC blocker prioritization and first must-fix selection: added `docs/CM1486_RC_BLOCKER_PRIORITIZATION_AND_FIRST_MUST_FIX_SELECTION.md`. The triage orders CM-1485 must-fix blockers and selects `Fresh post-closeout public contract evidence is not bundled for the seven-tool surface` as the first future must-fix repair target. Recommended next route is `CM-1487 post-closeout public contract evidence bundle preflight`. CM-1486 does not directly fix source, clear blockers, claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, perform raw scan, call provider/API, use bearer token material, or expand public MCP tools.
 
 CM-1485 RC blocker inventory after controlled mutation public surface closeout: added `docs/CM1485_RC_BLOCKER_INVENTORY_AFTER_CONTROLLED_MUTATION_CLOSEOUT.md`. The inventory classifies blockers as must-fix, should-fix, and deferred; records remaining evidence gaps; and recommends `CM-1486 RC blocker disposition and next-slice selection`. CM-1485 does not clear blockers, claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, perform raw scan, call provider/API, use bearer token material, or expand public MCP tools.
 

@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1485 RC blocker inventory after controlled mutation public surface closeout`.
-Current validation: `CMV-1590`.
+Current checkpoint: `CM-1486 RC blocker prioritization and first must-fix selection`.
+Current validation: `CMV-1591`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1486 RC Blocker Prioritization And First Must-Fix Selection
+
+Status: `COMPLETED_VALIDATED_RC_BLOCKER_PRIORITIZATION_NO_FIX_EXECUTED`
+
+Recorded:
+
+- Added `docs/CM1486_RC_BLOCKER_PRIORITIZATION_AND_FIRST_MUST_FIX_SELECTION.md`.
+- Prioritized CM-1485 must-fix blockers.
+- Selected `Fresh post-closeout public contract evidence is not bundled for the seven-tool surface` as the first future must-fix repair target.
+- Recommended `CM-1487 post-closeout public contract evidence bundle preflight`.
+- No direct source fix, blocker clearing, readiness or `RC_READY` claim, release/tag/deploy, confirmed mutation, raw scan, provider/API call, bearer-token use, or public MCP expansion occurred.
+
+Validation: `CMV-1591` docs/board blocker prioritization validation.
 
 ## CM-1485 RC Blocker Inventory After Controlled Mutation Public Surface Closeout
 

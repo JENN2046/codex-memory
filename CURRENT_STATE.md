@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1485 RC blocker inventory after controlled mutation public surface closeout` |
-| Current validation | `CMV-1590` |
-| Current route | CM-1485 inventories current RC blockers without clearing blockers or claiming readiness |
+| Current task | `CM-1486 RC blocker prioritization and first must-fix selection` |
+| Current validation | `CMV-1591` |
+| Current route | CM-1486 selects the first must-fix blocker for a future docs/preflight evidence bundle without executing a fix |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1486` adds `docs/CM1486_RC_BLOCKER_PRIORITIZATION_AND_FIRST_MUST_FIX_SELECTION.md` as docs-only triage. It orders CM-1485 must-fix blockers and selects `Fresh post-closeout public contract evidence is not bundled for the seven-tool surface` as the first future must-fix repair target. Recommended next route is `CM-1487 post-closeout public contract evidence bundle preflight`. CM-1486 does not directly fix source, clear blockers, claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, perform raw scan, call provider/API, use bearer-token material, or expand public MCP tools.
 
 `CM-1485` adds `docs/CM1485_RC_BLOCKER_INVENTORY_AFTER_CONTROLLED_MUTATION_CLOSEOUT.md` as a docs-only blocker inventory after the controlled mutation public surface closeout. It classifies blockers as must-fix, should-fix, and deferred; records remaining evidence gaps; and recommends `CM-1486 RC blocker disposition and next-slice selection`. CM-1485 does not clear blockers, claim readiness or `RC_READY`, release/tag/deploy, execute confirmed mutation, perform raw scan, call provider/API, use bearer-token material, or expand public MCP tools.
 

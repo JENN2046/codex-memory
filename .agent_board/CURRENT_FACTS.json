@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1485",
-  "validationId": "CMV-1590",
+  "taskId": "CM-1486",
+  "validationId": "CMV-1591",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1591",
+      "scope": "CM-1486 RC blocker prioritization and first must-fix selection",
+      "status": "COMPLETED_VALIDATED_RC_BLOCKER_PRIORITIZATION_NO_FIX_EXECUTED"
+    },
     {
       "id": "CMV-1590",
       "scope": "CM-1485 RC blocker inventory after controlled mutation public surface closeout",

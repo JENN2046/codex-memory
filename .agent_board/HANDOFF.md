@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1485 RC blocker inventory after controlled mutation public surface closeout`.
-Current validation: `CMV-1590`.
-Current handoff: CM-1485 inventories current RC blockers; blockers remain blocked and readiness remains unclaimed.
+Current task: `CM-1486 RC blocker prioritization and first must-fix selection`.
+Current validation: `CMV-1591`.
+Current handoff: CM-1486 selects the first future must-fix target; blockers remain blocked and readiness remains unclaimed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1485 inventories current RC blockers; blockers remain blocke
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_RC_BLOCKER_INVENTORY_NO_READY_CLAIM`.
+Current status: `COMPLETED_VALIDATED_RC_BLOCKER_PRIORITIZATION_NO_FIX_EXECUTED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1486 added `docs/CM1486_RC_BLOCKER_PRIORITIZATION_AND_FIRST_MUST_FIX_SELECTION.md`, prioritized CM-1485 must-fix blockers, and selected the post-closeout seven-tool public contract evidence bundle gap as the first future must-fix repair target. Recommended next route is `CM-1487 post-closeout public contract evidence bundle preflight`.
 - CM-1485 added `docs/CM1485_RC_BLOCKER_INVENTORY_AFTER_CONTROLLED_MUTATION_CLOSEOUT.md`, classified current RC blockers as must-fix, should-fix, and deferred, recorded remaining evidence gaps, and recommended `CM-1486 RC blocker disposition and next-slice selection`. It did not clear blockers or claim readiness / `RC_READY`.
 - CM-1484 added `docs/CM1484_POST_CONTROLLED_MUTATION_CLOSEOUT_ROUTE_REVIEW.md` and selected `CM-1485 RC blocker inventory after controlled mutation public surface closeout` as the next major route. Confirmed mutation chain, VCP-compatible integration readiness, and audit/search/write governance hardening selection are deferred until blockers are inventoried.
 - CM-1483 added `docs/CM1483_CONTROLLED_MUTATION_PUBLIC_SURFACE_CLOSEOUT_RECEIPT.md`, recorded the seven-tool public MCP contract, completed controlled mutation public-surface capabilities, remaining blockers, and next-phase prerequisites. Confirmed mutation remains separate exact approval work.
@@ -53,10 +54,10 @@ Completed in this slice:
 - CM-1452 bridged the release gate matrix to default-safe runner exclusions without package script changes.
 - CM-1453 reinforced readonly `audit_memory` draft validation against mutation-like inputs without public MCP registration.
 - CM-1454 selected no further automatic local-safe slice.
-- Recorded CM-1450 through CM-1485 and CMV-1560 through CMV-1590 in `.agent_board`.
+- Recorded CM-1450 through CM-1486 and CMV-1560 through CMV-1591 in `.agent_board`.
 - The public MCP expansions in this slice are exact-approved readonly bounded `audit_memory` and exact-approved controlled mutation dry-run tools. No confirmed mutation, raw scan, provider/API call, bearer-token material use, durable memory/audit write, config/watchdog/startup mutation, remote action, readiness claim, or `RC_READY` claim occurred.
 
-Validation: latest `CMV-1590`; CM-1485 docs/board blocker inventory validation recorded in `.agent_board/VALIDATION_LOG.md`.
+Validation: latest `CMV-1591`; CM-1486 docs/board blocker prioritization validation recorded in `.agent_board/VALIDATION_LOG.md`.
 
 Boundaries:
 
@@ -65,7 +66,7 @@ Boundaries:
 
 Next safe action:
 
-Next safe action is guarded local commit with message `docs: inventory RC blockers after controlled mutation closeout` after validation and diff review pass. Push requires separate explicit authorization. Confirmed mutation, real DB apply, raw/memory/provider/bearer/remote/readiness work remains forbidden unless separately and exactly approved.
+Next safe action is guarded local commit with message `docs: prioritize RC blockers and select first must-fix` after validation and diff review pass. Push requires separate explicit authorization. Confirmed mutation, real DB apply, raw/memory/provider/bearer/remote/readiness work remains forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 
