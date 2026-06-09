@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1536 live proof rerun readiness decision after freshness guard audit` |
-| Current validation | `CMV-1640` |
-| Current route | decision recorded: ready to request exact operator approval for live proof rerun; live proof not executed |
+| Current task | `CM-1537 live client integration proof rerun after freshness guard` |
+| Current validation | `CMV-1641` |
+| Current route | exact approval received; pre-proof runtime freshness missing/mismatched; blocked before proof requests |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1537` adds `docs/CM1537_LIVE_CLIENT_INTEGRATION_PROOF_RERUN_AFTER_FRESHNESS_GUARD.md` and records the exact-approved rerun attempt after CM-1536. Fresh Git preflight passed on clean synced `main` at `40eba239edadd879070a35903965a0fb7b9a2dec`, but `npm run start:http:ensure` failed closed because the live HTTP runtime was healthy while current-source runtime freshness evidence was missing or mismatched. The rerun stopped as `blocked_before_proof_requests`: no `initialize`, no `tools/list`, and no `tools/call` were sent. No acceptable live proof evidence was generated. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. CM-1537 does not call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, close the effective-write blocker, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1536` adds `docs/CM1536_LIVE_PROOF_RERUN_READINESS_DECISION_AFTER_FRESHNESS_GUARD_AUDIT.md` and records the post-CM-1532/CM-1534/CM-1535 decision point. Decision: `READY_TO_REQUEST_EXACT_OPERATOR_APPROVAL_FOR_LIVE_PROOF_RERUN`, with `execution_status=NOT_EXECUTED` and `approval_status=NOT_GRANTED_BY_CM_1536`. Runtime freshness guard is audited; runner stale fingerprint short-circuit is audited; future rerun must use the existing no-bearer CM-1493 envelope plus a required pre-proof runtime freshness match and fail-closed `blocked_before_proof_requests` behavior on mismatch. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. CM-1536 does not execute live proof, close blockers, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
@@ -239,7 +241,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1505 recommends `CM-1506 audit readonly refinements fixture/test preflight` as the next non-RC backlog hardening slice. Live client evidence and effective write reliability remain `OPEN / DEFERRED`; `RC_READY` remains blocked.
+CM-1537 is blocked before proof requests by missing/mismatched live runtime freshness. Next safe action is a separate exact decision for local HTTP runtime refresh/restart or another bounded freshness remediation path. Live client evidence remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked.
 
 ## Boundaries
 

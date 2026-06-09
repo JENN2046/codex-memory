@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1536",
-  "validationId": "CMV-1640",
+  "taskId": "CM-1537",
+  "validationId": "CMV-1641",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1641",
+      "scope": "CM-1537 live client integration proof rerun after freshness guard",
+      "status": "COMPLETED_VALIDATED_PREPROOF_RUNTIME_FRESHNESS_BLOCKED_NO_LIVE_MCP_OPERATIONS"
+    },
     {
       "id": "CMV-1640",
       "scope": "CM-1536 live proof rerun readiness decision after freshness guard audit",
@@ -658,6 +663,7 @@
     }
   ],
   "notValidated": [
+    "CM-1537 live client proof rerun after freshness guard",
     "live client acceptance",
     "provider smoke or benchmark",
     "live provider/API calls",

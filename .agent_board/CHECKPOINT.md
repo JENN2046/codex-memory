@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1536 live proof rerun readiness decision after freshness guard audit`.
-Current validation: `CMV-1640`.
+Current checkpoint: `CM-1537 live client integration proof rerun after freshness guard`.
+Current validation: `CMV-1641`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1537 Live Client Integration Proof Rerun After Freshness Guard
+
+Status: `COMPLETED_VALIDATED_PREPROOF_RUNTIME_FRESHNESS_BLOCKED_NO_LIVE_MCP_OPERATIONS`
+
+Recorded:
+
+- Added `docs/CM1537_LIVE_CLIENT_INTEGRATION_PROOF_RERUN_AFTER_FRESHNESS_GUARD.md`.
+- Recorded exact approval `APPROVE_LIVE_CLIENT_INTEGRATION_PROOF_RERUN_AFTER_FRESHNESS_GUARD`.
+- Fresh Git preflight passed on clean synced `main` at `40eba239edadd879070a35903965a0fb7b9a2dec`.
+- Runtime freshness preflight `npm run start:http:ensure` failed closed because the endpoint was healthy but current-source runtime freshness evidence was missing or mismatched.
+- Stopped before proof requests: no `initialize`, no `tools/list`, no `tools/call`, and no acceptable live proof evidence.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, effective-write blocker closure, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1641` pre-proof freshness blocker receipt plus docs/source validation.
 
 ## CM-1536 Live Proof Rerun Readiness Decision After Freshness Guard Audit
 

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1536 live proof rerun readiness decision after freshness guard audit`.
-Current validation: `CMV-1640`.
+Current task: `CM-1537 live client integration proof rerun after freshness guard`.
+Current validation: `CMV-1641`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1536` recorded the live proof rerun readiness decision after freshness guard audit. Decision is `READY_TO_REQUEST_EXACT_OPERATOR_APPROVAL_FOR_LIVE_PROOF_RERUN`; execution was not performed and approval was not granted by CM-1536. Runtime freshness guard is audited; runner stale fingerprint short-circuit is audited; future proof rerun must use the CM-1493 no-bearer envelope plus required pre-proof runtime freshness match and fail-closed `blocked_before_proof_requests` mismatch behavior. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is push review for CM-1536 or an operator exact approval decision for the bounded no-bearer live proof rerun; do not rerun proof or close blockers without exact approval.
+`CM-1537` received exact approval for the bounded no-bearer live proof rerun, but pre-proof runtime freshness failed closed. Fresh Git preflight passed on clean synced `main`, then `npm run start:http:ensure` reported a healthy live HTTP runtime whose current-source runtime freshness evidence was missing or mismatched. The rerun stopped before `initialize`, `tools/list`, or `tools/call`; live MCP operation count is `0`, and no acceptable proof evidence was generated. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is a separate exact decision for local HTTP runtime refresh/restart or another bounded freshness remediation path; do not rerun proof or close blockers until runtime freshness matches current source on clean synced `main`.
 
 ## Historical Run Notes
 
