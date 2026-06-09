@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1534 Phase F1 runner freshness mismatch short-circuit`.
-Current validation: `CMV-1638`.
+Current task: `CM-1535 Phase F1 runner freshness short-circuit source audit`.
+Current validation: `CMV-1639`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM1533_RESIDUAL_RUNNER_FRESHNESS_ORDERING_FINDING_FIXED_LOCALLY; live proof retry remains separate`.
+Current route: `CM1534_SOURCE_AUDIT_COMPLETED_PHASE_F1_RUNNER_FRESHNESS_SHORT_CIRCUIT_CONFIRMED; live proof retry remains separate`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1535 audit of Phase F1 runner freshness short-circuit: added `docs/CM1535_PHASE_F1_RUNNER_FRESHNESS_SHORT_CIRCUIT_SOURCE_AUDIT.md`. Independent changed-scope source audit confirmed the CM-1534 runner hardening returns `PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED` with `executionMode=blocked_before_proof_requests` after runtime source fingerprint mismatch, before `resolveMcpUrl`, `initialize`, `tools/list`, or any `tools/call`. Regression evidence proves no HTTP JSON proof requests are issued after stale health freshness. The failure reason remains low-disclosure (`runtime_source_fingerprint_mismatch`), and blocked evidence omits actual/expected fingerprints, bearer-token material, Authorization header material, local paths, provider/API keys or endpoints, raw memory, and raw audit content. Public MCP surface remains exactly seven tools, and no live proof automatic execution was introduced. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1535.
 
 CM-1534 Phase F1 runner freshness mismatch short-circuit: added `docs/CM1534_PHASE_F1_RUNNER_FRESHNESS_MISMATCH_SHORT_CIRCUIT.md`; updated `src/core/PhaseF1LiveClientNoWriteEvidenceRunner.js` and `tests/phase-f1-live-client-no-write-runner.test.js`. The runner now fails closed immediately after `/health` when runtime freshness is missing or mismatched, before any `initialize`, `tools/list`, or `tools/call` proof request. The blocked evidence uses low-disclosure `runtime_source_fingerprint_mismatch` wording and does not expose actual/expected fingerprints, bearer-token material, Authorization header material, local paths, provider/API keys or endpoints, raw memory, or raw audit content. The regression test proves stale health freshness produces `executionMode=blocked_before_proof_requests`, `evidenceAccepted=false`, no HTTP JSON proof requests, zero provider calls, zero durable writes, and no readiness claim. Public MCP surface remains exactly seven tools. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1534.
 

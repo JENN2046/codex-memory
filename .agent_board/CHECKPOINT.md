@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1534 Phase F1 runner freshness mismatch short-circuit`.
-Current validation: `CMV-1638`.
+Current checkpoint: `CM-1535 Phase F1 runner freshness short-circuit source audit`.
+Current validation: `CMV-1639`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1535 Audit of Phase F1 Runner Freshness Short-Circuit
+
+Status: `COMPLETED_VALIDATED_SOURCE_AUDIT_PHASE_F1_RUNNER_FRESHNESS_SHORT_CIRCUIT_CONFIRMED_NO_LIVE_PROOF`
+
+Recorded:
+
+- Added `docs/CM1535_PHASE_F1_RUNNER_FRESHNESS_SHORT_CIRCUIT_SOURCE_AUDIT.md`.
+- Reviewed CM-1534 changed scope without executing live proof.
+- Confirmed fingerprint mismatch returns `PHASE_F1_LIVE_CLIENT_NO_WRITE_EXECUTION_BLOCKED_FAIL_CLOSED` with `executionMode=blocked_before_proof_requests`.
+- Confirmed the mismatch return happens before `resolveMcpUrl`, `initialize`, `tools/list`, or any `tools/call`.
+- Confirmed regression evidence proves no HTTP JSON proof request is issued after stale health freshness.
+- Confirmed failure reason is low-disclosure `runtime_source_fingerprint_mismatch`.
+- Confirmed blocked evidence omits actual/expected fingerprints, bearer-token material, Authorization header material, local paths, provider/API details, raw memory, and raw audit content.
+- Confirmed public MCP surface remains exactly seven tools.
+- Confirmed no live proof automatic execution was introduced.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live proof execution, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1639` source audit/docs/board validation.
 
 ## CM-1534 Phase F1 Runner Freshness Mismatch Short-Circuit
 
