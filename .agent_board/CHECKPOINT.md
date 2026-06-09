@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1505 bounded search projection regression closeout and next backlog selection`.
-Current validation: `CMV-1610`.
+Current checkpoint: `CM-1506 audit readonly refinements fixture/test preflight`.
+Current validation: `CMV-1611`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1506 Audit Readonly Refinement Evidence Preflight
+
+Status: `COMPLETED_VALIDATED_AUDIT_READONLY_REFINEMENT_PREFLIGHT_NO_READY_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1506_AUDIT_READONLY_REFINEMENT_EVIDENCE_PREFLIGHT.md`.
+- Reviewed existing audit readonly service/test surfaces by source/test file inspection only.
+- Recorded acceptance criteria for readonly behavior, raw/private suppression, bounded evidence summary, raw/mutation-like rejection, provider/API isolation, public surface stability, and RC blocker isolation.
+- Recorded fixture/test plan for future CM-1507.
+- Recorded source-finding policy: if production source hardening is required, route it separately before editing production source.
+- No readiness / `RC_READY` claim, RC blocker closure, live client call, provider/API, bearer token, raw scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
+
+Validation: `CMV-1611` docs/board preflight validation.
 
 ## CM-1505 Bounded Search Projection Regression Closeout And Next Backlog Selection
 

@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1505 bounded search projection regression closeout and next backlog selection` |
-| Current validation | `CMV-1610` |
-| Current route | CM-1505 closes non-RC bounded search projection backlog item and selects audit readonly refinements |
+| Current task | `CM-1506 audit readonly refinements fixture/test preflight` |
+| Current validation | `CMV-1611` |
+| Current route | CM-1506 prepares audit readonly refinement fixture/test preflight |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1506` adds `docs/CM1506_AUDIT_READONLY_REFINEMENT_EVIDENCE_PREFLIGHT.md` as a docs/board preflight for the non-RC backlog item `audit readonly refinements`. It records the existing audit readonly service/test surfaces, acceptance criteria, fixture/test plan, source-finding policy, and validation matrix for future CM-1507 fixture/test execution. CM-1506 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1505` adds `docs/CM1505_BOUNDED_SEARCH_PROJECTION_REGRESSION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`, closes the non-RC backlog item `bounded search projection regression` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING`, and selects `audit readonly refinements` as the next non-RC backlog item. This closeout is docs-only. CM-1505 does not claim readiness / `RC_READY`, close live client evidence RC blocker, close effective write reliability RC blocker, execute live client calls, call provider/API, use bearer-token material, perform raw scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or modify source/tests. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

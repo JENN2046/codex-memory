@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1505 bounded search projection regression closeout and next backlog selection`.
-Current validation: `CMV-1610`.
+Current task: `CM-1506 audit readonly refinements fixture/test preflight`.
+Current validation: `CMV-1611`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `CM-1505 closes non-RC bounded search projection backlog item and selects audit readonly refinements`.
+Current route: `CM-1506 prepares audit readonly refinement fixture/test preflight`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1506 audit readonly refinements fixture/test preflight: added `docs/CM1506_AUDIT_READONLY_REFINEMENT_EVIDENCE_PREFLIGHT.md`. Recorded existing audit readonly service/test surfaces, acceptance criteria, fixture/test plan, source-finding policy, and validation matrix for future CM-1507 fixture/test execution. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 
 CM-1505 bounded search projection regression closeout and next backlog selection: added `docs/CM1505_BOUNDED_SEARCH_PROJECTION_REGRESSION_CLOSEOUT_AND_NEXT_BACKLOG_SELECTION.md`. Closed the non-RC backlog item `bounded search projection regression` as `COMPLETED_TEST_ONLY_BACKLOG_HARDENING` and selected `audit readonly refinements` as the next non-RC backlog item. Overall project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; live client evidence blocker remains `OPEN / DEFERRED`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains blocked. No readiness or `RC_READY` claim, RC blocker closure, live client call, provider/API call, bearer-token use, raw scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, source change, or test change occurred.
 
