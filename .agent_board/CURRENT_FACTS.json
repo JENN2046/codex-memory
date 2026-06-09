@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1530",
-  "validationId": "CMV-1634",
+  "taskId": "CM-1531",
+  "validationId": "CMV-1635",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1635",
+      "scope": "CM-1531 live runtime low-disclosure mismatch diagnosis",
+      "status": "COMPLETED_VALIDATED_STALE_LIVE_HTTP_RUNTIME_PRIMARY_HYPOTHESIS"
+    },
     {
       "id": "CMV-1634",
       "scope": "CM-1530 live client integration proof after hardening",

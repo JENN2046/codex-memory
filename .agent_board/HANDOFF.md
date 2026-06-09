@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1530 rerun live client integration proof after hardening`.
-Current validation: `CMV-1634`.
-Current handoff: live proof rerun executed with finding; live client evidence blocker remains open.
+Current task: `CM-1531 diagnose live runtime low-disclosure mismatch`.
+Current validation: `CMV-1635`.
+Current handoff: stale live HTTP runtime freshness is primary hypothesis; live client evidence blocker remains open.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: live proof rerun executed with finding; live client evidence bl
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `LIVE_PROOF_RERUN_EXECUTED_WITH_FINDING / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current status: `STALE_LIVE_HTTP_RUNTIME_PRIMARY_HYPOTHESIS / NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1531 added `docs/CM1531_LIVE_RUNTIME_LOW_DISCLOSURE_MISMATCH_DIAGNOSIS.md` and `tests/live-runtime-low-disclosure-mismatch-diagnosis.test.js`. Diagnosis decision is `STALE_LIVE_HTTP_RUNTIME_IS_PRIMARY_HYPOTHESIS`: current source/tests use `PUBLIC_REQUEST_BLOCKED` and `public_selected_overview` v2, but CM-1530 live endpoint still observed old shapes. Runtime inspection found the `7605` listener running `scripts\serve-codex-memory-http.js`; `scripts\ensure-codex-memory-http.ps1` exits on healthy `/health` without current-HEAD/source freshness validation. Finding: `CM-1531_FINDING: LIVE_RUNTIME_PROCESS_FRESHNESS_NOT_PROVEN`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No live proof closeout, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1530 added `docs/CM1530_LIVE_CLIENT_INTEGRATION_PROOF_AFTER_HARDENING.md` and reran the approved no-bearer local HTTP MCP proof after CM-1527 low-disclosure hardening and CM-1529 runner alignment were pushed. Fresh Git preflight confirmed local `main` synced with `origin/main` at `7add1bba91fb2e05d5438a0b2b651957379b7b39`. `tools/list` returned exactly seven public tools, but low-disclosure failed live: no-token rejection still used old code/reason shapes and `memory_overview` still used old selected projection metadata. Finding: `CM-1530_FINDING: LIVE_RUNTIME_LOW_DISCLOSURE_STILL_NOT_OBSERVED_AFTER_HARDENING`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, `dry_run=false`, `confirm=true`, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1529 added `docs/CM1529_PHASE_F1_RUNNER_PUBLIC_TOOLS_EXPECTATION_HARDENING.md` and updated `PhaseF1LiveClientNoWriteEvidenceRunner` so `REQUIRED_PUBLIC_TOOLS` matches the current seven-tool public MCP surface. Regression tests assert the exact seven-tool list and injected `publicToolCount=7`; runner validation passed `7/7`, HTTP MCP validation passed `26/26`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No live client proof, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
 - CM-1528 added `docs/CM1528_NO_TOKEN_LOW_DISCLOSURE_HARDENING_SOURCE_AUDIT.md` and completed a read-only changed-scope source audit of CM-1527. Runtime no-token rejection and public `memory_overview` projection hardening pass within changed scope. Runtime HTTP MCP tests still assert seven tools. Residual finding: `PhaseF1LiveClientNoWriteEvidenceRunner` still expects the older three-tool public surface and should be separately hardened before proof retry if that runner is used. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. No live client call, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.

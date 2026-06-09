@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1530 rerun live client integration proof after hardening` |
-| Current validation | `CMV-1634` |
-| Current route | live proof rerun executed with finding; live client evidence blocker remains open |
+| Current task | `CM-1531 diagnose live runtime low-disclosure mismatch` |
+| Current validation | `CMV-1635` |
+| Current route | stale live HTTP runtime freshness is primary hypothesis; live client evidence blocker remains open |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1531` adds `docs/CM1531_LIVE_RUNTIME_LOW_DISCLOSURE_MISMATCH_DIAGNOSIS.md` and `tests/live-runtime-low-disclosure-mismatch-diagnosis.test.js`. Diagnosis decision is `STALE_LIVE_HTTP_RUNTIME_IS_PRIMARY_HYPOTHESIS`: current source uses `PUBLIC_REQUEST_BLOCKED` no-token rejection and `public_selected_overview` projection v2, current tests cover those shapes, but CM-1530 live endpoint still observed old shapes. Runtime inspection found the `7605` listener running `scripts/serve-codex-memory-http.js`, and `scripts/ensure-codex-memory-http.ps1` exits successfully when `/health` is already healthy without current-HEAD/source freshness validation. Finding: `CM-1531_FINDING: LIVE_RUNTIME_PROCESS_FRESHNESS_NOT_PROVEN`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. CM-1531 does not rerun live proof closeout, close blockers, call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 `CM-1530` adds `docs/CM1530_LIVE_CLIENT_INTEGRATION_PROOF_AFTER_HARDENING.md` and reruns the approved no-bearer local HTTP MCP proof after CM-1527 low-disclosure hardening and CM-1529 runner alignment were pushed. Fresh Git preflight confirmed local `main` synced with `origin/main` at `7add1bba91fb2e05d5438a0b2b651957379b7b39` before the proof. The proof executed one no-bearer `initialize`, one no-bearer `tools/list`, and seven no-bearer bounded `tools/call` operations. `tools/list` returned exactly seven public tools, but the proof failed the low-disclosure checks because the live endpoint still returned old no-token rejection code/reason shapes and old `memory_overview` selected projection metadata. Finding: `CM-1530_FINDING: LIVE_RUNTIME_LOW_DISCLOSURE_STILL_NOT_OBSERVED_AFTER_HARDENING`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`. CM-1530 does not call provider/API, use bearer-token material, perform raw memory/audit/broad scan, execute effective `record_memory`, execute confirmed mutation, use `dry_run=false` or `confirm=true` mutation, expand public MCP tools, release/tag/deploy, or claim readiness / `RC_READY`. Overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 

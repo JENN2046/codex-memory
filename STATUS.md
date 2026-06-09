@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1530 rerun live client integration proof after hardening`.
-Current validation: `CMV-1634`.
+Current task: `CM-1531 diagnose live runtime low-disclosure mismatch`.
+Current validation: `CMV-1635`.
 Current project status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
-Current route: `LIVE_PROOF_RERUN_EXECUTED_WITH_FINDING; live client evidence blocker remains open`.
+Current route: `STALE_LIVE_HTTP_RUNTIME_PRIMARY_HYPOTHESIS; live client evidence blocker remains open`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1531 diagnose live runtime low-disclosure mismatch: added `docs/CM1531_LIVE_RUNTIME_LOW_DISCLOSURE_MISMATCH_DIAGNOSIS.md` and `tests/live-runtime-low-disclosure-mismatch-diagnosis.test.js`. Diagnosis decision is `STALE_LIVE_HTTP_RUNTIME_IS_PRIMARY_HYPOTHESIS`: current source and source-side HTTP tests use the new low-disclosure no-token rejection and `memory_overview` projection v2, but CM-1530 live endpoint still observed old shapes. Runtime inspection found the `7605` listener running `scripts/serve-codex-memory-http.js`; the startup helper `scripts/ensure-codex-memory-http.ps1` exits when `/health` is already healthy and does not validate current `HEAD` or source freshness. Finding: `CM-1531_FINDING: LIVE_RUNTIME_PROCESS_FRESHNESS_NOT_PROVEN`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No live proof closeout, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1531.
 
 CM-1530 rerun live client integration proof after hardening: added `docs/CM1530_LIVE_CLIENT_INTEGRATION_PROOF_AFTER_HARDENING.md`. Executed the approved no-bearer local HTTP MCP proof after CM-1527 low-disclosure hardening and CM-1529 runner alignment were pushed. Fresh Git preflight confirmed local `main` synced with `origin/main` at `7add1bba91fb2e05d5438a0b2b651957379b7b39`. `tools/list` returned exactly seven public tools, but the proof failed low-disclosure checks because the live endpoint still returned old no-token rejection code/reason shapes and old `memory_overview` selected projection metadata. Finding: `CM-1530_FINDING: LIVE_RUNTIME_LOW_DISCLOSURE_STILL_NOT_OBSERVED_AFTER_HARDENING`. Live client evidence blocker remains `STILL_OPEN`; effective write reliability blocker remains `OPEN / DEFERRED`; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; `RC_READY` remains blocked. No provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory` write, confirmed mutation, `dry_run=false` mutation, `confirm=true` mutation, public MCP expansion, effective write reliability proof, release/tag/deploy, readiness claim, or `RC_READY` claim occurred in CM-1530.
 

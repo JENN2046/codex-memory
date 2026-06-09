@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1530 rerun live client integration proof after hardening`.
-Current validation: `CMV-1634`.
+Current checkpoint: `CM-1531 diagnose live runtime low-disclosure mismatch`.
+Current validation: `CMV-1635`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1531 Live Runtime Low-Disclosure Mismatch Diagnosis
+
+Status: `COMPLETED_VALIDATED_STALE_LIVE_HTTP_RUNTIME_PRIMARY_HYPOTHESIS`
+
+Recorded:
+
+- Added `docs/CM1531_LIVE_RUNTIME_LOW_DISCLOSURE_MISMATCH_DIAGNOSIS.md`.
+- Added `tests/live-runtime-low-disclosure-mismatch-diagnosis.test.js`.
+- Diagnosed that current source uses `PUBLIC_REQUEST_BLOCKED` no-token rejection and `public_selected_overview` projection v2.
+- Confirmed current HTTP tests cover those source-side shapes.
+- Inspected the `7605` listener and found a Node process running `scripts\serve-codex-memory-http.js`.
+- Confirmed `scripts\ensure-codex-memory-http.ps1` exits when `/health` is healthy and does not validate current `HEAD` or source freshness.
+- Finding recorded: `CM-1531_FINDING: LIVE_RUNTIME_PROCESS_FRESHNESS_NOT_PROVEN`.
+- Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains `BLOCKED`.
+- No live proof closeout, blocker closure, provider/API call, bearer-token use, raw memory/audit/broad scan, effective `record_memory`, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or `RC_READY` claim occurred.
+
+Validation: `CMV-1635` source/test/docs/board validation.
 
 ## CM-1530 Live Client Integration Proof After Hardening
 

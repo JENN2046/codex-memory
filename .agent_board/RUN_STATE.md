@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1530 rerun live client integration proof after hardening`.
-Current validation: `CMV-1634`.
+Current task: `CM-1531 diagnose live runtime low-disclosure mismatch`.
+Current validation: `CMV-1635`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1530` reran the approved no-bearer local HTTP MCP proof after CM-1527 no-token low-disclosure hardening and CM-1529 runner alignment were pushed. The exact seven-tool public surface was observed, but live low-disclosure was not: the endpoint still returned old no-token rejection code/reason shapes and old `memory_overview` selected projection metadata. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is runtime freshness verification/retry under an allowed envelope or source hardening if a refreshed runtime still fails.
+`CM-1531` diagnosed the CM-1530 live low-disclosure mismatch. Current source/tests use `PUBLIC_REQUEST_BLOCKED` and `public_selected_overview` v2, while the live `7605` endpoint observed old shapes. The primary hypothesis is stale live HTTP runtime process freshness: `ensure-codex-memory-http.ps1` exits on healthy `/health` and does not validate current `HEAD` or loaded source freshness. Live client evidence blocker remains `STILL_OPEN`; effective write reliability remains `OPEN / DEFERRED`; `RC_READY` remains blocked; overall status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Next safe route is an exact runtime refresh/freshness envelope or a bounded freshness probe before another proof retry.
 
 ## Historical Run Notes
 
