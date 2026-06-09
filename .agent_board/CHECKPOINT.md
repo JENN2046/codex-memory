@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1483 controlled mutation public surface closeout receipt`.
-Current validation: `CMV-1588`.
+Current checkpoint: `CM-1484 post controlled mutation closeout route review`.
+Current validation: `CMV-1589`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1484 Post Controlled Mutation Closeout Route Review
+
+Status: `COMPLETED_VALIDATED_POST_CLOSEOUT_ROUTE_REVIEW_NO_MUTATION`
+
+Recorded:
+
+- Added `docs/CM1484_POST_CONTROLLED_MUTATION_CLOSEOUT_ROUTE_REVIEW.md`.
+- Reviewed candidate routes A through D after controlled mutation public surface closeout.
+- Decision is `GO_FOR_RC_BLOCKER_INVENTORY`.
+- Decision is `NO_GO_FOR_CONFIRMED_MUTATION_CHAIN_AS_NEXT_DEFAULT_ROUTE`.
+- Decision is `DEFER_VCP_INTEGRATION_READINESS_UNTIL_BLOCKERS_ARE_INVENTORIED`.
+- Decision is `DEFER_AUDIT_SEARCH_WRITE_GOVERNANCE_HARDENING_SELECTION_UNTIL_BLOCKERS_ARE_INVENTORIED`.
+- Recommended next route is `CM-1485 RC blocker inventory after controlled mutation public surface closeout`.
+- No confirmed mutation, `dry_run=false`, `confirm=true`, raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push occurred.
+
+Validation: `CMV-1589` docs/board route review validation.
 
 ## CM-1483 Controlled Mutation Public Surface Closeout Receipt
 

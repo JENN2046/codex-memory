@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-09",
-  "taskId": "CM-1483",
-  "validationId": "CMV-1588",
+  "taskId": "CM-1484",
+  "validationId": "CMV-1589",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_NOT_READY_BLOCKED"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1589",
+      "scope": "CM-1484 post controlled mutation closeout route review",
+      "status": "COMPLETED_VALIDATED_POST_CLOSEOUT_ROUTE_REVIEW_NO_MUTATION"
+    },
     {
       "id": "CMV-1588",
       "scope": "CM-1483 controlled mutation public surface closeout receipt",

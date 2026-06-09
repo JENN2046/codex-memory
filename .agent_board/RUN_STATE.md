@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1483 controlled mutation public surface closeout receipt`.
-Current validation: `CMV-1588`.
+Current task: `CM-1484 post controlled mutation closeout route review`.
+Current validation: `CMV-1589`.
 Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1483` records a docs-only controlled mutation public surface closeout receipt. The current public MCP contract is seven tools, and confirmed mutation remains blocked pending separate exact approval. Next safe action is guarded local commit with message `docs: close out controlled mutation public surface` after validation and diff review pass. Push requires separate explicit authorization.
+`CM-1484` records a docs-only post-closeout route review. Next major route is RC blocker inventory; confirmed mutation chain, VCP integration readiness, and audit/search/write governance selection are deferred until blockers are inventoried. Next safe action is guarded local commit with message `docs: review post controlled mutation closeout route` after validation and diff review pass. Push requires separate explicit authorization.
 
 ## Historical Run Notes
 

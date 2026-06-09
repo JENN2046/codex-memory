@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
-| Current task | `CM-1483 controlled mutation public surface closeout receipt` |
-| Current validation | `CMV-1588` |
-| Current route | CM-1483 closes the controlled mutation public surface stage as docs-only evidence while preserving seven-tool public contract and confirmed-mutation exact-approval block |
+| Current task | `CM-1484 post controlled mutation closeout route review` |
+| Current validation | `CMV-1589` |
+| Current route | CM-1484 selects RC blocker inventory as the next major route after controlled mutation public surface closeout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1484` adds `docs/CM1484_POST_CONTROLLED_MUTATION_CLOSEOUT_ROUTE_REVIEW.md` as a docs-only route review after the controlled mutation public surface closeout. Decision is `GO_FOR_RC_BLOCKER_INVENTORY`, `NO_GO_FOR_CONFIRMED_MUTATION_CHAIN_AS_NEXT_DEFAULT_ROUTE`, `DEFER_VCP_INTEGRATION_READINESS_UNTIL_BLOCKERS_ARE_INVENTORIED`, and `DEFER_AUDIT_SEARCH_WRITE_GOVERNANCE_HARDENING_SELECTION_UNTIL_BLOCKERS_ARE_INVENTORIED`. Recommended next route is `CM-1485 RC blocker inventory after controlled mutation public surface closeout`. CM-1484 does not execute confirmed mutation, does not use `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
 `CM-1483` adds `docs/CM1483_CONTROLLED_MUTATION_PUBLIC_SURFACE_CLOSEOUT_RECEIPT.md` as a docs-only closeout receipt for the controlled mutation public surface stage. The receipt records the current seven-tool public MCP contract: `record_memory`, `search_memory`, `memory_overview`, `audit_memory`, `validate_memory`, `tombstone_memory`, and `supersede_memory`. It records completed capabilities from preflight through registration, dry-run proof, actor binding, same-actor probing review, uniform low-disclosure hardening, and post-push source audit. Confirmed controlled mutation remains blocked and requires separate exact approval with one operator-provided target id and one mutation type. CM-1483 does not execute confirmed mutation, does not execute `dry_run=false` or `confirm=true`, does not perform raw scan, provider/API call, bearer-token use, readiness claim, `RC_READY` claim, release/tag/deploy, remote action, or push.
 
