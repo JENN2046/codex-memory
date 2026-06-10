@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1599 persistent TagMemo enrichment exact approval envelope`.
-Current validation: `CMV-1703`.
-Current handoff: Persistent TagMemo enrichment exact approval envelope is recorded; persistent tag write remains blocked until a future task supplies `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`.
+Current task: `CM-1600 persistent TagMemo enrichment no-write lane closeout`.
+Current validation: `CMV-1704`.
+Current handoff: Sprint E no-write lane is closed; persistent tag write remains blocked until a future task supplies `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF` and an exact command envelope.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Persistent TagMemo enrichment exact approval envelope is record
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_APPROVAL_ENVELOPE_RECORDED_NO_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_NO_WRITE_LANE_CLOSED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1600 added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_NO_WRITE_LANE_CLOSEOUT.md` and closes the Sprint E no-write governance lane. Sidecar schema is `BASELINE_COMPLETED_TEST_ONLY`; sidecar persistence adapter contract is `BASELINE_COMPLETED_TEST_ONLY`; sidecar dry-run adapter is `IMPLEMENTED_AND_AUDITED`; approval envelope is `COMPLETED`; persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; exact approval `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF` remains required for any future proof. No persistent tag write, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1599 added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_APPROVAL_ENVELOPE.md`. It records the future exact approval string `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, future command-envelope requirements, write proof scope, rollback/cleanup/tombstone sync proof boundary, and abort criteria. Persistent tag write remains `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`; sidecar dry-run adapter remains `IMPLEMENTED_AND_AUDITED`; no persistent tag write, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1598 added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_CLOSEOUT.md` and closes the dry-run adapter baseline as `IMPLEMENTED_AND_AUDITED`. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; no second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred. Future persistent tag enrichment remains separate exact-approval work.
 - CM-1597 added `docs/CM1597_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT.md` and records independent changed-scope audit pass for the dry-run adapter source, fixture, tests, and evidence doc. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Sidecar persistence dry-run adapter is `IMPLEMENTED_AND_AUDITED`; baseline closeout remains next. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; no second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1599 persistent TagMemo enrichment exact approval envelope`.
-Current validation: `CMV-1703`.
+Current task: `CM-1600 persistent TagMemo enrichment no-write lane closeout`.
+Current validation: `CMV-1704`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_APPROVAL_ENVELOPE_RECORDED_NO_WRITE`.
+Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_NO_WRITE_LANE_CLOSED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1600 persistent TagMemo enrichment no-write lane closeout: added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_NO_WRITE_LANE_CLOSEOUT.md`. This docs-only closeout records sidecar schema as `BASELINE_COMPLETED_TEST_ONLY`, sidecar persistence adapter contract as `BASELINE_COMPLETED_TEST_ONLY`, sidecar dry-run adapter as `IMPLEMENTED_AND_AUDITED`, and approval envelope as `COMPLETED`. Persistent tag enrichment is `NOT_STARTED`; persistent tag write is `STILL_BLOCKED`; exact approval `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF` remains required; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1599 persistent TagMemo enrichment exact approval envelope: added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_APPROVAL_ENVELOPE.md`. This docs-only envelope defines future exact approval string `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, future command-envelope requirements, bounded write proof scope, rollback/cleanup/tombstone sync proof boundary, proof evidence format, and abort criteria. Persistent tag write is `STILL_BLOCKED`; persistent tag enrichment is `NOT_STARTED`; sidecar dry-run adapter is `IMPLEMENTED_AND_AUDITED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1599 persistent TagMemo enrichment exact approval envelope` |
-| Current validation | `CMV-1703` |
-| Current route | Persistent TagMemo enrichment approval envelope recorded; persistent tag write remains still blocked |
+| Current task | `CM-1600 persistent TagMemo enrichment no-write lane closeout` |
+| Current validation | `CMV-1704` |
+| Current route | Sprint E no-write lane closed; persistent tag write remains still blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1600` adds `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_NO_WRITE_LANE_CLOSEOUT.md` and closes Sprint E no-write governance lane. Sidecar schema is `BASELINE_COMPLETED_TEST_ONLY`; sidecar persistence adapter contract is `BASELINE_COMPLETED_TEST_ONLY`; sidecar dry-run adapter is `IMPLEMENTED_AND_AUDITED`; approval envelope is `COMPLETED`; persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; exact approval `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF` remains required for any future proof; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1599` adds `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_APPROVAL_ENVELOPE.md` and records the future exact approval envelope for persistent TagMemo enrichment proof. It defines exact approval string `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, future command-envelope requirements, write proof scope, rollback/cleanup/tombstone sync proof boundary, and abort criteria. Persistent tag write is `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`; sidecar dry-run adapter remains `IMPLEMENTED_AND_AUDITED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
