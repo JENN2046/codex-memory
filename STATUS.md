@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1580 V8 TagMemo recall foundation Sprint B source audit`.
-Current validation: `CMV-1684`.
+Current task: `CM-1581 V8 TagMemo recall composition Sprint C preflight`.
+Current validation: `CMV-1685`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_SOURCE_AUDITED_AFTER_PUSH`.
+Current route: `V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_PREFLIGHT_DOCS_ONLY`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1581 V8 TagMemo recall composition Sprint C preflight: added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_PREFLIGHT.md`. This docs-only preflight plans bounded recall composition order `query expansion -> association recall -> time decay -> importance scoring -> recall ranking`, with tag extraction as supporting bounded tag projection. Proposed future module is `src/tagmemo/recall-composition.js`; source implementation and runtime integration remain `NOT_STARTED`. Public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; persistent tag enrichment is `NOT_STARTED`; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1580 V8 TagMemo recall foundation Sprint B source audit: added `docs/CM1580_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_SOURCE_AUDIT.md`. Independent changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Query expansion, association recall, and time-decay scoring remain deterministic internal pure-function baselines with bounded input/output and low-disclosure empty/rejected paths. Public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; persistent tag enrichment is `NOT_STARTED`; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

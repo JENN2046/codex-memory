@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1580 V8 TagMemo recall foundation Sprint B source audit`.
-Current validation: `CMV-1684`.
+Current checkpoint: `CM-1581 V8 TagMemo recall composition Sprint C preflight`.
+Current validation: `CMV-1685`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1581 V8 TagMemo Recall Composition Sprint C Preflight
+
+Status: `COMPLETED_VALIDATED_V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_PREFLIGHT_RECORDED_NO_RUNTIME_INTEGRATION`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_PREFLIGHT.md`.
+- Planned bounded recall composition order: query expansion -> association recall -> time decay -> importance scoring -> recall ranking.
+- Recorded tag extraction as a supporting bounded tag projection source.
+- Proposed future internal module `src/tagmemo/recall-composition.js` without implementing it.
+- Defined bounded input/output contracts, fail-closed/no-op behavior, fixture/test plan, and explicit non-goals.
+- Runtime integration remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Raw scan and broad memory scan remain `NOT_RUN`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, live proof, confirmed mutation, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1685` docs-only Sprint C preflight validation.
 
 ## CM-1580 V8 TagMemo Recall Foundation Sprint B Source Audit
 

@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1580 V8 TagMemo recall foundation Sprint B source audit` |
-| Current validation | `CMV-1684` |
-| Current route | Sprint B pushed, then independently audited locally; next safe route is Sprint C planning/preflight only |
+| Current task | `CM-1581 V8 TagMemo recall composition Sprint C preflight` |
+| Current validation | `CMV-1685` |
+| Current route | Sprint C bounded recall composition preflight recorded docs-only; next safe route is fixture/test coverage only |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1581` adds `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_PREFLIGHT.md` and opens Sprint C as docs-only bounded recall composition preflight. It records the required composition order `query expansion -> association recall -> time decay -> importance scoring -> recall ranking`, with tag extraction as supporting bounded tag projection. Proposed future module is `src/tagmemo/recall-composition.js`, but source implementation and runtime integration remain `NOT_STARTED`. Public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, persistent tag enrichment, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1580` adds `docs/CM1580_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_SOURCE_AUDIT.md` and records an independent changed-scope source audit of Sprint B after `f5324bd2` remote sync. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Query expansion, association recall, and time-decay scoring remain deterministic internal pure-function baselines with bounded input/output and low-disclosure empty/rejected paths. Public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, persistent tag enrichment, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
