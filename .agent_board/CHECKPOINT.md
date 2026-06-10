@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1578 simple time-decay scoring baseline`.
-Current validation: `CMV-1682`.
+Current checkpoint: `CM-1579 V8 TagMemo recall foundation Sprint B closeout`.
+Current validation: `CMV-1683`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1579 V8 TagMemo Recall Foundation Sprint B Closeout
+
+Status: `COMPLETED_VALIDATED_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_COMPLETED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_CLOSEOUT.md`.
+- Recorded query expansion as `IMPLEMENTED_AND_AUDITED`.
+- Recorded association recall as `IMPLEMENTED_AND_AUDITED`.
+- Recorded time-decay scoring as `IMPLEMENTED_AND_AUDITED`.
+- Recorded persistent tag enrichment, public MCP expansion, deep recall runtime integration, relation graph persistence, persistent decay state, memory consolidation, and complete V8 as not started or not claimed.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 ready claim occurred.
+
+Validation: `CMV-1683` Sprint B final closeout validation.
 
 ## CM-1578 Simple Time-Decay Scoring Baseline
 

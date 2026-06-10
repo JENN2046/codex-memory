@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1578 simple time-decay scoring baseline`.
-Current validation: `CMV-1682`.
+Current task: `CM-1579 V8 TagMemo recall foundation Sprint B closeout`.
+Current validation: `CMV-1683`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1578` implements and audits the simple deterministic time-decay scoring baseline. The next Sprint B slice is final closeout. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent decay state, relation graph persistence, persistent tag enrichment, public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1579` closes V8 TagMemo Recall Foundation Sprint B locally. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent decay state, relation graph persistence, persistent tag enrichment, public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred. Push was not performed without explicit push authorization.
 
 ## Historical Run Notes
 

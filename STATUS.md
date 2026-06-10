@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1578 simple time-decay scoring baseline`.
-Current validation: `CMV-1682`.
+Current task: `CM-1579 V8 TagMemo recall foundation Sprint B closeout`.
+Current validation: `CMV-1683`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `SPRINT_B_TIME_DECAY_SCORING_IMPLEMENTED_AND_AUDITED_NEXT_FINAL_CLOSEOUT`.
+Current route: `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_COMPLETED_LOCAL_NO_PUSH`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1579 V8 TagMemo recall foundation Sprint B closeout: added `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_CLOSEOUT.md` and records `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_COMPLETED`. Query expansion, association recall, and time-decay scoring are implemented and audited as deterministic internal baselines. Persistent tag enrichment, public MCP expansion, deep recall runtime integration, relation graph persistence, persistent decay state, memory consolidation, production/release/cutover readiness, and complete V8 remain not started or not claimed. Public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1578 simple time-decay scoring baseline: added `src/tagmemo/time-decay-scoring.js`, `tests/fixtures/tagmemo-time-decay-scoring-sprint-b-v1.json`, `tests/tagmemo-time-decay-scoring.test.js`, and `docs/V8_TAGMEMO_TIME_DECAY_SCORING_BASELINE.md`. The internal pure function accepts bounded safe-recency and safe evidence hints; outputs deterministic bounded `timeDecayScore`, `timeDecayBand`, `decayReasons`, and `decayVersion=deterministic_v1`; merges duplicate signals; and returns low-disclosure empty/rejected results. Targeted validation passed `10/10`. Time-decay scoring baseline is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; persistent decay state is `NOT_STARTED`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
