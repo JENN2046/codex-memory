@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1563 deterministic TagMemo importance scoring core`.
-Current validation: `CMV-1667`.
+Current task: `CM-1564 TagMemo importance scoring source audit`.
+Current validation: `CMV-1668`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_IMPORTANCE_SCORING_CORE_IMPLEMENTED; independent source audit not yet recorded`.
+Current route: `TAGMEMO_IMPORTANCE_SCORING_BASELINE_IMPLEMENTED_AND_AUDITED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1564 TagMemo importance scoring source audit: added `docs/CM1564_TAGMEMO_IMPORTANCE_SCORING_SOURCE_AUDIT.md`. Independent changed-scope source audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the importance scoring baseline is `IMPLEMENTED_AND_AUDITED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no raw scan; no confirmed mutation; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. Targeted validation remained `9/9`.
 
 CM-1563 deterministic TagMemo importance scoring core: added `src/tagmemo/importance-scoring.js` and expanded `tests/tagmemo-importance-scoring.test.js`. The internal pure function accepts bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints; outputs `importanceScore`, `importanceBand`, bounded `scoringSignals`, and `scoreVersion=deterministic_v1`; merges duplicate signals deterministically; lowers temporary status noise; and returns low-disclosure empty/rejected results. Targeted validation passed `9/9`. Persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no raw scan; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 

@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1563 deterministic TagMemo importance scoring core` |
-| Current validation | `CMV-1667` |
-| Current route | Importance scoring core implemented; independent source audit not yet recorded |
+| Current task | `CM-1564 TagMemo importance scoring source audit` |
+| Current validation | `CMV-1668` |
+| Current route | Importance scoring baseline implemented and audited |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1564` adds `docs/CM1564_TAGMEMO_IMPORTANCE_SCORING_SOURCE_AUDIT.md` and records an independent changed-scope source audit of the CM-1563 deterministic TagMemo importance scoring core. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/importance-scoring.js`, `tests/tagmemo-importance-scoring.test.js`, the Sprint A fixture, and baseline docs. Confirmed internal pure-function behavior, bounded input validation, low-disclosure empty/rejected output, deterministic score/band/signals, duplicate signal merge, forbidden raw/private rejection, no provider/API or bearer token path, no raw scan, no public MCP expansion, no effective `record_memory` write, no confirmed mutation, no production/release/cutover readiness claim, and no complete V8 claim. Importance scoring baseline is `IMPLEMENTED_AND_AUDITED`; persistent tag enrichment remains `NOT_STARTED`.
 
 `CM-1563` adds `src/tagmemo/importance-scoring.js` and updates `tests/tagmemo-importance-scoring.test.js` plus `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md`. The new internal pure function `scoreMemoryImportance(...)` accepts only bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints; rejects forbidden raw/private fields; strips provider/API/token/raw shaped values through low-disclosure rejection; merges duplicate signals deterministically; emits bounded `importanceScore`, reproducible `importanceBand`, bounded `scoringSignals`, and `scoreVersion=deterministic_v1`; and returns low-disclosure empty/rejected results. Targeted validation passed `9/9`. Persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan not run; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 

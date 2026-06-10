@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1563 deterministic TagMemo importance scoring core`.
-Current validation: `CMV-1667`.
+Current checkpoint: `CM-1564 TagMemo importance scoring source audit`.
+Current validation: `CMV-1668`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -27,6 +27,25 @@ Recorded:
 - Confirmed no provider/API, bearer token, raw scan, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 Validation: `CMV-1667` source/test changed-scope validation.
+
+## CM-1564 TagMemo Importance Scoring Source Audit
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1564_TAGMEMO_IMPORTANCE_SCORING_SOURCE_AUDIT.md`.
+- Audited `src/tagmemo/importance-scoring.js`.
+- Audited `tests/tagmemo-importance-scoring.test.js`.
+- Audited `tests/fixtures/tagmemo-importance-scoring-sprint-a-v1.json`.
+- Confirmed bounded input only, deterministic score/band/signals, duplicate signal merge, low-disclosure empty/rejected output, and forbidden raw/private field rejection.
+- Confirmed scoring output does not include provider/API/token/raw-shaped information.
+- Targeted validation passed `9/9`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, confirmed mutation, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1668` source audit/docs changed-scope validation.
 
 ## CM-1562 TagMemo Importance Scoring Regression Coverage
 
