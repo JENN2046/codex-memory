@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1613 persistent TagMemo write-capable implementation gap decision`.
-Current validation: `CMV-1717`.
+Current checkpoint: `CM-1614 persistent TagMemo write-capable proof implementation preflight`.
+Current validation: `CMV-1718`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1614 Persistent TagMemo Write-Capable Proof Implementation Preflight
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_IMPLEMENTATION_PREFLIGHT_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1614_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_IMPLEMENTATION_PREFLIGHT.md`.
+- Confirmed CM-1614 is docs/status/board preflight only.
+- Confirmed write-capable implementation remains `NOT_STARTED`.
+- Confirmed proof execution remains `NOT_EXECUTED`.
+- Confirmed persistent tag write remains `NOT_EXECUTED`.
+- Selected `PREPARE_FIXTURE_TEST_CONTRACT_BEFORE_SOURCE_IMPLEMENTATION`.
+- Recorded future guard requirements: dual-token guard, explicit write-capable proof flag, `maxWriteCount=1`, expected dry-run plan hash match, temp-local sidecar proof target, low-disclosure output, deterministic rollback/cleanup/tombstone behavior, and unchanged seven-tool public MCP surface.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live MCP proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1718` docs implementation preflight validation.
 
 ## CM-1613 Persistent TagMemo Write-Capable Implementation Gap Decision
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1613 persistent TagMemo write-capable implementation gap decision`.
-Current validation: `CMV-1717`.
+Current task: `CM-1614 persistent TagMemo write-capable proof implementation preflight`.
+Current validation: `CMV-1718`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `PERSISTENT_TAGMEMO_WRITE_CAPABLE_IMPLEMENTATION_GAP_DECISION_RECORDED_PERSISTENT_WRITE_BLOCKED`.
+Current route: `PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_PREFLIGHT_RECORDED_NEXT_FIXTURE_TEST_CONTRACT_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1614 persistent TagMemo write-capable proof implementation preflight: added `docs/CM1614_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_IMPLEMENTATION_PREFLIGHT.md`. This is docs/status/board preflight only. It records the future implementation boundary and selects `PREPARE_FIXTURE_TEST_CONTRACT_BEFORE_SOURCE_IMPLEMENTATION`. Future source work must require dual-token guard, explicit write-capable proof flag, `maxWriteCount=1`, expected dry-run plan hash match, temp-local sidecar proof target, low-disclosure output, deterministic rollback/cleanup/tombstone behavior, and unchanged seven-tool public MCP surface. Source implementation is `NOT_STARTED`; proof execution is `NOT_EXECUTED`; persistent tag write is `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; future proof execution still requires separate exact approval. No provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live MCP proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1613 persistent TagMemo write-capable implementation gap decision: added `docs/CM1613_PERSISTENT_TAGMEMO_WRITE_CAPABLE_IMPLEMENTATION_GAP_DECISION.md`. Reviewed CM-1612 receipt and `src/tagmemo/persistent-enrichment-proof-command.js`; decision is `WRITE_CAPABLE_IMPLEMENTATION_PREFLIGHT_REQUIRED`. CM-1612 is not persistent write success. The current command supports dry-run planning and gated no-write apply only; after both tokens match, `apply` returns `gated / ready_for_proof_no_write` without a write-capable persistence adapter call. Rollback remains `blocked / rollback_stub_no_mutation_executed` because no mutation occurred. Write-capable implementation is `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; future implementation requires separate source change and audit; future proof execution requires separate exact approval. No persistent tag write; no persistent enrichment success claim; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live MCP proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
