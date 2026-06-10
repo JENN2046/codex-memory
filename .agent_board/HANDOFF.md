@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1574 association recall baseline preflight`.
-Current validation: `CMV-1678`.
-Current handoff: Association recall baseline prepared as docs-only preflight. Next safe Sprint B route is fixture/test coverage.
+Current task: `CM-1575 association recall fixture/test coverage`.
+Current validation: `CMV-1679`.
+Current handoff: Association recall fixture/test coverage added. Next safe Sprint B route is internal pure-function implementation.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Association recall baseline prepared as docs-only preflight. Ne
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_BASELINE_PREFLIGHT_RECORDED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1575 added `tests/fixtures/tagmemo-association-recall-sprint-b-v1.json` and `tests/tagmemo-association-recall.test.js` for fixture/test coverage of deterministic association recall. It locks shared-tag ranking, query expansion overlap, empty candidate low-disclosure behavior, rejected unsafe input shape, side-effect boundaries, forbidden provider/token/raw-shaped sample placement, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; relation graph persistence remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1574 added `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md` and prepared deterministic association recall as docs-only preflight. It maps the user task-book Phase 5 alias `CM-1564` to repository task `CM-1574` because `CM-1560..CM-1569` are already occupied by Sprint A. It planned `src/tagmemo/association-recall.js`, bounded input contracts, forbidden raw/provider/token/audit/scan/storage inputs, deterministic output fields, association rules, and regression coverage. Source implementation remains `NOT_STARTED`; relation graph persistence remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1573 added `docs/CM1573_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of CM-1572. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/query-expansion.js`, `tests/tagmemo-query-expansion.test.js`, and `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json`. Confirmed bounded input only, deterministic expanded queries, bounded reasons, duplicate merge, low-disclosure empty/rejected output, forbidden raw/private field rejection, provider/API/token/raw-shaped data exclusion from output, and seven-tool public MCP surface preservation. Targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, confirmed mutation, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1572 added `src/tagmemo/query-expansion.js` and expanded `tests/tagmemo-query-expansion.test.js`. The internal pure function accepts bounded query text, bounded TagMemo tag projection, importance band, recall intent, and safe evidence hints; returns deterministic bounded expanded queries with `expansionVersion=deterministic_v1`; merges duplicates; rejects forbidden raw/private fields; keeps empty/rejected paths low-disclosure; and targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, effective write, readiness claim, or complete V8 claim occurred.

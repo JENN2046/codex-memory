@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1574 association recall baseline preflight`.
-Current validation: `CMV-1678`.
+Current checkpoint: `CM-1575 association recall fixture/test coverage`.
+Current validation: `CMV-1679`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1575 Association Recall Fixture/Test Coverage
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`
+
+Recorded:
+
+- Added `tests/fixtures/tagmemo-association-recall-sprint-b-v1.json`.
+- Added `tests/tagmemo-association-recall.test.js`.
+- Updated `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md`.
+- Locked fixture side-effect boundaries, required association cases, forbidden value placement, and seven-tool public MCP surface.
+- Recorded association recall source implementation as `NOT_STARTED`.
+- Recorded relation graph persistence as `NOT_STARTED`.
+- Recorded live search, raw scan, and broad memory scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, public MCP expansion, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1679` fixture/test changed-scope validation.
 
 ## CM-1574 Association Recall Baseline Preflight
 

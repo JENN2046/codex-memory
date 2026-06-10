@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "tagmemo-association-recall-fixture-v1",
+  "scope": "Sprint B deterministic TagMemo association recall baseline",
+  "boundaries": {
+    "fixtureOnly": true,
+    "relationGraphPersistence": false,
+    "liveSearch": false,
+    "providerApiCalls": 0,
+    "bearerTokenUse": 0,
+    "rawScan": false,
+    "broadMemoryScan": false,
+    "persistentTagEnrichment": false,
+    "publicMcpExpansion": false,
+    "effectiveRecordMemoryWrites": 0,
+    "completeV8Claimed": false,
+    "productionReleaseCutoverReady": false
+  },
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "forbiddenFragments": [
+    "cm1575-provider-endpoint",
+    "cm1575-token-fragment",
+    "cm1575-bearer-fragment",
+    "cm1575-raw-memory-body",
+    "A:/cm1575/must-not-leak"
+  ],
+  "cases": [
+    {
+      "id": "shared-tag-ranks-higher",
+      "input": {
+        "schemaVersion": "tagmemo-association-recall-input-v1",
+        "seedMemoryId": "memory:cm1575:seed",
+        "seedProjection": {
+          "tagProjection": {
+            "tags": [
+              { "tagLabel": "route blocker", "tagSource": "explicit_record_tag", "confidenceScore": 0.94 },
+              { "tagLabel": "proof receipt", "tagSource": "operator_reviewed", "confidenceScore": 0.9 }
+            ]
+          },
+          "queryExpansionHints": ["route proof", "route blocker"],
+          "safeEvidenceHints": ["decision", "proof", "route"]
+        },
+        "candidates": [
+          {
+            "memoryId": "memory:cm1575:shared",
+            "tagProjection": {
+              "tags": [
+                { "tagLabel": "route blocker", "tagSource": "explicit_record_tag", "confidenceScore": 0.92 }
+              ]
+            },
+            "queryExpansionHints": ["route blocker"],
+            "importanceScore": 0.58,
+            "safeEvidenceHints": ["route", "proof"]
+          },
+          {
+            "memoryId": "memory:cm1575:importance-only",
+            "tagProjection": {
+              "tags": [
+                { "tagLabel": "checkpoint", "tagSource": "derived_candidate", "confidenceScore": 0.88 }
+              ]
+            },
+            "queryExpansionHints": ["checkpoint"],
+            "importanceScore": 0.98,
+            "safeEvidenceHints": ["receipt"]
+          }
+        ]
+      },
+      "expected": {
+        "topMemoryId": "memory:cm1575:shared",
+        "requiredReasons": ["shared_tag", "query_expansion_overlap", "evidence_overlap", "importance_score"]
+      }
+    },
+    {
+      "id": "query-expansion-overlap-deterministic",
+      "input": {
+        "schemaVersion": "tagmemo-association-recall-input-v1",
+        "seedMemoryId": "memory:cm1575:seed2",
+        "seedProjection": {
+          "tagProjection": { "tags": [] },
+          "queryExpansionHints": ["validation proof", "decision record"],
+          "safeEvidenceHints": ["proof"]
+        },
+        "candidates": [
+          {
+            "memoryId": "memory:cm1575:overlap",
+            "tagProjection": { "tags": [] },
+            "queryExpansionHints": ["validation proof"],
+            "importanceScore": 0.42,
+            "safeEvidenceHints": ["proof"]
+          }
+        ]
+      },
+      "expected": {
+        "topMemoryId": "memory:cm1575:overlap",
+        "requiredReasons": ["query_expansion_overlap", "evidence_overlap"]
+      }
+    },
+    {
+      "id": "empty-candidates-low-disclosure",
+      "input": {
+        "schemaVersion": "tagmemo-association-recall-input-v1",
+        "seedMemoryId": "memory:cm1575:empty",
+        "seedProjection": {
+          "tagProjection": { "tags": [] },
+          "queryExpansionHints": [],
+          "safeEvidenceHints": []
+        },
+        "candidates": []
+      },
+      "expected": { "rejected": true, "reason": "empty_candidates" }
+    },
+    {
+      "id": "forbidden-provider-token-raw-rejected",
+      "input": {
+        "schemaVersion": "tagmemo-association-recall-input-v1",
+        "seedMemoryId": "memory:cm1575:forbidden",
+        "seedProjection": {
+          "tagProjection": { "tags": [] },
+          "queryExpansionHints": ["safe bounded"],
+          "safeEvidenceHints": []
+        },
+        "candidates": [
+          {
+            "memoryId": "memory:cm1575:bad",
+            "tagProjection": {
+              "tags": [
+                { "tagLabel": "cm1575-provider-endpoint", "tagSource": "explicit_record_tag", "confidenceScore": 0.95 }
+              ]
+            },
+            "queryExpansionHints": ["cm1575-token-fragment"],
+            "importanceScore": 0.9,
+            "safeEvidenceHints": [],
+            "rawText": "cm1575-raw-memory-body",
+            "authorization": "Bearer cm1575-bearer-fragment",
+            "filePath": "A:/cm1575/must-not-leak"
+          }
+        ]
+      },
+      "expected": { "rejected": true, "reason": "forbidden_raw_private_field" }
+    }
+  ]
+}

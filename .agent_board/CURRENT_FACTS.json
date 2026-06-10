@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1574",
-  "validationId": "CMV-1678",
+  "taskId": "CM-1575",
+  "validationId": "CMV-1679",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1679",
+      "scope": "CM-1575 association recall fixture/test coverage",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION"
+    },
     {
       "id": "CMV-1678",
       "scope": "CM-1574 association recall baseline preflight",
