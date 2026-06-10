@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1584 TagMemo recall composition source audit`.
-Current validation: `CMV-1688`.
-Current handoff: Recall composition core independently audited with no actionable findings in changed scope. Next safe route is Sprint C closeout, not runtime integration.
+Current task: `CM-1585 V8 TagMemo recall composition Sprint C closeout`.
+Current validation: `CMV-1689`.
+Current handoff: Sprint C recall composition is completed locally; push remains separate explicit authorization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Recall composition core independently audited with no actionabl
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_COMPOSITION_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_COMPLETED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1585 added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_CLOSEOUT.md` and recorded `V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_COMPLETED`. Sprint C preflight, fixture/test coverage, deterministic recall composition core, and independent source audit are completed. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1584 added `docs/CM1584_TAGMEMO_RECALL_COMPOSITION_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of the CM-1583 recall composition core. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the module is deterministic, bounded-input only, low-disclosure for empty/rejected paths, imports only audited TagMemo pure-function helpers, and does not import storage, MCP adapters, provider clients, HTTP clients, file-system readers, runtime write services, raw memory readers, or persistence APIs. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1583 added `src/tagmemo/recall-composition.js` and expanded `tests/tagmemo-recall-composition.test.js`. The internal pure function composes audited deterministic query expansion, association recall, time-decay scoring, importance scoring, and recall ranking over bounded projections only. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1582 added `tests/fixtures/tagmemo-recall-composition-sprint-c-v1.json`, `tests/tagmemo-recall-composition.test.js`, and `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_EXECUTION.md`. Fixture/test coverage locks bounded composition cases, no-side-effect boundaries, rejected unsafe input shape, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, persistent tag enrichment, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.

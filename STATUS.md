@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1584 TagMemo recall composition source audit`.
-Current validation: `CMV-1688`.
+Current task: `CM-1585 V8 TagMemo recall composition Sprint C closeout`.
+Current validation: `CMV-1689`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `V8_TAGMEMO_RECALL_COMPOSITION_CORE_IMPLEMENTED_AND_AUDITED_PENDING_SPRINT_C_CLOSEOUT`.
+Current route: `V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_COMPLETED_LOCAL_NOT_PUSHED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1585 V8 TagMemo recall composition Sprint C closeout: added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_CLOSEOUT.md` and recorded `V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_COMPLETED`. Sprint C preflight, fixture/test coverage, deterministic recall composition core, and independent source audit are completed. Recall composition core is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1584 TagMemo recall composition source audit: added `docs/CM1584_TAGMEMO_RECALL_COMPOSITION_SOURCE_AUDIT.md`. Independent changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the recall composition core is deterministic, accepts bounded input only, keeps low-disclosure empty/rejected paths, imports only audited TagMemo pure-function helpers, and does not import storage, MCP adapters, provider clients, HTTP clients, file-system readers, runtime write services, raw memory readers, or persistence APIs. Runtime integration remains `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

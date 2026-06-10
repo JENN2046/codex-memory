@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1584 TagMemo recall composition source audit`.
-Current validation: `CMV-1688`.
+Current checkpoint: `CM-1585 V8 TagMemo recall composition Sprint C closeout`.
+Current validation: `CMV-1689`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1585 V8 TagMemo Recall Composition Sprint C Closeout
+
+Status: `COMPLETED_VALIDATED_V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_COMPLETED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_CLOSEOUT.md`.
+- Recorded `V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_COMPLETED`.
+- Confirmed Sprint C preflight, fixture/test coverage, deterministic recall composition core, and independent source audit are completed.
+- Confirmed recall composition core is `IMPLEMENTED_AND_AUDITED`.
+- Runtime integration remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Raw scan and broad memory scan remain `NOT_RUN`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, live proof, confirmed mutation, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1689` Sprint C closeout validation.
 
 ## CM-1584 TagMemo Recall Composition Source Audit
 
