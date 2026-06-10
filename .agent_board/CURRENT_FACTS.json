@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1596",
-  "validationId": "CMV-1700",
+  "taskId": "CM-1597",
+  "validationId": "CMV-1701",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1701",
+      "scope": "CM-1597 TagMemo sidecar persistence dry-run adapter source audit",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS"
+    },
     {
       "id": "CMV-1700",
       "scope": "CM-1596 Sprint E sidecar persistence dry-run adapter implementation",

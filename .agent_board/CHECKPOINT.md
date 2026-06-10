@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1596 Sprint E sidecar persistence dry-run adapter implementation`.
-Current validation: `CMV-1700`.
+Current checkpoint: `CM-1597 TagMemo sidecar persistence dry-run adapter source audit`.
+Current validation: `CMV-1701`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1597 TagMemo Sidecar Persistence Dry-Run Adapter Source Audit
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1597_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT.md`.
+- Audited `src/tagmemo/sidecar-persistence-dry-run-adapter.js`.
+- Audited `tests/tagmemo-sidecar-persistence-dry-run-adapter.test.js`.
+- Audited `tests/fixtures/tagmemo-sidecar-persistence-dry-run-sprint-e-v1.json`.
+- Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`.
+- Sidecar persistence dry-run adapter is `IMPLEMENTED_AND_AUDITED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Persistent tag write remains `NOT_EXECUTED`.
+- No second effective `record_memory` write occurred.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1701` dry-run adapter source audit validation.
 
 ## CM-1596 Sprint E Sidecar Persistence Dry-Run Adapter Implementation
 

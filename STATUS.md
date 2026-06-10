@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1596 Sprint E sidecar persistence dry-run adapter implementation`.
-Current validation: `CMV-1700`.
+Current task: `CM-1597 TagMemo sidecar persistence dry-run adapter source audit`.
+Current validation: `CMV-1701`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_IMPLEMENTED_NO_PERSISTENT_WRITE`.
+Current route: `TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_IMPLEMENTED_AND_AUDITED_NO_PERSISTENT_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1597 TagMemo sidecar persistence dry-run adapter source audit: added `docs/CM1597_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT.md`. Independent changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. The adapter is an internal pure-function dry-run/no-op plan builder with no imports, no storage/DB/filesystem/HTTP/provider/runtime write service calls, bounded input only, and low-disclosure `dryRunWritePlan` output only. Sidecar persistence dry-run adapter is `IMPLEMENTED_AND_AUDITED`; baseline closeout remains next. Persistent tag enrichment is `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1596 Sprint E sidecar persistence dry-run adapter implementation: added `src/tagmemo/sidecar-persistence-dry-run-adapter.js`, `tests/fixtures/tagmemo-sidecar-persistence-dry-run-sprint-e-v1.json`, `tests/tagmemo-sidecar-persistence-dry-run-adapter.test.js`, and `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER.md`. This internal dry-run/no-op adapter accepts bounded tag projection input and returns only a low-disclosure `dryRunWritePlan`; it does not write files, DB rows, memory records, tag records, public MCP responses, or provider/API payloads. Adapter state is `IMPLEMENTED_INTERNAL_DRY_RUN_ONLY`; independent source audit and closeout remain next. Persistent tag enrichment is `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
