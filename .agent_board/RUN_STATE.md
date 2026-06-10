@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1593 Sprint E sidecar schema closeout and persistence adapter preflight`.
-Current validation: `CMV-1697`.
+Current task: `CM-1594 Sprint E sidecar persistence adapter contract coverage`.
+Current validation: `CMV-1698`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1593` closes the sidecar schema as `BASELINE_COMPLETED_TEST_ONLY` and records persistence adapter preflight boundaries. Persistence adapter remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no persistent tag write or second effective `record_memory` write occurred. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1594` records sidecar persistence adapter contract coverage as fixture/test-only. Persistence adapter implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no persistent tag write or second effective `record_memory` write occurred. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 
