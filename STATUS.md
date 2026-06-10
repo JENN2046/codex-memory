@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1586 V8 TagMemo runtime recall integration Sprint D preflight`.
-Current validation: `CMV-1690`.
+Current task: `CM-1587 TagMemo runtime recall projection coverage`.
+Current validation: `CMV-1691`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_PREFLIGHT_RECORDED_NO_RUNTIME_INTEGRATION`.
+Current route: `TAGMEMO_RUNTIME_RECALL_PROJECTION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1587 TagMemo runtime recall projection coverage: added `tests/fixtures/tagmemo-runtime-recall-projection-sprint-d-v1.json`, `tests/tagmemo-runtime-recall-projection.test.js`, and `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`. Fixture/test coverage locks bounded runtime recall projection cases, no-side-effect boundaries, rejected unsafe input shape, public response non-expansion, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1586 V8 TagMemo runtime recall integration Sprint D preflight: added `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_PREFLIGHT.md`. This docs-only preflight plans an internal no-op projection boundary for recall composition after bounded candidate narrowing, with bounded input/output contracts, low-disclosure no-op failure behavior, fixture/test plan, and rollback plan. Runtime integration remains `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

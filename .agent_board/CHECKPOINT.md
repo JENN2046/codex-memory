@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1586 V8 TagMemo runtime recall integration Sprint D preflight`.
-Current validation: `CMV-1690`.
+Current checkpoint: `CM-1587 TagMemo runtime recall projection coverage`.
+Current validation: `CMV-1691`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1587 TagMemo Runtime Recall Projection Coverage
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_RECALL_PROJECTION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`
+
+Recorded:
+
+- Added `tests/fixtures/tagmemo-runtime-recall-projection-sprint-d-v1.json`.
+- Added `tests/tagmemo-runtime-recall-projection.test.js`.
+- Added `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`.
+- Locked fixture/test coverage for bounded runtime recall projection cases, forbidden-value placement, low-disclosure case shape, public response non-expansion, and seven-tool public MCP surface.
+- Source implementation remains `NOT_STARTED`.
+- Runtime integration remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Raw scan and broad memory scan remain `NOT_RUN`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, live proof, confirmed mutation, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1691` fixture/test validation.
 
 ## CM-1586 V8 TagMemo Runtime Recall Integration Sprint D Preflight
 

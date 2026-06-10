@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1586 V8 TagMemo runtime recall integration Sprint D preflight`.
-Current validation: `CMV-1690`.
-Current handoff: Sprint D runtime recall integration preflight is recorded as docs-only; runtime integration remains not started.
+Current task: `CM-1587 TagMemo runtime recall projection coverage`.
+Current validation: `CMV-1691`.
+Current handoff: Runtime recall projection fixture/test coverage is recorded; source implementation remains not started.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Sprint D runtime recall integration preflight is recorded as do
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_PREFLIGHT_RECORDED_NO_RUNTIME_INTEGRATION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_RECALL_PROJECTION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1587 added `tests/fixtures/tagmemo-runtime-recall-projection-sprint-d-v1.json`, `tests/tagmemo-runtime-recall-projection.test.js`, and `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`. Fixture/test coverage locks bounded runtime recall projection cases, no-side-effect boundaries, rejected unsafe input shape, public response non-expansion, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, persistent tag enrichment, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1586 added `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_PREFLIGHT.md` and recorded a docs-only Sprint D bounded runtime recall integration preflight. It plans an internal no-op projection boundary for recall composition after bounded candidate narrowing, records bounded input/output contracts, failure/no-op behavior, fixture/test plan, and rollback plan. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1585 added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_CLOSEOUT.md` and recorded `V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_COMPLETED`. Sprint C preflight, fixture/test coverage, deterministic recall composition core, and independent source audit are completed. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1584 added `docs/CM1584_TAGMEMO_RECALL_COMPOSITION_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of the CM-1583 recall composition core. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the module is deterministic, bounded-input only, low-disclosure for empty/rejected paths, imports only audited TagMemo pure-function helpers, and does not import storage, MCP adapters, provider clients, HTTP clients, file-system readers, runtime write services, raw memory readers, or persistence APIs. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
