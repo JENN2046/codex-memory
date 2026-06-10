@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1618 persistent TagMemo write-capable proof source audit`.
-Current validation: `CMV-1722`.
+Current task: `CM-1619 persistent TagMemo proof execution exact approval gate`.
+Current validation: `CMV-1723`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1618` audits the persistent TagMemo write-capable proof source branch and finds no actionable changed-scope issue. Proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent enrichment success remains `NOT_CLAIMED`. Next safe route is a separate exact approval gate/readiness decision before any proof execution. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent enrichment success claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1619` opens the persistent TagMemo proof execution exact approval gate after the CM-1618 source audit. Gate status is `OPEN_AWAITING_OPERATOR_APPROVAL`, but CM-1619 grants no approval and executes no proof/write. Proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent enrichment success remains `NOT_CLAIMED`. Next safe route is waiting for a fresh operator message containing all required exact approval tokens before any proof execution task. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent enrichment success claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

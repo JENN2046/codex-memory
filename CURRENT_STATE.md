@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1618 persistent TagMemo write-capable proof source audit` |
-| Current validation | `CMV-1722` |
-| Current route | write-capable source branch audited; proof execution remains separate exact-approval work |
+| Current task | `CM-1619 persistent TagMemo proof execution exact approval gate` |
+| Current validation | `CMV-1723` |
+| Current route | proof execution exact approval gate open; proof execution remains blocked pending fresh operator approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1619` adds `docs/CM1619_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EXACT_APPROVAL_GATE.md` and opens the exact approval gate for a future persistent TagMemo write-capable proof execution after the CM-1618 source audit. Gate status is `OPEN_AWAITING_OPERATOR_APPROVAL`; approval is not granted by CM-1619 and proof execution is not authorized by CM-1619. A future execution task must receive a fresh operator message containing `APPROVE_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_EXECUTION_AFTER_SOURCE_AUDIT`, `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT`, and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, then pass fresh preflight for clean synced main, bounded input, `maxWriteCount=1`, expected dry-run plan hash match, `temp-local-tagmemo-proof-sidecar`, tombstone-active state, write-capable flag, execution flag, injected proof-store boundary, and redacted evidence. Proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent enrichment success remains `NOT_CLAIMED`; no live MCP proof, provider/API, bearer token, raw scan, broad memory scan, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 `CM-1618` adds `docs/CM1618_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_AUDIT.md` and records an independent changed-scope source audit for CM-1617. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the write-capable proof source branch remains internal, dual-token guarded, explicit-flag guarded, temp-local sidecar target bound, expected-dry-run-hash bound, tombstone-active gated, one-requested-write gated, explicit-execution guarded, and proof-store injected. Confirmed CLI does not expose `writeCapableProofFlag`, `executeWriteCapableProof`, or `proofStore`; public MCP surface remains seven tools; default no-flag dual-token apply remains `gated / ready_for_proof_no_write` with zero writes. Proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent enrichment success remains `NOT_CLAIMED`; future proof execution still requires separate exact approval. No confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live MCP proof, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
@@ -403,7 +405,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1618 audits the persistent TagMemo write-capable proof source branch and finds no actionable changed-scope issue. Next safe action, if selected after CM-1618 validation and sync, is a separate exact approval gate for proof execution readiness, not proof execution itself. Persistent tag write success, persistent enrichment success, future proof execution, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
+CM-1619 opens the persistent TagMemo proof execution exact approval gate without granting approval or executing proof. Next safe action, after CM-1619 validation and sync, is to wait for a fresh operator message containing all required exact approval tokens before opening a future proof execution task. Persistent tag write success, persistent enrichment success, future proof execution, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
 
 ## Boundaries
 

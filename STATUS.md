@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1618 persistent TagMemo write-capable proof source audit`.
-Current validation: `CMV-1722`.
+Current task: `CM-1619 persistent TagMemo proof execution exact approval gate`.
+Current validation: `CMV-1723`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_AUDITED_NO_PROOF_EXECUTION_NEXT_EXACT_APPROVAL_GATE`.
+Current route: `PERSISTENT_TAGMEMO_PROOF_EXECUTION_EXACT_APPROVAL_GATE_OPEN_NO_PROOF_EXECUTION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1619 persistent TagMemo proof execution exact approval gate: added `docs/CM1619_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EXACT_APPROVAL_GATE.md`. Gate status is `OPEN_AWAITING_OPERATOR_APPROVAL`. CM-1619 does not grant approval and does not authorize proof execution. A future execution task must receive a fresh operator message containing `APPROVE_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_EXECUTION_AFTER_SOURCE_AUDIT`, `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT`, and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, then pass fresh preflight for clean synced main, bounded input, `maxWriteCount=1`, expected dry-run plan hash match, `temp-local-tagmemo-proof-sidecar`, tombstone-active state, write-capable flag, execution flag, injected proof-store boundary, and redacted evidence. Proof execution is `NOT_EXECUTED`; persistent tag write is `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; persistent enrichment success is `NOT_CLAIMED`; public MCP surface remains seven tools. No provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live MCP proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1618 persistent TagMemo write-capable proof source audit: added `docs/CM1618_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_AUDIT.md`. Changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `69f90896`, `src/tagmemo/persistent-enrichment-proof-command.js`, `tests/tagmemo-persistent-enrichment-proof-command.test.js`, and the CM-1617 evidence doc. Confirmed the write-capable source branch remains internal, dual-token guarded, explicit-flag guarded, temp-local target bound, dry-run-hash bound, tombstone-active gated, one-requested-write gated, explicit-execution gated, and proof-store injected; CLI does not expose the write-capable flag, execution flag, or proof store; default no-flag apply remains `gated / ready_for_proof_no_write`; public MCP surface remains seven tools. Proof execution is `NOT_EXECUTED`; persistent tag write is `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; persistent enrichment success is `NOT_CLAIMED`; future proof execution still requires separate exact approval. No provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live MCP proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

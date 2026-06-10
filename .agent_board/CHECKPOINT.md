@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1618 persistent TagMemo write-capable proof source audit`.
-Current validation: `CMV-1722`.
+Current checkpoint: `CM-1619 persistent TagMemo proof execution exact approval gate`.
+Current validation: `CMV-1723`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1619 Persistent TagMemo Proof Execution Exact Approval Gate
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EXACT_APPROVAL_GATE_OPEN_NO_PROOF_EXECUTION`
+
+Recorded:
+
+- Added `docs/CM1619_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EXACT_APPROVAL_GATE.md`.
+- Opened gate status `OPEN_AWAITING_OPERATOR_APPROVAL`.
+- Confirmed CM-1619 grants no execution approval.
+- Confirmed proof execution remains `NOT_EXECUTED`.
+- Confirmed persistent tag write remains `NOT_EXECUTED`.
+- Confirmed persistent enrichment success remains `NOT_CLAIMED`.
+- Recorded required future approval message containing route-level token plus both source-recognized proof tokens.
+- Recorded future preflight requirements for clean synced main, bounded input, `maxWriteCount=1`, expected dry-run plan hash match, temp-local sidecar target, tombstone-active state, write-capable flag, execution flag, injected proof-store boundary, and redacted evidence.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live MCP proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1723` approval-envelope and docs/status validation.
 
 ## CM-1618 Persistent TagMemo Write-Capable Proof Source Audit
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1618",
-  "validationId": "CMV-1722",
+  "taskId": "CM-1619",
+  "validationId": "CMV-1723",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1723",
+      "scope": "CM-1619 persistent TagMemo proof execution exact approval gate",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EXACT_APPROVAL_GATE_OPEN_NO_PROOF_EXECUTION"
+    },
     {
       "id": "CMV-1722",
       "scope": "CM-1618 persistent TagMemo write-capable proof source audit",
