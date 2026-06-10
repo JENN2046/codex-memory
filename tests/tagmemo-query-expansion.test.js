@@ -6,6 +6,10 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const {
+  EXPANSION_VERSION,
+  expandTagMemoQuery
+} = require('../src/tagmemo/query-expansion');
 
 const fixturePath = path.join(
   __dirname,
@@ -95,4 +99,69 @@ test('CM1571 query expansion fixture preserves public MCP surface', () => {
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
   assert.equal(TOOL_DEFINITIONS.length, 7);
+});
+
+test('CM1572 query expansion output is deterministic and bounded', () => {
+  const fixture = loadFixture();
+  const input = fixture.cases.find(testCase => testCase.id === 'tag-derived-expansion').input;
+  const first = expandTagMemoQuery(input);
+  const second = expandTagMemoQuery(input);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.schemaVersion, 'tagmemo-query-expansion-output-v1');
+  assert.equal(first.expansionVersion, EXPANSION_VERSION);
+  assert.equal(first.expandedQueries[0], input.boundedQueryText);
+  assert.equal(first.expandedQueries.length <= 6, true);
+  assert.equal(first.rejected, false);
+  assert.equal(first.lowDisclosure, true);
+  assert.equal(first.mutated, false);
+  assert.equal(first.providerCalls, 0);
+  assert.equal(first.publicMcpExpansion, 0);
+});
+
+test('CM1572 tag and evidence derived expansion reasons are reproducible', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'tag-derived-expansion');
+  const output = expandTagMemoQuery(testCase.input);
+
+  for (const reason of testCase.expected.requiredReasons) {
+    assert.equal(output.expansionReasons.includes(reason), true, reason);
+  }
+  assert.equal(output.expandedQueries.some(query => query.includes('route blocker')), true);
+  assert.equal(output.expandedQueries.some(query => query.includes('validation proof')), true);
+});
+
+test('CM1572 duplicate expansions merge without blind multiplication', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'duplicate-expansion-merged');
+  const output = expandTagMemoQuery(testCase.input);
+
+  assert.equal(output.expansionReasons.includes('duplicate_expansion_merged'), true);
+  assert.equal(new Set(output.expandedQueries).size, output.expandedQueries.length);
+});
+
+test('CM1572 empty query returns low-disclosure result', () => {
+  const fixture = loadFixture();
+  const empty = fixture.cases.find(testCase => testCase.id === 'empty-query-low-disclosure');
+  const output = expandTagMemoQuery(empty.input);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'empty_query');
+  assert.deepEqual(output.expandedQueries, []);
+  assert.deepEqual(output.expansionReasons, []);
+  assert.equal(output.lowDisclosure, true);
+});
+
+test('CM1572 forbidden provider token raw shaped input is rejected without leakage', () => {
+  const fixture = loadFixture();
+  const rejected = fixture.cases.find(testCase => testCase.id === 'forbidden-provider-token-raw-rejected');
+  const output = expandTagMemoQuery(rejected.input);
+  const serialized = JSON.stringify(output);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'forbidden_raw_private_field');
+  assert.deepEqual(output.expandedQueries, []);
+  for (const fragment of fixture.forbiddenFragments) {
+    assert.equal(serialized.includes(fragment), false, fragment);
+  }
 });

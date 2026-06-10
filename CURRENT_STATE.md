@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1571 bounded query expansion fixture/test coverage` |
-| Current validation | `CMV-1675` |
-| Current route | Sprint B query expansion fixture/test coverage added; source implementation not started |
+| Current task | `CM-1572 deterministic query expansion core implementation` |
+| Current validation | `CMV-1676` |
+| Current route | Sprint B query expansion core implemented; source audit not yet recorded |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1572` adds `src/tagmemo/query-expansion.js` and updates `tests/tagmemo-query-expansion.test.js` plus `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md`. The new internal pure function `expandTagMemoQuery(...)` accepts only bounded query text, bounded TagMemo tag projection, importance band, recall intent, and safe evidence hints; rejects forbidden raw/private fields; strips provider/API/token/raw shaped values through low-disclosure rejection; emits deterministic bounded `expandedQueries`, bounded `expansionReasons`, and `expansionVersion=deterministic_v1`; and returns low-disclosure empty/rejected results. Targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan and broad memory scan are `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1571` adds `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json` and `tests/tagmemo-query-expansion.test.js` as fixture/test coverage for bounded deterministic query expansion. The fixture records no live search, provider/API, bearer token, raw scan, broad memory scan, persistent tag enrichment, public MCP expansion, effective `record_memory` write, complete V8 claim, or production/release/cutover readiness. The test locks required expansion cases, rejected unsafe input shape, low-disclosure boundary expectations, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 

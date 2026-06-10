@@ -85,11 +85,29 @@ tests/tagmemo-query-expansion.test.js
 
 The first regression slice locks fixture shape, required expansion scenarios, forbidden-value placement, side-effect boundaries, and the seven-tool public MCP surface before source implementation.
 
+## Source Implementation
+
+CM-1572 adds the internal pure-function core:
+
+```text
+src/tagmemo/query-expansion.js
+```
+
+The implementation exports `expandTagMemoQuery(input, options = {})` and `EXPANSION_VERSION`.
+
+Validation:
+
+```text
+tests\tagmemo-query-expansion.test.js: PASS_9_OF_9
+```
+
+The implementation is deterministic, local-only, and bounded. It does not call provider/API paths, does not perform live search, does not read raw memory, does not perform raw scans, does not persist tag enrichment, does not execute `record_memory`, and does not expand public MCP tools.
+
 ## Boundary Confirmation
 
 ```text
 runtime integration: NOT_STARTED
-query expansion source implementation: NOT_STARTED
+query expansion source implementation: IMPLEMENTED_INTERNAL_PURE_FUNCTION
 live search: NOT_RUN
 raw scan: NOT_RUN
 provider/API: NOT_USED

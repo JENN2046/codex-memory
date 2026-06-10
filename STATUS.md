@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1571 bounded query expansion fixture/test coverage`.
-Current validation: `CMV-1675`.
+Current task: `CM-1572 deterministic query expansion core implementation`.
+Current validation: `CMV-1676`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `SPRINT_B_QUERY_EXPANSION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`.
+Current route: `SPRINT_B_QUERY_EXPANSION_CORE_IMPLEMENTED_PENDING_SOURCE_AUDIT`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1572 deterministic query expansion core implementation: added `src/tagmemo/query-expansion.js` and expanded `tests/tagmemo-query-expansion.test.js`. The internal pure function accepts bounded query text, bounded TagMemo tag projection, importance band, recall intent, and safe evidence hints; outputs deterministic bounded `expandedQueries`, bounded `expansionReasons`, and `expansionVersion=deterministic_v1`; merges duplicate expansions; and returns low-disclosure empty/rejected results. Targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1571 bounded query expansion fixture/test coverage: added `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json` and `tests/tagmemo-query-expansion.test.js`. The fixture/test coverage records no side effects and locks required expansion cases for tag-derived expansion, evidence-derived expansion, duplicate expansion merge, empty query, forbidden provider/token/raw-shaped input, and the exact seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
