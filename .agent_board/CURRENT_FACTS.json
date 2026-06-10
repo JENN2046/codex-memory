@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1576",
-  "validationId": "CMV-1680",
+  "taskId": "CM-1577",
+  "validationId": "CMV-1681",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1681",
+      "scope": "CM-1577 association recall source audit",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS"
+    },
     {
       "id": "CMV-1680",
       "scope": "CM-1576 deterministic association recall core implementation",

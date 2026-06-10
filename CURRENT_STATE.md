@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1576 deterministic association recall core implementation` |
-| Current validation | `CMV-1680` |
-| Current route | Sprint B association recall core implemented; source audit not yet recorded |
+| Current task | `CM-1577 association recall source audit` |
+| Current validation | `CMV-1681` |
+| Current route | Sprint B association recall core implemented and audited; next time-decay baseline |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1577` adds `docs/CM1577_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT.md` and records an independent changed-scope source audit of CM-1576. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Association recall baseline is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; relation graph persistence is `NOT_STARTED`; live search is `NOT_RUN`; raw scan and broad memory scan are `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1576` adds `src/tagmemo/association-recall.js` and updates `tests/tagmemo-association-recall.test.js` plus `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md`. The new internal pure function `deriveTagMemoAssociations(...)` accepts only bounded seed projection and bounded candidates; rejects forbidden raw/private fields; strips provider/API/token/raw shaped values through low-disclosure rejection; emits deterministic bounded `associatedCandidates`, bounded `associationScore`, bounded `associationReasons`, and `associationVersion=deterministic_v1`; and returns low-disclosure empty/rejected results. Targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; relation graph persistence is `NOT_STARTED`; live search is `NOT_RUN`; raw scan and broad memory scan are `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 

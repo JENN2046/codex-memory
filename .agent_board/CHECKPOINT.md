@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1576 deterministic association recall core implementation`.
-Current validation: `CMV-1680`.
+Current checkpoint: `CM-1577 association recall source audit`.
+Current validation: `CMV-1681`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1577 Association Recall Source Audit
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1577_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT.md`.
+- Reviewed `src/tagmemo/association-recall.js`, `tests/tagmemo-association-recall.test.js`, `tests/fixtures/tagmemo-association-recall-sprint-b-v1.json`, and `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md`.
+- Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`.
+- Recorded association recall baseline as `IMPLEMENTED_AND_AUDITED`.
+- Runtime integration remains `NOT_STARTED`.
+- Relation graph persistence remains `NOT_STARTED`.
+- Live search, raw scan, and broad memory scan remain `NOT_RUN`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, confirmed mutation, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1681` source-audit docs validation.
 
 ## CM-1576 Deterministic Association Recall Core Implementation
 

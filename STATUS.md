@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1576 deterministic association recall core implementation`.
-Current validation: `CMV-1680`.
+Current task: `CM-1577 association recall source audit`.
+Current validation: `CMV-1681`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `SPRINT_B_ASSOCIATION_RECALL_CORE_IMPLEMENTED_PENDING_SOURCE_AUDIT`.
+Current route: `SPRINT_B_ASSOCIATION_RECALL_IMPLEMENTED_AND_AUDITED_NEXT_TIME_DECAY_BASELINE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1577 association recall source audit: added `docs/CM1577_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT.md`. Independent changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Association recall baseline is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; relation graph persistence is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1576 deterministic association recall core implementation: added `src/tagmemo/association-recall.js` and expanded `tests/tagmemo-association-recall.test.js`. The internal pure function accepts bounded seed projection and bounded candidates; outputs deterministic bounded `associatedCandidates`, bounded `associationScore`, bounded `associationReasons`, and `associationVersion=deterministic_v1`; scores shared tags, query expansion overlap, evidence overlap, and importance; and returns low-disclosure empty/rejected results. Targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; relation graph persistence is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 

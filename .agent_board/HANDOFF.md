@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1576 deterministic association recall core implementation`.
-Current validation: `CMV-1680`.
-Current handoff: Association recall core implemented; independent source audit not yet recorded. Next safe Sprint B route is source audit.
+Current task: `CM-1577 association recall source audit`.
+Current validation: `CMV-1681`.
+Current handoff: Association recall core implemented and audited. Next safe Sprint B route is time-decay baseline.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Association recall core implemented; independent source audit n
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_CORE_IMPLEMENTED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1577 added `docs/CM1577_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of CM-1576. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Association recall baseline is now `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; relation graph persistence remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1576 added `src/tagmemo/association-recall.js` and expanded `tests/tagmemo-association-recall.test.js`. The internal pure function accepts bounded seed projection and bounded candidates; returns deterministic associated candidates with `associationVersion=deterministic_v1`; scores shared tags, query expansion overlap, evidence overlap, and importance; rejects forbidden raw/private fields; keeps empty/rejected paths low-disclosure; and targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; relation graph persistence remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1575 added `tests/fixtures/tagmemo-association-recall-sprint-b-v1.json` and `tests/tagmemo-association-recall.test.js` for fixture/test coverage of deterministic association recall. It locks shared-tag ranking, query expansion overlap, empty candidate low-disclosure behavior, rejected unsafe input shape, side-effect boundaries, forbidden provider/token/raw-shaped sample placement, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; relation graph persistence remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1574 added `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md` and prepared deterministic association recall as docs-only preflight. It maps the user task-book Phase 5 alias `CM-1564` to repository task `CM-1574` because `CM-1560..CM-1569` are already occupied by Sprint A. It planned `src/tagmemo/association-recall.js`, bounded input contracts, forbidden raw/provider/token/audit/scan/storage inputs, deterministic output fields, association rules, and regression coverage. Source implementation remains `NOT_STARTED`; relation graph persistence remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
