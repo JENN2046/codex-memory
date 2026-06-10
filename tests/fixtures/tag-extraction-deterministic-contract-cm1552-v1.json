@@ -1,0 +1,398 @@
+{
+  "schemaVersion": "tag-extraction-deterministic-contract-cm1552-v1",
+  "phase": "CM-1552 tag extraction deterministic contract fixture/test coverage",
+  "source": {
+    "kind": "fixture-only",
+    "synthetic": true,
+    "runtimeTagExtractionImplemented": false,
+    "deterministicContractOnly": true
+  },
+  "safety": {
+    "mutated": false,
+    "providerCalls": 0,
+    "bearerTokenUse": false,
+    "rawScan": false,
+    "confirmedMutation": false,
+    "publicMcpExpansion": false,
+    "effectiveRecordMemoryWrites": 0,
+    "releaseTagDeploy": false,
+    "productionReady": false,
+    "releaseReady": false,
+    "cutoverReady": false,
+    "completeV8Claimed": false,
+    "runtimeRankingChanged": false,
+    "publicMcpTools": [
+      "record_memory",
+      "search_memory",
+      "memory_overview",
+      "audit_memory",
+      "validate_memory",
+      "tombstone_memory",
+      "supersede_memory"
+    ]
+  },
+  "contract": {
+    "inputSchemaVersion": "tagmemo-deterministic-extraction-input-v1",
+    "outputSchemaVersion": "tagmemo-deterministic-extraction-output-v1",
+    "tagSchemaVersion": "tagmemo-minimal-tag-v1",
+    "allowedInputKeys": [
+      "schemaVersion",
+      "memoryId",
+      "boundedMemoryText",
+      "metadataProjection"
+    ],
+    "allowedMetadataKeys": [
+      "title",
+      "summary",
+      "explicitTags",
+      "queryCoreTags",
+      "sourceKind"
+    ],
+    "allowedSourceKinds": [
+      "fixture",
+      "selected_projection",
+      "explicit_record_tag",
+      "query_core",
+      "operator_reviewed"
+    ],
+    "requiredTagFields": [
+      "schemaVersion",
+      "tagId",
+      "tagLabel",
+      "tagSource",
+      "confidenceScore",
+      "confidenceBucket",
+      "evidenceSourceId",
+      "memoryId",
+      "rankingCompatibility"
+    ],
+    "allowedTagSources": [
+      "explicit_record_tag",
+      "query_core_tag",
+      "derived_candidate",
+      "fixture_expected",
+      "operator_reviewed"
+    ],
+    "sourceTrustOrder": [
+      "explicit_record_tag",
+      "operator_reviewed",
+      "fixture_expected",
+      "query_core_tag",
+      "derived_candidate"
+    ],
+    "confidenceBySource": {
+      "explicit_record_tag": 0.95,
+      "operator_reviewed": 0.9,
+      "fixture_expected": 0.85,
+      "query_core_tag": 0.75,
+      "derived_candidate": 0.65
+    },
+    "confidenceBuckets": {
+      "low": {
+        "min": 0,
+        "maxExclusive": 0.5
+      },
+      "medium": {
+        "min": 0.5,
+        "maxExclusive": 0.8
+      },
+      "high": {
+        "min": 0.8,
+        "max": 1
+      }
+    },
+    "publicProjectionAllowedKeys": [
+      "schemaVersion",
+      "tagId",
+      "tagLabel",
+      "tagSource",
+      "confidenceBucket",
+      "memoryLinkagePresent",
+      "rankingCompatible"
+    ],
+    "forbiddenRawPrivateKeys": [
+      "rawText",
+      "rawContent",
+      "content",
+      "rawBody",
+      "transcript",
+      "rawAudit",
+      "rawJsonl",
+      "sqliteRow",
+      "vectorPayload",
+      "candidateCachePayload",
+      "sourceFile",
+      "fullPath",
+      "filePath",
+      "relativePath",
+      "provider",
+      "apiKey",
+      "token",
+      "authorization",
+      "bearer",
+      "privateLifecycleState",
+      "localPath",
+      "providerEndpoint"
+    ],
+    "forbiddenValueFragments": [
+      "cm1552-provider-endpoint",
+      "cm1552-token-fragment",
+      "cm1552-bearer-fragment",
+      "cm1552-raw-memory-body",
+      "cm1552-private-lifecycle",
+      "cm1552-jsonl-row",
+      "cm1552-sqlite-row"
+    ]
+  },
+  "normalizationCases": [
+    {
+      "id": "trim-collapse-case",
+      "input": "  Recall_Projection  ",
+      "expected": "recall projection"
+    },
+    {
+      "id": "leading-marker-hyphen",
+      "input": "- TagMemo-contract",
+      "expected": "tagmemo contract"
+    },
+    {
+      "id": "empty-after-trim",
+      "input": "   ",
+      "expected": null
+    },
+    {
+      "id": "unsafe-path-like",
+      "input": "A:/cm1552/should-not-leak",
+      "expected": null
+    }
+  ],
+  "validExtractionCases": [
+    {
+      "id": "stable-bounded-input",
+      "input": {
+        "schemaVersion": "tagmemo-deterministic-extraction-input-v1",
+        "memoryId": "memory:cm1552:alpha-001",
+        "boundedMemoryText": "Bounded TagMemo recall projection fixture text.",
+        "metadataProjection": {
+          "title": "Deterministic Tag Extraction",
+          "summary": "Low disclosure contract fixture",
+          "explicitTags": [
+            " Recall_Projection ",
+            "- TagMemo-contract",
+            "recall projection"
+          ],
+          "queryCoreTags": [
+            "bounded_projection",
+            "schema candidate",
+            "recall_projection"
+          ],
+          "sourceKind": "fixture"
+        }
+      },
+      "expectedOutput": {
+        "schemaVersion": "tagmemo-deterministic-extraction-output-v1",
+        "memoryId": "memory:cm1552:alpha-001",
+        "tags": [
+          {
+            "schemaVersion": "tagmemo-minimal-tag-v1",
+            "tagId": "tag:cm1552-alpha-001:bounded-projection",
+            "tagLabel": "bounded projection",
+            "tagSource": "query_core_tag",
+            "confidenceScore": 0.75,
+            "confidenceBucket": "medium",
+            "evidenceSourceId": "evidence:cm1552-alpha-001:query-core-tag",
+            "memoryId": "memory:cm1552:alpha-001",
+            "rankingCompatibility": {
+              "mayContributeToTagMemoScore": true,
+              "mayContributeToStructuralSignal": true,
+              "runtimeWeightTuningApproved": false
+            }
+          },
+          {
+            "schemaVersion": "tagmemo-minimal-tag-v1",
+            "tagId": "tag:cm1552-alpha-001:recall-projection",
+            "tagLabel": "recall projection",
+            "tagSource": "explicit_record_tag",
+            "confidenceScore": 0.95,
+            "confidenceBucket": "high",
+            "evidenceSourceId": "evidence:cm1552-alpha-001:explicit-record-tag",
+            "memoryId": "memory:cm1552:alpha-001",
+            "rankingCompatibility": {
+              "mayContributeToTagMemoScore": true,
+              "mayContributeToStructuralSignal": true,
+              "runtimeWeightTuningApproved": false
+            }
+          },
+          {
+            "schemaVersion": "tagmemo-minimal-tag-v1",
+            "tagId": "tag:cm1552-alpha-001:schema-candidate",
+            "tagLabel": "schema candidate",
+            "tagSource": "query_core_tag",
+            "confidenceScore": 0.75,
+            "confidenceBucket": "medium",
+            "evidenceSourceId": "evidence:cm1552-alpha-001:query-core-tag",
+            "memoryId": "memory:cm1552:alpha-001",
+            "rankingCompatibility": {
+              "mayContributeToTagMemoScore": true,
+              "mayContributeToStructuralSignal": true,
+              "runtimeWeightTuningApproved": false
+            }
+          },
+          {
+            "schemaVersion": "tagmemo-minimal-tag-v1",
+            "tagId": "tag:cm1552-alpha-001:tagmemo-contract",
+            "tagLabel": "tagmemo contract",
+            "tagSource": "explicit_record_tag",
+            "confidenceScore": 0.95,
+            "confidenceBucket": "high",
+            "evidenceSourceId": "evidence:cm1552-alpha-001:explicit-record-tag",
+            "memoryId": "memory:cm1552:alpha-001",
+            "rankingCompatibility": {
+              "mayContributeToTagMemoScore": true,
+              "mayContributeToStructuralSignal": true,
+              "runtimeWeightTuningApproved": false
+            }
+          }
+        ],
+        "mutated": false,
+        "providerCalls": 0,
+        "publicMcpExpansion": 0
+      }
+    },
+    {
+      "id": "reordered-duplicates",
+      "input": {
+        "schemaVersion": "tagmemo-deterministic-extraction-input-v1",
+        "memoryId": "memory:cm1552:alpha-001",
+        "boundedMemoryText": "Bounded TagMemo recall projection fixture text.",
+        "metadataProjection": {
+          "title": "Deterministic Tag Extraction",
+          "summary": "Low disclosure contract fixture",
+          "explicitTags": [
+            "recall projection",
+            "- TagMemo-contract",
+            " Recall_Projection "
+          ],
+          "queryCoreTags": [
+            "recall_projection",
+            "schema candidate",
+            "bounded_projection"
+          ],
+          "sourceKind": "fixture"
+        }
+      },
+      "expectedOutputRef": "stable-bounded-input"
+    }
+  ],
+  "rejectedInputCases": [
+    {
+      "id": "empty-input",
+      "expectedReason": "empty_input",
+      "forbiddenEcho": "empty private detail should not appear",
+      "input": {
+        "schemaVersion": "tagmemo-deterministic-extraction-input-v1",
+        "memoryId": "memory:cm1552:empty-001",
+        "boundedMemoryText": "",
+        "metadataProjection": {
+          "title": "",
+          "summary": "",
+          "explicitTags": [],
+          "queryCoreTags": [],
+          "sourceKind": "fixture"
+        }
+      }
+    },
+    {
+      "id": "missing-memory-id",
+      "expectedReason": "missing_memory_id",
+      "forbiddenEcho": "missing memory private detail should not appear",
+      "input": {
+        "schemaVersion": "tagmemo-deterministic-extraction-input-v1",
+        "boundedMemoryText": "bounded text without linkage",
+        "metadataProjection": {
+          "title": "Missing linkage",
+          "summary": "No memory id",
+          "explicitTags": [
+            "safe tag"
+          ],
+          "queryCoreTags": [],
+          "sourceKind": "fixture"
+        }
+      }
+    },
+    {
+      "id": "forbidden-raw-field",
+      "expectedReason": "forbidden_raw_private_field",
+      "forbiddenEcho": "cm1552-raw-memory-body",
+      "input": {
+        "schemaVersion": "tagmemo-deterministic-extraction-input-v1",
+        "memoryId": "memory:cm1552:reject-raw",
+        "boundedMemoryText": "bounded text",
+        "metadataProjection": {
+          "title": "Raw field case",
+          "summary": "Rejected before extraction",
+          "explicitTags": [
+            "safe tag"
+          ],
+          "queryCoreTags": [],
+          "sourceKind": "fixture"
+        },
+        "rawText": "cm1552-raw-memory-body"
+      }
+    },
+    {
+      "id": "unsafe-label-provider",
+      "expectedReason": "forbidden_raw_private_value",
+      "forbiddenEcho": "cm1552-provider-endpoint",
+      "input": {
+        "schemaVersion": "tagmemo-deterministic-extraction-input-v1",
+        "memoryId": "memory:cm1552:reject-provider",
+        "boundedMemoryText": "bounded text",
+        "metadataProjection": {
+          "title": "Unsafe label case",
+          "summary": "Rejected before output",
+          "explicitTags": [
+            "cm1552-provider-endpoint"
+          ],
+          "queryCoreTags": [],
+          "sourceKind": "fixture"
+        }
+      }
+    },
+    {
+      "id": "unsupported-source-kind",
+      "expectedReason": "unsupported_source_kind",
+      "forbiddenEcho": "unsupported private detail should not appear",
+      "input": {
+        "schemaVersion": "tagmemo-deterministic-extraction-input-v1",
+        "memoryId": "memory:cm1552:reject-source",
+        "boundedMemoryText": "bounded text",
+        "metadataProjection": {
+          "title": "Unsupported source kind",
+          "summary": "Rejected before output",
+          "explicitTags": [
+            "safe tag"
+          ],
+          "queryCoreTags": [],
+          "sourceKind": "provider_signal"
+        }
+      }
+    }
+  ],
+  "publicProjectionCases": [
+    {
+      "id": "low-disclosure-default",
+      "sourceCaseId": "stable-bounded-input",
+      "sourceTagId": "tag:cm1552-alpha-001:recall-projection",
+      "expectedKeys": [
+        "schemaVersion",
+        "tagId",
+        "tagLabel",
+        "tagSource",
+        "confidenceBucket",
+        "memoryLinkagePresent",
+        "rankingCompatible"
+      ]
+    }
+  ]
+}

@@ -4,11 +4,37 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1551 tag extraction deterministic contract preflight`.
-Current validation: `CMV-1655`.
+Current checkpoint: `CM-1552 tag extraction deterministic contract fixture/test coverage`.
+Current validation: `CMV-1656`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1552 Tag Extraction Deterministic Contract Fixture/Test Coverage
+
+Status: `COMPLETED_VALIDATED_TAG_EXTRACTION_DETERMINISTIC_CONTRACT_FIXTURE_COVERAGE_ADDED_NO_IMPLEMENTATION`
+
+Recorded:
+
+- Added `tests/fixtures/tag-extraction-deterministic-contract-cm1552-v1.json`.
+- Added `tests/tag-extraction-deterministic-contract-fixture.test.js`.
+- Added `docs/CM1552_TAG_EXTRACTION_DETERMINISTIC_CONTRACT_REGRESSION_COVERAGE.md`.
+- Targeted validation passed `7/7`.
+- Verified inputs use bounded memory text and metadata projection.
+- Verified outputs are compatible with TagMemo minimal schema.
+- Verified deterministic `tagLabel` normalization.
+- Verified duplicate tag handling is reproducible.
+- Verified confidence score range and bucket behavior.
+- Verified empty-input and rejected-input low-disclosure behavior.
+- Verified forbidden raw/private fields do not enter output or public projection.
+- Verified generated `tagSource` values do not contain provider/API/token/bearer/raw/scan-shaped content.
+- Verified public MCP surface remains seven tools.
+- Recorded `tag extraction implementation: NOT_STARTED`.
+- Recorded `complete V8: NOT_CLAIMED`.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- No tag extraction implementation, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, effective write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1656` fixture/test and docs changed-scope validation.
 
 ## CM-1551 Tag Extraction Deterministic Contract Preflight
 

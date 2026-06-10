@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1551 tag extraction deterministic contract preflight`.
-Current validation: `CMV-1655`.
+Current task: `CM-1552 tag extraction deterministic contract fixture/test coverage`.
+Current validation: `CMV-1656`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1551` recorded deterministic tag extraction contract preflight as docs-only and selected `CM-1552 tag extraction deterministic contract fixture/test coverage` as the next fixture-first slice. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Tag extraction implementation, complex V8 algorithm implementation, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1552` added deterministic tag extraction contract fixture/test coverage and kept tag extraction implementation not started. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Tag extraction implementation, complex V8 algorithm implementation, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 
