@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1560",
-  "validationId": "CMV-1664",
+  "taskId": "CM-1561",
+  "validationId": "CMV-1665",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1665",
+      "scope": "CM-1561 TagMemo importance scoring baseline preflight",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_BASELINE_PREFLIGHT_RECORDED"
+    },
     {
       "id": "CMV-1664",
       "scope": "CM-1560 TagMemo runtime no-op projection baseline closeout",

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1560 TagMemo runtime no-op projection baseline closeout`.
-Current validation: `CMV-1664`.
+Current task: `CM-1561 TagMemo importance scoring baseline preflight`.
+Current validation: `CMV-1665`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED; persistent enrichment and public MCP integration not started`.
+Current route: `TAGMEMO_IMPORTANCE_SCORING_BASELINE_PREFLIGHT_RECORDED; source implementation not started`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1561 TagMemo importance scoring baseline preflight: added `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md`. This docs-only preflight defines a deterministic, internal-only memory importance scoring baseline. Planned input is limited to bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints. Forbidden inputs include raw memory records, token/bearer material, provider/API payloads, raw audit, raw scan output, client secrets, and unbounded lifecycle metadata. Planned output is `importanceScore`, `importanceBand`, bounded `scoringSignals`, and `scoreVersion=deterministic_v1`. Runtime implementation is `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no raw scan; no public MCP expansion; no second effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1560 TagMemo runtime no-op projection baseline closeout: added `docs/CM1560_TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_CLOSEOUT.md`. Decision: `TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED`; `runtime no-op projection: IMPLEMENTED_AND_AUDITED`; `persistent tag enrichment: NOT_STARTED`; public MCP surface remains seven tools; second effective `record_memory` write was not executed; no provider/API; no bearer token; no raw scan; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. CM-1560 did not implement persistent tag enrichment, expose generated tags in public MCP responses, expand MCP, call provider/API, use bearer-token paths, run live proof, perform raw scan, execute confirmed mutation, write durable live memory, release/tag/deploy, or claim production/release/cutover readiness or complete V8 readiness.
 

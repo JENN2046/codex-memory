@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1560 TagMemo runtime no-op projection baseline closeout`.
-Current validation: `CMV-1664`.
-Current handoff: Runtime no-op projection baseline completed for deterministic TagMemo core; persistent enrichment and public response exposure remain not started. Next safe Sprint A route is deterministic importance scoring baseline.
+Current task: `CM-1561 TagMemo importance scoring baseline preflight`.
+Current validation: `CMV-1665`.
+Current handoff: Importance scoring baseline preflight recorded; source implementation not started. Next safe Sprint A route is fixture/test coverage.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Runtime no-op projection baseline completed for deterministic T
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_BASELINE_PREFLIGHT_RECORDED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1561 added `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md` and prepared deterministic memory importance scoring baseline as docs-only preflight. It planned `src/tagmemo/importance-scoring.js`, bounded input contracts, forbidden raw/provider/token/audit/scan inputs, deterministic output fields, scoring rules, and regression coverage. Source implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, raw scan, public MCP expansion, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
 - CM-1560 added `docs/CM1560_TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_CLOSEOUT.md` and closed TagMemo runtime no-op projection as `TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED`. It records `runtime no-op projection: IMPLEMENTED_AND_AUDITED`, persistent tag enrichment `NOT_STARTED`, public MCP surface still seven tools, second effective `record_memory` write not executed, provider/API not used, bearer token not used, raw scan not run, complete V8 `NOT_CLAIMED`, and production/release/cutover ready as `NO`. No persistent tag enrichment, public response exposure, live proof, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 - CM-1559 added `docs/CM1559_TAGMEMO_RUNTIME_NOOP_PROJECTION_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of CM-1558. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/runtime-noop-projection.js`, the `src/core/MemoryWriteService.js` no-op projection hook, `tests/tagmemo-runtime-noop-projection.test.js`, related write integration evidence, and CM-1558 evidence docs. Confirmed projection only calls the audited deterministic tag extraction core, generated tags are not persisted or exposed in public MCP responses, projection failure remains low-disclosure no-op and does not affect `record_memory`, empty/rejected input is low-disclosure, forbidden raw/private fields do not enter output, public MCP surface remains seven tools, and no provider/API, bearer token, raw scan, confirmed mutation, second effective write, production/release/cutover readiness claim, or complete V8 claim occurred. Validation passed `7/7`, `7/7`, `7/7`, and `12/12`; `git diff --check`, docs validation, and `CURRENT_FACTS.json` parse passed. Persistent tag enrichment remains `NOT_STARTED`.
 - CM-1558 added `src/tagmemo/runtime-noop-projection.js`, updated `src/core/MemoryWriteService.js`, added `tests/tagmemo-runtime-noop-projection.test.js`, and added `docs/CM1558_TAGMEMO_RUNTIME_NOOP_PROJECTION.md`. The internal projection adapter builds bounded extraction input from normalized internal write records, calls the audited deterministic tag extraction core, and returns TagMemo minimal schema compatible no-op projection tags with `persisted=false`, `publicResponse=false`, and `mutated=false`. `MemoryWriteService.record(...)` invokes the projection before durable writes, but generated tags are not attached to record, diary, SQLite, vector, chunks, audit, public result, canonical hash, or idempotency. Projection failure is low-disclosure no-op and does not affect the main write path. Targeted validation passed `7/7`, `7/7`, and `7/7`; related write integration validation passed `12/12`; `npm test` passed `3115/3115`. `runtime no-op projection: IMPLEMENTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, raw scan, second effective `record_memory` write, complete V8 claim, or production/release/cutover readiness occurred.

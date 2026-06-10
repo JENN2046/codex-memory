@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1560 TagMemo runtime no-op projection baseline closeout` |
-| Current validation | `CMV-1664` |
-| Current route | Runtime no-op projection baseline completed; persistent tag enrichment and public MCP integration not started |
+| Current task | `CM-1561 TagMemo importance scoring baseline preflight` |
+| Current validation | `CMV-1665` |
+| Current route | Importance scoring baseline prepared; source implementation not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1561` adds `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md` and prepares the deterministic memory importance scoring baseline as docs-only preflight. It defines the planned internal pure-function module `src/tagmemo/importance-scoring.js`, input contract for bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints, forbidden raw/provider/token/audit/scan inputs, output contract for `importanceScore`, `importanceBand`, `scoringSignals`, and `scoreVersion=deterministic_v1`, deterministic scoring rules, and planned regression tests. Runtime implementation is `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; provider/API not used; bearer token not used; raw scan not run; public MCP expansion not performed; second effective `record_memory` write not executed; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1560` adds `docs/CM1560_TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_CLOSEOUT.md` and closes the deterministic TagMemo runtime no-op projection lane as `TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED`. It records `runtime no-op projection: IMPLEMENTED_AND_AUDITED`, `persistent tag enrichment: NOT_STARTED`, public MCP surface still seven tools, second effective `record_memory` write not executed, provider/API not used, bearer token not used, raw scan not run, complete V8 `NOT_CLAIMED`, and production/release/cutover ready as `NO`. CM-1560 does not implement persistent tag enrichment, expose generated tags in public MCP responses, expand MCP, call provider/API, use bearer-token paths, run live proof, perform raw scan, execute confirmed mutation, write durable live memory, release/tag/deploy, or claim production/release/cutover readiness or complete V8 readiness.
 

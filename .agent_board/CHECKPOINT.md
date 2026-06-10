@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1560 TagMemo runtime no-op projection baseline closeout`.
-Current validation: `CMV-1664`.
+Current checkpoint: `CM-1561 TagMemo importance scoring baseline preflight`.
+Current validation: `CMV-1665`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1561 TagMemo Importance Scoring Baseline Preflight
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_BASELINE_PREFLIGHT_RECORDED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md`.
+- Prepared internal deterministic memory importance scoring baseline.
+- Planned `src/tagmemo/importance-scoring.js`.
+- Defined bounded input and output contracts.
+- Defined forbidden raw/provider/token/audit/scan inputs.
+- Defined deterministic scoring rules and planned tests.
+- Recorded runtime implementation as `NOT_STARTED`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, raw scan, public MCP expansion, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1665` docs preflight changed-scope validation.
 
 ## CM-1560 TagMemo Runtime No-Op Projection Baseline Closeout
 
