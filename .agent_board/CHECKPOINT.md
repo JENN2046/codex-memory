@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1552 tag extraction deterministic contract fixture/test coverage`.
-Current validation: `CMV-1656`.
+Current checkpoint: `CM-1553 tag extraction contract closeout and implementation preflight route selection`.
+Current validation: `CMV-1657`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1553 Tag Extraction Contract Closeout And Implementation Preflight Route Selection
+
+Status: `COMPLETED_VALIDATED_TAG_EXTRACTION_DETERMINISTIC_CONTRACT_BASELINE_COMPLETED_TEST_ONLY_NEXT_SOURCE_PREFLIGHT_SELECTED`
+
+Recorded:
+
+- Added `docs/CM1553_TAG_EXTRACTION_CONTRACT_CLOSEOUT_AND_IMPLEMENTATION_PREFLIGHT_ROUTE_SELECTION.md`.
+- Closed deterministic tag extraction contract as `BASELINE_COMPLETED_TEST_ONLY`.
+- Reviewed CM-1551 deterministic contract preflight.
+- Reviewed CM-1552 fixture/test evidence and targeted validation `7/7`.
+- Recorded `runtime tag extraction implementation: NOT_STARTED`.
+- Recorded `complete V8: NOT_CLAIMED`.
+- Recorded public MCP surface as still seven tools.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- Selected next recommended route: `CM-1554 minimal deterministic tag extraction source implementation preflight`.
+- No runtime tag extraction implementation, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, effective write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1657` docs closeout changed-scope validation.
 
 ## CM-1552 Tag Extraction Deterministic Contract Fixture/Test Coverage
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1552",
-  "validationId": "CMV-1656",
+  "taskId": "CM-1553",
+  "validationId": "CMV-1657",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1657",
+      "scope": "CM-1553 tag extraction contract closeout and implementation preflight route selection",
+      "status": "COMPLETED_VALIDATED_TAG_EXTRACTION_DETERMINISTIC_CONTRACT_BASELINE_COMPLETED_TEST_ONLY_NEXT_SOURCE_PREFLIGHT_SELECTED"
+    },
     {
       "id": "CMV-1656",
       "scope": "CM-1552 tag extraction deterministic contract fixture/test coverage",
