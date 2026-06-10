@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1589 TagMemo runtime recall projection source audit`.
-Current validation: `CMV-1693`.
+Current checkpoint: `CM-1590 V8 TagMemo runtime recall integration Sprint D closeout`.
+Current validation: `CMV-1694`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1590 V8 TagMemo Runtime Recall Integration Sprint D Closeout
+
+Status: `COMPLETED_VALIDATED_V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_COMPLETED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_CLOSEOUT.md`.
+- Updated `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`.
+- Recorded `V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_COMPLETED`.
+- Confirmed CM-1586 preflight, CM-1587 coverage, CM-1588 internal no-op projection implementation, and CM-1589 independent source audit are completed.
+- Runtime no-op recall projection is `IMPLEMENTED_AND_AUDITED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Public MCP surface remains seven tools.
+- `search_memory` public response contract remains unchanged.
+- Projection persistence remains `NO`.
+- Projection public MCP response exposure remains `NO`.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1694` Sprint D closeout validation.
 
 ## CM-1589 TagMemo Runtime Recall Projection Source Audit
 

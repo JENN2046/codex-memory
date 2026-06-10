@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1589 TagMemo runtime recall projection source audit`.
-Current validation: `CMV-1693`.
+Current task: `CM-1590 V8 TagMemo runtime recall integration Sprint D closeout`.
+Current validation: `CMV-1694`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_RUNTIME_RECALL_NOOP_PROJECTION_IMPLEMENTED_AND_AUDITED`.
+Current route: `V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_COMPLETED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1590 V8 TagMemo runtime recall integration Sprint D closeout: added `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_CLOSEOUT.md` and recorded `V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_COMPLETED`. Runtime no-op recall projection is `IMPLEMENTED_AND_AUDITED`; projection remains non-persistent, internal-only, outside public MCP response contracts, and outside `search_memory` public response changes. Persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1589 TagMemo runtime recall projection source audit: added `docs/CM1589_TAGMEMO_RUNTIME_RECALL_PROJECTION_SOURCE_AUDIT.md`. Independent changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Runtime no-op recall projection is `IMPLEMENTED_AND_AUDITED`; projection remains non-persistent, internal-only, outside public MCP response contracts, and outside `search_memory` public response changes. Public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1589",
-  "validationId": "CMV-1693",
+  "taskId": "CM-1590",
+  "validationId": "CMV-1694",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1694",
+      "scope": "CM-1590 V8 TagMemo runtime recall integration Sprint D closeout",
+      "status": "COMPLETED_VALIDATED_V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_COMPLETED"
+    },
     {
       "id": "CMV-1693",
       "scope": "CM-1589 TagMemo runtime recall projection source audit",

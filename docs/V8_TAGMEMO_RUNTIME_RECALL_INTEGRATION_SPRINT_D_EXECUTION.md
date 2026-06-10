@@ -48,6 +48,12 @@ CM-1589 records independent changed-scope source audit:
 docs/CM1589_TAGMEMO_RUNTIME_RECALL_PROJECTION_SOURCE_AUDIT.md
 ```
 
+CM-1590 closes Sprint D:
+
+```text
+docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_CLOSEOUT.md
+```
+
 ## Boundaries
 
 ```text
@@ -67,6 +73,7 @@ projection persistence: NO
 projection public MCP response exposure: NO
 production/release/cutover ready: NO
 complete V8: NOT_CLAIMED
+Sprint D final state: V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_COMPLETED
 ```
 
 ## Validation
