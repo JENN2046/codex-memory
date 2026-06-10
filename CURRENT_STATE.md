@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1554 minimal deterministic tag extraction source implementation preflight` |
-| Current validation | `CMV-1658` |
-| Current route | Minimal deterministic tag extraction source implementation preflight recorded; runtime implementation not started; proposed internal module `src/recall/TagExtraction.js` |
+| Current task | `CM-1555 minimal deterministic TagMemo tag extraction source implementation` |
+| Current validation | `CMV-1659` |
+| Current route | Minimal deterministic TagMemo tag extraction internal pure-function module added at `src/tagmemo/tag-extraction.js`; runtime integration not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1555` adds `src/tagmemo/tag-extraction.js`, `tests/tagmemo-tag-extraction.test.js`, and `docs/CM1555_DETERMINISTIC_TAGMEMO_TAG_EXTRACTION_CORE.md`. It implements the minimal deterministic TagMemo tag extraction core as an internal pure function with bounded input validation, deterministic normalization, duplicate merge, bounded confidence scores, low-disclosure empty/rejected results, forbidden raw/private field rejection, safe `tagSource` values, and TagMemo minimal schema compatible output. Targeted validation passed `7/7` for the new source-level unit tests and `7/7` for the CM-1552 deterministic contract fixture. `runtime integration: NOT_STARTED`; deterministic only; no provider/API; no bearer token; no raw scan; no public MCP expansion; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`. CM-1555 does not connect extraction to runtime write/recall flows, change public MCP surface, run live proof, execute confirmed mutation, perform another effective `record_memory` write, release/tag/deploy, cut over, claim production/release/cutover readiness, or claim complete V8 readiness.
 
 `CM-1554` adds `docs/CM1554_MINIMAL_TAG_EXTRACTION_IMPLEMENTATION_PREFLIGHT.md` and records a docs/status/board-only source implementation preflight for minimal deterministic tag extraction. It selects `src/recall/TagExtraction.js` as the future internal pure-function module candidate, proposes `extractDeterministicTags(input, options = {})`, records input/output contracts compatible with the CM-1551/CM-1552 deterministic baseline and TagMemo minimal schema, defines future test and rollback plans, and keeps `runtime implementation: NOT_STARTED`, deterministic only, provider/API not used, bearer token not used, raw scan not run, public MCP expansion not performed, complete V8 `NOT_CLAIMED`, and production/release/cutover ready as `NO`. CM-1554 does not implement runtime tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
@@ -275,7 +277,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1554 records the minimal deterministic tag extraction source implementation preflight and keeps runtime implementation not started. Next safe action, if selected, is a separate minimal source/test implementation slice for `src/recall/TagExtraction.js` and `tests/tag-extraction-implementation.test.js`. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, live proof, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, production-readiness claims, and complete V8 claims remain separate approval-bound work.
+CM-1555 records the minimal deterministic TagMemo tag extraction internal pure-function implementation. Next safe action, if selected, is a separate runtime integration preflight to decide whether and how `src/tagmemo/tag-extraction.js` may be wired into write/recall flows. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, live proof, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, production-readiness claims, and complete V8 claims remain separate approval-bound work.
 
 ## Boundaries
 

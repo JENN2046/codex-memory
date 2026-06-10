@@ -4,11 +4,35 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1554 minimal deterministic tag extraction source implementation preflight`.
-Current validation: `CMV-1658`.
+Current checkpoint: `CM-1555 minimal deterministic TagMemo tag extraction source implementation`.
+Current validation: `CMV-1659`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1555 Minimal Deterministic TagMemo Tag Extraction Source Implementation
+
+Status: `COMPLETED_VALIDATED_DETERMINISTIC_TAGMEMO_TAG_EXTRACTION_CORE_ADDED_RUNTIME_INTEGRATION_NOT_STARTED`
+
+Recorded:
+
+- Added `src/tagmemo/tag-extraction.js`.
+- Added `tests/tagmemo-tag-extraction.test.js`.
+- Added `docs/CM1555_DETERMINISTIC_TAGMEMO_TAG_EXTRACTION_CORE.md`.
+- Implemented internal pure-function `extractDeterministicTags(input, options = {})`.
+- Implemented `normalizeTagLabel(value)`.
+- Accepted only bounded memory text and bounded metadata projection.
+- Produced TagMemo minimal schema compatible tags with `tagId`, `tagLabel`, `tagSource`, `confidenceScore`, `evidenceSourceId`, and `memoryId`.
+- Covered deterministic normalization, duplicate tag merge, bounded confidence scores, low-disclosure empty/rejected results, forbidden raw/private field rejection, safe `tagSource`, no mutation, no provider/API calls, and no public MCP expansion.
+- Targeted source-level validation passed `7/7`.
+- CM-1552 deterministic contract fixture validation stayed passed `7/7`.
+- Recorded `runtime integration: NOT_STARTED`.
+- Recorded deterministic only, provider/API not used, bearer token not used, raw scan not run, public MCP expansion not performed.
+- Recorded `complete V8: NOT_CLAIMED`.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- No runtime write/recall wiring, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, effective write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1659` source/test/docs changed-scope validation.
 
 ## CM-1554 Minimal Deterministic Tag Extraction Source Implementation Preflight
 

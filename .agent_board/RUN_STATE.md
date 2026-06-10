@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1554 minimal deterministic tag extraction source implementation preflight`.
-Current validation: `CMV-1658`.
+Current task: `CM-1555 minimal deterministic TagMemo tag extraction source implementation`.
+Current validation: `CMV-1659`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1554` recorded the minimal deterministic tag extraction source implementation preflight and kept runtime implementation not started. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Future implementation candidate is `src/recall/TagExtraction.js` with tests in `tests/tag-extraction-implementation.test.js`, but no runtime source was changed in CM-1554. Runtime tag extraction implementation, complex V8 algorithm implementation, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1555` added the minimal deterministic TagMemo tag extraction internal pure-function core at `src/tagmemo/tag-extraction.js` with source-level tests in `tests/tagmemo-tag-extraction.test.js`. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Runtime integration remains not started. Complex V8 algorithm implementation, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

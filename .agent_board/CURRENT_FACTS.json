@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1554",
-  "validationId": "CMV-1658",
+  "taskId": "CM-1555",
+  "validationId": "CMV-1659",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1659",
+      "scope": "CM-1555 minimal deterministic TagMemo tag extraction source implementation",
+      "status": "COMPLETED_VALIDATED_DETERMINISTIC_TAGMEMO_TAG_EXTRACTION_CORE_ADDED_RUNTIME_INTEGRATION_NOT_STARTED"
+    },
     {
       "id": "CMV-1658",
       "scope": "CM-1554 minimal deterministic tag extraction source implementation preflight",
@@ -763,7 +768,7 @@
     "real query quality proof",
     "startup/watchdog warning source change",
     "raw audit or broad store scan",
-    "tag extraction implementation",
+    "runtime tag extraction integration",
     "complete V8 implementation",
     "committed live Git head facts"
   ],
