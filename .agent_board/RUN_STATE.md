@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1569 V8 TagMemo recall foundation Sprint A closeout`.
-Current validation: `CMV-1673`.
+Current task: `CM-1570 bounded deep recall query expansion preflight`.
+Current validation: `CMV-1674`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1569` closes V8 TagMemo recall foundation Sprint A as completed. Final validation and the single allowed final push remain next. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP expansion, deep recall query expansion, relation graph / association recall, time decay advanced model, memory consolidation, reflection / metacognitive memory, complete V8 claims, and production-readiness claims remain not started or not claimed.
+`CM-1570` prepares bounded deterministic deep recall query expansion as docs-only preflight. The next Sprint B slice is fixture/test coverage. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

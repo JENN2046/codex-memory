@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1569 V8 TagMemo recall foundation Sprint A closeout` |
-| Current validation | `CMV-1673` |
-| Current route | V8 TagMemo recall foundation Sprint A completed; final validation and push pending |
+| Current task | `CM-1570 bounded deep recall query expansion preflight` |
+| Current validation | `CMV-1674` |
+| Current route | Sprint B query expansion baseline preflight recorded |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1570` adds `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md` and prepares bounded deterministic deep recall query expansion as docs-only preflight for Sprint B. It records the user task-book Phase 1 alias `CM-1560` as already occupied by Sprint A and preserves repository numbering as `CM-1570`. Planned module is `src/tagmemo/query-expansion.js`; allowed input is bounded query text, TagMemo tag projection, deterministic importance band/score, safe evidence hints, and bounded recall intent. Forbidden input includes raw memory, token/bearer material, provider/API payloads, raw audit, raw scan output, client secrets, raw storage/vector/cache/file path payloads, and unbounded lifecycle metadata. Query expansion source implementation is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; no provider/API or bearer token path occurred; public MCP surface was not expanded; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1569` adds `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_CLOSEOUT.md` and records `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_COMPLETED`. Completed items: TagMemo minimal schema baseline, deterministic tag extraction contract, deterministic tag extraction core, runtime no-op projection, importance scoring baseline, and recall ranking baseline. Remaining V8 gaps are persistent tag enrichment, public MCP expansion, deep recall query expansion, relation graph / association recall, time decay advanced model, memory consolidation, and reflection / metacognitive memory. Public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad scan not run; no confirmed mutation, live proof, second effective `record_memory` write, persistent enrichment, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 

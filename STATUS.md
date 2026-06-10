@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1569 V8 TagMemo recall foundation Sprint A closeout`.
-Current validation: `CMV-1673`.
+Current task: `CM-1570 bounded deep recall query expansion preflight`.
+Current validation: `CMV-1674`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_COMPLETED_PENDING_FINAL_VALIDATION_AND_PUSH`.
+Current route: `SPRINT_B_QUERY_EXPANSION_BASELINE_PREFLIGHT_RECORDED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1570 bounded deep recall query expansion preflight: added `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md`. This docs-only preflight maps the user task-book Phase 1 alias `CM-1560` to repository task `CM-1570` because `CM-1560..CM-1569` are already occupied by Sprint A. It defines a deterministic, internal-only query expansion baseline over bounded query text, TagMemo tag projection, deterministic importance band/score, safe evidence hints, and bounded recall intent. Source implementation is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1569 V8 TagMemo recall foundation Sprint A closeout: added `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_CLOSEOUT.md` and recorded `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_COMPLETED`. Completed items: TagMemo minimal schema baseline `COMPLETED`; deterministic tag extraction contract `COMPLETED`; deterministic tag extraction core `IMPLEMENTED_AND_AUDITED`; runtime no-op projection `IMPLEMENTED_AND_AUDITED`; importance scoring baseline `IMPLEMENTED_AND_AUDITED`; recall ranking baseline `IMPLEMENTED_AND_AUDITED`. Remaining gaps: persistent tag enrichment `NOT_STARTED`; public MCP expansion `NOT_STARTED`; deep recall query expansion `NOT_STARTED`; relation graph / association recall `NOT_STARTED`; time decay advanced model `NOT_STARTED`; memory consolidation `NOT_STARTED`; reflection / metacognitive memory `NOT_STARTED`; complete V8 `NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. Public MCP surface remains seven tools. No provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, second effective `record_memory` write, persistent enrichment, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

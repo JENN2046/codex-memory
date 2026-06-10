@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1569 V8 TagMemo recall foundation Sprint A closeout`.
-Current validation: `CMV-1673`.
+Current checkpoint: `CM-1570 bounded deep recall query expansion preflight`.
+Current validation: `CMV-1674`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1570 Bounded Deep Recall Query Expansion Preflight
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_QUERY_EXPANSION_BASELINE_PREFLIGHT_RECORDED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md`.
+- Prepared internal deterministic bounded query expansion baseline.
+- Planned `src/tagmemo/query-expansion.js`.
+- Recorded requested task-book alias `CM-1560` as already occupied by Sprint A and preserved repository numbering as `CM-1570`.
+- Defined bounded query, tag projection, importance, safe evidence, and recall intent inputs.
+- Defined forbidden raw/provider/token/audit/scan/storage/private inputs.
+- Defined deterministic expansion output and planned tests.
+- Recorded query expansion source implementation as `NOT_STARTED`.
+- Recorded live search and raw scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, public MCP expansion, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1674` docs preflight changed-scope validation.
 
 ## CM-1569 V8 TagMemo Recall Foundation Sprint A Closeout
 
