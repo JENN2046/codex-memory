@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1595 Sprint E sidecar persistence adapter contract closeout and dry-run adapter preflight` |
-| Current validation | `CMV-1699` |
-| Current route | Sidecar persistence adapter contract baseline completed test-only; dry-run adapter preflight recorded; persistent tag write remains not started |
+| Current task | `CM-1596 Sprint E sidecar persistence dry-run adapter implementation` |
+| Current validation | `CMV-1700` |
+| Current route | Sidecar persistence dry-run adapter implemented; audit and closeout remain next; persistent tag write remains not executed |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1596` adds `src/tagmemo/sidecar-persistence-dry-run-adapter.js`, `tests/fixtures/tagmemo-sidecar-persistence-dry-run-sprint-e-v1.json`, `tests/tagmemo-sidecar-persistence-dry-run-adapter.test.js`, and `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER.md`. It implements an internal dry-run/no-op adapter that accepts bounded tag projection input and returns only a low-disclosure `dryRunWritePlan`. It does not write files, DB rows, memory records, tag records, public MCP responses, or provider/API payloads. Persistence dry-run adapter is `IMPLEMENTED_INTERNAL_DRY_RUN_ONLY`; independent source audit and closeout remain next. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1595` adds `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_CLOSEOUT_AND_DRY_RUN_PREFLIGHT.md`. It closes sidecar persistence adapter contract as `BASELINE_COMPLETED_TEST_ONLY` and records future dry-run/no-op adapter implementation boundary, rollback/cleanup/tombstone sync acceptance criteria, and exact approval gate draft. Persistence adapter implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

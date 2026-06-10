@@ -4,11 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1595 Sprint E sidecar persistence adapter contract closeout and dry-run adapter preflight`.
-Current validation: `CMV-1699`.
+Current checkpoint: `CM-1596 Sprint E sidecar persistence dry-run adapter implementation`.
+Current validation: `CMV-1700`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1596 Sprint E Sidecar Persistence Dry-Run Adapter Implementation
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_IMPLEMENTED_NO_PERSISTENT_WRITE`
+
+Recorded:
+
+- Added `src/tagmemo/sidecar-persistence-dry-run-adapter.js`.
+- Added `tests/fixtures/tagmemo-sidecar-persistence-dry-run-sprint-e-v1.json`.
+- Added `tests/tagmemo-sidecar-persistence-dry-run-adapter.test.js`.
+- Added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER.md`.
+- Implemented internal dry-run/no-op adapter plan builder.
+- Output is limited to `dryRunWritePlan`.
+- `wouldPersist=false` and `persisted=false` are locked by tests.
+- Rollback, cleanup, and tombstone sync plans are reproducible from bounded metadata.
+- Forbidden raw/private/provider/token-shaped input is rejected or stripped from output.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Persistent tag write remains `NOT_EXECUTED`.
+- No second effective `record_memory` write occurred.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1700` dry-run adapter source/test/docs validation.
 
 ## CM-1595 Sprint E Sidecar Persistence Adapter Contract Closeout And Dry-Run Adapter Preflight
 

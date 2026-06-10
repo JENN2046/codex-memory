@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "tagmemo-sidecar-persistence-dry-run-sprint-e-v1",
+  "phase": "Sprint E TagMemo sidecar persistence dry-run adapter",
+  "boundaries": {
+    "dryRunOnly": true,
+    "noOpOnly": true,
+    "persistentTagEnrichment": false,
+    "persistentTagWrite": false,
+    "effectiveRecordMemoryWrites": 0,
+    "providerApiCalls": 0,
+    "bearerTokenUse": 0,
+    "rawScan": false,
+    "broadMemoryScan": false,
+    "liveProof": false,
+    "confirmedMutation": false,
+    "publicMcpExpansion": false,
+    "releaseTagDeploy": false,
+    "productionReleaseCutoverReady": false,
+    "completeV8Claimed": false
+  },
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "forbiddenFragments": [
+    "cm1596-raw-memory-body",
+    "cm1596-secret-token",
+    "cm1596-provider-endpoint",
+    "Bearer cm1596",
+    "A:/cm1596/should-not-leak",
+    "raw-scan-output"
+  ],
+  "cases": [
+    {
+      "id": "valid-active-dry-run-plan",
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1596:route-001",
+          "memoryId": "memory:cm1596:process-001",
+          "tagId": "tag:cm1596:route",
+          "tagLabel": "route decision",
+          "confidenceScore": 0.82,
+          "derivedFromProjectionHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "rollbackToken": "rollback:cm1596:route-001",
+        "cleanupPlanRef": "cleanup-plan:cm1596:sidecar-v1",
+        "tombstoneSyncState": "active"
+      },
+      "expected": {
+        "rejected": false,
+        "reason": null,
+        "acceptedRows": [
+          "sidecar-tag:cm1596:route-001"
+        ],
+        "rejectedRows": [],
+        "rejectionReasons": [],
+        "tombstoneFailClosed": false
+      }
+    },
+    {
+      "id": "tombstone-suppressed-dry-run-plan",
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1596:tombstone-002",
+          "memoryId": "memory:cm1596:process-002",
+          "tagId": "tag:cm1596:tombstone",
+          "tagLabel": "suppressed receipt",
+          "confidenceScore": 0.61,
+          "derivedFromProjectionHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "rollbackToken": "rollback:cm1596:tombstone-002",
+        "cleanupPlanRef": "cleanup-plan:cm1596:sidecar-v1",
+        "tombstoneSyncState": "suppressed_by_tombstone"
+      },
+      "expected": {
+        "rejected": false,
+        "reason": null,
+        "acceptedRows": [],
+        "rejectedRows": [
+          "sidecar-tag:cm1596:tombstone-002"
+        ],
+        "rejectionReasons": [
+          "tombstone_sync_suppressed"
+        ],
+        "tombstoneFailClosed": true
+      }
+    },
+    {
+      "id": "empty-input-low-disclosure-rejected",
+      "input": {},
+      "expected": {
+        "rejected": true,
+        "reason": "invalid_schema_version",
+        "acceptedRows": [],
+        "rejectedRows": [],
+        "rejectionReasons": [
+          "invalid_schema_version"
+        ],
+        "tombstoneFailClosed": true
+      }
+    },
+    {
+      "id": "forbidden-raw-provider-token-rejected",
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1596:unsafe-003",
+          "memoryId": "memory:cm1596:process-003",
+          "tagId": "tag:cm1596:unsafe",
+          "tagLabel": "unsafe adapter input",
+          "confidenceScore": 0.55,
+          "derivedFromProjectionHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "rawText": "cm1596-raw-memory-body",
+          "authorization": "Bearer cm1596",
+          "providerEndpoint": "cm1596-provider-endpoint"
+        },
+        "rollbackToken": "rollback:cm1596:unsafe-003",
+        "cleanupPlanRef": "cleanup-plan:cm1596:sidecar-v1",
+        "tombstoneSyncState": "active"
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "forbidden_raw_private_field",
+        "acceptedRows": [],
+        "rejectedRows": [
+          "sidecar-tag:cm1596:unsafe-003"
+        ],
+        "rejectionReasons": [
+          "forbidden_raw_private_field"
+        ],
+        "tombstoneFailClosed": true
+      }
+    },
+    {
+      "id": "unsupported-source-version-rejected",
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "provider_generated_v9",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1596:source-004",
+          "memoryId": "memory:cm1596:process-004",
+          "tagId": "tag:cm1596:source",
+          "tagLabel": "unsupported source",
+          "confidenceScore": 0.5,
+          "derivedFromProjectionHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        },
+        "rollbackToken": "rollback:cm1596:source-004",
+        "cleanupPlanRef": "cleanup-plan:cm1596:sidecar-v1",
+        "tombstoneSyncState": "active"
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "unsupported_source_version",
+        "acceptedRows": [],
+        "rejectedRows": [
+          "sidecar-tag:cm1596:source-004"
+        ],
+        "rejectionReasons": [
+          "unsupported_source_version"
+        ],
+        "tombstoneFailClosed": true
+      }
+    }
+  ]
+}
