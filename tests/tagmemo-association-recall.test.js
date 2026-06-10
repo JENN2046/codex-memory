@@ -6,6 +6,10 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const {
+  ASSOCIATION_VERSION,
+  deriveTagMemoAssociations
+} = require('../src/tagmemo/association-recall');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'tagmemo-association-recall-sprint-b-v1.json');
 
@@ -89,4 +93,72 @@ test('CM1575 association recall fixture preserves public MCP surface', () => {
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
   assert.equal(TOOL_DEFINITIONS.length, 7);
+});
+
+test('CM1576 association recall output is deterministic and bounded', () => {
+  const fixture = loadFixture();
+  const input = fixture.cases.find(testCase => testCase.id === 'shared-tag-ranks-higher').input;
+  const first = deriveTagMemoAssociations(input);
+  const second = deriveTagMemoAssociations(input);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.schemaVersion, 'tagmemo-association-recall-output-v1');
+  assert.equal(first.associationVersion, ASSOCIATION_VERSION);
+  assert.equal(first.seedMemoryId, input.seedMemoryId);
+  assert.equal(first.rejected, false);
+  assert.equal(first.lowDisclosure, true);
+  assert.equal(first.mutated, false);
+  assert.equal(first.providerCalls, 0);
+  assert.equal(first.publicMcpExpansion, 0);
+  for (const candidate of first.associatedCandidates) {
+    assert.equal(candidate.associationScore >= 0 && candidate.associationScore <= 1, true);
+    assert.equal(Array.isArray(candidate.associationReasons), true);
+  }
+});
+
+test('CM1576 shared tags rank higher than importance-only candidate', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'shared-tag-ranks-higher');
+  const output = deriveTagMemoAssociations(testCase.input);
+
+  assert.equal(output.associatedCandidates[0].memoryId, testCase.expected.topMemoryId);
+  for (const reason of testCase.expected.requiredReasons) {
+    assert.equal(output.associatedCandidates[0].associationReasons.includes(reason), true, reason);
+  }
+});
+
+test('CM1576 query expansion overlap participates deterministically', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'query-expansion-overlap-deterministic');
+  const output = deriveTagMemoAssociations(testCase.input);
+
+  assert.equal(output.associatedCandidates[0].memoryId, testCase.expected.topMemoryId);
+  for (const reason of testCase.expected.requiredReasons) {
+    assert.equal(output.associatedCandidates[0].associationReasons.includes(reason), true, reason);
+  }
+});
+
+test('CM1576 empty candidates return low-disclosure result', () => {
+  const fixture = loadFixture();
+  const empty = fixture.cases.find(testCase => testCase.id === 'empty-candidates-low-disclosure');
+  const output = deriveTagMemoAssociations(empty.input);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'empty_candidates');
+  assert.deepEqual(output.associatedCandidates, []);
+  assert.equal(output.lowDisclosure, true);
+});
+
+test('CM1576 forbidden provider token raw shaped candidate is rejected without leakage', () => {
+  const fixture = loadFixture();
+  const rejected = fixture.cases.find(testCase => testCase.id === 'forbidden-provider-token-raw-rejected');
+  const output = deriveTagMemoAssociations(rejected.input);
+  const serialized = JSON.stringify(output);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'forbidden_raw_private_field');
+  assert.deepEqual(output.associatedCandidates, []);
+  for (const fragment of fixture.forbiddenFragments) {
+    assert.equal(serialized.includes(fragment), false, fragment);
+  }
 });

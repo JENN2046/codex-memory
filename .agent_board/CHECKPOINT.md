@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1575 association recall fixture/test coverage`.
-Current validation: `CMV-1679`.
+Current checkpoint: `CM-1576 deterministic association recall core implementation`.
+Current validation: `CMV-1680`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1576 Deterministic Association Recall Core Implementation
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_CORE_IMPLEMENTED`
+
+Recorded:
+
+- Added `src/tagmemo/association-recall.js`.
+- Updated `tests/tagmemo-association-recall.test.js`.
+- Updated `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md`.
+- Implemented internal deterministic pure function `deriveTagMemoAssociations(...)`.
+- Confirmed bounded input only, deterministic associated candidates, bounded association scores/reasons, shared tag and query expansion overlap participation, low-disclosure empty/rejected output, and forbidden raw/private field rejection.
+- Targeted validation passed `9/9`.
+- Recorded runtime integration as `NOT_STARTED`.
+- Recorded relation graph persistence as `NOT_STARTED`.
+- Recorded live search, raw scan, and broad memory scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, confirmed mutation, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1680` source/test changed-scope validation.
 
 ## CM-1575 Association Recall Fixture/Test Coverage
 

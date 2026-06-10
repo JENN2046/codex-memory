@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1575",
-  "validationId": "CMV-1679",
+  "taskId": "CM-1576",
+  "validationId": "CMV-1680",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1680",
+      "scope": "CM-1576 deterministic association recall core implementation",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_CORE_IMPLEMENTED"
+    },
     {
       "id": "CMV-1679",
       "scope": "CM-1575 association recall fixture/test coverage",

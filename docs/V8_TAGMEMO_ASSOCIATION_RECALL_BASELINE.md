@@ -85,11 +85,29 @@ tests/tagmemo-association-recall.test.js
 
 The first regression slice locks fixture shape, required association scenarios, forbidden-value placement, side-effect boundaries, and the seven-tool public MCP surface before source implementation.
 
+## Source Implementation
+
+CM-1576 adds the internal pure-function core:
+
+```text
+src/tagmemo/association-recall.js
+```
+
+The implementation exports `deriveTagMemoAssociations(input, options = {})` and `ASSOCIATION_VERSION`.
+
+Validation:
+
+```text
+tests\tagmemo-association-recall.test.js: PASS_9_OF_9
+```
+
+The implementation is deterministic, local-only, and bounded. It does not call provider/API paths, does not perform live search, does not read raw memory, does not perform raw scans or broad memory scans, does not persist relation graphs, does not persist tag enrichment, does not execute `record_memory`, and does not expand public MCP tools.
+
 ## Boundary Confirmation
 
 ```text
 runtime integration: NOT_STARTED
-association recall source implementation: NOT_STARTED
+association recall source implementation: IMPLEMENTED_INTERNAL_PURE_FUNCTION
 relation graph persistence: NOT_STARTED
 live search: NOT_RUN
 raw scan: NOT_RUN
