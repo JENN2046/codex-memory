@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1600 persistent TagMemo enrichment no-write lane closeout`.
-Current validation: `CMV-1704`.
+Current checkpoint: `CM-1601 persistent TagMemo enrichment proof approval decision and command envelope preflight`.
+Current validation: `CMV-1705`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1601 Persistent TagMemo Enrichment Proof Approval Decision And Command Envelope Preflight
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_APPROVAL_RECORDED_COMMAND_ENVELOPE_PENDING_NO_WRITE`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_APPROVAL_DECISION_AND_COMMAND_ENVELOPE_PREFLIGHT.md`.
+- Recorded exact approval string `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF` as `APPROVAL_RECORDED`.
+- Preserved the CM-1599 command-envelope requirement before any write-capable proof.
+- Persistent TagMemo enrichment proof remains `COMMAND_ENVELOPE_PENDING`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Persistent tag write is `NOT_EXECUTED`.
+- Confirmed mutation is `NOT_EXECUTED`.
+- No second effective `record_memory` write occurred.
+- Sidecar dry-run adapter remains `IMPLEMENTED_AND_AUDITED`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1705` approval decision and command-envelope preflight docs validation.
 
 ## CM-1600 Persistent TagMemo Enrichment No-Write Lane Closeout
 

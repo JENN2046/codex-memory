@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1600",
-  "validationId": "CMV-1704",
+  "taskId": "CM-1601",
+  "validationId": "CMV-1705",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1705",
+      "scope": "CM-1601 persistent TagMemo enrichment proof approval decision and command envelope preflight",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_APPROVAL_RECORDED_COMMAND_ENVELOPE_PENDING_NO_WRITE"
+    },
     {
       "id": "CMV-1704",
       "scope": "CM-1600 persistent TagMemo enrichment no-write lane closeout",
@@ -993,6 +998,8 @@
     "real query quality proof",
     "startup/watchdog warning source change",
     "raw audit or broad store scan",
+    "persistent TagMemo enrichment command envelope",
+    "persistent TagMemo enrichment proof execution",
     "persistent runtime tag extraction enrichment",
     "complete V8 implementation",
     "committed live Git head facts"
