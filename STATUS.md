@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1556 deterministic TagMemo core independent source audit`.
-Current validation: `CMV-1660`.
+Current task: `CM-1557 deterministic TagMemo runtime integration preflight`.
+Current validation: `CMV-1661`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `DETERMINISTIC_TAGMEMO_CORE_SOURCE_AUDIT_PASSED; runtime integration not started`.
+Current route: `TAGMEMO_RUNTIME_INTEGRATION_PREFLIGHT_RECORDED; runtime integration not started`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1557 deterministic TagMemo runtime integration preflight: added `docs/CM1557_TAGMEMO_RUNTIME_INTEGRATION_PREFLIGHT.md`. This docs/status/board-only preflight maps the future runtime integration boundary for the CM-1555 / CM-1556 deterministic TagMemo tag extraction core. It identifies `MemoryWriteService.record(...)` as the main future candidate boundary, recommends the first source/test route be an internal no-op / dry-run bounded projection rather than persistent tag enrichment, and records `record_memory` compatibility, canonical hash/idempotency risk, diary/SQLite/vector/chunk/recall effects, bounded projection rules, fail-closed/no-op behavior, test plan, and rollback plan. `runtime integration: NOT_STARTED`; `tag extraction core: IMPLEMENTED_AND_AUDITED`; public MCP surface remains seven tools; no provider/API; no bearer token; no raw scan; no second effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. CM-1557 did not wire runtime flows, persist generated tags, expose generated tags in public MCP responses, expand MCP, call provider/API, use bearer-token paths, run live proof, perform raw scan, execute confirmed mutation, write memory, release/tag/deploy, or claim production/release/cutover readiness or complete V8 readiness.
 
 CM-1556 deterministic TagMemo core independent source audit: added `docs/CM1556_DETERMINISTIC_TAGMEMO_CORE_SOURCE_AUDIT.md`. Independent changed-scope source audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE` for the CM-1555 deterministic TagMemo tag extraction core. Reviewed `src/tagmemo/tag-extraction.js`, `tests/tagmemo-tag-extraction.test.js`, the CM-1552 fixture contract, and CM-1555 evidence doc. Confirmed input accepts only bounded memory text / bounded metadata projection, output is TagMemo minimal schema compatible, deterministic normalization is stable, duplicate merge is reproducible, `confidenceScore` is bounded, empty/rejected input is low-disclosure, forbidden raw/private fields do not enter output, `tagSource` excludes provider/API/token/raw scan information, public MCP surface remains seven tools, runtime integration is not introduced, and no second effective `record_memory` write occurred. `runtime integration: NOT_STARTED`; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. CM-1556 did not connect runtime flows, expand MCP, call provider/API, use bearer-token paths, run raw scan/live proof, execute confirmed mutation, write memory, release/tag/deploy, or claim production/release/cutover readiness or complete V8 readiness.
 

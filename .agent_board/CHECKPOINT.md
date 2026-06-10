@@ -4,11 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1556 deterministic TagMemo core independent source audit`.
-Current validation: `CMV-1660`.
+Current checkpoint: `CM-1557 deterministic TagMemo runtime integration preflight`.
+Current validation: `CMV-1661`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1557 Deterministic TagMemo Runtime Integration Preflight
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_INTEGRATION_PREFLIGHT_RECORDED_NO_RUNTIME_INTEGRATION`
+
+Recorded:
+
+- Added `docs/CM1557_TAGMEMO_RUNTIME_INTEGRATION_PREFLIGHT.md`.
+- Mapped `MemoryWriteService.record(...)` as the main future runtime boundary.
+- Recorded why the first future source/test route should be an internal no-op / dry-run bounded projection rather than persistent generated tag enrichment.
+- Recorded `record_memory` public contract compatibility and public response non-exposure boundary.
+- Recorded canonical hash and idempotency risk for any later persistent enrichment route.
+- Recorded diary, SQLite, vector, chunk, and recall effects if generated tags are later persisted.
+- Recorded bounded projection rules and forbidden raw/private/provider/API/token/bearer/raw-scan fields.
+- Recorded fail-closed extraction and no-op write-path behavior for future integration.
+- Recorded future source/test validation plan and rollback plan.
+- Recorded `runtime integration: NOT_STARTED`.
+- Recorded `tag extraction core: IMPLEMENTED_AND_AUDITED`.
+- Recorded public MCP surface remains seven tools.
+- Recorded provider/API not used, bearer token not used, raw scan not run, and no second effective `record_memory` write occurred.
+- Recorded `complete V8: NOT_CLAIMED`.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- No runtime write/recall wiring, persistent generated tags, public response exposure, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, effective write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1661` docs/runtime-preflight changed-scope validation.
 
 ## CM-1556 Deterministic TagMemo Core Independent Source Audit
 
