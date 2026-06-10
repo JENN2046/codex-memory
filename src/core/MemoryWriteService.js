@@ -11,6 +11,11 @@ const {
 } = require('./FieldAliasNormalizer');
 const { applyProofMemoryWritePolicy } = require('./ProofMemoryPolicy');
 const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
+const {
+  buildRuntimeNoopProjectionFailure,
+  buildRuntimeNoopProjectionInput,
+  createTagMemoRuntimeNoopProjection
+} = require('../tagmemo/runtime-noop-projection');
 
 const HIGH_RISK_SENSITIVITY_PATTERN = /\b(secret|unsafe|credential|credentials|password|passwd|token|api[-_ ]?key|access[-_ ]?key|private[-_ ]?key|secret[-_ ]?key)\b/i;
 const SCHEMA_VERSION_METADATA_KEYS = Object.freeze([
@@ -203,7 +208,9 @@ class MemoryWriteService {
     chunkIndexingService,
     writePreflight = summarizeMemoryWriteLifecycleDedupSuppressionPreflight,
     writePreflightCandidateProvider = null,
-    writePreflightEnabled = false
+    writePreflightEnabled = false,
+    tagMemoNoopProjection = createTagMemoRuntimeNoopProjection,
+    tagMemoNoopProjectionObserver = null
   }) {
     this.config = config;
     this.diaryStore = diaryStore;
@@ -215,6 +222,8 @@ class MemoryWriteService {
     this.writePreflight = writePreflight;
     this.writePreflightCandidateProvider = writePreflightCandidateProvider;
     this.writePreflightEnabled = writePreflightEnabled === true;
+    this.tagMemoNoopProjection = tagMemoNoopProjection;
+    this.tagMemoNoopProjectionObserver = tagMemoNoopProjectionObserver;
   }
 
   buildRejectedResult(reason, executionContext, target = null) {
@@ -289,6 +298,36 @@ class MemoryWriteService {
     }
 
     return null;
+  }
+
+  runTagMemoNoopProjection(record) {
+    if (typeof this.tagMemoNoopProjection !== 'function') {
+      return null;
+    }
+
+    let projection;
+    try {
+      projection = this.tagMemoNoopProjection({
+        ...record,
+        tags: Array.isArray(record.tags) ? [...record.tags] : record.tags
+      });
+    } catch (error) {
+      const projectionInput = buildRuntimeNoopProjectionInput({ memoryId: record?.memoryId });
+      projection = buildRuntimeNoopProjectionFailure(
+        'tagmemo_noop_projection_failed',
+        projectionInput.ok ? projectionInput.input.memoryId : null
+      );
+    }
+
+    if (typeof this.tagMemoNoopProjectionObserver === 'function') {
+      try {
+        this.tagMemoNoopProjectionObserver(projection);
+      } catch (error) {
+        return projection;
+      }
+    }
+
+    return projection;
   }
 
   async record(payload, requestContext = {}) {
@@ -524,6 +563,7 @@ class MemoryWriteService {
       visibility: proofPolicy.visibility,
       retentionPolicy: proofPolicy.retentionPolicy
     };
+    this.runTagMemoNoopProjection(record);
 
     const shadowFailures = [];
     let sqliteShadowReady = !this.config.enableShadowWrites;

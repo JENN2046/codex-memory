@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1557",
-  "validationId": "CMV-1661",
+  "taskId": "CM-1558",
+  "validationId": "CMV-1662",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1662",
+      "scope": "CM-1558 deterministic TagMemo runtime no-op projection source/test",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_RUNTIME_NOOP_PROJECTION_IMPLEMENTED_NO_PERSISTENCE_NO_PUBLIC_RESPONSE"
+    },
     {
       "id": "CMV-1661",
       "scope": "CM-1557 deterministic TagMemo runtime integration preflight",
@@ -778,7 +783,7 @@
     "real query quality proof",
     "startup/watchdog warning source change",
     "raw audit or broad store scan",
-    "runtime tag extraction integration",
+    "persistent runtime tag extraction enrichment",
     "complete V8 implementation",
     "committed live Git head facts"
   ],

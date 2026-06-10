@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1557 deterministic TagMemo runtime integration preflight`.
-Current validation: `CMV-1661`.
+Current task: `CM-1558 deterministic TagMemo runtime no-op projection source/test`.
+Current validation: `CMV-1662`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1557` recorded the deterministic TagMemo runtime integration preflight as docs/status/board only. The recommended next safe route is a separate source/test slice for internal no-op / dry-run bounded projection around `MemoryWriteService.record(...)`; direct persistent tag enrichment remains not started and not authorized. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Complex V8 algorithm implementation, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1558` implemented deterministic TagMemo runtime no-op projection as an internal source/test slice. The projection calls the audited deterministic extraction core from bounded internal record projection, but generated tags are not persisted, not returned in public MCP responses, and do not change canonical hash/idempotency or `record_memory` write semantics. The recommended next safe route is an independent changed-scope source audit before any persistent enrichment. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP response exposure, complex V8 algorithm implementation, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

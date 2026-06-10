@@ -4,11 +4,39 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1557 deterministic TagMemo runtime integration preflight`.
-Current validation: `CMV-1661`.
+Current checkpoint: `CM-1558 deterministic TagMemo runtime no-op projection source/test`.
+Current validation: `CMV-1662`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1558 Deterministic TagMemo Runtime No-Op Projection Source/Test
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_NOOP_PROJECTION_IMPLEMENTED_NO_PERSISTENCE_NO_PUBLIC_RESPONSE`
+
+Recorded:
+
+- Added `src/tagmemo/runtime-noop-projection.js`.
+- Updated `src/core/MemoryWriteService.js`.
+- Added `tests/tagmemo-runtime-noop-projection.test.js`.
+- Added `docs/CM1558_TAGMEMO_RUNTIME_NOOP_PROJECTION.md`.
+- Implemented internal no-op projection adapter over the audited deterministic tag extraction core.
+- Bounded projection input to safe `memoryId`, bounded memory text, bounded title/summary, explicit tags, empty query core tags, and `sourceKind=selected_projection`.
+- Invoked the projection from `MemoryWriteService.record(...)` after internal record construction and before durable store writes.
+- Confirmed generated projection tags are not attached to `record`, diary, SQLite, vector, chunks, audit, public result, canonical hash, or idempotency.
+- Confirmed projection failure is low-disclosure no-op and does not affect the `record_memory` main path.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed provider/API not used, bearer token not used, raw scan not run, and no second effective `record_memory` write occurred.
+- Recorded `runtime no-op projection: IMPLEMENTED`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Recorded `complete V8: NOT_CLAIMED`.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- Targeted validation passed `7/7`, `7/7`, and `7/7`.
+- Related write integration validation passed `12/12`.
+- `npm test` passed `3115/3115`.
+- No persistent generated tags, public response exposure, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, durable live memory write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1662` source/test/docs changed-scope validation.
 
 ## CM-1557 Deterministic TagMemo Runtime Integration Preflight
 
