@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1565 TagMemo recall ranking baseline preflight`.
-Current validation: `CMV-1669`.
+Current task: `CM-1566 TagMemo recall ranking regression coverage`.
+Current validation: `CMV-1670`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_RECALL_RANKING_BASELINE_PREFLIGHT_RECORDED`.
+Current route: `TAGMEMO_RECALL_RANKING_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1566 TagMemo recall ranking regression coverage: added `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json` and `tests/tagmemo-recall-ranking.test.js`. The fixture/test coverage records no side effects and locks required ranking cases for tag match, query term match, importance participation, safe recency, evidence relevance, empty candidates, forbidden provider/token/raw-shaped input, and the exact seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1565 TagMemo recall ranking baseline preflight: added `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md`. This docs-only preflight defines a deterministic, internal-only recall ranking baseline over bounded query text, bounded memory candidates, TagMemo tag projection, deterministic `importanceScore`, and safe recency metadata. Forbidden inputs include raw memory records, token/bearer material, provider/API payloads, raw audit, raw scan output, client secrets, raw storage/vector/cache/file path payloads, and unbounded lifecycle metadata. Planned output is `rankedCandidates`, `rankScore`, `rankReasons`, and `rankVersion=deterministic_v1`. Source implementation is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 

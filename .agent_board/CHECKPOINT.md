@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1565 TagMemo recall ranking baseline preflight`.
-Current validation: `CMV-1669`.
+Current checkpoint: `CM-1566 TagMemo recall ranking regression coverage`.
+Current validation: `CMV-1670`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1566 TagMemo Recall Ranking Regression Coverage
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`
+
+Recorded:
+
+- Added `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json`.
+- Added `tests/tagmemo-recall-ranking.test.js`.
+- Updated `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md`.
+- Locked fixture side-effect boundaries, required ranking cases, forbidden value placement, and seven-tool public MCP surface.
+- Recorded recall ranking source implementation as `NOT_STARTED`.
+- Recorded live search and raw scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, public MCP expansion, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1670` fixture/test changed-scope validation.
 
 ## CM-1565 TagMemo Recall Ranking Baseline Preflight
 

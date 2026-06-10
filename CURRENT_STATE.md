@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1565 TagMemo recall ranking baseline preflight` |
-| Current validation | `CMV-1669` |
-| Current route | Recall ranking baseline preflight recorded |
+| Current task | `CM-1566 TagMemo recall ranking regression coverage` |
+| Current validation | `CMV-1670` |
+| Current route | Recall ranking fixture/test coverage added; source implementation not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1566` adds `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json` and `tests/tagmemo-recall-ranking.test.js` as fixture/test coverage for deterministic TagMemo recall ranking. The fixture records no live search, provider/API, bearer token, raw scan, persistent tag enrichment, public MCP expansion, effective `record_memory` write, complete V8 claim, or production/release/cutover readiness. The test locks required ranking cases, rejected unsafe input shape, low-disclosure boundary expectations, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1565` adds `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md` and prepares the deterministic TagMemo recall ranking baseline as docs-only preflight. It defines the planned internal pure-function module `src/tagmemo/recall-ranking.js`, input contract for bounded query text, bounded memory candidates, TagMemo tag projection, deterministic `importanceScore`, and safe recency metadata, forbidden raw/provider/token/audit/scan/storage/private inputs, output contract for `rankedCandidates`, `rankScore`, `rankReasons`, and `rankVersion=deterministic_v1`, deterministic ranking rules, and planned regression tests. Recall ranking source implementation is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; no provider/API or bearer token path occurred; public MCP surface was not expanded; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 

@@ -1,0 +1,262 @@
+{
+  "schemaVersion": "tagmemo-recall-ranking-fixture-v1",
+  "scope": "Sprint A deterministic TagMemo recall ranking baseline",
+  "boundaries": {
+    "fixtureOnly": true,
+    "liveSearch": false,
+    "providerApiCalls": 0,
+    "bearerTokenUse": 0,
+    "rawScan": false,
+    "persistentTagEnrichment": false,
+    "publicMcpExpansion": false,
+    "effectiveRecordMemoryWrites": 0,
+    "completeV8Claimed": false,
+    "productionReleaseCutoverReady": false
+  },
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "forbiddenFragments": [
+    "cm1566-provider-endpoint",
+    "cm1566-token-fragment",
+    "cm1566-bearer-fragment",
+    "cm1566-raw-memory-body",
+    "A:/cm1566/must-not-leak"
+  ],
+  "cases": [
+    {
+      "id": "tag-match-ranks-higher",
+      "input": {
+        "schemaVersion": "tagmemo-recall-ranking-input-v1",
+        "boundedQueryText": "route blocker proof",
+        "candidates": [
+          {
+            "memoryId": "memory:cm1566:tag-match",
+            "boundedMemoryText": "Decision proof receipt for blocker route.",
+            "tagProjection": {
+              "tags": [
+                {
+                  "tagLabel": "route blocker",
+                  "tagSource": "explicit_record_tag",
+                  "confidenceScore": 0.95
+                }
+              ]
+            },
+            "importanceScore": 0.62,
+            "safeRecency": {
+              "bucket": "recent",
+              "sequence": 2
+            },
+            "safeEvidenceHints": [
+              "decision",
+              "proof",
+              "route"
+            ]
+          },
+          {
+            "memoryId": "memory:cm1566:query-only",
+            "boundedMemoryText": "Route notes mention blocker and proof without matching tags.",
+            "tagProjection": {
+              "tags": [
+                {
+                  "tagLabel": "misc note",
+                  "tagSource": "derived_candidate",
+                  "confidenceScore": 0.55
+                }
+              ]
+            },
+            "importanceScore": 0.7,
+            "safeRecency": {
+              "bucket": "recent",
+              "sequence": 2
+            },
+            "safeEvidenceHints": [
+              "proof"
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "topMemoryId": "memory:cm1566:tag-match",
+        "requiredReasons": [
+          "tag_match",
+          "query_term_match",
+          "evidence_relevance",
+          "safe_recency"
+        ]
+      }
+    },
+    {
+      "id": "importance-participates-not-dominates",
+      "input": {
+        "schemaVersion": "tagmemo-recall-ranking-input-v1",
+        "boundedQueryText": "decision proof",
+        "candidates": [
+          {
+            "memoryId": "memory:cm1566:relevant-medium",
+            "boundedMemoryText": "Decision proof for selected route.",
+            "tagProjection": {
+              "tags": [
+                {
+                  "tagLabel": "decision proof",
+                  "tagSource": "explicit_record_tag",
+                  "confidenceScore": 0.9
+                }
+              ]
+            },
+            "importanceScore": 0.5,
+            "safeRecency": {
+              "bucket": "stable",
+              "sequence": 1
+            },
+            "safeEvidenceHints": [
+              "decision",
+              "proof"
+            ]
+          },
+          {
+            "memoryId": "memory:cm1566:high-importance-offtopic",
+            "boundedMemoryText": "Important unrelated checkpoint.",
+            "tagProjection": {
+              "tags": [
+                {
+                  "tagLabel": "checkpoint",
+                  "tagSource": "operator_reviewed",
+                  "confidenceScore": 0.9
+                }
+              ]
+            },
+            "importanceScore": 0.98,
+            "safeRecency": {
+              "bucket": "stable",
+              "sequence": 1
+            },
+            "safeEvidenceHints": [
+              "receipt"
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "topMemoryId": "memory:cm1566:relevant-medium",
+        "requiredReasons": [
+          "tag_match",
+          "query_term_match",
+          "importance_score"
+        ]
+      }
+    },
+    {
+      "id": "safe-recency-deterministic",
+      "input": {
+        "schemaVersion": "tagmemo-recall-ranking-input-v1",
+        "boundedQueryText": "route",
+        "candidates": [
+          {
+            "memoryId": "memory:cm1566:older",
+            "boundedMemoryText": "Route checkpoint.",
+            "tagProjection": {
+              "tags": [
+                {
+                  "tagLabel": "route",
+                  "tagSource": "explicit_record_tag",
+                  "confidenceScore": 0.8
+                }
+              ]
+            },
+            "importanceScore": 0.55,
+            "safeRecency": {
+              "bucket": "older",
+              "sequence": 1
+            },
+            "safeEvidenceHints": [
+              "route"
+            ]
+          },
+          {
+            "memoryId": "memory:cm1566:recent",
+            "boundedMemoryText": "Route checkpoint.",
+            "tagProjection": {
+              "tags": [
+                {
+                  "tagLabel": "route",
+                  "tagSource": "explicit_record_tag",
+                  "confidenceScore": 0.8
+                }
+              ]
+            },
+            "importanceScore": 0.55,
+            "safeRecency": {
+              "bucket": "recent",
+              "sequence": 3
+            },
+            "safeEvidenceHints": [
+              "route"
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "topMemoryId": "memory:cm1566:recent",
+        "requiredReasons": [
+          "safe_recency"
+        ]
+      }
+    },
+    {
+      "id": "empty-candidates-low-disclosure",
+      "input": {
+        "schemaVersion": "tagmemo-recall-ranking-input-v1",
+        "boundedQueryText": "route",
+        "candidates": []
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "empty_candidates"
+      }
+    },
+    {
+      "id": "forbidden-provider-token-raw-rejected",
+      "input": {
+        "schemaVersion": "tagmemo-recall-ranking-input-v1",
+        "boundedQueryText": "safe bounded query",
+        "candidates": [
+          {
+            "memoryId": "memory:cm1566:forbidden",
+            "boundedMemoryText": "Bounded safe text.",
+            "tagProjection": {
+              "tags": [
+                {
+                  "tagLabel": "cm1566-provider-endpoint",
+                  "tagSource": "explicit_record_tag",
+                  "confidenceScore": 0.95
+                }
+              ]
+            },
+            "importanceScore": 0.9,
+            "safeRecency": {
+              "bucket": "recent",
+              "sequence": 1
+            },
+            "safeEvidenceHints": [
+              "cm1566-token-fragment"
+            ],
+            "rawText": "cm1566-raw-memory-body",
+            "authorization": "Bearer cm1566-bearer-fragment",
+            "filePath": "A:/cm1566/must-not-leak"
+          }
+        ]
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "forbidden_raw_private_field"
+      }
+    }
+  ]
+}

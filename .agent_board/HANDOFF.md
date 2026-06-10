@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1565 TagMemo recall ranking baseline preflight`.
-Current validation: `CMV-1669`.
-Current handoff: Recall ranking baseline prepared as docs-only preflight. Next safe Sprint A route is fixture/test coverage.
+Current task: `CM-1566 TagMemo recall ranking regression coverage`.
+Current validation: `CMV-1670`.
+Current handoff: Recall ranking fixture/test coverage added. Next safe Sprint A route is internal pure-function implementation.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Recall ranking baseline prepared as docs-only preflight. Next s
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_BASELINE_PREFLIGHT_RECORDED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1566 added `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json` and `tests/tagmemo-recall-ranking.test.js` for fixture/test coverage of deterministic recall ranking. It locks tag-match ranking, importance participation, safe recency, empty candidate low-disclosure behavior, rejected unsafe candidate shape, side-effect boundaries, forbidden provider/token/raw-shaped sample placement, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search and raw scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1565 added `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md` and prepared deterministic recall ranking baseline as docs-only preflight. It planned `src/tagmemo/recall-ranking.js`, bounded input contracts for query/candidates/tags/importance/recency, forbidden raw/provider/token/audit/scan/storage inputs, deterministic ranking output fields, ranking rules, and regression coverage. Source implementation remains `NOT_STARTED`; live search and raw scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1564 added `docs/CM1564_TAGMEMO_IMPORTANCE_SCORING_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of CM-1563. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/importance-scoring.js`, `tests/tagmemo-importance-scoring.test.js`, and `tests/fixtures/tagmemo-importance-scoring-sprint-a-v1.json`. Confirmed bounded input only, deterministic score/band/signals, duplicate signal merge, low-disclosure empty/rejected output, forbidden raw/private field rejection, provider/API/token/raw-shaped data exclusion from scoring signals, and seven-tool public MCP surface preservation. Targeted validation passed `9/9`. Persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, raw scan, confirmed mutation, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1563 added `src/tagmemo/importance-scoring.js` and expanded `tests/tagmemo-importance-scoring.test.js`. The internal pure function accepts bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints; returns deterministic score/band/signals with `scoreVersion=deterministic_v1`; merges duplicate signals; rejects forbidden raw/private fields; keeps empty/rejected paths low-disclosure; and targeted validation passed `9/9`. Persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, raw scan, effective write, readiness claim, or complete V8 claim occurred.

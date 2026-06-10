@@ -70,6 +70,17 @@ Rejected or empty candidate input must return low-disclosure output and must not
 - Empty candidate list returns low-disclosure output.
 - Rejected candidate returns low-disclosure output.
 
+## Regression Fixture
+
+CM-1566 adds fixture/test coverage:
+
+```text
+tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json
+tests/tagmemo-recall-ranking.test.js
+```
+
+The first regression slice locks fixture shape, required ranking scenarios, forbidden-value placement, side-effect boundaries, and the seven-tool public MCP surface before source implementation.
+
 ## Boundary Confirmation
 
 ```text
