@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1572 deterministic query expansion core implementation`.
-Current validation: `CMV-1676`.
-Current handoff: Query expansion core implemented; independent source audit not yet recorded. Next safe Sprint B route is source audit.
+Current task: `CM-1573 query expansion source audit`.
+Current validation: `CMV-1677`.
+Current handoff: Query expansion core implemented and audited. Next safe Sprint B route is association recall baseline preflight.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Query expansion core implemented; independent source audit not 
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_QUERY_EXPANSION_CORE_IMPLEMENTED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1573 added `docs/CM1573_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of CM-1572. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/query-expansion.js`, `tests/tagmemo-query-expansion.test.js`, and `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json`. Confirmed bounded input only, deterministic expanded queries, bounded reasons, duplicate merge, low-disclosure empty/rejected output, forbidden raw/private field rejection, provider/API/token/raw-shaped data exclusion from output, and seven-tool public MCP surface preservation. Targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, confirmed mutation, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1572 added `src/tagmemo/query-expansion.js` and expanded `tests/tagmemo-query-expansion.test.js`. The internal pure function accepts bounded query text, bounded TagMemo tag projection, importance band, recall intent, and safe evidence hints; returns deterministic bounded expanded queries with `expansionVersion=deterministic_v1`; merges duplicates; rejects forbidden raw/private fields; keeps empty/rejected paths low-disclosure; and targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1571 added `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json` and `tests/tagmemo-query-expansion.test.js` for fixture/test coverage of bounded deterministic query expansion. It locks tag-derived expansion, evidence-derived expansion, duplicate expansion merge, empty query low-disclosure behavior, rejected unsafe input shape, side-effect boundaries, forbidden provider/token/raw-shaped sample placement, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1570 added `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md` and prepared bounded deterministic deep recall query expansion as docs-only preflight. It maps the user task-book Phase 1 alias `CM-1560` to repository task `CM-1570` because `CM-1560..CM-1569` are already occupied by Sprint A. It planned `src/tagmemo/query-expansion.js`, bounded input contracts, forbidden raw/provider/token/audit/scan/storage inputs, deterministic output fields, expansion rules, and regression coverage. Source implementation remains `NOT_STARTED`; live search and raw scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.

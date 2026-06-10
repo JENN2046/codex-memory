@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1572 deterministic query expansion core implementation`.
-Current validation: `CMV-1676`.
+Current checkpoint: `CM-1573 query expansion source audit`.
+Current validation: `CMV-1677`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1573 Query Expansion Source Audit
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1573_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT.md`.
+- Audited `src/tagmemo/query-expansion.js`.
+- Audited `tests/tagmemo-query-expansion.test.js`.
+- Audited `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json`.
+- Confirmed bounded input only, deterministic expanded queries, bounded reasons, duplicate merge, low-disclosure empty/rejected output, and forbidden raw/private field rejection.
+- Targeted validation passed `9/9`.
+- Recorded runtime integration as `NOT_STARTED`.
+- Recorded live search, raw scan, and broad memory scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, confirmed mutation, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1677` source audit/docs changed-scope validation.
 
 ## CM-1572 Deterministic Query Expansion Core Implementation
 

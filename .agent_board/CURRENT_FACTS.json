@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1572",
-  "validationId": "CMV-1676",
+  "taskId": "CM-1573",
+  "validationId": "CMV-1677",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1677",
+      "scope": "CM-1573 query expansion source audit",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS"
+    },
     {
       "id": "CMV-1676",
       "scope": "CM-1572 deterministic query expansion core implementation",

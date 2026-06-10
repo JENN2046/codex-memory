@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1572 deterministic query expansion core implementation` |
-| Current validation | `CMV-1676` |
-| Current route | Sprint B query expansion core implemented; source audit not yet recorded |
+| Current task | `CM-1573 query expansion source audit` |
+| Current validation | `CMV-1677` |
+| Current route | Sprint B query expansion baseline implemented and audited |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1573` adds `docs/CM1573_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT.md` and records an independent changed-scope source audit of the CM-1572 deterministic TagMemo query expansion core. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/query-expansion.js`, `tests/tagmemo-query-expansion.test.js`, the Sprint B fixture, and baseline docs. Confirmed internal pure-function behavior, bounded input validation, low-disclosure empty/rejected output, deterministic expanded queries, bounded reasons, duplicate merge, forbidden raw/private rejection, no provider/API or bearer token path, no raw scan or broad memory scan, no live search, no public MCP expansion, no effective `record_memory` write, no confirmed mutation, no production/release/cutover readiness claim, and no complete V8 claim. Query expansion baseline is `IMPLEMENTED_AND_AUDITED`; persistent tag enrichment remains `NOT_STARTED`.
 
 `CM-1572` adds `src/tagmemo/query-expansion.js` and updates `tests/tagmemo-query-expansion.test.js` plus `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md`. The new internal pure function `expandTagMemoQuery(...)` accepts only bounded query text, bounded TagMemo tag projection, importance band, recall intent, and safe evidence hints; rejects forbidden raw/private fields; strips provider/API/token/raw shaped values through low-disclosure rejection; emits deterministic bounded `expandedQueries`, bounded `expansionReasons`, and `expansionVersion=deterministic_v1`; and returns low-disclosure empty/rejected results. Targeted validation passed `9/9`. Runtime integration remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan and broad memory scan are `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
