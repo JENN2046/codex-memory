@@ -2,9 +2,10 @@
 
 ## Scope
 
-CM-1587 begins Sprint D execution with bounded runtime recall projection fixture/test coverage only.
+CM-1587 began Sprint D execution with bounded runtime recall projection fixture/test coverage.
+CM-1588 adds the internal deterministic runtime recall no-op projection source module.
 
-Planned future module:
+Implemented internal module:
 
 ```text
 src/tagmemo/runtime-recall-projection.js
@@ -13,7 +14,7 @@ src/tagmemo/runtime-recall-projection.js
 Current source implementation:
 
 ```text
-NOT_STARTED
+IMPLEMENTED_INTERNAL_NOOP_PROJECTION
 ```
 
 ## Projection Contract
@@ -34,15 +35,18 @@ The projection must not persist results, enter public MCP responses, change `sea
 ```text
 tests/fixtures/tagmemo-runtime-recall-projection-sprint-d-v1.json
 tests/tagmemo-runtime-recall-projection.test.js
+src/tagmemo/runtime-recall-projection.js
 ```
 
 The first regression slice locks fixture shape, no-side-effect boundaries, forbidden-value placement, low-disclosure case shape, and the seven-tool public MCP surface before source implementation.
 
+The second slice implements `createTagMemoRuntimeRecallProjection(...)` as an internal no-op projection adapter. It validates the runtime projection envelope, rejects forbidden raw/private keys and shaped values, maps bounded input into `composeTagMemoRecall(...)`, and returns a low-disclosure internal projection containing only candidate ids, bounded scores, stage names, and no-persistence/no-public-response flags.
+
 ## Boundaries
 
 ```text
-runtime integration: NOT_STARTED
-runtime no-op recall projection: NOT_STARTED
+runtime integration: INTERNAL_NOOP_PROJECTION_ONLY
+runtime no-op recall projection: IMPLEMENTED
 persistent tag enrichment: NOT_STARTED
 provider/API: NOT_USED
 bearer token: NOT_USED
@@ -53,6 +57,8 @@ confirmed mutation: NOT_EXECUTED
 public MCP expansion: NOT_EXECUTED
 second effective record_memory write: NOT_EXECUTED
 search_memory public response contract change: NO
+projection persistence: NO
+projection public MCP response exposure: NO
 production/release/cutover ready: NO
 complete V8: NOT_CLAIMED
 ```
@@ -71,9 +77,9 @@ staged diff check
 Results:
 
 ```text
-tests\tagmemo-runtime-recall-projection.test.js: PASS_4_OF_4
+tests\tagmemo-runtime-recall-projection.test.js: PASS_9_OF_9
 git diff --check: PASS
 validate-local.ps1 -Area docs: PASS
 CURRENT_FACTS.json parse: PASS
-changed-scope review: PASS_FIXTURE_TEST_ONLY_NO_SOURCE_IMPLEMENTATION
+changed-scope review: PASS_INTERNAL_NOOP_PROJECTION_NO_PUBLIC_MCP_NO_PERSISTENCE
 ```

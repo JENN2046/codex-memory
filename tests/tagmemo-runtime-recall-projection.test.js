@@ -6,6 +6,10 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const {
+  PROJECTION_SCHEMA_VERSION,
+  createTagMemoRuntimeRecallProjection
+} = require('../src/tagmemo/runtime-recall-projection');
 
 const fixturePath = path.join(
   __dirname,
@@ -99,4 +103,86 @@ test('CM1587 runtime recall projection fixture preserves public MCP surface', ()
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
   assert.equal(TOOL_DEFINITIONS.length, 7);
+});
+
+test('CM1588 runtime recall projection output is deterministic internal no-op', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'bounded-runtime-recall-projection-ranks-relevant-candidate');
+  const first = createTagMemoRuntimeRecallProjection(testCase.input);
+  const second = createTagMemoRuntimeRecallProjection(testCase.input);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.schemaVersion, PROJECTION_SCHEMA_VERSION);
+  assert.equal(first.projectionMode, testCase.expected.projectionMode);
+  assert.equal(first.rejected, false);
+  assert.equal(first.reason, null);
+  assert.equal(first.lowDisclosure, true);
+  assert.equal(first.mutated, testCase.expected.mutated);
+  assert.equal(first.persisted, testCase.expected.persisted);
+  assert.equal(first.publicResponse, testCase.expected.publicResponse);
+  assert.equal(first.searchMemoryPublicResponse, false);
+  assert.equal(first.searchMemoryPublicContractChanged, false);
+  assert.equal(first.providerCalls, 0);
+  assert.equal(first.publicMcpExpansion, 0);
+  assert.equal(first.projectedCandidates[0].memoryId, testCase.expected.topMemoryId);
+  assert.equal(first.projectedCandidates.length, testCase.input.candidates.length);
+});
+
+test('CM1588 runtime recall projection strips public rank reasons from output', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'bounded-runtime-recall-projection-ranks-relevant-candidate');
+  const output = createTagMemoRuntimeRecallProjection(testCase.input);
+  const keys = collectKeys(output);
+
+  assert.equal(keys.includes('rankReasons'), false);
+  assert.equal(keys.includes('boundedMemoryText'), false);
+  assert.equal(keys.includes('metadataProjection'), false);
+  assert.equal(keys.includes('tagProjection'), false);
+});
+
+test('CM1588 empty candidates return low-disclosure no-op projection', () => {
+  const fixture = loadFixture();
+  const empty = fixture.cases.find(testCase => testCase.id === 'empty-candidates-low-disclosure-noop');
+  const output = createTagMemoRuntimeRecallProjection(empty.input);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, empty.expected.reason);
+  assert.deepEqual(output.projectedCandidates, []);
+  assert.deepEqual(output.candidateScores, []);
+  assert.deepEqual(output.projectionReasons, []);
+  assert.equal(output.lowDisclosure, true);
+  assert.equal(output.persisted, false);
+  assert.equal(output.publicResponse, false);
+});
+
+test('CM1588 forbidden provider token raw shaped input is rejected without leakage', () => {
+  const fixture = loadFixture();
+  const rejected = fixture.cases.find(testCase => testCase.id === 'forbidden-provider-token-raw-rejected');
+  const output = createTagMemoRuntimeRecallProjection(rejected.input);
+  const serialized = JSON.stringify(output);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, rejected.expected.reason);
+  assert.equal(output.persisted, false);
+  assert.equal(output.publicResponse, false);
+  for (const fragment of fixture.forbiddenFragments) {
+    assert.equal(serialized.includes(fragment), false, fragment);
+  }
+});
+
+test('CM1588 recall composition failure returns low-disclosure no-op projection', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'bounded-runtime-recall-projection-ranks-relevant-candidate');
+  const output = createTagMemoRuntimeRecallProjection(testCase.input, {
+    composer() {
+      throw new Error('simulated composition failure');
+    }
+  });
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'recall_composition_failed');
+  assert.deepEqual(output.projectedCandidates, []);
+  assert.equal(output.persisted, false);
+  assert.equal(output.publicResponse, false);
+  assert.equal(output.providerCalls, 0);
 });

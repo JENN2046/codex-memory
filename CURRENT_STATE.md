@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1587 TagMemo runtime recall projection coverage` |
-| Current validation | `CMV-1691` |
-| Current route | Sprint D runtime recall projection fixture/test coverage recorded; source implementation not started |
+| Current task | `CM-1588 TagMemo runtime recall no-op projection implementation` |
+| Current validation | `CMV-1692` |
+| Current route | Sprint D runtime recall no-op projection implemented internally; independent source audit next |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1588` adds `src/tagmemo/runtime-recall-projection.js` and expands `tests/tagmemo-runtime-recall-projection.test.js`. The internal adapter validates bounded runtime recall projection input, rejects forbidden raw/private fields and shaped values, maps safe input into `composeTagMemoRecall(...)`, and returns only internal no-op projection output. Projection is not persisted, does not enter public MCP responses, does not change `search_memory` public response contract, and exposes no public rank reasons. Runtime live proof remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1587` adds `tests/fixtures/tagmemo-runtime-recall-projection-sprint-d-v1.json`, `tests/tagmemo-runtime-recall-projection.test.js`, and `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`. Fixture/test coverage locks bounded runtime recall projection cases, no-side-effect boundaries, rejected unsafe input shape, public response non-expansion, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

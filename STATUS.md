@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1587 TagMemo runtime recall projection coverage`.
-Current validation: `CMV-1691`.
+Current task: `CM-1588 TagMemo runtime recall no-op projection implementation`.
+Current validation: `CMV-1692`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_RUNTIME_RECALL_PROJECTION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`.
+Current route: `TAGMEMO_RUNTIME_RECALL_NOOP_PROJECTION_IMPLEMENTED_NO_PERSISTENCE_NO_PUBLIC_RESPONSE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1588 TagMemo runtime recall no-op projection implementation: added `src/tagmemo/runtime-recall-projection.js` and expanded `tests/tagmemo-runtime-recall-projection.test.js`. The internal adapter validates bounded runtime recall projection input, rejects forbidden raw/private fields and shaped values, maps safe input into `composeTagMemoRecall(...)`, and returns only internal no-op projection output. Projection is not persisted, does not enter public MCP responses, does not change `search_memory` public response contract, and exposes no public rank reasons. Runtime live proof remains `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no confirmed mutation; no public MCP expansion; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1587 TagMemo runtime recall projection coverage: added `tests/fixtures/tagmemo-runtime-recall-projection-sprint-d-v1.json`, `tests/tagmemo-runtime-recall-projection.test.js`, and `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`. Fixture/test coverage locks bounded runtime recall projection cases, no-side-effect boundaries, rejected unsafe input shape, public response non-expansion, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

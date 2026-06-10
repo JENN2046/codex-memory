@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1587 TagMemo runtime recall projection coverage`.
-Current validation: `CMV-1691`.
+Current checkpoint: `CM-1588 TagMemo runtime recall no-op projection implementation`.
+Current validation: `CMV-1692`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1588 TagMemo Runtime Recall No-Op Projection Implementation
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_RECALL_NOOP_PROJECTION_IMPLEMENTED_NO_PERSISTENCE_NO_PUBLIC_RESPONSE`
+
+Recorded:
+
+- Added `src/tagmemo/runtime-recall-projection.js`.
+- Expanded `tests/tagmemo-runtime-recall-projection.test.js`.
+- Updated `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`.
+- Implemented internal deterministic `createTagMemoRuntimeRecallProjection(...)`.
+- Confirmed the adapter accepts only bounded query, bounded seed projection, and bounded candidates before calling `composeTagMemoRecall(...)`.
+- Confirmed successful output is internal no-op projection only, with candidate ids, bounded scores, stage names, and no public rank reasons.
+- Confirmed empty/rejected/composition-failure paths return low-disclosure no-op projection.
+- Confirmed persistence remains `NO`.
+- Confirmed `search_memory` public response contract remains unchanged.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1692` source/test validation.
 
 ## CM-1587 TagMemo Runtime Recall Projection Coverage
 

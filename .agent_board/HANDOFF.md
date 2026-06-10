@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1587 TagMemo runtime recall projection coverage`.
-Current validation: `CMV-1691`.
-Current handoff: Runtime recall projection fixture/test coverage is recorded; source implementation remains not started.
+Current task: `CM-1588 TagMemo runtime recall no-op projection implementation`.
+Current validation: `CMV-1692`.
+Current handoff: Runtime recall no-op projection source/test is implemented; independent source audit remains next.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Runtime recall projection fixture/test coverage is recorded; so
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_RECALL_PROJECTION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_RECALL_NOOP_PROJECTION_IMPLEMENTED_NO_PERSISTENCE_NO_PUBLIC_RESPONSE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1588 added `src/tagmemo/runtime-recall-projection.js` and expanded `tests/tagmemo-runtime-recall-projection.test.js`. The internal adapter validates bounded runtime recall projection input, rejects forbidden raw/private fields and shaped values, maps safe input into `composeTagMemoRecall(...)`, and returns only internal no-op projection output. Projection is not persisted, does not enter public MCP responses, does not change `search_memory` public response contract, and exposes no public rank reasons. Runtime live proof remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1587 added `tests/fixtures/tagmemo-runtime-recall-projection-sprint-d-v1.json`, `tests/tagmemo-runtime-recall-projection.test.js`, and `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`. Fixture/test coverage locks bounded runtime recall projection cases, no-side-effect boundaries, rejected unsafe input shape, public response non-expansion, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, persistent tag enrichment, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1586 added `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_PREFLIGHT.md` and recorded a docs-only Sprint D bounded runtime recall integration preflight. It plans an internal no-op projection boundary for recall composition after bounded candidate narrowing, records bounded input/output contracts, failure/no-op behavior, fixture/test plan, and rollback plan. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1585 added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_CLOSEOUT.md` and recorded `V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_COMPLETED`. Sprint C preflight, fixture/test coverage, deterministic recall composition core, and independent source audit are completed. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
