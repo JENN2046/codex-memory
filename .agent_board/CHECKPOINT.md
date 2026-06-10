@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1611 persistent TagMemo enrichment proof exact approval gate`.
-Current validation: `CMV-1715`.
+Current checkpoint: `CM-1612 persistent TagMemo enrichment proof execution under dual-token gate`.
+Current validation: `CMV-1716`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1612 Persistent TagMemo Enrichment Proof Execution Under Dual-Token Gate
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_PERSISTENT_TAGMEMO_PROOF_COMMAND_ATTEMPT_GATED_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1612_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_UNDER_DUAL_TOKEN_GATE.md`.
+- Recorded exact approval receipt for CM-1612 using both required tokens.
+- Dry-run returned `planned` with `writeCountRequested=1`, `writeCountExecuted=0`, and `persistentTagRecordsWritten=0`.
+- Dual-token apply returned `gated / ready_for_proof_no_write`.
+- Dual-token apply matched both tokens but wrote zero records.
+- Dedicated tombstone zero-write proof returned `planned`.
+- Active-case tombstone negative control rejected with `write_count_exceeds_limit`.
+- Rollback returned `blocked / rollback_stub_no_mutation_executed`.
+- Confirmed persistent tag write remains `NOT_EXECUTED`.
+- Confirmed persistent tag enrichment remains `NOT_STARTED`.
+- Confirmed current command write capability remains `NOT_IMPLEMENTED`.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live MCP proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1716` exact-approved command attempt validation.
 
 ## CM-1611 Persistent TagMemo Enrichment Proof Exact Approval Gate
 

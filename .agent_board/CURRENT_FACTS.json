@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1611",
-  "validationId": "CMV-1715",
+  "taskId": "CM-1612",
+  "validationId": "CMV-1716",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1716",
+      "scope": "CM-1612 persistent TagMemo enrichment proof execution under dual-token gate",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_PERSISTENT_TAGMEMO_PROOF_COMMAND_ATTEMPT_GATED_NO_WRITE"
+    },
     {
       "id": "CMV-1715",
       "scope": "CM-1611 persistent TagMemo enrichment proof exact approval gate",
