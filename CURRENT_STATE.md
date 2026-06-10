@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1619 persistent TagMemo proof execution exact approval gate` |
-| Current validation | `CMV-1723` |
-| Current route | proof execution exact approval gate open; proof execution remains blocked pending fresh operator approval |
+| Current task | `CM-1620 persistent TagMemo proof execution after source audit` |
+| Current validation | `CMV-1724` |
+| Current route | scoped source-level temp-local sidecar proof executed; closeout audit/decision required before any broader claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1620` adds `docs/CM1620_PERSISTENT_TAGMEMO_PROOF_EXECUTION_AFTER_SOURCE_AUDIT.md` and records exact-approved persistent TagMemo write-capable proof execution after CM-1618 source audit and CM-1619 approval gate. The operator supplied all three required tokens: the route-level proof execution token plus both source-recognized proof tokens. Fresh Git preflight was clean synced `main` at `759d14b0dc87e3a2930cf0ee469f9cf247f93f3b` with ahead/behind `0 0`. Execution used bounded fixture case `valid-active-dry-run-plan`, `maxWriteCount=1`, `sidecarTarget=temp-local-tagmemo-proof-sidecar`, `writeCapableProofFlag=true`, `executeWriteCapableProof=true`, fresh dry-run plan hash match, tombstone state `active`, and an injected temp-local proof-store boundary. Result was `applyStatus=applied`, `writeCountExecuted=1`, `persistentTagRecordsWritten=1`, and `boundaryCounters.persistentTagWrites=1`. This is scoped source-level temp-local sidecar proof-store evidence only. It did not execute public MCP proof, `tools/list`, `tools/call`, `record_memory`, provider/API, bearer token, raw scan, broad memory scan, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim.
 
 `CM-1619` adds `docs/CM1619_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EXACT_APPROVAL_GATE.md` and opens the exact approval gate for a future persistent TagMemo write-capable proof execution after the CM-1618 source audit. Gate status is `OPEN_AWAITING_OPERATOR_APPROVAL`; approval is not granted by CM-1619 and proof execution is not authorized by CM-1619. A future execution task must receive a fresh operator message containing `APPROVE_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_EXECUTION_AFTER_SOURCE_AUDIT`, `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT`, and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, then pass fresh preflight for clean synced main, bounded input, `maxWriteCount=1`, expected dry-run plan hash match, `temp-local-tagmemo-proof-sidecar`, tombstone-active state, write-capable flag, execution flag, injected proof-store boundary, and redacted evidence. Proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent enrichment success remains `NOT_CLAIMED`; no live MCP proof, provider/API, bearer token, raw scan, broad memory scan, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
@@ -405,7 +407,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1619 opens the persistent TagMemo proof execution exact approval gate without granting approval or executing proof. Next safe action, after CM-1619 validation and sync, is to wait for a fresh operator message containing all required exact approval tokens before opening a future proof execution task. Persistent tag write success, persistent enrichment success, future proof execution, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
+CM-1620 executed one exact-approved scoped source-level temp-local sidecar proof-store write and records it as bounded proof evidence only. Next safe action is a closeout audit/decision for this scoped evidence, not another proof write. Broad `record_memory` reliability, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
 
 ## Boundaries
 

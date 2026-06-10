@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-06-10",
-  "taskId": "CM-1619",
-  "validationId": "CMV-1723",
+  "updatedAt": "2026-06-11",
+  "taskId": "CM-1620",
+  "validationId": "CMV-1724",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1724",
+      "scope": "CM-1620 persistent TagMemo proof execution after source audit",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_PROOF_EXECUTED_SCOPED_TEMP_LOCAL_SIDECAR_CLOSEOUT_PENDING"
+    },
     {
       "id": "CMV-1723",
       "scope": "CM-1619 persistent TagMemo proof execution exact approval gate",
@@ -1088,7 +1093,7 @@
     "real query quality proof",
     "startup/watchdog warning source change",
     "raw audit or broad store scan",
-    "persistent TagMemo enrichment proof execution",
+    "persistent TagMemo proof closeout audit after CM-1620",
     "persistent runtime tag extraction enrichment",
     "complete V8 implementation",
     "committed live Git head facts"

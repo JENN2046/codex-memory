@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1619 persistent TagMemo proof execution exact approval gate`.
-Current validation: `CMV-1723`.
+Current task: `CM-1620 persistent TagMemo proof execution after source audit`.
+Current validation: `CMV-1724`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1619` opens the persistent TagMemo proof execution exact approval gate after the CM-1618 source audit. Gate status is `OPEN_AWAITING_OPERATOR_APPROVAL`, but CM-1619 grants no approval and executes no proof/write. Proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent enrichment success remains `NOT_CLAIMED`. Next safe route is waiting for a fresh operator message containing all required exact approval tokens before any proof execution task. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent enrichment success claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1620` executed one exact-approved scoped source-level temp-local sidecar proof-store write after CM-1618 source audit and CM-1619 approval gate. Result is `applyStatus=applied`, `writeCountExecuted=1`, `persistentTagRecordsWritten=1`, and `boundaryCounters.persistentTagWrites=1`. This is bounded proof evidence only; it is not broad `record_memory` reliability, production write reliability, runtime public MCP persistent enrichment, production readiness, release readiness, cutover readiness, or complete V8. Next safe route is a closeout audit/decision for this scoped evidence, not another proof write. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent production-enrichment claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 
