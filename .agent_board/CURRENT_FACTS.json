@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1609",
-  "validationId": "CMV-1713",
+  "taskId": "CM-1610",
+  "validationId": "CMV-1714",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1714",
+      "scope": "CM-1610 persistent TagMemo enrichment proof readiness gate review",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_READINESS_GATE_REVIEW_READY_TO_REQUEST_EXACT_APPROVAL_NO_WRITE"
+    },
     {
       "id": "CMV-1713",
       "scope": "CM-1609 independent source audit for persistent TagMemo dual-token guard",

@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1609 independent source audit for persistent TagMemo dual-token guard`.
-Current validation: `CMV-1713`.
+Current checkpoint: `CM-1610 persistent TagMemo enrichment proof readiness gate review`.
+Current validation: `CMV-1714`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1610 Persistent TagMemo Enrichment Proof Readiness Gate Review
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_READINESS_GATE_REVIEW_READY_TO_REQUEST_EXACT_APPROVAL_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1610_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_READINESS_GATE_REVIEW.md`.
+- Reviewed CM-1608/CM-1609 dual-token guard evidence.
+- Reviewed approval-envelope consistency for the future persistent TagMemo enrichment proof.
+- Confirmed future execution must require both `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`.
+- Confirmed current two-token `apply` returns `gated / ready_for_proof_no_write`.
+- Confirmed persistent tag write remains `NOT_EXECUTED`.
+- Confirmed persistent tag enrichment remains `NOT_STARTED`.
+- Confirmed actual proof execution remains `NOT_EXECUTED`.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1714` readiness gate review validation.
 
 ## CM-1609 Persistent TagMemo Dual-Token Guard Source Audit
 
