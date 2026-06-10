@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout`.
-Current validation: `CMV-1702`.
+Current task: `CM-1599 persistent TagMemo enrichment exact approval envelope`.
+Current validation: `CMV-1703`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_BASELINE_COMPLETED_NO_PERSISTENT_WRITE`.
+Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_APPROVAL_ENVELOPE_RECORDED_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1599 persistent TagMemo enrichment exact approval envelope: added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_APPROVAL_ENVELOPE.md`. This docs-only envelope defines future exact approval string `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, future command-envelope requirements, bounded write proof scope, rollback/cleanup/tombstone sync proof boundary, proof evidence format, and abort criteria. Persistent tag write is `STILL_BLOCKED`; persistent tag enrichment is `NOT_STARTED`; sidecar dry-run adapter is `IMPLEMENTED_AND_AUDITED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout: added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_CLOSEOUT.md` and closed the dry-run adapter baseline as `IMPLEMENTED_AND_AUDITED`. Persistent tag enrichment is `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`. Future persistent tag enrichment remains separate exact-approval work.
 

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout`.
-Current validation: `CMV-1702`.
+Current task: `CM-1599 persistent TagMemo enrichment exact approval envelope`.
+Current validation: `CMV-1703`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1598` closes the TagMemo sidecar persistence dry-run adapter baseline as `IMPLEMENTED_AND_AUDITED`. Persistent tag enrichment remains `NOT_STARTED`; no persistent tag write or second effective `record_memory` write occurred. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1599` records the persistent TagMemo enrichment exact approval envelope. Future persistent enrichment proof requires exact approval string `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`; this task executes no persistent tag write. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write is `STILL_BLOCKED`; no second effective `record_memory` write occurred. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

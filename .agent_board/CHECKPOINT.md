@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout`.
-Current validation: `CMV-1702`.
+Current checkpoint: `CM-1599 persistent TagMemo enrichment exact approval envelope`.
+Current validation: `CMV-1703`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1599 Persistent TagMemo Enrichment Exact Approval Envelope
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_APPROVAL_ENVELOPE_RECORDED_NO_WRITE`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_APPROVAL_ENVELOPE.md`.
+- Defined future exact approval string `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`.
+- Defined future command envelope requirements.
+- Defined bounded write proof scope.
+- Defined rollback / cleanup / tombstone sync proof boundary.
+- Defined abort criteria before any future persistent tag write.
+- Persistent tag write is `STILL_BLOCKED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Sidecar dry-run adapter remains `IMPLEMENTED_AND_AUDITED`.
+- No persistent tag write occurred.
+- No second effective `record_memory` write occurred.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1703` approval-envelope docs validation.
 
 ## CM-1598 TagMemo Sidecar Persistence Dry-Run Adapter Baseline Closeout
 

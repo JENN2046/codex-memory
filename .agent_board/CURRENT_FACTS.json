@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1598",
-  "validationId": "CMV-1702",
+  "taskId": "CM-1599",
+  "validationId": "CMV-1703",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1703",
+      "scope": "CM-1599 persistent TagMemo enrichment exact approval envelope",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_APPROVAL_ENVELOPE_RECORDED_NO_WRITE"
+    },
     {
       "id": "CMV-1702",
       "scope": "CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout",
