@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1590 V8 TagMemo runtime recall integration Sprint D closeout`.
-Current validation: `CMV-1694`.
+Current task: `CM-1591 Sprint E persistent TagMemo enrichment governance preflight`.
+Current validation: `CMV-1695`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1590` closes Sprint D as `V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_COMPLETED`. Runtime no-op recall projection is implemented and audited. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistence, public MCP response exposure, `search_memory` public contract changes, persistent decay state, relation graph persistence, persistent tag enrichment, public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1591` records Sprint E persistent TagMemo enrichment governance preflight. Persistent tag enrichment remains `NOT_STARTED`; no persistent tag write or second effective `record_memory` write occurred. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1590 V8 TagMemo runtime recall integration Sprint D closeout`.
-Current validation: `CMV-1694`.
+Current checkpoint: `CM-1591 Sprint E persistent TagMemo enrichment governance preflight`.
+Current validation: `CMV-1695`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1591 Sprint E Persistent TagMemo Enrichment Governance Preflight
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_GOVERNANCE_PREFLIGHT_RECORDED_NO_PERSISTENT_WRITE`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_SPRINT_E_PREFLIGHT.md`.
+- Prepared persistent TagMemo enrichment governance boundary.
+- Proposed sidecar tag index as the preferred first persistent model.
+- Recorded exact-approval gate requirements for any future persistent tag write.
+- Recorded rollback, cleanup, migration, and deletion/tombstone sync strategy.
+- Recorded fixture/test plan for future dry-run sidecar schema coverage.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- No persistent tag write occurred.
+- No second effective `record_memory` write occurred.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1695` docs preflight validation.
 
 ## CM-1590 V8 TagMemo Runtime Recall Integration Sprint D Closeout
 

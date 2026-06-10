@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1590 V8 TagMemo runtime recall integration Sprint D closeout` |
-| Current validation | `CMV-1694` |
-| Current route | Sprint D runtime recall integration completed locally; push remains separate explicit authorization |
+| Current task | `CM-1591 Sprint E persistent TagMemo enrichment governance preflight` |
+| Current validation | `CMV-1695` |
+| Current route | Sprint E persistent enrichment governance preflight recorded; persistent tag write remains not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1591` adds `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_SPRINT_E_PREFLIGHT.md` and records docs-only governance preflight for persistent TagMemo enrichment. It selects a sidecar-first model for future consideration, defines exact-approval write gate requirements, bounded projection constraints, rollback/cleanup plan, migration sketch, deletion/tombstone sync strategy, and fixture/test plan. Persistent tag enrichment remains `NOT_STARTED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1590` adds `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_CLOSEOUT.md` and records `V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_COMPLETED`. Runtime no-op recall projection is `IMPLEMENTED_AND_AUDITED`; projection remains non-persistent, internal-only, outside public MCP response contracts, and outside `search_memory` public response changes. Persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
