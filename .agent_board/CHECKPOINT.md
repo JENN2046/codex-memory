@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1548 TagMemo minimal schema / tag extraction preflight`.
-Current validation: `CMV-1652`.
+Current checkpoint: `CM-1549 TagMemo minimal schema fixture/test execution`.
+Current validation: `CMV-1653`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1549 TagMemo Minimal Schema Fixture/Test Execution
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_MINIMAL_SCHEMA_FIXTURE_COVERAGE_ADDED_NO_V8_IMPLEMENTATION`
+
+Recorded:
+
+- Added `tests/fixtures/tagmemo-minimal-schema-cm1549-v1.json`.
+- Added `tests/tagmemo-minimal-schema-fixture.test.js`.
+- Added `docs/CM1549_TAGMEMO_MINIMAL_SCHEMA_REGRESSION_COVERAGE.md`.
+- Targeted validation passed `6/6`.
+- Verified controlled `tagId`, `tagLabel`, `tagSource`, `confidenceScore`, `evidenceSourceId`, and `memoryId` fields.
+- Verified confidence score bounds and buckets.
+- Verified bounded memory linkage and public projection without forbidden raw/private fields or values.
+- Verified unsafe provider/API/token/bearer/raw/scan-shaped `tagSource` values fail closed.
+- Verified ranking compatibility metadata cannot enable runtime weight tuning.
+- Verified public MCP surface remains exactly seven tools.
+- No tag extraction implementation, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, effective write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1653` fixture/test and docs changed-scope validation.
 
 ## CM-1548 TagMemo Minimal Schema / Tag Extraction Preflight
 

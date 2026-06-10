@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1548 TagMemo minimal schema / tag extraction preflight` |
-| Current validation | `CMV-1652` |
-| Current route | TagMemo minimal schema preflight recorded; scoped RC remains closed; release/production/cutover still require separate exact approval |
+| Current task | `CM-1549 TagMemo minimal schema fixture/test execution` |
+| Current validation | `CMV-1653` |
+| Current route | TagMemo minimal schema fixture/test coverage added; scoped RC remains closed; release/production/cutover still require separate exact approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1549` adds `tests/fixtures/tagmemo-minimal-schema-cm1549-v1.json`, `tests/tagmemo-minimal-schema-fixture.test.js`, and `docs/CM1549_TAGMEMO_MINIMAL_SCHEMA_REGRESSION_COVERAGE.md`. The fixture/test-only regression covers controlled `tagId`, `tagLabel`, `tagSource`, `confidenceScore`, `evidenceSourceId`, and `memoryId` fields; confidence score bounds and buckets; bounded memory linkage; low-disclosure public projection; forbidden raw/private fields and values; provider/API/token/bearer/raw/scan-shaped `tagSource` rejection; ranking compatibility without runtime weight tuning; and the seven-tool public MCP surface. Targeted validation passed `6/6`. CM-1549 does not implement tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
 `CM-1548` adds `docs/CM1548_TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT.md` and records a docs/status/board-only preflight for the first V8 deep recall / TagMemo capability slice. It proposes the minimal governed tag record fields `tagId`, `tagLabel`, `tagSource`, `confidenceScore`, `confidenceBucket`, `evidenceSourceId`, `memoryId`, and `rankingCompatibility`; records tag extraction input/output contracts; defines bounded public projection rules and forbidden raw/private fields; and lays out a future fixture plan. CM-1548 does not implement tag extraction, complex V8 algorithms, runtime ranking changes, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
@@ -263,7 +265,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1548 records TagMemo minimal schema and tag extraction preflight only. Next safe action is push review for CM-1548 if separately authorized, or `CM-1549 TagMemo minimal schema fixture contract` as a separate fixture/test slice. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, and production-readiness claims remain separate approval-bound work.
+CM-1549 adds TagMemo minimal schema fixture/test coverage. Next safe action is push review for CM-1549 if separately authorized, or a separate implementation proposal/review slice if this lane should proceed toward source changes. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, and production-readiness claims remain separate approval-bound work.
 
 ## Boundaries
 

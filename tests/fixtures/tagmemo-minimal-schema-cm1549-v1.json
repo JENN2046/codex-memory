@@ -1,0 +1,403 @@
+{
+  "schemaVersion": "tagmemo-minimal-schema-cm1549-v1",
+  "phase": "CM-1549 TagMemo minimal schema fixture/test execution",
+  "source": {
+    "kind": "fixture-only",
+    "synthetic": true,
+    "runtimeTagExtractionImplemented": false
+  },
+  "safety": {
+    "mutated": false,
+    "providerCalls": 0,
+    "bearerTokenUse": false,
+    "rawScan": false,
+    "confirmedMutation": false,
+    "publicMcpExpansion": false,
+    "effectiveRecordMemoryWrites": 0,
+    "releaseTagDeploy": false,
+    "productionReady": false,
+    "releaseReady": false,
+    "cutoverReady": false,
+    "completeV8Claimed": false,
+    "runtimeRankingChanged": false,
+    "publicMcpTools": [
+      "record_memory",
+      "search_memory",
+      "memory_overview",
+      "audit_memory",
+      "validate_memory",
+      "tombstone_memory",
+      "supersede_memory"
+    ]
+  },
+  "schema": {
+    "tagSchemaVersion": "tagmemo-minimal-tag-v1",
+    "extractionSchemaVersion": "tagmemo-minimal-extraction-v1",
+    "requiredTagFields": [
+      "schemaVersion",
+      "tagId",
+      "tagLabel",
+      "tagSource",
+      "confidenceScore",
+      "confidenceBucket",
+      "evidenceSourceId",
+      "memoryId",
+      "rankingCompatibility"
+    ],
+    "allowedTagSources": [
+      "explicit_record_tag",
+      "query_core_tag",
+      "derived_candidate",
+      "fixture_expected",
+      "operator_reviewed"
+    ],
+    "confidence": {
+      "min": 0,
+      "max": 1,
+      "buckets": {
+        "low": {
+          "min": 0,
+          "maxExclusive": 0.4
+        },
+        "medium": {
+          "min": 0.4,
+          "maxExclusive": 0.75
+        },
+        "high": {
+          "min": 0.75,
+          "max": 1
+        }
+      }
+    },
+    "publicProjectionAllowedKeys": [
+      "schemaVersion",
+      "tagId",
+      "tagLabel",
+      "tagSource",
+      "confidenceBucket",
+      "memoryLinkagePresent",
+      "rankingCompatible"
+    ],
+    "conditionalPublicProjectionKeys": [
+      "memoryId",
+      "confidenceScore",
+      "evidenceSourceId"
+    ],
+    "forbiddenRawPrivateKeys": [
+      "rawText",
+      "rawContent",
+      "content",
+      "snippet",
+      "sourceFile",
+      "fullPath",
+      "filePath",
+      "relativePath",
+      "provider",
+      "apiKey",
+      "token",
+      "authorization",
+      "bearer",
+      "rawAudit",
+      "rawJsonl",
+      "sqliteRow",
+      "vectorPayload",
+      "privateLifecycleState",
+      "localPath",
+      "providerEndpoint"
+    ],
+    "forbiddenValueFragments": [
+      "A:/cm1549/should-not-leak",
+      "cm1549-secret-token",
+      "cm1549-provider-endpoint",
+      "cm1549-raw-memory-body",
+      "cm1549-private-lifecycle"
+    ]
+  },
+  "validTags": [
+    {
+      "id": "explicit-process-tag",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:explicit-process",
+        "tagLabel": "bounded process guard",
+        "tagSource": "explicit_record_tag",
+        "confidenceScore": 0.76,
+        "confidenceBucket": "high",
+        "evidenceSourceId": "evidence:cm1549:explicit-tag",
+        "memoryId": "memory:cm1549:process-001",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": true,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "query-core-tag",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:query-core",
+        "tagLabel": "recall projection",
+        "tagSource": "query_core_tag",
+        "confidenceScore": 0.63,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "evidence:cm1549:query-core",
+        "memoryId": "memory:cm1549:knowledge-002",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "fixture-expected-low-confidence",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:fixture-expected",
+        "tagLabel": "schema candidate",
+        "tagSource": "fixture_expected",
+        "confidenceScore": 0.31,
+        "confidenceBucket": "low",
+        "evidenceSourceId": "evidence:cm1549:fixture-expected",
+        "memoryId": "memory:cm1549:fixture-003",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": false,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    }
+  ],
+  "invalidTags": [
+    {
+      "id": "missing-tag-id",
+      "expectedReason": "missing_required_field",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagLabel": "missing tag id",
+        "tagSource": "explicit_record_tag",
+        "confidenceScore": 0.5,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "evidence:cm1549:missing",
+        "memoryId": "memory:cm1549:invalid-001",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "blank-label",
+      "expectedReason": "invalid_tag_label",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:blank-label",
+        "tagLabel": "   ",
+        "tagSource": "explicit_record_tag",
+        "confidenceScore": 0.5,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "evidence:cm1549:blank",
+        "memoryId": "memory:cm1549:invalid-002",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "provider-shaped-source",
+      "expectedReason": "unsupported_tag_source",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:provider-source",
+        "tagLabel": "provider shaped source",
+        "tagSource": "provider_signal",
+        "confidenceScore": 0.5,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "evidence:cm1549:provider",
+        "memoryId": "memory:cm1549:invalid-003",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "token-shaped-source",
+      "expectedReason": "unsupported_tag_source",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:token-source",
+        "tagLabel": "token shaped source",
+        "tagSource": "bearer_token_derived",
+        "confidenceScore": 0.5,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "evidence:cm1549:token",
+        "memoryId": "memory:cm1549:invalid-004",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "raw-scan-source",
+      "expectedReason": "unsupported_tag_source",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:raw-scan",
+        "tagLabel": "raw scan source",
+        "tagSource": "raw_scan",
+        "confidenceScore": 0.5,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "evidence:cm1549:raw-scan",
+        "memoryId": "memory:cm1549:invalid-005",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "negative-confidence",
+      "expectedReason": "invalid_confidence_score",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:negative-confidence",
+        "tagLabel": "negative confidence",
+        "tagSource": "derived_candidate",
+        "confidenceScore": -0.01,
+        "confidenceBucket": "low",
+        "evidenceSourceId": "evidence:cm1549:negative",
+        "memoryId": "memory:cm1549:invalid-006",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "above-one-confidence",
+      "expectedReason": "invalid_confidence_score",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:above-one-confidence",
+        "tagLabel": "above one confidence",
+        "tagSource": "derived_candidate",
+        "confidenceScore": 1.01,
+        "confidenceBucket": "high",
+        "evidenceSourceId": "evidence:cm1549:above-one",
+        "memoryId": "memory:cm1549:invalid-007",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "path-like-evidence",
+      "expectedReason": "invalid_evidence_source_id",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:path-evidence",
+        "tagLabel": "path evidence",
+        "tagSource": "derived_candidate",
+        "confidenceScore": 0.5,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "A:/cm1549/should-not-leak/audit.jsonl",
+        "memoryId": "memory:cm1549:invalid-008",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    },
+    {
+      "id": "runtime-tuning-enabled",
+      "expectedReason": "runtime_weight_tuning_not_allowed",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:runtime-tuning",
+        "tagLabel": "runtime tuning",
+        "tagSource": "derived_candidate",
+        "confidenceScore": 0.5,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "evidence:cm1549:tuning",
+        "memoryId": "memory:cm1549:invalid-009",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": true,
+          "runtimeWeightTuningApproved": true
+        }
+      }
+    },
+    {
+      "id": "raw-private-field-present",
+      "expectedReason": "forbidden_raw_private_field",
+      "record": {
+        "schemaVersion": "tagmemo-minimal-tag-v1",
+        "tagId": "tag:cm1549:raw-private-field",
+        "tagLabel": "raw private field",
+        "tagSource": "derived_candidate",
+        "confidenceScore": 0.5,
+        "confidenceBucket": "medium",
+        "evidenceSourceId": "evidence:cm1549:raw-private",
+        "memoryId": "memory:cm1549:invalid-010",
+        "rawText": "cm1549-raw-memory-body",
+        "rankingCompatibility": {
+          "mayContributeToTagMemoScore": true,
+          "mayContributeToStructuralSignal": false,
+          "runtimeWeightTuningApproved": false
+        }
+      }
+    }
+  ],
+  "publicProjectionCases": [
+    {
+      "id": "default-low-disclosure",
+      "sourceTagId": "explicit-process-tag",
+      "options": {
+        "exposeMemoryId": false,
+        "exposeConfidenceScore": false,
+        "exposeEvidenceSourceId": false
+      },
+      "expectedKeys": [
+        "schemaVersion",
+        "tagId",
+        "tagLabel",
+        "tagSource",
+        "confidenceBucket",
+        "memoryLinkagePresent",
+        "rankingCompatible"
+      ]
+    },
+    {
+      "id": "selected-linkage-projection",
+      "sourceTagId": "query-core-tag",
+      "options": {
+        "exposeMemoryId": true,
+        "exposeConfidenceScore": false,
+        "exposeEvidenceSourceId": false
+      },
+      "expectedKeys": [
+        "schemaVersion",
+        "tagId",
+        "tagLabel",
+        "tagSource",
+        "confidenceBucket",
+        "memoryLinkagePresent",
+        "rankingCompatible",
+        "memoryId"
+      ]
+    }
+  ]
+}

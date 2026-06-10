@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1548 TagMemo minimal schema / tag extraction preflight`.
-Current validation: `CMV-1652`.
+Current task: `CM-1549 TagMemo minimal schema fixture/test execution`.
+Current validation: `CMV-1653`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT_RECORDED_DOCS_ONLY; scoped RC remains closed; release/production/cutover still require separate exact approval`.
+Current route: `TAGMEMO_MINIMAL_SCHEMA_FIXTURE_COVERAGE_ADDED; scoped RC remains closed; release/production/cutover still require separate exact approval`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1549 TagMemo minimal schema fixture/test execution: added `tests/fixtures/tagmemo-minimal-schema-cm1549-v1.json`, `tests/tagmemo-minimal-schema-fixture.test.js`, and `docs/CM1549_TAGMEMO_MINIMAL_SCHEMA_REGRESSION_COVERAGE.md`. Targeted validation passed `6/6`. Coverage verifies controlled minimal tag fields, confidence bounds and buckets, bounded memory linkage, public projection without forbidden raw/private fields, provider/API/token/bearer/raw/scan-shaped `tagSource` rejection, ranking compatibility without runtime tuning, and unchanged seven-tool public MCP surface. CM-1549 did not implement tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
 CM-1548 TagMemo minimal schema / tag extraction preflight: added `docs/CM1548_TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT.md`. This docs/status/board-only preflight proposes minimal governed tag fields, tag extraction input/output contracts, bounded public projection rules, forbidden raw/private fields, future ranking compatibility constraints, and a fixture plan. It does not implement tag extraction, complex V8 algorithms, runtime ranking changes, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
