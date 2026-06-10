@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1592",
-  "validationId": "CMV-1696",
+  "taskId": "CM-1593",
+  "validationId": "CMV-1697",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1697",
+      "scope": "CM-1593 Sprint E sidecar schema closeout and persistence adapter preflight",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_SIDECAR_SCHEMA_BASELINE_COMPLETED_TEST_ONLY_ADAPTER_PREFLIGHT_RECORDED_NO_PERSISTENT_WRITE"
+    },
     {
       "id": "CMV-1696",
       "scope": "CM-1592 Sprint E sidecar tag store schema contract coverage",
