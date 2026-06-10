@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1601 persistent TagMemo enrichment proof approval decision and command envelope preflight`.
-Current validation: `CMV-1705`.
+Current checkpoint: `CM-1602 persistent TagMemo enrichment bounded command envelope`.
+Current validation: `CMV-1706`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1602 Persistent TagMemo Enrichment Bounded Command Envelope
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_COMMAND_ENVELOPE_COMPLETED_PROOF_NOT_STARTED_NO_WRITE`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_ENVELOPE.md`.
+- Completed the bounded future proof command envelope.
+- Defined exact future command shapes for Git preflight, dry-run preview, apply proof, rollback / cleanup proof, tombstone sync proof, and validation.
+- Restricted default proof input to `tests/fixtures/tagmemo-sidecar-persistence-dry-run-sprint-e-v1.json`, case `valid-active-dry-run-plan`.
+- Restricted future write count to `1`.
+- Restricted future sidecar target to `temp-local-tagmemo-proof-sidecar`.
+- Proof command implementation remains `NOT_STARTED`.
+- Actual proof execution remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Persistent tag write remains `STILL_BLOCKED`.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1706` command-envelope docs validation.
 
 ## CM-1601 Persistent TagMemo Enrichment Proof Approval Decision And Command Envelope Preflight
 
