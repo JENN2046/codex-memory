@@ -12,6 +12,7 @@ const {
   OPERATOR_EXECUTION_TOKEN,
   OUTPUT_SCHEMA_VERSION,
   SIDECAR_TARGET,
+  WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_VERSION,
   buildPersistentTagMemoEnrichmentProofCommand
 } = require('../src/tagmemo/persistent-enrichment-proof-command');
 
@@ -154,6 +155,96 @@ test('CM1608 apply with dual token is gated and still writes nothing', () => {
   assert.equal(output.writeCountExecuted, 0);
   assert.equal(output.persistentTagRecordsWritten, 0);
   assert.equal(output.boundaryCounters.confirmedMutation, 0);
+});
+
+test('CM1617 write-capable source branch remains no-execution unless execution is enabled', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'valid-active-dry-run-plan');
+  const planned = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'dry-run',
+    maxWriteCount: 1
+  });
+  const output = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'apply',
+    maxWriteCount: 1,
+    approvalToken: EXACT_APPROVAL_TOKEN,
+    operatorExecutionToken: OPERATOR_EXECUTION_TOKEN,
+    writeCapableProofFlag: true,
+    sidecarTarget: SIDECAR_TARGET,
+    expectedDryRunPlanHash: planned.dryRunPlanHash
+  });
+
+  assert.equal(WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_VERSION.endsWith('_v1'), true);
+  assert.equal(output.status, 'blocked');
+  assert.equal(output.reason, 'proof_execution_not_enabled');
+  assert.equal(output.writeCountRequested, 1);
+  assertBoundaryCounters(output);
+  assertNoForbiddenFragments(output, fixture.forbiddenFragments);
+});
+
+test('CM1617 write-capable source branch fail-closes on hash mismatch', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'valid-active-dry-run-plan');
+  const output = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'apply',
+    maxWriteCount: 1,
+    approvalToken: EXACT_APPROVAL_TOKEN,
+    operatorExecutionToken: OPERATOR_EXECUTION_TOKEN,
+    writeCapableProofFlag: true,
+    sidecarTarget: SIDECAR_TARGET,
+    expectedDryRunPlanHash: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+  });
+
+  assert.equal(output.status, 'rejected');
+  assert.equal(output.reason, 'dry_run_plan_hash_mismatch');
+  assertBoundaryCounters(output);
+  assertNoForbiddenFragments(output, fixture.forbiddenFragments);
+});
+
+test('CM1617 write-capable source branch fail-closes on non-temp-local sidecar target', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'valid-active-dry-run-plan');
+  const planned = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'dry-run',
+    maxWriteCount: 1
+  });
+  const output = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'apply',
+    maxWriteCount: 1,
+    approvalToken: EXACT_APPROVAL_TOKEN,
+    operatorExecutionToken: OPERATOR_EXECUTION_TOKEN,
+    writeCapableProofFlag: true,
+    sidecarTarget: 'unsupported-sidecar-target',
+    expectedDryRunPlanHash: planned.dryRunPlanHash
+  });
+
+  assert.equal(output.status, 'rejected');
+  assert.equal(output.reason, 'invalid_sidecar_target');
+  assertBoundaryCounters(output);
+  assertNoForbiddenFragments(output, fixture.forbiddenFragments);
+});
+
+test('CM1617 write-capable source branch blocks tombstone-suppressed input before execution', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'tombstone-sync-proof-zero-write-plan');
+  const planned = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'dry-run',
+    maxWriteCount: 1
+  });
+  const output = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'apply',
+    maxWriteCount: 1,
+    approvalToken: EXACT_APPROVAL_TOKEN,
+    operatorExecutionToken: OPERATOR_EXECUTION_TOKEN,
+    writeCapableProofFlag: true,
+    sidecarTarget: SIDECAR_TARGET,
+    expectedDryRunPlanHash: planned.dryRunPlanHash
+  });
+
+  assert.equal(output.status, 'blocked');
+  assert.equal(output.reason, 'tombstone_sync_suppressed');
+  assertBoundaryCounters(output);
+  assertNoForbiddenFragments(output, fixture.forbiddenFragments);
 });
 
 test('CM1604 source avoids production persistence, provider, and record_memory paths', () => {

@@ -11,6 +11,9 @@ const COMMAND_VERSION = 'persistent_tagmemo_enrichment_proof_command_skeleton_v1
 const EXACT_APPROVAL_TOKEN = 'APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF';
 const OPERATOR_EXECUTION_TOKEN = 'APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT';
 const SIDECAR_TARGET = 'temp-local-tagmemo-proof-sidecar';
+const WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_VERSION =
+  'persistent_tagmemo_write_capable_proof_source_implementation_v1';
+const ONE_BOUNDED_PROOF_WRITE = 1;
 
 const ALLOWED_MODES = new Set([
   'dry-run',
@@ -186,6 +189,22 @@ function buildRedactedTombstoneSyncPlan(dryRunWritePlan = {}) {
   };
 }
 
+function makeProofExecutionDisabledOutput(base) {
+  return {
+    ...base,
+    status: 'blocked',
+    reason: 'proof_execution_not_enabled'
+  };
+}
+
+function makeWriteCapableProofFailure(base, reason, status = 'rejected') {
+  return {
+    ...base,
+    status,
+    reason
+  };
+}
+
 function buildPlanSkeleton(input) {
   const adapterOutput = createTagMemoSidecarPersistenceDryRunPlan(input);
   const dryRunWritePlan = adapterOutput.dryRunWritePlan || {};
@@ -204,6 +223,86 @@ function buildPlanSkeleton(input) {
     rollbackPlanHash: hashRedacted(redactedRollbackPlan),
     cleanupPlanHash: hashRedacted(redactedCleanupPlan),
     tombstoneSyncPlanHash: hashRedacted(redactedTombstoneSyncPlan)
+  };
+}
+
+function validateWriteCapableProofGuards({ base, options, plan }) {
+  if (options.writeCapableProofFlag !== true) {
+    return { ok: false, output: null };
+  }
+  if (options.sidecarTarget !== SIDECAR_TARGET) {
+    return {
+      ok: false,
+      output: makeWriteCapableProofFailure(base, 'invalid_sidecar_target')
+    };
+  }
+  if (typeof options.expectedDryRunPlanHash !== 'string'
+    || options.expectedDryRunPlanHash !== plan.dryRunPlanHash) {
+    return {
+      ok: false,
+      output: makeWriteCapableProofFailure(base, 'dry_run_plan_hash_mismatch')
+    };
+  }
+  if (plan.tombstoneSyncPlan.tombstoneSyncState !== 'active') {
+    return {
+      ok: false,
+      output: makeWriteCapableProofFailure(base, 'tombstone_sync_suppressed', 'blocked')
+    };
+  }
+  if (plan.writeCountRequested !== 1) {
+    return {
+      ok: false,
+      output: makeWriteCapableProofFailure(base, 'write_count_request_mismatch')
+    };
+  }
+  return { ok: true, output: null };
+}
+
+function makeBoundedProofRow({ input, plan }) {
+  return {
+    schemaVersion: 'tagmemo-bounded-sidecar-proof-row-v1',
+    sourceImplementationVersion: WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_VERSION,
+    sidecarTarget: SIDECAR_TARGET,
+    tagRecordId: input.boundedTagProjection.tagRecordId,
+    memoryId: input.boundedTagProjection.memoryId,
+    tagId: input.boundedTagProjection.tagId,
+    tagLabel: input.boundedTagProjection.tagLabel,
+    confidenceScore: input.boundedTagProjection.confidenceScore,
+    derivedFromProjectionHash: input.boundedTagProjection.derivedFromProjectionHash,
+    dryRunPlanHash: plan.dryRunPlanHash,
+    rollbackPlanHash: plan.rollbackPlanHash,
+    cleanupPlanHash: plan.cleanupPlanHash,
+    tombstoneSyncState: plan.tombstoneSyncPlan.tombstoneSyncState,
+    publicMcpResponse: false,
+    redacted: true,
+    lowDisclosure: true
+  };
+}
+
+function executeWriteCapableProof({ base, input, options, plan }) {
+  if (options.executeWriteCapableProof !== true) {
+    return makeProofExecutionDisabledOutput(base);
+  }
+  if (!options.proofStore || typeof options.proofStore.writeProofRow !== 'function') {
+    return makeWriteCapableProofFailure(base, 'proof_store_unavailable', 'blocked');
+  }
+
+  const proofRow = makeBoundedProofRow({ input, plan });
+  const proofResult = options.proofStore.writeProofRow(proofRow);
+  if (!proofResult || proofResult.persisted !== true || proofResult.recordsWritten !== ONE_BOUNDED_PROOF_WRITE) {
+    return makeWriteCapableProofFailure(base, 'proof_store_write_failed', 'blocked');
+  }
+
+  return {
+    ...base,
+    status: 'applied',
+    reason: null,
+    writeCountExecuted: ONE_BOUNDED_PROOF_WRITE,
+    persistentTagRecordsWritten: ONE_BOUNDED_PROOF_WRITE,
+    boundaryCounters: {
+      ...base.boundaryCounters,
+      persistentTagWrites: ONE_BOUNDED_PROOF_WRITE
+    }
   };
 }
 
@@ -279,6 +378,11 @@ function buildPersistentTagMemoEnrichmentProofCommand(input = {}, options = {}) 
         reason: 'missing_skeleton_guard_token'
       };
     }
+    const writeCapableGuard = validateWriteCapableProofGuards({ base, options, plan });
+    if (writeCapableGuard.output) return writeCapableGuard.output;
+    if (writeCapableGuard.ok) {
+      return executeWriteCapableProof({ base, input, options, plan });
+    }
     return {
       ...base,
       status: 'gated',
@@ -322,6 +426,7 @@ module.exports = {
   OPERATOR_EXECUTION_TOKEN,
   OUTPUT_SCHEMA_VERSION,
   SIDECAR_TARGET,
+  WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_VERSION,
   buildPersistentTagMemoEnrichmentProofCommand,
   hashRedacted
 };

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1616 persistent TagMemo write-capable proof source implementation preflight`.
-Current validation: `CMV-1720`.
+Current task: `CM-1617 persistent TagMemo write-capable proof source implementation no-execution`.
+Current validation: `CMV-1721`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_PREFLIGHT_RECORDED_NEXT_SOURCE_IMPLEMENTATION_NO_WRITE`.
+Current route: `PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTED_GATED_NO_EXECUTION_NEXT_SOURCE_AUDIT`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1617 persistent TagMemo write-capable proof source implementation no-execution: updated `src/tagmemo/persistent-enrichment-proof-command.js` and `tests/tagmemo-persistent-enrichment-proof-command.test.js`, and added `docs/CM1617_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION.md`. The source now contains an internal write-capable proof branch gated by dual tokens, explicit `writeCapableProofFlag`, exact `temp-local-tagmemo-proof-sidecar` target, expected dry-run hash match, active tombstone state, one requested write, explicit `executeWriteCapableProof`, and injected proof-store boundary. Default dual-token apply without the write-capable flag still returns `gated / ready_for_proof_no_write` with zero writes. CM-1617 validation covered no-execution and fail-closed paths only. Proof execution is `NOT_EXECUTED`; persistent tag write is `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; persistent enrichment success is `NOT_CLAIMED`; next route is independent source audit before any future proof execution. No provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live MCP proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1616 persistent TagMemo write-capable proof source implementation preflight: added `docs/CM1616_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_PREFLIGHT.md`. This is docs/status/board preflight only. It records future source implementation boundaries after CM-1615 fixture/test-only contract coverage: future source must preserve dual-token guard, explicit write-capable proof flag, `maxWriteCount=1`, expected dry-run plan hash match, temp-local sidecar proof target, bounded input rejection, low-disclosure output, deterministic rollback/cleanup/tombstone behavior, independent source audit, and unchanged seven-tool public MCP surface. Source implementation is `NOT_STARTED`; write-capable implementation is `NOT_STARTED`; proof execution is `NOT_EXECUTED`; persistent tag write is `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; future proof execution still requires separate exact approval. No provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live MCP proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
