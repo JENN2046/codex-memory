@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1550 TagMemo minimal schema closeout and next V8 capability selection`.
-Current validation: `CMV-1654`.
+Current task: `CM-1551 tag extraction deterministic contract preflight`.
+Current validation: `CMV-1655`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_MINIMAL_SCHEMA_BASELINE_COMPLETED_TEST_ONLY; next V8 slice selected as tag extraction deterministic contract preflight; scoped RC remains closed; release/production/cutover still require separate exact approval`.
+Current route: `TAG_EXTRACTION_DETERMINISTIC_CONTRACT_PREFLIGHT_RECORDED_DOCS_ONLY; implementation not started; scoped RC remains closed; release/production/cutover still require separate exact approval`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1551 tag extraction deterministic contract preflight: added `docs/CM1551_TAG_EXTRACTION_DETERMINISTIC_CONTRACT_PREFLIGHT.md`. This docs/status/board-only preflight defines deterministic input/output contracts, normalization rules, duplicate handling, stable id rules, confidence score tiers, rejection and empty-input behavior, bounded projection compatibility, and a fixture/test plan. `tag extraction implementation: NOT_STARTED`; `deterministic contract only: YES`; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`; public MCP surface was not expanded. CM-1551 did not implement tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
 CM-1550 TagMemo minimal schema closeout and next V8 capability selection: added `docs/CM1550_TAGMEMO_MINIMAL_SCHEMA_CLOSEOUT_AND_NEXT_V8_CAPABILITY_SELECTION.md`. Decision: `TagMemo minimal schema: BASELINE_COMPLETED_TEST_ONLY`; `tag extraction implementation: NOT_STARTED`; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`; public MCP surface was not expanded. Next selected V8 capability slice is `CM-1551 tag extraction deterministic contract preflight`. CM-1550 did not implement tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 

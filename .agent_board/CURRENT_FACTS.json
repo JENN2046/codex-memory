@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1550",
-  "validationId": "CMV-1654",
+  "taskId": "CM-1551",
+  "validationId": "CMV-1655",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1655",
+      "scope": "CM-1551 tag extraction deterministic contract preflight",
+      "status": "COMPLETED_VALIDATED_TAG_EXTRACTION_DETERMINISTIC_CONTRACT_PREFLIGHT_DOCS_ONLY_NO_IMPLEMENTATION"
+    },
     {
       "id": "CMV-1654",
       "scope": "CM-1550 TagMemo minimal schema closeout and next V8 capability selection",
@@ -743,6 +748,8 @@
     "real query quality proof",
     "startup/watchdog warning source change",
     "raw audit or broad store scan",
+    "tag extraction implementation",
+    "complete V8 implementation",
     "committed live Git head facts"
   ],
   "constraints": {

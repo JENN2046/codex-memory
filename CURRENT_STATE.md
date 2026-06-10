@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1550 TagMemo minimal schema closeout and next V8 capability selection` |
-| Current validation | `CMV-1654` |
-| Current route | TagMemo minimal schema baseline closed as test-only; next V8 slice selected as tag extraction deterministic contract preflight; scoped RC remains closed; release/production/cutover still require separate exact approval |
+| Current task | `CM-1551 tag extraction deterministic contract preflight` |
+| Current validation | `CMV-1655` |
+| Current route | Tag extraction deterministic contract preflight recorded as docs-only; implementation not started; scoped RC remains closed; release/production/cutover still require separate exact approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1551` adds `docs/CM1551_TAG_EXTRACTION_DETERMINISTIC_CONTRACT_PREFLIGHT.md` and records a docs/status/board-only deterministic tag extraction contract preflight. It defines bounded input and output schemas, normalization rules, duplicate handling, stable tag/evidence id rules, confidence score tiers, rejection and empty-input behavior, bounded projection compatibility, and a fixture/test plan. `tag extraction implementation: NOT_STARTED`; deterministic contract only; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`; public MCP surface was not expanded. CM-1551 does not implement tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
 `CM-1550` adds `docs/CM1550_TAGMEMO_MINIMAL_SCHEMA_CLOSEOUT_AND_NEXT_V8_CAPABILITY_SELECTION.md` and closes the TagMemo minimal schema lane as `BASELINE_COMPLETED_TEST_ONLY`. It reviews CM-1548 preflight and CM-1549 fixture/test evidence, keeps tag extraction implementation as `NOT_STARTED`, records complete V8 as `NOT_CLAIMED`, confirms production/release/cutover ready remain `NO`, and confirms public MCP surface was not expanded. The next selected V8 capability slice is `CM-1551 tag extraction deterministic contract preflight`. CM-1550 does not implement tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
@@ -267,7 +269,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1550 closes the TagMemo minimal schema baseline as test-only and selects `CM-1551 tag extraction deterministic contract preflight` as the next V8 capability slice. Next safe action is push review for CM-1550 if separately authorized, or CM-1551 as another docs/fixture-first preflight. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, and production-readiness claims remain separate approval-bound work.
+CM-1551 records the deterministic tag extraction contract preflight as docs-only and keeps implementation not started. Next safe action is push review for CM-1551 if separately authorized, or `CM-1552 tag extraction deterministic contract fixture/test coverage` as another fixture-first slice. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, and production-readiness claims remain separate approval-bound work.
 
 ## Boundaries
 
