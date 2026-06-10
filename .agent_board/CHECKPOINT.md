@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1564 TagMemo importance scoring source audit`.
-Current validation: `CMV-1668`.
+Current checkpoint: `CM-1565 TagMemo recall ranking baseline preflight`.
+Current validation: `CMV-1669`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1565 TagMemo Recall Ranking Baseline Preflight
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_BASELINE_PREFLIGHT_RECORDED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md`.
+- Prepared internal deterministic recall ranking baseline.
+- Planned `src/tagmemo/recall-ranking.js`.
+- Defined bounded query, candidate, tag projection, importance score, and safe recency inputs.
+- Defined forbidden raw/provider/token/audit/scan/storage/private inputs.
+- Defined deterministic ranking output and planned tests.
+- Recorded recall ranking source implementation as `NOT_STARTED`.
+- Recorded live search and raw scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, public MCP expansion, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1669` docs preflight changed-scope validation.
 
 ## CM-1563 Deterministic TagMemo Importance Scoring Core
 

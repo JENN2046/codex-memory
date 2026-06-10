@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1564 TagMemo importance scoring source audit` |
-| Current validation | `CMV-1668` |
-| Current route | Importance scoring baseline implemented and audited |
+| Current task | `CM-1565 TagMemo recall ranking baseline preflight` |
+| Current validation | `CMV-1669` |
+| Current route | Recall ranking baseline preflight recorded |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1565` adds `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md` and prepares the deterministic TagMemo recall ranking baseline as docs-only preflight. It defines the planned internal pure-function module `src/tagmemo/recall-ranking.js`, input contract for bounded query text, bounded memory candidates, TagMemo tag projection, deterministic `importanceScore`, and safe recency metadata, forbidden raw/provider/token/audit/scan/storage/private inputs, output contract for `rankedCandidates`, `rankScore`, `rankReasons`, and `rankVersion=deterministic_v1`, deterministic ranking rules, and planned regression tests. Recall ranking source implementation is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; no provider/API or bearer token path occurred; public MCP surface was not expanded; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1564` adds `docs/CM1564_TAGMEMO_IMPORTANCE_SCORING_SOURCE_AUDIT.md` and records an independent changed-scope source audit of the CM-1563 deterministic TagMemo importance scoring core. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/importance-scoring.js`, `tests/tagmemo-importance-scoring.test.js`, the Sprint A fixture, and baseline docs. Confirmed internal pure-function behavior, bounded input validation, low-disclosure empty/rejected output, deterministic score/band/signals, duplicate signal merge, forbidden raw/private rejection, no provider/API or bearer token path, no raw scan, no public MCP expansion, no effective `record_memory` write, no confirmed mutation, no production/release/cutover readiness claim, and no complete V8 claim. Importance scoring baseline is `IMPLEMENTED_AND_AUDITED`; persistent tag enrichment remains `NOT_STARTED`.
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1564 TagMemo importance scoring source audit`.
-Current validation: `CMV-1668`.
+Current task: `CM-1565 TagMemo recall ranking baseline preflight`.
+Current validation: `CMV-1669`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_IMPORTANCE_SCORING_BASELINE_IMPLEMENTED_AND_AUDITED`.
+Current route: `TAGMEMO_RECALL_RANKING_BASELINE_PREFLIGHT_RECORDED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1565 TagMemo recall ranking baseline preflight: added `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md`. This docs-only preflight defines a deterministic, internal-only recall ranking baseline over bounded query text, bounded memory candidates, TagMemo tag projection, deterministic `importanceScore`, and safe recency metadata. Forbidden inputs include raw memory records, token/bearer material, provider/API payloads, raw audit, raw scan output, client secrets, raw storage/vector/cache/file path payloads, and unbounded lifecycle metadata. Planned output is `rankedCandidates`, `rankScore`, `rankReasons`, and `rankVersion=deterministic_v1`. Source implementation is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1564 TagMemo importance scoring source audit: added `docs/CM1564_TAGMEMO_IMPORTANCE_SCORING_SOURCE_AUDIT.md`. Independent changed-scope source audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the importance scoring baseline is `IMPLEMENTED_AND_AUDITED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no raw scan; no confirmed mutation; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. Targeted validation remained `9/9`.
 
