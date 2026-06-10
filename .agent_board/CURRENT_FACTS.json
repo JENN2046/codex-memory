@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1607",
-  "validationId": "CMV-1711",
+  "taskId": "CM-1608",
+  "validationId": "CMV-1712",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1712",
+      "scope": "CM-1608 persistent TagMemo proof command dual-token guard implementation",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_DUAL_TOKEN_GUARD_IMPLEMENTED_NO_WRITE"
+    },
     {
       "id": "CMV-1711",
       "scope": "CM-1607 persistent TagMemo enrichment approval-token alignment preflight",

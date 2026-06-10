@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const {
   EXACT_APPROVAL_TOKEN,
+  OPERATOR_EXECUTION_TOKEN,
   buildPersistentTagMemoEnrichmentProofCommand
 } = require('../src/tagmemo/persistent-enrichment-proof-command');
 
@@ -18,7 +19,8 @@ function parseArgs(argv) {
     fixture: DEFAULT_FIXTURE,
     caseId: 'valid-active-dry-run-plan',
     maxWriteCount: 1,
-    approvalToken: null
+    approvalToken: null,
+    operatorExecutionToken: null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -39,8 +41,13 @@ function parseArgs(argv) {
     } else if (arg === '--approval') {
       parsed.approvalToken = next;
       index += 1;
+    } else if (arg === '--operator-approval') {
+      parsed.operatorExecutionToken = next;
+      index += 1;
     } else if (arg === '--approval-placeholder') {
       parsed.approvalToken = EXACT_APPROVAL_TOKEN;
+    } else if (arg === '--operator-approval-placeholder') {
+      parsed.operatorExecutionToken = OPERATOR_EXECUTION_TOKEN;
     } else {
       throw new Error(`unsupported argument: ${arg}`);
     }
@@ -67,7 +74,8 @@ function main(argv = process.argv.slice(2)) {
   const output = buildPersistentTagMemoEnrichmentProofCommand(input, {
     mode: args.mode,
     maxWriteCount: args.maxWriteCount,
-    approvalToken: args.approvalToken
+    approvalToken: args.approvalToken,
+    operatorExecutionToken: args.operatorExecutionToken
   });
   process.stdout.write(`${JSON.stringify(output, null, 2)}\n`);
   return output;

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1607 persistent TagMemo enrichment approval-token alignment preflight`.
-Current validation: `CMV-1711`.
+Current task: `CM-1608 persistent TagMemo proof command dual-token guard implementation`.
+Current validation: `CMV-1712`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_APPROVAL_TOKEN_ALIGNMENT_PREFLIGHT_RECORDED`.
+Current route: `PERSISTENT_TAGMEMO_DUAL_TOKEN_GUARD_IMPLEMENTED_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1608 persistent TagMemo proof command dual-token guard implementation: updated `src/tagmemo/persistent-enrichment-proof-command.js`, `scripts/tagmemo-enrichment-proof.js`, `tests/fixtures/tagmemo-persistent-enrichment-proof-command-sprint-e-v1.json`, `tests/tagmemo-persistent-enrichment-proof-command.test.js`, and added `docs/CM1608_PERSISTENT_TAGMEMO_DUAL_TOKEN_GUARD.md`. Apply mode now requires operator execution token `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` plus skeleton guard token `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`. Missing either token fails closed; both tokens return `gated / ready_for_proof_no_write` with zero writes. Persistent tag write is `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; actual proof execution is `NOT_STARTED`; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1607 persistent TagMemo enrichment approval-token alignment preflight: added `docs/CM1607_PERSISTENT_TAGMEMO_APPROVAL_TOKEN_ALIGNMENT_PREFLIGHT.md`. This docs/source preflight maps the post-audit operator token `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` to the skeleton internal guard token `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, records that current skeleton does not accept the after-audit token, and selects a future dual-token guard model. Persistent tag write is `STILL_BLOCKED`; persistent tag enrichment is `NOT_STARTED`; actual proof execution is `NOT_STARTED`; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

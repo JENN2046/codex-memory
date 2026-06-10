@@ -9,6 +9,7 @@ const test = require('node:test');
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
 const {
   EXACT_APPROVAL_TOKEN,
+  OPERATOR_EXECUTION_TOKEN,
   OUTPUT_SCHEMA_VERSION,
   SIDECAR_TARGET,
   buildPersistentTagMemoEnrichmentProofCommand
@@ -90,7 +91,8 @@ test('CM1604 command skeleton produces deterministic redacted plans for fixture 
     const options = {
       mode: testCase.mode,
       maxWriteCount: testCase.maxWriteCount,
-      approvalToken: testCase.approvalToken
+      approvalToken: testCase.approvalToken,
+      operatorExecutionToken: testCase.operatorExecutionToken
     };
     const first = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, options);
     const second = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, options);
@@ -111,6 +113,20 @@ test('CM1604 command skeleton produces deterministic redacted plans for fixture 
     if (Object.hasOwn(testCase.expected, 'approvalStringExactMatch')) {
       assert.equal(first.approvalStringExactMatch, testCase.expected.approvalStringExactMatch, testCase.id);
     }
+    if (Object.hasOwn(testCase.expected, 'operatorExecutionTokenExactMatch')) {
+      assert.equal(
+        first.operatorExecutionTokenExactMatch,
+        testCase.expected.operatorExecutionTokenExactMatch,
+        testCase.id
+      );
+    }
+    if (Object.hasOwn(testCase.expected, 'skeletonGuardTokenExactMatch')) {
+      assert.equal(
+        first.skeletonGuardTokenExactMatch,
+        testCase.expected.skeletonGuardTokenExactMatch,
+        testCase.id
+      );
+    }
     if (Object.hasOwn(testCase.expected, 'tombstoneSyncState')) {
       assert.equal(first.tombstoneSyncState, testCase.expected.tombstoneSyncState, testCase.id);
     }
@@ -119,18 +135,21 @@ test('CM1604 command skeleton produces deterministic redacted plans for fixture 
   }
 });
 
-test('CM1604 apply with exact approval remains fail-closed and writes nothing', () => {
+test('CM1608 apply with dual token is gated and still writes nothing', () => {
   const fixture = loadFixture();
-  const testCase = fixture.cases.find(item => item.id === 'apply-exact-approval-still-stubbed');
+  const testCase = fixture.cases.find(item => item.id === 'apply-dual-token-gated-no-write');
   const output = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
     mode: 'apply',
     maxWriteCount: 1,
-    approvalToken: EXACT_APPROVAL_TOKEN
+    approvalToken: EXACT_APPROVAL_TOKEN,
+    operatorExecutionToken: OPERATOR_EXECUTION_TOKEN
   });
 
   assert.equal(output.approvalStringExactMatch, true);
-  assert.equal(output.status, 'blocked');
-  assert.equal(output.reason, 'apply_stub_no_persistent_tag_write_executed');
+  assert.equal(output.operatorExecutionTokenExactMatch, true);
+  assert.equal(output.skeletonGuardTokenExactMatch, true);
+  assert.equal(output.status, 'gated');
+  assert.equal(output.reason, 'ready_for_proof_no_write');
   assert.equal(output.writeCountRequested, 1);
   assert.equal(output.writeCountExecuted, 0);
   assert.equal(output.persistentTagRecordsWritten, 0);
@@ -170,6 +189,32 @@ test('CM1604 CLI skeleton reads only bounded fixture input and emits redacted JS
   assert.equal(output.sidecarTarget, SIDECAR_TARGET);
   assertBoundaryCounters(output);
   assertNoForbiddenFragments(output, loadFixture().forbiddenFragments);
+});
+
+test('CM1608 CLI accepts separate operator and skeleton guard tokens without writing', () => {
+  const result = spawnSync(process.execPath, [
+    scriptPath,
+    '--mode',
+    'apply',
+    '--case',
+    'valid-active-dry-run-plan',
+    '--max-write-count',
+    '1',
+    '--operator-approval-placeholder',
+    '--approval-placeholder'
+  ], {
+    cwd: path.join(__dirname, '..'),
+    encoding: 'utf8'
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.status, 'gated');
+  assert.equal(output.reason, 'ready_for_proof_no_write');
+  assert.equal(output.approvalStringExactMatch, true);
+  assert.equal(output.operatorExecutionTokenExactMatch, true);
+  assert.equal(output.skeletonGuardTokenExactMatch, true);
+  assertBoundaryCounters(output);
 });
 
 test('CM1604 fixture test does not rewrite its fixture file', () => {

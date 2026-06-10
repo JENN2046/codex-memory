@@ -9,6 +9,7 @@ const {
 const OUTPUT_SCHEMA_VERSION = 'tagmemo-persistent-enrichment-proof-command-output-v1';
 const COMMAND_VERSION = 'persistent_tagmemo_enrichment_proof_command_skeleton_v1';
 const EXACT_APPROVAL_TOKEN = 'APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF';
+const OPERATOR_EXECUTION_TOKEN = 'APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT';
 const SIDECAR_TARGET = 'temp-local-tagmemo-proof-sidecar';
 
 const ALLOWED_MODES = new Set([
@@ -93,12 +94,19 @@ function makeBoundaryCounters() {
   };
 }
 
-function makeBaseOutput({ mode, approvalStringExactMatch = false }) {
+function makeBaseOutput({
+  mode,
+  approvalStringExactMatch = false,
+  operatorExecutionTokenExactMatch = false,
+  skeletonGuardTokenExactMatch = false
+}) {
   return {
     schemaVersion: OUTPUT_SCHEMA_VERSION,
     commandVersion: COMMAND_VERSION,
     executionMode: mode,
     approvalStringExactMatch,
+    operatorExecutionTokenExactMatch,
+    skeletonGuardTokenExactMatch,
     sidecarTarget: SIDECAR_TARGET,
     writeCountLimit: null,
     writeCountRequested: 0,
@@ -210,10 +218,17 @@ function buildPersistentTagMemoEnrichmentProofCommand(input = {}, options = {}) 
   const maxWriteCountValidation = validateMaxWriteCount(mode, options.maxWriteCount);
   if (!maxWriteCountValidation.ok) return makeFailure(maxWriteCountValidation.reason, { mode });
 
-  const approvalStringExactMatch = options.approvalToken === EXACT_APPROVAL_TOKEN;
+  const operatorExecutionTokenExactMatch = options.operatorExecutionToken === OPERATOR_EXECUTION_TOKEN;
+  const skeletonGuardTokenExactMatch = options.approvalToken === EXACT_APPROVAL_TOKEN;
+  const approvalStringExactMatch = operatorExecutionTokenExactMatch && skeletonGuardTokenExactMatch;
   const plan = buildPlanSkeleton(input);
   const base = {
-    ...makeBaseOutput({ mode, approvalStringExactMatch }),
+    ...makeBaseOutput({
+      mode,
+      approvalStringExactMatch,
+      operatorExecutionTokenExactMatch,
+      skeletonGuardTokenExactMatch
+    }),
     writeCountLimit: maxWriteCountValidation.writeCountLimit,
     writeCountRequested: plan.writeCountRequested,
     dryRunPlanHash: plan.dryRunPlanHash,
@@ -250,26 +265,40 @@ function buildPersistentTagMemoEnrichmentProofCommand(input = {}, options = {}) 
   }
 
   if (mode === 'apply') {
-    if (!approvalStringExactMatch) {
+    if (!operatorExecutionTokenExactMatch) {
       return {
         ...base,
         status: 'rejected',
-        reason: 'missing_exact_approval'
+        reason: 'missing_operator_execution_token'
+      };
+    }
+    if (!skeletonGuardTokenExactMatch) {
+      return {
+        ...base,
+        status: 'rejected',
+        reason: 'missing_skeleton_guard_token'
       };
     }
     return {
       ...base,
-      status: 'blocked',
-      reason: 'apply_stub_no_persistent_tag_write_executed'
+      status: 'gated',
+      reason: 'ready_for_proof_no_write'
     };
   }
 
   if (mode === 'rollback') {
-    if (!approvalStringExactMatch) {
+    if (!operatorExecutionTokenExactMatch) {
       return {
         ...base,
         status: 'rejected',
-        reason: 'missing_exact_approval'
+        reason: 'missing_operator_execution_token'
+      };
+    }
+    if (!skeletonGuardTokenExactMatch) {
+      return {
+        ...base,
+        status: 'rejected',
+        reason: 'missing_skeleton_guard_token'
       };
     }
     return {
@@ -290,6 +319,7 @@ function buildPersistentTagMemoEnrichmentProofCommand(input = {}, options = {}) 
 module.exports = {
   COMMAND_VERSION,
   EXACT_APPROVAL_TOKEN,
+  OPERATOR_EXECUTION_TOKEN,
   OUTPUT_SCHEMA_VERSION,
   SIDECAR_TARGET,
   buildPersistentTagMemoEnrichmentProofCommand,
