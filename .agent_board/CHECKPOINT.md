@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1585 V8 TagMemo recall composition Sprint C closeout`.
-Current validation: `CMV-1689`.
+Current checkpoint: `CM-1586 V8 TagMemo runtime recall integration Sprint D preflight`.
+Current validation: `CMV-1690`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1586 V8 TagMemo Runtime Recall Integration Sprint D Preflight
+
+Status: `COMPLETED_VALIDATED_V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_PREFLIGHT_RECORDED_NO_RUNTIME_INTEGRATION`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_PREFLIGHT.md`.
+- Planned internal no-op projection boundary for recall composition.
+- Mapped possible future review surfaces around `search_memory` candidate narrowing and bounded candidate projection.
+- Recorded bounded input/output contract, failure/no-op behavior, fixture/test plan, and rollback plan.
+- Runtime integration remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Raw scan and broad memory scan remain `NOT_RUN`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, live proof, confirmed mutation, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1690` docs-only Sprint D preflight validation.
 
 ## CM-1585 V8 TagMemo Recall Composition Sprint C Closeout
 
