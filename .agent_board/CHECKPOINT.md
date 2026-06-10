@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1620 persistent TagMemo proof execution after source audit`.
-Current validation: `CMV-1724`.
+Current checkpoint: `CM-1621 persistent TagMemo proof closeout audit decision`.
+Current validation: `CMV-1725`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1621 Persistent TagMemo Proof Closeout Audit Decision
+
+Status: `COMPLETED_VALIDATED_SCOPED_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EVIDENCE_CLOSED_NO_BROADER_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1621_PERSISTENT_TAGMEMO_PROOF_CLOSEOUT_AUDIT_DECISION.md`.
+- Reviewed CM-1620 evidence, CM-1619 gate, CM-1618 source audit, and source/test guard surfaces.
+- Reviewed public MCP surface count: seven tools.
+- Reviewed low-disclosure temp-local proofStore shape: one row, allowed key shape, no forbidden raw/private/provider/token key, redacted/low-disclosure, publicMcpResponse false, active tombstone state, hash fields present.
+- Confirmed CM-1620 was exact-approved with all three tokens.
+- Confirmed `applyStatus=applied`, `writeCountExecuted=1`, `persistentTagRecordsWritten=1`, and `persistentTagWrites=1`.
+- Closed only `SCOPED_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EVIDENCE`.
+- Confirmed broad `record_memory` reliability, production write reliability, runtime public MCP persistent enrichment, production/release/cutover readiness, and complete V8 remain not claimed.
+- Confirmed no second proof write, public MCP proof, `record_memory`, provider/API, bearer token, raw scan, broad memory scan, confirmed mutation, public MCP expansion, or release/tag/deploy occurred.
+
+Validation: `CMV-1725` closeout audit/docs validation.
 
 ## CM-1620 Persistent TagMemo Proof Execution After Source Audit
 

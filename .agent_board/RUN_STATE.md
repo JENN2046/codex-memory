@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1620 persistent TagMemo proof execution after source audit`.
-Current validation: `CMV-1724`.
+Current task: `CM-1621 persistent TagMemo proof closeout audit decision`.
+Current validation: `CMV-1725`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1620` executed one exact-approved scoped source-level temp-local sidecar proof-store write after CM-1618 source audit and CM-1619 approval gate. Result is `applyStatus=applied`, `writeCountExecuted=1`, `persistentTagRecordsWritten=1`, and `boundaryCounters.persistentTagWrites=1`. This is bounded proof evidence only; it is not broad `record_memory` reliability, production write reliability, runtime public MCP persistent enrichment, production readiness, release readiness, cutover readiness, or complete V8. Next safe route is a closeout audit/decision for this scoped evidence, not another proof write. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent production-enrichment claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1621` closes only the scoped persistent TagMemo proof execution evidence from CM-1620. The closeout audit confirms one exact-approved source-level temp-local sidecar proofStore row and no second proof write, no public MCP proof, no `record_memory`, no provider/API, no bearer token, no raw/broad scan, no confirmed mutation, no public MCP expansion, and no release/tag/deploy. This is not broad `record_memory` reliability, production write reliability, runtime public MCP persistent enrichment, production readiness, release readiness, cutover readiness, or complete V8. Next safe route is selecting the next V8/TagMemo capability slice or separately approving a runtime/public-MCP/production-enrichment path.
 
 ## Historical Run Notes
 

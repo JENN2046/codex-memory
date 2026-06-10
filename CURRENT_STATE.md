@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1620 persistent TagMemo proof execution after source audit` |
-| Current validation | `CMV-1724` |
-| Current route | scoped source-level temp-local sidecar proof executed; closeout audit/decision required before any broader claim |
+| Current task | `CM-1621 persistent TagMemo proof closeout audit decision` |
+| Current validation | `CMV-1725` |
+| Current route | scoped persistent TagMemo proof execution evidence closed; production/runtime/V8 claims remain not made |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1621` adds `docs/CM1621_PERSISTENT_TAGMEMO_PROOF_CLOSEOUT_AUDIT_DECISION.md` and closes only the scoped persistent TagMemo proof execution evidence from CM-1620. The audit reviewed CM-1620 evidence, CM-1619 gate, CM-1618 source audit, source/test guard surfaces, public MCP surface count, and low-disclosure temp-local proofStore shape. Confirmed CM-1620 was exact-approved with all three tokens, used bounded fixture input, `maxWriteCount=1`, expected dry-run hash match, `temp-local-tagmemo-proof-sidecar`, active tombstone state, explicit write-capable flag, explicit execution flag, injected proofStore boundary, and produced `applyStatus=applied`, `writeCountExecuted=1`, `persistentTagRecordsWritten=1`, and `boundaryCounters.persistentTagWrites=1`. Decision: `SCOPED_PERSISTENT_TAGMEMO_PROOF_EXECUTION_EVIDENCE: CLOSED`. Not claimed: broad `record_memory` reliability, production write reliability, runtime public MCP persistent enrichment, production readiness, release readiness, cutover readiness, or complete V8. No second proof write, public MCP proof, `record_memory`, provider/API, bearer token, raw scan, broad memory scan, confirmed mutation, public MCP expansion, or release/tag/deploy occurred.
 
 `CM-1620` adds `docs/CM1620_PERSISTENT_TAGMEMO_PROOF_EXECUTION_AFTER_SOURCE_AUDIT.md` and records exact-approved persistent TagMemo write-capable proof execution after CM-1618 source audit and CM-1619 approval gate. The operator supplied all three required tokens: the route-level proof execution token plus both source-recognized proof tokens. Fresh Git preflight was clean synced `main` at `759d14b0dc87e3a2930cf0ee469f9cf247f93f3b` with ahead/behind `0 0`. Execution used bounded fixture case `valid-active-dry-run-plan`, `maxWriteCount=1`, `sidecarTarget=temp-local-tagmemo-proof-sidecar`, `writeCapableProofFlag=true`, `executeWriteCapableProof=true`, fresh dry-run plan hash match, tombstone state `active`, and an injected temp-local proof-store boundary. Result was `applyStatus=applied`, `writeCountExecuted=1`, `persistentTagRecordsWritten=1`, and `boundaryCounters.persistentTagWrites=1`. This is scoped source-level temp-local sidecar proof-store evidence only. It did not execute public MCP proof, `tools/list`, `tools/call`, `record_memory`, provider/API, bearer token, raw scan, broad memory scan, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim.
 
@@ -407,7 +409,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1620 executed one exact-approved scoped source-level temp-local sidecar proof-store write and records it as bounded proof evidence only. Next safe action is a closeout audit/decision for this scoped evidence, not another proof write. Broad `record_memory` reliability, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
+CM-1621 closes the scoped persistent TagMemo proof execution evidence only. Next safe action is route selection for the next V8/TagMemo capability slice or a separate approval-bound runtime/public-MCP/production-enrichment path. Broad `record_memory` reliability, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
 
 ## Boundaries
 
