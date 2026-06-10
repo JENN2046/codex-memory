@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1567",
-  "validationId": "CMV-1671",
+  "taskId": "CM-1568",
+  "validationId": "CMV-1672",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1672",
+      "scope": "CM-1568 TagMemo recall ranking source audit",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS"
+    },
     {
       "id": "CMV-1671",
       "scope": "CM-1567 deterministic TagMemo recall ranking core",

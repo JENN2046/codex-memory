@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1567 deterministic TagMemo recall ranking core`.
-Current validation: `CMV-1671`.
-Current handoff: Recall ranking core implemented; independent source audit not yet recorded. Next safe Sprint A route is source audit.
+Current task: `CM-1568 TagMemo recall ranking source audit`.
+Current validation: `CMV-1672`.
+Current handoff: Recall ranking core implemented and audited. Next safe Sprint A route is final closeout.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Recall ranking core implemented; independent source audit not y
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_CORE_IMPLEMENTED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1568 added `docs/CM1568_TAGMEMO_RECALL_RANKING_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of CM-1567. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/recall-ranking.js`, `tests/tagmemo-recall-ranking.test.js`, and `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json`. Confirmed bounded input only, deterministic ranked candidates, bounded score/reasons, importance participation, safe recency participation, low-disclosure empty/rejected output, forbidden raw/private field rejection, provider/API/token/raw-shaped data exclusion from rank reasons, and seven-tool public MCP surface preservation. Targeted validation passed `10/10`. Runtime integration remains `NOT_STARTED`; live search and raw scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, confirmed mutation, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1567 added `src/tagmemo/recall-ranking.js` and expanded `tests/tagmemo-recall-ranking.test.js`. The internal pure function accepts bounded query text, bounded memory candidates, TagMemo tag projection, deterministic `importanceScore`, and safe recency metadata; returns deterministic ranked candidates with `rankVersion=deterministic_v1`; lets tag match, query term match, importance, safe recency, and evidence relevance participate; rejects forbidden raw/private fields; keeps empty/rejected paths low-disclosure; and targeted validation passed `10/10`. Runtime integration remains `NOT_STARTED`; live search and raw scan were not run; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1566 added `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json` and `tests/tagmemo-recall-ranking.test.js` for fixture/test coverage of deterministic recall ranking. It locks tag-match ranking, importance participation, safe recency, empty candidate low-disclosure behavior, rejected unsafe candidate shape, side-effect boundaries, forbidden provider/token/raw-shaped sample placement, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search and raw scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1565 added `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md` and prepared deterministic recall ranking baseline as docs-only preflight. It planned `src/tagmemo/recall-ranking.js`, bounded input contracts for query/candidates/tags/importance/recency, forbidden raw/provider/token/audit/scan/storage inputs, deterministic ranking output fields, ranking rules, and regression coverage. Source implementation remains `NOT_STARTED`; live search and raw scan were not run; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.

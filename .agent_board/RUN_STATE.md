@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1567 deterministic TagMemo recall ranking core`.
-Current validation: `CMV-1671`.
+Current task: `CM-1568 TagMemo recall ranking source audit`.
+Current validation: `CMV-1672`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1567` implemented the deterministic TagMemo recall ranking core as an internal pure function. The next Sprint A slice is independent source audit. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP response exposure, live search, raw audit / broad scan, provider/API, bearer-token path, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1568` audited the deterministic TagMemo recall ranking core with no actionable findings in the changed scope. The next Sprint A slice is final Sprint A closeout. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP response exposure, live search, raw audit / broad scan, provider/API, bearer-token path, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

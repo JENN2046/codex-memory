@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1567 deterministic TagMemo recall ranking core`.
-Current validation: `CMV-1671`.
+Current checkpoint: `CM-1568 TagMemo recall ranking source audit`.
+Current validation: `CMV-1672`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1568 TagMemo Recall Ranking Source Audit
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1568_TAGMEMO_RECALL_RANKING_SOURCE_AUDIT.md`.
+- Audited `src/tagmemo/recall-ranking.js`.
+- Audited `tests/tagmemo-recall-ranking.test.js`.
+- Audited `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json`.
+- Confirmed bounded input only, deterministic ranked candidates, bounded score/reasons, importance participation, safe recency participation, low-disclosure empty/rejected output, and forbidden raw/private field rejection.
+- Confirmed ranking output does not include provider/API/token/raw-shaped information.
+- Targeted validation passed `10/10`.
+- Recorded runtime integration as `NOT_STARTED`.
+- Recorded live search and raw scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, confirmed mutation, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1672` source audit/docs changed-scope validation.
 
 ## CM-1567 Deterministic TagMemo Recall Ranking Core
 

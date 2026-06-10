@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1567 deterministic TagMemo recall ranking core` |
-| Current validation | `CMV-1671` |
-| Current route | Recall ranking core implemented; independent source audit not yet recorded |
+| Current task | `CM-1568 TagMemo recall ranking source audit` |
+| Current validation | `CMV-1672` |
+| Current route | Recall ranking baseline implemented and audited |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1568` adds `docs/CM1568_TAGMEMO_RECALL_RANKING_SOURCE_AUDIT.md` and records an independent changed-scope source audit of the CM-1567 deterministic TagMemo recall ranking core. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/recall-ranking.js`, `tests/tagmemo-recall-ranking.test.js`, the Sprint A fixture, and baseline docs. Confirmed internal pure-function behavior, bounded input validation, low-disclosure empty/rejected output, deterministic ranked candidates, bounded score/reasons, importance and safe recency participation, forbidden raw/private rejection, no provider/API or bearer token path, no raw scan, no live search, no public MCP expansion, no effective `record_memory` write, no confirmed mutation, no production/release/cutover readiness claim, and no complete V8 claim. Recall ranking baseline is `IMPLEMENTED_AND_AUDITED`; persistent tag enrichment remains `NOT_STARTED`.
 
 `CM-1567` adds `src/tagmemo/recall-ranking.js` and updates `tests/tagmemo-recall-ranking.test.js` plus `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md`. The new internal pure function `rankTagMemoCandidates(...)` accepts only bounded query text, bounded memory candidates, TagMemo tag projection, deterministic `importanceScore`, and safe recency metadata; rejects forbidden raw/private fields; strips provider/API/token/raw shaped values through low-disclosure rejection; emits deterministic ranked candidates with bounded `rankScore`, bounded `rankReasons`, and `rankVersion=deterministic_v1`; and returns low-disclosure empty/rejected results. Targeted validation passed `10/10`. Runtime integration remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
