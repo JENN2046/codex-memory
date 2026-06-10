@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1617 persistent TagMemo write-capable proof source implementation no-execution`.
-Current validation: `CMV-1721`.
+Current checkpoint: `CM-1618 persistent TagMemo write-capable proof source audit`.
+Current validation: `CMV-1722`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1618 Persistent TagMemo Write-Capable Proof Source Audit
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_AUDIT_PASS_NO_PROOF_EXECUTION`
+
+Recorded:
+
+- Added `docs/CM1618_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_AUDIT.md`.
+- Audited CM-1617 changed scope at `69f90896ea38a1ca8c34e450b612be574e994fc6`.
+- Confirmed write-capable branch remains internal and guarded.
+- Confirmed CLI does not expose `writeCapableProofFlag`, `executeWriteCapableProof`, or `proofStore`.
+- Confirmed default no-flag dual-token apply remains `gated / ready_for_proof_no_write` with zero writes.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed proof execution remains `NOT_EXECUTED`.
+- Confirmed persistent tag write remains `NOT_EXECUTED`.
+- Confirmed persistent enrichment success remains `NOT_CLAIMED`.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live MCP proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1722` source audit validation.
 
 ## CM-1617 Persistent TagMemo Write-Capable Proof Source Implementation No-Execution
 

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1617 persistent TagMemo write-capable proof source implementation no-execution`.
-Current validation: `CMV-1721`.
+Current task: `CM-1618 persistent TagMemo write-capable proof source audit`.
+Current validation: `CMV-1722`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1617` implements the persistent TagMemo write-capable proof source branch behind explicit guards but does not execute proof. Proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent enrichment success remains `NOT_CLAIMED`. Next safe route is `CM-1618 persistent TagMemo write-capable proof source audit`. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent enrichment success claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1618` audits the persistent TagMemo write-capable proof source branch and finds no actionable changed-scope issue. Proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent enrichment success remains `NOT_CLAIMED`. Next safe route is a separate exact approval gate/readiness decision before any proof execution. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent enrichment success claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 
