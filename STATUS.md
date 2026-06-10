@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1591 Sprint E persistent TagMemo enrichment governance preflight`.
-Current validation: `CMV-1695`.
+Current task: `CM-1592 Sprint E sidecar tag store schema contract coverage`.
+Current validation: `CMV-1696`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_GOVERNANCE_PREFLIGHT_RECORDED_NO_PERSISTENT_WRITE`.
+Current route: `TAGMEMO_SIDECAR_SCHEMA_CONTRACT_COVERAGE_ADDED_NO_PERSISTENT_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1592 Sprint E sidecar tag store schema contract coverage: added `tests/fixtures/tagmemo-sidecar-schema-sprint-e-v1.json`, `tests/tagmemo-sidecar-schema-contract.test.js`, and `docs/V8_TAGMEMO_SIDECAR_SCHEMA_CONTRACT.md`. This fixture/test-only contract locks bounded sidecar tag record shape, rollback/cleanup selector rules, tombstone sync fail-closed behavior, forbidden raw/private field rejection, and seven-tool public MCP surface. Sidecar schema is `CONTRACT_ONLY / TEST_ONLY`; persistent tag enrichment is `NOT_STARTED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1591 Sprint E persistent TagMemo enrichment governance preflight: added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_SPRINT_E_PREFLIGHT.md`. This docs-only preflight records a sidecar-first model for future consideration, exact-approval write gate requirements, bounded projection constraints, rollback/cleanup plan, migration sketch, deletion/tombstone sync strategy, and fixture/test plan. Persistent tag enrichment is `NOT_STARTED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

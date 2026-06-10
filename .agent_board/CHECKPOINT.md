@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1591 Sprint E persistent TagMemo enrichment governance preflight`.
-Current validation: `CMV-1695`.
+Current checkpoint: `CM-1592 Sprint E sidecar tag store schema contract coverage`.
+Current validation: `CMV-1696`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1592 Sprint E Sidecar Tag Store Schema Contract Coverage
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_SCHEMA_CONTRACT_COVERAGE_ADDED_NO_PERSISTENT_WRITE`
+
+Recorded:
+
+- Added `tests/fixtures/tagmemo-sidecar-schema-sprint-e-v1.json`.
+- Added `tests/tagmemo-sidecar-schema-contract.test.js`.
+- Added `docs/V8_TAGMEMO_SIDECAR_SCHEMA_CONTRACT.md`.
+- Locked sidecar tag record shape as contract-only / test-only coverage.
+- Locked bounded field validation for `tagRecordId`, `memoryId`, `tagId`, `confidenceScore`, `sourceVersion`, `derivedFromProjectionHash`, bounded timestamps, `tombstoneSyncState`, `rollbackToken`, and `cleanupPlanRef`.
+- Locked rollback / cleanup selector as low-disclosure dry-run-only metadata.
+- Locked tombstone sync rules as fail-closed before persistence.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- No persistent tag write occurred.
+- No second effective `record_memory` write occurred.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1696` sidecar schema fixture/test and docs validation.
 
 ## CM-1591 Sprint E Persistent TagMemo Enrichment Governance Preflight
 

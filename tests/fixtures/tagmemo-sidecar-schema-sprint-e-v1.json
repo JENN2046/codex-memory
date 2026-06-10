@@ -1,0 +1,273 @@
+{
+  "schemaVersion": "tagmemo-sidecar-schema-sprint-e-v1",
+  "phase": "CM-1592 TagMemo sidecar schema contract coverage",
+  "boundaries": {
+    "contractOnly": true,
+    "testOnly": true,
+    "persistentTagEnrichment": false,
+    "persistentTagWrite": false,
+    "providerApiCalls": 0,
+    "bearerTokenUse": 0,
+    "rawScan": false,
+    "broadMemoryScan": false,
+    "liveProof": false,
+    "confirmedMutation": false,
+    "publicMcpExpansion": false,
+    "effectiveRecordMemoryWrites": 0,
+    "releaseTagDeploy": false,
+    "productionReleaseCutoverReady": false,
+    "completeV8Claimed": false
+  },
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "schema": {
+    "recordSchemaVersion": "tagmemo-sidecar-tag-record-v1",
+    "requiredFields": [
+      "schemaVersion",
+      "tagRecordId",
+      "memoryId",
+      "tagId",
+      "tagLabel",
+      "confidenceScore",
+      "sourceVersion",
+      "derivedFromProjectionHash",
+      "createdAt",
+      "updatedAt",
+      "tombstoneSyncState",
+      "rollbackToken",
+      "cleanupPlanRef"
+    ],
+    "confidence": {
+      "min": 0,
+      "max": 1
+    },
+    "allowedSourceVersions": [
+      "deterministic_tagmemo_projection_v1"
+    ],
+    "allowedTombstoneSyncStates": [
+      "active",
+      "suppressed_by_tombstone",
+      "sync_pending_fail_closed"
+    ],
+    "forbiddenRawPrivateKeys": [
+      "rawText",
+      "rawContent",
+      "content",
+      "snippet",
+      "sourceFile",
+      "fullPath",
+      "filePath",
+      "relativePath",
+      "provider",
+      "apiKey",
+      "token",
+      "authorization",
+      "bearer",
+      "rawAudit",
+      "rawJsonl",
+      "sqliteRow",
+      "vectorPayload",
+      "privateLifecycleState",
+      "providerEndpoint",
+      "publicMcpResponsePayload"
+    ],
+    "forbiddenValueFragments": [
+      "cm1592-raw-memory-body",
+      "cm1592-secret-token",
+      "cm1592-provider-endpoint",
+      "A:/cm1592/should-not-leak",
+      "Bearer cm1592",
+      "raw-scan-output"
+    ]
+  },
+  "validRecords": [
+    {
+      "id": "bounded-route-tag-sidecar-record",
+      "record": {
+        "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+        "tagRecordId": "sidecar-tag:cm1592:route-001",
+        "memoryId": "memory:cm1592:process-001",
+        "tagId": "tag:cm1592:route",
+        "tagLabel": "route decision",
+        "confidenceScore": 0.82,
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "derivedFromProjectionHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "createdAt": "2026-06-10T00:00:00Z",
+        "updatedAt": "2026-06-10T00:00:00Z",
+        "tombstoneSyncState": "active",
+        "rollbackToken": "rollback:cm1592:route-001",
+        "cleanupPlanRef": "cleanup-plan:cm1592:sidecar-v1"
+      }
+    },
+    {
+      "id": "bounded-proof-tag-sidecar-record",
+      "record": {
+        "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+        "tagRecordId": "sidecar-tag:cm1592:proof-002",
+        "memoryId": "memory:cm1592:process-002",
+        "tagId": "tag:cm1592:proof",
+        "tagLabel": "proof receipt",
+        "confidenceScore": 0.68,
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "derivedFromProjectionHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "createdAt": "2026-06-10T00:00:00Z",
+        "updatedAt": "2026-06-10T00:00:00Z",
+        "tombstoneSyncState": "active",
+        "rollbackToken": "rollback:cm1592:proof-002",
+        "cleanupPlanRef": "cleanup-plan:cm1592:sidecar-v1"
+      }
+    }
+  ],
+  "invalidRecords": [
+    {
+      "id": "missing-rollback-token",
+      "expectedReason": "missing_required_field",
+      "record": {
+        "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+        "tagRecordId": "sidecar-tag:cm1592:missing-rollback",
+        "memoryId": "memory:cm1592:invalid-001",
+        "tagId": "tag:cm1592:invalid",
+        "tagLabel": "missing rollback",
+        "confidenceScore": 0.5,
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "derivedFromProjectionHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "createdAt": "2026-06-10T00:00:00Z",
+        "updatedAt": "2026-06-10T00:00:00Z",
+        "tombstoneSyncState": "active",
+        "cleanupPlanRef": "cleanup-plan:cm1592:sidecar-v1"
+      }
+    },
+    {
+      "id": "above-one-confidence",
+      "expectedReason": "invalid_confidence_score",
+      "record": {
+        "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+        "tagRecordId": "sidecar-tag:cm1592:above-one",
+        "memoryId": "memory:cm1592:invalid-002",
+        "tagId": "tag:cm1592:invalid",
+        "tagLabel": "above one confidence",
+        "confidenceScore": 1.01,
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "derivedFromProjectionHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "createdAt": "2026-06-10T00:00:00Z",
+        "updatedAt": "2026-06-10T00:00:00Z",
+        "tombstoneSyncState": "active",
+        "rollbackToken": "rollback:cm1592:above-one",
+        "cleanupPlanRef": "cleanup-plan:cm1592:sidecar-v1"
+      }
+    },
+    {
+      "id": "raw-private-field-present",
+      "expectedReason": "forbidden_raw_private_field",
+      "record": {
+        "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+        "tagRecordId": "sidecar-tag:cm1592:raw-private",
+        "memoryId": "memory:cm1592:invalid-003",
+        "tagId": "tag:cm1592:invalid",
+        "tagLabel": "raw private field",
+        "confidenceScore": 0.5,
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "derivedFromProjectionHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "createdAt": "2026-06-10T00:00:00Z",
+        "updatedAt": "2026-06-10T00:00:00Z",
+        "tombstoneSyncState": "active",
+        "rollbackToken": "rollback:cm1592:raw-private",
+        "cleanupPlanRef": "cleanup-plan:cm1592:sidecar-v1",
+        "rawText": "cm1592-raw-memory-body"
+      }
+    },
+    {
+      "id": "provider-token-shaped-value",
+      "expectedReason": "forbidden_raw_private_value",
+      "record": {
+        "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+        "tagRecordId": "sidecar-tag:cm1592:token",
+        "memoryId": "memory:cm1592:invalid-004",
+        "tagId": "tag:cm1592:invalid",
+        "tagLabel": "Bearer cm1592 token-shaped label",
+        "confidenceScore": 0.5,
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "derivedFromProjectionHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+        "createdAt": "2026-06-10T00:00:00Z",
+        "updatedAt": "2026-06-10T00:00:00Z",
+        "tombstoneSyncState": "active",
+        "rollbackToken": "rollback:cm1592:token",
+        "cleanupPlanRef": "cleanup-plan:cm1592:sidecar-v1"
+      }
+    },
+    {
+      "id": "path-like-record-id",
+      "expectedReason": "invalid_bounded_id",
+      "record": {
+        "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+        "tagRecordId": "A:/cm1592/should-not-leak/tag.json",
+        "memoryId": "memory:cm1592:invalid-005",
+        "tagId": "tag:cm1592:invalid",
+        "tagLabel": "path shaped id",
+        "confidenceScore": 0.5,
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "derivedFromProjectionHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+        "createdAt": "2026-06-10T00:00:00Z",
+        "updatedAt": "2026-06-10T00:00:00Z",
+        "tombstoneSyncState": "active",
+        "rollbackToken": "rollback:cm1592:path",
+        "cleanupPlanRef": "cleanup-plan:cm1592:sidecar-v1"
+      }
+    }
+  ],
+  "rollbackRules": [
+    {
+      "id": "cleanup-selector-is-low-disclosure",
+      "selector": {
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "rollbackToken": "rollback:cm1592:route-001",
+        "cleanupPlanRef": "cleanup-plan:cm1592:sidecar-v1"
+      },
+      "expected": {
+        "dryRunOnly": true,
+        "destructiveCleanupApproved": false,
+        "allowedSelectorKeys": [
+          "sourceVersion",
+          "rollbackToken",
+          "cleanupPlanRef"
+        ]
+      }
+    }
+  ],
+  "tombstoneSyncRules": [
+    {
+      "id": "active-memory-allows-contract-row",
+      "sourceLifecycleBucket": "active",
+      "expected": {
+        "tombstoneSyncState": "active",
+        "writeAllowedInFixture": false,
+        "failClosed": false
+      }
+    },
+    {
+      "id": "tombstoned-memory-suppresses-row",
+      "sourceLifecycleBucket": "tombstoned",
+      "expected": {
+        "tombstoneSyncState": "suppressed_by_tombstone",
+        "writeAllowedInFixture": false,
+        "failClosed": true
+      }
+    },
+    {
+      "id": "unknown-lifecycle-fails-closed",
+      "sourceLifecycleBucket": "unknown",
+      "expected": {
+        "tombstoneSyncState": "sync_pending_fail_closed",
+        "writeAllowedInFixture": false,
+        "failClosed": true
+      }
+    }
+  ]
+}

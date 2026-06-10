@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1591",
-  "validationId": "CMV-1695",
+  "taskId": "CM-1592",
+  "validationId": "CMV-1696",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1696",
+      "scope": "CM-1592 Sprint E sidecar tag store schema contract coverage",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_SIDECAR_SCHEMA_CONTRACT_COVERAGE_ADDED_NO_PERSISTENT_WRITE"
+    },
     {
       "id": "CMV-1695",
       "scope": "CM-1591 Sprint E persistent TagMemo enrichment governance preflight",
