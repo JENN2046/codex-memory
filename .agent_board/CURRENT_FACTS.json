@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1605",
-  "validationId": "CMV-1709",
+  "taskId": "CM-1606",
+  "validationId": "CMV-1710",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1710",
+      "scope": "CM-1606 persistent TagMemo enrichment proof execution decision",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_ATTEMPT_FAIL_CLOSED_NO_WRITE"
+    },
     {
       "id": "CMV-1709",
       "scope": "CM-1605 independent source audit for persistent TagMemo enrichment proof command skeleton",

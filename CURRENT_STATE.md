@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1605 independent source audit for persistent TagMemo enrichment proof command skeleton` |
-| Current validation | `CMV-1709` |
-| Current route | proof command skeleton audited; actual proof execution not started |
+| Current task | `CM-1606 persistent TagMemo enrichment proof execution decision` |
+| Current validation | `CMV-1710` |
+| Current route | post-audit execution approval received; command execution attempt failed closed with no persistent write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1606` adds `docs/CM1606_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_DECISION.md` and records receipt of exact approval `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT`. The bounded proof command was attempted against the audited skeleton. Dry-run returned `planned`; apply with the after-audit token returned `rejected / missing_exact_approval`; apply with the skeleton guard token returned `blocked / apply_stub_no_persistent_tag_write_executed`; tombstone sync proof returned `planned` with zero write limit. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1605` adds `docs/CM1605_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_SOURCE_AUDIT.md` and records an independent changed-scope source audit for the CM-1604 proof command skeleton. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. The skeleton is `IMPLEMENTED_AND_AUDITED`; dry-run planning is audited; `apply` remains a fail-closed stub; actual proof execution remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

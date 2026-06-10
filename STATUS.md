@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1605 independent source audit for persistent TagMemo enrichment proof command skeleton`.
-Current validation: `CMV-1709`.
+Current task: `CM-1606 persistent TagMemo enrichment proof execution decision`.
+Current validation: `CMV-1710`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_SKELETON_AUDITED_NO_WRITE`.
+Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_ATTEMPT_FAIL_CLOSED_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1606 persistent TagMemo enrichment proof execution decision: exact approval `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` was received and recorded in `docs/CM1606_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_DECISION.md`. The bounded proof command path was attempted against the audited skeleton. Dry-run returned `planned`; apply with the after-audit token returned `rejected / missing_exact_approval`; apply with the skeleton guard token returned `blocked / apply_stub_no_persistent_tag_write_executed`; tombstone sync proof returned `planned` with zero write limit. Persistent tag write is `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1605 independent source audit for persistent TagMemo enrichment proof command skeleton: added `docs/CM1605_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_SOURCE_AUDIT.md`. Changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`; proof command skeleton is `IMPLEMENTED_AND_AUDITED`; dry-run planning is `IMPLEMENTED_AND_AUDITED`; apply mode remains `FAIL_CLOSED_STUB_AUDITED`; actual proof execution is `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
