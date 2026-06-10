@@ -42,11 +42,17 @@ The first regression slice locks fixture shape, no-side-effect boundaries, forbi
 
 The second slice implements `createTagMemoRuntimeRecallProjection(...)` as an internal no-op projection adapter. It validates the runtime projection envelope, rejects forbidden raw/private keys and shaped values, maps bounded input into `composeTagMemoRecall(...)`, and returns a low-disclosure internal projection containing only candidate ids, bounded scores, stage names, and no-persistence/no-public-response flags.
 
+CM-1589 records independent changed-scope source audit:
+
+```text
+docs/CM1589_TAGMEMO_RUNTIME_RECALL_PROJECTION_SOURCE_AUDIT.md
+```
+
 ## Boundaries
 
 ```text
 runtime integration: INTERNAL_NOOP_PROJECTION_ONLY
-runtime no-op recall projection: IMPLEMENTED
+runtime no-op recall projection: IMPLEMENTED_AND_AUDITED
 persistent tag enrichment: NOT_STARTED
 provider/API: NOT_USED
 bearer token: NOT_USED

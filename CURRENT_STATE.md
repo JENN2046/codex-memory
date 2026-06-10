@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1588 TagMemo runtime recall no-op projection implementation` |
-| Current validation | `CMV-1692` |
-| Current route | Sprint D runtime recall no-op projection implemented internally; independent source audit next |
+| Current task | `CM-1589 TagMemo runtime recall projection source audit` |
+| Current validation | `CMV-1693` |
+| Current route | Sprint D runtime recall no-op projection implemented and audited; closeout next |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1589` adds `docs/CM1589_TAGMEMO_RUNTIME_RECALL_PROJECTION_SOURCE_AUDIT.md` and records independent changed-scope audit pass for `src/tagmemo/runtime-recall-projection.js`, `tests/tagmemo-runtime-recall-projection.test.js`, the Sprint D fixture, and execution evidence. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Runtime no-op recall projection is `IMPLEMENTED_AND_AUDITED`; projection remains non-persistent, internal-only, outside public MCP response contracts, and outside `search_memory` public response changes. Public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1588` adds `src/tagmemo/runtime-recall-projection.js` and expands `tests/tagmemo-runtime-recall-projection.test.js`. The internal adapter validates bounded runtime recall projection input, rejects forbidden raw/private fields and shaped values, maps safe input into `composeTagMemoRecall(...)`, and returns only internal no-op projection output. Projection is not persisted, does not enter public MCP responses, does not change `search_memory` public response contract, and exposes no public rank reasons. Runtime live proof remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

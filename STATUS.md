@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1588 TagMemo runtime recall no-op projection implementation`.
-Current validation: `CMV-1692`.
+Current task: `CM-1589 TagMemo runtime recall projection source audit`.
+Current validation: `CMV-1693`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_RUNTIME_RECALL_NOOP_PROJECTION_IMPLEMENTED_NO_PERSISTENCE_NO_PUBLIC_RESPONSE`.
+Current route: `TAGMEMO_RUNTIME_RECALL_NOOP_PROJECTION_IMPLEMENTED_AND_AUDITED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1589 TagMemo runtime recall projection source audit: added `docs/CM1589_TAGMEMO_RUNTIME_RECALL_PROJECTION_SOURCE_AUDIT.md`. Independent changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Runtime no-op recall projection is `IMPLEMENTED_AND_AUDITED`; projection remains non-persistent, internal-only, outside public MCP response contracts, and outside `search_memory` public response changes. Public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1588 TagMemo runtime recall no-op projection implementation: added `src/tagmemo/runtime-recall-projection.js` and expanded `tests/tagmemo-runtime-recall-projection.test.js`. The internal adapter validates bounded runtime recall projection input, rejects forbidden raw/private fields and shaped values, maps safe input into `composeTagMemoRecall(...)`, and returns only internal no-op projection output. Projection is not persisted, does not enter public MCP responses, does not change `search_memory` public response contract, and exposes no public rank reasons. Runtime live proof remains `NOT_EXECUTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no confirmed mutation; no public MCP expansion; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

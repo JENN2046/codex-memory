@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1588 TagMemo runtime recall no-op projection implementation`.
-Current validation: `CMV-1692`.
+Current checkpoint: `CM-1589 TagMemo runtime recall projection source audit`.
+Current validation: `CMV-1693`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1589 TagMemo Runtime Recall Projection Source Audit
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_RECALL_PROJECTION_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1589_TAGMEMO_RUNTIME_RECALL_PROJECTION_SOURCE_AUDIT.md`.
+- Reviewed `src/tagmemo/runtime-recall-projection.js`.
+- Reviewed `tests/tagmemo-runtime-recall-projection.test.js`.
+- Reviewed `tests/fixtures/tagmemo-runtime-recall-projection-sprint-d-v1.json`.
+- Reviewed `docs/V8_TAGMEMO_RUNTIME_RECALL_INTEGRATION_SPRINT_D_EXECUTION.md`.
+- Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`.
+- Confirmed the adapter imports only `./recall-composition`.
+- Confirmed bounded input only, low-disclosure empty/rejected/composition-failure paths, no persistence, no public MCP response exposure, and no `search_memory` public contract change.
+- Runtime no-op recall projection is `IMPLEMENTED_AND_AUDITED`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1693` source audit validation.
 
 ## CM-1588 TagMemo Runtime Recall No-Op Projection Implementation
 
