@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1612 persistent TagMemo enrichment proof execution under dual-token gate`.
-Current validation: `CMV-1716`.
-Current handoff: exact-approved command attempt completed; apply remains gated no-write; persistent tag write remains blocked.
+Current task: `CM-1613 persistent TagMemo write-capable implementation gap decision`.
+Current validation: `CMV-1717`.
+Current handoff: implementation gap decision recorded; write-capable implementation preflight required; persistent tag write remains blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: exact-approved command attempt completed; apply remains gated n
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_PERSISTENT_TAGMEMO_PROOF_COMMAND_ATTEMPT_GATED_NO_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_WRITE_CAPABLE_GAP_DECISION_RECORDED_NO_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1613 added `docs/CM1613_PERSISTENT_TAGMEMO_WRITE_CAPABLE_IMPLEMENTATION_GAP_DECISION.md` and records the post-CM-1612 implementation gap decision. CM-1612 is not persistent write success. Current command supports dry-run planning and gated no-write apply only; after both exact tokens match, source `apply` returns `gated / ready_for_proof_no_write` and does not call a write-capable persistence adapter. Rollback remains `blocked / rollback_stub_no_mutation_executed` because no mutation occurred. Decision: `WRITE_CAPABLE_IMPLEMENTATION_PREFLIGHT_REQUIRED`. Write-capable implementation remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; future source change, independent source audit, and future exact proof execution approval are required. No persistent tag write, persistent enrichment success claim, provider/API, bearer token, raw scan, broad memory scan, live MCP proof, confirmed mutation, second effective `record_memory` write, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1612 added `docs/CM1612_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_UNDER_DUAL_TOKEN_GATE.md` and records exact-approved bounded command execution under the dual-token gate. Dry-run returned `planned` with one requested write and zero executed writes. Dual-token apply matched both tokens but returned `gated / ready_for_proof_no_write`, with `writeCountExecuted=0`, `persistentTagRecordsWritten=0`, and `persistentTagWrites=0`. Dedicated tombstone zero-write proof returned `planned`; active tombstone negative control rejected fail-closed; rollback returned `blocked / rollback_stub_no_mutation_executed`. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; current command write capability remains `NOT_IMPLEMENTED`. No proof-side confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live MCP proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1611 added `docs/CM1611_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXACT_APPROVAL_GATE.md` and opens the exact approval gate for a future persistent TagMemo enrichment proof execution task. Gate status is `OPEN_AWAITING_OPERATOR_APPROVAL`; approval is not granted by CM-1611; proof execution is not authorized by CM-1611. Future execution requires a fresh operator message containing both `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`. Current `apply` still returns `gated / ready_for_proof_no_write` with zero writes. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_EXECUTED`. No proof-side confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1610 added `docs/CM1610_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_READINESS_GATE_REVIEW.md` and records targeted readiness gate review for the future persistent TagMemo enrichment proof. Review result: `PASS_READY_TO_REQUEST_EXACT_APPROVAL`. It confirms CM-1608/CM-1609 dual-token guard evidence and approval-envelope consistency are coherent enough to request a separate exact approval packet, but it does not authorize or execute proof. Future execution must require both `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`; current `apply` still returns `gated / ready_for_proof_no_write` with zero writes. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_EXECUTED`. No proof-side confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1612",
-  "validationId": "CMV-1716",
+  "taskId": "CM-1613",
+  "validationId": "CMV-1717",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1717",
+      "scope": "CM-1613 persistent TagMemo write-capable implementation gap decision",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_WRITE_CAPABLE_GAP_DECISION_RECORDED_NO_WRITE"
+    },
     {
       "id": "CMV-1716",
       "scope": "CM-1612 persistent TagMemo enrichment proof execution under dual-token gate",
@@ -1053,7 +1058,8 @@
     "real query quality proof",
     "startup/watchdog warning source change",
     "raw audit or broad store scan",
-    "persistent TagMemo enrichment proof command implementation",
+    "persistent TagMemo write-capable proof implementation",
+    "persistent TagMemo write-capable implementation source audit",
     "persistent TagMemo enrichment proof execution",
     "persistent runtime tag extraction enrichment",
     "complete V8 implementation",

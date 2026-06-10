@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1612 persistent TagMemo enrichment proof execution under dual-token gate`.
-Current validation: `CMV-1716`.
+Current checkpoint: `CM-1613 persistent TagMemo write-capable implementation gap decision`.
+Current validation: `CMV-1717`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1613 Persistent TagMemo Write-Capable Implementation Gap Decision
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_WRITE_CAPABLE_GAP_DECISION_RECORDED_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1613_PERSISTENT_TAGMEMO_WRITE_CAPABLE_IMPLEMENTATION_GAP_DECISION.md`.
+- Confirmed CM-1612 is not persistent write success.
+- Confirmed current command supports dry-run planning and gated no-write apply only.
+- Confirmed source `apply` returns `gated / ready_for_proof_no_write` after both tokens match.
+- Confirmed no write-capable persistence adapter is called after token validation.
+- Confirmed rollback remains `blocked / rollback_stub_no_mutation_executed` because no mutation occurred.
+- Recorded decision `WRITE_CAPABLE_IMPLEMENTATION_PREFLIGHT_REQUIRED`.
+- Confirmed write-capable implementation remains `NOT_STARTED`.
+- Confirmed persistent tag write remains `STILL_BLOCKED`.
+- Confirmed future source change, independent audit, and future exact proof execution approval remain required before write-capable proof success can be claimed.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live MCP proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1717` docs gap decision validation.
 
 ## CM-1612 Persistent TagMemo Enrichment Proof Execution Under Dual-Token Gate
 

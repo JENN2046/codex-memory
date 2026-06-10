@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1612 persistent TagMemo enrichment proof execution under dual-token gate` |
-| Current validation | `CMV-1716` |
-| Current route | exact-approved command attempt completed; current apply remains gated no-write; persistent write still blocked |
+| Current task | `CM-1613 persistent TagMemo write-capable implementation gap decision` |
+| Current validation | `CMV-1717` |
+| Current route | write-capable implementation gap decision recorded; persistent write still blocked pending separate source preflight |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1613` adds `docs/CM1613_PERSISTENT_TAGMEMO_WRITE_CAPABLE_IMPLEMENTATION_GAP_DECISION.md` and records the implementation gap decision after CM-1612. The decision confirms CM-1612 is not persistent write success: the current command supports dry-run planning and gated no-write apply only; `src/tagmemo/persistent-enrichment-proof-command.js` returns `gated / ready_for_proof_no_write` after both tokens match and does not call a write-capable persistence adapter. Rollback remains `blocked / rollback_stub_no_mutation_executed` because no mutation occurred. Decision is `WRITE_CAPABLE_IMPLEMENTATION_PREFLIGHT_REQUIRED`. Write-capable implementation remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; future source change, independent audit, and fresh exact proof execution approval are required before any write-capable proof can succeed. No persistent tag write, persistent enrichment success claim, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live MCP proof, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 `CM-1612` adds `docs/CM1612_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_UNDER_DUAL_TOKEN_GATE.md` and records exact-approved bounded command execution under the dual-token gate. The operator supplied both required tokens. Dry-run returned `planned` with `writeCountRequested=1` and zero executed writes. Dual-token apply matched both tokens but returned `gated / ready_for_proof_no_write` with `writeCountExecuted=0`, `persistentTagRecordsWritten=0`, and `boundaryCounters.persistentTagWrites=0`. Tombstone zero-write proof returned `planned` for the dedicated tombstone case; active-case tombstone negative control rejected with `write_count_exceeds_limit`; rollback returned `blocked / rollback_stub_no_mutation_executed`. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; current command write capability remains `NOT_IMPLEMENTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live MCP proof, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
@@ -391,7 +393,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1556 records independent source audit pass for the deterministic TagMemo tag extraction core. Next safe action, if selected after CM-1556 remote sync, is a separate runtime integration preflight to decide whether and how `src/tagmemo/tag-extraction.js` may be wired into write/recall flows. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, live proof, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, production-readiness claims, and complete V8 claims remain separate approval-bound work.
+CM-1613 records the persistent TagMemo write-capable implementation gap decision. Next safe action, if selected after CM-1613 validation and sync, is `CM-1614 persistent TagMemo write-capable proof implementation preflight`. That route should remain preflight-only unless separately authorized for source changes. Persistent tag write success, persistent enrichment success, future proof execution, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
 
 ## Boundaries
 
