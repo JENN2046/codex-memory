@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1594",
-  "validationId": "CMV-1698",
+  "taskId": "CM-1595",
+  "validationId": "CMV-1699",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1699",
+      "scope": "CM-1595 Sprint E sidecar persistence adapter contract closeout and dry-run adapter preflight",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_BASELINE_COMPLETED_TEST_ONLY_DRY_RUN_PREFLIGHT_RECORDED_NO_IMPLEMENTATION_NO_PERSISTENT_WRITE"
+    },
     {
       "id": "CMV-1698",
       "scope": "CM-1594 Sprint E sidecar persistence adapter contract coverage",

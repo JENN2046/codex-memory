@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1594 Sprint E sidecar persistence adapter contract coverage`.
-Current validation: `CMV-1698`.
-Current handoff: Sprint E sidecar persistence adapter contract coverage is fixture/test-only; adapter implementation and persistent tag write remain not started and approval-bound.
+Current task: `CM-1595 Sprint E sidecar persistence adapter contract closeout and dry-run adapter preflight`.
+Current validation: `CMV-1699`.
+Current handoff: Sprint E sidecar persistence adapter contract baseline is completed test-only; dry-run adapter implementation and persistent tag write remain not started.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Sprint E sidecar persistence adapter contract coverage is fixtu
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_COVERAGE_ADDED_NO_IMPLEMENTATION_NO_PERSISTENT_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_BASELINE_COMPLETED_TEST_ONLY_DRY_RUN_PREFLIGHT_RECORDED_NO_IMPLEMENTATION_NO_PERSISTENT_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1595 added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_CLOSEOUT_AND_DRY_RUN_PREFLIGHT.md`. It closes the sidecar persistence adapter contract as `BASELINE_COMPLETED_TEST_ONLY`, records dry-run/no-op adapter implementation boundary, acceptance criteria, rollback/cleanup/tombstone sync rules, and exact approval gate draft. Persistence adapter implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no persistent tag write, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1594 added `tests/fixtures/tagmemo-sidecar-persistence-adapter-sprint-e-v1.json`, `tests/tagmemo-sidecar-persistence-adapter-contract.test.js`, and `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT.md`. It records fixture/test-only coverage for bounded adapter input, dry-run output, rollback/cleanup determinism, tombstone sync determinism, forbidden raw/private/provider/token/API-shaped surface stripping, and seven-tool public MCP surface. Persistence adapter implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no persistent tag write, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1593 added `docs/V8_TAGMEMO_SIDECAR_SCHEMA_CLOSEOUT_AND_PERSISTENCE_ADAPTER_PREFLIGHT.md`. It closes the sidecar schema contract as `BASELINE_COMPLETED_TEST_ONLY`, records persistence adapter as `NOT_STARTED`, drafts a dry-run-first adapter boundary, exact approval gate, rollback/cleanup rules, and tombstone sync fail-closed strategy. Persistent tag enrichment remains `NOT_STARTED`; no persistent tag write, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1592 added `tests/fixtures/tagmemo-sidecar-schema-sprint-e-v1.json`, `tests/tagmemo-sidecar-schema-contract.test.js`, and `docs/V8_TAGMEMO_SIDECAR_SCHEMA_CONTRACT.md`. It records contract-only / test-only sidecar schema coverage for bounded tag records, rollback/cleanup selectors, tombstone sync fail-closed rules, forbidden raw/private field rejection, and seven-tool public MCP surface. Persistent tag enrichment remains `NOT_STARTED`; no persistent tag write, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.

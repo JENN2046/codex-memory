@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1594 Sprint E sidecar persistence adapter contract coverage`.
-Current validation: `CMV-1698`.
+Current task: `CM-1595 Sprint E sidecar persistence adapter contract closeout and dry-run adapter preflight`.
+Current validation: `CMV-1699`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_COVERAGE_ADDED_NO_IMPLEMENTATION_NO_PERSISTENT_WRITE`.
+Current route: `TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_BASELINE_COMPLETED_TEST_ONLY_DRY_RUN_PREFLIGHT_RECORDED_NO_IMPLEMENTATION_NO_PERSISTENT_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1595 Sprint E sidecar persistence adapter contract closeout and dry-run adapter preflight: added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_CLOSEOUT_AND_DRY_RUN_PREFLIGHT.md`. This docs-only closeout records `sidecar persistence adapter contract: BASELINE_COMPLETED_TEST_ONLY` and future dry-run/no-op adapter implementation boundary. Persistence adapter implementation is `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1594 Sprint E sidecar persistence adapter contract coverage: added `tests/fixtures/tagmemo-sidecar-persistence-adapter-sprint-e-v1.json`, `tests/tagmemo-sidecar-persistence-adapter-contract.test.js`, and `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT.md`. This fixture/test-only contract locks bounded adapter input, dry-run output, rollback/cleanup determinism, tombstone sync determinism, forbidden raw/private/provider/token/API-shaped surface stripping, and seven-tool public MCP surface. Persistence adapter implementation is `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

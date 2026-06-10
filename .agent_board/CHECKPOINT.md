@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1594 Sprint E sidecar persistence adapter contract coverage`.
-Current validation: `CMV-1698`.
+Current checkpoint: `CM-1595 Sprint E sidecar persistence adapter contract closeout and dry-run adapter preflight`.
+Current validation: `CMV-1699`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1595 Sprint E Sidecar Persistence Adapter Contract Closeout And Dry-Run Adapter Preflight
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_BASELINE_COMPLETED_TEST_ONLY_DRY_RUN_PREFLIGHT_RECORDED_NO_IMPLEMENTATION_NO_PERSISTENT_WRITE`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_CLOSEOUT_AND_DRY_RUN_PREFLIGHT.md`.
+- Closed sidecar persistence adapter contract as `BASELINE_COMPLETED_TEST_ONLY`.
+- Recorded dry-run/no-op adapter implementation boundary.
+- Recorded rollback / cleanup / tombstone sync acceptance criteria.
+- Recorded exact approval gate draft for any future non-dry-run persistent tag write.
+- Persistence adapter implementation remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- No persistent tag write occurred.
+- No second effective `record_memory` write occurred.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1699` docs closeout/preflight validation.
 
 ## CM-1594 Sprint E Sidecar Persistence Adapter Contract Coverage
 

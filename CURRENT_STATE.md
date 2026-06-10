@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1594 Sprint E sidecar persistence adapter contract coverage` |
-| Current validation | `CMV-1698` |
-| Current route | Sidecar persistence adapter contract-only/test-only coverage recorded; persistent tag write remains not started |
+| Current task | `CM-1595 Sprint E sidecar persistence adapter contract closeout and dry-run adapter preflight` |
+| Current validation | `CMV-1699` |
+| Current route | Sidecar persistence adapter contract baseline completed test-only; dry-run adapter preflight recorded; persistent tag write remains not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1595` adds `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_CLOSEOUT_AND_DRY_RUN_PREFLIGHT.md`. It closes sidecar persistence adapter contract as `BASELINE_COMPLETED_TEST_ONLY` and records future dry-run/no-op adapter implementation boundary, rollback/cleanup/tombstone sync acceptance criteria, and exact approval gate draft. Persistence adapter implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1594` adds `tests/fixtures/tagmemo-sidecar-persistence-adapter-sprint-e-v1.json`, `tests/tagmemo-sidecar-persistence-adapter-contract.test.js`, and `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT.md`. This fixture/test-only contract locks bounded adapter input, dry-run output, rollback/cleanup determinism, tombstone sync determinism, forbidden raw/private/provider/token/API-shaped surface stripping, and seven-tool public MCP surface. Persistence adapter implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no persistent tag write occurred; no second effective `record_memory` write occurred; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
