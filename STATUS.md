@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1577 association recall source audit`.
-Current validation: `CMV-1681`.
+Current task: `CM-1578 simple time-decay scoring baseline`.
+Current validation: `CMV-1682`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `SPRINT_B_ASSOCIATION_RECALL_IMPLEMENTED_AND_AUDITED_NEXT_TIME_DECAY_BASELINE`.
+Current route: `SPRINT_B_TIME_DECAY_SCORING_IMPLEMENTED_AND_AUDITED_NEXT_FINAL_CLOSEOUT`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1578 simple time-decay scoring baseline: added `src/tagmemo/time-decay-scoring.js`, `tests/fixtures/tagmemo-time-decay-scoring-sprint-b-v1.json`, `tests/tagmemo-time-decay-scoring.test.js`, and `docs/V8_TAGMEMO_TIME_DECAY_SCORING_BASELINE.md`. The internal pure function accepts bounded safe-recency and safe evidence hints; outputs deterministic bounded `timeDecayScore`, `timeDecayBand`, `decayReasons`, and `decayVersion=deterministic_v1`; merges duplicate signals; and returns low-disclosure empty/rejected results. Targeted validation passed `10/10`. Time-decay scoring baseline is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; persistent decay state is `NOT_STARTED`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1577 association recall source audit: added `docs/CM1577_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT.md`. Independent changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Association recall baseline is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; relation graph persistence is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 

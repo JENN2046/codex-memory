@@ -4,11 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1577 association recall source audit`.
-Current validation: `CMV-1681`.
+Current checkpoint: `CM-1578 simple time-decay scoring baseline`.
+Current validation: `CMV-1682`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1578 Simple Time-Decay Scoring Baseline
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_TIME_DECAY_SCORING_BASELINE_IMPLEMENTED_AND_AUDITED`
+
+Recorded:
+
+- Added `src/tagmemo/time-decay-scoring.js`.
+- Added `tests/fixtures/tagmemo-time-decay-scoring-sprint-b-v1.json`.
+- Added `tests/tagmemo-time-decay-scoring.test.js`.
+- Added `docs/V8_TAGMEMO_TIME_DECAY_SCORING_BASELINE.md`.
+- Implemented internal deterministic pure function `scoreTimeDecay(...)`.
+- Confirmed bounded safe-recency input, deterministic score/band/reasons, duplicate signal merge, low-disclosure empty/rejected output, and forbidden raw/private field rejection.
+- Targeted validation passed `10/10`.
+- Recorded time-decay scoring baseline as `IMPLEMENTED_AND_AUDITED`.
+- Runtime integration remains `NOT_STARTED`.
+- Persistent decay state remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Raw scan and broad memory scan remain `NOT_RUN`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, confirmed mutation, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1682` source/test/docs changed-scope validation.
 
 ## CM-1577 Association Recall Source Audit
 

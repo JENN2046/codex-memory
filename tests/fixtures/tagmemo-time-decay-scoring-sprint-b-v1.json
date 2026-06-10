@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "tagmemo-time-decay-scoring-fixture-v1",
+  "scope": "Sprint B deterministic TagMemo time-decay scoring baseline",
+  "boundaries": {
+    "fixtureOnly": true,
+    "providerApiCalls": 0,
+    "bearerTokenUse": 0,
+    "rawScan": false,
+    "broadMemoryScan": false,
+    "persistentTagEnrichment": false,
+    "publicMcpExpansion": false,
+    "effectiveRecordMemoryWrites": 0,
+    "completeV8Claimed": false,
+    "productionReleaseCutoverReady": false
+  },
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "forbiddenFragments": [
+    "cm1578-provider-endpoint",
+    "cm1578-token-fragment",
+    "cm1578-bearer-fragment",
+    "cm1578-raw-memory-body",
+    "A:/cm1578/must-not-leak"
+  ],
+  "cases": [
+    {
+      "id": "recent-high",
+      "input": {
+        "schemaVersion": "tagmemo-time-decay-scoring-input-v1",
+        "memoryId": "memory:cm1578:recent",
+        "safeRecency": {
+          "bucket": "current",
+          "sequence": 2
+        },
+        "safeEvidenceHints": [
+          "decision",
+          "proof"
+        ]
+      },
+      "expected": {
+        "timeDecayBand": "high",
+        "requiredReasons": [
+          "recency_bucket_current",
+          "durable_evidence_retention"
+        ]
+      }
+    },
+    {
+      "id": "older-durable-medium",
+      "input": {
+        "schemaVersion": "tagmemo-time-decay-scoring-input-v1",
+        "memoryId": "memory:cm1578:older-durable",
+        "safeRecency": {
+          "bucket": "older",
+          "sequence": 1
+        },
+        "safeEvidenceHints": [
+          "decision",
+          "route",
+          "blocker"
+        ]
+      },
+      "expected": {
+        "timeDecayBand": "medium",
+        "requiredReasons": [
+          "recency_bucket_older",
+          "durable_evidence_retention"
+        ]
+      }
+    },
+    {
+      "id": "temporary-archival-low",
+      "input": {
+        "schemaVersion": "tagmemo-time-decay-scoring-input-v1",
+        "memoryId": "memory:cm1578:temporary",
+        "safeRecency": {
+          "bucket": "archival",
+          "sequence": 0
+        },
+        "safeEvidenceHints": [
+          "temporary",
+          "scratch",
+          "draft"
+        ]
+      },
+      "expected": {
+        "timeDecayBand": "low",
+        "requiredReasons": [
+          "recency_bucket_archival",
+          "temporary_status_decay"
+        ]
+      }
+    },
+    {
+      "id": "duplicate-signal-merged",
+      "input": {
+        "schemaVersion": "tagmemo-time-decay-scoring-input-v1",
+        "memoryId": "memory:cm1578:duplicate",
+        "safeRecency": {
+          "bucket": "stable",
+          "sequence": 1
+        },
+        "safeEvidenceHints": [
+          "proof",
+          "proof",
+          "receipt"
+        ]
+      },
+      "expected": {
+        "timeDecayBand": "medium",
+        "requiredReasons": [
+          "durable_evidence_retention",
+          "duplicate_signal_merged"
+        ]
+      }
+    },
+    {
+      "id": "empty-low-disclosure",
+      "input": {
+        "schemaVersion": "tagmemo-time-decay-scoring-input-v1",
+        "memoryId": "memory:cm1578:empty",
+        "safeRecency": {
+          "bucket": "unknown",
+          "sequence": 0
+        },
+        "safeEvidenceHints": []
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "empty_input",
+        "timeDecayBand": "low"
+      }
+    },
+    {
+      "id": "forbidden-provider-token-raw-rejected",
+      "input": {
+        "schemaVersion": "tagmemo-time-decay-scoring-input-v1",
+        "memoryId": "memory:cm1578:forbidden",
+        "safeRecency": {
+          "bucket": "recent",
+          "sequence": 1
+        },
+        "safeEvidenceHints": [
+          "cm1578-token-fragment"
+        ],
+        "rawText": "cm1578-raw-memory-body",
+        "authorization": "Bearer cm1578-bearer-fragment",
+        "filePath": "A:/cm1578/must-not-leak",
+        "providerEndpoint": "cm1578-provider-endpoint"
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "forbidden_raw_private_field"
+      }
+    }
+  ]
+}
