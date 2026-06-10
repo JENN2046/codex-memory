@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1568 TagMemo recall ranking source audit` |
-| Current validation | `CMV-1672` |
-| Current route | Recall ranking baseline implemented and audited |
+| Current task | `CM-1569 V8 TagMemo recall foundation Sprint A closeout` |
+| Current validation | `CMV-1673` |
+| Current route | V8 TagMemo recall foundation Sprint A completed; final validation and push pending |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1569` adds `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_CLOSEOUT.md` and records `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_COMPLETED`. Completed items: TagMemo minimal schema baseline, deterministic tag extraction contract, deterministic tag extraction core, runtime no-op projection, importance scoring baseline, and recall ranking baseline. Remaining V8 gaps are persistent tag enrichment, public MCP expansion, deep recall query expansion, relation graph / association recall, time decay advanced model, memory consolidation, and reflection / metacognitive memory. Public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad scan not run; no confirmed mutation, live proof, second effective `record_memory` write, persistent enrichment, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 `CM-1568` adds `docs/CM1568_TAGMEMO_RECALL_RANKING_SOURCE_AUDIT.md` and records an independent changed-scope source audit of the CM-1567 deterministic TagMemo recall ranking core. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/recall-ranking.js`, `tests/tagmemo-recall-ranking.test.js`, the Sprint A fixture, and baseline docs. Confirmed internal pure-function behavior, bounded input validation, low-disclosure empty/rejected output, deterministic ranked candidates, bounded score/reasons, importance and safe recency participation, forbidden raw/private rejection, no provider/API or bearer token path, no raw scan, no live search, no public MCP expansion, no effective `record_memory` write, no confirmed mutation, no production/release/cutover readiness claim, and no complete V8 claim. Recall ranking baseline is `IMPLEMENTED_AND_AUDITED`; persistent tag enrichment remains `NOT_STARTED`.
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1568 TagMemo recall ranking source audit`.
-Current validation: `CMV-1672`.
+Current task: `CM-1569 V8 TagMemo recall foundation Sprint A closeout`.
+Current validation: `CMV-1673`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_RECALL_RANKING_BASELINE_IMPLEMENTED_AND_AUDITED`.
+Current route: `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_COMPLETED_PENDING_FINAL_VALIDATION_AND_PUSH`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1569 V8 TagMemo recall foundation Sprint A closeout: added `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_CLOSEOUT.md` and recorded `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_COMPLETED`. Completed items: TagMemo minimal schema baseline `COMPLETED`; deterministic tag extraction contract `COMPLETED`; deterministic tag extraction core `IMPLEMENTED_AND_AUDITED`; runtime no-op projection `IMPLEMENTED_AND_AUDITED`; importance scoring baseline `IMPLEMENTED_AND_AUDITED`; recall ranking baseline `IMPLEMENTED_AND_AUDITED`. Remaining gaps: persistent tag enrichment `NOT_STARTED`; public MCP expansion `NOT_STARTED`; deep recall query expansion `NOT_STARTED`; relation graph / association recall `NOT_STARTED`; time decay advanced model `NOT_STARTED`; memory consolidation `NOT_STARTED`; reflection / metacognitive memory `NOT_STARTED`; complete V8 `NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. Public MCP surface remains seven tools. No provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, second effective `record_memory` write, persistent enrichment, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 CM-1568 TagMemo recall ranking source audit: added `docs/CM1568_TAGMEMO_RECALL_RANKING_SOURCE_AUDIT.md`. Independent changed-scope source audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the recall ranking baseline is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no confirmed mutation; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. Targeted validation remained `10/10`.
 

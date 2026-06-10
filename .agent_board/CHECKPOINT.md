@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1568 TagMemo recall ranking source audit`.
-Current validation: `CMV-1672`.
+Current checkpoint: `CM-1569 V8 TagMemo recall foundation Sprint A closeout`.
+Current validation: `CMV-1673`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1569 V8 TagMemo Recall Foundation Sprint A Closeout
+
+Status: `COMPLETED_VALIDATED_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_COMPLETED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_CLOSEOUT.md`.
+- Closed Sprint A as `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_A_COMPLETED`.
+- Recorded TagMemo minimal schema baseline as `COMPLETED`.
+- Recorded deterministic tag extraction contract as `COMPLETED`.
+- Recorded deterministic tag extraction core as `IMPLEMENTED_AND_AUDITED`.
+- Recorded runtime no-op projection as `IMPLEMENTED_AND_AUDITED`.
+- Recorded importance scoring baseline as `IMPLEMENTED_AND_AUDITED`.
+- Recorded recall ranking baseline as `IMPLEMENTED_AND_AUDITED`.
+- Recorded persistent tag enrichment, public MCP expansion, deep recall query expansion, relation graph / association recall, time decay advanced model, memory consolidation, and reflection / metacognitive memory as `NOT_STARTED`.
+- Confirmed complete V8 is `NOT_CLAIMED`.
+- Confirmed production/release/cutover ready remain `NO`.
+
+Validation: `CMV-1673` closeout changed-scope validation plus final validation after commit.
 
 ## CM-1568 TagMemo Recall Ranking Source Audit
 
