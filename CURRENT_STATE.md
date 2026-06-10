@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1614 persistent TagMemo write-capable proof implementation preflight` |
-| Current validation | `CMV-1718` |
-| Current route | write-capable proof implementation preflight recorded; next route is fixture/test contract before source implementation |
+| Current task | `CM-1615 persistent TagMemo write-capable proof fixture/test contract coverage` |
+| Current validation | `CMV-1719` |
+| Current route | write-capable proof contract baseline completed test-only; next route is source implementation preflight/implementation without proof execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1615` adds `tests/fixtures/tagmemo-write-capable-proof-contract-cm1615-v1.json`, `tests/tagmemo-write-capable-proof-contract.test.js`, and `docs/CM1615_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_CONTRACT_COVERAGE.md`. The fixture/test-only baseline locks the future write-capable proof contract for dual-token guard, explicit write-capable proof flag, `maxWriteCount=1`, expected dry-run plan hash match, temp-local sidecar proof target, low-disclosure output, rollback/cleanup/tombstone hashes, forbidden raw/private/provider/token/API-shaped rejection, and unchanged seven-tool public MCP surface. The targeted test also confirms the current command still returns `gated / ready_for_proof_no_write` with zero executed writes under dual tokens. Source implementation remains `NOT_STARTED`; proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; future proof execution remains separate exact-approval work. No persistent tag write, persistent enrichment success claim, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live MCP proof, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 `CM-1614` adds `docs/CM1614_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_IMPLEMENTATION_PREFLIGHT.md` and records the write-capable proof implementation preflight. It does not implement write capability and does not execute proof. The selected route is fixture/test contract coverage before source implementation. Future implementation must keep write capability behind dual-token guard, explicit write-capable proof flag, `maxWriteCount=1`, expected dry-run plan hash match, temp-local sidecar proof target, low-disclosure output, rollback/cleanup/tombstone deterministic behavior, and unchanged seven-tool public MCP surface. Write-capable implementation remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; future proof execution remains separate exact-approval work. No persistent tag write, persistent enrichment success claim, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live MCP proof, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
@@ -395,7 +397,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1614 records the persistent TagMemo write-capable proof implementation preflight. Next safe action, if selected after CM-1614 validation and sync, is `CM-1615 persistent TagMemo write-capable proof fixture/test contract coverage`. That route should remain fixture/test-only unless separately authorized for source implementation. Persistent tag write success, persistent enrichment success, future proof execution, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
+CM-1615 records persistent TagMemo write-capable proof fixture/test-only contract coverage. Next safe action, if selected after CM-1615 validation and sync, is `CM-1616 persistent TagMemo write-capable proof source implementation` or a source-implementation preflight, still without proof execution. Persistent tag write success, persistent enrichment success, future proof execution, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
 
 ## Boundaries
 

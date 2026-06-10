@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1614",
-  "validationId": "CMV-1718",
+  "taskId": "CM-1615",
+  "validationId": "CMV-1719",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1719",
+      "scope": "CM-1615 persistent TagMemo write-capable proof fixture/test contract coverage",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_CONTRACT_COVERAGE_TEST_ONLY_NO_WRITE"
+    },
     {
       "id": "CMV-1718",
       "scope": "CM-1614 persistent TagMemo write-capable proof implementation preflight",
@@ -1063,7 +1068,6 @@
     "real query quality proof",
     "startup/watchdog warning source change",
     "raw audit or broad store scan",
-    "persistent TagMemo write-capable proof fixture/test contract coverage",
     "persistent TagMemo write-capable proof source implementation",
     "persistent TagMemo write-capable implementation source audit",
     "persistent TagMemo enrichment proof execution",
