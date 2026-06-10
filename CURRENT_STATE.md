@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1608 persistent TagMemo proof command dual-token guard implementation` |
-| Current validation | `CMV-1712` |
-| Current route | dual-token guard implemented; apply returns gated no-write; persistent write still blocked |
+| Current task | `CM-1609 independent source audit for persistent TagMemo dual-token guard` |
+| Current validation | `CMV-1713` |
+| Current route | dual-token guard implemented and audited; proof execution and persistent write still blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1609` adds `docs/CM1609_PERSISTENT_TAGMEMO_DUAL_TOKEN_GUARD_SOURCE_AUDIT.md` and records independent changed-scope source audit pass for the CM-1608 dual-token guard. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed `apply` requires both `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`; missing either token fails closed; both tokens return `gated / ready_for_proof_no_write`; `maxWriteCount=1`, temp-local sidecar target, low-disclosure output, and seven-tool public MCP surface remain preserved. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1608` adds the dual-token guard to `src/tagmemo/persistent-enrichment-proof-command.js`, updates `scripts/tagmemo-enrichment-proof.js`, updates `tests/fixtures/tagmemo-persistent-enrichment-proof-command-sprint-e-v1.json`, updates `tests/tagmemo-persistent-enrichment-proof-command.test.js`, and adds `docs/CM1608_PERSISTENT_TAGMEMO_DUAL_TOKEN_GUARD.md`. Apply mode now requires both `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`. Missing either token fails closed; both tokens return `gated / ready_for_proof_no_write`. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

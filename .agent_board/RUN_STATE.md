@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1608 persistent TagMemo proof command dual-token guard implementation`.
-Current validation: `CMV-1712`.
+Current task: `CM-1609 independent source audit for persistent TagMemo dual-token guard`.
+Current validation: `CMV-1713`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1608` implements the dual-token guard. Apply now requires both the operator execution token and skeleton guard token; missing either token fails closed, and both tokens return `gated / ready_for_proof_no_write` with zero writes. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`. The next safe route is independent source audit, not proof execution. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1609` records independent changed-scope source audit pass for the CM-1608 dual-token guard. Apply requires both the operator execution token and skeleton guard token; missing either token fails closed, and both tokens return `gated / ready_for_proof_no_write` with zero writes. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`. The next route is not automatic proof execution; future proof movement requires a separate approval-bound task. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 
