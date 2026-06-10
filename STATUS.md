@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1547 V8 deep recall / TagMemo capability lane activation`.
-Current validation: `CMV-1651`.
+Current task: `CM-1548 TagMemo minimal schema / tag extraction preflight`.
+Current validation: `CMV-1652`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATED_DOCS_ONLY; scoped RC remains closed; release/production/cutover still require separate exact approval`.
+Current route: `TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT_RECORDED_DOCS_ONLY; scoped RC remains closed; release/production/cutover still require separate exact approval`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1548 TagMemo minimal schema / tag extraction preflight: added `docs/CM1548_TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT.md`. This docs/status/board-only preflight proposes minimal governed tag fields, tag extraction input/output contracts, bounded public projection rules, forbidden raw/private fields, future ranking compatibility constraints, and a fixture plan. It does not implement tag extraction, complex V8 algorithms, runtime ranking changes, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
 CM-1547 V8 deep recall / TagMemo capability lane activation: added `docs/CM1547_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATION.md` and activated the post-scoped-RC capability lane as docs/status/board evidence only. The route records current baseline and gaps for TagMemo / tag extraction, memory importance scoring, recall ranking, time decay / recency weighting, relation graph / association recall, deep recall query expansion, memory consolidation, reflection / metacognitive memory, recall quality evaluation, and bounded projection compatibility. It preserves `SCOPED_RC_READY: YES` and keeps production ready, release ready, and cutover ready as `NO`. CM-1547 did not implement complex V8 algorithms, tune runtime ranking, call provider/API, use bearer-token paths, run raw scans, execute confirmed mutation, expand public MCP tools, perform a second effective `record_memory` write, release/tag/deploy, cut over, or claim production/release/cutover readiness.
 

@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1547 V8 deep recall / TagMemo capability lane activation` |
-| Current validation | `CMV-1651` |
-| Current route | V8 deep recall / TagMemo capability lane activated as docs-only baseline and gap map; scoped RC remains closed; release/production/cutover still require separate exact approval |
+| Current task | `CM-1548 TagMemo minimal schema / tag extraction preflight` |
+| Current validation | `CMV-1652` |
+| Current route | TagMemo minimal schema preflight recorded; scoped RC remains closed; release/production/cutover still require separate exact approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1548` adds `docs/CM1548_TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT.md` and records a docs/status/board-only preflight for the first V8 deep recall / TagMemo capability slice. It proposes the minimal governed tag record fields `tagId`, `tagLabel`, `tagSource`, `confidenceScore`, `confidenceBucket`, `evidenceSourceId`, `memoryId`, and `rankingCompatibility`; records tag extraction input/output contracts; defines bounded public projection rules and forbidden raw/private fields; and lays out a future fixture plan. CM-1548 does not implement tag extraction, complex V8 algorithms, runtime ranking changes, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
 `CM-1547` adds `docs/CM1547_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATION.md` and activates the post-scoped-RC V8 deep recall / TagMemo capability lane as docs/status/board evidence only. It records the current source baseline for TagMemo query analysis, tag/core scoring, candidate ranking, RRF/geodesic rerank, time/freshness handling, context vectors, recall precision, P16/P17 fixture-backed diagnostics, and bounded projection compatibility. It also records a gap map covering TagMemo / tag extraction, memory importance scoring, recall ranking, time decay / recency weighting, relation graph / association recall, deep recall query expansion, memory consolidation, reflection / metacognitive memory, recall quality evaluation, and bounded projection compatibility. CM-1547 does not implement complex V8 algorithms, tune runtime ranking, call provider/API, use bearer-token paths, run raw scans, execute confirmed mutation, expand public MCP tools, perform a second effective `record_memory` write, release/tag/deploy, cut over, or claim production/release/cutover readiness.
 
@@ -261,7 +263,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1547 activates the V8 deep recall / TagMemo capability lane as docs-only baseline and gap-map work. Next safe action is push review for CM-1547 if separately authorized, or `CM-1548 TagMemo / V8 capability fixture inventory` as a separate local-safe fixture/docs slice. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, and production-readiness claims remain separate approval-bound work.
+CM-1548 records TagMemo minimal schema and tag extraction preflight only. Next safe action is push review for CM-1548 if separately authorized, or `CM-1549 TagMemo minimal schema fixture contract` as a separate fixture/test slice. Release/tag/deploy/cutover, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation, public MCP expansion, additional effective `record_memory` writes, complex V8 algorithm implementation, runtime ranking tuning, and production-readiness claims remain separate approval-bound work.
 
 ## Boundaries
 

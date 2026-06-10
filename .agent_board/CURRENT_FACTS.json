@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1547",
-  "validationId": "CMV-1651",
+  "taskId": "CM-1548",
+  "validationId": "CMV-1652",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1652",
+      "scope": "CM-1548 TagMemo minimal schema / tag extraction preflight",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT_DOCS_ONLY_NO_V8_IMPLEMENTATION"
+    },
     {
       "id": "CMV-1651",
       "scope": "CM-1547 V8 deep recall / TagMemo capability lane activation",

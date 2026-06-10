@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1547 V8 deep recall / TagMemo capability lane activation`.
-Current validation: `CMV-1651`.
+Current checkpoint: `CM-1548 TagMemo minimal schema / tag extraction preflight`.
+Current validation: `CMV-1652`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1548 TagMemo Minimal Schema / Tag Extraction Preflight
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT_DOCS_ONLY_NO_V8_IMPLEMENTATION`
+
+Recorded:
+
+- Added `docs/CM1548_TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT.md`.
+- Proposed minimal TagMemo tag fields: `tagId`, `tagLabel`, `tagSource`, `confidenceScore`, `confidenceBucket`, `evidenceSourceId`, `memoryId`, and `rankingCompatibility`.
+- Recorded tag extraction input and output contracts.
+- Recorded bounded public projection rules and forbidden raw/private fields.
+- Recorded future ranking compatibility without runtime ranking changes.
+- Recorded future fixture plan for schema validation and low-disclosure projection checks.
+- No provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, effective write, complex V8 algorithm implementation, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1652` docs preflight changed-scope validation.
 
 ## CM-1547 V8 Deep Recall / TagMemo Capability Lane Activation
 
