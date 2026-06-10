@@ -6,6 +6,10 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const {
+  COMPOSITION_VERSION,
+  composeTagMemoRecall
+} = require('../src/tagmemo/recall-composition');
 
 const fixturePath = path.join(
   __dirname,
@@ -97,4 +101,75 @@ test('CM1582 recall composition fixture preserves public MCP surface', () => {
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
   assert.equal(TOOL_DEFINITIONS.length, 7);
+});
+
+test('CM1583 recall composition output is deterministic and bounded', () => {
+  const fixture = loadFixture();
+  const input = fixture.cases.find(testCase => testCase.id === 'bounded-composition-ranks-relevant-candidate').input;
+  const first = composeTagMemoRecall(input);
+  const second = composeTagMemoRecall(input);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.schemaVersion, 'tagmemo-recall-composition-output-v1');
+  assert.equal(first.compositionVersion, COMPOSITION_VERSION);
+  assert.equal(first.rejected, false);
+  assert.equal(first.lowDisclosure, true);
+  assert.equal(first.mutated, false);
+  assert.equal(first.persisted, false);
+  assert.equal(first.publicResponse, false);
+  assert.equal(first.providerCalls, 0);
+  assert.equal(first.publicMcpExpansion, 0);
+  assert.equal(first.rankedCandidates.length, input.candidates.length);
+  for (const score of first.candidateScores) {
+    assert.equal(score.importanceScore >= 0 && score.importanceScore <= 1, true);
+    assert.equal(score.timeDecayScore >= 0 && score.timeDecayScore <= 1, true);
+  }
+});
+
+test('CM1583 composition executes required deterministic stages', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'bounded-composition-ranks-relevant-candidate');
+  const output = composeTagMemoRecall(testCase.input);
+
+  for (const stage of testCase.expected.requiredStages) {
+    assert.equal(output.compositionReasons.includes(stage), true, stage);
+  }
+  assert.equal(output.expandedQueries.length > 0, true);
+  assert.equal(output.associatedCandidates.length, testCase.input.candidates.length);
+  assert.equal(output.candidateScores.length, testCase.input.candidates.length);
+});
+
+test('CM1583 composition ranks relevant candidate first', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'bounded-composition-ranks-relevant-candidate');
+  const output = composeTagMemoRecall(testCase.input);
+
+  assert.equal(output.rankedCandidates[0].memoryId, testCase.expected.topMemoryId);
+});
+
+test('CM1583 empty candidates return low-disclosure result', () => {
+  const fixture = loadFixture();
+  const empty = fixture.cases.find(testCase => testCase.id === 'empty-candidates-low-disclosure');
+  const output = composeTagMemoRecall(empty.input);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'empty_candidates');
+  assert.deepEqual(output.expandedQueries, []);
+  assert.deepEqual(output.associatedCandidates, []);
+  assert.deepEqual(output.candidateScores, []);
+  assert.deepEqual(output.rankedCandidates, []);
+  assert.equal(output.lowDisclosure, true);
+});
+
+test('CM1583 forbidden provider token raw shaped input is rejected without leakage', () => {
+  const fixture = loadFixture();
+  const rejected = fixture.cases.find(testCase => testCase.id === 'forbidden-provider-token-raw-rejected');
+  const output = composeTagMemoRecall(rejected.input);
+  const serialized = JSON.stringify(output);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'forbidden_raw_private_field');
+  for (const fragment of fixture.forbiddenFragments) {
+    assert.equal(serialized.includes(fragment), false, fragment);
+  }
 });

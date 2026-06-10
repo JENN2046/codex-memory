@@ -13,7 +13,7 @@ src/tagmemo/recall-composition.js
 Current source implementation:
 
 ```text
-NOT_STARTED
+IMPLEMENTED_INTERNAL_PURE_FUNCTION
 ```
 
 ## Composition Contract
@@ -39,11 +39,31 @@ tests/tagmemo-recall-composition.test.js
 
 The first regression slice locks fixture shape, no-side-effect boundaries, forbidden-value placement, low-disclosure case shape, and the seven-tool public MCP surface before source implementation.
 
+CM-1583 adds the internal pure-function core:
+
+```text
+src/tagmemo/recall-composition.js
+```
+
+The implementation exports `composeTagMemoRecall(input)` and `COMPOSITION_VERSION`.
+
+It composes only audited internal pure functions:
+
+```text
+expandTagMemoQuery
+deriveTagMemoAssociations
+scoreTimeDecay
+scoreMemoryImportance
+rankTagMemoCandidates
+```
+
+The implementation remains internal and deterministic. It does not import storage, MCP adapters, provider clients, HTTP clients, file-system readers, runtime write services, raw memory readers, or persistence APIs.
+
 ## Boundaries
 
 ```text
 runtime integration: NOT_STARTED
-source implementation: NOT_STARTED
+source implementation: IMPLEMENTED_INTERNAL_PURE_FUNCTION
 provider/API: NOT_USED
 bearer token: NOT_USED
 raw scan: NOT_RUN
@@ -71,7 +91,7 @@ staged diff check
 Results:
 
 ```text
-tests\tagmemo-recall-composition.test.js: PASS_4_OF_4
+tests\tagmemo-recall-composition.test.js: PASS_9_OF_9
 git diff --check: PASS
 validate-local.ps1 -Area docs: PASS
 CURRENT_FACTS.json parse: PASS

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1582",
-  "validationId": "CMV-1686",
+  "taskId": "CM-1583",
+  "validationId": "CMV-1687",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1687",
+      "scope": "CM-1583 deterministic TagMemo recall composition core",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_RECALL_COMPOSITION_CORE_IMPLEMENTED"
+    },
     {
       "id": "CMV-1686",
       "scope": "CM-1582 TagMemo recall composition regression coverage",

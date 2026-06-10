@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1582 TagMemo recall composition regression coverage`.
-Current validation: `CMV-1686`.
+Current task: `CM-1583 deterministic TagMemo recall composition core`.
+Current validation: `CMV-1687`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `V8_TAGMEMO_RECALL_COMPOSITION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`.
+Current route: `V8_TAGMEMO_RECALL_COMPOSITION_CORE_IMPLEMENTED_PENDING_SOURCE_AUDIT`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1583 deterministic TagMemo recall composition core: added `src/tagmemo/recall-composition.js` and expanded `tests/tagmemo-recall-composition.test.js`. The internal pure function composes audited deterministic query expansion, association recall, time-decay scoring, importance scoring, and recall ranking over bounded projections only. Runtime integration remains `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1582 TagMemo recall composition regression coverage: added `tests/fixtures/tagmemo-recall-composition-sprint-c-v1.json`, `tests/tagmemo-recall-composition.test.js`, and `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_EXECUTION.md`. Fixture/test coverage records no side effects and locks bounded composition cases, rejected unsafe input shape, low-disclosure expectations, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; persistent tag enrichment is `NOT_STARTED`; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

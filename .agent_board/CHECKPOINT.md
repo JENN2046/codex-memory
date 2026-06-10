@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1582 TagMemo recall composition regression coverage`.
-Current validation: `CMV-1686`.
+Current checkpoint: `CM-1583 deterministic TagMemo recall composition core`.
+Current validation: `CMV-1687`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1583 Deterministic TagMemo Recall Composition Core
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_COMPOSITION_CORE_IMPLEMENTED`
+
+Recorded:
+
+- Added `src/tagmemo/recall-composition.js`.
+- Expanded `tests/tagmemo-recall-composition.test.js`.
+- Updated `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_EXECUTION.md`.
+- Implemented internal deterministic pure function `composeTagMemoRecall(...)`.
+- Confirmed bounded input validation, deterministic stage execution, low-disclosure empty/rejected results, forbidden raw/private field rejection, and no public response or persistence flags.
+- Runtime integration remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Raw scan and broad memory scan remain `NOT_RUN`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, live proof, confirmed mutation, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1687` source/test validation.
 
 ## CM-1582 TagMemo Recall Composition Regression Coverage
 
