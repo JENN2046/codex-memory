@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1602 persistent TagMemo enrichment bounded command envelope`.
-Current validation: `CMV-1706`.
+Current task: `CM-1603 persistent TagMemo enrichment proof command implementation preflight`.
+Current validation: `CMV-1707`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_COMMAND_ENVELOPE_COMPLETED_PROOF_NOT_STARTED`.
+Current route: `PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_IMPLEMENTATION_PREFLIGHT_RECORDED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1603 persistent TagMemo enrichment proof command implementation preflight: added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_IMPLEMENTATION_PREFLIGHT.md`. This docs-only preflight plans future proof command implementation boundaries for the CM-1602 command envelope: proposed source/CLI/test files, temp-local sidecar target contract, `maxWriteCount=1` guard, fixture-only first input route, rollback / cleanup / tombstone proof plan, test plan, and abort criteria. Proof command implementation is `NOT_STARTED`; actual proof execution is `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`; no proof command was implemented; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1602 persistent TagMemo enrichment bounded command envelope: added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_ENVELOPE.md`. This docs-only command envelope defines exact future command shapes, proof input/output contract, max write count `1`, sidecar target `temp-local-tagmemo-proof-sidecar`, rollback / cleanup / tombstone proof boundary, and abort criteria. Proof command envelope is `COMPLETED`; proof command implementation is `NOT_STARTED`; actual proof execution is `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

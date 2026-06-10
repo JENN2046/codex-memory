@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1602 persistent TagMemo enrichment bounded command envelope` |
-| Current validation | `CMV-1706` |
-| Current route | proof command envelope completed; actual proof execution not started; persistent tag write still blocked |
+| Current task | `CM-1603 persistent TagMemo enrichment proof command implementation preflight` |
+| Current validation | `CMV-1707` |
+| Current route | proof command implementation preflight recorded; implementation and execution not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1603` adds `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_IMPLEMENTATION_PREFLIGHT.md` and records a docs-only implementation preflight for the CM-1602 command envelope. It proposes future source/test landing points, temp-local sidecar target contract, `maxWriteCount=1` guard, fixture-only first input route, rollback / cleanup / tombstone proof command plan, fixture/test plan, and abort criteria. Proof command implementation remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`; no proof command was implemented; no persistent tag write, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1602` adds `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_ENVELOPE.md` and completes the bounded command envelope for a future persistent TagMemo enrichment proof. The envelope defines exact future command shapes, fixture-bounded input, max write count `1`, temp-local sidecar target boundary, low-disclosure output contract, rollback / cleanup / tombstone proof commands, and abort criteria. Proof command implementation remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; no persistent tag write, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

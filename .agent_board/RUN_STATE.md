@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1602 persistent TagMemo enrichment bounded command envelope`.
-Current validation: `CMV-1706`.
+Current task: `CM-1603 persistent TagMemo enrichment proof command implementation preflight`.
+Current validation: `CMV-1707`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1602` completes the bounded command envelope for a future persistent TagMemo enrichment proof. The envelope is docs-only and defines exact future command shapes, fixture-bounded input, max write count `1`, temp-local sidecar target, rollback/cleanup/tombstone proof commands, low-disclosure output, and abort criteria. Proof command implementation remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`. The next safe action is source/test preflight for a proof runner, not proof execution. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1603` records proof command implementation preflight only. Future source may add an internal proof runner and CLI with fixture-only first input, temp-local sidecar target, `maxWriteCount=1`, rollback/cleanup/tombstone modes, and redacted output. Proof command implementation remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`. The next safe route is fixture/test coverage for the proof runner contract, not proof execution. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

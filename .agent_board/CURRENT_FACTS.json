@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1602",
-  "validationId": "CMV-1706",
+  "taskId": "CM-1603",
+  "validationId": "CMV-1707",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1707",
+      "scope": "CM-1603 persistent TagMemo enrichment proof command implementation preflight",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_IMPLEMENTATION_PREFLIGHT_RECORDED_NO_IMPLEMENTATION_NO_WRITE"
+    },
     {
       "id": "CMV-1706",
       "scope": "CM-1602 persistent TagMemo enrichment bounded command envelope",
