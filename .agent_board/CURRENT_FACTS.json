@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1570",
-  "validationId": "CMV-1674",
+  "taskId": "CM-1571",
+  "validationId": "CMV-1675",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1675",
+      "scope": "CM-1571 bounded query expansion fixture/test coverage",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_QUERY_EXPANSION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION"
+    },
     {
       "id": "CMV-1674",
       "scope": "CM-1570 bounded deep recall query expansion preflight",

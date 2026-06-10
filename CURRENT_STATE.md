@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1570 bounded deep recall query expansion preflight` |
-| Current validation | `CMV-1674` |
-| Current route | Sprint B query expansion baseline preflight recorded |
+| Current task | `CM-1571 bounded query expansion fixture/test coverage` |
+| Current validation | `CMV-1675` |
+| Current route | Sprint B query expansion fixture/test coverage added; source implementation not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1571` adds `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json` and `tests/tagmemo-query-expansion.test.js` as fixture/test coverage for bounded deterministic query expansion. The fixture records no live search, provider/API, bearer token, raw scan, broad memory scan, persistent tag enrichment, public MCP expansion, effective `record_memory` write, complete V8 claim, or production/release/cutover readiness. The test locks required expansion cases, rejected unsafe input shape, low-disclosure boundary expectations, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1570` adds `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md` and prepares bounded deterministic deep recall query expansion as docs-only preflight for Sprint B. It records the user task-book Phase 1 alias `CM-1560` as already occupied by Sprint A and preserves repository numbering as `CM-1570`. Planned module is `src/tagmemo/query-expansion.js`; allowed input is bounded query text, TagMemo tag projection, deterministic importance band/score, safe evidence hints, and bounded recall intent. Forbidden input includes raw memory, token/bearer material, provider/API payloads, raw audit, raw scan output, client secrets, raw storage/vector/cache/file path payloads, and unbounded lifecycle metadata. Query expansion source implementation is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; no provider/API or bearer token path occurred; public MCP surface was not expanded; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 

@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1570 bounded deep recall query expansion preflight`.
-Current validation: `CMV-1674`.
+Current checkpoint: `CM-1571 bounded query expansion fixture/test coverage`.
+Current validation: `CMV-1675`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1571 Bounded Query Expansion Fixture/Test Coverage
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_QUERY_EXPANSION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`
+
+Recorded:
+
+- Added `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json`.
+- Added `tests/tagmemo-query-expansion.test.js`.
+- Updated `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md`.
+- Locked fixture side-effect boundaries, required expansion cases, forbidden value placement, and seven-tool public MCP surface.
+- Recorded query expansion source implementation as `NOT_STARTED`.
+- Recorded live search, raw scan, and broad memory scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, public MCP expansion, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1675` fixture/test changed-scope validation.
 
 ## CM-1570 Bounded Deep Recall Query Expansion Preflight
 

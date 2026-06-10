@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "tagmemo-query-expansion-fixture-v1",
+  "scope": "Sprint B bounded deterministic TagMemo query expansion baseline",
+  "boundaries": {
+    "fixtureOnly": true,
+    "liveSearch": false,
+    "providerApiCalls": 0,
+    "bearerTokenUse": 0,
+    "rawScan": false,
+    "broadMemoryScan": false,
+    "persistentTagEnrichment": false,
+    "publicMcpExpansion": false,
+    "effectiveRecordMemoryWrites": 0,
+    "completeV8Claimed": false,
+    "productionReleaseCutoverReady": false
+  },
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "forbiddenFragments": [
+    "cm1571-provider-endpoint",
+    "cm1571-token-fragment",
+    "cm1571-bearer-fragment",
+    "cm1571-raw-memory-body",
+    "A:/cm1571/must-not-leak"
+  ],
+  "cases": [
+    {
+      "id": "tag-derived-expansion",
+      "input": {
+        "schemaVersion": "tagmemo-query-expansion-input-v1",
+        "boundedQueryText": "route proof",
+        "recallIntent": "decision_support",
+        "importanceBand": "high",
+        "tagProjection": {
+          "tags": [
+            {
+              "tagLabel": "route blocker",
+              "tagSource": "explicit_record_tag",
+              "confidenceScore": 0.94
+            },
+            {
+              "tagLabel": "proof receipt",
+              "tagSource": "operator_reviewed",
+              "confidenceScore": 0.9
+            }
+          ]
+        },
+        "safeEvidenceHints": [
+          "decision",
+          "route",
+          "proof"
+        ]
+      },
+      "expected": {
+        "firstQuery": "route proof",
+        "requiredReasons": [
+          "original_query",
+          "tag_derived",
+          "evidence_derived"
+        ]
+      }
+    },
+    {
+      "id": "duplicate-expansion-merged",
+      "input": {
+        "schemaVersion": "tagmemo-query-expansion-input-v1",
+        "boundedQueryText": "decision route",
+        "recallIntent": "route_review",
+        "importanceBand": "medium",
+        "tagProjection": {
+          "tags": [
+            {
+              "tagLabel": "decision route",
+              "tagSource": "explicit_record_tag",
+              "confidenceScore": 0.92
+            },
+            {
+              "tagLabel": "decision route",
+              "tagSource": "query_core_tag",
+              "confidenceScore": 0.78
+            }
+          ]
+        },
+        "safeEvidenceHints": [
+          "decision",
+          "route",
+          "decision"
+        ]
+      },
+      "expected": {
+        "firstQuery": "decision route",
+        "requiredReasons": [
+          "duplicate_expansion_merged"
+        ]
+      }
+    },
+    {
+      "id": "empty-query-low-disclosure",
+      "input": {
+        "schemaVersion": "tagmemo-query-expansion-input-v1",
+        "boundedQueryText": "",
+        "recallIntent": "decision_support",
+        "importanceBand": "low",
+        "tagProjection": {
+          "tags": []
+        },
+        "safeEvidenceHints": []
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "empty_query"
+      }
+    },
+    {
+      "id": "forbidden-provider-token-raw-rejected",
+      "input": {
+        "schemaVersion": "tagmemo-query-expansion-input-v1",
+        "boundedQueryText": "safe bounded query",
+        "recallIntent": "decision_support",
+        "importanceBand": "high",
+        "tagProjection": {
+          "tags": [
+            {
+              "tagLabel": "cm1571-provider-endpoint",
+              "tagSource": "explicit_record_tag",
+              "confidenceScore": 0.95
+            }
+          ]
+        },
+        "safeEvidenceHints": [
+          "cm1571-token-fragment"
+        ],
+        "rawText": "cm1571-raw-memory-body",
+        "authorization": "Bearer cm1571-bearer-fragment",
+        "filePath": "A:/cm1571/must-not-leak"
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "forbidden_raw_private_field"
+      }
+    }
+  ]
+}

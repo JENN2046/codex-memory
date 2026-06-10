@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1570 bounded deep recall query expansion preflight`.
-Current validation: `CMV-1674`.
+Current task: `CM-1571 bounded query expansion fixture/test coverage`.
+Current validation: `CMV-1675`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1570` prepares bounded deterministic deep recall query expansion as docs-only preflight. The next Sprint B slice is fixture/test coverage. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1571` adds bounded deterministic query expansion fixture/test coverage without source implementation. The next Sprint B slice is the internal pure-function source implementation. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

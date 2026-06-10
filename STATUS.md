@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1570 bounded deep recall query expansion preflight`.
-Current validation: `CMV-1674`.
+Current task: `CM-1571 bounded query expansion fixture/test coverage`.
+Current validation: `CMV-1675`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `SPRINT_B_QUERY_EXPANSION_BASELINE_PREFLIGHT_RECORDED`.
+Current route: `SPRINT_B_QUERY_EXPANSION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1571 bounded query expansion fixture/test coverage: added `tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json` and `tests/tagmemo-query-expansion.test.js`. The fixture/test coverage records no side effects and locks required expansion cases for tag-derived expansion, evidence-derived expansion, duplicate expansion merge, empty query, forbidden provider/token/raw-shaped input, and the exact seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1570 bounded deep recall query expansion preflight: added `docs/V8_TAGMEMO_DEEP_RECALL_QUERY_EXPANSION_BASELINE.md`. This docs-only preflight maps the user task-book Phase 1 alias `CM-1560` to repository task `CM-1570` because `CM-1560..CM-1569` are already occupied by Sprint A. It defines a deterministic, internal-only query expansion baseline over bounded query text, TagMemo tag projection, deterministic importance band/score, safe evidence hints, and bounded recall intent. Source implementation is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 

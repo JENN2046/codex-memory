@@ -74,6 +74,17 @@ Rejected or empty input must return low-disclosure output and must not echo forb
 - Provider/API/token/raw shaped fields are rejected or stripped.
 - Empty input is low-disclosure.
 
+## Regression Fixture
+
+CM-1571 adds fixture/test coverage:
+
+```text
+tests/fixtures/tagmemo-query-expansion-sprint-b-v1.json
+tests/tagmemo-query-expansion.test.js
+```
+
+The first regression slice locks fixture shape, required expansion scenarios, forbidden-value placement, side-effect boundaries, and the seven-tool public MCP surface before source implementation.
+
 ## Boundary Confirmation
 
 ```text
