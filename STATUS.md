@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1553 tag extraction contract closeout and implementation preflight route selection`.
-Current validation: `CMV-1657`.
+Current task: `CM-1554 minimal deterministic tag extraction source implementation preflight`.
+Current validation: `CMV-1658`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAG_EXTRACTION_DETERMINISTIC_CONTRACT_BASELINE_COMPLETED_TEST_ONLY; implementation not started; next recommended route CM-1554 minimal source implementation preflight`.
+Current route: `MINIMAL_TAG_EXTRACTION_SOURCE_IMPLEMENTATION_PREFLIGHT_RECORDED; runtime implementation not started; proposed internal module src/recall/TagExtraction.js`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1554 minimal deterministic tag extraction source implementation preflight: added `docs/CM1554_MINIMAL_TAG_EXTRACTION_IMPLEMENTATION_PREFLIGHT.md`. This docs/status/board-only preflight selects future internal pure-function module candidate `src/recall/TagExtraction.js`, proposes `extractDeterministicTags(input, options = {})`, records bounded input and TagMemo minimal schema compatible output contracts, defines deterministic normalization, duplicate merge, bounded confidence, low-disclosure empty/rejected result, forbidden raw/private stripping, test plan, and rollback plan. `runtime implementation: NOT_STARTED`; deterministic only; no provider/API; no bearer token; no raw scan; no public MCP expansion; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. CM-1554 did not implement runtime tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 
 CM-1553 tag extraction contract closeout and implementation preflight route selection: added `docs/CM1553_TAG_EXTRACTION_CONTRACT_CLOSEOUT_AND_IMPLEMENTATION_PREFLIGHT_ROUTE_SELECTION.md`. Decision: `deterministic tag extraction contract: BASELINE_COMPLETED_TEST_ONLY`; `runtime tag extraction implementation: NOT_STARTED`; `complete V8: NOT_CLAIMED`; public MCP surface is still seven tools; production ready, release ready, and cutover ready remain `NO`. Reviewed CM-1551/CM-1552 evidence and selected next recommended route `CM-1554 minimal deterministic tag extraction source implementation preflight`. CM-1553 did not implement runtime tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective `record_memory` write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 

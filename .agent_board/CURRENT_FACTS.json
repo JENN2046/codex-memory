@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1553",
-  "validationId": "CMV-1657",
+  "taskId": "CM-1554",
+  "validationId": "CMV-1658",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1658",
+      "scope": "CM-1554 minimal deterministic tag extraction source implementation preflight",
+      "status": "COMPLETED_VALIDATED_MINIMAL_TAG_EXTRACTION_SOURCE_IMPLEMENTATION_PREFLIGHT_RECORDED_NO_RUNTIME_IMPLEMENTATION"
+    },
     {
       "id": "CMV-1657",
       "scope": "CM-1553 tag extraction contract closeout and implementation preflight route selection",

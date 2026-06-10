@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1553 tag extraction contract closeout and implementation preflight route selection`.
-Current validation: `CMV-1657`.
+Current checkpoint: `CM-1554 minimal deterministic tag extraction source implementation preflight`.
+Current validation: `CMV-1658`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1554 Minimal Deterministic Tag Extraction Source Implementation Preflight
+
+Status: `COMPLETED_VALIDATED_MINIMAL_TAG_EXTRACTION_SOURCE_IMPLEMENTATION_PREFLIGHT_RECORDED_NO_RUNTIME_IMPLEMENTATION`
+
+Recorded:
+
+- Added `docs/CM1554_MINIMAL_TAG_EXTRACTION_IMPLEMENTATION_PREFLIGHT.md`.
+- Selected future internal pure-function module candidate `src/recall/TagExtraction.js`.
+- Proposed `extractDeterministicTags(input, options = {})`.
+- Recorded bounded memory text / bounded metadata projection input contract.
+- Recorded TagMemo minimal schema compatible output contract.
+- Recorded deterministic normalization, duplicate merge, bounded confidence, low-disclosure empty/rejected output, and forbidden raw/private field stripping requirements.
+- Recorded future test plan and rollback plan.
+- Recorded `runtime implementation: NOT_STARTED`.
+- Recorded deterministic only, provider/API not used, bearer token not used, raw scan not run, public MCP expansion not performed.
+- Recorded `complete V8: NOT_CLAIMED`.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- No runtime tag extraction implementation, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, effective write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1658` docs/source-preflight changed-scope validation.
 
 ## CM-1553 Tag Extraction Contract Closeout And Implementation Preflight Route Selection
 
