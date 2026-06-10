@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1573 query expansion source audit`.
-Current validation: `CMV-1677`.
+Current checkpoint: `CM-1574 association recall baseline preflight`.
+Current validation: `CMV-1678`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1574 Association Recall Baseline Preflight
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_BASELINE_PREFLIGHT_RECORDED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md`.
+- Prepared internal deterministic association recall baseline.
+- Planned `src/tagmemo/association-recall.js`.
+- Recorded requested task-book alias `CM-1564` as already occupied by Sprint A and preserved repository numbering as `CM-1574`.
+- Defined bounded seed, candidate, tag projection, importance, query expansion, and safe evidence inputs.
+- Defined forbidden raw/provider/token/audit/scan/storage/private inputs.
+- Defined deterministic association output and planned tests.
+- Recorded association recall source implementation as `NOT_STARTED`.
+- Recorded relation graph persistence as `NOT_STARTED`.
+- Recorded live search, raw scan, and broad memory scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, public MCP expansion, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1678` docs preflight changed-scope validation.
 
 ## CM-1573 Query Expansion Source Audit
 

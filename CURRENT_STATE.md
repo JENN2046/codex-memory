@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1573 query expansion source audit` |
-| Current validation | `CMV-1677` |
-| Current route | Sprint B query expansion baseline implemented and audited |
+| Current task | `CM-1574 association recall baseline preflight` |
+| Current validation | `CMV-1678` |
+| Current route | Sprint B association recall baseline preflight recorded |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1574` adds `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md` and prepares deterministic association recall as docs-only preflight for Sprint B. It records the user task-book Phase 5 alias `CM-1564` as already occupied by Sprint A and preserves repository numbering as `CM-1574`. Planned module is `src/tagmemo/association-recall.js`; allowed input is bounded seed memory id, bounded memory candidates, TagMemo tag projection, deterministic importance score, bounded query expansion hints, and safe evidence hints. Forbidden input includes raw memory, token/bearer material, provider/API payloads, raw audit, raw scan output, client secrets, raw storage/vector/cache/file path payloads, and unbounded lifecycle metadata. Association recall source implementation is `NOT_STARTED`; relation graph persistence is `NOT_STARTED`; live search is `NOT_RUN`; raw scan and broad memory scan are `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; no provider/API or bearer token path occurred; public MCP surface was not expanded; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1573` adds `docs/CM1573_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT.md` and records an independent changed-scope source audit of the CM-1572 deterministic TagMemo query expansion core. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/query-expansion.js`, `tests/tagmemo-query-expansion.test.js`, the Sprint B fixture, and baseline docs. Confirmed internal pure-function behavior, bounded input validation, low-disclosure empty/rejected output, deterministic expanded queries, bounded reasons, duplicate merge, forbidden raw/private rejection, no provider/API or bearer token path, no raw scan or broad memory scan, no live search, no public MCP expansion, no effective `record_memory` write, no confirmed mutation, no production/release/cutover readiness claim, and no complete V8 claim. Query expansion baseline is `IMPLEMENTED_AND_AUDITED`; persistent tag enrichment remains `NOT_STARTED`.
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1573 query expansion source audit`.
-Current validation: `CMV-1677`.
+Current task: `CM-1574 association recall baseline preflight`.
+Current validation: `CMV-1678`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `SPRINT_B_QUERY_EXPANSION_BASELINE_IMPLEMENTED_AND_AUDITED`.
+Current route: `SPRINT_B_ASSOCIATION_RECALL_BASELINE_PREFLIGHT_RECORDED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1574 association recall baseline preflight: added `docs/V8_TAGMEMO_ASSOCIATION_RECALL_BASELINE.md`. This docs-only preflight maps the user task-book Phase 5 alias `CM-1564` to repository task `CM-1574` because `CM-1560..CM-1569` are already occupied by Sprint A. It defines a deterministic, internal-only association recall baseline over bounded seed memory id, bounded memory candidates, TagMemo tag projection, deterministic importance score, bounded query expansion hints, and safe evidence hints. Source implementation is `NOT_STARTED`; relation graph persistence is `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1573 query expansion source audit: added `docs/CM1573_TAGMEMO_QUERY_EXPANSION_SOURCE_AUDIT.md`. Independent changed-scope source audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the query expansion baseline is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no confirmed mutation; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`. Targeted validation remained `9/9`.
 

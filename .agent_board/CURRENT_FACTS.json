@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1573",
-  "validationId": "CMV-1677",
+  "taskId": "CM-1574",
+  "validationId": "CMV-1678",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1678",
+      "scope": "CM-1574 association recall baseline preflight",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_ASSOCIATION_RECALL_BASELINE_PREFLIGHT_RECORDED"
+    },
     {
       "id": "CMV-1677",
       "scope": "CM-1573 query expansion source audit",
