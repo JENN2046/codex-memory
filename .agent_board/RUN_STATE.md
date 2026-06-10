@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1610 persistent TagMemo enrichment proof readiness gate review`.
-Current validation: `CMV-1714`.
+Current task: `CM-1611 persistent TagMemo enrichment proof exact approval gate`.
+Current validation: `CMV-1715`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1610` records a targeted readiness gate review for the future persistent TagMemo enrichment proof. The review passed only for requesting a separate exact approval packet. Current two-token `apply` remains `gated / ready_for_proof_no_write` with zero writes. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_EXECUTED`. The next route is not automatic proof execution; future proof movement requires a separate exact approval-bound task that restates both approval tokens, max write count `1`, temp-local sidecar target, dry-run hash matching, and low-disclosure evidence boundaries. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1611` opens the exact approval gate for a future persistent TagMemo enrichment proof execution task. Gate status is `OPEN_AWAITING_OPERATOR_APPROVAL`; approval is not granted by CM-1611; proof execution is not authorized by CM-1611. Future proof movement requires a fresh operator message containing both `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`. Current two-token `apply` remains `gated / ready_for_proof_no_write` with zero writes. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_EXECUTED`. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

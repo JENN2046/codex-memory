@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1610 persistent TagMemo enrichment proof readiness gate review` |
-| Current validation | `CMV-1714` |
-| Current route | readiness gate review passed for requesting exact approval; proof execution and persistent write still blocked |
+| Current task | `CM-1611 persistent TagMemo enrichment proof exact approval gate` |
+| Current validation | `CMV-1715` |
+| Current route | exact approval gate open; proof execution and persistent write still blocked pending fresh operator approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1611` adds `docs/CM1611_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXACT_APPROVAL_GATE.md` and opens the exact approval gate for a future persistent TagMemo enrichment proof execution task. Gate status is `OPEN_AWAITING_OPERATOR_APPROVAL`; approval is not granted by CM-1611. Future execution requires a fresh operator message containing both `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`. Current `apply` still returns `gated / ready_for_proof_no_write` with zero writes. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_EXECUTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 `CM-1610` adds `docs/CM1610_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_READINESS_GATE_REVIEW.md` and records targeted readiness gate review for the future persistent TagMemo enrichment proof. Review result is `PASS_READY_TO_REQUEST_EXACT_APPROVAL`. Confirmed CM-1608/CM-1609 dual-token guard and source audit are coherent for requesting a separate future exact approval packet; both approval tokens remain required; current `apply` still returns `gated / ready_for_proof_no_write` with zero writes; `maxWriteCount=1`, temp-local sidecar target, low-disclosure output, and seven-tool public MCP surface remain preserved. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_EXECUTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
