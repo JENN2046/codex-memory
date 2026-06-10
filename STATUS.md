@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1581 V8 TagMemo recall composition Sprint C preflight`.
-Current validation: `CMV-1685`.
+Current task: `CM-1582 TagMemo recall composition regression coverage`.
+Current validation: `CMV-1686`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_PREFLIGHT_DOCS_ONLY`.
+Current route: `V8_TAGMEMO_RECALL_COMPOSITION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1582 TagMemo recall composition regression coverage: added `tests/fixtures/tagmemo-recall-composition-sprint-c-v1.json`, `tests/tagmemo-recall-composition.test.js`, and `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_EXECUTION.md`. Fixture/test coverage records no side effects and locks bounded composition cases, rejected unsafe input shape, low-disclosure expectations, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; persistent tag enrichment is `NOT_STARTED`; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 
 CM-1581 V8 TagMemo recall composition Sprint C preflight: added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_PREFLIGHT.md`. This docs-only preflight plans bounded recall composition order `query expansion -> association recall -> time decay -> importance scoring -> recall ranking`, with tag extraction as supporting bounded tag projection. Proposed future module is `src/tagmemo/recall-composition.js`; source implementation and runtime integration remain `NOT_STARTED`. Public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no second effective `record_memory` write; persistent tag enrichment is `NOT_STARTED`; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

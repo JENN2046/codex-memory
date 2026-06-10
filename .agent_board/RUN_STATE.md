@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1581 V8 TagMemo recall composition Sprint C preflight`.
-Current validation: `CMV-1685`.
+Current task: `CM-1582 TagMemo recall composition regression coverage`.
+Current validation: `CMV-1686`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1581` records the docs-only Sprint C bounded recall composition preflight. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Runtime integration, persistent decay state, relation graph persistence, persistent tag enrichment, public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1582` records Sprint C bounded recall composition fixture/test coverage. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Source implementation, runtime integration, persistent decay state, relation graph persistence, persistent tag enrichment, public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1581",
-  "validationId": "CMV-1685",
+  "taskId": "CM-1582",
+  "validationId": "CMV-1686",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1686",
+      "scope": "CM-1582 TagMemo recall composition regression coverage",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_RECALL_COMPOSITION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION"
+    },
     {
       "id": "CMV-1685",
       "scope": "CM-1581 V8 TagMemo recall composition Sprint C preflight",

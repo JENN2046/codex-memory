@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1581 V8 TagMemo recall composition Sprint C preflight` |
-| Current validation | `CMV-1685` |
-| Current route | Sprint C bounded recall composition preflight recorded docs-only; next safe route is fixture/test coverage only |
+| Current task | `CM-1582 TagMemo recall composition regression coverage` |
+| Current validation | `CMV-1686` |
+| Current route | Sprint C bounded recall composition fixture/test coverage added; source implementation not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1582` adds `tests/fixtures/tagmemo-recall-composition-sprint-c-v1.json`, `tests/tagmemo-recall-composition.test.js`, and `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_EXECUTION.md`. Fixture/test coverage locks bounded composition cases, no-side-effect boundaries, rejected unsafe input shape, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; runtime integration remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, persistent tag enrichment, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1581` adds `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_PREFLIGHT.md` and opens Sprint C as docs-only bounded recall composition preflight. It records the required composition order `query expansion -> association recall -> time decay -> importance scoring -> recall ranking`, with tag extraction as supporting bounded tag projection. Proposed future module is `src/tagmemo/recall-composition.js`, but source implementation and runtime integration remain `NOT_STARTED`. Public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, persistent tag enrichment, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

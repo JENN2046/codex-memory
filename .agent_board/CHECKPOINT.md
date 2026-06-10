@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1581 V8 TagMemo recall composition Sprint C preflight`.
-Current validation: `CMV-1685`.
+Current checkpoint: `CM-1582 TagMemo recall composition regression coverage`.
+Current validation: `CMV-1686`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1582 TagMemo Recall Composition Regression Coverage
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_COMPOSITION_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`
+
+Recorded:
+
+- Added `tests/fixtures/tagmemo-recall-composition-sprint-c-v1.json`.
+- Added `tests/tagmemo-recall-composition.test.js`.
+- Added `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_EXECUTION.md`.
+- Locked fixture/test coverage for bounded composition cases, forbidden-value placement, low-disclosure case shape, and seven-tool public MCP surface.
+- Source implementation remains `NOT_STARTED`.
+- Runtime integration remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Raw scan and broad memory scan remain `NOT_RUN`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, live proof, confirmed mutation, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1686` fixture/test validation.
 
 ## CM-1581 V8 TagMemo Recall Composition Sprint C Preflight
 
