@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1606 persistent TagMemo enrichment proof execution decision` |
-| Current validation | `CMV-1710` |
-| Current route | post-audit execution approval received; command execution attempt failed closed with no persistent write |
+| Current task | `CM-1607 persistent TagMemo enrichment approval-token alignment preflight` |
+| Current validation | `CMV-1711` |
+| Current route | approval token alignment preflight recorded; dual-token guard route selected; no persistent write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1607` adds `docs/CM1607_PERSISTENT_TAGMEMO_APPROVAL_TOKEN_ALIGNMENT_PREFLIGHT.md` and records docs/source preflight for approval-token alignment. It identifies the current mismatch between `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and skeleton guard token `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, selects a future dual-token model, and requires dry-run hash / `maxWriteCount=1` / temp-local sidecar target checks before any future apply. Persistent tag write remains `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1606` adds `docs/CM1606_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_DECISION.md` and records receipt of exact approval `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT`. The bounded proof command was attempted against the audited skeleton. Dry-run returned `planned`; apply with the after-audit token returned `rejected / missing_exact_approval`; apply with the skeleton guard token returned `blocked / apply_stub_no_persistent_tag_write_executed`; tombstone sync proof returned `planned` with zero write limit. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

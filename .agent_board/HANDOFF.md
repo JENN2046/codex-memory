@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1606 persistent TagMemo enrichment proof execution decision`.
-Current validation: `CMV-1710`.
-Current handoff: post-audit execution approval was received and bounded command attempts failed closed with no persistent tag write.
+Current task: `CM-1607 persistent TagMemo enrichment approval-token alignment preflight`.
+Current validation: `CMV-1711`.
+Current handoff: approval-token alignment preflight is recorded; dual-token guard route selected; persistent tag write remains blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: post-audit execution approval was received and bounded command 
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_ATTEMPT_FAIL_CLOSED_NO_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_APPROVAL_TOKEN_ALIGNMENT_PREFLIGHT_RECORDED_NO_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1607 added `docs/CM1607_PERSISTENT_TAGMEMO_APPROVAL_TOKEN_ALIGNMENT_PREFLIGHT.md` and records the approval token alignment preflight. It maps the operator execution token `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT` and skeleton internal guard token `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`, selects a future dual-token guard model, and requires dry-run hash / `maxWriteCount=1` / temp-local target checks before any future apply. Persistent tag write remains `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`. No proof-side confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1606 added `docs/CM1606_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_DECISION.md` and records receipt of exact approval `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT`. The audited skeleton command was attempted: dry-run planned, after-audit-token apply rejected fail-closed, skeleton guard-token apply blocked fail-closed, and tombstone sync proof planned zero writes. Persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`; no proof-side confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1605 added `docs/CM1605_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_SOURCE_AUDIT.md` and records independent changed-scope audit pass for the proof command skeleton source, CLI script, fixture, tests, and evidence doc. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Proof command skeleton is `IMPLEMENTED_AND_AUDITED`; dry-run planning is audited; `apply` remains fail-closed; actual proof execution remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`. No proof execution, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1604 added `src/tagmemo/persistent-enrichment-proof-command.js`, `scripts/tagmemo-enrichment-proof.js`, `tests/fixtures/tagmemo-persistent-enrichment-proof-command-sprint-e-v1.json`, `tests/tagmemo-persistent-enrichment-proof-command.test.js`, and `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_SKELETON.md`. It implements a bounded no-write command skeleton with deterministic redacted dry-run output, exact approval token recognition as guard input only, fail-closed `apply`, and rollback / cleanup / tombstone plan skeletons. Actual proof execution remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`. No confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.

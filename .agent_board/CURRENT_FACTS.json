@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1606",
-  "validationId": "CMV-1710",
+  "taskId": "CM-1607",
+  "validationId": "CMV-1711",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1711",
+      "scope": "CM-1607 persistent TagMemo enrichment approval-token alignment preflight",
+      "status": "COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_APPROVAL_TOKEN_ALIGNMENT_PREFLIGHT_RECORDED_NO_WRITE"
+    },
     {
       "id": "CMV-1710",
       "scope": "CM-1606 persistent TagMemo enrichment proof execution decision",

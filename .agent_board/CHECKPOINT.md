@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1606 persistent TagMemo enrichment proof execution decision`.
-Current validation: `CMV-1710`.
+Current checkpoint: `CM-1607 persistent TagMemo enrichment approval-token alignment preflight`.
+Current validation: `CMV-1711`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1607 Persistent TagMemo Enrichment Approval-Token Alignment Preflight
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_APPROVAL_TOKEN_ALIGNMENT_PREFLIGHT_RECORDED_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1607_PERSISTENT_TAGMEMO_APPROVAL_TOKEN_ALIGNMENT_PREFLIGHT.md`.
+- Confirmed current operator execution token: `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_EXECUTION_AFTER_AUDIT`.
+- Confirmed current skeleton guard token: `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF`.
+- Confirmed current skeleton does not accept the after-audit operator token.
+- Selected future dual-token guard model.
+- Required future apply to pass dry-run plan hash, `maxWriteCount=1`, temp-local sidecar target, rollback/cleanup hashes, safe tombstone state, and zero forbidden boundary counters.
+- Persistent tag write remains `STILL_BLOCKED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Actual proof execution remains `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1711` token-alignment preflight validation.
 
 ## CM-1606 Persistent TagMemo Enrichment Proof Execution Decision
 
