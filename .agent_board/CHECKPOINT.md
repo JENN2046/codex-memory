@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1615 persistent TagMemo write-capable proof fixture/test contract coverage`.
-Current validation: `CMV-1719`.
+Current checkpoint: `CM-1616 persistent TagMemo write-capable proof source implementation preflight`.
+Current validation: `CMV-1720`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1616 Persistent TagMemo Write-Capable Proof Source Implementation Preflight
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_PREFLIGHT_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1616_PERSISTENT_TAGMEMO_WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_PREFLIGHT.md`.
+- Confirmed CM-1616 is docs/status/board source implementation preflight only.
+- Confirmed current source behavior remains unchanged.
+- Confirmed source implementation remains `NOT_STARTED`.
+- Confirmed write-capable implementation remains `NOT_STARTED`.
+- Confirmed proof execution remains `NOT_EXECUTED`.
+- Confirmed persistent tag write remains `NOT_EXECUTED`.
+- Recorded future source landing points and required apply gates.
+- Recorded future low-disclosure output boundary, test plan, and independent source-audit requirement.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live MCP proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1720` source implementation preflight validation.
 
 ## CM-1615 Persistent TagMemo Write-Capable Proof Fixture/Test Contract Coverage
 

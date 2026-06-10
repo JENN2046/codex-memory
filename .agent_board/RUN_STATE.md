@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1615 persistent TagMemo write-capable proof fixture/test contract coverage`.
-Current validation: `CMV-1719`.
+Current task: `CM-1616 persistent TagMemo write-capable proof source implementation preflight`.
+Current validation: `CMV-1720`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1615` records persistent TagMemo write-capable proof fixture/test-only contract coverage. Source implementation remains `NOT_STARTED`; proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`. Next safe route is `CM-1616 persistent TagMemo write-capable proof source implementation` or a source-implementation preflight, still not proof execution. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent enrichment success claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1616` records persistent TagMemo write-capable proof source implementation preflight. Source implementation remains `NOT_STARTED`; proof execution remains `NOT_EXECUTED`; persistent tag write remains `NOT_EXECUTED`. Next safe route is `CM-1617 persistent TagMemo write-capable proof source implementation no-execution`. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Public MCP expansion, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, second effective `record_memory` write, release/tag/deploy/cutover, complete V8 claims, persistent enrichment success claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 
