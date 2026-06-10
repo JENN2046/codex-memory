@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1549 TagMemo minimal schema fixture/test execution`.
-Current validation: `CMV-1653`.
-Current handoff: TagMemo minimal schema fixture/test coverage added; release/production/cutover still require separate exact approval.
+Current task: `CM-1550 TagMemo minimal schema closeout and next V8 capability selection`.
+Current validation: `CMV-1654`.
+Current handoff: TagMemo minimal schema closed as test-only baseline; next V8 slice selected; release/production/cutover still require separate exact approval.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: TagMemo minimal schema fixture/test coverage added; release/pro
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_MINIMAL_SCHEMA_FIXTURE_COVERAGE_ADDED_NO_V8_IMPLEMENTATION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_MINIMAL_SCHEMA_BASELINE_COMPLETED_TEST_ONLY_NEXT_TAG_EXTRACTION_CONTRACT_SELECTED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1550 added `docs/CM1550_TAGMEMO_MINIMAL_SCHEMA_CLOSEOUT_AND_NEXT_V8_CAPABILITY_SELECTION.md` and closed TagMemo minimal schema as `BASELINE_COMPLETED_TEST_ONLY`. It reviews CM-1548/CM-1549 evidence, records `tag extraction implementation: NOT_STARTED`, `complete V8: NOT_CLAIMED`, production/release/cutover ready as `NO`, and public MCP surface not expanded. Next selected V8 capability slice is `CM-1551 tag extraction deterministic contract preflight`. CM-1550 does not implement tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 - CM-1549 added `tests/fixtures/tagmemo-minimal-schema-cm1549-v1.json`, `tests/tagmemo-minimal-schema-fixture.test.js`, and `docs/CM1549_TAGMEMO_MINIMAL_SCHEMA_REGRESSION_COVERAGE.md`. Targeted validation passed `6/6`. The fixture/test-only regression validates controlled tag fields, confidence bounds and buckets, bounded memory linkage, bounded public projection excluding forbidden raw/private fields, unsafe provider/API/token/bearer/raw/scan-shaped `tagSource` rejection, ranking compatibility without runtime tuning, and unchanged seven-tool public MCP surface. CM-1549 does not implement tag extraction, complex V8 algorithms, runtime ranking changes, live proof, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 - CM-1548 added `docs/CM1548_TAGMEMO_MINIMAL_SCHEMA_PREFLIGHT.md` and recorded a docs/status/board-only preflight for TagMemo minimal schema and tag extraction. It proposes tag id/label/source, confidence score/bucket, evidence source id, memory id linkage, bounded public projection, forbidden raw/private fields, future ranking compatibility, and fixture plan. It does not implement tag extraction, complex V8 algorithms, runtime ranking changes, provider/API calls, bearer-token paths, raw scans, public MCP expansion, confirmed mutation, another effective write, release/tag/deploy, cutover, production/release/cutover readiness, or complete V8 readiness.
 - CM-1547 added `docs/CM1547_V8_DEEP_RECALL_TAGMEMO_CAPABILITY_LANE_ACTIVATION.md` and activated the post-scoped-RC V8 deep recall / TagMemo capability lane as docs/status/board evidence only. It records source baseline and gaps for TagMemo / tag extraction, memory importance scoring, recall ranking, time decay / recency weighting, relation graph / association recall, deep recall query expansion, memory consolidation, reflection / metacognitive memory, recall quality evaluation, and bounded projection compatibility. It preserves scoped RC closeout while keeping production ready, release ready, and cutover ready as `NO`. CM-1547 did not implement complex V8 algorithms, tune runtime ranking, call provider/API, use bearer-token paths, run raw scans, execute confirmed mutation, expand public MCP tools, perform a second effective `record_memory` write, release/tag/deploy, cut over, or claim production/release/cutover readiness.
@@ -128,7 +129,7 @@ Boundaries:
 
 Next safe action:
 
-Next safe action after local commit is push review for CM-1549 if separately authorized, or a separately scoped implementation proposal/review slice if the V8 TagMemo lane should proceed toward source changes. Additional valid writes, confirmed mutation, raw/provider/bearer, public MCP expansion, tag extraction implementation, complex V8 algorithm implementation, runtime ranking tuning, release/tag/deploy/cutover, complete V8 claims, and production/release readiness work remain forbidden unless separately and exactly approved.
+Next safe action after local commit is push review for CM-1550 if separately authorized, or `CM-1551 tag extraction deterministic contract preflight` as another docs/fixture-first preflight. Additional valid writes, confirmed mutation, raw/provider/bearer, public MCP expansion, tag extraction implementation, complex V8 algorithm implementation, runtime ranking tuning, release/tag/deploy/cutover, complete V8 claims, and production/release readiness work remain forbidden unless separately and exactly approved.
 
 ## Historical Handoff Archive
 

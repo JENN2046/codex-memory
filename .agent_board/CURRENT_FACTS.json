@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1549",
-  "validationId": "CMV-1653",
+  "taskId": "CM-1550",
+  "validationId": "CMV-1654",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1654",
+      "scope": "CM-1550 TagMemo minimal schema closeout and next V8 capability selection",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_MINIMAL_SCHEMA_BASELINE_COMPLETED_TEST_ONLY_NEXT_TAG_EXTRACTION_CONTRACT_SELECTED"
+    },
     {
       "id": "CMV-1653",
       "scope": "CM-1549 TagMemo minimal schema fixture/test execution",

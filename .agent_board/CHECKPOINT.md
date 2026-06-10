@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1549 TagMemo minimal schema fixture/test execution`.
-Current validation: `CMV-1653`.
+Current checkpoint: `CM-1550 TagMemo minimal schema closeout and next V8 capability selection`.
+Current validation: `CMV-1654`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1550 TagMemo Minimal Schema Closeout And Next V8 Capability Selection
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_MINIMAL_SCHEMA_BASELINE_COMPLETED_TEST_ONLY_NEXT_TAG_EXTRACTION_CONTRACT_SELECTED`
+
+Recorded:
+
+- Added `docs/CM1550_TAGMEMO_MINIMAL_SCHEMA_CLOSEOUT_AND_NEXT_V8_CAPABILITY_SELECTION.md`.
+- Closed TagMemo minimal schema as `BASELINE_COMPLETED_TEST_ONLY`.
+- Reviewed CM-1548 preflight and CM-1549 fixture/test evidence.
+- Recorded `tag extraction implementation: NOT_STARTED`.
+- Recorded `complete V8: NOT_CLAIMED`.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- Confirmed public MCP surface was not expanded.
+- Selected next V8 capability slice: `CM-1551 tag extraction deterministic contract preflight`.
+- No tag extraction implementation, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, effective write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1654` docs closeout changed-scope validation.
 
 ## CM-1549 TagMemo Minimal Schema Fixture/Test Execution
 
