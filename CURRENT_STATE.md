@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1559 deterministic TagMemo runtime no-op projection source audit` |
-| Current validation | `CMV-1663` |
-| Current route | Runtime no-op projection implemented and audited; persistent tag enrichment and public MCP integration not started |
+| Current task | `CM-1560 TagMemo runtime no-op projection baseline closeout` |
+| Current validation | `CMV-1664` |
+| Current route | Runtime no-op projection baseline completed; persistent tag enrichment and public MCP integration not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1560` adds `docs/CM1560_TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_CLOSEOUT.md` and closes the deterministic TagMemo runtime no-op projection lane as `TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED`. It records `runtime no-op projection: IMPLEMENTED_AND_AUDITED`, `persistent tag enrichment: NOT_STARTED`, public MCP surface still seven tools, second effective `record_memory` write not executed, provider/API not used, bearer token not used, raw scan not run, complete V8 `NOT_CLAIMED`, and production/release/cutover ready as `NO`. CM-1560 does not implement persistent tag enrichment, expose generated tags in public MCP responses, expand MCP, call provider/API, use bearer-token paths, run live proof, perform raw scan, execute confirmed mutation, write durable live memory, release/tag/deploy, or claim production/release/cutover readiness or complete V8 readiness.
 
 `CM-1559` adds `docs/CM1559_TAGMEMO_RUNTIME_NOOP_PROJECTION_SOURCE_AUDIT.md` and records an independent changed-scope source audit of the CM-1558 deterministic TagMemo runtime no-op projection. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Reviewed `src/tagmemo/runtime-noop-projection.js`, the `src/core/MemoryWriteService.js` hook, `tests/tagmemo-runtime-noop-projection.test.js`, related `tests/memory-write-preflight-runtime-integration.test.js` evidence, and CM-1558 evidence docs. Confirmed the projection only calls the audited deterministic tag extraction core, does not persist generated tags, does not enter public MCP responses, does not affect the `record_memory` main path on failure, keeps empty/rejected input low-disclosure no-op, strips forbidden raw/private fields from output, keeps public MCP surface at seven tools, uses no provider/API or bearer token path, runs no raw scan, performs no confirmed mutation, executes no second effective `record_memory` write, and claims no production/release/cutover readiness or complete V8 readiness. Targeted validation passed `7/7`, `7/7`, `7/7`, and `12/12`; `git diff --check`, docs validation, and `CURRENT_FACTS.json` parse passed. CM-1559 does not implement persistent tag enrichment, expose generated tags publicly, expand MCP, call provider/API, use bearer-token paths, run live proof, perform raw scan, execute confirmed mutation, write durable live memory, release/tag/deploy, or claim production/release/cutover readiness or complete V8 readiness.
 

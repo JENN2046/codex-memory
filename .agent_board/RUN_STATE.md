@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1559 deterministic TagMemo runtime no-op projection source audit`.
-Current validation: `CMV-1663`.
+Current task: `CM-1560 TagMemo runtime no-op projection baseline closeout`.
+Current validation: `CMV-1664`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1559` audited the deterministic TagMemo runtime no-op projection changed scope and found no actionable issue. Runtime no-op projection is implemented and audited; persistent tag enrichment and public MCP response exposure remain not started. The recommended next safe route is a separate persistent enrichment preflight before any durable tag write or public response exposure. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP response exposure, complex V8 algorithm implementation, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1560` closed the TagMemo runtime no-op projection baseline as completed. Runtime no-op projection is implemented and audited; persistent tag enrichment and public MCP response exposure remain not started. The next Sprint A slice is deterministic memory importance scoring baseline. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP response exposure, complex V8 algorithm implementation, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 

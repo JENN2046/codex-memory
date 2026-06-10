@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1559 deterministic TagMemo runtime no-op projection source audit`.
-Current validation: `CMV-1663`.
+Current checkpoint: `CM-1560 TagMemo runtime no-op projection baseline closeout`.
+Current validation: `CMV-1664`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1560 TagMemo Runtime No-Op Projection Baseline Closeout
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED`
+
+Recorded:
+
+- Added `docs/CM1560_TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_CLOSEOUT.md`.
+- Closed TagMemo runtime no-op projection as `TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED`.
+- Recorded `runtime no-op projection: IMPLEMENTED_AND_AUDITED`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed second effective `record_memory` write was not executed.
+- Confirmed provider/API not used, bearer token not used, raw scan not run, and complete V8 not claimed.
+- Recorded production ready, release ready, and cutover ready as `NO`.
+- No persistent tag enrichment, public response exposure, complex V8 algorithm, runtime ranking change, live proof, provider/API call, bearer-token path, raw scan, public MCP expansion, confirmed mutation, durable live memory write, release/tag/deploy, cutover, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1664` docs closeout changed-scope validation.
 
 ## CM-1559 Deterministic TagMemo Runtime No-Op Projection Source Audit
 
