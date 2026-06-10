@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1583 deterministic TagMemo recall composition core`.
-Current validation: `CMV-1687`.
+Current checkpoint: `CM-1584 TagMemo recall composition source audit`.
+Current validation: `CMV-1688`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1584 TagMemo Recall Composition Source Audit
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_COMPOSITION_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1584_TAGMEMO_RECALL_COMPOSITION_SOURCE_AUDIT.md`.
+- Reviewed `src/tagmemo/recall-composition.js`.
+- Reviewed `tests/tagmemo-recall-composition.test.js`.
+- Reviewed `tests/fixtures/tagmemo-recall-composition-sprint-c-v1.json`.
+- Reviewed `docs/V8_TAGMEMO_RECALL_COMPOSITION_SPRINT_C_EXECUTION.md`.
+- Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`.
+- Confirmed bounded input only, deterministic-only composition, low-disclosure empty/rejected paths, and forbidden raw/private field rejection.
+- Confirmed the module imports only audited TagMemo pure-function helpers and does not import storage, MCP adapters, provider clients, HTTP clients, file-system readers, runtime write services, raw memory readers, or persistence APIs.
+- Runtime integration remains `NOT_STARTED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Raw scan and broad memory scan remain `NOT_RUN`.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, live proof, confirmed mutation, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1688` source audit validation.
 
 ## CM-1583 Deterministic TagMemo Recall Composition Core
 

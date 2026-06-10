@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1583 deterministic TagMemo recall composition core` |
-| Current validation | `CMV-1687` |
-| Current route | Sprint C bounded recall composition core implemented; source audit not yet recorded |
+| Current task | `CM-1584 TagMemo recall composition source audit` |
+| Current validation | `CMV-1688` |
+| Current route | Sprint C bounded recall composition core implemented and audited; closeout not yet recorded |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1584` adds `docs/CM1584_TAGMEMO_RECALL_COMPOSITION_SOURCE_AUDIT.md` and records an independent changed-scope source audit of the CM-1583 recall composition core. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Confirmed the module is deterministic, accepts bounded input only, keeps low-disclosure empty/rejected paths, imports only audited TagMemo pure-function helpers, and does not import storage, MCP adapters, provider clients, HTTP clients, file-system readers, runtime write services, raw memory readers, or persistence APIs. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1583` adds `src/tagmemo/recall-composition.js` and expands `tests/tagmemo-recall-composition.test.js`. The internal pure function composes audited deterministic query expansion, association recall, time-decay scoring, importance scoring, and recall ranking over bounded projections only. Runtime integration remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
