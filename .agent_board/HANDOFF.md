@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1597 TagMemo sidecar persistence dry-run adapter source audit`.
-Current validation: `CMV-1701`.
-Current handoff: Sprint E sidecar persistence dry-run adapter is implemented and audited; baseline closeout remains next; persistent tag write remains not executed.
+Current task: `CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout`.
+Current validation: `CMV-1702`.
+Current handoff: Sprint E sidecar persistence dry-run adapter baseline is completed; persistent tag write remains not executed and future persistent enrichment remains separate exact-approval work.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Sprint E sidecar persistence dry-run adapter is implemented and
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_BASELINE_COMPLETED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1598 added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_CLOSEOUT.md` and closes the dry-run adapter baseline as `IMPLEMENTED_AND_AUDITED`. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; no second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred. Future persistent tag enrichment remains separate exact-approval work.
 - CM-1597 added `docs/CM1597_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT.md` and records independent changed-scope audit pass for the dry-run adapter source, fixture, tests, and evidence doc. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Sidecar persistence dry-run adapter is `IMPLEMENTED_AND_AUDITED`; baseline closeout remains next. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; no second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1596 added `src/tagmemo/sidecar-persistence-dry-run-adapter.js`, `tests/fixtures/tagmemo-sidecar-persistence-dry-run-sprint-e-v1.json`, `tests/tagmemo-sidecar-persistence-dry-run-adapter.test.js`, and `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER.md`. It implements an internal dry-run/no-op sidecar adapter that accepts bounded tag projection input and returns only a low-disclosure `dryRunWritePlan`. It does not write files, DB rows, memory records, tag records, public MCP responses, or provider/API payloads. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; no second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred. Independent source audit and closeout remain next.
 - CM-1595 added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_ADAPTER_CONTRACT_CLOSEOUT_AND_DRY_RUN_PREFLIGHT.md`. It closes the sidecar persistence adapter contract as `BASELINE_COMPLETED_TEST_ONLY`, records dry-run/no-op adapter implementation boundary, acceptance criteria, rollback/cleanup/tombstone sync rules, and exact approval gate draft. Persistence adapter implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no persistent tag write, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.

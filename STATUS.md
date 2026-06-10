@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1597 TagMemo sidecar persistence dry-run adapter source audit`.
-Current validation: `CMV-1701`.
+Current task: `CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout`.
+Current validation: `CMV-1702`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_IMPLEMENTED_AND_AUDITED_NO_PERSISTENT_WRITE`.
+Current route: `TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_BASELINE_COMPLETED_NO_PERSISTENT_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout: added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_CLOSEOUT.md` and closed the dry-run adapter baseline as `IMPLEMENTED_AND_AUDITED`. Persistent tag enrichment is `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`. Future persistent tag enrichment remains separate exact-approval work.
 
 CM-1597 TagMemo sidecar persistence dry-run adapter source audit: added `docs/CM1597_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT.md`. Independent changed-scope audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. The adapter is an internal pure-function dry-run/no-op plan builder with no imports, no storage/DB/filesystem/HTTP/provider/runtime write service calls, bounded input only, and low-disclosure `dryRunWritePlan` output only. Sidecar persistence dry-run adapter is `IMPLEMENTED_AND_AUDITED`; baseline closeout remains next. Persistent tag enrichment is `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; no provider/API; no bearer token; raw scan is `NOT_RUN`; broad memory scan is `NOT_RUN`; no live proof; no confirmed mutation; no public MCP expansion; no release/tag/deploy; production ready, release ready, and cutover ready remain `NO`; `complete V8: NOT_CLAIMED`.
 

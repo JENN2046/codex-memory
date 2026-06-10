@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1597 TagMemo sidecar persistence dry-run adapter source audit`.
-Current validation: `CMV-1701`.
+Current checkpoint: `CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout`.
+Current validation: `CMV-1702`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1598 TagMemo Sidecar Persistence Dry-Run Adapter Baseline Closeout
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_BASELINE_COMPLETED`
+
+Recorded:
+
+- Added `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_CLOSEOUT.md`.
+- Closed dry-run adapter baseline after implementation and source audit.
+- Sidecar persistence dry-run adapter is `IMPLEMENTED_AND_AUDITED`.
+- Persistent tag enrichment remains `NOT_STARTED`.
+- Persistent tag write remains `NOT_EXECUTED`.
+- No second effective `record_memory` write occurred.
+- Public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1702` dry-run adapter closeout validation.
 
 ## CM-1597 TagMemo Sidecar Persistence Dry-Run Adapter Source Audit
 

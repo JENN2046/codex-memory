@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1597 TagMemo sidecar persistence dry-run adapter source audit` |
-| Current validation | `CMV-1701` |
-| Current route | Sidecar persistence dry-run adapter implemented and audited; baseline closeout remains next; persistent tag write remains not executed |
+| Current task | `CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout` |
+| Current validation | `CMV-1702` |
+| Current route | Sidecar persistence dry-run adapter baseline completed; persistent tag write remains not executed |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1598` adds `docs/V8_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_CLOSEOUT.md` and closes the dry-run adapter baseline as `IMPLEMENTED_AND_AUDITED`. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred. Future persistent tag enrichment remains separate exact-approval work.
 
 `CM-1597` adds `docs/CM1597_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_SOURCE_AUDIT.md` and records independent changed-scope audit pass for the CM-1596 dry-run adapter source, fixture, tests, and evidence doc. Audit result is `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Sidecar persistence dry-run adapter is `IMPLEMENTED_AND_AUDITED`; baseline closeout remains next. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; no second effective `record_memory` write occurred; public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

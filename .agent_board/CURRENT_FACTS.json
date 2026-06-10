@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1597",
-  "validationId": "CMV-1701",
+  "taskId": "CM-1598",
+  "validationId": "CMV-1702",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1702",
+      "scope": "CM-1598 TagMemo sidecar persistence dry-run adapter baseline closeout",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_SIDECAR_PERSISTENCE_DRY_RUN_ADAPTER_BASELINE_COMPLETED"
+    },
     {
       "id": "CMV-1701",
       "scope": "CM-1597 TagMemo sidecar persistence dry-run adapter source audit",
