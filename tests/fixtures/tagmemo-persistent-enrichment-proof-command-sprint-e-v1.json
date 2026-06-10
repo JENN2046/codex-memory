@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "tagmemo-persistent-enrichment-proof-command-sprint-e-v1",
+  "phase": "CM-1604 persistent TagMemo enrichment proof command skeleton",
+  "boundaries": {
+    "commandSkeletonOnly": true,
+    "dryRunPlanningOnly": true,
+    "applyStubFailClosed": true,
+    "persistentTagEnrichment": false,
+    "persistentTagWrite": false,
+    "effectiveRecordMemoryWrites": 0,
+    "providerApiCalls": 0,
+    "bearerTokenUse": 0,
+    "rawScan": false,
+    "broadMemoryScan": false,
+    "liveProof": false,
+    "confirmedMutation": false,
+    "publicMcpExpansion": false,
+    "releaseTagDeploy": false,
+    "productionReleaseCutoverReady": false,
+    "completeV8Claimed": false
+  },
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "exactApprovalToken": "APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF",
+  "sidecarTarget": "temp-local-tagmemo-proof-sidecar",
+  "forbiddenFragments": [
+    "cm1604-raw-memory-body",
+    "cm1604-secret-token",
+    "cm1604-provider-endpoint",
+    "Bearer cm1604",
+    "A:/cm1604/should-not-leak",
+    "raw-scan-output",
+    "provider_generated_v9"
+  ],
+  "cases": [
+    {
+      "id": "valid-active-dry-run-plan",
+      "mode": "dry-run",
+      "maxWriteCount": 1,
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1604:route-001",
+          "memoryId": "memory:cm1604:process-001",
+          "tagId": "tag:cm1604:route",
+          "tagLabel": "route decision",
+          "confidenceScore": 0.82,
+          "derivedFromProjectionHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "rollbackToken": "rollback:cm1604:route-001",
+        "cleanupPlanRef": "cleanup-plan:cm1604:sidecar-v1",
+        "tombstoneSyncState": "active"
+      },
+      "expected": {
+        "status": "planned",
+        "reason": null,
+        "writeCountLimit": 1,
+        "writeCountRequested": 1,
+        "writeCountExecuted": 0,
+        "persistentTagRecordsWritten": 0,
+        "tombstoneSyncState": "active"
+      }
+    },
+    {
+      "id": "apply-missing-approval-fail-closed",
+      "mode": "apply",
+      "maxWriteCount": 1,
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1604:route-001",
+          "memoryId": "memory:cm1604:process-001",
+          "tagId": "tag:cm1604:route",
+          "tagLabel": "route decision",
+          "confidenceScore": 0.82,
+          "derivedFromProjectionHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "rollbackToken": "rollback:cm1604:route-001",
+        "cleanupPlanRef": "cleanup-plan:cm1604:sidecar-v1",
+        "tombstoneSyncState": "active"
+      },
+      "expected": {
+        "status": "rejected",
+        "reason": "missing_exact_approval",
+        "approvalStringExactMatch": false,
+        "writeCountExecuted": 0,
+        "persistentTagRecordsWritten": 0
+      }
+    },
+    {
+      "id": "apply-exact-approval-still-stubbed",
+      "mode": "apply",
+      "maxWriteCount": 1,
+      "approvalToken": "APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF",
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1604:route-001",
+          "memoryId": "memory:cm1604:process-001",
+          "tagId": "tag:cm1604:route",
+          "tagLabel": "route decision",
+          "confidenceScore": 0.82,
+          "derivedFromProjectionHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "rollbackToken": "rollback:cm1604:route-001",
+        "cleanupPlanRef": "cleanup-plan:cm1604:sidecar-v1",
+        "tombstoneSyncState": "active"
+      },
+      "expected": {
+        "status": "blocked",
+        "reason": "apply_stub_no_persistent_tag_write_executed",
+        "approvalStringExactMatch": true,
+        "writeCountExecuted": 0,
+        "persistentTagRecordsWritten": 0
+      }
+    },
+    {
+      "id": "apply-max-write-count-over-one-rejected",
+      "mode": "apply",
+      "maxWriteCount": 2,
+      "approvalToken": "APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF",
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1604:route-001",
+          "memoryId": "memory:cm1604:process-001",
+          "tagId": "tag:cm1604:route",
+          "tagLabel": "route decision",
+          "confidenceScore": 0.82,
+          "derivedFromProjectionHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "rollbackToken": "rollback:cm1604:route-001",
+        "cleanupPlanRef": "cleanup-plan:cm1604:sidecar-v1",
+        "tombstoneSyncState": "active"
+      },
+      "expected": {
+        "status": "rejected",
+        "reason": "invalid_max_write_count",
+        "writeCountExecuted": 0,
+        "persistentTagRecordsWritten": 0
+      }
+    },
+    {
+      "id": "tombstone-sync-proof-zero-write-plan",
+      "mode": "tombstone-sync-proof",
+      "maxWriteCount": 0,
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1604:tombstone-002",
+          "memoryId": "memory:cm1604:process-002",
+          "tagId": "tag:cm1604:tombstone",
+          "tagLabel": "suppressed receipt",
+          "confidenceScore": 0.61,
+          "derivedFromProjectionHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "rollbackToken": "rollback:cm1604:tombstone-002",
+        "cleanupPlanRef": "cleanup-plan:cm1604:sidecar-v1",
+        "tombstoneSyncState": "suppressed_by_tombstone"
+      },
+      "expected": {
+        "status": "planned",
+        "reason": null,
+        "writeCountLimit": 0,
+        "writeCountRequested": 0,
+        "writeCountExecuted": 0,
+        "persistentTagRecordsWritten": 0,
+        "tombstoneSyncState": "suppressed_by_tombstone"
+      }
+    },
+    {
+      "id": "forbidden-raw-provider-token-rejected",
+      "mode": "dry-run",
+      "maxWriteCount": 1,
+      "input": {
+        "schemaVersion": "tagmemo-sidecar-persistence-dry-run-input-v1",
+        "adapterMode": "dry_run",
+        "sourceVersion": "deterministic_tagmemo_projection_v1",
+        "boundedTagProjection": {
+          "schemaVersion": "tagmemo-sidecar-tag-record-v1",
+          "tagRecordId": "sidecar-tag:cm1604:unsafe-003",
+          "memoryId": "memory:cm1604:process-003",
+          "tagId": "tag:cm1604:unsafe",
+          "tagLabel": "unsafe adapter input",
+          "confidenceScore": 0.55,
+          "derivedFromProjectionHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "rawText": "cm1604-raw-memory-body",
+          "authorization": "Bearer cm1604",
+          "providerEndpoint": "cm1604-provider-endpoint"
+        },
+        "rollbackToken": "rollback:cm1604:unsafe-003",
+        "cleanupPlanRef": "cleanup-plan:cm1604:sidecar-v1",
+        "tombstoneSyncState": "active"
+      },
+      "expected": {
+        "status": "rejected",
+        "reason": "forbidden_raw_private_field",
+        "writeCountExecuted": 0,
+        "persistentTagRecordsWritten": 0
+      }
+    }
+  ]
+}

@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1603 persistent TagMemo enrichment proof command implementation preflight` |
-| Current validation | `CMV-1707` |
-| Current route | proof command implementation preflight recorded; implementation and execution not started |
+| Current task | `CM-1604 persistent TagMemo enrichment proof command skeleton source/test` |
+| Current validation | `CMV-1708` |
+| Current route | proof command skeleton implemented as dry-run / fail-closed no-write path; actual proof execution not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1604` adds `src/tagmemo/persistent-enrichment-proof-command.js`, `scripts/tagmemo-enrichment-proof.js`, `tests/fixtures/tagmemo-persistent-enrichment-proof-command-sprint-e-v1.json`, `tests/tagmemo-persistent-enrichment-proof-command.test.js`, and `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_SKELETON.md`. It implements a bounded command skeleton that builds redacted dry-run plans, recognizes the exact approval token only as a guard input, keeps `apply` fail-closed, and emits rollback / cleanup / tombstone plan skeletons without writing. Persistent tag write remains `NOT_EXECUTED`; actual proof execution remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1603` adds `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_IMPLEMENTATION_PREFLIGHT.md` and records a docs-only implementation preflight for the CM-1602 command envelope. It proposes future source/test landing points, temp-local sidecar target contract, `maxWriteCount=1` guard, fixture-only first input route, rollback / cleanup / tombstone proof command plan, fixture/test plan, and abort criteria. Proof command implementation remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`; no proof command was implemented; no persistent tag write, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

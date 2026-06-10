@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1603 persistent TagMemo enrichment proof command implementation preflight`.
-Current validation: `CMV-1707`.
-Current handoff: proof command implementation preflight is recorded; implementation and actual proof execution remain not started, and persistent tag write remains blocked.
+Current task: `CM-1604 persistent TagMemo enrichment proof command skeleton source/test`.
+Current validation: `CMV-1708`.
+Current handoff: proof command skeleton is implemented as a no-write dry-run / fail-closed source slice; actual proof execution remains not started, and persistent tag write remains blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: proof command implementation preflight is recorded; implementat
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_IMPLEMENTATION_PREFLIGHT_RECORDED_NO_IMPLEMENTATION_NO_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_SKELETON_IMPLEMENTED_NO_WRITE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1604 added `src/tagmemo/persistent-enrichment-proof-command.js`, `scripts/tagmemo-enrichment-proof.js`, `tests/fixtures/tagmemo-persistent-enrichment-proof-command-sprint-e-v1.json`, `tests/tagmemo-persistent-enrichment-proof-command.test.js`, and `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_SKELETON.md`. It implements a bounded no-write command skeleton with deterministic redacted dry-run output, exact approval token recognition as guard input only, fail-closed `apply`, and rollback / cleanup / tombstone plan skeletons. Actual proof execution remains `NOT_STARTED`; persistent tag write remains `NOT_EXECUTED`; persistent tag enrichment remains `NOT_STARTED`. No confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1603 added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_IMPLEMENTATION_PREFLIGHT.md`. It records docs-only preflight for future proof command implementation, including proposed runner/CLI/test files, temp-local sidecar target contract, `maxWriteCount=1` guard, fixture-only first input route, rollback / cleanup / tombstone proof plan, fixture/test plan, and abort criteria. Proof command implementation remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`; persistent tag enrichment remains `NOT_STARTED`. No proof command was implemented; no persistent tag write, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1602 added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_ENVELOPE.md`. It completes the bounded command envelope for a future persistent TagMemo enrichment proof, defining exact future command shapes, fixture-bounded input, max write count `1`, temp-local sidecar target, rollback / cleanup / tombstone proof commands, redacted output contract, and abort criteria. Proof command implementation remains `NOT_STARTED`; actual proof execution remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; persistent tag write remains `STILL_BLOCKED`. No persistent tag write, confirmed mutation, second effective `record_memory` write, provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1601 added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_APPROVAL_DECISION_AND_COMMAND_ENVELOPE_PREFLIGHT.md`. Exact approval `APPROVE_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF` was received and recorded as `APPROVAL_RECORDED`; persistent TagMemo enrichment proof remains `COMMAND_ENVELOPE_PENDING` because the required bounded command envelope has not been supplied. Persistent tag enrichment remains `NOT_STARTED`; persistent tag write is `NOT_EXECUTED`; confirmed mutation is `NOT_EXECUTED`; no second effective `record_memory` write occurred; sidecar dry-run adapter remains `IMPLEMENTED_AND_AUDITED`; public MCP surface remains seven tools. No provider/API, bearer token, raw scan, broad memory scan, live proof, public MCP expansion, release/tag/deploy, production/release/cutover ready claim, or complete V8 claim occurred.

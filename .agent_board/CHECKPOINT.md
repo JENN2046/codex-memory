@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1603 persistent TagMemo enrichment proof command implementation preflight`.
-Current validation: `CMV-1707`.
+Current checkpoint: `CM-1604 persistent TagMemo enrichment proof command skeleton source/test`.
+Current validation: `CMV-1708`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1604 Persistent TagMemo Enrichment Proof Command Skeleton Source/Test
+
+Status: `COMPLETED_VALIDATED_PERSISTENT_TAGMEMO_ENRICHMENT_PROOF_COMMAND_SKELETON_IMPLEMENTED_NO_WRITE`
+
+Recorded:
+
+- Added `src/tagmemo/persistent-enrichment-proof-command.js`.
+- Added `scripts/tagmemo-enrichment-proof.js`.
+- Added `tests/fixtures/tagmemo-persistent-enrichment-proof-command-sprint-e-v1.json`.
+- Added `tests/tagmemo-persistent-enrichment-proof-command.test.js`.
+- Added `docs/V8_TAGMEMO_PERSISTENT_ENRICHMENT_PROOF_COMMAND_SKELETON.md`.
+- Implemented deterministic redacted dry-run plan output.
+- Implemented exact approval token recognition as a guard only.
+- Kept `apply` fail-closed with `writeCountExecuted=0` and `persistentTagRecordsWritten=0`.
+- Implemented rollback / cleanup / tombstone plan skeleton output only.
+- Preserved temp-local sidecar target only: `temp-local-tagmemo-proof-sidecar`.
+- Actual proof execution remains `NOT_STARTED`.
+- Persistent tag write remains `NOT_EXECUTED`.
+- Confirmed no persistent tag write, provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1708` source/test/docs validation.
 
 ## CM-1603 Persistent TagMemo Enrichment Proof Command Implementation Preflight
 
