@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1566 TagMemo recall ranking regression coverage`.
-Current validation: `CMV-1670`.
+Current task: `CM-1567 deterministic TagMemo recall ranking core`.
+Current validation: `CMV-1671`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_RECALL_RANKING_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`.
+Current route: `TAGMEMO_RECALL_RANKING_CORE_IMPLEMENTED_PENDING_SOURCE_AUDIT`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1567 deterministic TagMemo recall ranking core: added `src/tagmemo/recall-ranking.js` and expanded `tests/tagmemo-recall-ranking.test.js`. The internal pure function accepts bounded query text, bounded memory candidates, TagMemo tag projection, deterministic `importanceScore`, and safe recency metadata; outputs deterministic `rankedCandidates`, `rankScore`, bounded `rankReasons`, and `rankVersion=deterministic_v1`; lets tag match, query term match, evidence relevance, importance score, and safe recency participate; and returns low-disclosure empty/rejected results. Targeted validation passed `10/10`. Runtime integration remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1566 TagMemo recall ranking regression coverage: added `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json` and `tests/tagmemo-recall-ranking.test.js`. The fixture/test coverage records no side effects and locks required ranking cases for tag match, query term match, importance participation, safe recency, evidence relevance, empty candidates, forbidden provider/token/raw-shaped input, and the exact seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 

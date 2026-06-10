@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1566 TagMemo recall ranking regression coverage` |
-| Current validation | `CMV-1670` |
-| Current route | Recall ranking fixture/test coverage added; source implementation not started |
+| Current task | `CM-1567 deterministic TagMemo recall ranking core` |
+| Current validation | `CMV-1671` |
+| Current route | Recall ranking core implemented; independent source audit not yet recorded |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1567` adds `src/tagmemo/recall-ranking.js` and updates `tests/tagmemo-recall-ranking.test.js` plus `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md`. The new internal pure function `rankTagMemoCandidates(...)` accepts only bounded query text, bounded memory candidates, TagMemo tag projection, deterministic `importanceScore`, and safe recency metadata; rejects forbidden raw/private fields; strips provider/API/token/raw shaped values through low-disclosure rejection; emits deterministic ranked candidates with bounded `rankScore`, bounded `rankReasons`, and `rankVersion=deterministic_v1`; and returns low-disclosure empty/rejected results. Targeted validation passed `10/10`. Runtime integration remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; provider/API not used; bearer token not used; no effective `record_memory` write occurred; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1566` adds `tests/fixtures/tagmemo-recall-ranking-sprint-a-v1.json` and `tests/tagmemo-recall-ranking.test.js` as fixture/test coverage for deterministic TagMemo recall ranking. The fixture records no live search, provider/API, bearer token, raw scan, persistent tag enrichment, public MCP expansion, effective `record_memory` write, complete V8 claim, or production/release/cutover readiness. The test locks required ranking cases, rejected unsafe input shape, low-disclosure boundary expectations, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; live search is `NOT_RUN`; raw scan is `NOT_RUN`; persistent tag enrichment remains `NOT_STARTED`; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 

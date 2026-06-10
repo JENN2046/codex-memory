@@ -81,11 +81,29 @@ tests/tagmemo-recall-ranking.test.js
 
 The first regression slice locks fixture shape, required ranking scenarios, forbidden-value placement, side-effect boundaries, and the seven-tool public MCP surface before source implementation.
 
+## Source Implementation
+
+CM-1567 adds the internal pure-function core:
+
+```text
+src/tagmemo/recall-ranking.js
+```
+
+The implementation exports `rankTagMemoCandidates(input, options = {})` and `RANK_VERSION`.
+
+Validation:
+
+```text
+tests\tagmemo-recall-ranking.test.js: PASS_10_OF_10
+```
+
+The implementation is deterministic, local-only, and bounded. It does not call provider/API paths, does not perform live search, does not read raw memory, does not perform raw scans, does not persist tag enrichment, does not execute `record_memory`, and does not expand public MCP tools.
+
 ## Boundary Confirmation
 
 ```text
-runtime implementation: NOT_STARTED
-recall ranking source implementation: NOT_STARTED
+runtime integration: NOT_STARTED
+recall ranking source implementation: IMPLEMENTED_INTERNAL_PURE_FUNCTION
 live search: NOT_RUN
 raw scan: NOT_RUN
 provider/API: NOT_USED

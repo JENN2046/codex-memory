@@ -6,6 +6,10 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const {
+  RANK_VERSION,
+  rankTagMemoCandidates
+} = require('../src/tagmemo/recall-ranking');
 
 const fixturePath = path.join(
   __dirname,
@@ -102,4 +106,83 @@ test('CM1566 recall ranking fixture preserves public MCP surface', () => {
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
   assert.equal(TOOL_DEFINITIONS.length, 7);
+});
+
+test('CM1567 recall ranking output is deterministic and bounded', () => {
+  const fixture = loadFixture();
+  const input = fixture.cases.find(testCase => testCase.id === 'tag-match-ranks-higher').input;
+  const first = rankTagMemoCandidates(input);
+  const second = rankTagMemoCandidates(input);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.schemaVersion, 'tagmemo-recall-ranking-output-v1');
+  assert.equal(first.rankVersion, RANK_VERSION);
+  assert.equal(first.rejected, false);
+  assert.equal(first.lowDisclosure, true);
+  assert.equal(first.mutated, false);
+  assert.equal(first.providerCalls, 0);
+  assert.equal(first.publicMcpExpansion, 0);
+  assert.equal(first.rankedCandidates.length, input.candidates.length);
+  for (const candidate of first.rankedCandidates) {
+    assert.equal(candidate.rankScore >= 0 && candidate.rankScore <= 1, true);
+    assert.equal(Array.isArray(candidate.rankReasons), true);
+    assert.equal(candidate.lowDisclosure, true);
+  }
+});
+
+test('CM1567 higher tag match ranks higher', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'tag-match-ranks-higher');
+  const output = rankTagMemoCandidates(testCase.input);
+
+  assert.equal(output.rankedCandidates[0].memoryId, testCase.expected.topMemoryId);
+  for (const reason of testCase.expected.requiredReasons) {
+    assert.equal(output.rankedCandidates[0].rankReasons.includes(reason), true, reason);
+  }
+});
+
+test('CM1567 importance participates but does not dominate relevance', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'importance-participates-not-dominates');
+  const output = rankTagMemoCandidates(testCase.input);
+
+  assert.equal(output.rankedCandidates[0].memoryId, testCase.expected.topMemoryId);
+  assert.equal(output.rankedCandidates[0].rankReasons.includes('importance_score'), true);
+  assert.equal(output.rankedCandidates[1].rankReasons.includes('importance_score'), true);
+});
+
+test('CM1567 safe recency participates deterministically', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'safe-recency-deterministic');
+  const first = rankTagMemoCandidates(testCase.input);
+  const second = rankTagMemoCandidates(testCase.input);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.rankedCandidates[0].memoryId, testCase.expected.topMemoryId);
+  assert.equal(first.rankedCandidates[0].rankReasons.includes('safe_recency'), true);
+});
+
+test('CM1567 empty candidate list returns low-disclosure result', () => {
+  const fixture = loadFixture();
+  const empty = fixture.cases.find(testCase => testCase.id === 'empty-candidates-low-disclosure');
+  const output = rankTagMemoCandidates(empty.input);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'empty_candidates');
+  assert.deepEqual(output.rankedCandidates, []);
+  assert.equal(output.lowDisclosure, true);
+});
+
+test('CM1567 forbidden provider token raw shaped candidate is rejected without leakage', () => {
+  const fixture = loadFixture();
+  const rejected = fixture.cases.find(testCase => testCase.id === 'forbidden-provider-token-raw-rejected');
+  const output = rankTagMemoCandidates(rejected.input);
+  const serialized = JSON.stringify(output);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'forbidden_raw_private_field');
+  assert.deepEqual(output.rankedCandidates, []);
+  for (const fragment of fixture.forbiddenFragments) {
+    assert.equal(serialized.includes(fragment), false, fragment);
+  }
 });

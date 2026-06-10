@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1566 TagMemo recall ranking regression coverage`.
-Current validation: `CMV-1670`.
+Current checkpoint: `CM-1567 deterministic TagMemo recall ranking core`.
+Current validation: `CMV-1671`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1567 Deterministic TagMemo Recall Ranking Core
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_RECALL_RANKING_CORE_IMPLEMENTED`
+
+Recorded:
+
+- Added `src/tagmemo/recall-ranking.js`.
+- Updated `tests/tagmemo-recall-ranking.test.js`.
+- Updated `docs/V8_TAGMEMO_RECALL_RANKING_BASELINE.md`.
+- Implemented internal deterministic pure function `rankTagMemoCandidates(...)`.
+- Confirmed bounded input only, deterministic ranked candidates, bounded rank scores, stable rank reasons, importance participation, safe recency participation, and low-disclosure empty/rejected output.
+- Targeted validation passed `10/10`.
+- Recorded runtime integration as `NOT_STARTED`.
+- Recorded live search and raw scan as `NOT_RUN`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, confirmed mutation, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1671` source/test changed-scope validation.
 
 ## CM-1566 TagMemo Recall Ranking Regression Coverage
 
