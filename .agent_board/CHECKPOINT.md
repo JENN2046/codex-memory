@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1561 TagMemo importance scoring baseline preflight`.
-Current validation: `CMV-1665`.
+Current checkpoint: `CM-1562 TagMemo importance scoring regression coverage`.
+Current validation: `CMV-1666`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1562 TagMemo Importance Scoring Regression Coverage
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION`
+
+Recorded:
+
+- Added `tests/fixtures/tagmemo-importance-scoring-sprint-a-v1.json`.
+- Added `tests/tagmemo-importance-scoring.test.js`.
+- Locked fixture side-effect boundaries, required scoring cases, forbidden value placement, and seven-tool public MCP surface.
+- Recorded source implementation as `NOT_STARTED`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed no provider/API, bearer token, raw scan, public MCP expansion, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1666` fixture/test changed-scope validation.
 
 ## CM-1561 TagMemo Importance Scoring Baseline Preflight
 

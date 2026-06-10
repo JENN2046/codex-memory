@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-10",
-  "taskId": "CM-1561",
-  "validationId": "CMV-1665",
+  "taskId": "CM-1562",
+  "validationId": "CMV-1666",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,11 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1666",
+      "scope": "CM-1562 TagMemo importance scoring regression coverage",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION"
+    },
     {
       "id": "CMV-1665",
       "scope": "CM-1561 TagMemo importance scoring baseline preflight",

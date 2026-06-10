@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1561 TagMemo importance scoring baseline preflight`.
-Current validation: `CMV-1665`.
+Current task: `CM-1562 TagMemo importance scoring regression coverage`.
+Current validation: `CMV-1666`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_IMPORTANCE_SCORING_BASELINE_PREFLIGHT_RECORDED; source implementation not started`.
+Current route: `TAGMEMO_IMPORTANCE_SCORING_REGRESSION_COVERAGE_ADDED; source implementation not started`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1562 TagMemo importance scoring regression coverage: added `tests/fixtures/tagmemo-importance-scoring-sprint-a-v1.json` and `tests/tagmemo-importance-scoring.test.js`. The fixture/test coverage records no side effects and locks required scoring cases for explicit decision/route/proof signals, duplicate proof merging, temporary status noise, empty input, forbidden provider/token/raw-shaped input, and the exact seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no raw scan; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1561 TagMemo importance scoring baseline preflight: added `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md`. This docs-only preflight defines a deterministic, internal-only memory importance scoring baseline. Planned input is limited to bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints. Forbidden inputs include raw memory records, token/bearer material, provider/API payloads, raw audit, raw scan output, client secrets, and unbounded lifecycle metadata. Planned output is `importanceScore`, `importanceBand`, bounded `scoringSignals`, and `scoreVersion=deterministic_v1`. Runtime implementation is `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no raw scan; no public MCP expansion; no second effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 

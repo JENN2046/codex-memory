@@ -67,6 +67,17 @@ Rejected or empty input must return low-disclosure output and must not echo forb
 - Empty input is low-disclosure.
 - Duplicate signal handling is reproducible.
 
+## Regression Fixture
+
+CM-1562 adds fixture/test coverage:
+
+```text
+tests/fixtures/tagmemo-importance-scoring-sprint-a-v1.json
+tests/tagmemo-importance-scoring.test.js
+```
+
+The first regression slice locks fixture shape, required scoring scenarios, forbidden-value placement, side-effect boundaries, and the seven-tool public MCP surface before source implementation.
+
 ## Boundary Confirmation
 
 ```text

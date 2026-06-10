@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1561 TagMemo importance scoring baseline preflight` |
-| Current validation | `CMV-1665` |
-| Current route | Importance scoring baseline prepared; source implementation not started |
+| Current task | `CM-1562 TagMemo importance scoring regression coverage` |
+| Current validation | `CMV-1666` |
+| Current route | Importance scoring fixture/test coverage added; source implementation not started |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1562` adds `tests/fixtures/tagmemo-importance-scoring-sprint-a-v1.json` and `tests/tagmemo-importance-scoring.test.js` as fixture/test coverage for deterministic memory importance scoring. The fixture records no provider/API, bearer token, raw scan, persistent tag enrichment, public MCP expansion, effective `record_memory` write, complete V8 claim, or production/release/cutover readiness. The test locks required scoring cases, rejected unsafe input shape, low-disclosure boundary expectations, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 
 `CM-1561` adds `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md` and prepares the deterministic memory importance scoring baseline as docs-only preflight. It defines the planned internal pure-function module `src/tagmemo/importance-scoring.js`, input contract for bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints, forbidden raw/provider/token/audit/scan inputs, output contract for `importanceScore`, `importanceBand`, `scoringSignals`, and `scoreVersion=deterministic_v1`, deterministic scoring rules, and planned regression tests. Runtime implementation is `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; provider/API not used; bearer token not used; raw scan not run; public MCP expansion not performed; second effective `record_memory` write not executed; complete V8 is `NOT_CLAIMED`; production/release/cutover ready remain `NO`.
 

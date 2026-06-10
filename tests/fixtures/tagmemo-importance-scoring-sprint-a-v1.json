@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "tagmemo-importance-scoring-fixture-v1",
+  "scope": "Sprint A deterministic TagMemo importance scoring baseline",
+  "boundaries": {
+    "fixtureOnly": true,
+    "providerApiCalls": 0,
+    "bearerTokenUse": 0,
+    "rawScan": false,
+    "persistentTagEnrichment": false,
+    "publicMcpExpansion": false,
+    "effectiveRecordMemoryWrites": 0,
+    "completeV8Claimed": false,
+    "productionReleaseCutoverReady": false
+  },
+  "expectedPublicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview",
+    "audit_memory",
+    "validate_memory",
+    "tombstone_memory",
+    "supersede_memory"
+  ],
+  "forbiddenFragments": [
+    "cm1562-provider-endpoint",
+    "cm1562-token-fragment",
+    "cm1562-bearer-fragment",
+    "cm1562-raw-memory-body",
+    "A:/cm1562/must-not-leak"
+  ],
+  "cases": [
+    {
+      "id": "explicit-decision-route-high",
+      "input": {
+        "schemaVersion": "tagmemo-importance-scoring-input-v1",
+        "memoryId": "memory:cm1562:high",
+        "boundedMemoryText": "Explicit user instruction: preserve the route decision and blocker proof receipt for Sprint A.",
+        "metadataProjection": {
+          "title": "Route decision proof receipt",
+          "summary": "Decision, route, blocker, proof, and receipt evidence should be important.",
+          "sourceKind": "fixture"
+        },
+        "tagProjection": {
+          "tags": [
+            {
+              "tagLabel": "route decision",
+              "tagSource": "explicit_record_tag",
+              "confidenceScore": 0.95
+            },
+            {
+              "tagLabel": "proof receipt",
+              "tagSource": "operator_reviewed",
+              "confidenceScore": 0.9
+            }
+          ]
+        },
+        "safeEvidenceHints": [
+          "explicit_user_instruction",
+          "decision",
+          "route",
+          "blocker",
+          "proof",
+          "receipt"
+        ]
+      },
+      "expected": {
+        "importanceBand": "high",
+        "requiredSignals": [
+          "explicit_user_instruction",
+          "decision",
+          "route",
+          "blocker",
+          "proof",
+          "receipt"
+        ]
+      }
+    },
+    {
+      "id": "duplicate-proof-merged",
+      "input": {
+        "schemaVersion": "tagmemo-importance-scoring-input-v1",
+        "memoryId": "memory:cm1562:duplicate",
+        "boundedMemoryText": "Proof proof proof receipt receipt.",
+        "metadataProjection": {
+          "title": "Duplicate proof evidence",
+          "summary": "Repeated duplicate signal should merge deterministically.",
+          "sourceKind": "fixture"
+        },
+        "tagProjection": {
+          "tags": [
+            {
+              "tagLabel": "proof",
+              "tagSource": "explicit_record_tag",
+              "confidenceScore": 0.95
+            },
+            {
+              "tagLabel": "proof",
+              "tagSource": "query_core_tag",
+              "confidenceScore": 0.75
+            }
+          ]
+        },
+        "safeEvidenceHints": [
+          "proof",
+          "proof",
+          "receipt"
+        ]
+      },
+      "expected": {
+        "importanceBand": "medium",
+        "requiredSignals": [
+          "proof",
+          "receipt",
+          "duplicate_signal_merged"
+        ]
+      }
+    },
+    {
+      "id": "temporary-status-noise-low",
+      "input": {
+        "schemaVersion": "tagmemo-importance-scoring-input-v1",
+        "memoryId": "memory:cm1562:low",
+        "boundedMemoryText": "Temporary scratch draft transient status noise.",
+        "metadataProjection": {
+          "title": "Temporary scratch",
+          "summary": "Noise only; no durable decision.",
+          "sourceKind": "fixture"
+        },
+        "tagProjection": {
+          "tags": [
+            {
+              "tagLabel": "temporary status",
+              "tagSource": "derived_candidate",
+              "confidenceScore": 0.65
+            }
+          ]
+        },
+        "safeEvidenceHints": [
+          "temporary",
+          "scratch"
+        ]
+      },
+      "expected": {
+        "importanceBand": "low",
+        "requiredSignals": [
+          "temporary_status_noise"
+        ]
+      }
+    },
+    {
+      "id": "empty-low-disclosure",
+      "input": {
+        "schemaVersion": "tagmemo-importance-scoring-input-v1",
+        "memoryId": "memory:cm1562:empty",
+        "boundedMemoryText": "",
+        "metadataProjection": {
+          "title": "",
+          "summary": "",
+          "sourceKind": "fixture"
+        },
+        "tagProjection": {
+          "tags": []
+        },
+        "safeEvidenceHints": []
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "empty_input",
+        "importanceBand": "low"
+      }
+    },
+    {
+      "id": "forbidden-provider-token-raw-rejected",
+      "input": {
+        "schemaVersion": "tagmemo-importance-scoring-input-v1",
+        "memoryId": "memory:cm1562:forbidden",
+        "boundedMemoryText": "Bounded safe text.",
+        "metadataProjection": {
+          "title": "Forbidden fixture",
+          "summary": "Should reject unsafe material.",
+          "sourceKind": "fixture"
+        },
+        "tagProjection": {
+          "tags": [
+            {
+              "tagLabel": "cm1562-provider-endpoint",
+              "tagSource": "explicit_record_tag",
+              "confidenceScore": 0.95
+            }
+          ]
+        },
+        "safeEvidenceHints": [
+          "cm1562-token-fragment"
+        ],
+        "rawText": "cm1562-raw-memory-body",
+        "authorization": "Bearer cm1562-bearer-fragment",
+        "filePath": "A:/cm1562/must-not-leak"
+      },
+      "expected": {
+        "rejected": true,
+        "reason": "forbidden_raw_private_field",
+        "importanceBand": "low"
+      }
+    }
+  ]
+}
