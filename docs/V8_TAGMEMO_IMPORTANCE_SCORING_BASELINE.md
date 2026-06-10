@@ -78,10 +78,28 @@ tests/tagmemo-importance-scoring.test.js
 
 The first regression slice locks fixture shape, required scoring scenarios, forbidden-value placement, side-effect boundaries, and the seven-tool public MCP surface before source implementation.
 
+## Source Implementation
+
+CM-1563 adds the internal pure-function core:
+
+```text
+src/tagmemo/importance-scoring.js
+```
+
+The implementation exports `scoreMemoryImportance(input, options = {})` and `SCORE_VERSION`.
+
+Validation:
+
+```text
+tests\tagmemo-importance-scoring.test.js: PASS_9_OF_9
+```
+
+The implementation is deterministic, local-only, and bounded. It does not call provider/API paths, does not read raw memory, does not perform raw scans, does not persist tag enrichment, does not execute `record_memory`, and does not expand public MCP tools.
+
 ## Boundary Confirmation
 
 ```text
-runtime implementation: NOT_STARTED
+runtime implementation: IMPLEMENTED_INTERNAL_PURE_FUNCTION
 provider/API: NOT_USED
 bearer token: NOT_USED
 raw scan: NOT_RUN

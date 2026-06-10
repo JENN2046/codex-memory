@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1562 TagMemo importance scoring regression coverage`.
-Current validation: `CMV-1666`.
-Current handoff: Importance scoring fixture/test coverage added; source implementation not started. Next safe Sprint A route is pure-function scoring core.
+Current task: `CM-1563 deterministic TagMemo importance scoring core`.
+Current validation: `CMV-1667`.
+Current handoff: Importance scoring core implemented; independent source audit not yet recorded. Next safe Sprint A route is source audit.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Importance scoring fixture/test coverage added; source implemen
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_REGRESSION_COVERAGE_ADDED_NO_SOURCE_IMPLEMENTATION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_CORE_IMPLEMENTED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1563 added `src/tagmemo/importance-scoring.js` and expanded `tests/tagmemo-importance-scoring.test.js`. The internal pure function accepts bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints; returns deterministic score/band/signals with `scoreVersion=deterministic_v1`; merges duplicate signals; rejects forbidden raw/private fields; keeps empty/rejected paths low-disclosure; and targeted validation passed `9/9`. Persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, raw scan, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1562 added `tests/fixtures/tagmemo-importance-scoring-sprint-a-v1.json` and `tests/tagmemo-importance-scoring.test.js` for fixture/test coverage of deterministic importance scoring. It locks scoring scenario shape, side-effect boundaries, forbidden provider/token/raw-shaped sample placement, and seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, raw scan, public MCP expansion, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1561 added `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md` and prepared deterministic memory importance scoring baseline as docs-only preflight. It planned `src/tagmemo/importance-scoring.js`, bounded input contracts, forbidden raw/provider/token/audit/scan inputs, deterministic output fields, scoring rules, and regression coverage. Source implementation remains `NOT_STARTED`; persistent tag enrichment remains `NOT_STARTED`; no provider/API, bearer token, raw scan, public MCP expansion, second effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
 - CM-1560 added `docs/CM1560_TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_CLOSEOUT.md` and closed TagMemo runtime no-op projection as `TAGMEMO_RUNTIME_NOOP_PROJECTION_BASELINE_COMPLETED`. It records `runtime no-op projection: IMPLEMENTED_AND_AUDITED`, persistent tag enrichment `NOT_STARTED`, public MCP surface still seven tools, second effective `record_memory` write not executed, provider/API not used, bearer token not used, raw scan not run, complete V8 `NOT_CLAIMED`, and production/release/cutover ready as `NO`. No persistent tag enrichment, public response exposure, live proof, provider/API, bearer-token path, raw scan, confirmed mutation, public MCP expansion, release/tag/deploy, readiness claim, or complete V8 claim occurred.

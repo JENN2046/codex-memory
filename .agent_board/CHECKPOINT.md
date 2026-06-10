@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1562 TagMemo importance scoring regression coverage`.
-Current validation: `CMV-1666`.
+Current checkpoint: `CM-1563 deterministic TagMemo importance scoring core`.
+Current validation: `CMV-1667`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1563 Deterministic TagMemo Importance Scoring Core
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_IMPORTANCE_SCORING_CORE_IMPLEMENTED`
+
+Recorded:
+
+- Added `src/tagmemo/importance-scoring.js`.
+- Updated `tests/tagmemo-importance-scoring.test.js`.
+- Updated `docs/V8_TAGMEMO_IMPORTANCE_SCORING_BASELINE.md`.
+- Implemented internal deterministic pure function `scoreMemoryImportance(...)`.
+- Confirmed bounded input only, deterministic score/band/signals, duplicate signal merge, low-disclosure empty/rejected output, and forbidden raw/private rejection.
+- Targeted validation passed `9/9`.
+- Recorded persistent tag enrichment as `NOT_STARTED`.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, effective `record_memory` write, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1667` source/test changed-scope validation.
 
 ## CM-1562 TagMemo Importance Scoring Regression Coverage
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1562 TagMemo importance scoring regression coverage`.
-Current validation: `CMV-1666`.
+Current task: `CM-1563 deterministic TagMemo importance scoring core`.
+Current validation: `CMV-1667`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `TAGMEMO_IMPORTANCE_SCORING_REGRESSION_COVERAGE_ADDED; source implementation not started`.
+Current route: `TAGMEMO_IMPORTANCE_SCORING_CORE_IMPLEMENTED; independent source audit not yet recorded`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1563 deterministic TagMemo importance scoring core: added `src/tagmemo/importance-scoring.js` and expanded `tests/tagmemo-importance-scoring.test.js`. The internal pure function accepts bounded memory text, bounded metadata projection, TagMemo tag projection, and safe evidence hints; outputs `importanceScore`, `importanceBand`, bounded `scoringSignals`, and `scoreVersion=deterministic_v1`; merges duplicate signals deterministically; lowers temporary status noise; and returns low-disclosure empty/rejected results. Targeted validation passed `9/9`. Persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API; no bearer token; no raw scan; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 
 CM-1562 TagMemo importance scoring regression coverage: added `tests/fixtures/tagmemo-importance-scoring-sprint-a-v1.json` and `tests/tagmemo-importance-scoring.test.js`. The fixture/test coverage records no side effects and locks required scoring cases for explicit decision/route/proof signals, duplicate proof merging, temporary status noise, empty input, forbidden provider/token/raw-shaped input, and the exact seven-tool public MCP surface. Source implementation remains `NOT_STARTED`; persistent tag enrichment is `NOT_STARTED`; no provider/API; no bearer token; no raw scan; no public MCP expansion; no effective `record_memory` write; `complete V8: NOT_CLAIMED`; production ready, release ready, and cutover ready remain `NO`.
 

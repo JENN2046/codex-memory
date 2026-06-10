@@ -6,6 +6,10 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const {
+  SCORE_VERSION,
+  scoreMemoryImportance
+} = require('../src/tagmemo/importance-scoring');
 
 const fixturePath = path.join(
   __dirname,
@@ -95,4 +99,86 @@ test('CM1562 importance scoring fixture preserves public MCP surface', () => {
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
   assert.equal(TOOL_DEFINITIONS.length, 7);
+});
+
+test('CM1563 importance scoring output is deterministic and bounded', () => {
+  const fixture = loadFixture();
+  const input = fixture.cases.find(testCase => testCase.id === 'explicit-decision-route-high').input;
+  const first = scoreMemoryImportance(input);
+  const second = scoreMemoryImportance(input);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.schemaVersion, 'tagmemo-importance-scoring-output-v1');
+  assert.equal(first.scoreVersion, SCORE_VERSION);
+  assert.equal(first.memoryId, input.memoryId);
+  assert.equal(first.importanceScore >= 0 && first.importanceScore <= 1, true);
+  assert.equal(first.importanceBand, 'high');
+  assert.equal(first.rejected, false);
+  assert.equal(first.lowDisclosure, true);
+  assert.equal(first.mutated, false);
+  assert.equal(first.providerCalls, 0);
+  assert.equal(first.publicMcpExpansion, 0);
+});
+
+test('CM1563 importance scoring bands and required signals are reproducible', () => {
+  const fixture = loadFixture();
+
+  for (const testCase of fixture.cases.filter(item => item.expected.rejected !== true)) {
+    const output = scoreMemoryImportance(testCase.input);
+    assert.equal(output.importanceBand, testCase.expected.importanceBand, testCase.id);
+    for (const signal of testCase.expected.requiredSignals) {
+      assert.equal(output.scoringSignals.includes(signal), true, `${testCase.id}:${signal}`);
+    }
+  }
+});
+
+test('CM1563 duplicate signals merge without blind multiplication', () => {
+  const fixture = loadFixture();
+  const duplicate = fixture.cases.find(testCase => testCase.id === 'duplicate-proof-merged');
+  const single = JSON.parse(JSON.stringify(duplicate.input));
+  single.boundedMemoryText = 'Proof receipt.';
+  single.safeEvidenceHints = ['proof', 'receipt'];
+  single.tagProjection.tags = [
+    {
+      tagLabel: 'proof',
+      tagSource: 'explicit_record_tag',
+      confidenceScore: 0.95
+    }
+  ];
+
+  const duplicateOutput = scoreMemoryImportance(duplicate.input);
+  const singleOutput = scoreMemoryImportance(single);
+
+  assert.equal(duplicateOutput.scoringSignals.includes('duplicate_signal_merged'), true);
+  assert.equal(duplicateOutput.importanceBand, 'medium');
+  assert.equal(singleOutput.importanceBand, 'medium');
+  assert.equal(duplicateOutput.importanceScore - singleOutput.importanceScore <= 0.06, true);
+});
+
+test('CM1563 empty input returns low-disclosure result', () => {
+  const fixture = loadFixture();
+  const empty = fixture.cases.find(testCase => testCase.id === 'empty-low-disclosure');
+  const output = scoreMemoryImportance(empty.input);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'empty_input');
+  assert.equal(output.importanceScore, 0);
+  assert.equal(output.importanceBand, 'low');
+  assert.deepEqual(output.scoringSignals, []);
+  assert.equal(output.lowDisclosure, true);
+});
+
+test('CM1563 forbidden provider token raw shaped input is rejected without leakage', () => {
+  const fixture = loadFixture();
+  const rejected = fixture.cases.find(testCase => testCase.id === 'forbidden-provider-token-raw-rejected');
+  const output = scoreMemoryImportance(rejected.input);
+  const serialized = JSON.stringify(output);
+
+  assert.equal(output.rejected, true);
+  assert.equal(output.reason, 'forbidden_raw_private_field');
+  assert.equal(output.importanceBand, 'low');
+  for (const fragment of fixture.forbiddenFragments) {
+    assert.equal(serialized.includes(fragment), false, fragment);
+  }
+  assert.deepEqual(output.scoringSignals, []);
 });

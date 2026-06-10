@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1562 TagMemo importance scoring regression coverage`.
-Current validation: `CMV-1666`.
+Current task: `CM-1563 deterministic TagMemo importance scoring core`.
+Current validation: `CMV-1667`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1562` added deterministic TagMemo importance scoring fixture/test coverage. Source implementation is not started. The next Sprint A slice is the pure-function scoring core. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP response exposure, complex V8 algorithm implementation beyond this deterministic baseline, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
+`CM-1563` implemented the deterministic TagMemo importance scoring core as an internal pure function. The next Sprint A slice is independent source audit. Scoped RC remains closed with `SCOPED_RC_READY: YES`; production ready, release ready, and cutover ready remain `NO`. Persistent tag enrichment, public MCP response exposure, complex V8 algorithm implementation beyond this deterministic baseline, runtime ranking tuning, live proof, provider/API, bearer-token path, raw audit / broad scan, confirmed mutation apply, public MCP expansion, additional effective writes, release/tag/deploy/cutover, complete V8 claims, and production-readiness claims remain separately approval-bound or deferred.
 
 ## Historical Run Notes
 
