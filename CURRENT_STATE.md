@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1579 V8 TagMemo recall foundation Sprint B closeout` |
-| Current validation | `CMV-1683` |
-| Current route | Sprint B completed locally; push not performed without explicit push authorization |
+| Current task | `CM-1580 V8 TagMemo recall foundation Sprint B source audit` |
+| Current validation | `CMV-1684` |
+| Current route | Sprint B pushed, then independently audited locally; next safe route is Sprint C planning/preflight only |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1580` adds `docs/CM1580_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_SOURCE_AUDIT.md` and records an independent changed-scope source audit of Sprint B after `f5324bd2` remote sync. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Query expansion, association recall, and time-decay scoring remain deterministic internal pure-function baselines with bounded input/output and low-disclosure empty/rejected paths. Public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, persistent tag enrichment, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 
 `CM-1579` adds `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_CLOSEOUT.md` and records `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_COMPLETED`. Query expansion, association recall, and time-decay scoring are implemented and audited as deterministic internal baselines. Persistent tag enrichment, public MCP expansion, deep recall runtime integration, relation graph persistence, persistent decay state, memory consolidation, production/release/cutover readiness, and complete V8 remain not started or not claimed. Public MCP surface remains seven tools; provider/API not used; bearer token not used; raw scan and broad memory scan not run; no live proof, confirmed mutation, second effective `record_memory` write, release/tag/deploy, readiness claim, or complete V8 claim occurred.
 

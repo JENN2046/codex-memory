@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1579 V8 TagMemo recall foundation Sprint B closeout`.
-Current validation: `CMV-1683`.
-Current handoff: Sprint B completed locally. Push not performed in CM-1579 without explicit push authorization.
+Current task: `CM-1580 V8 TagMemo recall foundation Sprint B source audit`.
+Current validation: `CMV-1684`.
+Current handoff: Sprint B was pushed and then independently audited locally. Next safe route is Sprint C planning/preflight only unless separately authorized.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: Sprint B completed locally. Push not performed in CM-1579 witho
 
 Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
 
-Current status: `COMPLETED_VALIDATED_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_COMPLETED / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1580 added `docs/CM1580_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of Sprint B. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Query expansion, association recall, and time-decay scoring remain deterministic internal pure-function baselines with bounded input/output and low-disclosure empty/rejected paths. Public MCP surface remains seven tools. No provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, second effective `record_memory` write, persistent tag enrichment, production/release/cutover ready claim, or complete V8 claim occurred.
 - CM-1579 added `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_CLOSEOUT.md` and recorded `V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_COMPLETED`. Query expansion, association recall, and time-decay scoring are implemented and audited as internal deterministic baselines. Persistent tag enrichment, public MCP expansion, deep recall runtime integration, relation graph persistence, persistent decay state, production/release/cutover readiness, and complete V8 remain not started or not claimed. Public MCP surface remains seven tools. No provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, second effective `record_memory` write, release/tag/deploy, production/release/cutover ready claim, or complete V8 ready claim occurred.
 - CM-1578 added `src/tagmemo/time-decay-scoring.js`, `tests/fixtures/tagmemo-time-decay-scoring-sprint-b-v1.json`, `tests/tagmemo-time-decay-scoring.test.js`, and `docs/V8_TAGMEMO_TIME_DECAY_SCORING_BASELINE.md`. The internal pure function accepts bounded safe-recency and safe evidence hints; returns deterministic bounded `timeDecayScore`, `timeDecayBand`, `decayReasons`, and `decayVersion=deterministic_v1`; keeps empty/rejected paths low-disclosure; rejects forbidden raw/private fields; and targeted validation passed `10/10`. Time-decay scoring baseline is `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; persistent decay state remains `NOT_STARTED`; raw scan and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, effective write, readiness claim, or complete V8 claim occurred.
 - CM-1577 added `docs/CM1577_TAGMEMO_ASSOCIATION_RECALL_SOURCE_AUDIT.md` and recorded an independent changed-scope source audit of CM-1576. Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`. Association recall baseline is now `IMPLEMENTED_AND_AUDITED`; runtime integration remains `NOT_STARTED`; relation graph persistence remains `NOT_STARTED`; live search, raw scan, and broad memory scan were not run; persistent tag enrichment remains `NOT_STARTED`; public MCP surface remains seven tools; no provider/API, bearer token, effective write, readiness claim, or complete V8 claim occurred.

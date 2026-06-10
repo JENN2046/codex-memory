@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1579 V8 TagMemo recall foundation Sprint B closeout`.
-Current validation: `CMV-1683`.
+Current checkpoint: `CM-1580 V8 TagMemo recall foundation Sprint B source audit`.
+Current validation: `CMV-1684`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1580 V8 TagMemo Recall Foundation Sprint B Source Audit
+
+Status: `COMPLETED_VALIDATED_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_SOURCE_AUDIT_PASS_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1580_V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_SOURCE_AUDIT.md`.
+- Reviewed `src/tagmemo/query-expansion.js`, `src/tagmemo/association-recall.js`, and `src/tagmemo/time-decay-scoring.js`.
+- Reviewed `tests/tagmemo-query-expansion.test.js`, `tests/tagmemo-association-recall.test.js`, and `tests/tagmemo-time-decay-scoring.test.js`.
+- Reviewed `docs/V8_TAGMEMO_RECALL_FOUNDATION_SPRINT_B_CLOSEOUT.md`.
+- Audit result: `PASS_NO_ACTIONABLE_FINDINGS_IN_CHANGED_SCOPE`.
+- Confirmed deterministic-only, bounded-input, low-disclosure empty/rejected boundaries.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no provider/API, bearer token, raw scan, broad memory scan, live proof, confirmed mutation, second effective `record_memory` write, persistent tag enrichment, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1684` Sprint B independent source audit validation.
 
 ## CM-1579 V8 TagMemo Recall Foundation Sprint B Closeout
 
