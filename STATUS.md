@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1649 VCP Bridge live no-write probe design`.
-Current validation: `CMV-1753`.
-Current project status: CM-1649 VCP Bridge live no-write probe plan implemented design-only; production/release/cutover ready no.
-Current route: `VCP_BRIDGE_LIVE_NO_WRITE_PROBE_PLAN_DESIGN_ONLY_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1650 VCP memory governance integration map v0.1`.
+Current validation: `CMV-1754`.
+Current project status: CM-1650 VCP memory governance integration map v0.1 recorded docs-only; production/release/cutover ready no.
+Current route: `VCP_MEMORY_GOVERNANCE_INTEGRATION_BOUNDARY_DOCS_ONLY_NO_LIVE_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1650 VCP memory governance integration map v0.1: added `docs/VCP_MEMORY_GOVERNANCE_INTEGRATION_MAP_V0_1.md`. The map redefines the integration stance after the upstream VCPToolBox memory-system focused audit: codex-memory must not replace VCP memory; VCP remains runtime owner for hot memory (`DailyNote`, `KnowledgeBaseManager`, `TagMemo`), cold knowledge (`TDBKnowledge`, `LightMemo` cold route), active recall (`LightMemo`, `DailyNoteManager`, `DeepMemo`, `MeshMemo`, `TopicMemo`), and passive injection (`RAGDiaryPlugin`). codex-memory is the controlled governance kernel for selected VCP memory events: runtime memory events, governance memory events, recall evidence events, write receipt events, memory correction events, agent decision events, and safety boundary events. The map records non-sync content, must-sync event classes, optional bounded sync, a minimal VCP Bridge event model, bridge non-goals, and the next adapter contract direction. This is docs-only; no source/runtime/test behavior changed. VCP memory replacement `NO`, full DailyNote sync `NO`, raw/broad scan `NO`, live VCP proof `NO`, real `record_memory` write `NO`, public MCP expansion `NO`, production/release/cutover ready `NO`, and complete V8 `NOT_CLAIMED`.
 
 CM-1649 VCP Bridge live no-write probe design: added `src/core/VcpBridgeLiveNoWriteProbePlan.js`, `tests/vcp-bridge-live-no-write-probe-plan.test.js`, and `docs/CM1649_VCP_BRIDGE_LIVE_NO_WRITE_PROBE_DESIGN.md`. The helper is pure/no-network/no-runtime/no-MCP/no-write and outputs an action plan only. It requires accepted CM-1646 adapter output, accepted CM-1647 signed/static proof preflight, and accepted CM-1648 approval gate output for `live_bridge_probe_no_write`. It plans only design/shape/hash/gate checks: bridge reachable design placeholder, trusted context shape, allowlist hash, context hash, approval gate accepted, no `record_memory` call, and no public MCP expansion. Missing approval, requested `live_bridge_record_memory_proof`, write intent, provider/API intent, bearer-token material intent, raw/broad scan intent, confirmed mutation intent, and public MCP expansion intent fail closed with low-disclosure output. All counters remain zero. Validation passed CM-1649 probe plan test `9/9`, CM-1648 approval gate test `10/10`, CM-1647 proof preflight test `9/9`, and CM-1646 adapter contract test `8/8`. Strict default changed `NO`, production strict mode enabled `NO`, live VCP proof executed `NO`, real `record_memory` write occurred `NO`, public MCP surface remains exactly seven tools, production/release/cutover ready `NO`, and complete V8 `NOT_CLAIMED`.
 

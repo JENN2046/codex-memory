@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1649 VCP Bridge live no-write probe design`.
-Current validation: `CMV-1753`.
-Current status: VCP Bridge live no-write probe plan implemented design-only; production/release/cutover ready no.
+Current task: `CM-1650 VCP memory governance integration map v0.1`.
+Current validation: `CMV-1754`.
+Current status: VCP memory governance integration map v0.1 recorded docs-only; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1649` implements a pure/no-network/no-runtime/no-MCP/no-write VCP Bridge live no-write probe action-plan helper after CM-1646 through CM-1648. The plan requires accepted adapter, proof preflight, and exact approval gate outputs for `live_bridge_probe_no_write`; missing approval, requested live write proof, write intent, provider/API intent, bearer-token material intent, raw/broad scan intent, confirmed mutation intent, and public MCP expansion intent fail closed. Accepted output records design-only checks and keeps all planned execution counters at zero. The helper is not wired into runtime and does not connect to VCP, call MCP, call `record_memory`, or enable production strict default. Remaining production blockers: strict mode is still not production default, live bridge proof has not been executed, runtime wiring safety is not proven, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is VCP Bridge runtime wiring safety preflight or an exact approval packet for future live no-write execution; live execution remains exact-approval work.
+`CM-1650` records the VCP memory governance integration boundary map v0.1. VCP memory remains runtime owner for hot memory, cold knowledge, active recall, and passive injection; `codex-memory` remains the controlled governance kernel for selected events only. The map defines no-sync content, must-sync governance event classes, optional bounded sync, a minimal VCP Bridge event model, bridge non-goals, and a next-stage governance event adapter contract direction. This is docs-only: no full DailyNote sync/read, raw/broad scan, live VCP proof, MCP call, real `record_memory` write, provider/API, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is VCP memory governance event adapter contract preflight; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
 
 ## Historical Run Notes
 

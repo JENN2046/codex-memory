@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1649 VCP Bridge live no-write probe design`.
-Current validation: `CMV-1753`.
+Current checkpoint: `CM-1650 VCP memory governance integration map v0.1`.
+Current validation: `CMV-1754`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1650 VCP Memory Governance Integration Map v0.1
+
+Status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_INTEGRATION_MAP_V0_1_DOCS_ONLY_NO_LIVE_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_GOVERNANCE_INTEGRATION_MAP_V0_1.md`.
+- Recorded that `codex-memory` must not replace VCP memory and should govern selected VCP memory events only.
+- Mapped VCP hot memory (`DailyNote`, `KnowledgeBaseManager`, `TagMemo`), cold knowledge (`TDBKnowledge`, `LightMemo` cold route), active recall (`LightMemo`, `DailyNoteManager`, `DeepMemo`, `MeshMemo`, `TopicMemo`), and passive injection (`RAGDiaryPlugin`).
+- Mapped `codex-memory` governance capabilities: write governance, read governance, controlled mutation governance, principal/scope control, bridge context governance, receipt ledgers, correction lifecycle, and low-disclosure output.
+- Defined content that should not sync, must sync, and may optionally sync only as bounded low-disclosure governance evidence.
+- Defined the minimal VCP Bridge event model for `runtime_memory_event`, `governance_memory_event`, `recall_evidence_event`, `write_receipt_event`, `memory_correction_event`, `agent_decision_event`, and `safety_boundary_event`.
+- Recorded bridge non-goals and the next-stage `VcpMemoryGovernanceEventAdapter` contract direction.
+- Confirmed no VCP memory replacement, full DailyNote sync, raw/broad scan, live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material, public MCP expansion, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1754` docs/status VCP memory governance integration map validation.
 
 ## CM-1649 VCP Bridge Live No-Write Probe Design
 

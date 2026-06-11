@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1649 VCP Bridge live no-write probe plan implemented design-only; production/release/cutover ready no |
-| Current task | `CM-1649 VCP Bridge live no-write probe design` |
-| Current validation | `CMV-1753` |
-| Current route | VCP Bridge live no-write probe plan; pure no-network no-runtime no-write |
+| Status | CM-1650 VCP memory governance integration map v0.1 recorded docs-only; production/release/cutover ready no |
+| Current task | `CM-1650 VCP memory governance integration map v0.1` |
+| Current validation | `CMV-1754` |
+| Current route | VCP memory governance integration boundary; docs-only no-live no-write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1650` adds `docs/VCP_MEMORY_GOVERNANCE_INTEGRATION_MAP_V0_1.md`. It redefines the VCP memory / codex-memory split after the VCPToolBox memory-system focused audit: VCP memory remains the runtime owner for `DailyNote`, `KnowledgeBaseManager`, `TagMemo`, `TDBKnowledge`, `LightMemo`, `DailyNoteManager`, `DeepMemo`, `MeshMemo`, `TopicMemo`, and `RAGDiaryPlugin`; codex-memory is the controlled governance layer for selected events such as governance memory events, recall evidence events, write receipt events, memory correction events, agent decision events, and safety boundary events. The map explicitly says not to replace VCP memory, not to sync all diaries, not to read all `DailyNote`, not to perform raw/broad scans, and not to call live VCP or `record_memory`. It defines a minimal VCP Bridge event model and next adapter contract direction for a future `VcpMemoryGovernanceEventAdapter`. This is docs-only and no source/runtime/test behavior changed. VCP memory replacement `NO`; full DailyNote sync `NO`; raw/broad scan `NO`; live VCP proof `NO`; real `record_memory` write `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1649` adds `src/core/VcpBridgeLiveNoWriteProbePlan.js`, `tests/vcp-bridge-live-no-write-probe-plan.test.js`, and `docs/CM1649_VCP_BRIDGE_LIVE_NO_WRITE_PROBE_DESIGN.md`. It implements a pure, no-network, no-runtime, no-MCP, no-write action-plan helper for future `live_bridge_probe_no_write`. The plan requires accepted CM-1646 adapter output, accepted CM-1647 signed/static proof preflight, and accepted CM-1648 approval gate output for `live_bridge_probe_no_write`; missing approval, missing accepted preflight, wrong approval action, requested `live_bridge_record_memory_proof`, write intent, provider/API intent, bearer-token material intent, raw/broad scan intent, confirmed mutation intent, and public MCP expansion intent all fail closed with low-disclosure output. Accepted output lists allowed design checks only and keeps all receipt counters at zero, including network, VCP runtime, MCP, `record_memory`, persistent tag write, provider/API, bearer-token material, raw/broad scan, confirmed mutation, and public MCP expansion counters. Validation passed CM-1649 probe plan test `9/9`, CM-1648 approval gate test `10/10`, CM-1647 proof preflight test `9/9`, and CM-1646 adapter contract test `8/8`. Strict default changed `NO`; production strict mode enabled `NO`; live VCP proof executed `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
@@ -465,7 +467,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1649 closes the design-only VCP Bridge live no-write probe plan only. Next safe action is either VCP Bridge runtime wiring safety preflight or a separate exact approval packet for future live no-write probe execution. Any live bridge probe execution, live `record_memory` proof, production strict default enablement, broad `record_memory` reliability claim, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claim, and complete V8 claim remain separate approval-bound work.
+CM-1650 closes the docs-only VCP memory governance integration boundary map. Next safe action is a VCP memory governance event adapter contract preflight. Any live bridge probe execution, full DailyNote sync, broad VCP memory scan, live `record_memory` proof, production strict default enablement, broad `record_memory` reliability claim, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claim, and complete V8 claim remain separate approval-bound work.
 
 ## Boundaries
 

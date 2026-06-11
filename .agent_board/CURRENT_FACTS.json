@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1649",
-  "validationId": "CMV-1753",
+  "taskId": "CM-1650",
+  "validationId": "CMV-1754",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1754",
+      "scope": "CM-1650 VCP memory governance integration map v0.1",
+      "status": "COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_INTEGRATION_MAP_V0_1_DOCS_ONLY_NO_LIVE_NO_WRITE"
+    },
     {
       "id": "CMV-1753",
       "scope": "CM-1649 VCP Bridge live no-write probe design",
@@ -1246,6 +1251,10 @@
     "future VCP Bridge live no-write probe execution evidence",
     "future VCP Bridge exact live approval execution evidence",
     "future VCP Bridge runtime wiring safety evidence",
+    "future VCP memory governance event adapter contract implementation",
+    "future VCP memory governance event adapter validation",
+    "full DailyNote sync intentionally not performed",
+    "all DailyNote read intentionally not performed",
     "stage 1 observe-only complete-policy rollout evidence",
     "stage 3 strict local runtime candidate evidence",
     "strict principal/scope production deployment control",
@@ -1266,6 +1275,9 @@
     "claudeMdUntrackedUntouched": true,
     "noProviderCalls": true,
     "noRawMemoryAccess": true,
+    "noFullDailyNoteSync": true,
+    "noAllDailyNoteRead": true,
+    "noLiveVcpProof": true,
     "noEffectiveMemoryWrites": false,
     "noBearerTokenUse": true,
     "noPushWithoutExplicitAuthorization": true,
