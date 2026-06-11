@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1677",
-  "validationId": "CMV-1782",
+  "taskId": "CM-1678",
+  "validationId": "CMV-1783",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1783",
+      "scope": "CM-1678 post-push mainline gate receipt after CM-1677",
+      "status": "COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_CM1677"
+    },
     {
       "id": "CMV-1782",
       "scope": "CM-1677 post-push mainline gate receipt after strict auth closeout",

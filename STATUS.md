@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1677 post-push mainline gate receipt after strict auth closeout`.
-Current validation: `CMV-1782`.
-Current project status: post-push `npm run gate:mainline` after `94212a80` passed health, compare, and rollback in daily mode; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
+Current task: `CM-1678 post-push mainline gate receipt after CM-1677`.
+Current validation: `CMV-1783`.
+Current project status: post-push `npm run gate:mainline` after `4c91390f` passed health, compare, and rollback in daily mode; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
 Current route: `POST_PUSH_MAINLINE_GATE_RECEIPT`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1678 post-push mainline gate receipt after CM-1677: added `docs/CM1678_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_CM1677.md`. It records post-push mainline health after `4c91390f docs: record strict auth closeout post-push gate`: fresh Git status before gate was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1677 post-push mainline gate receipt after strict auth closeout: added `docs/CM1677_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT.md`. It records post-push mainline health after `94212a80 test: close out strict auth evidence receipts`: fresh Git status before gate was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

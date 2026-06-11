@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1677 post-push mainline gate receipt after strict auth closeout`.
-Current validation: `CMV-1782`.
-Current handoff: post-push `npm run gate:mainline` after `94212a80` passed health, compare, and rollback; receipt recorded for continuation.
+Current task: `CM-1678 post-push mainline gate receipt after CM-1677`.
+Current validation: `CMV-1783`.
+Current handoff: post-push `npm run gate:mainline` after `4c91390f` passed health, compare, and rollback; receipt recorded for continuation.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: record post-push mainline health after pushing the CM-1672 through CM-1676 local closeout batch.
+Goal: record post-push mainline health after pushing the CM-1677 receipt commit.
 
-Current status: `COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_CM1677`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,26 @@ Current entrypoints:
 
 Completed in this slice:
 
+- Added `docs/CM1678_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_CM1677.md`.
+- Confirmed fresh Git status before gate was `## main...origin/main`.
+- Confirmed `npm run gate:mainline` passed in daily mode after `4c91390f`.
+- Confirmed health ok with HTTP `200`.
+- Confirmed compare matched `43/43`.
+- Confirmed rollback ready `43/43` with recommendation `rollback-safe`.
+- Confirmed no production observe rollout, production strict auth enablement, `.env` edit, production config/profile edit, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1783` post-push mainline gate receipt validation.
+
+Next safe route: commit this post-push receipt if clean, or choose another local docs/source review task. Production observe/strict rollout remains blocked until a fresh exact CM-1664-formatted approval is provided.
+
+## Previous Active Handoff
+
+Goal: record post-push mainline health after pushing the CM-1672 through CM-1676 local closeout batch.
+
+Current status: `COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
 - Added `docs/CM1677_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT.md`.
 - Confirmed fresh Git status before gate was `## main...origin/main`.
 - Confirmed `npm run gate:mainline` passed in daily mode after `94212a80`.
@@ -38,9 +58,9 @@ Completed in this slice:
 
 Validation: `CMV-1782` post-push mainline gate receipt validation.
 
-Next safe route: commit this post-push receipt if clean, or choose another local docs/source review task. Production observe/strict rollout remains blocked until a fresh exact CM-1664-formatted approval is provided.
+Next safe route: push receipt if authorized, then run post-push mainline gate and record receipt.
 
-## Previous Active Handoff
+## Previous CM-1672 Through CM-1676 Handoff
 
 Goal: complete the selected local safe batch: post-push receipt consistency closeout, approval packet helper focused review, expiry/commit-binding negative cases, observe readout next-stage boundary, and VCP governance receipt consistency review.
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1677 post-push mainline gate receipt recorded after pushing `94212a80`; `npm run gate:mainline` passed health, compare, and rollback in daily mode |
-| Current task | `CM-1677 post-push mainline gate receipt after strict auth closeout` |
-| Current validation | `CMV-1782` |
+| Status | CM-1678 post-push mainline gate receipt recorded after pushing `4c91390f`; `npm run gate:mainline` passed health, compare, and rollback in daily mode |
+| Current task | `CM-1678 post-push mainline gate receipt after CM-1677` |
+| Current validation | `CMV-1783` |
 | Current route | Post-push health receipt; no runtime wiring or production rollout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1678` adds `docs/CM1678_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_CM1677.md`. It records the post-push `npm run gate:mainline` result after `4c91390f docs: record strict auth closeout post-push gate`: fresh Git status before gate was `## main...origin/main`; gate passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1677` adds `docs/CM1677_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT.md`. It records the post-push `npm run gate:mainline` result after `94212a80 test: close out strict auth evidence receipts`: fresh Git status before gate was `## main...origin/main`; gate passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
