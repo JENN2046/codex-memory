@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1646 VCP Bridge trusted context adapter skeleton default-off`.
-Current validation: `CMV-1750`.
+Current checkpoint: `CM-1647 VCP Bridge signed/static allowlist proof preflight`.
+Current validation: `CMV-1751`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1647 VCP Bridge Signed Static Allowlist Proof Preflight
+
+Status: `COMPLETED_VALIDATED_VCP_BRIDGE_SIGNED_STATIC_ALLOWLIST_PROOF_PREFLIGHT_FIXTURE_ONLY`
+
+Recorded:
+
+- Added `src/core/VcpBridgeTrustedContextProofPreflight.js`.
+- Added `tests/vcp-bridge-trusted-context-proof-preflight.test.js`.
+- Added `docs/CM1647_VCP_BRIDGE_SIGNED_STATIC_ALLOWLIST_PROOF_PREFLIGHT.md`.
+- Added deterministic context hash helper for fixture mismatch testing.
+- Recorded fixture-only proof packet shape with complete static allowlist and signed-context metadata.
+- Kept `signatureVerified=false`; no real signature verification or private-key handling was added.
+- Rejected expired proof, missing allowlist, mismatched context hash, payload-derived identity, non-accepted adapter output, and secret-shaped material.
+- Confirmed output remains low-disclosure and adapter output is consumable only when proof is accepted.
+- Confirmed no real VCP call, live MCP proof, real `record_memory` write, provider/API, bearer-token material, raw/broad scan, confirmed mutation, public MCP expansion, persistent tag write, release/tag/deploy, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1751` source/test/docs fixture-only proof preflight validation.
 
 ## CM-1646 VCP Bridge Trusted Context Adapter Skeleton
 

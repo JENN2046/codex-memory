@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1646 VCP Bridge trusted context adapter skeleton default-off`.
-Current validation: `CMV-1750`.
-Current status: VCP Bridge trusted context adapter skeleton implemented default-off fixture-only; production/release/cutover ready no.
+Current task: `CM-1647 VCP Bridge signed/static allowlist proof preflight`.
+Current validation: `CMV-1751`.
+Current status: VCP Bridge signed/static allowlist proof preflight implemented fixture-only; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1646` implements a default-off fixture-only VCP Bridge trusted context adapter skeleton after CM-1645. The helper accepts only bridge runtime/static/allowlist authority, normalizes all six trusted fields, rejects prompt/tool payload/public args authority, and fails closed with low-disclosure output for missing fields, incomplete allowlist, non-plain context, non-bridge-owned request source, and allowlist mismatch. The helper is not wired into app, HTTP, stdio, config defaults, VCP runtime, MCP tools, or `record_memory`. Remaining production blockers: strict mode is still not production default, bridge-side signed/static allowlist proof is not executed, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is bridge-side signed/static context fixture proof or static allowlist runbook evidence.
+`CM-1647` implements fixture-only VCP Bridge signed/static allowlist proof preflight after CM-1646. The helper defines proof packet shape, signed-context metadata shape, deterministic context hash mismatch checks, expired proof rejection, missing allowlist rejection, payload-derived identity rejection, non-accepted adapter output rejection, and secret-shaped material rejection. `signatureVerified` remains `false`; no real signature verification, private-key handling, live bridge proof, runtime wiring, or `record_memory` call was added. Remaining production blockers: strict mode is still not production default, exact live bridge approval is not granted, runtime wiring safety is not proven, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is runtime wiring safety preflight or exact-approval packet design for future live bridge proof.
 
 ## Historical Run Notes
 

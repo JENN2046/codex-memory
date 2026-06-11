@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1646 VCP Bridge trusted context adapter skeleton implemented default-off fixture-only; production/release/cutover ready no |
-| Current task | `CM-1646 VCP Bridge trusted context adapter skeleton default-off` |
-| Current validation | `CMV-1750` |
-| Current route | VCP Bridge trusted executionContext adapter skeleton; default-off fixture-only |
+| Status | CM-1647 VCP Bridge signed/static allowlist proof preflight implemented fixture-only; production/release/cutover ready no |
+| Current task | `CM-1647 VCP Bridge signed/static allowlist proof preflight` |
+| Current validation | `CMV-1751` |
+| Current route | VCP Bridge signed/static allowlist proof preflight; fixture-only no-live |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1647` adds `src/core/VcpBridgeTrustedContextProofPreflight.js`, `tests/vcp-bridge-trusted-context-proof-preflight.test.js`, and `docs/CM1647_VCP_BRIDGE_SIGNED_STATIC_ALLOWLIST_PROOF_PREFLIGHT.md`. It defines a fixture-only signed/static allowlist proof preflight for CM-1646 adapter output. The proof packet shape includes complete static allowlist plus signed-context metadata `issuedAt`, `expiresAt`, `nonce`, `bridgeInstanceId`, `contextHash`, `signaturePresent=true`, and `signatureVerified=false`. The deterministic hash binds accepted adapter `executionContext` to the static allowlist for fixture mismatch testing only. The helper rejects expired proof, missing allowlist, mismatched context hash, payload-derived identity, non-accepted adapter output, and private key / signing key / bearer-token / API key / secret-shaped material. Output remains low-disclosure and adapter output is consumable only when proof is accepted. Validation passed CM-1647 proof preflight test `9/9` and CM-1646 adapter contract test `8/8`. Strict default changed `NO`; production strict mode enabled `NO`; real signature verification occurred `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1646` adds `src/core/VcpBridgeTrustedExecutionContext.js`, `tests/vcp-bridge-trusted-context-contract.test.js`, and `docs/CM1646_VCP_BRIDGE_TRUSTED_CONTEXT_ADAPTER_SKELETON.md`. It implements a default-off, fixture-only VCP Bridge trusted context adapter skeleton that accepts only `bridgeRuntimeContext`, `bridgeStaticConfig`, and `bridgeAllowlist`, normalizes bridge-owned context into `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId`, and fails closed for missing fields, incomplete allowlist, non-plain runtime/static context, non-bridge-owned `requestSource`, allowlist mismatch, or prompt/tool payload/public args as authority. Rejected output is low-disclosure and does not echo raw `agentId`, `workspaceId`, or `clientId`; accepted output reports `payloadAuthorityUsed=false`, `publicMcpExpanded=false`, `recordMemoryCalled=false`, and `providerApiCalled=false`. The helper is not wired into app, HTTP, stdio, config defaults, VCP runtime, MCP tools, or `record_memory`. Validation passed the CM-1646 fixture contract test `8/8` and existing principal/scope config test `10/10`. Strict default changed `NO`; production strict mode enabled `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
