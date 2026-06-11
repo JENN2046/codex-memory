@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1681 compact post-push health note after CM-1680 push`.
-Current validation: `CMV-1786`.
+Current checkpoint: `CM-1682 post-push compact mode contract validation`.
+Current validation: `CMV-1787`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1682 Post-Push Compact Mode Contract Validation
+
+Status: `COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_CONTRACT_VALIDATION_FIXTURE_ONLY`
+
+Recorded:
+
+- Added `src/core/PostPushGateCompactModeContract.js`.
+- Added `tests/fixtures/post-push-gate-compact-mode-cm1682-v1.json`.
+- Added `tests/post-push-gate-compact-mode-contract.test.js`.
+- Confirmed routine compact mode acceptance.
+- Confirmed dedicated receipt doc exception flags fail closed.
+- Confirmed missing required fields fail closed.
+- Confirmed positive forbidden non-claims fail closed.
+- Confirmed helper reports no runtime/provider/memory/public-MCP/readiness actions.
+
+Validation: `CMV-1787` compact mode contract test passed `6/6`.
 
 ## CM-1681 Compact Post-Push Health Note After CM-1680 Push
 

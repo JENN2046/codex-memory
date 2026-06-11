@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1681",
-  "validationId": "CMV-1786",
+  "taskId": "CM-1682",
+  "validationId": "CMV-1787",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1787",
+      "scope": "CM-1682 post-push compact mode contract validation",
+      "status": "COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_CONTRACT_VALIDATION_FIXTURE_ONLY"
+    },
     {
       "id": "CMV-1786",
       "scope": "CM-1681 compact post-push health note after CM-1680 push",

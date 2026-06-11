@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1681 compact post-push health note after CM-1680 push`.
-Current validation: `CMV-1786`.
-Current handoff: post-push `npm run gate:mainline` after `f67a2ce7` passed health, compare, and rollback; compact status note recorded without adding a new receipt doc.
+Current task: `CM-1682 post-push compact mode contract validation`.
+Current validation: `CMV-1787`.
+Current handoff: post-push compact mode now has fixture-only helper/test contract validation; compact acceptance and fail-closed exception paths passed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: record compact post-push mainline health after pushing the CM-1680 compact mode policy commit.
+Goal: add fixture-only contract validation for post-push gate compact mode.
 
-Current status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1680_PUSH`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_CONTRACT_VALIDATION_FIXTURE_ONLY`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,24 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+
+Completed in this slice:
+
+- Added `src/core/PostPushGateCompactModeContract.js`.
+- Added `tests/fixtures/post-push-gate-compact-mode-cm1682-v1.json`.
+- Added `tests/post-push-gate-compact-mode-contract.test.js`.
+- Validated routine compact acceptance, dedicated receipt exception fail-closed behavior, missing required fields, forbidden positive non-claims, required vocabulary, and no runtime/provider/memory/public-MCP/readiness actions.
+- Confirmed no runtime wiring, production config/profile edit, `.env` edit, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1787` compact mode contract test `6/6`.
+
+Next safe route: run docs validation and commit this fixture-only contract if clean, or continue with another local docs/test hardening task.
+
+## Previous Active Handoff
+
+Goal: record compact post-push mainline health after pushing the CM-1680 compact mode policy commit.
+
+Current status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1680_PUSH`; production/release/cutover ready no; complete V8 not claimed.
 
 Completed in this slice:
 

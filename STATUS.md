@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1681 compact post-push health note after CM-1680 push`.
-Current validation: `CMV-1786`.
-Current project status: compact post-push `npm run gate:mainline` note after `f67a2ce7` passed health, compare, and rollback in daily mode; no new receipt doc, runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
-Current route: `POST_PUSH_GATE_COMPACT_MODE`.
+Current task: `CM-1682 post-push compact mode contract validation`.
+Current validation: `CMV-1787`.
+Current project status: post-push compact mode now has fixture-only contract validation for routine acceptance, required fields, receipt-doc exception fail-closed paths, and forbidden boundary non-claims; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
+Current route: `POST_PUSH_GATE_COMPACT_MODE_CONTRACT_VALIDATION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1682 post-push compact mode contract validation: added `src/core/PostPushGateCompactModeContract.js`, `tests/fixtures/post-push-gate-compact-mode-cm1682-v1.json`, and `tests/post-push-gate-compact-mode-contract.test.js`. It locks routine compact mode acceptance, required compact fields, dedicated receipt doc exception vocabulary, missing-field fail-closed behavior, positive forbidden non-claim fail-closed behavior, and no runtime/provider/memory/public-MCP/readiness action flags. Validation passed compact mode contract test `6/6`. Runtime wiring `NO`; source runtime behavior change `NO`; production config `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1681 compact post-push health note after CM-1680 push: no new receipt doc was added. It records post-push mainline health after `f67a2ce7 docs: define post-push gate compact mode`: fresh Git status before gate was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

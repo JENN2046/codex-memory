@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1681 compact post-push health note recorded after pushing `f67a2ce7`; `npm run gate:mainline` passed health, compare, and rollback in daily mode |
-| Current task | `CM-1681 compact post-push health note after CM-1680 push` |
-| Current validation | `CMV-1786` |
-| Current route | Compact post-push health note; no new receipt doc, runtime wiring, or production rollout |
+| Status | CM-1682 post-push compact mode contract validation added as fixture-only helper/test; compact acceptance and fail-closed receipt-doc exception paths passed |
+| Current task | `CM-1682 post-push compact mode contract validation` |
+| Current validation | `CMV-1787` |
+| Current route | Fixture-only governance contract validation; no runtime wiring or production rollout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1682` adds `src/core/PostPushGateCompactModeContract.js`, `tests/fixtures/post-push-gate-compact-mode-cm1682-v1.json`, and `tests/post-push-gate-compact-mode-contract.test.js`. It fixture-tests routine compact mode acceptance, dedicated receipt doc exception fail-closed behavior, missing required field fail-closed behavior, positive forbidden non-claim fail-closed behavior, required field vocabulary, and no runtime/provider/memory/public-MCP/readiness actions. Validation passed post-push compact mode contract test `6/6`. Runtime wiring `NO`; source runtime behavior change `NO`; production config `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`.
 
 `CM-1681` records a compact post-push health note without adding a new receipt doc. After pushing `f67a2ce7 docs: define post-push gate compact mode`, fresh Git status was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
