@@ -69,6 +69,15 @@ const RUNTIME_FRESHNESS_KEYS = [
   'startedAt'
 ];
 
+const RECORD_MEMORY_PRINCIPAL_SCOPE_POLICY = {
+  allowedAgentAlias: 'Codex',
+  allowedAgentIds: ['codex-desktop'],
+  allowedRequestSources: ['codex-memory-mcp'],
+  allowedProjectIds: ['codex-memory'],
+  allowedWorkspaceIds: ['workspace-alpha'],
+  allowedClientIds: ['codex']
+};
+
 async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
   const app = createCodexMemoryApplication({
@@ -1042,6 +1051,140 @@ test('HTTP MCP should execute record_memory through authorized tools/call', asyn
     assert.equal(payload.result.structuredContent.decision, 'accepted');
     assert.equal(payload.result.structuredContent.agentAlias, 'Codex');
   }, { bearerToken: 'test-token' });
+});
+
+test('CM1642 HTTP MCP strict principal scope uses trusted base context and accepts match', async () => {
+  await withHttpServer(async ({ address }) => {
+    const initResponse = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {}
+      })
+    });
+    const sessionId = initResponse.headers.get(SESSION_HEADER);
+    assert.ok(sessionId);
+
+    const record = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token',
+        [SESSION_HEADER]: sessionId
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 2,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: 'HTTP strict principal scope accepted',
+            content: 'Type: checkpoint\nvia http strict context test',
+            evidence: 'CM-1642 http strict matching regression',
+            validated: true,
+            reusable: false,
+            sensitivity: 'none'
+          }
+        }
+      })
+    });
+    const payload = await record.json();
+
+    assert.equal(record.status, 200);
+    assert.equal(payload.result.structuredContent.decision, 'accepted');
+    assert.equal(payload.result.structuredContent.principalScopeAuthorization, undefined);
+  }, {
+    bearerToken: 'test-token',
+    baseRequestContext: {
+      executionContext: {
+        projectId: 'codex-memory',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex'
+      }
+    }
+  }, {
+    recordMemoryPrincipalScopeAuthorization: {
+      mode: 'strict',
+      policy: RECORD_MEMORY_PRINCIPAL_SCOPE_POLICY
+    }
+  });
+});
+
+test('CM1642 HTTP MCP strict principal scope does not trust payload scope as principal source', async () => {
+  await withHttpServer(async ({ address }) => {
+    const initResponse = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {}
+      })
+    });
+    const sessionId = initResponse.headers.get(SESSION_HEADER);
+    assert.ok(sessionId);
+
+    const record = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token',
+        [SESSION_HEADER]: sessionId
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 2,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: 'HTTP strict payload scope rejected',
+            content: 'Type: checkpoint\npayload scope must not authorize principal scope',
+            evidence: 'CM-1642 http payload scope negative regression',
+            validated: true,
+            reusable: false,
+            sensitivity: 'none',
+            project_id: 'codex-memory',
+            workspace_id: 'workspace-alpha',
+            client_id: 'codex'
+          }
+        }
+      })
+    });
+    const payload = await record.json();
+    const serialized = JSON.stringify(payload);
+
+    assert.equal(record.status, 200);
+    assert.equal(payload.result.structuredContent.decision, 'rejected');
+    assert.deepEqual(payload.result.structuredContent.principalScopeAuthorization.missingRequiredContextFields, [
+      'projectId',
+      'workspaceId',
+      'clientId'
+    ]);
+    assert.doesNotMatch(serialized, /workspace-alpha/);
+    assert.doesNotMatch(serialized, /client_id/);
+    assert.doesNotMatch(serialized, /project_id/);
+  }, {
+    bearerToken: 'test-token'
+  }, {
+    recordMemoryPrincipalScopeAuthorization: {
+      mode: 'strict',
+      policy: RECORD_MEMORY_PRINCIPAL_SCOPE_POLICY
+    }
+  });
 });
 test('HTTP MCP session hardening should expose invalid env fallback warnings', async () => {
   const hardening = createSessionHardeningConfig({

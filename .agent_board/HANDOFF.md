@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1641 post-PRO remediation focused review receipt`.
-Current validation: `CMV-1745`.
-Current handoff: post-PRO focused review receipt recorded; residual production blockers remain.
+Current task: `CM-1642 record_memory strict context config wiring`.
+Current validation: `CMV-1746`.
+Current handoff: strict config/context wiring implemented default-off; residual production blockers remain.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: record the post-PRO remediation focused review receipt for current HEAD and residual production blockers without runtime/proof/write action.
+Goal: implement default-off `record_memory` strict principal/scope config/env/profile/context wiring without making strict mode a production default.
 
-Current status: `PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS`; scoped RC ready yes; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_CONTEXT_CONFIG_WIRING_DEFAULT_OFF_NO_PRODUCTION_STRICT_DEFAULT`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1642 implemented default-off `record_memory` strict principal/scope config/profile/env/context wiring. Effective `observe` or `strict` requires complete policy; incomplete policy stays `off`. HTTP/stdio trusted context now carries `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId` from env/base/config only; tool payload scope is not used as production principal authority. Validation passed config `10/10`, integration `11/11`, and HTTP MCP `29/29`; public MCP surface remains seven tools. Default runtime behavior changed `NO`; production strict mode enabled `NO`; broad `record_memory` reliability `NOT_PROVEN`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`. No provider/API, bearer-token material, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective real `record_memory` write, persistent tag write, release/tag/deploy, production/release/cutover ready claim, or complete V8 ready claim occurred.
 - CM-1641 added `docs/CM1641_POST_PRO_REMEDIATION_FOCUSED_REVIEW_RECEIPT.md`. It records focused review anchors current HEAD `668168851e47099ac0810d4c6e86c9efbd62f3a9` and remediation target `537977798bd624118ba3f20d486e7a6626762f51`. Result: `PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS`; scoped RC ready `YES`; production ready `NO`; release ready `NO`; cutover ready `NO`; complete V8 `NOT_CLAIMED`; public MCP surface `STILL_7_TOOLS`. Remaining blockers are strict principal/scope not default production policy, no-token `/health` `sourceFingerprint` still public by bounded decision, production persistent TagMemo writer not implemented, runtime/public MCP persistent TagMemo enrichment not completed, broad `record_memory` reliability not proven, and complete V8 not claimed. No provider/API, bearer-token flow, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, persistent tag write, release/tag/deploy, production/release/cutover ready claim, or complete V8 ready claim occurred.
 - CM-1640 added `src/core/RecordMemoryPrincipalScopeAuthorizationConfig.js`, updated `src/config/createConfig.js`, updated `src/app.js`, expanded `tests/record-memory-principal-scope-observe-only-integration.test.js`, added `tests/record-memory-principal-scope-authorization-config.test.js`, and added `docs/CM1640_RECORD_MEMORY_PRINCIPAL_SCOPE_DEFAULT_OFF_SOURCE_SLICE.md`. It implements default-off config normalization for `recordMemoryPrincipalScopeAuthorization.mode=off|observe|strict` from explicit overrides only. Default remains `off`, with no preflight/policy injected into `MemoryWriteService`; observe mode runs low-disclosure preflight without rejecting; strict mode rejects missing/mismatched required fields before persistence in temp-local tests. Targeted validation passed `19/19`, security write policy passed `3/3`, and HTTP MCP record/no-token/missing-token subset passed `27/27`; full `npm test` was attempted and returned `3251/3252` because an unrelated Windows temp-local vector-index `EPERM` rename hit `tests/public-default-search-lifecycle-tombstone-cold-derived-temp-local-evidence.test.js`, which passed when rerun alone `1/1`; public MCP surface remains exactly seven tools. No env var, profile file, public MCP schema field, HTTP/stdio context parsing, bearer-token behavior, default strict rejection, live MCP traffic outside temp-local tests, provider/API, real memory read/write, raw store scan, broad memory scan, public MCP expansion, production/release/cutover readiness, or complete V8 occurred.
 - CM-1639 added `docs/CM1639_RECORD_MEMORY_PRODUCTION_AUTH_SCOPE_STRICT_MODE_DESIGN_PREFLIGHT.md`. It formally closes the P2-2 design-preflight gap by defining the future default-off config/profile contract for `record_memory` principal/scope strict mode, trusted context source rules, HTTP/stdio compatibility requirements, low-disclosure strict rejection boundary, and future acceptance matrix. It confirms production runtime enforcement is still not implemented: current config/profile has no strict principal/scope control, HTTP/stdio defaults still do not derive `projectId`, `workspaceId`, or `clientId`, and bearer auth alone is not sufficient for principal/scope authorization. No env/config key, profile field, HTTP/stdio context parsing, bearer-token behavior, default strict mode, runtime authorization change, live MCP traffic, provider/API, real memory read/write, raw store scan, broad memory scan, public MCP expansion, production/release/cutover readiness, or complete V8 occurred.

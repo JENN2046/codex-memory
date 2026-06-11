@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1641",
-  "validationId": "CMV-1745",
+  "taskId": "CM-1642",
+  "validationId": "CMV-1746",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -21,10 +21,10 @@
     "url": null
   },
   "reviewedObject": {
-    "commit": "668168851e47099ac0810d4c6e86c9efbd62f3a9",
-    "parent": "537977798bd624118ba3f20d486e7a6626762f51",
-    "source": "post_pro_remediation_focused_review_receipt",
-    "presentInLocalCheckout": true
+    "commit": null,
+    "parent": null,
+    "source": "none",
+    "presentInLocalCheckout": null
   },
   "status": {
     "project": "READY",
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1746",
+      "scope": "CM-1642 record_memory strict context config wiring",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_CONTEXT_CONFIG_WIRING_DEFAULT_OFF_NO_PRODUCTION_STRICT_DEFAULT"
+    },
     {
       "id": "CMV-1745",
       "scope": "CM-1641 post-PRO remediation focused review receipt",
@@ -1211,13 +1216,14 @@
     "production persistent TagMemo enrichment",
     "complete V8 implementation",
     "post-PRO remaining production blockers",
+    "production default strict principal/scope policy",
     "committed live Git head facts"
   ],
   "constraints": {
     "claudeMdUntrackedUntouched": true,
     "noProviderCalls": true,
     "noRawMemoryAccess": true,
-    "noEffectiveMemoryWrites": true,
+    "noEffectiveMemoryWrites": false,
     "noBearerTokenUse": true,
     "noPushWithoutExplicitAuthorization": true,
     "noCommittedLiveGitHeads": true,

@@ -307,6 +307,132 @@ test('CM1640 strict config rejects missing scope before persistence with low dis
   });
 });
 
+test('CM1642 observe config accepts matching temp-local context without rejecting', async () => {
+  const observed = [];
+
+  await withApp(async ({ app }) => {
+    const result = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Checkpoint observe config matching principal scope',
+      content: 'Type: checkpoint\nrisk: observe mode should accept matching temp-local context',
+      evidence: 'CM-1642 observe matching regression',
+      validated: true,
+      reusable: false,
+      sensitivity: 'none'
+    }, {
+      executionContext: {
+        agentAlias: 'Codex',
+        agentId: 'codex-desktop',
+        requestSource: 'codex-memory-mcp',
+        projectId: 'codex-memory',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex'
+      }
+    });
+
+    assert.equal(result.decision, 'accepted');
+    assert.equal(result.principalScopeAuthorization, undefined);
+    assert.equal(observed.length, 1);
+    assert.equal(observed[0].acceptedForPrincipalScopeAuthorizationPreflight, true);
+    assert.equal(observed[0].recordMemoryRuntimeIntegrated, true);
+  }, {
+    recordMemoryPrincipalScopeAuthorization: {
+      mode: 'observe',
+      policy
+    },
+    recordMemoryPrincipalScopeAuthorizationObserver: summary => observed.push(summary)
+  });
+});
+
+test('CM1642 strict config accepts complete matching temp-local context', async () => {
+  const observed = [];
+
+  await withApp(async ({ app }) => {
+    const result = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Checkpoint strict config matching principal scope',
+      content: 'Type: checkpoint\nrisk: strict config should accept complete matching temp-local context',
+      evidence: 'CM-1642 strict matching regression',
+      validated: true,
+      reusable: false,
+      sensitivity: 'none'
+    }, {
+      executionContext: {
+        agentAlias: 'Codex',
+        agentId: 'codex-desktop',
+        requestSource: 'codex-memory-mcp',
+        projectId: 'codex-memory',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex'
+      }
+    });
+
+    assert.equal(result.decision, 'accepted');
+    assert.equal(result.principalScopeAuthorization, undefined);
+    assert.equal(observed.length, 1);
+    assert.equal(observed[0].acceptedForPrincipalScopeAuthorizationPreflight, true);
+    assert.equal(observed[0].allPrincipalScopeMatched, true);
+  }, {
+    recordMemoryPrincipalScopeAuthorization: {
+      mode: 'strict',
+      policy
+    },
+    recordMemoryPrincipalScopeAuthorizationObserver: summary => observed.push(summary)
+  });
+});
+
+test('CM1642 strict config rejects mismatched context before persistence with low disclosure', async () => {
+  const observed = [];
+
+  await withApp(async ({ app }) => {
+    const result = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Checkpoint strict config mismatched principal scope rejected',
+      content: 'Type: checkpoint\nrisk: strict config should reject mismatched context before persistence',
+      evidence: 'CM-1642 strict mismatched regression',
+      validated: true,
+      reusable: false,
+      sensitivity: 'none'
+    }, {
+      executionContext: {
+        agentAlias: 'Codex',
+        agentId: 'unexpected-agent',
+        requestSource: 'codex-memory-mcp',
+        projectId: 'codex-memory',
+        workspaceId: 'workspace-beta',
+        clientId: 'claude'
+      }
+    });
+
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.filePath, null);
+    assert.equal(result.shadowWrite.status, 'skipped');
+    assert.deepEqual(result.principalScopeAuthorization.mismatchedFields, [
+      'agentId',
+      'workspaceId',
+      'clientId'
+    ]);
+    assert.equal(observed.length, 1);
+    assert.equal(observed[0].acceptedForPrincipalScopeAuthorizationPreflight, false);
+
+    const publicResult = JSON.stringify(result);
+    assert.doesNotMatch(publicResult, /workspace-beta/);
+    assert.doesNotMatch(publicResult, /unexpected-agent/);
+    assert.doesNotMatch(publicResult, /claude/);
+
+    const auditText = await fs.readFile(app.config.auditLogPath, 'utf8');
+    assert.doesNotMatch(auditText, /workspace-beta/);
+    assert.doesNotMatch(auditText, /unexpected-agent/);
+    assert.doesNotMatch(auditText, /claude/);
+  }, {
+    recordMemoryPrincipalScopeAuthorization: {
+      mode: 'strict',
+      policy
+    },
+    recordMemoryPrincipalScopeAuthorizationObserver: summary => observed.push(summary)
+  });
+});
+
 test('CM1634 strict principal scope mode accepts exact temp-local principal and scope', async () => {
   await withApp(async ({ app }) => {
     const observed = [];

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1641 post-PRO remediation focused review receipt`.
-Current validation: `CMV-1745`.
-Current status: post-PRO focused review receipt recorded; scoped RC ready yes, production/release/cutover ready no.
+Current task: `CM-1642 record_memory strict context config wiring`.
+Current validation: `CMV-1746`.
+Current status: strict config/context wiring implemented default-off; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1641` records the post-PRO remediation focused review receipt for current HEAD `668168851e47099ac0810d4c6e86c9efbd62f3a9` and remediation target `537977798bd624118ba3f20d486e7a6626762f51`. Result is `PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS`: scoped RC ready yes, production/release/cutover ready no, complete V8 not claimed, and public MCP surface still seven tools. Remaining production blockers are strict principal/scope not default production policy, no-token `/health` `sourceFingerprint` still public by bounded decision, production persistent TagMemo writer not implemented, runtime/public MCP persistent TagMemo enrichment not completed, broad `record_memory` reliability not proven, and complete V8 not claimed. Next safe route is one blocker-focused design/source slice; production claims still require separate evidence.
+`CM-1642` implements default-off strict principal/scope config/env/profile/context wiring for `record_memory`. It closes the wiring part of blocker #1 without making strict mode the production default. Remaining production blockers: no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is a separate default policy decision/production acceptance packet or another remaining blocker slice.
 
 ## Historical Run Notes
 

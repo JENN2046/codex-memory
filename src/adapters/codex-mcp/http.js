@@ -4,6 +4,9 @@ const http = require('node:http');
 const crypto = require('node:crypto');
 
 const { CodexMemoryMcpServer, jsonRpcError } = require('./server');
+const {
+  buildRecordMemoryTrustedExecutionContext
+} = require('../../core/RecordMemoryTrustedExecutionContext');
 
 const SESSION_HEADER = 'Mcp-Session-Id';
 const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
@@ -364,11 +367,10 @@ function createStreamableHttpServer({
   const sessionStreams = new Map();
   const sessionMetadata = new Map();
   const sessionHardening = createSessionHardeningConfig(sessionHardeningEnv);
-  const defaultExecutionContext = {
-    agentAlias: process.env.CODEX_MEMORY_AGENT_ALIAS || baseRequestContext.executionContext?.agentAlias || app.config.allowedAgentAlias || 'Codex',
-    agentId: process.env.CODEX_MEMORY_AGENT_ID || baseRequestContext.executionContext?.agentId || app.config.defaultAgentId,
-    requestSource: process.env.CODEX_MEMORY_REQUEST_SOURCE || baseRequestContext.executionContext?.requestSource || app.config.defaultRequestSource
-  };
+  const defaultExecutionContext = buildRecordMemoryTrustedExecutionContext({
+    config: app.config,
+    baseRequestContext
+  });
 
   function now() {
     return sessionClock();

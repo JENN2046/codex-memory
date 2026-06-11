@@ -1,4 +1,7 @@
 const { CodexMemoryMcpServer } = require('./server');
+const {
+  buildRecordMemoryTrustedExecutionContext
+} = require('../../core/RecordMemoryTrustedExecutionContext');
 
 function encodeMessage(message) {
   const body = Buffer.from(JSON.stringify(message), 'utf8');
@@ -34,11 +37,10 @@ function createStdioServer({ app, input = process.stdin, output = process.stdout
 
     const result = await server.handleJsonRpc(message, {
       ...baseRequestContext,
-      executionContext: {
-        agentAlias: process.env.CODEX_MEMORY_AGENT_ALIAS || baseRequestContext.executionContext?.agentAlias || 'Codex',
-        agentId: process.env.CODEX_MEMORY_AGENT_ID || baseRequestContext.executionContext?.agentId || app.config.defaultAgentId,
-        requestSource: process.env.CODEX_MEMORY_REQUEST_SOURCE || baseRequestContext.executionContext?.requestSource || app.config.defaultRequestSource
-      }
+      executionContext: buildRecordMemoryTrustedExecutionContext({
+        config: app.config,
+        baseRequestContext
+      })
     });
 
     if (result && !result.notification && result.response) {

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | post-PRO focused review receipt recorded; scoped RC ready yes, production/release/cutover ready no |
-| Current task | `CM-1641 post-PRO remediation focused review receipt` |
-| Current validation | `CMV-1745` |
-| Current route | PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS receipt; docs/status only |
+| Status | CM-1642 strict config/context wiring implemented default-off; production/release/cutover ready no |
+| Current task | `CM-1642 record_memory strict context config wiring` |
+| Current validation | `CMV-1746` |
+| Current route | strict principal/scope env/profile/context wiring default-off; no production strict default |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1642` adds default-off `record_memory` strict principal/scope config/profile/env/context wiring. It updates `src/core/RecordMemoryPrincipalScopeAuthorizationConfig.js`, adds `src/core/RecordMemoryTrustedExecutionContext.js`, updates `src/config/createConfig.js`, updates HTTP/stdio adapters, expands principal/scope tests, expands HTTP MCP tests, and adds `docs/CM1642_RECORD_MEMORY_STRICT_CONTEXT_CONFIG_WIRING.md`. Effective `observe` or `strict` mode now requires a complete policy; missing or malformed policy stays effective `off`. HTTP/stdio trusted context can now carry `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId` from env/base/config sources only; tool payload scope is not used as production principal authority. Validation passed config `10/10`, integration `11/11`, and HTTP MCP `29/29`; public MCP surface remains exactly seven tools. Default runtime behavior changed `NO`; production strict mode enabled `NO`; broad `record_memory` reliability `NOT_PROVEN`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`. No provider/API, bearer-token material, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective real `record_memory` write, persistent tag write, release/tag/deploy, production/release/cutover ready claim, or complete V8 ready claim occurred.
 
 `CM-1641` adds `docs/CM1641_POST_PRO_REMEDIATION_FOCUSED_REVIEW_RECEIPT.md`. It records the focused post-PRO remediation review receipt for current HEAD `668168851e47099ac0810d4c6e86c9efbd62f3a9` and remediation target `537977798bd624118ba3f20d486e7a6626762f51`. Result: `PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS`; scoped RC ready `YES`; production ready `NO`; release ready `NO`; cutover ready `NO`; complete V8 `NOT_CLAIMED`; public MCP surface `STILL_7_TOOLS`. Remaining blockers: `record_memory` strict principal/scope is not default production policy, no-token `/health` `sourceFingerprint` remains public by bounded threat-model decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. This is docs/status review only. No provider/API, bearer-token flow, raw store scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, persistent tag write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 ready claim occurred.
 

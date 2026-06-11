@@ -106,9 +106,81 @@ function pickFirstNonEmpty(...values) {
   for (const value of values) {
     if (value === undefined || value === null) continue;
     if (typeof value === 'string' && !value.trim()) continue;
+    if (Array.isArray(value) && value.length === 0) continue;
     return value;
   }
   return undefined;
+}
+
+function getNestedPlainObject(source, key) {
+  return source && typeof source === 'object' && !Array.isArray(source) &&
+    source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])
+    ? source[key]
+    : {};
+}
+
+function buildRecordMemoryPrincipalScopeAuthorizationConfigSource({
+  overrides = {},
+  env = process.env,
+  profileParams = {}
+} = {}) {
+  const overrideConfig = getNestedPlainObject(overrides, 'recordMemoryPrincipalScopeAuthorization');
+  const profileConfig = getNestedPlainObject(profileParams, 'recordMemoryPrincipalScopeAuthorization');
+  const overridePolicy = getNestedPlainObject(overrideConfig, 'policy');
+  const profilePolicy = getNestedPlainObject(profileConfig, 'policy');
+
+  return {
+    mode: pickFirstNonEmpty(
+      overrideConfig.mode,
+      env.CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE,
+      profileConfig.mode,
+      'off'
+    ),
+    policy: {
+      allowedAgentAlias: pickFirstNonEmpty(
+        overridePolicy.allowedAgentAlias,
+        overrideConfig.allowedAgentAlias,
+        env.CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_ALIAS,
+        profilePolicy.allowedAgentAlias,
+        profileConfig.allowedAgentAlias
+      ),
+      allowedAgentIds: pickFirstNonEmpty(
+        overridePolicy.allowedAgentIds,
+        overrideConfig.allowedAgentIds,
+        env.CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_IDS,
+        profilePolicy.allowedAgentIds,
+        profileConfig.allowedAgentIds
+      ),
+      allowedRequestSources: pickFirstNonEmpty(
+        overridePolicy.allowedRequestSources,
+        overrideConfig.allowedRequestSources,
+        env.CODEX_MEMORY_RECORD_MEMORY_ALLOWED_REQUEST_SOURCES,
+        profilePolicy.allowedRequestSources,
+        profileConfig.allowedRequestSources
+      ),
+      allowedProjectIds: pickFirstNonEmpty(
+        overridePolicy.allowedProjectIds,
+        overrideConfig.allowedProjectIds,
+        env.CODEX_MEMORY_RECORD_MEMORY_ALLOWED_PROJECT_IDS,
+        profilePolicy.allowedProjectIds,
+        profileConfig.allowedProjectIds
+      ),
+      allowedWorkspaceIds: pickFirstNonEmpty(
+        overridePolicy.allowedWorkspaceIds,
+        overrideConfig.allowedWorkspaceIds,
+        env.CODEX_MEMORY_RECORD_MEMORY_ALLOWED_WORKSPACE_IDS,
+        profilePolicy.allowedWorkspaceIds,
+        profileConfig.allowedWorkspaceIds
+      ),
+      allowedClientIds: pickFirstNonEmpty(
+        overridePolicy.allowedClientIds,
+        overrideConfig.allowedClientIds,
+        env.CODEX_MEMORY_RECORD_MEMORY_ALLOWED_CLIENT_IDS,
+        profilePolicy.allowedClientIds,
+        profileConfig.allowedClientIds
+      )
+    }
+  };
 }
 
 function parsePositiveInteger(value, fallback) {
@@ -320,6 +392,13 @@ function createConfig(overrides = {}) {
     dimension: inferredEmbedDimensions,
     version: embeddingProfileVersion
   });
+  const ragProfileConfig = loadRagProfileConfig({
+    filePath: resolveAbsolutePath(
+      basePath,
+      overrides.ragParamsPath || process.env.CODEX_MEMORY_RAG_PARAMS_PATH || ''
+    ),
+    embeddingFingerprint
+  });
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
   const vectorIndexPath = resolveAbsolutePath(
     basePath,
@@ -370,6 +449,9 @@ function createConfig(overrides = {}) {
     allowedAgentAlias: overrides.allowedAgentAlias || process.env.CODEX_MEMORY_ALLOWED_AGENT || 'Codex',
     defaultAgentId: overrides.defaultAgentId || process.env.CODEX_MEMORY_AGENT_ID || 'codex-desktop',
     defaultRequestSource: overrides.defaultRequestSource || process.env.CODEX_MEMORY_REQUEST_SOURCE || 'codex-memory-mcp',
+    defaultProjectId: overrides.defaultProjectId || process.env.CODEX_MEMORY_PROJECT_ID || '',
+    defaultWorkspaceId: overrides.defaultWorkspaceId || process.env.CODEX_MEMORY_WORKSPACE_ID || '',
+    defaultClientId: overrides.defaultClientId || process.env.CODEX_MEMORY_CLIENT_ID || '',
     httpHost: overrides.httpHost || process.env.CODEX_MEMORY_HTTP_HOST || '127.0.0.1',
     httpPort: parsePositiveInteger(overrides.httpPort || process.env.CODEX_MEMORY_HTTP_PORT || '7605', 7605),
     httpMcpPath: normalizeHttpPath(overrides.httpMcpPath || process.env.CODEX_MEMORY_HTTP_PATH || '/mcp/codex-memory'),
@@ -423,7 +505,12 @@ function createConfig(overrides = {}) {
     enableLifecycleReadPolicy: _resolveBool(overrides.enableLifecycleReadPolicy, 'CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY', isHardened),
     enableWritePreflight: _resolveBool(overrides.enableWritePreflight, 'CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT', isHardened),
     recordMemoryPrincipalScopeAuthorization:
-      normalizeRecordMemoryPrincipalScopeAuthorizationConfig(overrides.recordMemoryPrincipalScopeAuthorization),
+      normalizeRecordMemoryPrincipalScopeAuthorizationConfig(
+        buildRecordMemoryPrincipalScopeAuthorizationConfigSource({
+          overrides,
+          profileParams: ragProfileConfig.params
+        })
+      ),
     allowExternalProvider,
     enableWriteManifest: toBoolean(overrides.enableWriteManifest ?? process.env.CODEX_MEMORY_ENABLE_WRITE_MANIFEST, true),
     candidateCacheTtlMs: Number.parseInt(String(overrides.candidateCacheTtlMs || process.env.CODEX_MEMORY_CANDIDATE_CACHE_TTL_MS || '3600000'), 10) || 3600000,
@@ -477,10 +564,7 @@ function createConfig(overrides = {}) {
 
   return applyRagProfileToConfig(
     baseConfig,
-    loadRagProfileConfig({
-      filePath: baseConfig.ragParamsPath,
-      embeddingFingerprint
-    })
+    ragProfileConfig
   );
 }
 

@@ -42,7 +42,7 @@ function normalizeMode(value) {
 
 function normalizeRecordMemoryPrincipalScopeAuthorizationConfig(input = {}) {
   const source = isPlainObject(input) ? input : {};
-  const mode = normalizeMode(source.mode);
+  const requestedMode = normalizeMode(source.mode);
   const policySource = isPlainObject(source.policy) ? source.policy : source;
   const policy = Object.freeze({
     allowedAgentAlias: normalizeString(policySource.allowedAgentAlias),
@@ -58,15 +58,23 @@ function normalizeRecordMemoryPrincipalScopeAuthorizationConfig(input = {}) {
     policy.allowedProjectIds.length > 0 &&
     policy.allowedWorkspaceIds.length > 0 &&
     policy.allowedClientIds.length > 0;
+  const mode = requestedMode === 'off' || requiredPolicyPresent !== true
+    ? 'off'
+    : requestedMode;
 
   return Object.freeze({
     mode,
+    requestedMode,
     enabled: mode !== 'off',
     observeOnly: mode === 'observe',
     strictMode: mode === 'strict',
     lowDisclosureRejection: source.lowDisclosureRejection !== false,
     policy,
     requiredPolicyPresent,
+    configComplete: requiredPolicyPresent,
+    disabledReason: requestedMode !== 'off' && requiredPolicyPresent !== true
+      ? 'incomplete_policy'
+      : null,
     defaultOff: mode === 'off',
     currentRuntimeAuthorizationChanged: false,
     publicMcpExpanded: false

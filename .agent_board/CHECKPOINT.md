@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1641 post-PRO remediation focused review receipt`.
-Current validation: `CMV-1745`.
+Current checkpoint: `CM-1642 record_memory strict context config wiring`.
+Current validation: `CMV-1746`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1642 Record Memory Strict Context Config Wiring
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_CONTEXT_CONFIG_WIRING_DEFAULT_OFF_NO_PRODUCTION_STRICT_DEFAULT`
+
+Recorded:
+
+- Updated config normalization so effective `observe` or `strict` requires a complete policy; incomplete policy stays `off`.
+- Added env/profile/config source wiring for `recordMemoryPrincipalScopeAuthorization`.
+- Added trusted HTTP/stdio execution context wiring for `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId`.
+- Confirmed payload scope is not trusted as production principal/scope authority.
+- Added config/env/profile/helper tests and expanded temp-local integration/HTTP MCP tests.
+- Validation passed config `10/10`, integration `11/11`, and HTTP MCP `29/29`.
+- Confirmed public MCP surface remains exactly seven tools.
+- Confirmed default runtime behavior changed `NO`, production strict mode enabled `NO`, broad `record_memory` reliability `NOT_PROVEN`, production/release/cutover ready `NO`, complete V8 `NOT_CLAIMED`.
+- Confirmed no provider/API, bearer-token material, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective real `record_memory` write, persistent tag write, release/tag/deploy, production/release/cutover ready claim, or complete V8 ready claim occurred.
+
+Validation: `CMV-1746` strict context config wiring validation.
 
 ## CM-1641 Post-PRO Remediation Focused Review Receipt
 
