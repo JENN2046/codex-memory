@@ -4,11 +4,47 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1683 wire compact mode contract into docs validation`.
-Current validation: `CMV-1788`.
+Current checkpoint: `CM-1685 VCP sustained recall envelope contract`.
+Current validation: `CMV-1790`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1685 VCP Sustained Recall Envelope Contract
+
+Status: `COMPLETED_VALIDATED_FIXTURE_ONLY_VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpSustainedRecallEnvelopeContract.js`.
+- Added `tests/fixtures/vcp-sustained-recall-envelope-cm1685-v1.json`.
+- Added `tests/vcp-sustained-recall-envelope-contract.test.js`.
+- Added `docs/CM1685_VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT.md`.
+- Validated summary-only no-write acceptance.
+- Validated missing principal scope fail-closed behavior.
+- Validated raw DailyNote content rejection without echoing raw value.
+- Validated write/provider/raw/broad/public-MCP/mutation counter rejection.
+- Validated non-summary projection and over-budget limit rejection.
+- Confirmed no runtime wiring, live VCPToolBox call, VCP config/profile edit, `.env` edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1790` fixture-only contract validation.
+
+## CM-1684 VCPToolBox Sustained Conversation Memory Source Map
+
+Status: `SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1684_VCPTOOLBOX_SUSTAINED_CONVERSATION_MEMORY_SOURCE_MAP.md`.
+- Recorded candidate architecture: `Codex <-> codex-memory MCP <-> VCPToolBox memory runtime`.
+- Recorded source baseline and VCP-owned candidate surfaces.
+- Recorded unresolved transport/auth/profile/query/output unknowns.
+- Defined allowed summary-only no-write recall envelope.
+- Defined forbidden raw memory/content/id/path/token/provider/config/write/public-expansion boundaries.
+- Defined staged rollout and stop conditions.
+- Confirmed no runtime wiring, live VCPToolBox call, VCP config/profile edit, `.env` edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1789` docs/source-map validation.
 
 ## CM-1683 Wire Compact Mode Contract Into Docs Validation
 

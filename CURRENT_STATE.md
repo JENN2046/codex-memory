@@ -8,15 +8,27 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1683 post-push compact mode contract is wired into local docs validation scripts; docs gate now runs the compact mode contract test when present |
-| Current task | `CM-1683 wire compact mode contract into docs validation` |
-| Current validation | `CMV-1788` |
-| Current route | Local validation script wiring; no runtime wiring or production rollout |
+| Status | CM-1685 fixture-only VCP sustained recall envelope contract added |
+| Current task | `CM-1685 VCP sustained recall envelope contract` |
+| Current validation | `CMV-1790` |
+| Current route | Fixture-only helper/test/docs; no runtime wiring, live VCPToolBox call, raw memory read, config edit, or write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
+## Future Candidate Routes
+
+`CM-1684` is recorded as a future candidate route for sustained-conversation VCPToolBox realtime memory integration. The candidate architecture is `Codex <-> codex-memory MCP <-> VCPToolBox memory runtime`, with `codex-memory` acting as a controlled bridge/governance layer rather than replacing VCPToolBox memory.
+
+Current status for this route: `SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_WRITE`. Added `docs/CM1684_VCPTOOLBOX_SUSTAINED_CONVERSATION_MEMORY_SOURCE_MAP.md`, which records the candidate architecture, source baseline, unresolved VCPToolBox entrypoint/auth/profile unknowns, allowed read-only recall envelope, forbidden raw/broad/write boundaries, staged rollout, stop conditions, and next `CM-1685` fixture-only envelope contract route.
+
+Boundary: live VCPToolBox call `NO`; VCP runtime wiring `NO`; VCP config/profile edit `NO`; `.env` edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad memory scan/export/import `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
+
 ## Last Accepted Evidence
+
+`CM-1685` adds `src/core/VcpSustainedRecallEnvelopeContract.js`, `tests/fixtures/vcp-sustained-recall-envelope-cm1685-v1.json`, `tests/vcp-sustained-recall-envelope-contract.test.js`, and `docs/CM1685_VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT.md`. It fixture-tests the future VCP sustained recall envelope for summary-only no-write acceptance, missing principal scope fail-closed behavior, raw DailyNote content rejection without echo, write/provider/raw/broad/public-MCP/mutation counter rejection, non-summary projection and over-budget limit rejection, allowed VCP component vocabulary, forbidden raw/secret field vocabulary, and no runtime/external actions. Runtime wiring `NO`; live VCPToolBox call `NO`; VCP config/profile edit `NO`; `.env` edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad scan/export/import `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`.
+
+`CM-1684` adds `docs/CM1684_VCPTOOLBOX_SUSTAINED_CONVERSATION_MEMORY_SOURCE_MAP.md`. It records the future `Codex <-> codex-memory MCP <-> VCPToolBox memory runtime` route as docs/source-map only. It identifies VCP-owned candidate memory surfaces, unresolved transport/auth/profile/query/output unknowns, allowed summary-only no-write recall envelope, forbidden raw memory/content/id/path/token/provider/config/write/public-expansion boundaries, staged rollout, and stop conditions. Runtime wiring `NO`; live VCPToolBox call `NO`; VCP config/profile edit `NO`; `.env` edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad scan/export/import `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`.
 
 `CM-1683` updates `scripts/validate-local.ps1` and `scripts/validate-local.sh` so docs validation runs `node --test tests/post-push-gate-compact-mode-contract.test.js` when the test exists. Validation passed compact mode contract test `6/6` through direct target run and docs validation. Runtime wiring `NO`; source runtime behavior change `NO`; production config `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`.
 

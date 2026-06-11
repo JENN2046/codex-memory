@@ -4,13 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1683 wire compact mode contract into docs validation`.
-Current validation: `CMV-1788`.
-Current project status: post-push compact mode contract is now included in local docs validation scripts on Windows and shell paths; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
-Current route: `POST_PUSH_GATE_COMPACT_MODE_DOCS_VALIDATION_WIRING`.
+Current task: `CM-1685 VCP sustained recall envelope contract`.
+Current validation: `CMV-1790`.
+Current project status: fixture-only VCP sustained recall envelope contract is added for the future VCPToolBox sustained-conversation route; no runtime wiring, live VCPToolBox call, VCP config/profile edit, `.env`, raw memory read, provider/API, memory write, public MCP expansion, production strict enablement, or readiness claim occurred.
+Current route: `VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT_FIXTURE_ONLY`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1685 VCP sustained recall envelope contract: added `src/core/VcpSustainedRecallEnvelopeContract.js`, `tests/fixtures/vcp-sustained-recall-envelope-cm1685-v1.json`, `tests/vcp-sustained-recall-envelope-contract.test.js`, and `docs/CM1685_VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT.md`. It fixture-tests the future VCP sustained recall envelope for summary-only no-write acceptance, missing principal scope fail-closed behavior, raw DailyNote content rejection without echo, write/provider/raw/broad/public-MCP/mutation counter rejection, non-summary projection and over-budget limit rejection, allowed VCP component vocabulary, forbidden raw/secret field vocabulary, and no runtime/external actions. Runtime wiring `NO`; live VCPToolBox call `NO`; VCP config/profile edit `NO`; `.env` edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad scan/export/import `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
+
+CM-1684 VCPToolBox sustained conversation memory source map: added `docs/CM1684_VCPTOOLBOX_SUSTAINED_CONVERSATION_MEMORY_SOURCE_MAP.md`. It records the future `Codex <-> codex-memory MCP <-> VCPToolBox memory runtime` route as `SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_WRITE`, with `codex-memory` as a controlled bridge/governance layer rather than a VCP memory replacement. The map identifies VCP-owned candidate memory surfaces, unresolved transport/auth/profile/query/output unknowns, allowed summary-only no-write recall envelope, forbidden raw memory/content/id/path/token/provider/config/write/public-expansion boundaries, staged rollout, stop conditions, and next `CM-1685` fixture-only envelope contract route. Live VCPToolBox call `NO`; VCP runtime wiring `NO`; VCP config/profile edit `NO`; `.env` edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad memory scan/export/import `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`.
 
 CM-1683 wire compact mode contract into docs validation: updated `scripts/validate-local.ps1` and `scripts/validate-local.sh` so docs validation runs `node --test tests/post-push-gate-compact-mode-contract.test.js` when present. This makes compact mode contract coverage part of the routine docs gate. Runtime wiring `NO`; source runtime behavior change `NO`; production config `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 

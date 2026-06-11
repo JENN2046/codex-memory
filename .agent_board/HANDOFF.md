@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1683 wire compact mode contract into docs validation`.
-Current validation: `CMV-1788`.
-Current handoff: post-push compact mode contract test is now included in local docs validation scripts.
+Current task: `CM-1685 VCP sustained recall envelope contract`.
+Current validation: `CMV-1790`.
+Current handoff: fixture-only VCP sustained recall envelope contract is added; runtime bridge remains approval-bound.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: wire post-push compact mode contract validation into local docs validation scripts.
+Goal: add fixture-only contract validation for the future VCPToolBox sustained recall envelope without runtime wiring.
 
-Current status: `COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_DOCS_VALIDATION_WIRING`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_FIXTURE_ONLY_VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,50 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+
+Completed in this slice:
+
+- Added `src/core/VcpSustainedRecallEnvelopeContract.js`.
+- Added `tests/fixtures/vcp-sustained-recall-envelope-cm1685-v1.json`.
+- Added `tests/vcp-sustained-recall-envelope-contract.test.js`.
+- Added `docs/CM1685_VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT.md`.
+- Validated summary-only no-write acceptance.
+- Validated missing principal scope fail-closed behavior.
+- Validated raw DailyNote content rejection without echoing raw value.
+- Validated write/provider/raw/broad/public-MCP/mutation counter rejection.
+- Validated non-summary projection and over-budget limit rejection.
+- Validated allowed VCP component vocabulary and forbidden raw/secret field vocabulary.
+- Confirmed no runtime wiring, live VCPToolBox call, VCP config/profile edit, `.env` edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write, provider/API, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1790` fixture-only contract validation.
+
+Next safe route: `CM-1686 VCP sustained recall connector plan helper`, or commit CM-1684/CM-1685 if requested.
+
+## Previous Active Handoff
+
+Goal: record the source-map route for future sustained-conversation VCPToolBox realtime memory integration without runtime wiring.
+
+Current status: `SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Added `docs/CM1684_VCPTOOLBOX_SUSTAINED_CONVERSATION_MEMORY_SOURCE_MAP.md`.
+- Recorded future candidate architecture: `Codex <-> codex-memory MCP <-> VCPToolBox memory runtime`.
+- Mapped VCP-owned candidate memory surfaces: `DailyNote`, `DailyNoteManager`, `KnowledgeBaseManager`, `TagMemo`, `RAGDiaryPlugin`, `LightMemo`, `TDBKnowledge`, `DeepMemo`, `TopicMemo`, and `MeshMemo`.
+- Recorded unresolved runtime unknowns: transport, auth mode, profile source, query entrypoint, component routing, principal scope, output shape, no-write proof, timeout/failure mode, and audit receipt.
+- Defined allowed summary-only no-write recall envelope and forbidden raw/broad/write/public-expansion boundaries.
+- Defined staged rollout from source map through fixture contract, connector plan, exact-approved live no-write probe, sustained read-only candidate, and separate bounded write proof.
+- Confirmed no runtime wiring, live VCPToolBox call, VCP config/profile edit, `.env` edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write, provider/API, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1789` docs/source-map validation.
+
+Next safe route: `CM-1685 fixture-only VCP sustained recall envelope contract`, or commit CM-1684 if requested.
+
+## Previous Active Handoff
+
+Goal: wire post-push compact mode contract validation into local docs validation scripts.
+
+Current status: `COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_DOCS_VALIDATION_WIRING`; production/release/cutover ready no; complete V8 not claimed.
 
 Completed in this slice:
 

@@ -1,0 +1,202 @@
+{
+  "acceptedSummaryOnlyCase": {
+    "schemaVersion": 1,
+    "action": "vcp_recall_no_write",
+    "sourceSystem": "VCPToolBox",
+    "sourceComponent": "LightMemo",
+    "queryHashPresent": true,
+    "queryTextIncluded": false,
+    "principal": {
+      "agentAlias": "Codex",
+      "agentIdPresent": true,
+      "projectIdPresent": true,
+      "workspaceIdPresent": true,
+      "clientIdPresent": true
+    },
+    "limits": {
+      "maxSnippets": 3,
+      "maxCharsPerSnippet": 500,
+      "timeoutMs": 5000
+    },
+    "projection": {
+      "lowDisclosure": true,
+      "rawContentIncluded": false,
+      "rawIdsIncluded": false,
+      "rawPathsIncluded": false,
+      "snippetBodiesAllowed": false,
+      "summaryOnly": true
+    },
+    "counters": {
+      "recordMemoryCalls": 0,
+      "recordMemoryWrites": 0,
+      "providerApiCalls": 0,
+      "rawDailyNoteReads": 0,
+      "rawRagReads": 0,
+      "rawVectorReads": 0,
+      "rawPromptReads": 0,
+      "broadMemoryScans": 0,
+      "publicMcpExpansions": 0,
+      "confirmedMutations": 0
+    }
+  },
+  "missingScopeCase": {
+    "schemaVersion": 1,
+    "action": "vcp_recall_no_write",
+    "sourceSystem": "VCPToolBox",
+    "sourceComponent": "LightMemo",
+    "queryHashPresent": true,
+    "queryTextIncluded": false,
+    "principal": {
+      "agentAlias": "Codex",
+      "agentIdPresent": true,
+      "projectIdPresent": true,
+      "workspaceIdPresent": true
+    },
+    "limits": {
+      "maxSnippets": 3,
+      "maxCharsPerSnippet": 500,
+      "timeoutMs": 5000
+    },
+    "projection": {
+      "lowDisclosure": true,
+      "rawContentIncluded": false,
+      "rawIdsIncluded": false,
+      "rawPathsIncluded": false,
+      "snippetBodiesAllowed": false,
+      "summaryOnly": true
+    },
+    "counters": {
+      "recordMemoryCalls": 0,
+      "recordMemoryWrites": 0,
+      "providerApiCalls": 0,
+      "rawDailyNoteReads": 0,
+      "rawRagReads": 0,
+      "rawVectorReads": 0,
+      "rawPromptReads": 0,
+      "broadMemoryScans": 0,
+      "publicMcpExpansions": 0,
+      "confirmedMutations": 0
+    }
+  },
+  "rawContentCase": {
+    "schemaVersion": 1,
+    "action": "vcp_recall_no_write",
+    "sourceSystem": "VCPToolBox",
+    "sourceComponent": "DailyNoteManager",
+    "queryHashPresent": true,
+    "queryTextIncluded": false,
+    "rawDailyNoteContent": "RAW_DAILY_NOTE_PRIVATE_CONTENT",
+    "principal": {
+      "agentAlias": "Codex",
+      "agentIdPresent": true,
+      "projectIdPresent": true,
+      "workspaceIdPresent": true,
+      "clientIdPresent": true
+    },
+    "limits": {
+      "maxSnippets": 3,
+      "maxCharsPerSnippet": 500,
+      "timeoutMs": 5000
+    },
+    "projection": {
+      "lowDisclosure": true,
+      "rawContentIncluded": false,
+      "rawIdsIncluded": false,
+      "rawPathsIncluded": false,
+      "snippetBodiesAllowed": false,
+      "summaryOnly": true
+    },
+    "counters": {
+      "recordMemoryCalls": 0,
+      "recordMemoryWrites": 0,
+      "providerApiCalls": 0,
+      "rawDailyNoteReads": 0,
+      "rawRagReads": 0,
+      "rawVectorReads": 0,
+      "rawPromptReads": 0,
+      "broadMemoryScans": 0,
+      "publicMcpExpansions": 0,
+      "confirmedMutations": 0
+    }
+  },
+  "writeCounterCase": {
+    "schemaVersion": 1,
+    "action": "vcp_recall_no_write",
+    "sourceSystem": "VCPToolBox",
+    "sourceComponent": "LightMemo",
+    "queryHashPresent": true,
+    "queryTextIncluded": false,
+    "principal": {
+      "agentAlias": "Codex",
+      "agentIdPresent": true,
+      "projectIdPresent": true,
+      "workspaceIdPresent": true,
+      "clientIdPresent": true
+    },
+    "limits": {
+      "maxSnippets": 3,
+      "maxCharsPerSnippet": 500,
+      "timeoutMs": 5000
+    },
+    "projection": {
+      "lowDisclosure": true,
+      "rawContentIncluded": false,
+      "rawIdsIncluded": false,
+      "rawPathsIncluded": false,
+      "snippetBodiesAllowed": false,
+      "summaryOnly": true
+    },
+    "counters": {
+      "recordMemoryCalls": 1,
+      "recordMemoryWrites": 1,
+      "providerApiCalls": 0,
+      "rawDailyNoteReads": 0,
+      "rawRagReads": 0,
+      "rawVectorReads": 0,
+      "rawPromptReads": 0,
+      "broadMemoryScans": 0,
+      "publicMcpExpansions": 0,
+      "confirmedMutations": 0
+    }
+  },
+  "invalidProjectionCase": {
+    "schemaVersion": 1,
+    "action": "vcp_recall_no_write",
+    "sourceSystem": "VCPToolBox",
+    "sourceComponent": "LightMemo",
+    "queryHashPresent": true,
+    "queryTextIncluded": true,
+    "principal": {
+      "agentAlias": "Codex",
+      "agentIdPresent": true,
+      "projectIdPresent": true,
+      "workspaceIdPresent": true,
+      "clientIdPresent": true
+    },
+    "limits": {
+      "maxSnippets": 4,
+      "maxCharsPerSnippet": 501,
+      "timeoutMs": 5001
+    },
+    "projection": {
+      "lowDisclosure": true,
+      "rawContentIncluded": true,
+      "rawIdsIncluded": true,
+      "rawPathsIncluded": true,
+      "snippetBodiesAllowed": true,
+      "summaryOnly": false
+    },
+    "counters": {
+      "recordMemoryCalls": 0,
+      "recordMemoryWrites": 0,
+      "providerApiCalls": 0,
+      "rawDailyNoteReads": 0,
+      "rawRagReads": 0,
+      "rawVectorReads": 0,
+      "rawPromptReads": 0,
+      "broadMemoryScans": 0,
+      "publicMcpExpansions": 0,
+      "confirmedMutations": 0
+    }
+  }
+}

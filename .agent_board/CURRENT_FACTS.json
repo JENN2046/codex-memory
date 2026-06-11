@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1683",
-  "validationId": "CMV-1788",
+  "taskId": "CM-1685",
+  "validationId": "CMV-1790",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,16 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1790",
+      "scope": "CM-1685 VCP sustained recall envelope contract",
+      "status": "COMPLETED_VALIDATED_FIXTURE_ONLY_VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1789",
+      "scope": "CM-1684 VCPToolBox sustained conversation memory source map",
+      "status": "COMPLETED_VALIDATED_SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1788",
       "scope": "CM-1683 wire compact mode contract into docs validation",
@@ -1422,6 +1432,9 @@
     "future VCP Bridge runtime wiring safety evidence",
     "future VCP memory governance event adapter runtime wiring",
     "future VCP memory governance event adapter production validation",
+    "future VCPToolBox sustained-conversation realtime memory integration",
+    "future VCPToolBox read-only no-write recall probe",
+    "future VCPToolBox bridge transport/auth/profile source validation",
     "future VCP memory governance event receipt low-disclosure tests",
     "full DailyNote sync intentionally not performed",
     "all DailyNote read intentionally not performed",
