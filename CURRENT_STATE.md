@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1640 source/test slice validated; not release, production, deploy, or cutover ready |
-| Current task | `CM-1640 record_memory principal/scope default-off source slice` |
-| Current validation | `CMV-1744` |
-| Current route | default-off source/test wiring for principal/scope authorization config; no production enforcement |
+| Status | post-PRO focused review receipt recorded; scoped RC ready yes, production/release/cutover ready no |
+| Current task | `CM-1641 post-PRO remediation focused review receipt` |
+| Current validation | `CMV-1745` |
+| Current route | PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS receipt; docs/status only |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1641` adds `docs/CM1641_POST_PRO_REMEDIATION_FOCUSED_REVIEW_RECEIPT.md`. It records the focused post-PRO remediation review receipt for current HEAD `668168851e47099ac0810d4c6e86c9efbd62f3a9` and remediation target `537977798bd624118ba3f20d486e7a6626762f51`. Result: `PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS`; scoped RC ready `YES`; production ready `NO`; release ready `NO`; cutover ready `NO`; complete V8 `NOT_CLAIMED`; public MCP surface `STILL_7_TOOLS`. Remaining blockers: `record_memory` strict principal/scope is not default production policy, no-token `/health` `sourceFingerprint` remains public by bounded threat-model decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. This is docs/status review only. No provider/API, bearer-token flow, raw store scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, persistent tag write, release/tag/deploy, production/release/cutover readiness claim, or complete V8 ready claim occurred.
 
 `CM-1640` adds `src/core/RecordMemoryPrincipalScopeAuthorizationConfig.js`, updates `src/config/createConfig.js`, updates `src/app.js`, expands `tests/record-memory-principal-scope-observe-only-integration.test.js`, adds `tests/record-memory-principal-scope-authorization-config.test.js`, and adds `docs/CM1640_RECORD_MEMORY_PRINCIPAL_SCOPE_DEFAULT_OFF_SOURCE_SLICE.md`. It implements default-off config normalization for `recordMemoryPrincipalScopeAuthorization.mode=off|observe|strict` from explicit overrides only. Default remains `off`, with no preflight/policy injected into `MemoryWriteService`; observe mode runs low-disclosure preflight without rejecting; strict mode rejects missing/mismatched required fields before persistence in temp-local tests. Targeted validation passed `19/19`, security write policy passed `3/3`, and HTTP MCP record/no-token/missing-token subset passed `27/27`; public MCP surface remains exactly seven tools. Full `npm test` was attempted and returned `3251/3252` because `tests/public-default-search-lifecycle-tombstone-cold-derived-temp-local-evidence.test.js` hit a Windows temp-local vector-index `EPERM` rename; that same test passed when rerun alone `1/1`. No env var, profile file, public MCP schema field, HTTP/stdio context parsing, bearer-token behavior, default strict rejection, live MCP traffic outside temp-local tests, provider/API, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 

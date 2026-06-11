@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1640 record_memory principal/scope default-off source slice`.
-Current validation: `CMV-1744`.
-Current status: CM-1640 source/test slice validated; not release, production, deploy, or cutover ready.
+Current task: `CM-1641 post-PRO remediation focused review receipt`.
+Current validation: `CMV-1745`.
+Current status: post-PRO focused review receipt recorded; scoped RC ready yes, production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1640` implements default-off source/test wiring for `record_memory` principal/scope authorization config. Default remains `off` with no preflight/policy injected into `MemoryWriteService`; explicit `observe` mode observes without rejecting; explicit `strict` mode rejects missing/mismatched required fields before persistence in temp-local tests. Targeted validation passed `19/19`, security write policy passed `3/3`, and HTTP MCP record/no-token/missing-token subset passed `27/27`; full `npm test` was attempted and returned `3251/3252` because an unrelated Windows temp-local vector-index `EPERM` rename hit `tests/public-default-search-lifecycle-tombstone-cold-derived-temp-local-evidence.test.js`, which passed when rerun alone `1/1`. No env var, profile file, public MCP schema field, HTTP/stdio context parsing, bearer-token behavior, default strict rejection, live MCP traffic outside temp-local tests, provider/API, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, production/release/cutover readiness, or complete V8 claim occurred. Next safe route is HTTP/stdio trusted context source implementation or deployment docs, still default-off.
+`CM-1641` records the post-PRO remediation focused review receipt for current HEAD `668168851e47099ac0810d4c6e86c9efbd62f3a9` and remediation target `537977798bd624118ba3f20d486e7a6626762f51`. Result is `PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS`: scoped RC ready yes, production/release/cutover ready no, complete V8 not claimed, and public MCP surface still seven tools. Remaining production blockers are strict principal/scope not default production policy, no-token `/health` `sourceFingerprint` still public by bounded decision, production persistent TagMemo writer not implemented, runtime/public MCP persistent TagMemo enrichment not completed, broad `record_memory` reliability not proven, and complete V8 not claimed. Next safe route is one blocker-focused design/source slice; production claims still require separate evidence.
 
 ## Historical Run Notes
 

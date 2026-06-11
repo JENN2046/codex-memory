@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1640 record_memory principal/scope default-off source slice`.
-Current validation: `CMV-1744`.
+Current checkpoint: `CM-1641 post-PRO remediation focused review receipt`.
+Current validation: `CMV-1745`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1641 Post-PRO Remediation Focused Review Receipt
+
+Status: `PASS_WITH_RESIDUAL_PRODUCTION_BLOCKERS`
+
+Recorded:
+
+- Added `docs/CM1641_POST_PRO_REMEDIATION_FOCUSED_REVIEW_RECEIPT.md`.
+- Reviewed current HEAD `668168851e47099ac0810d4c6e86c9efbd62f3a9` against remediation target `537977798bd624118ba3f20d486e7a6626762f51`.
+- Recorded scoped RC ready `YES`, production ready `NO`, release ready `NO`, cutover ready `NO`, complete V8 `NOT_CLAIMED`, and public MCP surface `STILL_7_TOOLS`.
+- Recorded remaining blockers: strict principal/scope is not default production policy; no-token `/health` `sourceFingerprint` remains public by bounded threat-model decision; production persistent TagMemo writer is not implemented; runtime/public MCP persistent TagMemo enrichment is not completed; broad `record_memory` reliability is not proven; complete V8 is not claimed.
+- Confirmed no provider/API, bearer-token flow, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective `record_memory` write, persistent tag write, release/tag/deploy, production/release/cutover ready claim, or complete V8 ready claim occurred.
+
+Validation: `CMV-1745` docs/status focused review validation.
 
 ## CM-1640 Record Memory Principal Scope Default-Off Source Slice
 
