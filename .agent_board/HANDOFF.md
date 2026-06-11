@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1637 record_memory strict mode config/profile preflight`.
-Current validation: `CMV-1741`.
-Current handoff: strict-mode config/profile compatibility preflight recorded; default record_memory runtime auth remains unchanged.
+Current task: `CM-1638 post-PRO remediation closure review`.
+Current validation: `CMV-1742`.
+Current handoff: post-PRO remediation closure review recorded; no runtime/proof/write action executed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: implement the next local-safe hardening plan through bounded source/test and docs/contract slices.
+Goal: review the target commit against the PRO full repository audit remediation findings and record closure status without continuing V8 or executing runtime/proof/write actions.
 
-Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_MODE_CONFIG_PROFILE_PREFLIGHT_DOCS_ONLY_NO_CONFIG_CHANGE / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current status: `COMPLETED_VALIDATED_POST_PRO_REMEDIATION_CLOSURE_REVIEW_NO_RUNTIME_ACTION / READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1638 added `docs/CM1638_POST_PRO_REMEDIATION_CLOSURE_REVIEW.md`. It reviewed remediation target commit `537977798bd624118ba3f20d486e7a6626762f51`, the parent of the CM-1638 receipt commit, against the PRO findings. Closure table result: P1-1 scoped persistent TagMemo wording closed; P1-2 authenticated `record_memory` write-capable boundary closed for wording/source map; P1-3 public `audit_memory` bounded readonly shell closed; P2-1 controlled mutation public dry-run rejection coverage closed; P2-2 production auth/scope strict-mode limitation remains clearly deferred; P2-3 `/health.runtimeFreshness.sourceFingerprint` threat model closed for documentation; P3 persistent proof taxonomy closed for CLI/source/public MCP separation. Public MCP surface remains exactly seven tools. Affected non-live tests passed `50/50`. No provider/API, bearer-token flow, raw store scan, broad memory scan, live proof, runtime action, confirmed public mutation, persistent tag write, public MCP expansion, production/release/cutover readiness, or complete V8 occurred.
 - CM-1637 added `docs/CM1637_RECORD_MEMORY_STRICT_MODE_CONFIG_PROFILE_PREFLIGHT.md`. It records the docs-only compatibility preflight before strict `record_memory` principal/scope mode can be exposed through config/profile controls. It confirms current config/source reality supports `allowedAgentAlias`, `defaultAgentId`, `defaultRequestSource`, and `enableWritePreflight`, but no strict principal/scope config/profile control. It also confirms current HTTP/stdio defaults provide `agentAlias`, `agentId`, and `requestSource`, but not strict-required `projectId`, `workspaceId`, or `clientId`. No env/config key, profile field, HTTP/stdio context parsing, default strict mode, runtime behavior change, live MCP traffic, provider/API, real bearer token, real memory read/write, raw store scan, broad memory scan, public MCP expansion, production/release/cutover readiness, or complete V8 occurred.
 - CM-1636 updated `src/app.js`, updated `tests/record-memory-principal-scope-observe-only-integration.test.js`, and added `docs/CM1636_RECORD_MEMORY_STRICT_MODE_APP_OVERRIDE_WIRING.md`. It wires `createCodexMemoryApplication(...)` overrides into `MemoryWriteService` for principal/scope preflight, policy, observer, and strict mode. The wiring is disabled by default and adds no env/config key or HTTP/stdio context parsing. Validation passed `12/12`, `3/3`, and HTTP MCP record/no-token/missing-token subset `27/27`, covering app-level observe-only acceptance and app-level strict mismatch rejection with low-disclosure public/audit output. No default strict mode, live MCP traffic outside temp-local tests, provider/API, real bearer token, real memory read/write, raw store scan, broad memory scan, public MCP expansion, production/release/cutover readiness, or complete V8 occurred.
 - CM-1635 added `docs/CM1635_RECORD_MEMORY_STRICT_MODE_CONTEXT_SOURCE_MAP.md`. It maps HTTP/stdio strict-mode context sources. HTTP and stdio currently derive `agentAlias`, `agentId`, and `requestSource` from env/base/config, but do not derive required strict fields `projectId`, `workspaceId`, or `clientId`. Enabling strict mode beyond temp-local tests would reject current HTTP/stdio `record_memory` writes unless those fields are supplied. This is docs/source-map only. No config keys, env vars, public MCP schema fields, client metadata parsing, runtime behavior change, live MCP traffic, provider/API, real bearer token, real memory read/write, raw store scan, broad memory scan, public MCP expansion, production/release/cutover readiness, or complete V8 occurred.
