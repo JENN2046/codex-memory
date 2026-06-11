@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1678 post-push mainline gate receipt after CM-1677`.
-Current validation: `CMV-1783`.
+Current checkpoint: `CM-1679 compact post-push health note after CM-1678 push`.
+Current validation: `CMV-1784`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1679 Compact Post-Push Health Note After CM-1678 Push
+
+Status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1678_PUSH`
+
+Recorded:
+
+- Added no new receipt doc by request.
+- Confirmed post-push fresh Git status before gate was `## main...origin/main`.
+- Confirmed `npm run gate:mainline` passed in daily mode after `8d4e2ba3`.
+- Confirmed health ok with HTTP `200`.
+- Confirmed compare matched `43/43`.
+- Confirmed rollback ready `43/43` with recommendation `rollback-safe`.
+- Confirmed no production observe rollout, production strict auth enablement, `.env` edit, production config/profile edit, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1784` compact post-push mainline health note validation.
 
 ## CM-1678 Post-Push Mainline Gate Receipt After CM-1677
 

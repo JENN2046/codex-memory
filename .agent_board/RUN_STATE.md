@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1678 post-push mainline gate receipt after CM-1677`.
-Current validation: `CMV-1783`.
-Current status: post-push `npm run gate:mainline` after `4c91390f` passed health, compare, and rollback in daily mode; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
+Current task: `CM-1679 compact post-push health note after CM-1678 push`.
+Current validation: `CMV-1784`.
+Current status: compact post-push `npm run gate:mainline` note after `8d4e2ba3` passed health, compare, and rollback in daily mode; no new receipt doc, runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1678` recorded post-push mainline gate health after `4c91390f`; production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
+`CM-1679` compactly recorded post-push mainline gate health after `8d4e2ba3`; production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
 
 ## Historical Run Notes
 
