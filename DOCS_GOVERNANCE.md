@@ -145,6 +145,8 @@ checkpoint 是重要阶段记录，不是普通 gate 流水。
 
 不为普通 push-after gate 创建 checkpoint-20。
 
+普通 push-after gate 默认使用 [Post-Push Gate Compact Mode](docs/POST_PUSH_GATE_COMPACT_MODE.md)：不新增独立 receipt doc，只更新现有 active status / `.agent_board` 交接面。只有 gate 异常、用户明确要求、涉及 source/runtime/security/auth/rollback/provider/migration/config 独立证据、需要 exact approval traceability、阶段收口，或 compact 记录会导致交接歧义时，才新增独立 receipt doc。
+
 只有满足以下情况之一，才新建 checkpoint：
 
 - runtime contract 或主链行为有实质变化

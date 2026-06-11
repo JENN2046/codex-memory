@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1679",
-  "validationId": "CMV-1784",
+  "taskId": "CM-1680",
+  "validationId": "CMV-1785",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1785",
+      "scope": "CM-1680 post-push gate compact mode policy",
+      "status": "COMPLETED_VALIDATED_POST_PUSH_GATE_COMPACT_MODE_POLICY_DOCS_ONLY"
+    },
     {
       "id": "CMV-1784",
       "scope": "CM-1679 compact post-push health note after CM-1678 push",

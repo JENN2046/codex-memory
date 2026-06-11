@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1679 compact post-push health note after CM-1678 push`.
-Current validation: `CMV-1784`.
+Current checkpoint: `CM-1680 post-push gate compact mode policy`.
+Current validation: `CMV-1785`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1680 Post-Push Gate Compact Mode Policy
+
+Status: `COMPLETED_VALIDATED_POST_PUSH_GATE_COMPACT_MODE_POLICY_DOCS_ONLY`
+
+Recorded:
+
+- Added `docs/POST_PUSH_GATE_COMPACT_MODE.md`.
+- Updated `DOCS_GOVERNANCE.md`.
+- Updated `docs/CONTEXT_INTAKE_CONTRACT.md`.
+- Defined routine post-push compact mode criteria, required compact fields, dedicated receipt doc exceptions, and validation requirements.
+- Confirmed no runtime wiring, source behavior change, production config, `.env` edit, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1785` post-push gate compact mode policy validation.
 
 ## CM-1679 Compact Post-Push Health Note After CM-1678 Push
 

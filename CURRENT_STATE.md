@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1679 compact post-push health note recorded after pushing `8d4e2ba3`; `npm run gate:mainline` passed health, compare, and rollback in daily mode |
-| Current task | `CM-1679 compact post-push health note after CM-1678 push` |
-| Current validation | `CMV-1784` |
-| Current route | Post-push health receipt; no runtime wiring or production rollout |
+| Status | CM-1680 post-push gate compact mode policy solidified as docs-only governance; routine post-push gate evidence now defaults to compact status surfaces instead of new receipt docs |
+| Current task | `CM-1680 post-push gate compact mode policy` |
+| Current validation | `CMV-1785` |
+| Current route | Docs-only governance policy; no runtime wiring or production rollout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1680` adds `docs/POST_PUSH_GATE_COMPACT_MODE.md` and updates `DOCS_GOVERNANCE.md` plus `docs/CONTEXT_INTAKE_CONTRACT.md`. It defines routine post-push `npm run gate:mainline` compact mode: when Git is aligned and health/compare/rollback all pass with no production/runtime/config/provider/raw/public-expansion/readiness boundary, record only in existing active status surfaces and `.agent_board` ledgers. Dedicated receipt docs remain reserved for explicit request, abnormal gate, diagnosis, source/runtime/security/auth/rollback/provider/migration/config standalone evidence, exact approval traceability, phase/blocker closeout, or ambiguity. Runtime wiring `NO`; source behavior change `NO`; production config `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`.
 
 `CM-1679` records a compact post-push health note without adding a new receipt doc. After pushing `8d4e2ba3 docs: record CM1677 post-push gate receipt`, fresh Git status was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

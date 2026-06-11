@@ -66,3 +66,4 @@ Every meaningful local work slice should leave:
 
 Validation evidence should state what was run and what was not run. Docs-only, fixture-only, read-only, and live-runtime evidence must not be mixed.
 
+Routine post-push `npm run gate:mainline` evidence should use [Post-Push Gate Compact Mode](POST_PUSH_GATE_COMPACT_MODE.md): update the active status surfaces and validation ledger without adding a new receipt document unless the gate is unusual, approval-bound, source/runtime-sensitive, phase-closing, or explicitly requested as a standalone receipt.

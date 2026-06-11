@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1679 compact post-push health note after CM-1678 push`.
-Current validation: `CMV-1784`.
-Current handoff: post-push `npm run gate:mainline` after `8d4e2ba3` passed health, compare, and rollback; compact status note recorded without adding a new receipt doc.
+Current task: `CM-1680 post-push gate compact mode policy`.
+Current validation: `CMV-1785`.
+Current handoff: post-push gate compact mode is now docs-only governance policy; routine post-push gate evidence should update compact active status surfaces instead of creating new receipt docs.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: record compact post-push mainline health after pushing the CM-1678 receipt commit.
+Goal: solidify post-push `npm run gate:mainline` compact mode so routine post-push health evidence does not create unnecessary receipt docs.
 
-Current status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1678_PUSH`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_POST_PUSH_GATE_COMPACT_MODE_POLICY_DOCS_ONLY`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,24 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+
+Completed in this slice:
+
+- Added `docs/POST_PUSH_GATE_COMPACT_MODE.md`.
+- Updated `DOCS_GOVERNANCE.md`.
+- Updated `docs/CONTEXT_INTAKE_CONTRACT.md`.
+- Defined compact mode default criteria, required fields, dedicated receipt doc exceptions, and validation expectations.
+- Confirmed this is docs/status governance only: no runtime wiring, source behavior change, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1785` post-push gate compact mode policy validation.
+
+Next safe route: validate and commit this docs-only policy if clean, or continue with another local docs/source review task.
+
+## Previous Active Handoff
+
+Goal: record compact post-push mainline health after pushing the CM-1678 receipt commit.
+
+Current status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1678_PUSH`; production/release/cutover ready no; complete V8 not claimed.
 
 Completed in this slice:
 
@@ -40,7 +58,7 @@ Validation: `CMV-1784` compact post-push mainline health note validation.
 
 Next safe route: commit this compact handoff update if clean, or choose another local docs/source review task. Production observe/strict rollout remains blocked until a fresh exact CM-1664-formatted approval is provided.
 
-## Previous Active Handoff
+## Previous CM-1678 Handoff
 
 Goal: record post-push mainline health after pushing the CM-1677 receipt commit.
 
