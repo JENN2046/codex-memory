@@ -44,6 +44,9 @@ const {
   filterRecallCandidatesByLifecycleScope,
   normalizeScopeFields
 } = require('./core/MemoryLifecycleScopeGovernanceContract');
+const {
+  buildRecordMemoryPrincipalScopeAuthorizationRuntime
+} = require('./core/RecordMemoryPrincipalScopeAuthorizationConfig');
 
 function normalizeScopeVisibility(value) {
   if (Array.isArray(value)) {
@@ -738,6 +741,10 @@ async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
 
 function createCodexMemoryApplication(overrides = {}) {
   const config = createConfig(overrides);
+  const recordMemoryPrincipalScopeAuthorizationRuntime =
+    buildRecordMemoryPrincipalScopeAuthorizationRuntime(
+      config.recordMemoryPrincipalScopeAuthorization
+    );
   const internalValidateRuntimeEntryEnabled = overrides.internalValidateRuntimeEntryEnabled === true;
   const internalTombstoneRuntimeEntryEnabled = overrides.internalTombstoneRuntimeEntryEnabled === true;
   const internalSupersedeRuntimeEntryEnabled = overrides.internalSupersedeRuntimeEntryEnabled === true;
@@ -821,13 +828,16 @@ function createCodexMemoryApplication(overrides = {}) {
     writePreflightEnabled: config.enableWritePreflight === true,
     writePreflightCandidateProvider: request => getDefaultWritePreflightCandidates(shadowStore, request),
     recordMemoryPrincipalScopeAuthorizationPreflight:
-      overrides.recordMemoryPrincipalScopeAuthorizationPreflight,
+      overrides.recordMemoryPrincipalScopeAuthorizationPreflight ||
+      recordMemoryPrincipalScopeAuthorizationRuntime.preflight,
     recordMemoryPrincipalScopeAuthorizationPolicy:
-      overrides.recordMemoryPrincipalScopeAuthorizationPolicy,
+      overrides.recordMemoryPrincipalScopeAuthorizationPolicy ||
+      recordMemoryPrincipalScopeAuthorizationRuntime.policy,
     recordMemoryPrincipalScopeAuthorizationObserver:
       overrides.recordMemoryPrincipalScopeAuthorizationObserver,
     recordMemoryPrincipalScopeAuthorizationStrictMode:
-      overrides.recordMemoryPrincipalScopeAuthorizationStrictMode === true
+      overrides.recordMemoryPrincipalScopeAuthorizationStrictMode === true ||
+      recordMemoryPrincipalScopeAuthorizationRuntime.strictMode === true
   });
   const memoryWriteReconcileService = new MemoryWriteReconcileService({
     shadowStore,

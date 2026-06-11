@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1639 record_memory production auth/scope strict-mode design preflight`.
-Current validation: `CMV-1743`.
+Current checkpoint: `CM-1640 record_memory principal/scope default-off source slice`.
+Current validation: `CMV-1744`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1640 Record Memory Principal Scope Default-Off Source Slice
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_DEFAULT_OFF_SOURCE_SLICE_NO_PRODUCTION_ENFORCEMENT`
+
+Recorded:
+
+- Added `src/core/RecordMemoryPrincipalScopeAuthorizationConfig.js`.
+- Updated `src/config/createConfig.js`.
+- Updated `src/app.js`.
+- Added `tests/record-memory-principal-scope-authorization-config.test.js`.
+- Expanded `tests/record-memory-principal-scope-observe-only-integration.test.js`.
+- Added `docs/CM1640_RECORD_MEMORY_PRINCIPAL_SCOPE_DEFAULT_OFF_SOURCE_SLICE.md`.
+- Confirmed default config leaves principal/scope preflight/policy unset and preserves current alias-only `record_memory` behavior.
+- Confirmed explicit observe mode runs low-disclosure preflight without rejecting missing scope.
+- Confirmed explicit strict mode rejects missing required scope before persistence in temp-local tests.
+- Confirmed public MCP surface remains exactly seven tools.
+- Confirmed targeted validation passed `19/19`, security write policy passed `3/3`, and HTTP MCP record/no-token/missing-token subset passed `27/27`.
+- Attempted full `npm test`; result was `3251/3252` because `tests/public-default-search-lifecycle-tombstone-cold-derived-temp-local-evidence.test.js` hit a Windows temp-local vector-index `EPERM` rename, and that same test passed when rerun alone `1/1`.
+- Confirmed no env var, profile file, public MCP schema field, HTTP/stdio context parsing, bearer-token behavior, default strict rejection, live MCP traffic outside temp-local tests, provider/API call, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1744` default-off principal/scope source validation.
 
 ## CM-1639 Record Memory Production Auth Scope Strict Mode Design Preflight
 

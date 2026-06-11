@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1639 record_memory production auth/scope strict-mode design preflight`.
-Current validation: `CMV-1743`.
-Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
+Current task: `CM-1640 record_memory principal/scope default-off source slice`.
+Current validation: `CMV-1744`.
+Current status: CM-1640 source/test slice validated; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1639` records the P2-2 production auth/scope strict-mode design preflight for future `record_memory` principal/scope strict mode. It defines a future default-off config/profile contract, trusted context source rules, HTTP/stdio compatibility requirements, low-disclosure strict rejection boundary, and future acceptance matrix. It does not implement production runtime enforcement, add config/profile fields, parse new HTTP/stdio context fields, use bearer-token flow, change default auth behavior, run live MCP traffic, call providers/APIs, read/write real memory, scan raw stores, expand public MCP, or claim production/release/cutover readiness or complete V8. Next safe route is a separate source/test slice for a default-off config/profile parser or policy normalizer using temp-local tests only.
+`CM-1640` implements default-off source/test wiring for `record_memory` principal/scope authorization config. Default remains `off` with no preflight/policy injected into `MemoryWriteService`; explicit `observe` mode observes without rejecting; explicit `strict` mode rejects missing/mismatched required fields before persistence in temp-local tests. Targeted validation passed `19/19`, security write policy passed `3/3`, and HTTP MCP record/no-token/missing-token subset passed `27/27`; full `npm test` was attempted and returned `3251/3252` because an unrelated Windows temp-local vector-index `EPERM` rename hit `tests/public-default-search-lifecycle-tombstone-cold-derived-temp-local-evidence.test.js`, which passed when rerun alone `1/1`. No env var, profile file, public MCP schema field, HTTP/stdio context parsing, bearer-token behavior, default strict rejection, live MCP traffic outside temp-local tests, provider/API, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, production/release/cutover readiness, or complete V8 claim occurred. Next safe route is HTTP/stdio trusted context source implementation or deployment docs, still default-off.
 
 ## Historical Run Notes
 

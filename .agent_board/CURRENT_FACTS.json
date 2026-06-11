@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1639",
-  "validationId": "CMV-1743",
+  "taskId": "CM-1640",
+  "validationId": "CMV-1744",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1744",
+      "scope": "CM-1640 record_memory principal/scope default-off source slice",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_DEFAULT_OFF_SOURCE_SLICE_NO_PRODUCTION_ENFORCEMENT"
+    },
     {
       "id": "CMV-1743",
       "scope": "CM-1639 record_memory production auth/scope strict-mode design preflight",
@@ -1189,7 +1194,8 @@
     "cutover readiness",
     "release/tag/deploy/cutover",
     "production auth/scope strict-mode runtime enforcement",
-    "strict principal/scope config/profile control",
+    "HTTP/stdio trusted principal/scope context source implementation",
+    "strict principal/scope production deployment control",
     "confirmed mutation",
     "public MCP expansion beyond current seven-tool surface",
     "follow-up search validation for CM-1432 corrected write proof",

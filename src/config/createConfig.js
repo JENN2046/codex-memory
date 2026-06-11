@@ -11,6 +11,9 @@ const {
 } = require('../core/constants');
 const { getEmbeddingFingerprint } = require('./embeddingFingerprint');
 const { applyRagProfileToConfig, loadRagProfileConfig } = require('./ragProfileConfig');
+const {
+  normalizeRecordMemoryPrincipalScopeAuthorizationConfig
+} = require('../core/RecordMemoryPrincipalScopeAuthorizationConfig');
 
 function toBoolean(value, fallback = false) {
   if (typeof value === 'boolean') return value;
@@ -419,6 +422,8 @@ function createConfig(overrides = {}) {
     enableSoftReadPolicy: _resolveBool(overrides.enableSoftReadPolicy, 'CODEX_MEMORY_ENABLE_SOFT_READ_POLICY', isHardened),
     enableLifecycleReadPolicy: _resolveBool(overrides.enableLifecycleReadPolicy, 'CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY', isHardened),
     enableWritePreflight: _resolveBool(overrides.enableWritePreflight, 'CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT', isHardened),
+    recordMemoryPrincipalScopeAuthorization:
+      normalizeRecordMemoryPrincipalScopeAuthorizationConfig(overrides.recordMemoryPrincipalScopeAuthorization),
     allowExternalProvider,
     enableWriteManifest: toBoolean(overrides.enableWriteManifest ?? process.env.CODEX_MEMORY_ENABLE_WRITE_MANIFEST, true),
     candidateCacheTtlMs: Number.parseInt(String(overrides.candidateCacheTtlMs || process.env.CODEX_MEMORY_CANDIDATE_CACHE_TTL_MS || '3600000'), 10) || 3600000,

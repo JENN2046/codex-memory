@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1639 record_memory production auth/scope strict-mode design preflight` |
-| Current validation | `CMV-1743` |
-| Current route | P2-2 production auth/scope strict-mode design preflight closed; no config/runtime change executed |
+| Status | CM-1640 source/test slice validated; not release, production, deploy, or cutover ready |
+| Current task | `CM-1640 record_memory principal/scope default-off source slice` |
+| Current validation | `CMV-1744` |
+| Current route | default-off source/test wiring for principal/scope authorization config; no production enforcement |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1640` adds `src/core/RecordMemoryPrincipalScopeAuthorizationConfig.js`, updates `src/config/createConfig.js`, updates `src/app.js`, expands `tests/record-memory-principal-scope-observe-only-integration.test.js`, adds `tests/record-memory-principal-scope-authorization-config.test.js`, and adds `docs/CM1640_RECORD_MEMORY_PRINCIPAL_SCOPE_DEFAULT_OFF_SOURCE_SLICE.md`. It implements default-off config normalization for `recordMemoryPrincipalScopeAuthorization.mode=off|observe|strict` from explicit overrides only. Default remains `off`, with no preflight/policy injected into `MemoryWriteService`; observe mode runs low-disclosure preflight without rejecting; strict mode rejects missing/mismatched required fields before persistence in temp-local tests. Targeted validation passed `19/19`, security write policy passed `3/3`, and HTTP MCP record/no-token/missing-token subset passed `27/27`; public MCP surface remains exactly seven tools. Full `npm test` was attempted and returned `3251/3252` because `tests/public-default-search-lifecycle-tombstone-cold-derived-temp-local-evidence.test.js` hit a Windows temp-local vector-index `EPERM` rename; that same test passed when rerun alone `1/1`. No env var, profile file, public MCP schema field, HTTP/stdio context parsing, bearer-token behavior, default strict rejection, live MCP traffic outside temp-local tests, provider/API, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 `CM-1639` adds `docs/CM1639_RECORD_MEMORY_PRODUCTION_AUTH_SCOPE_STRICT_MODE_DESIGN_PREFLIGHT.md`. It formally closes the P2-2 design-preflight gap by defining the future default-off config/profile contract for `record_memory` principal/scope strict mode, trusted context source rules, HTTP/stdio compatibility requirements, low-disclosure strict rejection boundary, and future acceptance matrix. It confirms production runtime enforcement is still not implemented: current config/profile has no strict principal/scope control, HTTP/stdio defaults still do not derive `projectId`, `workspaceId`, or `clientId`, and bearer auth alone is not sufficient for principal/scope authorization. No env/config key, profile field, HTTP/stdio context parsing, bearer-token behavior, default strict mode, runtime authorization change, live MCP traffic, provider/API, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
