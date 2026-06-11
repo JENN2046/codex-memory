@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1637 record_memory strict mode config/profile preflight`.
-Current validation: `CMV-1741`.
+Current task: `CM-1638 post-PRO remediation closure review`.
+Current validation: `CMV-1742`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1637` records the compatibility preflight before strict `record_memory` principal/scope mode can be exposed through config/profile controls. It confirms current HTTP/stdio defaults still lack `projectId`, `workspaceId`, and `clientId`, so config-gated strict mode remains behavior-changing until context-source and policy key design are exact. Next safe route is either source/test config helper design with default-off behavior after exact key design, or SecretScanner hardening.
+`CM-1638` records the post-PRO remediation closure review against fresh local HEAD `537977798bd624118ba3f20d486e7a6626762f51`. Findings P1-1, P1-2, P1-3, P2-1, P2-3, and P3 are closed for their scoped remediation evidence; P2-2 remains explicitly deferred for production auth/scope strict-mode config/profile work. Public MCP surface remains exactly seven tools. No runtime/proof/write action, provider/API, bearer-token flow, raw/broad scan, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred. Next safe route is a separate local docs/source/test slice only if a new scoped task is selected.
 
 ## Historical Run Notes
 
