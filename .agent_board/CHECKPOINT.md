@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1642 record_memory strict context config wiring`.
-Current validation: `CMV-1746`.
+Current checkpoint: `CM-1643 record_memory strict auth production policy preflight`.
+Current validation: `CMV-1747`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1643 Record Memory Strict Auth Production Policy Preflight
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_PRODUCTION_POLICY_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1643_RECORD_MEMORY_STRICT_AUTH_PRODUCTION_POLICY_PREFLIGHT.md`.
+- Answered when strict mode can move from default-off to production candidate.
+- Recorded required production principal/scope fields: `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId`.
+- Recorded trusted context source matrix for HTTP MCP, stdio MCP, local CLI, future VCP bridge, and public MCP payload.
+- Selected conservative rollout: stage 0 off, stage 1 observe-only complete policy, stage 2 strict temp-local only, stage 3 strict local runtime candidate, stage 4 production candidate only after separate exact approval.
+- Recorded rollback to `CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE=off`.
+- Confirmed strict default changed `NO`, production strict mode enabled `NO`, runtime behavior changed `NO`, real `record_memory` write occurred `NO`, public MCP surface remains seven, production/release/cutover ready `NO`, and complete V8 `NOT_CLAIMED`.
+
+Validation: `CMV-1747` docs-only production policy preflight validation.
 
 ## CM-1642 Record Memory Strict Context Config Wiring
 

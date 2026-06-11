@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1642",
-  "validationId": "CMV-1746",
+  "taskId": "CM-1643",
+  "validationId": "CMV-1747",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1747",
+      "scope": "CM-1643 record_memory strict auth production policy preflight",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_PRODUCTION_POLICY_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_CHANGE"
+    },
     {
       "id": "CMV-1746",
       "scope": "CM-1642 record_memory strict context config wiring",
@@ -1203,8 +1208,12 @@
     "release readiness",
     "cutover readiness",
     "release/tag/deploy/cutover",
-    "production auth/scope strict-mode runtime enforcement",
-    "HTTP/stdio trusted principal/scope context source implementation",
+    "production auth/scope strict-mode default enforcement",
+    "HTTP/stdio strict auth production deployment runbook evidence",
+    "local CLI trusted principal/scope context source map",
+    "future VCP bridge trusted principal/scope context contract",
+    "stage 1 observe-only complete-policy rollout evidence",
+    "stage 3 strict local runtime candidate evidence",
     "strict principal/scope production deployment control",
     "confirmed mutation",
     "public MCP expansion beyond current seven-tool surface",

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1642 record_memory strict context config wiring`.
-Current validation: `CMV-1746`.
-Current project status: CM-1642 strict config/context wiring implemented default-off; production/release/cutover ready no.
-Current route: `RECORD_MEMORY_STRICT_CONTEXT_CONFIG_WIRING_DEFAULT_OFF_NO_PRODUCTION_STRICT_DEFAULT`.
+Current task: `CM-1643 record_memory strict auth production policy preflight`.
+Current validation: `CMV-1747`.
+Current project status: CM-1643 production strict auth policy preflight recorded docs-only; production/release/cutover ready no.
+Current route: `RECORD_MEMORY_STRICT_AUTH_PRODUCTION_POLICY_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_CHANGE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1643 record_memory strict auth production policy preflight: added `docs/CM1643_RECORD_MEMORY_STRICT_AUTH_PRODUCTION_POLICY_PREFLIGHT.md`. It records when `record_memory` strict principal/scope auth can move from default-off wiring toward a production candidate. Required fields are `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId`. HTTP and stdio are candidate-capable after complete trusted-context runbook/profile evidence; local CLI and future VCP bridge remain blocked until separate source maps and tests exist. Recommended rollout is stage 0 `off`, stage 1 observe-only with complete policy, stage 2 strict temp-local only, stage 3 strict local runtime candidate, and stage 4 production candidate only after separate exact approval. Missing fields are observe-only only in stage 1; strict stages fail closed before persistence. No source/runtime behavior changed, strict default changed `NO`, production strict mode enabled `NO`, real `record_memory` write occurred `NO`, public MCP surface remains exactly seven tools, production/release/cutover ready `NO`, and complete V8 `NOT_CLAIMED`.
 
 CM-1642 record_memory strict context config wiring: added default-off `record_memory` strict principal/scope config/profile/env/context wiring. Updated `src/core/RecordMemoryPrincipalScopeAuthorizationConfig.js`, added `src/core/RecordMemoryTrustedExecutionContext.js`, updated `src/config/createConfig.js`, updated HTTP/stdio adapters, expanded principal/scope tests, expanded HTTP MCP tests, and added `docs/CM1642_RECORD_MEMORY_STRICT_CONTEXT_CONFIG_WIRING.md`. Effective `observe` or `strict` mode requires a complete policy; missing or malformed policy stays effective `off`. HTTP/stdio trusted context now carries `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId` from env/base/config sources only; tool payload scope is not used as production principal authority. Validation passed config `10/10`, integration `11/11`, and HTTP MCP `29/29`; public MCP surface remains exactly seven tools. Default runtime behavior changed `NO`; production strict mode enabled `NO`; broad `record_memory` reliability `NOT_PROVEN`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`. No provider/API, bearer-token material, raw scan, broad memory scan, live proof, confirmed mutation, public MCP expansion, second effective real `record_memory` write, persistent tag write, release/tag/deploy, production/release/cutover ready claim, or complete V8 ready claim occurred.
 

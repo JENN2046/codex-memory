@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1642 record_memory strict context config wiring`.
-Current validation: `CMV-1746`.
-Current status: strict config/context wiring implemented default-off; production/release/cutover ready no.
+Current task: `CM-1643 record_memory strict auth production policy preflight`.
+Current validation: `CMV-1747`.
+Current status: strict auth production policy preflight recorded docs-only; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1642` implements default-off strict principal/scope config/env/profile/context wiring for `record_memory`. It closes the wiring part of blocker #1 without making strict mode the production default. Remaining production blockers: no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is a separate default policy decision/production acceptance packet or another remaining blocker slice.
+`CM-1643` records the production strict auth policy preflight after CM-1642 default-off wiring. It keeps strict default off and records the staged route: observe-only complete policy, strict temp-local, strict local runtime candidate, then production candidate only after separate exact approval. Remaining production blockers: strict mode is still not production default, local CLI and future VCP bridge context sources are not proven, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is stage 1 observe-only planning/runbook evidence or another remaining blocker slice.
 
 ## Historical Run Notes
 
