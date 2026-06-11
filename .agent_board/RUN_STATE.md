@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1670 VCP memory governance runtime wiring focused review`.
-Current validation: `CMV-1775`.
-Current status: CM-1666 through CM-1670 completed as a local strict-auth/governance evidence batch: post-merge mainline health receipt recorded, HTTP strict auth focused review found no actionable findings, CM-1664 approval packet fields are fixture-tested, observe readout integration remains docs-only, and VCP governance runtime wiring review found no actionable findings.
+Current task: `CM-1671 post-push mainline gate receipt`.
+Current validation: `CMV-1776`.
+Current status: post-push mainline gate receipt recorded after `fc1475b4`; `npm run gate:mainline` passed with health ok, compare `43/43`, rollback `43/43`, and clean aligned Git state.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1670` completed a local focused review of the fixture-only VCP memory governance event adapter and CM-1654 runtime wiring preflight boundary. No runtime wiring was added. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
+`CM-1671` recorded the post-push mainline gate result after `fc1475b4`. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
 
 ## Historical Run Notes
 

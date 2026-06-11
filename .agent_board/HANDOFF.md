@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1670 VCP memory governance runtime wiring focused review`.
-Current validation: `CMV-1775`.
-Current handoff: CM-1666 through CM-1670 local evidence batch completed; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
+Current task: `CM-1671 post-push mainline gate receipt`.
+Current validation: `CMV-1776`.
+Current handoff: post-push mainline gate receipt recorded after `fc1475b4`; health ok, compare `43/43`, rollback `43/43`, and Git status clean/aligned.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete the selected local safe batch: post-merge strict auth health receipt, HTTP strict auth focused review, fixture-only approval packet contract tests, observe readout integration preflight, and VCP governance runtime wiring focused review.
+Goal: record the post-push `npm run gate:mainline` result so the next session can resume from verified mainline health.
 
-Current status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW_NO_ACTIONABLE_FINDINGS`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,23 +28,17 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/CM1666_STRICT_AUTH_POST_MERGE_HEALTH_RECEIPT.md`.
-- Added `docs/CM1667_RECORD_MEMORY_HTTP_STRICT_AUTH_CANDIDATE_FOCUSED_REVIEW.md`.
-- Added `src/core/RecordMemoryProductionStrictAuthApprovalPacket.js`.
-- Added `tests/record-memory-production-strict-auth-approval-packet.test.js`.
-- Added `docs/CM1668_RECORD_MEMORY_STRICT_AUTH_APPROVAL_PACKET_CONTRACT_TESTS.md`.
-- Added `docs/CM1669_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_INTEGRATION_PREFLIGHT.md`.
-- Added `docs/CM1670_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW.md`.
-- Recorded post-push mainline health: `npm run gate:mainline` passed with health ok, compare `43/43`, rollback `43/43`.
-- Reviewed HTTP strict auth candidate and found no actionable findings.
-- Locked CM-1664 approval packet field/token/validation/forbidden-flag contract in fixture-only helper tests.
-- Defined observe readout integration as future sanitized summaries only; runtime wiring remains not started.
-- Reviewed VCP governance event adapter runtime wiring boundary and found no actionable findings.
+- Added `docs/CM1671_POST_PUSH_MAINLINE_GATE_RECEIPT.md`.
+- Recorded fresh Git status `## main...origin/main`.
+- Recorded `npm run gate:mainline` passed in daily mode.
+- Recorded health ok with HTTP `200`.
+- Recorded compare matched `43/43`.
+- Recorded rollback ready `43/43` with recommendation `rollback-safe`.
 - Confirmed no rollout execution, `.env` edit, production config/profile edit, startup/watchdog/config change, production strict enablement, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
 
-Validation: `CMV-1770` through `CMV-1775`; targeted tests passed `7/7`, `32/32`, `7/7`, and `12/12`; docs validation, diff checks, and default `npm test` passed `3331/3331`.
+Validation: `CMV-1776` post-push mainline gate receipt; `npm run gate:mainline` passed.
 
-Next safe route: commit request, or select another local fixture/docs/review task. Production observe/strict rollout remains blocked until a fresh exact CM-1664-formatted approval is provided.
+Next safe route: commit this receipt, or select another local fixture/docs/review task. Production observe/strict rollout remains blocked until a fresh exact CM-1664-formatted approval is provided.
 
 ## Previous Active Handoff
 

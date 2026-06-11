@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1670 VCP memory governance runtime wiring focused review`.
-Current validation: `CMV-1775`.
+Current checkpoint: `CM-1671 post-push mainline gate receipt`.
+Current validation: `CMV-1776`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1671 Post-Push Mainline Gate Receipt
+
+Status: `COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT`
+
+Recorded:
+
+- Added `docs/CM1671_POST_PUSH_MAINLINE_GATE_RECEIPT.md`.
+- Confirmed fresh Git status `## main...origin/main`.
+- Confirmed `npm run gate:mainline` passed in daily mode.
+- Confirmed health ok with HTTP `200`.
+- Confirmed compare matched `43/43`.
+- Confirmed rollback ready `43/43` with recommendation `rollback-safe`.
+- Confirmed no production observe rollout, production strict auth enablement, `.env` edit, production profile/config edit, startup/watchdog change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1776` post-push mainline gate receipt validation.
 
 ## CM-1670 VCP Memory Governance Runtime Wiring Focused Review
 

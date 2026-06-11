@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1670",
-  "validationId": "CMV-1775",
+  "taskId": "CM-1671",
+  "validationId": "CMV-1776",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1776",
+      "scope": "CM-1671 post-push mainline gate receipt",
+      "status": "COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT"
+    },
     {
       "id": "CMV-1775",
       "scope": "CM-1666 through CM-1670 local evidence batch broad default regression",

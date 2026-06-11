@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1666 through CM-1670 local evidence batch completed; post-push mainline health passed, HTTP strict auth focused review found no actionable findings, approval packet contract is fixture-tested, observe readout integration remains docs-only, and VCP governance runtime wiring review found no actionable findings |
-| Current task | `CM-1670 VCP memory governance runtime wiring focused review` |
-| Current validation | `CMV-1775` |
-| Current route | Local strict-auth/governance evidence batch; no runtime wiring or production rollout |
+| Status | CM-1671 post-push mainline gate receipt recorded after `fc1475b4`; `npm run gate:mainline` passed with health ok, compare `43/43`, rollback `43/43`, and clean aligned Git state |
+| Current task | `CM-1671 post-push mainline gate receipt` |
+| Current validation | `CMV-1776` |
+| Current route | Post-push health receipt; docs/status only |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1671` adds `docs/CM1671_POST_PUSH_MAINLINE_GATE_RECEIPT.md`. It records the post-push `npm run gate:mainline` result after `fc1475b4`: health ok with HTTP `200`, compare matched `43/43`, rollback ready `43/43`, recommendation `rollback-safe`, and fresh Git status `## main...origin/main`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1670` adds `docs/CM1670_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW.md`. It reviews the fixture-only `VcpMemoryGovernanceEventAdapter` and CM-1654 runtime wiring preflight boundary. No actionable findings were found. Runtime wiring executed `NO`; live VCP/MCP proof `NO`; `record_memory` called `NO`; raw store/DailyNote/RAG/vector/prompt read `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

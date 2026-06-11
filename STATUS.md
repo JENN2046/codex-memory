@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1670 VCP memory governance runtime wiring focused review`.
-Current validation: `CMV-1775`.
-Current project status: CM-1666 through CM-1670 local evidence batch completed; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
-Current route: `LOCAL_STRICT_AUTH_GOVERNANCE_EVIDENCE_BATCH`.
+Current task: `CM-1671 post-push mainline gate receipt`.
+Current validation: `CMV-1776`.
+Current project status: post-push mainline gate receipt recorded after `fc1475b4`; health ok, compare `43/43`, rollback `43/43`, and Git status clean/aligned.
+Current route: `POST_PUSH_MAINLINE_GATE_RECEIPT`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1671 post-push mainline gate receipt: added `docs/CM1671_POST_PUSH_MAINLINE_GATE_RECEIPT.md`. It records the post-push `npm run gate:mainline` result after `fc1475b4 test: lock strict auth approval packet contract`: status ok, daily mode, health ok with HTTP `200`, compare matched `43/43`, rollback ready `43/43`, recommendation `rollback-safe`, and fresh Git status `## main...origin/main`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1670 VCP memory governance runtime wiring focused review: added `docs/CM1670_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW.md`. It reviews `src/core/VcpMemoryGovernanceEventAdapter.js`, `tests/vcp-memory-governance-event-adapter.test.js`, and the CM-1654 runtime wiring preflight boundary. No actionable findings were found. The adapter remains fixture-only, rejects live write approval, forbids raw memory families and authority/write/provider/raw/broad/public-expansion intent, keeps zero write/provider/public-expansion counters, and does not wire runtime behavior. Runtime wiring `NO`; live VCP/MCP proof `NO`; `record_memory` call `NO`; raw store/DailyNote/RAG/vector/prompt read `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
