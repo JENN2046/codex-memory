@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1638 post-PRO remediation closure review`.
-Current validation: `CMV-1742`.
+Current task: `CM-1639 record_memory production auth/scope strict-mode design preflight`.
+Current validation: `CMV-1743`.
 Current project status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
-Current route: `POST_PRO_REMEDIATION_CLOSURE_REVIEW_NO_RUNTIME_ACTION`.
+Current route: `RECORD_MEMORY_PRODUCTION_AUTH_SCOPE_STRICT_MODE_DESIGN_PREFLIGHT_NO_CONFIG_CHANGE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1639 record_memory production auth/scope strict-mode design preflight: added `docs/CM1639_RECORD_MEMORY_PRODUCTION_AUTH_SCOPE_STRICT_MODE_DESIGN_PREFLIGHT.md`. It formally closes the P2-2 design-preflight gap by defining the future default-off config/profile contract for `record_memory` principal/scope strict mode, trusted context source rules, HTTP/stdio compatibility requirements, low-disclosure strict rejection boundary, and future acceptance matrix. It confirms production runtime enforcement is still not implemented: current config/profile has no strict principal/scope control, HTTP/stdio defaults still do not derive `projectId`, `workspaceId`, or `clientId`, and bearer auth alone is not sufficient for principal/scope authorization. No env/config key, profile field, HTTP/stdio context parsing, bearer-token behavior, default strict mode, runtime authorization change, live MCP traffic, provider/API, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 CM-1638 post-PRO remediation closure review: added `docs/CM1638_POST_PRO_REMEDIATION_CLOSURE_REVIEW.md`. It reviews remediation target commit `537977798bd624118ba3f20d486e7a6626762f51`, the parent of the CM-1638 receipt commit, against the PRO full repository audit remediation list. Closure table result: P1-1 scoped persistent TagMemo wording closed; P1-2 authenticated `record_memory` write-capable boundary closed for wording/source map; P1-3 public `audit_memory` bounded readonly shell closed; P2-1 controlled mutation public dry-run rejection coverage closed; P2-2 production auth/scope strict-mode limitation remains clearly deferred; P2-3 `/health.runtimeFreshness.sourceFingerprint` threat model closed for documentation; P3 persistent proof taxonomy closed for CLI/source/public MCP separation. Static public MCP surface check returned exactly seven tools: `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, and `validate_memory`. Affected non-live tests passed `50/50`; `CURRENT_FACTS.json` parse passed; targeted low-disclosure / overclaim scan found no forbidden positive production, release, deploy, cutover, or complete V8 claim in reviewed scope. Existing `READY / RC_READY` wording remains explicitly scoped and not a release/production/deploy/cutover claim. `CURRENT_FACTS.json` keeps enum-compatible `READY` / `RC_READY` values but now records structured scoped-readiness qualifiers and the reviewed target commit to avoid treating the snapshot as release/production/deploy/cutover readiness. No provider/API, bearer-token flow, raw store scan, broad memory scan, live proof, runtime action, confirmed public mutation, persistent tag write, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 

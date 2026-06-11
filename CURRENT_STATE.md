@@ -9,14 +9,16 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 | Field | Value |
 |---|---|
 | Status | `READY / RC_READY` scoped; not release, production, deploy, or cutover ready |
-| Current task | `CM-1638 post-PRO remediation closure review` |
-| Current validation | `CMV-1742` |
-| Current route | post-PRO remediation findings closure reviewed; no runtime/proof/write action executed |
+| Current task | `CM-1639 record_memory production auth/scope strict-mode design preflight` |
+| Current validation | `CMV-1743` |
+| Current route | P2-2 production auth/scope strict-mode design preflight closed; no config/runtime change executed |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1639` adds `docs/CM1639_RECORD_MEMORY_PRODUCTION_AUTH_SCOPE_STRICT_MODE_DESIGN_PREFLIGHT.md`. It formally closes the P2-2 design-preflight gap by defining the future default-off config/profile contract for `record_memory` principal/scope strict mode, trusted context source rules, HTTP/stdio compatibility requirements, low-disclosure strict rejection boundary, and future acceptance matrix. It confirms production runtime enforcement is still not implemented: current config/profile has no strict principal/scope control, HTTP/stdio defaults still do not derive `projectId`, `workspaceId`, or `clientId`, and bearer auth alone is not sufficient for principal/scope authorization. No env/config key, profile field, HTTP/stdio context parsing, bearer-token behavior, default strict mode, runtime authorization change, live MCP traffic, provider/API, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 
 `CM-1638` adds `docs/CM1638_POST_PRO_REMEDIATION_CLOSURE_REVIEW.md`. It reviews remediation target commit `537977798bd624118ba3f20d486e7a6626762f51`, the parent of the CM-1638 receipt commit, against the PRO full repository audit remediation findings. Closure table result: P1-1 scoped persistent TagMemo wording closed; P1-2 authenticated `record_memory` write-capable boundary closed for wording/source map; P1-3 public `audit_memory` bounded readonly shell closed; P2-1 controlled mutation public dry-run rejection coverage closed; P2-2 production auth/scope strict-mode limitation remains clearly deferred; P2-3 `/health.runtimeFreshness.sourceFingerprint` threat model closed for documentation; P3 persistent proof taxonomy closed for CLI/source/public MCP separation. Static public MCP surface check returned exactly seven tools. Affected non-live tests passed `50/50`. No provider/API, bearer-token flow, raw store scan, broad memory scan, live proof, runtime action, confirmed public mutation, persistent tag write, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
 

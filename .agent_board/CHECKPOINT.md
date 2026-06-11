@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1638 post-PRO remediation closure review`.
-Current validation: `CMV-1742`.
+Current checkpoint: `CM-1639 record_memory production auth/scope strict-mode design preflight`.
+Current validation: `CMV-1743`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1639 Record Memory Production Auth Scope Strict Mode Design Preflight
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRODUCTION_AUTH_SCOPE_STRICT_MODE_DESIGN_PREFLIGHT_DOCS_ONLY_NO_CONFIG_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1639_RECORD_MEMORY_PRODUCTION_AUTH_SCOPE_STRICT_MODE_DESIGN_PREFLIGHT.md`.
+- Defined the future default-off config/profile contract for `record_memory` principal/scope strict mode.
+- Recorded trusted context source rules for `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId`.
+- Confirmed public payload scope must not authorize the same write by itself.
+- Confirmed bearer auth alone is not enough for principal/scope authorization.
+- Recorded HTTP/stdio compatibility requirements, low-disclosure strict rejection boundary, and future acceptance matrix.
+- Confirmed production runtime enforcement is not implemented and no env/config key, profile field, HTTP/stdio context parsing, default strict mode, runtime auth behavior, live MCP traffic, provider/API call, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1743` production auth/scope strict-mode design preflight validation.
 
 ## CM-1638 Post-PRO Remediation Closure Review
 

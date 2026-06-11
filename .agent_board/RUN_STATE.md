@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1638 post-PRO remediation closure review`.
-Current validation: `CMV-1742`.
+Current task: `CM-1639 record_memory production auth/scope strict-mode design preflight`.
+Current validation: `CMV-1743`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1638` records the post-PRO remediation closure review against remediation target commit `537977798bd624118ba3f20d486e7a6626762f51`, the parent of the CM-1638 receipt commit. Findings P1-1, P1-2, P1-3, P2-1, P2-3, and P3 are closed for their scoped remediation evidence; P2-2 remains explicitly deferred for production auth/scope strict-mode config/profile work. Public MCP surface remains exactly seven tools. No runtime/proof/write action, provider/API, bearer-token flow, raw/broad scan, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred. Next safe route is a separate local docs/source/test slice only if a new scoped task is selected.
+`CM-1639` records the P2-2 production auth/scope strict-mode design preflight for future `record_memory` principal/scope strict mode. It defines a future default-off config/profile contract, trusted context source rules, HTTP/stdio compatibility requirements, low-disclosure strict rejection boundary, and future acceptance matrix. It does not implement production runtime enforcement, add config/profile fields, parse new HTTP/stdio context fields, use bearer-token flow, change default auth behavior, run live MCP traffic, call providers/APIs, read/write real memory, scan raw stores, expand public MCP, or claim production/release/cutover readiness or complete V8. Next safe route is a separate source/test slice for a default-off config/profile parser or policy normalizer using temp-local tests only.
 
 ## Historical Run Notes
 
