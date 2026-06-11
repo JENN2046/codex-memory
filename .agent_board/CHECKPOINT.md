@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1644 local CLI trusted context source map preflight`.
-Current validation: `CMV-1748`.
+Current checkpoint: `CM-1645 VCP Bridge trusted context contract preflight`.
+Current validation: `CMV-1749`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1645 VCP Bridge Trusted Context Contract Preflight
+
+Status: `COMPLETED_VALIDATED_VCP_BRIDGE_TRUSTED_CONTEXT_CONTRACT_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1645_VCP_BRIDGE_TRUSTED_CONTEXT_CONTRACT_PREFLIGHT.md`.
+- Confirmed no real `VCPBridgeServer` implementation exists in this repository today.
+- Confirmed current VCP passive, active, LightMemo, object-mapping, and migration-readiness surfaces are read/compatibility/dry-run surfaces, not public `record_memory` write paths.
+- Recorded that future bridge strict context can provide `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId` only from bridge-owned runtime context, operator-owned static plugin config, bridge-generated canonical context, signed context, or static allowlist.
+- Recorded that user prompt, public tool args, and VCP tool payload must not provide strict principal/scope authority.
+- Recorded missing required scope in strict mode as fail-closed before persistence with low-disclosure output.
+- Recorded VCP Bridge strict production candidate as `NOT_READY`.
+- Confirmed no source/runtime behavior change, strict default changed `NO`, production strict mode enabled `NO`, real `record_memory` write occurred `NO`, public MCP surface remains seven, production/release/cutover ready `NO`, and complete V8 `NOT_CLAIMED`.
+
+Validation: `CMV-1749` docs-only VCP Bridge trusted context contract validation.
 
 ## CM-1644 Local CLI Trusted Context Source Map Preflight
 

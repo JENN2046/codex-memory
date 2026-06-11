@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1644 local CLI trusted context source map recorded docs-only; production/release/cutover ready no |
-| Current task | `CM-1644 local CLI trusted context source map preflight` |
-| Current validation | `CMV-1748` |
-| Current route | local CLI trusted executionContext source map; no runtime change |
+| Status | CM-1645 VCP Bridge trusted context contract recorded docs-only; production/release/cutover ready no |
+| Current task | `CM-1645 VCP Bridge trusted context contract preflight` |
+| Current validation | `CMV-1749` |
+| Current route | VCP Bridge trusted executionContext contract; no runtime change |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1645` adds `docs/CM1645_VCP_BRIDGE_TRUSTED_CONTEXT_CONTRACT_PREFLIGHT.md`. It records the future VCP Bridge / `VCPBridgeServer` trusted executionContext contract for `record_memory` strict principal/scope auth. Current source reality: this repository has no real `VCPBridgeServer`; existing VCP passive, active, LightMemo, object-mapping, and migration-readiness surfaces are read/compatibility/dry-run surfaces and are not public `record_memory` write paths. Decision: a future bridge can provide `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId` only from bridge-owned runtime context, static plugin config, bridge-generated canonical context, signed context, or static allowlist; those fields must not come from user prompt, public tool args, or VCP tool payload. Missing required scope in strict mode must fail closed before persistence with low-disclosure rejection output. VCP Bridge strict production candidate remains `NOT_READY`; future bridge-side trusted context adapter, signed/static context proof, allowlist evidence, and exact approval are still required. No source/runtime behavior changed; strict default changed `NO`; production strict mode enabled `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1644` adds `docs/CM1644_LOCAL_CLI_TRUSTED_CONTEXT_SOURCE_MAP_PREFLIGHT.md`. It maps local CLI/script trusted context boundaries for future `record_memory` strict principal/scope auth. Findings: stdio and HTTP MCP local binaries already use `RecordMemoryTrustedExecutionContext`; most CLI surfaces are preflight/dry-run and do not execute `record_memory`; `src/cli/scope-acceptance.js` is the local temp-workspace CLI that executes temp-local `record_memory` writes, but its trusted context currently supplies only `agentAlias`, `agentId`, and `requestSource`, while `projectId`, `workspaceId`, and `clientId` live in tool payload scope and must not authorize the same write in strict production mode. Decision: local CLI trusted context source map is recorded, but local CLI strict production candidate remains `NOT_READY`; future write-capable local CLI paths should share `RecordMemoryTrustedExecutionContext` or a documented equivalent. No source/runtime behavior changed; strict default changed `NO`; production strict mode enabled `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

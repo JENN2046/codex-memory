@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1644",
-  "validationId": "CMV-1748",
+  "taskId": "CM-1645",
+  "validationId": "CMV-1749",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1749",
+      "scope": "CM-1645 VCP Bridge trusted context contract preflight",
+      "status": "COMPLETED_VALIDATED_VCP_BRIDGE_TRUSTED_CONTEXT_CONTRACT_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_CHANGE"
+    },
     {
       "id": "CMV-1748",
       "scope": "CM-1644 local CLI trusted context source map preflight",
@@ -1217,7 +1222,9 @@
     "HTTP/stdio strict auth production deployment runbook evidence",
     "local CLI trusted principal/scope context source implementation",
     "scope:acceptance trusted six-field context helper adoption",
-    "future VCP bridge trusted principal/scope context contract",
+    "future VCP Bridge trusted context adapter implementation",
+    "future VCP Bridge signed/static context proof",
+    "future VCP Bridge exact approval and allowlist evidence",
     "stage 1 observe-only complete-policy rollout evidence",
     "stage 3 strict local runtime candidate evidence",
     "strict principal/scope production deployment control",

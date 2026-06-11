@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1644 local CLI trusted context source map preflight`.
-Current validation: `CMV-1748`.
-Current status: local CLI trusted context source map recorded docs-only; production/release/cutover ready no.
+Current task: `CM-1645 VCP Bridge trusted context contract preflight`.
+Current validation: `CMV-1749`.
+Current status: VCP Bridge trusted context contract recorded docs-only; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1644` records local CLI trusted context source mapping after CM-1643. Stdio and HTTP MCP local binaries already use the shared trusted context helper; most CLI surfaces are preflight/dry-run only; `scope:acceptance` is temp-local write-capable but currently lacks trusted `projectId`, `workspaceId`, and `clientId`. Remaining production blockers: strict mode is still not production default, local CLI strict production candidate is not ready, future VCP bridge context contract is not proven, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is CM-1645 VCP Bridge trusted context contract preflight or a temp-local source/test slice for local CLI helper adoption.
+`CM-1645` records the future VCP Bridge trusted executionContext contract after CM-1644. This repository has no real `VCPBridgeServer` implementation today; existing VCP passive/active/LightMemo/object-mapping/migration-readiness surfaces are read/compatibility/dry-run surfaces and not public `record_memory` write paths. Future bridge strict context can provide all six fields only from bridge-owned runtime context, operator-owned static plugin config, bridge-generated canonical context, signed context, or static allowlist. User prompt, public tool args, and VCP tool payload must not be trusted as strict principal/scope authority. Remaining production blockers: strict mode is still not production default, VCP Bridge trusted context adapter is not implemented, bridge-side signed/static allowlist proof is not executed, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is a fixture-only VCP Bridge trusted context adapter/helper design slice or another residual production blocker preflight.
 
 ## Historical Run Notes
 
