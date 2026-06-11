@@ -78,6 +78,45 @@ const RECORD_MEMORY_PRINCIPAL_SCOPE_POLICY = {
   allowedClientIds: ['codex']
 };
 
+const RECORD_MEMORY_STRICT_AUTH_ENV_KEYS = [
+  'CODEX_MEMORY_AGENT_ALIAS',
+  'CODEX_MEMORY_AGENT_ID',
+  'CODEX_MEMORY_REQUEST_SOURCE',
+  'CODEX_MEMORY_PROJECT_ID',
+  'CODEX_MEMORY_WORKSPACE_ID',
+  'CODEX_MEMORY_CLIENT_ID',
+  'CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE',
+  'CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_ALIAS',
+  'CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_IDS',
+  'CODEX_MEMORY_RECORD_MEMORY_ALLOWED_REQUEST_SOURCES',
+  'CODEX_MEMORY_RECORD_MEMORY_ALLOWED_PROJECT_IDS',
+  'CODEX_MEMORY_RECORD_MEMORY_ALLOWED_WORKSPACE_IDS',
+  'CODEX_MEMORY_RECORD_MEMORY_ALLOWED_CLIENT_IDS'
+];
+
+async function withRecordMemoryStrictAuthEnv(values, handler) {
+  const previous = new Map(RECORD_MEMORY_STRICT_AUTH_ENV_KEYS.map(key => [key, process.env[key]]));
+  for (const key of RECORD_MEMORY_STRICT_AUTH_ENV_KEYS) {
+    delete process.env[key];
+  }
+  for (const [key, value] of Object.entries(values)) {
+    process.env[key] = value;
+  }
+
+  try {
+    await handler();
+  } finally {
+    for (const key of RECORD_MEMORY_STRICT_AUTH_ENV_KEYS) {
+      const value = previous.get(key);
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
 async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
   const app = createCodexMemoryApplication({
@@ -1186,6 +1225,242 @@ test('CM1642 HTTP MCP strict principal scope does not trust payload scope as pri
     }
   });
 });
+
+test('CM1656 HTTP MCP production-candidate strict auth accepts trusted env context', async () => {
+  await withRecordMemoryStrictAuthEnv({
+    CODEX_MEMORY_AGENT_ALIAS: 'Codex',
+    CODEX_MEMORY_AGENT_ID: 'codex-desktop',
+    CODEX_MEMORY_REQUEST_SOURCE: 'codex-memory-mcp',
+    CODEX_MEMORY_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_WORKSPACE_ID: 'workspace-alpha',
+    CODEX_MEMORY_CLIENT_ID: 'codex',
+    CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE: 'strict',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_ALIAS: 'Codex',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_IDS: 'codex-desktop',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_REQUEST_SOURCES: 'codex-memory-mcp',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_PROJECT_IDS: 'codex-memory',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_WORKSPACE_IDS: 'workspace-alpha',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_CLIENT_IDS: 'codex'
+  }, async () => {
+    await withHttpServer(async ({ app, address }) => {
+      assert.equal(app.config.recordMemoryPrincipalScopeAuthorization.mode, 'strict');
+      assert.equal(app.services.writeService.recordMemoryPrincipalScopeAuthorizationStrictMode, true);
+
+      const initResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      });
+      const sessionId = initResponse.headers.get(SESSION_HEADER);
+      assert.ok(sessionId);
+
+      const record = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token',
+          [SESSION_HEADER]: sessionId
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 2,
+          method: 'tools/call',
+          params: {
+            name: 'record_memory',
+            arguments: {
+              target: 'process',
+              title: 'HTTP env strict principal scope accepted',
+              content: 'Type: checkpoint\nrisk: trusted env strict auth should accept matching runtime context',
+              evidence: 'CM-1656 http env strict production-candidate regression',
+              validated: true,
+              reusable: false,
+              sensitivity: 'none'
+            }
+          }
+        })
+      });
+      const payload = await record.json();
+
+      assert.equal(record.status, 200);
+      assert.equal(payload.result.structuredContent.decision, 'accepted');
+      assert.equal(payload.result.structuredContent.principalScopeAuthorization, undefined);
+    }, {
+      bearerToken: 'test-token'
+    });
+  });
+});
+
+test('CM1656 HTTP MCP production-candidate strict auth rejects trusted env mismatch despite payload scope', async () => {
+  await withRecordMemoryStrictAuthEnv({
+    CODEX_MEMORY_AGENT_ALIAS: 'Codex',
+    CODEX_MEMORY_AGENT_ID: 'codex-desktop',
+    CODEX_MEMORY_REQUEST_SOURCE: 'codex-memory-mcp',
+    CODEX_MEMORY_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_WORKSPACE_ID: 'workspace-beta',
+    CODEX_MEMORY_CLIENT_ID: 'claude',
+    CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE: 'strict',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_ALIAS: 'Codex',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_IDS: 'codex-desktop',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_REQUEST_SOURCES: 'codex-memory-mcp',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_PROJECT_IDS: 'codex-memory',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_WORKSPACE_IDS: 'workspace-alpha',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_CLIENT_IDS: 'codex'
+  }, async () => {
+    await withHttpServer(async ({ app, address }) => {
+      assert.equal(app.config.recordMemoryPrincipalScopeAuthorization.mode, 'strict');
+      assert.equal(app.services.writeService.recordMemoryPrincipalScopeAuthorizationStrictMode, true);
+
+      const initResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      });
+      const sessionId = initResponse.headers.get(SESSION_HEADER);
+      assert.ok(sessionId);
+
+      const record = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token',
+          [SESSION_HEADER]: sessionId
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 2,
+          method: 'tools/call',
+          params: {
+            name: 'record_memory',
+            arguments: {
+              target: 'process',
+              title: 'HTTP env strict payload scope rejected',
+              content: 'Type: checkpoint\nrisk: payload scope must not override trusted env strict auth',
+              evidence: 'CM-1656 http env strict payload-spoof rejection regression',
+              validated: true,
+              reusable: false,
+              sensitivity: 'none',
+              project_id: 'codex-memory',
+              workspace_id: 'workspace-alpha',
+              client_id: 'codex'
+            }
+          }
+        })
+      });
+      const payload = await record.json();
+      const serialized = JSON.stringify(payload);
+
+      assert.equal(record.status, 200);
+      assert.equal(payload.result.structuredContent.decision, 'rejected');
+      assert.deepEqual(payload.result.structuredContent.principalScopeAuthorization.mismatchedFields, [
+        'workspaceId',
+        'clientId'
+      ]);
+      assert.doesNotMatch(serialized, /workspace-beta/);
+      assert.doesNotMatch(serialized, /workspace-alpha/);
+      assert.doesNotMatch(serialized, /claude/);
+      assert.doesNotMatch(serialized, /client_id/);
+      assert.doesNotMatch(serialized, /workspace_id/);
+    }, {
+      bearerToken: 'test-token'
+    });
+  });
+});
+
+test('CM1658 HTTP MCP observe-only complete policy records mismatch without rejecting', async () => {
+  await withRecordMemoryStrictAuthEnv({
+    CODEX_MEMORY_AGENT_ALIAS: 'Codex',
+    CODEX_MEMORY_AGENT_ID: 'codex-desktop',
+    CODEX_MEMORY_REQUEST_SOURCE: 'codex-memory-mcp',
+    CODEX_MEMORY_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_WORKSPACE_ID: 'workspace-beta',
+    CODEX_MEMORY_CLIENT_ID: 'claude',
+    CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE: 'observe',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_ALIAS: 'Codex',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_IDS: 'codex-desktop',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_REQUEST_SOURCES: 'codex-memory-mcp',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_PROJECT_IDS: 'codex-memory',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_WORKSPACE_IDS: 'workspace-alpha',
+    CODEX_MEMORY_RECORD_MEMORY_ALLOWED_CLIENT_IDS: 'codex'
+  }, async () => {
+    await withHttpServer(async ({ app, address }) => {
+      assert.equal(app.config.recordMemoryPrincipalScopeAuthorization.mode, 'observe');
+      assert.equal(app.services.writeService.recordMemoryPrincipalScopeAuthorizationStrictMode, false);
+
+      const initResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      });
+      const sessionId = initResponse.headers.get(SESSION_HEADER);
+      assert.ok(sessionId);
+
+      const record = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token',
+          [SESSION_HEADER]: sessionId
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 2,
+          method: 'tools/call',
+          params: {
+            name: 'record_memory',
+            arguments: {
+              target: 'process',
+              title: 'HTTP env observe-only principal scope mismatch accepted',
+              content: 'Type: checkpoint\nrisk: observe mode should not reject trusted context mismatch',
+              evidence: 'CM-1658 http env observe-only stage 1 regression',
+              validated: true,
+              reusable: false,
+              sensitivity: 'none',
+              project_id: 'codex-memory',
+              workspace_id: 'workspace-alpha',
+              client_id: 'codex'
+            }
+          }
+        })
+      });
+      const payload = await record.json();
+      const serialized = JSON.stringify(payload);
+
+      assert.equal(record.status, 200);
+      assert.equal(payload.result.structuredContent.decision, 'accepted');
+      assert.equal(payload.result.structuredContent.principalScopeAuthorization, undefined);
+      assert.doesNotMatch(serialized, /workspace-beta/);
+      assert.doesNotMatch(serialized, /claude/);
+      assert.doesNotMatch(serialized, /principalScopeAuthorization/);
+    }, {
+      bearerToken: 'test-token'
+    });
+  });
+});
+
 test('HTTP MCP session hardening should expose invalid env fallback warnings', async () => {
   const hardening = createSessionHardeningConfig({
     CODEX_MEMORY_HTTP_SESSION_TTL_MS: 'not-a-number',

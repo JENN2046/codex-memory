@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-06-11",
-  "taskId": "CM-1654",
-  "validationId": "CMV-1758",
+  "updatedAt": "2026-06-12",
+  "taskId": "CM-1665",
+  "validationId": "CMV-1769",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,61 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1769",
+      "scope": "CM-1665 record_memory strict auth evidence bundle closeout review",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_EVIDENCE_BUNDLE_CLOSEOUT_REVIEW_NO_DRIFT"
+    },
+    {
+      "id": "CMV-1768",
+      "scope": "CM-1664 record_memory production observe/strict exact approval packet",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_PRODUCTION_OBSERVE_STRICT_EXACT_APPROVAL_PACKET_DOCS_ONLY_NOT_EXECUTED"
+    },
+    {
+      "id": "CMV-1767",
+      "scope": "CM-1663 record_memory strict auth stdio candidate focused review",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_STDIO_CANDIDATE_FOCUSED_REVIEW_NO_ACTIONABLE_FINDINGS"
+    },
+    {
+      "id": "CMV-1766",
+      "scope": "CM-1662 record_memory strict auth stage 3 local stdio runtime candidate evidence",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_STAGE3_LOCAL_STDIO_RUNTIME_CANDIDATE_EVIDENCE_NO_PRODUCTION_ENABLEMENT"
+    },
+    {
+      "id": "CMV-1765",
+      "scope": "CM-1661 record_memory strict auth observe readout focused source review",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_FOCUSED_SOURCE_REVIEW_REPAIRED"
+    },
+    {
+      "id": "CMV-1764",
+      "scope": "CM-1660 record_memory strict auth observe readout helper contract tests",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_HELPER_CONTRACT_TESTS_FIXTURE_ONLY_NO_RUNTIME_WIRING"
+    },
+    {
+      "id": "CMV-1763",
+      "scope": "CM-1659 record_memory strict auth stage 1 observe readout design",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_STAGE1_OBSERVE_READOUT_DESIGN_DOCS_ONLY_NO_RUNTIME_WIRING"
+    },
+    {
+      "id": "CMV-1762",
+      "scope": "CM-1658 record_memory strict auth stage 1 observe-only evidence",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_STAGE1_OBSERVE_ONLY_EVIDENCE_NO_ENABLEMENT"
+    },
+    {
+      "id": "CMV-1761",
+      "scope": "CM-1657 record_memory production strict auth runbook/profile evidence",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_PRODUCTION_STRICT_AUTH_RUNBOOK_PROFILE_EVIDENCE_DOCS_ONLY_NO_ENABLEMENT"
+    },
+    {
+      "id": "CMV-1760",
+      "scope": "CM-1656 record_memory production strict auth env HTTP candidate",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_PRODUCTION_STRICT_AUTH_ENV_HTTP_CANDIDATE_NO_DEFAULT_ENABLEMENT"
+    },
+    {
+      "id": "CMV-1759",
+      "scope": "CM-1655 origin/main fast-forward sync and mainline health confirmation",
+      "status": "COMPLETED_VALIDATED_ORIGIN_MAIN_FAST_FORWARD_AND_MAINLINE_HEALTH_CONFIRMATION"
+    },
     {
       "id": "CMV-1758",
       "scope": "CM-1654 VCP memory governance runtime wiring preflight design",
@@ -1264,7 +1319,6 @@
     "cutover readiness",
     "release/tag/deploy/cutover",
     "production auth/scope strict-mode default enforcement",
-    "HTTP/stdio strict auth production deployment runbook evidence",
     "local CLI trusted principal/scope context source implementation",
     "scope:acceptance trusted six-field context helper adoption",
     "future VCP Bridge live signed/static context proof",
@@ -1279,8 +1333,9 @@
     "raw RAG sync intentionally not performed",
     "raw vector sync intentionally not performed",
     "raw prompt sync intentionally not performed",
-    "stage 1 observe-only complete-policy rollout evidence",
-    "stage 3 strict local runtime candidate evidence",
+    "stage 1 production observe-only rollout evidence",
+    "stage 1 observe-only readout runtime implementation",
+    "stage 3 production rollout evidence",
     "strict principal/scope production deployment control",
     "confirmed mutation",
     "public MCP expansion beyond current seven-tool surface",

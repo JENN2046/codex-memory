@@ -4,13 +4,239 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1654 VCP memory governance runtime wiring preflight design`.
-Current validation: `CMV-1758`.
-Current handoff: VCP memory governance runtime wiring preflight design recorded docs-only; residual production blockers remain.
+Current task: `CM-1665 record_memory strict auth evidence bundle closeout review`.
+Current validation: `CMV-1769`.
+Current handoff: CM-1656 through CM-1664 strict auth evidence bundle closeout review found no drift; no rollout execution, `.env`, production config/profile, startup/watchdog, or strict production enablement changed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+Goal: close out CM-1656 through CM-1664 strict auth evidence bundle consistency.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_EVIDENCE_BUNDLE_CLOSEOUT_REVIEW_NO_DRIFT`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+
+Completed in this slice:
+
+- Added `docs/CM1665_RECORD_MEMORY_STRICT_AUTH_EVIDENCE_BUNDLE_CLOSEOUT_REVIEW.md`.
+- Reviewed CM-1656 through CM-1664 docs/status/current-facts surfaces.
+- Confirmed local HTTP/stdio strict candidate evidence, observe-only evidence, readout helper/design, focused reviews, and approval packet are consistent.
+- Confirmed no evidence claims production rollout, production strict enablement, production/release/cutover readiness, or complete V8.
+- Confirmed not-validated list still preserves production rollout, production strict deployment control, production readiness, release readiness, cutover readiness, and committed live Git facts.
+- Confirmed no rollout execution, `.env` edit, production config/profile edit, startup/watchdog/config change, production strict enablement, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1769` strict auth evidence bundle closeout validation.
+
+Next safe route: stop/commit request, or wait for a fresh exact CM-1664-formatted production observe/strict approval.
+
+## Previous Active Handoff
+
+Goal: prepare a docs-only exact approval packet for any future `record_memory` production observe/strict rollout.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRODUCTION_OBSERVE_STRICT_EXACT_APPROVAL_PACKET_DOCS_ONLY_NOT_EXECUTED`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Added `docs/CM1664_RECORD_MEMORY_PRODUCTION_OBSERVE_STRICT_EXACT_APPROVAL_PACKET.md`.
+- Defined separate exact approval tokens for observe-only and strict rollout.
+- Recorded required operator fields including target commit, runtime surface, target mode, trusted context source, policy source, rollback owner, validation command list, and forbidden action flags.
+- Recorded required prior evidence from CM-1657, CM-1658, CM-1662, and CM-1663.
+- Recorded execution boundary, abort conditions, rollback to `CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE=off`, and non-claims.
+- Confirmed no rollout execution, `.env` edit, production config/profile edit, startup/watchdog/config change, production strict enablement, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1768` docs-only approval packet validation.
+
+Next safe route: stop before runtime boundary unless a fresh exact approval message matches CM-1664 fields.
+
+## Previous CM-1663 Handoff
+
+Goal: focused review of CM-1662 stdio candidate evidence surface for low-disclosure and boundary gaps.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_STDIO_CANDIDATE_FOCUSED_REVIEW_NO_ACTIONABLE_FINDINGS`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Reviewed `tests/record-memory-strict-auth-stdio-runtime-candidate.test.js` and `docs/CM1662_RECORD_MEMORY_STRICT_AUTH_STAGE3_LOCAL_STDIO_RUNTIME_CANDIDATE_EVIDENCE.md`.
+- Reviewed `src/adapters/codex-mcp/stdio.js`, `src/adapters/codex-mcp/server.js`, `src/core/RecordMemoryTrustedExecutionContext.js`, and `src/core/MemoryWriteService.js`.
+- Confirmed stdio trusted context comes from env/base/config.
+- Confirmed payload scope cannot become trusted principal/scope authority.
+- Confirmed strict mismatch rejects before persistence.
+- Confirmed rejected stdio response remains low-disclosure and CM-1662 asserts no persistence shape.
+- Found no actionable findings in changed scope.
+- Validation passed: stdio candidate `2/2`, diff check, `CURRENT_FACTS.json` parse, and docs validation.
+- Confirmed no source behavior change, `.env` edit, startup/watchdog/config change, production strict enablement, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1767` stdio candidate focused review validation.
+
+Next safe route: docs-only exact approval packet for production observe/strict rollout, or stop before any production/runtime boundary. Production observe rollout and strict enablement remain separate exact-approval routes.
+
+## Previous CM-1662 Handoff
+
+Goal: add local stdio MCP stage 3 strict auth runtime candidate evidence for `record_memory` without production enablement.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_STAGE3_LOCAL_STDIO_RUNTIME_CANDIDATE_EVIDENCE_NO_PRODUCTION_ENABLEMENT`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Added `tests/record-memory-strict-auth-stdio-runtime-candidate.test.js`.
+- Added `docs/CM1662_RECORD_MEMORY_STRICT_AUTH_STAGE3_LOCAL_STDIO_RUNTIME_CANDIDATE_EVIDENCE.md`.
+- Confirmed complete env policy enables strict mode through temp-local stdio MCP.
+- Confirmed trusted stdio env context accepts matching `record_memory`.
+- Confirmed trusted `workspaceId` / `clientId` mismatch rejects before persistence.
+- Confirmed payload `project_id`, `workspace_id`, and `client_id` cannot spoof trusted stdio authority.
+- Confirmed public JSON-RPC rejection does not echo trusted or payload workspace/client values.
+- Validation passed: stdio candidate `2/2`, HTTP MCP `32/32`, and principal/scope config + integration `21/21`.
+- Confirmed no `.env` edit, runtime default change, production strict enablement, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1766` stage 3 local stdio runtime candidate validation.
+
+Next safe route: focused source review of the stdio candidate evidence, or a separate exact approval packet for production observe/strict rollout. Production observe rollout and strict enablement remain separate exact-approval routes.
+
+## Previous CM-1661 Handoff
+
+Goal: focused source review of CM-1660 helper/test/doc for low-disclosure and boundary gaps, with narrow repair if needed.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_FOCUSED_SOURCE_REVIEW_REPAIRED`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Reviewed CM-1660 helper/test/doc changed scope.
+- Found one actionable gap: direct raw principal/scope value keys such as `workspaceId`, `clientId`, and `project_id` were not fail-closed.
+- Repaired `FORBIDDEN_RAW_KEYS` to reject direct camelCase and snake_case principal/scope value keys.
+- Added regression test `CM1661 observe readout rejects direct camelCase and snake_case principal scope values`.
+- Validation passed: observe readout helper contract `7/7`, diff check, `CURRENT_FACTS.json` parse, and docs validation.
+- Re-reviewed changed scope after repair and found no further actionable low-disclosure, runtime wiring, provider/API, raw/broad scan, public MCP expansion, or readiness-claim issues.
+- Confirmed no runtime wiring, production log read, `.env` edit, startup/watchdog/config change, strict enforcement, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1765` focused source review repair validation.
+
+Next safe route: stage 3 local HTTP/stdio strict runtime candidate evidence. Production observe rollout and strict enablement remain separate exact-approval routes.
+
+## Previous CM-1660 Handoff
+
+Goal: add fixture-only observe readout helper and contract tests for `record_memory` strict auth without runtime wiring or production config changes.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_HELPER_CONTRACT_TESTS_FIXTURE_ONLY_NO_RUNTIME_WIRING`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Added `src/core/RecordMemoryStrictAuthObserveReadout.js`.
+- Added `tests/record-memory-strict-auth-observe-readout.test.js`.
+- Added `docs/CM1660_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_HELPER_CONTRACT_TESTS.md`.
+- Confirmed fixture-only helper aggregates observe summaries into counters and allowed field names only.
+- Confirmed helper rejects raw principal/scope value fields, token/secret-shaped fields, non-`observe` mode, strict enforcement, and forbidden boundary counters.
+- Confirmed helper remains unwired from runtime and keeps provider/API, raw/broad scan, readiness, release, cutover, and complete V8 claims false.
+- Validation passed: observe readout helper contract `6/6`, diff check, `CURRENT_FACTS.json` parse, and docs validation.
+- Confirmed no runtime wiring, production log read, `.env` edit, startup/watchdog/config change, strict enforcement, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1764` fixture-only observe readout helper contract validation.
+
+Next safe route: focused source review or stage 3 local HTTP/stdio strict runtime candidate evidence. Production observe rollout and strict enablement remain separate exact-approval routes.
+
+## Previous CM-1659 Handoff
+
+Goal: define a low-disclosure stage 1 observe-only readout design for future `record_memory` strict auth rollout without wiring runtime telemetry.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_STAGE1_OBSERVE_READOUT_DESIGN_DOCS_ONLY_NO_RUNTIME_WIRING`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Added `docs/CM1659_RECORD_MEMORY_STRICT_AUTH_STAGE1_OBSERVE_READOUT_DESIGN.md`.
+- Defined allowed aggregate counters and field-name-only output for future observe readout.
+- Forbid raw principal/scope values, tokens, provider keys, private keys, paths, write payload content, provider/API calls, raw/broad scans, and readiness claims.
+- Recorded recommended readout shape, promotion criteria, and abort conditions.
+- Confirmed no runtime wiring, production log read, `.env` edit, startup/watchdog/config change, strict enforcement, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1763` docs-only readout design validation.
+
+Next safe route: fixture-only readout helper/contract tests, or stage 3 local HTTP/stdio strict runtime candidate evidence. Production observe rollout and strict enablement remain separate exact-approval routes.
+
+## Previous CM-1658 Handoff
+
+Goal: add local HTTP MCP stage 1 observe-only complete-policy evidence for `record_memory` strict auth without enabling strict enforcement.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_STAGE1_OBSERVE_ONLY_EVIDENCE_NO_ENABLEMENT`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Added `docs/CM1658_RECORD_MEMORY_STRICT_AUTH_STAGE1_OBSERVE_ONLY_EVIDENCE.md`.
+- Expanded `tests/mcp-http.test.js` with HTTP MCP env complete-policy observe-only regression coverage.
+- Confirmed mode `observe` loads from complete env policy and strict mode remains `false`.
+- Confirmed authenticated `record_memory` remains accepted despite trusted workspace/client mismatch.
+- Confirmed public output remains low-disclosure and does not expose `principalScopeAuthorization`.
+- Validation passed: HTTP MCP `32/32`, principal/scope config + integration `21/21`, docs validation, and daily mainline gate with health ok, compare `43/43`, rollback `43/43`.
+- Confirmed no `.env` edit, runtime default change, strict enforcement enablement, config/watchdog/startup change, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, production readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1762` stage 1 observe-only evidence validation.
+
+Next safe route: bounded stage 1 readout design, stage 3 local HTTP/stdio strict runtime candidate evidence, or local CLI/VCP Bridge strict candidate work. Production observe rollout and strict enablement remain separate exact-approval routes.
+
+## Previous CM-1657 Handoff
+
+Goal: solidify the `record_memory` production strict auth runbook/profile evidence by documenting required env/profile fields, pre-production checks, no-go conditions, and rollback without enabling strict auth by default.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRODUCTION_STRICT_AUTH_RUNBOOK_PROFILE_EVIDENCE_DOCS_ONLY_NO_ENABLEMENT`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Added `docs/CM1657_RECORD_MEMORY_PRODUCTION_STRICT_AUTH_RUNBOOK_PROFILE_EVIDENCE.md`.
+- Documented the required trusted runtime context env/profile fields: `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId`.
+- Documented the required strict auth policy env keys: mode plus all six allowlist groups.
+- Added sanitized profile shape, rollout stages, pre-production checklist, validation commands, no-go conditions, and rollback to `CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE=off`.
+- Validation passed: principal/scope config + integration `21/21`, HTTP MCP `31/31`, docs validation, and daily mainline gate with health ok, compare `43/43`, rollback `43/43`.
+- Confirmed no `.env` edit, runtime default change, config/watchdog/startup change, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, production readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1761` runbook/profile evidence validation.
+
+Next safe route: stage 1 observe-only evidence, stage 3 local HTTP/stdio runtime candidate evidence, or local CLI/VCP Bridge strict candidate work. Default production strict enablement remains a separate exact-approval route.
+
+## Previous CM-1656 Handoff
+
+Goal: advance `record_memory` production strict auth by proving the env/profile-style HTTP MCP strict path without enabling strict auth by default.
+
+Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRODUCTION_STRICT_AUTH_ENV_HTTP_CANDIDATE_NO_DEFAULT_ENABLEMENT`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Added `docs/CM1656_RECORD_MEMORY_PRODUCTION_STRICT_AUTH_ENV_HTTP_CANDIDATE.md`.
+- Expanded `tests/mcp-http.test.js` with env-driven production-candidate strict auth coverage.
+- Confirmed complete env policy enables strict mode for HTTP MCP.
+- Confirmed trusted env context authorizes authenticated HTTP `record_memory` when principal/scope fields match.
+- Confirmed trusted env mismatch rejects even when payload scope carries allowed-looking values.
+- Confirmed no default strict enablement, `.env` edit, config/watchdog/startup change, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, production readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1760` HTTP MCP production-candidate strict auth validation.
+
+Next safe route: production strict auth runbook/profile evidence, or local CLI/VCP Bridge strict candidate work. Default production strict enablement remains a separate exact-approval route.
+
+## Previous CM-1655 Handoff
+
+Goal: record the 2026-06-11 remote sync and mainline health confirmation so the next operator can resume from a clean, validated local baseline.
+
+Current status: `COMPLETED_VALIDATED_ORIGIN_MAIN_FAST_FORWARD_AND_MAINLINE_HEALTH_CONFIRMATION`; production/release/cutover ready no; complete V8 not claimed.
+
+Completed in this slice:
+
+- Fetched `origin` and fast-forwarded local `main` from `3dee934f` to `2d4364bb`, receiving 20 remote commits. No merge commit, rebase, push, PR, tag, release, deploy, config/watchdog/startup change, secret edit, dependency change, or destructive command occurred.
+- Confirmed post-sync `git status --short --branch` was clean and aligned: `## main...origin/main`.
+- Ran default local validation: `npm test` passed with `3315` tests passed, `0` failed.
+- Ran daily mainline health gate: `npm run gate:mainline` passed. Health returned HTTP `200` from `http://127.0.0.1:7605/health` with service name `vcp_codex_memory`; compare matched `43/43`; rollback reported `43/43` rollback-ready.
+
+Validation: `CMV-1759` sync and mainline health confirmation.
+
+Next safe route: continue from `CM-1654` product/governance route or select the next local task from `.agent_board/TASK_QUEUE.md`. Run fresh Git checks before branch-sensitive, runtime-sensitive, remote, or approval-bound work. Push/release/cutover remain not authorized by this record.
+
+## Previous CM-1654 Handoff
 
 Goal: define future VCP memory governance event adapter runtime wiring boundaries without executing runtime wiring, replacing VCP memory, accepting raw VCP memory content, executing live proof, connecting real VCP, calling MCP, writing memory, or making strict mode a production default.
 

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1654 VCP memory governance runtime wiring preflight design`.
-Current validation: `CMV-1758`.
-Current status: VCP memory governance runtime wiring preflight design recorded docs-only; production/release/cutover ready no.
+Current task: `CM-1665 record_memory strict auth evidence bundle closeout review`.
+Current validation: `CMV-1769`.
+Current status: CM-1656 through CM-1664 strict auth evidence bundle closeout review found no drift; no rollout execution, `.env`, production config/profile, startup/watchdog, or strict production enablement changed.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1654` records docs-only runtime wiring preflight design for `VcpMemoryGovernanceEventAdapter`. It defines future runtime wiring as low-disclosure governance event handling only, not VCP memory content sync and not direct VCP-to-codex-memory writes. It records the minimum future entrypoint, allowed/forbidden inputs, seven event types, rollout stages, fail-closed conditions, output contract, and validation matrix. No runtime wiring, live VCP proof, MCP call, real `record_memory` write, provider/API, raw store read, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is focused review or a separate Stage 1/Stage 2 fixture/no-write plan task; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
+`CM-1665` closed out the CM-1656 through CM-1664 strict auth evidence bundle and found no drift. Local HTTP/stdio evidence, observe-only evidence, fixture-only readout helper, focused reviews, and the docs-only approval packet remain consistent. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
 
 ## Historical Run Notes
 
