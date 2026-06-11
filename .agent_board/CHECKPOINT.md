@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1648 VCP Bridge exact approval gate design`.
-Current validation: `CMV-1752`.
+Current checkpoint: `CM-1649 VCP Bridge live no-write probe design`.
+Current validation: `CMV-1753`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1649 VCP Bridge Live No-Write Probe Design
+
+Status: `COMPLETED_VALIDATED_VCP_BRIDGE_LIVE_NO_WRITE_PROBE_PLAN_DESIGN_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpBridgeLiveNoWriteProbePlan.js`.
+- Added `tests/vcp-bridge-live-no-write-probe-plan.test.js`.
+- Added `docs/CM1649_VCP_BRIDGE_LIVE_NO_WRITE_PROBE_DESIGN.md`.
+- Implemented pure helper `buildVcpBridgeLiveNoWriteProbePlan(...)`.
+- Required accepted CM-1646 adapter result, accepted CM-1647 proof preflight, and accepted CM-1648 approval gate result for `live_bridge_probe_no_write`.
+- Defined allowed no-write checks for bridge reachable design placeholder, trusted context shape, allowlist hash, context hash, approval gate accepted, no `record_memory` call, and no public MCP expansion.
+- Confirmed missing approval, requested live `record_memory` proof, write intent, provider/API intent, bearer-token material intent, raw/broad scan intent, confirmed mutation intent, and public MCP expansion intent fail closed.
+- Confirmed accepted output is action-plan only and all counters remain zero.
+- Confirmed no real VCP call, live MCP proof, real `record_memory` write, provider/API, bearer-token material, raw/broad scan, confirmed mutation, public MCP expansion, persistent tag write, release/tag/deploy, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1753` source/test/docs live no-write probe plan validation.
 
 ## CM-1648 VCP Bridge Exact Approval Gate Design
 

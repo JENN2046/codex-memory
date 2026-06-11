@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1648",
-  "validationId": "CMV-1752",
+  "taskId": "CM-1649",
+  "validationId": "CMV-1753",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1753",
+      "scope": "CM-1649 VCP Bridge live no-write probe design",
+      "status": "COMPLETED_VALIDATED_VCP_BRIDGE_LIVE_NO_WRITE_PROBE_PLAN_DESIGN_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1752",
       "scope": "CM-1648 VCP Bridge exact approval gate design",
@@ -1238,6 +1243,7 @@
     "local CLI trusted principal/scope context source implementation",
     "scope:acceptance trusted six-field context helper adoption",
     "future VCP Bridge live signed/static context proof",
+    "future VCP Bridge live no-write probe execution evidence",
     "future VCP Bridge exact live approval execution evidence",
     "future VCP Bridge runtime wiring safety evidence",
     "stage 1 observe-only complete-policy rollout evidence",
