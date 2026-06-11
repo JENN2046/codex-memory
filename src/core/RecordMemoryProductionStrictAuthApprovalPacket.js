@@ -87,7 +87,10 @@ function makeRejected(reasonCode, details = {}) {
   };
 }
 
-function validateRecordMemoryProductionStrictAuthApprovalPacket(packet = {}, { now } = {}) {
+function validateRecordMemoryProductionStrictAuthApprovalPacket(packet = {}, {
+  expectedTargetCommit,
+  now
+} = {}) {
   if (!isPlainObject(packet)) {
     return makeRejected('approval_packet_not_plain_object');
   }
@@ -102,6 +105,12 @@ function validateRecordMemoryProductionStrictAuthApprovalPacket(packet = {}, { n
   const targetMode = normalizeString(packet.target_mode);
 
   if (!/^[0-9a-f]{40}$/i.test(normalizeString(packet.target_commit))) {
+    invalidFields.push('target_commit');
+  }
+  if (
+    expectedTargetCommit &&
+    normalizeString(packet.target_commit).toLowerCase() !== normalizeString(expectedTargetCommit).toLowerCase()
+  ) {
     invalidFields.push('target_commit');
   }
 

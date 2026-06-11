@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1671 post-push mainline gate receipt`.
-Current validation: `CMV-1776`.
-Current handoff: post-push mainline gate receipt recorded after `fc1475b4`; health ok, compare `43/43`, rollback `43/43`, and Git status clean/aligned.
+Current task: `CM-1676 VCP governance event adapter receipt consistency review`.
+Current validation: `CMV-1781`.
+Current handoff: CM-1672 through CM-1676 local consistency/review batch completed; approval packet commit-binding negative coverage added and targeted tests passed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: record the post-push `npm run gate:mainline` result so the next session can resume from verified mainline health.
+Goal: complete the selected local safe batch: post-push receipt consistency closeout, approval packet helper focused review, expiry/commit-binding negative cases, observe readout next-stage boundary, and VCP governance receipt consistency review.
 
-Current status: `COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_VCP_GOVERNANCE_EVENT_ADAPTER_RECEIPT_CONSISTENCY_REVIEW_NO_DRIFT`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,17 +28,21 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/CM1671_POST_PUSH_MAINLINE_GATE_RECEIPT.md`.
-- Recorded fresh Git status `## main...origin/main`.
-- Recorded `npm run gate:mainline` passed in daily mode.
-- Recorded health ok with HTTP `200`.
-- Recorded compare matched `43/43`.
-- Recorded rollback ready `43/43` with recommendation `rollback-safe`.
+- Added `docs/CM1672_POST_PUSH_RECEIPT_CONSISTENCY_CLOSEOUT.md`.
+- Added `docs/CM1673_RECORD_MEMORY_APPROVAL_PACKET_HELPER_FOCUSED_REVIEW.md`.
+- Updated `src/core/RecordMemoryProductionStrictAuthApprovalPacket.js` with optional fixture-only `expectedTargetCommit` validation.
+- Updated `tests/record-memory-production-strict-auth-approval-packet.test.js` with commit-binding negative and matching cases.
+- Added `docs/CM1674_RECORD_MEMORY_APPROVAL_PACKET_EXPIRY_COMMIT_BINDING_NEGATIVE_CASES.md`.
+- Added `docs/CM1675_OBSERVE_READOUT_RUNTIME_WIRING_NEXT_STAGE_BOUNDARY.md`.
+- Added `docs/CM1676_VCP_GOVERNANCE_EVENT_ADAPTER_RECEIPT_CONSISTENCY_REVIEW.md`.
+- Confirmed post-push receipt surfaces have no drift.
+- Confirmed approval packet helper review has no actionable findings.
+- Confirmed VCP governance adapter receipt consistency has no drift.
 - Confirmed no rollout execution, `.env` edit, production config/profile edit, startup/watchdog/config change, production strict enablement, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
 
-Validation: `CMV-1776` post-push mainline gate receipt; `npm run gate:mainline` passed.
+Validation: `CMV-1777` through `CMV-1781`; approval packet test passed `9/9`, VCP adapter test passed `12/12`, observe readout test passed `7/7`.
 
-Next safe route: commit this receipt, or select another local fixture/docs/review task. Production observe/strict rollout remains blocked until a fresh exact CM-1664-formatted approval is provided.
+Next safe route: run docs validation and commit this batch if clean. Production observe/strict rollout remains blocked until a fresh exact CM-1664-formatted approval is provided.
 
 ## Previous Active Handoff
 

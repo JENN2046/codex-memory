@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1671",
-  "validationId": "CMV-1776",
+  "taskId": "CM-1676",
+  "validationId": "CMV-1781",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,31 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1781",
+      "scope": "CM-1676 VCP governance event adapter receipt consistency review",
+      "status": "COMPLETED_VALIDATED_VCP_GOVERNANCE_EVENT_ADAPTER_RECEIPT_CONSISTENCY_REVIEW_NO_DRIFT"
+    },
+    {
+      "id": "CMV-1780",
+      "scope": "CM-1675 observe readout runtime wiring next-stage boundary",
+      "status": "COMPLETED_VALIDATED_OBSERVE_READOUT_RUNTIME_WIRING_NEXT_STAGE_BOUNDARY_DOCS_ONLY"
+    },
+    {
+      "id": "CMV-1779",
+      "scope": "CM-1674 record_memory approval packet expiry / commit binding negative cases",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_APPROVAL_PACKET_EXPIRY_COMMIT_BINDING_NEGATIVE_CASES_FIXTURE_ONLY"
+    },
+    {
+      "id": "CMV-1778",
+      "scope": "CM-1673 record_memory approval packet helper focused review",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_APPROVAL_PACKET_HELPER_FOCUSED_REVIEW_NO_ACTIONABLE_FINDINGS"
+    },
+    {
+      "id": "CMV-1777",
+      "scope": "CM-1672 post-push receipt consistency closeout",
+      "status": "COMPLETED_VALIDATED_POST_PUSH_RECEIPT_CONSISTENCY_CLOSEOUT_NO_DRIFT"
+    },
     {
       "id": "CMV-1776",
       "scope": "CM-1671 post-push mainline gate receipt",

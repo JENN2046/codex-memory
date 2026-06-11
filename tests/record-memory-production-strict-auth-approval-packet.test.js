@@ -118,6 +118,30 @@ test('CM1668 rejects forbidden rollout expansion flags and expired packets', () 
   assert.equal(result.publicMcpExpansionAllowed, false);
 });
 
+test('CM1674 fails closed when target commit does not match expected current commit', () => {
+  const result = validateRecordMemoryProductionStrictAuthApprovalPacket(validPacket(), {
+    expectedTargetCommit: '0123456789abcdef0123456789abcdef01234567'
+  });
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'invalid_approval_packet_fields');
+  assert.ok(result.invalidFields.includes('target_commit'));
+  assert.equal(result.rolloutAuthorized, false);
+  assert.equal(result.productionStrictEnabled, false);
+});
+
+test('CM1674 accepts expected target commit comparison case-insensitively', () => {
+  const targetCommit = 'ABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD';
+  const result = validateRecordMemoryProductionStrictAuthApprovalPacket(validPacket({
+    target_commit: targetCommit.toLowerCase()
+  }), {
+    expectedTargetCommit: targetCommit
+  });
+
+  assert.equal(result.accepted, true);
+  assert.equal(result.rolloutAuthorized, true);
+});
+
 test('CM1668 exported required field list matches CM-1664 packet surface', () => {
   assert.deepEqual(REQUIRED_FIELDS, [
     'task_id',

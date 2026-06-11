@@ -4,11 +4,76 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1671 post-push mainline gate receipt`.
-Current validation: `CMV-1776`.
+Current checkpoint: `CM-1676 VCP governance event adapter receipt consistency review`.
+Current validation: `CMV-1781`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1676 VCP Governance Event Adapter Receipt Consistency Review
+
+Status: `COMPLETED_VALIDATED_VCP_GOVERNANCE_EVENT_ADAPTER_RECEIPT_CONSISTENCY_REVIEW_NO_DRIFT`
+
+Recorded:
+
+- Added `docs/CM1676_VCP_GOVERNANCE_EVENT_ADAPTER_RECEIPT_CONSISTENCY_REVIEW.md`.
+- Reviewed fixture-only VCP governance event adapter receipt boundaries.
+- Confirmed adapter mode remains `fixture_only`.
+- Confirmed accepted/rejected receipts remain low-disclosure and do not echo raw values.
+- Confirmed live write approval remains rejected by the fixture adapter.
+- Confirmed zero counters and no `recordMemoryCalled`, provider/API, public MCP expansion, or runtime wiring claims.
+
+Validation: `CMV-1781` VCP governance receipt consistency validation.
+
+## CM-1675 Observe Readout Runtime Wiring Next-Stage Boundary
+
+Status: `COMPLETED_VALIDATED_OBSERVE_READOUT_RUNTIME_WIRING_NEXT_STAGE_BOUNDARY_DOCS_ONLY`
+
+Recorded:
+
+- Added `docs/CM1675_OBSERVE_READOUT_RUNTIME_WIRING_NEXT_STAGE_BOUNDARY.md`.
+- Defined preconditions before future runtime wiring of the strict auth observe readout helper.
+- Kept runtime wiring, production log read, raw audit/store read, config edits, provider/API, public MCP expansion, and readiness claims out of scope.
+
+Validation: `CMV-1780` observe readout next-stage boundary validation.
+
+## CM-1674 Record Memory Approval Packet Expiry / Commit Binding Negative Cases
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_APPROVAL_PACKET_EXPIRY_COMMIT_BINDING_NEGATIVE_CASES_FIXTURE_ONLY`
+
+Recorded:
+
+- Updated `src/core/RecordMemoryProductionStrictAuthApprovalPacket.js`.
+- Updated `tests/record-memory-production-strict-auth-approval-packet.test.js`.
+- Added `docs/CM1674_RECORD_MEMORY_APPROVAL_PACKET_EXPIRY_COMMIT_BINDING_NEGATIVE_CASES.md`.
+- Added optional fixture-only `expectedTargetCommit` validation.
+- Confirmed mismatched target commit fails closed and matching comparison is case-insensitive.
+
+Validation: `CMV-1779` approval packet expiry/commit binding validation.
+
+## CM-1673 Record Memory Approval Packet Helper Focused Review
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_APPROVAL_PACKET_HELPER_FOCUSED_REVIEW_NO_ACTIONABLE_FINDINGS`
+
+Recorded:
+
+- Added `docs/CM1673_RECORD_MEMORY_APPROVAL_PACKET_HELPER_FOCUSED_REVIEW.md`.
+- Reviewed approval packet helper field completeness, token split, low-disclosure output, forbidden expansion flags, expiration handling, and runtime wiring boundary.
+- Found no actionable findings in changed scope.
+
+Validation: `CMV-1778` approval packet helper focused review validation.
+
+## CM-1672 Post-Push Receipt Consistency Closeout
+
+Status: `COMPLETED_VALIDATED_POST_PUSH_RECEIPT_CONSISTENCY_CLOSEOUT_NO_DRIFT`
+
+Recorded:
+
+- Added `docs/CM1672_POST_PUSH_RECEIPT_CONSISTENCY_CLOSEOUT.md`.
+- Reviewed CM-1671 post-push receipt surfaces.
+- Confirmed task/validation pointers, gate result, Git status, health/compare/rollback facts, and non-claims remain consistent.
+
+Validation: `CMV-1777` post-push receipt consistency closeout validation.
 
 ## CM-1671 Post-Push Mainline Gate Receipt
 

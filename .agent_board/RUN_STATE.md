@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1671 post-push mainline gate receipt`.
-Current validation: `CMV-1776`.
-Current status: post-push mainline gate receipt recorded after `fc1475b4`; `npm run gate:mainline` passed with health ok, compare `43/43`, rollback `43/43`, and clean aligned Git state.
+Current task: `CM-1676 VCP governance event adapter receipt consistency review`.
+Current validation: `CMV-1781`.
+Current status: CM-1672 through CM-1676 local consistency/review batch completed; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1671` recorded the post-push mainline gate result after `fc1475b4`. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
+`CM-1676` completed VCP governance event adapter receipt consistency review with no drift. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
 
 ## Historical Run Notes
 

@@ -8,15 +8,25 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1671 post-push mainline gate receipt recorded after `fc1475b4`; `npm run gate:mainline` passed with health ok, compare `43/43`, rollback `43/43`, and clean aligned Git state |
-| Current task | `CM-1671 post-push mainline gate receipt` |
-| Current validation | `CMV-1776` |
-| Current route | Post-push health receipt; docs/status only |
+| Status | CM-1672 through CM-1676 local consistency/review batch completed; post-push receipt consistency found no drift, approval packet helper review found no actionable findings, expiry/commit binding negative cases passed, observe readout next-stage boundary documented, and VCP governance receipt consistency found no drift |
+| Current task | `CM-1676 VCP governance event adapter receipt consistency review` |
+| Current validation | `CMV-1781` |
+| Current route | Local consistency/review batch; no runtime wiring or production rollout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1676` adds `docs/CM1676_VCP_GOVERNANCE_EVENT_ADAPTER_RECEIPT_CONSISTENCY_REVIEW.md`. It reviews VCP governance event adapter receipt consistency and finds no drift. Validation passed VCP adapter test `12/12`. Runtime wiring `NO`; live VCP/MCP proof `NO`; `record_memory` call `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; complete V8 `NOT_CLAIMED`.
+
+`CM-1675` adds `docs/CM1675_OBSERVE_READOUT_RUNTIME_WIRING_NEXT_STAGE_BOUNDARY.md`. It defines the docs-only next-stage boundary before any runtime wiring of the strict auth observe readout helper. Runtime wiring `NO`; production logs read `NO`; raw audit/store read `NO`; `.env` edit `NO`; provider/API `NO`; readiness claim `NO`.
+
+`CM-1674` adds fixture-only commit-binding negative coverage for `RecordMemoryProductionStrictAuthApprovalPacket`. The helper now accepts optional `expectedTargetCommit`; mismatched target commits fail closed with `target_commit` in `invalidFields`. Validation passed approval packet test `9/9`. Runtime wiring `NO`; rollout executed `NO`; production strict enabled `NO`.
+
+`CM-1673` adds `docs/CM1673_RECORD_MEMORY_APPROVAL_PACKET_HELPER_FOCUSED_REVIEW.md`. It reviews the approval packet helper and finds no actionable findings in changed scope.
+
+`CM-1672` adds `docs/CM1672_POST_PUSH_RECEIPT_CONSISTENCY_CLOSEOUT.md`. It reviews post-push receipt surfaces after CM-1671 and finds no drift.
 
 `CM-1671` adds `docs/CM1671_POST_PUSH_MAINLINE_GATE_RECEIPT.md`. It records the post-push `npm run gate:mainline` result after `fc1475b4`: health ok with HTTP `200`, compare matched `43/43`, rollback ready `43/43`, recommendation `rollback-safe`, and fresh Git status `## main...origin/main`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
