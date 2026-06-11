@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1643 production strict auth policy preflight recorded docs-only; production/release/cutover ready no |
-| Current task | `CM-1643 record_memory strict auth production policy preflight` |
-| Current validation | `CMV-1747` |
-| Current route | strict principal/scope production policy decision preflight; no runtime change |
+| Status | CM-1644 local CLI trusted context source map recorded docs-only; production/release/cutover ready no |
+| Current task | `CM-1644 local CLI trusted context source map preflight` |
+| Current validation | `CMV-1748` |
+| Current route | local CLI trusted executionContext source map; no runtime change |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1644` adds `docs/CM1644_LOCAL_CLI_TRUSTED_CONTEXT_SOURCE_MAP_PREFLIGHT.md`. It maps local CLI/script trusted context boundaries for future `record_memory` strict principal/scope auth. Findings: stdio and HTTP MCP local binaries already use `RecordMemoryTrustedExecutionContext`; most CLI surfaces are preflight/dry-run and do not execute `record_memory`; `src/cli/scope-acceptance.js` is the local temp-workspace CLI that executes temp-local `record_memory` writes, but its trusted context currently supplies only `agentAlias`, `agentId`, and `requestSource`, while `projectId`, `workspaceId`, and `clientId` live in tool payload scope and must not authorize the same write in strict production mode. Decision: local CLI trusted context source map is recorded, but local CLI strict production candidate remains `NOT_READY`; future write-capable local CLI paths should share `RecordMemoryTrustedExecutionContext` or a documented equivalent. No source/runtime behavior changed; strict default changed `NO`; production strict mode enabled `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1643` adds `docs/CM1643_RECORD_MEMORY_STRICT_AUTH_PRODUCTION_POLICY_PREFLIGHT.md`. It records the production policy decision preflight after CM-1642 default-off config/context wiring. Decision: strict mode can move toward production candidate only through staged rollout: stage 0 `off`, stage 1 observe-only with complete policy, stage 2 strict temp-local only, stage 3 strict local runtime candidate, and stage 4 production candidate only after separate exact approval. Required production principal/scope fields remain `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId`. HTTP and stdio are candidate-capable after runbook/profile evidence; local CLI and future VCP bridge remain blocked until separate source maps and tests exist. Missing fields are observe-only in stage 1 and fail-closed before persistence in strict stages. No source/runtime behavior changed; strict default changed `NO`; production strict mode enabled `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

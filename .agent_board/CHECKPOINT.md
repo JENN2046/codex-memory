@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1643 record_memory strict auth production policy preflight`.
-Current validation: `CMV-1747`.
+Current checkpoint: `CM-1644 local CLI trusted context source map preflight`.
+Current validation: `CMV-1748`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1644 Local CLI Trusted Context Source Map Preflight
+
+Status: `COMPLETED_VALIDATED_LOCAL_CLI_TRUSTED_CONTEXT_SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1644_LOCAL_CLI_TRUSTED_CONTEXT_SOURCE_MAP_PREFLIGHT.md`.
+- Confirmed stdio and HTTP MCP local binaries already use `RecordMemoryTrustedExecutionContext`.
+- Confirmed most local CLI surfaces are preflight/dry-run and do not execute `record_memory`.
+- Identified `scope:acceptance` as a local temp-workspace CLI that executes temp-local `record_memory` writes.
+- Confirmed `scope:acceptance` current trusted context has `agentAlias`, `agentId`, and `requestSource`, but lacks trusted `projectId`, `workspaceId`, and `clientId`; those values are payload scope and must not authorize strict production writes.
+- Recorded local CLI strict production candidate as `NOT_READY`.
+- Confirmed no source/runtime behavior change, strict default changed `NO`, production strict mode enabled `NO`, real `record_memory` write occurred `NO`, public MCP surface remains seven, production/release/cutover ready `NO`, and complete V8 `NOT_CLAIMED`.
+
+Validation: `CMV-1748` docs-only local CLI trusted context source map validation.
 
 ## CM-1643 Record Memory Strict Auth Production Policy Preflight
 

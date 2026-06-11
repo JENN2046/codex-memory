@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1643",
-  "validationId": "CMV-1747",
+  "taskId": "CM-1644",
+  "validationId": "CMV-1748",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1748",
+      "scope": "CM-1644 local CLI trusted context source map preflight",
+      "status": "COMPLETED_VALIDATED_LOCAL_CLI_TRUSTED_CONTEXT_SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_CHANGE"
+    },
     {
       "id": "CMV-1747",
       "scope": "CM-1643 record_memory strict auth production policy preflight",
@@ -1210,7 +1215,8 @@
     "release/tag/deploy/cutover",
     "production auth/scope strict-mode default enforcement",
     "HTTP/stdio strict auth production deployment runbook evidence",
-    "local CLI trusted principal/scope context source map",
+    "local CLI trusted principal/scope context source implementation",
+    "scope:acceptance trusted six-field context helper adoption",
     "future VCP bridge trusted principal/scope context contract",
     "stage 1 observe-only complete-policy rollout evidence",
     "stage 3 strict local runtime candidate evidence",

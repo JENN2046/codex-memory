@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1643 record_memory strict auth production policy preflight`.
-Current validation: `CMV-1747`.
-Current status: strict auth production policy preflight recorded docs-only; production/release/cutover ready no.
+Current task: `CM-1644 local CLI trusted context source map preflight`.
+Current validation: `CMV-1748`.
+Current status: local CLI trusted context source map recorded docs-only; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1643` records the production strict auth policy preflight after CM-1642 default-off wiring. It keeps strict default off and records the staged route: observe-only complete policy, strict temp-local, strict local runtime candidate, then production candidate only after separate exact approval. Remaining production blockers: strict mode is still not production default, local CLI and future VCP bridge context sources are not proven, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is stage 1 observe-only planning/runbook evidence or another remaining blocker slice.
+`CM-1644` records local CLI trusted context source mapping after CM-1643. Stdio and HTTP MCP local binaries already use the shared trusted context helper; most CLI surfaces are preflight/dry-run only; `scope:acceptance` is temp-local write-capable but currently lacks trusted `projectId`, `workspaceId`, and `clientId`. Remaining production blockers: strict mode is still not production default, local CLI strict production candidate is not ready, future VCP bridge context contract is not proven, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is CM-1645 VCP Bridge trusted context contract preflight or a temp-local source/test slice for local CLI helper adoption.
 
 ## Historical Run Notes
 
