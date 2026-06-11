@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1650 VCP memory governance integration map v0.1`.
-Current validation: `CMV-1754`.
-Current status: VCP memory governance integration map v0.1 recorded docs-only; production/release/cutover ready no.
+Current task: `CM-1651 VCP memory governance event adapter contract preflight`.
+Current validation: `CMV-1755`.
+Current status: VCP memory governance event adapter contract preflight recorded docs-only; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1650` records the VCP memory governance integration boundary map v0.1. VCP memory remains runtime owner for hot memory, cold knowledge, active recall, and passive injection; `codex-memory` remains the controlled governance kernel for selected events only. The map defines no-sync content, must-sync governance event classes, optional bounded sync, a minimal VCP Bridge event model, bridge non-goals, and a next-stage governance event adapter contract direction. This is docs-only: no full DailyNote sync/read, raw/broad scan, live VCP proof, MCP call, real `record_memory` write, provider/API, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is VCP memory governance event adapter contract preflight; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
+`CM-1651` records the VCP memory governance event adapter contract preflight. The future `VcpMemoryGovernanceEventAdapter` accepts only bridge-owned context/config/allowlist authority plus a low-disclosure governance event envelope, proof preflight result, and approval gate result. It rejects raw DailyNote, raw RAG, raw vector/cache/chunk/embedding content, raw prompt/conversation/model output, raw ids, token/provider/API/private-key material, VCP export payloads, bulk migration payloads, positive raw/broad/provider/public-expansion counters, and write/mutation intent without exact approval. This is docs-only: no source/runtime/test behavior change, full DailyNote sync/read, raw/broad scan, live VCP proof, MCP call, real `record_memory` write, provider/API, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is CM-1652 fixture-only adapter skeleton; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
 
 ## Historical Run Notes
 

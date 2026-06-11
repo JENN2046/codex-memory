@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1650",
-  "validationId": "CMV-1754",
+  "taskId": "CM-1651",
+  "validationId": "CMV-1755",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1755",
+      "scope": "CM-1651 VCP memory governance event adapter contract preflight",
+      "status": "COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_CONTRACT_PREFLIGHT_DOCS_ONLY_NO_LIVE_NO_WRITE"
+    },
     {
       "id": "CMV-1754",
       "scope": "CM-1650 VCP memory governance integration map v0.1",
@@ -1253,8 +1258,13 @@
     "future VCP Bridge runtime wiring safety evidence",
     "future VCP memory governance event adapter contract implementation",
     "future VCP memory governance event adapter validation",
+    "future VCP memory governance event adapter fixture-only skeleton",
+    "future VCP memory governance event receipt low-disclosure tests",
     "full DailyNote sync intentionally not performed",
     "all DailyNote read intentionally not performed",
+    "raw RAG sync intentionally not performed",
+    "raw vector sync intentionally not performed",
+    "raw prompt sync intentionally not performed",
     "stage 1 observe-only complete-policy rollout evidence",
     "stage 3 strict local runtime candidate evidence",
     "strict principal/scope production deployment control",
@@ -1277,6 +1287,9 @@
     "noRawMemoryAccess": true,
     "noFullDailyNoteSync": true,
     "noAllDailyNoteRead": true,
+    "noRawRagSync": true,
+    "noRawVectorSync": true,
+    "noRawPromptSync": true,
     "noLiveVcpProof": true,
     "noEffectiveMemoryWrites": false,
     "noBearerTokenUse": true,

@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1650 VCP memory governance integration map v0.1`.
-Current validation: `CMV-1754`.
+Current checkpoint: `CM-1651 VCP memory governance event adapter contract preflight`.
+Current validation: `CMV-1755`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1651 VCP Memory Governance Event Adapter Contract Preflight
+
+Status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_CONTRACT_PREFLIGHT_DOCS_ONLY_NO_LIVE_NO_WRITE`
+
+Recorded:
+
+- Added `docs/CM1651_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_CONTRACT_PREFLIGHT.md`.
+- Defined future `VcpMemoryGovernanceEventAdapter` as a low-disclosure governance-event adapter only.
+- Confirmed it is not a VCP memory replacement, memory-content sync tool, live bridge probe, or write trigger.
+- Allowed only `bridgeRuntimeContext`, `bridgeStaticConfig`, `bridgeAllowlist`, `vcpMemoryGovernanceEventEnvelope`, `proofPreflightResult`, and `approvalGateResult` as inputs.
+- Required event envelopes to be low-disclosure and supported by the seven CM-1650 event classes.
+- Explicitly rejected raw DailyNote, raw RAG, raw vector/cache/chunk/embedding content, raw prompt/conversation/model output, raw ids, token/provider/API/private-key material, VCP export payloads, bulk migration payloads, positive raw/broad/provider/public-expansion counters, and write/mutation intent without exact approval.
+- Recorded CM-1652 fixture-only skeleton requirements and CM-1653 low-disclosure receipt test requirements.
+- Confirmed no VCP memory replacement, full DailyNote sync/read, raw RAG/vector/prompt sync, raw/broad scan, live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material, public MCP expansion, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1755` docs/status VCP memory governance event adapter contract validation.
 
 ## CM-1650 VCP Memory Governance Integration Map v0.1
 
