@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1647 VCP Bridge signed/static allowlist proof preflight`.
-Current validation: `CMV-1751`.
-Current status: VCP Bridge signed/static allowlist proof preflight implemented fixture-only; production/release/cutover ready no.
+Current task: `CM-1648 VCP Bridge exact approval gate design`.
+Current validation: `CMV-1752`.
+Current status: VCP Bridge exact approval gate skeleton implemented default-off; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1647` implements fixture-only VCP Bridge signed/static allowlist proof preflight after CM-1646. The helper defines proof packet shape, signed-context metadata shape, deterministic context hash mismatch checks, expired proof rejection, missing allowlist rejection, payload-derived identity rejection, non-accepted adapter output rejection, and secret-shaped material rejection. `signatureVerified` remains `false`; no real signature verification, private-key handling, live bridge proof, runtime wiring, or `record_memory` call was added. Remaining production blockers: strict mode is still not production default, exact live bridge approval is not granted, runtime wiring safety is not proven, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is runtime wiring safety preflight or exact-approval packet design for future live bridge proof.
+`CM-1648` implements a pure/default-off/no-live VCP Bridge exact approval gate skeleton after CM-1646 and CM-1647. The helper defines exact action gates for `design_only`, `fixture_only`, `local_dry_run`, `live_bridge_probe_no_write`, and `live_bridge_record_memory_proof`, with stronger tokens required for live no-write and future live write proof. Approval packets require operator intent scope, expiry, single-use nonce/receipt markers, and expected context/allowlist hashes. Missing token, wrong token, expired approval, hash mismatch, weaker token for live action, and production strict default request fail closed with low-disclosure output. The helper is not wired into runtime and does not connect to VCP, call MCP, call `record_memory`, or enable production strict default. Remaining production blockers: strict mode is still not production default, exact live bridge approval has not been executed, runtime wiring safety is not proven, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is VCP Bridge runtime wiring safety preflight or a separate production candidate decision packet; live bridge proof remains exact-approval work.
 
 ## Historical Run Notes
 

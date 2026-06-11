@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1647 VCP Bridge signed/static allowlist proof preflight implemented fixture-only; production/release/cutover ready no |
-| Current task | `CM-1647 VCP Bridge signed/static allowlist proof preflight` |
-| Current validation | `CMV-1751` |
-| Current route | VCP Bridge signed/static allowlist proof preflight; fixture-only no-live |
+| Status | CM-1648 VCP Bridge exact approval gate skeleton implemented default-off; production/release/cutover ready no |
+| Current task | `CM-1648 VCP Bridge exact approval gate design` |
+| Current validation | `CMV-1752` |
+| Current route | VCP Bridge exact approval gate skeleton; default-off pure no-live |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1648` adds `src/core/VcpBridgeExactApprovalGate.js`, `tests/vcp-bridge-exact-approval-gate.test.js`, and `docs/CM1648_VCP_BRIDGE_EXACT_APPROVAL_GATE_DESIGN.md`. It implements a pure, default-off, no-live exact approval gate skeleton for future VCP Bridge proof work after CM-1646 and CM-1647. The helper defines allowed actions `design_only`, `fixture_only`, `local_dry_run`, `live_bridge_probe_no_write`, and `live_bridge_record_memory_proof`; fixture/design actions require `APPROVE_VCP_BRIDGE_FIXTURE_ONLY_PROOF_PREFLIGHT`, live no-write requires `APPROVE_VCP_BRIDGE_LIVE_PROBE_NO_WRITE`, and future live `record_memory` proof requires separate exact token `APPROVE_VCP_BRIDGE_LIVE_RECORD_MEMORY_PROOF_EXACT`. Approval packets must include `token`, `operatorIntentScope`, `allowedAction`, `expiresAt`, `nonce`, `receiptId`, `expectedContextHash`, and `expectedAllowlistHash`; missing token, wrong token, expired approval, wrong context hash, stronger live action with weaker token, and production strict default request fail closed with low-disclosure output. The helper does not echo raw token, nonce, or receipt values, does not connect to real VCP, does not call MCP, does not call `record_memory`, and never enables production strict default. Validation passed CM-1648 exact approval gate test `10/10`, CM-1647 proof preflight test `9/9`, and CM-1646 adapter contract test `8/8`. Strict default changed `NO`; production strict mode enabled `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1647` adds `src/core/VcpBridgeTrustedContextProofPreflight.js`, `tests/vcp-bridge-trusted-context-proof-preflight.test.js`, and `docs/CM1647_VCP_BRIDGE_SIGNED_STATIC_ALLOWLIST_PROOF_PREFLIGHT.md`. It defines a fixture-only signed/static allowlist proof preflight for CM-1646 adapter output. The proof packet shape includes complete static allowlist plus signed-context metadata `issuedAt`, `expiresAt`, `nonce`, `bridgeInstanceId`, `contextHash`, `signaturePresent=true`, and `signatureVerified=false`. The deterministic hash binds accepted adapter `executionContext` to the static allowlist for fixture mismatch testing only. The helper rejects expired proof, missing allowlist, mismatched context hash, payload-derived identity, non-accepted adapter output, and private key / signing key / bearer-token / API key / secret-shaped material. Output remains low-disclosure and adapter output is consumable only when proof is accepted. Validation passed CM-1647 proof preflight test `9/9` and CM-1646 adapter contract test `8/8`. Strict default changed `NO`; production strict mode enabled `NO`; real signature verification occurred `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
@@ -461,7 +463,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1621 closes the scoped persistent TagMemo proof execution evidence only. Next safe action is route selection for the next V8/TagMemo capability slice or a separate approval-bound runtime/public-MCP/production-enrichment path. Broad `record_memory` reliability, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claims, and complete V8 claims remain separate approval-bound work.
+CM-1648 closes the default-off VCP Bridge exact approval gate skeleton only. Next safe action is either VCP Bridge runtime wiring safety preflight or a separate production candidate decision packet. Any live bridge probe, live `record_memory` proof, production strict default enablement, broad `record_memory` reliability claim, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claim, and complete V8 claim remain separate approval-bound work.
 
 ## Boundaries
 

@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1647 VCP Bridge signed/static allowlist proof preflight`.
-Current validation: `CMV-1751`.
+Current checkpoint: `CM-1648 VCP Bridge exact approval gate design`.
+Current validation: `CMV-1752`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1648 VCP Bridge Exact Approval Gate Design
+
+Status: `COMPLETED_VALIDATED_VCP_BRIDGE_EXACT_APPROVAL_GATE_SKELETON_DEFAULT_OFF_NO_LIVE`
+
+Recorded:
+
+- Added `src/core/VcpBridgeExactApprovalGate.js`.
+- Added `tests/vcp-bridge-exact-approval-gate.test.js`.
+- Added `docs/CM1648_VCP_BRIDGE_EXACT_APPROVAL_GATE_DESIGN.md`.
+- Implemented pure helper `buildVcpBridgeExactApprovalGate(...)`.
+- Defined allowed actions `design_only`, `fixture_only`, `local_dry_run`, `live_bridge_probe_no_write`, and `live_bridge_record_memory_proof`.
+- Required stronger exact tokens for live no-write and future live `record_memory` proof.
+- Required approval packet fields `token`, `operatorIntentScope`, `allowedAction`, `expiresAt`, `nonce`, `receiptId`, `expectedContextHash`, and `expectedAllowlistHash`.
+- Confirmed missing token, wrong token, expired approval, wrong context hash, weaker live-action token, and production strict default request fail closed.
+- Confirmed rejected output is low-disclosure and does not echo raw token, nonce, or receipt values.
+- Confirmed helper reports no production strict default enablement, no public MCP expansion, no provider/API, no bearer-token material acceptance, no unbounded `record_memory` write, and no `record_memory` call.
+- Confirmed no real VCP call, live MCP proof, real `record_memory` write, provider/API, bearer-token material, raw/broad scan, confirmed mutation, public MCP expansion, persistent tag write, release/tag/deploy, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1752` source/test/docs exact approval gate skeleton validation.
 
 ## CM-1647 VCP Bridge Signed Static Allowlist Proof Preflight
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1647",
-  "validationId": "CMV-1751",
+  "taskId": "CM-1648",
+  "validationId": "CMV-1752",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1752",
+      "scope": "CM-1648 VCP Bridge exact approval gate design",
+      "status": "COMPLETED_VALIDATED_VCP_BRIDGE_EXACT_APPROVAL_GATE_SKELETON_DEFAULT_OFF_NO_LIVE"
+    },
     {
       "id": "CMV-1751",
       "scope": "CM-1647 VCP Bridge signed/static allowlist proof preflight",
@@ -1233,7 +1238,8 @@
     "local CLI trusted principal/scope context source implementation",
     "scope:acceptance trusted six-field context helper adoption",
     "future VCP Bridge live signed/static context proof",
-    "future VCP Bridge exact approval and allowlist evidence",
+    "future VCP Bridge exact live approval execution evidence",
+    "future VCP Bridge runtime wiring safety evidence",
     "stage 1 observe-only complete-policy rollout evidence",
     "stage 3 strict local runtime candidate evidence",
     "strict principal/scope production deployment control",
