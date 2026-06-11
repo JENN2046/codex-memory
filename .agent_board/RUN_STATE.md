@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1652 VCP memory governance event adapter fixture-only skeleton`.
-Current validation: `CMV-1756`.
-Current status: VCP memory governance event adapter fixture-only skeleton implemented; production/release/cutover ready no.
+Current task: `CM-1653 VCP memory governance event receipt low-disclosure tests`.
+Current validation: `CMV-1757`.
+Current status: VCP memory governance event receipt low-disclosure tests implemented; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1652` implements a pure fixture-only `VcpMemoryGovernanceEventAdapter` skeleton. The helper accepts only low-disclosure VCP governance event envelopes after accepted bridge context/proof/approval preflight inputs, supports the seven CM-1650 event classes, rejects raw DailyNote/RAG/vector/prompt material without echoing raw content, rejects broad scan and `record_memory` call counters, keeps output counters zero, and is not wired into runtime. No full DailyNote sync/read, raw/broad scan, live VCP proof, MCP call, real `record_memory` write, provider/API, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is CM-1653 low-disclosure receipt tests or focused source review; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
+`CM-1653` adds focused low-disclosure receipt regression tests for the fixture-only `VcpMemoryGovernanceEventAdapter`. Tests verify raw content, raw ids, paths, tokens, provider/API keys, and private keys are not echoed; `forbiddenFields` and `forbiddenCounters` return names only; accepted projection is low-disclosure only; `recordMemoryCalled=false`; `publicMcpExpanded=false`; public MCP surface remains seven. No runtime wiring, live VCP proof, MCP call, real `record_memory` write, provider/API, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is focused source review or a separate cleanup/contract slice; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
 
 ## Historical Run Notes
 

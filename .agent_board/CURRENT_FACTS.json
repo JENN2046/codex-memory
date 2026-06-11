@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1652",
-  "validationId": "CMV-1756",
+  "taskId": "CM-1653",
+  "validationId": "CMV-1757",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1757",
+      "scope": "CM-1653 VCP memory governance event receipt low-disclosure tests",
+      "status": "COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS_NO_RUNTIME_WIRING"
+    },
     {
       "id": "CMV-1756",
       "scope": "CM-1652 VCP memory governance event adapter fixture-only skeleton",

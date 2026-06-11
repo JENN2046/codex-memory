@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1652 VCP memory governance event adapter fixture-only skeleton`.
-Current validation: `CMV-1756`.
+Current checkpoint: `CM-1653 VCP memory governance event receipt low-disclosure tests`.
+Current validation: `CMV-1757`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1653 VCP Memory Governance Event Receipt Low-Disclosure Tests
+
+Status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS_NO_RUNTIME_WIRING`
+
+Recorded:
+
+- Added `tests/vcp-memory-governance-event-receipt-low-disclosure.test.js`.
+- Added `docs/CM1653_VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS.md`.
+- Confirmed rejected receipts do not echo raw DailyNote, raw RAG, raw vector, or raw prompt values.
+- Confirmed rejected receipts do not echo raw workspace id, raw DailyNote path, bearer token, provider/API key, or private key values.
+- Confirmed `forbiddenFields` returns only field names or dotted paths.
+- Confirmed `forbiddenCounters` returns only counter names.
+- Confirmed accepted projection contains only low-disclosure fields.
+- Confirmed accepted and rejected receipts keep `recordMemoryCalled=false` and `publicMcpExpanded=false`.
+- Confirmed public MCP surface remains seven tools.
+- Confirmed no runtime wiring, live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material acceptance, raw store read, public MCP expansion, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1757` receipt low-disclosure regression validation.
 
 ## CM-1652 VCP Memory Governance Event Adapter Fixture-Only Skeleton
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1652 VCP memory governance event adapter fixture-only skeleton implemented; production/release/cutover ready no |
-| Current task | `CM-1652 VCP memory governance event adapter fixture-only skeleton` |
-| Current validation | `CMV-1756` |
-| Current route | VCP memory governance event adapter fixture-only skeleton; no-live no-write |
+| Status | CM-1653 VCP memory governance event receipt low-disclosure tests implemented; production/release/cutover ready no |
+| Current task | `CM-1653 VCP memory governance event receipt low-disclosure tests` |
+| Current validation | `CMV-1757` |
+| Current route | VCP memory governance event receipt low-disclosure tests; no runtime wiring |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1653` adds `tests/vcp-memory-governance-event-receipt-low-disclosure.test.js` and `docs/CM1653_VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS.md`. It hardens receipt-output regression coverage for the CM-1652 fixture-only `VcpMemoryGovernanceEventAdapter` without changing runtime wiring. Tests assert raw DailyNote, raw RAG, raw vector, raw prompt, raw workspace id, raw DailyNote path, bearer token, provider/API key, and private key values are not echoed; `forbiddenFields` returns only field names or dotted paths; `forbiddenCounters` returns only counter names; accepted projection contains only low-disclosure fields; accepted and rejected receipts keep `recordMemoryCalled=false` and `publicMcpExpanded=false`; public MCP surface remains seven. No source runtime behavior changed. VCP memory replacement `NO`; full DailyNote sync/read `NO`; raw RAG/vector/prompt sync `NO`; live VCP proof `NO`; live MCP proof `NO`; real `record_memory` write `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1652` adds `src/core/VcpMemoryGovernanceEventAdapter.js`, `tests/vcp-memory-governance-event-adapter.test.js`, and `docs/CM1652_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_FIXTURE_ONLY_SKELETON.md`. It implements a pure fixture-only `buildVcpMemoryGovernanceEventAdapterResult(...)` helper for low-disclosure VCP governance event envelopes. The helper requires accepted bridge context/proof/approval preflight inputs, accepts only the seven CM-1650 event classes, and rejects raw DailyNote, raw RAG, raw vector/cache/chunk/embedding content, raw prompt/conversation/model output, raw ids, token/provider/API/private-key material, VCP export payloads, bulk migration payloads, positive raw/broad/provider/public-expansion/write/mutation counters, fixture-only `record_memory` call intent, and live `record_memory` proof approval. Rejected output remains low-disclosure and does not echo raw fixture values. Validation covers accepted low-disclosure envelope, raw DailyNote/RAG/vector/prompt rejection, raw classification flag rejection, broad scan rejection, `record_memory` call rejection, live write approval rejection, zero counters, seven event types, and seven-tool public MCP surface. The helper is not wired into runtime. VCP memory replacement `NO`; full DailyNote sync/read `NO`; raw RAG/vector/prompt sync `NO`; live VCP proof `NO`; live MCP proof `NO`; real `record_memory` write `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
@@ -471,7 +473,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1652 closes the fixture-only `VcpMemoryGovernanceEventAdapter` skeleton. Next safe action is CM-1653 VCP memory governance event receipt low-disclosure tests or a focused source review of CM-1652. Any runtime wiring, live bridge probe execution, full DailyNote sync, broad VCP memory scan, live `record_memory` proof, production strict default enablement, broad `record_memory` reliability claim, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claim, and complete V8 claim remain separate approval-bound work.
+CM-1653 closes focused VCP memory governance event receipt low-disclosure regression tests. Next safe action is a focused source review of CM-1653 or a separate CM-1654 contract/source cleanup slice if needed. Any runtime wiring, live bridge probe execution, full DailyNote sync, broad VCP memory scan, live `record_memory` proof, production strict default enablement, broad `record_memory` reliability claim, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claim, and complete V8 claim remain separate approval-bound work.
 
 ## Boundaries
 

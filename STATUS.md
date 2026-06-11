@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1652 VCP memory governance event adapter fixture-only skeleton`.
-Current validation: `CMV-1756`.
-Current project status: CM-1652 VCP memory governance event adapter fixture-only skeleton implemented; production/release/cutover ready no.
-Current route: `VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_FIXTURE_ONLY_NO_LIVE_NO_WRITE`.
+Current task: `CM-1653 VCP memory governance event receipt low-disclosure tests`.
+Current validation: `CMV-1757`.
+Current project status: CM-1653 VCP memory governance event receipt low-disclosure tests implemented; production/release/cutover ready no.
+Current route: `VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS_NO_RUNTIME_WIRING`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1653 VCP memory governance event receipt low-disclosure tests: added `tests/vcp-memory-governance-event-receipt-low-disclosure.test.js` and `docs/CM1653_VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS.md`. The tests call the existing pure CM-1652 fixture-only adapter helper and add focused receipt-output assertions. They confirm raw DailyNote, raw RAG, raw vector, raw prompt, raw workspace id, raw DailyNote path, bearer token, provider/API key, and private key values are not echoed; `forbiddenFields` contains only field names or dotted paths; `forbiddenCounters` contains only counter names; accepted projection contains only low-disclosure fields; accepted and rejected receipts keep `recordMemoryCalled=false` and `publicMcpExpanded=false`; public MCP surface remains seven. No runtime wiring, live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material acceptance, raw store read, public MCP expansion, production/release/cutover ready claim, or complete V8 claim occurred.
 
 CM-1652 VCP memory governance event adapter fixture-only skeleton: added `src/core/VcpMemoryGovernanceEventAdapter.js`, `tests/vcp-memory-governance-event-adapter.test.js`, and `docs/CM1652_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_FIXTURE_ONLY_SKELETON.md`. The helper is pure, fixture-only, and not wired into runtime. It accepts only low-disclosure governance event envelopes with accepted bridge context/proof/approval preflight inputs, supports only the seven CM-1650 event classes, and rejects raw DailyNote, raw RAG, raw vector/cache/chunk/embedding content, raw prompt/conversation/model output, raw ids, token/provider/API/private-key material, VCP export payloads, bulk migration payloads, positive raw/broad/provider/public-expansion/write/mutation counters, fixture-only `record_memory` call intent, and live `record_memory` proof approval. Tests cover accepted low-disclosure events, raw DailyNote/RAG/vector/prompt rejection without echoing content, raw classification flag rejection, broad scan rejection, `record_memory` call rejection, live write approval rejection, zero counters, event type allowlist, and seven-tool public MCP surface. No live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material, raw store read, public MCP expansion, runtime wiring, production/release/cutover ready claim, or complete V8 claim occurred.
 
