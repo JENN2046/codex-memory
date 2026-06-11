@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1645",
-  "validationId": "CMV-1749",
+  "taskId": "CM-1646",
+  "validationId": "CMV-1750",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1750",
+      "scope": "CM-1646 VCP Bridge trusted context adapter skeleton default-off",
+      "status": "COMPLETED_VALIDATED_VCP_BRIDGE_TRUSTED_CONTEXT_ADAPTER_SKELETON_DEFAULT_OFF_FIXTURE_ONLY"
+    },
     {
       "id": "CMV-1749",
       "scope": "CM-1645 VCP Bridge trusted context contract preflight",
@@ -1222,7 +1227,6 @@
     "HTTP/stdio strict auth production deployment runbook evidence",
     "local CLI trusted principal/scope context source implementation",
     "scope:acceptance trusted six-field context helper adoption",
-    "future VCP Bridge trusted context adapter implementation",
     "future VCP Bridge signed/static context proof",
     "future VCP Bridge exact approval and allowlist evidence",
     "stage 1 observe-only complete-policy rollout evidence",

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1645 VCP Bridge trusted context contract preflight`.
-Current validation: `CMV-1749`.
-Current project status: CM-1645 VCP Bridge trusted context contract recorded docs-only; production/release/cutover ready no.
-Current route: `VCP_BRIDGE_TRUSTED_CONTEXT_CONTRACT_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_CHANGE`.
+Current task: `CM-1646 VCP Bridge trusted context adapter skeleton default-off`.
+Current validation: `CMV-1750`.
+Current project status: CM-1646 VCP Bridge trusted context adapter skeleton implemented default-off fixture-only; production/release/cutover ready no.
+Current route: `VCP_BRIDGE_TRUSTED_CONTEXT_ADAPTER_SKELETON_DEFAULT_OFF_FIXTURE_ONLY`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1646 VCP Bridge trusted context adapter skeleton default-off: added `src/core/VcpBridgeTrustedExecutionContext.js`, `tests/vcp-bridge-trusted-context-contract.test.js`, and `docs/CM1646_VCP_BRIDGE_TRUSTED_CONTEXT_ADAPTER_SKELETON.md`. The helper accepts only `bridgeRuntimeContext`, `bridgeStaticConfig`, and `bridgeAllowlist`; normalizes bridge-owned trusted context into `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId`; and fails closed for missing required fields, incomplete allowlist, non-plain runtime/static context, non-bridge-owned `requestSource`, allowlist mismatch, or prompt/tool payload/public args as authority. Rejected output is low-disclosure and does not echo raw `agentId`, `workspaceId`, or `clientId`. Accepted output reports `payloadAuthorityUsed=false`, `publicMcpExpanded=false`, `recordMemoryCalled=false`, and `providerApiCalled=false`. The helper is not wired into app, HTTP, stdio, config defaults, VCP runtime, MCP tools, or `record_memory`. Validation passed CM-1646 fixture contract test `8/8` and existing principal/scope config test `10/10`. Strict default changed `NO`, production strict mode enabled `NO`, real `record_memory` write occurred `NO`, public MCP surface remains exactly seven tools, production/release/cutover ready `NO`, and complete V8 `NOT_CLAIMED`.
 
 CM-1645 VCP Bridge trusted context contract preflight: added `docs/CM1645_VCP_BRIDGE_TRUSTED_CONTEXT_CONTRACT_PREFLIGHT.md`. It records the future VCP Bridge / `VCPBridgeServer` trusted executionContext contract for `record_memory` strict principal/scope auth. Current source reality: this repository has no real `VCPBridgeServer`; existing VCP passive, active, LightMemo, object-mapping, and migration-readiness surfaces are read/compatibility/dry-run surfaces and not public `record_memory` write paths. Future bridge strict context can provide `agentAlias`, `agentId`, `requestSource`, `projectId`, `workspaceId`, and `clientId` only from bridge-owned runtime context, operator-owned static plugin config, bridge-generated canonical context, signed context, or static allowlist. These fields must not come from user prompt, public tool args, or VCP tool payload. Missing required scope in strict mode must fail closed before persistence with low-disclosure public/audit output. VCP Bridge strict production candidate remains `NOT_READY`; bridge-side trusted context adapter, signed/static context proof, allowlist evidence, and exact approval remain future blockers. No source/runtime behavior changed, strict default changed `NO`, production strict mode enabled `NO`, real `record_memory` write occurred `NO`, public MCP surface remains exactly seven tools, production/release/cutover ready `NO`, and complete V8 `NOT_CLAIMED`.
 

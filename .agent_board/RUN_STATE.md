@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1645 VCP Bridge trusted context contract preflight`.
-Current validation: `CMV-1749`.
-Current status: VCP Bridge trusted context contract recorded docs-only; production/release/cutover ready no.
+Current task: `CM-1646 VCP Bridge trusted context adapter skeleton default-off`.
+Current validation: `CMV-1750`.
+Current status: VCP Bridge trusted context adapter skeleton implemented default-off fixture-only; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1645` records the future VCP Bridge trusted executionContext contract after CM-1644. This repository has no real `VCPBridgeServer` implementation today; existing VCP passive/active/LightMemo/object-mapping/migration-readiness surfaces are read/compatibility/dry-run surfaces and not public `record_memory` write paths. Future bridge strict context can provide all six fields only from bridge-owned runtime context, operator-owned static plugin config, bridge-generated canonical context, signed context, or static allowlist. User prompt, public tool args, and VCP tool payload must not be trusted as strict principal/scope authority. Remaining production blockers: strict mode is still not production default, VCP Bridge trusted context adapter is not implemented, bridge-side signed/static allowlist proof is not executed, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is a fixture-only VCP Bridge trusted context adapter/helper design slice or another residual production blocker preflight.
+`CM-1646` implements a default-off fixture-only VCP Bridge trusted context adapter skeleton after CM-1645. The helper accepts only bridge runtime/static/allowlist authority, normalizes all six trusted fields, rejects prompt/tool payload/public args authority, and fails closed with low-disclosure output for missing fields, incomplete allowlist, non-plain context, non-bridge-owned request source, and allowlist mismatch. The helper is not wired into app, HTTP, stdio, config defaults, VCP runtime, MCP tools, or `record_memory`. Remaining production blockers: strict mode is still not production default, bridge-side signed/static allowlist proof is not executed, no-token `/health` sourceFingerprint remains public by bounded decision, production persistent TagMemo writer is not implemented, runtime/public MCP persistent TagMemo enrichment is not completed, broad `record_memory` reliability is not proven, and complete V8 is not claimed. Next safe route is bridge-side signed/static context fixture proof or static allowlist runbook evidence.
 
 ## Historical Run Notes
 

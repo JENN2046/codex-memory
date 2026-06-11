@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1645 VCP Bridge trusted context contract preflight`.
-Current validation: `CMV-1749`.
+Current checkpoint: `CM-1646 VCP Bridge trusted context adapter skeleton default-off`.
+Current validation: `CMV-1750`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1646 VCP Bridge Trusted Context Adapter Skeleton
+
+Status: `COMPLETED_VALIDATED_VCP_BRIDGE_TRUSTED_CONTEXT_ADAPTER_SKELETON_DEFAULT_OFF_FIXTURE_ONLY`
+
+Recorded:
+
+- Added `src/core/VcpBridgeTrustedExecutionContext.js`.
+- Added `tests/vcp-bridge-trusted-context-contract.test.js`.
+- Added `docs/CM1646_VCP_BRIDGE_TRUSTED_CONTEXT_ADAPTER_SKELETON.md`.
+- Implemented pure helper `buildVcpBridgeTrustedExecutionContext(...)`.
+- Confirmed accepted authority sources are only `bridgeRuntimeContext`, `bridgeStaticConfig`, and `bridgeAllowlist`.
+- Confirmed prompt/tool payload/public args authority is rejected.
+- Confirmed missing required fields, incomplete allowlist, non-plain context, non-bridge-owned request source, and allowlist mismatch fail closed.
+- Confirmed rejected output is low-disclosure and does not echo raw `agentId`, `workspaceId`, or `clientId`.
+- Confirmed helper reports `payloadAuthorityUsed=false`, `publicMcpExpanded=false`, `recordMemoryCalled=false`, and `providerApiCalled=false`.
+- Confirmed helper is not wired into app, HTTP, stdio, config defaults, VCP runtime, MCP tools, or `record_memory`.
+- Confirmed public MCP surface remains seven.
+- Confirmed no real VCP call, live MCP proof, real `record_memory` write, provider/API, bearer-token material, raw/broad scan, confirmed mutation, public MCP expansion, persistent tag write, release/tag/deploy, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1750` source/test/docs fixture-only adapter validation.
 
 ## CM-1645 VCP Bridge Trusted Context Contract Preflight
 
