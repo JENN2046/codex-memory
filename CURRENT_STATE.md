@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1682 post-push compact mode contract validation added as fixture-only helper/test; compact acceptance and fail-closed receipt-doc exception paths passed |
-| Current task | `CM-1682 post-push compact mode contract validation` |
-| Current validation | `CMV-1787` |
-| Current route | Fixture-only governance contract validation; no runtime wiring or production rollout |
+| Status | CM-1683 post-push compact mode contract is wired into local docs validation scripts; docs gate now runs the compact mode contract test when present |
+| Current task | `CM-1683 wire compact mode contract into docs validation` |
+| Current validation | `CMV-1788` |
+| Current route | Local validation script wiring; no runtime wiring or production rollout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1683` updates `scripts/validate-local.ps1` and `scripts/validate-local.sh` so docs validation runs `node --test tests/post-push-gate-compact-mode-contract.test.js` when the test exists. Validation passed compact mode contract test `6/6` through direct target run and docs validation. Runtime wiring `NO`; source runtime behavior change `NO`; production config `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`.
 
 `CM-1682` adds `src/core/PostPushGateCompactModeContract.js`, `tests/fixtures/post-push-gate-compact-mode-cm1682-v1.json`, and `tests/post-push-gate-compact-mode-contract.test.js`. It fixture-tests routine compact mode acceptance, dedicated receipt doc exception fail-closed behavior, missing required field fail-closed behavior, positive forbidden non-claim fail-closed behavior, required field vocabulary, and no runtime/provider/memory/public-MCP/readiness actions. Validation passed post-push compact mode contract test `6/6`. Runtime wiring `NO`; source runtime behavior change `NO`; production config `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`.
 

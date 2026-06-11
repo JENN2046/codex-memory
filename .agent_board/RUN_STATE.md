@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1682 post-push compact mode contract validation`.
-Current validation: `CMV-1787`.
-Current status: post-push compact mode now has fixture-only contract validation; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
+Current task: `CM-1683 wire compact mode contract into docs validation`.
+Current validation: `CMV-1788`.
+Current status: post-push compact mode contract is now included in local docs validation scripts; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1682` added fixture-only post-push compact mode contract validation. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
+`CM-1683` wired the post-push compact mode contract test into docs validation scripts. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
 
 ## Historical Run Notes
 

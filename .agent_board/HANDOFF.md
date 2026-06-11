@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1682 post-push compact mode contract validation`.
-Current validation: `CMV-1787`.
-Current handoff: post-push compact mode now has fixture-only helper/test contract validation; compact acceptance and fail-closed exception paths passed.
+Current task: `CM-1683 wire compact mode contract into docs validation`.
+Current validation: `CMV-1788`.
+Current handoff: post-push compact mode contract test is now included in local docs validation scripts.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: add fixture-only contract validation for post-push gate compact mode.
+Goal: wire post-push compact mode contract validation into local docs validation scripts.
 
-Current status: `COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_CONTRACT_VALIDATION_FIXTURE_ONLY`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_DOCS_VALIDATION_WIRING`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,23 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+
+Completed in this slice:
+
+- Updated `scripts/validate-local.ps1`.
+- Updated `scripts/validate-local.sh`.
+- Docs validation now runs `node --test tests/post-push-gate-compact-mode-contract.test.js` when present.
+- Confirmed no runtime wiring, production config/profile edit, `.env` edit, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1788` docs validation wiring.
+
+Next safe route: validate and commit this local validation script wiring if clean, or continue with another local docs/test hardening task.
+
+## Previous Active Handoff
+
+Goal: add fixture-only contract validation for post-push gate compact mode.
+
+Current status: `COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_CONTRACT_VALIDATION_FIXTURE_ONLY`; production/release/cutover ready no; complete V8 not claimed.
 
 Completed in this slice:
 

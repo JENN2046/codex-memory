@@ -134,6 +134,9 @@ switch ($Area) {
       Run-Step "node --check .\scripts\validate_autopilot_green_file_write_executor_contract.js" "node" @("--check", ".\scripts\validate_autopilot_green_file_write_executor_contract.js")
       Run-Step "node .\scripts\validate_autopilot_green_file_write_executor_contract.js" "node" @(".\scripts\validate_autopilot_green_file_write_executor_contract.js")
     }
+    if (Test-Path ".\tests\post-push-gate-compact-mode-contract.test.js") {
+      Run-Step "node --test .\tests\post-push-gate-compact-mode-contract.test.js" "node" @("--test", ".\tests\post-push-gate-compact-mode-contract.test.js")
+    }
   }
   "test" {
     Run-NpmScript "test"

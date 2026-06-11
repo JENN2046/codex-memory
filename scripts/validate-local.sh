@@ -109,6 +109,9 @@ case "$AREA" in
     run_optional_node_script "./scripts/validate_autopilot_fixture_green_executor.js"
     run_optional_node_script "./scripts/validate_autopilot_green_file_write_boundary.js"
     run_optional_node_script "./scripts/validate_autopilot_green_file_write_executor_contract.js"
+    if [[ -f "./tests/post-push-gate-compact-mode-contract.test.js" ]]; then
+      run_step "node --test ./tests/post-push-gate-compact-mode-contract.test.js" node --test "./tests/post-push-gate-compact-mode-contract.test.js"
+    fi
     ;;
   test)
     run_npm_script "test"

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1682 post-push compact mode contract validation`.
-Current validation: `CMV-1787`.
-Current project status: post-push compact mode now has fixture-only contract validation for routine acceptance, required fields, receipt-doc exception fail-closed paths, and forbidden boundary non-claims; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
-Current route: `POST_PUSH_GATE_COMPACT_MODE_CONTRACT_VALIDATION`.
+Current task: `CM-1683 wire compact mode contract into docs validation`.
+Current validation: `CMV-1788`.
+Current project status: post-push compact mode contract is now included in local docs validation scripts on Windows and shell paths; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
+Current route: `POST_PUSH_GATE_COMPACT_MODE_DOCS_VALIDATION_WIRING`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1683 wire compact mode contract into docs validation: updated `scripts/validate-local.ps1` and `scripts/validate-local.sh` so docs validation runs `node --test tests/post-push-gate-compact-mode-contract.test.js` when present. This makes compact mode contract coverage part of the routine docs gate. Runtime wiring `NO`; source runtime behavior change `NO`; production config `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1682 post-push compact mode contract validation: added `src/core/PostPushGateCompactModeContract.js`, `tests/fixtures/post-push-gate-compact-mode-cm1682-v1.json`, and `tests/post-push-gate-compact-mode-contract.test.js`. It locks routine compact mode acceptance, required compact fields, dedicated receipt doc exception vocabulary, missing-field fail-closed behavior, positive forbidden non-claim fail-closed behavior, and no runtime/provider/memory/public-MCP/readiness action flags. Validation passed compact mode contract test `6/6`. Runtime wiring `NO`; source runtime behavior change `NO`; production config `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 

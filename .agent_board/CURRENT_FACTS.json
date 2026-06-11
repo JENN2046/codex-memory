@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1682",
-  "validationId": "CMV-1787",
+  "taskId": "CM-1683",
+  "validationId": "CMV-1788",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1788",
+      "scope": "CM-1683 wire compact mode contract into docs validation",
+      "status": "COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_DOCS_VALIDATION_WIRING"
+    },
     {
       "id": "CMV-1787",
       "scope": "CM-1682 post-push compact mode contract validation",

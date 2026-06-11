@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1682 post-push compact mode contract validation`.
-Current validation: `CMV-1787`.
+Current checkpoint: `CM-1683 wire compact mode contract into docs validation`.
+Current validation: `CMV-1788`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1683 Wire Compact Mode Contract Into Docs Validation
+
+Status: `COMPLETED_VALIDATED_POST_PUSH_COMPACT_MODE_DOCS_VALIDATION_WIRING`
+
+Recorded:
+
+- Updated `scripts/validate-local.ps1`.
+- Updated `scripts/validate-local.sh`.
+- Docs validation now runs `node --test tests/post-push-gate-compact-mode-contract.test.js` when present.
+- Confirmed no runtime wiring, source runtime behavior change, production config, `.env` edit, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1788` docs validation wiring.
 
 ## CM-1682 Post-Push Compact Mode Contract Validation
 
