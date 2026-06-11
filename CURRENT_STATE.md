@@ -8,15 +8,27 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1656 through CM-1664 strict auth evidence bundle closeout review found no drift; no rollout execution, `.env`, production config/profile, startup/watchdog, or strict production enablement changed |
-| Current task | `CM-1665 record_memory strict auth evidence bundle closeout review` |
-| Current validation | `CMV-1769` |
-| Current route | Strict auth evidence bundle closeout; docs/status review only |
+| Status | CM-1666 through CM-1670 local evidence batch completed; post-push mainline health passed, HTTP strict auth focused review found no actionable findings, approval packet contract is fixture-tested, observe readout integration remains docs-only, and VCP governance runtime wiring review found no actionable findings |
+| Current task | `CM-1670 VCP memory governance runtime wiring focused review` |
+| Current validation | `CMV-1775` |
+| Current route | Local strict-auth/governance evidence batch; no runtime wiring or production rollout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1670` adds `docs/CM1670_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW.md`. It reviews the fixture-only `VcpMemoryGovernanceEventAdapter` and CM-1654 runtime wiring preflight boundary. No actionable findings were found. Runtime wiring executed `NO`; live VCP/MCP proof `NO`; `record_memory` called `NO`; raw store/DailyNote/RAG/vector/prompt read `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
+
+Post-batch validation `CMV-1775`: default `npm test` passed `3331/3331`.
+
+`CM-1669` adds `docs/CM1669_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_INTEGRATION_PREFLIGHT.md`. It defines future sanitized-summary-only input for connecting the observe readout helper to an evidence surface. Runtime wiring `NO`; production logs read `NO`; raw audit/store read `NO`; `.env` edit `NO`; strict enforcement `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
+
+`CM-1668` adds `src/core/RecordMemoryProductionStrictAuthApprovalPacket.js`, `tests/record-memory-production-strict-auth-approval-packet.test.js`, and `docs/CM1668_RECORD_MEMORY_STRICT_AUTH_APPROVAL_PACKET_CONTRACT_TESTS.md`. It fixture-tests the CM-1664 approval packet field/token/validation/forbidden-flag contract. Validation passed `7/7`. Rollout executed `NO`; production strict enabled `NO`; runtime wiring changed `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
+
+`CM-1667` adds `docs/CM1667_RECORD_MEMORY_HTTP_STRICT_AUTH_CANDIDATE_FOCUSED_REVIEW.md`. It reviews HTTP strict auth candidate evidence and finds no actionable findings: trusted env/server context remains authority, payload scope cannot authorize mismatched context, strict rejection remains low-disclosure, and observe-only remains non-enforcing. Validation passed HTTP MCP `32/32`.
+
+`CM-1666` adds `docs/CM1666_STRICT_AUTH_POST_MERGE_HEALTH_RECEIPT.md`. It records post-push clean aligned status and `npm run gate:mainline` passing with health ok, compare `43/43`, rollback `43/43`, and recommendation `rollback-safe`.
 
 `CM-1665` adds `docs/CM1665_RECORD_MEMORY_STRICT_AUTH_EVIDENCE_BUNDLE_CLOSEOUT_REVIEW.md`. It closes out the CM-1656 through CM-1664 strict auth evidence bundle. No drift found: HTTP strict candidate, observe-only evidence, stdio candidate, focused review, fixture-only readout helper, and approval packet remain consistent; payload scope remains non-authoritative; observe evidence remains non-enforcing; strict candidate evidence remains local/temp-backed; production observe/strict rollout is not executed; exact approval remains required; rollback remains `CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE=off`; current status surfaces and current facts agree. Rollout executed `NO`; `.env` edit `NO`; production config/profile edit `NO`; startup/watchdog/config change `NO`; production strict enablement `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

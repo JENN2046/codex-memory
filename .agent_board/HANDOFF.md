@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1665 record_memory strict auth evidence bundle closeout review`.
-Current validation: `CMV-1769`.
-Current handoff: CM-1656 through CM-1664 strict auth evidence bundle closeout review found no drift; no rollout execution, `.env`, production config/profile, startup/watchdog, or strict production enablement changed.
+Current task: `CM-1670 VCP memory governance runtime wiring focused review`.
+Current validation: `CMV-1775`.
+Current handoff: CM-1666 through CM-1670 local evidence batch completed; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: close out CM-1656 through CM-1664 strict auth evidence bundle consistency.
+Goal: complete the selected local safe batch: post-merge strict auth health receipt, HTTP strict auth focused review, fixture-only approval packet contract tests, observe readout integration preflight, and VCP governance runtime wiring focused review.
 
-Current status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_EVIDENCE_BUNDLE_CLOSEOUT_REVIEW_NO_DRIFT`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW_NO_ACTIONABLE_FINDINGS`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,16 +28,23 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/CM1665_RECORD_MEMORY_STRICT_AUTH_EVIDENCE_BUNDLE_CLOSEOUT_REVIEW.md`.
-- Reviewed CM-1656 through CM-1664 docs/status/current-facts surfaces.
-- Confirmed local HTTP/stdio strict candidate evidence, observe-only evidence, readout helper/design, focused reviews, and approval packet are consistent.
-- Confirmed no evidence claims production rollout, production strict enablement, production/release/cutover readiness, or complete V8.
-- Confirmed not-validated list still preserves production rollout, production strict deployment control, production readiness, release readiness, cutover readiness, and committed live Git facts.
-- Confirmed no rollout execution, `.env` edit, production config/profile edit, startup/watchdog/config change, production strict enablement, provider/API, raw/broad scan, public MCP expansion, push/release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+- Added `docs/CM1666_STRICT_AUTH_POST_MERGE_HEALTH_RECEIPT.md`.
+- Added `docs/CM1667_RECORD_MEMORY_HTTP_STRICT_AUTH_CANDIDATE_FOCUSED_REVIEW.md`.
+- Added `src/core/RecordMemoryProductionStrictAuthApprovalPacket.js`.
+- Added `tests/record-memory-production-strict-auth-approval-packet.test.js`.
+- Added `docs/CM1668_RECORD_MEMORY_STRICT_AUTH_APPROVAL_PACKET_CONTRACT_TESTS.md`.
+- Added `docs/CM1669_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_INTEGRATION_PREFLIGHT.md`.
+- Added `docs/CM1670_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW.md`.
+- Recorded post-push mainline health: `npm run gate:mainline` passed with health ok, compare `43/43`, rollback `43/43`.
+- Reviewed HTTP strict auth candidate and found no actionable findings.
+- Locked CM-1664 approval packet field/token/validation/forbidden-flag contract in fixture-only helper tests.
+- Defined observe readout integration as future sanitized summaries only; runtime wiring remains not started.
+- Reviewed VCP governance event adapter runtime wiring boundary and found no actionable findings.
+- Confirmed no rollout execution, `.env` edit, production config/profile edit, startup/watchdog/config change, production strict enablement, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
 
-Validation: `CMV-1769` strict auth evidence bundle closeout validation.
+Validation: `CMV-1770` through `CMV-1775`; targeted tests passed `7/7`, `32/32`, `7/7`, and `12/12`; docs validation, diff checks, and default `npm test` passed `3331/3331`.
 
-Next safe route: stop/commit request, or wait for a fresh exact CM-1664-formatted production observe/strict approval.
+Next safe route: commit request, or select another local fixture/docs/review task. Production observe/strict rollout remains blocked until a fresh exact CM-1664-formatted approval is provided.
 
 ## Previous Active Handoff
 

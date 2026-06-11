@@ -4,13 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1665 record_memory strict auth evidence bundle closeout review`.
-Current validation: `CMV-1769`.
-Current project status: CM-1656 through CM-1664 strict auth evidence bundle closeout review found no drift; no rollout execution, `.env`, production config/profile, startup/watchdog, or strict production enablement changed.
-Current route: `RECORD_MEMORY_STRICT_AUTH_EVIDENCE_BUNDLE_CLOSEOUT_REVIEW`.
+Current task: `CM-1670 VCP memory governance runtime wiring focused review`.
+Current validation: `CMV-1775`.
+Current project status: CM-1666 through CM-1670 local evidence batch completed; no runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
+Current route: `LOCAL_STRICT_AUTH_GOVERNANCE_EVIDENCE_BATCH`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1670 VCP memory governance runtime wiring focused review: added `docs/CM1670_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW.md`. It reviews `src/core/VcpMemoryGovernanceEventAdapter.js`, `tests/vcp-memory-governance-event-adapter.test.js`, and the CM-1654 runtime wiring preflight boundary. No actionable findings were found. The adapter remains fixture-only, rejects live write approval, forbids raw memory families and authority/write/provider/raw/broad/public-expansion intent, keeps zero write/provider/public-expansion counters, and does not wire runtime behavior. Runtime wiring `NO`; live VCP/MCP proof `NO`; `record_memory` call `NO`; raw store/DailyNote/RAG/vector/prompt read `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
+
+Post-batch validation CMV-1775: default `npm test` passed `3331/3331`.
+
+CM-1669 record_memory strict auth observe readout integration preflight: added `docs/CM1669_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_INTEGRATION_PREFLIGHT.md`. It defines a future integration boundary for calling `buildRecordMemoryStrictAuthObserveReadout(...)` only with sanitized observe summaries and field-name arrays. Runtime wiring `NO`; production logs read `NO`; raw audit/store records read `NO`; `.env` edit `NO`; startup/watchdog/config change `NO`; strict enforcement `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
+
+CM-1668 record_memory strict auth approval packet contract tests: added `src/core/RecordMemoryProductionStrictAuthApprovalPacket.js`, `tests/record-memory-production-strict-auth-approval-packet.test.js`, and `docs/CM1668_RECORD_MEMORY_STRICT_AUTH_APPROVAL_PACKET_CONTRACT_TESTS.md`. It fixture-tests CM-1664 approval packet shape: required fields, observe/strict exact token split, target runtime surfaces, trusted context/policy source values, rollback mode `off`, complete validation command list, forbidden expansion flags, and optional expiry fail-closed behavior. Validation passed `7/7`. Rollout executed `NO`; production strict enabled `NO`; runtime wiring changed `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
+
+CM-1667 record_memory HTTP strict auth candidate focused review: added `docs/CM1667_RECORD_MEMORY_HTTP_STRICT_AUTH_CANDIDATE_FOCUSED_REVIEW.md`. It reviews `tests/mcp-http.test.js` and HTTP trusted context / strict auth candidate behavior. No actionable findings were found. Trusted env/server context remains the authority, payload scope cannot authorize mismatched trusted context, strict mismatch rejects with low-disclosure output, and observe-only mode remains non-enforcing. Validation passed HTTP MCP `32/32`.
+
+CM-1666 strict auth evidence bundle post-merge health receipt: added `docs/CM1666_STRICT_AUTH_POST_MERGE_HEALTH_RECEIPT.md`. It records post-push clean aligned status `## main...origin/main` and `npm run gate:mainline` passing in daily mode with health ok, compare `43/43`, rollback `43/43`, and recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1665 record_memory strict auth evidence bundle closeout review: added `docs/CM1665_RECORD_MEMORY_STRICT_AUTH_EVIDENCE_BUNDLE_CLOSEOUT_REVIEW.md`. It closes out the CM-1656 through CM-1664 strict auth evidence bundle. No drift found: HTTP strict candidate, observe-only evidence, stdio candidate, focused review, fixture-only readout helper, and approval packet remain consistent; payload scope remains non-authoritative; observe evidence remains non-enforcing; strict candidate evidence remains local/temp-backed; production observe/strict rollout is not executed; exact approval remains required; rollback remains `CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE=off`; current status surfaces and current facts agree. Rollout executed `NO`; `.env` edit `NO`; production config/profile edit `NO`; startup/watchdog/config change `NO`; production strict enablement `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

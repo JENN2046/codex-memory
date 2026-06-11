@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1665 record_memory strict auth evidence bundle closeout review`.
-Current validation: `CMV-1769`.
-Current status: CM-1656 through CM-1664 strict auth evidence bundle closeout review found no drift; no rollout execution, `.env`, production config/profile, startup/watchdog, or strict production enablement changed.
+Current task: `CM-1670 VCP memory governance runtime wiring focused review`.
+Current validation: `CMV-1775`.
+Current status: CM-1666 through CM-1670 completed as a local strict-auth/governance evidence batch: post-merge mainline health receipt recorded, HTTP strict auth focused review found no actionable findings, CM-1664 approval packet fields are fixture-tested, observe readout integration remains docs-only, and VCP governance runtime wiring review found no actionable findings.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1665` closed out the CM-1656 through CM-1664 strict auth evidence bundle and found no drift. Local HTTP/stdio evidence, observe-only evidence, fixture-only readout helper, focused reviews, and the docs-only approval packet remain consistent. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
+`CM-1670` completed a local focused review of the fixture-only VCP memory governance event adapter and CM-1654 runtime wiring preflight boundary. No runtime wiring was added. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
 
 ## Historical Run Notes
 

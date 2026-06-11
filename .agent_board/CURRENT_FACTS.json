@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1665",
-  "validationId": "CMV-1769",
+  "taskId": "CM-1670",
+  "validationId": "CMV-1775",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,36 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1775",
+      "scope": "CM-1666 through CM-1670 local evidence batch broad default regression",
+      "status": "COMPLETED_VALIDATED_DEFAULT_NPM_TEST_PASSED_3331_OF_3331"
+    },
+    {
+      "id": "CMV-1774",
+      "scope": "CM-1670 VCP memory governance runtime wiring focused review",
+      "status": "COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_FOCUSED_REVIEW_NO_ACTIONABLE_FINDINGS"
+    },
+    {
+      "id": "CMV-1773",
+      "scope": "CM-1669 record_memory strict auth observe readout integration preflight",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_OBSERVE_READOUT_INTEGRATION_PREFLIGHT_DOCS_ONLY"
+    },
+    {
+      "id": "CMV-1772",
+      "scope": "CM-1668 record_memory strict auth approval packet contract tests",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_AUTH_APPROVAL_PACKET_CONTRACT_TESTS_FIXTURE_ONLY"
+    },
+    {
+      "id": "CMV-1771",
+      "scope": "CM-1667 record_memory HTTP strict auth candidate focused review",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_HTTP_STRICT_AUTH_CANDIDATE_FOCUSED_REVIEW_NO_ACTIONABLE_FINDINGS"
+    },
+    {
+      "id": "CMV-1770",
+      "scope": "CM-1666 strict auth evidence bundle post-merge health receipt",
+      "status": "COMPLETED_VALIDATED_STRICT_AUTH_POST_MERGE_HEALTH_RECEIPT"
+    },
     {
       "id": "CMV-1769",
       "scope": "CM-1665 record_memory strict auth evidence bundle closeout review",
