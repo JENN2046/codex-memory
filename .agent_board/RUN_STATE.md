@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1651 VCP memory governance event adapter contract preflight`.
-Current validation: `CMV-1755`.
-Current status: VCP memory governance event adapter contract preflight recorded docs-only; production/release/cutover ready no.
+Current task: `CM-1652 VCP memory governance event adapter fixture-only skeleton`.
+Current validation: `CMV-1756`.
+Current status: VCP memory governance event adapter fixture-only skeleton implemented; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1651` records the VCP memory governance event adapter contract preflight. The future `VcpMemoryGovernanceEventAdapter` accepts only bridge-owned context/config/allowlist authority plus a low-disclosure governance event envelope, proof preflight result, and approval gate result. It rejects raw DailyNote, raw RAG, raw vector/cache/chunk/embedding content, raw prompt/conversation/model output, raw ids, token/provider/API/private-key material, VCP export payloads, bulk migration payloads, positive raw/broad/provider/public-expansion counters, and write/mutation intent without exact approval. This is docs-only: no source/runtime/test behavior change, full DailyNote sync/read, raw/broad scan, live VCP proof, MCP call, real `record_memory` write, provider/API, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is CM-1652 fixture-only adapter skeleton; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
+`CM-1652` implements a pure fixture-only `VcpMemoryGovernanceEventAdapter` skeleton. The helper accepts only low-disclosure VCP governance event envelopes after accepted bridge context/proof/approval preflight inputs, supports the seven CM-1650 event classes, rejects raw DailyNote/RAG/vector/prompt material without echoing raw content, rejects broad scan and `record_memory` call counters, keeps output counters zero, and is not wired into runtime. No full DailyNote sync/read, raw/broad scan, live VCP proof, MCP call, real `record_memory` write, provider/API, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is CM-1653 low-disclosure receipt tests or focused source review; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
 
 ## Historical Run Notes
 

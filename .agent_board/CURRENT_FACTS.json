@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1651",
-  "validationId": "CMV-1755",
+  "taskId": "CM-1652",
+  "validationId": "CMV-1756",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1756",
+      "scope": "CM-1652 VCP memory governance event adapter fixture-only skeleton",
+      "status": "COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_FIXTURE_ONLY_SKELETON_NO_LIVE_NO_WRITE"
+    },
     {
       "id": "CMV-1755",
       "scope": "CM-1651 VCP memory governance event adapter contract preflight",
@@ -1256,9 +1261,8 @@
     "future VCP Bridge live no-write probe execution evidence",
     "future VCP Bridge exact live approval execution evidence",
     "future VCP Bridge runtime wiring safety evidence",
-    "future VCP memory governance event adapter contract implementation",
-    "future VCP memory governance event adapter validation",
-    "future VCP memory governance event adapter fixture-only skeleton",
+    "future VCP memory governance event adapter runtime wiring",
+    "future VCP memory governance event adapter production validation",
     "future VCP memory governance event receipt low-disclosure tests",
     "full DailyNote sync intentionally not performed",
     "all DailyNote read intentionally not performed",

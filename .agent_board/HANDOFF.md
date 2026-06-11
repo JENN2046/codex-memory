@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1651 VCP memory governance event adapter contract preflight`.
-Current validation: `CMV-1755`.
-Current handoff: VCP memory governance event adapter contract recorded docs-only; residual production blockers remain.
+Current task: `CM-1652 VCP memory governance event adapter fixture-only skeleton`.
+Current validation: `CMV-1756`.
+Current handoff: VCP memory governance event adapter fixture-only skeleton implemented; residual production blockers remain.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: record the VCP memory governance event adapter contract preflight without replacing VCP memory, accepting raw VCP memory content, executing live proof, connecting real VCP, calling MCP, writing memory, or making strict mode a production default.
+Goal: implement a fixture-only VCP memory governance event adapter skeleton without replacing VCP memory, accepting raw VCP memory content, executing live proof, connecting real VCP, calling MCP, writing memory, or making strict mode a production default.
 
-Current status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_CONTRACT_PREFLIGHT_DOCS_ONLY_NO_LIVE_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_FIXTURE_ONLY_SKELETON_NO_LIVE_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 
 Completed in this slice:
 
+- CM-1652 added `src/core/VcpMemoryGovernanceEventAdapter.js`, `tests/vcp-memory-governance-event-adapter.test.js`, and `docs/CM1652_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_FIXTURE_ONLY_SKELETON.md`. It implements pure fixture-only helper `buildVcpMemoryGovernanceEventAdapterResult(...)`. The helper requires accepted bridge context/proof/approval preflight inputs, accepts only low-disclosure governance event envelopes for the seven CM-1650 event classes, rejects raw DailyNote/RAG/vector/prompt material without echoing raw content, rejects broad scan and `record_memory` call counters, and keeps output counters zero. The helper is not wired into app, HTTP, stdio, VCP runtime, MCP tools, or `record_memory`. Validation passed CM-1652 adapter test `10/10`. No live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material, raw store read, public MCP expansion, runtime wiring, production/release/cutover claim, or complete V8 claim occurred.
 - CM-1651 added `docs/CM1651_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_CONTRACT_PREFLIGHT.md`. It defines `VcpMemoryGovernanceEventAdapter` as a future low-disclosure governance-event adapter only. It accepts bridge-owned runtime/static/allowlist authority plus a low-disclosure governance event envelope, proof preflight result, and approval gate result. It rejects raw DailyNote, raw RAG injected context, raw vector/cache/chunk/embedding content, raw prompt/conversation/model output, raw ids, token/provider/API/private-key material, VCP export payloads, bulk migration payloads, positive raw/broad/provider/public-expansion counters, and write/mutation intent without exact approval. It records CM-1652 fixture-only skeleton requirements and CM-1653 low-disclosure receipt test requirements. No source/runtime/test behavior changed. No full DailyNote sync/read, raw/broad scan, live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material, public MCP expansion, production/release/cutover claim, or complete V8 claim occurred.
 - CM-1650 added `docs/VCP_MEMORY_GOVERNANCE_INTEGRATION_MAP_V0_1.md`. It records that `codex-memory` must not replace VCP memory and should govern selected VCP memory events only. VCP remains runtime owner for hot memory (`DailyNote`, `KnowledgeBaseManager`, `TagMemo`), cold knowledge (`TDBKnowledge`, `LightMemo` cold route), active recall (`LightMemo`, `DailyNoteManager`, `DeepMemo`, `MeshMemo`, `TopicMemo`), and passive injection (`RAGDiaryPlugin`). The map separates content that should not sync, must sync, and may optionally sync as bounded low-disclosure governance evidence; defines minimal bridge event classes (`runtime_memory_event`, `governance_memory_event`, `recall_evidence_event`, `write_receipt_event`, `memory_correction_event`, `agent_decision_event`, `safety_boundary_event`); lists bridge non-goals; and records the next-stage `VcpMemoryGovernanceEventAdapter` direction. No source/runtime/test behavior changed. No full DailyNote sync/read, raw/broad scan, live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material, public MCP expansion, production/release/cutover claim, or complete V8 claim occurred.
 - CM-1649 added `src/core/VcpBridgeLiveNoWriteProbePlan.js`, `tests/vcp-bridge-live-no-write-probe-plan.test.js`, and `docs/CM1649_VCP_BRIDGE_LIVE_NO_WRITE_PROBE_DESIGN.md`. The helper is pure/no-network/no-runtime/no-MCP/no-write and outputs an action plan only for future `live_bridge_probe_no_write`. It requires accepted CM-1646 adapter output, accepted CM-1647 signed/static proof preflight, and accepted CM-1648 exact approval gate output for `live_bridge_probe_no_write`. It rejects missing approval, requested `live_bridge_record_memory_proof`, write intent, provider/API intent, bearer-token material intent, raw/broad scan intent, confirmed mutation intent, and public MCP expansion intent. Accepted output keeps all counters zero. Validation passed CM-1649 probe plan test `9/9`, CM-1648 approval gate test `10/10`, CM-1647 proof preflight test `9/9`, and CM-1646 adapter contract test `8/8`. Strict default changed `NO`; production strict mode enabled `NO`; live VCP proof executed `NO`; runtime behavior changed `NO`; real `record_memory` write occurred `NO`; public MCP surface remains seven; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.

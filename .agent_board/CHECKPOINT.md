@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1651 VCP memory governance event adapter contract preflight`.
-Current validation: `CMV-1755`.
+Current checkpoint: `CM-1652 VCP memory governance event adapter fixture-only skeleton`.
+Current validation: `CMV-1756`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1652 VCP Memory Governance Event Adapter Fixture-Only Skeleton
+
+Status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_FIXTURE_ONLY_SKELETON_NO_LIVE_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryGovernanceEventAdapter.js`.
+- Added `tests/vcp-memory-governance-event-adapter.test.js`.
+- Added `docs/CM1652_VCP_MEMORY_GOVERNANCE_EVENT_ADAPTER_FIXTURE_ONLY_SKELETON.md`.
+- Implemented pure fixture-only helper `buildVcpMemoryGovernanceEventAdapterResult(...)`.
+- Required accepted bridge context, proof preflight, and approval gate results before accepting a governance event envelope.
+- Accepted only the seven CM-1650 event types.
+- Rejected raw DailyNote, raw RAG, raw vector/cache/chunk/embedding content, raw prompt/conversation/model output, raw ids, token/provider/API/private-key material, VCP export payload, bulk migration payload, positive raw/broad/provider/public-expansion/write/mutation counters, and fixture-only `record_memory` call intent.
+- Confirmed rejected output remains low-disclosure and does not echo raw fixture values.
+- Confirmed helper reports `recordMemoryCalled=false`, `providerApiCalled=false`, `publicMcpExpanded=false`, zero output counters, and `nextAllowedStep=fixture_receipt_only` for accepted events.
+- Confirmed no live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material, raw store read, public MCP expansion, runtime wiring, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1756` source/test/docs fixture-only adapter validation.
 
 ## CM-1651 VCP Memory Governance Event Adapter Contract Preflight
 
