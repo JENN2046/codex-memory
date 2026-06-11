@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1672 through CM-1676 local consistency/review batch completed; post-push receipt consistency found no drift, approval packet helper review found no actionable findings, expiry/commit binding negative cases passed, observe readout next-stage boundary documented, and VCP governance receipt consistency found no drift |
-| Current task | `CM-1676 VCP governance event adapter receipt consistency review` |
-| Current validation | `CMV-1781` |
-| Current route | Local consistency/review batch; no runtime wiring or production rollout |
+| Status | CM-1677 post-push mainline gate receipt recorded after pushing `94212a80`; `npm run gate:mainline` passed health, compare, and rollback in daily mode |
+| Current task | `CM-1677 post-push mainline gate receipt after strict auth closeout` |
+| Current validation | `CMV-1782` |
+| Current route | Post-push health receipt; no runtime wiring or production rollout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1677` adds `docs/CM1677_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT.md`. It records the post-push `npm run gate:mainline` result after `94212a80 test: close out strict auth evidence receipts`: fresh Git status before gate was `## main...origin/main`; gate passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1676` adds `docs/CM1676_VCP_GOVERNANCE_EVENT_ADAPTER_RECEIPT_CONSISTENCY_REVIEW.md`. It reviews VCP governance event adapter receipt consistency and finds no drift. Validation passed VCP adapter test `12/12`. Runtime wiring `NO`; live VCP/MCP proof `NO`; `record_memory` call `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; complete V8 `NOT_CLAIMED`.
 

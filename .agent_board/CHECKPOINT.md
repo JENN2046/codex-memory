@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1676 VCP governance event adapter receipt consistency review`.
-Current validation: `CMV-1781`.
+Current checkpoint: `CM-1677 post-push mainline gate receipt after strict auth closeout`.
+Current validation: `CMV-1782`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1677 Post-Push Mainline Gate Receipt After Strict Auth Closeout
+
+Status: `COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT`
+
+Recorded:
+
+- Added `docs/CM1677_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT.md`.
+- Confirmed post-push fresh Git status before gate was `## main...origin/main`.
+- Confirmed `npm run gate:mainline` passed in daily mode after `94212a80`.
+- Confirmed health ok with HTTP `200`.
+- Confirmed compare matched `43/43`.
+- Confirmed rollback ready `43/43` with recommendation `rollback-safe`.
+- Confirmed no production observe rollout, production strict auth enablement, `.env` edit, production config/profile edit, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1782` post-push mainline gate receipt validation.
 
 ## CM-1676 VCP Governance Event Adapter Receipt Consistency Review
 

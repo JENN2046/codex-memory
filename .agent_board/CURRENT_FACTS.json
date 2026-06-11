@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1676",
-  "validationId": "CMV-1781",
+  "taskId": "CM-1677",
+  "validationId": "CMV-1782",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1782",
+      "scope": "CM-1677 post-push mainline gate receipt after strict auth closeout",
+      "status": "COMPLETED_VALIDATED_POST_PUSH_MAINLINE_GATE_RECEIPT_AFTER_STRICT_AUTH_CLOSEOUT"
+    },
     {
       "id": "CMV-1781",
       "scope": "CM-1676 VCP governance event adapter receipt consistency review",
