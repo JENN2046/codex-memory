@@ -819,7 +819,15 @@ function createCodexMemoryApplication(overrides = {}) {
     executionContextResolver,
     chunkIndexingService,
     writePreflightEnabled: config.enableWritePreflight === true,
-    writePreflightCandidateProvider: request => getDefaultWritePreflightCandidates(shadowStore, request)
+    writePreflightCandidateProvider: request => getDefaultWritePreflightCandidates(shadowStore, request),
+    recordMemoryPrincipalScopeAuthorizationPreflight:
+      overrides.recordMemoryPrincipalScopeAuthorizationPreflight,
+    recordMemoryPrincipalScopeAuthorizationPolicy:
+      overrides.recordMemoryPrincipalScopeAuthorizationPolicy,
+    recordMemoryPrincipalScopeAuthorizationObserver:
+      overrides.recordMemoryPrincipalScopeAuthorizationObserver,
+    recordMemoryPrincipalScopeAuthorizationStrictMode:
+      overrides.recordMemoryPrincipalScopeAuthorizationStrictMode === true
   });
   const memoryWriteReconcileService = new MemoryWriteReconcileService({
     shadowStore,

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1621 persistent TagMemo proof closeout audit decision`.
-Current validation: `CMV-1725`.
+Current task: `CM-1637 record_memory strict mode config/profile preflight`.
+Current validation: `CMV-1741`.
 Current status: `READY / RC_READY` scoped; not release, production, deploy, or cutover ready.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1621` closes only the scoped persistent TagMemo proof execution evidence from CM-1620. The closeout audit confirms one exact-approved source-level temp-local sidecar proofStore row and no second proof write, no public MCP proof, no `record_memory`, no provider/API, no bearer token, no raw/broad scan, no confirmed mutation, no public MCP expansion, and no release/tag/deploy. This is not broad `record_memory` reliability, production write reliability, runtime public MCP persistent enrichment, production readiness, release readiness, cutover readiness, or complete V8. Next safe route is selecting the next V8/TagMemo capability slice or separately approving a runtime/public-MCP/production-enrichment path.
+`CM-1637` records the compatibility preflight before strict `record_memory` principal/scope mode can be exposed through config/profile controls. It confirms current HTTP/stdio defaults still lack `projectId`, `workspaceId`, and `clientId`, so config-gated strict mode remains behavior-changing until context-source and policy key design are exact. Next safe route is either source/test config helper design with default-off behavior after exact key design, or SecretScanner hardening.
 
 ## Historical Run Notes
 

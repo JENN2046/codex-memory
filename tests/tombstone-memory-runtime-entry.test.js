@@ -236,3 +236,88 @@ test('internal tombstone runtime entry derives actor_client_id from execution co
     );
   });
 });
+
+test('public tombstone_memory valid dry-run reaches service preview without mutating', async () => {
+  await withApp({}, async ({ app }) => {
+    insertRecord(app.config.dbPath, { memoryId: 'mem-1', status: 'active' });
+
+    const publicResult = await app.callTool('tombstone_memory', runtimeEntryPayload({
+      request_source: 'public-controlled-mutation-dry-run-test',
+      dry_run: true,
+      confirm: false
+    }), {
+      executionContext: {
+        clientId: 'codex'
+      }
+    });
+    const row = getRecordRow(app.config.dbPath, 'mem-1');
+
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.tool, 'tombstone_memory');
+    assert.equal(publicResult.dryRun, true);
+    assert.equal(publicResult.mutated, false);
+    assert.equal(publicResult.access.mode, 'controlled_mutation_public_bounded');
+    assert.equal(publicResult.policy.dryRunOnlyPublicPath, true);
+    assert.equal(publicResult.policy.durableMutationPerformed, false);
+    assert.equal(publicResult.confirmGate.confirmedMutationAllowed, false);
+    assert.equal(publicResult.reason, 'public controlled mutation dry-run requires separate exact review.');
+    assert.equal(row.status, 'active');
+    assert.deepEqual(readAuditEntries(app.config.auditLogPath), []);
+  });
+});
+
+test('public tombstone_memory rejects dry_run=false before service mutation', async () => {
+  await withApp({}, async ({ app }) => {
+    insertRecord(app.config.dbPath, { memoryId: 'mem-1', status: 'active' });
+
+    const publicResult = await app.callTool('tombstone_memory', runtimeEntryPayload({
+      request_source: 'public-controlled-mutation-rejection-test',
+      dry_run: false,
+      confirm: false
+    }), {
+      executionContext: {
+        clientId: 'codex'
+      }
+    });
+    const row = getRecordRow(app.config.dbPath, 'mem-1');
+
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.tool, 'tombstone_memory');
+    assert.equal(publicResult.dryRun, true);
+    assert.equal(publicResult.mutated, false);
+    assert.equal(publicResult.confirmGate.dryRunRequested, false);
+    assert.equal(publicResult.confirmGate.confirmRequested, false);
+    assert.equal(publicResult.confirmGate.confirmedMutationAllowed, false);
+    assert.match(publicResult.reason, /public confirmed controlled mutation requires separate exact mutation approval/);
+    assert.equal(row.status, 'active');
+    assert.deepEqual(readAuditEntries(app.config.auditLogPath), []);
+  });
+});
+
+test('public tombstone_memory rejects confirm=true before service mutation', async () => {
+  await withApp({}, async ({ app }) => {
+    insertRecord(app.config.dbPath, { memoryId: 'mem-1', status: 'active' });
+
+    const publicResult = await app.callTool('tombstone_memory', runtimeEntryPayload({
+      request_source: 'public-controlled-mutation-rejection-test',
+      dry_run: true,
+      confirm: true
+    }), {
+      executionContext: {
+        clientId: 'codex'
+      }
+    });
+    const row = getRecordRow(app.config.dbPath, 'mem-1');
+
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.tool, 'tombstone_memory');
+    assert.equal(publicResult.dryRun, true);
+    assert.equal(publicResult.mutated, false);
+    assert.equal(publicResult.confirmGate.dryRunRequested, true);
+    assert.equal(publicResult.confirmGate.confirmRequested, true);
+    assert.equal(publicResult.confirmGate.confirmedMutationAllowed, false);
+    assert.match(publicResult.reason, /public confirmed controlled mutation requires separate exact mutation approval/);
+    assert.equal(row.status, 'active');
+    assert.deepEqual(readAuditEntries(app.config.auditLogPath), []);
+  });
+});

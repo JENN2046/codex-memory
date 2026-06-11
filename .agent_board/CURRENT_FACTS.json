@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1621",
-  "validationId": "CMV-1725",
+  "taskId": "CM-1637",
+  "validationId": "CMV-1741",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -31,6 +31,86 @@
     "rc": "RC_READY"
   },
   "validationSummary": [
+    {
+      "id": "CMV-1741",
+      "scope": "CM-1637 record_memory strict mode config/profile preflight",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_MODE_CONFIG_PROFILE_PREFLIGHT_DOCS_ONLY_NO_CONFIG_CHANGE"
+    },
+    {
+      "id": "CMV-1740",
+      "scope": "CM-1636 record_memory strict mode app override wiring",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_MODE_APP_OVERRIDE_WIRING_NO_DEFAULT_BEHAVIOR_CHANGE"
+    },
+    {
+      "id": "CMV-1739",
+      "scope": "CM-1635 record_memory strict mode context source map",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_MODE_CONTEXT_SOURCE_MAP_NO_CONFIG_CHANGE"
+    },
+    {
+      "id": "CMV-1738",
+      "scope": "CM-1634 record_memory principal/scope strict temp-local",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_STRICT_TEMP_LOCAL_NO_DEFAULT_BEHAVIOR_CHANGE"
+    },
+    {
+      "id": "CMV-1737",
+      "scope": "CM-1633 record_memory principal/scope observe-only injection",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_OBSERVE_ONLY_INJECTION_NO_DEFAULT_BEHAVIOR_CHANGE"
+    },
+    {
+      "id": "CMV-1736",
+      "scope": "CM-1632 record_memory principal/scope runtime integration design",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_RUNTIME_INTEGRATION_DESIGN_NO_BEHAVIOR_CHANGE"
+    },
+    {
+      "id": "CMV-1735",
+      "scope": "CM-1631 record_memory principal/scope authorization preflight",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_AUTHORIZATION_PREFLIGHT_NO_RUNTIME_AUTH_CHANGE"
+    },
+    {
+      "id": "CMV-1734",
+      "scope": "CM-1630 TagMemo proof CLI layer boundary map",
+      "status": "COMPLETED_VALIDATED_TAGMEMO_PROOF_CLI_LAYER_BOUNDARY_MAP_NO_CLI_WRITE_CAPABLE_PATH"
+    },
+    {
+      "id": "CMV-1733",
+      "scope": "CM-1629 SecretScanner boundary map",
+      "status": "COMPLETED_VALIDATED_SECRET_SCANNER_BOUNDARY_MAP_NO_RUNTIME_CHANGE"
+    },
+    {
+      "id": "CMV-1732",
+      "scope": "CM-1628 record_memory auth principal scope preflight",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_AUTH_PRINCIPAL_SCOPE_PREFLIGHT_NO_SOURCE_AUTH_CHANGE"
+    },
+    {
+      "id": "CMV-1731",
+      "scope": "CM-1627 audit_memory bounded shell boundary map",
+      "status": "COMPLETED_VALIDATED_AUDIT_MEMORY_BOUNDED_SHELL_BOUNDARY_MAP_NO_RAW_ROLLUP"
+    },
+    {
+      "id": "CMV-1730",
+      "scope": "CM-1626 record_memory authenticated write boundary map",
+      "status": "COMPLETED_VALIDATED_RECORD_MEMORY_AUTHENTICATED_WRITE_BOUNDARY_MAP_NO_NEW_WRITE"
+    },
+    {
+      "id": "CMV-1729",
+      "scope": "CM-1625 controlled mutation public rejection hardening",
+      "status": "COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_REJECTION_HARDENING_NO_MUTATION"
+    },
+    {
+      "id": "CMV-1728",
+      "scope": "CM-1624 query quality fixture gate reality map",
+      "status": "COMPLETED_VALIDATED_QUERY_QUALITY_FIXTURE_GATE_REALITY_MAP_NO_PARALLEL_HARNESS"
+    },
+    {
+      "id": "CMV-1727",
+      "scope": "CM-1623 runtime freshness fingerprint threat model",
+      "status": "COMPLETED_VALIDATED_RUNTIME_FRESHNESS_FINGERPRINT_THREAT_MODEL_DOCS_ONLY_NO_BEHAVIOR_CHANGE"
+    },
+    {
+      "id": "CMV-1726",
+      "scope": "CM-1622 audit findings local test hardening",
+      "status": "COMPLETED_VALIDATED_AUDIT_FINDINGS_LOCAL_TEST_HARDENING_NO_RUNTIME_OR_PRODUCTION_CLAIM"
+    },
     {
       "id": "CMV-1725",
       "scope": "CM-1621 persistent TagMemo proof closeout audit decision",

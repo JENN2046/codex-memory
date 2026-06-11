@@ -15,6 +15,9 @@ const {
   WRITE_CAPABLE_PROOF_SOURCE_IMPLEMENTATION_VERSION,
   buildPersistentTagMemoEnrichmentProofCommand
 } = require('../src/tagmemo/persistent-enrichment-proof-command');
+const {
+  parseArgs
+} = require('../scripts/tagmemo-enrichment-proof');
 
 const fixturePath = path.join(
   __dirname,
@@ -182,6 +185,54 @@ test('CM1617 write-capable source branch remains no-execution unless execution i
   assertNoForbiddenFragments(output, fixture.forbiddenFragments);
 });
 
+test('CM1622 write-capable source branch can execute exactly one injected temp-local proofStore row', () => {
+  const fixture = loadFixture();
+  const testCase = fixture.cases.find(item => item.id === 'valid-active-dry-run-plan');
+  const planned = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'dry-run',
+    maxWriteCount: 1
+  });
+  const proofRows = [];
+  const output = buildPersistentTagMemoEnrichmentProofCommand(testCase.input, {
+    mode: 'apply',
+    maxWriteCount: 1,
+    approvalToken: EXACT_APPROVAL_TOKEN,
+    operatorExecutionToken: OPERATOR_EXECUTION_TOKEN,
+    writeCapableProofFlag: true,
+    sidecarTarget: SIDECAR_TARGET,
+    expectedDryRunPlanHash: planned.dryRunPlanHash,
+    executeWriteCapableProof: true,
+    proofStore: {
+      writeProofRow(row) {
+        proofRows.push(row);
+        return {
+          persisted: true,
+          recordsWritten: proofRows.length
+        };
+      }
+    }
+  });
+
+  assert.equal(output.status, 'applied');
+  assert.equal(output.reason, null);
+  assert.equal(output.writeCountRequested, 1);
+  assert.equal(output.writeCountExecuted, 1);
+  assert.equal(output.persistentTagRecordsWritten, 1);
+  assert.equal(output.boundaryCounters.persistentTagWrites, 1);
+  assert.equal(output.boundaryCounters.providerApiCalls, 0);
+  assert.equal(output.boundaryCounters.bearerTokenUse, 0);
+  assert.equal(output.boundaryCounters.rawScanRun, false);
+  assert.equal(output.boundaryCounters.broadMemoryScanRun, false);
+  assert.equal(output.boundaryCounters.confirmedMutation, 0);
+  assert.equal(output.boundaryCounters.publicMcpExpansion, 0);
+  assert.equal(proofRows.length, 1);
+  assert.equal(proofRows[0].sidecarTarget, SIDECAR_TARGET);
+  assert.equal(proofRows[0].dryRunPlanHash, planned.dryRunPlanHash);
+  assert.equal(proofRows[0].redactedInputHash, planned.redactedInputHash);
+  assertNoForbiddenFragments(output, fixture.forbiddenFragments);
+  assertNoForbiddenFragments(proofRows, fixture.forbiddenFragments);
+});
+
 test('CM1617 write-capable source branch fail-closes on hash mismatch', () => {
   const fixture = loadFixture();
   const testCase = fixture.cases.find(item => item.id === 'valid-active-dry-run-plan');
@@ -306,6 +357,46 @@ test('CM1608 CLI accepts separate operator and skeleton guard tokens without wri
   assert.equal(output.operatorExecutionTokenExactMatch, true);
   assert.equal(output.skeletonGuardTokenExactMatch, true);
   assertBoundaryCounters(output);
+});
+
+test('CM1630 CLI layer does not expose source-only write-capable proof controls', () => {
+  const parsed = parseArgs([
+    '--mode',
+    'apply',
+    '--case',
+    'valid-active-dry-run-plan',
+    '--max-write-count',
+    '1',
+    '--operator-approval-placeholder',
+    '--approval-placeholder'
+  ]);
+
+  assert.equal(Object.hasOwn(parsed, 'writeCapableProofFlag'), false);
+  assert.equal(Object.hasOwn(parsed, 'executeWriteCapableProof'), false);
+  assert.equal(Object.hasOwn(parsed, 'proofStore'), false);
+
+  const result = spawnSync(process.execPath, [
+    scriptPath,
+    '--mode',
+    'apply',
+    '--case',
+    'valid-active-dry-run-plan',
+    '--max-write-count',
+    '1',
+    '--operator-approval-placeholder',
+    '--approval-placeholder',
+    '--write-capable-proof-flag'
+  ], {
+    cwd: path.join(__dirname, '..'),
+    encoding: 'utf8'
+  });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, '');
+  const errorOutput = JSON.parse(result.stderr);
+  assert.equal(errorOutput.status, 'rejected');
+  assert.equal(errorOutput.reason, 'unsupported argument: --write-capable-proof-flag');
+  assert.equal(errorOutput.lowDisclosure, true);
 });
 
 test('CM1604 fixture test does not rewrite its fixture file', () => {

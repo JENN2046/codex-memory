@@ -271,3 +271,103 @@ test('internal supersede runtime entry derives actor_client_id from execution co
     );
   });
 });
+
+test('public supersede_memory valid dry-run reaches service preview without mutating', async () => {
+  await withApp({}, async ({ app }) => {
+    insertRecord(app.config.dbPath, { memoryId: 'mem-old', status: 'active', title: 'Old memory' });
+    insertRecord(app.config.dbPath, { memoryId: 'mem-new', status: 'proposal', title: 'New memory' });
+
+    const publicResult = await app.callTool('supersede_memory', runtimeEntryPayload({
+      request_source: 'public-controlled-mutation-dry-run-test',
+      dry_run: true,
+      confirm: false
+    }), {
+      executionContext: {
+        clientId: 'codex'
+      }
+    });
+    const oldRow = getRecordRow(app.config.dbPath, 'mem-old');
+    const newRow = getRecordRow(app.config.dbPath, 'mem-new');
+
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.tool, 'supersede_memory');
+    assert.equal(publicResult.dryRun, true);
+    assert.equal(publicResult.mutated, false);
+    assert.equal(publicResult.access.mode, 'controlled_mutation_public_bounded');
+    assert.equal(publicResult.policy.dryRunOnlyPublicPath, true);
+    assert.equal(publicResult.policy.durableMutationPerformed, false);
+    assert.equal(publicResult.confirmGate.confirmedMutationAllowed, false);
+    assert.equal(publicResult.reason, 'public controlled mutation dry-run requires separate exact review.');
+    assert.equal(oldRow.status, 'active');
+    assert.equal(oldRow.superseded_by_memory_id, null);
+    assert.equal(newRow.status, 'proposal');
+    assert.equal(newRow.supersedes_memory_id, null);
+    assert.deepEqual(readAuditEntries(app.config.auditLogPath), []);
+  });
+});
+
+test('public supersede_memory rejects dry_run=false before service mutation', async () => {
+  await withApp({}, async ({ app }) => {
+    insertRecord(app.config.dbPath, { memoryId: 'mem-old', status: 'active', title: 'Old memory' });
+    insertRecord(app.config.dbPath, { memoryId: 'mem-new', status: 'proposal', title: 'New memory' });
+
+    const publicResult = await app.callTool('supersede_memory', runtimeEntryPayload({
+      request_source: 'public-controlled-mutation-rejection-test',
+      dry_run: false,
+      confirm: false
+    }), {
+      executionContext: {
+        clientId: 'codex'
+      }
+    });
+    const oldRow = getRecordRow(app.config.dbPath, 'mem-old');
+    const newRow = getRecordRow(app.config.dbPath, 'mem-new');
+
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.tool, 'supersede_memory');
+    assert.equal(publicResult.dryRun, true);
+    assert.equal(publicResult.mutated, false);
+    assert.equal(publicResult.confirmGate.dryRunRequested, false);
+    assert.equal(publicResult.confirmGate.confirmRequested, false);
+    assert.equal(publicResult.confirmGate.confirmedMutationAllowed, false);
+    assert.match(publicResult.reason, /public confirmed controlled mutation requires separate exact mutation approval/);
+    assert.equal(oldRow.status, 'active');
+    assert.equal(oldRow.superseded_by_memory_id, null);
+    assert.equal(newRow.status, 'proposal');
+    assert.equal(newRow.supersedes_memory_id, null);
+    assert.deepEqual(readAuditEntries(app.config.auditLogPath), []);
+  });
+});
+
+test('public supersede_memory rejects confirm=true before service mutation', async () => {
+  await withApp({}, async ({ app }) => {
+    insertRecord(app.config.dbPath, { memoryId: 'mem-old', status: 'active', title: 'Old memory' });
+    insertRecord(app.config.dbPath, { memoryId: 'mem-new', status: 'proposal', title: 'New memory' });
+
+    const publicResult = await app.callTool('supersede_memory', runtimeEntryPayload({
+      request_source: 'public-controlled-mutation-rejection-test',
+      dry_run: true,
+      confirm: true
+    }), {
+      executionContext: {
+        clientId: 'codex'
+      }
+    });
+    const oldRow = getRecordRow(app.config.dbPath, 'mem-old');
+    const newRow = getRecordRow(app.config.dbPath, 'mem-new');
+
+    assert.equal(publicResult.decision, 'rejected');
+    assert.equal(publicResult.tool, 'supersede_memory');
+    assert.equal(publicResult.dryRun, true);
+    assert.equal(publicResult.mutated, false);
+    assert.equal(publicResult.confirmGate.dryRunRequested, true);
+    assert.equal(publicResult.confirmGate.confirmRequested, true);
+    assert.equal(publicResult.confirmGate.confirmedMutationAllowed, false);
+    assert.match(publicResult.reason, /public confirmed controlled mutation requires separate exact mutation approval/);
+    assert.equal(oldRow.status, 'active');
+    assert.equal(oldRow.superseded_by_memory_id, null);
+    assert.equal(newRow.status, 'proposal');
+    assert.equal(newRow.supersedes_memory_id, null);
+    assert.deepEqual(readAuditEntries(app.config.auditLogPath), []);
+  });
+});

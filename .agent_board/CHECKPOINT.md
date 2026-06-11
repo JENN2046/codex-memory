@@ -4,11 +4,271 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1621 persistent TagMemo proof closeout audit decision`.
-Current validation: `CMV-1725`.
+Current checkpoint: `CM-1637 record_memory strict mode config/profile preflight`.
+Current validation: `CMV-1741`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1637 Record Memory Strict Mode Config Profile Preflight
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_MODE_CONFIG_PROFILE_PREFLIGHT_DOCS_ONLY_NO_CONFIG_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1637_RECORD_MEMORY_STRICT_MODE_CONFIG_PROFILE_PREFLIGHT.md`.
+- Confirmed current config/source reality supports `allowedAgentAlias`, `defaultAgentId`, `defaultRequestSource`, and `enableWritePreflight`, but no strict principal/scope config/profile control.
+- Confirmed current HTTP/stdio defaults provide `agentAlias`, `agentId`, and `requestSource`, but not strict-required `projectId`, `workspaceId`, or `clientId`.
+- Recorded future config/profile requirements, compatibility matrix, minimum future acceptance tests, and rollback expectations.
+- Confirmed no env/config key, profile field, HTTP/stdio context parsing, default strict mode, runtime behavior change, live MCP traffic, provider/API call, real bearer-token flow, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1741` record_memory strict mode config/profile preflight validation.
+
+## CM-1636 Record Memory Strict Mode App Override Wiring
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_MODE_APP_OVERRIDE_WIRING_NO_DEFAULT_BEHAVIOR_CHANGE`
+
+Recorded:
+
+- Updated `src/app.js`.
+- Updated `tests/record-memory-principal-scope-observe-only-integration.test.js`.
+- Added `docs/CM1636_RECORD_MEMORY_STRICT_MODE_APP_OVERRIDE_WIRING.md`.
+- Wired `createCodexMemoryApplication(...)` overrides into `MemoryWriteService` for principal/scope preflight, policy, observer, and strict mode.
+- Confirmed the wiring is disabled by default and does not add env/config keys or HTTP/stdio context parsing.
+- Confirmed app-level observe-only override accepts matching temp-local principal/scope without strict rejection.
+- Confirmed app-level strict override rejects mismatched temp-local `agentId`, `workspaceId`, and `clientId` with low-disclosure public/audit output.
+- Confirmed no default strict mode, live MCP traffic, provider/API call, real bearer-token flow, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1740` record_memory strict mode app override wiring validation.
+
+## CM-1635 Record Memory Strict Mode Context Source Map
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_STRICT_MODE_CONTEXT_SOURCE_MAP_NO_CONFIG_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1635_RECORD_MEMORY_STRICT_MODE_CONTEXT_SOURCE_MAP.md`.
+- Confirmed `src/adapters/codex-mcp/http.js` builds default execution context from env/base/config for `agentAlias`, `agentId`, and `requestSource`.
+- Confirmed HTTP default execution context does not derive `projectId`, `workspaceId`, or `clientId`.
+- Confirmed `src/adapters/codex-mcp/stdio.js` also defaults to `agentAlias`, `agentId`, and `requestSource`, without deriving `projectId`, `workspaceId`, or `clientId`.
+- Recorded compatibility risk: enabling strict mode beyond temp-local tests would reject current HTTP/stdio `record_memory` writes unless scope fields are supplied.
+- Confirmed no config keys, env vars, public MCP schema fields, client metadata parsing, runtime behavior change, live MCP traffic, provider/API call, real bearer-token flow, real memory read/write, raw store scan, broad memory scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1739` record_memory strict mode context source map validation.
+
+## CM-1634 Record Memory Principal Scope Strict Temp-Local
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_STRICT_TEMP_LOCAL_NO_DEFAULT_BEHAVIOR_CHANGE`
+
+Recorded:
+
+- Updated `src/core/MemoryWriteService.js`.
+- Updated `tests/record-memory-principal-scope-observe-only-integration.test.js`.
+- Added `docs/CM1634_RECORD_MEMORY_PRINCIPAL_SCOPE_STRICT_TEMP_LOCAL.md`.
+- Added opt-in strict principal/scope rejection after the existing alias-only gate.
+- Confirmed strict mode is disabled by default.
+- Confirmed strict exact-match temp-local context remains accepted.
+- Confirmed strict mismatched temp-local context is rejected before persistence.
+- Confirmed principal/scope strict rejection clears `agentId` and does not echo raw workspace, agent id, or client id values in public result or audit text.
+- Confirmed no default auth behavior change, live MCP traffic outside temp-local tests, provider/API call, real bearer-token flow, real memory read/write, raw store scan, broad memory scan, production config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1738` record_memory principal/scope strict temp-local validation.
+
+## CM-1633 Record Memory Principal Scope Observe-Only Injection
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_OBSERVE_ONLY_INJECTION_NO_DEFAULT_BEHAVIOR_CHANGE`
+
+Recorded:
+
+- Updated `src/core/MemoryWriteService.js`.
+- Added `tests/record-memory-principal-scope-observe-only-integration.test.js`.
+- Added `docs/CM1633_RECORD_MEMORY_PRINCIPAL_SCOPE_OBSERVE_ONLY_INJECTION.md`.
+- Added disabled-by-default observe-only preflight injection fields and runner.
+- Confirmed default `record_memory` behavior remains unchanged when no preflight is injected.
+- Confirmed injected temp-local observe-only preflight is observed once and does not block accepted writes.
+- Confirmed public `record_memory` result does not expose the observe-only summary.
+- Confirmed no strict rejection, default auth behavior change, live MCP traffic outside temp-local tests, provider/API call, bearer-token flow, real memory read/write, raw store scan, broad memory scan, production config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1737` record_memory principal/scope observe-only injection validation.
+
+## CM-1632 Record Memory Principal Scope Runtime Integration Design
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_RUNTIME_INTEGRATION_DESIGN_NO_BEHAVIOR_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1632_RECORD_MEMORY_PRINCIPAL_SCOPE_RUNTIME_INTEGRATION_DESIGN.md`.
+- Confirmed public `record_memory` routes through `writeService.record(args, requestContext)`.
+- Confirmed `MemoryWriteService.record(...)` resolves execution context before the current alias-only authorization gate.
+- Confirmed direct strict principal/scope enforcement would be behavior-changing for existing HTTP/MCP write paths.
+- Recommended staged path: disabled-by-default injection, observe-only projection, feature-flagged strict rejection in temp-local tests, then separate default-policy decision.
+- Confirmed no runtime auth behavior change, live MCP traffic, provider/API call, bearer-token flow, real memory read/write, raw store scan, broad memory scan, durable mutation, dependency/config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1736` record_memory principal/scope runtime integration design validation.
+
+## CM-1631 Record Memory Principal Scope Authorization Preflight
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_PRINCIPAL_SCOPE_AUTHORIZATION_PREFLIGHT_NO_RUNTIME_AUTH_CHANGE`
+
+Recorded:
+
+- Added `src/core/RecordMemoryPrincipalScopeAuthorizationPreflight.js`.
+- Added `tests/record-memory-principal-scope-authorization-preflight.test.js`.
+- Added `docs/CM1631_RECORD_MEMORY_PRINCIPAL_SCOPE_AUTHORIZATION_PREFLIGHT.md`.
+- Modeled future fail-closed `record_memory` authorization requiring exact alias plus allowlisted agent id, request source, project id, workspace id, and client id.
+- Confirmed matching alias alone is not sufficient for the future policy.
+- Confirmed missing required principal/scope fields fail closed.
+- Confirmed blank canonical scope aliases fall through to non-empty snake case aliases.
+- Confirmed no raw workspace value is exposed in low-disclosure summary.
+- Confirmed helper is not integrated into `MemoryWriteService`; current runtime authorization remains unchanged.
+- Confirmed no live MCP traffic, provider/API call, bearer-token flow, real memory read/write, raw store scan, broad memory scan, durable mutation, dependency/config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1735` record_memory principal/scope authorization preflight validation.
+
+## CM-1630 TagMemo Proof CLI Layer Boundary Map
+
+Status: `COMPLETED_VALIDATED_TAGMEMO_PROOF_CLI_LAYER_BOUNDARY_MAP_NO_CLI_WRITE_CAPABLE_PATH`
+
+Recorded:
+
+- Added `docs/CM1630_TAGMEMO_PROOF_CLI_LAYER_BOUNDARY_MAP.md`.
+- Updated `tests/tagmemo-persistent-enrichment-proof-command.test.js`.
+- Confirmed `scripts/tagmemo-enrichment-proof.js` is a bounded fixture CLI wrapper.
+- Confirmed CLI argument parsing does not expose `writeCapableProofFlag`, `executeWriteCapableProof`, or `proofStore`.
+- Confirmed attempted `--write-capable-proof-flag` fails closed as an unsupported argument with low-disclosure error output.
+- Confirmed source-level one-row proof remains direct-source/options plus injected proof-store only.
+- Confirmed no CLI write-capable path, durable sidecar persistence, public MCP persistent enrichment, provider/API call, bearer-token flow, real memory read/write, raw store scan, broad memory scan, confirmed mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1734` TagMemo proof CLI layer boundary validation.
+
+## CM-1629 SecretScanner Boundary Map
+
+Status: `COMPLETED_VALIDATED_SECRET_SCANNER_BOUNDARY_MAP_NO_RUNTIME_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1629_SECRET_SCANNER_BOUNDARY_MAP.md`.
+- Added `tests/secret-scanner-boundary.test.js`.
+- Confirmed `SecretScanner` is a pattern-based write-payload scanner over title/content/evidence/tags and selected scope metadata.
+- Confirmed configured category findings are low-disclosure and do not include raw matched values.
+- Confirmed current scanner does not perform entropy-only detection.
+- Confirmed this is boundary hardening only: no scanner behavior was changed and production DLP/security readiness was not claimed.
+- Confirmed no live MCP traffic, provider/API call, bearer-token flow, real memory read/write, raw store scan, broad memory scan, dependency/config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1733` SecretScanner boundary validation.
+
+## CM-1628 Record Memory Auth Principal Scope Preflight
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_AUTH_PRINCIPAL_SCOPE_PREFLIGHT_NO_SOURCE_AUTH_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1628_RECORD_MEMORY_AUTH_PRINCIPAL_SCOPE_PREFLIGHT.md`.
+- Added `tests/execution-context-resolver.test.js`.
+- Confirmed `ExecutionContextResolver.resolve(...)` parses principal/scope fields including `agentId`, `clientId`, `projectId`, and `workspaceId`.
+- Confirmed current `ExecutionContextResolver.isWritableByCodex(...)` is alias-only.
+- Confirmed matching `agentAlias` passes even when other principal/scope fields are unexpected.
+- Confirmed non-matching `agentAlias` fails even when other identity/scope fields look Codex-like.
+- Confirmed this is a baseline/preflight only: no stronger principal/scope auth was implemented and source auth behavior was not changed.
+- Confirmed no live MCP traffic, provider/API call, bearer-token flow, real memory read/write, raw store scan, broad memory scan, dependency/config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1732` auth principal scope preflight validation.
+
+## CM-1627 Audit Memory Bounded Shell Boundary Map
+
+Status: `COMPLETED_VALIDATED_AUDIT_MEMORY_BOUNDED_SHELL_BOUNDARY_MAP_NO_RAW_ROLLUP`
+
+Recorded:
+
+- Added `docs/CM1627_AUDIT_MEMORY_BOUNDED_SHELL_BOUNDARY_MAP.md`.
+- Recorded correct P1-3 wording: public `audit_memory` is a bounded readonly low-disclosure shell, not full raw audit/evidence rollup.
+- Confirmed `src/app.js` routes public `audit_memory` to `auditMemoryReadonlyService.run(args)`.
+- Confirmed `src/core/AuditMemoryReadonlyService.js` defaults `decisionProvider` to `() => []`.
+- Confirmed policy keeps `rawAuditScanPerformed=false`, `providerCalled=false`, `durableMutationPerformed=false`, `readinessClaimed=false`, and `rcReadyClaimed=false`.
+- Confirmed existing tests cover default empty bounded projection, safe injected decisions, raw/mutation-like rejection, no provider fetch or DB-like mutation, forbidden output key guard, public registration, and public low-disclosure `tools/call`.
+- Confirmed no raw audit scans, full evidence rollup, provider-backed audit decisions, live MCP traffic against real service, provider/API, bearer-token flow, real memory read/write, raw store scan, broad memory scan, dependency/config/watchdog/startup change, new public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1731` audit_memory boundary validation.
+
+## CM-1626 Record Memory Authenticated Write Boundary Map
+
+Status: `COMPLETED_VALIDATED_RECORD_MEMORY_AUTHENTICATED_WRITE_BOUNDARY_MAP_NO_NEW_WRITE`
+
+Recorded:
+
+- Added `docs/CM1626_RECORD_MEMORY_AUTHENTICATED_WRITE_BOUNDARY_MAP.md`.
+- Recorded correct P1-2 wording: no-token `record_memory` is blocked; authenticated public `record_memory` is write-capable; broad/production reliability is not claimed.
+- Confirmed `src/app.js` routes public `record_memory` to `writeService.record(args, requestContext)`.
+- Confirmed `tests/mcp-http.test.js` already covers no-token mutation rejection, bearer-configured missing-token rejection, and authenticated `record_memory` accepted through `tools/call`.
+- Confirmed validation is temp-local HTTP MCP contract evidence, not production write reliability evidence.
+- Confirmed no new live `record_memory`, production `record_memory`, provider/API call, real memory read/write, raw store scan, broad memory scan, dependency change, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1730` record_memory boundary validation.
+
+## CM-1625 Controlled Mutation Public Rejection Hardening
+
+Status: `COMPLETED_VALIDATED_CONTROLLED_MUTATION_PUBLIC_REJECTION_HARDENING_NO_MUTATION`
+
+Recorded:
+
+- Added `docs/CM1625_CONTROLLED_MUTATION_PUBLIC_REJECTION_HARDENING.md`.
+- Expanded `tests/validate-memory-runtime-entry.test.js`, `tests/tombstone-memory-runtime-entry.test.js`, and `tests/supersede-memory-runtime-entry.test.js`.
+- Added authenticated public `dry_run=false` rejection coverage for `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- Added authenticated public `confirm=true` rejection coverage for `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- Confirmed public rejection happens before service mutation: temp SQLite lifecycle rows remain unchanged and mutation audit entries remain empty.
+- Confirmed public projection remains low-disclosure with `dryRun=true`, `mutated=false`, and `confirmGate.confirmedMutationAllowed=false`.
+- Confirmed existing internal tests still cover default-disabled runtime entries, exact internal context requirement, and approved temp-fixture internal mutation behavior.
+- Confirmed no live MCP traffic, HTTP runtime, provider/API call, bearer-token flow, real memory read/write, raw store scan, broad memory scan, confirmed public mutation, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1729` controlled mutation public rejection validation.
+
+## CM-1624 Query Quality Fixture Gate Reality Map
+
+Status: `COMPLETED_VALIDATED_QUERY_QUALITY_FIXTURE_GATE_REALITY_MAP_NO_PARALLEL_HARNESS`
+
+Recorded:
+
+- Added `docs/CM1624_QUERY_QUALITY_FIXTURE_GATE_REALITY_MAP.md`.
+- Confirmed the audit-plan query-quality fixture item maps to existing `query:quality:temp-db`.
+- Validated `tests/query-quality-temp-db-gate.test.js` passed `4/4`.
+- Confirmed existing coverage includes synthetic temp SQLite recall records, default gate pass, `topKOrder` failure detection, tombstoned suppression, cross-client private suppression, CLI JSON output, provider calls `0`, MCP/live MCP calls `0`, real memory reads/writes `0`, raw store scans `0`, durable audit writes `0`, public MCP expansion `false`, config/watchdog/startup changes `0`, and readiness claim `false`.
+- Confirmed this is fixture/temp-db evidence only, not live memory recall quality, provider-backed recall quality, production query quality, public MCP response change, runtime/public MCP persistent TagMemo enrichment, production/release/cutover readiness, or complete V8.
+
+Validation: `CMV-1728` query-quality fixture gate validation.
+
+## CM-1623 Runtime Freshness Fingerprint Threat Model
+
+Status: `COMPLETED_VALIDATED_RUNTIME_FRESHNESS_FINGERPRINT_THREAT_MODEL_DOCS_ONLY_NO_BEHAVIOR_CHANGE`
+
+Recorded:
+
+- Added `docs/CM1623_RUNTIME_FRESHNESS_FINGERPRINT_THREAT_MODEL.md`.
+- Classified `/health.runtimeFreshness.sourceFingerprint` as a bounded public freshness signal for scoped local HTTP runtime checks.
+- Clarified it is not token material, provider/API material, raw memory, raw audit, filesystem path disclosure, memory id disclosure, or production readiness evidence.
+- Preserved current no-token `/health` behavior so existing local freshness guards can continue source-fingerprint comparisons without bearer-token material.
+- Recorded bearer-only fingerprint projection as a future separate source/test hardening option, not a CM-1623 behavior change.
+- Confirmed no source behavior change, live HTTP probe, bearer-token use, provider/API call, memory tool call, raw store scan, config/watchdog/startup change, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1727` docs-only threat-model validation.
+
+## CM-1622 Audit Findings Local Test Hardening
+
+Status: `COMPLETED_VALIDATED_AUDIT_FINDINGS_LOCAL_TEST_HARDENING_NO_RUNTIME_OR_PRODUCTION_CLAIM`
+
+Recorded:
+
+- Added `docs/CM1622_AUDIT_FINDINGS_LOCAL_TEST_HARDENING.md`.
+- Expanded `tests/validate-memory-runtime-entry.test.js`, `tests/tombstone-memory-runtime-entry.test.js`, and `tests/supersede-memory-runtime-entry.test.js`.
+- Added authenticated public valid dry-run coverage for `validate_memory`, `tombstone_memory`, and `supersede_memory`.
+- Confirmed public projection remains low-disclosure and dry-run only.
+- Confirmed temp SQLite lifecycle rows remain unchanged and no mutation audit entries are appended.
+- Expanded `tests/tagmemo-persistent-enrichment-proof-command.test.js`.
+- Added injected in-memory proofStore success-path coverage for the write-capable proof source branch.
+- Confirmed the test path writes exactly one fake proof row and returns `status=applied`, `writeCountExecuted=1`, `persistentTagRecordsWritten=1`, and `persistentTagWrites=1`.
+- Confirmed the fake proofStore is not a durable store, public MCP path, or production persistence.
+- Confirmed no live MCP traffic, `record_memory`, provider/API, bearer token, raw scan, broad memory scan, confirmed mutation, public MCP expansion, second real proof write, production persistent enrichment, runtime public MCP persistent enrichment, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1726` targeted source/test/docs validation.
 
 ## CM-1621 Persistent TagMemo Proof Closeout Audit Decision
 

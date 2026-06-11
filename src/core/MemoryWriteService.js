@@ -209,6 +209,10 @@ class MemoryWriteService {
     writePreflight = summarizeMemoryWriteLifecycleDedupSuppressionPreflight,
     writePreflightCandidateProvider = null,
     writePreflightEnabled = false,
+    recordMemoryPrincipalScopeAuthorizationPreflight = null,
+    recordMemoryPrincipalScopeAuthorizationPolicy = null,
+    recordMemoryPrincipalScopeAuthorizationObserver = null,
+    recordMemoryPrincipalScopeAuthorizationStrictMode = false,
     tagMemoNoopProjection = createTagMemoRuntimeNoopProjection,
     tagMemoNoopProjectionObserver = null
   }) {
@@ -222,6 +226,22 @@ class MemoryWriteService {
     this.writePreflight = writePreflight;
     this.writePreflightCandidateProvider = writePreflightCandidateProvider;
     this.writePreflightEnabled = writePreflightEnabled === true;
+    this.recordMemoryPrincipalScopeAuthorizationPreflight =
+      typeof recordMemoryPrincipalScopeAuthorizationPreflight === 'function'
+        ? recordMemoryPrincipalScopeAuthorizationPreflight
+        : null;
+    this.recordMemoryPrincipalScopeAuthorizationPolicy =
+      recordMemoryPrincipalScopeAuthorizationPolicy &&
+        typeof recordMemoryPrincipalScopeAuthorizationPolicy === 'object' &&
+        !Array.isArray(recordMemoryPrincipalScopeAuthorizationPolicy)
+        ? recordMemoryPrincipalScopeAuthorizationPolicy
+        : null;
+    this.recordMemoryPrincipalScopeAuthorizationObserver =
+      typeof recordMemoryPrincipalScopeAuthorizationObserver === 'function'
+        ? recordMemoryPrincipalScopeAuthorizationObserver
+        : null;
+    this.recordMemoryPrincipalScopeAuthorizationStrictMode =
+      recordMemoryPrincipalScopeAuthorizationStrictMode === true;
     this.tagMemoNoopProjection = tagMemoNoopProjection;
     this.tagMemoNoopProjectionObserver = tagMemoNoopProjectionObserver;
   }
@@ -330,6 +350,121 @@ class MemoryWriteService {
     return projection;
   }
 
+  async runRecordMemoryPrincipalScopeAuthorizationPreflight({
+    executionContext = {},
+    requestContext = {}
+  } = {}) {
+    if (!this.recordMemoryPrincipalScopeAuthorizationPreflight) {
+      return null;
+    }
+
+    const policy = requestContext.recordMemoryPrincipalScopeAuthorizationPolicy ||
+      this.recordMemoryPrincipalScopeAuthorizationPolicy ||
+      {};
+
+    let summary;
+    try {
+      summary = await this.recordMemoryPrincipalScopeAuthorizationPreflight({
+        sourceMode: 'explicit_input',
+        policy,
+        executionContext,
+        sideEffects: {
+          runtimeApplied: false,
+          recordMemoryCalled: false,
+          providerCalls: 0,
+          realMemoryScanned: false,
+          durableMutationExecuted: false,
+          durableAuditWritten: false,
+          configChanged: false,
+          watchdogStartupChanged: false,
+          publicMcpExpanded: false,
+          readinessClaimed: false,
+          reliabilityClaimed: false
+        }
+      });
+      summary = {
+        ...(summary || {}),
+        currentRuntimeAuthorizationChanged: false,
+        recordMemoryRuntimeIntegrated: true,
+        runtimeApplied: false
+      };
+    } catch (error) {
+      summary = {
+        acceptedForPrincipalScopeAuthorizationPreflight: false,
+        decision: 'NOT_READY_BLOCKED',
+        currentRuntimeAuthorizationChanged: false,
+        recordMemoryRuntimeIntegrated: true,
+        noApplyInvariant: true,
+        runtimeApplied: false,
+        recordMemoryCalled: false,
+        providerCalls: 0,
+        realMemoryScanned: false,
+        durableMutationExecuted: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        readinessClaimed: false,
+        reliabilityClaimed: false,
+        safety: {
+          callsMemoryTools: false,
+          callsProviders: false,
+          scansRealMemory: false,
+          mutatesDurableState: false,
+          changesRuntimeAuth: false
+        }
+      };
+    }
+
+    if (this.recordMemoryPrincipalScopeAuthorizationObserver) {
+      try {
+        this.recordMemoryPrincipalScopeAuthorizationObserver(summary);
+      } catch (error) {
+        return summary;
+      }
+    }
+
+    return summary;
+  }
+
+  shouldEnforceRecordMemoryPrincipalScopeAuthorization(requestContext = {}) {
+    return this.recordMemoryPrincipalScopeAuthorizationStrictMode === true ||
+      requestContext.recordMemoryPrincipalScopeAuthorizationStrictMode === true;
+  }
+
+  buildRecordMemoryPrincipalScopeAuthorizationRejectedResult(summary = {}, executionContext = {}, target = null) {
+    const missing = Array.isArray(summary.missingRequiredContextFields)
+      ? summary.missingRequiredContextFields
+      : [];
+    const mismatched = Array.isArray(summary.mismatchedFields)
+      ? summary.mismatchedFields
+      : [];
+    const blockers = [...new Set([
+      ...(summary.requiredPolicyPresent === false ? ['policy'] : []),
+      ...missing,
+      ...mismatched,
+      ...(summary.noApplyInvariant === false ? ['noApplyInvariant'] : []),
+      ...(summary.rawWorkspaceIdExposed === true ? ['lowDisclosure'] : [])
+    ])];
+    const reason = blockers.length > 0
+      ? `record_memory principal/scope authorization rejected: ${blockers.join(', ')}.`
+      : 'record_memory principal/scope authorization rejected.';
+
+    const result = this.buildRejectedResult(reason, executionContext, target);
+    result.agentId = null;
+    result.principalScopeAuthorization = {
+      decision: summary.decision || 'NOT_READY_BLOCKED',
+      accepted: false,
+      strictMode: true,
+      requiredPolicyPresent: summary.requiredPolicyPresent === true,
+      requiredContextFieldsPresent: summary.requiredContextFieldsPresent === true,
+      allPrincipalScopeMatched: summary.allPrincipalScopeMatched === true,
+      missingRequiredContextFields: missing,
+      mismatchedFields: mismatched,
+      rawWorkspaceIdExposed: summary.rawWorkspaceIdExposed === true,
+      noApplyInvariant: summary.noApplyInvariant === true
+    };
+    return result;
+  }
+
   async record(payload, requestContext = {}) {
     const executionContext = this.executionContextResolver.resolve(requestContext, payload);
     const target = normalizeString(payload.target).toLowerCase();
@@ -345,6 +480,24 @@ class MemoryWriteService {
 
     if (!this.executionContextResolver.isWritableByCodex(executionContext)) {
       result = this.buildRejectedResult('CodexMemoryBridge only allows writes from the Codex agent context.', executionContext, target || null);
+      await this.writeAudit(result);
+      return result;
+    }
+
+    const principalScopeAuthorization =
+      await this.runRecordMemoryPrincipalScopeAuthorizationPreflight({
+        executionContext,
+        requestContext
+      });
+    if (
+      this.shouldEnforceRecordMemoryPrincipalScopeAuthorization(requestContext) &&
+      principalScopeAuthorization?.acceptedForPrincipalScopeAuthorizationPreflight !== true
+    ) {
+      result = this.buildRecordMemoryPrincipalScopeAuthorizationRejectedResult(
+        principalScopeAuthorization || {},
+        executionContext,
+        target || null
+      );
       await this.writeAudit(result);
       return result;
     }
