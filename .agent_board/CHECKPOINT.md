@@ -17,7 +17,7 @@ Status: `COMPLETED_VALIDATED_POST_PRO_REMEDIATION_CLOSURE_REVIEW_NO_RUNTIME_ACTI
 Recorded:
 
 - Added `docs/CM1638_POST_PRO_REMEDIATION_CLOSURE_REVIEW.md`.
-- Reviewed fresh local HEAD `537977798bd624118ba3f20d486e7a6626762f51` against the PRO full repository audit remediation findings.
+- Reviewed remediation target commit `537977798bd624118ba3f20d486e7a6626762f51`, the parent of the CM-1638 receipt commit, against the PRO full repository audit remediation findings.
 - Recorded closure table for P1-1, P1-2, P1-3, P2-1, P2-2, P2-3, P3, public MCP surface, and overclaim scan.
 - Confirmed public MCP surface remains exactly seven tools by static `TOOL_DEFINITIONS` check.
 - Confirmed P2-2 production auth/scope strict-mode config/profile limitation remains explicitly deferred.

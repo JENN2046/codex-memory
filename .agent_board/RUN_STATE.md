@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1638` records the post-PRO remediation closure review against fresh local HEAD `537977798bd624118ba3f20d486e7a6626762f51`. Findings P1-1, P1-2, P1-3, P2-1, P2-3, and P3 are closed for their scoped remediation evidence; P2-2 remains explicitly deferred for production auth/scope strict-mode config/profile work. Public MCP surface remains exactly seven tools. No runtime/proof/write action, provider/API, bearer-token flow, raw/broad scan, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred. Next safe route is a separate local docs/source/test slice only if a new scoped task is selected.
+`CM-1638` records the post-PRO remediation closure review against remediation target commit `537977798bd624118ba3f20d486e7a6626762f51`, the parent of the CM-1638 receipt commit. Findings P1-1, P1-2, P1-3, P2-1, P2-3, and P3 are closed for their scoped remediation evidence; P2-2 remains explicitly deferred for production auth/scope strict-mode config/profile work. Public MCP surface remains exactly seven tools. No runtime/proof/write action, provider/API, bearer-token flow, raw/broad scan, public MCP expansion, release/tag/deploy, production/release/cutover readiness claim, or complete V8 claim occurred. Next safe route is a separate local docs/source/test slice only if a new scoped task is selected.
 
 ## Historical Run Notes
 

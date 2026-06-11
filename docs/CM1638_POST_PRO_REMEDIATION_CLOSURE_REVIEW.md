@@ -2,7 +2,8 @@
 
 Date: 2026-06-11
 
-Scope: read-only changed-scope review of the remediation state at fresh local HEAD
+Scope: read-only changed-scope review of the remediation state at reviewed
+remediation target commit
 `537977798bd624118ba3f20d486e7a6626762f51`.
 
 This is a review and closure receipt. It does not continue V8 implementation,
@@ -50,7 +51,7 @@ Results:
 - `scripts\validate-local.ps1 -Area docs`: passed after updating `.agent_board/AUTOPILOT_LEDGER.md` to match `CM-1638` / `CMV-1742`
 - public MCP surface count: `7`
 - public MCP names: `audit_memory`, `memory_overview`, `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`, `validate_memory`
-- `CURRENT_FACTS.json` parse: passed
+- `CURRENT_FACTS.json` parse: passed; reviewed target commit and scoped readiness qualifiers are recorded in the structured snapshot
 - low-disclosure / overclaim scan: no forbidden positive production, release, cutover, deploy, or complete V8 claim found in the reviewed scope; existing `READY / RC_READY` wording remains explicitly scoped and denied for release/production/deploy/cutover.
 
 Not rerun by design:

@@ -21,14 +21,20 @@
     "url": null
   },
   "reviewedObject": {
-    "commit": null,
-    "parent": null,
-    "source": "none",
-    "presentInLocalCheckout": null
+    "commit": "537977798bd624118ba3f20d486e7a6626762f51",
+    "parent": "3dee934f0e7ef69bfe542b48667296e16e242d88",
+    "source": "local_git_review_target",
+    "presentInLocalCheckout": true
   },
   "status": {
     "project": "READY",
-    "rc": "RC_READY"
+    "rc": "RC_READY",
+    "scope": "scoped_status_snapshot",
+    "notReleaseReady": true,
+    "notProductionReady": true,
+    "notDeployReady": true,
+    "notCutoverReady": true,
+    "completeV8Claimed": false
   },
   "validationSummary": [
     {
