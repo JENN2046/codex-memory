@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1653 VCP memory governance event receipt low-disclosure tests`.
-Current validation: `CMV-1757`.
-Current project status: CM-1653 VCP memory governance event receipt low-disclosure tests implemented; production/release/cutover ready no.
-Current route: `VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS_NO_RUNTIME_WIRING`.
+Current task: `CM-1654 VCP memory governance runtime wiring preflight design`.
+Current validation: `CMV-1758`.
+Current project status: CM-1654 VCP memory governance runtime wiring preflight design recorded docs-only; production/release/cutover ready no.
+Current route: `VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_PREFLIGHT_DESIGN_DOCS_ONLY`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1654 VCP memory governance runtime wiring preflight design: added `docs/CM1654_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_PREFLIGHT_DESIGN.md`. The design defines future runtime wiring as a low-disclosure governance-event path only: VCP memory content does not enter `codex-memory`, and VCP runtime does not directly write `codex-memory`. It records the minimum future runtime entrypoint, allowed inputs, forbidden raw input families, the seven allowed event types, stage 0 through stage 4 rollout, fail-closed conditions, low-disclosure output requirements, and a future validation matrix. This is docs-only. No runtime wiring was executed, no live VCP/MCP was called, no `record_memory` was called, no raw store was read, no provider/API was called, no public MCP expansion occurred, no production/release/cutover ready claim occurred, and complete V8 remains `NOT_CLAIMED`.
 
 CM-1653 VCP memory governance event receipt low-disclosure tests: added `tests/vcp-memory-governance-event-receipt-low-disclosure.test.js` and `docs/CM1653_VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS.md`. The tests call the existing pure CM-1652 fixture-only adapter helper and add focused receipt-output assertions. They confirm raw DailyNote, raw RAG, raw vector, raw prompt, raw workspace id, raw DailyNote path, bearer token, provider/API key, and private key values are not echoed; `forbiddenFields` contains only field names or dotted paths; `forbiddenCounters` contains only counter names; accepted projection contains only low-disclosure fields; accepted and rejected receipts keep `recordMemoryCalled=false` and `publicMcpExpanded=false`; public MCP surface remains seven. No runtime wiring, live VCP proof, live MCP proof, real `record_memory` write, provider/API, bearer-token material acceptance, raw store read, public MCP expansion, production/release/cutover ready claim, or complete V8 claim occurred.
 

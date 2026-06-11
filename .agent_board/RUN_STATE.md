@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1653 VCP memory governance event receipt low-disclosure tests`.
-Current validation: `CMV-1757`.
-Current status: VCP memory governance event receipt low-disclosure tests implemented; production/release/cutover ready no.
+Current task: `CM-1654 VCP memory governance runtime wiring preflight design`.
+Current validation: `CMV-1758`.
+Current status: VCP memory governance runtime wiring preflight design recorded docs-only; production/release/cutover ready no.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1653` adds focused low-disclosure receipt regression tests for the fixture-only `VcpMemoryGovernanceEventAdapter`. Tests verify raw content, raw ids, paths, tokens, provider/API keys, and private keys are not echoed; `forbiddenFields` and `forbiddenCounters` return names only; accepted projection is low-disclosure only; `recordMemoryCalled=false`; `publicMcpExpanded=false`; public MCP surface remains seven. No runtime wiring, live VCP proof, MCP call, real `record_memory` write, provider/API, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is focused source review or a separate cleanup/contract slice; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
+`CM-1654` records docs-only runtime wiring preflight design for `VcpMemoryGovernanceEventAdapter`. It defines future runtime wiring as low-disclosure governance event handling only, not VCP memory content sync and not direct VCP-to-codex-memory writes. It records the minimum future entrypoint, allowed/forbidden inputs, seven event types, rollout stages, fail-closed conditions, output contract, and validation matrix. No runtime wiring, live VCP proof, MCP call, real `record_memory` write, provider/API, raw store read, public MCP expansion, production readiness claim, or complete V8 claim occurred. Next safe route is focused review or a separate Stage 1/Stage 2 fixture/no-write plan task; live bridge execution, live write proof, full VCP memory sync, and production candidate work remain separate approval-bound routes.
 
 ## Historical Run Notes
 

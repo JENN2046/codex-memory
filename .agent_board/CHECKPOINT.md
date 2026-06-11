@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1653 VCP memory governance event receipt low-disclosure tests`.
-Current validation: `CMV-1757`.
+Current checkpoint: `CM-1654 VCP memory governance runtime wiring preflight design`.
+Current validation: `CMV-1758`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1654 VCP Memory Governance Runtime Wiring Preflight Design
+
+Status: `COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_PREFLIGHT_DESIGN_DOCS_ONLY_NO_RUNTIME_WIRING`
+
+Recorded:
+
+- Added `docs/CM1654_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_PREFLIGHT_DESIGN.md`.
+- Defined future runtime wiring as low-disclosure governance event handling only.
+- Confirmed runtime wiring is not VCP memory content sync and not direct VCP-to-codex-memory writing.
+- Recorded the minimum future entrypoint and equivalent pure-function wrapper.
+- Recorded allowed runtime inputs and forbidden raw input families.
+- Recorded allowed seven event types and unknown-event fail-closed behavior.
+- Recorded Stage 0 through Stage 4 rollout boundaries.
+- Recorded fail-closed conditions for missing preflights, unknown event type, raw flags, positive counters, prompt/tool authority, raw ids/paths, tokens/provider/private-key material, and readiness claims.
+- Recorded low-disclosure output contract and forbidden output fields.
+- Confirmed no runtime wiring, live VCP proof, live MCP proof, `record_memory` call, provider/API, raw store read, public MCP expansion, production/release/cutover claim, or complete V8 claim occurred.
+
+Validation: `CMV-1758` docs-only runtime wiring preflight design validation.
 
 ## CM-1653 VCP Memory Governance Event Receipt Low-Disclosure Tests
 

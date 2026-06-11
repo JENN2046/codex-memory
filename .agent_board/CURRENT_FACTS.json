@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-11",
-  "taskId": "CM-1653",
-  "validationId": "CMV-1757",
+  "taskId": "CM-1654",
+  "validationId": "CMV-1758",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1758",
+      "scope": "CM-1654 VCP memory governance runtime wiring preflight design",
+      "status": "COMPLETED_VALIDATED_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_PREFLIGHT_DESIGN_DOCS_ONLY_NO_RUNTIME_WIRING"
+    },
     {
       "id": "CMV-1757",
       "scope": "CM-1653 VCP memory governance event receipt low-disclosure tests",

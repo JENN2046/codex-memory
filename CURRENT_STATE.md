@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1653 VCP memory governance event receipt low-disclosure tests implemented; production/release/cutover ready no |
-| Current task | `CM-1653 VCP memory governance event receipt low-disclosure tests` |
-| Current validation | `CMV-1757` |
-| Current route | VCP memory governance event receipt low-disclosure tests; no runtime wiring |
+| Status | CM-1654 VCP memory governance runtime wiring preflight design recorded docs-only; production/release/cutover ready no |
+| Current task | `CM-1654 VCP memory governance runtime wiring preflight design` |
+| Current validation | `CMV-1758` |
+| Current route | VCP memory governance runtime wiring preflight design; docs-only no runtime wiring |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Last Accepted Evidence
+
+`CM-1654` adds `docs/CM1654_VCP_MEMORY_GOVERNANCE_RUNTIME_WIRING_PREFLIGHT_DESIGN.md`. It defines future runtime wiring boundaries for `VcpMemoryGovernanceEventAdapter`: runtime wiring is for low-disclosure VCP governance event envelopes only, not VCP memory content sync and not direct VCP-to-codex-memory writes. The design records the minimum future entrypoint, allowed inputs, forbidden raw inputs, the seven allowed event types, staged rollout from docs-only preflight through fixture-only invocation, local no-write dry-run, live bridge no-write probe, and separate exact-approved bounded write proof. It records fail-closed conditions for missing preflights, unknown event type, non-low-disclosure envelope, raw flags, positive raw/broad/provider/public-expansion counters, no-write `recordMemoryCalls`, write counters without exact approval, prompt/tool authority, raw ids/paths, tokens/provider keys/private keys, and readiness claims. This is docs-only. Runtime wiring executed `NO`; live VCP/MCP called `NO`; `record_memory` called `NO`; raw store read `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1653` adds `tests/vcp-memory-governance-event-receipt-low-disclosure.test.js` and `docs/CM1653_VCP_MEMORY_GOVERNANCE_EVENT_RECEIPT_LOW_DISCLOSURE_TESTS.md`. It hardens receipt-output regression coverage for the CM-1652 fixture-only `VcpMemoryGovernanceEventAdapter` without changing runtime wiring. Tests assert raw DailyNote, raw RAG, raw vector, raw prompt, raw workspace id, raw DailyNote path, bearer token, provider/API key, and private key values are not echoed; `forbiddenFields` returns only field names or dotted paths; `forbiddenCounters` returns only counter names; accepted projection contains only low-disclosure fields; accepted and rejected receipts keep `recordMemoryCalled=false` and `publicMcpExpanded=false`; public MCP surface remains seven. No source runtime behavior changed. VCP memory replacement `NO`; full DailyNote sync/read `NO`; raw RAG/vector/prompt sync `NO`; live VCP proof `NO`; live MCP proof `NO`; real `record_memory` write `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
@@ -473,7 +475,7 @@ These are local validation facts only. They are not `RC_READY`, release readines
 
 ## Next Safe Action
 
-CM-1653 closes focused VCP memory governance event receipt low-disclosure regression tests. Next safe action is a focused source review of CM-1653 or a separate CM-1654 contract/source cleanup slice if needed. Any runtime wiring, live bridge probe execution, full DailyNote sync, broad VCP memory scan, live `record_memory` proof, production strict default enablement, broad `record_memory` reliability claim, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claim, and complete V8 claim remain separate approval-bound work.
+CM-1654 closes docs-only runtime wiring preflight design. Next safe action is focused review of CM-1654 or a separate Stage 1/Stage 2 fixture/no-write plan task. Any real runtime wiring, live bridge probe execution, full DailyNote sync, broad VCP memory scan, live `record_memory` proof, production strict default enablement, broad `record_memory` reliability claim, production persistent enrichment, runtime public MCP persistent enrichment, confirmed mutation, second effective `record_memory` write, provider/API, bearer-token path, raw audit / broad scan, public MCP expansion, release/tag/deploy/cutover, production-readiness claim, and complete V8 claim remain separate approval-bound work.
 
 ## Boundaries
 
