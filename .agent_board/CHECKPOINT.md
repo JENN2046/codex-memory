@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1680 post-push gate compact mode policy`.
-Current validation: `CMV-1785`.
+Current checkpoint: `CM-1681 compact post-push health note after CM-1680 push`.
+Current validation: `CMV-1786`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1681 Compact Post-Push Health Note After CM-1680 Push
+
+Status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1680_PUSH`
+
+Recorded:
+
+- Added no new receipt doc by compact mode.
+- Confirmed post-push fresh Git status before gate was `## main...origin/main`.
+- Confirmed `npm run gate:mainline` passed in daily mode after `f67a2ce7`.
+- Confirmed health ok with HTTP `200`.
+- Confirmed compare matched `43/43`.
+- Confirmed rollback ready `43/43` with recommendation `rollback-safe`.
+- Confirmed no production observe rollout, production strict auth enablement, `.env` edit, production config/profile edit, startup/watchdog/config change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1786` compact post-push mainline health note validation.
 
 ## CM-1680 Post-Push Gate Compact Mode Policy
 

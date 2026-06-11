@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1680 post-push gate compact mode policy`.
-Current validation: `CMV-1785`.
-Current status: post-push gate compact mode is now docs-only governance policy; routine post-push `npm run gate:mainline` evidence should update compact active status surfaces instead of creating new receipt docs.
+Current task: `CM-1681 compact post-push health note after CM-1680 push`.
+Current validation: `CMV-1786`.
+Current status: compact post-push `npm run gate:mainline` note after `f67a2ce7` passed health, compare, and rollback in daily mode; no new receipt doc, runtime wiring, production config, `.env`, startup/watchdog, provider/API, raw/broad scan, public MCP expansion, production strict enablement, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1680` solidified post-push gate compact mode as docs-only governance. Production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
+`CM-1681` compactly recorded post-push mainline gate health after `f67a2ce7`; production observe/strict rollout is still not executed and still requires a fresh exact CM-1664-formatted approval.
 
 ## Historical Run Notes
 
