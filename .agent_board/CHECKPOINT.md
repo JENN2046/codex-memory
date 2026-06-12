@@ -4,11 +4,45 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1693 VCPToolBox full-capability live target proof packet contract`.
-Current validation: `CMV-1798`.
+Current checkpoint: `CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit`.
+Current validation: `CMV-1800`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1695 VCPToolBox Live Target Proof Approval Packet Focused Review
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_FOCUSED_REVIEW_REPAIRED`
+
+Recorded:
+
+- Added `docs/CM1695_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_FOCUSED_REVIEW.md`.
+- Reviewed CM-1694 approval packet helper/test/doc and referenced CM-1693 proof packet contract.
+- Found approval packet helper did not globally reject extra locator/endpoint/config/env/token/secret/raw-memory shaped fields on the approval packet itself.
+- Repaired helper with recursive forbidden-field rejection and `forbiddenFields` in rejected output.
+- Added regression coverage for `endpoint`, `bearerToken`, `configEnvPath`, and `rawDailyNoteContent` without echoing submitted values.
+- Confirmed no live execution approval, runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/secret persistence, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1800`; targeted approval packet test passed `12/12`.
+
+## CM-1694 VCPToolBox Live Target Proof Approval Packet Contract
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_CONTRACT_FIXTURE_ONLY_NO_EXECUTION`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxLiveTargetProofApprovalPacketContract.js`.
+- Added `tests/vcp-toolbox-live-target-proof-approval-packet-contract.test.js`.
+- Added `docs/CM1694_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_CONTRACT.md`.
+- Locked fixture-only exact approval packet shape for future VCPToolBox live target proof.
+- Required exact token match and `approve_packet_contract_only_no_execution`.
+- Required referenced CM-1693 proof packet to validate first.
+- Required approval scope to match referenced proof packet id, target reference, proof mode/profile, and runtime call limit.
+- Required commit/origin/expiry values to be represented only by presence flags.
+- Required forbidden expansion flags to remain false and counters zero.
+- Confirmed no live execution approval, runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/secret persistence, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1799`; targeted approval packet test passed `11/11`; CM-1689 through CM-1693 regression passed `42/42`.
 
 ## CM-1693 VCPToolBox Full-Capability Live Target Proof Packet Contract
 

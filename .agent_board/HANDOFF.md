@@ -4,13 +4,77 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1693 VCPToolBox full-capability live target proof packet contract`.
-Current validation: `CMV-1798`.
-Current handoff: fixture-only VCPToolBox live target proof packet contract recorded; no live target proof or runtime execution occurred.
+Current task: `CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit`.
+Current validation: `CMV-1800`.
+Current handoff: CM-1694 approval packet boundary reviewed and repaired; no live execution approval or runtime execution occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+Goal: review and repair the CM-1694 VCPToolBox live target proof approval packet execution boundary.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_FOCUSED_REVIEW_REPAIRED`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+- `docs/CM1695_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_FOCUSED_REVIEW.md`
+
+Completed in this slice:
+
+- Added CM-1695 focused review doc.
+- Repaired `src/core/VcpToolBoxLiveTargetProofApprovalPacketContract.js`.
+- Expanded `tests/vcp-toolbox-live-target-proof-approval-packet-contract.test.js`.
+- Found and fixed missing global rejection for extra locator/endpoint/config/env/token/secret/raw-memory shaped fields on approval packets.
+- Confirmed forbidden values are not echoed.
+- Confirmed no live execution approval, runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/secret persistence, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1800`; targeted approval packet test passed `12/12`.
+
+Next safe route: `CM-1696 VCPToolBox live target proof execution approval packet draft`. Actual live target proof remains approval-bound.
+
+## Previous Active Handoff
+
+Goal: lock a fixture-only exact approval packet contract before any future VCPToolBox live target proof.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_CONTRACT_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+- `docs/CM1694_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_CONTRACT.md`
+
+Completed in this slice:
+
+- Added `src/core/VcpToolBoxLiveTargetProofApprovalPacketContract.js`.
+- Added `tests/vcp-toolbox-live-target-proof-approval-packet-contract.test.js`.
+- Added CM-1694 evidence doc.
+- Required exact token match for packet shape validation.
+- Required operator decision `approve_packet_contract_only_no_execution`.
+- Required referenced CM-1693 proof packet validation before approval scope checks.
+- Required approval scope to match referenced proof packet id, target reference, proof mode/profile, and runtime call limit.
+- Required commit/origin/expiry values to be omitted and represented only by presence flags.
+- Required forbidden expansion flags false and counters zero.
+- Confirmed no live execution approval, runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/secret persistence, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1799`; targeted approval packet test passed `11/11`; CM-1689 through CM-1693 regression passed `42/42`.
+
+Next safe route: `CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit`. Actual live target proof remains approval-bound.
+
+## Previous Active Handoff
 
 Goal: lock a fixture-only packet contract before any future VCPToolBox live target proof.
 

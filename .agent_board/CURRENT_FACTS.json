@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1693",
-  "validationId": "CMV-1798",
+  "taskId": "CM-1695",
+  "validationId": "CMV-1800",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,16 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1800",
+      "scope": "CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_FOCUSED_REVIEW_REPAIRED"
+    },
+    {
+      "id": "CMV-1799",
+      "scope": "CM-1694 VCPToolBox live target proof approval packet contract",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_CONTRACT_FIXTURE_ONLY_NO_EXECUTION"
+    },
     {
       "id": "CMV-1798",
       "scope": "CM-1693 VCPToolBox full-capability live target proof packet contract",

@@ -8,15 +8,23 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1693 VCPToolBox live target proof packet contract fixture-only |
-| Current task | `CM-1693 VCPToolBox full-capability live target proof packet contract` |
-| Current validation | `CMV-1798` |
-| Current route | Fixture-only live target proof packet contract; no live target proof |
+| Status | CM-1695 VCPToolBox live target proof approval packet focused review repaired |
+| Current task | `CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit` |
+| Current validation | `CMV-1800` |
+| Current route | Focused review and low-disclosure boundary repair; no live execution approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1695` reviews the CM-1694 live target proof approval packet contract and repairs an approval-packet boundary gap. The helper now recursively rejects extra locator/endpoint/config/env/token/secret/raw-memory shaped fields such as `endpoint`, `bearerToken`, `configEnvPath`, and `rawDailyNoteContent` without echoing submitted values. Targeted validation passed `12/12`.
+
+Boundary: live execution approved `NO`; live target proof `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; real path inspected/persisted `NO`; endpoint persisted `NO`; secret persisted `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad filesystem scan `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
+
+`CM-1694` adds `src/core/VcpToolBoxLiveTargetProofApprovalPacketContract.js`, `tests/vcp-toolbox-live-target-proof-approval-packet-contract.test.js`, and `docs/CM1694_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_CONTRACT.md`. It validates future approval-packet shape and binding only: exact fixture token, `approve_packet_contract_only_no_execution`, referenced CM-1693 proof packet accepted, approval scope matches referenced packet, commit/origin/expiry values represented by presence flags only, forbidden expansion flags false, and counters zero. Targeted validation passed `11/11`, and CM-1689 through CM-1693 regression validation passed `42/42`.
+
+Boundary: live execution approved `NO`; live target proof `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; real path inspected/persisted `NO`; endpoint persisted `NO`; secret persisted `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad filesystem scan `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
 
 `CM-1693` adds `src/core/VcpToolBoxLiveTargetProofPacketContract.js`, `tests/vcp-toolbox-live-target-proof-packet-contract.test.js`, and `docs/CM1693_VCPTOOLBOX_FULL_CAPABILITY_LIVE_TARGET_PROOF_PACKET_CONTRACT.md`. It turns the next live target proof step into a fixture-only source contract. The helper accepts planned proof packets only when `liveExecutionApproved=false`, approval token material is absent, safe alias fields are used, no raw/path/endpoint/token/config/env values are present, counters are zero, and runtime actions fit the selected no-memory proof mode. Targeted validation passed `10/10`, and CM-1689/1690/1691 regression validation passed `32/32`.
 

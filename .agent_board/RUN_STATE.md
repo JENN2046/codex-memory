@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1693 VCPToolBox full-capability live target proof packet contract`.
-Current validation: `CMV-1798`.
-Current status: fixture-only VCPToolBox live target proof packet contract recorded; no live target proof or runtime execution occurred.
+Current task: `CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit`.
+Current validation: `CMV-1800`.
+Current status: CM-1694 approval packet boundary reviewed and repaired; no live execution approval or runtime execution occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1693` records a fixture-only live target proof packet contract. Next safe local action is focused review of the approval-bound live target proof route; any actual live target proof remains approval-bound.
+`CM-1694` records a fixture-only live target proof approval packet contract. Next safe local action is approval-bound execution boundary review; any actual live target proof remains approval-bound.
 
 ## Historical Run Notes
 
