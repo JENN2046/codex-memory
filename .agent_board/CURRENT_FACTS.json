@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1687",
-  "validationId": "CMV-1792",
+  "taskId": "CM-1692",
+  "validationId": "CMV-1797",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,31 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1797",
+      "scope": "CM-1692 VCPToolBox full-capability target packet focused review",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_PACKET_FOCUSED_REVIEW_REPAIRED_LOW_DISCLOSURE_ALIAS_BOUNDARY"
+    },
+    {
+      "id": "CMV-1796",
+      "scope": "CM-1691 VCPToolBox full-capability runtime target operator packet",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_RUNTIME_TARGET_OPERATOR_PACKET_SOURCE_ONLY_NO_SECRET_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1795",
+      "scope": "CM-1690 VCPToolBox full-capability runtime target locator preflight",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_RUNTIME_TARGET_LOCATOR_PREFLIGHT_SOURCE_ONLY_NO_SECRET_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1794",
+      "scope": "CM-1689 VCPToolBox full-capability target/profile parser and call-plan contract",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_FULL_CAPABILITY_TARGET_PROFILE_CALL_PLAN_CONTRACT_SOURCE_ONLY_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1793",
+      "scope": "CM-1688 VCPToolBox full-capability runtime bridge discovery",
+      "status": "COMPLETED_VALIDATED_FULL_CAPABILITY_RUNTIME_BRIDGE_DISCOVERY_DOCS_ONLY_TARGET_RUNTIME_NOT_FOUND"
+    },
     {
       "id": "CMV-1792",
       "scope": "CM-1687 compact post-push mainline health note after CM-1686 push",
@@ -1443,7 +1468,9 @@
     "future VCP memory governance event adapter runtime wiring",
     "future VCP memory governance event adapter production validation",
     "future VCPToolBox sustained-conversation realtime memory integration",
-    "future VCPToolBox read-only no-write recall probe",
+    "future VCPToolBox full-capability runtime target discovery",
+    "future VCPToolBox live full-read recall probe",
+    "future VCPToolBox trusted-full write/proposal proof",
     "future VCPToolBox bridge transport/auth/profile source validation",
     "future VCP memory governance event receipt low-disclosure tests",
     "full DailyNote sync intentionally not performed",

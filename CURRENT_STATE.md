@@ -8,17 +8,39 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1687 compact post-push mainline health note recorded after pushing CM-1686 |
-| Current task | `CM-1687 compact post-push mainline health note after CM-1686 push` |
-| Current validation | `CMV-1792` |
-| Current route | Compact post-push status note; no new receipt doc |
+| Status | CM-1692 VCPToolBox target packet focused review repaired low-disclosure alias boundary |
+| Current task | `CM-1692 VCPToolBox full-capability target packet focused review` |
+| Current validation | `CMV-1797` |
+| Current route | Focused source/test review and alias low-disclosure hardening; no live target proof |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
-`CM-1684` is recorded as a future candidate route for sustained-conversation VCPToolBox realtime memory integration. The candidate architecture is `Codex <-> codex-memory MCP <-> VCPToolBox memory runtime`, with `codex-memory` acting as a controlled bridge/governance layer rather than replacing VCPToolBox memory.
+`CM-1692` adds `src/core/VcpToolBoxSafeReference.js` and updates the CM-1689/CM-1690/CM-1691 source contracts plus targeted tests. Focused review found that operator-controlled alias fields could carry path/URL/token-like values and be echoed through low-disclosure projections or accepted operator packet output. The repair requires safe short aliases for `referenceName` and `packetId`, rejects locator/secret-shaped `operatorIntent`, and replaces accepted raw `operatorIntent` output with `operatorIntentPresent=true`. Targeted validation passed `32/32` across the CM-1689/1690/1691 VCPToolBox tests.
+
+Boundary: live target proof `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; real path persisted `NO`; endpoint persisted `NO`; token/secret persisted `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad filesystem scan `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
+
+`CM-1691` adds `src/core/VcpToolBoxRuntimeTargetOperatorPacket.js`, `tests/vcp-toolbox-runtime-target-operator-packet.test.js`, and `docs/CM1691_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_TARGET_OPERATOR_PACKET.md`. It defines the non-secret operator packet for providing a real VCPToolBox target reference. Required fields include `packetId`, `operatorIntent`, sanitized `target`, `intendedProfile`, `requestedActions`, `principalScope`, and `nonSecretAssertions`. The packet emits `locatorPreflightInput` for CM-1690 and test coverage proves packet -> locator preflight -> CM-1689 full-capability call plan chaining. Targeted validation passed `9/9`.
+
+Boundary: real VCPToolBox path persisted `NO`; endpoint persisted `NO`; token/secret persisted `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad filesystem scan `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
+
+`CM-1690` adds `src/core/VcpToolBoxRuntimeTargetLocatorPreflight.js`, `tests/vcp-toolbox-runtime-target-locator-preflight.test.js`, and `docs/CM1690_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_TARGET_LOCATOR_PREFLIGHT.md`. It locks a source-only no-secret runtime target locator preflight for VCPToolBox full-capability bridge work. The preflight accepts default-path, operator-provided, service-registry, MCP-server, CLI, plugin API, and IPC target references only as sanitized references with `locatorHashPresent=true`, `locatorValueIncluded=false`, `secretMaterialIncluded=false`, `configEnvRead=false`, and `runtimeCalled=false`. Targeted validation passed `10/10`, including proof that an accepted sanitized target feeds the CM-1689 call-plan contract.
+
+Boundary: live VCPToolBox target found `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; `config.env` read `NO`; `.env` read/edit `NO`; endpoint/path/token value committed `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad filesystem scan `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
+
+`CM-1689` adds `src/core/VcpToolBoxFullCapabilityBridgePlan.js`, `tests/vcp-toolbox-full-capability-bridge-plan.test.js`, and `docs/CM1689_VCPTOOLBOX_FULL_CAPABILITY_TARGET_PROFILE_CALL_PLAN_CONTRACT.md`. It locks a local source contract for `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`. `trusted-full-read` keeps raw and structured VCP read capability available by profile; `trusted-write-proposal` accepts proposal actions but rejects durable writes; `trusted-full` accepts full read and durable write call plans such as `daily_note.write`, `knowledge_base.write`, and `tagmemo.write` while keeping execution `planned_not_executed`.
+
+Boundary: VCPToolBox runtime found `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; `config.env` read `NO`; `.env` edit/read `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad scan/export/import `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
+
+`CM-1688` corrects the future sustained-conversation VCPToolBox route from a conservative summary-only helper toward a full-capability runtime bridge. The target architecture is `Codex sustained conversation -> codex-memory VCP full-capability bridge -> VCPToolBox memory runtime`, with VCPToolBox retaining native ownership of `DailyNote`, `DailyNoteManager`, `KnowledgeBaseManager`, `TagMemo`, `LightMemo`, `TDBKnowledge`, `DeepMemo`, `TopicMemo`, `MeshMemo`, and `RAGDiaryPlugin`.
+
+Current status for this route: `COMPLETED_VALIDATED_FULL_CAPABILITY_RUNTIME_BRIDGE_DISCOVERY_DOCS_ONLY_TARGET_RUNTIME_NOT_FOUND`. Added `docs/CM1688_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_BRIDGE_DISCOVERY.md`. Local discovery found `A:\VCP\VCPToolBox not found`, so no live VCPToolBox checkout or runtime entrypoint was inspected. The route now defines required profiles `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`; CM-1684/CM-1685 summary-only no-write evidence is reclassified as optional `observe-lite`, not the implementation ceiling.
+
+Boundary: VCPToolBox runtime found `NO`; live VCPToolBox call `NO`; VCP runtime wiring `NO`; VCP config/profile edit `NO`; `.env` edit `NO`; `config.env` read `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad memory scan/export/import `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
+
+`CM-1684` remains recorded as the earlier candidate route for sustained-conversation VCPToolBox realtime memory integration. The candidate architecture was `Codex <-> codex-memory MCP <-> VCPToolBox memory runtime`, with `codex-memory` acting as a controlled bridge/governance layer rather than replacing VCPToolBox memory.
 
 Current status for this route: `SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_WRITE`. Added `docs/CM1684_VCPTOOLBOX_SUSTAINED_CONVERSATION_MEMORY_SOURCE_MAP.md`, which records the candidate architecture, source baseline, unresolved VCPToolBox entrypoint/auth/profile unknowns, allowed read-only recall envelope, forbidden raw/broad/write boundaries, staged rollout, stop conditions, and next `CM-1685` fixture-only envelope contract route.
 

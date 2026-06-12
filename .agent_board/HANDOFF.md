@@ -4,13 +4,166 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1687 compact post-push mainline health note after CM-1686 push`.
-Current validation: `CMV-1792`.
-Current handoff: post-push mainline health passed after `e88770d1`; compact mode used with no new receipt doc.
+Current task: `CM-1692 VCPToolBox full-capability target packet focused review`.
+Current validation: `CMV-1797`.
+Current handoff: VCPToolBox target packet alias low-disclosure boundary repaired; no live target proof or runtime execution occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+Goal: review CM-1689 through CM-1691 before any live target proof and repair low-disclosure alias boundary gaps.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_PACKET_FOCUSED_REVIEW_REPAIRED_LOW_DISCLOSURE_ALIAS_BOUNDARY`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+- `docs/CM1692_VCPTOOLBOX_FULL_CAPABILITY_TARGET_PACKET_FOCUSED_REVIEW.md`
+
+Completed in this slice:
+
+- Reviewed CM-1689 through CM-1691 target packet surfaces.
+- Added `src/core/VcpToolBoxSafeReference.js`.
+- Required safe short aliases for `referenceName` and `packetId`.
+- Rejected locator/secret-shaped `operatorIntent`.
+- Projected unsafe rejected aliases as `null`.
+- Replaced accepted raw `operatorIntent` output with `operatorIntentPresent=true`.
+- Added no-echo negative tests across CM-1689/1690/1691.
+- Confirmed no runtime wiring, live VCPToolBox call, real path/endpoint/token persistence, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1797`; targeted VCPToolBox tests passed `32/32`.
+
+Next safe route: docs-only or fixture-only live target proof packet. Actual live target proof remains approval-bound.
+
+## Previous Active Handoff
+
+Goal: define the non-secret operator packet for providing a real VCPToolBox runtime target reference.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_RUNTIME_TARGET_OPERATOR_PACKET_SOURCE_ONLY_NO_SECRET_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+- `docs/CM1691_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_TARGET_OPERATOR_PACKET.md`
+
+Completed in this slice:
+
+- Added source helper `src/core/VcpToolBoxRuntimeTargetOperatorPacket.js`.
+- Added targeted tests `tests/vcp-toolbox-runtime-target-operator-packet.test.js`.
+- Added CM-1691 evidence doc.
+- Defined required non-secret operator packet fields for real VCPToolBox target references.
+- Confirmed accepted packet output chains into CM-1690 locator preflight and CM-1689 call-plan contract.
+- Confirmed path, endpoint, token, config-env, secret, and raw memory values are rejected without echo.
+- Confirmed no runtime wiring, live VCPToolBox call, real path/endpoint/token persistence, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1796`; targeted test passed `9/9`.
+
+Next safe route: `CM-1692 VCPToolBox full-capability target packet focused review`, before any live target proof or runtime wiring.
+
+## Previous Active Handoff
+
+Goal: lock the no-secret full-capability VCPToolBox runtime target locator preflight.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_RUNTIME_TARGET_LOCATOR_PREFLIGHT_SOURCE_ONLY_NO_SECRET_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+- `docs/CM1690_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_TARGET_LOCATOR_PREFLIGHT.md`
+
+Completed in this slice:
+
+- Added source helper `src/core/VcpToolBoxRuntimeTargetLocatorPreflight.js`.
+- Added targeted tests `tests/vcp-toolbox-runtime-target-locator-preflight.test.js`.
+- Added CM-1690 evidence doc.
+- Locked sanitized target references for default path, operator-provided, service registry, MCP server, CLI, plugin API, and IPC discovery sources.
+- Confirmed accepted sanitized targets can feed the CM-1689 full-capability call-plan contract.
+- Confirmed no runtime wiring, live VCPToolBox call, live target found, `config.env` read, `.env` read/edit, endpoint/path/token value commit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1795`; targeted test passed `10/10`.
+
+Next safe route: `CM-1691 VCPToolBox full-capability runtime target operator packet`, or provide exact runtime target details through a non-secret operator packet.
+
+## Previous Active Handoff
+
+Goal: lock full-capability VCPToolBox target/profile parser and call-plan contract as local source/test evidence.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_FULL_CAPABILITY_TARGET_PROFILE_CALL_PLAN_CONTRACT_SOURCE_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+- `docs/CM1689_VCPTOOLBOX_FULL_CAPABILITY_TARGET_PROFILE_CALL_PLAN_CONTRACT.md`
+
+Completed in this slice:
+
+- Added source helper `src/core/VcpToolBoxFullCapabilityBridgePlan.js`.
+- Added targeted tests `tests/vcp-toolbox-full-capability-bridge-plan.test.js`.
+- Added CM-1689 evidence doc.
+- Locked `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`.
+- Confirmed `trusted-full-read` keeps full read/raw/structured capability by profile.
+- Confirmed `trusted-full` can plan durable VCP writes without executing them.
+- Confirmed no runtime wiring, live VCPToolBox call, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1794`; targeted test passed `10/10`.
+
+Next safe route: `CM-1690 VCPToolBox full-capability runtime target locator preflight`, or provide a real VCPToolBox target path/service endpoint for a separate runtime-sensitive task.
+
+## Previous Active Handoff
+
+Goal: record the full-capability VCPToolBox runtime bridge discovery route for sustained Codex conversations.
+
+Current status: `COMPLETED_VALIDATED_FULL_CAPABILITY_RUNTIME_BRIDGE_DISCOVERY_DOCS_ONLY_TARGET_RUNTIME_NOT_FOUND`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+- `docs/CM1688_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_BRIDGE_DISCOVERY.md`
+
+Completed in this slice:
+
+- Added CM-1688 full-capability bridge discovery doc.
+- Corrected route from summary-only as target to full-capability VCPToolBox bridge.
+- Defined target profiles `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`.
+- Confirmed default local target `A:\VCP\VCPToolBox` was not found.
+- Confirmed no runtime wiring, live VCPToolBox call, VCP config/profile edit, `config.env` read, `.env` edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1793` docs/discovery validation.
+
+Next safe route: `CM-1689 VCPToolBox full-capability target/profile parser and call-plan contract`, or provide a real VCPToolBox target path/service endpoint for a separate runtime-sensitive discovery task.
+
+## Previous Active Handoff
 
 Goal: record compact post-push mainline health after pushing CM-1686.
 

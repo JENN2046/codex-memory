@@ -4,11 +4,93 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1687 compact post-push mainline health note after CM-1686 push`.
-Current validation: `CMV-1792`.
+Current checkpoint: `CM-1692 VCPToolBox full-capability target packet focused review`.
+Current validation: `CMV-1797`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1692 VCPToolBox Full-Capability Target Packet Focused Review
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_PACKET_FOCUSED_REVIEW_REPAIRED_LOW_DISCLOSURE_ALIAS_BOUNDARY`
+
+Recorded:
+
+- Reviewed CM-1689, CM-1690, and CM-1691 VCPToolBox full-capability target packet surfaces.
+- Added `src/core/VcpToolBoxSafeReference.js`.
+- Updated `referenceName`, candidate `referenceName`, and `packetId` validation to require safe aliases.
+- Updated `operatorIntent` validation to reject locator/secret-shaped values.
+- Updated rejected low-disclosure projections to project unsafe aliases as `null`.
+- Updated accepted operator packet output to use `operatorIntentPresent=true` instead of returning raw `operatorIntent`.
+- Added targeted negative tests for unsafe alias/intent values and no-echo behavior.
+- Confirmed no runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/token persistence, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1797` focused review validation; targeted VCPToolBox tests passed `32/32`.
+
+## CM-1691 VCPToolBox Full-Capability Runtime Target Operator Packet
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_RUNTIME_TARGET_OPERATOR_PACKET_SOURCE_ONLY_NO_SECRET_NO_RUNTIME`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxRuntimeTargetOperatorPacket.js`.
+- Added `tests/vcp-toolbox-runtime-target-operator-packet.test.js`.
+- Added `docs/CM1691_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_TARGET_OPERATOR_PACKET.md`.
+- Defined required non-secret packet fields for real VCPToolBox target references.
+- Confirmed accepted packet output chains into CM-1690 locator preflight and CM-1689 call-plan contract.
+- Confirmed packet rejects path, endpoint, token, config-env, secret, and raw memory values without echoing submitted values.
+- Confirmed durable write actions fail closed under full-read profile.
+- Confirmed no runtime wiring, live VCPToolBox call, real path/endpoint/token persistence, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1796` source packet validation; targeted test passed `9/9`.
+
+## CM-1690 VCPToolBox Full-Capability Runtime Target Locator Preflight
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_RUNTIME_TARGET_LOCATOR_PREFLIGHT_SOURCE_ONLY_NO_SECRET_NO_RUNTIME`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxRuntimeTargetLocatorPreflight.js`.
+- Added `tests/vcp-toolbox-runtime-target-locator-preflight.test.js`.
+- Added `docs/CM1690_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_TARGET_LOCATOR_PREFLIGHT.md`.
+- Locked no-secret candidate target references for default path, operator-provided, service registry, MCP server, CLI, plugin API, and IPC discovery sources.
+- Confirmed accepted sanitized targets feed the CM-1689 full-capability call-plan contract.
+- Confirmed default-path no-target receipt remains valid when no VCPToolBox target is found.
+- Confirmed no runtime wiring, live VCPToolBox call, live target found, `config.env` read, `.env` read/edit, endpoint/path/token value commit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1795` source preflight validation; targeted test passed `10/10`.
+
+## CM-1689 VCPToolBox Full-Capability Target/Profile Call-Plan Contract
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_FULL_CAPABILITY_TARGET_PROFILE_CALL_PLAN_CONTRACT_SOURCE_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxFullCapabilityBridgePlan.js`.
+- Added `tests/vcp-toolbox-full-capability-bridge-plan.test.js`.
+- Added `docs/CM1689_VCPTOOLBOX_FULL_CAPABILITY_TARGET_PROFILE_CALL_PLAN_CONTRACT.md`.
+- Locked profiles `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`.
+- Confirmed `trusted-full-read` keeps raw and structured read capability available by profile.
+- Confirmed `trusted-write-proposal` accepts proposal actions but rejects durable writes.
+- Confirmed `trusted-full` accepts full read and durable write call plans while keeping all operations `planned_not_executed`.
+- Confirmed no runtime wiring, live VCPToolBox call, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1794` source contract validation; targeted test passed `10/10`.
+
+## CM-1688 VCPToolBox Full-Capability Runtime Bridge Discovery
+
+Status: `COMPLETED_VALIDATED_FULL_CAPABILITY_RUNTIME_BRIDGE_DISCOVERY_DOCS_ONLY_TARGET_RUNTIME_NOT_FOUND`
+
+Recorded:
+
+- Added `docs/CM1688_VCPTOOLBOX_FULL_CAPABILITY_RUNTIME_BRIDGE_DISCOVERY.md`.
+- Corrected the future route away from treating summary-only/no-write as the implementation ceiling.
+- Defined full-capability target profiles: `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`.
+- Reclassified CM-1684/CM-1685 summary-only no-write evidence as optional `observe-lite`.
+- Confirmed default local target `A:\VCP\VCPToolBox` was not found.
+- Confirmed no runtime wiring, live VCPToolBox call, VCP config/profile edit, `config.env` read, `.env` edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1793` docs/discovery validation.
 
 ## CM-1687 Compact Post-Push Mainline Health Note After CM-1686 Push
 
