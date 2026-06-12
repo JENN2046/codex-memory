@@ -8,9 +8,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1686 compact post-push mainline health note recorded after pushing CM-1684/CM-1685 |
-| Current task | `CM-1686 compact post-push mainline health note after CM-1685 push` |
-| Current validation | `CMV-1791` |
+| Status | CM-1687 compact post-push mainline health note recorded after pushing CM-1686 |
+| Current task | `CM-1687 compact post-push mainline health note after CM-1686 push` |
+| Current validation | `CMV-1792` |
 | Current route | Compact post-push status note; no new receipt doc |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
@@ -25,6 +25,8 @@ Current status for this route: `SOURCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_WRITE`. Added
 Boundary: live VCPToolBox call `NO`; VCP runtime wiring `NO`; VCP config/profile edit `NO`; `.env` edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad memory scan/export/import `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
 
 ## Last Accepted Evidence
+
+`CM-1687` records a compact post-push mainline health note after pushing `e88770d1 docs: record compact post-push health note`. No new receipt doc was added. Fresh Git status before gate was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1686` records a compact post-push mainline health note after pushing `029bfa8a test: map vcp sustained recall envelope`. No new receipt doc was added. Fresh Git status before gate was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

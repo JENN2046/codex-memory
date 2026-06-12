@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1686 compact post-push mainline health note after CM-1685 push`.
-Current validation: `CMV-1791`.
-Current status: compact post-push mainline health after `029bfa8a` is recorded; gate passed with health `200`, compare `43/43`, rollback `43/43`, and no new receipt doc.
+Current task: `CM-1687 compact post-push mainline health note after CM-1686 push`.
+Current validation: `CMV-1792`.
+Current status: compact post-push mainline health after `e88770d1` is recorded; gate passed with health `200`, compare `43/43`, rollback `43/43`, and no new receipt doc.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1686` recorded compact post-push mainline health after pushing `029bfa8a`. Future live no-write probe, runtime bridge wiring, raw memory access, config/profile edit, or write remains separate exact-approval-bound work.
+`CM-1687` recorded compact post-push mainline health after pushing `e88770d1`. Future live no-write probe, runtime bridge wiring, raw memory access, config/profile edit, or write remains separate exact-approval-bound work.
 
 ## Historical Run Notes
 

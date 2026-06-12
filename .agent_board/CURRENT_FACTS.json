@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1686",
-  "validationId": "CMV-1791",
+  "taskId": "CM-1687",
+  "validationId": "CMV-1792",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1792",
+      "scope": "CM-1687 compact post-push mainline health note after CM-1686 push",
+      "status": "COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1686_PUSH"
+    },
     {
       "id": "CMV-1791",
       "scope": "CM-1686 compact post-push mainline health note after CM-1685 push",

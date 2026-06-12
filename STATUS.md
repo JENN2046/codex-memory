@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1686 compact post-push mainline health note after CM-1685 push`.
-Current validation: `CMV-1791`.
-Current project status: compact post-push mainline health after `029bfa8a` is recorded; gate passed with health `200`, compare `43/43`, rollback `43/43`, and no new receipt doc.
+Current task: `CM-1687 compact post-push mainline health note after CM-1686 push`.
+Current validation: `CMV-1792`.
+Current project status: compact post-push mainline health after `e88770d1` is recorded; gate passed with health `200`, compare `43/43`, rollback `43/43`, and no new receipt doc.
 Current route: `COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1687 compact post-push mainline health note after CM-1686 push: no new receipt doc was added. It records post-push mainline health after `e88770d1 docs: record compact post-push health note`: fresh Git status before gate was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1686 compact post-push mainline health note after CM-1685 push: no new receipt doc was added. It records post-push mainline health after `029bfa8a test: map vcp sustained recall envelope`: fresh Git status before gate was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

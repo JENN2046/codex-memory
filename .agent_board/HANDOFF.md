@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1686 compact post-push mainline health note after CM-1685 push`.
-Current validation: `CMV-1791`.
-Current handoff: post-push mainline health passed after `029bfa8a`; compact mode used with no new receipt doc.
+Current task: `CM-1687 compact post-push mainline health note after CM-1686 push`.
+Current validation: `CMV-1792`.
+Current handoff: post-push mainline health passed after `e88770d1`; compact mode used with no new receipt doc.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: record compact post-push mainline health after pushing CM-1684/CM-1685.
+Goal: record compact post-push mainline health after pushing CM-1686.
 
-Current status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1685_PUSH`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1686_PUSH`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,26 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+
+Completed in this slice:
+
+- Added no new receipt doc by compact mode.
+- Confirmed post-push fresh Git status before gate was `## main...origin/main`.
+- Confirmed `npm run gate:mainline` passed in daily mode after `e88770d1 docs: record compact post-push health note`.
+- Confirmed health ok with HTTP `200`.
+- Confirmed compare matched `43/43`.
+- Confirmed rollback ready `43/43` with recommendation `rollback-safe`.
+- Confirmed no production observe rollout, production strict auth enablement, `.env` edit, startup/watchdog change, provider/API, raw/broad scan, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1792` compact post-push mainline health note validation.
+
+Next safe route: commit this compact status update if requested, or continue with `CM-1688 VCP sustained recall connector plan helper`.
+
+## Previous Active Handoff
+
+Goal: record compact post-push mainline health after pushing CM-1684/CM-1685.
+
+Current status: `COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1685_PUSH`; production/release/cutover ready no; complete V8 not claimed.
 
 Completed in this slice:
 
