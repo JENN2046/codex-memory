@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1685",
-  "validationId": "CMV-1790",
+  "taskId": "CM-1686",
+  "validationId": "CMV-1791",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1791",
+      "scope": "CM-1686 compact post-push mainline health note after CM-1685 push",
+      "status": "COMPLETED_VALIDATED_COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE_AFTER_CM1685_PUSH"
+    },
     {
       "id": "CMV-1790",
       "scope": "CM-1685 VCP sustained recall envelope contract",

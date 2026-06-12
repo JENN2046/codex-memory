@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1685 VCP sustained recall envelope contract`.
-Current validation: `CMV-1790`.
-Current project status: fixture-only VCP sustained recall envelope contract is added for the future VCPToolBox sustained-conversation route; no runtime wiring, live VCPToolBox call, VCP config/profile edit, `.env`, raw memory read, provider/API, memory write, public MCP expansion, production strict enablement, or readiness claim occurred.
-Current route: `VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT_FIXTURE_ONLY`.
+Current task: `CM-1686 compact post-push mainline health note after CM-1685 push`.
+Current validation: `CMV-1791`.
+Current project status: compact post-push mainline health after `029bfa8a` is recorded; gate passed with health `200`, compare `43/43`, rollback `43/43`, and no new receipt doc.
+Current route: `COMPACT_POST_PUSH_MAINLINE_HEALTH_NOTE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1686 compact post-push mainline health note after CM-1685 push: no new receipt doc was added. It records post-push mainline health after `029bfa8a test: map vcp sustained recall envelope`: fresh Git status before gate was `## main...origin/main`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Production observe rollout `NO`; production strict auth enabled `NO`; `.env` edit `NO`; startup/watchdog change `NO`; provider/API `NO`; raw/broad scan `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1685 VCP sustained recall envelope contract: added `src/core/VcpSustainedRecallEnvelopeContract.js`, `tests/fixtures/vcp-sustained-recall-envelope-cm1685-v1.json`, `tests/vcp-sustained-recall-envelope-contract.test.js`, and `docs/CM1685_VCP_SUSTAINED_RECALL_ENVELOPE_CONTRACT.md`. It fixture-tests the future VCP sustained recall envelope for summary-only no-write acceptance, missing principal scope fail-closed behavior, raw DailyNote content rejection without echo, write/provider/raw/broad/public-MCP/mutation counter rejection, non-summary projection and over-budget limit rejection, allowed VCP component vocabulary, forbidden raw/secret field vocabulary, and no runtime/external actions. Runtime wiring `NO`; live VCPToolBox call `NO`; VCP config/profile edit `NO`; `.env` edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad scan/export/import `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
