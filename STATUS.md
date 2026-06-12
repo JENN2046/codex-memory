@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1692 VCPToolBox full-capability target packet focused review`.
-Current validation: `CMV-1797`.
-Current project status: CM-1692 repaired the VCPToolBox full-capability target packet low-disclosure alias boundary; no live target proof or runtime execution occurred.
-Current route: `VCPTOOLBOX_TARGET_PACKET_FOCUSED_REVIEW_SOURCE_TEST_HARDENING_NO_RUNTIME`.
+Current task: `CM-1693 VCPToolBox full-capability live target proof packet contract`.
+Current validation: `CMV-1798`.
+Current project status: CM-1693 records the fixture-only live target proof packet contract; no live target proof or runtime execution occurred.
+Current route: `VCPTOOLBOX_LIVE_TARGET_PROOF_PACKET_CONTRACT_FIXTURE_ONLY_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1693 VCPToolBox full-capability live target proof packet contract: added `src/core/VcpToolBoxLiveTargetProofPacketContract.js`, `tests/vcp-toolbox-live-target-proof-packet-contract.test.js`, and `docs/CM1693_VCPTOOLBOX_FULL_CAPABILITY_LIVE_TARGET_PROOF_PACKET_CONTRACT.md`. The contract validates only fixture/planned proof packets: `liveExecutionApproved=false`, approval token material absent, no raw/path/endpoint/token/config/env values, safe alias fields, zero execution counters, and runtime actions limited to selected no-memory proof mode. Targeted validation passed `10/10`; CM-1689/1690/1691 regression validation passed `32/32`. Runtime wiring `NO`; live VCPToolBox call `NO`; live target proof `NO`; real path inspected/persisted `NO`; endpoint persisted `NO`; token/secret persisted `NO`; approval token value/hash included `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad scan/export/import `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1692 VCPToolBox full-capability target packet focused review: added `src/core/VcpToolBoxSafeReference.js`, updated CM-1689/1690/1691 VCPToolBox helpers, updated targeted tests, and added `docs/CM1692_VCPTOOLBOX_FULL_CAPABILITY_TARGET_PACKET_FOCUSED_REVIEW.md`. Focused review found that operator-controlled alias fields could carry locator-shaped or secret-shaped values and be echoed through low-disclosure projections or accepted operator packet output. The repair requires safe short aliases for `target.referenceName`, candidate `referenceName`, and `packetId`; rejects unsafe `operatorIntent`; and replaces accepted raw `operatorIntent` with `operatorIntentPresent=true`. Targeted validation passed `32/32`. Runtime wiring `NO`; live VCPToolBox call `NO`; live target proof `NO`; real path persisted `NO`; endpoint persisted `NO`; token/secret persisted `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad scan/export/import `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 

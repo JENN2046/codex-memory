@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1692 VCPToolBox full-capability target packet focused review`.
-Current validation: `CMV-1797`.
-Current status: VCPToolBox target packet alias low-disclosure boundary repaired; no live target proof or runtime execution occurred.
+Current task: `CM-1693 VCPToolBox full-capability live target proof packet contract`.
+Current validation: `CMV-1798`.
+Current status: fixture-only VCPToolBox live target proof packet contract recorded; no live target proof or runtime execution occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1692` repaired the CM-1689 through CM-1691 target packet alias low-disclosure boundary. Next safe local action is a docs-only or fixture-only live target proof packet; any actual live target proof remains approval-bound.
+`CM-1693` records a fixture-only live target proof packet contract. Next safe local action is focused review of the approval-bound live target proof route; any actual live target proof remains approval-bound.
 
 ## Historical Run Notes
 

@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1692 VCPToolBox full-capability target packet focused review`.
-Current validation: `CMV-1797`.
+Current checkpoint: `CM-1693 VCPToolBox full-capability live target proof packet contract`.
+Current validation: `CMV-1798`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1693 VCPToolBox Full-Capability Live Target Proof Packet Contract
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_PACKET_CONTRACT_FIXTURE_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxLiveTargetProofPacketContract.js`.
+- Added `tests/vcp-toolbox-live-target-proof-packet-contract.test.js`.
+- Added `docs/CM1693_VCPTOOLBOX_FULL_CAPABILITY_LIVE_TARGET_PROOF_PACKET_CONTRACT.md`.
+- Locked fixture-only planned proof packet fields for future VCPToolBox live target proof.
+- Required `liveExecutionApproved=false` and no approval token value/hash in packet.
+- Reused safe alias boundary for packet and target reference fields.
+- Locked no-memory proof modes and runtime action vocabulary.
+- Confirmed positive runtime/provider/memory/public-MCP/readiness counters fail closed.
+- Confirmed no runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/token persistence, approval token value/hash inclusion, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1798`; targeted live target proof packet test passed `10/10`; CM-1689/1690/1691 regression passed `32/32`.
 
 ## CM-1692 VCPToolBox Full-Capability Target Packet Focused Review
 

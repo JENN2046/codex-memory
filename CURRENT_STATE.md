@@ -8,15 +8,19 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1692 VCPToolBox target packet focused review repaired low-disclosure alias boundary |
-| Current task | `CM-1692 VCPToolBox full-capability target packet focused review` |
-| Current validation | `CMV-1797` |
-| Current route | Focused source/test review and alias low-disclosure hardening; no live target proof |
+| Status | CM-1693 VCPToolBox live target proof packet contract fixture-only |
+| Current task | `CM-1693 VCPToolBox full-capability live target proof packet contract` |
+| Current validation | `CMV-1798` |
+| Current route | Fixture-only live target proof packet contract; no live target proof |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1693` adds `src/core/VcpToolBoxLiveTargetProofPacketContract.js`, `tests/vcp-toolbox-live-target-proof-packet-contract.test.js`, and `docs/CM1693_VCPTOOLBOX_FULL_CAPABILITY_LIVE_TARGET_PROOF_PACKET_CONTRACT.md`. It turns the next live target proof step into a fixture-only source contract. The helper accepts planned proof packets only when `liveExecutionApproved=false`, approval token material is absent, safe alias fields are used, no raw/path/endpoint/token/config/env values are present, counters are zero, and runtime actions fit the selected no-memory proof mode. Targeted validation passed `10/10`, and CM-1689/1690/1691 regression validation passed `32/32`.
+
+Boundary: live target proof `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; real path inspected/persisted `NO`; endpoint persisted `NO`; token/secret persisted `NO`; approval token value/hash included `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad filesystem scan `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`.
 
 `CM-1692` adds `src/core/VcpToolBoxSafeReference.js` and updates the CM-1689/CM-1690/CM-1691 source contracts plus targeted tests. Focused review found that operator-controlled alias fields could carry path/URL/token-like values and be echoed through low-disclosure projections or accepted operator packet output. The repair requires safe short aliases for `referenceName` and `packetId`, rejects locator/secret-shaped `operatorIntent`, and replaces accepted raw `operatorIntent` output with `operatorIntentPresent=true`. Targeted validation passed `32/32` across the CM-1689/1690/1691 VCPToolBox tests.
 

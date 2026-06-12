@@ -4,13 +4,46 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1692 VCPToolBox full-capability target packet focused review`.
-Current validation: `CMV-1797`.
-Current handoff: VCPToolBox target packet alias low-disclosure boundary repaired; no live target proof or runtime execution occurred.
+Current task: `CM-1693 VCPToolBox full-capability live target proof packet contract`.
+Current validation: `CMV-1798`.
+Current handoff: fixture-only VCPToolBox live target proof packet contract recorded; no live target proof or runtime execution occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+Goal: lock a fixture-only packet contract before any future VCPToolBox live target proof.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_PACKET_CONTRACT_FIXTURE_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+- `docs/CM1693_VCPTOOLBOX_FULL_CAPABILITY_LIVE_TARGET_PROOF_PACKET_CONTRACT.md`
+
+Completed in this slice:
+
+- Added `src/core/VcpToolBoxLiveTargetProofPacketContract.js`.
+- Added `tests/vcp-toolbox-live-target-proof-packet-contract.test.js`.
+- Added CM-1693 evidence doc.
+- Required fixture packet `liveExecutionApproved=false`.
+- Required approval token material absent from packet.
+- Locked no-memory proof modes and allowed runtime action vocabulary.
+- Confirmed unsafe packet/target aliases and intent values fail closed without echo.
+- Confirmed positive execution counters fail closed.
+- Confirmed no runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/token persistence, approval token value/hash inclusion, `config.env` read, `.env` read/edit, raw DailyNote/RAG/vector/prompt read, broad scan/export/import, memory write execution, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1798`; targeted live target proof packet test passed `10/10`; CM-1689/1690/1691 regression passed `32/32`.
+
+Next safe route: `CM-1694 VCPToolBox live target proof approval packet focused review`. Actual live target proof remains approval-bound.
+
+## Previous Active Handoff
 
 Goal: review CM-1689 through CM-1691 before any live target proof and repair low-disclosure alias boundary gaps.
 
