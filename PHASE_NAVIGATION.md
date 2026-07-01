@@ -74,6 +74,7 @@
 - 如果目标是“继续排优先级做后续精修”：先看 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
 - 如果目标是“收束文档事实源”：先看 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
 - 如果目标是“规划下一阶段”：先看 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)，再看 [docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md](/A:/codex-memory/docs/PHASE_H_CLIENT_SCOPE_BOUNDARY_MATRIX.md)
+- 如果目标是“规划 VCPToolBox 记忆能力线最终目标”：先看 [docs/VCPTOOLBOX_MEMORY_CAPABILITY_VISION_PLAN.md](/A:/codex-memory/docs/VCPTOOLBOX_MEMORY_CAPABILITY_VISION_PLAN.md)，再看 [docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - 如果目标是“设计 CI-safe gate”：先看 [GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)
 - 如果目标是“恢复最近决策和基线”：先看 [MEMORY.md](/A:/codex-memory/MEMORY.md)
 
