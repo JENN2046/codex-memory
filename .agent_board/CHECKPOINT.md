@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1697 VCPToolBox live target proof execution approval draft`.
-Current validation: `CMV-1802`.
+Current checkpoint: `CM-1698 VCPToolBox exact target discovery packet preflight`.
+Current validation: `CMV-1803`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1698 VCPToolBox Exact Target Discovery Packet Preflight
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT_FIXTURE_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxExactTargetDiscoveryPacketPreflight.js`.
+- Added `tests/vcp-toolbox-exact-target-discovery-packet-preflight.test.js`.
+- Added `docs/CM1698_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT.md`.
+- Used ColaMeta prompt preview `prompt_preview_CM_1698_vcptoolbox_e_20260701T180321_8d365f44`; no executor run or plan apply occurred.
+- Validated future exact target discovery packet shape without target-specific runtime inspection.
+- Required safe target reference alias, principal scope presence flags, discovery question coverage, component surface coverage, explicit profile boundary, execution authorization flags false, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters.
+- Confirmed no target-specific runtime inspection, runtime wiring, live VCPToolBox call, real path/endpoint/secret/config/env persistence, `config.env` read, `.env` read/edit, raw memory read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1803`; targeted CM-1698 test passed `14/14`; adjacent CM-1690/1691/1697 regression passed `49/49`; default `npm test` passed `3428/3428`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
 
 ## CM-1697 VCPToolBox Live Target Proof Execution Approval Draft
 

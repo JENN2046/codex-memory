@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-02",
-  "taskId": "CM-1697",
-  "validationId": "CMV-1802",
+  "taskId": "CM-1698",
+  "validationId": "CMV-1803",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1803",
+      "scope": "CM-1698 VCPToolBox exact target discovery packet preflight",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT_FIXTURE_ONLY_NO_RUNTIME"
+    },
     {
       "id": "CMV-1802",
       "scope": "CM-1697 VCPToolBox live target proof execution approval draft",

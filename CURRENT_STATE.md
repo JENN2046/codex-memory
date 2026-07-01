@@ -8,15 +8,19 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1697 VCPToolBox live target proof execution approval draft |
-| Current task | `CM-1697 VCPToolBox live target proof execution approval draft` |
-| Current validation | `CMV-1802` |
-| Current route | Fixture-only execution approval draft; no live proof, no approval line issued |
+| Status | CM-1698 VCPToolBox exact target discovery packet preflight |
+| Current task | `CM-1698 VCPToolBox exact target discovery packet preflight` |
+| Current validation | `CMV-1803` |
+| Current route | Fixture-only exact target discovery packet preflight; no target-specific runtime inspection |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1698` adds `src/core/VcpToolBoxExactTargetDiscoveryPacketPreflight.js`, `tests/vcp-toolbox-exact-target-discovery-packet-preflight.test.js`, and `docs/CM1698_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT.md`. It validates a fixture-only future exact target discovery packet: safe target reference alias, principal scope presence flags, discovery question coverage, component surface coverage, explicit profile boundary, execution authorization flags false, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters. New targeted validation passed `14/14`; adjacent CM-1690/1691/1697 regression passed `49/49`; default `npm test` passed `3428/3428`.
+
+Boundary: target-specific runtime inspection `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; real path inspected/persisted `NO`; endpoint persisted `NO`; secret/config/env persisted `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw memory read `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1697` adds `src/core/VcpToolBoxLiveTargetProofExecutionApprovalDraft.js`, `tests/vcp-toolbox-live-target-proof-execution-approval-draft.test.js`, and `docs/CM1697_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT.md`. It validates a fixture-only future execution approval draft: referenced CM-1694 approval packet accepted, execution scope bound to the referenced proof/approval packet, current facts represented by presence flags only, approval-line value omitted, runtime budget no-memory/no-write/no-provider, low-disclosure output/receipt policy, all stop conditions fail-closed, and counters zero. New targeted validation passed `14/14`; combined CM-1693/1694/1697 proof/approval regression passed `36/36`; default `npm test` passed `3414/3414`.
 

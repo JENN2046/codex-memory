@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1697 VCPToolBox live target proof execution approval draft`.
-Current validation: `CMV-1802`.
-Current handoff: CM-1697 fixture-only execution approval draft added; no live proof, no approval line issued, no runtime call.
+Current task: `CM-1698 VCPToolBox exact target discovery packet preflight`.
+Current validation: `CMV-1803`.
+Current handoff: CM-1698 fixture-only exact target discovery packet preflight added; no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: add fixture-only VCPToolBox live target proof execution approval draft coverage.
+Goal: add fixture-only VCPToolBox exact target discovery packet preflight coverage.
 
-Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT_FIXTURE_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,7 +25,29 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
-- `docs/CM1697_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT.md`
+- `docs/CM1698_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT.md`
+
+Completed in this slice:
+
+- Added `src/core/VcpToolBoxExactTargetDiscoveryPacketPreflight.js`.
+- Added `tests/vcp-toolbox-exact-target-discovery-packet-preflight.test.js`.
+- Added `docs/CM1698_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT.md`.
+- Used ColaMeta prompt preview `prompt_preview_CM_1698_vcptoolbox_e_20260701T180321_8d365f44`; no executor run or plan apply occurred.
+- Validated future exact target discovery packet shape without target-specific runtime inspection.
+- Confirmed safe target reference alias, principal scope presence flags, discovery question coverage, component surface coverage, explicit profile boundary, execution authorization flags false, low-disclosure output policy, no raw/secret/readiness receipt fields, fail-closed stop conditions, forbidden expansion flags false, and zero counters.
+- Confirmed no target-specific runtime inspection, runtime wiring, live VCPToolBox call, real path/endpoint/secret/config/env persistence, `config.env` read, `.env` read/edit, raw memory read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1803`; targeted CM-1698 test passed `14/14`; adjacent CM-1690/1691/1697 regression passed `49/49`; default `npm test` passed `3428/3428`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
+
+Next safe route: `CM-1699 VCPToolBox target-specific runtime inspection approval packet`, or request explicit push if remote update is intended.
+
+## Previous Active Handoff
+
+Goal: add fixture-only VCPToolBox live target proof execution approval draft coverage.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
 
 Completed in this slice:
 
@@ -39,7 +61,7 @@ Completed in this slice:
 
 Validation: `CMV-1802`; targeted CM-1697 test passed `14/14`; CM-1693/1694/1697 regression passed `36/36`; default `npm test` passed `3414/3414`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
 
-Next safe route: `CM-1698 VCPToolBox exact target discovery packet preflight`, or request explicit push if remote update is intended.
+Next safe route at that time was `CM-1698 VCPToolBox exact target discovery packet preflight`.
 
 ## Previous Active Handoff
 

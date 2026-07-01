@@ -108,14 +108,17 @@ Current local evidence already establishes the first boundary layers:
 - `CM-1697`: fixture-only live target proof execution approval draft
   contract; validates future exact approval-line shape without issuing approval
   or executing runtime.
+- `CM-1698`: fixture-only exact target discovery packet preflight; validates
+  the non-secret packet shape for future target-specific discovery without
+  inspecting a real target or executing runtime.
 
 Next selected local-safe route:
 
 ```text
-CM-1698 VCPToolBox exact target discovery packet preflight
+CM-1699 VCPToolBox target-specific runtime inspection approval packet
 ```
 
-`CM-1698` should remain local docs/fixture/source-review unless Jenn gives a
+`CM-1699` should remain local docs/fixture/source-review unless Jenn gives a
 separate exact approval for target-specific runtime inspection. It should not
 execute VCPToolBox, inspect secrets, read raw memory, wire runtime behavior,
 write memory, or claim readiness by default.
@@ -137,12 +140,19 @@ Done when:
 
 Represent VCPToolBox target references and profiles without executing them.
 
-Covered by CM-1689 through CM-1697.
+Covered by CM-1689 through CM-1698.
 
 CM-1697 adds the execution approval draft layer and negative cases around
 approval-line value persistence, current-facts value disclosure, target binding,
 profile/runtime-action mismatch, budget expansion, non-stop conditions, and
 forbidden expansion.
+
+CM-1698 adds the exact target discovery packet preflight layer and negative
+cases around unsafe target aliases, locator/endpoint/config/env/token/raw field
+inclusion, incomplete component coverage, target-specific inspection flags,
+execution authorization flags, raw output policy, readiness receipt claims,
+non-stop stop conditions, forbidden expansion flags, and positive execution
+counters.
 
 ### Phase 2 - Exact Target Discovery Packet
 
@@ -162,6 +172,11 @@ Required answers:
 
 This phase may record only safe aliases and presence flags. It must not persist
 path, endpoint, token, config, raw memory, or provider values.
+
+Current local status: CM-1698 completed this phase as fixture-only source,
+test, and docs evidence. It did not inspect a target, read config/env, execute
+VCPToolBox, read memory, write memory, call a provider/API, expand public MCP,
+or claim readiness.
 
 ### Phase 3 - Exact-Approved Live Target Proof
 

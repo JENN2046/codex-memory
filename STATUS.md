@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1697 VCPToolBox live target proof execution approval draft`.
-Current validation: `CMV-1802`.
-Current project status: CM-1697 fixture-only execution approval draft added; no live proof, no approval line issued, no runtime call.
-Current route: `VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`.
+Current task: `CM-1698 VCPToolBox exact target discovery packet preflight`.
+Current validation: `CMV-1803`.
+Current project status: CM-1698 fixture-only exact target discovery packet preflight added; no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
+Current route: `VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT_FIXTURE_ONLY_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1698 VCPToolBox exact target discovery packet preflight: added `src/core/VcpToolBoxExactTargetDiscoveryPacketPreflight.js`, `tests/vcp-toolbox-exact-target-discovery-packet-preflight.test.js`, and `docs/CM1698_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT.md`. The fixture-only helper validates future exact target discovery packet shape without target-specific runtime inspection: safe target reference alias, principal scope presence flags, discovery question coverage, component surface coverage, explicit profile boundary, execution authorization flags false, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters. Targeted validation passed `14/14`; adjacent CM-1690/1691/1697 regression passed `49/49`; default `npm test` passed `3428/3428`. ColaMeta prompt preview `prompt_preview_CM_1698_vcptoolbox_e_20260701T180321_8d365f44` was used; no ColaMeta executor run or plan apply occurred. Target-specific runtime inspection `NO`; runtime wiring `NO`; live VCPToolBox call `NO`; real path/endpoint/secret/config/env persistence `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw memory read `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1697 VCPToolBox live target proof execution approval draft: added `src/core/VcpToolBoxLiveTargetProofExecutionApprovalDraft.js`, `tests/vcp-toolbox-live-target-proof-execution-approval-draft.test.js`, and `docs/CM1697_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT.md`. The fixture-only helper validates future execution approval draft shape without issuing an approval line or granting live execution: referenced CM-1694 approval packet accepted, execution scope bound to proof/approval packet, current facts values omitted, approval-line value omitted, runtime budget no-memory/no-write/no-provider, low-disclosure output/receipt policy, fail-closed stop conditions, and zero counters. Targeted validation passed `14/14`; CM-1693/1694/1697 regression passed `36/36`; default `npm test` passed `3414/3414`. ColaMeta prompt preview `prompt_preview_CM_1697_vcptoolbox_l_20260701T174957_b2c5ed44` was used; no ColaMeta executor run or plan apply occurred. Approval line issued `NO`; live execution approved `NO`; runtime wiring `NO`; live VCPToolBox call `NO`; live target proof `NO`; real path/endpoint/secret persistence `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw memory read `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
