@@ -114,14 +114,17 @@ Current local evidence already establishes the first boundary layers:
 - `CM-1699`: fixture-only target-specific runtime inspection approval packet;
   validates a future approval packet bound to CM-1698 without issuing approval
   or executing runtime.
+- `CM-1700`: fixture-only target-specific runtime inspection execution
+  approval draft; validates a future exact approval-line draft bound to CM-1699
+  without issuing approval or executing runtime.
 
 Next selected local-safe route:
 
 ```text
-CM-1700 VCPToolBox target-specific runtime inspection execution approval draft
+CM-1701 VCPToolBox target-specific runtime inspection execution boundary review
 ```
 
-`CM-1700` should remain local docs/fixture/source-review unless Jenn gives a
+`CM-1701` should remain local docs/fixture/source-review unless Jenn gives a
 separate exact approval for target-specific runtime inspection execution. It
 should not execute VCPToolBox, inspect secrets, read raw memory, wire runtime
 behavior, write memory, or claim readiness by default.
@@ -143,7 +146,7 @@ Done when:
 
 Represent VCPToolBox target references and profiles without executing them.
 
-Covered by CM-1689 through CM-1699.
+Covered by CM-1689 through CM-1700.
 
 CM-1697 adds the execution approval draft layer and negative cases around
 approval-line value persistence, current-facts value disclosure, target binding,
@@ -164,6 +167,13 @@ issue/consumption flags, runtime budget expansion, raw runtime response
 persistence, non-stop stop conditions, forbidden expansion flags, and non-zero
 execution counters.
 
+CM-1700 adds the target-specific runtime inspection execution approval draft
+layer and negative cases around referenced approval packet rejection,
+execution-scope drift, current-facts value disclosure, approval-line template
+value disclosure, runtime budget expansion, raw runtime response persistence,
+non-stop stop conditions, forbidden expansion flags, and non-zero execution or
+approval counters.
+
 ### Phase 2 - Exact Target Discovery Packet
 
 Prepare a non-secret operator packet for a real VCPToolBox target.
@@ -183,11 +193,11 @@ Required answers:
 This phase may record only safe aliases and presence flags. It must not persist
 path, endpoint, token, config, raw memory, or provider values.
 
-Current local status: CM-1699 completed the approval-packet layer after this
-phase as fixture-only source, test, and docs evidence. It did not issue or
-consume an approval line, inspect a target, read config/env, execute VCPToolBox,
-read memory, write memory, call a provider/API, expand public MCP, or claim
-readiness.
+Current local status: CM-1700 completed the execution-approval-draft layer
+after this phase as fixture-only source, test, and docs evidence. It did not
+issue or consume an approval line, inspect a target, read config/env, execute
+VCPToolBox, read memory, write memory, call a provider/API, expand public MCP,
+or claim readiness.
 
 ### Phase 3 - Exact-Approved Live Target Proof
 

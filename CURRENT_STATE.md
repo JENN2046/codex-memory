@@ -8,15 +8,19 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1699 VCPToolBox target-specific runtime inspection approval packet |
-| Current task | `CM-1699 VCPToolBox target-specific runtime inspection approval packet` |
-| Current validation | `CMV-1804` |
-| Current route | Fixture-only target-specific runtime inspection approval packet; no approval-line issue or runtime execution |
+| Status | CM-1700 VCPToolBox target-specific runtime inspection execution approval draft |
+| Current task | `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft` |
+| Current validation | `CMV-1805` |
+| Current route | Fixture-only target-specific runtime inspection execution approval draft; no approval-line issue/consumption or runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1700` adds `src/core/VcpToolBoxTargetSpecificRuntimeInspectionExecutionApprovalDraft.js`, `tests/vcp-toolbox-target-specific-runtime-inspection-execution-approval-draft.test.js`, and `docs/CM1700_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT.md`. It validates a fixture-only future target-specific runtime inspection execution approval draft: accepted referenced CM-1699 approval packet, execution scope bound to the approval packet and sanitized target reference, allowed runtime actions limited to target presence / runtime handshake / no-memory target-specific runtime inspection, current Git facts represented by presence flags only, approval-line value omitted, runtime budget capped to three calls / ten probe minutes with zero memory/provider/write budget, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters. New targeted validation passed `14/14`; adjacent CM-1700/1699/1698 regression passed `43/43`; default `npm test` passed `3457/3457`.
+
+Boundary: approval line issued `NO`; approval line consumed `NO`; target-specific runtime inspection `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; real path inspected/persisted `NO`; endpoint persisted `NO`; secret/config/env persisted `NO`; commit/branch/expiry value persisted `NO`; approval-line value persisted `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw memory/runtime response read `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1699` adds `src/core/VcpToolBoxTargetSpecificRuntimeInspectionApprovalPacket.js`, `tests/vcp-toolbox-target-specific-runtime-inspection-approval-packet.test.js`, and `docs/CM1699_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET.md`. It validates a fixture-only future target-specific runtime inspection approval packet: accepted referenced CM-1698 discovery packet, approval scope bound to the discovery packet and sanitized target reference, current Git facts represented by presence flags only, expiry represented by flags only, execution authorization flags false, runtime budget capped to three calls / ten probe minutes with zero memory/provider/write budget, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters. New targeted validation passed `15/15`; adjacent CM-1699/1698/1697 regression passed `43/43`; default `npm test` passed `3443/3443`.
 

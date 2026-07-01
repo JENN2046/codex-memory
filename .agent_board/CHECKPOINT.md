@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1699 VCPToolBox target-specific runtime inspection approval packet`.
-Current validation: `CMV-1804`.
+Current checkpoint: `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`.
+Current validation: `CMV-1805`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1700 VCPToolBox Target-Specific Runtime Inspection Execution Approval Draft
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxTargetSpecificRuntimeInspectionExecutionApprovalDraft.js`.
+- Added `tests/vcp-toolbox-target-specific-runtime-inspection-execution-approval-draft.test.js`.
+- Added `docs/CM1700_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT.md`.
+- Used ColaMeta prompt preview `prompt_preview_CM_1700_vcptoolbox_t_20260701T183842_a57a7a4e`; no executor run or plan apply occurred.
+- Validated future target-specific runtime inspection execution approval draft shape without issuing or consuming an approval line.
+- Required accepted referenced CM-1699 approval packet, execution-scope binding, allowed runtime actions limited to target presence / runtime handshake / no-memory target-specific runtime inspection, current-facts value omission, approval-line value omission, capped runtime budget, zero memory/provider/write budget, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters.
+- Confirmed no approval-line issue or consumption, target-specific runtime inspection, runtime wiring, live VCPToolBox call, real path/endpoint/secret/config/env/commit/branch/expiry/approval-line persistence, `config.env` read, `.env` read/edit, raw memory/runtime read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1805`; targeted CM-1700 test passed `14/14`; adjacent CM-1700/1699/1698 regression passed `43/43`; default `npm test` passed `3457/3457`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
 
 ## CM-1699 VCPToolBox Target-Specific Runtime Inspection Approval Packet
 

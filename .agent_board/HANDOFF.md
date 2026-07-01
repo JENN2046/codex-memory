@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1699 VCPToolBox target-specific runtime inspection approval packet`.
-Current validation: `CMV-1804`.
-Current handoff: CM-1699 fixture-only target-specific runtime inspection approval packet added; no approval-line issue or consumption, no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
+Current task: `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`.
+Current validation: `CMV-1805`.
+Current handoff: CM-1700 fixture-only target-specific runtime inspection execution approval draft added; no approval-line issue or consumption, no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: add fixture-only VCPToolBox target-specific runtime inspection approval packet coverage.
+Goal: add fixture-only VCPToolBox target-specific runtime inspection execution approval draft coverage.
 
-Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,7 +25,29 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
-- `docs/CM1699_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET.md`
+- `docs/CM1700_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT.md`
+
+Completed in this slice:
+
+- Added `src/core/VcpToolBoxTargetSpecificRuntimeInspectionExecutionApprovalDraft.js`.
+- Added `tests/vcp-toolbox-target-specific-runtime-inspection-execution-approval-draft.test.js`.
+- Added `docs/CM1700_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT.md`.
+- Used ColaMeta prompt preview `prompt_preview_CM_1700_vcptoolbox_t_20260701T183842_a57a7a4e`; no executor run or plan apply occurred.
+- Validated future target-specific runtime inspection execution approval draft shape without issuing or consuming an approval line.
+- Confirmed referenced CM-1699 approval packet binding, execution-scope binding, allowed runtime actions limited to target presence / runtime handshake / no-memory target-specific runtime inspection, current-facts value omission, approval-line value omission, capped runtime budget, zero memory/provider/write budget, low-disclosure output policy, no raw/secret/readiness receipt fields, fail-closed stop conditions, forbidden expansion flags false, and zero counters.
+- Confirmed no approval-line issue or consumption, target-specific runtime inspection, runtime wiring, live VCPToolBox call, real path/endpoint/secret/config/env/commit/branch/expiry persistence, `config.env` read, `.env` read/edit, raw memory/runtime read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1805`; targeted CM-1700 test passed `14/14`; adjacent CM-1700/1699/1698 regression passed `43/43`; default `npm test` passed `3457/3457`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
+
+Next safe route: `CM-1701 VCPToolBox target-specific runtime inspection execution boundary review`, or request explicit push if remote update is intended.
+
+## Previous Active Handoff
+
+Goal: add fixture-only VCPToolBox target-specific runtime inspection approval packet coverage.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
 
 Completed in this slice:
 
@@ -39,9 +61,7 @@ Completed in this slice:
 
 Validation: `CMV-1804`; targeted CM-1699 test passed `15/15`; adjacent CM-1699/1698/1697 regression passed `43/43`; default `npm test` passed `3443/3443`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
 
-Next safe route: `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`, or request explicit push if remote update is intended.
-
-## Previous Active Handoff
+## Earlier Active Handoff
 
 Goal: add fixture-only VCPToolBox exact target discovery packet preflight coverage.
 
