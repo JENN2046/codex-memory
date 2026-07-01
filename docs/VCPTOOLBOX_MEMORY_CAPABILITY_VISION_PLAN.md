@@ -105,16 +105,20 @@ Current local evidence already establishes the first boundary layers:
 - `CM-1694`: fixture-only live target proof approval packet contract.
 - `CM-1695`: approval packet execution-boundary focused review and repair.
 - `CM-1696`: compact local mainline health after CM-1695.
+- `CM-1697`: fixture-only live target proof execution approval draft
+  contract; validates future exact approval-line shape without issuing approval
+  or executing runtime.
 
 Next selected local-safe route:
 
 ```text
-CM-1697 VCPToolBox live target proof execution approval packet draft
+CM-1698 VCPToolBox exact target discovery packet preflight
 ```
 
-`CM-1697` should remain a local docs/fixture/source-review task. It should not
+`CM-1698` should remain local docs/fixture/source-review unless Jenn gives a
+separate exact approval for target-specific runtime inspection. It should not
 execute VCPToolBox, inspect secrets, read raw memory, wire runtime behavior,
-write memory, or claim readiness.
+write memory, or claim readiness by default.
 
 ## Phased Plan
 
@@ -133,13 +137,12 @@ Done when:
 
 Represent VCPToolBox target references and profiles without executing them.
 
-Already covered by CM-1689 through CM-1695.
+Covered by CM-1689 through CM-1697.
 
-Remaining local-safe work:
-
-- draft CM-1697 execution approval packet;
-- add any missing negative cases around approval staleness, target binding,
-  profile mismatch, and forbidden expansion.
+CM-1697 adds the execution approval draft layer and negative cases around
+approval-line value persistence, current-facts value disclosure, target binding,
+profile/runtime-action mismatch, budget expansion, non-stop conditions, and
+forbidden expansion.
 
 ### Phase 2 - Exact Target Discovery Packet
 

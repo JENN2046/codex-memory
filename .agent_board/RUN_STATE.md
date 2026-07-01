@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1696 compact local mainline health confirmation after CM-1695 commit`.
-Current validation: `CMV-1801`.
-Current status: CM-1695 is committed locally and post-commit mainline gate passed; no push occurred.
+Current task: `CM-1697 VCPToolBox live target proof execution approval draft`.
+Current validation: `CMV-1802`.
+Current status: CM-1697 fixture-only execution approval draft added; no live proof, no approval line issued, no runtime call.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1696` records compact local post-commit mainline health after CM-1695. Next safe local action is selecting another fixture/docs/source-review task, or requesting explicit push if remote update is intended.
+`CM-1697` records fixture-only execution approval draft coverage for future VCPToolBox live target proof. Next safe local action is `CM-1698 VCPToolBox exact target discovery packet preflight`, or requesting explicit push if remote update is intended.
 
 ## Historical Run Notes
 

@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-06-12",
-  "taskId": "CM-1696",
-  "validationId": "CMV-1801",
+  "updatedAt": "2026-07-02",
+  "taskId": "CM-1697",
+  "validationId": "CMV-1802",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1802",
+      "scope": "CM-1697 VCPToolBox live target proof execution approval draft",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION"
+    },
     {
       "id": "CMV-1801",
       "scope": "CM-1696 compact local mainline health confirmation after CM-1695 commit",

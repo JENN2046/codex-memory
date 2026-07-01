@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1696 compact local mainline health confirmation after CM-1695 commit`.
-Current validation: `CMV-1801`.
+Current checkpoint: `CM-1697 VCPToolBox live target proof execution approval draft`.
+Current validation: `CMV-1802`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1697 VCPToolBox Live Target Proof Execution Approval Draft
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxLiveTargetProofExecutionApprovalDraft.js`.
+- Added `tests/vcp-toolbox-live-target-proof-execution-approval-draft.test.js`.
+- Added `docs/CM1697_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT.md`.
+- Used ColaMeta prompt preview `prompt_preview_CM_1697_vcptoolbox_l_20260701T174957_b2c5ed44`; no executor run or plan apply occurred.
+- Validated future execution approval draft shape without issuing an approval line or granting live execution.
+- Required referenced CM-1694 approval packet acceptance, execution scope binding, current-facts value omission, approval-line value omission, no-memory/no-write/no-provider budget, low-disclosure output/receipt policy, fail-closed stop conditions, and zero counters.
+- Confirmed no approval line issued, live execution approval, runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/secret persistence, `config.env` read, `.env` read/edit, raw memory read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1802`; targeted CM-1697 test passed `14/14`; CM-1693/1694/1697 regression passed `36/36`; default `npm test` passed `3414/3414`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
 
 ## CM-1696 Compact Local Mainline Health After CM-1695 Commit
 

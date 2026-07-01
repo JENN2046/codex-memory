@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1696 compact local mainline health confirmation after CM-1695 commit`.
-Current validation: `CMV-1801`.
-Current project status: CM-1695 committed locally and post-commit `npm run gate:mainline` passed; no push occurred.
-Current route: `COMPACT_LOCAL_POST_COMMIT_MAINLINE_HEALTH_AFTER_CM1695`.
+Current task: `CM-1697 VCPToolBox live target proof execution approval draft`.
+Current validation: `CMV-1802`.
+Current project status: CM-1697 fixture-only execution approval draft added; no live proof, no approval line issued, no runtime call.
+Current route: `VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1697 VCPToolBox live target proof execution approval draft: added `src/core/VcpToolBoxLiveTargetProofExecutionApprovalDraft.js`, `tests/vcp-toolbox-live-target-proof-execution-approval-draft.test.js`, and `docs/CM1697_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT.md`. The fixture-only helper validates future execution approval draft shape without issuing an approval line or granting live execution: referenced CM-1694 approval packet accepted, execution scope bound to proof/approval packet, current facts values omitted, approval-line value omitted, runtime budget no-memory/no-write/no-provider, low-disclosure output/receipt policy, fail-closed stop conditions, and zero counters. Targeted validation passed `14/14`; CM-1693/1694/1697 regression passed `36/36`; default `npm test` passed `3414/3414`. ColaMeta prompt preview `prompt_preview_CM_1697_vcptoolbox_l_20260701T174957_b2c5ed44` was used; no ColaMeta executor run or plan apply occurred. Approval line issued `NO`; live execution approved `NO`; runtime wiring `NO`; live VCPToolBox call `NO`; live target proof `NO`; real path/endpoint/secret persistence `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw memory read `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1696 compact local mainline health confirmation after CM-1695 commit: records post-commit local health after `2dbb939e test: close vcptoolbox live proof approval review` without adding a new receipt doc. Fresh Git before gate was `## main...origin/main [ahead 4]`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Push `NO`; production observe rollout `NO`; production strict auth enabled `NO`; runtime wiring `NO`; live VCPToolBox call `NO`; live target proof `NO`; `.env` edit/read `NO`; `config.env` read `NO`; provider/API `NO`; raw/broad scan `NO`; memory write `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 

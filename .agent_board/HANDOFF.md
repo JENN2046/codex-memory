@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1696 compact local mainline health confirmation after CM-1695 commit`.
-Current validation: `CMV-1801`.
-Current handoff: CM-1695 is committed locally and post-commit mainline gate passed; no push occurred.
+Current task: `CM-1697 VCPToolBox live target proof execution approval draft`.
+Current validation: `CMV-1802`.
+Current handoff: CM-1697 fixture-only execution approval draft added; no live proof, no approval line issued, no runtime call.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: record compact local post-commit mainline health after CM-1695.
+Goal: add fixture-only VCPToolBox live target proof execution approval draft coverage.
 
-Current status: `COMPLETED_VALIDATED_COMPACT_LOCAL_MAINLINE_HEALTH_AFTER_CM1695_COMMIT`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,29 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/CM1697_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT.md`
+
+Completed in this slice:
+
+- Added `src/core/VcpToolBoxLiveTargetProofExecutionApprovalDraft.js`.
+- Added `tests/vcp-toolbox-live-target-proof-execution-approval-draft.test.js`.
+- Added `docs/CM1697_VCPTOOLBOX_LIVE_TARGET_PROOF_EXECUTION_APPROVAL_DRAFT.md`.
+- Used ColaMeta prompt preview `prompt_preview_CM_1697_vcptoolbox_l_20260701T174957_b2c5ed44`; no executor run or plan apply occurred.
+- Validated future execution approval draft shape without issuing an approval line or granting live execution.
+- Confirmed referenced CM-1694 approval packet validation, execution scope binding, current-facts value omission, approval-line value omission, no-memory/no-write/no-provider budget, low-disclosure output/receipt policy, fail-closed stop conditions, and zero counters.
+- Confirmed no approval line issued, live execution approval, runtime wiring, live VCPToolBox call, live target proof, real path/endpoint/secret persistence, `config.env` read, `.env` read/edit, raw memory read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1802`; targeted CM-1697 test passed `14/14`; CM-1693/1694/1697 regression passed `36/36`; default `npm test` passed `3414/3414`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
+
+Next safe route: `CM-1698 VCPToolBox exact target discovery packet preflight`, or request explicit push if remote update is intended.
+
+## Previous Active Handoff
+
+Goal: record compact local post-commit mainline health after CM-1695.
+
+Current status: `COMPLETED_VALIDATED_COMPACT_LOCAL_MAINLINE_HEALTH_AFTER_CM1695_COMMIT`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
 
 Completed in this slice:
 
@@ -39,7 +62,7 @@ Validation: `CMV-1801`; local `gate:mainline`, `git diff --check`, `CURRENT_FACT
 
 Next safe route: choose the next local fixture/docs/source-review task, or request explicit push if remote update is intended.
 
-## Previous Active Handoff
+## Earlier Active Handoff
 
 Goal: review and repair the CM-1694 VCPToolBox live target proof approval packet execution boundary.
 
