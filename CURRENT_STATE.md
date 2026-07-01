@@ -8,15 +8,19 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1695 VCPToolBox live target proof approval packet focused review repaired |
-| Current task | `CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit` |
-| Current validation | `CMV-1800` |
-| Current route | Focused review and low-disclosure boundary repair; no live execution approval |
+| Status | CM-1696 compact local mainline health after CM-1695 commit |
+| Current task | `CM-1696 compact local mainline health confirmation after CM-1695 commit` |
+| Current validation | `CMV-1801` |
+| Current route | Compact local status note; post-commit `gate:mainline` passed; no push |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1696` records the local post-commit health check after `2dbb939e test: close vcptoolbox live proof approval review`. Fresh Git before gate was `## main...origin/main [ahead 4]`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. No new receipt doc was added.
+
+Boundary: push `NO`; production observe rollout `NO`; production strict auth enabled `NO`; runtime wiring `NO`; live VCPToolBox call `NO`; live target proof `NO`; `.env` edit/read `NO`; `config.env` read `NO`; provider/API `NO`; raw/broad scan `NO`; memory write `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1695` reviews the CM-1694 live target proof approval packet contract and repairs an approval-packet boundary gap. The helper now recursively rejects extra locator/endpoint/config/env/token/secret/raw-memory shaped fields such as `endpoint`, `bearerToken`, `configEnvPath`, and `rawDailyNoteContent` without echoing submitted values. Targeted validation passed `12/12`.
 

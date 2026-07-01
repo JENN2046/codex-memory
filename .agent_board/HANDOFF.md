@@ -4,13 +4,42 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit`.
-Current validation: `CMV-1800`.
-Current handoff: CM-1694 approval packet boundary reviewed and repaired; no live execution approval or runtime execution occurred.
+Current task: `CM-1696 compact local mainline health confirmation after CM-1695 commit`.
+Current validation: `CMV-1801`.
+Current handoff: CM-1695 is committed locally and post-commit mainline gate passed; no push occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+Goal: record compact local post-commit mainline health after CM-1695.
+
+Current status: `COMPLETED_VALIDATED_COMPACT_LOCAL_MAINLINE_HEALTH_AFTER_CM1695_COMMIT`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
+
+Current entrypoints:
+
+- `CURRENT_STATE.md`
+- `.agent_board/CURRENT_FACTS.json`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/HANDOFF.md`
+
+Completed in this slice:
+
+- Confirmed local commit `2dbb939e test: close vcptoolbox live proof approval review`.
+- Fresh Git before gate was `## main...origin/main [ahead 4]`.
+- Ran `npm run gate:mainline`.
+- Gate passed in daily mode: health ok with HTTP `200`, compare matched `43/43`, rollback ready `43/43`, recommendation `rollback-safe`.
+- Recorded compact status only; no new receipt doc.
+- Confirmed no push, production observe rollout, production strict enablement, runtime wiring, live VCPToolBox call, live target proof, `.env` read/edit, `config.env` read, provider/API, raw/broad scan, memory write, public MCP expansion, release/deploy/cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1801`; local `gate:mainline`, `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed after CM-1695 commit.
+
+Next safe route: choose the next local fixture/docs/source-review task, or request explicit push if remote update is intended.
+
+## Previous Active Handoff
 
 Goal: review and repair the CM-1694 VCPToolBox live target proof approval packet execution boundary.
 

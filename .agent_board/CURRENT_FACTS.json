@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-06-12",
-  "taskId": "CM-1695",
-  "validationId": "CMV-1800",
+  "taskId": "CM-1696",
+  "validationId": "CMV-1801",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1801",
+      "scope": "CM-1696 compact local mainline health confirmation after CM-1695 commit",
+      "status": "COMPLETED_VALIDATED_COMPACT_LOCAL_MAINLINE_HEALTH_AFTER_CM1695_COMMIT"
+    },
     {
       "id": "CMV-1800",
       "scope": "CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit",

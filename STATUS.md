@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit`.
-Current validation: `CMV-1800`.
-Current project status: CM-1695 reviewed and repaired the CM-1694 approval packet low-disclosure boundary; no live execution approval or runtime execution occurred.
-Current route: `VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_FOCUSED_REVIEW_REPAIRED_NO_EXECUTION`.
+Current task: `CM-1696 compact local mainline health confirmation after CM-1695 commit`.
+Current validation: `CMV-1801`.
+Current project status: CM-1695 committed locally and post-commit `npm run gate:mainline` passed; no push occurred.
+Current route: `COMPACT_LOCAL_POST_COMMIT_MAINLINE_HEALTH_AFTER_CM1695`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1696 compact local mainline health confirmation after CM-1695 commit: records post-commit local health after `2dbb939e test: close vcptoolbox live proof approval review` without adding a new receipt doc. Fresh Git before gate was `## main...origin/main [ahead 4]`; `npm run gate:mainline` passed in daily mode; health ok with HTTP `200`; compare matched `43/43`; rollback ready `43/43`; recommendation `rollback-safe`. Push `NO`; production observe rollout `NO`; production strict auth enabled `NO`; runtime wiring `NO`; live VCPToolBox call `NO`; live target proof `NO`; `.env` edit/read `NO`; `config.env` read `NO`; provider/API `NO`; raw/broad scan `NO`; memory write `NO`; public MCP expansion `NO`; release/deploy/cutover `NO`; production/release/cutover ready `NO`; complete V8 `NOT_CLAIMED`.
 
 CM-1695 VCPToolBox live target proof approval packet focused review / execution boundary audit: added `docs/CM1695_VCPTOOLBOX_LIVE_TARGET_PROOF_APPROVAL_PACKET_FOCUSED_REVIEW.md`, repaired `src/core/VcpToolBoxLiveTargetProofApprovalPacketContract.js`, and expanded `tests/vcp-toolbox-live-target-proof-approval-packet-contract.test.js`. Focused review found the approval packet helper did not globally reject extra locator/endpoint/config/env/token/secret/raw-memory shaped fields on the approval packet itself. The repair adds recursive forbidden-field rejection and regression coverage for `endpoint`, `bearerToken`, `configEnvPath`, and `rawDailyNoteContent` without echoing submitted values. Targeted validation passed `12/12`. Runtime wiring `NO`; live execution approved `NO`; live VCPToolBox call `NO`; live target proof `NO`; real path inspected/persisted `NO`; endpoint persisted `NO`; secret persisted `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw DailyNote/RAG/vector/prompt read `NO`; broad scan/export/import `NO`; memory write executed `NO`; provider/API `NO`; public MCP expansion `NO`; readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
