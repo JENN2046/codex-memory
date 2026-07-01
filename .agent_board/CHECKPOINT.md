@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1698 VCPToolBox exact target discovery packet preflight`.
-Current validation: `CMV-1803`.
+Current checkpoint: `CM-1699 VCPToolBox target-specific runtime inspection approval packet`.
+Current validation: `CMV-1804`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1699 VCPToolBox Target-Specific Runtime Inspection Approval Packet
+
+Status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET_FIXTURE_ONLY_NO_EXECUTION`
+
+Recorded:
+
+- Added `src/core/VcpToolBoxTargetSpecificRuntimeInspectionApprovalPacket.js`.
+- Added `tests/vcp-toolbox-target-specific-runtime-inspection-approval-packet.test.js`.
+- Added `docs/CM1699_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET.md`.
+- Used ColaMeta prompt preview `prompt_preview_CM_1699_vcptoolbox_t_20260701T181829_98e875eb`; no executor run or plan apply occurred.
+- Validated future target-specific runtime inspection approval packet shape without issuing or consuming an approval line.
+- Required accepted referenced CM-1698 discovery packet, approval-scope binding, current-facts value omission, expiry value omission, execution authorization flags false, capped runtime budget, zero memory/provider/write budget, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters.
+- Confirmed no approval-line issue or consumption, target-specific runtime inspection, runtime wiring, live VCPToolBox call, real path/endpoint/secret/config/env/commit/branch/expiry persistence, `config.env` read, `.env` read/edit, raw memory/runtime read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1804`; targeted CM-1699 test passed `15/15`; adjacent CM-1699/1698/1697 regression passed `43/43`; default `npm test` passed `3443/3443`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
 
 ## CM-1698 VCPToolBox Exact Target Discovery Packet Preflight
 

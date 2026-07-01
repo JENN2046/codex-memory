@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1698 VCPToolBox exact target discovery packet preflight`.
-Current validation: `CMV-1803`.
-Current status: CM-1698 fixture-only exact target discovery packet preflight added; no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
+Current task: `CM-1699 VCPToolBox target-specific runtime inspection approval packet`.
+Current validation: `CMV-1804`.
+Current status: CM-1699 fixture-only target-specific runtime inspection approval packet added; no approval-line issue or consumption, no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1698` records fixture-only exact target discovery packet preflight coverage for future VCPToolBox target-specific discovery. Next safe local action is `CM-1699 VCPToolBox target-specific runtime inspection approval packet`, or requesting explicit push if remote update is intended.
+`CM-1699` records fixture-only target-specific runtime inspection approval packet coverage for future VCPToolBox target inspection. Next safe local action is `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`, or requesting explicit push if remote update is intended.
 
 ## Historical Run Notes
 

@@ -8,15 +8,19 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1698 VCPToolBox exact target discovery packet preflight |
-| Current task | `CM-1698 VCPToolBox exact target discovery packet preflight` |
-| Current validation | `CMV-1803` |
-| Current route | Fixture-only exact target discovery packet preflight; no target-specific runtime inspection |
+| Status | CM-1699 VCPToolBox target-specific runtime inspection approval packet |
+| Current task | `CM-1699 VCPToolBox target-specific runtime inspection approval packet` |
+| Current validation | `CMV-1804` |
+| Current route | Fixture-only target-specific runtime inspection approval packet; no approval-line issue or runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1699` adds `src/core/VcpToolBoxTargetSpecificRuntimeInspectionApprovalPacket.js`, `tests/vcp-toolbox-target-specific-runtime-inspection-approval-packet.test.js`, and `docs/CM1699_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET.md`. It validates a fixture-only future target-specific runtime inspection approval packet: accepted referenced CM-1698 discovery packet, approval scope bound to the discovery packet and sanitized target reference, current Git facts represented by presence flags only, expiry represented by flags only, execution authorization flags false, runtime budget capped to three calls / ten probe minutes with zero memory/provider/write budget, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters. New targeted validation passed `15/15`; adjacent CM-1699/1698/1697 regression passed `43/43`; default `npm test` passed `3443/3443`.
+
+Boundary: approval line issued `NO`; approval line consumed `NO`; target-specific runtime inspection `NO`; live VCPToolBox call `NO`; runtime wiring `NO`; real path inspected/persisted `NO`; endpoint persisted `NO`; secret/config/env persisted `NO`; commit/branch/expiry value persisted `NO`; `config.env` read `NO`; `.env` read/edit `NO`; raw memory/runtime response read `NO`; memory write `NO`; provider/API `NO`; public MCP expansion `NO`; production/release/cutover readiness claim `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1698` adds `src/core/VcpToolBoxExactTargetDiscoveryPacketPreflight.js`, `tests/vcp-toolbox-exact-target-discovery-packet-preflight.test.js`, and `docs/CM1698_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT.md`. It validates a fixture-only future exact target discovery packet: safe target reference alias, principal scope presence flags, discovery question coverage, component surface coverage, explicit profile boundary, execution authorization flags false, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters. New targeted validation passed `14/14`; adjacent CM-1690/1691/1697 regression passed `49/49`; default `npm test` passed `3428/3428`.
 

@@ -111,17 +111,20 @@ Current local evidence already establishes the first boundary layers:
 - `CM-1698`: fixture-only exact target discovery packet preflight; validates
   the non-secret packet shape for future target-specific discovery without
   inspecting a real target or executing runtime.
+- `CM-1699`: fixture-only target-specific runtime inspection approval packet;
+  validates a future approval packet bound to CM-1698 without issuing approval
+  or executing runtime.
 
 Next selected local-safe route:
 
 ```text
-CM-1699 VCPToolBox target-specific runtime inspection approval packet
+CM-1700 VCPToolBox target-specific runtime inspection execution approval draft
 ```
 
-`CM-1699` should remain local docs/fixture/source-review unless Jenn gives a
-separate exact approval for target-specific runtime inspection. It should not
-execute VCPToolBox, inspect secrets, read raw memory, wire runtime behavior,
-write memory, or claim readiness by default.
+`CM-1700` should remain local docs/fixture/source-review unless Jenn gives a
+separate exact approval for target-specific runtime inspection execution. It
+should not execute VCPToolBox, inspect secrets, read raw memory, wire runtime
+behavior, write memory, or claim readiness by default.
 
 ## Phased Plan
 
@@ -140,7 +143,7 @@ Done when:
 
 Represent VCPToolBox target references and profiles without executing them.
 
-Covered by CM-1689 through CM-1698.
+Covered by CM-1689 through CM-1699.
 
 CM-1697 adds the execution approval draft layer and negative cases around
 approval-line value persistence, current-facts value disclosure, target binding,
@@ -153,6 +156,13 @@ inclusion, incomplete component coverage, target-specific inspection flags,
 execution authorization flags, raw output policy, readiness receipt claims,
 non-stop stop conditions, forbidden expansion flags, and positive execution
 counters.
+
+CM-1699 adds the target-specific runtime inspection approval packet layer and
+negative cases around referenced discovery packet rejection, approval-scope
+drift, current-facts value disclosure, expiry value disclosure, approval-line
+issue/consumption flags, runtime budget expansion, raw runtime response
+persistence, non-stop stop conditions, forbidden expansion flags, and non-zero
+execution counters.
 
 ### Phase 2 - Exact Target Discovery Packet
 
@@ -173,10 +183,11 @@ Required answers:
 This phase may record only safe aliases and presence flags. It must not persist
 path, endpoint, token, config, raw memory, or provider values.
 
-Current local status: CM-1698 completed this phase as fixture-only source,
-test, and docs evidence. It did not inspect a target, read config/env, execute
-VCPToolBox, read memory, write memory, call a provider/API, expand public MCP,
-or claim readiness.
+Current local status: CM-1699 completed the approval-packet layer after this
+phase as fixture-only source, test, and docs evidence. It did not issue or
+consume an approval line, inspect a target, read config/env, execute VCPToolBox,
+read memory, write memory, call a provider/API, expand public MCP, or claim
+readiness.
 
 ### Phase 3 - Exact-Approved Live Target Proof
 

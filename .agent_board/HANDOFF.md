@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1698 VCPToolBox exact target discovery packet preflight`.
-Current validation: `CMV-1803`.
-Current handoff: CM-1698 fixture-only exact target discovery packet preflight added; no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
+Current task: `CM-1699 VCPToolBox target-specific runtime inspection approval packet`.
+Current validation: `CMV-1804`.
+Current handoff: CM-1699 fixture-only target-specific runtime inspection approval packet added; no approval-line issue or consumption, no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: add fixture-only VCPToolBox exact target discovery packet preflight coverage.
+Goal: add fixture-only VCPToolBox target-specific runtime inspection approval packet coverage.
 
-Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT_FIXTURE_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,7 +25,29 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
-- `docs/CM1698_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT.md`
+- `docs/CM1699_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET.md`
+
+Completed in this slice:
+
+- Added `src/core/VcpToolBoxTargetSpecificRuntimeInspectionApprovalPacket.js`.
+- Added `tests/vcp-toolbox-target-specific-runtime-inspection-approval-packet.test.js`.
+- Added `docs/CM1699_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET.md`.
+- Used ColaMeta prompt preview `prompt_preview_CM_1699_vcptoolbox_t_20260701T181829_98e875eb`; no executor run or plan apply occurred.
+- Validated future target-specific runtime inspection approval packet shape without issuing or consuming an approval line.
+- Confirmed referenced CM-1698 discovery packet binding, approval-scope binding, current-facts value omission, expiry value omission, execution authorization flags false, capped runtime budget, zero memory/provider/write budget, low-disclosure output policy, no raw/secret/readiness receipt fields, fail-closed stop conditions, forbidden expansion flags false, and zero counters.
+- Confirmed no approval-line issue or consumption, target-specific runtime inspection, runtime wiring, live VCPToolBox call, real path/endpoint/secret/config/env/commit/branch/expiry persistence, `config.env` read, `.env` read/edit, raw memory/runtime read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1804`; targeted CM-1699 test passed `15/15`; adjacent CM-1699/1698/1697 regression passed `43/43`; default `npm test` passed `3443/3443`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
+
+Next safe route: `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`, or request explicit push if remote update is intended.
+
+## Previous Active Handoff
+
+Goal: add fixture-only VCPToolBox exact target discovery packet preflight coverage.
+
+Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_EXACT_TARGET_DISCOVERY_PACKET_PREFLIGHT_FIXTURE_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+
+Workspace: `A:\codex-memory`.
 
 Completed in this slice:
 
@@ -39,7 +61,7 @@ Completed in this slice:
 
 Validation: `CMV-1803`; targeted CM-1698 test passed `14/14`; adjacent CM-1690/1691/1697 regression passed `49/49`; default `npm test` passed `3428/3428`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
 
-Next safe route: `CM-1699 VCPToolBox target-specific runtime inspection approval packet`, or request explicit push if remote update is intended.
+Next safe route at that time was `CM-1699 VCPToolBox target-specific runtime inspection approval packet`.
 
 ## Previous Active Handoff
 

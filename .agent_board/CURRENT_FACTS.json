@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-02",
-  "taskId": "CM-1698",
-  "validationId": "CMV-1803",
+  "taskId": "CM-1699",
+  "validationId": "CMV-1804",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1804",
+      "scope": "CM-1699 VCPToolBox target-specific runtime inspection approval packet",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_APPROVAL_PACKET_FIXTURE_ONLY_NO_EXECUTION"
+    },
     {
       "id": "CMV-1803",
       "scope": "CM-1698 VCPToolBox exact target discovery packet preflight",
