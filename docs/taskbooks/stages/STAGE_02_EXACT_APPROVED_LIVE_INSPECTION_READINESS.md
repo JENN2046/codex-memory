@@ -16,6 +16,7 @@ serves_master_workstreams:
   - Workstream F - Mainline Protection And Runtime Hardening
 default_lane: Green Lane fixture-only readiness gate
 runtime_authorization: not_granted
+current_version: CM-1707
 ```
 
 ## 1. Master Alignment
@@ -74,3 +75,18 @@ version_name: Stage 01 Closeout / Stage 02 Exact-Approved Live Inspection Readin
 version_goal: prepare a fixture-only gate that keeps the future live inspection exact-approval-bound
 status: prepared_for_local_execution
 ```
+
+## 6. Current Version
+
+Current Version:
+
+```yaml id="stage-02-current-version"
+version_id: CM-1707
+version_name: Stage 02 Exact Approval Packet Preflight
+version_goal: prepare a fixture-only approval packet preflight without issuing or consuming approval
+status: prepared_for_local_execution
+```
+
+CM-1707 may only inspect caller-provided sanitized summaries. It must not issue
+an approval line, consume an approval line, expose an approval-line value, call
+VCPToolBox, probe runtime, or claim readiness.

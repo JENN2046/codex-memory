@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-02",
-  "taskId": "CM-1706",
-  "validationId": "CMV-1809",
+  "taskId": "CM-1707",
+  "validationId": "CMV-1810",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1810",
+      "scope": "CM-1707 Stage 02 exact approval packet preflight",
+      "status": "COMPLETED_VALIDATED_STAGE_02_EXACT_APPROVAL_PACKET_PREFLIGHT_FIXTURE_ONLY_NO_APPROVAL_NO_RUNTIME"
+    },
     {
       "id": "CMV-1809",
       "scope": "CM-1706 Stage 01 closeout / Stage 02 exact-approved live inspection readiness gate",
