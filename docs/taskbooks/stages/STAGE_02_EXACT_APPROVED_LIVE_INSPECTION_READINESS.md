@@ -16,7 +16,7 @@ serves_master_workstreams:
   - Workstream F - Mainline Protection And Runtime Hardening
 default_lane: Green Lane fixture-only readiness gate
 runtime_authorization: not_granted
-current_version: CM-1712
+current_version: CM-1713
 ```
 
 ## 1. Master Alignment
@@ -158,9 +158,9 @@ review-readiness. It must not validate, generate, issue, consume, store,
 template, expose, or rely on a real approval line; it must not grant runtime
 authorization, call VCPToolBox, probe runtime, or claim readiness.
 
-## 11. Current Version
+## 11. Previous Version
 
-Current Version:
+Previous Version:
 
 ```yaml id="stage-02-current-version-v1-11"
 version_id: CM-1712
@@ -175,3 +175,22 @@ future exact approval request packet route as
 `needs_adjustment`. It must not validate, generate, issue, consume, store,
 template, expose, or rely on a real approval line; it must not grant runtime
 authorization, call VCPToolBox, probe runtime, or claim readiness.
+
+## 12. Current Version
+
+Current Version:
+
+```yaml id="stage-02-current-version-v1-12"
+version_id: CM-1713
+version_name: Stage 02 Exact Approval Request Packet Final Display Request Boundary
+version_goal: prepare a final non-authorizing future exact approval request display / request surface
+status: prepared_for_local_execution
+```
+
+CM-1713 may only inspect caller-provided sanitized summaries. It prepares a
+future human-review display/request surface only after CM-1712 returns
+`proceed_to_future_exact_approval_request`. It must not submit a real approval
+request; it must not validate, generate, issue, consume, store, template,
+simulate, expose, or rely on a real approval line; it must not grant runtime
+authorization, call VCPToolBox, probe runtime, or claim readiness. Stage 02
+closeout remains a later version.
