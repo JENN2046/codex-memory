@@ -10,6 +10,10 @@ const {
   SELF_REFERENTIAL_FILES,
   FIXTURE_DRIFT_FILES,
   buildSpawnOptions,
+  formatSummaryOutput,
+  parseNodeMajor,
+  selectSummaryOutput,
+  validateNodeRuntime,
   resolveDefaultSafeFiles
 } = require('../src/cli/run-default-tests');
 
@@ -103,4 +107,45 @@ test("buildSpawnOptions forces provider gate off", () => {
 
   assert.equal(options.hasOwnProperty("timeout"), false);
   assert.equal(options.env.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER, "false");
+});
+
+test('validateNodeRuntime enforces the package Node 22 floor', () => {
+  assert.equal(parseNodeMajor('v18.19.1'), 18);
+  assert.equal(validateNodeRuntime('v18.19.1').ok, false);
+  assert.equal(validateNodeRuntime('22.23.1').ok, true);
+});
+
+test('selectSummaryOutput returns TAP summary lines without full test body', () => {
+  const output = [
+    'TAP version 13',
+    '# Subtest: very noisy test body',
+    'ok 1 - very noisy test body',
+    '# tests 10',
+    '# suites 0',
+    '# pass 10',
+    '# fail 0',
+    '# duration_ms 123.45'
+  ].join('\n');
+
+  const summary = selectSummaryOutput(output);
+
+  assert.match(summary, /# tests 10/);
+  assert.match(summary, /# pass 10/);
+  assert.equal(summary.includes('very noisy test body'), false);
+});
+
+test('formatSummaryOutput keeps bounded diagnostic tail on failed summary run', () => {
+  const output = [
+    'TAP version 13',
+    '# Subtest: failing default runner case',
+    'not ok 1 - failing default runner case',
+    '# tests 1',
+    '# pass 0',
+    '# fail 1'
+  ].join('\n');
+
+  const summary = formatSummaryOutput(output, 1);
+
+  assert.match(summary, /not ok 1 - failing default runner case/);
+  assert.match(summary, /# fail 1/);
 });

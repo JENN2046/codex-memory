@@ -5,6 +5,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
+const SUMMARY_OUTPUT_TAIL_CHARS = 12000;
+const SUMMARY_FAILURE_TAIL_CHARS = 7000;
+const MIN_NODE_MAJOR = 22;
+
 // ---------------------------------------------------------------------------
 // Default-safe test contract
 // Excludes provider-dependent, daemon-dependent, and self-referential tests.
@@ -81,6 +85,21 @@ function buildDefaultSafeEnv(env = process.env) {
   };
 }
 
+function parseNodeMajor(version = process.versions.node) {
+  const match = String(version || '').match(/^v?(\d+)(?:\.|$)/);
+  return match ? Number(match[1]) : 0;
+}
+
+function validateNodeRuntime(version = process.versions.node) {
+  const major = parseNodeMajor(version);
+  return {
+    ok: major >= MIN_NODE_MAJOR,
+    major,
+    minMajor: MIN_NODE_MAJOR,
+    version: String(version || '')
+  };
+}
+
 function buildSpawnOptions({ cwd = process.cwd(), env = process.env } = {}) {
   const options = {
     cwd,
@@ -92,14 +111,51 @@ function buildSpawnOptions({ cwd = process.cwd(), env = process.env } = {}) {
 }
 
 function parseArgs(argv = []) {
-  const options = { json: false };
+  const options = { json: false, summary: false };
   for (const arg of argv) {
     if (arg === '--json') options.json = true;
+    if (arg === '--summary') options.summary = true;
   }
   return options;
 }
 
+function appendLimited(current, chunk, limit = SUMMARY_OUTPUT_TAIL_CHARS) {
+  const next = `${current}${chunk}`;
+  return next.length > limit ? next.slice(next.length - limit) : next;
+}
+
+function selectSummaryOutput(output, limit = SUMMARY_OUTPUT_TAIL_CHARS) {
+  const lines = String(output || '').split(/\r?\n/);
+  const summaryLines = lines.filter(line => /^# (tests|suites|pass|fail|cancelled|skipped|todo|duration_ms) /.test(line));
+  if (summaryLines.length > 0) {
+    return `${summaryLines.join('\n')}\n`;
+  }
+  const tail = String(output || '').slice(-limit);
+  return tail ? `${tail.replace(/\s+$/, '')}\n` : '';
+}
+
+function formatSummaryOutput(output, exitCode = 0, limit = SUMMARY_FAILURE_TAIL_CHARS) {
+  const summary = selectSummaryOutput(output);
+  if (exitCode === 0) return summary;
+
+  const diagnosticTail = String(output || '').slice(-limit).replace(/\s+$/, '');
+  if (!diagnosticTail) return summary;
+
+  const tailOutput = `${diagnosticTail}\n`;
+  if (!summary) return tailOutput;
+  return tailOutput.includes(summary.trim()) ? tailOutput : `${tailOutput}${summary}`;
+}
+
 function main() {
+  const runtime = validateNodeRuntime();
+  if (!runtime.ok) {
+    process.stderr.write(
+      `codex-memory default tests require Node >=${runtime.minMajor}. ` +
+      `Current Node is ${runtime.version || 'unknown'}.\n`
+    );
+    process.exit(1);
+  }
+
   const options = parseArgs(process.argv.slice(2));
   const testsDir = path.join(process.cwd(), 'tests');
   const { safeFiles, excludedDetails, totalFiles } = resolveDefaultSafeFiles(testsDir);
@@ -117,14 +173,33 @@ function main() {
     process.stderr.write(`${JSON.stringify(contract, null, 2)}\n`);
   }
 
-  const child = spawn(process.execPath, ['--test', ...testPatterns], buildSpawnOptions());
+  const spawnOptions = options.summary
+    ? {
+        cwd: process.cwd(),
+        env: buildDefaultSafeEnv(process.env),
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true
+      }
+    : buildSpawnOptions();
+  const child = spawn(process.execPath, ['--test', ...testPatterns], spawnOptions);
 
+  let stdoutBuf = '';
   let stderrBuf = '';
-  child.stderr.on('data', d => { stderrBuf += d; });
+  if (options.summary) {
+    child.stdout.on('data', d => { stdoutBuf = appendLimited(stdoutBuf, d); });
+  }
+  child.stderr.on('data', d => {
+    stderrBuf = options.summary ? appendLimited(stderrBuf, d) : `${stderrBuf}${d}`;
+  });
 
   child.on('close', code => {
-    // Forward stderr (contains summary)
-    if (stderrBuf) process.stderr.write(stderrBuf);
+    if (options.summary) {
+      const summary = formatSummaryOutput(`${stdoutBuf}\n${stderrBuf}`, code !== null ? code : 1);
+      if (summary) process.stdout.write(summary);
+    } else if (stderrBuf) {
+      // Forward stderr (contains summary)
+      process.stderr.write(stderrBuf);
+    }
     // null code means the child was killed by a signal (OOM, runner timeout, etc.)
     // Map to nonzero exit to avoid masking the failure.
     process.exit(code !== null ? code : 1);
@@ -146,6 +221,10 @@ module.exports = {
   FIXTURE_DRIFT_FILES,
   buildDefaultSafeEnv,
   buildSpawnOptions,
+  formatSummaryOutput,
+  parseNodeMajor,
+  selectSummaryOutput,
+  validateNodeRuntime,
   resolveDefaultSafeFiles,
   resolveExcluded
 };
