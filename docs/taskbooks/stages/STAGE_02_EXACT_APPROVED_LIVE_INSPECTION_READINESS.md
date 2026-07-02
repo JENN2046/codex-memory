@@ -16,7 +16,7 @@ serves_master_workstreams:
   - Workstream F - Mainline Protection And Runtime Hardening
 default_lane: Green Lane fixture-only readiness gate
 runtime_authorization: not_granted
-current_version: CM-1709
+current_version: CM-1710
 ```
 
 ## 1. Master Alignment
@@ -107,9 +107,9 @@ the CM-1707-preflighted future packet candidate may enter human exact-approval
 review. It must not generate, issue, consume, store, expose, or validate an
 approval line; it must not call VCPToolBox, probe runtime, or claim readiness.
 
-## 8. Current Version
+## 8. Previous Version
 
-Current Version:
+Previous Version:
 
 ```yaml id="stage-02-current-version-v1-8"
 version_id: CM-1709
@@ -123,3 +123,20 @@ CM-1709 may only inspect caller-provided sanitized summaries. It classifies
 review. It must not validate, generate, issue, consume, store, expose, or rely
 on an approval line; it must not grant runtime authorization, call VCPToolBox,
 probe runtime, or claim readiness.
+
+## 9. Current Version
+
+Current Version:
+
+```yaml id="stage-02-current-version-v1-9"
+version_id: CM-1710
+version_name: Stage 02 Exact Approval Request Packet Skeleton Boundary
+version_goal: prepare a non-authorizing future exact approval request packet skeleton
+status: prepared_for_local_execution
+```
+
+CM-1710 may only inspect caller-provided sanitized summaries. It prepares a
+future exact approval request packet skeleton only after CM-1709
+`approve_requested` intake. It must not validate, generate, issue, consume,
+store, expose, or rely on a real approval line; it must not grant runtime
+authorization, call VCPToolBox, probe runtime, or claim readiness.

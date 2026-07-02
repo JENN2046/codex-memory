@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1709",
-  "validationId": "CMV-1812",
+  "taskId": "CM-1710",
+  "validationId": "CMV-1813",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1813",
+      "scope": "CM-1710 Stage 02 exact approval request packet skeleton boundary",
+      "status": "COMPLETED_VALIDATED_STAGE_02_EXACT_APPROVAL_REQUEST_PACKET_SKELETON_BOUNDARY_FIXTURE_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
     {
       "id": "CMV-1812",
       "scope": "CM-1709 Stage 02 exact approval decision intake boundary",
