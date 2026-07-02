@@ -39,6 +39,7 @@ const DAEMON_DEPENDENT_FILES = [
 
 const SELF_REFERENTIAL_FILES = [
   'gate-ci-cli.test.js',
+  'gate-ci-default-test-contract.test.js',
   'gate-ci-env-override-evidence.test.js',
   'dashboard-cli.test.js'
 ];
