@@ -106,7 +106,35 @@ Current repository reality, as of this Master Taskbook draft:
 - `docs/VCPTOOLBOX_MEMORY_CAPABILITY_VISION_PLAN.md` is the current vision plan
   for the VCPToolBox memory capability line.
 
-## 5. Master Workstreams
+## 5. Master / Stage / Version Governance Chain
+
+This project adopts the ColaMeta governance chain Jenn specified:
+
+1. Master defines the final direction.
+   For ColaMeta itself, the product-level pattern is: `ColaMeta should become a
+   target-anchored AI delivery command layer.` For this `codex-memory` Master,
+   the project final direction is the North Star in Section 3: governed
+   Codex/Claude use of native VCPToolBox memory through the `codex-memory`
+   bridge.
+2. Stage defines a stage goal.
+   Every Stage must say which Master goal it serves, why it serves that goal,
+   what it excludes, and what evidence proves the stage stayed aligned.
+3. Version defines one current slice.
+   Every Version must cite the Master and Stage, deliver one concrete small
+   capability, and must not expand the project final goal on its own.
+4. Execution Envelope locks execution boundaries.
+   An agent may edit only `allowed_files`, respect `forbidden_files`, stay inside
+   `out_of_scope`, and run only the bound validation commands or separately
+   authorized safe validation.
+5. Review asks the alignment question again.
+   The closeout question is: `Does this work still serve project_final_goal?` If
+   the answer is uncertain, the result must enter review or plan adjustment. It
+   must not be marked complete by assumption.
+
+No Stage, Version, Execution Envelope, review packet, ColaMeta preview, or
+executor report may silently replace the Master final direction.
+
+## 6. Master Workstreams
 
 ### Workstream A - VCPToolBox Target And Profile Governance
 
@@ -156,7 +184,7 @@ Goal: preserve existing `vcp_codex_memory` behavior, mainline gates, rollback
 readiness, HTTP stability, provider fail-closed behavior, and public MCP surface
 boundaries while VCPToolBox bridge work advances.
 
-## 6. ColaMeta Execution Policy
+## 7. ColaMeta Execution Policy
 
 The project is registered in ColaMeta as `project_name=codex-memory` in
 `managed` mode.
@@ -185,7 +213,7 @@ is by itself a ReviewDecision, GateEvent, Delivery State acceptance, runtime
 execution approval, stable replacement approval, commit approval, or push
 approval.
 
-## 7. First Route From This Master Taskbook
+## 8. First Route From This Master Taskbook
 
 Initial taskbook adoption route:
 
@@ -225,7 +253,7 @@ execute the target-specific runtime inspection unless Jenn provides a separate
 exact approval line bound to target, commit, scope, budget, expiry, and output
 policy.
 
-## 8. Review And Acceptance Criteria
+## 9. Review And Acceptance Criteria
 
 This Master Taskbook is ready for local acceptance when:
 
