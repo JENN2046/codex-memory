@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-02",
-  "taskId": "CM-1703",
-  "validationId": "CMV-1806",
+  "taskId": "CM-1704",
+  "validationId": "CMV-1807",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1807",
+      "scope": "CM-1704 VCPToolBox target-specific runtime inspection receipt contract",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_RECEIPT_CONTRACT_FIXTURE_ONLY_NO_RUNTIME"
+    },
     {
       "id": "CMV-1806",
       "scope": "CM-1703 ColaMeta managed validation Node 22 runner alignment",
