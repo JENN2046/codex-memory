@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-02",
-  "taskId": "CM-1704",
-  "validationId": "CMV-1807",
+  "taskId": "CM-1705",
+  "validationId": "CMV-1808",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1808",
+      "scope": "CM-1705 VCPToolBox exact-approved live inspection execution boundary",
+      "status": "COMPLETED_VALIDATED_VCPTOOLBOX_EXACT_APPROVED_LIVE_INSPECTION_EXECUTION_BOUNDARY_FIXTURE_ONLY_NO_RUNTIME"
+    },
     {
       "id": "CMV-1807",
       "scope": "CM-1704 VCPToolBox target-specific runtime inspection receipt contract",
