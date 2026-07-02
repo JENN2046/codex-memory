@@ -3,7 +3,7 @@
 ```yaml id="stage-01-metadata"
 document_type: colameta_stage_taskbook
 schema_version: taskbook_stage.v1
-status: prepared
+status: closed_prepared_for_stage_02_gate
 project: codex-memory
 managed_project_name: codex-memory
 stage_id: stage-01
@@ -17,6 +17,8 @@ serves_master_workstreams:
   - Workstream F - Mainline Protection And Runtime Hardening
 default_lane: Green Lane docs-only preparation
 runtime_authorization: not_granted
+closeout_reference: docs/taskbooks/stages/STAGE_01_CLOSEOUT_CM1706.md
+next_stage_reference: docs/taskbooks/stages/STAGE_02_EXACT_APPROVED_LIVE_INSPECTION_READINESS.md
 ```
 
 ## 1. Master Alignment
@@ -85,4 +87,23 @@ version_id: CM-1701
 version_name: VCPToolBox Target Boundary Review
 version_goal: prepare and verify the execution boundary for future target-specific runtime inspection
 status: prepared_not_executed
+```
+
+## 7. Closeout
+
+Stage 01 is closed by:
+
+```text
+docs/taskbooks/stages/STAGE_01_CLOSEOUT_CM1706.md
+```
+
+The closeout means the target boundary governance chain is prepared for a Stage
+02 exact-approval readiness gate. It does not mean live VCPToolBox runtime
+inspection was executed, target readiness was proven, memory readiness exists,
+or runtime authorization was granted.
+
+Stage 02 begins only as an exact-approval readiness gate:
+
+```text
+docs/taskbooks/stages/STAGE_02_EXACT_APPROVED_LIVE_INSPECTION_READINESS.md
 ```
