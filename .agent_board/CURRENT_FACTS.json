@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1711",
-  "validationId": "CMV-1814",
+  "taskId": "CM-1712",
+  "validationId": "CMV-1815",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1815",
+      "scope": "CM-1712 Stage 02 exact approval request packet final review / abort boundary",
+      "status": "COMPLETED_VALIDATED_STAGE_02_EXACT_APPROVAL_REQUEST_PACKET_FINAL_REVIEW_ABORT_BOUNDARY_FIXTURE_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
     {
       "id": "CMV-1814",
       "scope": "CM-1711 Stage 02 exact approval request packet review-readiness boundary",

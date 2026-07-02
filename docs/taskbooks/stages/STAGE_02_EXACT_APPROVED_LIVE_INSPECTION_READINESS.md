@@ -16,7 +16,7 @@ serves_master_workstreams:
   - Workstream F - Mainline Protection And Runtime Hardening
 default_lane: Green Lane fixture-only readiness gate
 runtime_authorization: not_granted
-current_version: CM-1711
+current_version: CM-1712
 ```
 
 ## 1. Master Alignment
@@ -141,9 +141,9 @@ future exact approval request packet skeleton only after CM-1709
 store, expose, or rely on a real approval line; it must not grant runtime
 authorization, call VCPToolBox, probe runtime, or claim readiness.
 
-## 10. Current Version
+## 10. Previous Version
 
-Current Version:
+Previous Version:
 
 ```yaml id="stage-02-current-version-v1-10"
 version_id: CM-1711
@@ -155,5 +155,23 @@ status: prepared_for_local_execution
 CM-1711 may only inspect caller-provided sanitized summaries. It checks whether
 the CM-1710 request packet skeleton can enter human exact-approval request
 review-readiness. It must not validate, generate, issue, consume, store,
+template, expose, or rely on a real approval line; it must not grant runtime
+authorization, call VCPToolBox, probe runtime, or claim readiness.
+
+## 11. Current Version
+
+Current Version:
+
+```yaml id="stage-02-current-version-v1-11"
+version_id: CM-1712
+version_name: Stage 02 Exact Approval Request Packet Final Review Abort Boundary
+version_goal: prepare final non-authorizing future exact approval request review / abort routing
+status: prepared_for_local_execution
+```
+
+CM-1712 may only inspect caller-provided sanitized summaries. It closes the
+future exact approval request packet route as
+`proceed_to_future_exact_approval_request`, `abort_request_packet`, or
+`needs_adjustment`. It must not validate, generate, issue, consume, store,
 template, expose, or rely on a real approval line; it must not grant runtime
 authorization, call VCPToolBox, probe runtime, or claim readiness.
