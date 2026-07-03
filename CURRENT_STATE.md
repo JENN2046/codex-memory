@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout |
-| Current task | `CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout` |
-| Current validation | `CMV-1865` |
-| Current route | M12 fixture/schema chain is closed and validated; live workflow integration remains blocked by incomplete M8/M11 live evidence; next safe action is M13 fallback local memory hardening precondition review, not runtime or checkpoint/handoff memory write |
+| Status | CM-1763 M13-K0 VCP memory fallback local memory precondition review |
+| Current task | `CM-1763 M13-K0 VCP memory fallback local memory precondition review` |
+| Current validation | `CMV-1866` |
+| Current route | M13 may begin as fixture/dry-run fallback hardening; fallback governance parity is not green; next safe action is M13 fallback hardening gap matrix, not runtime fallback or private runtime reads |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1763` adds `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_PRECONDITION_REVIEW.md`. It reviews M13 entry conditions against the fallback role contract, M5 policy shield, client/scope/visibility matrix, and M12 blocked closeout. Boundary: fallback role contract exists `YES`; policy shield exists `YES`; client/scope/visibility matrix exists `YES`; M13 entry conditions satisfied for fixture work `YES`; M13 entry conditions satisfied for runtime work `NO`; local tests allowed fixture-only `YES`; dry-run gates allowed `YES`; private runtime reads allowed `NO`; fallback execution `NO`; private runtime read `NO`; real query `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; VCPToolBox runtime `NO`; MCP tool call for M13 evidence `NO`; public MCP expansion `NO`; fallback governance parity green `NO`; scope/client isolation M13 suite green `NO`; secret rejection M13 suite green `NO`; lifecycle filter M13 suite green `NO`; query tests M13 suite green `NO`; fallback hardening report complete `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1762` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes the safe M12 fixture/schema chain covering CM-1758 through CM-1761 while preserving that full M12 live workflow exit conditions remain blocked. Boundary: docs fixture chain complete `YES`; fixture contracts implemented `YES`; executable fixture tests `17`; targeted fixture tests passed `YES`; combined source review tests passed `YES`; previous full `npm test` passed for executable chain `YES`; M12 exit conditions completed `NO`; governed MCP workflows live-proven `NO`; checkpoint/handoff memory receipts live-auditable `NO`; Codex/Claude private memories isolated live `NO`; Codex/Claude private memories isolated fixture-only `YES`; workflow harness started `NO`; workflow steps executed `0`; workflow integration proven `NO`; workflow receipts accepted `NO`; M8 trusted-full-read evidence complete `NO`; M11 live response/receipt evidence complete `NO`; VCPToolBox runtime `NO`; target discovery/probing `NO`; MCP tool call for M12 evidence `NO`; memory read/write/update/supersede/tombstone `NO`; checkpoint/handoff receipt write `NO`; checkpoint/handoff memory write `NO`; durable audit/runtime write `NO`; provider/API `NO`; approval request submitted `NO`; approval line present/generated `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

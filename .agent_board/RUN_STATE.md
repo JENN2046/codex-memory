@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout`.
-Current validation: `CMV-1865`.
-Current status: CM-1762 closes the safe M12 fixture/schema Codex/Claude sustained workflow chain while preserving that live M12 workflow remains blocked until accepted M8 and M11 live evidence exists. No workflow harness, workflow steps, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, checkpoint/handoff receipt write, checkpoint/handoff memory write, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1763 M13-K0 VCP memory fallback local memory precondition review`.
+Current validation: `CMV-1866`.
+Current status: CM-1763 reviews M13 entry conditions and allows only fixture/dry-run fallback hardening while preserving that fallback governance parity is not green and runtime fallback remains blocked. No local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M13 fallback local memory hardening precondition review without runtime/workflow execution/MCP tool calls/memory read/write/checkpoint-handoff receipt or memory writes. Push remains separate explicit authorization.
+Next safe local action is M13 fallback hardening gap matrix without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, or provider/API calls. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

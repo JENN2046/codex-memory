@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1762",
-  "validationId": "CMV-1865",
+  "taskId": "CM-1763",
+  "validationId": "CMV-1866",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_blocked_closeout",
+    "scope": "vcp_memory_fallback_local_memory_m13_precondition_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1866",
+      "scope": "CM-1763 M13-K0 VCP memory fallback local memory precondition review",
+      "status": "COMPLETED_VALIDATED_M13_K0_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_PRECONDITION_REVIEW_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1865",
       "scope": "CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout",

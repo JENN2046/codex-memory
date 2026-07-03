@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout`.
-Current validation: `CMV-1865`.
+Current checkpoint: `CM-1763 M13-K0 VCP memory fallback local memory precondition review`.
+Current validation: `CMV-1866`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1763 M13-K0 VCP Memory Fallback Local Memory Precondition Review
+
+Status: `COMPLETED_VALIDATED_M13_K0_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_PRECONDITION_REVIEW_DOCS_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_PRECONDITION_REVIEW.md`.
+- Reviewed M13 entry conditions against the fallback role contract, M5 policy shield, client/scope/visibility matrix, and M12 blocked closeout.
+- Recorded that M13 may begin as fixture/dry-run hardening work.
+- Recorded that fallback governance parity is not green and no runtime fallback work is unlocked.
+- Preserved that no local fallback runtime execution, private runtime read, real query, MCP tool call, VCPToolBox runtime call, target probing, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1866`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1762 M12-K4 VCP Memory Codex Claude Sustained Workflow Blocked Closeout
 
