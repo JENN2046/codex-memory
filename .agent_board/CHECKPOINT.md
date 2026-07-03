@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary`.
-Current validation: `CMV-1861`.
+Current checkpoint: `CM-1759 M12-K1 VCP memory Codex Claude sustained workflow envelope contract`.
+Current validation: `CMV-1862`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1759 M12-K1 VCP Memory Codex Claude Sustained Workflow Envelope Contract
+
+Status: `COMPLETED_VALIDATED_M12_K1_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_ENVELOPE_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryCodexClaudeSustainedWorkflowEnvelopeContract.js`.
+- Added `tests/vcp-memory-codex-claude-sustained-workflow-envelope-contract.test.js`.
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_ENVELOPE_CONTRACT.md`.
+- Covered accepted Codex private fixture envelope and Claude shared fixture envelope.
+- Covered cross-client private access as L4 stop without memory read, and missing client/scope as deny fixture.
+- Covered rejection of success-like missing scope, runtime/MCP/checkpoint/handoff write plans, positive side-effect counters, raw/secret/approval/readiness fields, and side-effect posture drift.
+- Preserved that no workflow harness, workflow steps, MCP tool call, VCPToolBox runtime call, target probing, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1862`; targeted node test, `npm test`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review.
 
 ## CM-1758 M12-K0 VCP Memory Codex Claude Sustained Workflow Fixture Boundary
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary |
-| Current task | `CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary` |
-| Current validation | `CMV-1861` |
-| Current route | M12 fixture-safe boundary recorded; live workflow integration remains blocked by incomplete M8 trusted-full-read evidence and incomplete M11 live response/receipt evidence; next safe route is fixture-only workflow envelope contract, not runtime or checkpoint/handoff memory write |
+| Status | CM-1759 M12-K1 VCP memory Codex Claude sustained workflow envelope contract |
+| Current task | `CM-1759 M12-K1 VCP memory Codex Claude sustained workflow envelope contract` |
+| Current validation | `CMV-1862` |
+| Current route | M12 fixture-only workflow envelope contract implemented; live workflow integration remains blocked by incomplete M8/M11 live evidence; next safe route is focused source review or fixture-only receipt-chain contract, not runtime or checkpoint/handoff memory write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1759` adds `src/core/VcpMemoryCodexClaudeSustainedWorkflowEnvelopeContract.js`, `tests/vcp-memory-codex-claude-sustained-workflow-envelope-contract.test.js`, and `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_ENVELOPE_CONTRACT.md`. It turns the CM-1758 M12 boundary into executable fixture-only envelope validation. Boundary: contract implemented `YES`; targeted test count `8`; targeted test passed `YES`; Codex private fixture accepted `YES`; Claude shared fixture accepted `YES`; cross-client private L4 stop covered `YES`; missing scope deny covered `YES`; success-like missing scope rejected `YES`; runtime/MCP/write plan rejected `YES`; raw/secret/approval/readiness fields rejected `YES`; side-effect posture locked `YES`; workflow harness started `NO`; workflow steps executed `0`; MCP tool call for M12 evidence `NO`; VCPToolBox runtime `NO`; fallback execution `NO`; memory read/write/update/supersede/tombstone `NO`; checkpoint memory write `NO`; handoff memory write `NO`; durable audit/runtime write `NO`; provider/API `NO`; approval request submitted `NO`; approval line generated `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1758` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_FIXTURE_BOUNDARY.md`. It defines the non-executing M12 fixture-safe boundary for future Codex/Claude sustained workflow integration. Boundary: single capability `fixture_safe_workflow_boundary_only`; M8 read-only workflow harness exists `NO`; M8 trusted-full-read evidence complete `NO`; M11 exit conditions completed `NO`; M11 fixture chain closed `YES`; M11 live response/receipt evidence complete `NO`; client/scope/visibility matrix exists `YES`; Codex/Claude isolation fixture basis available `YES`; M12 live workflow unlocked `NO`; M12 fixture boundary allowed `YES`; workflow harness started `NO`; workflow steps executed `0`; workflow integration proven `NO`; workflow receipts accepted `NO`; checkpoint memory write `NO`; handoff memory write `NO`; durable audit/runtime write `NO`; memory read/write/update/supersede/tombstone `NO`; VCPToolBox runtime `NO`; MCP tool call for M12 evidence `NO`; fallback execution `NO`; approval request submitted `NO`; approval line present/generated `NO`; provider/API `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
