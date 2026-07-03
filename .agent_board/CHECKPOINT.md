@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1719 M4-K2 VCP memory result normalization contract`.
-Current validation: `CMV-1822`.
+Current checkpoint: `CM-1720 M5-K1 VCP memory governance policy shield truth table`.
+Current validation: `CMV-1823`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1720 M5-K1 VCP Memory Governance Policy Shield Truth Table
+
+Status: `COMPLETED_VALIDATED_M5_K1_VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE_DOCS_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE.md`.
+- Defined L0-L4 level model, decision vocabulary, required receipt fields, 16 policy rows, L4 hard-stop rows, and self-review gate.
+- Preserved the boundary that live VCPToolBox runtime, target probing, fallback execution, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, and complete V8 claims remain blocked.
+
+Validation: `CMV-1823`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1719 M4-K2 VCP Memory Result Normalization Contract
 

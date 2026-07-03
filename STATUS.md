@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1719 M4-K2 VCP memory result normalization contract`.
-Current validation: `CMV-1822`.
-Current project status: CM-1719 records the docs-only VCP memory result normalization contract. It defines normalized output across VCP-native and local fallback paths with `source_runtime`, confidence/evidence, scope, visibility, `receipt_id`, and fallback flags; no live VCPToolBox target discovery, fallback execution, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `VCP_MEMORY_RESULT_NORMALIZATION_CONTRACT_DOCS_ONLY_NO_RUNTIME`.
+Current task: `CM-1720 M5-K1 VCP memory governance policy shield truth table`.
+Current validation: `CMV-1823`.
+Current project status: CM-1720 records the docs-only governance policy shield truth table. It defines L0-L4 policy levels, decision vocabulary, required receipt fields, L4 hard-stop rows, and the self-review gate; no live VCPToolBox target discovery, fallback execution, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE_DOCS_ONLY_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1720 M5-K1 VCP memory governance policy shield truth table: added `docs/VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE.md`. The truth table defines L0-L4 level model, decision vocabulary, required receipt fields, 16 policy rows, L4 hard-stop rows, and self-review gate. It records that bounded routine read inside an exact approved profile self-approves, while cross-client private leakage, raw output without approval, unapproved durable write, secrets/config, provider/API, broad/raw memory access, public MCP expansion, config/startup/watchdog, dependency action, push, release, deploy, cutover, and readiness claims fail closed. No live VCPToolBox runtime call, target probing, fallback execution, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
 CM-1719 M4-K2 VCP memory result normalization contract: added `docs/VCP_MEMORY_RESULT_NORMALIZATION_CONTRACT.md`. The contract defines normalized output with `source_runtime`, confidence/evidence, scope, visibility, `receipt_id`, fallback flags, projection rules, source-runtime mapping, confidence rules, status mapping, static examples, and fail-closed cases. No live VCPToolBox runtime call, target probing, fallback execution, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 

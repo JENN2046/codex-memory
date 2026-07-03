@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1719",
-  "validationId": "CMV-1822",
+  "taskId": "CM-1720",
+  "validationId": "CMV-1823",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_result_normalization_contract_docs_only",
+    "scope": "vcp_memory_governance_policy_shield_truth_table_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1823",
+      "scope": "CM-1720 M5-K1 VCP memory governance policy shield truth table",
+      "status": "COMPLETED_VALIDATED_M5_K1_VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE_DOCS_ONLY_NO_RUNTIME"
+    },
     {
       "id": "CMV-1822",
       "scope": "CM-1719 M4-K2 VCP memory result normalization contract",
