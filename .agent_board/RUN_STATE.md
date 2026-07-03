@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1811 M8 trusted-full-read workflow harness boundary preflight`.
-Current validation: `CMV-1914`.
-Current status: CM-1811 bound the next M8 workflow candidate to two bounded `DailyNoteSearcher.SearchDailyNote` read-shape steps with Codex/Claude receipt-scope client aliases, shape-only projection, no-write/no-provider/no-public-MCP rules, and no runtime client-isolation overclaim. CM-1811 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M9 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion.
+Current task: `CM-1812 M8 trusted-full-read workflow low-disclosure execution`.
+Current validation: `CMV-1915`.
+Current status: CM-1812 executed two bounded `DailyNoteSearcher.SearchDailyNote` read-shape workflow steps through `/v1/human/tool` under the CM-1811 boundary. Both steps returned `http_2xx` and JSON parse `ok`; response bodies were consumed by the harness only for key/type/count shape projection and raw values were not printed or persisted. Receipt-scope client aliases were distinct, but runtime-enforced client isolation is not claimed. No runtime stdout/stderr read, runtime log read, secret/config/env content read, raw memory/raw store read by agent, provider/API call by agent, MCP memory tool call, memory write, public MCP expansion, M9 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1812 M8 trusted-full-read workflow low-disclosure execution candidate under the unchanged CM-1811 boundary. It may consume response bodies in memory only for redacted shape projection, must not print or persist raw values, and must abort on raw-private-output, client alias mixing, budget, visibility, provider, write, log, config, or target drift. Push remains separate explicit authorization.
+Next safe action is CM-1813 M8 workflow receipt closeout gate review. It should decide whether CM-1812 is accepted as the narrow M8 workflow proof and whether M9 preparation can open. It must not claim runtime-enforced client isolation, M9 execution, M15, release, deploy, cutover, push, readiness, `RC_READY`, complete V8, or full bridge completion. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1811 M8 trusted-full-read workflow harness boundary preflight |
-| Current task | `CM-1811 M8 trusted-full-read workflow harness boundary preflight` |
-| Current validation | `CMV-1914` |
-| Current route | M8 workflow boundary defined; next route is CM-1812 low-disclosure workflow execution candidate |
+| Status | CM-1812 M8 trusted-full-read workflow low-disclosure execution |
+| Current task | `CM-1812 M8 trusted-full-read workflow low-disclosure execution` |
+| Current validation | `CMV-1915` |
+| Current route | M8 workflow proof executed; next route is CM-1813 workflow receipt closeout gate review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1812` adds `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1812_WORKFLOW_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`. It records one bounded live two-step trusted-full-read workflow through `/v1/human/tool`: pre-start `connection_refused_or_fetch_failed`; runtime started by agent `YES`; warmup probe count `2`; warmup status `http_4xx`; workflow steps `2`; both step statuses `http_2xx`; both response JSON parses `ok`; response bodies consumed by harness `YES`; response bodies printed/persisted `NO`; response bytes consumed `138` per step; shape keys only emitted; receipt-scope client aliases distinct `YES`; runtime client isolation claimed `NO`; raw private payload disclosed `NO`; runtime stdout/stderr/logs read `NO`; config/env/secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; M9 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; independent post-stop endpoint `connection_refused_or_fetch_failed`; independent bracket-pattern process counts `0`; next action `CM-1813 M8 workflow receipt closeout gate review`.
 
 `CM-1811` adds `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1811_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT.md`. It binds the next M8 workflow candidate to two bounded `DailyNoteSearcher.SearchDailyNote` read-shape steps through `/v1/human/tool` with receipt-scope client aliases `codex_local_agent` and `claude_compatible_client`; runtime client isolation claimed `NO`; output projection shape-only; no-write/no-provider/no-public-MCP rules defined. Runtime action in CM-1811 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; M8 execution performed `NO`; M9 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; next action `CM-1812 M8 trusted-full-read workflow low-disclosure execution candidate`.
 

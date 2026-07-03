@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1811 M8 trusted-full-read workflow harness boundary preflight`.
-Current validation: `CMV-1914`.
+Current checkpoint: `CM-1812 M8 trusted-full-read workflow low-disclosure execution`.
+Current validation: `CMV-1915`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1812 M8 Trusted-Full-Read Workflow Low-Disclosure Execution
+
+Status: `COMPLETED_VALIDATED_M8_WORKFLOW_LOW_DISCLOSURE_EXECUTION_TWO_STEPS_HTTP_2XX_SHAPE_ONLY_NO_RAW_OUTPUT_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1812_WORKFLOW_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`.
+- Executed two bounded `DailyNoteSearcher.SearchDailyNote` read-shape workflow steps through `/v1/human/tool` under the CM-1811 boundary.
+- Used a disposable child-process bearer and two in-memory request bodies; none were printed or persisted.
+- Reached `http_2xx` and JSON parse `ok` for both steps.
+- Consumed `138` response bytes per step in memory only for shape projection and printed no raw response values.
+- Recorded distinct receipt-scope client aliases `codex_local_agent` and `claude_compatible_client`; did not claim runtime-enforced client isolation.
+- Confirmed no runtime stdout/stderr read, runtime log read, config/env/secret content read, raw memory/raw store read by agent, provider/API call by agent, MCP memory tool call, memory write, public MCP expansion, release/deploy/cutover/push, readiness claim, `RC_READY` claim, M9 unlock, M15 unlock, complete V8 claim, or full bridge completion claim.
+- Rejected the primary harness transient nonzero `DailyNoteSearcher` count and accepted independent bracket-pattern process checks showing zero residual `node server.js` and `DailyNoteSearcher` processes.
+
+Validation: `CMV-1915`; live harness output, independent post-stop endpoint/process checks, VCPToolBox status, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1811 M8 Trusted-Full-Read Workflow Harness Boundary Preflight
 
