@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1824 M9 proposal-mode closeout gate fixture contract`.
-Current validation: `CMV-1927`.
-Current project status: CM-1824 added a fixture-only closeout gate helper and targeted tests. The local M9 fixture-contract preparation slice is executable and closed, but full M9 proposal mode, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1824_CLOSEOUT_GATE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1825 M9 blocked-to-exact-boundary decision packet refresh`.
+Current validation: `CMV-1928`.
+Current project status: CM-1825 selected the next route as a non-authorizing exact-boundary packet skeleton contract. The local M9 fixture-contract preparation slice is closed, but full M9 proposal mode, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1825_BLOCKED_TO_EXACT_BOUNDARY_DECISION_PACKET_REFRESH_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1825 M9 blocked-to-exact-boundary decision packet refresh: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1825_BLOCKED_TO_EXACT_BOUNDARY_DECISION_PACKET_REFRESH.md`. It decides to stop adding same-layer fixture guard docs and prepare a non-authorizing exact-boundary packet skeleton contract next. The route uses accepted M8 planning evidence and CM-1821/CM-1822/CM-1823/CM-1824 local fixture evidence only. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1826 M9 non-authorizing exact-boundary packet skeleton contract.
 
 CM-1824 M9 proposal-mode closeout gate fixture contract: added `src/core/VcpMemoryTrustedWriteProposalCloseoutGateContract.js`, `tests/vcp-memory-trusted-write-proposal-closeout-gate-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1824_CLOSEOUT_GATE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3738/3738`. Post-fix re-review added explicit `rawOutput` forbidden vocabulary. The helper accepts only the local fixture-contract preparation slice as closed and preserves `m9_proposal_mode_passed=false`, `m9_completion_claimed=false`, `m10_unlocked=false`, `m15_unlocked=false`, no runtime, no proposal generation/submission, no accepted real proposal receipt, no memory read/write, no durable write, no provider/API, no public MCP expansion, no approval request, no approval line, and no readiness. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1825 M9 blocked-to-exact-boundary decision packet refresh.
 

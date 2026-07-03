@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1824 M9 proposal-mode closeout gate fixture contract`.
-Current validation: `CMV-1927`.
+Current checkpoint: `CM-1825 M9 blocked-to-exact-boundary decision packet refresh`.
+Current validation: `CMV-1928`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1825 M9 Blocked-to-Exact-Boundary Decision Packet Refresh
+
+Status: `COMPLETED_VALIDATED_M9_BLOCKED_TO_EXACT_BOUNDARY_DECISION_PACKET_REFRESH_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1825_BLOCKED_TO_EXACT_BOUNDARY_DECISION_PACKET_REFRESH.md`.
+- Reviewed CM-1815, CM-1820, CM-1821, CM-1822, CM-1823, CM-1824, and M9/M10 plan gates.
+- Selected `prepare_non_authorizing_exact_boundary_packet_skeleton`.
+- Preserved that exact request submission, approval-line generation, proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1826 M9 non-authorizing exact-boundary packet skeleton contract.
+
+Validation: `CMV-1928`; source-plan review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1824 M9 Proposal-Mode Closeout Gate Fixture Contract
 
