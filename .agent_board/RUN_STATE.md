@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis`.
-Current validation: `CMV-1902`.
-Current status: CM-1799 performed fixed-source/fixed-directory metadata diagnosis. Local runtime metadata is `linux x64`; the Linux source candidate list includes `DailyNoteSearcher`, `DailyNoteSearcher-aarch64-unknown-linux-musl`, release target, and debug target. Only the aarch64 Linux candidate exists, with mode `755` and file header `ELF 64-bit ARM aarch64`. Linux release/debug targets are absent. `DailyNoteSearcher.exe` exists as `PE32+ x86-64 MS Windows`, but the Linux source branch does not include it. Primary diagnosis is `DAILYNOTESEARCHER_LINUX_BINARY_ARCH_MISMATCH`. No runtime was started, no binary executed by agent, no response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result was read, and no VCPToolBox file was modified by CM-1799. No memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, dependency action, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight`.
+Current validation: `CMV-1903`.
+Current status: CM-1800 performed toolchain/source metadata and dependency-action simulation only. `cargo`, `rustc`, and `rustup` are absent. `apt-get` and passwordless `sudo` are available. Rust source files `Cargo.toml`, `Cargo.lock`, and `src/main.rs` are present. `cargo metadata` is not runnable because cargo is absent. `sudo apt-get -s install cargo rustc` simulation would newly install 8 packages and upgrade/remove 0. No package install, cargo build, runtime start, binary execution by agent, response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, or VCPToolBox file modification by CM-1800 occurred. No memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1800 DailyNoteSearcher local x64 build/install preflight. Determine whether the checked-in Rust source can produce a Linux x64 binary under a bounded local-build envelope. Keep the preflight source/metadata/build-tool focused first: no root-wide VCPToolBox search, no logs, no response bodies, no stdout/stderr from runtime, no config/env contents, no raw memory, no raw stores, no memory results, and no provider responses. Do not open M7/M8/M15 unless a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
+Next safe action is CM-1801 exact Rust toolchain dependency install: `sudo apt-get install -y cargo rustc`. Keep it limited to the simulated package action. Do not build, start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1801. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1799",
-  "validationId": "CMV-1902",
+  "taskId": "CM-1800",
+  "validationId": "CMV-1903",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_dailynotesearcher_binary_compatibility_diagnosis",
+    "scope": "vcp_memory_observe_lite_dailynotesearcher_local_x64_build_install_preflight",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1903",
+      "scope": "CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT_NO_RUNTIME_NO_SECRET_NO_WRITE"
+    },
     {
       "id": "CMV-1902",
       "scope": "CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis",

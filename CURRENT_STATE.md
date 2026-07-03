@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis |
-| Current task | `CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis` |
-| Current validation | `CMV-1902` |
-| Current route | Fixed-source/metadata diagnosis found local runtime `linux x64` but the only present Linux DailyNoteSearcher candidate is `ARM aarch64`; next route is bounded local x64 build/install preflight |
+| Status | CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight |
+| Current task | `CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight` |
+| Current validation | `CMV-1903` |
+| Current route | Rust source is present but cargo/rustc/rustup are absent; apt-get and passwordless sudo are available; exact simulated install `cargo rustc` would add 8 packages and upgrade/remove 0 |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1800` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1800_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT.md`. It records local x64 build/install preflight: `cargo` present `NO`; `rustc` present `NO`; `rustup` present `NO`; `apt-get` present `YES`; passwordless `sudo` available `YES`; `Cargo.toml`, `Cargo.lock`, and `src/main.rs` present `YES`; `cargo metadata` runnable `NO`; simulated install command `sudo apt-get install -y cargo rustc`; simulated new packages `8`; simulated upgrades/removals `0`; package install performed `NO`; cargo build performed `NO`; runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; VCPToolBox file modified by CM-1800 `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1801 exact Rust toolchain dependency install`.
 
 `CM-1799` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1799_DAILYNOTESEARCHER_BINARY_COMPATIBILITY_DIAGNOSIS.md`. It records fixed-source/fixed-directory metadata diagnosis: local runtime platform `linux`, arch `x64`; Linux candidate `DailyNoteSearcher` exists `NO`; Linux candidate `DailyNoteSearcher-aarch64-unknown-linux-musl` exists `YES`, mode `755`, file header `ELF 64-bit ARM aarch64`; Linux release/debug targets exist `NO`; Windows `DailyNoteSearcher.exe` exists `YES` with `PE32+ x86-64 MS Windows` header; Linux source branch includes Windows exe `NO`; source starts selected binary with `--serve` `YES`; source waits for service ready `YES`; source logs child stderr to console `YES`; primary diagnosis `dailynotesearcher_linux_binary_arch_mismatch`. Runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; VCPToolBox file modified by CM-1799 `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1800 DailyNoteSearcher local x64 build/install preflight`.
 

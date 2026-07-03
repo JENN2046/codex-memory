@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis`.
-Current validation: `CMV-1902`.
+Current checkpoint: `CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight`.
+Current validation: `CMV-1903`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1800 M6 Observe-Lite DailyNoteSearcher Local X64 Build/Install Preflight
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT_NO_RUNTIME_NO_SECRET_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1800_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT.md`.
+- Confirmed `cargo`, `rustc`, and `rustup` are absent.
+- Confirmed `apt-get` and passwordless `sudo` are available.
+- Confirmed Rust source files `Cargo.toml`, `Cargo.lock`, and `src/main.rs` are present.
+- Confirmed `cargo metadata` is not runnable because cargo is absent.
+- Ran `sudo apt-get -s install cargo rustc` simulation only; it would newly install 8 packages and upgrade/remove 0.
+- Preserved package install performed `NO`, cargo build performed `NO`, runtime started `NO`, binary executed by agent `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets read `NO`, raw memory/raw store read by agent `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, VCPToolBox file modified by CM-1800 `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1801 exact Rust toolchain dependency install.
+
+Validation: `CMV-1903`; toolchain presence checks, source metadata, exact apt simulation, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1799 M6 Observe-Lite DailyNoteSearcher Binary Compatibility Diagnosis
 
