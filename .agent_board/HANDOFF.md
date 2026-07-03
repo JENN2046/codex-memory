@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1757 M11-K3 VCP memory response normalization audit receipts blocked closeout`.
-Current validation: `CMV-1860`.
-Current handoff: CM-1757 closes the safe fixture/schema M11 response normalization and audit receipt chain while preserving that live VCP-native parity, fallback runtime parity, and runtime receipt stability remain blocked until exact-approved M7/live evidence and an exact M11 live runtime boundary exist. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, M12 live workflow unlock, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary`.
+Current validation: `CMV-1861`.
+Current handoff: CM-1758 records the non-executing M12 fixture-safe boundary for future Codex/Claude sustained workflow integration. M8 trusted-full-read workflow evidence and M11 live response/receipt evidence remain incomplete, so live M12 workflow remains blocked. No workflow harness, workflow steps, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, checkpoint/handoff memory write, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M11-K3 Response Normalization Audit Receipts Blocked Closeout` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M12-K0 Codex Claude Sustained Workflow Fixture Boundary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M11_K3_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M12_K0_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_FIXTURE_BOUNDARY_DOCS_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,7 +25,10 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_FIXTURE_BOUNDARY.md`
 - `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_M8_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX.md`
 - `src/core/VcpMemoryResponseNormalizationAuditReceiptContract.js`
 - `tests/vcp-memory-response-normalization-audit-receipt-contract.test.js`
 - `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_FIXTURE_CONTRACT.md`
@@ -66,16 +69,16 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_BLOCKED_CLOSEOUT_SUMMARY.md`.
-- Closed the safe M11 fixture/schema chain covering CM-1754 through CM-1756.
-- Recorded docs fixture chain complete and fixture contract implemented within the current safe boundary.
-- Recorded that full M11 exit conditions remain incomplete because accepted exact-approved M7 read-shape receipt, live VCP-native parity evidence, fallback runtime parity evidence, low-disclosure runtime receipt evidence, and exact M11 live runtime boundary are absent.
-- Recorded that M12 may proceed only as fixture/schema/governance boundary work until live evidence exists.
-- Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable audit/runtime write, memory write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_FIXTURE_BOUNDARY.md`.
+- Reviewed M12 entry conditions against M8 blocked closeout, M11 blocked closeout, and M5 client/scope/visibility matrix.
+- Recorded the current single capability as fixture-safe workflow boundary only.
+- Recorded that M12 live workflow integration remains blocked because M8 trusted-full-read workflow evidence and M11 live response/receipt evidence are incomplete.
+- Recorded allowed future fixture work for workflow envelope fields, Codex/Claude isolation markers, checkpoint/handoff receipt field names, stale context aborts, and low-disclosure workflow report shape.
+- Confirmed no workflow harness, workflow step execution, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, checkpoint memory write, handoff memory write, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable audit/runtime write, memory write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
 
-Validation: `CMV-1860`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review.
+Validation: `CMV-1861`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review.
 
-Next safe route: M12 fixture-safe workflow boundary without runtime/write/update/supersede/tombstone/checkpoint-handoff memory execution, or wait for an exact-approved M7 read-shape receipt. Push remains separate explicit authorization.
+Next safe route: M12 fixture-only workflow envelope contract without runtime/workflow execution/MCP tool calls/memory read/write/checkpoint-handoff memory writes, or wait for accepted M8 and M11 live evidence. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

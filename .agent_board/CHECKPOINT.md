@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1757 M11-K3 VCP memory response normalization audit receipts blocked closeout`.
-Current validation: `CMV-1860`.
+Current checkpoint: `CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary`.
+Current validation: `CMV-1861`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1758 M12-K0 VCP Memory Codex Claude Sustained Workflow Fixture Boundary
+
+Status: `COMPLETED_VALIDATED_M12_K0_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_FIXTURE_BOUNDARY_DOCS_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_FIXTURE_BOUNDARY.md`.
+- Reviewed M12 dependencies against M8 blocked closeout, M11 blocked closeout, and M5 client/scope/visibility matrix.
+- Recorded that M12 live workflow integration remains blocked because M8 trusted-full-read workflow evidence and M11 live response/receipt evidence are incomplete.
+- Recorded the single current capability as fixture-safe workflow boundary only.
+- Recorded that future fixture work may define workflow envelope fields, Codex/Claude isolation markers, checkpoint/handoff receipt field names, stale context aborts, and low-disclosure workflow report shape.
+- Preserved that no workflow harness, workflow steps, MCP tool call, VCPToolBox runtime call, target probing, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1861`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review.
 
 ## CM-1757 M11-K3 VCP Memory Response Normalization Audit Receipts Blocked Closeout
 

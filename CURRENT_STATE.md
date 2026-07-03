@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1757 M11-K3 VCP memory response normalization audit receipts blocked closeout |
-| Current task | `CM-1757 M11-K3 VCP memory response normalization audit receipts blocked closeout` |
-| Current validation | `CMV-1860` |
-| Current route | M11 fixture/schema chain closed as docs-only blocked closeout; full M11 live parity and runtime receipt proof still blocked; M12 may proceed only as fixture/schema/governance boundary; no runtime, fallback execution, memory read/write, approval line, readiness, M12 live workflow unlock, or live normalized envelope proof |
+| Status | CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary |
+| Current task | `CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary` |
+| Current validation | `CMV-1861` |
+| Current route | M12 fixture-safe boundary recorded; live workflow integration remains blocked by incomplete M8 trusted-full-read evidence and incomplete M11 live response/receipt evidence; next safe route is fixture-only workflow envelope contract, not runtime or checkpoint/handoff memory write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1758` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_FIXTURE_BOUNDARY.md`. It defines the non-executing M12 fixture-safe boundary for future Codex/Claude sustained workflow integration. Boundary: single capability `fixture_safe_workflow_boundary_only`; M8 read-only workflow harness exists `NO`; M8 trusted-full-read evidence complete `NO`; M11 exit conditions completed `NO`; M11 fixture chain closed `YES`; M11 live response/receipt evidence complete `NO`; client/scope/visibility matrix exists `YES`; Codex/Claude isolation fixture basis available `YES`; M12 live workflow unlocked `NO`; M12 fixture boundary allowed `YES`; workflow harness started `NO`; workflow steps executed `0`; workflow integration proven `NO`; workflow receipts accepted `NO`; checkpoint memory write `NO`; handoff memory write `NO`; durable audit/runtime write `NO`; memory read/write/update/supersede/tombstone `NO`; VCPToolBox runtime `NO`; MCP tool call for M12 evidence `NO`; fallback execution `NO`; approval request submitted `NO`; approval line present/generated `NO`; provider/API `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1757` adds `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes the safe M11 fixture/schema response normalization and audit receipt chain covering CM-1754 through CM-1756, while explicitly preserving that full M11 exit conditions remain incomplete. Boundary: docs fixture chain complete `YES`; fixture contract implemented `YES`; targeted fixture tests passed `YES`; previous full `npm test` passed for CM-1756 `YES`; M11 exit conditions completed `NO`; normalizer stable fixture-only `YES`; receipt schema stable fixture-only `YES`; live VCP-native parity proof `NO`; fallback runtime parity proof `NO`; low-disclosure runtime receipts proof `NO`; M7 read-shape receipt accepted `NO`; exact M11 live runtime boundary present `NO`; approval request submitted `NO`; approval line present/generated `NO`; VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; memory write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; durable memory write `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; public MCP expansion `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; M12 live workflow unlocked `NO`; M12 fixture boundary allowed `YES`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

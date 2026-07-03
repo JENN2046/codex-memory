@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1757 M11-K3 VCP memory response normalization audit receipts blocked closeout`.
-Current validation: `CMV-1860`.
-Current status: CM-1757 closes the safe M11 fixture/schema response normalization and audit receipt chain while preserving that full M11 exit conditions remain blocked until accepted exact-approved M7 live read-shape receipt, live VCP-native parity evidence, fallback runtime parity evidence, low-disclosure runtime receipt evidence, and exact M11 live runtime boundary exist. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, M12 live workflow unlock, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary`.
+Current validation: `CMV-1861`.
+Current status: CM-1758 records the non-executing M12 fixture-safe boundary for future Codex/Claude sustained workflow integration. M8 trusted-full-read workflow evidence and M11 live response/receipt evidence remain incomplete, so live M12 workflow remains blocked. No workflow harness, workflow steps, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, checkpoint/handoff memory write, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M12 fixture-safe sustained workflow boundary work without runtime/write/update/supersede/tombstone/checkpoint-handoff memory execution, or wait for an exact-approved M7 read-shape receipt before live M11/M12 workflow evidence. Push remains separate explicit authorization.
+Next safe local action is M12 fixture-only workflow envelope contract for Codex/Claude isolation and checkpoint/handoff receipt shape, without runtime/workflow execution/MCP tool calls/memory read/write/checkpoint-handoff memory writes; or wait for accepted M8 and M11 live evidence. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
