@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1737",
-  "validationId": "CMV-1840",
+  "taskId": "CM-1738",
+  "validationId": "CMV-1841",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_full_read_exact_approval_request_display_boundary_docs_only",
+    "scope": "vcp_memory_trusted_full_read_runtime_abort_receipt_skeleton_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1841",
+      "scope": "CM-1738 M8-K5 VCP memory trusted-full-read runtime abort receipt skeleton",
+      "status": "COMPLETED_VALIDATED_M8_K5_VCP_MEMORY_TRUSTED_FULL_READ_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
     {
       "id": "CMV-1840",
       "scope": "CM-1737 M8-K4 VCP memory trusted-full-read exact approval request display boundary",

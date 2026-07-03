@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1737 M8-K4 VCP memory trusted-full-read exact approval request display boundary`.
-Current validation: `CMV-1840`.
-Current handoff: CM-1737 recorded the docs-only non-authorizing M8 trusted-full-read exact approval request display boundary. Accepted M7 read-shape receipt and exact Jenn trusted-full-read approval remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-full-read workflow execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1738 M8-K5 VCP memory trusted-full-read runtime abort receipt skeleton`.
+Current validation: `CMV-1841`.
+Current handoff: CM-1738 recorded the docs-only non-authorizing M8 trusted-full-read runtime abort receipt skeleton. Accepted M7 read-shape receipt and exact Jenn trusted-full-read approval remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-full-read workflow execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M8-K4 Trusted-Full-Read Exact Approval Request Display Boundary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M8-K5 Trusted-Full-Read Runtime Abort Receipt Skeleton` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M8_K4_VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M8_K5_VCP_MEMORY_TRUSTED_FULL_READ_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_RUNTIME_ABORT_RECEIPT_SKELETON.md`
 - `docs/VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
 - `docs/VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
 - `docs/VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_PACKET_PREPARATION.md`
@@ -44,15 +45,15 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added M8 trusted-full-read exact approval request display boundary.
-- Defined display state, required future inputs, non-authorizing display template, display stop rules, current display result, and receipt skeleton.
-- Preserved current decision `not_display_ready_missing_m7_receipt_and_exact_trusted_full_read_approval`.
+- Added M8 trusted-full-read runtime abort receipt skeleton.
+- Defined low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-runtime conclusion.
+- Preserved current result `abort_receipt_skeleton_ready_no_runtime`.
 - Preserved that accepted M7 read-shape receipt and exact Jenn trusted-full-read approval are missing.
 - Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read-shape query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M9 unlock occurred.
 
-Validation: `CMV-1840`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1841`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M8 abort receipt skeleton without workflow/runtime, or remain blocked before M8 runtime until required exact approvals exist. Push remains separate explicit authorization.
+Next safe route: M8 blocked closeout summary without workflow/runtime, or remain blocked before M8 runtime until required exact approvals exist. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

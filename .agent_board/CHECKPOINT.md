@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1737 M8-K4 VCP memory trusted-full-read exact approval request display boundary`.
-Current validation: `CMV-1840`.
+Current checkpoint: `CM-1738 M8-K5 VCP memory trusted-full-read runtime abort receipt skeleton`.
+Current validation: `CMV-1841`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1738 M8-K5 VCP Memory Trusted-Full-Read Runtime Abort Receipt Skeleton
+
+Status: `COMPLETED_VALIDATED_M8_K5_VCP_MEMORY_TRUSTED_FULL_READ_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_FULL_READ_RUNTIME_ABORT_RECEIPT_SKELETON.md`.
+- Defined low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-runtime conclusion.
+- Recorded current result `abort_receipt_skeleton_ready_no_runtime`.
+- Preserved that accepted M7 read-shape receipt and exact Jenn trusted-full-read approval are missing.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, trusted-full-read workflow execution, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M9 unlock occurred.
+
+Validation: `CMV-1841`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1737 M8-K4 VCP Memory Trusted-Full-Read Exact Approval Request Display Boundary
 
