@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1828 M9 exact request field candidate selection preflight`.
-Current validation: `CMV-1931`.
-Current handoff: CM-1828 selected safe request-field candidates for local contract work only. Full M9 proposal mode, exact request packet, request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1829 M9 exact request field candidate fixture contract`.
+Current validation: `CMV-1932`.
+Current handoff: CM-1829 added a pure local source/test contract for non-authorizing request-field candidate packets. Full M9 proposal mode, exact request packet readiness, request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1828 selected safe request-field candidates for local contra
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_SELECTION_PREFLIGHT_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 has executable local envelope, receipt-shape, closeout-gate, and exact-boundary packet skeleton fixture contracts; local packet skeleton preparation is closed; safe request-field candidates have been selected for local contract work only; exact request packet, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 has executable local envelope, receipt-shape, closeout-gate, exact-boundary packet skeleton, and exact request field candidate fixture contracts; local packet skeleton preparation is closed; safe request-field candidates have been selected and covered by local contract work only; exact request packet readiness, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -38,6 +38,9 @@ Current entrypoints:
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1826_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1827_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1828_EXACT_REQUEST_FIELD_CANDIDATE_SELECTION_PREFLIGHT.md`
+- `src/core/VcpMemoryTrustedWriteProposalExactRequestFieldCandidateContract.js`
+- `tests/vcp-memory-trusted-write-proposal-exact-request-field-candidate-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1829_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT.md`
 - `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`
 - `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`

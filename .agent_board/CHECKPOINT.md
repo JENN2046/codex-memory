@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1828 M9 exact request field candidate selection preflight`.
-Current validation: `CMV-1931`.
+Current checkpoint: `CM-1829 M9 exact request field candidate fixture contract`.
+Current validation: `CMV-1932`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1829 M9 Exact Request Field Candidate Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalExactRequestFieldCandidateContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-exact-request-field-candidate-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1829_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3754/3754`.
+- Post-fix re-review repaired incomplete-vs-invalid candidate layering so malformed fields fail invalid, incomplete candidate packets compute `field_candidate_incomplete`, and authority expansion computes `stop_l4`.
+- Confirmed helper accepts only non-authorizing request-field candidate packets and keeps request/proposal/runtime/write/M10/readiness blocked.
+- Routed next work to CM-1830 M9 exact request field candidate contract closeout / packet-readiness gate review.
+
+Validation: `CMV-1932`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1828 M9 Exact Request Field Candidate Selection Preflight
 

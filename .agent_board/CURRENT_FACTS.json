@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1828",
-  "validationId": "CMV-1931",
+  "taskId": "CM-1829",
+  "validationId": "CMV-1932",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_field_candidate_selection_preflight",
+    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_field_candidate_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1932",
+      "scope": "CM-1829 M9 exact request field candidate fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1931",
       "scope": "CM-1828 M9 exact request field candidate selection preflight",
