@@ -3,6 +3,21 @@
 const CONTRACT_NAME = 'VcpMemoryHealthReportSchemaContract';
 const CONTRACT_MODE = 'fixture_health_report_schema_contract_only';
 const SCHEMA_VERSION = 1;
+const SAFE_REQUEST_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$/;
+
+const FORBIDDEN_STRING_VALUE_PATTERNS = Object.freeze([
+  ['url', /https?:\/\//i],
+  ['windows_path', /[A-Za-z]:[\\/]/],
+  ['unix_private_path', /(^|[\s"'=])(~\/|\/home\/|\/Users\/|\/mnt\/|\/tmp\/|\/var\/)/],
+  ['openai_key', /sk-(proj-)?[A-Za-z0-9_-]{12,}/],
+  ['private_key_block', /-----BEGIN [A-Z ]*PRIVATE KEY-----/],
+  ['raw_private_marker', /RAW_(PRIVATE|MEMORY|RUNTIME|STORE|AUDIT|SQLITE|JSONL|VECTOR|CACHE|DAILY|RAG|PROMPT)/i],
+  ['synthetic_sensitive_marker', /(TOKEN|SECRET|PRIVATE_MEMORY|APPROVAL_VALUE)_SHOULD_NOT_ECHO/i]
+]);
+
+const FORBIDDEN_STRING_VALUE_PATTERN_NAMES = Object.freeze(
+  FORBIDDEN_STRING_VALUE_PATTERNS.map(([name]) => name)
+);
 
 const ALLOWED_EVIDENCE_TYPES = Object.freeze([
   'fixture_schema',
@@ -231,6 +246,25 @@ function collectForbiddenFields(value, prefix = '') {
   return found;
 }
 
+function stringValueHasForbiddenShape(value) {
+  return typeof value === 'string' && FORBIDDEN_STRING_VALUE_PATTERNS.some(([, pattern]) => pattern.test(value));
+}
+
+function collectForbiddenStringValueFields(value, prefix = '') {
+  if (typeof value === 'string') {
+    return stringValueHasForbiddenShape(value) ? [prefix || '<root>'] : [];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((item, index) => collectForbiddenStringValueFields(item, `${prefix}[${index}]`));
+  }
+  if (!isPlainObject(value)) return [];
+
+  return Object.entries(value).flatMap(([key, nested]) => collectForbiddenStringValueFields(
+    nested,
+    pathJoin(prefix, key)
+  ));
+}
+
 function collectUnexpectedKeys(value, allowedFields, prefix = '') {
   if (!isPlainObject(value)) return [];
   return Object.keys(value)
@@ -271,12 +305,16 @@ function collectPositiveCounters(counters) {
   return ZERO_COUNTER_FIELDS.filter(field => Number(counters[field] || 0) > 0);
 }
 
+function isSafeRequestId(value) {
+  return typeof value === 'string' && SAFE_REQUEST_ID_PATTERN.test(value);
+}
+
 function lowDisclosureProjection(input) {
   const context = isPlainObject(input) ? input.reportContext : null;
   const readiness = isPlainObject(input) ? input.readiness : null;
 
   return {
-    requestId: isPlainObject(context) && typeof context.request_id === 'string'
+    requestId: isPlainObject(context) && isSafeRequestId(context.request_id)
       ? context.request_id
       : null,
     evidenceType: isPlainObject(context) && typeof context.evidence_type === 'string'
@@ -304,6 +342,7 @@ function rejected(reasonCode, input, details = {}) {
     lowDisclosureProjection: lowDisclosureProjection(input),
     missingFields: details.missingFields || [],
     forbiddenFields: details.forbiddenFields || [],
+    forbiddenStringValueFields: details.forbiddenStringValueFields || [],
     unexpectedFields: details.unexpectedFields || [],
     forbiddenCounters: details.forbiddenCounters || [],
     invalidFields: details.invalidFields || [],
@@ -353,6 +392,8 @@ function validateShape(input) {
   if (input.schemaVersion !== SCHEMA_VERSION) invalid.push('schemaVersion');
   if (!ALLOWED_DECISIONS.includes(input.expectedDecision)) invalid.push('expectedDecision');
   if (typeof context.request_id !== 'string' || context.request_id.trim().length === 0) {
+    invalid.push('reportContext.request_id');
+  } else if (!isSafeRequestId(context.request_id)) {
     invalid.push('reportContext.request_id');
   }
   if (!ALLOWED_EVIDENCE_TYPES.includes(context.evidence_type)) {
@@ -485,6 +526,11 @@ function validateVcpMemoryHealthReportSchemaContract(input) {
     });
   }
 
+  const forbiddenStringValueFields = collectForbiddenStringValueFields(input);
+  if (forbiddenStringValueFields.length > 0) {
+    return rejected('forbidden_sensitive_value_shapes', input, { forbiddenStringValueFields });
+  }
+
   const unexpectedFields = collectUnexpectedFields(input);
   if (unexpectedFields.length > 0) {
     return rejected('unexpected_fields', input, { unexpectedFields });
@@ -551,10 +597,12 @@ module.exports = {
   ALLOWED_READINESS_LABELS,
   CONTRACT_MODE,
   FORBIDDEN_FIELD_NAMES,
+  FORBIDDEN_STRING_VALUE_PATTERN_NAMES,
   REQUIRED_CONTEXT_BOOLEAN_FIELDS,
   REQUIRED_SECTION_BOOLEAN_FIELDS,
   REQUIRED_SECTION_IDS,
   REQUIRED_READINESS_BOOLEAN_FIELDS,
+  SAFE_REQUEST_ID_PATTERN,
   SECTION_SOURCE_TYPES,
   ZERO_COUNTER_FIELDS,
   validateVcpMemoryHealthReportSchemaContract

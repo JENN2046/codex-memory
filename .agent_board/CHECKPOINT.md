@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1772 M14-K1 VCP memory health report schema contract`.
-Current validation: `CMV-1875`.
+Current checkpoint: `CM-1773 M14-K2 VCP memory health report raw/private leak rejection`.
+Current validation: `CMV-1876`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1773 M14-K2 VCP Memory Health Report Raw Private Leak Rejection
+
+Status: `COMPLETED_VALIDATED_M14_K2_VCP_MEMORY_HEALTH_REPORT_RAW_PRIVATE_LEAK_REJECTION_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Hardened `src/core/VcpMemoryHealthReportSchemaContract.js`.
+- Expanded `tests/vcp-memory-health-report-schema-contract.test.js`.
+- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_RAW_PRIVATE_LEAK_REJECTION.md`.
+- Added recursive sensitive string value-shape rejection for URL, Windows path, Unix private path, OpenAI key, private key block, raw-private marker, and synthetic sensitive marker patterns.
+- Added safe request id projection so unsafe or malformed `reportContext.request_id` values are not echoed through low-disclosure rejection output.
+- Added rejection reason `forbidden_sensitive_value_shapes` with field-path-only reporting.
+- Covered sensitive values in allowed fields and nested section fields without echoing submitted values.
+- Preserved that no dashboard runtime implementation, dashboard CLI call, VCPToolBox runtime call, MCP memory tool call, private runtime read, raw store read, real query, provider/API call, memory read/write, durable audit/runtime write, public MCP expansion, approval request, approval line, push, release, deploy, cutover, readiness claim, complete V8 claim, or full bridge completion claim occurred.
+
+Validation: `CMV-1876`; syntax checks, targeted health report schema contract test `14/14`, `npm test` `3705/3705`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1772 M14-K1 VCP Memory Health Report Schema Contract
 

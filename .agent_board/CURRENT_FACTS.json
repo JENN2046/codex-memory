@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1772",
-  "validationId": "CMV-1875",
+  "taskId": "CM-1773",
+  "validationId": "CMV-1876",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_health_report_m14_schema_contract",
+    "scope": "vcp_memory_health_report_m14_raw_private_leak_rejection",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1876",
+      "scope": "CM-1773 M14-K2 VCP memory health report raw/private leak rejection",
+      "status": "COMPLETED_VALIDATED_M14_K2_VCP_MEMORY_HEALTH_REPORT_RAW_PRIVATE_LEAK_REJECTION_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1875",
       "scope": "CM-1772 M14-K1 VCP memory health report schema contract",

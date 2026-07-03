@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1772 M14-K1 VCP memory health report schema contract`.
-Current validation: `CMV-1875`.
-Current status: CM-1772 adds a pure fixture health report schema contract helper, targeted tests, and evidence doc. Targeted tests passed `11/11`; default `npm test` passed `3702/3702`. The helper locks low-disclosure health report sections and conservative readiness labels, while stopping runtime/dashboard/MCP/private-read/raw-store/real-query/provider/approval requests as L4. No dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1773 M14-K2 VCP memory health report raw/private leak rejection`.
+Current validation: `CMV-1876`.
+Current status: CM-1773 hardens the fixture health report schema contract against sensitive string values and unsafe request id echo. Targeted tests passed `14/14`; default `npm test` passed `3705/3705`. The helper recursively rejects URL/path/key/private-marker shaped string values and projects unsafe request ids as `null` in low-disclosure output. No dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M14-K2 raw/private leak rejection tests for the health report schema, without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, or readiness claims. Push remains separate explicit authorization.
+Next safe local action is M14-K3 readiness label accuracy tests for the health report schema, without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

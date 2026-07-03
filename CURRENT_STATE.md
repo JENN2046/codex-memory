@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1772 M14-K1 VCP memory health report schema contract |
-| Current task | `CM-1772 M14-K1 VCP memory health report schema contract` |
-| Current validation | `CMV-1875` |
-| Current route | M14 health report schema contract is complete at fixture-only boundary; targeted tests passed `11/11` and `npm test` passed `3702/3702`; next safe action is M14-K2 raw/private leak rejection tests, not dashboard runtime, private reads, raw stores, real query, provider/API, approval, or readiness |
+| Status | CM-1773 M14-K2 VCP memory health report raw/private leak rejection |
+| Current task | `CM-1773 M14-K2 VCP memory health report raw/private leak rejection` |
+| Current validation | `CMV-1876` |
+| Current route | M14 health report raw/private leak rejection is complete at fixture-only boundary; targeted tests passed `14/14` and `npm test` passed `3705/3705`; next safe action is M14-K3 readiness label accuracy tests, not dashboard runtime, private reads, raw stores, real query, provider/API, approval, or readiness |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1773` hardens `src/core/VcpMemoryHealthReportSchemaContract.js`, expands `tests/vcp-memory-health-report-schema-contract.test.js`, and adds `docs/VCP_MEMORY_HEALTH_REPORT_M14_RAW_PRIVATE_LEAK_REJECTION.md`. It closes the immediate raw/private value echo gap in the fixture health report schema contract. Boundary: contract hardening implemented `YES`; targeted test count `14`; targeted test passed `YES`; default `npm test` passed `3705/3705`; sensitive string value-shape rejection added `YES`; recursive allowed-field rejection added `YES`; safe request id projection added `YES`; unsafe request id projection null `YES`; no-echo rejection covered `YES`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; approval request submitted `NO`; approval line generated `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m14_health_report_readiness_label_accuracy_tests`.
 
 `CM-1772` adds `src/core/VcpMemoryHealthReportSchemaContract.js`, `tests/vcp-memory-health-report-schema-contract.test.js`, and `docs/VCP_MEMORY_HEALTH_REPORT_M14_SCHEMA_CONTRACT.md`. It turns M14-K0 into a fixture-only schema contract for low-disclosure health report sections. Boundary: contract implemented `YES`; targeted test count `11`; targeted test passed `YES`; default `npm test` passed `3702/3702`; policy/target/fallback/query-quality/receipt sections locked `YES`; conservative readiness labels locked `YES`; runtime requests stopped L4 `YES`; raw private/provider/audit-row material stopped L4 `YES`; readiness overclaim stopped L4 `YES`; hidden missing-live-evidence blocker denied `YES`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; approval request submitted `NO`; approval line generated `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m14_health_report_raw_private_leak_rejection_tests`.
 

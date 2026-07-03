@@ -9,10 +9,12 @@ const {
   ALLOWED_EVIDENCE_TYPES,
   ALLOWED_READINESS_LABELS,
   FORBIDDEN_FIELD_NAMES,
+  FORBIDDEN_STRING_VALUE_PATTERN_NAMES,
   REQUIRED_CONTEXT_BOOLEAN_FIELDS,
   REQUIRED_SECTION_BOOLEAN_FIELDS,
   REQUIRED_SECTION_IDS,
   REQUIRED_READINESS_BOOLEAN_FIELDS,
+  SAFE_REQUEST_ID_PATTERN,
   SECTION_SOURCE_TYPES,
   ZERO_COUNTER_FIELDS,
   validateVcpMemoryHealthReportSchemaContract
@@ -226,6 +228,52 @@ test('CM1772 rejects forbidden raw private secret approval and overclaim fields 
   assert.equal(serialized.includes('SYNTHETIC_DASHBOARD_PAYLOAD_SHOULD_NOT_ECHO'), false);
 });
 
+test('CM1773 rejects sensitive string value shapes in allowed fields without echoing values', () => {
+  const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
+    reportContext: {
+      request_id: 'https://example.invalid/raw-private-health-report'
+    }
+  }));
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'forbidden_sensitive_value_shapes');
+  assert.ok(result.forbiddenStringValueFields.includes('reportContext.request_id'));
+  assert.equal(result.lowDisclosureProjection.requestId, null);
+  assert.equal(serialized.includes('https://example.invalid/raw-private-health-report'), false);
+});
+
+test('CM1773 rejects recursive sensitive string values before shape validation without echoing values', () => {
+  const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
+    sections: {
+      target_status: {
+        source_type: 'C:\\Users\\Jenn\\secret\\target-runtime.txt'
+      }
+    }
+  }));
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'forbidden_sensitive_value_shapes');
+  assert.ok(result.forbiddenStringValueFields.includes('sections.target_status.source_type'));
+  assert.equal(serialized.includes('C:\\Users\\Jenn\\secret\\target-runtime.txt'), false);
+});
+
+test('CM1773 keeps malformed but non-sensitive request ids out of low-disclosure projection', () => {
+  const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
+    reportContext: {
+      request_id: 'unsafe request id with spaces'
+    }
+  }));
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'invalid_health_report_schema_contract');
+  assert.ok(result.invalidFields.includes('reportContext.request_id'));
+  assert.equal(result.lowDisclosureProjection.requestId, null);
+  assert.equal(serialized.includes('unsafe request id with spaces'), false);
+});
+
 test('CM1772 rejects missing positive and malformed zero side-effect counters', () => {
   const missingFixture = healthReportContract();
   delete missingFixture.counters.providerApiCalls;
@@ -326,6 +374,10 @@ test('CM1772 locks health report vocabulary and side-effect posture', () => {
   assert.ok(REQUIRED_READINESS_BOOLEAN_FIELDS.includes('exact_approval_required_for_live_evidence'));
   assert.ok(FORBIDDEN_FIELD_NAMES.includes('rawPrivateMemory'));
   assert.ok(FORBIDDEN_FIELD_NAMES.includes('dashboardRuntimePayload'));
+  assert.ok(FORBIDDEN_STRING_VALUE_PATTERN_NAMES.includes('url'));
+  assert.ok(FORBIDDEN_STRING_VALUE_PATTERN_NAMES.includes('windows_path'));
+  assert.equal(SAFE_REQUEST_ID_PATTERN.test('m14_health_report_schema_001'), true);
+  assert.equal(SAFE_REQUEST_ID_PATTERN.test('unsafe request id with spaces'), false);
   assert.ok(ZERO_COUNTER_FIELDS.includes('dashboardRuntimeCalls'));
   assert.ok(ZERO_COUNTER_FIELDS.includes('readinessClaims'));
   assert.equal(result.dashboardRuntimeImplemented, false);
