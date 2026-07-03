@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1715",
-  "validationId": "CMV-1818",
+  "taskId": "CM-1716",
+  "validationId": "CMV-1819",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_native_capability_inventory_docs_only",
+    "scope": "vcp_invocation_boundary_templates_non_authorizing",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1819",
+      "scope": "CM-1716 M3-T2 VCP memory invocation boundary templates",
+      "status": "COMPLETED_VALIDATED_M3_T2_INVOCATION_BOUNDARY_TEMPLATES_NON_AUTHORIZING_NO_RUNTIME"
+    },
     {
       "id": "CMV-1818",
       "scope": "CM-1715 M3-T1 VCPToolBox native memory capability inventory",

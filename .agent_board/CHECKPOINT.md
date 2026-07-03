@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1715 M3-T1 VCPToolBox native memory capability inventory`.
-Current validation: `CMV-1818`.
+Current checkpoint: `CM-1716 M3-T2 VCP memory invocation boundary templates`.
+Current validation: `CMV-1819`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1716 M3-T2 VCP Memory Invocation Boundary Templates
+
+Status: `COMPLETED_VALIDATED_M3_T2_INVOCATION_BOUNDARY_TEMPLATES_NON_AUTHORIZING_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_INVOCATION_BOUNDARY_TEMPLATES.md`.
+- Defined non-authorizing shared packet fields, profile-specific allowed actions, budgets, output disclosure, receipt shape, stop conditions, and non-authorization review requirements.
+- Separated read-only profiles from write-proposal and durable-write profiles.
+- Preserved the boundary that real approval-line generation/submission/issue/storage/simulation, live VCPToolBox runtime, target probing, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, and complete V8 claims remain blocked.
+
+Validation: `CMV-1819`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1715 M3-T1 VCPToolBox Native Memory Capability Inventory
 

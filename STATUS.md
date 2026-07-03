@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1715 M3-T1 VCPToolBox native memory capability inventory`.
-Current validation: `CMV-1818`.
-Current project status: CM-1715 records a docs/source-contract inventory of candidate VCPToolBox native memory surfaces, profile mappings, local compatibility surfaces, and unresolved live facts. This is docs-only inventory; no live VCPToolBox target discovery, approval-line generation/submission, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `VCP_NATIVE_CAPABILITY_INVENTORY_DOCS_ONLY_NO_RUNTIME`.
+Current task: `CM-1716 M3-T2 VCP memory invocation boundary templates`.
+Current validation: `CMV-1819`.
+Current project status: CM-1716 records non-authorizing invocation boundary templates for `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`. This is docs-only boundary planning; no real approval line, live VCPToolBox target discovery, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_INVOCATION_BOUNDARY_TEMPLATES_NON_AUTHORIZING_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1716 M3-T2 VCP memory invocation boundary templates: added `docs/VCP_MEMORY_INVOCATION_BOUNDARY_TEMPLATES.md`. The templates define required packet fields, profile-specific allowed actions, budgets, output disclosure, receipt shape, stop conditions, and non-authorization review requirements. They explicitly do not generate, simulate, submit, issue, store, or expose a real approval line and do not authorize runtime execution. No live VCPToolBox runtime call, target probing, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
 CM-1715 M3-T1 VCPToolBox native memory capability inventory: added `docs/VCPTOOLBOX_NATIVE_MEMORY_CAPABILITY_INVENTORY.md`. The inventory tags DailyNote, DailyNoteManager, KnowledgeBaseManager, TagMemo/TagMemoEngine, LightMemo, TDBKnowledge, DeepMemo, TopicMemo, MeshMemo, and RAGDiaryPlugin as docs/source-contract/local-compat/unresolved evidence, maps them to `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`, and lists unresolved target/transport/auth/profile/read/write/output/scope/failure/receipt facts. No live VCPToolBox runtime call, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
