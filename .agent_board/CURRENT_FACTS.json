@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1779",
-  "validationId": "CMV-1882",
+  "taskId": "CM-1780",
+  "validationId": "CMV-1883",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_m15_blocked_precondition_record",
+    "scope": "vcp_memory_m15_package_evidence_map",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1883",
+      "scope": "CM-1780 M15-K1 VCP memory package evidence map",
+      "status": "COMPLETED_VALIDATED_M15_K1_VCP_MEMORY_PACKAGE_EVIDENCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_RELEASE"
+    },
     {
       "id": "CMV-1882",
       "scope": "CM-1779 M15-K0 VCP memory blocked precondition record",

@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1779 M15-K0 VCP memory blocked precondition record`.
-Current validation: `CMV-1882`.
+Current checkpoint: `CM-1780 M15-K1 VCP memory package evidence map`.
+Current validation: `CMV-1883`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1780 M15-K1 VCP Memory Package Evidence Map
+
+Status: `COMPLETED_VALIDATED_M15_K1_VCP_MEMORY_PACKAGE_EVIDENCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_RELEASE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`.
+- Mapped M0-M15 repository evidence against M15 gate requirements.
+- Classified current package evidence as local-safe docs, fixture, schema, source-review, and approval-boundary evidence.
+- Recorded missing M15 evidence: complete M0-M14 live chain, docs/runtime match, no P0/P1 live risk review, dedicated RC approval packet, accepted live health report, and live-chain rollback posture.
+- Recorded RC gate report created `NO`, RC gate ready `NO`, M15 opened `NO`, and M0-M14 live evidence complete `NO`.
+- Set the next safe route to `m15_non_authorizing_rc_checklist_skeleton`.
+- Preserved that no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, VCPToolBox runtime call, MCP memory tool call, private runtime read, raw store read, real query, provider/API call, memory read/write, durable audit/runtime write, public MCP expansion, approval request, approval line, push, release, deploy, cutover, readiness claim, complete V8 claim, M15 unlock, or full bridge completion claim occurred.
+
+Validation: `CMV-1883`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1779 M15-K0 VCP Memory Blocked Precondition Record
 

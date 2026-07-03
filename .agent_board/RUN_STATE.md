@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1779 M15-K0 VCP memory blocked precondition record`.
-Current validation: `CMV-1882`.
-Current status: CM-1779 records that M15 is blocked before RC gate work because M0-M14 evidence is incomplete, M14 live health report evidence is absent, and no dedicated RC review approval exists. M15 is not opened and RC gate is not ready. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1780 M15-K1 VCP memory package evidence map`.
+Current validation: `CMV-1883`.
+Current status: CM-1780 maps M0-M15 package evidence and records that the package has local-safe docs, fixture, schema, source-review, and approval-boundary evidence, but not the live/runtime/approval evidence required for M15 RC gate consideration. M15 is not opened and RC gate is not ready. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M15 package evidence map, without opening M15, without RC approval, and without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
+Next safe local action is a non-authorizing RC checklist skeleton, without opening M15, without RC approval, and without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
