@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1725",
-  "validationId": "CMV-1828",
+  "taskId": "CM-1726",
+  "validationId": "CMV-1829",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_runtime_abort_receipt_skeleton_docs_only",
+    "scope": "vcp_memory_observe_lite_m6_blocked_closeout_summary_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1829",
+      "scope": "CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M6_K5_VCP_MEMORY_OBSERVE_LITE_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
     {
       "id": "CMV-1828",
       "scope": "CM-1725 M6-K4 VCP memory observe-lite runtime abort receipt skeleton",

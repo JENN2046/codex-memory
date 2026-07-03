@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1725 M6-K4 VCP memory observe-lite runtime abort receipt skeleton |
-| Current task | `CM-1725 M6-K4 VCP memory observe-lite runtime abort receipt skeleton` |
-| Current validation | `CMV-1828` |
-| Current route | Docs-only observe-lite runtime abort receipt skeleton; current result `abort_receipt_skeleton_ready_no_runtime`; no approval line or live runtime execution |
+| Status | CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary |
+| Current task | `CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary` |
+| Current validation | `CMV-1829` |
+| Current route | Docs-only M6 blocked closeout summary; M6 live proof incomplete; M7 not unlocked; no approval line or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1726` adds `docs/VCP_MEMORY_OBSERVE_LITE_M6_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes the safe docs-only M6 preparation chain while recording that M6 live target/handshake proof remains incomplete and M7 is not unlocked. Boundary: real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M7 unlock `NO`.
 
 `CM-1725` adds `docs/VCP_MEMORY_OBSERVE_LITE_RUNTIME_ABORT_RECEIPT_SKELETON.md`. It defines low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-live-proof conclusion. Current result is `abort_receipt_skeleton_ready_no_runtime`. Boundary: real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 

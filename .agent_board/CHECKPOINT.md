@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1725 M6-K4 VCP memory observe-lite runtime abort receipt skeleton`.
-Current validation: `CMV-1828`.
+Current checkpoint: `CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary`.
+Current validation: `CMV-1829`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1726 M6-K5 VCP Memory Observe-Lite Blocked Closeout Summary
+
+Status: `COMPLETED_VALIDATED_M6_K5_VCP_MEMORY_OBSERVE_LITE_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_M6_BLOCKED_CLOSEOUT_SUMMARY.md`.
+- Closed the docs-only M6 preparation chain while recording that M6 live target/handshake proof remains incomplete.
+- Recorded that M7 is not unlocked without an accepted exact-approved M6 observe-lite receipt or a current Jenn dependency change.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M7 unlock occurred.
+
+Validation: `CMV-1829`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1725 M6-K4 VCP Memory Observe-Lite Runtime Abort Receipt Skeleton
 
