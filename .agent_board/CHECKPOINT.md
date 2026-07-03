@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1832 M9 exact request packet-readiness contract closeout / request-preparation gate review`.
-Current validation: `CMV-1935`.
+Current checkpoint: `CM-1833 M9 exact request preparation boundary fixture contract`.
+Current validation: `CMV-1936`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1833 M9 Exact Request Preparation Boundary Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_PREPARATION_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalExactRequestPreparationBoundaryContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-exact-request-preparation-boundary-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1833_EXACT_REQUEST_PREPARATION_BOUNDARY_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3770/3770`.
+- Confirmed helper accepts only non-authorizing request-preparation boundary fixtures whose accepted state is `request_preparation_blocked_missing_exact_boundary`.
+- Confirmed helper keeps exact request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness blocked.
+- Routed next work to CM-1834 M9 exact request preparation boundary contract closeout / exact-field binding gate review.
+
+Validation: `CMV-1936`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, source-safety scan, and changed-scope re-review passed.
 
 ## CM-1832 M9 Exact Request Packet-Readiness Contract Closeout / Request-Preparation Gate Review
 
