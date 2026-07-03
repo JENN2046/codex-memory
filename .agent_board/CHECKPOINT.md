@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1769 M13-K6 VCP memory fallback local memory query-quality dry-run contract`.
-Current validation: `CMV-1872`.
+Current checkpoint: `CM-1770 M13-K7 VCP memory fallback local memory hardening report`.
+Current validation: `CMV-1873`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1770 M13-K7 VCP Memory Fallback Local Memory Hardening Report
+
+Status: `COMPLETED_VALIDATED_M13_K7_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_HARDENING_REPORT_DOCS_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_HARDENING_REPORT.md`.
+- Closed the current safe M13 fallback hardening chain at fixture/dry-run boundary.
+- Aggregated CM-1763 through CM-1769.
+- Recorded marker/receipt, scope isolation, secret rejection, lifecycle filter, and query-quality dry-run contracts as green for fixture/dry-run boundary.
+- Recorded fallback runtime governance parity as not green.
+- Recorded that M13 live/runtime fallback work remains blocked.
+- Preserved that no local fallback runtime execution, private runtime read, real query, MCP memory tool call, VCPToolBox runtime call, target probing, raw store scan, broad memory scan, lifecycle store scan, lifecycle mutation, migration/import/export/backfill, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1873`; combined M13 targeted node tests `64/64`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1769 M13-K6 VCP Memory Fallback Local Memory Query-Quality Dry-Run Contract
 

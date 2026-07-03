@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1769",
-  "validationId": "CMV-1872",
+  "taskId": "CM-1770",
+  "validationId": "CMV-1873",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_fallback_local_memory_m13_query_quality_dry_run_contract",
+    "scope": "vcp_memory_fallback_local_memory_m13_hardening_report",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1873",
+      "scope": "CM-1770 M13-K7 VCP memory fallback local memory hardening report",
+      "status": "COMPLETED_VALIDATED_M13_K7_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_HARDENING_REPORT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1872",
       "scope": "CM-1769 M13-K6 VCP memory fallback local memory query-quality dry-run contract",

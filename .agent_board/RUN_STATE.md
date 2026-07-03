@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1769 M13-K6 VCP memory fallback local memory query-quality dry-run contract`.
-Current validation: `CMV-1872`.
-Current status: CM-1769 adds a fixture-only fallback query-quality dry-run contract with targeted tests `14/14` and default `npm test` `3691/3691`, while preserving that fallback governance parity is not green and runtime fallback remains blocked. It covers fixture-only and temp-local dataset metadata dry-run success, bounded-scope requirement for broad/ambiguous fallback queries, synthetic quality failure marked as local fallback failure, unmarked quality failure denial, real query/provider/MCP/private read/broad scan L4 stops, raw/provider/MCP/real-memory result payload L4 stops, VCP-native lookalike rejection, decision mismatch rejection, forbidden raw query/secret/approval/readiness field rejection, side-effect counter rejection, non-boolean flag rejection, non-string request id rejection, unexpected non-allowlisted field rejection, and side-effect posture lock. No local fallback runtime execution, private runtime read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, raw store scan, broad memory scan, provider/API, temp-local write by this contract, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1770 M13-K7 VCP memory fallback local memory hardening report`.
+Current validation: `CMV-1873`.
+Current status: CM-1770 adds the M13 fallback hardening report and blocked closeout. It aggregates CM-1763 through CM-1769, records combined M13 targeted tests `64/64`, marks marker/receipt, scope isolation, secret rejection, lifecycle filter, and query-quality dry-run contracts green for fixture/dry-run boundary, and keeps fallback runtime governance parity false. No local fallback runtime execution, private runtime read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, raw store scan, broad memory scan, lifecycle mutation, migration/import/export/backfill, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is final M13 fallback hardening report / governance parity review, without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, or readiness claims. Push remains separate explicit authorization.
+Next safe local action is M14 docs/fixture health-report preflight, without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, dashboard raw private memory, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

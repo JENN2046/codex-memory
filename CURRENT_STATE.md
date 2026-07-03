@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1769 M13-K6 VCP memory fallback local memory query-quality dry-run contract |
-| Current task | `CM-1769 M13-K6 VCP memory fallback local memory query-quality dry-run contract` |
-| Current validation | `CMV-1872` |
-| Current route | M13 fallback query-quality dry-run fixture contract is implemented and validated; fallback governance parity is not green; next safe action is final M13 fallback hardening report / governance parity review, not runtime fallback, real query, lifecycle mutation, migration/import/export/backfill, provider/API, or private runtime reads |
+| Status | CM-1770 M13-K7 VCP memory fallback local memory hardening report |
+| Current task | `CM-1770 M13-K7 VCP memory fallback local memory hardening report` |
+| Current validation | `CMV-1873` |
+| Current route | M13 fallback hardening report is complete at fixture/dry-run boundary; fallback runtime governance parity is not green; next safe action is M14 docs/fixture health-report preflight, not runtime fallback, real query, lifecycle mutation, migration/import/export/backfill, provider/API, raw dashboard/private memory, or private runtime reads |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1770` adds `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_HARDENING_REPORT.md`. It closes the current safe M13 fallback hardening chain at fixture/dry-run boundary by aggregating CM-1763 through CM-1769. Boundary: marker/receipt contract green `YES`; scope/client isolation contract green `YES`; secret rejection contract green `YES`; lifecycle filter contract green `YES`; query-quality dry-run contract green `YES`; combined targeted tests passed `64/64`; latest full-suite evidence from CM-1769 passed `3691/3691`; fallback fixture governance parity green `YES`; fallback runtime governance parity green `NO`; local fallback runtime executed `NO`; private runtime read `NO`; real query `NO`; MCP memory tool call `NO`; VCPToolBox runtime `NO`; raw store scan `NO`; broad memory scan `NO`; lifecycle mutation `NO`; migration/import/export/backfill `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1769` adds `src/core/VcpMemoryFallbackLocalMemoryQueryQualityDryRunContract.js`, `tests/vcp-memory-fallback-local-memory-query-quality-dry-run-contract.test.js`, and `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_QUERY_QUALITY_DRY_RUN_CONTRACT.md`. It turns the M13 fallback query-quality dry-run gap into fixture-only executable contract coverage. Boundary: contract implemented `YES`; targeted test count `14`; targeted test passed `YES`; default `npm test` passed `3691/3691`; fixture dataset metadata accepted `YES`; temp-local dataset metadata accepted `YES`; broad query requires bounded scope `YES`; synthetic quality failure marked local fallback `YES`; unmarked quality failure denied `YES`; real query stopped L4 `YES`; provider/MCP/private read/broad scan stopped L4 `YES`; raw/provider/MCP/real-memory payload stopped L4 `YES`; VCP-native lookalike rejected `YES`; decision mismatch rejected `YES`; raw query/secret/approval/readiness fields rejected without echo `YES`; side-effect counter rejection `YES`; non-boolean request/dry-run/expectation flags rejected `YES`; non-string request id rejected `YES`; unexpected non-allowlisted fields rejected `YES`; side-effect posture locked `YES`; local fallback runtime executed `NO`; query executed `NO`; private runtime read `NO`; real query `NO`; MCP tool call for M13 evidence `NO`; provider/API `NO`; real memory read/write `NO`; raw store scan `NO`; broad memory scan `NO`; temp-local write by this contract `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; VCPToolBox runtime `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
