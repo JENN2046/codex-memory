@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1812",
-  "validationId": "CMV-1915",
+  "taskId": "CM-1813",
+  "validationId": "CMV-1916",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_full_read_m8_workflow_low_disclosure_execution",
+    "scope": "vcp_memory_trusted_full_read_m8_workflow_receipt_closeout_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1916",
+      "scope": "CM-1813 M8 workflow receipt closeout gate review",
+      "status": "COMPLETED_VALIDATED_M8_WORKFLOW_RECEIPT_CLOSEOUT_M9_PREPARATION_UNLOCKED_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-1915",
       "scope": "CM-1812 M8 trusted-full-read workflow low-disclosure execution",

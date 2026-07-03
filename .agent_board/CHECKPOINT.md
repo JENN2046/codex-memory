@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1812 M8 trusted-full-read workflow low-disclosure execution`.
-Current validation: `CMV-1915`.
+Current checkpoint: `CM-1813 M8 workflow receipt closeout gate review`.
+Current validation: `CMV-1916`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1813 M8 Workflow Receipt Closeout Gate Review
+
+Status: `COMPLETED_VALIDATED_M8_WORKFLOW_RECEIPT_CLOSEOUT_M9_PREPARATION_UNLOCKED_NO_RUNTIME_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1813_WORKFLOW_RECEIPT_CLOSEOUT_GATE_REVIEW.md`.
+- Accepted CM-1812 as the narrow M8 trusted-full-read workflow proof.
+- Confirmed the accepted M8 proof is limited to two bounded read-only workflow steps, `http_2xx` statuses, JSON parse `ok`, shape-only projection, distinct receipt-scope client aliases, no raw private output, and no write.
+- Confirmed runtime-enforced client isolation, recall quality, proposal behavior, durable write behavior, release readiness, cutover readiness, `RC_READY`, complete V8, and full bridge completion are not proven.
+- Unlocked M9 preparation only.
+- Confirmed CM-1813 performed no runtime action, proposal generation, proposal submission, approval-line generation, approval request submission, memory read by agent, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, M10 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1916`; plan M8/M9 slices, CM-1812 receipt review, existing M9 blocked/preparation artifacts, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1812 M8 Trusted-Full-Read Workflow Low-Disclosure Execution
 

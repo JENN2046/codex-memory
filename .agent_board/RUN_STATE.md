@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1812 M8 trusted-full-read workflow low-disclosure execution`.
-Current validation: `CMV-1915`.
-Current status: CM-1812 executed two bounded `DailyNoteSearcher.SearchDailyNote` read-shape workflow steps through `/v1/human/tool` under the CM-1811 boundary. Both steps returned `http_2xx` and JSON parse `ok`; response bodies were consumed by the harness only for key/type/count shape projection and raw values were not printed or persisted. Receipt-scope client aliases were distinct, but runtime-enforced client isolation is not claimed. No runtime stdout/stderr read, runtime log read, secret/config/env content read, raw memory/raw store read by agent, provider/API call by agent, MCP memory tool call, memory write, public MCP expansion, M9 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+Current task: `CM-1813 M8 workflow receipt closeout gate review`.
+Current validation: `CMV-1916`.
+Current status: CM-1813 accepted CM-1812 as the narrow M8 trusted-full-read workflow proof: two bounded read-only workflow steps, `http_2xx` statuses, JSON parse `ok`, shape-only projection, distinct receipt-scope client aliases, no raw private output, no memory write, and independent post-stop process counts zero. Runtime-enforced client isolation, recall quality, proposal behavior, durable write behavior, release readiness, cutover readiness, `RC_READY`, complete V8, and full bridge completion are not proven. M9 preparation can open; M9 proposal generation/submission, approval-line generation, durable write, M10, M15, release/deploy/cutover/push, readiness, and `RC_READY` remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1813 M8 workflow receipt closeout gate review. It should decide whether CM-1812 is accepted as the narrow M8 workflow proof and whether M9 preparation can open. It must not claim runtime-enforced client isolation, M9 execution, M15, release, deploy, cutover, push, readiness, `RC_READY`, complete V8, or full bridge completion. Push remains separate explicit authorization.
+Next safe action is CM-1814 M9 trusted-write-proposal precondition refresh. It should reconcile older M9 blocked artifacts with the accepted CM-1812/CM-1813 M8 proof while keeping proposal generation, proposal submission, real approval-line generation, runtime execution, memory read by agent, durable write, provider/API, public MCP expansion, M10, M15, release, deploy, cutover, push, readiness, `RC_READY`, complete V8, and full bridge completion blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

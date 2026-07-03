@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1812 M8 trusted-full-read workflow low-disclosure execution |
-| Current task | `CM-1812 M8 trusted-full-read workflow low-disclosure execution` |
-| Current validation | `CMV-1915` |
-| Current route | M8 workflow proof executed; next route is CM-1813 workflow receipt closeout gate review |
+| Status | CM-1813 M8 workflow receipt closeout gate review |
+| Current task | `CM-1813 M8 workflow receipt closeout gate review` |
+| Current validation | `CMV-1916` |
+| Current route | M8 workflow proof accepted; next route is CM-1814 M9 trusted-write-proposal precondition refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1813` adds `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1813_WORKFLOW_RECEIPT_CLOSEOUT_GATE_REVIEW.md`. It accepts CM-1812 as the narrow M8 trusted-full-read workflow proof: two bounded read-only workflow steps, `http_2xx` statuses, JSON parse `ok`, shape-only projection, distinct receipt-scope client aliases, raw output print/persist `NO`, memory write `NO`, and independent post-stop process counts `0`. Runtime-enforced client isolation, recall quality, proposal behavior, durable write behavior, production/release/cutover readiness, `RC_READY`, complete V8, and full bridge completion are not proven. M9 preparation can open; M9 proposal generation/submission, approval-line generation, durable write, M10, M15, release/deploy/cutover/push, readiness, and `RC_READY` remain blocked. Next safe route is CM-1814 M9 trusted-write-proposal precondition refresh.
 
 `CM-1812` adds `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1812_WORKFLOW_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`. It records one bounded live two-step trusted-full-read workflow through `/v1/human/tool`: pre-start `connection_refused_or_fetch_failed`; runtime started by agent `YES`; warmup probe count `2`; warmup status `http_4xx`; workflow steps `2`; both step statuses `http_2xx`; both response JSON parses `ok`; response bodies consumed by harness `YES`; response bodies printed/persisted `NO`; response bytes consumed `138` per step; shape keys only emitted; receipt-scope client aliases distinct `YES`; runtime client isolation claimed `NO`; raw private payload disclosed `NO`; runtime stdout/stderr/logs read `NO`; config/env/secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; M9 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; independent post-stop endpoint `connection_refused_or_fetch_failed`; independent bracket-pattern process counts `0`; next action `CM-1813 M8 workflow receipt closeout gate review`.
 
