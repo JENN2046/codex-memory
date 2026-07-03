@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1777",
-  "validationId": "CMV-1880",
+  "taskId": "CM-1778",
+  "validationId": "CMV-1881",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_health_report_m14_source_review",
+    "scope": "vcp_memory_health_report_m14_blocked_closeout",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1881",
+      "scope": "CM-1778 M14-K7 VCP memory health report blocked closeout",
+      "status": "COMPLETED_VALIDATED_M14_K7_VCP_MEMORY_HEALTH_REPORT_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1880",
       "scope": "CM-1777 M14-K6 VCP memory health report source review",
