@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1827 M9 packet skeleton closeout / request-boundary gate review |
-| Current task | `CM-1827 M9 packet skeleton closeout / request-boundary gate review` |
-| Current validation | `CMV-1930` |
-| Current route | M9 packet skeleton preparation slice closed; next route is CM-1828 exact request field candidate selection preflight |
+| Status | CM-1828 M9 exact request field candidate selection preflight |
+| Current task | `CM-1828 M9 exact request field candidate selection preflight` |
+| Current validation | `CMV-1931` |
+| Current route | M9 request-field candidates selected for local contract work; exact request packet, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1828` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1828_EXACT_REQUEST_FIELD_CANDIDATE_SELECTION_PREFLIGHT.md`. It selects safe candidate fields for a future non-authorizing exact request packet: `trusted-write-proposal`, accepted M8 evidence references, safe target/transport aliases, receipt-scope client aliases, local workspace/owner aliases, fixture-only operation vocabulary `render_redacted_intent` / `render_rollback_posture`, review status vocabulary `accept` / `reject`, shape-only rollback posture, zero current-call budgets, and low-disclosure receipt/abort rules. Exact target/transport/client/workspace/owner/visibility/proposal scope/operation/payload/review/rollback/budget/L4 shield fields remain unbound. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1829 M9 exact request field candidate fixture contract.
 
 `CM-1827` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1827_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW.md`. It reviews CM-1825 and CM-1826, closes only the local non-authorizing packet skeleton preparation slice, and keeps full M9 proposal mode blocked. Exact request field packet, request submission, approval line, proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain absent or blocked. Next safe route is CM-1828 M9 exact request field candidate selection preflight.
 

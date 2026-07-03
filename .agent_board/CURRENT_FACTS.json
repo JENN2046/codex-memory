@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1827",
-  "validationId": "CMV-1930",
+  "taskId": "CM-1828",
+  "validationId": "CMV-1931",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_packet_skeleton_closeout_request_boundary_gate_review",
+    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_field_candidate_selection_preflight",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1931",
+      "scope": "CM-1828 M9 exact request field candidate selection preflight",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_SELECTION_PREFLIGHT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1930",
       "scope": "CM-1827 M9 packet skeleton closeout / request-boundary gate review",

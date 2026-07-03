@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1827 M9 packet skeleton closeout / request-boundary gate review`.
-Current validation: `CMV-1930`.
+Current checkpoint: `CM-1828 M9 exact request field candidate selection preflight`.
+Current validation: `CMV-1931`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1828 M9 Exact Request Field Candidate Selection Preflight
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_SELECTION_PREFLIGHT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1828_EXACT_REQUEST_FIELD_CANDIDATE_SELECTION_PREFLIGHT.md`.
+- Selected safe candidate fields for future local contract work: `trusted-write-proposal`, accepted M8 evidence references, safe target/transport aliases, receipt-scope client aliases, local workspace/owner aliases, fixture-only operation vocabulary, review status vocabulary, shape-only rollback posture, zero current-call budgets, and low-disclosure receipt/abort rules.
+- Explicitly kept exact target/transport/client/workspace/owner/visibility/proposal scope/operation/payload/review/rollback/budget/L4 shield fields unbound.
+- Preserved that exact request packet, request submission, approval-line generation, proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1829 M9 exact request field candidate fixture contract.
+
+Validation: `CMV-1931`; CM-1820/CM-1821/CM-1822/CM-1826/CM-1827 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1827 M9 Packet Skeleton Closeout / Request-Boundary Gate Review
 
