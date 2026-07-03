@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1833",
-  "validationId": "CMV-1936",
+  "taskId": "CM-1834",
+  "validationId": "CMV-1937",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_preparation_boundary_fixture_contract",
+    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_preparation_boundary_contract_closeout_exact_field_binding_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1937",
+      "scope": "CM-1834 M9 exact request preparation boundary contract closeout / exact-field binding gate review",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PREPARATION_BOUNDARY_CONTRACT_CLOSEOUT_EXACT_FIELD_BINDING_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1936",
       "scope": "CM-1833 M9 exact request preparation boundary fixture contract",

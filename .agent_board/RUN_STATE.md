@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1833 M9 exact request preparation boundary fixture contract`.
-Current validation: `CMV-1936`.
-Current status: CM-1833 adds a pure local source/test fixture contract for exact request preparation boundary. The accepted state remains not-ready; full M9 proposal mode, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1834 M9 exact request preparation boundary contract closeout / exact-field binding gate review`.
+Current validation: `CMV-1937`.
+Current status: CM-1834 closes only the local request-preparation boundary fixture contract for planning. Full M9 proposal mode, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1834 M9 exact request preparation boundary contract closeout / exact-field binding gate review. It should review CM-1832 and CM-1833 and decide whether the local request-preparation boundary fixture slice can close, while preserving that request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
+Next safe action is CM-1835 M9 exact field binding feasibility fixture contract. It should turn the CM-1834 closeout decision into a pure local source/test fixture that validates exact-field binding remains feasibility-only until concrete exact values are supplied by a later exact boundary, while preserving that request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
