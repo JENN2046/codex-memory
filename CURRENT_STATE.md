@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1760 M12-K2 VCP memory Codex Claude sustained workflow receipt chain contract |
-| Current task | `CM-1760 M12-K2 VCP memory Codex Claude sustained workflow receipt chain contract` |
-| Current validation | `CMV-1863` |
-| Current route | M12 fixture-only receipt-chain contract implemented and validated; live workflow integration remains blocked by incomplete M8/M11 live evidence; next safe route is focused source review or M12 fixture-chain blocked closeout, not runtime or checkpoint/handoff memory write |
+| Status | CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review |
+| Current task | `CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review` |
+| Current validation | `CMV-1864` |
+| Current route | M12 fixture helper/test source review is completed and validated; live workflow integration remains blocked by incomplete M8/M11 live evidence; next safe action is M12 fixture-chain blocked closeout, not runtime or checkpoint/handoff memory write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1761` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_SOURCE_REVIEW.md`. It reviews the M12 envelope and receipt-chain helper/test scope after CM-1759 and CM-1760. Boundary: reviewed helper/test files `4`; combined targeted tests `17`; targeted test passed `YES`; no actionable findings in changed scope `YES`; direct filesystem access found `NO`; child process found `NO`; fetch/http/https found `NO`; process env access found `NO`; MCP memory tool call found `NO`; runtime wiring found `NO`; workflow harness start found `NO`; VCPToolBox runtime `NO`; checkpoint/handoff receipt write `NO`; checkpoint/handoff memory write `NO`; durable audit/runtime write `NO`; provider/API `NO`; approval request submitted `NO`; approval line generated `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1760` adds `src/core/VcpMemoryCodexClaudeSustainedWorkflowReceiptChainContract.js`, `tests/vcp-memory-codex-claude-sustained-workflow-receipt-chain-contract.test.js`, and `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_RECEIPT_CHAIN_CONTRACT.md`. It turns the CM-1759 envelope contract into fixture-only receipt-chain validation for checkpoint/handoff shape. Boundary: contract implemented `YES`; targeted test count `9`; targeted test passed `YES`; valid envelope contract required `YES`; Codex private receipt chain accepted `YES`; Claude shared receipt chain accepted `YES`; stop L4 abort receipt chain covered `YES`; deny receipt chain covered `YES`; invalid envelope rejected `YES`; envelope id/decision drift rejected `YES`; checkpoint/handoff/audit write rejected `YES`; raw/approval/readiness fields rejected `YES`; side-effect posture locked `YES`; workflow harness started `NO`; workflow steps executed `0`; MCP tool call for M12 evidence `NO`; VCPToolBox runtime `NO`; fallback execution `NO`; memory read/write/update/supersede/tombstone `NO`; checkpoint receipt write `NO`; handoff receipt write `NO`; checkpoint memory write `NO`; handoff memory write `NO`; audit receipt write `NO`; durable audit/runtime write `NO`; provider/API `NO`; approval request submitted `NO`; approval line generated `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

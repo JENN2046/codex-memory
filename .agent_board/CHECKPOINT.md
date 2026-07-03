@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1760 M12-K2 VCP memory Codex Claude sustained workflow receipt chain contract`.
-Current validation: `CMV-1863`.
+Current checkpoint: `CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review`.
+Current validation: `CMV-1864`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1761 M12-K3 VCP Memory Codex Claude Sustained Workflow Source Review
+
+Status: `COMPLETED_VALIDATED_M12_K3_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_SOURCE_REVIEW_NO_ACTIONABLE_FINDINGS_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_SOURCE_REVIEW.md`.
+- Reviewed M12 envelope and receipt-chain helper/test scope.
+- Targeted M12 tests passed `17/17`.
+- Source scan found no direct filesystem, child process, fetch/http/https, process env, MCP memory tool call, runtime wiring, workflow harness start, VCPToolBox call, checkpoint/handoff memory write, durable audit write, approval-line generation, or readiness claim path in the helper source.
+- Preserved that no workflow harness, workflow steps, MCP tool call, VCPToolBox runtime call, target probing, memory read/write/update/supersede/tombstone, checkpoint/handoff receipt write, checkpoint/handoff memory write, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1864`; targeted M12 node tests, source scan, docs/status validation, boundary scans, and changed-scope review passed.
 
 ## CM-1760 M12-K2 VCP Memory Codex Claude Sustained Workflow Receipt Chain Contract
 
