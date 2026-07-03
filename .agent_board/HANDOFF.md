@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1723 M6-K2 VCP memory observe-lite exact approval decision review boundary`.
-Current validation: `CMV-1826`.
-Current handoff: CM-1723 completed the docs-only non-authorizing observe-lite exact approval decision review boundary. Current decision is `blocked_before_runtime_exact_fields_missing`. No real approval line, approval request submission, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1724 M6-K3 VCP memory observe-lite exact approval request display boundary`.
+Current validation: `CMV-1827`.
+Current handoff: CM-1724 completed the docs-only non-authorizing observe-lite exact approval request display boundary. Current decision is `not_display_ready_as_exact_request` because exact fields are missing. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M6-K2 Observe-Lite Exact Approval Decision Review Boundary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M6-K3 Observe-Lite Exact Approval Request Display Boundary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M6_K2_VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M6_K3_VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,19 +25,20 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION.md`
 
 Completed in this slice:
 
-- Added non-authorizing observe-lite exact approval decision review boundary.
-- Reviewed CM-1722 against the M6 and M5 boundaries and recorded current decision `blocked_before_runtime_exact_fields_missing`.
-- Defined decision matrix, review checklist, current review result, and low-disclosure receipt skeleton.
-- Confirmed no real approval line, approval request submission, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
+- Added non-authorizing observe-lite exact approval request display boundary.
+- Defined display state, required future inputs, non-authorizing display template, display stop rules, current display result, and receipt skeleton.
+- Recorded current decision `not_display_ready_as_exact_request` because exact target, transport, client, scope, visibility, and budget fields are missing.
+- Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
-Validation: `CMV-1826`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1827`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: non-authorizing human-facing observe-lite exact request boundary, or remain blocked before runtime until Jenn supplies exact approval. Push remains separate explicit authorization.
+Next safe route: runtime abort receipt skeleton without execution, or remain blocked before runtime until Jenn supplies exact approval. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

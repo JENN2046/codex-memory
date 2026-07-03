@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1723 M6-K2 VCP memory observe-lite exact approval decision review boundary`.
-Current validation: `CMV-1826`.
-Current status: CM-1723 records the docs-only non-authorizing observe-lite exact approval decision review boundary. Current decision is `blocked_before_runtime_exact_fields_missing`. No real approval line, approval request submission, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1724 M6-K3 VCP memory observe-lite exact approval request display boundary`.
+Current validation: `CMV-1827`.
+Current status: CM-1724 records the docs-only non-authorizing observe-lite exact approval request display boundary. Current decision is `not_display_ready_as_exact_request` because exact fields are missing. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is a non-authorizing human-facing observe-lite exact request boundary, or remain blocked before runtime until Jenn supplies exact target/transport/client/scope/visibility/budget/disclosure approval. Push remains separate explicit authorization.
+Next safe local action is a runtime abort receipt skeleton without execution, or remain blocked before runtime until Jenn supplies exact target/transport/client/scope/visibility/budget/disclosure approval. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

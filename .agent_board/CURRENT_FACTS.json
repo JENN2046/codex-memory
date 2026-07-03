@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1723",
-  "validationId": "CMV-1826",
+  "taskId": "CM-1724",
+  "validationId": "CMV-1827",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_exact_approval_decision_review_boundary_docs_only",
+    "scope": "vcp_memory_observe_lite_exact_approval_request_display_boundary_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1827",
+      "scope": "CM-1724 M6-K3 VCP memory observe-lite exact approval request display boundary",
+      "status": "COMPLETED_VALIDATED_M6_K3_VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
     {
       "id": "CMV-1826",
       "scope": "CM-1723 M6-K2 VCP memory observe-lite exact approval decision review boundary",
