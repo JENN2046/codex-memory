@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1738 M8-K5 VCP memory trusted-full-read runtime abort receipt skeleton`.
-Current validation: `CMV-1841`.
-Current status: CM-1738 records the docs-only non-authorizing M8 trusted-full-read runtime abort receipt skeleton. Accepted M7 read-shape receipt and exact Jenn trusted-full-read approval remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-full-read workflow execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1739 M8-K6 VCP memory trusted-full-read blocked closeout summary`.
+Current validation: `CMV-1842`.
+Current status: CM-1739 closes the docs-only M8 preparation chain while recording that trusted-full-read workflow evidence remains incomplete and blocked. Accepted M8 trusted-full-read receipt and exact Jenn boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-full-read workflow execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M8 blocked closeout summary without workflow/runtime, or remain blocked before M8 runtime until required exact approvals exist. Push remains separate explicit authorization.
+Next safe local action is M9 blocked precondition record without workflow/runtime, or remain blocked before M9 until required exact approvals exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
