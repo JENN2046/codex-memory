@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1809 M7 observe-full read-shape low-disclosure execution`.
-Current validation: `CMV-1912`.
-Current project status: CM-1809 executed one bounded `DailyNoteSearcher.SearchDailyNote` read-shape probe through `/v1/human/tool` under the CM-1808 boundary. Route status was `http_2xx`; response body was consumed by the harness only for key/type/count shape projection and raw values were not printed or persisted. No runtime stdout/stderr read, runtime log read, secret/config/env content read, raw memory/raw store read by agent, provider/API call by agent, MCP memory tool call, memory write, public MCP expansion, M8 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
-Current route: `VCP_MEMORY_OBSERVE_FULL_CM1809_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_HTTP_2XX_SHAPE_ONLY_NO_RAW_OUTPUT_NO_WRITE`.
+Current task: `CM-1810 M7 read-shape receipt closeout gate review`.
+Current validation: `CMV-1913`.
+Current project status: CM-1810 accepted CM-1809 as the narrow M7 read-shape proof and unlocked M8 preparation only. M8 trusted-full-read execution, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1810 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
+Current route: `VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_M8_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1810 M7 read-shape receipt closeout gate review: added `docs/VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_GATE_REVIEW.md`. It accepts CM-1809 as the narrow M7 read-shape proof and unlocks M8 preparation only. M8 trusted-full-read execution authorized `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime action in CM-1810 `NO`; response body read `NO`; runtime logs read `NO`; config/env contents read `NO`; secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`. Next safe route is CM-1811 M8 trusted-full-read workflow harness boundary preflight.
 
 CM-1809 M7 observe-full read-shape low-disclosure execution: added `docs/VCP_MEMORY_OBSERVE_FULL_CM1809_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`. It records one bounded live `DailyNoteSearcher.SearchDailyNote` read-shape probe through `/v1/human/tool` under the CM-1808 boundary: pre-start `connection_refused_or_fetch_failed`; runtime started by agent `YES`; warmup probe count `2`; warmup status `http_4xx`; route status `http_2xx`; response body consumed by harness `YES`; response body printed/persisted `NO`; response bytes consumed `138`; JSON parse `ok`; emitted shape keys only `content`, `limited`, `notes`, `timestamp`, `total`; raw private payload disclosed `NO`; runtime stdout/stderr/logs read `NO`; config/env/secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M8 unlocked `NO`; M15 unlocked `NO`; independent post-stop endpoint `connection_refused_or_fetch_failed`; independent bracket-pattern process counts `0`. Next safe route is CM-1810 M7 read-shape receipt closeout gate review.
 

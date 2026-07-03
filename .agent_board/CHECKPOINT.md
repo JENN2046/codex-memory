@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1809 M7 observe-full read-shape low-disclosure execution`.
-Current validation: `CMV-1912`.
+Current checkpoint: `CM-1810 M7 read-shape receipt closeout gate review`.
+Current validation: `CMV-1913`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1810 M7 Read-Shape Receipt Closeout Gate Review
+
+Status: `COMPLETED_VALIDATED_M7_READ_SHAPE_RECEIPT_CLOSEOUT_M8_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_GATE_REVIEW.md`.
+- Accepted CM-1809 as the narrow M7 read-shape proof.
+- Confirmed M7 proof is limited to bounded read-shape, redacted/metadata-only output, no raw private output, and no write.
+- Unlocked CM-1811 M8 trusted-full-read workflow harness boundary preflight only.
+- Confirmed CM-1810 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M8 execution, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1913`; plan M7/M8 slices, CM-1809 receipt review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1809 M7 Observe-Full Read-Shape Low-Disclosure Execution
 

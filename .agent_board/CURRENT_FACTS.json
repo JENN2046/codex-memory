@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1809",
-  "validationId": "CMV-1912",
+  "taskId": "CM-1810",
+  "validationId": "CMV-1913",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_full_m7_read_shape_low_disclosure_execution",
+    "scope": "vcp_memory_observe_full_m7_read_shape_receipt_closeout_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1913",
+      "scope": "CM-1810 M7 read-shape receipt closeout gate review",
+      "status": "COMPLETED_VALIDATED_M7_READ_SHAPE_RECEIPT_CLOSEOUT_M8_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS"
+    },
     {
       "id": "CMV-1912",
       "scope": "CM-1809 M7 observe-full read-shape low-disclosure execution",

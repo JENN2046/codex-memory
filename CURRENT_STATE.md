@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1809 M7 observe-full read-shape low-disclosure execution |
-| Current task | `CM-1809 M7 observe-full read-shape low-disclosure execution` |
-| Current validation | `CMV-1912` |
-| Current route | M7 read-shape proof executed; next route is CM-1810 read-shape receipt closeout gate review |
+| Status | CM-1810 M7 read-shape receipt closeout gate review |
+| Current task | `CM-1810 M7 read-shape receipt closeout gate review` |
+| Current validation | `CMV-1913` |
+| Current route | M7 read-shape accepted; M8 preparation unlocked; next route is CM-1811 trusted-full-read boundary preflight |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1810` adds `docs/VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_GATE_REVIEW.md`. It accepts CM-1809 as the narrow M7 read-shape proof and unlocks M8 preparation only. M8 trusted-full-read execution authorized `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime action in CM-1810 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; next action `CM-1811 M8 trusted-full-read workflow harness boundary preflight`.
 
 `CM-1809` adds `docs/VCP_MEMORY_OBSERVE_FULL_CM1809_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`. It records one bounded live `DailyNoteSearcher.SearchDailyNote` read-shape probe through `/v1/human/tool` under the CM-1808 boundary: pre-start `connection_refused_or_fetch_failed`; runtime started by agent `YES`; warmup probe count `2`; warmup status `http_4xx`; route status `http_2xx`; response body consumed by harness `YES`; response body printed/persisted `NO`; response bytes consumed `138`; JSON parse `ok`; emitted shape keys only `content`, `limited`, `notes`, `timestamp`, `total`; raw private payload disclosed `NO`; runtime stdout/stderr/logs read `NO`; config/env/secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; M8 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; independent post-stop endpoint `connection_refused_or_fetch_failed`; independent bracket-pattern process counts `0`; next action `CM-1810 M7 read-shape receipt closeout gate review`.
 
