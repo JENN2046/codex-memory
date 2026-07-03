@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1767 M13-K4 VCP memory fallback local memory secret rejection contract`.
-Current validation: `CMV-1870`.
+Current checkpoint: `CM-1768 M13-K5 VCP memory fallback local memory lifecycle filter contract`.
+Current validation: `CMV-1871`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1768 M13-K5 VCP Memory Fallback Local Memory Lifecycle Filter Contract
+
+Status: `COMPLETED_VALIDATED_M13_K5_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_LIFECYCLE_FILTER_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryFallbackLocalMemoryLifecycleFilterContract.js`.
+- Added `tests/vcp-memory-fallback-local-memory-lifecycle-filter-contract.test.js`.
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_LIFECYCLE_FILTER_CONTRACT.md`.
+- Covered active local fallback fixture acceptance without runtime execution.
+- Covered inactive lifecycle state denial as active fallback results.
+- Covered inactive lifecycle low-disclosure status summary only when requested by policy.
+- Covered status summary denial when policy is disabled.
+- Covered unknown lifecycle and missing scope fail-closed denial.
+- Covered lifecycle store scan, migration/backfill, and lifecycle mutation requests as L4 stops.
+- Covered raw private lifecycle, linked replacement, and proposal payload fixture rejection as L4 stops.
+- Covered VCP-native lookalike lifecycle fallback candidate rejection.
+- Covered decision mismatch rejection, forbidden raw lifecycle/secret/approval/readiness field rejection without echoing values, missing/positive/malformed side-effect counter rejection, non-boolean policy/request/candidate flag rejection, non-string request id rejection, unexpected non-allowlisted field rejection, and side-effect posture lock.
+- Preserved that no local fallback runtime execution, private runtime read, real query, MCP tool call, VCPToolBox runtime call, target probing, lifecycle store scan, lifecycle mutation, migration/import/export/backfill, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1871`; syntax checks, targeted lifecycle filter node test `14/14`, `npm test` `3677/3677`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1767 M13-K4 VCP Memory Fallback Local Memory Secret Rejection Contract
 
