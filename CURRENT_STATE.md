@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1785 M6 live observe-lite target preflight receipt |
-| Current task | `CM-1785 M6 live observe-lite target preflight receipt` |
-| Current validation | `CMV-1888` |
-| Current route | Authorized observe-lite target preflight executed read-only/no-write/low-disclosure; no VCPToolBox target found, process candidate count was zero, local status-only handshake was connection refused, no response body/raw memory/secret/config was read, and M6 live proof remains incomplete; next safe action requires a safe operator-provided target alias or another exact safe locator route |
+| Status | CM-1786 M6 observe-lite operator target locator receipt |
+| Current task | `CM-1786 M6 observe-lite operator target locator receipt` |
+| Current validation | `CMV-1889` |
+| Current route | Operator target locator executed read-only/no-write/low-disclosure; sanitized VCPToolBox checkout target is bound, declared entrypoint and package metadata are present, local service handshake is still connection refused, startup command was not executed, and M6 live proof remains incomplete; next safe action requires exact approval to start or otherwise reach the service in observe-lite mode |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1786` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1786_OPERATOR_TARGET_LOCATOR_RECEIPT.md`. It records the operator-provided target locator result using only sanitized aliases and booleans: root alias present `YES`; entrypoint alias present `YES`; package metadata present `YES`; package script values included `NO`; dependency names included `NO`; startup command executed `NO`; local handshake probe count `1`; local handshake reachable `NO`; error class `connection_refused`; response body included `NO`; locator projection accepted `YES`; no target found `NO`; accepted target count `1`; found target count `1`; sanitized target count `2`; proof packet projection accepted `YES` as action-plan only; runtime execution allowed by helper `NO`; live VCPToolBox called `NO`; live target proof executed `NO`; M6 live proof complete `NO`. Boundary: read-only `YES`; no-write `YES`; low-disclosure `YES`; locator/path/endpoint/command args/process/response body/package script/dependency values included `NO`; config/env/secret/raw runtime/raw memory/raw store read `NO`; memory read/write/result `NO`; provider/API `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M15 unlocked `NO`; next required boundary `exact approval for observe-lite service start or live handshake`.
 
 `CM-1785` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1785_LIVE_TARGET_PREFLIGHT_RECEIPT.md`. It records the exact authorized observe-lite live target preflight result: exact candidate count `6`, candidate present count `0`, process-name candidate count `0`, local handshake probe count `1`, local handshake reachable `NO`, error class `connection_refused`, response body included `NO`, locator contract projection accepted `YES`, no target found `YES`, accepted target count `0`, found target count `0`. Boundary: read-only `YES`; no-write `YES`; low-disclosure `YES`; locator/path/endpoint/process/args/response body included `NO`; config/env/secret/raw runtime/raw memory/raw store read `NO`; memory read/write/result `NO`; provider/API `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; approval line present/generated `NO`; approval granted `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M6 live proof complete `NO`; M15 unlocked `NO`; next required input `safe operator target alias or exact safe locator route`.
 

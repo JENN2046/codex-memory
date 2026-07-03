@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1785 M6 live observe-lite target preflight receipt`.
-Current validation: `CMV-1888`.
-Current handoff: CM-1785 executed the user-authorized observe-lite live target preflight in read-only/no-write/low-disclosure mode. Six exact candidate target aliases were checked as metadata only and none were present; process command-name candidate count was zero; one local status-only handshake probe was attempted and returned `connection_refused`; response body was not read; locator contract projection accepted the fail-closed no-target result. M6 live proof remains incomplete, no VCPToolBox target is bound, M15 remains locked, and no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1786 M6 observe-lite operator target locator receipt`.
+Current validation: `CMV-1889`.
+Current handoff: CM-1786 executed the operator target locator route in read-only/no-write/low-disclosure mode. The sanitized VCPToolBox checkout target is bound, declared entrypoint and package metadata are present, package script values and dependency names were not disclosed, startup command was not executed, and one local status-only handshake probe returned `connection_refused`; response body was not read. M6 live proof remains incomplete because service transport is not live, M15 remains locked, and no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: execute and record `M6 live observe-lite target preflight` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: execute and record `M6 observe-lite operator target locator` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M6_LIVE_OBSERVE_LITE_TARGET_PREFLIGHT_NO_TARGET_FOUND_READ_ONLY_NO_WRITE_LOW_DISCLOSURE`; production/release/cutover ready no; complete V8 not claimed; M6 live proof incomplete; VCPToolBox target not found; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_OPERATOR_TARGET_LOCATOR_TARGET_BOUND_TRANSPORT_NOT_RUNNING_READ_ONLY_NO_WRITE_LOW_DISCLOSURE`; production/release/cutover ready no; complete V8 not claimed; M6 live proof incomplete; sanitized VCPToolBox target bound; service transport not running; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -27,6 +27,7 @@ Current entrypoints:
 - `.agent_board/HANDOFF.md`
 - `src/core/VcpMemoryHealthReportSchemaContract.js`
 - `tests/vcp-memory-health-report-schema-contract.test.js`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1786_OPERATOR_TARGET_LOCATOR_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1785_LIVE_TARGET_PREFLIGHT_RECEIPT.md`
 - `docs/VCP_MEMORY_M15_BLOCKED_CLOSEOUT_SUMMARY.md`
 - `docs/VCP_MEMORY_M15_RC_REVIEW_APPROVAL_PACKET_READINESS_BOUNDARY.md`
@@ -112,17 +113,18 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1785_LIVE_TARGET_PREFLIGHT_RECEIPT.md`.
-- Executed user-authorized observe-lite target preflight in read-only/no-write/low-disclosure mode.
-- Checked six exact candidate target aliases as metadata only; present count `0`.
-- Checked process command-name candidates count-only; candidate count `0`.
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1786_OPERATOR_TARGET_LOCATOR_RECEIPT.md`.
+- Used the operator-provided target information as sanitized aliases only.
+- Confirmed root alias present `YES`, entrypoint alias present `YES`, and package metadata present `YES`.
+- Confirmed package script values included `NO`, dependency names included `NO`, and startup command executed `NO`.
 - Attempted one local status-only handshake probe; reachable `NO`, error class `connection_refused`, response body included `NO`.
-- Ran locator contract projection; accepted `YES`, no target found `YES`, accepted target count `0`, found target count `0`.
-- Confirmed no locator/path/endpoint values, process names, command args, response bodies, config/env/secrets, raw runtime, raw memory, raw store, memory result, memory read/write, provider/API, MCP memory tool, public MCP expansion, approval line, release, deploy, cutover, push, readiness, M6 completion, M15 unlock, complete V8 claim, full bridge completion claim, or readiness claim occurred.
+- Ran locator contract projection; accepted `YES`, no target found `NO`, accepted target count `1`, found target count `1`, sanitized target count `2`.
+- Ran live proof packet projection; accepted `YES` as action-plan only, runtime execution allowed by helper `NO`, live VCPToolBox called `NO`, live target proof executed `NO`.
+- Confirmed no locator/path/endpoint values, command args, process names, response bodies, package script values, dependency names, config/env/secrets, raw runtime, raw memory, raw store, memory result, memory read/write, provider/API, MCP memory tool, public MCP expansion, startup command, approval line, release, deploy, cutover, push, readiness, M6 completion, M15 unlock, complete V8 claim, full bridge completion claim, or readiness claim occurred.
 
-Validation: `CMV-1888`; exact preflight output, locator contract projection, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
+Validation: `CMV-1889`; operator target locator output, locator contract projection, live proof packet projection, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
-Next safe route: safe operator-provided VCPToolBox target alias or another exact safe locator route. Do not run observe-full/trusted-read/write, do not read secrets/config/raw memory/raw stores, do not call MCP memory tools, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe route: exact approval for observe-lite service start or another live handshake route. Do not run observe-full/trusted-read/write, do not read secrets/config/raw memory/raw stores, do not call MCP memory tools, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

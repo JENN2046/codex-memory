@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1785 M6 live observe-lite target preflight receipt`.
-Current validation: `CMV-1888`.
+Current checkpoint: `CM-1786 M6 observe-lite operator target locator receipt`.
+Current validation: `CMV-1889`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1786 M6 Observe-Lite Operator Target Locator Receipt
+
+Status: `COMPLETED_VALIDATED_M6_OPERATOR_TARGET_LOCATOR_TARGET_BOUND_TRANSPORT_NOT_RUNNING_READ_ONLY_NO_WRITE_LOW_DISCLOSURE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1786_OPERATOR_TARGET_LOCATOR_RECEIPT.md`.
+- Used the operator-provided target information as sanitized aliases only.
+- Confirmed root alias present `YES`, entrypoint alias present `YES`, and package metadata present `YES`.
+- Confirmed package script values included `NO`, dependency names included `NO`, and startup command executed `NO`.
+- Attempted one local status-only handshake probe; reachable `NO`, error class `connection_refused`, response body included `NO`.
+- Ran `VcpToolBoxRuntimeTargetLocatorPreflight` projection; accepted `YES`, no target found `NO`, accepted target count `1`, found target count `1`, sanitized target count `2`.
+- Ran live proof packet projection; accepted `YES` as action-plan only, runtime execution allowed by helper `NO`, live VCPToolBox called `NO`, live target proof executed `NO`.
+- Preserved that no locator/path/endpoint values, command args, process names, response bodies, package script values, dependency names, config/env/secrets, raw runtime, raw memory, raw store, memory result, memory read/write, provider/API, MCP memory tool, public MCP expansion, startup command, approval line, release, deploy, cutover, push, readiness, M6 completion, M15 unlock, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-1889`; operator target locator output, locator contract projection, live proof packet projection, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1785 M6 Live Observe-Lite Target Preflight Receipt
 
