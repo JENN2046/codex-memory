@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1775 M14-K4 VCP memory health report section requiredness`.
-Current validation: `CMV-1878`.
-Current status: CM-1775 locks the fixture health report schema required section boundary with tests for missing sections, missing section fields, and extra sections. Targeted tests passed `20/20`; default `npm test` passed `3711/3711`. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1776 M14-K5 VCP memory health report counter reason specificity`.
+Current validation: `CMV-1879`.
+Current status: CM-1776 locks the fixture health report schema positive side-effect counter rejection detail. Targeted tests passed `22/22`; default `npm test` passed `3713/3713`. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M14-K5 counter reason specificity tests for the health report schema, without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, or readiness claims. Push remains separate explicit authorization.
+Next safe local action is M14 health report source review or blocked closeout, without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

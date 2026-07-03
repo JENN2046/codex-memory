@@ -354,6 +354,71 @@ test('CM1775 rejects extra health report sections outside the required set', () 
   assert.ok(result.unexpectedFields.includes('sections.unapproved_status'));
 });
 
+test('CM1776 reports positive side-effect counters with field names only', () => {
+  const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
+    counters: {
+      dashboardRuntimeCalls: 1,
+      mcpToolCalls: 2,
+      memoryWrites: 3,
+      readinessClaims: 4
+    }
+  }));
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'forbidden_positive_side_effect_counters');
+  assert.deepEqual(result.forbiddenCounters, [
+    'dashboardRuntimeCalls',
+    'mcpToolCalls',
+    'memoryWrites',
+    'readinessClaims'
+  ]);
+  assert.equal(Object.prototype.hasOwnProperty.call(result, 'counters'), false);
+  assert.equal(serialized.includes('"dashboardRuntimeCalls":1'), false);
+  assert.equal(serialized.includes('"mcpToolCalls":2'), false);
+  assert.equal(serialized.includes('"memoryWrites":3'), false);
+  assert.equal(serialized.includes('"readinessClaims":4'), false);
+});
+
+test('CM1776 keeps positive counter rejection projection side-effect false', () => {
+  const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
+    counters: {
+      privateRuntimeReads: 1,
+      rawStoreReads: 1,
+      providerApiCalls: 1,
+      durableAuditWrites: 1,
+      approvalLineOperations: 1
+    }
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'forbidden_positive_side_effect_counters');
+  assert.deepEqual(result.forbiddenCounters, [
+    'privateRuntimeReads',
+    'rawStoreReads',
+    'providerApiCalls',
+    'durableAuditWrites',
+    'approvalLineOperations'
+  ]);
+  assert.equal(result.lowDisclosureProjection.requestId, 'm14_health_report_schema_001');
+  assert.equal(result.dashboardRuntimeImplemented, false);
+  assert.equal(result.dashboardCliCalled, false);
+  assert.equal(result.vcpToolboxRuntimeCalled, false);
+  assert.equal(result.mcpMemoryToolCalled, false);
+  assert.equal(result.privateRuntimeRead, false);
+  assert.equal(result.rawStoreRead, false);
+  assert.equal(result.realQueryExecuted, false);
+  assert.equal(result.providerApiCalled, false);
+  assert.equal(result.memoryRead, false);
+  assert.equal(result.memoryWritten, false);
+  assert.equal(result.durableAuditWritten, false);
+  assert.equal(result.durableMemoryWritten, false);
+  assert.equal(result.publicMcpExpanded, false);
+  assert.equal(result.approvalRequestSubmitted, false);
+  assert.equal(result.approvalLineGenerated, false);
+  assert.equal(result.readinessClaimAllowed, false);
+});
+
 test('CM1772 rejects missing positive and malformed zero side-effect counters', () => {
   const missingFixture = healthReportContract();
   delete missingFixture.counters.providerApiCalls;

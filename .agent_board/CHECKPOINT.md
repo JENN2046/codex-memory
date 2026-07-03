@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1775 M14-K4 VCP memory health report section requiredness`.
-Current validation: `CMV-1878`.
+Current checkpoint: `CM-1776 M14-K5 VCP memory health report counter reason specificity`.
+Current validation: `CMV-1879`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1776 M14-K5 VCP Memory Health Report Counter Reason Specificity
+
+Status: `COMPLETED_VALIDATED_M14_K5_VCP_MEMORY_HEALTH_REPORT_COUNTER_REASON_SPECIFICITY_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Expanded `tests/vcp-memory-health-report-schema-contract.test.js`.
+- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_COUNTER_REASON_SPECIFICITY.md`.
+- Covered exact positive side-effect counter rejection reason code `forbidden_positive_side_effect_counters`.
+- Covered field-name-only `forbiddenCounters` reporting.
+- Covered no submitted counter object/value echo in rejected output.
+- Covered rejected side-effect projection outputs remaining false.
+- Preserved that no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, VCPToolBox runtime call, MCP memory tool call, private runtime read, raw store read, real query, provider/API call, memory read/write, durable audit/runtime write, public MCP expansion, approval request, approval line, push, release, deploy, cutover, readiness claim, complete V8 claim, or full bridge completion claim occurred.
+
+Validation: `CMV-1879`; targeted health report schema contract test `22/22`, `npm test` `3713/3713`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1775 M14-K4 VCP Memory Health Report Section Requiredness
 
