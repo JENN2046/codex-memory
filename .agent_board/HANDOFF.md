@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1751 M10-K4 VCP memory bounded mutation exact approval request display boundary`.
-Current validation: `CMV-1854`.
-Current handoff: CM-1751 defines a non-authorizing display boundary for a future M10 bounded mutation exact approval request. Accepted M9 proposal receipts, exact Jenn M10 write boundary, exact mutation fields, rollback posture, and audit receipt plan remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, write/update/supersede/tombstone execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, bounded write safety claim, or readiness claim occurred.
+Current task: `CM-1752 M10-K5 VCP memory bounded mutation runtime abort receipt skeleton`.
+Current validation: `CMV-1855`.
+Current handoff: CM-1752 defines a low-disclosure abort receipt skeleton for future M10 bounded mutation attempts. Accepted M9 proposal receipts, exact Jenn M10 write boundary, exact mutation fields, rollback posture, and audit receipt plan remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, write/update/supersede/tombstone execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, bounded write safety claim, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M10-K4 Bounded Mutation Exact Approval Request Display Boundary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M10-K5 Bounded Mutation Runtime Abort Receipt Skeleton` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M10_K4_VCP_MEMORY_BOUNDED_MUTATION_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M10_K5_VCP_MEMORY_BOUNDED_MUTATION_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_RUNTIME_ABORT_RECEIPT_SKELETON.md`
 - `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
 - `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_DECISION_REVIEW.md`
 - `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_PACKET_PREPARATION.md`
@@ -58,15 +59,15 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added M10 bounded mutation exact approval request display boundary.
-- Defined the non-authorizing future display shape, required future inputs, display stop rules, current display result, and receipt skeleton.
-- Recorded that the current state is not display-ready as a real exact request because accepted M9 proposal receipts, exact Jenn M10 write boundary, exact mutation fields, rollback posture, and audit receipt plan are missing.
+- Added M10 bounded mutation runtime abort receipt skeleton.
+- Defined low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-runtime conclusion.
+- Recorded that accepted M9 proposal receipts, exact Jenn M10 write boundary, exact mutation fields, rollback posture, and audit receipt plan are still missing.
 - Preserved that no write/update/supersede/tombstone execution, durable write, memory write/update/supersede/tombstone, mutation receipt, or rollback audit occurred.
 - Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, bounded write safety claim, or readiness claim occurred.
 
-Validation: `CMV-1854`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1855`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M10 runtime abort receipt skeleton without runtime/write/update/supersede/tombstone execution, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
+Next safe route: M10 blocked closeout summary without runtime/write/update/supersede/tombstone execution, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

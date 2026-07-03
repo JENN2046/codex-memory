@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1751 M10-K4 VCP memory bounded mutation exact approval request display boundary`.
-Current validation: `CMV-1854`.
-Current status: CM-1751 defines a non-authorizing display boundary for a future M10 bounded mutation exact approval request. Accepted M9 proposal receipts, exact Jenn M10 write boundary, exact mutation fields, rollback posture, and audit receipt plan remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, write/update/supersede/tombstone execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, bounded write safety claim, or readiness claim occurred.
+Current task: `CM-1752 M10-K5 VCP memory bounded mutation runtime abort receipt skeleton`.
+Current validation: `CMV-1855`.
+Current status: CM-1752 defines a low-disclosure abort receipt skeleton for future M10 bounded mutation attempts. Accepted M9 proposal receipts, exact Jenn M10 write boundary, exact mutation fields, rollback posture, and audit receipt plan remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, write/update/supersede/tombstone execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, bounded write safety claim, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M10 runtime abort receipt skeleton without runtime/write/update/supersede/tombstone execution, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
+Next safe local action is M10 blocked closeout summary without runtime/write/update/supersede/tombstone execution, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1751 M10-K4 VCP memory bounded mutation exact approval request display boundary |
-| Current task | `CM-1751 M10-K4 VCP memory bounded mutation exact approval request display boundary` |
-| Current validation | `CMV-1854` |
-| Current route | Docs-only M10 exact approval request display boundary; accepted M9 proposal receipts absent; exact M10 write boundary absent; no approval line, request submission, durable write, memory write/update/supersede/tombstone, bounded write safety claim, or live runtime execution |
+| Status | CM-1752 M10-K5 VCP memory bounded mutation runtime abort receipt skeleton |
+| Current task | `CM-1752 M10-K5 VCP memory bounded mutation runtime abort receipt skeleton` |
+| Current validation | `CMV-1855` |
+| Current route | Docs-only M10 runtime abort receipt skeleton; accepted M9 proposal receipts absent; exact M10 write boundary absent; no approval line, request submission, runtime, durable write, memory write/update/supersede/tombstone, bounded write safety claim, or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1752` adds `docs/VCP_MEMORY_BOUNDED_MUTATION_RUNTIME_ABORT_RECEIPT_SKELETON.md`. It defines low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-runtime conclusion for future M10 bounded mutation attempts. Boundary: abort skeleton ready no runtime `YES`; accepted M9 proposal receipts `NO`; exact write boundary approval `NO`; exact mutation fields `NO`; rollback posture `NO`; audit receipt plan `NO`; request submitted `NO`; execution authorized `NO`; mutation harness started `NO`; write/update/supersede/tombstone authorized `NO`; durable memory write `NO`; memory write/update/supersede/tombstone `NO`; mutation receipt `NO`; rollback audit `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; bounded write safety claim `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1751` adds `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`. It defines a non-authorizing display boundary for a future M10 bounded mutation exact approval request, but is not a real approval request and cannot authorize execution. Boundary: display ready as exact request `NO`; accepted M9 proposal receipts `NO`; exact write boundary approval `NO`; exact mutation fields `NO`; rollback posture `NO`; audit receipt plan `NO`; request submitted `NO`; execution authorized by display `NO`; write/update/supersede/tombstone authorized by display `NO`; durable memory write `NO`; memory write/update/supersede/tombstone `NO`; mutation receipt `NO`; rollback audit `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; bounded write safety claim `NO`; complete V8 `NOT_CLAIMED`.
 
