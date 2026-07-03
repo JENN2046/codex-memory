@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1750",
-  "validationId": "CMV-1853",
+  "taskId": "CM-1751",
+  "validationId": "CMV-1854",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_bounded_mutation_exact_write_boundary_decision_review_docs_only",
+    "scope": "vcp_memory_bounded_mutation_exact_approval_request_display_boundary_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1854",
+      "scope": "CM-1751 M10-K4 VCP memory bounded mutation exact approval request display boundary",
+      "status": "COMPLETED_VALIDATED_M10_K4_VCP_MEMORY_BOUNDED_MUTATION_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1853",
       "scope": "CM-1750 M10-K3 VCP memory bounded mutation exact write boundary decision review",

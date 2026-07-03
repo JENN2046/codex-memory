@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1750 M10-K3 VCP memory bounded mutation exact write boundary decision review`.
-Current validation: `CMV-1853`.
+Current checkpoint: `CM-1751 M10-K4 VCP memory bounded mutation exact approval request display boundary`.
+Current validation: `CMV-1854`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1751 M10-K4 VCP Memory Bounded Mutation Exact Approval Request Display Boundary
+
+Status: `COMPLETED_VALIDATED_M10_K4_VCP_MEMORY_BOUNDED_MUTATION_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`.
+- Defined a non-authorizing display boundary for a future M10 bounded mutation exact approval request.
+- Preserved that the current state is not display-ready as a real exact request because accepted M9 proposal receipts, exact Jenn M10 write boundary, exact mutation fields, rollback posture, and audit receipt plan are absent.
+- Preserved that request submission, approval-line generation, runtime, write/update/supersede/tombstone execution, durable write, memory write/update/supersede/tombstone, mutation receipt, and rollback audit did not occur.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, memory write/update/supersede/tombstone, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, bounded write safety claim, or readiness claim occurred.
+
+Validation: `CMV-1854`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1750 M10-K3 VCP Memory Bounded Mutation Exact Write Boundary Decision Review
 
