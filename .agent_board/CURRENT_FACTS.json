@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1754",
-  "validationId": "CMV-1857",
+  "taskId": "CM-1755",
+  "validationId": "CMV-1858",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_response_normalization_audit_receipts_m11_precondition_review_docs_only",
+    "scope": "vcp_memory_response_normalization_audit_receipts_m11_gap_matrix_docs_only_fixture_schema",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1858",
+      "scope": "CM-1755 M11-K1 VCP memory response normalization audit receipts gap matrix",
+      "status": "COMPLETED_VALIDATED_M11_K1_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_GAP_MATRIX_DOCS_ONLY_FIXTURE_SCHEMA_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1857",
       "scope": "CM-1754 M11-K0 VCP memory response normalization audit receipts precondition review",

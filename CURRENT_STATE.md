@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1754 M11-K0 VCP memory response normalization audit receipts precondition review |
-| Current task | `CM-1754 M11-K0 VCP memory response normalization audit receipts precondition review` |
-| Current validation | `CMV-1857` |
-| Current route | Docs-only M11 precondition review; M4 contract exists for docs/schema work; accepted M7 live read-shape receipt absent; no runtime, fallback execution, memory read/write, approval line, readiness, or live normalized envelope proof |
+| Status | CM-1755 M11-K1 VCP memory response normalization audit receipts gap matrix |
+| Current task | `CM-1755 M11-K1 VCP memory response normalization audit receipts gap matrix` |
+| Current validation | `CMV-1858` |
+| Current route | Docs-only fixture/schema M11 gap matrix; response/receipt lockable fields mapped; live VCP-native parity and runtime receipt stability still blocked; no runtime, fallback execution, memory read/write, approval line, readiness, or live normalized envelope proof |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1755` adds `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_GAP_MATRIX.md`. It maps fixture/schema-lockable M11 areas and separates live-proof gaps. Boundary: normalized envelope mandatory fields mapped `YES`; source runtime and fallback markers mapped `YES`; confidence/evidence basis mapped `YES`; low-disclosure receipt fields mapped `YES`; raw/private/debug exclusion mapped `YES`; status/error mapping mapped `YES`; readiness overclaim rejection mapped `YES`; M7 live read-shape receipt accepted `NO`; live VCP-native parity proof `NO`; runtime receipt stability proof `NO`; VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; memory write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; real approval line `NO`; approval request submission `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1754` adds `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_PRECONDITION_REVIEW.md`. It reviews M11 entry conditions against M4 invocation/result normalization contracts and M7 observe-full closeout. Boundary: M4 contract exists `YES`; M7 live read-shape receipt accepted `NO`; M7 read shape explicitly simulated `YES` only on schema/fixture basis; live VCP-native normalized envelope proof `NO`; stable low-disclosure runtime receipt proof `NO`; VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; memory write/update/supersede/tombstone `NO`; durable memory write `NO`; real approval line `NO`; approval request submission `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

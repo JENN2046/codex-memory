@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1754 M11-K0 VCP memory response normalization audit receipts precondition review`.
-Current validation: `CMV-1857`.
+Current checkpoint: `CM-1755 M11-K1 VCP memory response normalization audit receipts gap matrix`.
+Current validation: `CMV-1858`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1755 M11-K1 VCP Memory Response Normalization Audit Receipts Gap Matrix
+
+Status: `COMPLETED_VALIDATED_M11_K1_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_GAP_MATRIX_DOCS_ONLY_FIXTURE_SCHEMA_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_GAP_MATRIX.md`.
+- Mapped fixture/schema-lockable M11 areas: normalized envelope fields, source runtime and fallback markers, confidence/evidence basis, low-disclosure receipt fields, raw/private/debug exclusion, status/error mapping, and readiness overclaim rejection.
+- Recorded blocked live proof gaps: VCP-native response parity and runtime receipt stability still require exact-approved M7/live evidence.
+- Listed future fixture families for schema-only success, fallback, L4 stop, denied scope, unknown target, partial budget, sanitized error, fallback conflict, raw leakage rejection, and overclaim rejection.
+- Preserved that no VCPToolBox runtime call, target probing, fallback execution, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1858`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1754 M11-K0 VCP Memory Response Normalization Audit Receipts Precondition Review
 
