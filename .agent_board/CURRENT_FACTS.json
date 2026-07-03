@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1805",
-  "validationId": "CMV-1908",
+  "taskId": "CM-1806",
+  "validationId": "CMV-1909",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_dailynotesearcher_primary_linux_candidate_install",
+    "scope": "vcp_memory_observe_lite_dailynotesearcher_primary_candidate_status_only_rerun",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1909",
+      "scope": "CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_HTTP_2XX_NO_BODY_NO_LOG_NO_SECRET_NO_MEMORY_WRITE"
+    },
     {
       "id": "CMV-1908",
       "scope": "CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install",

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install`.
-Current validation: `CMV-1908`.
-Current status: CM-1805 installed the CM-1804 release binary to `Plugin/DailyNoteSearcher/DailyNoteSearcher` with `install -m 755`; exit code `0`. Source and target are byte-identical with SHA-256 `20444e1d1ee650c9add0905f7fa851217863c43a5fab243ba78cc05cae5d65df`. Target is Linux x86-64, mode `755`, size `3735640`, and executable. No runtime start, binary service execution, response body/stdout/stderr from runtime/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun`.
+Current validation: `CMV-1909`.
+Current status: CM-1806 corrected rerun used a disposable child-process bearer and in-memory request body, discarded response body and runtime stdout/stderr, and reached `/v1/human/tool` status `http_2xx` after warmup `http_4xx`. A first runtime attempt had a status classifier bug and is not accepted as proof. Independent post-stop checks found endpoint `connection_refused_or_fetch_failed`, `node server.js` process count `0`, and DailyNoteSearcher process count `0`. No response body/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1806 DailyNoteSearcher primary-candidate status-only rerun. Use the existing low-disclosure temporary-auth/status-only envelope: no token disclosure/persistence, no response body, no runtime logs, no stdout/stderr from runtime, no config/env contents, no raw memory/stores, no provider APIs, and no memory write. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
+Next safe action is CM-1807 M6 observe-lite successful proof closeout / next-stage gate review. This should be no-runtime review/closeout that decides the next plan stage from the accepted low-disclosure `http_2xx` memory-capability status proof. Do not claim release, production, cutover, `RC_READY`, M15, complete V8, or full bridge completion. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

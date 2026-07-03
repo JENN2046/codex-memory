@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install`.
-Current validation: `CMV-1908`.
+Current checkpoint: `CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun`.
+Current validation: `CMV-1909`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1806 M6 Observe-Lite DailyNoteSearcher Primary-Candidate Status-Only Rerun
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_HTTP_2XX_NO_BODY_NO_LOG_NO_SECRET_NO_MEMORY_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1806_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_RECEIPT.md`.
+- First runtime attempt had a status classifier bug and is not accepted as proof.
+- Corrected rerun used disposable child-process bearer auth, generated request body only in memory, and discarded response body.
+- Corrected rerun pre-start status was `connection_refused_or_fetch_failed`; warmup reached `http_4xx` after `2` probes; `/v1/human/tool` returned `http_2xx`.
+- Independent post-stop checks found endpoint `connection_refused_or_fetch_failed`, `node server.js` process count `0`, and DailyNoteSearcher process count `0`.
+- Confirmed bearer disclosed/persisted `NO`, request body printed/persisted `NO`, response body/stdout/stderr from runtime/runtime logs/config/env/secrets/raw memory/raw store read `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, public MCP expansion `NO`, release/deploy/cutover/push `NO`, readiness `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1807 M6 observe-lite successful proof closeout / next-stage gate review.
+
+Validation: `CMV-1909`; fixed source calibration slices, first classifier-bug attempt record, corrected status-only rerun output, independent post-stop process/endpoint checks, VCPToolBox status, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1805 M6 Observe-Lite DailyNoteSearcher Primary Linux Candidate Install
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install |
-| Current task | `CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install` |
-| Current validation | `CMV-1908` |
-| Current route | Linux x64 primary candidate installed but not executed; next route is CM-1806 status-only rerun |
+| Status | CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun |
+| Current task | `CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun` |
+| Current validation | `CMV-1909` |
+| Current route | primary-candidate human-tool status `http_2xx` proven without body/log/secret/memory write; next route is CM-1807 closeout/gate review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1806` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1806_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_RECEIPT.md`. It records a live status-only rerun after primary Linux candidate install: first attempt classifier bug `YES` and not accepted as proof; corrected rerun pre-start `connection_refused_or_fetch_failed`; runtime started by agent `YES`; disposable bearer generated `YES` and disclosed/persisted `NO`; request body generated in memory `YES` and printed/persisted `NO`; warmup probe count `2`; warmup status `http_4xx`; `/v1/human/tool` status `http_2xx`; response body/stdout/stderr from runtime/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M15 unlocked `NO`; final endpoint after stop `connection_refused_or_fetch_failed`; final process counts `0`; next action `CM-1807 M6 observe-lite successful proof closeout and next-stage gate review`.
 
 `CM-1805` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1805_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_RECEIPT.md`. It records installing the CM-1804 release binary to `Plugin/DailyNoteSearcher/DailyNoteSearcher`: primary Linux candidate existed before install `NO`; `install -m 755` exit code `0`; source and target byte-identical `YES`; SHA-256 `20444e1d1ee650c9add0905f7fa851217863c43a5fab243ba78cc05cae5d65df`; target file header `ELF 64-bit LSB pie executable, x86-64`; target mode `755`; target size `3735640`; target executable `YES`; runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr from runtime/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1806 DailyNoteSearcher primary-candidate status-only rerun`.
 
