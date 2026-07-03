@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1825 M9 blocked-to-exact-boundary decision packet refresh`.
-Current validation: `CMV-1928`.
+Current checkpoint: `CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract`.
+Current validation: `CMV-1929`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1826 M9 Non-Authorizing Exact-Boundary Packet Skeleton Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalExactBoundaryPacketSkeletonContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-exact-boundary-packet-skeleton-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1826_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3746/3746`.
+- Confirmed helper accepts only non-authorizing packet skeletons and keeps request/proposal/runtime/write/M10/readiness blocked.
+- Routed next work to CM-1827 M9 exact-boundary packet skeleton closeout / request-boundary gate review.
+
+Validation: `CMV-1929`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1825 M9 Blocked-to-Exact-Boundary Decision Packet Refresh
 

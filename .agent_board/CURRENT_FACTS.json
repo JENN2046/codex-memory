@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1825",
-  "validationId": "CMV-1928",
+  "taskId": "CM-1826",
+  "validationId": "CMV-1929",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_blocked_to_exact_boundary_decision_packet_refresh",
+    "scope": "vcp_memory_trusted_write_proposal_m9_exact_boundary_packet_skeleton_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1929",
+      "scope": "CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1928",
       "scope": "CM-1825 M9 blocked-to-exact-boundary decision packet refresh",

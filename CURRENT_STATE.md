@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1825 M9 blocked-to-exact-boundary decision packet refresh |
-| Current task | `CM-1825 M9 blocked-to-exact-boundary decision packet refresh` |
-| Current validation | `CMV-1928` |
-| Current route | M9 decision packet refreshed; next route is CM-1826 non-authorizing exact-boundary packet skeleton contract |
+| Status | CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract |
+| Current task | `CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract` |
+| Current validation | `CMV-1929` |
+| Current route | M9 packet skeleton fixture contract added; next route is CM-1827 closeout / request-boundary gate review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1826` adds `src/core/VcpMemoryTrustedWriteProposalExactBoundaryPacketSkeletonContract.js`, `tests/vcp-memory-trusted-write-proposal-exact-boundary-packet-skeleton-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1826_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3746/3746`. The helper validates a non-authorizing exact-boundary packet skeleton, keeps exact request submission, approval-line generation, proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M9 completion, M10/M15 unlock, and readiness blocked, and rejects raw/secret/request/approval/readiness fields without echo. Next safe route is CM-1827 M9 exact-boundary packet skeleton closeout / request-boundary gate review.
 
 `CM-1825` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1825_BLOCKED_TO_EXACT_BOUNDARY_DECISION_PACKET_REFRESH.md`. It decides to stop adding same-layer fixture guard docs and prepare a non-authorizing exact-boundary packet skeleton contract next. The decision uses CM-1821, CM-1822, CM-1823, and CM-1824 as local fixture evidence only. It does not submit an approval request, generate approval line, generate/submit proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1826 M9 non-authorizing exact-boundary packet skeleton contract.
 
