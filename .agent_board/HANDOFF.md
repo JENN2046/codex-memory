@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance`.
-Current validation: `CMV-1917`.
-Current handoff: CM-1814 refreshed M9 preconditions after accepted M8 evidence. Accepted M8 trusted-full-read workflow evidence now exists for planning via CM-1812/CM-1813, but exact `trusted-write-proposal` boundary, exact proposal fields, proposal review route, L4 write-intent shield evidence, approval line, proposal generation/submission authorization, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+Current task: `CM-1815 M9 trusted-write-proposal exact approval packet refresh`.
+Current validation: `CMV-1918`.
+Current handoff: CM-1815 refreshed the non-authorizing M9 exact approval packet shape so accepted M8 evidence can be referenced for future packet preparation. Exact target, transport, client, scope, visibility, proposal operations, review route, rollback posture, budgets, and output disclosure remain unset until a separate exact boundary supplies them. Approval-line generation, approval request submission, proposal generation/submission, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1814 refreshed M9 preconditions after accepted M8 evidence. 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M9_PRECONDITION_REFRESH_M8_ACCEPTED_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 preparation is refreshed, but exact proposal boundary and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M9_PACKET_REFRESH_M8_PRESENT_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 packet preparation is refreshed, but exact proposal boundary and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1815_EXACT_APPROVAL_PACKET_REFRESH.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1814_PRECONDITION_REFRESH_AFTER_M8_ACCEPTANCE.md`
 - `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1813_WORKFLOW_RECEIPT_CLOSEOUT_GATE_REVIEW.md`
 - `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1812_WORKFLOW_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`

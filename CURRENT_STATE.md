@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance |
-| Current task | `CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance` |
-| Current validation | `CMV-1917` |
-| Current route | M9 precondition refreshed; next route is CM-1815 trusted-write-proposal exact approval packet refresh |
+| Status | CM-1815 M9 trusted-write-proposal exact approval packet refresh |
+| Current task | `CM-1815 M9 trusted-write-proposal exact approval packet refresh` |
+| Current validation | `CMV-1918` |
+| Current route | M9 packet refresh complete; next route is CM-1816 exact approval decision review refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1815` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1815_EXACT_APPROVAL_PACKET_REFRESH.md`. It refreshes the non-authorizing M9 exact approval packet shape so accepted M8 evidence can be referenced in future packet preparation. Exact target, transport, client, scope, visibility, proposal operations, review route, rollback posture, budgets, and output disclosure remain unset until a separate exact boundary supplies them. Approval-line generation, approval request submission, proposal generation/submission, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1816 M9 exact approval decision review refresh.
 
 `CM-1814` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1814_PRECONDITION_REFRESH_AFTER_M8_ACCEPTANCE.md`. It refreshes M9 preconditions after CM-1813 accepted the narrow M8 workflow proof. Accepted M8 evidence now exists for planning via CM-1812/CM-1813, but exact `trusted-write-proposal` boundary, exact proposal fields, proposal review route, L4 write-intent shield evidence, approval line, proposal generation/submission authorization, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1815 M9 trusted-write-proposal exact approval packet refresh.
 

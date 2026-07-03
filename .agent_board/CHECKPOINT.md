@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance`.
-Current validation: `CMV-1917`.
+Current checkpoint: `CM-1815 M9 trusted-write-proposal exact approval packet refresh`.
+Current validation: `CMV-1918`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1815 M9 Trusted-Write-Proposal Exact Approval Packet Refresh
+
+Status: `COMPLETED_VALIDATED_M9_PACKET_REFRESH_M8_PRESENT_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1815_EXACT_APPROVAL_PACKET_REFRESH.md`.
+- Refreshed the non-authorizing M9 exact approval packet shape after CM-1814.
+- Recorded that accepted M8 evidence can now be referenced in future packet preparation.
+- Preserved that exact target, transport, client, scope, visibility, proposal operations, review route, rollback posture, budgets, and output disclosure remain unset until a separate exact boundary supplies them.
+- Confirmed CM-1815 performed no runtime action, proposal generation, proposal submission, approval-line generation, approval request submission, memory read by agent, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, M10 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1918`; CM-1814 precondition review, CM-1742 historical packet review, M9 entry/exit review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1814 M9 Trusted-Write-Proposal Precondition Refresh After M8 Acceptance
 
