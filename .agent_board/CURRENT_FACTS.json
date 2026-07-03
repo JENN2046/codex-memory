@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1741",
-  "validationId": "CMV-1844",
+  "taskId": "CM-1742",
+  "validationId": "CMV-1845",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_harness_draft_boundary_docs_only",
+    "scope": "vcp_memory_trusted_write_proposal_exact_approval_packet_preparation_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1845",
+      "scope": "CM-1742 M9-K2 VCP memory trusted-write-proposal exact approval packet preparation",
+      "status": "COMPLETED_VALIDATED_M9_K2_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1844",
       "scope": "CM-1741 M9-K1 VCP memory trusted-write-proposal harness draft boundary",
