@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1788 M6 observe-lite startup failure source diagnosis`.
-Current validation: `CMV-1891`.
+Current checkpoint: `CM-1789 M6 observe-lite extended no-log startup window`.
+Current validation: `CMV-1892`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1789 M6 Observe-Lite Extended No-Log Startup Window
+
+Status: `COMPLETED_VALIDATED_M6_EXTENDED_NO_LOG_STARTUP_WINDOW_TRANSPORT_REACHABLE_HTTP_4XX_NO_BODY_NO_LOG_NO_MEMORY`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1789_EXTENDED_NO_LOG_STARTUP_WINDOW_RECEIPT.md`.
+- Used the operator-provided local VCPToolBox target as a disposable integration target for the plan package.
+- Confirmed pre-start status class `connection_failed`.
+- Started one local VCPToolBox process with stdout/stderr discarded.
+- Performed two status-only HTTP probes; last status class `http_4xx`; endpoint transport reachable `YES`.
+- Recorded `/health` success proven `NO`, full M6 observe-lite handshake complete `NO`, and transport-reachable subproof complete `YES`.
+- Sent stop signal and observed child exit; persistent process intentionally left running `NO`.
+- Preserved that no response body, stdout, stderr, runtime log, config/env content, secret, raw memory, raw store, raw runtime response, memory result, memory read/write, provider/API, MCP memory tool, public MCP expansion, config/startup/watchdog change, approval line, release, deploy, cutover, push, readiness, full M6 completion, M15 unlock, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-1892`; startup/probe output, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1788 M6 Observe-Lite Startup Failure Source Diagnosis
 

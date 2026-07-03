@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1788 M6 observe-lite startup failure source diagnosis`.
-Current validation: `CMV-1891`.
-Current status: CM-1788 performed source-only/no-log/no-secret startup diagnosis. `server.js` syntax passed, selected dependencies resolve, Rust Vexus bridge loads, and source review shows `app.listen` happens only after heavy async initialization. CM-1787's twelve-second, three-probe window is too short to prove startup failure; it proves only not reachable before the process was stopped. Actual `PORT` remains unknown because `config.env` contents were not read. M6 live proof remains incomplete, M15 remains locked, and no runtime start, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1789 M6 observe-lite extended no-log startup window`.
+Current validation: `CMV-1892`.
+Current status: CM-1789 started one local VCPToolBox process against the disposable integration target with stdout/stderr discarded and no log/body/config/secret/raw-memory reads. The pre-start status class was `connection_failed`; probe 2 reached status class `http_4xx`. Endpoint HTTP transport is reachable, but `/health` success and full M6 observe-lite handshake are not proven. The child process was stopped and exit was observed. M15 remains locked, and no response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1789 extended no-log startup window: one bounded local startup attempt with stdout/stderr discarded, status-only probes, no response bodies, no runtime logs, no config/env content reads, no secrets, no raw memory/raw stores, no memory tools, no provider/API, no config/startup/watchdog changes, no durable writes, and no readiness claim. If the process exits early or remains unreachable after the full window, request exact low-disclosure log-read boundary from Jenn. Do not open M6/M15, do not run observe-full/trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe action is CM-1790 status-only observe-lite route matrix/source-guided route selection. Keep response bodies and logs unread by default; if a later proof requires low-disclosure response shape inspection, bind that as a separate exact boundary before reading body content. Do not open M7/M8/M15 yet, do not run trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

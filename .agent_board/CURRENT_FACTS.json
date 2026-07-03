@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1788",
-  "validationId": "CMV-1891",
+  "taskId": "CM-1789",
+  "validationId": "CMV-1892",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_startup_failure_source_diagnosis",
+    "scope": "vcp_memory_observe_lite_extended_no_log_startup_window",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1892",
+      "scope": "CM-1789 M6 observe-lite extended no-log startup window",
+      "status": "COMPLETED_VALIDATED_M6_EXTENDED_NO_LOG_STARTUP_WINDOW_TRANSPORT_REACHABLE_HTTP_4XX_NO_BODY_NO_LOG_NO_MEMORY"
+    },
     {
       "id": "CMV-1891",
       "scope": "CM-1788 M6 observe-lite startup failure source diagnosis",

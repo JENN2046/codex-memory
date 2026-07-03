@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1788 M6 observe-lite startup failure source diagnosis`.
-Current validation: `CMV-1891`.
-Current handoff: CM-1788 completed source-only/no-log/no-secret startup diagnosis. `server.js` syntax passed, selected dependencies resolve, Rust Vexus bridge loads, and source review shows `app.listen` happens only after heavy async initialization. CM-1787's twelve-second, three-probe window is too short to prove startup failure; actual `PORT` remains unknown because `config.env` contents were not read. M6 live proof remains incomplete, M15 remains locked, and no runtime start, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1789 M6 observe-lite extended no-log startup window`.
+Current validation: `CMV-1892`.
+Current handoff: CM-1789 completed one bounded startup window against the local disposable VCPToolBox integration target. One process was started with stdout/stderr discarded; probe 2 reached `http_4xx`; response bodies and logs were not read; the child process was stopped and exit was observed. Endpoint HTTP transport is reachable, but `/health` success and full M6 observe-lite handshake remain incomplete. M15 remains locked, and no config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1788 completed source-only/no-log/no-secret startup diagnosi
 
 Goal: complete `M6 observe-lite` transport proof for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_STARTUP_SOURCE_DIAGNOSIS_NO_LOG_NO_SECRET_NO_RUNTIME_NO_MEMORY`; production/release/cutover ready no; complete V8 not claimed; M6 live proof incomplete; sanitized VCPToolBox target bound; CM-1787 transport not reachable within a short window; source indicates startup may require a longer no-log window; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_EXTENDED_NO_LOG_STARTUP_WINDOW_TRANSPORT_REACHABLE_HTTP_4XX_NO_BODY_NO_LOG_NO_MEMORY`; production/release/cutover ready no; complete V8 not claimed; M6 full handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport reachable; `/health` route success not proven; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1789_EXTENDED_NO_LOG_STARTUP_WINDOW_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1788_STARTUP_FAILURE_SOURCE_DIAGNOSIS.md`
 - `src/core/VcpMemoryHealthReportSchemaContract.js`
 - `tests/vcp-memory-health-report-schema-contract.test.js`

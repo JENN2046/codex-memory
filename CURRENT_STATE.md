@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1788 M6 observe-lite startup failure source diagnosis |
-| Current task | `CM-1788 M6 observe-lite startup failure source diagnosis` |
-| Current validation | `CMV-1891` |
-| Current route | Source-only/no-log/no-secret diagnosis found no syntax, selected dependency, or Rust bridge blocker; source shows `app.listen` happens only after heavy async initialization, so CM-1787's 12-second probe window is too short to prove startup failure; next safe action is an extended no-log startup window before any log-read escalation |
+| Status | CM-1789 M6 observe-lite extended no-log startup window |
+| Current task | `CM-1789 M6 observe-lite extended no-log startup window` |
+| Current validation | `CMV-1892` |
+| Current route | Extended no-log startup window reached HTTP transport by probe 2 with status class `http_4xx`; stdout/stderr/logs/response body/config/env/secrets/raw memory/raw store were not read; transport-reachable subproof is complete, but `/health` success and full M6 observe-lite handshake remain incomplete |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1789` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1789_EXTENDED_NO_LOG_STARTUP_WINDOW_RECEIPT.md`. It records the operator-provided local VCPToolBox target as a disposable integration target for the plan package. Evidence: pre-start local status class `connection_failed`; runtime start attempted `YES`; process count started by agent `1`; max window `10 minutes`; probe interval `10 seconds`; actual probe count `2`; endpoint transport reachable `YES`; last status class `http_4xx`; health route OK proven `NO`; response body read `NO`; runtime logs read `NO`; stdout/stderr read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; memory read/write/result `NO`; provider/API `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M6 transport subproof complete `YES`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; log read required now `NO`; next action `CM-1790 status-only observe-lite route matrix`.
 
 `CM-1788` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1788_STARTUP_FAILURE_SOURCE_DIAGNOSIS.md`. It records source-only/no-log/no-secret startup diagnosis. Evidence: `server.js` syntax OK; selected dependencies resolve; Rust Vexus bridge loads with expected exports; `config.env` presence checked as metadata only and contents not read; actual port value unknown; `AdminPanel` root absent as metadata only but not proven fatal; source shows `app.listen` after heavy async initialization; CM-1787 probe window seconds `12`; probe count `3`; process stopped by agent `YES`. Diagnosis: primary `CM1787_WINDOW_TOO_SHORT_TO_PROVE_STARTUP_FAILURE`; secondary unresolved risk `actual port may differ from operator endpoint`; log read required now `NO`; next action `CM-1789 extended no-log startup window before log read`. Boundary: runtime started `NO`; runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store read `NO`; memory read/write/result `NO`; provider/API `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M6 live proof complete `NO`; M15 unlocked `NO`.
 
