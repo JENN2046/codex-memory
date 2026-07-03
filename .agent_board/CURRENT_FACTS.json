@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1786",
-  "validationId": "CMV-1889",
+  "taskId": "CM-1787",
+  "validationId": "CMV-1890",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_operator_target_locator_receipt",
+    "scope": "vcp_memory_observe_lite_service_start_handshake_receipt",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1890",
+      "scope": "CM-1787 M6 observe-lite service start handshake receipt",
+      "status": "COMPLETED_VALIDATED_M6_SERVICE_START_ATTEMPT_TRANSPORT_NOT_REACHABLE_LOW_DISCLOSURE_NO_MEMORY_NO_WRITE"
+    },
     {
       "id": "CMV-1889",
       "scope": "CM-1786 M6 observe-lite operator target locator receipt",

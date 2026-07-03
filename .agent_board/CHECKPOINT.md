@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1786 M6 observe-lite operator target locator receipt`.
-Current validation: `CMV-1889`.
+Current checkpoint: `CM-1787 M6 observe-lite service start handshake receipt`.
+Current validation: `CMV-1890`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1787 M6 Observe-Lite Service Start Handshake Receipt
+
+Status: `COMPLETED_VALIDATED_M6_SERVICE_START_ATTEMPT_TRANSPORT_NOT_REACHABLE_LOW_DISCLOSURE_NO_MEMORY_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1787_SERVICE_START_HANDSHAKE_RECEIPT.md`.
+- Executed one operator startup command alias with stdout/stderr discarded.
+- Performed three local status-only probes; reachable `NO`, error class `connection_refused`, response body included `NO`.
+- Sent a stop signal and observed child exit; child exit code included `NO`.
+- Recorded persistent process left running `NO` and duration seconds `12`.
+- Preserved that no locator/path/endpoint values, command args, process names, stdout/stderr/logs, response bodies, child exit code, agent config/env/secrets, raw runtime, raw memory, raw store, memory result, memory read/write, provider/API, MCP memory tool, public MCP expansion, approval line, release, deploy, cutover, push, readiness, M6 completion, M15 unlock, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-1890`; service start/probe output, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1786 M6 Observe-Lite Operator Target Locator Receipt
 
