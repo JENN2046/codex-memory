@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract`.
-Current validation: `CMV-1868`.
+Current checkpoint: `CM-1766 M13-K3 VCP memory fallback local memory scope isolation contract`.
+Current validation: `CMV-1869`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1766 M13-K3 VCP Memory Fallback Local Memory Scope Isolation Contract
+
+Status: `COMPLETED_VALIDATED_M13_K3_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_SCOPE_ISOLATION_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryFallbackLocalMemoryScopeIsolationContract.js`.
+- Added `tests/vcp-memory-fallback-local-memory-scope-isolation-contract.test.js`.
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_SCOPE_ISOLATION_CONTRACT.md`.
+- Covered same-client Codex and Claude private fallback fixture acceptance.
+- Covered shared fallback denial without explicit shared boundary and acceptance with explicit shared boundary.
+- Covered cross-client private denial, explicit cross-client private L4 stop, unknown scope/visibility fail-closed denial, and visibility widening denial.
+- Covered decision mismatch rejection, missing and positive side-effect counter rejection, raw/private/secret/approval/readiness field rejection without echoing values, non-boolean scope/sensitive presence flag rejection, non-string request id and non-numeric zero counter rejection, and side-effect posture lock.
+- Re-review found non-boolean flag, request id type, and zero counter type validation gaps in the initial helper; repaired by adding required request/candidate boolean field validation, request id validation, zero counter exact-zero validation, and regression tests.
+- Preserved that no local fallback runtime execution, private runtime read, real query, MCP tool call, VCPToolBox runtime call, target probing, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1869`; syntax checks, targeted scope isolation node test `14/14`, `npm test` `3651/3651`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1765 M13-K2 VCP Memory Fallback Local Memory Marker Receipt Contract
 

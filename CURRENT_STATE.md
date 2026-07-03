@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract |
-| Current task | `CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract` |
-| Current validation | `CMV-1868` |
-| Current route | M13 fallback marker/receipt fixture contract is implemented and validated; fallback governance parity is not green; next safe action is M13 fallback scope/client isolation fixture work or CM-1765 source review, not runtime fallback or private runtime reads |
+| Status | CM-1766 M13-K3 VCP memory fallback local memory scope isolation contract |
+| Current task | `CM-1766 M13-K3 VCP memory fallback local memory scope isolation contract` |
+| Current validation | `CMV-1869` |
+| Current route | M13 fallback scope/client isolation fixture contract is implemented and validated; fallback governance parity is not green; next safe action is M13 synthetic secret rejection fixture work or CM-1766 source review, not runtime fallback or private runtime reads |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1766` adds `src/core/VcpMemoryFallbackLocalMemoryScopeIsolationContract.js`, `tests/vcp-memory-fallback-local-memory-scope-isolation-contract.test.js`, and `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_SCOPE_ISOLATION_CONTRACT.md`. It turns the M13 fallback scope/client isolation gap into fixture-only executable contract coverage. Boundary: contract implemented `YES`; targeted test count `14`; targeted test passed `YES`; default `npm test` passed `3651/3651`; same-client Codex private fallback accepted `YES`; same-client Claude private fallback accepted `YES`; cross-client private fallback denied `YES`; explicit cross-client private request stopped as L4 `YES`; shared fallback requires explicit boundary `YES`; unknown scope/visibility fails closed `YES`; visibility widening denied `YES`; decision mismatch rejected `YES`; missing and positive side-effect counters rejected `YES`; raw/secret/approval/readiness fields rejected without echo `YES`; non-boolean scope/sensitive presence flags rejected `YES`; non-string request id rejected `YES`; non-numeric zero counter rejected `YES`; side-effect posture locked `YES`; local fallback runtime executed `NO`; private runtime read `NO`; real query `NO`; MCP tool call for M13 evidence `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; VCPToolBox runtime `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1765` adds `src/core/VcpMemoryFallbackLocalMemoryMarkerReceiptContract.js`, `tests/vcp-memory-fallback-local-memory-marker-receipt-contract.test.js`, and `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_MARKER_RECEIPT_CONTRACT.md`. It turns the M13 fallback marker/receipt gap into fixture-only executable contract coverage. Boundary: contract implemented `YES`; targeted test count `10`; targeted test passed `YES`; default `npm test` passed `3637/3637`; VCP target unapproved fallback marker/receipt covered `YES`; test/dry-run fallback covered `YES`; VCP-native-required denial covered `YES`; private runtime read L4 stop covered `YES`; missing client/scope rejected `YES`; missing zero counter fields rejected `YES`; VCP-native lookalike marker rejected `YES`; runtime plans and positive counters rejected `YES`; raw/secret/approval/readiness fields rejected without echo `YES`; side-effect posture locked `YES`; local fallback runtime executed `NO`; private runtime read `NO`; real query `NO`; MCP tool call for M13 evidence `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; VCPToolBox runtime `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

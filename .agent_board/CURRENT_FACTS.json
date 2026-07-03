@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1765",
-  "validationId": "CMV-1868",
+  "taskId": "CM-1766",
+  "validationId": "CMV-1869",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_fallback_local_memory_m13_marker_receipt_contract",
+    "scope": "vcp_memory_fallback_local_memory_m13_scope_isolation_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1869",
+      "scope": "CM-1766 M13-K3 VCP memory fallback local memory scope isolation contract",
+      "status": "COMPLETED_VALIDATED_M13_K3_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_SCOPE_ISOLATION_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1868",
       "scope": "CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract",

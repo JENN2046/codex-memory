@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract`.
-Current validation: `CMV-1868`.
-Current handoff: CM-1765 adds a fixture-only fallback marker/receipt contract with targeted tests `10/10` and default `npm test` `3637/3637`, while preserving that fallback governance parity is not green and runtime fallback remains blocked. No local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1766 M13-K3 VCP memory fallback local memory scope isolation contract`.
+Current validation: `CMV-1869`.
+Current handoff: CM-1766 adds a fixture-only fallback scope/client isolation contract with targeted tests `14/14` and default `npm test` `3651/3651`, while preserving that fallback governance parity is not green and runtime fallback remains blocked. Re-review found and repaired non-boolean flag, request id type, and zero counter type validation gaps. No local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M13-K2 Fallback Local Memory Marker Receipt Contract` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M13-K3 Fallback Local Memory Scope Isolation Contract` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M13_K2_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_MARKER_RECEIPT_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M13_K3_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_SCOPE_ISOLATION_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpMemoryFallbackLocalMemoryScopeIsolationContract.js`
+- `tests/vcp-memory-fallback-local-memory-scope-isolation-contract.test.js`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_SCOPE_ISOLATION_CONTRACT.md`
 - `src/core/VcpMemoryFallbackLocalMemoryMarkerReceiptContract.js`
 - `tests/vcp-memory-fallback-local-memory-marker-receipt-contract.test.js`
 - `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_MARKER_RECEIPT_CONTRACT.md`
@@ -82,16 +85,19 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `src/core/VcpMemoryFallbackLocalMemoryMarkerReceiptContract.js`.
-- Added `tests/vcp-memory-fallback-local-memory-marker-receipt-contract.test.js`.
-- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_MARKER_RECEIPT_CONTRACT.md`.
-- Covered fixture-only fallback marker/receipt acceptance, denial, and L4 stop shapes.
-- Rejected missing client/scope, missing zero side-effect counter fields, VCP-native lookalike markers, runtime plans, positive side-effect counters, raw/private/secret/approval/readiness fields, and side-effect posture drift.
+- Added `src/core/VcpMemoryFallbackLocalMemoryScopeIsolationContract.js`.
+- Added `tests/vcp-memory-fallback-local-memory-scope-isolation-contract.test.js`.
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_SCOPE_ISOLATION_CONTRACT.md`.
+- Covered same-client Codex and Claude private fallback fixture acceptance.
+- Covered shared fallback denial without explicit shared boundary and acceptance with explicit shared boundary.
+- Covered cross-client private denial, explicit cross-client private L4 stop, unknown scope/visibility fail-closed denial, and visibility widening denial.
+- Rejected decision mismatches, missing or positive side-effect counters, raw/private/secret/approval/readiness fields, non-boolean scope/sensitive presence flags, non-string request ids, non-numeric zero counters, and side-effect posture drift.
+- Re-review found non-boolean flag, request id type, and zero counter type validation gaps in the initial helper; repaired by adding required request/candidate boolean field validation, request id validation, zero counter exact-zero validation, and regression tests.
 - Confirmed no local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable audit/runtime write, memory write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
 
-Validation: `CMV-1868`; syntax checks, targeted marker/receipt node test `10/10`, `npm test` `3637/3637`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
+Validation: `CMV-1869`; syntax checks, targeted scope isolation node test `14/14`, `npm test` `3651/3651`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
-Next safe route: M13 fallback scope/client isolation fixture contract or a focused CM-1765 source review without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, or provider/API calls. Push remains separate explicit authorization.
+Next safe route: M13 synthetic secret rejection fallback fixture contract or a focused CM-1766 source review without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, or provider/API calls. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 
