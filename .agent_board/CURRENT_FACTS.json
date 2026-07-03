@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1792",
-  "validationId": "CMV-1895",
+  "taskId": "CM-1793",
+  "validationId": "CMV-1896",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_dailynote_searcher_invocation_envelope_preflight",
+    "scope": "vcp_memory_observe_lite_dailynote_searcher_probe_decision_abort_boundary",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1896",
+      "scope": "CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PROBE_ABORT_BOUNDARY_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER"
+    },
     {
       "id": "CMV-1895",
       "scope": "CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight",

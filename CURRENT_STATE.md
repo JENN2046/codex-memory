@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight |
-| Current task | `CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight` |
-| Current validation | `CMV-1895` |
-| Current route | Source-only exact invocation envelope selected `DailyNoteSearcher.SearchDailyNote` via the direct human-tool route alias, with no runtime start, real request body generation, route call, response body read, log read, config/env content read, secret read, raw memory/raw store read, memory result read, provider/API call, MCP memory tool call, plugin execution, write, or public MCP expansion; full M6 memory/capability handshake remains incomplete |
+| Status | CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary |
+| Current task | `CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary` |
+| Current validation | `CMV-1896` |
+| Current route | Source-only abort boundary recorded: direct human-tool route is behind generic bearer auth, credential value is not known and cannot be read from secret/config/env/log surfaces, so the status-only no-body `DailyNoteSearcher.SearchDailyNote` runtime probe was aborted before execution; full M6 memory/capability handshake remains incomplete |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1793` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1793_DAILYNOTESEARCHER_PROBE_DECISION_ABORT_BOUNDARY.md`. It records a source-only decision to abort the CM-1792 status-only/no-body `DailyNoteSearcher.SearchDailyNote` probe before execution. Evidence: bearer auth required before route `YES`; bearer credential value known `NO`; request body generated `NO`; real request body disclosed `NO`; runtime started `NO`; service start attempted `NO`; route called `NO`; unauthenticated/authenticated probe executed `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; memory read/write/result `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime probe aborted before execution `YES`; abort reason `bearer_auth_required_secret_boundary`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1794 temporary disposable auth boundary packet for status-only no-body tool probe`.
 
 `CM-1792` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1792_DAILYNOTESEARCHER_INVOCATION_ENVELOPE_PREFLIGHT.md`. It records a source-only exact invocation envelope preflight for `DailyNoteSearcher.SearchDailyNote` through the direct human-tool route alias. Evidence: selected surface `DailyNoteSearcher.SearchDailyNote`; request body generated `NO`; real request body disclosed `NO`; runtime started `NO`; service start attempted `NO`; route called `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; memory read/write/result `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; invocation envelope preflight complete `YES`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1793 status-only no-body DailyNoteSearcher probe decision or abort boundary`.
 

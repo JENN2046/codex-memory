@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight`.
-Current validation: `CMV-1895`.
-Current status: CM-1792 selected `DailyNoteSearcher.SearchDailyNote` as the next exact observe-lite invocation-envelope target through the direct human-tool route alias. It deferred `LightMemo.SearchRAG` pending provider/output classification. Full M6 memory/capability handshake remains incomplete because no runtime route, request body, response body, memory result, VCP plugin, MCP memory tool, provider/API, or memory read/write was executed. M15 remains locked, and no runtime start, route call, response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary`.
+Current validation: `CMV-1896`.
+Current status: CM-1793 source review found generic bearer auth before `/v1/human/tool`, so the CM-1792 status-only/no-body `DailyNoteSearcher.SearchDailyNote` probe was aborted before execution. The bearer credential value is unknown and was not read from config/env/log/runtime surfaces. Full M6 memory/capability handshake remains incomplete because no runtime route, request body, response body, memory result, VCP plugin, MCP memory tool, provider/API, or memory read/write was executed. M15 remains locked, and no runtime start, route call, response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1793 status-only no-body DailyNoteSearcher probe decision or abort boundary. Keep response bodies, logs, config/env contents, raw memory, raw stores, memory results, and provider responses unread. Decide whether the CM-1792 envelope can be executed as a single status-only/no-body probe under the existing preauthorized local disposable target boundary; if any response body, runtime log, config/env content, raw memory, provider output, write, or readiness claim would be needed, abort and record the blocker. Do not open M7/M8/M15 yet, do not run trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe action is CM-1794 temporary disposable auth boundary packet for status-only no-body tool probe. Do not read existing bearer tokens, `config.env`, `.env`, process env, logs, or runtime output. The packet may define a future temporary non-production auth setup for the disposable local target only, but must not modify config or execute auth changes unless a later exact boundary makes that safe. Keep response bodies, logs, config/env contents, raw memory, raw stores, memory results, and provider responses unread. Do not open M7/M8/M15 yet, do not run trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

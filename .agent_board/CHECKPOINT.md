@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight`.
-Current validation: `CMV-1895`.
+Current checkpoint: `CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary`.
+Current validation: `CMV-1896`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1793 M6 Observe-Lite DailyNoteSearcher Probe Decision Abort Boundary
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PROBE_ABORT_BOUNDARY_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1793_DAILYNOTESEARCHER_PROBE_DECISION_ABORT_BOUNDARY.md`.
+- Reviewed source ordering and found generic bearer auth before `/v1/human/tool`.
+- Recorded that a meaningful `DailyNoteSearcher.SearchDailyNote` probe needs a valid bearer credential or temporary auth boundary.
+- Rejected reading or deriving auth from `config.env`, `.env`, process env, logs, runtime output, or config files.
+- Rejected an unauthenticated status-only route call because it would prove only the auth guard, not tool invocation or memory capability.
+- Preserved that runtime started `NO`, real request body generated `NO`, route called `NO`, unauthenticated probe executed `NO`, authenticated probe executed `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets/raw memory/raw store/raw runtime response read `NO`, provider/API called `NO`, MCP memory tool called `NO`, VCP plugin executed `NO`, memory read/write/result `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1794 temporary disposable auth boundary packet for status-only no-body tool probe.
+
+Validation: `CMV-1896`; source-only auth middleware ordering review, direct human-tool route review, abort boundary review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1792 M6 Observe-Lite DailyNoteSearcher Invocation Envelope Preflight
 
