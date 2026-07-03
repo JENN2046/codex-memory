@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1749 M10-K2 VCP memory bounded mutation exact write boundary packet preparation`.
-Current validation: `CMV-1852`.
+Current checkpoint: `CM-1750 M10-K3 VCP memory bounded mutation exact write boundary decision review`.
+Current validation: `CMV-1853`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1750 M10-K3 VCP Memory Bounded Mutation Exact Write Boundary Decision Review
+
+Status: `COMPLETED_VALIDATED_M10_K3_VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_DECISION_REVIEW_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_DECISION_REVIEW.md`.
+- Reviewed CM-1749 as aligned with M10 preparation and M5 governance, but not executable and not usable as authorization.
+- Preserved that accepted M9 proposal receipts and exact Jenn M10 write boundary are absent.
+- Preserved that write/update/supersede/tombstone execution, durable write, memory write/update/supersede/tombstone, mutation receipt, and rollback audit did not occur.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, memory write/update/supersede/tombstone, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, bounded write safety claim, or readiness claim occurred.
+
+Validation: `CMV-1853`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1749 M10-K2 VCP Memory Bounded Mutation Exact Write Boundary Packet Preparation
 
