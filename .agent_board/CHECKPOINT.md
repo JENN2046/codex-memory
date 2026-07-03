@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1808 M7 observe-full read-shape exact boundary preflight`.
-Current validation: `CMV-1911`.
+Current checkpoint: `CM-1809 M7 observe-full read-shape low-disclosure execution`.
+Current validation: `CMV-1912`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1809 M7 Observe-Full Read-Shape Low-Disclosure Execution
+
+Status: `COMPLETED_VALIDATED_M7_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_HTTP_2XX_SHAPE_ONLY_NO_RAW_OUTPUT_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_FULL_CM1809_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`.
+- Executed one bounded `DailyNoteSearcher.SearchDailyNote` read-shape probe through `/v1/human/tool` under the CM-1808 boundary.
+- Used a disposable child-process bearer and in-memory request body; neither was printed or persisted.
+- Reached route status `http_2xx` after warmup status `http_4xx`.
+- Consumed `138` response bytes in memory only for shape projection and printed no raw response values.
+- Recorded only top-level shape keys `content`, `limited`, `notes`, `timestamp`, and `total`, plus container/key/type/count metadata.
+- Confirmed no runtime stdout/stderr read, runtime log read, config/env/secret content read, raw memory/raw store read by agent, provider/API call by agent, MCP memory tool call, memory write, public MCP expansion, release/deploy/cutover/push, readiness claim, `RC_READY` claim, M8 unlock, M15 unlock, complete V8 claim, or full bridge completion claim.
+- Rejected the primary harness post-stop process counts because the pattern matched its own `pgrep` command line; independent bracket-pattern checks showed zero residual `node server.js` and `DailyNoteSearcher` processes.
+
+Validation: `CMV-1912`; live harness output, independent post-stop endpoint/process checks, VCPToolBox status, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1808 M7 Observe-Full Read-Shape Exact Boundary Preflight
 

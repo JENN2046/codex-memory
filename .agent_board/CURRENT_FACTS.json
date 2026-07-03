@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1808",
-  "validationId": "CMV-1911",
+  "taskId": "CM-1809",
+  "validationId": "CMV-1912",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_full_m7_read_shape_exact_boundary_preflight",
+    "scope": "vcp_memory_observe_full_m7_read_shape_low_disclosure_execution",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1912",
+      "scope": "CM-1809 M7 observe-full read-shape low-disclosure execution",
+      "status": "COMPLETED_VALIDATED_M7_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_HTTP_2XX_SHAPE_ONLY_NO_RAW_OUTPUT_NO_WRITE"
+    },
     {
       "id": "CMV-1911",
       "scope": "CM-1808 M7 observe-full read-shape exact boundary preflight",

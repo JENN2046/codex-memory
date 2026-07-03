@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1808 M7 observe-full read-shape exact boundary preflight |
-| Current task | `CM-1808 M7 observe-full read-shape exact boundary preflight` |
-| Current validation | `CMV-1911` |
-| Current route | M7 read-shape exact boundary defined; next route is CM-1809 low-disclosure read-shape execution candidate |
+| Status | CM-1809 M7 observe-full read-shape low-disclosure execution |
+| Current task | `CM-1809 M7 observe-full read-shape low-disclosure execution` |
+| Current validation | `CMV-1912` |
+| Current route | M7 read-shape proof executed; next route is CM-1810 read-shape receipt closeout gate review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1809` adds `docs/VCP_MEMORY_OBSERVE_FULL_CM1809_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`. It records one bounded live `DailyNoteSearcher.SearchDailyNote` read-shape probe through `/v1/human/tool` under the CM-1808 boundary: pre-start `connection_refused_or_fetch_failed`; runtime started by agent `YES`; warmup probe count `2`; warmup status `http_4xx`; route status `http_2xx`; response body consumed by harness `YES`; response body printed/persisted `NO`; response bytes consumed `138`; JSON parse `ok`; emitted shape keys only `content`, `limited`, `notes`, `timestamp`, `total`; raw private payload disclosed `NO`; runtime stdout/stderr/logs read `NO`; config/env/secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; M8 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; independent post-stop endpoint `connection_refused_or_fetch_failed`; independent bracket-pattern process counts `0`; next action `CM-1810 M7 read-shape receipt closeout gate review`.
 
 `CM-1808` adds `docs/VCP_MEMORY_OBSERVE_FULL_CM1808_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT.md`. It binds the next M7 read-shape candidate to `DailyNoteSearcher.SearchDailyNote` through `/v1/human/tool`, exact safe query `codex_memory_m7_read_shape_probe_cm1809_no_private_match_20260704`, `max_results=1`, `context_lines=0`, shape-only output projection, response-body no-print/no-persist rule, raw-output abort, no-write rule, and receipt schema. Runtime action in CM-1808 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; M8 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; next action `CM-1809 M7 observe-full read-shape low-disclosure execution candidate`.
 
