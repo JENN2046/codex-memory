@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build |
-| Current task | `CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build` |
-| Current validation | `CMV-1907` |
-| Current route | Linux x64 release binary built but not installed; next route is CM-1805 primary Linux candidate install |
+| Status | CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install |
+| Current task | `CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install` |
+| Current validation | `CMV-1908` |
+| Current route | Linux x64 primary candidate installed but not executed; next route is CM-1806 status-only rerun |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1805` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1805_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_RECEIPT.md`. It records installing the CM-1804 release binary to `Plugin/DailyNoteSearcher/DailyNoteSearcher`: primary Linux candidate existed before install `NO`; `install -m 755` exit code `0`; source and target byte-identical `YES`; SHA-256 `20444e1d1ee650c9add0905f7fa851217863c43a5fab243ba78cc05cae5d65df`; target file header `ELF 64-bit LSB pie executable, x86-64`; target mode `755`; target size `3735640`; target executable `YES`; runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr from runtime/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1806 DailyNoteSearcher primary-candidate status-only rerun`.
 
 `CM-1804` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1804_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_RECEIPT.md`. It records isolated-toolchain locked release build for `Plugin/DailyNoteSearcher/src`: `cargo build --release --locked` exit code `0`; Cargo dependency downloads `YES`; release target generated `YES`; release binary `Plugin/DailyNoteSearcher/src/target/release/DailyNoteSearcher`; file header `ELF 64-bit LSB pie executable, x86-64`; mode `755`; size `3735640`; target ignored by VCPToolBox Git status `YES`; installed to primary Linux candidate `NO`; runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr from runtime/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1805 DailyNoteSearcher x64 binary install to primary Linux candidate`.
 

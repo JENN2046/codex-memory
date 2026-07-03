@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build`.
-Current validation: `CMV-1907`.
-Current handoff: CM-1804 built `Plugin/DailyNoteSearcher/src` with the CM-1803 isolated toolchain using `cargo build --release --locked`; exit code `0`. Cargo dependency downloads occurred. The release binary at `Plugin/DailyNoteSearcher/src/target/release/DailyNoteSearcher` is Linux x86-64, mode `755`, size `3735640`, and its target directory is ignored by VCPToolBox Git status. No primary Linux candidate install, runtime start, binary service execution, response body/stdout/stderr from runtime/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install`.
+Current validation: `CMV-1908`.
+Current handoff: CM-1805 installed the CM-1804 release binary to `Plugin/DailyNoteSearcher/DailyNoteSearcher` with `install -m 755`; exit code `0`. Source and target are byte-identical with SHA-256 `20444e1d1ee650c9add0905f7fa851217863c43a5fab243ba78cc05cae5d65df`. Target is Linux x86-64, mode `755`, size `3735640`, and executable. No runtime start, binary service execution, response body/stdout/stderr from runtime/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1804 built `Plugin/DailyNoteSearcher/src` with the CM-1803 i
 
 Goal: complete `M6 observe-lite` transport and memory-capability proof planning for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, response body, provider, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; CM-1794 defines the future disposable child-process auth boundary without execution; CM-1795 records a source-scan boundary repair; CM-1796 proves temporary-auth transport and authenticated human-tool route status but receives HTTP 5xx; CM-1797 diagnoses missing executable permission; CM-1798 repairs that file mode and reruns status-only but authenticated human-tool call times out; CM-1799 diagnoses Linux x64 versus only-present Linux ARM aarch64 binary mismatch; CM-1800 preflights exact Rust toolchain install; CM-1801 installs exact Rust toolchain dependency packages; CM-1802 locked build is blocked by Cargo.lock v4 under cargo 1.75; CM-1803 installs an isolated VCPToolBox-local stable Rust toolchain with cargo/rustc 1.96.1 and locked metadata pass; CM-1804 builds the Linux x64 release binary but does not install or execute it; `/health` is not a source-defined route; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; CM-1794 defines the future disposable child-process auth boundary without execution; CM-1795 records a source-scan boundary repair; CM-1796 proves temporary-auth transport and authenticated human-tool route status but receives HTTP 5xx; CM-1797 diagnoses missing executable permission; CM-1798 repairs that file mode and reruns status-only but authenticated human-tool call times out; CM-1799 diagnoses Linux x64 versus only-present Linux ARM aarch64 binary mismatch; CM-1800 preflights exact Rust toolchain install; CM-1801 installs exact Rust toolchain dependency packages; CM-1802 locked build is blocked by Cargo.lock v4 under cargo 1.75; CM-1803 installs an isolated VCPToolBox-local stable Rust toolchain with cargo/rustc 1.96.1 and locked metadata pass; CM-1804 builds the Linux x64 release binary; CM-1805 installs it to the primary Linux candidate without execution; `/health` is not a source-defined route; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1805_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1804_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1803_ISOLATED_RUSTUP_TOOLCHAIN_INSTALL_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1802_DAILYNOTESEARCHER_LOCKED_LOCAL_X64_BUILD_ATTEMPT.md`

@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build`.
-Current validation: `CMV-1907`.
+Current checkpoint: `CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install`.
+Current validation: `CMV-1908`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1805 M6 Observe-Lite DailyNoteSearcher Primary Linux Candidate Install
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1805_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_RECEIPT.md`.
+- Confirmed primary Linux candidate did not exist before install.
+- Installed the CM-1804 release binary to `Plugin/DailyNoteSearcher/DailyNoteSearcher` with `install -m 755`; exit code `0`.
+- Verified source and target are byte-identical with SHA-256 `20444e1d1ee650c9add0905f7fa851217863c43a5fab243ba78cc05cae5d65df`.
+- Verified target is `ELF 64-bit LSB pie executable, x86-64`, mode `755`, size `3735640`, and executable.
+- Confirmed runtime started `NO`, binary executed by agent `NO`, response body/stdout/stderr from runtime/runtime logs/config/env/secrets/raw memory/raw store read `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, public MCP expansion `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1806 DailyNoteSearcher primary-candidate status-only rerun.
+
+Validation: `CMV-1908`; pre-install target absence check, `install -m 755`, `cmp -s`, `sha256sum`, target `file`, target `stat`, VCPToolBox status, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1804 M6 Observe-Lite DailyNoteSearcher Isolated-Toolchain Locked X64 Build
 
