@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1733 M8-K0 VCP memory trusted-full-read blocked precondition record`.
-Current validation: `CMV-1836`.
+Current checkpoint: `CM-1734 M8-K1 VCP memory trusted-full-read harness draft boundary`.
+Current validation: `CMV-1837`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1734 M8-K1 VCP Memory Trusted-Full-Read Harness Draft Boundary
+
+Status: `COMPLETED_VALIDATED_M8_K1_VCP_MEMORY_TRUSTED_FULL_READ_HARNESS_DRAFT_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_FULL_READ_HARNESS_DRAFT_BOUNDARY.md`.
+- Defined non-authorizing harness draft state, required future inputs, draft template, stop rules, current draft result, and receipt skeleton.
+- Recorded current decision `draft_boundary_recorded_execution_blocked_missing_m7_receipt_and_exact_approval`.
+- Preserved that accepted M7 read-shape receipt and exact Jenn trusted-full-read approval are missing, trusted-full-read workflow execution is not started, and M9 is not unlocked.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M9 unlock occurred.
+
+Validation: `CMV-1837`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1733 M8-K0 VCP Memory Trusted-Full-Read Blocked Precondition Record
 
