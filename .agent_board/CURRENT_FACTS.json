@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1746",
-  "validationId": "CMV-1849",
+  "taskId": "CM-1747",
+  "validationId": "CMV-1850",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_blocked_closeout_summary_docs_only",
+    "scope": "vcp_memory_bounded_mutation_m10_blocked_precondition_record_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1850",
+      "scope": "CM-1747 M10-K0 VCP memory bounded mutation blocked precondition record",
+      "status": "COMPLETED_VALIDATED_M10_K0_VCP_MEMORY_BOUNDED_MUTATION_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1849",
       "scope": "CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary",

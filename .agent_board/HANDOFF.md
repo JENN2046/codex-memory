@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary`.
-Current validation: `CMV-1849`.
-Current handoff: CM-1746 closes the docs-only M9 trusted-write-proposal preparation chain while recording that proposal-mode evidence remains blocked. Accepted M8 trusted-full-read workflow receipt, exact Jenn trusted-write-proposal boundary, exact proposal fields, generated/submitted proposals, accepted proposal receipts, and exact M10 write boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
+Current task: `CM-1747 M10-K0 VCP memory bounded mutation blocked precondition record`.
+Current validation: `CMV-1850`.
+Current handoff: CM-1747 records that M10 bounded mutation remains blocked. Accepted M9 proposal receipts, exact Jenn M10 write boundary, exact target/client/scope/visibility/rollback fields, mutation family, and audit receipt plan remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, write/update/supersede/tombstone execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, bounded write safety claim, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M9-K6 Trusted-Write-Proposal Blocked Closeout Summary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M10-K0 Bounded Mutation Blocked Precondition Record` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M9_K6_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M10_K0_VCP_MEMORY_BOUNDED_MUTATION_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_M10_BLOCKED_PRECONDITION_RECORD.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_M9_BLOCKED_CLOSEOUT_SUMMARY.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_RUNTIME_ABORT_RECEIPT_SKELETON.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
@@ -53,16 +54,15 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added M9 trusted-write-proposal blocked closeout summary.
-- Recorded CM-1740 through CM-1745 as the completed docs-only M9 preparation chain.
-- Recorded that M9 proposal-mode evidence remains incomplete and blocked.
-- Recorded that accepted M8 trusted-full-read workflow receipt, exact Jenn trusted-write-proposal boundary, exact proposal fields, proposal review route, generated/submitted proposals, accepted proposal receipts, and exact M10 write boundary are missing.
-- Preserved that no write proposal was generated or submitted, and no durable write or memory write occurred.
-- Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M10 unlock occurred.
+- Added M10 bounded mutation blocked precondition record.
+- Recorded that M10 is the first durable mutation phase and is not executable from current evidence.
+- Recorded that accepted M9 proposal receipts, exact Jenn M10 write boundary, exact target/client/scope/visibility/rollback fields, mutation family, and audit receipt plan are missing.
+- Preserved that no write/update/supersede/tombstone execution, durable write, memory write/update/supersede/tombstone, mutation receipt, or rollback audit occurred.
+- Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, bounded write safety claim, or readiness claim occurred.
 
-Validation: `CMV-1849`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1850`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M10 blocked precondition record without runtime/write/proposal generation, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
+Next safe route: M10 bounded mutation harness draft boundary without runtime/write/update/supersede/tombstone execution, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

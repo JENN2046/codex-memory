@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary`.
-Current validation: `CMV-1849`.
-Current status: CM-1746 closes the docs-only M9 trusted-write-proposal preparation chain while recording that proposal-mode evidence remains blocked. Accepted M8 trusted-full-read workflow receipt, exact Jenn trusted-write-proposal boundary, exact proposal fields, generated/submitted proposals, accepted proposal receipts, and exact M10 write boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
+Current task: `CM-1747 M10-K0 VCP memory bounded mutation blocked precondition record`.
+Current validation: `CMV-1850`.
+Current status: CM-1747 records that M10 bounded mutation remains blocked. Accepted M9 proposal receipts, exact Jenn M10 write boundary, exact target/client/scope/visibility/rollback fields, mutation family, and audit receipt plan remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, write/update/supersede/tombstone execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, bounded write safety claim, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M10 blocked precondition record without runtime/write/proposal generation, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
+Next safe local action is M10 bounded mutation harness draft boundary without runtime/write/update/supersede/tombstone execution, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
