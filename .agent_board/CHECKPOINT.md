@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1801 M6 observe-lite Rust toolchain dependency install`.
-Current validation: `CMV-1904`.
+Current checkpoint: `CM-1802 M6 observe-lite DailyNoteSearcher locked local x64 build attempt`.
+Current validation: `CMV-1905`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1802 M6 Observe-Lite DailyNoteSearcher Locked Local X64 Build Attempt
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_LOCKED_BUILD_BLOCKED_BY_LOCKFILE_V4_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1802_DAILYNOTESEARCHER_LOCKED_LOCAL_X64_BUILD_ATTEMPT.md`.
+- Attempted `cargo build --release --locked`; exit code `101`.
+- Build failed before target generation because Cargo 1.75 cannot parse `Cargo.lock` version `4`.
+- Confirmed no `target` directory was created and VCPToolBox status did not change from the build attempt.
+- Confirmed apt `rustup` simulation would remove installed `cargo`/`rustc`, so the next route is isolated rustup under VCPToolBox-local toolchain directories.
+- Preserved runtime started `NO`, binary service executed `NO`, response body/stdout/stderr/runtime logs/config/env/secrets/raw memory/raw store read `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, public MCP expansion `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1803 isolated rustup stable toolchain install.
+
+Validation: `CMV-1905`; cargo build failure output, Cargo.lock header, VCPToolBox status/target-dir check, apt rustup simulation, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1801 M6 Observe-Lite Rust Toolchain Dependency Install
 

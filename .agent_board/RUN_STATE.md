@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1801 M6 observe-lite Rust toolchain dependency install`.
-Current validation: `CMV-1904`.
-Current status: CM-1801 executed exact dependency action `sudo apt-get install -y cargo rustc`; exit code `0`. It installed 8 new packages, upgraded 0, removed 0, downloaded `97.4 MB`, and used `419 MB` additional disk. Verified `cargo 1.75.0`, `rustc 1.75.0`, host `x86_64-unknown-linux-gnu`, and `cargo metadata --locked` pass. No cargo build, runtime start, binary execution by agent, response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, or VCPToolBox content modification by CM-1801 occurred. No memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1802 M6 observe-lite DailyNoteSearcher locked local x64 build attempt`.
+Current validation: `CMV-1905`.
+Current status: CM-1802 attempted `cargo build --release --locked`; exit code `101`. Build failed before target generation because Cargo 1.75 cannot parse `Cargo.lock` version `4`. No `target` directory was created and VCPToolBox status did not change from the build attempt. Apt `rustup` simulation would remove installed `cargo`/`rustc`, so the next route is isolated rustup under VCPToolBox-local toolchain directories. No runtime start, binary service execution, response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1802 DailyNoteSearcher locked local x64 build. Keep it to `cargo build --release --locked` in `Plugin/DailyNoteSearcher/src`, then inspect only build metadata and binary header. Do not start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1802. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
+Next safe action is CM-1803 isolated rustup stable toolchain install. Use VCPToolBox-local `RUSTUP_HOME` and `CARGO_HOME`, `--profile minimal`, `--default-toolchain stable`, and `--no-modify-path`. Do not start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1803. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
