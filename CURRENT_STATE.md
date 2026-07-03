@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1734 M8-K1 VCP memory trusted-full-read harness draft boundary |
-| Current task | `CM-1734 M8-K1 VCP memory trusted-full-read harness draft boundary` |
-| Current validation | `CMV-1837` |
-| Current route | Docs-only M8 harness draft boundary; accepted M7 read-shape receipt and trusted-full-read approval absent; no trusted-full-read workflow, approval line, or live runtime execution |
+| Status | CM-1735 M8-K2 VCP memory trusted-full-read exact approval packet preparation |
+| Current task | `CM-1735 M8-K2 VCP memory trusted-full-read exact approval packet preparation` |
+| Current validation | `CMV-1838` |
+| Current route | Docs-only M8 exact approval packet preparation; accepted M7 read-shape receipt and trusted-full-read approval absent; no trusted-full-read workflow, approval line, or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1735` adds `docs/VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_PACKET_PREPARATION.md`. It defines a non-authorizing packet state, exact fields required later from Jenn, future allowed action boundary, forbidden actions, stop conditions, receipt skeleton, and review gate. Boundary: accepted M7 read-shape receipt `NO`; trusted-full-read profile approval `NO`; exact workflow fields `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; trusted-full-read workflow execution `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M9 unlock `NO`.
 
 `CM-1734` adds `docs/VCP_MEMORY_TRUSTED_FULL_READ_HARNESS_DRAFT_BOUNDARY.md`. It defines a non-authorizing harness draft state, required future inputs, draft template, stop rules, current draft result, and receipt skeleton. Current decision is `draft_boundary_recorded_execution_blocked_missing_m7_receipt_and_exact_approval`. Boundary: accepted M7 read-shape receipt `NO`; trusted-full-read profile approval `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; trusted-full-read workflow execution `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M9 unlock `NO`.
 
