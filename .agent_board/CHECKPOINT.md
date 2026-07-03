@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1771 M14-K0 VCP memory health report preflight`.
-Current validation: `CMV-1874`.
+Current checkpoint: `CM-1772 M14-K1 VCP memory health report schema contract`.
+Current validation: `CMV-1875`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1772 M14-K1 VCP Memory Health Report Schema Contract
+
+Status: `COMPLETED_VALIDATED_M14_K1_VCP_MEMORY_HEALTH_REPORT_SCHEMA_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryHealthReportSchemaContract.js`.
+- Added `tests/vcp-memory-health-report-schema-contract.test.js`.
+- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_SCHEMA_CONTRACT.md`.
+- Locked low-disclosure health report sections for policy, target, fallback, query quality, receipt status, and conservative readiness labels.
+- Covered runtime/dashboard/MCP/private-read/raw-store/real-query/provider/approval requests as L4 stops.
+- Covered raw private/provider/audit-row section material as L4 stops.
+- Covered readiness overclaims as L4 stops and hidden missing-live-evidence blocker denial.
+- Covered section source drift, forbidden raw/private/secret/approval/readiness fields, unexpected fields, and side-effect counter rejection.
+- Preserved that no dashboard runtime implementation, dashboard CLI call, VCPToolBox runtime call, MCP memory tool call, private runtime read, raw store read, real query, provider/API call, memory read/write, durable audit/runtime write, public MCP expansion, approval request, approval line, push, release, deploy, cutover, readiness claim, complete V8 claim, or full bridge completion claim occurred.
+
+Validation: `CMV-1875`; syntax checks, targeted health report schema contract test `11/11`, `npm test` `3702/3702`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1771 M14-K0 VCP Memory Health Report Preflight
 

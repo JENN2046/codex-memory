@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1771 M14-K0 VCP memory health report preflight`.
-Current validation: `CMV-1874`.
-Current handoff: CM-1771 adds the M14 health report preflight at docs/fixture boundary. It defines low-disclosure policy, target, fallback, query quality, receipt, and conservative readiness sections; records live runtime health evidence and dashboard raw/private leak audit as not satisfied; and routes next to M14-K1 health report schema contract fixture. No dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1772 M14-K1 VCP memory health report schema contract`.
+Current validation: `CMV-1875`.
+Current handoff: CM-1772 adds a pure fixture health report schema contract helper, targeted tests, and evidence doc. Targeted tests passed `11/11`; default `npm test` passed `3702/3702`. The helper locks low-disclosure health report sections and conservative readiness labels, while stopping runtime/dashboard/MCP/private-read/raw-store/real-query/provider/approval requests as L4. No dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M14-K0 VCP Memory Health Report Preflight` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M14-K1 VCP Memory Health Report Schema Contract` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M14_K0_VCP_MEMORY_HEALTH_REPORT_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M14_K1_VCP_MEMORY_HEALTH_REPORT_SCHEMA_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpMemoryHealthReportSchemaContract.js`
+- `tests/vcp-memory-health-report-schema-contract.test.js`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_SCHEMA_CONTRACT.md`
 - `docs/VCP_MEMORY_HEALTH_REPORT_M14_PREFLIGHT.md`
 - `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_HARDENING_REPORT.md`
 - `src/core/VcpMemoryFallbackLocalMemoryQueryQualityDryRunContract.js`
@@ -96,16 +99,18 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_PREFLIGHT.md`.
-- Opened M14 only at the docs/fixture preflight boundary.
-- Defined low-disclosure candidate health report sections for policy, target, fallback, query quality, receipt status, and conservative readiness labels.
-- Recorded receipt schema, normalized output, and M13 fallback hardening evidence as sufficient only for docs/fixture work.
-- Recorded live runtime health evidence and dashboard raw/private leak audit as not satisfied.
+- Added `src/core/VcpMemoryHealthReportSchemaContract.js`.
+- Added `tests/vcp-memory-health-report-schema-contract.test.js`.
+- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_SCHEMA_CONTRACT.md`.
+- Locked low-disclosure health report section shape for policy, target, fallback, query quality, receipt status, and conservative readiness labels.
+- Covered runtime/dashboard/MCP/private-read/raw-store/real-query/provider/approval requests as L4 stops.
+- Covered raw private/provider/audit-row section material as L4 stops.
+- Covered readiness overclaims as L4 stops and hidden missing-live-evidence blocker denial.
 - Confirmed no dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, provider/API call, approval-line generation/submission/issue/storage/simulation, durable audit/runtime write, memory read/write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
 
-Validation: `CMV-1874`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
+Validation: `CMV-1875`; syntax checks, targeted health report schema contract test `11/11`, `npm test` `3702/3702`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
-Next safe route: M14-K1 health report schema contract fixture without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, or readiness claims. Push remains separate explicit authorization.
+Next safe route: M14-K2 raw/private leak rejection tests for the health report schema without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, or readiness claims. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

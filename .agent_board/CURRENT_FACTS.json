@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1771",
-  "validationId": "CMV-1874",
+  "taskId": "CM-1772",
+  "validationId": "CMV-1875",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_health_report_m14_preflight",
+    "scope": "vcp_memory_health_report_m14_schema_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1875",
+      "scope": "CM-1772 M14-K1 VCP memory health report schema contract",
+      "status": "COMPLETED_VALIDATED_M14_K1_VCP_MEMORY_HEALTH_REPORT_SCHEMA_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1874",
       "scope": "CM-1771 M14-K0 VCP memory health report preflight",
