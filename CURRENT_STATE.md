@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization |
-| Current task | `CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization` |
-| Current validation | `CMV-1817` |
-| Current route | Repo-native archived plan intake; M0 reality/drift evidence, M1 VCPToolBox-native bridge pivot, M2 docs/state synchronization; no runtime execution |
+| Status | CM-1715 M3-T1 VCPToolBox native memory capability inventory |
+| Current task | `CM-1715 M3-T1 VCPToolBox native memory capability inventory` |
+| Current validation | `CMV-1818` |
+| Current route | Docs/source-contract native capability inventory; no live target discovery or runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1715` adds `docs/VCPTOOLBOX_NATIVE_MEMORY_CAPABILITY_INVENTORY.md`. It maps candidate VCPToolBox native memory surfaces, profile vocabulary, local compatibility surfaces, and unresolved live facts using evidence tags `verified_docs`, `verified_source_contract`, `verified_local_compat`, `inferred`, and `unresolved_live`. Boundary: live VCPToolBox runtime `NO`; target discovery/probing `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1714` records the active intake for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`: M0 fresh reality snapshot, M0 drift matrix, M1 strategy pivot decision, README positioning sync, VCP parity roadmap reclassification, and active status/board synchronization. The current strategy is VCPToolBox-native-first governed bridge work with local `vcp_codex_memory` preserved as fallback/test substrate and compatibility protection. Boundary: live VCPToolBox runtime `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 

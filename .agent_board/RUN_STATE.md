@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization`.
-Current validation: `CMV-1817`.
-Current status: CM-1714 records repo-native intake of the archived VCP-native bridge plan package, M0 fresh reality/drift evidence, M1 strategy pivot, and M2 active docs/state synchronization. No live VCPToolBox runtime, approval-line generation/submission, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1715 M3-T1 VCPToolBox native memory capability inventory`.
+Current validation: `CMV-1818`.
+Current status: CM-1715 records docs/source-contract inventory of VCPToolBox native memory surfaces, profile mapping, local compatibility surfaces, and unresolved live facts. No live VCPToolBox target discovery/runtime, approval-line generation/submission, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M3 VCPToolBox native capability inventory / approval-boundary preparation from the archived plan package, still without live runtime access. Push remains separate explicit authorization.
+Next safe local action is `M3-T2 Invocation Profile Boundary Templates`, still without live runtime access and without generating a real approval line. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

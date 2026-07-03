@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization`.
-Current validation: `CMV-1817`.
+Current checkpoint: `CM-1715 M3-T1 VCPToolBox native memory capability inventory`.
+Current validation: `CMV-1818`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1715 M3-T1 VCPToolBox Native Memory Capability Inventory
+
+Status: `COMPLETED_VALIDATED_M3_T1_VCPTOOLBOX_NATIVE_CAPABILITY_INVENTORY_DOCS_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCPTOOLBOX_NATIVE_MEMORY_CAPABILITY_INVENTORY.md`.
+- Tagged VCPToolBox native surfaces as docs/source-contract/local-compat/inferred/unresolved evidence.
+- Mapped capabilities to `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`.
+- Listed unresolved live target, transport, auth/profile, read/write, output, scope, failure, and receipt facts.
+- Preserved the boundary that live VCPToolBox runtime, target probing, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, and complete V8 claims remain blocked.
+
+Validation: `CMV-1818`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1714 M0-M2 VCP-Native Bridge Plan Intake And Docs/State Synchronization
 

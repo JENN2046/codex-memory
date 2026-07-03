@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization`.
-Current validation: `CMV-1817`.
-Current handoff: CM-1714 completed repo-native intake of the archived VCP-native bridge plan package through M0 reality/drift evidence, M1 strategy pivot, and M2 active docs/state synchronization. No live VCPToolBox runtime, approval-line generation/submission, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1715 M3-T1 VCPToolBox native memory capability inventory`.
+Current validation: `CMV-1818`.
+Current handoff: CM-1715 completed docs/source-contract inventory of VCPToolBox native memory surfaces, profile mapping, local compatibility surfaces, and unresolved live facts. No live VCPToolBox target discovery/runtime, approval-line generation/submission, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete M0-M2 intake for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` using repo-native autopilot and no ColaMeta execution.
+Goal: complete `M3-T1 VCP Native Capability Inventory` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M0_M2_VCP_NATIVE_BRIDGE_PLAN_INTAKE_DOCS_STATE_SYNC_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M3_T1_VCPTOOLBOX_NATIVE_CAPABILITY_INVENTORY_DOCS_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,22 +25,19 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
-- `docs/taskbooks/M0_REPOSITORY_REALITY_SNAPSHOT_20260703.md`
-- `docs/taskbooks/M0_REPOSITORY_DRIFT_MATRIX_20260703.md`
-- `docs/taskbooks/M1_STRATEGY_PIVOT_DECISION_RECORD_20260703.md`
+- `docs/VCPTOOLBOX_NATIVE_MEMORY_CAPABILITY_INVENTORY.md`
 
 Completed in this slice:
 
-- Added M0 fresh repository reality snapshot and drift matrix.
-- Added M1 strategy pivot decision record.
-- Updated README positioning to VCPToolBox-native-first governed bridge.
-- Reclassified the older VCP parity roadmap as fallback/reference for this plan.
-- Synchronized active status, current state, task queue, validation, checkpoint, handoff, run state, ledger, and current facts surfaces.
-- Confirmed no live VCPToolBox runtime, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
+- Added VCPToolBox native memory capability inventory.
+- Tagged capabilities as docs/source-contract/local-compat/inferred/unresolved evidence.
+- Mapped native surfaces to `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`.
+- Listed unresolved live target, transport, auth/profile, read/write, output, scope, failure, and receipt facts.
+- Confirmed no live VCPToolBox runtime, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
-Validation: `CMV-1817`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1818`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M3 VCPToolBox native capability inventory / approval-boundary preparation from the archived plan package. Push remains separate explicit authorization.
+Next safe route: `M3-T2 Invocation Profile Boundary Templates`. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization`.
-Current validation: `CMV-1817`.
-Current project status: CM-1714 records M0 fresh reality and drift evidence, freezes the M1 VCPToolBox-native governed bridge strategy pivot, and synchronizes active docs/state surfaces for the archived plan package. This is docs/state work only; live VCPToolBox runtime, approval-line generation/submission, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, and readiness claims remain blocked.
-Current route: `VCP_NATIVE_BRIDGE_PLAN_INTAKE_DOCS_STATE_SYNC_NO_RUNTIME`.
+Current task: `CM-1715 M3-T1 VCPToolBox native memory capability inventory`.
+Current validation: `CMV-1818`.
+Current project status: CM-1715 records a docs/source-contract inventory of candidate VCPToolBox native memory surfaces, profile mappings, local compatibility surfaces, and unresolved live facts. This is docs-only inventory; no live VCPToolBox target discovery, approval-line generation/submission, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_NATIVE_CAPABILITY_INVENTORY_DOCS_ONLY_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1715 M3-T1 VCPToolBox native memory capability inventory: added `docs/VCPTOOLBOX_NATIVE_MEMORY_CAPABILITY_INVENTORY.md`. The inventory tags DailyNote, DailyNoteManager, KnowledgeBaseManager, TagMemo/TagMemoEngine, LightMemo, TDBKnowledge, DeepMemo, TopicMemo, MeshMemo, and RAGDiaryPlugin as docs/source-contract/local-compat/unresolved evidence, maps them to `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`, and lists unresolved target/transport/auth/profile/read/write/output/scope/failure/receipt facts. No live VCPToolBox runtime call, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
 CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization: added `docs/taskbooks/M0_REPOSITORY_REALITY_SNAPSHOT_20260703.md`, `docs/taskbooks/M0_REPOSITORY_DRIFT_MATRIX_20260703.md`, and `docs/taskbooks/M1_STRATEGY_PIVOT_DECISION_RECORD_20260703.md`; updated README positioning, the VCP parity roadmap classification, and active status/board surfaces. This establishes repo-native execution of the archived plan package and records that VCPToolBox-native governed bridge is now the primary strategy while local parity remains fallback/reference. No live VCPToolBox runtime call, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 

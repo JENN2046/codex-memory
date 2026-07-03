@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1714",
-  "validationId": "CMV-1817",
+  "taskId": "CM-1715",
+  "validationId": "CMV-1818",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_native_bridge_plan_intake_docs_state_sync",
+    "scope": "vcp_native_capability_inventory_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1818",
+      "scope": "CM-1715 M3-T1 VCPToolBox native memory capability inventory",
+      "status": "COMPLETED_VALIDATED_M3_T1_VCPTOOLBOX_NATIVE_CAPABILITY_INVENTORY_DOCS_ONLY_NO_RUNTIME"
+    },
     {
       "id": "CMV-1817",
       "scope": "CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization",
