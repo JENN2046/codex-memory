@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1829 M9 exact request field candidate fixture contract`.
-Current validation: `CMV-1932`.
+Current checkpoint: `CM-1830 M9 exact request field candidate contract closeout / packet-readiness gate review`.
+Current validation: `CMV-1933`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1830 M9 Exact Request Field Candidate Contract Closeout / Packet-Readiness Gate Review
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_CONTRACT_CLOSEOUT_PACKET_READINESS_GATE_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1830_EXACT_REQUEST_FIELD_CANDIDATE_CONTRACT_CLOSEOUT_PACKET_READINESS_GATE_REVIEW.md`.
+- Reviewed CM-1828 field candidate selection and CM-1829 field candidate fixture contract.
+- Closed only the local exact request field candidate preparation slice for planning.
+- Opened only the next local-safe packet-readiness fixture contract route.
+- Preserved that exact request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1831 M9 exact request packet-readiness fixture contract.
+
+Validation: `CMV-1933`; CM-1828/CM-1829 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1829 M9 Exact Request Field Candidate Fixture Contract
 

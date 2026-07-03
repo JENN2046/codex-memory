@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1829 M9 exact request field candidate fixture contract`.
-Current validation: `CMV-1932`.
-Current project status: CM-1829 added a pure local source/test contract for non-authorizing request-field candidate packets. Full M9 proposal mode, exact request packet readiness, request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1829_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1830 M9 exact request field candidate contract closeout / packet-readiness gate review`.
+Current validation: `CMV-1933`.
+Current project status: CM-1830 closes the local exact request field candidate slice for planning and opens only the next packet-readiness fixture contract route. Full M9 proposal mode, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1830_EXACT_REQUEST_FIELD_CANDIDATE_CONTRACT_CLOSEOUT_PACKET_READINESS_GATE_REVIEW_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1830 M9 exact request field candidate contract closeout / packet-readiness gate review: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1830_EXACT_REQUEST_FIELD_CANDIDATE_CONTRACT_CLOSEOUT_PACKET_READINESS_GATE_REVIEW.md`. It reviews CM-1828 and CM-1829, accepts the local exact request field candidate slice as closed for planning, and opens only the next local-safe packet-readiness fixture contract route. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1831 M9 exact request packet-readiness fixture contract.
 
 CM-1829 M9 exact request field candidate fixture contract: added `src/core/VcpMemoryTrustedWriteProposalExactRequestFieldCandidateContract.js`, `tests/vcp-memory-trusted-write-proposal-exact-request-field-candidate-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1829_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3754/3754`. The helper validates non-authorizing exact request field candidate packets, accepts safe candidate vocabulary and declared missing exact fields, routes authority expansion to `stop_l4`, rejects raw/secret/request/approval/readiness fields without echo, and reports no runtime/write side effects. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1830 M9 exact request field candidate contract closeout / packet-readiness gate review.
 
