@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1718",
-  "validationId": "CMV-1821",
+  "taskId": "CM-1719",
+  "validationId": "CMV-1822",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_invocation_contract_spec_docs_only",
+    "scope": "vcp_memory_result_normalization_contract_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1822",
+      "scope": "CM-1719 M4-K2 VCP memory result normalization contract",
+      "status": "COMPLETED_VALIDATED_M4_K2_VCP_MEMORY_RESULT_NORMALIZATION_CONTRACT_DOCS_ONLY_NO_RUNTIME"
+    },
     {
       "id": "CMV-1821",
       "scope": "CM-1718 M4-K1 VCP memory invocation contract spec",

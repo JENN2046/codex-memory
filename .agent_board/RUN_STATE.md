@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1718 M4-K1 VCP memory invocation contract spec`.
-Current validation: `CMV-1821`.
-Current status: CM-1718 records the docs-only VCP memory invocation contract spec. No live VCPToolBox target discovery/runtime, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1719 M4-K2 VCP memory result normalization contract`.
+Current validation: `CMV-1822`.
+Current status: CM-1719 records the docs-only VCP memory result normalization contract. No live VCPToolBox target discovery/runtime, fallback execution, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M4-K2 result normalization contract, still without live runtime access. Push remains separate explicit authorization.
+Next safe local action is M5 governance policy shield truth table, still without live runtime access. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

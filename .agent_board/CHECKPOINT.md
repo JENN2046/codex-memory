@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1718 M4-K1 VCP memory invocation contract spec`.
-Current validation: `CMV-1821`.
+Current checkpoint: `CM-1719 M4-K2 VCP memory result normalization contract`.
+Current validation: `CMV-1822`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1719 M4-K2 VCP Memory Result Normalization Contract
+
+Status: `COMPLETED_VALIDATED_M4_K2_VCP_MEMORY_RESULT_NORMALIZATION_CONTRACT_DOCS_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_RESULT_NORMALIZATION_CONTRACT.md`.
+- Defined normalized output with `source_runtime`, confidence/evidence, scope, visibility, `receipt_id`, fallback flags, projection rules, source-runtime mapping, confidence rules, status mapping, static examples, and fail-closed cases.
+- Preserved the boundary that live VCPToolBox runtime, target probing, fallback execution, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, and complete V8 claims remain blocked.
+
+Validation: `CMV-1822`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1718 M4-K1 VCP Memory Invocation Contract Spec
 
