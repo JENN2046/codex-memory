@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1729 M7-K2 VCP memory observe-full exact approval decision review boundary`.
-Current validation: `CMV-1832`.
+Current checkpoint: `CM-1730 M7-K3 VCP memory observe-full exact approval request display boundary`.
+Current validation: `CMV-1833`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1730 M7-K3 VCP Memory Observe-Full Exact Approval Request Display Boundary
+
+Status: `COMPLETED_VALIDATED_M7_K3_VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`.
+- Defined non-authorizing display state, required future inputs, display template, stop rules, current display result, and receipt skeleton.
+- Recorded current decision `not_display_ready_missing_m6_receipt_and_exact_read_approval`.
+- Preserved that accepted M6 receipt is missing, exact Jenn read-shape approval is missing, exact bounded query is missing, read-shape proof is not started, and M8 is not unlocked.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read-shape query, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M8 unlock occurred.
+
+Validation: `CMV-1833`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1729 M7-K2 VCP Memory Observe-Full Exact Approval Decision Review Boundary
 
