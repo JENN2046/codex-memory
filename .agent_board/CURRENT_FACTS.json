@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1795",
-  "validationId": "CMV-1898",
+  "taskId": "CM-1796",
+  "validationId": "CMV-1899",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_source_scan_boundary_repair_abort_receipt",
+    "scope": "vcp_memory_observe_lite_whitelist_temp_auth_status_only_probe",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1899",
+      "scope": "CM-1796 M6 observe-lite whitelist temporary auth status-only probe",
+      "status": "COMPLETED_VALIDATED_M6_TEMP_AUTH_HUMAN_TOOL_ROUTE_STATUS_PROOF_HTTP_5XX_NO_BODY_NO_LOG_NO_SECRET_NO_WRITE"
+    },
     {
       "id": "CMV-1898",
       "scope": "CM-1795 M6 observe-lite source scan boundary repair abort receipt",

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1795 M6 observe-lite source scan boundary repair abort receipt |
-| Current task | `CM-1795 M6 observe-lite source scan boundary repair abort receipt` |
-| Current validation | `CMV-1898` |
-| Current route | Boundary repair recorded: a broad VCPToolBox source search returned runtime-data surface snippets during CM-1795 pre-execution calibration, so the live probe was aborted before execution and future calibration is restricted to fixed allowlisted source files; full M6 memory/capability handshake remains incomplete |
+| Status | CM-1796 M6 observe-lite whitelist temporary auth status-only probe |
+| Current task | `CM-1796 M6 observe-lite whitelist temporary auth status-only probe` |
+| Current validation | `CMV-1899` |
+| Current route | Live status-only probe executed with a one-shot child-process auth value: warmup/auth guard reached HTTP 4xx and `/v1/human/tool` returned HTTP 5xx without response-body/log/secret output; authenticated route proof exists, but successful DailyNoteSearcher memory/capability result is not proven |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1796` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1796_WHITELIST_TEMP_AUTH_STATUS_ONLY_PROBE_RECEIPT.md`. It records a whitelist-only live status probe using a disposable child-process bearer value. Evidence: pre-start endpoint `connection_refused`; runtime started `YES`; child process count `1`; temporary bearer generated `YES` but disclosed/persisted `NO`; request body generated `YES` but printed/disclosed `NO`; warmup probe count `10`; warmup status `http_4xx`; auth guard status `http_4xx`; `/v1/human/tool` status `http_5xx`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store/raw runtime response read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; VCP plugin success proven `NO`; runtime memory query success proven `NO`; memory result returned to agent `NO`; memory write `NO`; VCPToolBox files modified `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; child stopped and exit observed `YES`; persistent process intentionally left running `NO`; temporary auth transport proof complete `YES`; human-tool route status proof complete `YES`; memory capability success complete `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1797 DailyNoteSearcher status-only failure source diagnosis`.
 
 `CM-1795` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1795_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_RECEIPT.md`. It records a pre-execution boundary repair: broad root-wide VCPToolBox source search returned runtime-data surface snippets, so the live temporary-auth status-only probe was aborted before execution and future source calibration is restricted to fixed allowlisted files only. Evidence: boundary repair recorded `YES`; live probe aborted before execution `YES`; root-wide source search attempted `YES`; runtime-data surface snippet hit `YES`; raw snippets repeated in receipt `NO`; runtime started `NO`; service start attempted `NO`; temporary bearer generated/disclosed/persisted `NO`; request body generated `NO`; route called `NO`; authenticated probe executed `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; runtime memory query executed `NO`; memory write `NO`; VCPToolBox files modified `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1796 whitelist-only exact temporary auth status-only probe`.
 

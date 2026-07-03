@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1795 M6 observe-lite source scan boundary repair abort receipt`.
-Current validation: `CMV-1898`.
-Current status: CM-1795 recorded a pre-execution boundary repair: a broad VCPToolBox source search returned runtime-data surface snippets, so the live temporary-auth status-only probe was aborted before execution. Future calibration is restricted to a fixed source-file allowlist. Full M6 memory/capability handshake remains incomplete because no runtime route, request body, response body, memory result, VCP plugin, MCP memory tool, provider/API, runtime memory query, or memory read/write was executed. M15 remains locked, and no runtime start, route call, response body read, runtime log read, config/env content read, secret read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1796 M6 observe-lite whitelist temporary auth status-only probe`.
+Current validation: `CMV-1899`.
+Current status: CM-1796 executed a whitelist-only live status probe with a generated one-shot child-process bearer value. Warmup/auth guard reached `http_4xx`; `/v1/human/tool` returned `http_5xx`; the child process was stopped and exit was observed. Temporary-auth transport and authenticated route status are proven, but successful `DailyNoteSearcher.SearchDailyNote` result and full M6 memory/capability handshake are not proven. No response body, stdout, stderr, runtime logs, config/env content, existing bearer secret, raw memory/store/runtime response, provider response, or memory result was read by agent. M15 remains locked, and no memory write, MCP memory tool call, provider/API call by agent, VCPToolBox file modification, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1796 whitelist-only exact temporary auth status-only probe. Use only the fixed source-file allowlist for any remaining source calibration. Use only a newly generated disposable child-process auth value; do not read existing bearer tokens, `config.env`, `.env`, process env, logs, or runtime output. Do not print or persist any bearer value. Keep response bodies, logs, config/env contents, raw memory, raw stores, memory results, and provider responses unread. Do not open M7/M8/M15 yet, do not run trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe action is CM-1797 DailyNoteSearcher status-only failure source diagnosis. Start source-only and metadata-only; do not read logs, response bodies, config/env contents, raw memory, raw stores, memory results, or provider responses. Do not open M7/M8/M15 yet, do not run trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

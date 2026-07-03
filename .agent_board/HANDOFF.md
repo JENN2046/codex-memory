@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1795 M6 observe-lite source scan boundary repair abort receipt`.
-Current validation: `CMV-1898`.
-Current handoff: CM-1795 recorded a pre-execution boundary repair: a broad VCPToolBox source search returned runtime-data surface snippets, so the live temporary-auth status-only probe was aborted before execution. Future calibration is restricted to a fixed source-file allowlist. Full M6 memory/capability handshake remains incomplete because no runtime route, request body, response body, memory result, VCP plugin, MCP memory tool, provider/API, runtime memory query, or memory read/write was executed. M15 remains locked, and no runtime start, response body read, runtime log read, config/env content read, secret read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1796 M6 observe-lite whitelist temporary auth status-only probe`.
+Current validation: `CMV-1899`.
+Current handoff: CM-1796 executed a whitelist-only live status probe with a generated one-shot child-process bearer value. Warmup/auth guard reached `http_4xx`; `/v1/human/tool` returned `http_5xx`; the child process was stopped and exit was observed. Temporary-auth transport and authenticated route status are proven, but successful `DailyNoteSearcher.SearchDailyNote` result and full M6 memory/capability handshake are not proven. No response body, stdout, stderr, runtime logs, config/env content, existing bearer secret, raw memory/store/runtime response, provider response, or memory result was read by agent. M15 remains locked, and no memory write, MCP memory tool call, provider/API call by agent, VCPToolBox file modification, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1795 recorded a pre-execution boundary repair: a broad VCPTo
 
 Goal: complete `M6 observe-lite` transport and memory-capability proof planning for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, response body, provider, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_NO_RUNTIME_NO_SECRET_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; CM-1794 defines the future disposable child-process auth boundary without execution; CM-1795 records a source-scan boundary repair and aborts live probe before execution; `/health` is not a source-defined route; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_TEMP_AUTH_HUMAN_TOOL_ROUTE_STATUS_PROOF_HTTP_5XX_NO_BODY_NO_LOG_NO_SECRET_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; CM-1794 defines the future disposable child-process auth boundary without execution; CM-1795 records a source-scan boundary repair; CM-1796 proves temporary-auth transport and authenticated human-tool route status but receives HTTP 5xx; `/health` is not a source-defined route; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1796_WHITELIST_TEMP_AUTH_STATUS_ONLY_PROBE_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1795_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1794_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1793_DAILYNOTESEARCHER_PROBE_DECISION_ABORT_BOUNDARY.md`
@@ -122,15 +123,15 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1795_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_RECEIPT.md`.
-- Classified the pre-execution source-scan boundary issue: a broad root-wide VCPToolBox source search returned runtime-data surface snippets.
-- Aborted the live temporary-auth status-only probe before execution.
-- Replaced future calibration with a fixed source-file allowlist and forbade root-wide VCPToolBox search for this route.
-- Confirmed raw snippets repeated in receipt `NO`, runtime started `NO`, temporary bearer generated/disclosed/persisted `NO`, request body generated `NO`, real request body disclosed `NO`, route called `NO`, authenticated probe executed `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, agent config/env/secrets read `NO`, memory result returned `NO`, runtime memory query executed `NO`, VCP plugin executed `NO`, MCP memory tool called `NO`, memory write `NO`, provider/API `NO`, VCPToolBox files modified `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, M6 full completion `NO`, M15 unlock `NO`, complete V8 claim `NO`, and full bridge completion claim `NO`.
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1796_WHITELIST_TEMP_AUTH_STATUS_ONLY_PROBE_RECEIPT.md`.
+- Ran whitelist-only live probe with a generated one-shot child-process bearer value.
+- Confirmed pre-start endpoint `connection_refused`, child process count `1`, warmup probe count `10`, warmup status `http_4xx`, auth guard status `http_4xx`, and `/v1/human/tool` status `http_5xx`.
+- Stopped the child process and observed exit; persistent process left running `NO`.
+- Confirmed bearer disclosed/persisted `NO`, request body printed/disclosed `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, agent config/env/secrets read `NO`, raw memory/raw store/raw runtime response read by agent `NO`, memory result returned to agent `NO`, VCP plugin success proven `NO`, runtime memory query success proven `NO`, MCP memory tool called `NO`, memory write `NO`, provider/API by agent `NO`, VCPToolBox files modified `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, M6 full completion `NO`, M15 unlock `NO`, complete V8 claim `NO`, and full bridge completion claim `NO`.
 
-Validation: `CMV-1898`; boundary incident classification, corrected fixed-file allowlist review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/runtime-action scans, and changed-scope review passed.
+Validation: `CMV-1899`; whitelist source calibration, sanitized live probe output, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
-Next safe route: CM-1796 whitelist-only exact temporary auth status-only probe. Use only fixed source-file allowlist for remaining source calibration. Use only a newly generated disposable child-process auth value; do not read existing bearer tokens, `config.env`, `.env`, process env, logs, or runtime output. Do not print or persist any bearer value. Do not run observe-full/trusted-read/write, do not read response bodies/logs/secrets/config/raw memory/raw stores/memory results/provider responses, do not call MCP memory tools, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe route: CM-1797 DailyNoteSearcher status-only failure source diagnosis. Start source-only and metadata-only. Do not read logs, response bodies, config/env contents, raw memory, raw stores, memory results, or provider responses. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

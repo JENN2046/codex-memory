@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1795 M6 observe-lite source scan boundary repair abort receipt`.
-Current validation: `CMV-1898`.
+Current checkpoint: `CM-1796 M6 observe-lite whitelist temporary auth status-only probe`.
+Current validation: `CMV-1899`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1796 M6 Observe-Lite Whitelist Temporary Auth Status-Only Probe
+
+Status: `COMPLETED_VALIDATED_M6_TEMP_AUTH_HUMAN_TOOL_ROUTE_STATUS_PROOF_HTTP_5XX_NO_BODY_NO_LOG_NO_SECRET_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1796_WHITELIST_TEMP_AUTH_STATUS_ONLY_PROBE_RECEIPT.md`.
+- Ran whitelist-only live probe using a generated one-shot child-process bearer value.
+- Confirmed pre-start endpoint status `connection_refused`.
+- Started one local child process, warmed up for `10` status-only probes, and reached `http_4xx`.
+- Confirmed auth guard status class `http_4xx`.
+- Called `/v1/human/tool` once with an exact request body generated at execution time; status class was `http_5xx`.
+- Preserved that bearer value disclosed/persisted `NO`, request body printed/disclosed `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets read `NO`, raw memory/raw store/raw runtime response read by agent `NO`, provider/API called by agent `NO`, MCP memory tool called `NO`, VCP plugin success proven `NO`, runtime memory query success proven `NO`, memory result returned to agent `NO`, memory write `NO`, VCPToolBox files modified `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Sent stop signal, observed child exit, and left no persistent process intentionally running.
+- Set next route to CM-1797 DailyNoteSearcher status-only failure source diagnosis.
+
+Validation: `CMV-1899`; whitelist source calibration, sanitized live probe output, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1795 M6 Observe-Lite Source Scan Boundary Repair Abort Receipt
 
