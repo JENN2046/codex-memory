@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1798 M6 observe-lite executable-bit repair status-only rerun |
-| Current task | `CM-1798 M6 observe-lite executable-bit repair status-only rerun` |
-| Current validation | `CMV-1901` |
-| Current route | Exact executable-bit repair changed one DailyNoteSearcher binary mode from 644 to 755, then low-disclosure status-only rerun reached HTTP guard but authenticated human-tool call timed out; no body/log/stdout/stderr/secret/raw memory read, no memory write, no readiness claim |
+| Status | CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis |
+| Current task | `CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis` |
+| Current validation | `CMV-1902` |
+| Current route | Fixed-source/metadata diagnosis found local runtime `linux x64` but the only present Linux DailyNoteSearcher candidate is `ARM aarch64`; next route is bounded local x64 build/install preflight |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1799` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1799_DAILYNOTESEARCHER_BINARY_COMPATIBILITY_DIAGNOSIS.md`. It records fixed-source/fixed-directory metadata diagnosis: local runtime platform `linux`, arch `x64`; Linux candidate `DailyNoteSearcher` exists `NO`; Linux candidate `DailyNoteSearcher-aarch64-unknown-linux-musl` exists `YES`, mode `755`, file header `ELF 64-bit ARM aarch64`; Linux release/debug targets exist `NO`; Windows `DailyNoteSearcher.exe` exists `YES` with `PE32+ x86-64 MS Windows` header; Linux source branch includes Windows exe `NO`; source starts selected binary with `--serve` `YES`; source waits for service ready `YES`; source logs child stderr to console `YES`; primary diagnosis `dailynotesearcher_linux_binary_arch_mismatch`. Runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; VCPToolBox file modified by CM-1799 `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1800 DailyNoteSearcher local x64 build/install preflight`.
 
 `CM-1798` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1798_EXECUTABLE_BIT_REPAIR_STATUS_ONLY_RERUN_RECEIPT.md`. It records exact external repair `chmod +x Plugin/DailyNoteSearcher/DailyNoteSearcher-aarch64-unknown-linux-musl`: mode before `644`, mode after `755`, VCPToolBox content modified `NO`, VCPToolBox file mode modified `YES`, rollback `chmod -x`. Host architecture metadata `x86_64`; executable architecture metadata `ARM aarch64`. Low-disclosure temporary-auth status-only rerun: first probe stayed `connection_refused_or_fetch_failed`; extended probe warmup/auth guard `http_4xx`; authenticated human-tool status `timeout`; post-probe no `node server.js` process remained and endpoint returned connection refused. Token/body printed or persisted `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1799 DailyNoteSearcher binary compatibility source/metadata diagnosis`.
 

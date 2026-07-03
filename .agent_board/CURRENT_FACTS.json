@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1798",
-  "validationId": "CMV-1901",
+  "taskId": "CM-1799",
+  "validationId": "CMV-1902",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_executable_bit_repair_status_only_rerun",
+    "scope": "vcp_memory_observe_lite_dailynotesearcher_binary_compatibility_diagnosis",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1902",
+      "scope": "CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_BINARY_COMPATIBILITY_DIAGNOSIS_SOURCE_METADATA_NO_RUNTIME_NO_SECRET_NO_WRITE"
+    },
     {
       "id": "CMV-1901",
       "scope": "CM-1798 M6 observe-lite executable-bit repair status-only rerun",

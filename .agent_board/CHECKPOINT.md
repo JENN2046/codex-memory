@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1798 M6 observe-lite executable-bit repair status-only rerun`.
-Current validation: `CMV-1901`.
+Current checkpoint: `CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis`.
+Current validation: `CMV-1902`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1799 M6 Observe-Lite DailyNoteSearcher Binary Compatibility Diagnosis
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_BINARY_COMPATIBILITY_DIAGNOSIS_SOURCE_METADATA_NO_RUNTIME_NO_SECRET_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1799_DAILYNOTESEARCHER_BINARY_COMPATIBILITY_DIAGNOSIS.md`.
+- Confirmed local runtime metadata `linux x64`.
+- Confirmed Linux source candidate order includes `DailyNoteSearcher`, `DailyNoteSearcher-aarch64-unknown-linux-musl`, release target, and debug target.
+- Confirmed only the aarch64 Linux candidate exists, now mode `755`; its file header is `ELF 64-bit ARM aarch64`.
+- Confirmed Linux release/debug targets are absent.
+- Confirmed `DailyNoteSearcher.exe` exists as `PE32+ x86-64 MS Windows`, but the Linux branch does not include it.
+- Recorded primary diagnosis `DAILYNOTESEARCHER_LINUX_BINARY_ARCH_MISMATCH`.
+- Preserved that runtime started `NO`, binary executed by agent `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets read `NO`, raw memory/raw store read by agent `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, VCPToolBox file modified by CM-1799 `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1800 DailyNoteSearcher local x64 build/install preflight.
+
+Validation: `CMV-1902`; fixed source slice review, fixed plugin-directory metadata, executable header metadata, local platform/arch metadata, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1798 M6 Observe-Lite Executable-Bit Repair Status-Only Rerun
 
