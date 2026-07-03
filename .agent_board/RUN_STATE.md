@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1735 M8-K2 VCP memory trusted-full-read exact approval packet preparation`.
-Current validation: `CMV-1838`.
-Current status: CM-1735 records the docs-only non-authorizing M8 trusted-full-read exact approval packet preparation. Accepted M7 read-shape receipt and exact Jenn trusted-full-read approval remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-full-read workflow execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1736 M8-K3 VCP memory trusted-full-read exact approval decision review boundary`.
+Current validation: `CMV-1839`.
+Current status: CM-1736 records the docs-only non-authorizing M8 trusted-full-read exact approval decision review boundary. Accepted M7 read-shape receipt and exact Jenn trusted-full-read approval remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-full-read workflow execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M8 exact approval decision/review boundary without workflow/runtime, or remain blocked before M8 runtime until required exact approvals exist. Push remains separate explicit authorization.
+Next safe local action is M8 non-authorizing request display boundary without workflow/runtime, or remain blocked before M8 runtime until required exact approvals exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

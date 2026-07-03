@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1735 M8-K2 VCP memory trusted-full-read exact approval packet preparation`.
-Current validation: `CMV-1838`.
+Current checkpoint: `CM-1736 M8-K3 VCP memory trusted-full-read exact approval decision review boundary`.
+Current validation: `CMV-1839`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1736 M8-K3 VCP Memory Trusted-Full-Read Exact Approval Decision Review Boundary
+
+Status: `COMPLETED_VALIDATED_M8_K3_VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`.
+- Reviewed CM-1735 as non-authorizing packet preparation.
+- Defined review state, required input review, decision matrix, review checklist, current review result, and receipt skeleton.
+- Recorded current decision `blocked_before_workflow_missing_m7_receipt_and_exact_trusted_full_read_approval`.
+- Preserved that accepted M7 read-shape receipt and exact Jenn trusted-full-read approval are missing.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, trusted-full-read workflow execution, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M9 unlock occurred.
+
+Validation: `CMV-1839`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1735 M8-K2 VCP Memory Trusted-Full-Read Exact Approval Packet Preparation
 
