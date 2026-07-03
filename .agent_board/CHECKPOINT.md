@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1768 M13-K5 VCP memory fallback local memory lifecycle filter contract`.
-Current validation: `CMV-1871`.
+Current checkpoint: `CM-1769 M13-K6 VCP memory fallback local memory query-quality dry-run contract`.
+Current validation: `CMV-1872`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1769 M13-K6 VCP Memory Fallback Local Memory Query-Quality Dry-Run Contract
+
+Status: `COMPLETED_VALIDATED_M13_K6_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_QUERY_QUALITY_DRY_RUN_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryFallbackLocalMemoryQueryQualityDryRunContract.js`.
+- Added `tests/vcp-memory-fallback-local-memory-query-quality-dry-run-contract.test.js`.
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_QUERY_QUALITY_DRY_RUN_CONTRACT.md`.
+- Covered fixture-only fallback query-quality dry-run success without runtime execution.
+- Covered temp-local dataset metadata accepted only as dry-run fixture metadata.
+- Covered broad or ambiguous fallback query denial unless bounded scope is present.
+- Covered synthetic query-quality failure accepted only when visibly marked as local fallback failure.
+- Covered synthetic query-quality failure denial when it is not marked local fallback.
+- Covered real query, provider, MCP memory tool, private read, and broad scan requests as L4 stops.
+- Covered raw, provider, MCP, and real-memory result payload fixtures as L4 stops.
+- Covered VCP-native lookalike query-quality fallback result rejection.
+- Covered decision mismatch rejection, forbidden raw query/secret/approval/readiness field rejection without echoing values, missing/positive/malformed side-effect counter rejection, non-boolean request/dry-run/expectation flag rejection, non-string request id rejection, unexpected non-allowlisted field rejection, and side-effect posture lock.
+- Preserved that no local fallback runtime execution, private runtime read, real query, MCP memory tool call, VCPToolBox runtime call, target probing, raw store scan, broad memory scan, provider/API, temp-local write by this contract, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1872`; syntax checks, targeted query-quality dry-run node test `14/14`, `npm test` `3691/3691`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1768 M13-K5 VCP Memory Fallback Local Memory Lifecycle Filter Contract
 

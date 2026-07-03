@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1768 M13-K5 VCP memory fallback local memory lifecycle filter contract`.
-Current validation: `CMV-1871`.
-Current status: CM-1768 adds a fixture-only fallback lifecycle filter contract with targeted tests `14/14` and default `npm test` `3677/3677`, while preserving that fallback governance parity is not green and runtime fallback remains blocked. It covers active local fallback acceptance, inactive lifecycle denial as active fallback results, inactive lifecycle low-disclosure status summary only when requested by policy, status summary policy denial, unknown lifecycle and missing scope fail-closed denial, lifecycle store scan / migration-backfill / lifecycle mutation L4 stops, raw lifecycle / linked replacement / proposal payload L4 stops, VCP-native lookalike rejection, decision mismatch rejection, forbidden raw lifecycle/secret/approval/readiness field rejection, side-effect counter rejection, non-boolean flag rejection, non-string request id rejection, unexpected non-allowlisted field rejection, and side-effect posture lock. No local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, lifecycle store scan, lifecycle mutation, migration/import/export/backfill, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1769 M13-K6 VCP memory fallback local memory query-quality dry-run contract`.
+Current validation: `CMV-1872`.
+Current status: CM-1769 adds a fixture-only fallback query-quality dry-run contract with targeted tests `14/14` and default `npm test` `3691/3691`, while preserving that fallback governance parity is not green and runtime fallback remains blocked. It covers fixture-only and temp-local dataset metadata dry-run success, bounded-scope requirement for broad/ambiguous fallback queries, synthetic quality failure marked as local fallback failure, unmarked quality failure denial, real query/provider/MCP/private read/broad scan L4 stops, raw/provider/MCP/real-memory result payload L4 stops, VCP-native lookalike rejection, decision mismatch rejection, forbidden raw query/secret/approval/readiness field rejection, side-effect counter rejection, non-boolean flag rejection, non-string request id rejection, unexpected non-allowlisted field rejection, and side-effect posture lock. No local fallback runtime execution, private runtime read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, raw store scan, broad memory scan, provider/API, temp-local write by this contract, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M13 query-quality fallback dry-run tests, final fallback hardening report, or a focused CM-1768 source review, without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, or provider/API calls. Push remains separate explicit authorization.
+Next safe local action is final M13 fallback hardening report / governance parity review, without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
