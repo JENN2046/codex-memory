@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1745 M9-K5 VCP memory trusted-write-proposal runtime abort receipt skeleton |
-| Current task | `CM-1745 M9-K5 VCP memory trusted-write-proposal runtime abort receipt skeleton` |
-| Current validation | `CMV-1848` |
-| Current route | Docs-only M9 abort receipt skeleton; accepted M8 trusted-full-read workflow receipt absent; no request submission, write proposal generation/submission, approval line, M10 unlock, memory write, or live runtime execution |
+| Status | CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary |
+| Current task | `CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary` |
+| Current validation | `CMV-1849` |
+| Current route | Docs-only M9 blocked closeout; accepted M8 trusted-full-read workflow receipt absent; no request submission, write proposal generation/submission, approval line, M10 unlock, memory write, or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1746` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_M9_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes the safe docs-only M9 preparation chain covering CM-1740 through CM-1745, lists unresolved proposal-mode blockers, states M9 proposal-mode evidence is incomplete, and states M10 is not unlocked. Boundary: M9 docs-only chain complete `YES`; M9 proposal-mode evidence complete `NO`; accepted M8 trusted-full-read receipt `NO`; exact trusted-write-proposal approval `NO`; exact proposal fields `NO`; proposal review route `NO`; write proposal generated/submitted `NO`; accepted proposal receipts `NO`; durable memory write `NO`; memory write `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; trusted-write-proposal workflow execution `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M10 unlock `NO`.
 
 `CM-1745` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_RUNTIME_ABORT_RECEIPT_SKELETON.md`. It defines low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-runtime conclusion for future M9 trusted-write-proposal attempts. Boundary: accepted M8 trusted-full-read receipt `NO`; exact trusted-write-proposal approval `NO`; exact proposal fields `NO`; proposal review route `NO`; proposal generation authorization `NO`; proposal submission authorization `NO`; write proposal generated/submitted `NO`; durable memory write `NO`; memory write `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; trusted-write-proposal workflow execution `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M10 unlock `NO`.
 

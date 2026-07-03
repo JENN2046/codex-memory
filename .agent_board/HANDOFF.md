@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1745 M9-K5 VCP memory trusted-write-proposal runtime abort receipt skeleton`.
-Current validation: `CMV-1848`.
-Current handoff: CM-1745 records a non-authorizing abort receipt skeleton for future M9 trusted-write-proposal attempts. Accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
+Current task: `CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary`.
+Current validation: `CMV-1849`.
+Current handoff: CM-1746 closes the docs-only M9 trusted-write-proposal preparation chain while recording that proposal-mode evidence remains blocked. Accepted M8 trusted-full-read workflow receipt, exact Jenn trusted-write-proposal boundary, exact proposal fields, generated/submitted proposals, accepted proposal receipts, and exact M10 write boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M9-K5 Trusted-Write-Proposal Runtime Abort Receipt Skeleton` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M9-K6 Trusted-Write-Proposal Blocked Closeout Summary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M9_K5_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M9_K6_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_M9_BLOCKED_CLOSEOUT_SUMMARY.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_RUNTIME_ABORT_RECEIPT_SKELETON.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
@@ -52,16 +53,16 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added M9 trusted-write-proposal runtime abort receipt skeleton.
-- Defined low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-runtime conclusion.
-- Recorded current result `abort_receipt_skeleton_ready_no_runtime`.
-- Recorded that accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary are missing.
+- Added M9 trusted-write-proposal blocked closeout summary.
+- Recorded CM-1740 through CM-1745 as the completed docs-only M9 preparation chain.
+- Recorded that M9 proposal-mode evidence remains incomplete and blocked.
+- Recorded that accepted M8 trusted-full-read workflow receipt, exact Jenn trusted-write-proposal boundary, exact proposal fields, proposal review route, generated/submitted proposals, accepted proposal receipts, and exact M10 write boundary are missing.
 - Preserved that no write proposal was generated or submitted, and no durable write or memory write occurred.
 - Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M10 unlock occurred.
 
-Validation: `CMV-1848`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1849`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M9 blocked closeout summary without workflow/runtime/write/proposal generation, or remain blocked before M9 until accepted M8 receipt and required exact approvals exist. Push remains separate explicit authorization.
+Next safe route: M10 blocked precondition record without runtime/write/proposal generation, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

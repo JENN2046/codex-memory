@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1745",
-  "validationId": "CMV-1848",
+  "taskId": "CM-1746",
+  "validationId": "CMV-1849",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_runtime_abort_receipt_skeleton_docs_only",
+    "scope": "vcp_memory_trusted_write_proposal_m9_blocked_closeout_summary_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1849",
+      "scope": "CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M9_K6_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1848",
       "scope": "CM-1745 M9-K5 VCP memory trusted-write-proposal runtime abort receipt skeleton",

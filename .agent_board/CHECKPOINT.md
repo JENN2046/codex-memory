@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1745 M9-K5 VCP memory trusted-write-proposal runtime abort receipt skeleton`.
-Current validation: `CMV-1848`.
+Current checkpoint: `CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary`.
+Current validation: `CMV-1849`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1746 M9-K6 VCP Memory Trusted-Write-Proposal Blocked Closeout Summary
+
+Status: `COMPLETED_VALIDATED_M9_K6_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_M9_BLOCKED_CLOSEOUT_SUMMARY.md`.
+- Closed the safe docs-only M9 preparation chain covering CM-1740 through CM-1745.
+- Recorded that M9 proposal-mode evidence remains incomplete and blocked before proposal generation.
+- Preserved that accepted M8 trusted-full-read workflow receipt, exact Jenn trusted-write-proposal boundary, exact proposal fields, proposal review route, generated/submitted proposals, accepted proposal receipts, and exact M10 write boundary are absent.
+- Preserved that request submission, proposal generation/submission, durable write, memory write, runtime execution, and M10 unlock did not occur.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, trusted-write-proposal workflow execution, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, memory write, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M10 unlock occurred.
+
+Validation: `CMV-1849`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1745 M9-K5 VCP Memory Trusted-Write-Proposal Runtime Abort Receipt Skeleton
 
