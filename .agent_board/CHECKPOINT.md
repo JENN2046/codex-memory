@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1817 M9 trusted-write-proposal non-authorizing request display refresh`.
-Current validation: `CMV-1920`.
+Current checkpoint: `CM-1818 M9 trusted-write-proposal runtime abort receipt refresh`.
+Current validation: `CMV-1921`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1818 M9 Trusted-Write-Proposal Runtime Abort Receipt Refresh
+
+Status: `COMPLETED_VALIDATED_M9_ABORT_RECEIPT_REFRESH_NO_RUNTIME_NO_REQUEST_NO_PROPOSAL_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1818_RUNTIME_ABORT_RECEIPT_REFRESH.md`.
+- Refreshed the CM-1745 abort receipt boundary after accepted M8 evidence from CM-1812/CM-1813.
+- Preserved that exact M9 proposal boundary, exact fields, proposal review route, L4 write-intent shield evidence, proposal generation/submission, runtime execution, memory read by agent, memory write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+- Confirmed CM-1818 performed no runtime action, approval request submission, approval-line generation, proposal generation, proposal submission, memory read by agent, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, M10 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1921`; CM-1745 abort skeleton review, CM-1817 display refresh review, M9 entry/exit review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1817 M9 Trusted-Write-Proposal Non-Authorizing Request Display Refresh
 

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1817 M9 trusted-write-proposal non-authorizing request display refresh`.
-Current validation: `CMV-1920`.
-Current status: CM-1817 displayed accepted M8 references and missing exact M9 fields as a non-authorizing review aid only. The display is not an approval request, not approval-line generation, not approval grant, not proposal generation/submission, not runtime execution, not memory read/write, not durable mutation, not M10/M15 unlock, and not readiness. Exact proposal boundary and proposal execution remain blocked.
+Current task: `CM-1818 M9 trusted-write-proposal runtime abort receipt refresh`.
+Current validation: `CMV-1921`.
+Current status: CM-1818 refreshed the M9 abort receipt boundary after accepted M8 evidence. The refresh is not an approval request, not approval-line generation, not approval grant, not proposal generation/submission, not runtime execution, not memory read/write, not durable mutation, not M10/M15 unlock, and not readiness. Exact proposal boundary and proposal execution remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1818 M9 runtime abort receipt refresh. It should refresh the abort receipt vocabulary with accepted M8 references while performing no runtime attempt, no request submission, no approval line, no proposal generation, no write, no provider/API, no public MCP expansion, no M10/M15 unlock, and no readiness claim. Push remains separate explicit authorization.
+Next safe action is CM-1819 M9 blocked closeout refresh after M8 acceptance. It should update the M9 closeout blockers to reflect accepted M8 evidence while performing no runtime attempt, no request submission, no approval line, no proposal generation, no write, no provider/API, no public MCP expansion, no M10/M15 unlock, and no readiness claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
