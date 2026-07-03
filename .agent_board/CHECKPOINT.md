@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1778 M14-K7 VCP memory health report blocked closeout`.
-Current validation: `CMV-1881`.
+Current checkpoint: `CM-1779 M15-K0 VCP memory blocked precondition record`.
+Current validation: `CMV-1882`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1779 M15-K0 VCP Memory Blocked Precondition Record
+
+Status: `COMPLETED_VALIDATED_M15_K0_VCP_MEMORY_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_RUNTIME_NO_RELEASE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_M15_BLOCKED_PRECONDITION_RECORD.md`.
+- Evaluated M15 entry conditions before RC gate work.
+- Recorded M0-M14 evidence complete `NO`.
+- Recorded M14 live health report accepted `NO`.
+- Recorded dedicated RC review approval present `NO`.
+- Recorded M15 opened `NO` and RC gate ready `NO`.
+- Set the next safe route to `m15_package_evidence_map`.
+- Preserved that no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, VCPToolBox runtime call, MCP memory tool call, private runtime read, raw store read, real query, provider/API call, memory read/write, durable audit/runtime write, public MCP expansion, approval request, approval line, push, release, deploy, cutover, readiness claim, complete V8 claim, M15 unlock, or full bridge completion claim occurred.
+
+Validation: `CMV-1882`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1778 M14-K7 VCP Memory Health Report Blocked Closeout
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1778 M14-K7 VCP memory health report blocked closeout |
-| Current task | `CM-1778 M14-K7 VCP memory health report blocked closeout` |
-| Current validation | `CMV-1881` |
-| Current route | M14 local-safe fixture/schema/source-review chain is closed, but live health report evidence is absent; M14 runtime exit condition is not satisfied and M15 is not unlocked; next safe action is M15 blocked precondition record or package evidence map, not dashboard runtime, private reads, raw stores, real query, provider/API, approval, or readiness |
+| Status | CM-1779 M15-K0 VCP memory blocked precondition record |
+| Current task | `CM-1779 M15-K0 VCP memory blocked precondition record` |
+| Current validation | `CMV-1882` |
+| Current route | M15 is blocked before RC gate work because M0-M14 evidence is incomplete, M14 live health report evidence is absent, and no dedicated RC review approval exists; next safe action is M15 package evidence map, not RC approval, release, deploy, cutover, dashboard runtime, private reads, raw stores, real query, provider/API, approval line, or readiness |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1779` adds `docs/VCP_MEMORY_M15_BLOCKED_PRECONDITION_RECORD.md`. It evaluates M15 entry conditions and records M15 blocked before RC gate work. Boundary: M15 opened `NO`; RC gate ready `NO`; RC review approval present `NO`; M0-M14 evidence complete `NO`; M14 live health report accepted `NO`; docs match available fixture evidence `YES`; docs match live runtime evidence `NO`; release/tag/deploy/cutover performed `NO`; source runtime behavior changed `NO`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; approval request submitted `NO`; approval line generated `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m15_package_evidence_map`.
 
 `CM-1778` adds `docs/VCP_MEMORY_HEALTH_REPORT_M14_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes only the M14 local-safe fixture/schema/source-review chain and records that live health report evidence is absent. Boundary: safe fixture/schema/source-review chain complete `YES`; live health report accepted `NO`; M14 runtime exit condition satisfied `NO`; M15 unlocked `NO`; source runtime behavior changed `NO`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; approval request submitted `NO`; approval line generated `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m15_blocked_precondition_record_or_package_evidence_map`.
 

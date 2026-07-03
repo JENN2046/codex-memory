@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1778 M14-K7 VCP memory health report blocked closeout`.
-Current validation: `CMV-1881`.
-Current handoff: CM-1778 closes only the M14 local-safe fixture/schema/source-review chain. Live health report evidence is absent, the M14 runtime exit condition is not satisfied, and M15 is not unlocked. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1779 M15-K0 VCP memory blocked precondition record`.
+Current validation: `CMV-1882`.
+Current handoff: CM-1779 records that M15 is blocked before RC gate work because M0-M14 evidence is incomplete, M14 live health report evidence is absent, and no dedicated RC review approval exists. M15 is not opened and RC gate is not ready. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M14-K7 VCP Memory Health Report Blocked Closeout` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M15-K0 VCP Memory Blocked Precondition Record` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M14_K7_VCP_MEMORY_HEALTH_REPORT_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; M15 not unlocked.
+Current status: `COMPLETED_VALIDATED_M15_K0_VCP_MEMORY_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_RUNTIME_NO_RELEASE`; production/release/cutover ready no; complete V8 not claimed; M15 not opened; RC gate not ready.
 
 Workspace: `A:\codex-memory`.
 
@@ -27,6 +27,7 @@ Current entrypoints:
 - `.agent_board/HANDOFF.md`
 - `src/core/VcpMemoryHealthReportSchemaContract.js`
 - `tests/vcp-memory-health-report-schema-contract.test.js`
+- `docs/VCP_MEMORY_M15_BLOCKED_PRECONDITION_RECORD.md`
 - `docs/VCP_MEMORY_HEALTH_REPORT_M14_BLOCKED_CLOSEOUT_SUMMARY.md`
 - `docs/VCP_MEMORY_HEALTH_REPORT_M14_SOURCE_REVIEW.md`
 - `docs/VCP_MEMORY_HEALTH_REPORT_M14_COUNTER_REASON_SPECIFICITY.md`
@@ -105,17 +106,18 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_BLOCKED_CLOSEOUT_SUMMARY.md`.
-- Closed only the M14 local-safe fixture/schema/source-review chain.
-- Recorded CM-1771 through CM-1777 as completed M14 local-safe evidence.
-- Preserved that live health report evidence is absent.
-- Preserved that M14 runtime exit condition is not satisfied.
-- Preserved that M15 is not unlocked.
+- Added `docs/VCP_MEMORY_M15_BLOCKED_PRECONDITION_RECORD.md`.
+- Evaluated M15 entry conditions before RC gate work.
+- Recorded M0-M14 evidence complete `NO`.
+- Recorded M14 live health report accepted `NO`.
+- Recorded dedicated RC review approval present `NO`.
+- Recorded M15 opened `NO` and RC gate ready `NO`.
+- Set the next safe route to `m15_package_evidence_map`.
 - Confirmed no dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, provider/API call, approval-line generation/submission/issue/storage/simulation, durable audit/runtime write, memory read/write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
 
-Validation: `CMV-1881`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
+Validation: `CMV-1882`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
-Next safe route: M15 blocked precondition record or package evidence map without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, RC approval, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
+Next safe route: M15 package evidence map without opening M15, RC approval, dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 
