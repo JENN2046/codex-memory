@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1781 M15-K2 VCP memory non-authorizing RC checklist skeleton |
-| Current task | `CM-1781 M15-K2 VCP memory non-authorizing RC checklist skeleton` |
-| Current validation | `CMV-1884` |
-| Current route | M15 non-authorizing RC checklist skeleton exists, but live-evidence, approval, risk-review, and gate-report prerequisites remain blocked or absent; next safe action is a non-authorizing M15 risk review skeleton, not RC approval, release, deploy, cutover, dashboard runtime, private reads, raw stores, real query, provider/API, approval line, or readiness |
+| Status | CM-1782 M15-K3 VCP memory risk review skeleton |
+| Current task | `CM-1782 M15-K3 VCP memory risk review skeleton` |
+| Current validation | `CMV-1885` |
+| Current route | M15 risk review skeleton exists, but risk review is not satisfied and P0/P1 risks remain open or blocked because live evidence and dedicated RC review approval are absent; next safe action is a non-authorizing RC review approval packet readiness boundary, not RC approval, release, deploy, cutover, dashboard runtime, private reads, raw stores, real query, provider/API, approval line, or readiness |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1782` adds `docs/VCP_MEMORY_M15_RISK_REVIEW_SKELETON.md`. It defines the risk review shape required before any future M15 RC gate review and records that risk review is not satisfied. Boundary: risk review skeleton created `YES`; risk review satisfied `NO`; no P0/P1 open risk `NO`; P0 risks open `YES`; P1 risks open `YES`; risk closure claimed `NO`; RC gate report created `NO`; RC gate ready `NO`; M15 opened `NO`; M0-M14 live evidence complete `NO`; live proof chain complete `NO`; docs match live runtime evidence `NO`; dedicated RC review approval present `NO`; approval request submitted `NO`; approval line generated `NO`; source runtime behavior changed `NO`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; release/tag/deploy/cutover performed `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m15_rc_review_approval_packet_readiness_boundary`.
 
 `CM-1781` adds `docs/VCP_MEMORY_M15_NON_AUTHORIZING_RC_CHECKLIST_SKELETON.md`. It creates the checklist shape for a future M15 RC gate review while keeping every live-evidence, approval, risk-review, and gate-report prerequisite blocked or absent. Boundary: RC checklist skeleton created `YES`; RC gate report created `NO`; RC gate ready `NO`; M15 opened `NO`; M0-M14 live evidence complete `NO`; live proof chain complete `NO`; docs match live runtime evidence `NO`; no P0/P1 open risk `NO`; dedicated RC review approval present `NO`; approval request submitted `NO`; approval line generated `NO`; source runtime behavior changed `NO`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; release/tag/deploy/cutover performed `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m15_risk_review_skeleton`.
 

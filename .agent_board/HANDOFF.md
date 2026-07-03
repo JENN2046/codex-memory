@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1781 M15-K2 VCP memory non-authorizing RC checklist skeleton`.
-Current validation: `CMV-1884`.
-Current handoff: CM-1781 creates the non-authorizing M15 RC checklist skeleton and records that live-evidence, approval, risk-review, and gate-report prerequisites remain blocked or absent. M15 is not opened and RC gate is not ready. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1782 M15-K3 VCP memory risk review skeleton`.
+Current validation: `CMV-1885`.
+Current handoff: CM-1782 creates the non-authorizing M15 risk review skeleton and records that risk review is not satisfied; P0/P1 risks remain open or blocked because live evidence and dedicated RC review approval are absent. M15 is not opened and RC gate is not ready. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M15-K2 VCP Memory Non-Authorizing RC Checklist Skeleton` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M15-K3 VCP Memory Risk Review Skeleton` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M15_K2_VCP_MEMORY_NON_AUTHORIZING_RC_CHECKLIST_SKELETON_DOCS_ONLY_NO_RUNTIME_NO_RELEASE`; production/release/cutover ready no; complete V8 not claimed; M15 not opened; RC gate not ready.
+Current status: `COMPLETED_VALIDATED_M15_K3_VCP_MEMORY_RISK_REVIEW_SKELETON_DOCS_ONLY_NO_RUNTIME_NO_RELEASE`; production/release/cutover ready no; complete V8 not claimed; M15 not opened; RC gate not ready; risk review not satisfied.
 
 Workspace: `A:\codex-memory`.
 
@@ -27,6 +27,7 @@ Current entrypoints:
 - `.agent_board/HANDOFF.md`
 - `src/core/VcpMemoryHealthReportSchemaContract.js`
 - `tests/vcp-memory-health-report-schema-contract.test.js`
+- `docs/VCP_MEMORY_M15_RISK_REVIEW_SKELETON.md`
 - `docs/VCP_MEMORY_M15_NON_AUTHORIZING_RC_CHECKLIST_SKELETON.md`
 - `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`
 - `docs/VCP_MEMORY_M15_BLOCKED_PRECONDITION_RECORD.md`
@@ -108,17 +109,16 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_M15_NON_AUTHORIZING_RC_CHECKLIST_SKELETON.md`.
-- Defined future RC review checklist rows and status vocabulary.
-- Explicitly forbade using the skeleton as authorization, approval, or readiness.
-- Recorded current live-evidence, approval, risk-review, and gate-report prerequisites as blocked or absent.
-- Recorded RC checklist skeleton created `YES`, RC gate report created `NO`, RC gate ready `NO`, M15 opened `NO`, M0-M14 live evidence complete `NO`, and live proof chain complete `NO`.
-- Set the next safe route to `m15_risk_review_skeleton`.
+- Added `docs/VCP_MEMORY_M15_RISK_REVIEW_SKELETON.md`.
+- Mapped P0/P1/P2 risks from the archived plan into M15 risk review shape.
+- Recorded risk review satisfied `NO`, no P0/P1 open risk `NO`, P0 risks open `YES`, P1 risks open `YES`, and risk closure claimed `NO`.
+- Recorded RC gate report created `NO`, RC gate ready `NO`, M15 opened `NO`, M0-M14 live evidence complete `NO`, and live proof chain complete `NO`.
+- Set the next safe route to `m15_rc_review_approval_packet_readiness_boundary`.
 - Confirmed no dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, provider/API call, approval-line generation/submission/issue/storage/simulation, durable audit/runtime write, memory read/write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
 
-Validation: `CMV-1884`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
+Validation: `CMV-1885`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
-Next safe route: non-authorizing M15 risk review skeleton without opening M15, RC approval, dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
+Next safe route: non-authorizing RC review approval packet readiness boundary without opening M15, RC approval, dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 
