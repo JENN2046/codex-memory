@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1803 M6 observe-lite isolated rustup toolchain install |
-| Current task | `CM-1803 M6 observe-lite isolated rustup toolchain install` |
-| Current validation | `CMV-1906` |
-| Current route | isolated VCPToolBox-local stable Rust toolchain installed; next route is CM-1804 DailyNoteSearcher isolated-toolchain locked x64 build |
+| Status | CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build |
+| Current task | `CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build` |
+| Current validation | `CMV-1907` |
+| Current route | Linux x64 release binary built but not installed; next route is CM-1805 primary Linux candidate install |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1804` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1804_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_RECEIPT.md`. It records isolated-toolchain locked release build for `Plugin/DailyNoteSearcher/src`: `cargo build --release --locked` exit code `0`; Cargo dependency downloads `YES`; release target generated `YES`; release binary `Plugin/DailyNoteSearcher/src/target/release/DailyNoteSearcher`; file header `ELF 64-bit LSB pie executable, x86-64`; mode `755`; size `3735640`; target ignored by VCPToolBox Git status `YES`; installed to primary Linux candidate `NO`; runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr from runtime/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1805 DailyNoteSearcher x64 binary install to primary Linux candidate`.
 
 `CM-1803` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1803_ISOLATED_RUSTUP_TOOLCHAIN_INSTALL_RECEIPT.md`. It records isolated stable Rust toolchain install under VCPToolBox-local `.rustup-cm1803/` and `.cargo-cm1803/`: install exit code `0`; `--no-modify-path` used `YES`; global PATH/profile modified `NO`; apt cargo/rustc removed `NO`; isolated `cargo --version` `cargo 1.96.1`; isolated `rustc` release `1.96.1`; rustc host `x86_64-unknown-linux-gnu`; `cargo metadata --locked` passed; cargo build performed `NO`; runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1804 DailyNoteSearcher isolated-toolchain locked x64 build`.
 

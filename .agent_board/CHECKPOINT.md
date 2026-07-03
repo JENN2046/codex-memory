@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1803 M6 observe-lite isolated rustup toolchain install`.
-Current validation: `CMV-1906`.
+Current checkpoint: `CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build`.
+Current validation: `CMV-1907`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1804 M6 Observe-Lite DailyNoteSearcher Isolated-Toolchain Locked X64 Build
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1804_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_RECEIPT.md`.
+- Built `Plugin/DailyNoteSearcher/src` with the CM-1803 isolated toolchain using `cargo build --release --locked`; exit code `0`.
+- Cargo dependency downloads occurred through Cargo.
+- Verified release binary `Plugin/DailyNoteSearcher/src/target/release/DailyNoteSearcher` exists as `ELF 64-bit LSB pie executable, x86-64`, mode `755`, size `3735640`.
+- Confirmed the release target is ignored by VCPToolBox Git status and no primary Linux candidate install occurred.
+- Confirmed runtime started `NO`, binary executed by agent `NO`, response body/stdout/stderr from runtime/runtime logs/config/env/secrets/raw memory/raw store read `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, public MCP expansion `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1805 DailyNoteSearcher x64 binary install to primary Linux candidate.
+
+Validation: `CMV-1907`; isolated cargo build output, release binary `file`, release binary `stat`, VCPToolBox status/ignored target check, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1803 M6 Observe-Lite Isolated Rustup Toolchain Install
 

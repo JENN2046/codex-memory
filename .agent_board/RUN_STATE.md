@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1803 M6 observe-lite isolated rustup toolchain install`.
-Current validation: `CMV-1906`.
-Current status: CM-1803 installed stable Rust toolchain into VCPToolBox-local `.rustup-cm1803/` and `.cargo-cm1803/` directories using `--profile minimal`, `--default-toolchain stable`, and `--no-modify-path`. Isolated cargo/rustc are `1.96.1`; locked cargo metadata passed. No global PATH/profile mutation, apt cargo/rustc removal, cargo build, runtime start, binary service execution, response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build`.
+Current validation: `CMV-1907`.
+Current status: CM-1804 built `Plugin/DailyNoteSearcher/src` with the CM-1803 isolated toolchain using `cargo build --release --locked`; exit code `0`. Cargo dependency downloads occurred. The release binary at `Plugin/DailyNoteSearcher/src/target/release/DailyNoteSearcher` is Linux x86-64, mode `755`, size `3735640`, and its target directory is ignored by VCPToolBox Git status. No primary Linux candidate install, runtime start, binary service execution, response body/stdout/stderr from runtime/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1804 DailyNoteSearcher isolated-toolchain locked x64 build. Use the isolated cargo binary under VCPToolBox-local `.cargo-cm1803/` with `RUSTUP_HOME` and `CARGO_HOME` set to the CM-1803 directories. Do not start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1804. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
+Next safe action is CM-1805 DailyNoteSearcher x64 binary install to primary Linux candidate. Copy the built release binary to `Plugin/DailyNoteSearcher/DailyNoteSearcher` and verify file metadata only. Do not start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1805. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
