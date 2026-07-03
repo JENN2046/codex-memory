@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1787 M6 observe-lite service start handshake receipt`.
-Current validation: `CMV-1890`.
+Current checkpoint: `CM-1788 M6 observe-lite startup failure source diagnosis`.
+Current validation: `CMV-1891`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1788 M6 Observe-Lite Startup Failure Source Diagnosis
+
+Status: `COMPLETED_VALIDATED_M6_STARTUP_SOURCE_DIAGNOSIS_NO_LOG_NO_SECRET_NO_RUNTIME_NO_MEMORY`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1788_STARTUP_FAILURE_SOURCE_DIAGNOSIS.md`.
+- Performed source-only/no-log/no-secret diagnosis before any runtime log escalation.
+- Confirmed `server.js` syntax OK, selected dependencies resolving, and Rust Vexus bridge loading with expected exports.
+- Checked `config.env` and `AdminPanel` as presence metadata only; `config.env` contents were not read and actual `PORT` value remains unknown.
+- Reviewed startup order and found `app.listen` happens after heavy async initialization.
+- Diagnosed CM-1787 as too short to prove startup failure because the process was stopped after about twelve seconds and three status-only probes.
+- Preserved that no runtime start, runtime log read, config/env content read, secret read, raw memory/raw store read, response body read, memory read/write/result, provider/API, MCP memory tool, public MCP expansion, config/startup/watchdog change, dependency action, approval line, release, deploy, cutover, push, readiness, M6 completion, M15 unlock, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-1891`; source-only startup inspection, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1787 M6 Observe-Lite Service Start Handshake Receipt
 

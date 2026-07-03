@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1787 M6 observe-lite service start handshake receipt`.
-Current validation: `CMV-1890`.
-Current status: CM-1787 attempted the operator-provided service start once with stdout/stderr discarded and no logs read or persisted. Three local status-only probes returned `connection_refused`; response bodies were not read; a stop signal was sent and child exit was observed; no persistent process was intentionally left running. M6 live proof remains incomplete because service transport did not become reachable, M15 remains locked, and no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1788 M6 observe-lite startup failure source diagnosis`.
+Current validation: `CMV-1891`.
+Current status: CM-1788 performed source-only/no-log/no-secret startup diagnosis. `server.js` syntax passed, selected dependencies resolve, Rust Vexus bridge loads, and source review shows `app.listen` happens only after heavy async initialization. CM-1787's twelve-second, three-probe window is too short to prove startup failure; it proves only not reachable before the process was stopped. Actual `PORT` remains unknown because `config.env` contents were not read. M6 live proof remains incomplete, M15 remains locked, and no runtime start, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is startup failure diagnosis that remains source-only/no-log/no-secret, or an exact low-disclosure log-read boundary from Jenn. Do not open M6/M15, do not run observe-full/trusted-read/write, do not read secrets/config/raw memory/raw stores, do not call MCP memory tools, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe action is CM-1789 extended no-log startup window: one bounded local startup attempt with stdout/stderr discarded, status-only probes, no response bodies, no runtime logs, no config/env content reads, no secrets, no raw memory/raw stores, no memory tools, no provider/API, no config/startup/watchdog changes, no durable writes, and no readiness claim. If the process exits early or remains unreachable after the full window, request exact low-disclosure log-read boundary from Jenn. Do not open M6/M15, do not run observe-full/trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

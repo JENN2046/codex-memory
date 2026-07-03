@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-07-03",
-  "taskId": "CM-1787",
-  "validationId": "CMV-1890",
+  "updatedAt": "2026-07-04",
+  "taskId": "CM-1788",
+  "validationId": "CMV-1891",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_service_start_handshake_receipt",
+    "scope": "vcp_memory_observe_lite_startup_failure_source_diagnosis",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1891",
+      "scope": "CM-1788 M6 observe-lite startup failure source diagnosis",
+      "status": "COMPLETED_VALIDATED_M6_STARTUP_SOURCE_DIAGNOSIS_NO_LOG_NO_SECRET_NO_RUNTIME_NO_MEMORY"
+    },
     {
       "id": "CMV-1890",
       "scope": "CM-1787 M6 observe-lite service start handshake receipt",

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1787 M6 observe-lite service start handshake receipt |
-| Current task | `CM-1787 M6 observe-lite service start handshake receipt` |
-| Current validation | `CMV-1890` |
-| Current route | Operator service start attempted once with runtime output discarded and three status-only probes; service transport remained `connection_refused`, process was stopped, no logs/response body/secrets/config/raw memory were read by the agent, and M6 live proof remains incomplete; next safe action is startup failure diagnosis or exact low-disclosure log-read boundary |
+| Status | CM-1788 M6 observe-lite startup failure source diagnosis |
+| Current task | `CM-1788 M6 observe-lite startup failure source diagnosis` |
+| Current validation | `CMV-1891` |
+| Current route | Source-only/no-log/no-secret diagnosis found no syntax, selected dependency, or Rust bridge blocker; source shows `app.listen` happens only after heavy async initialization, so CM-1787's 12-second probe window is too short to prove startup failure; next safe action is an extended no-log startup window before any log-read escalation |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1788` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1788_STARTUP_FAILURE_SOURCE_DIAGNOSIS.md`. It records source-only/no-log/no-secret startup diagnosis. Evidence: `server.js` syntax OK; selected dependencies resolve; Rust Vexus bridge loads with expected exports; `config.env` presence checked as metadata only and contents not read; actual port value unknown; `AdminPanel` root absent as metadata only but not proven fatal; source shows `app.listen` after heavy async initialization; CM-1787 probe window seconds `12`; probe count `3`; process stopped by agent `YES`. Diagnosis: primary `CM1787_WINDOW_TOO_SHORT_TO_PROVE_STARTUP_FAILURE`; secondary unresolved risk `actual port may differ from operator endpoint`; log read required now `NO`; next action `CM-1789 extended no-log startup window before log read`. Boundary: runtime started `NO`; runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store read `NO`; memory read/write/result `NO`; provider/API `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M6 live proof complete `NO`; M15 unlocked `NO`.
 
 `CM-1787` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1787_SERVICE_START_HANDSHAKE_RECEIPT.md`. It records an observe-lite service start handshake attempt: service start attempted `YES`; process count started by agent `1`; service stdout read `NO`; service stderr read `NO`; service log persisted `NO`; probe count `3`; reachable `NO`; error class `connection_refused`; response body included `NO`; stop signal sent `YES`; child exit observed `YES`; child exit code included `NO`; persistent process left running `NO`; duration seconds `12`; live VCPToolBox called `NO`; live target proof executed `NO`; M6 live proof complete `NO`. Boundary: low-disclosure `YES`; locator/path/endpoint/command args/process/log/response body/exit-code values included `NO`; agent config/env/secret read `NO`; raw runtime/raw memory/raw store read `NO`; memory read/write/result `NO`; provider/API `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M15 unlocked `NO`; next required boundary `startup failure diagnosis without logs or exact low-disclosure log-read approval`.
 

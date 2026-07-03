@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1787 M6 observe-lite service start handshake receipt`.
-Current validation: `CMV-1890`.
-Current handoff: CM-1787 attempted the operator-provided service start once with stdout/stderr discarded and no logs read or persisted. Three local status-only probes returned `connection_refused`; response bodies were not read; a stop signal was sent and child exit was observed; no persistent process was intentionally left running. M6 live proof remains incomplete because service transport did not become reachable, M15 remains locked, and no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1788 M6 observe-lite startup failure source diagnosis`.
+Current validation: `CMV-1891`.
+Current handoff: CM-1788 completed source-only/no-log/no-secret startup diagnosis. `server.js` syntax passed, selected dependencies resolve, Rust Vexus bridge loads, and source review shows `app.listen` happens only after heavy async initialization. CM-1787's twelve-second, three-probe window is too short to prove startup failure; actual `PORT` remains unknown because `config.env` contents were not read. M6 live proof remains incomplete, M15 remains locked, and no runtime start, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: execute and record `M6 observe-lite service start handshake` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M6 observe-lite` transport proof for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_SERVICE_START_ATTEMPT_TRANSPORT_NOT_REACHABLE_LOW_DISCLOSURE_NO_MEMORY_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; M6 live proof incomplete; sanitized VCPToolBox target bound; service transport not reachable; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_STARTUP_SOURCE_DIAGNOSIS_NO_LOG_NO_SECRET_NO_RUNTIME_NO_MEMORY`; production/release/cutover ready no; complete V8 not claimed; M6 live proof incomplete; sanitized VCPToolBox target bound; CM-1787 transport not reachable within a short window; source indicates startup may require a longer no-log window; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1788_STARTUP_FAILURE_SOURCE_DIAGNOSIS.md`
 - `src/core/VcpMemoryHealthReportSchemaContract.js`
 - `tests/vcp-memory-health-report-schema-contract.test.js`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1787_SERVICE_START_HANDSHAKE_RECEIPT.md`
