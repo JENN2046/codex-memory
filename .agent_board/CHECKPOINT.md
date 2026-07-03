@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1816 M9 trusted-write-proposal exact approval decision review refresh`.
-Current validation: `CMV-1919`.
+Current checkpoint: `CM-1817 M9 trusted-write-proposal non-authorizing request display refresh`.
+Current validation: `CMV-1920`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1817 M9 Trusted-Write-Proposal Non-Authorizing Request Display Refresh
+
+Status: `COMPLETED_VALIDATED_M9_REQUEST_DISPLAY_REFRESH_NOT_SUBMITTED_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1817_NON_AUTHORIZING_REQUEST_DISPLAY_REFRESH.md`.
+- Displayed accepted M8 evidence references and missing exact M9 fields in a non-authorizing form.
+- Preserved that the display is not an approval request, not approval-line generation, not approval grant, not proposal generation/submission, not runtime execution, not memory read/write, not durable mutation, not M10/M15 unlock, and not readiness.
+- Confirmed CM-1817 performed no runtime action, proposal generation, proposal submission, approval-line generation, approval request submission, memory read by agent, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, M10 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1920`; CM-1816 decision review, CM-1744 historical display boundary, M9 entry/exit review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1816 M9 Trusted-Write-Proposal Exact Approval Decision Review Refresh
 

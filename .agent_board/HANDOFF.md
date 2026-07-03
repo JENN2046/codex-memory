@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1816 M9 trusted-write-proposal exact approval decision review refresh`.
-Current validation: `CMV-1919`.
-Current handoff: CM-1816 reviewed the refreshed CM-1815 packet and selected `eligible_for_non_authorizing_request_display_refresh_not_submission`. Accepted M8 evidence exists for planning and the packet can feed a future display refresh, but exact proposal boundary, exact fields, proposal review route, L4 write-intent shield, approval line, request submission, proposal generation/submission, runtime, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+Current task: `CM-1817 M9 trusted-write-proposal non-authorizing request display refresh`.
+Current validation: `CMV-1920`.
+Current handoff: CM-1817 displayed accepted M8 references and missing exact M9 fields as a non-authorizing review aid only. The display is not an approval request, not approval-line generation, not approval grant, not proposal generation/submission, not runtime execution, not memory read/write, not durable mutation, not M10/M15 unlock, and not readiness. Exact proposal boundary and proposal execution remain blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1816 reviewed the refreshed CM-1815 packet and selected `eli
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M9_DECISION_REVIEW_REFRESH_DISPLAY_ONLY_NO_REQUEST_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 can proceed only to non-authorizing request display refresh; exact proposal boundary and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M9_REQUEST_DISPLAY_REFRESH_NOT_SUBMITTED_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 can proceed only to abort receipt refresh / exact boundary preparation; exact proposal boundary and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1817_NON_AUTHORIZING_REQUEST_DISPLAY_REFRESH.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_EXACT_APPROVAL_DECISION_REVIEW_REFRESH.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1815_EXACT_APPROVAL_PACKET_REFRESH.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1814_PRECONDITION_REFRESH_AFTER_M8_ACCEPTANCE.md`

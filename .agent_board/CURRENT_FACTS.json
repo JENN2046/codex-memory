@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1816",
-  "validationId": "CMV-1919",
+  "taskId": "CM-1817",
+  "validationId": "CMV-1920",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_exact_approval_decision_review_refresh",
+    "scope": "vcp_memory_trusted_write_proposal_m9_non_authorizing_request_display_refresh",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1920",
+      "scope": "CM-1817 M9 trusted-write-proposal non-authorizing request display refresh",
+      "status": "COMPLETED_VALIDATED_M9_REQUEST_DISPLAY_REFRESH_NOT_SUBMITTED_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1919",
       "scope": "CM-1816 M9 trusted-write-proposal exact approval decision review refresh",

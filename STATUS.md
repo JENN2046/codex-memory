@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1816 M9 trusted-write-proposal exact approval decision review refresh`.
-Current validation: `CMV-1919`.
-Current project status: CM-1816 reviewed the refreshed CM-1815 packet and selected `eligible_for_non_authorizing_request_display_refresh_not_submission`. Accepted M8 evidence exists for planning and the packet can feed a future display refresh, but exact proposal boundary, exact fields, proposal review route, L4 write-intent shield, approval line, request submission, proposal generation/submission, runtime, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_DECISION_REVIEW_REFRESH_DISPLAY_ONLY_NO_REQUEST_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1817 M9 trusted-write-proposal non-authorizing request display refresh`.
+Current validation: `CMV-1920`.
+Current project status: CM-1817 displayed accepted M8 references and missing exact M9 fields as a non-authorizing review aid only. The display is not an approval request, not approval-line generation, not approval grant, not proposal generation/submission, not runtime execution, not memory read/write, not durable mutation, not M10/M15 unlock, and not readiness. Exact proposal boundary and proposal execution remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1817_REQUEST_DISPLAY_REFRESH_NOT_SUBMITTED_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1817 M9 trusted-write-proposal non-authorizing request display refresh: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1817_NON_AUTHORIZING_REQUEST_DISPLAY_REFRESH.md`. It displays accepted M8 evidence references and missing exact fields in safe non-authorizing form. It does not submit an approval request, generate approval line, grant approval, bind target/transport, invent proposal operations, generate/submit proposals, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1818 M9 runtime abort receipt refresh.
 
 CM-1816 M9 trusted-write-proposal exact approval decision review refresh: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_EXACT_APPROVAL_DECISION_REVIEW_REFRESH.md`. It reviews CM-1815 and selects `eligible_for_non_authorizing_request_display_refresh_not_submission`: accepted M8 evidence exists for planning and a non-authorizing display refresh may be prepared, but exact proposal boundary, exact target/transport/client/scope/visibility/proposal-operation/review-route/rollback/budget fields, L4 write-intent shield evidence, approval line, approval request submission, proposal generation/submission, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain `NO`. Next safe route is CM-1817 M9 non-authorizing request display refresh.
 

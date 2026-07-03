@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1816 M9 trusted-write-proposal exact approval decision review refresh |
-| Current task | `CM-1816 M9 trusted-write-proposal exact approval decision review refresh` |
-| Current validation | `CMV-1919` |
-| Current route | M9 decision review refreshed; next route is CM-1817 non-authorizing request display refresh |
+| Status | CM-1817 M9 trusted-write-proposal non-authorizing request display refresh |
+| Current task | `CM-1817 M9 trusted-write-proposal non-authorizing request display refresh` |
+| Current validation | `CMV-1920` |
+| Current route | M9 request display refreshed; next route is CM-1818 runtime abort receipt refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1817` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1817_NON_AUTHORIZING_REQUEST_DISPLAY_REFRESH.md`. It displays accepted M8 references and missing exact M9 fields as a non-authorizing review aid only. The display is not an approval request, not approval-line generation, not approval grant, not proposal generation/submission, not runtime execution, not memory read/write, not durable mutation, not M10/M15 unlock, and not readiness. Exact proposal boundary and proposal execution remain blocked. Next safe route is CM-1818 M9 runtime abort receipt refresh.
 
 `CM-1816` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_EXACT_APPROVAL_DECISION_REVIEW_REFRESH.md`. It reviews the refreshed CM-1815 packet and selects `eligible_for_non_authorizing_request_display_refresh_not_submission`. Accepted M8 evidence exists for planning and the packet can feed a future display refresh, but exact proposal boundary, exact fields, proposal review route, L4 write-intent shield, approval line, request submission, proposal generation/submission, runtime, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1817 M9 non-authorizing request display refresh.
 

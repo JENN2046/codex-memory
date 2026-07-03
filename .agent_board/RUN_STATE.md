@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1816 M9 trusted-write-proposal exact approval decision review refresh`.
-Current validation: `CMV-1919`.
-Current status: CM-1816 reviewed the refreshed CM-1815 packet and selected `eligible_for_non_authorizing_request_display_refresh_not_submission`. Accepted M8 evidence exists for planning and the packet can feed a future display refresh, but exact proposal boundary, exact fields, proposal review route, L4 write-intent shield, approval line, request submission, proposal generation/submission, runtime, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+Current task: `CM-1817 M9 trusted-write-proposal non-authorizing request display refresh`.
+Current validation: `CMV-1920`.
+Current status: CM-1817 displayed accepted M8 references and missing exact M9 fields as a non-authorizing review aid only. The display is not an approval request, not approval-line generation, not approval grant, not proposal generation/submission, not runtime execution, not memory read/write, not durable mutation, not M10/M15 unlock, and not readiness. Exact proposal boundary and proposal execution remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1817 M9 non-authorizing request display refresh. It should display accepted M8 references and missing exact fields without submitting a request, generating approval lines, generating proposals, executing runtime, reading memory by agent, writing memory, calling providers/APIs, expanding public MCP, unlocking M10/M15, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1818 M9 runtime abort receipt refresh. It should refresh the abort receipt vocabulary with accepted M8 references while performing no runtime attempt, no request submission, no approval line, no proposal generation, no write, no provider/API, no public MCP expansion, no M10/M15 unlock, and no readiness claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
