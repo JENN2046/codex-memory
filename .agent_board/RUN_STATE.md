@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1717 M3-T3 local fallback memory role contract`.
-Current validation: `CMV-1820`.
-Current status: CM-1717 records the docs-only local fallback memory role contract. No local fallback execution, live VCPToolBox target discovery/runtime, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1718 M4-K1 VCP memory invocation contract spec`.
+Current validation: `CMV-1821`.
+Current status: CM-1718 records the docs-only VCP memory invocation contract spec. No live VCPToolBox target discovery/runtime, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M4 invocation contract design, still without live runtime access. Push remains separate explicit authorization.
+Next safe local action is M4-K2 result normalization contract, still without live runtime access. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

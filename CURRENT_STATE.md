@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1717 M3-T3 local fallback memory role contract |
-| Current task | `CM-1717 M3-T3 local fallback memory role contract` |
-| Current validation | `CMV-1820` |
-| Current route | Docs-only local fallback role contract; no fallback execution or runtime execution |
+| Status | CM-1718 M4-K1 VCP memory invocation contract spec |
+| Current task | `CM-1718 M4-K1 VCP memory invocation contract spec` |
+| Current validation | `CMV-1821` |
+| Current route | Docs-only invocation contract spec; no live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1718` adds `docs/VCP_MEMORY_INVOCATION_CONTRACT_SPEC.md`. It defines the low-disclosure request envelope, profile constraints, result envelope, error taxonomy, receipt envelope, fallback marker, disclosure budgets, static success/fallback/denied/L4-stop/unknown-target/partial examples, and negative examples. Boundary: live VCPToolBox runtime `NO`; target discovery/probing `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1717` adds `docs/LOCAL_FALLBACK_MEMORY_ROLE_CONTRACT.md`. It defines when local memory may act as explicit fallback, required `memory_source=local_fallback` / `fallback_used=true` / `vcp_native_result=false` result markers, fallback receipt fields, must-not-run cases, and examples. Boundary: local fallback execution `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 

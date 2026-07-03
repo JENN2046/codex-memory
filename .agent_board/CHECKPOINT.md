@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1717 M3-T3 local fallback memory role contract`.
-Current validation: `CMV-1820`.
+Current checkpoint: `CM-1718 M4-K1 VCP memory invocation contract spec`.
+Current validation: `CMV-1821`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1718 M4-K1 VCP Memory Invocation Contract Spec
+
+Status: `COMPLETED_VALIDATED_M4_K1_VCP_MEMORY_INVOCATION_CONTRACT_SPEC_DOCS_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_INVOCATION_CONTRACT_SPEC.md`.
+- Defined low-disclosure request envelope, profile constraints, result envelope, error taxonomy, receipt envelope, fallback marker, and disclosure budgets.
+- Added static success, fallback, denied, L4-stop, unknown-target, and partial examples plus fail-closed negative examples.
+- Preserved the boundary that live VCPToolBox runtime, target probing, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, and complete V8 claims remain blocked.
+
+Validation: `CMV-1821`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1717 M3-T3 Local Fallback Memory Role Contract
 

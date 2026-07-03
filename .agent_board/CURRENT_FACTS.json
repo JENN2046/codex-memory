@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1717",
-  "validationId": "CMV-1820",
+  "taskId": "CM-1718",
+  "validationId": "CMV-1821",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "local_fallback_role_contract_docs_only",
+    "scope": "vcp_memory_invocation_contract_spec_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1821",
+      "scope": "CM-1718 M4-K1 VCP memory invocation contract spec",
+      "status": "COMPLETED_VALIDATED_M4_K1_VCP_MEMORY_INVOCATION_CONTRACT_SPEC_DOCS_ONLY_NO_RUNTIME"
+    },
     {
       "id": "CMV-1820",
       "scope": "CM-1717 M3-T3 local fallback memory role contract",

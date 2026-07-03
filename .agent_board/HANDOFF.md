@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1717 M3-T3 local fallback memory role contract`.
-Current validation: `CMV-1820`.
-Current handoff: CM-1717 completed the docs-only local fallback memory role contract. No local fallback execution, live VCPToolBox target discovery/runtime, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1718 M4-K1 VCP memory invocation contract spec`.
+Current validation: `CMV-1821`.
+Current handoff: CM-1718 completed the docs-only VCP memory invocation contract spec. No live VCPToolBox target discovery/runtime, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M3-T3 Local Fallback Role Contract` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M4-K1 VCP Invocation Contract Spec` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M3_T3_LOCAL_FALLBACK_ROLE_CONTRACT_DOCS_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M4_K1_VCP_MEMORY_INVOCATION_CONTRACT_SPEC_DOCS_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,17 +25,17 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
-- `docs/LOCAL_FALLBACK_MEMORY_ROLE_CONTRACT.md`
+- `docs/VCP_MEMORY_INVOCATION_CONTRACT_SPEC.md`
 
 Completed in this slice:
 
-- Added local fallback memory role contract.
-- Defined fallback entry conditions, result markers, receipt fields, must-not-run cases, and fallback/non-fallback examples.
-- Confirmed no local fallback execution, live VCPToolBox runtime, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
+- Added VCP memory invocation contract spec.
+- Defined low-disclosure request envelope, profile constraints, result envelope, error taxonomy, receipt envelope, fallback marker, disclosure budgets, static examples, and negative examples.
+- Confirmed no live VCPToolBox runtime call, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
-Validation: `CMV-1820`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1821`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M4 invocation contract design. Push remains separate explicit authorization.
+Next safe route: M4-K2 result normalization contract. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

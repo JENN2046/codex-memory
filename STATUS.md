@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1717 M3-T3 local fallback memory role contract`.
-Current validation: `CMV-1820`.
-Current project status: CM-1717 records when local memory may act as explicit fallback and how fallback results/receipts must be marked so they cannot be mistaken for VCP-native success. This is docs-only fallback contract work; no fallback execution, live VCPToolBox target discovery, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `LOCAL_FALLBACK_ROLE_CONTRACT_DOCS_ONLY_NO_RUNTIME`.
+Current task: `CM-1718 M4-K1 VCP memory invocation contract spec`.
+Current validation: `CMV-1821`.
+Current project status: CM-1718 records the docs-only VCP memory invocation contract spec for future governed calls. It defines low-disclosure request/result/error/receipt/fallback/disclosure shapes and static examples; no live VCPToolBox target discovery, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_MEMORY_INVOCATION_CONTRACT_SPEC_DOCS_ONLY_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1718 M4-K1 VCP memory invocation contract spec: added `docs/VCP_MEMORY_INVOCATION_CONTRACT_SPEC.md`. The spec defines the request envelope, profile constraints, result envelope, error taxonomy, receipt envelope, fallback marker, disclosure budgets, static success/fallback/denied/L4-stop/unknown-target/partial examples, and negative examples. No live VCPToolBox runtime call, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
 CM-1717 M3-T3 local fallback memory role contract: added `docs/LOCAL_FALLBACK_MEMORY_ROLE_CONTRACT.md`. The contract defines fallback entry conditions, required result marker, receipt fields, must-not-run cases, and fallback/non-fallback examples. It keeps local memory as fallback/compatibility/test substrate and requires explicit `memory_source=local_fallback`, `fallback_used=true`, and `vcp_native_result=false` markers when fallback is used. No local fallback execution, live VCPToolBox runtime call, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
