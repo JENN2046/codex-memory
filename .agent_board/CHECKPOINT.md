@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1743 M9-K3 VCP memory trusted-write-proposal exact approval decision review boundary`.
-Current validation: `CMV-1846`.
+Current checkpoint: `CM-1744 M9-K4 VCP memory trusted-write-proposal exact approval request display boundary`.
+Current validation: `CMV-1847`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1744 M9-K4 VCP Memory Trusted-Write-Proposal Exact Approval Request Display Boundary
+
+Status: `COMPLETED_VALIDATED_M9_K4_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`.
+- Defined a non-authorizing display boundary for future M9 exact approval request review.
+- Recorded current decision `not_display_ready_missing_m8_receipt_and_exact_trusted_write_proposal_approval`.
+- Defined display state, required future inputs, display template, display stop rules, current display result, and receipt skeleton.
+- Preserved that accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary are absent.
+- Preserved that request submission, proposal generation/submission, durable write, memory write, runtime execution, and M10 unlock did not occur.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, trusted-write-proposal workflow execution, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, memory write, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M10 unlock occurred.
+
+Validation: `CMV-1847`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1743 M9-K3 VCP Memory Trusted-Write-Proposal Exact Approval Decision Review Boundary
 

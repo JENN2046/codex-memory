@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1743 M9-K3 VCP memory trusted-write-proposal exact approval decision review boundary`.
-Current validation: `CMV-1846`.
-Current handoff: CM-1743 reviews CM-1742 as non-authorizing packet preparation and records a blocked decision before proposal generation. Accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
+Current task: `CM-1744 M9-K4 VCP memory trusted-write-proposal exact approval request display boundary`.
+Current validation: `CMV-1847`.
+Current handoff: CM-1744 records a non-authorizing request display boundary and keeps display not ready. Accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M9-K3 Trusted-Write-Proposal Exact Approval Decision Review Boundary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M9-K4 Trusted-Write-Proposal Exact Approval Request Display Boundary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M9_K3_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M9_K4_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_PACKET_PREPARATION.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_HARNESS_DRAFT_BOUNDARY.md`
@@ -50,16 +51,16 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added M9 trusted-write-proposal exact approval decision review boundary.
-- Reviewed CM-1742 as non-authorizing packet preparation and recorded the blocked decision before proposal generation.
-- Defined required input review, decision matrix, review checklist, current review result, and receipt skeleton.
+- Added M9 trusted-write-proposal exact approval request display boundary.
+- Defined display state, required future inputs, non-authorizing display template, display stop rules, current display result, and receipt skeleton.
+- Recorded current decision `not_display_ready_missing_m8_receipt_and_exact_trusted_write_proposal_approval`.
 - Recorded that accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary are missing.
 - Preserved that no write proposal was generated or submitted, and no durable write or memory write occurred.
 - Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M10 unlock occurred.
 
-Validation: `CMV-1846`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1847`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M9 non-authorizing request display boundary without workflow/runtime/write/proposal generation, or remain blocked before M9 until accepted M8 receipt and required exact approvals exist. Push remains separate explicit authorization.
+Next safe route: M9 abort receipt skeleton without workflow/runtime/write/proposal generation, or remain blocked before M9 until accepted M8 receipt and required exact approvals exist. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

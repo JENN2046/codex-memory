@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1743",
-  "validationId": "CMV-1846",
+  "taskId": "CM-1744",
+  "validationId": "CMV-1847",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_exact_approval_decision_review_boundary_docs_only",
+    "scope": "vcp_memory_trusted_write_proposal_exact_approval_request_display_boundary_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1847",
+      "scope": "CM-1744 M9-K4 VCP memory trusted-write-proposal exact approval request display boundary",
+      "status": "COMPLETED_VALIDATED_M9_K4_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1846",
       "scope": "CM-1743 M9-K3 VCP memory trusted-write-proposal exact approval decision review boundary",

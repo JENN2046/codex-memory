@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1743 M9-K3 VCP memory trusted-write-proposal exact approval decision review boundary`.
-Current validation: `CMV-1846`.
-Current status: CM-1743 reviews CM-1742 as non-authorizing packet preparation and records a blocked decision before proposal generation. Accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
+Current task: `CM-1744 M9-K4 VCP memory trusted-write-proposal exact approval request display boundary`.
+Current validation: `CMV-1847`.
+Current status: CM-1744 records a non-authorizing request display boundary and keeps display not ready. Accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M9 non-authorizing request display boundary without workflow/runtime/write/proposal generation, or remain blocked before M9 until accepted M8 receipt and required exact approvals exist. Push remains separate explicit authorization.
+Next safe local action is M9 abort receipt skeleton without workflow/runtime/write/proposal generation, or remain blocked before M9 until accepted M8 receipt and required exact approvals exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
