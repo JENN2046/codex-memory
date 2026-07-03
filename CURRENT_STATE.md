@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1739 M8-K6 VCP memory trusted-full-read blocked closeout summary |
-| Current task | `CM-1739 M8-K6 VCP memory trusted-full-read blocked closeout summary` |
-| Current validation | `CMV-1842` |
-| Current route | Docs-only M8 blocked closeout; accepted M8 trusted-full-read workflow receipt absent; no request submission, trusted-full-read workflow, approval line, M9 unlock, or live runtime execution |
+| Status | CM-1740 M9-K0 VCP memory trusted-write-proposal blocked precondition record |
+| Current task | `CM-1740 M9-K0 VCP memory trusted-write-proposal blocked precondition record` |
+| Current validation | `CMV-1843` |
+| Current route | Docs-only M9 blocked precondition; accepted M8 trusted-full-read workflow receipt absent; no request submission, write proposal generation/submission, approval line, M10 unlock, memory write, or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1740` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_M9_BLOCKED_PRECONDITION_RECORD.md`. It records that M9 governed mutation proposal mode is blocked because accepted M8 trusted-full-read workflow receipt, exact Jenn trusted-write-proposal boundary, exact proposal scope, exact operation list, governance proposal envelope, and proposal review policy are absent. Boundary: accepted M8 trusted-full-read receipt `NO`; exact trusted-write-proposal approval `NO`; exact proposal scope `NO`; exact operation list `NO`; governance proposal envelope `NO`; proposal review policy `NO`; write proposal ready `NO`; write proposal generated/submitted `NO`; durable memory write `NO`; memory write `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; trusted-write-proposal workflow execution `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M10 unlock `NO`.
 
 `CM-1739` adds `docs/VCP_MEMORY_TRUSTED_FULL_READ_M8_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes the safe docs-only M8 preparation chain covering CM-1733 through CM-1738, lists unresolved live proof blockers, states M8 trusted-full-read workflow evidence is incomplete, and states M9 is not unlocked. Boundary: accepted M8 trusted-full-read receipt `NO`; M9 unlock `NO`; exact workflow fields `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; trusted-full-read workflow execution `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 

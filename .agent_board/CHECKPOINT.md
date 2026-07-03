@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1739 M8-K6 VCP memory trusted-full-read blocked closeout summary`.
-Current validation: `CMV-1842`.
+Current checkpoint: `CM-1740 M9-K0 VCP memory trusted-write-proposal blocked precondition record`.
+Current validation: `CMV-1843`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1740 M9-K0 VCP Memory Trusted-Write-Proposal Blocked Precondition Record
+
+Status: `COMPLETED_VALIDATED_M9_K0_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_M9_BLOCKED_PRECONDITION_RECORD.md`.
+- Recorded that M9 governed mutation proposal mode remains blocked because accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary are absent.
+- Recorded that exact proposal scope, exact write operation list, governance proposal envelope, and proposal review policy are absent.
+- Preserved that proposal generation/submission, durable write, memory write, runtime execution, and M10 unlock did not occur.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, trusted-write-proposal workflow execution, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, memory write, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M10 unlock occurred.
+
+Validation: `CMV-1843`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1739 M8-K6 VCP Memory Trusted-Full-Read Blocked Closeout Summary
 

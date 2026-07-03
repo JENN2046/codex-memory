@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1739 M8-K6 VCP memory trusted-full-read blocked closeout summary`.
-Current validation: `CMV-1842`.
-Current status: CM-1739 closes the docs-only M8 preparation chain while recording that trusted-full-read workflow evidence remains incomplete and blocked. Accepted M8 trusted-full-read receipt and exact Jenn boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-full-read workflow execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1740 M9-K0 VCP memory trusted-write-proposal blocked precondition record`.
+Current validation: `CMV-1843`.
+Current status: CM-1740 records that M9 governed mutation proposal mode is blocked because accepted M8 trusted-full-read workflow receipt, exact Jenn trusted-write-proposal boundary, exact proposal scope, exact operation list, governance proposal envelope, and proposal review policy are absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, trusted-write-proposal workflow execution, write proposal generation/submission, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write, public MCP expansion, dependency action, remote action, M10 unlock, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M9 blocked precondition record without workflow/runtime, or remain blocked before M9 until required exact approvals exist. Push remains separate explicit authorization.
+Next safe local action is M9 trusted-write-proposal harness draft boundary without workflow/runtime/write, or remain blocked before M9 until accepted M8 receipt and required exact approvals exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
