@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance |
-| Current task | `CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance` |
-| Current validation | `CMV-1922` |
-| Current route | M9 closeout refreshed; next route is CM-1820 exact boundary field feasibility preflight |
+| Status | CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight |
+| Current task | `CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight` |
+| Current validation | `CMV-1923` |
+| Current route | M9 field feasibility classified; next route is CM-1821 envelope fixture contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1820` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_EXACT_BOUNDARY_FIELD_FEASIBILITY_PREFLIGHT.md`. It classifies exact M9 boundary fields into safe derived constants, candidate target/transport facts, and missing exact fields. It finds local fixture/contract work can start, but exact proposal boundary, proposal generation/submission, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1821 M9 trusted-write-proposal envelope fixture contract.
 
 `CM-1819` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1819_BLOCKED_CLOSEOUT_REFRESH_AFTER_M8_ACCEPTANCE.md`. It refreshes M9 closeout state after accepted M8 evidence: M8 is now accepted for planning, but exact trusted-write-proposal boundary, exact fields, proposal review route, L4 write-intent shield evidence, generated/submitted proposals, accepted proposal receipts, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1820 M9 exact trusted-write-proposal boundary field feasibility preflight.
 

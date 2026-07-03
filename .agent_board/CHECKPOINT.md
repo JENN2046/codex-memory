@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance`.
-Current validation: `CMV-1922`.
+Current checkpoint: `CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight`.
+Current validation: `CMV-1923`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1820 M9 Trusted-Write-Proposal Exact Boundary Field Feasibility Preflight
+
+Status: `COMPLETED_VALIDATED_M9_FIELD_FEASIBILITY_PREFLIGHT_PARTIAL_CONTRACT_WORK_CAN_START_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_EXACT_BOUNDARY_FIELD_FEASIBILITY_PREFLIGHT.md`.
+- Classified M9 exact boundary fields into safe derived constants, candidate target/transport facts, and missing exact fields.
+- Confirmed accepted M8 evidence and low-disclosure target/read/workflow receipts are enough for fixture/contract work, but not enough for proposal generation or runtime execution.
+- Preserved that exact M9 proposal boundary, exact fields, proposal review route, proposal receipts, runtime execution, memory read by agent, memory write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+
+Validation: `CMV-1923`; archived M9 plan review, invocation/profile contract review, M5 policy shield review, CM-1807/CM-1810/CM-1813 closeout review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1819 M9 Trusted-Write-Proposal Blocked Closeout Refresh After M8 Acceptance
 

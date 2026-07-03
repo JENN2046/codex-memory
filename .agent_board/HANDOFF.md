@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance`.
-Current validation: `CMV-1922`.
-Current handoff: CM-1819 refreshed M9 closeout state after accepted M8 evidence. M8 is accepted for planning, but exact proposal boundary, proposal receipts, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight`.
+Current validation: `CMV-1923`.
+Current handoff: CM-1820 classified M9 exact fields into safe derived constants, candidate target/transport facts, and missing exact fields. Fixture/contract work can start, but proposal generation, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1819 refreshed M9 closeout state after accepted M8 evidence.
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M9_BLOCKED_CLOSEOUT_REFRESH_M8_ACCEPTED_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 can proceed to exact boundary field feasibility preflight only; exact proposal boundary and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M9_FIELD_FEASIBILITY_PREFLIGHT_PARTIAL_CONTRACT_WORK_CAN_START_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 can proceed to local fixture/contract work; exact proposal boundary and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_EXACT_BOUNDARY_FIELD_FEASIBILITY_PREFLIGHT.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1819_BLOCKED_CLOSEOUT_REFRESH_AFTER_M8_ACCEPTANCE.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1818_RUNTIME_ABORT_RECEIPT_REFRESH.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1817_NON_AUTHORIZING_REQUEST_DISPLAY_REFRESH.md`

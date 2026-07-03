@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance`.
-Current validation: `CMV-1922`.
-Current status: CM-1819 refreshed M9 closeout state after accepted M8 evidence. M8 is accepted for planning, but exact proposal boundary, proposal receipts, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight`.
+Current validation: `CMV-1923`.
+Current status: CM-1820 classified M9 exact fields into safe derived constants, candidate target/transport facts, and missing exact fields. Fixture/contract work can start, but proposal generation, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1820 M9 exact trusted-write-proposal boundary field feasibility preflight. It should inspect plan and existing low-disclosure target facts to determine which exact M9 fields can be safely derived, while performing no runtime attempt, no request submission, no approval line, no proposal generation, no write, no provider/API, no public MCP expansion, no M10/M15 unlock, and no readiness claim. Push remains separate explicit authorization.
+Next safe action is CM-1821 M9 trusted-write-proposal envelope fixture contract. It should add local fixture/contract coverage for non-durable proposal envelopes and fail-closed durable write intent, without runtime attempt, request submission, approval line, proposal generation, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, or readiness claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

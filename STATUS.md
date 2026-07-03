@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance`.
-Current validation: `CMV-1922`.
-Current project status: CM-1819 refreshed M9 closeout state after accepted M8 evidence. M8 is accepted for planning, but exact trusted-write-proposal boundary, exact fields, proposal review route, L4 write-intent shield evidence, proposal receipts, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1819_BLOCKED_CLOSEOUT_REFRESH_M8_ACCEPTED_EXACT_PROPOSAL_BOUNDARY_MISSING`.
+Current task: `CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight`.
+Current validation: `CMV-1923`.
+Current project status: CM-1820 classified M9 exact fields into safe derived constants, candidate target/transport facts, and missing exact fields. Fixture/contract work can start, but exact proposal boundary, proposal generation/submission, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_FIELD_FEASIBILITY_PREFLIGHT_PARTIAL_CONTRACT_WORK_CAN_START`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_EXACT_BOUNDARY_FIELD_FEASIBILITY_PREFLIGHT.md`. It classifies M9 exact fields into safe derived constants, candidate facts, and missing exact fields. Safe constants and candidate facts can support local fixture/contract work, but exact proposal boundary, proposal generation/submission, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. It does not submit an approval request, generate approval line, grant approval, generate/submit proposals, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1821 M9 trusted-write-proposal envelope fixture contract.
 
 CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1819_BLOCKED_CLOSEOUT_REFRESH_AFTER_M8_ACCEPTANCE.md`. It refreshes M9 closeout state: accepted M8 evidence is present for planning, but exact proposal boundary, exact fields, proposal review route, L4 write-intent shield evidence, generated/submitted proposals, accepted proposal receipts, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. It does not submit an approval request, generate approval line, grant approval, bind target/transport, invent proposal operations, generate/submit proposals, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1820 M9 exact trusted-write-proposal boundary field feasibility preflight.
 

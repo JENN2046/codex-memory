@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1819",
-  "validationId": "CMV-1922",
+  "taskId": "CM-1820",
+  "validationId": "CMV-1923",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_blocked_closeout_refresh_after_m8_acceptance",
+    "scope": "vcp_memory_trusted_write_proposal_m9_exact_boundary_field_feasibility_preflight",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1923",
+      "scope": "CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight",
+      "status": "COMPLETED_VALIDATED_M9_FIELD_FEASIBILITY_PREFLIGHT_PARTIAL_CONTRACT_WORK_CAN_START_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1922",
       "scope": "CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance",
