@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1784 M15-K5 VCP memory blocked closeout summary`.
-Current validation: `CMV-1887`.
+Current checkpoint: `CM-1785 M6 live observe-lite target preflight receipt`.
+Current validation: `CMV-1888`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1785 M6 Live Observe-Lite Target Preflight Receipt
+
+Status: `COMPLETED_VALIDATED_M6_LIVE_OBSERVE_LITE_TARGET_PREFLIGHT_NO_TARGET_FOUND_READ_ONLY_NO_WRITE_LOW_DISCLOSURE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1785_LIVE_TARGET_PREFLIGHT_RECEIPT.md`.
+- Executed the user-authorized observe-lite live target preflight in read-only/no-write/low-disclosure mode.
+- Checked six exact candidate target aliases as metadata only; present count `0`.
+- Checked process command-name candidates count-only; candidate count `0`.
+- Attempted one local status-only handshake probe; reachable `NO`, error class `connection_refused`, response body included `NO`.
+- Ran `VcpToolBoxRuntimeTargetLocatorPreflight` projection; accepted `YES`, no target found `YES`, accepted target count `0`, found target count `0`.
+- Preserved that no locator/path/endpoint values, process names, command args, response bodies, config/env/secrets, raw runtime, raw memory, raw store, memory result, memory read/write, provider/API, MCP memory tool, public MCP expansion, approval line, release, deploy, cutover, push, readiness, M6 completion, M15 unlock, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-1888`; exact preflight output, locator contract projection, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1784 M15-K5 VCP Memory Blocked Closeout Summary
 

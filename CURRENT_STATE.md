@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1784 M15-K5 VCP memory blocked closeout summary |
-| Current task | `CM-1784 M15-K5 VCP memory blocked closeout summary` |
-| Current validation | `CMV-1887` |
-| Current route | M15 local-safe documentation chain is complete through blocked closeout, but RC gate report, RC gate readiness, M15 open, approval packet readiness, approval request readiness, approval line, approval grant, live proof chain, docs/runtime match, no-P0/P1 risk closure, release, deploy, cutover, and readiness are all false; next safe action is a plan-package local-safe closeout summary, not live runtime, approval, release, deploy, cutover, or readiness |
+| Status | CM-1785 M6 live observe-lite target preflight receipt |
+| Current task | `CM-1785 M6 live observe-lite target preflight receipt` |
+| Current validation | `CMV-1888` |
+| Current route | Authorized observe-lite target preflight executed read-only/no-write/low-disclosure; no VCPToolBox target found, process candidate count was zero, local status-only handshake was connection refused, no response body/raw memory/secret/config was read, and M6 live proof remains incomplete; next safe action requires a safe operator-provided target alias or another exact safe locator route |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1785` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1785_LIVE_TARGET_PREFLIGHT_RECEIPT.md`. It records the exact authorized observe-lite live target preflight result: exact candidate count `6`, candidate present count `0`, process-name candidate count `0`, local handshake probe count `1`, local handshake reachable `NO`, error class `connection_refused`, response body included `NO`, locator contract projection accepted `YES`, no target found `YES`, accepted target count `0`, found target count `0`. Boundary: read-only `YES`; no-write `YES`; low-disclosure `YES`; locator/path/endpoint/process/args/response body included `NO`; config/env/secret/raw runtime/raw memory/raw store read `NO`; memory read/write/result `NO`; provider/API `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; approval line present/generated `NO`; approval granted `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M6 live proof complete `NO`; M15 unlocked `NO`; next required input `safe operator target alias or exact safe locator route`.
 
 `CM-1784` adds `docs/VCP_MEMORY_M15_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes the local-safe M15 documentation chain as blocked by aggregating CM-1779 through CM-1783 and preserving the source M15 rule: gate report only, no release, no deploy, no cutover, no readiness. Boundary: local-safe M15 chain complete `YES`; RC gate report created `NO`; RC gate ready `NO`; M15 opened `NO`; approval packet ready `NO`; approval request ready `NO`; approval line present/generated `NO`; approval granted `NO`; RC review authorized `NO`; M0-M14 live evidence complete `NO`; live proof chain complete `NO`; docs match live runtime evidence `NO`; risk review satisfied `NO`; no P0/P1 open risk `NO`; source runtime behavior changed `NO`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; approval request submitted `NO`; approval line operation `NO`; release/tag/deploy/cutover performed `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `plan_package_local_safe_closeout_summary`.
 

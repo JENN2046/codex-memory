@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1784",
-  "validationId": "CMV-1887",
+  "taskId": "CM-1785",
+  "validationId": "CMV-1888",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_m15_blocked_closeout_summary",
+    "scope": "vcp_memory_observe_lite_live_target_preflight_receipt",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1888",
+      "scope": "CM-1785 M6 live observe-lite target preflight receipt",
+      "status": "COMPLETED_VALIDATED_M6_LIVE_OBSERVE_LITE_TARGET_PREFLIGHT_NO_TARGET_FOUND_READ_ONLY_NO_WRITE_LOW_DISCLOSURE"
+    },
     {
       "id": "CMV-1887",
       "scope": "CM-1784 M15-K5 VCP memory blocked closeout summary",

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1784 M15-K5 VCP memory blocked closeout summary`.
-Current validation: `CMV-1887`.
-Current status: CM-1784 closes the local-safe M15 documentation chain as blocked. CM-1779 through CM-1784 are complete docs-only M15 precondition/evidence/checklist/risk/approval-boundary/closeout work, but M15 is not opened, RC gate report is not created, RC gate is not ready, approval packet/request are not ready, approval line is not present/generated, approval is not granted, RC review is not authorized, live proof chain is absent, P0/P1 risk closure is not satisfied, and no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1785 M6 live observe-lite target preflight receipt`.
+Current validation: `CMV-1888`.
+Current status: CM-1785 executed the user-authorized observe-lite live target preflight in read-only/no-write/low-disclosure mode. Six exact candidate target aliases were checked as metadata only and none were present; process command-name candidate count was zero; one local status-only handshake probe was attempted and returned `connection_refused`; response body was not read; locator contract projection accepted the fail-closed no-target result. M6 live proof remains incomplete, no VCPToolBox target is bound, M15 remains locked, and no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is a plan-package local-safe closeout summary, without opening M15, without RC approval, and without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
+Next safe local action requires a safe operator-provided VCPToolBox target alias or another exact safe locator route. Do not open M6/M15, do not run observe-full/trusted-read/write, do not read secrets/config/raw memory/raw stores, do not call MCP memory tools, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
