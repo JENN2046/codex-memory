@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1722 M6-K1 VCP memory observe-lite exact approval packet preparation`.
-Current validation: `CMV-1825`.
+Current checkpoint: `CM-1723 M6-K2 VCP memory observe-lite exact approval decision review boundary`.
+Current validation: `CMV-1826`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1723 M6-K2 VCP Memory Observe-Lite Exact Approval Decision Review Boundary
+
+Status: `COMPLETED_VALIDATED_M6_K2_VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`.
+- Reviewed CM-1722 and recorded current decision `blocked_before_runtime_exact_fields_missing`.
+- Defined non-authorizing review state, required input review, decision matrix, review checklist, current review result, and receipt skeleton.
+- Preserved the boundary that no real approval line, approval request submission, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claims occurred.
+
+Validation: `CMV-1826`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1722 M6-K1 VCP Memory Observe-Lite Exact Approval Packet Preparation
 
