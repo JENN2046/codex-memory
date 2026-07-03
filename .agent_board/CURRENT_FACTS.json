@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1753",
-  "validationId": "CMV-1856",
+  "taskId": "CM-1754",
+  "validationId": "CMV-1857",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_bounded_mutation_m10_blocked_closeout_summary_docs_only",
+    "scope": "vcp_memory_response_normalization_audit_receipts_m11_precondition_review_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1857",
+      "scope": "CM-1754 M11-K0 VCP memory response normalization audit receipts precondition review",
+      "status": "COMPLETED_VALIDATED_M11_K0_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_PRECONDITION_REVIEW_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1856",
       "scope": "CM-1753 M10-K6 VCP memory bounded mutation blocked closeout summary",
