@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1780",
-  "validationId": "CMV-1883",
+  "taskId": "CM-1781",
+  "validationId": "CMV-1884",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_m15_package_evidence_map",
+    "scope": "vcp_memory_m15_non_authorizing_rc_checklist_skeleton",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1884",
+      "scope": "CM-1781 M15-K2 VCP memory non-authorizing RC checklist skeleton",
+      "status": "COMPLETED_VALIDATED_M15_K2_VCP_MEMORY_NON_AUTHORIZING_RC_CHECKLIST_SKELETON_DOCS_ONLY_NO_RUNTIME_NO_RELEASE"
+    },
     {
       "id": "CMV-1883",
       "scope": "CM-1780 M15-K1 VCP memory package evidence map",
