@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1720 M5-K1 VCP memory governance policy shield truth table`.
-Current validation: `CMV-1823`.
+Current checkpoint: `CM-1721 M5-K2 VCP memory client scope visibility matrix`.
+Current validation: `CMV-1824`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1721 M5-K2 VCP Memory Client Scope Visibility Matrix
+
+Status: `COMPLETED_VALIDATED_M5_K2_VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX_DOCS_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX.md`.
+- Defined Codex/Claude/shared/unknown client identity rules, scope fields, visibility matrix, scope expansion matrix, safe routing rules, and fixture decisions.
+- Preserved the boundary that live VCPToolBox runtime, target probing, fallback execution, client-private memory read, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, and complete V8 claims remain blocked.
+
+Validation: `CMV-1824`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1720 M5-K1 VCP Memory Governance Policy Shield Truth Table
 

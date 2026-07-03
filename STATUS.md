@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1720 M5-K1 VCP memory governance policy shield truth table`.
-Current validation: `CMV-1823`.
-Current project status: CM-1720 records the docs-only governance policy shield truth table. It defines L0-L4 policy levels, decision vocabulary, required receipt fields, L4 hard-stop rows, and the self-review gate; no live VCPToolBox target discovery, fallback execution, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE_DOCS_ONLY_NO_RUNTIME`.
+Current task: `CM-1721 M5-K2 VCP memory client scope visibility matrix`.
+Current validation: `CMV-1824`.
+Current project status: CM-1721 records the docs-only client/scope/visibility matrix. It defines Codex/Claude/shared/unknown client identity rules, scope fields, visibility matrix, scope expansion matrix, safe routing rules, and fixture decisions; no live VCPToolBox target discovery, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX_DOCS_ONLY_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1721 M5-K2 VCP memory client scope visibility matrix: added `docs/VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX.md`. The matrix defines Codex/Claude/shared/unknown client identity rules, scope fields, visibility matrix, scope expansion matrix, safe routing rules, and fixture decisions. It records that Codex-private memory does not leak to Claude, Claude-private memory does not leak to Codex, shared visibility requires explicit boundary, and unknown client id fails closed. No live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
 CM-1720 M5-K1 VCP memory governance policy shield truth table: added `docs/VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE.md`. The truth table defines L0-L4 level model, decision vocabulary, required receipt fields, 16 policy rows, L4 hard-stop rows, and self-review gate. It records that bounded routine read inside an exact approved profile self-approves, while cross-client private leakage, raw output without approval, unapproved durable write, secrets/config, provider/API, broad/raw memory access, public MCP expansion, config/startup/watchdog, dependency action, push, release, deploy, cutover, and readiness claims fail closed. No live VCPToolBox runtime call, target probing, fallback execution, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 

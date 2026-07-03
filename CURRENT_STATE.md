@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1720 M5-K1 VCP memory governance policy shield truth table |
-| Current task | `CM-1720 M5-K1 VCP memory governance policy shield truth table` |
-| Current validation | `CMV-1823` |
-| Current route | Docs-only governance policy truth table; no live runtime execution |
+| Status | CM-1721 M5-K2 VCP memory client scope visibility matrix |
+| Current task | `CM-1721 M5-K2 VCP memory client scope visibility matrix` |
+| Current validation | `CMV-1824` |
+| Current route | Docs-only client/scope/visibility matrix; no live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1721` adds `docs/VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX.md`. It defines Codex/Claude/shared/unknown client identity rules, scope fields, visibility matrix, scope expansion matrix, safe routing rules, and fixture decisions. Boundary: live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1720` adds `docs/VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE.md`. It defines L0-L4 level model, decision vocabulary, required receipt fields, 16 policy rows, L4 hard-stop rows, and self-review gate. Boundary: live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 
