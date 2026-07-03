@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1783 M15-K4 VCP memory RC review approval packet readiness boundary`.
-Current validation: `CMV-1886`.
-Current status: CM-1783 creates the non-authorizing RC review approval packet readiness boundary and records that the packet is not ready: approval request ready false, approval line present/generated false, approval granted false, RC review authorized false, RC gate ready false, and M15 opened false. M15 is not opened and RC gate is not ready. No source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1784 M15-K5 VCP memory blocked closeout summary`.
+Current validation: `CMV-1887`.
+Current status: CM-1784 closes the local-safe M15 documentation chain as blocked. CM-1779 through CM-1784 are complete docs-only M15 precondition/evidence/checklist/risk/approval-boundary/closeout work, but M15 is not opened, RC gate report is not created, RC gate is not ready, approval packet/request are not ready, approval line is not present/generated, approval is not granted, RC review is not authorized, live proof chain is absent, P0/P1 risk closure is not satisfied, and no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is an M15 blocked closeout summary, without opening M15, without RC approval, and without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
+Next safe local action is a plan-package local-safe closeout summary, without opening M15, without RC approval, and without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, release, deploy, cutover, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

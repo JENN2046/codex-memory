@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1783",
-  "validationId": "CMV-1886",
+  "taskId": "CM-1784",
+  "validationId": "CMV-1887",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_m15_rc_review_approval_packet_readiness_boundary",
+    "scope": "vcp_memory_m15_blocked_closeout_summary",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1887",
+      "scope": "CM-1784 M15-K5 VCP memory blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M15_K5_VCP_MEMORY_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1886",
       "scope": "CM-1783 M15-K4 VCP memory RC review approval packet readiness boundary",
