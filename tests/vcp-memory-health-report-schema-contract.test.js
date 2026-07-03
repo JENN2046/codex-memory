@@ -318,6 +318,42 @@ test('CM1774 preserves L4 readiness overclaim detection for valid labels', () =>
   assert.equal(result.readinessClaimAllowed, false);
 });
 
+test('CM1775 rejects missing required health report sections', () => {
+  const fixture = healthReportContract();
+  delete fixture.sections.receipt_status;
+
+  const result = validateVcpMemoryHealthReportSchemaContract(fixture);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'missing_required_fields');
+  assert.ok(result.missingFields.includes('sections.receipt_status'));
+  assert.equal(result.sectionCount, undefined);
+});
+
+test('CM1775 rejects missing required fields inside health report sections', () => {
+  const fixture = healthReportContract();
+  delete fixture.sections.policy_status.low_disclosure;
+
+  const result = validateVcpMemoryHealthReportSchemaContract(fixture);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'missing_required_fields');
+  assert.ok(result.missingFields.includes('sections.policy_status.low_disclosure'));
+});
+
+test('CM1775 rejects extra health report sections outside the required set', () => {
+  const fixture = healthReportContract();
+  fixture.sections.unapproved_status = section('policy_status', {
+    section_id: 'unapproved_status'
+  });
+
+  const result = validateVcpMemoryHealthReportSchemaContract(fixture);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'unexpected_fields');
+  assert.ok(result.unexpectedFields.includes('sections.unapproved_status'));
+});
+
 test('CM1772 rejects missing positive and malformed zero side-effect counters', () => {
   const missingFixture = healthReportContract();
   delete missingFixture.counters.providerApiCalls;

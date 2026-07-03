@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1774 M14-K3 VCP memory health report readiness label accuracy`.
-Current validation: `CMV-1877`.
+Current checkpoint: `CM-1775 M14-K4 VCP memory health report section requiredness`.
+Current validation: `CMV-1878`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1775 M14-K4 VCP Memory Health Report Section Requiredness
+
+Status: `COMPLETED_VALIDATED_M14_K4_VCP_MEMORY_HEALTH_REPORT_SECTION_REQUIREDNESS_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Expanded `tests/vcp-memory-health-report-schema-contract.test.js`.
+- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_SECTION_REQUIREDNESS.md`.
+- Covered missing required health report section rejection.
+- Covered missing required field inside a required section rejection.
+- Covered extra section rejection outside the required section set.
+- Preserved that no source runtime behavior change, dashboard runtime implementation, dashboard CLI call, VCPToolBox runtime call, MCP memory tool call, private runtime read, raw store read, real query, provider/API call, memory read/write, durable audit/runtime write, public MCP expansion, approval request, approval line, push, release, deploy, cutover, readiness claim, complete V8 claim, or full bridge completion claim occurred.
+
+Validation: `CMV-1878`; targeted health report schema contract test `20/20`, `npm test` `3711/3711`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1774 M14-K3 VCP Memory Health Report Readiness Label Accuracy
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1774",
-  "validationId": "CMV-1877",
+  "taskId": "CM-1775",
+  "validationId": "CMV-1878",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_health_report_m14_readiness_label_accuracy",
+    "scope": "vcp_memory_health_report_m14_section_requiredness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1878",
+      "scope": "CM-1775 M14-K4 VCP memory health report section requiredness",
+      "status": "COMPLETED_VALIDATED_M14_K4_VCP_MEMORY_HEALTH_REPORT_SECTION_REQUIREDNESS_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1877",
       "scope": "CM-1774 M14-K3 VCP memory health report readiness label accuracy",
