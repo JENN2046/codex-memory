@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1770 M13-K7 VCP memory fallback local memory hardening report`.
-Current validation: `CMV-1873`.
-Current status: CM-1770 adds the M13 fallback hardening report and blocked closeout. It aggregates CM-1763 through CM-1769, records combined M13 targeted tests `64/64`, marks marker/receipt, scope isolation, secret rejection, lifecycle filter, and query-quality dry-run contracts green for fixture/dry-run boundary, and keeps fallback runtime governance parity false. No local fallback runtime execution, private runtime read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, raw store scan, broad memory scan, lifecycle mutation, migration/import/export/backfill, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1771 M14-K0 VCP memory health report preflight`.
+Current validation: `CMV-1874`.
+Current status: CM-1771 adds the M14 health report preflight at docs/fixture boundary. It defines low-disclosure policy, target, fallback, query quality, receipt, and conservative readiness sections; records live runtime health evidence and dashboard raw/private leak audit as not satisfied; and routes next to M14-K1 health report schema contract fixture. No dashboard runtime implementation, dashboard CLI call, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M14 docs/fixture health-report preflight, without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, dashboard raw private memory, or readiness claims. Push remains separate explicit authorization.
+Next safe local action is M14-K1 health report schema contract fixture, without dashboard runtime, private runtime reads, raw stores, MCP tool calls, memory read/write, lifecycle mutation, migration/import/export/backfill, real query, provider/API calls, approval request, approval line, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

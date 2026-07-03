@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1770 M13-K7 VCP memory fallback local memory hardening report`.
-Current validation: `CMV-1873`.
+Current checkpoint: `CM-1771 M14-K0 VCP memory health report preflight`.
+Current validation: `CMV-1874`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1771 M14-K0 VCP Memory Health Report Preflight
+
+Status: `COMPLETED_VALIDATED_M14_K0_VCP_MEMORY_HEALTH_REPORT_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_PREFLIGHT.md`.
+- Opened M14 only at the docs/fixture preflight boundary.
+- Defined low-disclosure health report candidate sections for policy, target, fallback, query quality, receipt status, and conservative readiness labels.
+- Recorded that receipt schema, normalized output, and M13 fallback hardening evidence are sufficient only for docs/fixture work.
+- Recorded that live runtime health evidence and dashboard raw/private leak audit are not satisfied.
+- Set the next safe route to M14-K1 health report schema contract fixture.
+- Preserved that no dashboard runtime implementation, dashboard CLI call, VCPToolBox runtime call, MCP memory tool call, private runtime read, raw store read, real query, provider/API call, memory write, durable audit/runtime write, public MCP expansion, approval request, approval line, push, release, deploy, cutover, readiness claim, complete V8 claim, or full bridge completion claim occurred.
+
+Validation: `CMV-1874`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1770 M13-K7 VCP Memory Fallback Local Memory Hardening Report
 

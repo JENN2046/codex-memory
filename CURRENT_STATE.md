@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1770 M13-K7 VCP memory fallback local memory hardening report |
-| Current task | `CM-1770 M13-K7 VCP memory fallback local memory hardening report` |
-| Current validation | `CMV-1873` |
-| Current route | M13 fallback hardening report is complete at fixture/dry-run boundary; fallback runtime governance parity is not green; next safe action is M14 docs/fixture health-report preflight, not runtime fallback, real query, lifecycle mutation, migration/import/export/backfill, provider/API, raw dashboard/private memory, or private runtime reads |
+| Status | CM-1771 M14-K0 VCP memory health report preflight |
+| Current task | `CM-1771 M14-K0 VCP memory health report preflight` |
+| Current validation | `CMV-1874` |
+| Current route | M14 health report preflight is open only at docs/fixture boundary; live runtime health evidence and dashboard raw/private leak audit are not satisfied; next safe action is M14-K1 health report schema contract fixture, not dashboard runtime, private reads, raw stores, real query, provider/API, approval, or readiness |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1771` adds `docs/VCP_MEMORY_HEALTH_REPORT_M14_PREFLIGHT.md`. It opens M14 only at the docs/fixture preflight boundary and defines low-disclosure health report sections for policy, target, fallback, query quality, receipt status, and conservative readiness labels. Boundary: health report preflight created `YES`; M14 entry conditions reviewed `YES`; receipt schema stable for fixture/schema work `YES`; normalized outputs stable for docs/fixture work `YES`; fallback hardening available for fixture/dry-run boundary `YES`; live runtime health evidence accepted `NO`; dashboard raw/private leak audit complete `NO`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; approval request submitted `NO`; approval line generated `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m14_health_report_schema_contract_fixture`.
 
 `CM-1770` adds `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_HARDENING_REPORT.md`. It closes the current safe M13 fallback hardening chain at fixture/dry-run boundary by aggregating CM-1763 through CM-1769. Boundary: marker/receipt contract green `YES`; scope/client isolation contract green `YES`; secret rejection contract green `YES`; lifecycle filter contract green `YES`; query-quality dry-run contract green `YES`; combined targeted tests passed `64/64`; latest full-suite evidence from CM-1769 passed `3691/3691`; fallback fixture governance parity green `YES`; fallback runtime governance parity green `NO`; local fallback runtime executed `NO`; private runtime read `NO`; real query `NO`; MCP memory tool call `NO`; VCPToolBox runtime `NO`; raw store scan `NO`; broad memory scan `NO`; lifecycle mutation `NO`; migration/import/export/backfill `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

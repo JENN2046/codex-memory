@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1770",
-  "validationId": "CMV-1873",
+  "taskId": "CM-1771",
+  "validationId": "CMV-1874",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_fallback_local_memory_m13_hardening_report",
+    "scope": "vcp_memory_health_report_m14_preflight",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1874",
+      "scope": "CM-1771 M14-K0 VCP memory health report preflight",
+      "status": "COMPLETED_VALIDATED_M14_K0_VCP_MEMORY_HEALTH_REPORT_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1873",
       "scope": "CM-1770 M13-K7 VCP memory fallback local memory hardening report",
