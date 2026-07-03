@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1747",
-  "validationId": "CMV-1850",
+  "taskId": "CM-1748",
+  "validationId": "CMV-1851",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_bounded_mutation_m10_blocked_precondition_record_docs_only",
+    "scope": "vcp_memory_bounded_mutation_harness_draft_boundary_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1851",
+      "scope": "CM-1748 M10-K1 VCP memory bounded mutation harness draft boundary",
+      "status": "COMPLETED_VALIDATED_M10_K1_VCP_MEMORY_BOUNDED_MUTATION_HARNESS_DRAFT_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1850",
       "scope": "CM-1747 M10-K0 VCP memory bounded mutation blocked precondition record",

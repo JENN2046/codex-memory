@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1747 M10-K0 VCP memory bounded mutation blocked precondition record |
-| Current task | `CM-1747 M10-K0 VCP memory bounded mutation blocked precondition record` |
-| Current validation | `CMV-1850` |
-| Current route | Docs-only M10 blocked precondition record; accepted M9 proposal receipts absent; exact M10 write boundary absent; no approval line, durable write, memory write/update/supersede/tombstone, bounded write safety claim, or live runtime execution |
+| Status | CM-1748 M10-K1 VCP memory bounded mutation harness draft boundary |
+| Current task | `CM-1748 M10-K1 VCP memory bounded mutation harness draft boundary` |
+| Current validation | `CMV-1851` |
+| Current route | Docs-only M10 harness draft boundary; accepted M9 proposal receipts absent; exact M10 write boundary absent; no approval line, durable write, memory write/update/supersede/tombstone, bounded write safety claim, or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1748` adds `docs/VCP_MEMORY_BOUNDED_MUTATION_HARNESS_DRAFT_BOUNDARY.md`. It defines a non-authorizing future harness shape, required future inputs, draft template, stop rules, current draft result, and receipt skeleton. Boundary: accepted M9 proposal receipts `NO`; exact write boundary approval `NO`; harness ready for execution `NO`; write/update/supersede/tombstone authorized `NO`; durable memory write `NO`; memory write/update/supersede/tombstone `NO`; mutation receipt `NO`; rollback audit `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; bounded write safety claim `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1747` adds `docs/VCP_MEMORY_BOUNDED_MUTATION_M10_BLOCKED_PRECONDITION_RECORD.md`. It records that M10 bounded write/update/supersede/tombstone is blocked before runtime because accepted M9 proposal receipts, exact Jenn M10 write boundary, exact target/client/scope/visibility/rollback fields, mutation family, and audit receipt plan are missing. Boundary: M10 execution authorized `NO`; M9 proposal mode passed `NO`; accepted M9 proposal receipts `NO`; exact write boundary approval `NO`; target bound `NO`; client/scope/visibility/rollback/audit fields present `NO`; write/update/supersede/tombstone authorized `NO`; durable write allowed `NO`; durable memory write `NO`; memory write/update/supersede/tombstone `NO`; mutation receipt `NO`; rollback audit `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; bounded write safety claim `NO`; complete V8 `NOT_CLAIMED`.
 
