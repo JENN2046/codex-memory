@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1818 M9 trusted-write-proposal runtime abort receipt refresh |
-| Current task | `CM-1818 M9 trusted-write-proposal runtime abort receipt refresh` |
-| Current validation | `CMV-1921` |
-| Current route | M9 abort receipt refreshed; next route is CM-1819 blocked closeout refresh after M8 acceptance |
+| Status | CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance |
+| Current task | `CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance` |
+| Current validation | `CMV-1922` |
+| Current route | M9 closeout refreshed; next route is CM-1820 exact boundary field feasibility preflight |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1819` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1819_BLOCKED_CLOSEOUT_REFRESH_AFTER_M8_ACCEPTANCE.md`. It refreshes M9 closeout state after accepted M8 evidence: M8 is now accepted for planning, but exact trusted-write-proposal boundary, exact fields, proposal review route, L4 write-intent shield evidence, generated/submitted proposals, accepted proposal receipts, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1820 M9 exact trusted-write-proposal boundary field feasibility preflight.
 
 `CM-1818` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1818_RUNTIME_ABORT_RECEIPT_REFRESH.md`. It refreshes the M9 abort receipt boundary after accepted M8 evidence from CM-1812/CM-1813. The active M8-missing blocker is removed for planning, but exact trusted-write-proposal boundary, exact fields, proposal review route, L4 write-intent shield evidence, proposal generation/submission, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1819 M9 blocked closeout refresh after M8 acceptance.
 

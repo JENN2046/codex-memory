@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1818",
-  "validationId": "CMV-1921",
+  "taskId": "CM-1819",
+  "validationId": "CMV-1922",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_runtime_abort_receipt_refresh",
+    "scope": "vcp_memory_trusted_write_proposal_m9_blocked_closeout_refresh_after_m8_acceptance",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1922",
+      "scope": "CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance",
+      "status": "COMPLETED_VALIDATED_M9_BLOCKED_CLOSEOUT_REFRESH_M8_ACCEPTED_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1921",
       "scope": "CM-1818 M9 trusted-write-proposal runtime abort receipt refresh",
