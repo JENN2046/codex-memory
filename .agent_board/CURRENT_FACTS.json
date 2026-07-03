@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1713",
-  "validationId": "CMV-1816",
+  "taskId": "CM-1714",
+  "validationId": "CMV-1817",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -27,9 +27,9 @@
     "presentInLocalCheckout": null
   },
   "status": {
-    "project": "READY",
-    "rc": "RC_READY",
-    "scope": "scoped_status_snapshot",
+    "project": "NOT_READY_BLOCKED",
+    "rc": "RC_NOT_READY_BLOCKED",
+    "scope": "vcp_native_bridge_plan_intake_docs_state_sync",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1817",
+      "scope": "CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization",
+      "status": "COMPLETED_VALIDATED_M0_M2_VCP_NATIVE_BRIDGE_PLAN_INTAKE_DOCS_STATE_SYNC_NO_RUNTIME"
+    },
     {
       "id": "CMV-1816",
       "scope": "CM-1713 Stage 02 exact approval request packet final display / request boundary",

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`.
-Current validation: `CMV-1805`.
-Current status: CM-1700 fixture-only target-specific runtime inspection execution approval draft added; no approval-line issue or consumption, no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
+Current task: `CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization`.
+Current validation: `CMV-1817`.
+Current status: CM-1714 records repo-native intake of the archived VCP-native bridge plan package, M0 fresh reality/drift evidence, M1 strategy pivot, and M2 active docs/state synchronization. No live VCPToolBox runtime, approval-line generation/submission, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1700` records fixture-only target-specific runtime inspection execution approval draft coverage for future VCPToolBox target inspection. Next safe local action is `CM-1701 VCPToolBox target-specific runtime inspection execution boundary review`, or requesting explicit push if remote update is intended.
+Next safe local action is M3 VCPToolBox native capability inventory / approval-boundary preparation from the archived plan package, still without live runtime access. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

@@ -1,6 +1,18 @@
 ﻿# codex-memory
 
-`codex-memory` 是独立的 `vcp_codex_memory` 仓库实现，目标是让 Codex 的记忆写入、检索、审计和召回增强不再依赖 `VCPToolBox` 运行时。
+`codex-memory` 当前正在从独立 `vcp_codex_memory` 实现路线，转入
+VCPToolBox-native-first governed memory bridge 路线。
+
+最终目标是让 Codex / Claude sustained workflows 通过 `codex-memory`
+治理桥，完整、受控、可审计地使用 VCPToolBox native memory runtime。
+VCPToolBox 保持 native memory behavior owner；`codex-memory` 负责 profile
+selection、approval boundary、low-disclosure projection、audit receipt、rollback
+posture、client scope governance 和 fallback/test substrate。
+
+现有本地 `vcp_codex_memory` runtime 仍是需要保护的兼容层和 fallback/test
+substrate。当前 README 同步不证明 live VCPToolBox capability，不授权 runtime
+call、secret/config/raw memory read、provider/API call、durable memory write、
+public MCP expansion、push/release/deploy/cutover 或 readiness claim。
 
 当前实现遵循这几个原则：
 

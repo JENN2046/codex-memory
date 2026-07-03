@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`.
-Current validation: `CMV-1805`.
+Current checkpoint: `CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization`.
+Current validation: `CMV-1817`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1714 M0-M2 VCP-Native Bridge Plan Intake And Docs/State Synchronization
+
+Status: `COMPLETED_VALIDATED_M0_M2_VCP_NATIVE_BRIDGE_PLAN_INTAKE_DOCS_STATE_SYNC_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/taskbooks/M0_REPOSITORY_REALITY_SNAPSHOT_20260703.md`.
+- Added `docs/taskbooks/M0_REPOSITORY_DRIFT_MATRIX_20260703.md`.
+- Added `docs/taskbooks/M1_STRATEGY_PIVOT_DECISION_RECORD_20260703.md`.
+- Updated README positioning to VCPToolBox-native-first governed bridge.
+- Reclassified `docs/VCP_MEMORY_PARITY_ROADMAP.md` as fallback/reference for this plan.
+- Synchronized active status and `.agent_board` current-facts surfaces to `CM-1714` / `CMV-1817`.
+- Preserved the boundary that live VCPToolBox runtime, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, and complete V8 claims remain blocked.
+
+Validation: `CMV-1817`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1700 VCPToolBox Target-Specific Runtime Inspection Execution Approval Draft
 

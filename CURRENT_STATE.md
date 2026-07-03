@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1700 VCPToolBox target-specific runtime inspection execution approval draft |
-| Current task | `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft` |
-| Current validation | `CMV-1805` |
-| Current route | Fixture-only target-specific runtime inspection execution approval draft; no approval-line issue/consumption or runtime execution |
+| Status | CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization |
+| Current task | `CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization` |
+| Current validation | `CMV-1817` |
+| Current route | Repo-native archived plan intake; M0 reality/drift evidence, M1 VCPToolBox-native bridge pivot, M2 docs/state synchronization; no runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1714` records the active intake for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`: M0 fresh reality snapshot, M0 drift matrix, M1 strategy pivot decision, README positioning sync, VCP parity roadmap reclassification, and active status/board synchronization. The current strategy is VCPToolBox-native-first governed bridge work with local `vcp_codex_memory` preserved as fallback/test substrate and compatibility protection. Boundary: live VCPToolBox runtime `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1700` adds `src/core/VcpToolBoxTargetSpecificRuntimeInspectionExecutionApprovalDraft.js`, `tests/vcp-toolbox-target-specific-runtime-inspection-execution-approval-draft.test.js`, and `docs/CM1700_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT.md`. It validates a fixture-only future target-specific runtime inspection execution approval draft: accepted referenced CM-1699 approval packet, execution scope bound to the approval packet and sanitized target reference, allowed runtime actions limited to target presence / runtime handshake / no-memory target-specific runtime inspection, current Git facts represented by presence flags only, approval-line value omitted, runtime budget capped to three calls / ten probe minutes with zero memory/provider/write budget, low-disclosure output policy, receipt plan without raw/secret/readiness data, fail-closed stop conditions, forbidden expansion flags false, and zero counters. New targeted validation passed `14/14`; adjacent CM-1700/1699/1698 regression passed `43/43`; default `npm test` passed `3457/3457`.
 
