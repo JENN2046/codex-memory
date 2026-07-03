@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1766 M13-K3 VCP memory fallback local memory scope isolation contract`.
-Current validation: `CMV-1869`.
+Current checkpoint: `CM-1767 M13-K4 VCP memory fallback local memory secret rejection contract`.
+Current validation: `CMV-1870`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1767 M13-K4 VCP Memory Fallback Local Memory Secret Rejection Contract
+
+Status: `COMPLETED_VALIDATED_M13_K4_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_SECRET_REJECTION_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryFallbackLocalMemorySecretRejectionContract.js`.
+- Added `tests/vcp-memory-fallback-local-memory-secret-rejection-contract.test.js`.
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_SECRET_REJECTION_CONTRACT.md`.
+- Covered no-secret local fallback fixture acceptance without runtime execution.
+- Covered marked synthetic secret-like fixture redaction without raw value echo.
+- Covered unmarked secret-like fallback input, config/env/provider/auth/endpoint read requirements, raw private secret disclosure, and provider payload fixtures as L4 stops.
+- Covered missing scope denial and VCP-native lookalike fallback candidate rejection.
+- Covered decision mismatch rejection, forbidden raw secret/token/approval/readiness field rejection without echoing values, missing/positive/malformed side-effect counter rejection, non-boolean policy/request/candidate flag rejection, non-string request id rejection, and side-effect posture lock.
+- Re-review found that unexpected non-allowlisted fields were not fail-closed in the initial helper; repaired by adding unexpected-field rejection and no-echo regression coverage.
+- Preserved that no local fallback runtime execution, private runtime read, real query, MCP tool call, VCPToolBox runtime call, target probing, secret/config/env/endpoint read, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1870`; syntax checks, targeted secret rejection node test `12/12`, `npm test` `3663/3663`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1766 M13-K3 VCP Memory Fallback Local Memory Scope Isolation Contract
 

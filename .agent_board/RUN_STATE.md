@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1766 M13-K3 VCP memory fallback local memory scope isolation contract`.
-Current validation: `CMV-1869`.
-Current status: CM-1766 adds a fixture-only fallback scope/client isolation contract with targeted tests `14/14` and default `npm test` `3651/3651`, while preserving that fallback governance parity is not green and runtime fallback remains blocked. Re-review found and repaired non-boolean flag, request id type, and zero counter type validation gaps. No local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1767 M13-K4 VCP memory fallback local memory secret rejection contract`.
+Current validation: `CMV-1870`.
+Current status: CM-1767 adds a fixture-only fallback secret rejection contract with targeted tests `12/12` and default `npm test` `3663/3663`, while preserving that fallback governance parity is not green and runtime fallback remains blocked. It covers no-secret fallback acceptance, marked synthetic secret-like redaction, unmarked secret-like L4 stop, config/env/provider/auth/endpoint L4 stop, raw secret/provider payload L4 stop, missing-scope denial, VCP-native lookalike rejection, decision mismatch rejection, forbidden raw secret/token/approval/readiness field rejection, side-effect counter rejection, non-boolean flag rejection, non-string request id rejection, unexpected non-allowlisted field rejection, and side-effect posture lock. Re-review found and repaired an unexpected-field fail-closed gap. No local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, secret/config/env/endpoint read, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M13 synthetic secret rejection fallback fixture contract or a focused CM-1766 source review, without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, or provider/API calls. Push remains separate explicit authorization.
+Next safe local action is M13 lifecycle filter fallback fixture contract, query-quality fallback dry-run tests, final fallback hardening report, or a focused CM-1767 source review, without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, or provider/API calls. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
