@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1810 M7 read-shape receipt closeout gate review |
-| Current task | `CM-1810 M7 read-shape receipt closeout gate review` |
-| Current validation | `CMV-1913` |
-| Current route | M7 read-shape accepted; M8 preparation unlocked; next route is CM-1811 trusted-full-read boundary preflight |
+| Status | CM-1811 M8 trusted-full-read workflow harness boundary preflight |
+| Current task | `CM-1811 M8 trusted-full-read workflow harness boundary preflight` |
+| Current validation | `CMV-1914` |
+| Current route | M8 workflow boundary defined; next route is CM-1812 low-disclosure workflow execution candidate |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1811` adds `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1811_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT.md`. It binds the next M8 workflow candidate to two bounded `DailyNoteSearcher.SearchDailyNote` read-shape steps through `/v1/human/tool` with receipt-scope client aliases `codex_local_agent` and `claude_compatible_client`; runtime client isolation claimed `NO`; output projection shape-only; no-write/no-provider/no-public-MCP rules defined. Runtime action in CM-1811 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; M8 execution performed `NO`; M9 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; next action `CM-1812 M8 trusted-full-read workflow low-disclosure execution candidate`.
 
 `CM-1810` adds `docs/VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_GATE_REVIEW.md`. It accepts CM-1809 as the narrow M7 read-shape proof and unlocks M8 preparation only. M8 trusted-full-read execution authorized `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime action in CM-1810 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; next action `CM-1811 M8 trusted-full-read workflow harness boundary preflight`.
 

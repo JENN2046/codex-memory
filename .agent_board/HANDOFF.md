@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1810 M7 read-shape receipt closeout gate review`.
-Current validation: `CMV-1913`.
-Current handoff: CM-1810 accepted CM-1809 as the narrow M7 read-shape proof and unlocked M8 preparation only. M8 trusted-full-read execution, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1810 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
+Current task: `CM-1811 M8 trusted-full-read workflow harness boundary preflight`.
+Current validation: `CMV-1914`.
+Current handoff: CM-1811 bound the next M8 workflow candidate to two bounded `DailyNoteSearcher.SearchDailyNote` read-shape steps with Codex/Claude receipt-scope client aliases, shape-only projection, no-write/no-provider/no-public-MCP rules, and no runtime client-isolation overclaim. CM-1811 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M9 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1810 accepted CM-1809 as the narrow M7 read-shape proof and 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite` into bounded `M7 observe-full` read-shape proof work without crossing log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M7_READ_SHAPE_RECEIPT_CLOSEOUT_M8_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; M8 preparation is unlocked; M8 execution is not authorized by this closeout; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M8_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; M8 execution boundary exists for CM-1812; runtime client isolation is not claimed; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M9, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1811_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT.md`
 - `docs/VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_GATE_REVIEW.md`
 - `docs/VCP_MEMORY_OBSERVE_FULL_CM1809_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_FULL_CM1808_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT.md`

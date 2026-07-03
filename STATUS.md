@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1810 M7 read-shape receipt closeout gate review`.
-Current validation: `CMV-1913`.
-Current project status: CM-1810 accepted CM-1809 as the narrow M7 read-shape proof and unlocked M8 preparation only. M8 trusted-full-read execution, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1810 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
-Current route: `VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_M8_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS`.
+Current task: `CM-1811 M8 trusted-full-read workflow harness boundary preflight`.
+Current validation: `CMV-1914`.
+Current project status: CM-1811 bound the next M8 workflow candidate to two bounded `DailyNoteSearcher.SearchDailyNote` read-shape steps with Codex/Claude receipt-scope client aliases, shape-only projection, no-write/no-provider/no-public-MCP rules, and no runtime client-isolation overclaim. CM-1811 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M9 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion.
+Current route: `VCP_MEMORY_TRUSTED_FULL_READ_CM1811_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1811 M8 trusted-full-read workflow harness boundary preflight: added `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1811_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT.md`. It binds the next M8 workflow candidate to two bounded `DailyNoteSearcher.SearchDailyNote` read-shape steps through `/v1/human/tool` with receipt-scope client aliases `codex_local_agent` and `claude_compatible_client`; runtime client isolation claimed `NO`; output projection shape-only; no-write/no-provider/no-public-MCP rules defined. Runtime action in CM-1811 `NO`; response body read `NO`; runtime logs read `NO`; config/env contents read `NO`; secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M8 execution performed `NO`; M9 unlocked `NO`; M15 unlocked `NO`. Next safe route is CM-1812 M8 trusted-full-read workflow low-disclosure execution candidate under unchanged CM-1811 boundary.
 
 CM-1810 M7 read-shape receipt closeout gate review: added `docs/VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_GATE_REVIEW.md`. It accepts CM-1809 as the narrow M7 read-shape proof and unlocks M8 preparation only. M8 trusted-full-read execution authorized `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime action in CM-1810 `NO`; response body read `NO`; runtime logs read `NO`; config/env contents read `NO`; secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`. Next safe route is CM-1811 M8 trusted-full-read workflow harness boundary preflight.
 

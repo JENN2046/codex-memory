@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1810 M7 read-shape receipt closeout gate review`.
-Current validation: `CMV-1913`.
+Current checkpoint: `CM-1811 M8 trusted-full-read workflow harness boundary preflight`.
+Current validation: `CMV-1914`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1811 M8 Trusted-Full-Read Workflow Harness Boundary Preflight
+
+Status: `COMPLETED_VALIDATED_M8_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1811_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT.md`.
+- Accepted CM-1810 as the M7 closeout required to prepare M8.
+- Bound the next M8 execution candidate to two bounded `DailyNoteSearcher.SearchDailyNote` read-shape steps through `/v1/human/tool`.
+- Selected receipt-scope client aliases `codex_local_agent` and `claude_compatible_client` while explicitly not claiming VCPToolBox runtime-enforced client isolation.
+- Defined call/result/duration budgets, shape-only projection, response-body no-print/no-persist rules, no-write/no-provider/no-public-MCP rules, abort rules, and CM-1812 receipt-chain schema.
+- Confirmed CM-1811 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M8 execution, M9 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1914`; plan M8/M8-K1 slices, CM-1810 closeout, existing M8 draft/approval packet review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1810 M7 Read-Shape Receipt Closeout Gate Review
 

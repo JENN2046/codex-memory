@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1810",
-  "validationId": "CMV-1913",
+  "taskId": "CM-1811",
+  "validationId": "CMV-1914",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_full_m7_read_shape_receipt_closeout_gate_review",
+    "scope": "vcp_memory_trusted_full_read_m8_workflow_harness_boundary_preflight",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1914",
+      "scope": "CM-1811 M8 trusted-full-read workflow harness boundary preflight",
+      "status": "COMPLETED_VALIDATED_M8_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS"
+    },
     {
       "id": "CMV-1913",
       "scope": "CM-1810 M7 read-shape receipt closeout gate review",

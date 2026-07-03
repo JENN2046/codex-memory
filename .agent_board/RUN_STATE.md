@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1810 M7 read-shape receipt closeout gate review`.
-Current validation: `CMV-1913`.
-Current status: CM-1810 accepted CM-1809 as the narrow M7 read-shape proof and unlocked M8 preparation only. M8 trusted-full-read execution, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1810 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
+Current task: `CM-1811 M8 trusted-full-read workflow harness boundary preflight`.
+Current validation: `CMV-1914`.
+Current status: CM-1811 bound the next M8 workflow candidate to two bounded `DailyNoteSearcher.SearchDailyNote` read-shape steps with Codex/Claude receipt-scope client aliases, shape-only projection, no-write/no-provider/no-public-MCP rules, and no runtime client-isolation overclaim. CM-1811 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M9 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1811 M8 trusted-full-read workflow harness boundary preflight. It should define exact client/scope/visibility, operation sequence, call/result/duration budgets, receipt chain, fallback behavior, abort rules, and no-write/no-provider/no-public-MCP rules before any M8 runtime workflow. Push remains separate explicit authorization.
+Next safe action is CM-1812 M8 trusted-full-read workflow low-disclosure execution candidate under the unchanged CM-1811 boundary. It may consume response bodies in memory only for redacted shape projection, must not print or persist raw values, and must abort on raw-private-output, client alias mixing, budget, visibility, provider, write, log, config, or target drift. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
