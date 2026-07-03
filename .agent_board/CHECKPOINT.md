@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1822 M9 trusted-write-proposal receipt shape fixture contract`.
-Current validation: `CMV-1925`.
+Current checkpoint: `CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review`.
+Current validation: `CMV-1926`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1823 M9 Trusted-Write-Proposal Receipt Closeout / Next-Stage Gate Review
+
+Status: `COMPLETED_VALIDATED_M9_RECEIPT_CLOSEOUT_FIXTURE_PREPARATION_CLOSED_M9_STILL_BLOCKED_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1823_RECEIPT_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`.
+- Reviewed CM-1821 envelope fixture contract and CM-1822 receipt-shape fixture contract.
+- Closed only the local fixture-contract preparation slice.
+- Preserved that full M9 proposal mode has not passed.
+- Preserved that M10 and M15 remain locked.
+- Confirmed no runtime action, proposal generation, proposal submission, accepted real proposal receipt, memory read, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, approval request submission, approval-line generation, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim occurred.
+
+Validation: `CMV-1926`; CM-1821/CM-1822 review, M9/M10 plan review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1822 M9 Trusted-Write-Proposal Receipt Shape Fixture Contract
 

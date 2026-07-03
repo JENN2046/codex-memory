@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1822 M9 trusted-write-proposal receipt shape fixture contract |
-| Current task | `CM-1822 M9 trusted-write-proposal receipt shape fixture contract` |
-| Current validation | `CMV-1925` |
-| Current route | M9 receipt shape fixture contract added; next route is CM-1823 receipt closeout / next-stage gate review |
+| Status | CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review |
+| Current task | `CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review` |
+| Current validation | `CMV-1926` |
+| Current route | M9 local fixture-contract preparation slice closed; next route is CM-1824 proposal-mode closeout gate fixture contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1823` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1823_RECEIPT_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`. It reviews CM-1821 and CM-1822 as fixture-contract evidence only and closes the narrow local fixture-contract preparation slice. It does not close M9: no exact execution boundary, generated proposal, review-route accept/reject receipt, real proposal audit receipt, or L4 write-intent runtime/workflow evidence exists. M10/M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1824 M9 proposal-mode closeout gate fixture contract.
 
 `CM-1822` adds `src/core/VcpMemoryTrustedWriteProposalReceiptShapeContract.js`, `tests/vcp-memory-trusted-write-proposal-receipt-shape-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1822_RECEIPT_SHAPE_FIXTURE_CONTRACT.md`. Targeted tests passed `9/9`; default `npm test` passed `3730/3730`. The helper validates fixture-only trusted-write-proposal receipt shapes, accepts explicit `accept`/`reject` review statuses as shape vocabulary only, rejects raw/secret/receipt/approval/readiness fields without echo, repairs rejected-path `expectedDecision` projection to allowlist-only no-echo, stops proposal-generation/submission/write/provider/public-MCP/readiness intent, requires safe fixture id prefixes, and reports zero runtime/write side effects. It distinguishes fixture `receiptShapeAccepted` from real `proposalReceiptAccepted=false`. Runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review.
 

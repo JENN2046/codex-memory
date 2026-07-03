@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1822 M9 trusted-write-proposal receipt shape fixture contract`.
-Current validation: `CMV-1925`.
-Current status: CM-1822 added a fixture-only trusted-write-proposal receipt shape contract and targeted tests. Local receipt-shape contract work is executable, but runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review`.
+Current validation: `CMV-1926`.
+Current status: CM-1823 closed only the local M9 fixture-contract preparation slice from CM-1821/CM-1822. Full M9 proposal mode, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review. It should review CM-1821 and CM-1822 as fixture-contract evidence only, decide whether the current M9 proposal-mode preparation slice can close or needs another fixture/dry-run boundary, and preserve that runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
+Next safe action is CM-1824 M9 proposal-mode closeout gate fixture contract. It should turn the CM-1823 gate decision into executable fixture-only validation, accept only the local fixture-contract preparation slice as closed, keep `m9_proposal_mode_passed=false`, and preserve that runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
