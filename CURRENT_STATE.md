@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1764 M13-K1 VCP memory fallback local memory gap matrix |
-| Current task | `CM-1764 M13-K1 VCP memory fallback local memory gap matrix` |
-| Current validation | `CMV-1867` |
-| Current route | M13 fallback hardening gaps are mapped into fixture-lockable work; fallback governance parity is not green; next safe action is M13 fallback marker/receipt fixture contract, not runtime fallback or private runtime reads |
+| Status | CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract |
+| Current task | `CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract` |
+| Current validation | `CMV-1868` |
+| Current route | M13 fallback marker/receipt fixture contract is implemented and validated; fallback governance parity is not green; next safe action is M13 fallback scope/client isolation fixture work or CM-1765 source review, not runtime fallback or private runtime reads |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1765` adds `src/core/VcpMemoryFallbackLocalMemoryMarkerReceiptContract.js`, `tests/vcp-memory-fallback-local-memory-marker-receipt-contract.test.js`, and `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_MARKER_RECEIPT_CONTRACT.md`. It turns the M13 fallback marker/receipt gap into fixture-only executable contract coverage. Boundary: contract implemented `YES`; targeted test count `10`; targeted test passed `YES`; default `npm test` passed `3637/3637`; VCP target unapproved fallback marker/receipt covered `YES`; test/dry-run fallback covered `YES`; VCP-native-required denial covered `YES`; private runtime read L4 stop covered `YES`; missing client/scope rejected `YES`; missing zero counter fields rejected `YES`; VCP-native lookalike marker rejected `YES`; runtime plans and positive counters rejected `YES`; raw/secret/approval/readiness fields rejected without echo `YES`; side-effect posture locked `YES`; local fallback runtime executed `NO`; private runtime read `NO`; real query `NO`; MCP tool call for M13 evidence `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; VCPToolBox runtime `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1764` adds `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_GAP_MATRIX.md`. It maps fallback marker/receipt, scope/client isolation, secret rejection, lifecycle filter, query tests, and governance parity into fixture-lockable work and blocked runtime/private-read gaps. Boundary: fallback marker/receipt fixture-lockable `YES`; scope/client isolation fixture-lockable `YES`; secret rejection fixture-lockable `YES`; lifecycle filter fixture-lockable `YES`; query tests fixture-lockable `YES`; governance parity report lockable `YES`; M13 fallback marker contract exists `NO`; M13 fallback scope isolation tests green `NO`; M13 fallback secret rejection tests green `NO`; M13 fallback lifecycle filter tests green `NO`; M13 fallback query tests green `NO`; fallback governance parity green `NO`; fallback hardening report complete `NO`; local fallback runtime executed `NO`; private runtime read `NO`; real query `NO`; MCP tool call for M13 evidence `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; VCPToolBox runtime `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

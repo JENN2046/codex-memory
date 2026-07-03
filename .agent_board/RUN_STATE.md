@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1764 M13-K1 VCP memory fallback local memory gap matrix`.
-Current validation: `CMV-1867`.
-Current status: CM-1764 maps M13 fallback hardening gaps into fixture-lockable work and blocked runtime/private-read gaps while preserving that fallback governance parity is not green and runtime fallback remains blocked. No local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract`.
+Current validation: `CMV-1868`.
+Current status: CM-1765 adds a fixture-only fallback marker/receipt contract with targeted tests `10/10` and default `npm test` `3637/3637`, while preserving that fallback governance parity is not green and runtime fallback remains blocked. No local fallback runtime execution, private runtime read, real query, MCP tool call for M13 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M13 fallback marker/receipt fixture contract without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, or provider/API calls. Push remains separate explicit authorization.
+Next safe local action is M13 fallback scope/client isolation fixture contract or a focused CM-1765 source review, without runtime fallback execution, private runtime reads, MCP tool calls, memory read/write, or provider/API calls. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

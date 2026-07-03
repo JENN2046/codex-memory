@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1764 M13-K1 VCP memory fallback local memory gap matrix`.
-Current validation: `CMV-1867`.
+Current checkpoint: `CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract`.
+Current validation: `CMV-1868`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1765 M13-K2 VCP Memory Fallback Local Memory Marker Receipt Contract
+
+Status: `COMPLETED_VALIDATED_M13_K2_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_MARKER_RECEIPT_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryFallbackLocalMemoryMarkerReceiptContract.js`.
+- Added `tests/vcp-memory-fallback-local-memory-marker-receipt-contract.test.js`.
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_MARKER_RECEIPT_CONTRACT.md`.
+- Covered fixture-only fallback marker/receipt acceptance for VCP target unapproved and test/dry-run cases.
+- Covered VCP-native-required denial and private-runtime-read L4 stop shapes without execution.
+- Covered rejection of missing client/scope, missing zero side-effect counter fields, VCP-native lookalike markers, runtime plans, positive side-effect counters, raw/private/secret/approval/readiness fields, and side-effect posture drift.
+- Preserved that no local fallback runtime execution, private runtime read, real query, MCP tool call, VCPToolBox runtime call, target probing, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1868`; syntax checks, targeted marker/receipt node test `10/10`, `npm test` `3637/3637`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1764 M13-K1 VCP Memory Fallback Local Memory Gap Matrix
 
