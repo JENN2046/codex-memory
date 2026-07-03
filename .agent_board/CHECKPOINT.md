@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1831 M9 exact request packet-readiness fixture contract`.
-Current validation: `CMV-1934`.
+Current checkpoint: `CM-1832 M9 exact request packet-readiness contract closeout / request-preparation gate review`.
+Current validation: `CMV-1935`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1832 M9 Exact Request Packet-Readiness Contract Closeout / Request-Preparation Gate Review
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_READINESS_CONTRACT_CLOSEOUT_REQUEST_PREPARATION_GATE_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1832_EXACT_REQUEST_PACKET_READINESS_CONTRACT_CLOSEOUT_REQUEST_PREPARATION_GATE_REVIEW.md`.
+- Reviewed CM-1830 packet-readiness gate and CM-1831 packet-readiness fixture contract.
+- Closed only the local packet-readiness fixture preparation slice for planning.
+- Opened only the next local-safe request-preparation boundary fixture contract route.
+- Preserved that exact request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1833 M9 exact request preparation boundary fixture contract.
+
+Validation: `CMV-1935`; CM-1830/CM-1831 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1831 M9 Exact Request Packet-Readiness Fixture Contract
 

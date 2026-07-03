@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1831 M9 exact request packet-readiness fixture contract |
-| Current task | `CM-1831 M9 exact request packet-readiness fixture contract` |
-| Current validation | `CMV-1934` |
-| Current route | M9 packet-readiness fixture contract added; accepted state remains not-ready; exact request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked |
+| Status | CM-1832 M9 exact request packet-readiness contract closeout / request-preparation gate review |
+| Current task | `CM-1832 M9 exact request packet-readiness contract closeout / request-preparation gate review` |
+| Current validation | `CMV-1935` |
+| Current route | M9 packet-readiness fixture contract closed for planning; request-preparation fixture work may start next; exact request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1832` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1832_EXACT_REQUEST_PACKET_READINESS_CONTRACT_CLOSEOUT_REQUEST_PREPARATION_GATE_REVIEW.md`. It reviews CM-1830 and CM-1831, accepts the local packet-readiness fixture contract as closed for planning, and opens only the next local-safe request-preparation boundary fixture contract route. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1833 M9 exact request preparation boundary fixture contract.
 
 `CM-1831` adds `src/core/VcpMemoryTrustedWriteProposalExactRequestPacketReadinessContract.js`, `tests/vcp-memory-trusted-write-proposal-exact-request-packet-readiness-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1831_EXACT_REQUEST_PACKET_READINESS_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3762/3762`. The helper validates non-authorizing exact request packet-readiness fixtures whose accepted state is `packet_readiness_blocked_missing_exact_fields`, routes exact-ready/request/proposal/runtime/write/M10/readiness claims to `stop_l4`, rejects raw/secret/request/approval/readiness fields without echo, and reports no runtime/write side effects. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1832 M9 exact request packet-readiness contract closeout / request-preparation gate review.
 
