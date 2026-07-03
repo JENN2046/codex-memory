@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1724 M6-K3 VCP memory observe-lite exact approval request display boundary`.
-Current validation: `CMV-1827`.
-Current status: CM-1724 records the docs-only non-authorizing observe-lite exact approval request display boundary. Current decision is `not_display_ready_as_exact_request` because exact fields are missing. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1725 M6-K4 VCP memory observe-lite runtime abort receipt skeleton`.
+Current validation: `CMV-1828`.
+Current status: CM-1725 records the docs-only non-authorizing observe-lite runtime abort receipt skeleton. Current result is `abort_receipt_skeleton_ready_no_runtime`. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is a runtime abort receipt skeleton without execution, or remain blocked before runtime until Jenn supplies exact target/transport/client/scope/visibility/budget/disclosure approval. Push remains separate explicit authorization.
+Next safe local action is an M6 closeout blocked summary, or remain blocked before runtime until Jenn supplies exact target/transport/client/scope/visibility/budget/disclosure approval. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

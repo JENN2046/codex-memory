@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1724 M6-K3 VCP memory observe-lite exact approval request display boundary`.
-Current validation: `CMV-1827`.
-Current project status: CM-1724 records the docs-only non-authorizing observe-lite exact approval request display boundary. It defines display state, required future inputs, display template, stop rules, current display result, and receipt skeleton, and records current decision `not_display_ready_as_exact_request`; no real approval line, approval request submission, approval grant, live VCPToolBox target discovery, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`.
+Current task: `CM-1725 M6-K4 VCP memory observe-lite runtime abort receipt skeleton`.
+Current validation: `CMV-1828`.
+Current project status: CM-1725 records the docs-only non-authorizing observe-lite runtime abort receipt skeleton. It defines abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-live-proof conclusion, and records current result `abort_receipt_skeleton_ready_no_runtime`; no real approval line, approval request submission, approval grant, live VCPToolBox target discovery, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_MEMORY_OBSERVE_LITE_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1725 M6-K4 VCP memory observe-lite runtime abort receipt skeleton: added `docs/VCP_MEMORY_OBSERVE_LITE_RUNTIME_ABORT_RECEIPT_SKELETON.md`. The skeleton defines low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-live-proof conclusion. Current result is `abort_receipt_skeleton_ready_no_runtime`. No real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
 CM-1724 M6-K3 VCP memory observe-lite exact approval request display boundary: added `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`. The boundary defines display state, required future inputs, non-authorizing display template, display stop rules, current display result, and receipt skeleton. Current decision is `not_display_ready_as_exact_request` because exact target, transport, client, scope, visibility, and budget fields remain unset. No real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
