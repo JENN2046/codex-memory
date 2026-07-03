@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1727 M7-K0 VCP memory observe-full blocked precondition record |
-| Current task | `CM-1727 M7-K0 VCP memory observe-full blocked precondition record` |
-| Current validation | `CMV-1830` |
-| Current route | Docs-only M7 blocked precondition record; M7 read-shape proof not started; M8 not unlocked; no approval line or live runtime execution |
+| Status | CM-1728 M7-K1 VCP memory observe-full exact approval packet preparation |
+| Current task | `CM-1728 M7-K1 VCP memory observe-full exact approval packet preparation` |
+| Current validation | `CMV-1831` |
+| Current route | Docs-only M7 exact approval packet preparation; real query omitted; M7 read-shape proof not started; M8 not unlocked; no approval line or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1728` adds `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_PACKET_PREPARATION.md`. It defines a non-authorizing packet state, exact fields required later from Jenn, future allowed action boundary, forbidden actions, stop conditions, receipt skeleton, and review gate for observe-full read-shape proof. Boundary: real query `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read-shape query `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M8 unlock `NO`.
 
 `CM-1727` adds `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_PRECONDITION_RECORD.md`. It records that M7 read-shape proof is blocked before runtime because accepted M6 observe-lite receipt and exact Jenn read-shape approval are missing. Boundary: real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read-shape query `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M8 unlock `NO`.
 

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1727 M7-K0 VCP memory observe-full blocked precondition record`.
-Current validation: `CMV-1830`.
-Current status: CM-1727 records the docs-only M7 blocked precondition record. M7 read-shape proof is not started, accepted M6 receipt is missing, exact Jenn read-shape approval is missing, and M8 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1728 M7-K1 VCP memory observe-full exact approval packet preparation`.
+Current validation: `CMV-1831`.
+Current status: CM-1728 records the docs-only non-authorizing M7 observe-full exact approval packet preparation. The packet omits real query values, accepted M6 receipt is missing, exact Jenn read-shape approval is missing, read-shape proof is not started, and M8 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M7 exact approval packet preparation without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
+Next safe local action is M7 exact approval decision/review boundary without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

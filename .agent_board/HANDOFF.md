@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1727 M7-K0 VCP memory observe-full blocked precondition record`.
-Current validation: `CMV-1830`.
-Current handoff: CM-1727 completed the docs-only M7 blocked precondition record. M7 read-shape proof is not started, accepted M6 receipt is missing, exact Jenn read-shape approval is missing, and M8 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1728 M7-K1 VCP memory observe-full exact approval packet preparation`.
+Current validation: `CMV-1831`.
+Current handoff: CM-1728 completed the docs-only non-authorizing M7 observe-full exact approval packet preparation. The packet omits real query values, accepted M6 receipt is missing, exact Jenn read-shape approval is missing, read-shape proof is not started, and M8 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M7-K0 Observe-Full Blocked Precondition Record` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M7-K1 Observe-Full Exact Approval Packet Preparation` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M7_K0_VCP_MEMORY_OBSERVE_FULL_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M7_K1_VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_PACKET_PREPARATION.md`
 - `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_PRECONDITION_RECORD.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_M6_BLOCKED_CLOSEOUT_SUMMARY.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_RUNTIME_ABORT_RECEIPT_SKELETON.md`
@@ -34,14 +35,14 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added M7 blocked precondition record.
-- Recorded M7 is blocked before runtime because accepted M6 observe-lite receipt and exact Jenn read-shape approval are missing.
-- Defined future exact approval requirements and M7/M8 non-claims.
+- Added non-authorizing M7 observe-full exact approval packet preparation.
+- Defined packet state, exact fields required later from Jenn, future allowed action boundary, forbidden actions, stop conditions, receipt skeleton, and review gate.
+- Preserved that real query values are omitted, accepted M6 receipt is missing, exact Jenn read-shape approval is missing, read-shape proof is not started, and M8 is not unlocked.
 - Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read-shape query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M8 unlock occurred.
 
-Validation: `CMV-1830`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1831`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M7 exact approval packet preparation without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
+Next safe route: M7 exact approval decision/review boundary without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 
