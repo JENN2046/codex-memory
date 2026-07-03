@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1759 M12-K1 VCP memory Codex Claude sustained workflow envelope contract`.
-Current validation: `CMV-1862`.
-Current handoff: CM-1759 adds a pure fixture/schema helper and targeted tests for the M12 Codex/Claude sustained workflow envelope contract while preserving that live M12 workflow remains blocked until accepted M8 and M11 live evidence exists. No workflow harness, workflow steps, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, checkpoint/handoff memory write, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1760 M12-K2 VCP memory Codex Claude sustained workflow receipt chain contract`.
+Current validation: `CMV-1863`.
+Current handoff: CM-1760 adds a pure fixture/schema helper and targeted tests for the M12 Codex/Claude sustained workflow receipt-chain contract while preserving that live M12 workflow remains blocked until accepted M8 and M11 live evidence exists. No workflow harness, workflow steps, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, checkpoint/handoff receipt write, checkpoint/handoff memory write, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M12-K1 Codex Claude Sustained Workflow Envelope Contract` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M12-K2 Codex Claude Sustained Workflow Receipt Chain Contract` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M12_K1_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_ENVELOPE_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M12_K2_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_RECEIPT_CHAIN_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpMemoryCodexClaudeSustainedWorkflowReceiptChainContract.js`
+- `tests/vcp-memory-codex-claude-sustained-workflow-receipt-chain-contract.test.js`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_RECEIPT_CHAIN_CONTRACT.md`
 - `src/core/VcpMemoryCodexClaudeSustainedWorkflowEnvelopeContract.js`
 - `tests/vcp-memory-codex-claude-sustained-workflow-envelope-contract.test.js`
 - `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_ENVELOPE_CONTRACT.md`
@@ -70,19 +73,19 @@ Current entrypoints:
 - `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION.md`
 
-Completed in this slice:
+Completed in this slice so far:
 
-- Added `src/core/VcpMemoryCodexClaudeSustainedWorkflowEnvelopeContract.js`.
-- Added `tests/vcp-memory-codex-claude-sustained-workflow-envelope-contract.test.js`.
-- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_ENVELOPE_CONTRACT.md`.
-- Covered accepted Codex private and Claude shared fixture workflow envelopes.
-- Covered cross-client private access as L4 stop without memory read and missing client/scope as deny fixture.
-- Covered rejection of success-like missing scope, runtime/MCP/checkpoint/handoff write plans, positive side-effect counters, raw/secret/approval/readiness fields, and side-effect posture drift.
-- Confirmed no workflow harness, workflow step execution, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, checkpoint memory write, handoff memory write, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable audit/runtime write, memory write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
+- Added `src/core/VcpMemoryCodexClaudeSustainedWorkflowReceiptChainContract.js`.
+- Added `tests/vcp-memory-codex-claude-sustained-workflow-receipt-chain-contract.test.js`.
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_RECEIPT_CHAIN_CONTRACT.md`.
+- Covered accepted Codex private and Claude shared fixture receipt chains.
+- Covered stopped L4 and denied workflow envelopes as low-disclosure receipt chains without memory read/write.
+- Covered rejection of invalid envelope contracts, envelope id/decision drift, checkpoint/handoff/audit writes, positive side-effect counters, raw/approval/readiness fields, and side-effect posture drift.
+- Confirmed no workflow harness, workflow step execution, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, checkpoint receipt write, handoff receipt write, checkpoint memory write, handoff memory write, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable audit/runtime write, memory write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
 
-Validation: `CMV-1862`; targeted node test, `npm test`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review.
+Validation: `CMV-1863`; targeted node test, `npm test`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review.
 
-Next safe route: focused source review of the M12 envelope contract or fixture-only receipt-chain contract without runtime/workflow execution/MCP tool calls/memory read/write/checkpoint-handoff memory writes, or wait for accepted M8 and M11 live evidence. Push remains separate explicit authorization.
+Next safe route: finish CM-1760 broader validation and guarded commit, then focused source review or M12 fixture-chain blocked closeout without runtime/workflow execution/MCP tool calls/memory read/write/checkpoint-handoff receipt or memory writes. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

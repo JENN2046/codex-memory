@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1759 M12-K1 VCP memory Codex Claude sustained workflow envelope contract`.
-Current validation: `CMV-1862`.
+Current checkpoint: `CM-1760 M12-K2 VCP memory Codex Claude sustained workflow receipt chain contract`.
+Current validation: `CMV-1863`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1760 M12-K2 VCP Memory Codex Claude Sustained Workflow Receipt Chain Contract
+
+Status: `COMPLETED_VALIDATED_M12_K2_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_RECEIPT_CHAIN_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryCodexClaudeSustainedWorkflowReceiptChainContract.js`.
+- Added `tests/vcp-memory-codex-claude-sustained-workflow-receipt-chain-contract.test.js`.
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_RECEIPT_CHAIN_CONTRACT.md`.
+- Covered accepted Codex private and Claude shared fixture-only receipt chains.
+- Covered stopped L4 and denied workflow envelopes as low-disclosure receipt chains without memory read/write.
+- Covered rejection of invalid envelope contracts, envelope id/decision drift, checkpoint/handoff/audit writes, positive side-effect counters, raw/approval/readiness fields, and side-effect posture drift.
+- Preserved that no workflow harness, workflow steps, MCP tool call, VCPToolBox runtime call, target probing, memory read/write/update/supersede/tombstone, checkpoint/handoff receipt write, checkpoint/handoff memory write, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1863`; targeted node test, `npm test`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review.
 
 ## CM-1759 M12-K1 VCP Memory Codex Claude Sustained Workflow Envelope Contract
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1759",
-  "validationId": "CMV-1862",
+  "taskId": "CM-1760",
+  "validationId": "CMV-1863",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_envelope_contract_fixture_only",
+    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_receipt_chain_contract_fixture_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1863",
+      "scope": "CM-1760 M12-K2 VCP memory Codex Claude sustained workflow receipt chain contract",
+      "status": "COMPLETED_VALIDATED_M12_K2_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_RECEIPT_CHAIN_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1862",
       "scope": "CM-1759 M12-K1 VCP memory Codex Claude sustained workflow envelope contract",
