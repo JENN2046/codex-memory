@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1813 M8 workflow receipt closeout gate review`.
-Current validation: `CMV-1916`.
-Current project status: CM-1813 accepted CM-1812 as the narrow M8 trusted-full-read workflow proof. CM-1812 evidence is limited to two bounded read-only workflow steps, `http_2xx` statuses, JSON parse `ok`, shape-only projection, distinct receipt-scope client aliases, no raw private output, no memory write, and independent post-stop process counts zero. Runtime-enforced client isolation, recall quality, proposal behavior, durable write behavior, release readiness, cutover readiness, `RC_READY`, complete V8, and full bridge completion are not proven. M9 preparation can open; M9 proposal generation/submission, approval-line generation, durable write, M10, M15, release/deploy/cutover/push, readiness, and `RC_READY` remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_FULL_READ_CM1813_WORKFLOW_RECEIPT_CLOSEOUT_M9_PREPARATION_ONLY_NO_RUNTIME_NO_WRITE_NO_READINESS`.
+Current task: `CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance`.
+Current validation: `CMV-1917`.
+Current project status: CM-1814 refreshed M9 preconditions after CM-1813 accepted the narrow M8 workflow proof. Accepted M8 trusted-full-read workflow evidence now exists for planning via CM-1812/CM-1813, but exact `trusted-write-proposal` boundary, exact proposal fields, proposal review route, L4 write-intent shield evidence, approval line, proposal generation/submission authorization, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1814_PRECONDITION_REFRESH_M8_ACCEPTED_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1814_PRECONDITION_REFRESH_AFTER_M8_ACCEPTANCE.md`. It records the current delta from the older CM-1740 through CM-1746 M9 blocked chain: accepted M8 trusted-full-read workflow receipt is now present for planning, but exact `trusted-write-proposal` execution boundary, exact target/transport/client/scope/visibility/proposal-operation/review-route/rollback/budget fields, L4 write-intent shield evidence, approval line, proposal generation/submission authorization, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain `NO`. Next safe route is CM-1815 M9 trusted-write-proposal exact approval packet refresh.
 
 CM-1813 M8 workflow receipt closeout gate review: added `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1813_WORKFLOW_RECEIPT_CLOSEOUT_GATE_REVIEW.md`. It accepts CM-1812 as the narrow M8 trusted-full-read workflow proof: workflow steps `2`; both step statuses `http_2xx`; both response JSON parses `ok`; shape-only projection; receipt-scope client aliases distinct `YES`; runtime client isolation claimed `NO`; raw response values printed/persisted `NO`; runtime logs/config/env/secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion `NO`; independent post-stop process counts `0`. M9 preparation can open, but proposal generation/submission, approval-line generation, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain `NO`. Next safe route is CM-1814 M9 trusted-write-proposal precondition refresh.
 

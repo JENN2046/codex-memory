@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1813 M8 workflow receipt closeout gate review`.
-Current validation: `CMV-1916`.
-Current status: CM-1813 accepted CM-1812 as the narrow M8 trusted-full-read workflow proof: two bounded read-only workflow steps, `http_2xx` statuses, JSON parse `ok`, shape-only projection, distinct receipt-scope client aliases, no raw private output, no memory write, and independent post-stop process counts zero. Runtime-enforced client isolation, recall quality, proposal behavior, durable write behavior, release readiness, cutover readiness, `RC_READY`, complete V8, and full bridge completion are not proven. M9 preparation can open; M9 proposal generation/submission, approval-line generation, durable write, M10, M15, release/deploy/cutover/push, readiness, and `RC_READY` remain blocked.
+Current task: `CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance`.
+Current validation: `CMV-1917`.
+Current status: CM-1814 refreshed M9 preconditions after accepted M8 evidence. Accepted M8 trusted-full-read workflow evidence now exists for planning via CM-1812/CM-1813, but the exact `trusted-write-proposal` boundary, exact proposal fields, proposal review route, L4 write-intent shield evidence, approval line, proposal generation/submission authorization, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1814 M9 trusted-write-proposal precondition refresh. It should reconcile older M9 blocked artifacts with the accepted CM-1812/CM-1813 M8 proof while keeping proposal generation, proposal submission, real approval-line generation, runtime execution, memory read by agent, durable write, provider/API, public MCP expansion, M10, M15, release, deploy, cutover, push, readiness, `RC_READY`, complete V8, and full bridge completion blocked. Push remains separate explicit authorization.
+Next safe action is CM-1815 M9 trusted-write-proposal exact approval packet refresh. It may update a non-authorizing packet shape to reference the accepted M8 evidence, but it must keep exact proposal fields unset unless supplied by a separate exact boundary and must not generate approval lines, submit requests, generate proposals, execute runtime, read memory by agent, write memory, call providers/APIs, expand public MCP, unlock M10/M15, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

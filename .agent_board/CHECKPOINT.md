@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1813 M8 workflow receipt closeout gate review`.
-Current validation: `CMV-1916`.
+Current checkpoint: `CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance`.
+Current validation: `CMV-1917`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1814 M9 Trusted-Write-Proposal Precondition Refresh After M8 Acceptance
+
+Status: `COMPLETED_VALIDATED_M9_PRECONDITION_REFRESH_M8_ACCEPTED_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1814_PRECONDITION_REFRESH_AFTER_M8_ACCEPTANCE.md`.
+- Refreshed M9 preconditions after CM-1813 accepted the narrow M8 trusted-full-read workflow proof.
+- Recorded that accepted M8 evidence now exists for planning via CM-1812/CM-1813.
+- Preserved that exact `trusted-write-proposal` execution boundary, exact proposal fields, proposal review route, L4 write-intent shield evidence, approval line, proposal generation/submission authorization, runtime execution, memory read by agent, durable write, M10, M15, and readiness remain absent or blocked.
+- Confirmed CM-1814 performed no runtime action, proposal generation, proposal submission, approval-line generation, approval request submission, memory read by agent, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, M10 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1917`; plan M9 entry/exit review, CM-1813 closeout review, historical M9 artifacts CM-1740 through CM-1746 review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1813 M8 Workflow Receipt Closeout Gate Review
 
