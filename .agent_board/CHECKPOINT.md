@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract`.
-Current validation: `CMV-1929`.
+Current checkpoint: `CM-1827 M9 packet skeleton closeout / request-boundary gate review`.
+Current validation: `CMV-1930`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1827 M9 Packet Skeleton Closeout / Request-Boundary Gate Review
+
+Status: `COMPLETED_VALIDATED_M9_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1827_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW.md`.
+- Reviewed CM-1825 route decision and CM-1826 packet skeleton fixture contract.
+- Closed only the local non-authorizing packet skeleton preparation slice.
+- Preserved that exact request field packet, request submission, approval-line generation, proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1828 M9 exact request field candidate selection preflight.
+
+Validation: `CMV-1930`; CM-1825/CM-1826 review, M9/M10 plan review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1826 M9 Non-Authorizing Exact-Boundary Packet Skeleton Fixture Contract
 

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract`.
-Current validation: `CMV-1929`.
-Current project status: CM-1826 added a pure source/test contract for the non-authorizing M9 exact-boundary packet skeleton. The local packet skeleton shape is validated, but full M9 proposal mode, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1826_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1827 M9 packet skeleton closeout / request-boundary gate review`.
+Current validation: `CMV-1930`.
+Current project status: CM-1827 closed only the local non-authorizing packet skeleton preparation slice. Full M9 proposal mode, exact request field packet, request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1827_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1827 M9 packet skeleton closeout / request-boundary gate review: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1827_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW.md`. It reviews CM-1825 and CM-1826 and closes only the local non-authorizing packet skeleton preparation slice. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1828 M9 exact request field candidate selection preflight.
 
 CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract: added `src/core/VcpMemoryTrustedWriteProposalExactBoundaryPacketSkeletonContract.js`, `tests/vcp-memory-trusted-write-proposal-exact-boundary-packet-skeleton-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1826_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3746/3746`. The helper validates only non-authorizing packet skeleton shape, accepts planning evidence from M8 and CM-1821/CM-1822/CM-1823/CM-1824, declares missing exact fields, routes request/proposal/runtime/write/M10/readiness claims to `stop_l4`, rejects raw/secret/request/approval/readiness fields without echo, and reports no runtime/write side effects. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1827 M9 exact-boundary packet skeleton closeout / request-boundary gate review.
 

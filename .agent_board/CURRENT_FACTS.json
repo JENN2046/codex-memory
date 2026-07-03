@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1826",
-  "validationId": "CMV-1929",
+  "taskId": "CM-1827",
+  "validationId": "CMV-1930",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_exact_boundary_packet_skeleton_fixture_contract",
+    "scope": "vcp_memory_trusted_write_proposal_m9_packet_skeleton_closeout_request_boundary_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1930",
+      "scope": "CM-1827 M9 packet skeleton closeout / request-boundary gate review",
+      "status": "COMPLETED_VALIDATED_M9_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1929",
       "scope": "CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract",
