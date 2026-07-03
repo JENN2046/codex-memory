@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1752 M10-K5 VCP memory bounded mutation runtime abort receipt skeleton`.
-Current validation: `CMV-1855`.
+Current checkpoint: `CM-1753 M10-K6 VCP memory bounded mutation blocked closeout summary`.
+Current validation: `CMV-1856`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1753 M10-K6 VCP Memory Bounded Mutation Blocked Closeout Summary
+
+Status: `COMPLETED_VALIDATED_M10_K6_VCP_MEMORY_BOUNDED_MUTATION_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_BOUNDED_MUTATION_M10_BLOCKED_CLOSEOUT_SUMMARY.md`.
+- Closed the safe docs-only M10 preparation chain covering CM-1747 through CM-1752.
+- Recorded that M10 bounded mutation evidence remains incomplete and blocked before request submission, approval-line generation, runtime, and durable mutation.
+- Preserved that accepted M9 proposal receipts, exact Jenn M10 write boundary, exact mutation fields, rollback posture, and audit receipt plan are absent.
+- Preserved that request submission, approval-line generation, runtime, write/update/supersede/tombstone execution, durable write, memory write/update/supersede/tombstone, mutation receipt, rollback audit, bounded write safety, M11 unlock by M10, and readiness claim did not occur.
+
+Validation: `CMV-1856`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1752 M10-K5 VCP Memory Bounded Mutation Runtime Abort Receipt Skeleton
 

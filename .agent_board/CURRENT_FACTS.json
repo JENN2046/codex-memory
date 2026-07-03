@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1752",
-  "validationId": "CMV-1855",
+  "taskId": "CM-1753",
+  "validationId": "CMV-1856",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_bounded_mutation_runtime_abort_receipt_skeleton_docs_only",
+    "scope": "vcp_memory_bounded_mutation_m10_blocked_closeout_summary_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1856",
+      "scope": "CM-1753 M10-K6 VCP memory bounded mutation blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M10_K6_VCP_MEMORY_BOUNDED_MUTATION_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1855",
       "scope": "CM-1752 M10-K5 VCP memory bounded mutation runtime abort receipt skeleton",
