@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1730 M7-K3 VCP memory observe-full exact approval request display boundary |
-| Current task | `CM-1730 M7-K3 VCP memory observe-full exact approval request display boundary` |
-| Current validation | `CMV-1833` |
-| Current route | Docs-only M7 exact approval request display boundary; accepted M6 receipt, exact read approval, and query absent; M7 read-shape proof not started; M8 not unlocked; no approval line or live runtime execution |
+| Status | CM-1731 M7-K4 VCP memory observe-full runtime abort receipt skeleton |
+| Current task | `CM-1731 M7-K4 VCP memory observe-full runtime abort receipt skeleton` |
+| Current validation | `CMV-1834` |
+| Current route | Docs-only M7 runtime abort receipt skeleton; accepted M6 receipt, exact read approval, and query absent; M7 read-shape proof not started; M8 not unlocked; no approval line or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1731` adds `docs/VCP_MEMORY_OBSERVE_FULL_RUNTIME_ABORT_RECEIPT_SKELETON.md`. It defines low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-live-proof conclusion. Current result is `abort_receipt_skeleton_ready_no_runtime`. Boundary: accepted M6 receipt `NO`; exact Jenn read-shape approval `NO`; exact bounded query `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read-shape query `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M8 unlock `NO`.
 
 `CM-1730` adds `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`. It defines a non-authorizing display state, required future inputs, display template, stop rules, current display result, and receipt skeleton. Current decision is `not_display_ready_missing_m6_receipt_and_exact_read_approval`. Boundary: accepted M6 receipt `NO`; exact Jenn read-shape approval `NO`; exact bounded query `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read-shape query `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M8 unlock `NO`.
 

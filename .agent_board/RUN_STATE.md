@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1730 M7-K3 VCP memory observe-full exact approval request display boundary`.
-Current validation: `CMV-1833`.
-Current status: CM-1730 records the docs-only non-authorizing M7 observe-full exact approval request display boundary. Current decision is `not_display_ready_missing_m6_receipt_and_exact_read_approval`; accepted M6 receipt, exact Jenn read-shape approval, and exact bounded query remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1731 M7-K4 VCP memory observe-full runtime abort receipt skeleton`.
+Current validation: `CMV-1834`.
+Current status: CM-1731 records the docs-only non-authorizing M7 observe-full runtime abort receipt skeleton. Current result is `abort_receipt_skeleton_ready_no_runtime`; accepted M6 receipt, exact Jenn read-shape approval, and exact bounded query remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M7 abort receipt skeleton without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
+Next safe local action is M7 blocked closeout summary without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
