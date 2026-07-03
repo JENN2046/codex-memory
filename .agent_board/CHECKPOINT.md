@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1815 M9 trusted-write-proposal exact approval packet refresh`.
-Current validation: `CMV-1918`.
+Current checkpoint: `CM-1816 M9 trusted-write-proposal exact approval decision review refresh`.
+Current validation: `CMV-1919`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1816 M9 Trusted-Write-Proposal Exact Approval Decision Review Refresh
+
+Status: `COMPLETED_VALIDATED_M9_DECISION_REVIEW_REFRESH_DISPLAY_ONLY_NO_REQUEST_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_EXACT_APPROVAL_DECISION_REVIEW_REFRESH.md`.
+- Reviewed the refreshed CM-1815 packet shape.
+- Selected `eligible_for_non_authorizing_request_display_refresh_not_submission`.
+- Confirmed accepted M8 evidence exists for planning and the packet can feed a future display refresh.
+- Preserved that exact proposal boundary, exact fields, proposal review route, L4 write-intent shield, approval line, request submission, proposal generation/submission, runtime, memory read by agent, durable write, M10, M15, and readiness remain blocked.
+- Confirmed CM-1816 performed no runtime action, proposal generation, proposal submission, approval-line generation, approval request submission, memory read by agent, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, M10 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1919`; CM-1815 packet review, CM-1743 historical decision review, M9 entry/exit review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1815 M9 Trusted-Write-Proposal Exact Approval Packet Refresh
 

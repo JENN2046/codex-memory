@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1815 M9 trusted-write-proposal exact approval packet refresh |
-| Current task | `CM-1815 M9 trusted-write-proposal exact approval packet refresh` |
-| Current validation | `CMV-1918` |
-| Current route | M9 packet refresh complete; next route is CM-1816 exact approval decision review refresh |
+| Status | CM-1816 M9 trusted-write-proposal exact approval decision review refresh |
+| Current task | `CM-1816 M9 trusted-write-proposal exact approval decision review refresh` |
+| Current validation | `CMV-1919` |
+| Current route | M9 decision review refreshed; next route is CM-1817 non-authorizing request display refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1816` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_EXACT_APPROVAL_DECISION_REVIEW_REFRESH.md`. It reviews the refreshed CM-1815 packet and selects `eligible_for_non_authorizing_request_display_refresh_not_submission`. Accepted M8 evidence exists for planning and the packet can feed a future display refresh, but exact proposal boundary, exact fields, proposal review route, L4 write-intent shield, approval line, request submission, proposal generation/submission, runtime, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1817 M9 non-authorizing request display refresh.
 
 `CM-1815` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1815_EXACT_APPROVAL_PACKET_REFRESH.md`. It refreshes the non-authorizing M9 exact approval packet shape so accepted M8 evidence can be referenced in future packet preparation. Exact target, transport, client, scope, visibility, proposal operations, review route, rollback posture, budgets, and output disclosure remain unset until a separate exact boundary supplies them. Approval-line generation, approval request submission, proposal generation/submission, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1816 M9 exact approval decision review refresh.
 

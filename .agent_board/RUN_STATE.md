@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1815 M9 trusted-write-proposal exact approval packet refresh`.
-Current validation: `CMV-1918`.
-Current status: CM-1815 refreshed the non-authorizing M9 exact approval packet shape so accepted M8 evidence can be referenced for future packet preparation. Exact target, transport, client, scope, visibility, proposal operations, review route, rollback posture, budgets, and output disclosure remain unset until a separate exact boundary supplies them. Approval-line generation, approval request submission, proposal generation/submission, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+Current task: `CM-1816 M9 trusted-write-proposal exact approval decision review refresh`.
+Current validation: `CMV-1919`.
+Current status: CM-1816 reviewed the refreshed CM-1815 packet and selected `eligible_for_non_authorizing_request_display_refresh_not_submission`. Accepted M8 evidence exists for planning and the packet can feed a future display refresh, but exact proposal boundary, exact fields, proposal review route, L4 write-intent shield, approval line, request submission, proposal generation/submission, runtime, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1816 M9 exact approval decision review refresh. It should review the refreshed packet and decide whether it is ready only for a future non-authorizing request display. It must not submit requests, generate approval lines, generate proposals, execute runtime, read memory by agent, write memory, call providers/APIs, expand public MCP, unlock M10/M15, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1817 M9 non-authorizing request display refresh. It should display accepted M8 references and missing exact fields without submitting a request, generating approval lines, generating proposals, executing runtime, reading memory by agent, writing memory, calling providers/APIs, expanding public MCP, unlocking M10/M15, or claiming readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

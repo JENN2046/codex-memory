@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1815 M9 trusted-write-proposal exact approval packet refresh`.
-Current validation: `CMV-1918`.
-Current project status: CM-1815 refreshed the non-authorizing M9 exact approval packet shape so accepted M8 evidence can be referenced in future packet preparation. Exact target, transport, client, scope, visibility, proposal operations, review route, rollback posture, budgets, and output disclosure remain unset until a separate exact boundary supplies them. Approval-line generation, approval request submission, proposal generation/submission, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1815_PACKET_REFRESH_M8_PRESENT_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1816 M9 trusted-write-proposal exact approval decision review refresh`.
+Current validation: `CMV-1919`.
+Current project status: CM-1816 reviewed the refreshed CM-1815 packet and selected `eligible_for_non_authorizing_request_display_refresh_not_submission`. Accepted M8 evidence exists for planning and the packet can feed a future display refresh, but exact proposal boundary, exact fields, proposal review route, L4 write-intent shield, approval line, request submission, proposal generation/submission, runtime, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_DECISION_REVIEW_REFRESH_DISPLAY_ONLY_NO_REQUEST_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1816 M9 trusted-write-proposal exact approval decision review refresh: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_EXACT_APPROVAL_DECISION_REVIEW_REFRESH.md`. It reviews CM-1815 and selects `eligible_for_non_authorizing_request_display_refresh_not_submission`: accepted M8 evidence exists for planning and a non-authorizing display refresh may be prepared, but exact proposal boundary, exact target/transport/client/scope/visibility/proposal-operation/review-route/rollback/budget fields, L4 write-intent shield evidence, approval line, approval request submission, proposal generation/submission, runtime execution, memory read by agent, durable write, M10, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain `NO`. Next safe route is CM-1817 M9 non-authorizing request display refresh.
 
 CM-1815 M9 trusted-write-proposal exact approval packet refresh: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1815_EXACT_APPROVAL_PACKET_REFRESH.md`. It refreshes the non-authorizing packet shape so accepted M8 evidence can be referenced, while exact target/transport/client/scope/visibility/proposal-operation/review-route/rollback/budget/output fields remain unset. It does not submit approval, generate approval line, bind target, generate/submit proposal, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1816 M9 exact approval decision review refresh.
 
