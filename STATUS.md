@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1731 M7-K4 VCP memory observe-full runtime abort receipt skeleton`.
-Current validation: `CMV-1834`.
-Current project status: CM-1731 records the docs-only non-authorizing M7 observe-full runtime abort receipt skeleton. Current result is `abort_receipt_skeleton_ready_no_runtime`; accepted M6 receipt, exact Jenn read-shape approval, and exact bounded query remain absent, read-shape proof is unstarted, and M8 is locked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `VCP_MEMORY_OBSERVE_FULL_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`.
+Current task: `CM-1732 M7-K5 VCP memory observe-full blocked closeout summary`.
+Current validation: `CMV-1835`.
+Current project status: CM-1732 closes the safe docs-only M7 preparation chain while recording that M7 read-shape proof remains incomplete and blocked. Accepted M6 receipt, exact Jenn read-shape approval, and exact bounded query remain absent, read-shape proof is unstarted, and M8 is locked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1732 M7-K5 VCP memory observe-full blocked closeout summary: added `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_CLOSEOUT_SUMMARY.md`. The closeout records CM-1727 through CM-1731 as the completed docs-only M7 preparation chain, lists unresolved live proof blockers, states M7 read-shape proof is incomplete, and states M8 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read-shape query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M8 unlock occurred.
 
 CM-1731 M7-K4 VCP memory observe-full runtime abort receipt skeleton: added `docs/VCP_MEMORY_OBSERVE_FULL_RUNTIME_ABORT_RECEIPT_SKELETON.md`. The skeleton defines low-disclosure abort reason vocabulary, future abort receipt shape, skeleton self-check, current skeleton result, and no-live-proof conclusion. Current result is `abort_receipt_skeleton_ready_no_runtime`; accepted M6 receipt, exact Jenn read-shape approval, and exact bounded query remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read-shape query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M8 unlock occurred.
 
