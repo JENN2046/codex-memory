@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1782 M15-K3 VCP memory risk review skeleton |
-| Current task | `CM-1782 M15-K3 VCP memory risk review skeleton` |
-| Current validation | `CMV-1885` |
-| Current route | M15 risk review skeleton exists, but risk review is not satisfied and P0/P1 risks remain open or blocked because live evidence and dedicated RC review approval are absent; next safe action is a non-authorizing RC review approval packet readiness boundary, not RC approval, release, deploy, cutover, dashboard runtime, private reads, raw stores, real query, provider/API, approval line, or readiness |
+| Status | CM-1783 M15-K4 VCP memory RC review approval packet readiness boundary |
+| Current task | `CM-1783 M15-K4 VCP memory RC review approval packet readiness boundary` |
+| Current validation | `CMV-1886` |
+| Current route | M15 RC review approval packet readiness boundary exists, but packet_ready, approval_request_ready, approval_line_present, approval_line_generated, approval_granted, rc_review_authorized, rc_gate_ready, and M15 opened are all false; next safe action is an M15 blocked closeout summary, not RC approval, release, deploy, cutover, dashboard runtime, private reads, raw stores, real query, provider/API, approval line, or readiness |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1783` adds `docs/VCP_MEMORY_M15_RC_REVIEW_APPROVAL_PACKET_READINESS_BOUNDARY.md`. It defines the readiness boundary for a future dedicated M15 RC review approval packet while recording that the packet is not ready. Boundary: readiness boundary created `YES`; packet ready `NO`; approval request ready `NO`; approval line present `NO`; approval line generated `NO`; approval granted `NO`; RC review authorized `NO`; RC gate report created `NO`; RC gate ready `NO`; M15 opened `NO`; risk review satisfied `NO`; no P0/P1 open risk `NO`; M0-M14 live evidence complete `NO`; live proof chain complete `NO`; docs match live runtime evidence `NO`; dedicated RC review approval present `NO`; source runtime behavior changed `NO`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; release/tag/deploy/cutover performed `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m15_blocked_closeout_summary`.
 
 `CM-1782` adds `docs/VCP_MEMORY_M15_RISK_REVIEW_SKELETON.md`. It defines the risk review shape required before any future M15 RC gate review and records that risk review is not satisfied. Boundary: risk review skeleton created `YES`; risk review satisfied `NO`; no P0/P1 open risk `NO`; P0 risks open `YES`; P1 risks open `YES`; risk closure claimed `NO`; RC gate report created `NO`; RC gate ready `NO`; M15 opened `NO`; M0-M14 live evidence complete `NO`; live proof chain complete `NO`; docs match live runtime evidence `NO`; dedicated RC review approval present `NO`; approval request submitted `NO`; approval line generated `NO`; source runtime behavior changed `NO`; dashboard runtime implemented `NO`; dashboard CLI called `NO`; VCPToolBox runtime `NO`; MCP memory tool call `NO`; private runtime read `NO`; raw store read `NO`; real query `NO`; provider/API `NO`; memory read/write `NO`; durable audit/runtime write `NO`; public MCP expansion `NO`; release/tag/deploy/cutover performed `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`; next safe route `m15_rc_review_approval_packet_readiness_boundary`.
 
