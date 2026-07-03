@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review |
-| Current task | `CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review` |
-| Current validation | `CMV-1864` |
-| Current route | M12 fixture helper/test source review is completed and validated; live workflow integration remains blocked by incomplete M8/M11 live evidence; next safe action is M12 fixture-chain blocked closeout, not runtime or checkpoint/handoff memory write |
+| Status | CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout |
+| Current task | `CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout` |
+| Current validation | `CMV-1865` |
+| Current route | M12 fixture/schema chain is closed and validated; live workflow integration remains blocked by incomplete M8/M11 live evidence; next safe action is M13 fallback local memory hardening precondition review, not runtime or checkpoint/handoff memory write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1762` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes the safe M12 fixture/schema chain covering CM-1758 through CM-1761 while preserving that full M12 live workflow exit conditions remain blocked. Boundary: docs fixture chain complete `YES`; fixture contracts implemented `YES`; executable fixture tests `17`; targeted fixture tests passed `YES`; combined source review tests passed `YES`; previous full `npm test` passed for executable chain `YES`; M12 exit conditions completed `NO`; governed MCP workflows live-proven `NO`; checkpoint/handoff memory receipts live-auditable `NO`; Codex/Claude private memories isolated live `NO`; Codex/Claude private memories isolated fixture-only `YES`; workflow harness started `NO`; workflow steps executed `0`; workflow integration proven `NO`; workflow receipts accepted `NO`; M8 trusted-full-read evidence complete `NO`; M11 live response/receipt evidence complete `NO`; VCPToolBox runtime `NO`; target discovery/probing `NO`; MCP tool call for M12 evidence `NO`; memory read/write/update/supersede/tombstone `NO`; checkpoint/handoff receipt write `NO`; checkpoint/handoff memory write `NO`; durable audit/runtime write `NO`; provider/API `NO`; approval request submitted `NO`; approval line present/generated `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1761` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_SOURCE_REVIEW.md`. It reviews the M12 envelope and receipt-chain helper/test scope after CM-1759 and CM-1760. Boundary: reviewed helper/test files `4`; combined targeted tests `17`; targeted test passed `YES`; no actionable findings in changed scope `YES`; direct filesystem access found `NO`; child process found `NO`; fetch/http/https found `NO`; process env access found `NO`; MCP memory tool call found `NO`; runtime wiring found `NO`; workflow harness start found `NO`; VCPToolBox runtime `NO`; checkpoint/handoff receipt write `NO`; checkpoint/handoff memory write `NO`; durable audit/runtime write `NO`; provider/API `NO`; approval request submitted `NO`; approval line generated `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

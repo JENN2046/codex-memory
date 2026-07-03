@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1761",
-  "validationId": "CMV-1864",
+  "taskId": "CM-1762",
+  "validationId": "CMV-1865",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_source_review",
+    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_blocked_closeout",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1865",
+      "scope": "CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout",
+      "status": "COMPLETED_VALIDATED_M12_K4_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1864",
       "scope": "CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review",

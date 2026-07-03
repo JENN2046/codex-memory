@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review`.
-Current validation: `CMV-1864`.
-Current handoff: CM-1761 records a focused source review for the M12 Codex/Claude sustained workflow envelope and receipt-chain fixture helpers/tests while preserving that live M12 workflow remains blocked until accepted M8 and M11 live evidence exists. No workflow harness, workflow steps, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, checkpoint/handoff receipt write, checkpoint/handoff memory write, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout`.
+Current validation: `CMV-1865`.
+Current handoff: CM-1762 closes the safe M12 fixture/schema Codex/Claude sustained workflow chain while preserving that live M12 workflow remains blocked until accepted M8 and M11 live evidence exists. No workflow harness, workflow steps, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, checkpoint/handoff receipt write, checkpoint/handoff memory write, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M12-K3 Codex Claude Sustained Workflow Source Review` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M12-K4 Codex Claude Sustained Workflow Blocked Closeout` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M12_K3_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_SOURCE_REVIEW_NO_ACTIONABLE_FINDINGS_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M12_K4_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_BLOCKED_CLOSEOUT_SUMMARY.md`
 - `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_SOURCE_REVIEW.md`
 - `src/core/VcpMemoryCodexClaudeSustainedWorkflowReceiptChainContract.js`
 - `tests/vcp-memory-codex-claude-sustained-workflow-receipt-chain-contract.test.js`
@@ -74,17 +75,17 @@ Current entrypoints:
 - `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION.md`
 
-Completed in this slice so far:
+Completed in this slice:
 
-- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_SOURCE_REVIEW.md`.
-- Reviewed M12 envelope and receipt-chain fixture helpers/tests.
-- Targeted M12 tests passed `17/17`.
-- Source scan found no direct filesystem, child process, fetch/http/https, process env, MCP memory tool call, runtime wiring, workflow harness start, VCPToolBox call, checkpoint/handoff memory write, durable audit write, approval-line generation, or readiness claim path in the helper source.
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_BLOCKED_CLOSEOUT_SUMMARY.md`.
+- Closed the safe M12 fixture/schema chain covering CM-1758 through CM-1761.
+- Recorded fixture contracts implemented, executable fixture tests `17`, combined source review tests `17/17`, and previous full `npm test` `3627/3627` for the executable chain.
+- Preserved that M12 live workflow remains blocked by absent M8 trusted-full-read workflow evidence, absent M11 live response/receipt evidence, absent exact client/scope/target/workflow budgets, and absent checkpoint/handoff memory-write approval.
 - Confirmed no workflow harness, workflow step execution, MCP tool call for M12 evidence, real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read query, checkpoint receipt write, handoff receipt write, checkpoint memory write, handoff memory write, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable audit/runtime write, memory write/update/supersede/tombstone, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, full bridge completion claim, or readiness claim occurred.
 
-Validation: `CMV-1864`; targeted M12 node tests, source scan, docs/status validation, boundary scans, and changed-scope review passed.
+Validation: `CMV-1865`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
-Next safe route: commit CM-1761, then M12 fixture-chain blocked closeout without runtime/workflow execution/MCP tool calls/memory read/write/checkpoint-handoff receipt or memory writes. Push remains separate explicit authorization.
+Next safe route: M13 fallback local memory hardening precondition review without runtime/workflow execution/MCP tool calls/memory read/write/checkpoint-handoff receipt or memory writes. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

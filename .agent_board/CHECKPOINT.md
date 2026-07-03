@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review`.
-Current validation: `CMV-1864`.
+Current checkpoint: `CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout`.
+Current validation: `CMV-1865`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1762 M12-K4 VCP Memory Codex Claude Sustained Workflow Blocked Closeout
+
+Status: `COMPLETED_VALIDATED_M12_K4_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_BLOCKED_CLOSEOUT_SUMMARY.md`.
+- Closed the safe M12 fixture/schema chain covering CM-1758 through CM-1761.
+- Recorded fixture contracts implemented, executable fixture tests `17`, combined source review tests `17/17`, and previous full `npm test` `3627/3627` for the executable chain.
+- Preserved that full M12 live workflow exit conditions remain blocked by absent M8 trusted-full-read workflow evidence, absent M11 live response/receipt evidence, absent exact client/scope/target/workflow budgets, and absent checkpoint/handoff memory-write approval.
+- Preserved that no workflow harness, workflow steps, MCP tool call, VCPToolBox runtime call, target probing, memory read/write/update/supersede/tombstone, checkpoint/handoff receipt write, checkpoint/handoff memory write, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1865`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1761 M12-K3 VCP Memory Codex Claude Sustained Workflow Source Review
 
