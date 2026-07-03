@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review`.
-Current validation: `CMV-1926`.
-Current handoff: CM-1823 closed only the local M9 fixture-contract preparation slice from CM-1821/CM-1822. Full M9 proposal mode, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1824 M9 proposal-mode closeout gate fixture contract`.
+Current validation: `CMV-1927`.
+Current handoff: CM-1824 added a fixture-only closeout gate helper and targeted tests. The local M9 fixture-contract preparation slice is executable and closed, but full M9 proposal mode, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1823 closed only the local M9 fixture-contract preparation s
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M9_RECEIPT_CLOSEOUT_FIXTURE_PREPARATION_CLOSED_M9_STILL_BLOCKED_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 has local envelope and receipt-shape fixture contracts and that local preparation slice is closed; exact proposal boundary, real proposal generation/submission, accepted real proposal receipts, and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M9_CLOSEOUT_GATE_FIXTURE_CONTRACT_M9_STILL_BLOCKED_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 has executable local envelope, receipt-shape, and closeout-gate fixture contracts; exact proposal boundary, real proposal generation/submission, accepted real proposal receipts, and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -29,6 +29,9 @@ Current entrypoints:
 - `tests/vcp-memory-trusted-write-proposal-receipt-shape-contract.test.js`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1822_RECEIPT_SHAPE_FIXTURE_CONTRACT.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1823_RECEIPT_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`
+- `src/core/VcpMemoryTrustedWriteProposalCloseoutGateContract.js`
+- `tests/vcp-memory-trusted-write-proposal-closeout-gate-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1824_CLOSEOUT_GATE_FIXTURE_CONTRACT.md`
 - `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`
 - `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`

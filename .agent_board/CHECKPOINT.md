@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review`.
-Current validation: `CMV-1926`.
+Current checkpoint: `CM-1824 M9 proposal-mode closeout gate fixture contract`.
+Current validation: `CMV-1927`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1824 M9 Proposal-Mode Closeout Gate Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_CLOSEOUT_GATE_FIXTURE_CONTRACT_M9_STILL_BLOCKED_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalCloseoutGateContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-closeout-gate-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1824_CLOSEOUT_GATE_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3738/3738`.
+- Post-fix re-review added explicit `rawOutput` forbidden vocabulary.
+- Confirmed helper accepts only the local fixture-contract preparation slice as closed.
+- Preserved that M9 proposal mode has not passed, M10/M15 remain locked, and no runtime/proposal/write/readiness action occurred.
+
+Validation: `CMV-1927`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1823 M9 Trusted-Write-Proposal Receipt Closeout / Next-Stage Gate Review
 

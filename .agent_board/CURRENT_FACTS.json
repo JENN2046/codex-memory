@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1823",
-  "validationId": "CMV-1926",
+  "taskId": "CM-1824",
+  "validationId": "CMV-1927",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_receipt_closeout_next_stage_gate_review",
+    "scope": "vcp_memory_trusted_write_proposal_m9_closeout_gate_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1927",
+      "scope": "CM-1824 M9 proposal-mode closeout gate fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_CLOSEOUT_GATE_FIXTURE_CONTRACT_M9_STILL_BLOCKED_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1926",
       "scope": "CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review",

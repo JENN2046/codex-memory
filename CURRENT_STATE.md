@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review |
-| Current task | `CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review` |
-| Current validation | `CMV-1926` |
-| Current route | M9 local fixture-contract preparation slice closed; next route is CM-1824 proposal-mode closeout gate fixture contract |
+| Status | CM-1824 M9 proposal-mode closeout gate fixture contract |
+| Current task | `CM-1824 M9 proposal-mode closeout gate fixture contract` |
+| Current validation | `CMV-1927` |
+| Current route | M9 closeout gate fixture contract added; next route is CM-1825 blocked-to-exact-boundary decision packet refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1824` adds `src/core/VcpMemoryTrustedWriteProposalCloseoutGateContract.js`, `tests/vcp-memory-trusted-write-proposal-closeout-gate-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1824_CLOSEOUT_GATE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3738/3738`. Post-fix re-review added explicit `rawOutput` forbidden vocabulary. The helper accepts only the local fixture-contract preparation slice as closed and preserves `m9_proposal_mode_passed=false`, `m10_unlocked=false`, no runtime, no proposal generation/submission, no accepted real proposal receipt, no memory read/write, no durable write, no provider/API, no public MCP expansion, no approval line, and no readiness. Next safe route is CM-1825 M9 blocked-to-exact-boundary decision packet refresh.
 
 `CM-1823` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1823_RECEIPT_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`. It reviews CM-1821 and CM-1822 as fixture-contract evidence only and closes the narrow local fixture-contract preparation slice. It does not close M9: no exact execution boundary, generated proposal, review-route accept/reject receipt, real proposal audit receipt, or L4 write-intent runtime/workflow evidence exists. M10/M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1824 M9 proposal-mode closeout gate fixture contract.
 
