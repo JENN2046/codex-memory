@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1789 M6 observe-lite extended no-log startup window |
-| Current task | `CM-1789 M6 observe-lite extended no-log startup window` |
-| Current validation | `CMV-1892` |
-| Current route | Extended no-log startup window reached HTTP transport by probe 2 with status class `http_4xx`; stdout/stderr/logs/response body/config/env/secrets/raw memory/raw store were not read; transport-reachable subproof is complete, but `/health` success and full M6 observe-lite handshake remain incomplete |
+| Status | CM-1790 M6 observe-lite status-only route matrix |
+| Current task | `CM-1790 M6 observe-lite status-only route matrix` |
+| Current validation | `CMV-1893` |
+| Current route | Source-guided status-only route matrix reached HTTP guards/handlers without reading response bodies or logs: `/health` has no source route and returned `http_4xx`; admin candidates returned `http_5xx`; unauth models candidate returned `http_4xx` before provider handler; full M6 memory/capability handshake remains incomplete |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1790` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1790_STATUS_ONLY_ROUTE_MATRIX_RECEIPT.md`. It records a source-guided status-only route matrix. Evidence: source route map performed `YES`; warmup transport ready `YES` by probe count `2`; route matrix candidate count `5`; health candidate `http_4xx`; admin lifecycle candidate `http_5xx`; admin panel candidate `http_5xx`; models auth candidate `http_4xx`; unknown candidate `http_4xx`; health route present in source `NO`; provider route called after auth `NO`; provider/API called `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; memory read/write/result `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M6 transport subproof complete `YES`; route matrix complete `YES`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; log read required now `NO`; next action `CM-1791 source-only VCP memory capability endpoint map`.
 
 `CM-1789` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1789_EXTENDED_NO_LOG_STARTUP_WINDOW_RECEIPT.md`. It records the operator-provided local VCPToolBox target as a disposable integration target for the plan package. Evidence: pre-start local status class `connection_failed`; runtime start attempted `YES`; process count started by agent `1`; max window `10 minutes`; probe interval `10 seconds`; actual probe count `2`; endpoint transport reachable `YES`; last status class `http_4xx`; health route OK proven `NO`; response body read `NO`; runtime logs read `NO`; stdout/stderr read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; memory read/write/result `NO`; provider/API `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M6 transport subproof complete `YES`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; log read required now `NO`; next action `CM-1790 status-only observe-lite route matrix`.
 

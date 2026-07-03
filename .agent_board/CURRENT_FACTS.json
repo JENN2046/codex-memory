@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1789",
-  "validationId": "CMV-1892",
+  "taskId": "CM-1790",
+  "validationId": "CMV-1893",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_extended_no_log_startup_window",
+    "scope": "vcp_memory_observe_lite_status_only_route_matrix",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1893",
+      "scope": "CM-1790 M6 observe-lite status-only route matrix",
+      "status": "COMPLETED_VALIDATED_M6_STATUS_ONLY_ROUTE_MATRIX_HTTP_GUARDS_REACHED_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER"
+    },
     {
       "id": "CMV-1892",
       "scope": "CM-1789 M6 observe-lite extended no-log startup window",

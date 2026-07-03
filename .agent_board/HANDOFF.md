@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1789 M6 observe-lite extended no-log startup window`.
-Current validation: `CMV-1892`.
-Current handoff: CM-1789 completed one bounded startup window against the local disposable VCPToolBox integration target. One process was started with stdout/stderr discarded; probe 2 reached `http_4xx`; response bodies and logs were not read; the child process was stopped and exit was observed. Endpoint HTTP transport is reachable, but `/health` success and full M6 observe-lite handshake remain incomplete. M15 remains locked, and no config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1790 M6 observe-lite status-only route matrix`.
+Current validation: `CMV-1893`.
+Current handoff: CM-1790 completed a source-guided status-only route matrix against the local disposable VCPToolBox integration target. Warmup reached `http_4xx` by probe 2; matrix statuses were health `http_4xx`, admin lifecycle `http_5xx`, admin panel `http_5xx`, models auth `http_4xx`, and unknown `http_4xx`. Source review found no `/health` route, an admin-disabled `5xx` branch, and bearer auth before `/v1/models`. Full M6 memory/capability handshake remains incomplete. M15 remains locked, and no response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1789 completed one bounded startup window against the local 
 
 Goal: complete `M6 observe-lite` transport proof for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_EXTENDED_NO_LOG_STARTUP_WINDOW_TRANSPORT_REACHABLE_HTTP_4XX_NO_BODY_NO_LOG_NO_MEMORY`; production/release/cutover ready no; complete V8 not claimed; M6 full handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport reachable; `/health` route success not proven; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_STATUS_ONLY_ROUTE_MATRIX_HTTP_GUARDS_REACHED_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable; `/health` is not a source-defined route; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1790_STATUS_ONLY_ROUTE_MATRIX_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1789_EXTENDED_NO_LOG_STARTUP_WINDOW_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1788_STARTUP_FAILURE_SOURCE_DIAGNOSIS.md`
 - `src/core/VcpMemoryHealthReportSchemaContract.js`

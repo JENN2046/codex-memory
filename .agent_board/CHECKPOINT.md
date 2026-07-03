@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1789 M6 observe-lite extended no-log startup window`.
-Current validation: `CMV-1892`.
+Current checkpoint: `CM-1790 M6 observe-lite status-only route matrix`.
+Current validation: `CMV-1893`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1790 M6 Observe-Lite Status-Only Route Matrix
+
+Status: `COMPLETED_VALIDATED_M6_STATUS_ONLY_ROUTE_MATRIX_HTTP_GUARDS_REACHED_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1790_STATUS_ONLY_ROUTE_MATRIX_RECEIPT.md`.
+- Performed source-guided route map and one status-only runtime route matrix.
+- Warmup transport reached status class `http_4xx` by probe 2.
+- Matrix statuses: health candidate `http_4xx`; admin lifecycle candidate `http_5xx`; admin panel candidate `http_5xx`; models auth candidate `http_4xx`; unknown candidate `http_4xx`.
+- Source-only review found no `/health` route, found admin auth before admin routes, found an admin-disabled branch that can return `5xx`, and found bearer auth before `/v1/models`.
+- Preserved that provider route called after auth `NO`, provider/API `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets/raw memory/raw store/raw runtime response read `NO`, memory read/write/result `NO`, MCP memory tool `NO`, public MCP expansion `NO`, config/startup/watchdog change `NO`, approval line `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+
+Validation: `CMV-1893`; source-guided route map, startup/probe output, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1789 M6 Observe-Lite Extended No-Log Startup Window
 
