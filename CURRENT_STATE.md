@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary |
-| Current task | `CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary` |
-| Current validation | `CMV-1896` |
-| Current route | Source-only abort boundary recorded: direct human-tool route is behind generic bearer auth, credential value is not known and cannot be read from secret/config/env/log surfaces, so the status-only no-body `DailyNoteSearcher.SearchDailyNote` runtime probe was aborted before execution; full M6 memory/capability handshake remains incomplete |
+| Status | CM-1794 M6 observe-lite temporary disposable auth boundary packet |
+| Current task | `CM-1794 M6 observe-lite temporary disposable auth boundary packet` |
+| Current validation | `CMV-1897` |
+| Current route | Source-only boundary packet recorded: `/v1/human/tool` requires bearer auth, `serverKey` is sourced from `process.env.Key`, existing bearer secret was not read, and the future probe must use a newly generated disposable child-process auth value that is never printed, persisted, or written to VCPToolBox files; full M6 memory/capability handshake remains incomplete |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1794` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1794_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET.md`. It records a source-only temporary disposable auth boundary packet for a future status-only/no-body `DailyNoteSearcher.SearchDailyNote` probe. Evidence: bearer auth required before route `YES`; `serverKey` source `process.env.Key`; existing bearer credential value known `NO`; existing credential read `NO`; disposable auth required for future probe `YES`; disposable auth value generated now `NO`; disposable auth value disclosed/persisted `NO`; runtime started `NO`; service start attempted `NO`; route called `NO`; request body generated `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store/raw runtime response read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; runtime memory query executed `NO`; memory read by agent/write/result `NO`; VCPToolBox files modified `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1795 exact temporary auth status-only DailyNoteSearcher probe execution envelope`.
 
 `CM-1793` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1793_DAILYNOTESEARCHER_PROBE_DECISION_ABORT_BOUNDARY.md`. It records a source-only decision to abort the CM-1792 status-only/no-body `DailyNoteSearcher.SearchDailyNote` probe before execution. Evidence: bearer auth required before route `YES`; bearer credential value known `NO`; request body generated `NO`; real request body disclosed `NO`; runtime started `NO`; service start attempted `NO`; route called `NO`; unauthenticated/authenticated probe executed `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; memory read/write/result `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime probe aborted before execution `YES`; abort reason `bearer_auth_required_secret_boundary`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1794 temporary disposable auth boundary packet for status-only no-body tool probe`.
 

@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary`.
-Current validation: `CMV-1896`.
+Current checkpoint: `CM-1794 M6 observe-lite temporary disposable auth boundary packet`.
+Current validation: `CMV-1897`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1794 M6 Observe-Lite Temporary Disposable Auth Boundary Packet
+
+Status: `COMPLETED_VALIDATED_M6_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1794_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET.md`.
+- Reviewed source/docs and confirmed `/v1/human/tool` requires bearer auth and `serverKey` is sourced from `process.env.Key`.
+- Recorded that existing bearer credential value is unknown and was not read from `config.env`, `.env`, process env, logs, runtime output, or config files.
+- Defined the future auth rule: only a newly generated disposable child-process auth value may be used, and it must never be printed, persisted, written to VCPToolBox files, or reused against stable/cloud services.
+- Preserved that disposable auth generated `NO`, disclosed `NO`, persisted `NO`, runtime started `NO`, real request body generated `NO`, route called `NO`, authenticated probe executed `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets/raw memory/raw store/raw runtime response read `NO`, provider/API called `NO`, MCP memory tool called `NO`, VCP plugin executed `NO`, runtime memory query executed `NO`, memory read by agent/write/result `NO`, VCPToolBox files modified `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1795 exact temporary auth status-only DailyNoteSearcher probe execution envelope.
+
+Validation: `CMV-1897`; source-only auth source review, VCPToolBox API/auth docs review, temporary disposable auth boundary packet review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1793 M6 Observe-Lite DailyNoteSearcher Probe Decision Abort Boundary
 

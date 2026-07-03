@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary`.
-Current validation: `CMV-1896`.
-Current handoff: CM-1793 source review found generic bearer auth before `/v1/human/tool`, so the CM-1792 status-only/no-body `DailyNoteSearcher.SearchDailyNote` probe was aborted before execution. The bearer credential value is unknown and was not read from config/env/log/runtime surfaces. Full M6 memory/capability handshake remains incomplete because no runtime route, request body, response body, memory result, VCP plugin, MCP memory tool, provider/API, or memory read/write was executed. M15 remains locked, and no runtime start, response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1794 M6 observe-lite temporary disposable auth boundary packet`.
+Current validation: `CMV-1897`.
+Current handoff: CM-1794 source/docs review confirmed `/v1/human/tool` is behind bearer auth and `serverKey` is sourced from `process.env.Key`. The existing bearer credential value is unknown and was not read from config/env/log/runtime surfaces. The future probe must use a newly generated disposable child-process auth value that is never printed, persisted, written to VCPToolBox files, or reused against stable/cloud services. Full M6 memory/capability handshake remains incomplete because no runtime route, request body, response body, memory result, VCP plugin, MCP memory tool, provider/API, runtime memory query, or memory read/write was executed. M15 remains locked, and no runtime start, response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1793 source review found generic bearer auth before `/v1/hum
 
 Goal: complete `M6 observe-lite` transport and memory-capability proof planning for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, response body, provider, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PROBE_ABORT_BOUNDARY_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; `/health` is not a source-defined route; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; CM-1794 defines the future disposable child-process auth boundary without execution; `/health` is not a source-defined route; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1794_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1793_DAILYNOTESEARCHER_PROBE_DECISION_ABORT_BOUNDARY.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1792_DAILYNOTESEARCHER_INVOCATION_ENVELOPE_PREFLIGHT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1791_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP.md`
@@ -120,15 +121,15 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1793_DAILYNOTESEARCHER_PROBE_DECISION_ABORT_BOUNDARY.md`.
-- Reviewed source ordering and found generic bearer auth before `/v1/human/tool`.
-- Aborted the CM-1792 status-only/no-body `DailyNoteSearcher.SearchDailyNote` runtime probe before execution because a meaningful probe requires bearer auth and existing secrets/config/env/log surfaces cannot be read.
-- Rejected an unauthenticated status-only route call because it would prove only auth guard, not tool invocation or memory capability.
-- Confirmed request body generated `NO`, real request body disclosed `NO`, runtime started `NO`, route called `NO`, unauthenticated probe executed `NO`, authenticated probe executed `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, agent config/env/secrets read `NO`, raw runtime response read `NO`, raw memory read `NO`, raw store read `NO`, memory result returned `NO`, VCP plugin executed `NO`, MCP memory tool called `NO`, memory read/write `NO`, provider/API `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, M6 full completion `NO`, M15 unlock `NO`, complete V8 claim `NO`, and full bridge completion claim `NO`.
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1794_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET.md`.
+- Reviewed source/docs and confirmed `/v1/human/tool` requires bearer auth and `serverKey` is sourced from `process.env.Key`.
+- Preserved that existing bearer credential value is unknown and was not read from `config.env`, `.env`, process env, logs, runtime output, or config files.
+- Defined the future rule: only a newly generated disposable child-process auth value may be used; it must never be printed, persisted, written to VCPToolBox files, or reused against stable/cloud services.
+- Confirmed disposable auth generated `NO`, disclosed `NO`, persisted `NO`, request body generated `NO`, real request body disclosed `NO`, runtime started `NO`, route called `NO`, authenticated probe executed `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, agent config/env/secrets read `NO`, raw runtime response read `NO`, raw memory read `NO`, raw store read `NO`, memory result returned `NO`, runtime memory query executed `NO`, VCP plugin executed `NO`, MCP memory tool called `NO`, memory read by agent/write `NO`, provider/API `NO`, VCPToolBox files modified `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, M6 full completion `NO`, M15 unlock `NO`, complete V8 claim `NO`, and full bridge completion claim `NO`.
 
-Validation: `CMV-1896`; source-only auth middleware ordering review, direct human-tool route review, abort boundary review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
+Validation: `CMV-1897`; source-only auth source review, VCPToolBox API/auth docs review, temporary disposable auth boundary packet review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
-Next safe route: CM-1794 temporary disposable auth boundary packet for status-only no-body tool probe. Do not read existing bearer tokens, `config.env`, `.env`, process env, logs, or runtime output. Do not run observe-full/trusted-read/write, do not generate request bodies or execute routes unless the boundary remains status-only/no-body/no-log/no-provider/no-write, do not read response bodies/logs/secrets/config/raw memory/raw stores/memory results/provider responses, do not call MCP memory tools, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe route: CM-1795 exact temporary auth status-only DailyNoteSearcher probe execution envelope. Use only a newly generated disposable child-process auth value; do not read existing bearer tokens, `config.env`, `.env`, process env, logs, or runtime output. Do not print or persist any bearer value. Do not run observe-full/trusted-read/write, do not read response bodies/logs/secrets/config/raw memory/raw stores/memory results/provider responses, do not call MCP memory tools, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 
