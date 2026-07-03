@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1763",
-  "validationId": "CMV-1866",
+  "taskId": "CM-1764",
+  "validationId": "CMV-1867",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_fallback_local_memory_m13_precondition_review",
+    "scope": "vcp_memory_fallback_local_memory_m13_gap_matrix",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1867",
+      "scope": "CM-1764 M13-K1 VCP memory fallback local memory gap matrix",
+      "status": "COMPLETED_VALIDATED_M13_K1_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_GAP_MATRIX_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1866",
       "scope": "CM-1763 M13-K0 VCP memory fallback local memory precondition review",

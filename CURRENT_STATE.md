@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1763 M13-K0 VCP memory fallback local memory precondition review |
-| Current task | `CM-1763 M13-K0 VCP memory fallback local memory precondition review` |
-| Current validation | `CMV-1866` |
-| Current route | M13 may begin as fixture/dry-run fallback hardening; fallback governance parity is not green; next safe action is M13 fallback hardening gap matrix, not runtime fallback or private runtime reads |
+| Status | CM-1764 M13-K1 VCP memory fallback local memory gap matrix |
+| Current task | `CM-1764 M13-K1 VCP memory fallback local memory gap matrix` |
+| Current validation | `CMV-1867` |
+| Current route | M13 fallback hardening gaps are mapped into fixture-lockable work; fallback governance parity is not green; next safe action is M13 fallback marker/receipt fixture contract, not runtime fallback or private runtime reads |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1764` adds `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_GAP_MATRIX.md`. It maps fallback marker/receipt, scope/client isolation, secret rejection, lifecycle filter, query tests, and governance parity into fixture-lockable work and blocked runtime/private-read gaps. Boundary: fallback marker/receipt fixture-lockable `YES`; scope/client isolation fixture-lockable `YES`; secret rejection fixture-lockable `YES`; lifecycle filter fixture-lockable `YES`; query tests fixture-lockable `YES`; governance parity report lockable `YES`; M13 fallback marker contract exists `NO`; M13 fallback scope isolation tests green `NO`; M13 fallback secret rejection tests green `NO`; M13 fallback lifecycle filter tests green `NO`; M13 fallback query tests green `NO`; fallback governance parity green `NO`; fallback hardening report complete `NO`; local fallback runtime executed `NO`; private runtime read `NO`; real query `NO`; MCP tool call for M13 evidence `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; VCPToolBox runtime `NO`; public MCP expansion `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1763` adds `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_PRECONDITION_REVIEW.md`. It reviews M13 entry conditions against the fallback role contract, M5 policy shield, client/scope/visibility matrix, and M12 blocked closeout. Boundary: fallback role contract exists `YES`; policy shield exists `YES`; client/scope/visibility matrix exists `YES`; M13 entry conditions satisfied for fixture work `YES`; M13 entry conditions satisfied for runtime work `NO`; local tests allowed fixture-only `YES`; dry-run gates allowed `YES`; private runtime reads allowed `NO`; fallback execution `NO`; private runtime read `NO`; real query `NO`; memory read/write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; provider/API `NO`; VCPToolBox runtime `NO`; MCP tool call for M13 evidence `NO`; public MCP expansion `NO`; fallback governance parity green `NO`; scope/client isolation M13 suite green `NO`; secret rejection M13 suite green `NO`; lifecycle filter M13 suite green `NO`; query tests M13 suite green `NO`; fallback hardening report complete `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
