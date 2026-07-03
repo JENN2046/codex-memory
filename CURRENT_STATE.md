@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1755 M11-K1 VCP memory response normalization audit receipts gap matrix |
-| Current task | `CM-1755 M11-K1 VCP memory response normalization audit receipts gap matrix` |
-| Current validation | `CMV-1858` |
-| Current route | Docs-only fixture/schema M11 gap matrix; response/receipt lockable fields mapped; live VCP-native parity and runtime receipt stability still blocked; no runtime, fallback execution, memory read/write, approval line, readiness, or live normalized envelope proof |
+| Status | CM-1756 M11-K2 VCP memory response normalization audit receipt fixture contract |
+| Current task | `CM-1756 M11-K2 VCP memory response normalization audit receipt fixture contract` |
+| Current validation | `CMV-1859` |
+| Current route | Fixture-only M11 helper/test contract; normalized response and audit receipt accepted/rejected cases covered; live VCP-native parity and runtime receipt stability still blocked; no runtime, fallback execution, memory read/write, approval line, readiness, or live normalized envelope proof |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1756` adds `src/core/VcpMemoryResponseNormalizationAuditReceiptContract.js`, `tests/vcp-memory-response-normalization-audit-receipt-contract.test.js`, and `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_FIXTURE_CONTRACT.md`. It turns the CM-1755 gap matrix into fixture-only executable regression coverage. Boundary: schema-only VCP-native success covered `YES`; fixture-only local fallback success covered `YES`; L4 stop covered `YES`; unknown target denial covered `YES`; partial budget covered `YES`; sanitized error covered `YES`; missing scope rejected `YES`; fallback/source-runtime conflict rejected `YES`; raw/private/debug/approval fields rejected `YES`; readiness/complete-V8/live evidence overclaims rejected `YES`; positive side-effect counters rejected `YES`; live VCP-native parity proof `NO`; runtime receipt stability proof `NO`; VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; memory write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; real approval line `NO`; approval request submission `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 
 `CM-1755` adds `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_GAP_MATRIX.md`. It maps fixture/schema-lockable M11 areas and separates live-proof gaps. Boundary: normalized envelope mandatory fields mapped `YES`; source runtime and fallback markers mapped `YES`; confidence/evidence basis mapped `YES`; low-disclosure receipt fields mapped `YES`; raw/private/debug exclusion mapped `YES`; status/error mapping mapped `YES`; readiness overclaim rejection mapped `YES`; M7 live read-shape receipt accepted `NO`; live VCP-native parity proof `NO`; runtime receipt stability proof `NO`; VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; memory write/update/supersede/tombstone `NO`; durable audit/runtime write `NO`; real approval line `NO`; approval request submission `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; full bridge completion `NO`.
 

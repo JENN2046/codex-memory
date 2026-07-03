@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1755 M11-K1 VCP memory response normalization audit receipts gap matrix`.
-Current validation: `CMV-1858`.
+Current checkpoint: `CM-1756 M11-K2 VCP memory response normalization audit receipt fixture contract`.
+Current validation: `CMV-1859`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1756 M11-K2 VCP Memory Response Normalization Audit Receipt Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M11_K2_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPT_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryResponseNormalizationAuditReceiptContract.js`.
+- Added `tests/vcp-memory-response-normalization-audit-receipt-contract.test.js`.
+- Added `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_FIXTURE_CONTRACT.md`.
+- Covered schema-only VCP-native success, fixture-only local fallback success, L4 stop, unknown target denial, partial budget, sanitized error, missing scope rejection, fallback conflict rejection, raw/private/debug rejection, readiness/complete-V8/live evidence overclaim rejection, and positive side-effect counter rejection.
+- Preserved that no VCPToolBox runtime call, target probing, fallback execution, memory read/write/update/supersede/tombstone, durable audit/runtime write, approval request, approval line, provider/API, public MCP expansion, push, release, deploy, cutover, readiness claim, or complete V8 claim occurred.
+
+Validation: `CMV-1859`; targeted node test, `npm test`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1755 M11-K1 VCP Memory Response Normalization Audit Receipts Gap Matrix
 
