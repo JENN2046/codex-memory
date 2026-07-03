@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1716 M3-T2 VCP memory invocation boundary templates`.
-Current validation: `CMV-1819`.
+Current checkpoint: `CM-1717 M3-T3 local fallback memory role contract`.
+Current validation: `CMV-1820`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1717 M3-T3 Local Fallback Memory Role Contract
+
+Status: `COMPLETED_VALIDATED_M3_T3_LOCAL_FALLBACK_ROLE_CONTRACT_DOCS_ONLY_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/LOCAL_FALLBACK_MEMORY_ROLE_CONTRACT.md`.
+- Defined fallback entry conditions, result markers, receipt fields, must-not-run cases, and fallback/non-fallback examples.
+- Required fallback results to be explicitly marked as local fallback and not VCP-native success.
+- Preserved the boundary that local fallback execution, live VCPToolBox runtime, target probing, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, and complete V8 claims remain blocked.
+
+Validation: `CMV-1820`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1716 M3-T2 VCP Memory Invocation Boundary Templates
 

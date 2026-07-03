@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1716 M3-T2 VCP memory invocation boundary templates |
-| Current task | `CM-1716 M3-T2 VCP memory invocation boundary templates` |
-| Current validation | `CMV-1819` |
-| Current route | Non-authorizing invocation boundary templates; no real approval line or runtime execution |
+| Status | CM-1717 M3-T3 local fallback memory role contract |
+| Current task | `CM-1717 M3-T3 local fallback memory role contract` |
+| Current validation | `CMV-1820` |
+| Current route | Docs-only local fallback role contract; no fallback execution or runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1717` adds `docs/LOCAL_FALLBACK_MEMORY_ROLE_CONTRACT.md`. It defines when local memory may act as explicit fallback, required `memory_source=local_fallback` / `fallback_used=true` / `vcp_native_result=false` result markers, fallback receipt fields, must-not-run cases, and examples. Boundary: local fallback execution `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 
 `CM-1716` adds `docs/VCP_MEMORY_INVOCATION_BOUNDARY_TEMPLATES.md`. It defines non-authorizing boundary templates for `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`, including shared packet fields, budgets, output disclosure, receipt shape, and stop conditions. Boundary: real approval line generation/submission/issue/storage/simulation `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`.
 

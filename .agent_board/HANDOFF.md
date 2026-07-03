@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1716 M3-T2 VCP memory invocation boundary templates`.
-Current validation: `CMV-1819`.
-Current handoff: CM-1716 completed non-authorizing invocation boundary templates for future VCPToolBox-native profiles. No real approval line, live VCPToolBox target discovery/runtime, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
+Current task: `CM-1717 M3-T3 local fallback memory role contract`.
+Current validation: `CMV-1820`.
+Current handoff: CM-1717 completed the docs-only local fallback memory role contract. No local fallback execution, live VCPToolBox target discovery/runtime, raw memory, provider/API, durable write, public MCP expansion, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M3-T2 Invocation Profile Boundary Templates` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M3-T3 Local Fallback Role Contract` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M3_T2_INVOCATION_BOUNDARY_TEMPLATES_NON_AUTHORIZING_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M3_T3_LOCAL_FALLBACK_ROLE_CONTRACT_DOCS_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,17 +25,17 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
-- `docs/VCP_MEMORY_INVOCATION_BOUNDARY_TEMPLATES.md`
+- `docs/LOCAL_FALLBACK_MEMORY_ROLE_CONTRACT.md`
 
 Completed in this slice:
 
-- Added non-authorizing invocation boundary templates for all five profiles.
-- Defined shared packet fields, profile-specific allowed actions, budgets, output disclosure, receipt shape, stop conditions, and non-authorization review requirements.
-- Confirmed no real approval line generation/submission/issue/storage/simulation, live VCPToolBox runtime, target probing, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
+- Added local fallback memory role contract.
+- Defined fallback entry conditions, result markers, receipt fields, must-not-run cases, and fallback/non-fallback examples.
+- Confirmed no local fallback execution, live VCPToolBox runtime, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
-Validation: `CMV-1819`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1820`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: `M3-T3 Local Fallback Role Contract`. Push remains separate explicit authorization.
+Next safe route: M4 invocation contract design. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

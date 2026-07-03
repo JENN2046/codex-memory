@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1716",
-  "validationId": "CMV-1819",
+  "taskId": "CM-1717",
+  "validationId": "CMV-1820",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_invocation_boundary_templates_non_authorizing",
+    "scope": "local_fallback_role_contract_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1820",
+      "scope": "CM-1717 M3-T3 local fallback memory role contract",
+      "status": "COMPLETED_VALIDATED_M3_T3_LOCAL_FALLBACK_ROLE_CONTRACT_DOCS_ONLY_NO_RUNTIME"
+    },
     {
       "id": "CMV-1819",
       "scope": "CM-1716 M3-T2 VCP memory invocation boundary templates",

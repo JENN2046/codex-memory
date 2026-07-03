@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1716 M3-T2 VCP memory invocation boundary templates`.
-Current validation: `CMV-1819`.
-Current project status: CM-1716 records non-authorizing invocation boundary templates for `observe-lite`, `observe-full`, `trusted-full-read`, `trusted-write-proposal`, and `trusted-full`. This is docs-only boundary planning; no real approval line, live VCPToolBox target discovery, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `VCP_INVOCATION_BOUNDARY_TEMPLATES_NON_AUTHORIZING_NO_RUNTIME`.
+Current task: `CM-1717 M3-T3 local fallback memory role contract`.
+Current validation: `CMV-1820`.
+Current project status: CM-1717 records when local memory may act as explicit fallback and how fallback results/receipts must be marked so they cannot be mistaken for VCP-native success. This is docs-only fallback contract work; no fallback execution, live VCPToolBox target discovery, raw memory, provider/API, durable write, public MCP expansion, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `LOCAL_FALLBACK_ROLE_CONTRACT_DOCS_ONLY_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1717 M3-T3 local fallback memory role contract: added `docs/LOCAL_FALLBACK_MEMORY_ROLE_CONTRACT.md`. The contract defines fallback entry conditions, required result marker, receipt fields, must-not-run cases, and fallback/non-fallback examples. It keeps local memory as fallback/compatibility/test substrate and requires explicit `memory_source=local_fallback`, `fallback_used=true`, and `vcp_native_result=false` markers when fallback is used. No local fallback execution, live VCPToolBox runtime call, target probing, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
 CM-1716 M3-T2 VCP memory invocation boundary templates: added `docs/VCP_MEMORY_INVOCATION_BOUNDARY_TEMPLATES.md`. The templates define required packet fields, profile-specific allowed actions, budgets, output disclosure, receipt shape, stop conditions, and non-authorization review requirements. They explicitly do not generate, simulate, submit, issue, store, or expose a real approval line and do not authorize runtime execution. No live VCPToolBox runtime call, target probing, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
