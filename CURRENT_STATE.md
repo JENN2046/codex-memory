@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1794 M6 observe-lite temporary disposable auth boundary packet |
-| Current task | `CM-1794 M6 observe-lite temporary disposable auth boundary packet` |
-| Current validation | `CMV-1897` |
-| Current route | Source-only boundary packet recorded: `/v1/human/tool` requires bearer auth, `serverKey` is sourced from `process.env.Key`, existing bearer secret was not read, and the future probe must use a newly generated disposable child-process auth value that is never printed, persisted, or written to VCPToolBox files; full M6 memory/capability handshake remains incomplete |
+| Status | CM-1795 M6 observe-lite source scan boundary repair abort receipt |
+| Current task | `CM-1795 M6 observe-lite source scan boundary repair abort receipt` |
+| Current validation | `CMV-1898` |
+| Current route | Boundary repair recorded: a broad VCPToolBox source search returned runtime-data surface snippets during CM-1795 pre-execution calibration, so the live probe was aborted before execution and future calibration is restricted to fixed allowlisted source files; full M6 memory/capability handshake remains incomplete |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1795` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1795_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_RECEIPT.md`. It records a pre-execution boundary repair: broad root-wide VCPToolBox source search returned runtime-data surface snippets, so the live temporary-auth status-only probe was aborted before execution and future source calibration is restricted to fixed allowlisted files only. Evidence: boundary repair recorded `YES`; live probe aborted before execution `YES`; root-wide source search attempted `YES`; runtime-data surface snippet hit `YES`; raw snippets repeated in receipt `NO`; runtime started `NO`; service start attempted `NO`; temporary bearer generated/disclosed/persisted `NO`; request body generated `NO`; route called `NO`; authenticated probe executed `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; runtime memory query executed `NO`; memory write `NO`; VCPToolBox files modified `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1796 whitelist-only exact temporary auth status-only probe`.
 
 `CM-1794` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1794_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET.md`. It records a source-only temporary disposable auth boundary packet for a future status-only/no-body `DailyNoteSearcher.SearchDailyNote` probe. Evidence: bearer auth required before route `YES`; `serverKey` source `process.env.Key`; existing bearer credential value known `NO`; existing credential read `NO`; disposable auth required for future probe `YES`; disposable auth value generated now `NO`; disposable auth value disclosed/persisted `NO`; runtime started `NO`; service start attempted `NO`; route called `NO`; request body generated `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store/raw runtime response read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; runtime memory query executed `NO`; memory read by agent/write/result `NO`; VCPToolBox files modified `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1795 exact temporary auth status-only DailyNoteSearcher probe execution envelope`.
 

@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1794 M6 observe-lite temporary disposable auth boundary packet`.
-Current validation: `CMV-1897`.
+Current checkpoint: `CM-1795 M6 observe-lite source scan boundary repair abort receipt`.
+Current validation: `CMV-1898`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1795 M6 Observe-Lite Source Scan Boundary Repair Abort Receipt
+
+Status: `COMPLETED_VALIDATED_M6_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_NO_RUNTIME_NO_SECRET_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1795_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_RECEIPT.md`.
+- Classified the pre-execution source-scan boundary issue: a broad root-wide VCPToolBox source search returned runtime-data surface snippets.
+- Aborted the live temporary-auth status-only probe before execution.
+- Replaced future calibration with a fixed allowlist: `server.js`, `modules/vcpLoop/toolCallParser.js`, `Plugin/DailyNoteSearcher/plugin-manifest.json`, `Plugin/DailyNoteSearcher/DailyNoteSearcher.js`, `docs/API_ROUTES.md`, `docs/CONFIGURATION.md`, `AGENTS.md`, and `package.json`.
+- Preserved that raw snippets repeated in receipt `NO`, runtime started `NO`, temporary bearer generated/disclosed/persisted `NO`, real request body generated `NO`, route called `NO`, authenticated probe executed `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets read `NO`, provider/API called `NO`, MCP memory tool called `NO`, VCP plugin executed `NO`, runtime memory query executed `NO`, memory write `NO`, VCPToolBox files modified `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1796 whitelist-only exact temporary auth status-only probe.
+
+Validation: `CMV-1898`; boundary incident classification, corrected fixed-file allowlist review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/runtime-action scans, and changed-scope review passed.
 
 ## CM-1794 M6 Observe-Lite Temporary Disposable Auth Boundary Packet
 
