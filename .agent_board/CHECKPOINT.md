@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review`.
-Current validation: `CMV-1910`.
+Current checkpoint: `CM-1808 M7 observe-full read-shape exact boundary preflight`.
+Current validation: `CMV-1911`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1808 M7 Observe-Full Read-Shape Exact Boundary Preflight
+
+Status: `COMPLETED_VALIDATED_M7_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_FULL_CM1808_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT.md`.
+- Accepted CM-1807 as the M6 observe-lite closeout required to prepare M7.
+- Bound the next M7 execution candidate to `DailyNoteSearcher.SearchDailyNote` through `/v1/human/tool`.
+- Selected exact safe query `codex_memory_m7_read_shape_probe_cm1809_no_private_match_20260704`, `max_results=1`, `context_lines=0`, `is_regex=false`, `case_sensitive=true`, and `whole_word=true`.
+- Defined shape-only output projection, response-body no-print/no-persist rules, raw-private-output abort rules, no-write rule, and CM-1809 receipt schema.
+- Confirmed CM-1808 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, release/deploy/cutover/push, readiness claim, `RC_READY` claim, M8 unlock, M15 unlock, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1911`; plan M7/M7-K1 slices, CM-1807 closeout, CM-1791/CM-1792/CM-1806 receipts, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1807 M6 Observe-Lite Successful Proof Closeout / Next-Stage Gate Review
 

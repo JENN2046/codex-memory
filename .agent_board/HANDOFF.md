@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review`.
-Current validation: `CMV-1910`.
-Current handoff: CM-1807 accepted CM-1806 as narrow M6 observe-lite target/transport/status proof and unlocked M7 preparation only. M7 live read execution, M8 trusted-full-read, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1807 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
+Current task: `CM-1808 M7 observe-full read-shape exact boundary preflight`.
+Current validation: `CMV-1911`.
+Current handoff: CM-1808 bound the next M7 read-shape candidate to `DailyNoteSearcher.SearchDailyNote` through `/v1/human/tool`, exact safe query, max one result, shape-only output projection, response-body no-print/no-persist rule, raw-output abort, no-write rule, and receipt schema. CM-1808 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M8 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M6 observe-lite` transport and memory-capability proof planning for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, response body, provider, or write boundaries.
+Goal: continue the imported VCP memory plan from accepted `M6 observe-lite` into bounded `M7 observe-full` read-shape proof work without crossing log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_OBSERVE_LITE_SUCCESSFUL_PROOF_CLOSEOUT_M7_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; successful low-disclosure memory capability status proof exists; M7 preparation is unlocked; M7 live read execution is not authorized by this closeout; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; CM-1806 proves primary-candidate human-tool status `http_2xx` without body/log/secret/memory write; `/health` is not a source-defined route; M8, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M7_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; successful low-disclosure memory capability status proof exists; M7 preparation is unlocked; CM-1808 exact read-shape boundary exists for CM-1809; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; CM-1806 proves primary-candidate human-tool status `http_2xx` without body/log/secret/memory write; `/health` is not a source-defined route; M8, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_CM1808_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1807_M6_SUCCESSFUL_PROOF_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1806_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1805_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_RECEIPT.md`

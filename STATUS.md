@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review`.
-Current validation: `CMV-1910`.
-Current project status: CM-1807 accepted CM-1806 as narrow M6 observe-lite target/transport/status proof and unlocked M7 preparation only. M7 live read execution, M8 trusted-full-read, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1807 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
-Current route: `VCP_MEMORY_OBSERVE_LITE_CM1807_M6_SUCCESSFUL_PROOF_CLOSEOUT_M7_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS`.
+Current task: `CM-1808 M7 observe-full read-shape exact boundary preflight`.
+Current validation: `CMV-1911`.
+Current project status: CM-1808 bound the next M7 read-shape candidate to `DailyNoteSearcher.SearchDailyNote` through `/v1/human/tool`, exact safe query, max one result, shape-only output projection, response-body no-print/no-persist rule, raw-output abort, no-write rule, and receipt schema. CM-1808 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M8 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion.
+Current route: `VCP_MEMORY_OBSERVE_FULL_CM1808_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1808 M7 observe-full read-shape exact boundary preflight: added `docs/VCP_MEMORY_OBSERVE_FULL_CM1808_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT.md`. It binds the next M7 read-shape candidate to `DailyNoteSearcher.SearchDailyNote` through `/v1/human/tool`, exact safe query `codex_memory_m7_read_shape_probe_cm1809_no_private_match_20260704`, `max_results=1`, `context_lines=0`, shape-only output projection, response-body no-print/no-persist rule, raw-output abort, no-write rule, and receipt schema. Runtime action in CM-1808 `NO`; response body read `NO`; runtime logs read `NO`; config/env contents read `NO`; secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M8 unlocked `NO`; M15 unlocked `NO`. Next safe route is CM-1809 M7 observe-full read-shape low-disclosure execution candidate under unchanged CM-1808 boundary.
 
 CM-1807 M6 observe-lite successful proof closeout / next-stage gate review: added `docs/VCP_MEMORY_OBSERVE_LITE_CM1807_M6_SUCCESSFUL_PROOF_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`. It accepts CM-1806 as narrow M6 observe-lite target/transport/status proof and unlocks M7 preparation only. M7 live read execution authorized `NO`; M8 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime action in CM-1807 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`. Next safe route is CM-1808 M7 observe-full read-shape exact boundary preflight.
 

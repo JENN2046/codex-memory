@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1807",
-  "validationId": "CMV-1910",
+  "taskId": "CM-1808",
+  "validationId": "CMV-1911",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_m6_successful_proof_closeout_next_stage_gate_review",
+    "scope": "vcp_memory_observe_full_m7_read_shape_exact_boundary_preflight",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1911",
+      "scope": "CM-1808 M7 observe-full read-shape exact boundary preflight",
+      "status": "COMPLETED_VALIDATED_M7_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS"
+    },
     {
       "id": "CMV-1910",
       "scope": "CM-1807 M6 observe-lite successful proof closeout / next-stage gate review",

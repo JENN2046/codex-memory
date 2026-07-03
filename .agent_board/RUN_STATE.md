@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review`.
-Current validation: `CMV-1910`.
-Current status: CM-1807 accepted CM-1806 as narrow M6 observe-lite target/transport/status proof and unlocked M7 preparation only. M7 live read execution, M8 trusted-full-read, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1807 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
+Current task: `CM-1808 M7 observe-full read-shape exact boundary preflight`.
+Current validation: `CMV-1911`.
+Current status: CM-1808 bound the next M7 read-shape candidate to `DailyNoteSearcher.SearchDailyNote` through `/v1/human/tool`, exact safe query, max one result, shape-only output projection, response-body no-print/no-persist rule, raw-output abort, no-write rule, and receipt schema. CM-1808 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, M8 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1808 M7 observe-full read-shape exact boundary preflight. It should define exact target, route, query, result budget, output projection, abort rules, and receipt schema before any read-shape runtime call. Do not read response bodies or raw private memory until that boundary is complete. Push remains separate explicit authorization.
+Next safe action is CM-1809 M7 observe-full read-shape low-disclosure execution candidate under the unchanged CM-1808 boundary. It may consume the response body in memory only for redacted shape projection, must not print or persist raw body values, and must abort on raw-private-output, budget, visibility, provider, write, log, config, or target drift. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

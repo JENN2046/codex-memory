@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1807 M6 observe-lite successful proof closeout / next-stage gate review |
-| Current task | `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review` |
-| Current validation | `CMV-1910` |
-| Current route | M6 observe-lite accepted; M7 preparation unlocked; next route is CM-1808 read-shape boundary preflight |
+| Status | CM-1808 M7 observe-full read-shape exact boundary preflight |
+| Current task | `CM-1808 M7 observe-full read-shape exact boundary preflight` |
+| Current validation | `CMV-1911` |
+| Current route | M7 read-shape exact boundary defined; next route is CM-1809 low-disclosure read-shape execution candidate |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1808` adds `docs/VCP_MEMORY_OBSERVE_FULL_CM1808_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT.md`. It binds the next M7 read-shape candidate to `DailyNoteSearcher.SearchDailyNote` through `/v1/human/tool`, exact safe query `codex_memory_m7_read_shape_probe_cm1809_no_private_match_20260704`, `max_results=1`, `context_lines=0`, shape-only output projection, response-body no-print/no-persist rule, raw-output abort, no-write rule, and receipt schema. Runtime action in CM-1808 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; M8 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; next action `CM-1809 M7 observe-full read-shape low-disclosure execution candidate`.
 
 `CM-1807` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1807_M6_SUCCESSFUL_PROOF_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`. It accepts CM-1806 as narrow M6 observe-lite target/transport/status proof and unlocks M7 preparation only. M7 live read execution authorized `NO`; M8 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime action in CM-1807 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; next action `CM-1808 M7 observe-full read-shape exact boundary preflight`.
 
