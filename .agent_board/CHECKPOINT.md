@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1790 M6 observe-lite status-only route matrix`.
-Current validation: `CMV-1893`.
+Current checkpoint: `CM-1791 M6 observe-lite source-only memory capability endpoint map`.
+Current validation: `CMV-1894`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1791 M6 Observe-Lite Source-Only Memory Capability Endpoint Map
+
+Status: `COMPLETED_VALIDATED_M6_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1791_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP.md`.
+- Mapped VCPToolBox memory/capability surfaces from source and plugin manifests only.
+- Identified chat-chain routes, protocol bridge routes, direct tool route, admin RAG routes, admin daily-note routes, LightMemo, DailyNoteSearcher, DailyNote/DailyNoteWrite, DailyNoteManager, RAGDiaryPlugin, ContextFoldingV2, ThoughtClusterManager, KnowledgeBaseManager, and TDBKnowledgeManager as candidate surfaces.
+- Preserved that runtime started `NO`, service start attempted `NO`, route called `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets/raw memory/raw store/raw runtime response read `NO`, provider/API called `NO`, MCP memory tool called `NO`, VCP plugin executed `NO`, memory read/write/result `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1792 exact invocation-envelope preflight for one memory capability surface.
+
+Validation: `CMV-1894`; source-only route/module/plugin manifest review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1790 M6 Observe-Lite Status-Only Route Matrix
 

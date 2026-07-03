@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1790 M6 observe-lite status-only route matrix`.
-Current validation: `CMV-1893`.
-Current status: CM-1790 performed a source-guided status-only route matrix against the local disposable VCPToolBox integration target. Warmup reached HTTP transport by probe 2; matrix statuses were health `http_4xx`, admin lifecycle `http_5xx`, admin panel `http_5xx`, models auth `http_4xx`, and unknown `http_4xx`. Source-only review found no `/health` route, admin auth before admin routes, an admin-disabled `5xx` branch, and bearer auth before `/v1/models`. Full M6 memory/capability handshake remains incomplete. M15 remains locked, and no response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1791 M6 observe-lite source-only memory capability endpoint map`.
+Current validation: `CMV-1894`.
+Current status: CM-1791 mapped source-only VCPToolBox memory/capability surfaces for the local disposable integration target. It identified candidate chat-chain, protocol bridge, direct tool, admin RAG, admin daily-note, LightMemo, DailyNoteSearcher, DailyNote/DailyNoteWrite, DailyNoteManager, RAGDiaryPlugin, ContextFoldingV2, ThoughtClusterManager, KnowledgeBaseManager, and TDBKnowledgeManager surfaces. Full M6 memory/capability handshake remains incomplete because no runtime route, response body, memory result, VCP plugin, MCP memory tool, provider/API, or memory read/write was executed. M15 remains locked, and no runtime start, route call, response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1791 source-only VCP memory capability endpoint map. Keep response bodies, logs, config/env contents, raw memory, and raw stores unread; identify memory/capability routes and plugin surfaces from source and manifests only before any later low-disclosure body or real memory proof. Do not open M7/M8/M15 yet, do not run trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe action is CM-1792 exact invocation-envelope preflight for one memory capability surface. Keep response bodies, logs, config/env contents, raw memory, raw stores, memory results, and provider responses unread. Select one candidate surface and define request shape, disclosure budget, stop conditions, and receipt fields before any live body or memory capability proof. Do not open M7/M8/M15 yet, do not run trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

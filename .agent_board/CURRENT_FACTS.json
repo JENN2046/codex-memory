@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1790",
-  "validationId": "CMV-1893",
+  "taskId": "CM-1791",
+  "validationId": "CMV-1894",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_status_only_route_matrix",
+    "scope": "vcp_memory_observe_lite_source_only_memory_capability_endpoint_map",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1894",
+      "scope": "CM-1791 M6 observe-lite source-only memory capability endpoint map",
+      "status": "COMPLETED_VALIDATED_M6_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER"
+    },
     {
       "id": "CMV-1893",
       "scope": "CM-1790 M6 observe-lite status-only route matrix",

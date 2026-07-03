@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1790 M6 observe-lite status-only route matrix`.
-Current validation: `CMV-1893`.
-Current handoff: CM-1790 completed a source-guided status-only route matrix against the local disposable VCPToolBox integration target. Warmup reached `http_4xx` by probe 2; matrix statuses were health `http_4xx`, admin lifecycle `http_5xx`, admin panel `http_5xx`, models auth `http_4xx`, and unknown `http_4xx`. Source review found no `/health` route, an admin-disabled `5xx` branch, and bearer auth before `/v1/models`. Full M6 memory/capability handshake remains incomplete. M15 remains locked, and no response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1791 M6 observe-lite source-only memory capability endpoint map`.
+Current validation: `CMV-1894`.
+Current handoff: CM-1791 completed a source-only VCPToolBox memory/capability endpoint map for the local disposable integration target. It identified candidate chat-chain, protocol bridge, direct tool, admin RAG, admin daily-note, LightMemo, DailyNoteSearcher, DailyNote/DailyNoteWrite, DailyNoteManager, RAGDiaryPlugin, ContextFoldingV2, ThoughtClusterManager, KnowledgeBaseManager, and TDBKnowledgeManager surfaces. Full M6 memory/capability handshake remains incomplete because no runtime route, response body, memory result, VCP plugin, MCP memory tool, provider/API, or memory read/write was executed. M15 remains locked, and no runtime start, response body read, runtime log read, config/env content read, secret read, private runtime read, raw store read, real query, MCP memory tool call, real approval line, approval request submission, approval grant, fallback execution, client-private memory read, provider/API, durable memory write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M6 observe-lite` transport proof for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, or write boundaries.
+Goal: complete `M6 observe-lite` transport and memory-capability proof planning for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, response body, provider, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_STATUS_ONLY_ROUTE_MATRIX_HTTP_GUARDS_REACHED_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable; `/health` is not a source-defined route; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped; `/health` is not a source-defined route; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1791_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1790_STATUS_ONLY_ROUTE_MATRIX_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1789_EXTENDED_NO_LOG_STARTUP_WINDOW_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1788_STARTUP_FAILURE_SOURCE_DIAGNOSIS.md`
@@ -117,16 +118,14 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1787_SERVICE_START_HANDSHAKE_RECEIPT.md`.
-- Executed one operator startup command alias with stdout/stderr discarded.
-- Performed three local status-only probes; reachable `NO`, error class `connection_refused`, response body included `NO`.
-- Sent a stop signal and observed child exit; child exit code included `NO`.
-- Recorded persistent process left running `NO` and duration seconds `12`.
-- Confirmed no locator/path/endpoint values, command args, process names, stdout/stderr/logs, response bodies, child exit code, agent config/env/secrets, raw runtime, raw memory, raw store, memory result, memory read/write, provider/API, MCP memory tool, public MCP expansion, approval line, release, deploy, cutover, push, readiness, M6 completion, M15 unlock, complete V8 claim, full bridge completion claim, or readiness claim occurred.
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1791_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP.md`.
+- Mapped memory/capability surfaces from source and plugin manifests only.
+- Identified candidate chat-chain, protocol bridge, direct tool, admin RAG, admin daily-note, LightMemo, DailyNoteSearcher, DailyNote/DailyNoteWrite, DailyNoteManager, RAGDiaryPlugin, ContextFoldingV2, ThoughtClusterManager, KnowledgeBaseManager, and TDBKnowledgeManager surfaces.
+- Confirmed runtime started `NO`, route called `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, agent config/env/secrets read `NO`, raw runtime response read `NO`, raw memory read `NO`, raw store read `NO`, memory result returned `NO`, VCP plugin executed `NO`, MCP memory tool called `NO`, memory read/write `NO`, provider/API `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, M6 full completion `NO`, M15 unlock `NO`, complete V8 claim `NO`, and full bridge completion claim `NO`.
 
-Validation: `CMV-1890`; service start/probe output, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
+Validation: `CMV-1894`; source-only route/module/plugin manifest review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
-Next safe route: startup failure diagnosis that remains source-only/no-log/no-secret, or exact low-disclosure log-read boundary. Do not run observe-full/trusted-read/write, do not read secrets/config/raw memory/raw stores, do not call MCP memory tools, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe route: CM-1792 exact invocation-envelope preflight for one memory capability surface. Do not run observe-full/trusted-read/write, do not read response bodies/logs/secrets/config/raw memory/raw stores/memory results/provider responses, do not call MCP memory tools or VCP plugins, do not write memory, do not call providers/APIs, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

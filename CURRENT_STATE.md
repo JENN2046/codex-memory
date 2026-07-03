@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1790 M6 observe-lite status-only route matrix |
-| Current task | `CM-1790 M6 observe-lite status-only route matrix` |
-| Current validation | `CMV-1893` |
-| Current route | Source-guided status-only route matrix reached HTTP guards/handlers without reading response bodies or logs: `/health` has no source route and returned `http_4xx`; admin candidates returned `http_5xx`; unauth models candidate returned `http_4xx` before provider handler; full M6 memory/capability handshake remains incomplete |
+| Status | CM-1791 M6 observe-lite source-only memory capability endpoint map |
+| Current task | `CM-1791 M6 observe-lite source-only memory capability endpoint map` |
+| Current validation | `CMV-1894` |
+| Current route | Source-only VCPToolBox memory/capability endpoint map completed without runtime start, route call, response body read, log read, config/env content read, secret read, raw memory/raw store read, memory result read, provider/API call, MCP memory tool call, plugin execution, write, or public MCP expansion; full M6 memory/capability handshake remains incomplete |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1791` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1791_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP.md`. It records a source-only memory/capability endpoint map for the local disposable VCPToolBox target. Evidence: source-only review `YES`; runtime started `NO`; service start attempted `NO`; route called `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; memory read/write/result `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; memory capability endpoint map complete `YES`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1792 exact invocation envelope preflight for one memory capability surface`.
 
 `CM-1790` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1790_STATUS_ONLY_ROUTE_MATRIX_RECEIPT.md`. It records a source-guided status-only route matrix. Evidence: source route map performed `YES`; warmup transport ready `YES` by probe count `2`; route matrix candidate count `5`; health candidate `http_4xx`; admin lifecycle candidate `http_5xx`; admin panel candidate `http_5xx`; models auth candidate `http_4xx`; unknown candidate `http_4xx`; health route present in source `NO`; provider route called after auth `NO`; provider/API called `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; memory read/write/result `NO`; MCP memory tool `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M6 transport subproof complete `YES`; route matrix complete `YES`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; log read required now `NO`; next action `CM-1791 source-only VCP memory capability endpoint map`.
 
