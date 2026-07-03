@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis`.
-Current validation: `CMV-1900`.
+Current checkpoint: `CM-1798 M6 observe-lite executable-bit repair status-only rerun`.
+Current validation: `CMV-1901`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1798 M6 Observe-Lite Executable-Bit Repair Status-Only Rerun
+
+Status: `COMPLETED_VALIDATED_M6_EXECUTABLE_BIT_REPAIR_STATUS_ONLY_RERUN_TIMEOUT_NO_BODY_NO_LOG_NO_SECRET_NO_MEMORY_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1798_EXECUTABLE_BIT_REPAIR_STATUS_ONLY_RERUN_RECEIPT.md`.
+- Applied exact external repair `chmod +x Plugin/DailyNoteSearcher/DailyNoteSearcher-aarch64-unknown-linux-musl`; mode changed from `644` to `755`.
+- Confirmed VCPToolBox content modified `NO`; file mode modified `YES`; rollback remains `chmod -x Plugin/DailyNoteSearcher/DailyNoteSearcher-aarch64-unknown-linux-musl`.
+- Recorded host architecture metadata `x86_64` and executable architecture metadata `ARM aarch64`.
+- Ran low-disclosure temporary-auth status-only rerun. First probe stayed `connection_refused_or_fetch_failed`. Extended probe reached warmup/auth guard `http_4xx`, but authenticated human-tool status was `timeout`.
+- Confirmed token/body printed or persisted `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets read `NO`, raw memory/raw store read by agent `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, public MCP expansion `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Confirmed post-probe no `node server.js` process remained and endpoint returned connection refused.
+- Set next route to CM-1799 DailyNoteSearcher binary compatibility source/metadata diagnosis.
+
+Validation: `CMV-1901`; exact stat/file metadata, exact chmod, low-disclosure status-only probe output, post-probe process/endpoint checks, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1797 M6 Observe-Lite DailyNoteSearcher Failure Source Diagnosis
 

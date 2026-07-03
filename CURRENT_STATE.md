@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis |
-| Current task | `CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis` |
-| Current validation | `CMV-1900` |
-| Current route | Source/metadata diagnosis found the CM-1796 request body parses correctly and the likely HTTP 5xx cause is missing executable bit on the only present DailyNoteSearcher binary; no runtime/log/body/secret/raw memory read or VCPToolBox file change occurred |
+| Status | CM-1798 M6 observe-lite executable-bit repair status-only rerun |
+| Current task | `CM-1798 M6 observe-lite executable-bit repair status-only rerun` |
+| Current validation | `CMV-1901` |
+| Current route | Exact executable-bit repair changed one DailyNoteSearcher binary mode from 644 to 755, then low-disclosure status-only rerun reached HTTP guard but authenticated human-tool call timed out; no body/log/stdout/stderr/secret/raw memory read, no memory write, no readiness claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1798` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1798_EXECUTABLE_BIT_REPAIR_STATUS_ONLY_RERUN_RECEIPT.md`. It records exact external repair `chmod +x Plugin/DailyNoteSearcher/DailyNoteSearcher-aarch64-unknown-linux-musl`: mode before `644`, mode after `755`, VCPToolBox content modified `NO`, VCPToolBox file mode modified `YES`, rollback `chmod -x`. Host architecture metadata `x86_64`; executable architecture metadata `ARM aarch64`. Low-disclosure temporary-auth status-only rerun: first probe stayed `connection_refused_or_fetch_failed`; extended probe warmup/auth guard `http_4xx`; authenticated human-tool status `timeout`; post-probe no `node server.js` process remained and endpoint returned connection refused. Token/body printed or persisted `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1799 DailyNoteSearcher binary compatibility source/metadata diagnosis`.
 
 `CM-1797` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1797_DAILYNOTESEARCHER_FAILURE_SOURCE_DIAGNOSIS.md`. It records a source-only/metadata-only diagnosis of the CM-1796 `http_5xx`. Evidence: request body parser marker extracted `YES`; parsed tool name `DailyNoteSearcher`; parsed required args present `YES`; `DailyNoteSearcher` exports `processToolCall` `YES`; only present executable candidate `DailyNoteSearcher-aarch64-unknown-linux-musl` exists `YES`; executable bit `NO`; release/debug candidates exist `NO`; source `findExecutable()` checks existence `YES` but executable permission `NO`; primary diagnosis `dailynotesearcher_executable_bit_missing`; runtime started `NO`; route called `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; VCPToolBox files modified `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1798 exact executable-bit repair and rerun status-only probe`.
 
