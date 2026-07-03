@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1748 M10-K1 VCP memory bounded mutation harness draft boundary`.
-Current validation: `CMV-1851`.
-Current status: CM-1748 records a non-authorizing M10 bounded mutation harness draft boundary. Accepted M9 proposal receipts and exact Jenn M10 write boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, write/update/supersede/tombstone execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, bounded write safety claim, or readiness claim occurred.
+Current task: `CM-1749 M10-K2 VCP memory bounded mutation exact write boundary packet preparation`.
+Current validation: `CMV-1852`.
+Current status: CM-1749 prepares a non-authorizing M10 exact write-boundary packet shape. Accepted M9 proposal receipts and exact Jenn M10 write boundary remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, write/update/supersede/tombstone execution, fallback execution, client-private memory read, read query, checkpoint/handoff/audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, bounded write safety claim, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M10 exact write boundary packet preparation without runtime/write/update/supersede/tombstone execution, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
+Next safe local action is M10 exact write boundary decision review without runtime/write/update/supersede/tombstone execution, or remain blocked before M10 until accepted M9 proposal receipts and required exact M10 write boundary exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

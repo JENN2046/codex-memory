@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1748",
-  "validationId": "CMV-1851",
+  "taskId": "CM-1749",
+  "validationId": "CMV-1852",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_bounded_mutation_harness_draft_boundary_docs_only",
+    "scope": "vcp_memory_bounded_mutation_exact_write_boundary_packet_preparation_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1852",
+      "scope": "CM-1749 M10-K2 VCP memory bounded mutation exact write boundary packet preparation",
+      "status": "COMPLETED_VALIDATED_M10_K2_VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1851",
       "scope": "CM-1748 M10-K1 VCP memory bounded mutation harness draft boundary",
