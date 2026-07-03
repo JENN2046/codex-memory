@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary |
-| Current task | `CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary` |
-| Current validation | `CMV-1829` |
-| Current route | Docs-only M6 blocked closeout summary; M6 live proof incomplete; M7 not unlocked; no approval line or live runtime execution |
+| Status | CM-1727 M7-K0 VCP memory observe-full blocked precondition record |
+| Current task | `CM-1727 M7-K0 VCP memory observe-full blocked precondition record` |
+| Current validation | `CMV-1830` |
+| Current route | Docs-only M7 blocked precondition record; M7 read-shape proof not started; M8 not unlocked; no approval line or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1727` adds `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_PRECONDITION_RECORD.md`. It records that M7 read-shape proof is blocked before runtime because accepted M6 observe-lite receipt and exact Jenn read-shape approval are missing. Boundary: real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read-shape query `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M8 unlock `NO`.
 
 `CM-1726` adds `docs/VCP_MEMORY_OBSERVE_LITE_M6_BLOCKED_CLOSEOUT_SUMMARY.md`. It closes the safe docs-only M6 preparation chain while recording that M6 live target/handshake proof remains incomplete and M7 is not unlocked. Boundary: real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; durable memory write `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M7 unlock `NO`.
 

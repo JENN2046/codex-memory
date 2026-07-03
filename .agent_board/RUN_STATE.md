@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary`.
-Current validation: `CMV-1829`.
-Current status: CM-1726 records the docs-only M6 blocked closeout summary. Docs-only M6 preparation is closed, but M6 live proof remains incomplete and M7 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1727 M7-K0 VCP memory observe-full blocked precondition record`.
+Current validation: `CMV-1830`.
+Current status: CM-1727 records the docs-only M7 blocked precondition record. M7 read-shape proof is not started, accepted M6 receipt is missing, exact Jenn read-shape approval is missing, and M8 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is an M7 blocked precondition record, or remain blocked before M6 runtime until Jenn supplies exact target/transport/client/scope/visibility/budget/disclosure approval. Push remains separate explicit authorization.
+Next safe local action is M7 exact approval packet preparation without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

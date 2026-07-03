@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary`.
-Current validation: `CMV-1829`.
-Current project status: CM-1726 records the docs-only M6 blocked closeout summary. It closes the safe docs-only M6 preparation chain while recording that M6 live target/handshake proof remains incomplete and M7 is not unlocked; no real approval line, approval request submission, approval grant, live VCPToolBox target discovery, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `VCP_MEMORY_OBSERVE_LITE_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`.
+Current task: `CM-1727 M7-K0 VCP memory observe-full blocked precondition record`.
+Current validation: `CMV-1830`.
+Current project status: CM-1727 records the docs-only M7 blocked precondition record. It states M7 read-shape proof is blocked before runtime because accepted M6 observe-lite receipt and exact Jenn read-shape approval are missing; no real approval line, approval request submission, approval grant, live VCPToolBox target discovery, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1727 M7-K0 VCP memory observe-full blocked precondition record: added `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_PRECONDITION_RECORD.md`. The record states M7 read-shape proof is blocked before runtime because accepted M6 observe-lite receipt and exact Jenn read-shape approval are missing, defines future exact approval requirements, and records M7/M8 non-claims. No real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read-shape query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M8 unlock occurred.
 
 CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary: added `docs/VCP_MEMORY_OBSERVE_LITE_M6_BLOCKED_CLOSEOUT_SUMMARY.md`. The closeout records CM-1722 through CM-1725 as the completed docs-only M6 preparation chain, lists unresolved live proof blockers, states M6 live target/handshake proof is incomplete, and states M7 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M7 unlock occurred.
 

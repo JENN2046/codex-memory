@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1726",
-  "validationId": "CMV-1829",
+  "taskId": "CM-1727",
+  "validationId": "CMV-1830",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_m6_blocked_closeout_summary_docs_only",
+    "scope": "vcp_memory_observe_full_m7_blocked_precondition_record_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1830",
+      "scope": "CM-1727 M7-K0 VCP memory observe-full blocked precondition record",
+      "status": "COMPLETED_VALIDATED_M7_K0_VCP_MEMORY_OBSERVE_FULL_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
     {
       "id": "CMV-1829",
       "scope": "CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary",

@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary`.
-Current validation: `CMV-1829`.
+Current checkpoint: `CM-1727 M7-K0 VCP memory observe-full blocked precondition record`.
+Current validation: `CMV-1830`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1727 M7-K0 VCP Memory Observe-Full Blocked Precondition Record
+
+Status: `COMPLETED_VALIDATED_M7_K0_VCP_MEMORY_OBSERVE_FULL_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_PRECONDITION_RECORD.md`.
+- Recorded that M7 read-shape proof is blocked before runtime because accepted M6 observe-lite receipt and exact Jenn read-shape approval are missing.
+- Defined future exact approval requirements and non-claims for M7/M8.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read-shape query, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M8 unlock occurred.
+
+Validation: `CMV-1830`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1726 M6-K5 VCP Memory Observe-Lite Blocked Closeout Summary
 
