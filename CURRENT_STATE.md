@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1742 M9-K2 VCP memory trusted-write-proposal exact approval packet preparation |
-| Current task | `CM-1742 M9-K2 VCP memory trusted-write-proposal exact approval packet preparation` |
-| Current validation | `CMV-1845` |
-| Current route | Docs-only M9 exact approval packet preparation; accepted M8 trusted-full-read workflow receipt absent; no request submission, write proposal generation/submission, approval line, M10 unlock, memory write, or live runtime execution |
+| Status | CM-1743 M9-K3 VCP memory trusted-write-proposal exact approval decision review boundary |
+| Current task | `CM-1743 M9-K3 VCP memory trusted-write-proposal exact approval decision review boundary` |
+| Current validation | `CMV-1846` |
+| Current route | Docs-only M9 exact approval decision review boundary; accepted M8 trusted-full-read workflow receipt absent; no request submission, write proposal generation/submission, approval line, M10 unlock, memory write, or live runtime execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1743` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`. It reviews CM-1742 as non-authorizing packet preparation and defines review state, required input review, decision matrix, review checklist, current review result, and receipt skeleton. Boundary: accepted M8 trusted-full-read receipt `NO`; exact trusted-write-proposal approval `NO`; exact proposal fields `NO`; proposal review route `NO`; proposal generation authorization `NO`; proposal submission authorization `NO`; write proposal generated/submitted `NO`; durable memory write `NO`; memory write `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; trusted-write-proposal workflow execution `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M10 unlock `NO`.
 
 `CM-1742` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_PACKET_PREPARATION.md`. It prepares a non-authorizing future exact approval packet shape, exact fields required later, future allowed action boundary, forbidden actions, stop conditions, receipt skeleton, and review gate for M9 governed mutation proposal mode. Boundary: accepted M8 trusted-full-read receipt `NO`; exact trusted-write-proposal approval `NO`; proposal generation authorization `NO`; proposal submission authorization `NO`; write proposal generated/submitted `NO`; durable memory write `NO`; memory write `NO`; real approval line `NO`; approval request submission `NO`; approval grant `NO`; live VCPToolBox runtime `NO`; trusted-write-proposal workflow execution `NO`; target discovery/probing `NO`; fallback execution `NO`; client-private memory read `NO`; read query `NO`; checkpoint/handoff/audit write `NO`; approval-line generation/submission/issue/storage/simulation `NO`; secret/config/env read `NO`; raw memory/runtime read `NO`; provider/API `NO`; runtime mutation `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; dependency action `NO`; push/release/deploy/cutover `NO`; production/release/cutover readiness `NO`; complete V8 `NOT_CLAIMED`; M10 unlock `NO`.
 

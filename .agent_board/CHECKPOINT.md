@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1742 M9-K2 VCP memory trusted-write-proposal exact approval packet preparation`.
-Current validation: `CMV-1845`.
+Current checkpoint: `CM-1743 M9-K3 VCP memory trusted-write-proposal exact approval decision review boundary`.
+Current validation: `CMV-1846`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1743 M9-K3 VCP Memory Trusted-Write-Proposal Exact Approval Decision Review Boundary
+
+Status: `COMPLETED_VALIDATED_M9_K3_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`.
+- Reviewed CM-1742 as non-authorizing packet preparation.
+- Recorded current decision `blocked_before_proposal_missing_m8_receipt_and_exact_trusted_write_proposal_approval`.
+- Defined required input review, decision matrix, review checklist, current review result, and receipt skeleton.
+- Preserved that accepted M8 trusted-full-read workflow receipt and exact Jenn trusted-write-proposal boundary are absent.
+- Preserved that proposal generation/submission, approval request submission, durable write, memory write, runtime execution, and M10 unlock did not occur.
+- Preserved the boundary that no real approval line, approval request submission, approval grant, live VCPToolBox runtime, target probing, fallback execution, client-private memory read, read query, trusted-write-proposal workflow execution, checkpoint/handoff/audit write, approval-line generation/submission, secret/config/env read, raw memory/runtime read, provider/API, durable write, memory write, runtime mutation, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M10 unlock occurred.
+
+Validation: `CMV-1846`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
 ## CM-1742 M9-K2 VCP Memory Trusted-Write-Proposal Exact Approval Packet Preparation
 
