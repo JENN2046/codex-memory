@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight |
-| Current task | `CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight` |
-| Current validation | `CMV-1923` |
-| Current route | M9 field feasibility classified; next route is CM-1821 envelope fixture contract |
+| Status | CM-1821 M9 trusted-write-proposal envelope fixture contract |
+| Current task | `CM-1821 M9 trusted-write-proposal envelope fixture contract` |
+| Current validation | `CMV-1924` |
+| Current route | M9 envelope fixture contract added; next route is CM-1822 receipt shape fixture contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1821` adds `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`, `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3721/3721`. The helper validates fixture-only trusted-write-proposal envelopes, denies missing exact proposal fields, stops durable write/provider/public-MCP/readiness intent, rejects raw/secret/approval/readiness fields without echo, requires safe fixture id prefixes and allowlisted operation entries, and reports zero runtime/write side effects. Runtime execution, real proposal generation/submission, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1822 M9 trusted-write-proposal receipt shape fixture contract.
 
 `CM-1820` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_EXACT_BOUNDARY_FIELD_FEASIBILITY_PREFLIGHT.md`. It classifies exact M9 boundary fields into safe derived constants, candidate target/transport facts, and missing exact fields. It finds local fixture/contract work can start, but exact proposal boundary, proposal generation/submission, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1821 M9 trusted-write-proposal envelope fixture contract.
 

@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight`.
-Current validation: `CMV-1923`.
+Current checkpoint: `CM-1821 M9 trusted-write-proposal envelope fixture contract`.
+Current validation: `CMV-1924`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1821 M9 Trusted-Write-Proposal Envelope Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_ENVELOPE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3721/3721`.
+- Post-fix re-review found and repaired one fixture shape gap: envelope/receipt identifiers now use safe fixture id prefixes, proposal operation entries are allowlisted, and unsafe identifier values are not echoed from rejected projections.
+- Confirmed helper performs no runtime action, proposal generation, proposal submission, memory read, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, approval request submission, approval-line generation, M10 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1924`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1820 M9 Trusted-Write-Proposal Exact Boundary Field Feasibility Preflight
 

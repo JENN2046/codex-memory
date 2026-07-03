@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight`.
-Current validation: `CMV-1923`.
-Current project status: CM-1820 classified M9 exact fields into safe derived constants, candidate target/transport facts, and missing exact fields. Fixture/contract work can start, but exact proposal boundary, proposal generation/submission, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_FIELD_FEASIBILITY_PREFLIGHT_PARTIAL_CONTRACT_WORK_CAN_START`.
+Current task: `CM-1821 M9 trusted-write-proposal envelope fixture contract`.
+Current validation: `CMV-1924`.
+Current project status: CM-1821 added a fixture-only trusted-write-proposal envelope contract and targeted tests. Local contract work is now executable, but runtime execution, real proposal generation/submission, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1821 M9 trusted-write-proposal envelope fixture contract: added `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`, `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3721/3721`. Post-fix re-review found and repaired one fixture shape gap: safe fixture id prefixes, allowlisted operation entries, and no unsafe identifier echo from rejected projections. The helper validates fixture-only trusted-write-proposal envelopes, denies missing proposal scope/operations/review/rollback/budgets/L4 shield fields, stops durable write/update/supersede/tombstone/provider/public-MCP/readiness intent, rejects raw/secret/proposal/approval/readiness fields without echo, and reports zero runtime/write side effects. It does not submit approval, generate approval line, generate/submit real proposals, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1822 M9 trusted-write-proposal receipt shape fixture contract.
 
 CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_EXACT_BOUNDARY_FIELD_FEASIBILITY_PREFLIGHT.md`. It classifies M9 exact fields into safe derived constants, candidate facts, and missing exact fields. Safe constants and candidate facts can support local fixture/contract work, but exact proposal boundary, proposal generation/submission, runtime execution, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. It does not submit an approval request, generate approval line, grant approval, generate/submit proposals, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1821 M9 trusted-write-proposal envelope fixture contract.
 

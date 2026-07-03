@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1820",
-  "validationId": "CMV-1923",
+  "taskId": "CM-1821",
+  "validationId": "CMV-1924",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_exact_boundary_field_feasibility_preflight",
+    "scope": "vcp_memory_trusted_write_proposal_m9_envelope_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1924",
+      "scope": "CM-1821 M9 trusted-write-proposal envelope fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_ENVELOPE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1923",
       "scope": "CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight",
