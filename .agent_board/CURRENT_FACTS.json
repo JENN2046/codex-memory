@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1802",
-  "validationId": "CMV-1905",
+  "taskId": "CM-1803",
+  "validationId": "CMV-1906",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_dailynotesearcher_locked_local_x64_build_attempt",
+    "scope": "vcp_memory_observe_lite_isolated_rustup_toolchain_install",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1906",
+      "scope": "CM-1803 M6 observe-lite isolated rustup toolchain install",
+      "status": "COMPLETED_VALIDATED_M6_ISOLATED_RUSTUP_TOOLCHAIN_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE"
+    },
     {
       "id": "CMV-1905",
       "scope": "CM-1802 M6 observe-lite DailyNoteSearcher locked local x64 build attempt",

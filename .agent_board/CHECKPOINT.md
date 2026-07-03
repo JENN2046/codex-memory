@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1802 M6 observe-lite DailyNoteSearcher locked local x64 build attempt`.
-Current validation: `CMV-1905`.
+Current checkpoint: `CM-1803 M6 observe-lite isolated rustup toolchain install`.
+Current validation: `CMV-1906`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1803 M6 Observe-Lite Isolated Rustup Toolchain Install
+
+Status: `COMPLETED_VALIDATED_M6_ISOLATED_RUSTUP_TOOLCHAIN_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1803_ISOLATED_RUSTUP_TOOLCHAIN_INSTALL_RECEIPT.md`.
+- Installed stable Rust toolchain into VCPToolBox-local `.rustup-cm1803/` and `.cargo-cm1803/` directories.
+- Used `--profile minimal`, `--default-toolchain stable`, and `--no-modify-path`.
+- Verified isolated `cargo 1.96.1`, `rustc 1.96.1`, host `x86_64-unknown-linux-gnu`, and locked cargo metadata pass.
+- Confirmed global PATH/profile modified `NO`, apt `cargo`/`rustc` removed `NO`, cargo build performed `NO`, runtime started `NO`, binary executed by agent `NO`, response body/stdout/stderr/runtime logs/config/env/secrets/raw memory/raw store read `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, public MCP expansion `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1804 DailyNoteSearcher isolated-toolchain locked x64 build.
+
+Validation: `CMV-1906`; isolated rustup install output, isolated cargo/rustc version checks, locked cargo metadata, VCPToolBox status, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1802 M6 Observe-Lite DailyNoteSearcher Locked Local X64 Build Attempt
 
