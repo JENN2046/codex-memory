@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1830 M9 exact request field candidate contract closeout / packet-readiness gate review`.
-Current validation: `CMV-1933`.
-Current status: CM-1830 closes the local exact request field candidate slice for planning and opens only the next packet-readiness fixture contract route. Full M9 proposal mode, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1831 M9 exact request packet-readiness fixture contract`.
+Current validation: `CMV-1934`.
+Current status: CM-1831 adds a pure local source/test fixture contract for exact request packet-readiness. The accepted state remains not-ready; full M9 proposal mode, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1831 M9 exact request packet-readiness fixture contract. It should turn the CM-1830 gate decision into a pure local source/test fixture for not-ready packet state, while preserving that request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
+Next safe action is CM-1832 M9 exact request packet-readiness contract closeout / request-preparation gate review. It should review CM-1830 and CM-1831 and decide whether the local packet-readiness fixture slice can close, while preserving that request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

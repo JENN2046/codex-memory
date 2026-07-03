@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1830",
-  "validationId": "CMV-1933",
+  "taskId": "CM-1831",
+  "validationId": "CMV-1934",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_field_candidate_contract_closeout_packet_readiness_gate_review",
+    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_packet_readiness_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1934",
+      "scope": "CM-1831 M9 exact request packet-readiness fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_READINESS_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1933",
       "scope": "CM-1830 M9 exact request field candidate contract closeout / packet-readiness gate review",
