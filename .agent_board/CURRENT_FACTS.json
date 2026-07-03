@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-03",
-  "taskId": "CM-1756",
-  "validationId": "CMV-1859",
+  "taskId": "CM-1757",
+  "validationId": "CMV-1860",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_response_normalization_audit_receipt_contract_fixture_only",
+    "scope": "vcp_memory_response_normalization_audit_receipts_m11_blocked_closeout_docs_only",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1860",
+      "scope": "CM-1757 M11-K3 VCP memory response normalization audit receipts blocked closeout",
+      "status": "COMPLETED_VALIDATED_M11_K3_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1859",
       "scope": "CM-1756 M11-K2 VCP memory response normalization audit receipt fixture contract",

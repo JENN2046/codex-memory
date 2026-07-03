@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1756 M11-K2 VCP memory response normalization audit receipt fixture contract`.
-Current validation: `CMV-1859`.
-Current status: CM-1756 adds a pure fixture/schema helper and targeted tests for M11 response normalization and audit receipt contract while preserving that live VCP-native parity and runtime receipt stability remain blocked until exact-approved M7/live evidence exists. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1757 M11-K3 VCP memory response normalization audit receipts blocked closeout`.
+Current validation: `CMV-1860`.
+Current status: CM-1757 closes the safe M11 fixture/schema response normalization and audit receipt chain while preserving that full M11 exit conditions remain blocked until accepted exact-approved M7 live read-shape receipt, live VCP-native parity evidence, fallback runtime parity evidence, low-disclosure runtime receipt evidence, and exact M11 live runtime boundary exist. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read query, runtime audit write, raw memory, provider/API, durable write, memory write/update/supersede/tombstone, public MCP expansion, dependency action, remote action, M12 live workflow unlock, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M11 fixture contract closeout or fixture extension without runtime/write/update/supersede/tombstone execution, or wait for an exact-approved M7 read-shape receipt. Push remains separate explicit authorization.
+Next safe local action is M12 fixture-safe sustained workflow boundary work without runtime/write/update/supersede/tombstone/checkpoint-handoff memory execution, or wait for an exact-approved M7 read-shape receipt before live M11/M12 workflow evidence. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
