@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun`.
-Current validation: `CMV-1909`.
-Current handoff: CM-1806 corrected rerun used a disposable child-process bearer and in-memory request body, discarded response body and runtime stdout/stderr, and reached `/v1/human/tool` status `http_2xx` after warmup `http_4xx`. A first runtime attempt had a status classifier bug and is not accepted as proof. Independent post-stop checks found endpoint `connection_refused_or_fetch_failed`, `node server.js` process count `0`, and DailyNoteSearcher process count `0`. No response body/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review`.
+Current validation: `CMV-1910`.
+Current handoff: CM-1807 accepted CM-1806 as narrow M6 observe-lite target/transport/status proof and unlocked M7 preparation only. M7 live read execution, M8 trusted-full-read, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1807 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1806 corrected rerun used a disposable child-process bearer 
 
 Goal: complete `M6 observe-lite` transport and memory-capability proof planning for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, response body, provider, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_HTTP_2XX_NO_BODY_NO_LOG_NO_SECRET_NO_MEMORY_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful low-disclosure memory capability status proof exists; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; CM-1794 defines the future disposable child-process auth boundary without execution; CM-1795 records a source-scan boundary repair; CM-1796 proves temporary-auth transport and authenticated human-tool route status but receives HTTP 5xx; CM-1797 diagnoses missing executable permission; CM-1798 repairs that file mode and reruns status-only but authenticated human-tool call times out; CM-1799 diagnoses Linux x64 versus only-present Linux ARM aarch64 binary mismatch; CM-1800 preflights exact Rust toolchain install; CM-1801 installs exact Rust toolchain dependency packages; CM-1802 locked build is blocked by Cargo.lock v4 under cargo 1.75; CM-1803 installs an isolated VCPToolBox-local stable Rust toolchain with cargo/rustc 1.96.1 and locked metadata pass; CM-1804 builds the Linux x64 release binary; CM-1805 installs it to the primary Linux candidate; CM-1806 proves primary-candidate human-tool status `http_2xx` without body/log/secret/memory write; `/health` is not a source-defined route; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_OBSERVE_LITE_SUCCESSFUL_PROOF_CLOSEOUT_M7_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; successful low-disclosure memory capability status proof exists; M7 preparation is unlocked; M7 live read execution is not authorized by this closeout; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; CM-1806 proves primary-candidate human-tool status `http_2xx` without body/log/secret/memory write; `/health` is not a source-defined route; M8, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1807_M6_SUCCESSFUL_PROOF_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1806_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1805_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1804_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_RECEIPT.md`

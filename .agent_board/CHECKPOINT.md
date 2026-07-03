@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun`.
-Current validation: `CMV-1909`.
+Current checkpoint: `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review`.
+Current validation: `CMV-1910`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1807 M6 Observe-Lite Successful Proof Closeout / Next-Stage Gate Review
+
+Status: `COMPLETED_VALIDATED_M6_OBSERVE_LITE_SUCCESSFUL_PROOF_CLOSEOUT_M7_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1807_M6_SUCCESSFUL_PROOF_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`.
+- Accepted CM-1806 as the narrow M6 observe-lite target/transport/status proof.
+- Preserved that M6 acceptance is not M7 read-shape proof, not M8 trusted-full-read proof, not M15 unlock, and not readiness.
+- Unlocked CM-1808 M7 observe-full read-shape exact boundary preflight only.
+- Confirmed CM-1807 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, public MCP expansion, release/deploy/cutover/push, readiness claim, `RC_READY` claim, M15 unlock, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1910`; plan M6/M7 slices, CM-1806 receipt review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1806 M6 Observe-Lite DailyNoteSearcher Primary-Candidate Status-Only Rerun
 

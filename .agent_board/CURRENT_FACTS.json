@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1806",
-  "validationId": "CMV-1909",
+  "taskId": "CM-1807",
+  "validationId": "CMV-1910",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_dailynotesearcher_primary_candidate_status_only_rerun",
+    "scope": "vcp_memory_observe_lite_m6_successful_proof_closeout_next_stage_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1910",
+      "scope": "CM-1807 M6 observe-lite successful proof closeout / next-stage gate review",
+      "status": "COMPLETED_VALIDATED_M6_OBSERVE_LITE_SUCCESSFUL_PROOF_CLOSEOUT_M7_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS"
+    },
     {
       "id": "CMV-1909",
       "scope": "CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun",

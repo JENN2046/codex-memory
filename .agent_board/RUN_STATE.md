@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun`.
-Current validation: `CMV-1909`.
-Current status: CM-1806 corrected rerun used a disposable child-process bearer and in-memory request body, discarded response body and runtime stdout/stderr, and reached `/v1/human/tool` status `http_2xx` after warmup `http_4xx`. A first runtime attempt had a status classifier bug and is not accepted as proof. Independent post-stop checks found endpoint `connection_refused_or_fetch_failed`, `node server.js` process count `0`, and DailyNoteSearcher process count `0`. No response body/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review`.
+Current validation: `CMV-1910`.
+Current status: CM-1807 accepted CM-1806 as narrow M6 observe-lite target/transport/status proof and unlocked M7 preparation only. M7 live read execution, M8 trusted-full-read, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain not claimed. CM-1807 performed no runtime action, response body read, runtime log read, secret/config/env content read, raw memory/raw store read, provider/API call, MCP memory tool call, memory write, or public MCP expansion.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1807 M6 observe-lite successful proof closeout / next-stage gate review. This should be no-runtime review/closeout that decides the next plan stage from the accepted low-disclosure `http_2xx` memory-capability status proof. Do not claim release, production, cutover, `RC_READY`, M15, complete V8, or full bridge completion. Push remains separate explicit authorization.
+Next safe action is CM-1808 M7 observe-full read-shape exact boundary preflight. It should define exact target, route, query, result budget, output projection, abort rules, and receipt schema before any read-shape runtime call. Do not read response bodies or raw private memory until that boundary is complete. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun |
-| Current task | `CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun` |
-| Current validation | `CMV-1909` |
-| Current route | primary-candidate human-tool status `http_2xx` proven without body/log/secret/memory write; next route is CM-1807 closeout/gate review |
+| Status | CM-1807 M6 observe-lite successful proof closeout / next-stage gate review |
+| Current task | `CM-1807 M6 observe-lite successful proof closeout / next-stage gate review` |
+| Current validation | `CMV-1910` |
+| Current route | M6 observe-lite accepted; M7 preparation unlocked; next route is CM-1808 read-shape boundary preflight |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1807` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1807_M6_SUCCESSFUL_PROOF_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`. It accepts CM-1806 as narrow M6 observe-lite target/transport/status proof and unlocks M7 preparation only. M7 live read execution authorized `NO`; M8 unlocked `NO`; M15 unlocked `NO`; release/deploy/cutover/push `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; runtime action in CM-1807 `NO`; response body/runtime logs/config/env/secrets/raw memory/raw store read `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; next action `CM-1808 M7 observe-full read-shape exact boundary preflight`.
 
 `CM-1806` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1806_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_RECEIPT.md`. It records a live status-only rerun after primary Linux candidate install: first attempt classifier bug `YES` and not accepted as proof; corrected rerun pre-start `connection_refused_or_fetch_failed`; runtime started by agent `YES`; disposable bearer generated `YES` and disclosed/persisted `NO`; request body generated in memory `YES` and printed/persisted `NO`; warmup probe count `2`; warmup status `http_4xx`; `/v1/human/tool` status `http_2xx`; response body/stdout/stderr from runtime/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; M15 unlocked `NO`; final endpoint after stop `connection_refused_or_fetch_failed`; final process counts `0`; next action `CM-1807 M6 observe-lite successful proof closeout and next-stage gate review`.
 
