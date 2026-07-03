@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight`.
-Current validation: `CMV-1903`.
+Current checkpoint: `CM-1801 M6 observe-lite Rust toolchain dependency install`.
+Current validation: `CMV-1904`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1801 M6 Observe-Lite Rust Toolchain Dependency Install
+
+Status: `COMPLETED_VALIDATED_M6_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1801_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_RECEIPT.md`.
+- Executed exact dependency action `sudo apt-get install -y cargo rustc`; exit code `0`.
+- Installed 8 new packages, upgraded 0, removed 0, downloaded `97.4 MB`, and used `419 MB` additional disk.
+- Verified `cargo 1.75.0`, `rustc 1.75.0`, host `x86_64-unknown-linux-gnu`, and `cargo metadata --locked` pass.
+- Confirmed cargo build performed `NO`, runtime started `NO`, binary executed by agent `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets read `NO`, raw memory/raw store read by agent `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, VCPToolBox content modified by CM-1801 `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1802 DailyNoteSearcher locked local x64 build.
+
+Validation: `CMV-1904`; exact apt install output, cargo/rustc version checks, locked cargo metadata, dpkg-query, VCPToolBox status/build-dir check, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1800 M6 Observe-Lite DailyNoteSearcher Local X64 Build/Install Preflight
 

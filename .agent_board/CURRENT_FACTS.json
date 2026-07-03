@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1800",
-  "validationId": "CMV-1903",
+  "taskId": "CM-1801",
+  "validationId": "CMV-1904",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_dailynotesearcher_local_x64_build_install_preflight",
+    "scope": "vcp_memory_observe_lite_rust_toolchain_dependency_install",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1904",
+      "scope": "CM-1801 M6 observe-lite Rust toolchain dependency install",
+      "status": "COMPLETED_VALIDATED_M6_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE"
+    },
     {
       "id": "CMV-1903",
       "scope": "CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight",

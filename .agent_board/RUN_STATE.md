@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight`.
-Current validation: `CMV-1903`.
-Current status: CM-1800 performed toolchain/source metadata and dependency-action simulation only. `cargo`, `rustc`, and `rustup` are absent. `apt-get` and passwordless `sudo` are available. Rust source files `Cargo.toml`, `Cargo.lock`, and `src/main.rs` are present. `cargo metadata` is not runnable because cargo is absent. `sudo apt-get -s install cargo rustc` simulation would newly install 8 packages and upgrade/remove 0. No package install, cargo build, runtime start, binary execution by agent, response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, or VCPToolBox file modification by CM-1800 occurred. No memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1801 M6 observe-lite Rust toolchain dependency install`.
+Current validation: `CMV-1904`.
+Current status: CM-1801 executed exact dependency action `sudo apt-get install -y cargo rustc`; exit code `0`. It installed 8 new packages, upgraded 0, removed 0, downloaded `97.4 MB`, and used `419 MB` additional disk. Verified `cargo 1.75.0`, `rustc 1.75.0`, host `x86_64-unknown-linux-gnu`, and `cargo metadata --locked` pass. No cargo build, runtime start, binary execution by agent, response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, or VCPToolBox content modification by CM-1801 occurred. No memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1801 exact Rust toolchain dependency install: `sudo apt-get install -y cargo rustc`. Keep it limited to the simulated package action. Do not build, start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1801. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
+Next safe action is CM-1802 DailyNoteSearcher locked local x64 build. Keep it to `cargo build --release --locked` in `Plugin/DailyNoteSearcher/src`, then inspect only build metadata and binary header. Do not start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1802. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

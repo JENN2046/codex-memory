@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight |
-| Current task | `CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight` |
-| Current validation | `CMV-1903` |
-| Current route | Rust source is present but cargo/rustc/rustup are absent; apt-get and passwordless sudo are available; exact simulated install `cargo rustc` would add 8 packages and upgrade/remove 0 |
+| Status | CM-1801 M6 observe-lite Rust toolchain dependency install |
+| Current task | `CM-1801 M6 observe-lite Rust toolchain dependency install` |
+| Current validation | `CMV-1904` |
+| Current route | Exact dependency action installed `cargo rustc` via apt, adding 8 packages; cargo/rustc and locked metadata now pass; next route is locked local x64 build |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1801` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1801_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_RECEIPT.md`. It records exact dependency action `sudo apt-get install -y cargo rustc`: exit code `0`; newly installed packages `8`; upgraded/removed `0`; downloaded `97.4 MB`; additional disk `419 MB`; `cargo --version` `cargo 1.75.0`; `rustc` release `1.75.0`; `rustc` host `x86_64-unknown-linux-gnu`; `cargo metadata --locked` passed; cargo target directory `Plugin/DailyNoteSearcher/src/target`; cargo build performed `NO`; runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; VCPToolBox content modified by CM-1801 `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1802 DailyNoteSearcher locked local x64 build`.
 
 `CM-1800` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1800_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT.md`. It records local x64 build/install preflight: `cargo` present `NO`; `rustc` present `NO`; `rustup` present `NO`; `apt-get` present `YES`; passwordless `sudo` available `YES`; `Cargo.toml`, `Cargo.lock`, and `src/main.rs` present `YES`; `cargo metadata` runnable `NO`; simulated install command `sudo apt-get install -y cargo rustc`; simulated new packages `8`; simulated upgrades/removals `0`; package install performed `NO`; cargo build performed `NO`; runtime started by agent `NO`; binary executed by agent `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; VCPToolBox file modified by CM-1800 `NO`; public MCP expansion/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1801 exact Rust toolchain dependency install`.
 

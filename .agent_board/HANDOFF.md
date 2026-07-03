@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight`.
-Current validation: `CMV-1903`.
-Current handoff: CM-1800 performed toolchain/source metadata and dependency-action simulation only. `cargo`, `rustc`, and `rustup` are absent. `apt-get` and passwordless `sudo` are available. Rust source files `Cargo.toml`, `Cargo.lock`, and `src/main.rs` are present. `cargo metadata` is not runnable because cargo is absent. `sudo apt-get -s install cargo rustc` simulation would newly install 8 packages and upgrade/remove 0. No package install, cargo build, runtime start, binary execution by agent, response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, or VCPToolBox file modification by CM-1800 occurred. No memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+Current task: `CM-1801 M6 observe-lite Rust toolchain dependency install`.
+Current validation: `CMV-1904`.
+Current handoff: CM-1801 executed exact dependency action `sudo apt-get install -y cargo rustc`; exit code `0`. It installed 8 new packages, upgraded 0, removed 0, downloaded `97.4 MB`, and used `419 MB` additional disk. Verified `cargo 1.75.0`, `rustc 1.75.0`, host `x86_64-unknown-linux-gnu`, and `cargo metadata --locked` pass. No cargo build, runtime start, binary execution by agent, response body/stdout/stderr/runtime log/config/env/secret/raw memory/raw store/provider response/memory result read, or VCPToolBox content modification by CM-1801 occurred. No memory write, MCP memory tool call, provider/API call by agent, public MCP expansion, remote action, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1800 performed toolchain/source metadata and dependency-acti
 
 Goal: complete `M6 observe-lite` transport and memory-capability proof planning for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/` without crossing log, secret, raw memory, response body, provider, or write boundaries.
 
-Current status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT_NO_RUNTIME_NO_SECRET_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; CM-1794 defines the future disposable child-process auth boundary without execution; CM-1795 records a source-scan boundary repair; CM-1796 proves temporary-auth transport and authenticated human-tool route status but receives HTTP 5xx; CM-1797 diagnoses missing executable permission; CM-1798 repairs that file mode and reruns status-only but authenticated human-tool call times out; CM-1799 diagnoses Linux x64 versus only-present Linux ARM aarch64 binary mismatch; CM-1800 preflights exact Rust toolchain install; `/health` is not a source-defined route; M15 not opened.
+Current status: `COMPLETED_VALIDATED_M6_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE`; production/release/cutover ready no; complete V8 not claimed; M6 full memory/capability handshake proof incomplete; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; direct tool probe aborted by CM-1793 because bearer auth is required and existing secrets/config cannot be read; CM-1794 defines the future disposable child-process auth boundary without execution; CM-1795 records a source-scan boundary repair; CM-1796 proves temporary-auth transport and authenticated human-tool route status but receives HTTP 5xx; CM-1797 diagnoses missing executable permission; CM-1798 repairs that file mode and reruns status-only but authenticated human-tool call times out; CM-1799 diagnoses Linux x64 versus only-present Linux ARM aarch64 binary mismatch; CM-1800 preflights exact Rust toolchain install; CM-1801 installs exact Rust toolchain dependency packages; `/health` is not a source-defined route; M15 not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1801_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1800_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1799_DAILYNOTESEARCHER_BINARY_COMPATIBILITY_DIAGNOSIS.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1798_EXECUTABLE_BIT_REPAIR_STATUS_ONLY_RERUN_RECEIPT.md`
@@ -127,17 +128,15 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1800_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT.md`.
-- Confirmed `cargo`, `rustc`, and `rustup` are absent.
-- Confirmed `apt-get` and passwordless `sudo` are available.
-- Confirmed Rust source files `Cargo.toml`, `Cargo.lock`, and `src/main.rs` are present.
-- Confirmed `cargo metadata` is not runnable because cargo is absent.
-- Ran `sudo apt-get -s install cargo rustc` simulation only; it would newly install 8 packages and upgrade/remove 0.
-- Confirmed no package install, cargo build, runtime start, binary execution by agent, response body read, stdout/stderr read, runtime log read, config/env content read, secret read, raw memory/raw store read by agent, provider/API by agent, MCP memory tool call, memory write, VCPToolBox file modification by CM-1800, public MCP expansion, remote action, readiness claim, M6 full completion claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1801_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_RECEIPT.md`.
+- Executed exact dependency action `sudo apt-get install -y cargo rustc`; exit code `0`.
+- Installed 8 new packages, upgraded 0, removed 0, downloaded `97.4 MB`, and used `419 MB` additional disk.
+- Verified `cargo 1.75.0`, `rustc 1.75.0`, host `x86_64-unknown-linux-gnu`, and `cargo metadata --locked` pass.
+- Confirmed no cargo build, runtime start, binary execution by agent, response body read, stdout/stderr read, runtime log read, config/env content read, secret read, raw memory/raw store read by agent, provider/API by agent, MCP memory tool call, memory write, VCPToolBox content modification by CM-1801, public MCP expansion, remote action, readiness claim, M6 full completion claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 
-Validation: `CMV-1903`; toolchain presence checks, source metadata, exact apt simulation, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
+Validation: `CMV-1904`; exact apt install output, cargo/rustc version checks, locked cargo metadata, dpkg-query, VCPToolBox status/build-dir check, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
-Next safe route: CM-1801 exact Rust toolchain dependency install: `sudo apt-get install -y cargo rustc`. Keep it limited to the simulated package action. Do not build, start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1801. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
+Next safe route: CM-1802 DailyNoteSearcher locked local x64 build. Keep it to `cargo build --release --locked` in `Plugin/DailyNoteSearcher/src`, then inspect only build metadata and binary header. Do not start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1802. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 
