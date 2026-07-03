@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1791 M6 observe-lite source-only memory capability endpoint map |
-| Current task | `CM-1791 M6 observe-lite source-only memory capability endpoint map` |
-| Current validation | `CMV-1894` |
-| Current route | Source-only VCPToolBox memory/capability endpoint map completed without runtime start, route call, response body read, log read, config/env content read, secret read, raw memory/raw store read, memory result read, provider/API call, MCP memory tool call, plugin execution, write, or public MCP expansion; full M6 memory/capability handshake remains incomplete |
+| Status | CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight |
+| Current task | `CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight` |
+| Current validation | `CMV-1895` |
+| Current route | Source-only exact invocation envelope selected `DailyNoteSearcher.SearchDailyNote` via the direct human-tool route alias, with no runtime start, real request body generation, route call, response body read, log read, config/env content read, secret read, raw memory/raw store read, memory result read, provider/API call, MCP memory tool call, plugin execution, write, or public MCP expansion; full M6 memory/capability handshake remains incomplete |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1792` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1792_DAILYNOTESEARCHER_INVOCATION_ENVELOPE_PREFLIGHT.md`. It records a source-only exact invocation envelope preflight for `DailyNoteSearcher.SearchDailyNote` through the direct human-tool route alias. Evidence: selected surface `DailyNoteSearcher.SearchDailyNote`; request body generated `NO`; real request body disclosed `NO`; runtime started `NO`; service start attempted `NO`; route called `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; memory read/write/result `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; invocation envelope preflight complete `YES`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1793 status-only no-body DailyNoteSearcher probe decision or abort boundary`.
 
 `CM-1791` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1791_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP.md`. It records a source-only memory/capability endpoint map for the local disposable VCPToolBox target. Evidence: source-only review `YES`; runtime started `NO`; service start attempted `NO`; route called `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents read `NO`; secrets/raw memory/raw store/raw runtime response read `NO`; provider/API called `NO`; MCP memory tool called `NO`; VCP plugin executed `NO`; memory read/write/result `NO`; public MCP expansion `NO`; config/startup/watchdog change `NO`; release/tag/deploy/cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; memory capability endpoint map complete `YES`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1792 exact invocation envelope preflight for one memory capability surface`.
 

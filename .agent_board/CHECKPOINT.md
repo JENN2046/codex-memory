@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1791 M6 observe-lite source-only memory capability endpoint map`.
-Current validation: `CMV-1894`.
+Current checkpoint: `CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight`.
+Current validation: `CMV-1895`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1792 M6 Observe-Lite DailyNoteSearcher Invocation Envelope Preflight
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_INVOCATION_ENVELOPE_PREFLIGHT_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1792_DAILYNOTESEARCHER_INVOCATION_ENVELOPE_PREFLIGHT.md`.
+- Selected `DailyNoteSearcher.SearchDailyNote` as the next exact observe-lite invocation-envelope target.
+- Deferred `LightMemo.SearchRAG` because source review found query embedding and possible rerank/TagMemo/vector/formatted memory-result paths that need provider/output classification before live proof.
+- Recorded the direct human-tool route alias, required future request fields, forbidden fields, output policy, budgets, stop conditions, and future receipt requirements.
+- Preserved that runtime started `NO`, real request body generated `NO`, route called `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets/raw memory/raw store/raw runtime response read `NO`, provider/API called `NO`, MCP memory tool called `NO`, VCP plugin executed `NO`, memory read/write/result `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1793 status-only no-body DailyNoteSearcher probe decision or abort boundary.
+
+Validation: `CMV-1895`; source-only route/parser/plugin comparison, direct human-tool route review, DailyNoteSearcher source review, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1791 M6 Observe-Lite Source-Only Memory Capability Endpoint Map
 
