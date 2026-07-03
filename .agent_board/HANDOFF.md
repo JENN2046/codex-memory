@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1721 M5-K2 VCP memory client scope visibility matrix`.
-Current validation: `CMV-1824`.
-Current handoff: CM-1721 completed the docs-only client/scope/visibility matrix. No live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1722 M6-K1 VCP memory observe-lite exact approval packet preparation`.
+Current validation: `CMV-1825`.
+Current handoff: CM-1722 completed the docs-only non-authorizing observe-lite exact approval packet preparation. No real approval line, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M5-K2 Client Scope Visibility Matrix` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M6-K1 Observe-Lite Exact Approval Packet Preparation` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M5_K2_VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX_DOCS_ONLY_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M6_K1_VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,17 +25,17 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
-- `docs/VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION.md`
 
 Completed in this slice:
 
-- Added VCP memory client/scope/visibility matrix.
-- Defined Codex/Claude/shared/unknown client identity rules, scope fields, visibility matrix, scope expansion matrix, safe routing rules, and fixture decisions.
-- Confirmed no live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
+- Added non-authorizing observe-lite exact approval packet preparation.
+- Defined packet state, exact fields required later from Jenn, future allowed action boundary, forbidden actions, stop conditions, receipt skeleton, and review gate.
+- Confirmed no real approval line, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
-Validation: `CMV-1824`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1825`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M6 observe-lite exact approval packet preparation. Push remains separate explicit authorization.
+Next safe route: observe-lite exact approval decision/review boundary. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

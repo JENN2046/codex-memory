@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1721 M5-K2 VCP memory client scope visibility matrix`.
-Current validation: `CMV-1824`.
-Current project status: CM-1721 records the docs-only client/scope/visibility matrix. It defines Codex/Claude/shared/unknown client identity rules, scope fields, visibility matrix, scope expansion matrix, safe routing rules, and fixture decisions; no live VCPToolBox target discovery, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
-Current route: `VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX_DOCS_ONLY_NO_RUNTIME`.
+Current task: `CM-1722 M6-K1 VCP memory observe-lite exact approval packet preparation`.
+Current validation: `CMV-1825`.
+Current project status: CM-1722 records the docs-only non-authorizing observe-lite exact approval packet preparation. It defines packet state, exact fields required later from Jenn, future allowed action boundary, forbidden actions, stop conditions, receipt skeleton, and review gate; no real approval line, live VCPToolBox target discovery, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, push/release/deploy/cutover, or readiness claim occurred.
+Current route: `VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1722 M6-K1 VCP memory observe-lite exact approval packet preparation: added `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION.md`. The packet preparation defines non-authorizing packet state, exact fields required later from Jenn, future allowed action boundary, forbidden actions, stop conditions, receipt skeleton, and review gate. It explicitly does not supply a real approval line, bind a real target, or authorize execution. No real approval line, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 
 CM-1721 M5-K2 VCP memory client scope visibility matrix: added `docs/VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX.md`. The matrix defines Codex/Claude/shared/unknown client identity rules, scope fields, visibility matrix, scope expansion matrix, safe routing rules, and fixture decisions. It records that Codex-private memory does not leak to Claude, Claude-private memory does not leak to Codex, shared visibility requires explicit boundary, and unknown client id fails closed. No live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, or complete V8 claim occurred.
 

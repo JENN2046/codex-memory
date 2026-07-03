@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1721 M5-K2 VCP memory client scope visibility matrix`.
-Current validation: `CMV-1824`.
-Current status: CM-1721 records the docs-only client/scope/visibility matrix. No live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1722 M6-K1 VCP memory observe-lite exact approval packet preparation`.
+Current validation: `CMV-1825`.
+Current status: CM-1722 records the docs-only non-authorizing observe-lite exact approval packet preparation. No real approval line, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe local action is M6 observe-lite exact approval packet preparation, still without live runtime access unless separately exact-approved. Push remains separate explicit authorization.
+Next safe local action is observe-lite exact approval decision/review boundary, still without live runtime access unless separately exact-approved. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
