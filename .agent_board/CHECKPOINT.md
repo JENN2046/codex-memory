@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1773 M14-K2 VCP memory health report raw/private leak rejection`.
-Current validation: `CMV-1876`.
+Current checkpoint: `CM-1774 M14-K3 VCP memory health report readiness label accuracy`.
+Current validation: `CMV-1877`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1774 M14-K3 VCP Memory Health Report Readiness Label Accuracy
+
+Status: `COMPLETED_VALIDATED_M14_K3_VCP_MEMORY_HEALTH_REPORT_READINESS_LABEL_ACCURACY_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Hardened `src/core/VcpMemoryHealthReportSchemaContract.js`.
+- Expanded `tests/vcp-memory-health-report-schema-contract.test.js`.
+- Added `docs/VCP_MEMORY_HEALTH_REPORT_M14_READINESS_LABEL_ACCURACY.md`.
+- Added field-specific readiness status label validation: `project_status` must be `NOT_READY_BLOCKED`; `rc_status` must be `RC_NOT_READY_BLOCKED`.
+- Covered project/RC status label swaps as schema errors instead of generic decision mismatches.
+- Preserved L4 readiness overclaim detection for valid labels.
+- Preserved that no dashboard runtime implementation, dashboard CLI call, VCPToolBox runtime call, MCP memory tool call, private runtime read, raw store read, real query, provider/API call, memory read/write, durable audit/runtime write, public MCP expansion, approval request, approval line, push, release, deploy, cutover, readiness claim, complete V8 claim, or full bridge completion claim occurred.
+
+Validation: `CMV-1877`; syntax checks, targeted health report schema contract test `17/17`, `npm test` `3708/3708`, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, boundary scans, and changed-scope review passed.
 
 ## CM-1773 M14-K2 VCP Memory Health Report Raw Private Leak Rejection
 

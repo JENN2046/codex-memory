@@ -7,6 +7,8 @@ const {
   ALLOWED_DECISIONS,
   ALLOWED_EVIDENCE_CLASSES,
   ALLOWED_EVIDENCE_TYPES,
+  ALLOWED_PROJECT_STATUS_LABELS,
+  ALLOWED_RC_STATUS_LABELS,
   ALLOWED_READINESS_LABELS,
   FORBIDDEN_FIELD_NAMES,
   FORBIDDEN_STRING_VALUE_PATTERN_NAMES,
@@ -177,7 +179,6 @@ test('CM1772 stops raw private provider and audit row material in sections as L4
 test('CM1772 stops readiness overclaims as L4', () => {
   const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
     readiness: {
-      project_status: 'RC_NOT_READY_BLOCKED',
       production_ready: true
     },
     expectedDecision: 'stop_l4'
@@ -272,6 +273,49 @@ test('CM1773 keeps malformed but non-sensitive request ids out of low-disclosure
   assert.ok(result.invalidFields.includes('reportContext.request_id'));
   assert.equal(result.lowDisclosureProjection.requestId, null);
   assert.equal(serialized.includes('unsafe request id with spaces'), false);
+});
+
+test('CM1774 rejects project readiness status when it uses an RC-only label', () => {
+  const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
+    readiness: {
+      project_status: 'RC_NOT_READY_BLOCKED'
+    }
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'invalid_health_report_schema_contract');
+  assert.ok(result.invalidFields.includes('readiness.project_status'));
+  assert.equal(result.readinessClaimAllowed, false);
+});
+
+test('CM1774 rejects RC readiness status when it uses a project-only label', () => {
+  const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
+    readiness: {
+      rc_status: 'NOT_READY_BLOCKED'
+    }
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'invalid_health_report_schema_contract');
+  assert.ok(result.invalidFields.includes('readiness.rc_status'));
+  assert.equal(result.readinessClaimAllowed, false);
+});
+
+test('CM1774 preserves L4 readiness overclaim detection for valid labels', () => {
+  const result = validateVcpMemoryHealthReportSchemaContract(healthReportContract({
+    readiness: {
+      production_ready: true,
+      release_ready: true,
+      cutover_ready: true,
+      complete_v8_claimed: true,
+      full_bridge_completion_claimed: true
+    },
+    expectedDecision: 'stop_l4'
+  }));
+
+  assert.equal(result.accepted, true);
+  assert.equal(result.computedDecision, 'stop_l4');
+  assert.equal(result.readinessClaimAllowed, false);
 });
 
 test('CM1772 rejects missing positive and malformed zero side-effect counters', () => {
@@ -376,6 +420,8 @@ test('CM1772 locks health report vocabulary and side-effect posture', () => {
   assert.ok(FORBIDDEN_FIELD_NAMES.includes('dashboardRuntimePayload'));
   assert.ok(FORBIDDEN_STRING_VALUE_PATTERN_NAMES.includes('url'));
   assert.ok(FORBIDDEN_STRING_VALUE_PATTERN_NAMES.includes('windows_path'));
+  assert.deepEqual(ALLOWED_PROJECT_STATUS_LABELS, ['NOT_READY_BLOCKED']);
+  assert.deepEqual(ALLOWED_RC_STATUS_LABELS, ['RC_NOT_READY_BLOCKED']);
   assert.equal(SAFE_REQUEST_ID_PATTERN.test('m14_health_report_schema_001'), true);
   assert.equal(SAFE_REQUEST_ID_PATTERN.test('unsafe request id with spaces'), false);
   assert.ok(ZERO_COUNTER_FIELDS.includes('dashboardRuntimeCalls'));

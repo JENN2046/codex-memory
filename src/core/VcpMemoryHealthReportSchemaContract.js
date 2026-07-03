@@ -35,6 +35,14 @@ const ALLOWED_READINESS_LABELS = Object.freeze([
   'RC_NOT_READY_BLOCKED'
 ]);
 
+const ALLOWED_PROJECT_STATUS_LABELS = Object.freeze([
+  'NOT_READY_BLOCKED'
+]);
+
+const ALLOWED_RC_STATUS_LABELS = Object.freeze([
+  'RC_NOT_READY_BLOCKED'
+]);
+
 const REQUIRED_SECTION_IDS = Object.freeze([
   'policy_status',
   'target_status',
@@ -419,10 +427,10 @@ function validateShape(input) {
       if (typeof section[field] !== 'boolean') invalid.push(`sections.${sectionId}.${field}`);
     }
   }
-  if (!ALLOWED_READINESS_LABELS.includes(readiness.project_status)) {
+  if (!ALLOWED_PROJECT_STATUS_LABELS.includes(readiness.project_status)) {
     invalid.push('readiness.project_status');
   }
-  if (!ALLOWED_READINESS_LABELS.includes(readiness.rc_status)) {
+  if (!ALLOWED_RC_STATUS_LABELS.includes(readiness.rc_status)) {
     invalid.push('readiness.rc_status');
   }
   for (const field of REQUIRED_READINESS_BOOLEAN_FIELDS) {
@@ -594,6 +602,8 @@ module.exports = {
   ALLOWED_DECISIONS,
   ALLOWED_EVIDENCE_CLASSES,
   ALLOWED_EVIDENCE_TYPES,
+  ALLOWED_PROJECT_STATUS_LABELS,
+  ALLOWED_RC_STATUS_LABELS,
   ALLOWED_READINESS_LABELS,
   CONTRACT_MODE,
   FORBIDDEN_FIELD_NAMES,
