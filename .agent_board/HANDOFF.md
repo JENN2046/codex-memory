@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1728 M7-K1 VCP memory observe-full exact approval packet preparation`.
-Current validation: `CMV-1831`.
-Current handoff: CM-1728 completed the docs-only non-authorizing M7 observe-full exact approval packet preparation. The packet omits real query values, accepted M6 receipt is missing, exact Jenn read-shape approval is missing, read-shape proof is not started, and M8 is not unlocked. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
+Current task: `CM-1729 M7-K2 VCP memory observe-full exact approval decision review boundary`.
+Current validation: `CMV-1832`.
+Current handoff: CM-1729 completed the docs-only non-authorizing M7 observe-full exact approval decision review boundary. Current decision is `blocked_before_runtime_missing_m6_receipt_and_exact_read_approval`; real query, accepted M6 receipt, and exact Jenn read-shape approval remain absent. No real approval line, approval request submission, approval grant, live VCPToolBox target discovery/runtime, fallback execution, client-private memory read, read-shape query, raw memory, provider/API, durable write, public MCP expansion, dependency action, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: complete `M7-K1 Observe-Full Exact Approval Packet Preparation` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
+Goal: complete `M7-K2 Observe-Full Exact Approval Decision Review Boundary` for `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703/`.
 
-Current status: `COMPLETED_VALIDATED_M7_K1_VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_M7_K2_VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME`; production/release/cutover ready no; complete V8 not claimed.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
 - `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_PACKET_PREPARATION.md`
 - `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_PRECONDITION_RECORD.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_M6_BLOCKED_CLOSEOUT_SUMMARY.md`
@@ -35,14 +36,14 @@ Current entrypoints:
 
 Completed in this slice:
 
-- Added non-authorizing M7 observe-full exact approval packet preparation.
-- Defined packet state, exact fields required later from Jenn, future allowed action boundary, forbidden actions, stop conditions, receipt skeleton, and review gate.
-- Preserved that real query values are omitted, accepted M6 receipt is missing, exact Jenn read-shape approval is missing, read-shape proof is not started, and M8 is not unlocked.
+- Added non-authorizing M7 observe-full exact approval decision review boundary.
+- Reviewed CM-1728 and recorded current decision `blocked_before_runtime_missing_m6_receipt_and_exact_read_approval`.
+- Defined decision matrix, review checklist, current review result, and low-disclosure receipt skeleton.
 - Confirmed no real approval line, approval request submission, approval grant, live VCPToolBox runtime call, target probing, fallback execution, client-private memory read, read-shape query, approval-line generation/submission/issue/storage/simulation, secret/config/env read, raw memory/runtime read, provider/API call, durable memory write, public MCP expansion, config/startup/watchdog change, dependency action, push, release, deploy, cutover, production readiness, release readiness, `RC_READY`, complete V8 claim, or M8 unlock occurred.
 
-Validation: `CMV-1831`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
+Validation: `CMV-1832`; docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, and changed-scope review.
 
-Next safe route: M7 exact approval decision/review boundary without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
+Next safe route: M7 non-authorizing request display boundary without query/runtime, or remain blocked before M6/M7 runtime until required exact approvals exist. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 
