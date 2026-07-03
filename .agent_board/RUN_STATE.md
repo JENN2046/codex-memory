@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1821 M9 trusted-write-proposal envelope fixture contract`.
-Current validation: `CMV-1924`.
-Current status: CM-1821 added a fixture-only trusted-write-proposal envelope contract and targeted tests. Local contract work is now executable, but runtime execution, real proposal generation/submission, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1822 M9 trusted-write-proposal receipt shape fixture contract`.
+Current validation: `CMV-1925`.
+Current status: CM-1822 added a fixture-only trusted-write-proposal receipt shape contract and targeted tests. Local receipt-shape contract work is executable, but runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1822 M9 trusted-write-proposal receipt shape fixture contract. It should add fixture/contract coverage for low-disclosure proposal receipt shape, accept/reject status, scope, intent, rollback posture, and zero side-effect counters, without runtime execution, real proposal generation/submission, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, or readiness claim. Push remains separate explicit authorization.
+Next safe action is CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review. It should review CM-1821 and CM-1822 as fixture-contract evidence only, decide whether the current M9 proposal-mode preparation slice can close or needs another fixture/dry-run boundary, and preserve that runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1821 M9 trusted-write-proposal envelope fixture contract |
-| Current task | `CM-1821 M9 trusted-write-proposal envelope fixture contract` |
-| Current validation | `CMV-1924` |
-| Current route | M9 envelope fixture contract added; next route is CM-1822 receipt shape fixture contract |
+| Status | CM-1822 M9 trusted-write-proposal receipt shape fixture contract |
+| Current task | `CM-1822 M9 trusted-write-proposal receipt shape fixture contract` |
+| Current validation | `CMV-1925` |
+| Current route | M9 receipt shape fixture contract added; next route is CM-1823 receipt closeout / next-stage gate review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1822` adds `src/core/VcpMemoryTrustedWriteProposalReceiptShapeContract.js`, `tests/vcp-memory-trusted-write-proposal-receipt-shape-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1822_RECEIPT_SHAPE_FIXTURE_CONTRACT.md`. Targeted tests passed `9/9`; default `npm test` passed `3730/3730`. The helper validates fixture-only trusted-write-proposal receipt shapes, accepts explicit `accept`/`reject` review statuses as shape vocabulary only, rejects raw/secret/receipt/approval/readiness fields without echo, repairs rejected-path `expectedDecision` projection to allowlist-only no-echo, stops proposal-generation/submission/write/provider/public-MCP/readiness intent, requires safe fixture id prefixes, and reports zero runtime/write side effects. It distinguishes fixture `receiptShapeAccepted` from real `proposalReceiptAccepted=false`. Runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review.
 
 `CM-1821` adds `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`, `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3721/3721`. The helper validates fixture-only trusted-write-proposal envelopes, denies missing exact proposal fields, stops durable write/provider/public-MCP/readiness intent, rejects raw/secret/approval/readiness fields without echo, requires safe fixture id prefixes and allowlisted operation entries, and reports zero runtime/write side effects. Runtime execution, real proposal generation/submission, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked. Next safe route is CM-1822 M9 trusted-write-proposal receipt shape fixture contract.
 

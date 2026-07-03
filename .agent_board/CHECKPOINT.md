@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1821 M9 trusted-write-proposal envelope fixture contract`.
-Current validation: `CMV-1924`.
+Current checkpoint: `CM-1822 M9 trusted-write-proposal receipt shape fixture contract`.
+Current validation: `CMV-1925`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1822 M9 Trusted-Write-Proposal Receipt Shape Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_RECEIPT_SHAPE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalReceiptShapeContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-receipt-shape-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1822_RECEIPT_SHAPE_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `9/9`.
+- Default `npm test` passed `3730/3730`.
+- Post-fix re-review found and repaired one rejected-path projection gap:
+  unsafe `expectedDecision` values now project as `null` instead of echoing.
+- Confirmed helper validates low-disclosure receipt shapes and accepts `accept` / `reject` proposal review status as shape vocabulary only.
+- Confirmed helper distinguishes fixture `receiptShapeAccepted` from real `proposalReceiptAccepted=false`.
+- Confirmed helper performs no runtime action, proposal generation, proposal submission, accepted real proposal receipt, memory read, memory write, durable write, provider/API call, MCP memory tool call, public MCP expansion, approval request submission, approval-line generation, M10 unlock, M15 unlock, release/deploy/cutover/push, readiness claim, `RC_READY` claim, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-1925`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1821 M9 Trusted-Write-Proposal Envelope Fixture Contract
 

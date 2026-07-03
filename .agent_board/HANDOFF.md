@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1821 M9 trusted-write-proposal envelope fixture contract`.
-Current validation: `CMV-1924`.
-Current handoff: CM-1821 added a fixture-only trusted-write-proposal envelope contract and targeted tests. Local contract work is now executable, but runtime execution, real proposal generation/submission, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1822 M9 trusted-write-proposal receipt shape fixture contract`.
+Current validation: `CMV-1925`.
+Current handoff: CM-1822 added a fixture-only trusted-write-proposal receipt shape contract and targeted tests. Local receipt-shape contract work is executable, but runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1821 added a fixture-only trusted-write-proposal envelope co
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M9_ENVELOPE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 can proceed to receipt shape fixture contract work; exact proposal boundary and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M9_RECEIPT_SHAPE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 has local envelope and receipt-shape fixture contracts; exact proposal boundary, real proposal generation/submission, accepted real proposal receipts, and proposal execution remain blocked; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpMemoryTrustedWriteProposalReceiptShapeContract.js`
+- `tests/vcp-memory-trusted-write-proposal-receipt-shape-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1822_RECEIPT_SHAPE_FIXTURE_CONTRACT.md`
 - `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`
 - `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`
