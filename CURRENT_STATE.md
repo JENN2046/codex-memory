@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1796 M6 observe-lite whitelist temporary auth status-only probe |
-| Current task | `CM-1796 M6 observe-lite whitelist temporary auth status-only probe` |
-| Current validation | `CMV-1899` |
-| Current route | Live status-only probe executed with a one-shot child-process auth value: warmup/auth guard reached HTTP 4xx and `/v1/human/tool` returned HTTP 5xx without response-body/log/secret output; authenticated route proof exists, but successful DailyNoteSearcher memory/capability result is not proven |
+| Status | CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis |
+| Current task | `CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis` |
+| Current validation | `CMV-1900` |
+| Current route | Source/metadata diagnosis found the CM-1796 request body parses correctly and the likely HTTP 5xx cause is missing executable bit on the only present DailyNoteSearcher binary; no runtime/log/body/secret/raw memory read or VCPToolBox file change occurred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1797` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1797_DAILYNOTESEARCHER_FAILURE_SOURCE_DIAGNOSIS.md`. It records a source-only/metadata-only diagnosis of the CM-1796 `http_5xx`. Evidence: request body parser marker extracted `YES`; parsed tool name `DailyNoteSearcher`; parsed required args present `YES`; `DailyNoteSearcher` exports `processToolCall` `YES`; only present executable candidate `DailyNoteSearcher-aarch64-unknown-linux-musl` exists `YES`; executable bit `NO`; release/debug candidates exist `NO`; source `findExecutable()` checks existence `YES` but executable permission `NO`; primary diagnosis `dailynotesearcher_executable_bit_missing`; runtime started `NO`; route called `NO`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; memory write `NO`; VCPToolBox files modified `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1798 exact executable-bit repair and rerun status-only probe`.
 
 `CM-1796` adds `docs/VCP_MEMORY_OBSERVE_LITE_CM1796_WHITELIST_TEMP_AUTH_STATUS_ONLY_PROBE_RECEIPT.md`. It records a whitelist-only live status probe using a disposable child-process bearer value. Evidence: pre-start endpoint `connection_refused`; runtime started `YES`; child process count `1`; temporary bearer generated `YES` but disclosed/persisted `NO`; request body generated `YES` but printed/disclosed `NO`; warmup probe count `10`; warmup status `http_4xx`; auth guard status `http_4xx`; `/v1/human/tool` status `http_5xx`; response body/stdout/stderr/runtime logs read `NO`; config/env contents and secrets read `NO`; raw memory/raw store/raw runtime response read by agent `NO`; provider/API called by agent `NO`; MCP memory tool called `NO`; VCP plugin success proven `NO`; runtime memory query success proven `NO`; memory result returned to agent `NO`; memory write `NO`; VCPToolBox files modified `NO`; public MCP expansion/config-startup-watchdog change/release-tag-deploy-cutover/push `NO`; approval line present/generated/granted `NO`; readiness/RC_READY/complete V8/full bridge completion `NO`; child stopped and exit observed `YES`; persistent process intentionally left running `NO`; temporary auth transport proof complete `YES`; human-tool route status proof complete `YES`; memory capability success complete `NO`; full M6 observe-lite handshake complete `NO`; M15 unlocked `NO`; next action `CM-1797 DailyNoteSearcher status-only failure source diagnosis`.
 

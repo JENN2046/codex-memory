@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1796",
-  "validationId": "CMV-1899",
+  "taskId": "CM-1797",
+  "validationId": "CMV-1900",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_observe_lite_whitelist_temp_auth_status_only_probe",
+    "scope": "vcp_memory_observe_lite_dailynotesearcher_failure_source_diagnosis",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1900",
+      "scope": "CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_EXECUTABLE_BIT_DIAGNOSIS_SOURCE_ONLY_NO_RUNTIME_NO_SECRET_NO_WRITE"
+    },
     {
       "id": "CMV-1899",
       "scope": "CM-1796 M6 observe-lite whitelist temporary auth status-only probe",

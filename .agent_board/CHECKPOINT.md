@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1796 M6 observe-lite whitelist temporary auth status-only probe`.
-Current validation: `CMV-1899`.
+Current checkpoint: `CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis`.
+Current validation: `CMV-1900`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1797 M6 Observe-Lite DailyNoteSearcher Failure Source Diagnosis
+
+Status: `COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_EXECUTABLE_BIT_DIAGNOSIS_SOURCE_ONLY_NO_RUNTIME_NO_SECRET_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1797_DAILYNOTESEARCHER_FAILURE_SOURCE_DIAGNOSIS.md`.
+- Confirmed the CM-1796 exact request body parses correctly as `DailyNoteSearcher` with required argument keys.
+- Confirmed `DailyNoteSearcher` source exports `processToolCall` and starts a local service executable.
+- Checked executable metadata only: `DailyNoteSearcher-aarch64-unknown-linux-musl` exists, but executable bit is absent; other release/debug candidates are absent.
+- Confirmed source `findExecutable()` checks candidate existence but not executable permission.
+- Recorded primary diagnosis `DAILYNOTESEARCHER_EXECUTABLE_BIT_MISSING`.
+- Preserved that runtime started `NO`, route called `NO`, response body read `NO`, stdout/stderr read `NO`, runtime logs read `NO`, config/env contents read `NO`, secrets read `NO`, raw memory/raw store read by agent `NO`, provider/API by agent `NO`, MCP memory tool called `NO`, memory write `NO`, VCPToolBox files modified `NO`, public MCP expansion `NO`, approval line present/generated/granted `NO`, release/deploy/cutover/push `NO`, readiness `NO`, full M6 completion `NO`, M15 unlock `NO`, complete V8 `NO`, and full bridge completion `NO`.
+- Set next route to CM-1798 exact executable-bit repair and rerun status-only probe.
+
+Validation: `CMV-1900`; whitelist source review, parser dry-run output, executable metadata output, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1796 M6 Observe-Lite Whitelist Temporary Auth Status-Only Probe
 

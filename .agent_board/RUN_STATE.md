@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1796 M6 observe-lite whitelist temporary auth status-only probe`.
-Current validation: `CMV-1899`.
-Current status: CM-1796 executed a whitelist-only live status probe with a generated one-shot child-process bearer value. Warmup/auth guard reached `http_4xx`; `/v1/human/tool` returned `http_5xx`; the child process was stopped and exit was observed. Temporary-auth transport and authenticated route status are proven, but successful `DailyNoteSearcher.SearchDailyNote` result and full M6 memory/capability handshake are not proven. No response body, stdout, stderr, runtime logs, config/env content, existing bearer secret, raw memory/store/runtime response, provider response, or memory result was read by agent. M15 remains locked, and no memory write, MCP memory tool call, provider/API call by agent, VCPToolBox file modification, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
+Current task: `CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis`.
+Current validation: `CMV-1900`.
+Current status: CM-1797 performed source-only/metadata-only diagnosis of the CM-1796 `http_5xx`. The request body parses correctly. The only present DailyNoteSearcher executable candidate exists but lacks executable permission, and source `findExecutable()` checks existence but not executable permission. Primary diagnosis is `DAILYNOTESEARCHER_EXECUTABLE_BIT_MISSING`. No runtime started, route call, response body read, stdout/stderr read, runtime log read, config/env content read, secret read, raw memory/store read by agent, provider/API call by agent, memory write, VCPToolBox file modification, public MCP expansion, dependency action, remote action, readiness claim, or complete V8 claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1797 DailyNoteSearcher status-only failure source diagnosis. Start source-only and metadata-only; do not read logs, response bodies, config/env contents, raw memory, raw stores, memory results, or provider responses. Do not open M7/M8/M15 yet, do not run trusted-read/write, do not generate an approval line, and do not claim release, deploy, cutover, `RC_READY`, complete V8, or readiness. Push remains separate explicit authorization.
+Next safe action is CM-1798 exact executable-bit repair and rerun status-only probe. Scope the repair to one reversible executable-bit change on `Plugin/DailyNoteSearcher/DailyNoteSearcher-aarch64-unknown-linux-musl`, then rerun the same low-disclosure temporary-auth status-only probe. Do not read logs, response bodies, config/env contents, raw memory, raw stores, memory results, or provider responses. Do not open M7/M8/M15 unless the rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
