@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1845 M9 proposal mode blocked closeout refresh`.
-Current validation: `CMV-1948`.
+Current checkpoint: `CM-1846 M9 final blocked closeout / M10 gate preflight`.
+Current validation: `CMV-1949`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1846 M9 Final Blocked Closeout / M10 Gate Preflight
+
+Status: `COMPLETED_VALIDATED_M9_FINAL_BLOCKED_CLOSEOUT_M10_GATE_PREFLIGHT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1846_M9_FINAL_BLOCKED_CLOSEOUT_M10_GATE_PREFLIGHT.md`.
+- Recorded M9 as a final blocked closeout for planning only.
+- Preflighted M10 gate as blocked because M9 proposal mode is not complete.
+- Preserved that request template creation, request body preparation, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1847 M10 blocked state fixture contract.
+
+Validation: `CMV-1949`; CM-1845 review, M9 local evidence chain review, M10 gate preflight review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1845 M9 Proposal Mode Blocked Closeout Refresh
 

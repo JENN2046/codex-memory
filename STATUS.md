@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1845 M9 proposal mode blocked closeout refresh`.
-Current validation: `CMV-1948`.
-Current project status: CM-1845 refreshes the M9 trusted-write-proposal local planning chain and records proposal mode as still blocked. Full M9 proposal mode, approval-request boundary readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1845_PROPOSAL_MODE_BLOCKED_CLOSEOUT_REFRESH_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1846 M9 final blocked closeout / M10 gate preflight`.
+Current validation: `CMV-1949`.
+Current project status: CM-1846 records M9 as a final blocked closeout for planning and preflights M10 as blocked because M9 proposal mode is not complete. Approval-request boundary readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1846_M9_FINAL_BLOCKED_CLOSEOUT_M10_GATE_PREFLIGHT_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1846 M9 final blocked closeout / M10 gate preflight: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1846_M9_FINAL_BLOCKED_CLOSEOUT_M10_GATE_PREFLIGHT.md`. It records M9 as a final blocked closeout for planning and preflights M10 as blocked because M9 proposal mode is not complete. It does not create a request template, prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1847 M10 blocked state fixture contract.
 
 CM-1845 M9 proposal mode blocked closeout refresh: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1845_PROPOSAL_MODE_BLOCKED_CLOSEOUT_REFRESH.md`. It refreshes the M9 trusted-write-proposal local planning chain after CM-1844 and records proposal mode as still blocked. It does not create a request template, prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1846 M9 final blocked closeout / M10 gate preflight.
 
