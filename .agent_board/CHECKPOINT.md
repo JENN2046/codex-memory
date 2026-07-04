@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1913 VCP native read-only execution receipt schema`.
-Current validation: `CMV-2016`.
+Current checkpoint: `CM-1914 exact-approved live read-only proof request packet`.
+Current validation: `CMV-2017`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1914 Exact-Approved Live Read-Only Proof Request Packet
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_LIVE_READONLY_PROOF_REQUEST_PACKET_NON_AUTHORIZING_NO_RUNTIME_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1914_EXACT_APPROVED_LIVE_READONLY_PROOF_REQUEST.md`.
+- Prepared a non-authorizing request packet boundary for a future `one_read_only_vcp_native_proof`.
+- Bound only safe request policy fields: profile `observe-lite`, `max_runtime_calls=1`, `max_network_calls=1`, `write_budget=0`, `response_body_byte_budget=0`, `log_read_budget=0`, and `result_projection=shape_only`.
+- Kept target, component, and component action safe-reference-only and unbound until Jenn exact approval.
+- Recorded required Jenn exact approval fields: target reference, component/action, max call count, output projection, no-write rule, no-body/log rule, and stop conditions.
+- Preserved CM-1913 low-disclosure receipt constraints for any later live proof.
+- Preserved that no runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory read/write, durable write, receipt write, provider/API call, config/startup/watchdog change, public MCP expansion, authorization request creation/submission, request body generation/submission, approval-line generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1915 live read-only proof execution harness default no-run.
+
+Validation: `CMV-2017`; docs-only review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1913 VCP Native Read-Only Execution Receipt Schema
 

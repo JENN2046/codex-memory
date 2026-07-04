@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1913 VCP native read-only execution receipt schema |
-| Current task | `CM-1913 VCP native read-only execution receipt schema` |
-| Current validation | `CMV-2016` |
-| Current route | CM-1913 implements a local source/test low-disclosure receipt schema that accepts only shape/status/count/bucket metadata plus zero write counters, rejects raw response/memory/endpoint/approval/token/config/log/provider material without echo, and keeps runtime execution and exact approval blocked. Next local-safe route is CM-1914 exact-approved live read-only proof request packet without approval-line generation or runtime execution |
+| Status | CM-1914 exact-approved live read-only proof request packet |
+| Current task | `CM-1914 exact-approved live read-only proof request packet` |
+| Current validation | `CMV-2017` |
+| Current route | CM-1914 prepares a non-authorizing request packet boundary for a future exact-approved live read-only VCP native proof. Target/component/action stay safe-reference-only and unbound; no approval line, request body, runtime execution, or readiness claim occurred. Next local-safe route is CM-1915 live read-only proof execution harness default no-run |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1914` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1914_EXACT_APPROVED_LIVE_READONLY_PROOF_REQUEST.md`. It prepares only a non-authorizing request boundary for a future `one_read_only_vcp_native_proof` using profile `observe-lite`, `max_runtime_calls=1`, `max_network_calls=1`, `write_budget=0`, `response_body_byte_budget=0`, `log_read_budget=0`, and `result_projection=shape_only`. Target, component, and component action remain safe references only and unbound until Jenn exact approval. It lists required Jenn exact approval fields, CM-1913 low-disclosure receipt constraints, and stop conditions. It does not execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, write receipts, call providers/APIs, change config/startup/watchdog, expand public MCP, create/submit authorization requests, generate or submit request bodies, generate or submit approval lines, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1915 live read-only proof execution harness default no-run.
 
 `CM-1913` adds `src/core/VcpNativeReadOnlyExecutionReceipt.js`, `tests/vcp-native-readonly-execution-receipt.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1913_VCP_NATIVE_READONLY_EXECUTION_RECEIPT_SCHEMA.md`. It defines the low-disclosure receipt schema that must exist before any exact-approved live read-only proof: allowed receipt output is limited to target reference name, profile, component, action, status category, shape keys, item count, duration bucket, normalized result status, and zero write counters. It rejects raw response body, raw memory text, memory IDs, endpoint URL, approval line, token, config/env, stdout/stderr/log, provider payload, unknown top-level fields, unsafe values, nonzero counters, and unknown counters without echoing submitted sensitive values. Targeted tests passed `7/7`; adjacent CM-1912+CM-1913 tests passed `16/16`; default `npm test` passed `3965/3965`. It does not execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, write receipts, call providers/APIs, change config/startup/watchdog, expand public MCP, create/submit authorization requests, generate or submit request bodies, generate or submit approval lines, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1914 exact-approved live read-only proof request packet, still without generating an approval line, executing runtime, or generating/submitting a request body.
 
