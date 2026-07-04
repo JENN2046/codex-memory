@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1887 exact live runtime approval request packet boundary fixture contract |
-| Current task | `CM-1887 exact live runtime approval request packet boundary fixture contract` |
-| Current validation | `CMV-1990` |
-| Current route | Exact live runtime approval request packet boundary fixture contract validates only the category-only, non-authorizing boundary shape after CM-1886. Request packet creation, request assembly/body/approval line, runtime, memory, config/startup/watchdog, release/deploy/cutover/push, and readiness remain blocked and unauthorized. Next local-safe route is CM-1888 exact live runtime approval request packet boundary fixture closeout or packet skeleton review |
+| Status | CM-1888 exact live runtime approval request packet boundary fixture closeout |
+| Current task | `CM-1888 exact live runtime approval request packet boundary fixture closeout` |
+| Current validation | `CMV-1991` |
+| Current route | Exact live runtime approval request packet boundary fixture contract slice is closed for planning only after CM-1887. Request packet creation, request assembly/body/approval line, runtime, memory, config/startup/watchdog, release/deploy/cutover/push, and readiness remain blocked and unauthorized. Next local-safe route is CM-1889 exact live runtime approval request packet skeleton review boundary |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1888` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1888_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_BOUNDARY_FIXTURE_CLOSEOUT.md`. It reviews CM-1886 and CM-1887, accepts the local request packet boundary fixture contract slice as closed for planning only, and routes next work to CM-1889 exact live runtime approval request packet skeleton review boundary. It does not fill live values, create a request packet, assemble a request, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1889 exact live runtime approval request packet skeleton review boundary.
 
 `CM-1887` adds `src/core/VcpMemoryExactLiveRuntimeApprovalRequestPacketBoundaryContract.js`, `tests/vcp-memory-exact-live-runtime-approval-request-packet-boundary-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1887_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_BOUNDARY_FIXTURE_CONTRACT.md`. The fixture contract accepts only the category-only exact live runtime approval request packet boundary shape after CM-1886, reports L4 stops for request packet creation/readiness/presence, request assembly, live value binding, request body generation/submission, approval-line handling, runtime/memory/provider/config/remote/readiness expansion, rejects raw/private/exact-value/request/config fields without echo, and requires zero side-effect counters. Targeted tests passed `8/8`; default `npm test` passed `3875/3875`. It does not fill live values, create a request packet, assemble a request, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1888 exact live runtime approval request packet boundary fixture closeout or packet skeleton review.
 
