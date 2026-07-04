@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1850 M11 blocked route fixture contract`.
-Current validation: `CMV-1953`.
-Current project status: CM-1850 adds a pure source/test fixture contract for the M11 blocked route. Targeted tests passed `8/8`; default `npm test` passed `3818/3818`. M11 remains blocked: true runtime execution, true memory read/write, request body generation/submission, approval-line generation/submission, proposal generation/submission, accepted real proposal receipts, configuration/startup/watchdog changes, provider/API, public MCP expansion, M10/M11/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1850_M11_BLOCKED_ROUTE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1851 M11 blocked route fixture closeout / next gate review`.
+Current validation: `CMV-1954`.
+Current project status: CM-1851 closes only the local M11 blocked route fixture slice for planning. M11 remains blocked and live M12 workflow remains unopened. True runtime execution, true memory read/write, request body generation/submission, approval-line generation/submission, proposal generation/submission, accepted real proposal receipts, configuration/startup/watchdog changes, provider/API, public MCP expansion, M11/M12/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1851_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1851 M11 blocked route fixture closeout / next gate review: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1851_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW.md`. It reviews CM-1849 and CM-1850, closes only the local M11 blocked route fixture slice for planning, and records that M11 remains blocked while live M12 workflow remains unopened. It does not call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept real proposal receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1852 M12 blocked precondition refresh.
 
 CM-1850 M11 blocked route fixture contract: added `src/core/VcpMemoryTrustedWriteProposalM11BlockedRouteContract.js`, `tests/vcp-memory-trusted-write-proposal-m11-blocked-route-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1850_M11_BLOCKED_ROUTE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3818/3818`. The helper validates only non-authorizing M11 blocked route fixtures whose accepted state is `m11_route_blocked_missing_exact_runtime_memory_or_approval_material_authority`, reports incomplete evidence/blockers as `m11_route_incomplete`, routes runtime, memory read/write, request body generation/submission, approval-line handling, config/startup, proposal receipt, M11/M15 unlock, provider/API, public MCP expansion, and readiness claims to `stop_l4`, rejects raw/secret/runtime/memory/approval/config/readiness fields without echo, and reports no runtime/write/read/config side effects. It does not call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept real proposal receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1851 M11 blocked route fixture closeout / next gate review.
 

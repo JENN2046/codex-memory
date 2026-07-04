@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1850 M11 blocked route fixture contract |
-| Current task | `CM-1850 M11 blocked route fixture contract` |
-| Current validation | `CMV-1953` |
-| Current route | Local M11 blocked route fixture contract added and validated: targeted tests passed 8/8 and default `npm test` passed 3818/3818. M11 remains blocked; runtime, memory read/write, request body, approval-line, proposal, config/startup/watchdog, M11/M15 unlock, and readiness remain blocked. Next local-safe route is CM-1851 M11 blocked route fixture closeout / next gate review |
+| Status | CM-1851 M11 blocked route fixture closeout / next gate review |
+| Current task | `CM-1851 M11 blocked route fixture closeout / next gate review` |
+| Current validation | `CMV-1954` |
+| Current route | Local M11 blocked route fixture slice closed for planning only; M11 remains blocked and no live M12 workflow is opened. Next local-safe route is CM-1852 M12 blocked precondition refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1851` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1851_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW.md`. It reviews CM-1849 and CM-1850, closes only the local M11 blocked route fixture slice for planning, and records that M11 remains blocked while live M12 workflow remains unopened. It does not call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept real proposal receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1852 M12 blocked precondition refresh.
 
 `CM-1850` adds `src/core/VcpMemoryTrustedWriteProposalM11BlockedRouteContract.js`, `tests/vcp-memory-trusted-write-proposal-m11-blocked-route-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1850_M11_BLOCKED_ROUTE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3818/3818`. The helper validates only non-authorizing M11 blocked route fixtures whose accepted state is `m11_route_blocked_missing_exact_runtime_memory_or_approval_material_authority`, reports incomplete evidence/blockers as `m11_route_incomplete`, routes runtime, memory read/write, request body generation/submission, approval-line handling, config/startup, proposal receipt, M11/M15 unlock, provider/API, public MCP expansion, and readiness claims to `stop_l4`, rejects raw/secret/runtime/memory/approval/config/readiness fields without echo, and reports no runtime/write/read/config side effects. It does not call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept real proposal receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1851 M11 blocked route fixture closeout / next gate review.
 

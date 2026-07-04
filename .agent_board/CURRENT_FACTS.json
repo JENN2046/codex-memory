@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1850",
-  "validationId": "CMV-1953",
+  "taskId": "CM-1851",
+  "validationId": "CMV-1954",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m11_blocked_route_fixture_contract",
+    "scope": "vcp_memory_trusted_write_proposal_m11_blocked_route_closeout_next_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1954",
+      "scope": "CM-1851 M11 blocked route fixture closeout / next gate review",
+      "status": "COMPLETED_VALIDATED_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1953",
       "scope": "CM-1850 M11 blocked route fixture contract",

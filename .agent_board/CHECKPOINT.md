@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1850 M11 blocked route fixture contract`.
-Current validation: `CMV-1953`.
+Current checkpoint: `CM-1851 M11 blocked route fixture closeout / next gate review`.
+Current validation: `CMV-1954`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1851 M11 Blocked Route Fixture Closeout / Next Gate Review
+
+Status: `COMPLETED_VALIDATED_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1851_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW.md`.
+- Reviewed CM-1849 M11 blocked precondition refresh and CM-1850 M11 blocked route fixture contract.
+- Closed only the local M11 blocked route fixture slice for planning.
+- Recorded that M11 remains blocked and live M12 workflow remains unopened.
+- Preserved that runtime, memory read/write, durable write, request body generation/submission, approval-line handling, proposal generation/submission, accepted real proposal receipts, config/startup/watchdog, provider/API, public MCP expansion, M11/M12/M15, and readiness remain blocked.
+- Routed next work to CM-1852 M12 blocked precondition refresh.
+
+Validation: `CMV-1954`; CM-1849/CM-1850 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1850 M11 Blocked Route Fixture Contract
 
