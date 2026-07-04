@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1865 plan-package local-safe closeout refresh |
-| Current task | `CM-1865 plan-package local-safe closeout refresh` |
-| Current validation | `CMV-1968` |
-| Current route | Plan-package local-safe closeout refreshed; docs/fixture/source-review/governance/boundary evidence is separated from still-blocked live/runtime/approval work. Next local-safe route is CM-1866 exact live runtime approval boundary preflight |
+| Status | CM-1866 exact live runtime approval boundary preflight |
+| Current task | `CM-1866 exact live runtime approval boundary preflight` |
+| Current validation | `CMV-1969` |
+| Current route | Exact live runtime approval boundary preflight created; future non-authorizing request-packet skeleton may be prepared, but approval packet/request/body/line and runtime remain not ready. Next local-safe route is CM-1867 exact live runtime non-authorizing request packet skeleton |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1866` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1866_EXACT_LIVE_RUNTIME_APPROVAL_BOUNDARY_PREFLIGHT.md`. It defines the non-authorizing boundary shape for a future exact live runtime approval request after CM-1865, using CM-1807 and CM-1810 as scope-only evidence. It does not create an approval packet, approval request, request body, approval line, runtime action, VCPToolBox call, MCP memory tool call, response body read, log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1867 exact live runtime non-authorizing request packet skeleton.
 
 `CM-1865` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1865_LOCAL_SAFE_CLOSEOUT_REFRESH.md`. It records that the imported plan package is locally advanced and locally closed out only for safe docs/fixture/source-review/governance/boundary evidence, while full live/runtime completion remains incomplete. It does not create an RC gate report, approval packet, approval request, request body, approval line, runtime action, VCPToolBox call, MCP memory tool call, log/raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1866 exact live runtime approval boundary preflight, still without generating approval material.
 
