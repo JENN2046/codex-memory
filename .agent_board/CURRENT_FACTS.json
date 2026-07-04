@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1905",
-  "validationId": "CMV-2008",
+  "taskId": "CM-1906",
+  "validationId": "CMV-2009",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_authorization_request_exact_material_boundary_fixture_contract",
+    "scope": "vcp_memory_exact_live_runtime_authorization_request_exact_material_boundary_fixture_closeout_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2009",
+      "scope": "CM-1906 exact live runtime authorization request exact-material boundary fixture closeout gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-2008",
       "scope": "CM-1905 exact live runtime authorization request exact-material boundary fixture contract",

@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1905 exact live runtime authorization request exact-material boundary fixture contract`.
-Current validation: `CMV-2008`.
+Current checkpoint: `CM-1906 exact live runtime authorization request exact-material boundary fixture closeout gate review`.
+Current validation: `CMV-2009`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1906 Exact Live Runtime Authorization Request Exact-Material Boundary Fixture Closeout Gate Review
+
+Status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1906_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CLOSEOUT_GATE_REVIEW.md`.
+- Reviewed CM-1904 exact material boundary preflight.
+- Reviewed CM-1905 exact material boundary fixture contract.
+- Closed only the local exact-material boundary fixture contract slice for planning.
+- Recorded that accepted fixture decision remains `exact_material_boundary_accepted_categories_only_no_values`.
+- Preserved that no concrete exact values were bound.
+- Preserved that the authorization gate is not opened, authorization request is not created/ready/submitted, approval is not requested/granted, and dedicated exact approval text is absent.
+- Preserved that approval request packet creation/readiness/submission, request packet creation/rendering/storage/submission, request packet readiness/presence, concrete exact values, request assembly, assembled request generation/disclosure, approval packet readiness, request body generation/submission, approval-line presence/generation/exposure/submission, runtime authorization, and runtime execution remain false.
+- Preserved that no approval packet, live RC request, approval line, request body, assembled request, runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1907 exact live runtime authorization request exact-material readiness blocked precondition refresh.
+
+Validation: `CMV-2009`; CM-1904/CM-1905 review, source/test `node --check`, targeted CM-1905 fixture test `8/8`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1905 Exact Live Runtime Authorization Request Exact-Material Boundary Fixture Contract
 
