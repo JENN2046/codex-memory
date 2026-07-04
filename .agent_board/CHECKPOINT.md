@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1840 M9 exact request packet refresh blocked fixture contract`.
-Current validation: `CMV-1943`.
+Current checkpoint: `CM-1841 M9 exact request packet refresh blocked contract closeout / approval request boundary review`.
+Current validation: `CMV-1944`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1841 M9 Exact Request Packet Refresh Blocked Contract Closeout / Approval Request Boundary Review
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_BOUNDARY_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1841_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_BOUNDARY_REVIEW.md`.
+- Reviewed CM-1839 exact request packet refresh blocked preflight and CM-1840 exact request packet refresh blocked fixture contract.
+- Closed only the local exact request packet refresh blocked fixture slice for planning.
+- Recorded approval request boundary readiness as blocked because concrete exact values, request body, approval-line value handling, and submission authority remain absent.
+- Preserved that exact target/transport/client/workspace/owner/visibility/proposal fields, request body, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1842 M9 approval request boundary blocked preflight.
+
+Validation: `CMV-1944`; CM-1839/CM-1840 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1840 M9 Exact Request Packet Refresh Blocked Fixture Contract
 
