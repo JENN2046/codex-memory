@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1892 exact live runtime approval request packet readiness blocked precondition refresh`.
-Current validation: `CMV-1995`.
-Current status: CM-1892 records that CM-1889 through CM-1891 skeleton evidence is not exact request packet material. Request packet readiness, packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1893 exact live runtime approval request packet readiness blocked fixture contract`.
+Current validation: `CMV-1996`.
+Current status: CM-1893 adds only a pure local blocked-readiness fixture contract after CM-1892. Request packet readiness remains blocked; packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1893 exact live runtime approval request packet readiness blocked fixture contract. It may only add a pure local blocked-readiness fixture contract and must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1894 exact live runtime approval request packet readiness blocked fixture closeout gate review. It may only review and close the local blocked-readiness fixture contract slice for planning and must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1892",
-  "validationId": "CMV-1995",
+  "taskId": "CM-1893",
+  "validationId": "CMV-1996",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_approval_request_packet_readiness_blocked_precondition_refresh",
+    "scope": "vcp_memory_exact_live_runtime_approval_request_packet_readiness_blocked_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1996",
+      "scope": "CM-1893 exact live runtime approval request packet readiness blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1995",
       "scope": "CM-1892 exact live runtime approval request packet readiness blocked precondition refresh",
