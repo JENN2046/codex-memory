@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1908 exact live runtime authorization request exact-material readiness blocked fixture contract`.
-Current validation: `CMV-2011`.
-Current status: CM-1908 adds a pure local source/test fixture contract for the CM-1907 blocked exact-material readiness state. Concrete exact values, authorization request/request packet/request body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1909 exact live runtime authorization request exact-material readiness blocked fixture closeout gate review`.
+Current validation: `CMV-2012`.
+Current status: CM-1909 closes only the local exact-material readiness blocked fixture contract slice for planning. Concrete exact values, authorization request/request packet/request body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1909 exact live runtime authorization request exact-material readiness blocked fixture closeout gate review. It may only review and close the local CM-1908 fixture contract slice for planning. It must not fill live values, create/render/store/submit authorization requests or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1910 VCP native invocation adapter skeleton / exact target-profile contract as code / low-disclosure result normalizer. It may only implement local code skeletons for the adapter contract, target/profile contract, result normalizer, and hardcoded no-write/no-body-leak runtime wrapper boundary. It must not execute runtime, call VCPToolBox, read memory/logs/raw data, change config/startup/watchdog, expand public MCP, add write paths, generate request bodies or approval lines, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
