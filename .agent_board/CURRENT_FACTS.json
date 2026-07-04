@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1876",
-  "validationId": "CMV-1979",
+  "taskId": "CM-1877",
+  "validationId": "CMV-1980",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_approval_request_assembly_preflight_closeout",
+    "scope": "vcp_memory_exact_live_runtime_approval_request_assembly_boundary_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1980",
+      "scope": "CM-1877 exact live runtime approval request assembly boundary review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_ASSEMBLY_BOUNDARY_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1979",
       "scope": "CM-1876 exact live runtime approval request assembly preflight closeout",
