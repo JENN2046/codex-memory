@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1921",
-  "validationId": "CMV-2024",
+  "taskId": "CM-1922",
+  "validationId": "CMV-2025",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_transport_diagnosis_transport_error_no_body_no_write",
+    "scope": "transport_diagnosis_closeout_route_to_runtime_startup_or_target_locator_diagnosis",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2025",
+      "scope": "CM-1922 transport diagnosis closeout",
+      "status": "COMPLETED_VALIDATED_TRANSPORT_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS"
+    },
     {
       "id": "CMV-2024",
       "scope": "CM-1921 exact-approved transport diagnosis receipt",

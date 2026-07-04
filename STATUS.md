@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1921 exact-approved transport diagnosis receipt`.
-Current validation: `CMV-2024`.
-Current project status: CM-1921 consumed exactly one Jenn-approved transport diagnosis live/network call under the CM-1920 packet. Result: `transport_error`; `transportReachable=false`; `statusClass=transport_error`; `durationBucket=lt_100ms`; `processCountBucket=not_checked`. No retry is authorized. No request body, response body, raw error payload, endpoint disclosure, config/env/secret/log/stdout/stderr/raw memory read, memory write, durable write, provider/API call, public MCP expansion, readiness, release, deploy, cutover, or push occurred.
-Current route: `EXACT_APPROVED_TRANSPORT_DIAGNOSIS_TRANSPORT_ERROR_ROUTE_TO_CM1922`.
+Current task: `CM-1922 transport diagnosis closeout`.
+Current validation: `CMV-2025`.
+Current project status: CM-1922 closes out the CM-1921 receipt as a valid failed transport diagnosis. CM-1921 consumed one approved live/network call and returned `transport_error`; `transportReachable=false`; approved budget remaining `0`; no retry is authorized. CM-1922 keeps component/action status probe and read-shape proof locked and routes next to `runtime_startup_or_target_locator_diagnosis`.
+Current route: `TRANSPORT_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1922 transport diagnosis closeout: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1922_TRANSPORT_DIAGNOSIS_CLOSEOUT.md`. It reviews CM-1921 and records `cm1921_receipt_valid=true`, `live_budget_exhausted=true`, `transport_diagnosis_success=false`, `transportReachable=false`, `component_action_status_probe_unlocked=false`, `read_shape_unlocked=false`, `retry_allowed=false`, and `next_route=runtime_startup_or_target_locator_diagnosis`. CM-1922 does not perform a new live call, retry CM-1921, call VCPToolBox, inspect process state, disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next candidate is CM-1923 runtime startup or target locator diagnosis preflight, source-only/no-live unless Jenn gives a new exact approval.
 
 CM-1921 exact-approved transport diagnosis receipt: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1921_EXACT_APPROVED_TRANSPORT_DIAGNOSIS_RECEIPT.md`. Under Jenn's exact approval `APPROVE_CM1921_EXACT_TRANSPORT_DIAGNOSIS`, one live/network transport diagnosis call was consumed for safe target reference `operator-vcp-toolbox-service-ref` and purpose `transport_target_diagnosis`. Result: `statusCategory=transport_error`, `transportReachable=false`, `statusClass=transport_error`, `durationBucket=lt_100ms`, `processCountBucket=not_checked`. CM-1921 does not establish transport reachability, component/action reachability, read-shape support, runtime readiness, production readiness, release readiness, cutover readiness, complete V8, or full bridge completion. It did not retry after the approved call, generate or submit a request body, generate/expose/store/submit an approval line, read or persist response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, inspect process state, call MCP memory tools, call providers/APIs, write memory or durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, or claim readiness. Next route is CM-1922 transport diagnosis closeout.
 

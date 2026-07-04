@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1921 exact-approved transport diagnosis receipt |
-| Current task | `CM-1921 exact-approved transport diagnosis receipt` |
-| Current validation | `CMV-2024` |
-| Current route | CM-1921 consumed one Jenn-approved transport diagnosis live/network call under the CM-1920 packet. Result: `transport_error`; transport reachability remains false; no retry or read-shape proof is authorized. Next route is CM-1922 transport diagnosis closeout |
+| Status | CM-1922 transport diagnosis closeout |
+| Current task | `CM-1922 transport diagnosis closeout` |
+| Current validation | `CMV-2025` |
+| Current route | CM-1922 closes out CM-1921 as a valid failed transport diagnosis: transport remains unreachable, retry/read-shape/component-action status probe remain locked, and next route is runtime startup or target locator diagnosis |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1922` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1922_TRANSPORT_DIAGNOSIS_CLOSEOUT.md`. It reviews CM-1921 and records `cm1921_receipt_valid=true`, `live_budget_exhausted=true`, `transport_diagnosis_success=false`, `transportReachable=false`, `component_action_status_probe_unlocked=false`, `read_shape_unlocked=false`, `retry_allowed=false`, and `next_route=runtime_startup_or_target_locator_diagnosis`. CM-1922 does not perform a new live call, retry CM-1921, call VCPToolBox, inspect process state, disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next candidate is CM-1923 runtime startup or target locator diagnosis preflight, source-only/no-live unless Jenn gives a new exact approval.
 
 `CM-1921` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1921_EXACT_APPROVED_TRANSPORT_DIAGNOSIS_RECEIPT.md`. Under Jenn's exact approval `APPROVE_CM1921_EXACT_TRANSPORT_DIAGNOSIS`, one live/network transport diagnosis call was consumed for safe target reference `operator-vcp-toolbox-service-ref` and purpose `transport_target_diagnosis`. Result: `statusCategory=transport_error`, `transportReachable=false`, `statusClass=transport_error`, `durationBucket=lt_100ms`, and `processCountBucket=not_checked`. CM-1921 does not establish transport reachability, component/action reachability, read-shape support, runtime readiness, production readiness, release readiness, cutover readiness, complete V8, or full bridge completion. It did not retry after the approved call, generate or submit a request body, generate/expose/store/submit an approval line, read or persist response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, inspect process state, call MCP memory tools, call providers/APIs, write memory or durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, or claim readiness. Next route is CM-1922 transport diagnosis closeout with recommended route `runtime_startup_or_target_locator_diagnosis`.
 

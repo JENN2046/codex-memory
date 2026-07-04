@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1921 exact-approved transport diagnosis receipt`.
-Current validation: `CMV-2024`.
+Current checkpoint: `CM-1922 transport diagnosis closeout`.
+Current validation: `CMV-2025`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1922 Transport Diagnosis Closeout
+
+Status: `COMPLETED_VALIDATED_TRANSPORT_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1922_TRANSPORT_DIAGNOSIS_CLOSEOUT.md`.
+- Reviewed the CM-1921 exact-approved transport diagnosis receipt.
+- Accepted CM-1921 as a valid low-disclosure failed diagnosis: `cm1921_receipt_valid=true`.
+- Recorded `live_budget_exhausted=true`, `transport_diagnosis_success=false`, `transportReachable=false`, `component_action_status_probe_unlocked=false`, `read_shape_unlocked=false`, and `retry_allowed=false`.
+- Routed next work to `runtime_startup_or_target_locator_diagnosis`.
+- Defined the next candidate as CM-1923 runtime startup or target locator diagnosis preflight, source-only/no-live unless Jenn gives a new exact approval.
+- Preserved that no new live call, CM-1921 retry, VCPToolBox call, process-state inspection, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure, memory write, durable write, config/startup/watchdog/dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2025`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted secret/readiness/raw-output scan over changed files, and changed-scope re-review passed.
 
 ## CM-1921 Exact-Approved Transport Diagnosis Receipt
 
