@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1864 M15 blocked closeout refresh`.
-Current validation: `CMV-1967`.
-Current project status: CM-1864 refreshes the M15 blocked closeout against CM-1859 through CM-1863. M15 remains unopened; RC gate report, approval packet/request/request body/approval line, live RC request, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
-Current route: `VCP_MEMORY_M15_BLOCKED_CLOSEOUT_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
+Current task: `CM-1865 plan-package local-safe closeout refresh`.
+Current validation: `CMV-1968`.
+Current project status: CM-1865 refreshes plan-package local-safe closeout. Docs/fixture/source-review/governance/boundary evidence is separated from still-blocked live/runtime/approval work; RC gate report, approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current route: `VCP_MEMORY_PLAN_PACKAGE_LOCAL_SAFE_CLOSEOUT_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1865 plan-package local-safe closeout refresh: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1865_LOCAL_SAFE_CLOSEOUT_REFRESH.md`. It records that the imported plan package is locally advanced and locally closed out only for safe docs/fixture/source-review/governance/boundary evidence, while full live/runtime completion remains incomplete. It does not create an RC gate report, approval packet, approval request, request body, approval line, runtime action, call VCPToolBox, call MCP memory tools, read logs/raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1866 exact live runtime approval boundary preflight, still without generating approval material.
 
 CM-1864 M15 blocked closeout refresh: updated `docs/VCP_MEMORY_M15_BLOCKED_CLOSEOUT_SUMMARY.md` against CM-1859 through CM-1863. It records that the M15 local-safe chain is refreshed but M15 remains blocked because live M0-M14 evidence, M14 live health-report evidence, P0/P1 risk closure, docs/runtime match, dedicated RC review approval, approval packet readiness, approval request readiness, request body generation/submission, and approval-line presence/generation are absent. It does not create an RC gate report, approval packet, approval request, request body, approval line, runtime action, call VCPToolBox, call MCP memory tools, read logs/raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1865 plan-package local-safe closeout refresh.
 

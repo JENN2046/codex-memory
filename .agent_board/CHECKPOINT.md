@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1864 M15 blocked closeout refresh`.
-Current validation: `CMV-1967`.
+Current checkpoint: `CM-1865 plan-package local-safe closeout refresh`.
+Current validation: `CMV-1968`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1865 Plan-Package Local-Safe Closeout Refresh
+
+Status: `COMPLETED_VALIDATED_PLAN_PACKAGE_LOCAL_SAFE_CLOSEOUT_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1865_LOCAL_SAFE_CLOSEOUT_REFRESH.md`.
+- Reviewed CM-1864 M15 blocked closeout as the current package-level transition point.
+- Reviewed the archived package manifest/evidence map as the imported plan source.
+- Separated local-safe docs/fixture/source-review/governance/boundary evidence from still-blocked live/runtime/approval work.
+- Preserved that full live package completion, RC gate readiness, M15 opening, approval packet readiness, approval request readiness, request body generation/submission, approval-line presence/generation, approval grant, and RC review authorization remain false.
+- Preserved that no approval packet, live RC request, approval line, request body, runtime, VCPToolBox call, MCP memory tool call, log/raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1866 exact live runtime approval boundary preflight.
+
+Validation: `CMV-1968`; plan-package closeout review, CM-1864 M15 blocked closeout review, archived package manifest/evidence map review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1864 M15 Blocked Closeout Refresh
 

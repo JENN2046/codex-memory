@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1864 M15 blocked closeout refresh`.
-Current validation: `CMV-1967`.
-Current status: CM-1864 refreshes the M15 blocked closeout against CM-1859 through CM-1863. M15 remains unopened; RC gate report, approval packet/request/request body/approval line, live RC request, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current task: `CM-1865 plan-package local-safe closeout refresh`.
+Current validation: `CMV-1968`.
+Current status: CM-1865 refreshes plan-package local-safe closeout. Docs/fixture/source-review/governance/boundary evidence is separated from still-blocked live/runtime/approval work; RC gate report, approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1865 plan-package local-safe closeout refresh. It may only summarize completed docs/fixture/governance evidence versus still-blocked live/runtime/approval work and keep every approval packet/request/request body/approval line, runtime, release, deploy, cutover, push, memory read/write, durable write, provider/API, config/startup/watchdog, public MCP expansion, and readiness field false. Push remains separate explicit authorization.
+Next safe action is CM-1866 exact live runtime approval boundary preflight. It may only define the non-authorizing boundary for a future exact live runtime request and keep every approval packet/request/request body/approval line, runtime, release, deploy, cutover, push, memory read/write, durable write, provider/API, config/startup/watchdog, public MCP expansion, and readiness field false. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
