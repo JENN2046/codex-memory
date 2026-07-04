@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1848 M10 blocked state fixture closeout / M11 gate review`.
-Current validation: `CMV-1951`.
+Current checkpoint: `CM-1849 M11 blocked precondition refresh`.
+Current validation: `CMV-1952`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1849 M11 Blocked Precondition Refresh
+
+Status: `COMPLETED_VALIDATED_M11_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1849_M11_BLOCKED_PRECONDITION_REFRESH.md`.
+- Refreshed M11 as blocked after CM-1848.
+- Recorded that true runtime execution, true memory read/write, request body generation/submission, approval-line generation/submission, and configuration/startup/watchdog changes are not scheduled by the current Green chain.
+- Bound those action families to future exact gated tasks with concrete boundaries and fresh exact authorization where project policy requires it.
+- Preserved that request body generation/submission, approval-line generation/exposure/submission, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, config/startup/watchdog, M10/M11/M15, and readiness remain blocked.
+- Routed next work to CM-1850 M11 blocked route fixture or closeout gate review.
+
+Validation: `CMV-1952`; CM-1848 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1848 M10 Blocked State Fixture Closeout / M11 Gate Review
 

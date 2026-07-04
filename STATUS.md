@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1848 M10 blocked state fixture closeout / M11 gate review`.
-Current validation: `CMV-1951`.
-Current project status: CM-1848 closes only the local M10 blocked state fixture slice for planning. M10 remains blocked because M9 proposal mode is not complete, and M11 remains blocked because M10 is blocked and no runtime/write/receipt authority exists. M9 completion, M10/M11/M15 unlock, exact boundary, request body, request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, provider/API, public MCP expansion, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1848_M10_BLOCKED_STATE_CLOSEOUT_M11_GATE_REVIEW_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1849 M11 blocked precondition refresh`.
+Current validation: `CMV-1952`.
+Current project status: CM-1849 refreshes M11 as blocked and records that true runtime execution, true memory read/write, request body generation/submission, approval-line generation/submission, and configuration/startup/watchdog changes are not scheduled by the current Green chain. They remain future exact-gated work requiring concrete boundaries and fresh exact authorization where project policy requires it. M9 completion, M10/M11/M15 unlock, accepted real proposal receipts, memory read/write, durable mutation, provider/API, public MCP expansion, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1849_M11_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1849 M11 blocked precondition refresh: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1849_M11_BLOCKED_PRECONDITION_REFRESH.md`. It refreshes M11 as blocked after CM-1848 and records the current timing rule: true runtime execution, true memory read/write, request body generation/submission, approval-line generation/submission, and configuration/startup/watchdog changes are not scheduled in the current automatic Green chain. They require future exact gated tasks with concrete boundaries and fresh exact authorization where required. It does not call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept real proposal receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1850 M11 blocked route fixture or closeout gate review.
 
 CM-1848 M10 blocked state fixture closeout / M11 gate review: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1848_M10_BLOCKED_STATE_CLOSEOUT_M11_GATE_REVIEW.md`. It reviews CM-1846 and CM-1847, closes only the local M10 blocked state fixture slice for planning, and records that M11 remains blocked because M10 is blocked and no runtime/write/receipt authority exists. It does not complete M9, unlock M10/M11/M15, bind concrete exact values, prepare request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1849 M11 blocked precondition refresh.
 

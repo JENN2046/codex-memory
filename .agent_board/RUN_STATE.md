@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1848 M10 blocked state fixture closeout / M11 gate review`.
-Current validation: `CMV-1951`.
-Current status: CM-1848 closes only the local M10 blocked state fixture slice for planning. M10 remains blocked because M9 proposal mode is not complete, and M11 remains blocked because M10 is blocked and no runtime/write/receipt authority exists. M9 completion, M10/M11/M15 unlock, exact boundary, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, provider/API, public MCP expansion, and readiness remain blocked.
+Current task: `CM-1849 M11 blocked precondition refresh`.
+Current validation: `CMV-1952`.
+Current status: CM-1849 refreshes M11 as blocked and records that true runtime execution, true memory read/write, request body generation/submission, approval-line generation/submission, and configuration/startup/watchdog changes are not scheduled by the current Green chain. They remain future exact-gated work requiring concrete boundaries and fresh exact authorization where project policy requires it. M9 completion, M10/M11/M15 unlock, accepted real proposal receipts, memory read/write, durable mutation, provider/API, public MCP expansion, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1849 M11 blocked precondition refresh. It should record why M11 remains blocked from the current trusted-write-proposal route and map only fixture/schema/governance-safe follow-up work. Push remains separate explicit authorization.
+Next safe action is CM-1850 M11 blocked route fixture or closeout gate review. It should remain fixture/schema/governance-safe and must not generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
