@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1869 exact live runtime non-authorizing request packet display boundary`.
-Current validation: `CMV-1972`.
-Current project status: CM-1869 defines how a future exact live runtime request packet may be displayed as low-disclosure planning material only. Approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
-Current route: `VCP_MEMORY_EXACT_LIVE_RUNTIME_NON_AUTHORIZING_REQUEST_PACKET_DISPLAY_BOUNDARY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
+Current task: `CM-1870 exact live runtime request packet abort boundary review`.
+Current validation: `CMV-1973`.
+Current project status: CM-1870 defines abort conditions for future exact live runtime request packet/display work. Approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current route: `VCP_MEMORY_EXACT_LIVE_RUNTIME_REQUEST_PACKET_ABORT_BOUNDARY_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1870 exact live runtime request packet abort boundary review: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1870_EXACT_LIVE_RUNTIME_REQUEST_PACKET_ABORT_BOUNDARY_REVIEW.md`. It defines abort conditions for future exact live runtime request packet/display work and routes boundary-crossing material back to review instead of completion. It does not fill live values, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1871 exact live runtime request packet readiness blocked closeout.
 
 CM-1869 exact live runtime non-authorizing request packet display boundary: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1869_EXACT_LIVE_RUNTIME_NON_AUTHORIZING_REQUEST_PACKET_DISPLAY_BOUNDARY.md`. It defines how a future exact live runtime request packet may be displayed for human review as low-disclosure planning material only. It does not fill live values, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1870 exact live runtime request packet abort boundary review.
 

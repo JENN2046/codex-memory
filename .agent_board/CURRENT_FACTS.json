@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1869",
-  "validationId": "CMV-1972",
+  "taskId": "CM-1870",
+  "validationId": "CMV-1973",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_non_authorizing_request_packet_display_boundary",
+    "scope": "vcp_memory_exact_live_runtime_request_packet_abort_boundary_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1973",
+      "scope": "CM-1870 exact live runtime request packet abort boundary review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_REQUEST_PACKET_ABORT_BOUNDARY_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1972",
       "scope": "CM-1869 exact live runtime non-authorizing request packet display boundary",
