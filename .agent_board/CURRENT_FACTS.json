@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1900",
-  "validationId": "CMV-2003",
+  "taskId": "CM-1901",
+  "validationId": "CMV-2004",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_authorization_request_boundary_fixture_closeout_gate_review",
+    "scope": "vcp_memory_exact_live_runtime_authorization_request_readiness_blocked_precondition_refresh",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2004",
+      "scope": "CM-1901 exact live runtime authorization request readiness blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-2003",
       "scope": "CM-1900 exact live runtime authorization request boundary fixture closeout gate review",

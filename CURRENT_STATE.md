@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1900 exact live runtime authorization request boundary fixture closeout gate review |
-| Current task | `CM-1900 exact live runtime authorization request boundary fixture closeout gate review` |
-| Current validation | `CMV-2003` |
-| Current route | CM-1900 closes only the local CM-1898/CM-1899 authorization request boundary fixture slice for planning. The authorization request path remains blocked; approval request packet creation, approval request submission, request packet readiness, request body generation/submission, approval line generation/submission, runtime, memory, config/startup/watchdog, release/deploy/cutover/push, and readiness remain blocked and unauthorized. Next local-safe route is CM-1901 exact live runtime authorization request readiness blocked precondition refresh |
+| Status | CM-1901 exact live runtime authorization request readiness blocked precondition refresh |
+| Current task | `CM-1901 exact live runtime authorization request readiness blocked precondition refresh` |
+| Current validation | `CMV-2004` |
+| Current route | CM-1901 reviews CM-1898 through CM-1900 and records that boundary/fixture closeout evidence is not authorization request readiness. Authorization request creation/readiness/submission, approval request packet creation/submission, request packet readiness, request body generation/submission, approval line generation/submission, runtime, memory, config/startup/watchdog, release/deploy/cutover/push, and readiness remain blocked and unauthorized. Next local-safe route is CM-1902 exact live runtime authorization request readiness blocked fixture contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1901` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1901_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_PRECONDITION_REFRESH.md`. It reviews CM-1898 through CM-1900 and records that category-only boundary evidence plus fixture closeout evidence is not authorization request readiness. It does not request approval, open the authorization gate, create/readiness/submit an authorization request, fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1902 exact live runtime authorization request readiness blocked fixture contract.
 
 `CM-1900` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1900_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_FIXTURE_CLOSEOUT_GATE_REVIEW.md`. It reviews CM-1898 and CM-1899, accepts the local authorization request boundary fixture contract slice as closed for planning only, and records that the accepted fixture decision remains `authorization_request_boundary_accepted_category_only_no_authority`. It does not request approval, open the authorization gate, fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1901 exact live runtime authorization request readiness blocked precondition refresh.
 
