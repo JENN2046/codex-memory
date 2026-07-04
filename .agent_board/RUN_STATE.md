@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1843 M9 approval request boundary blocked fixture contract`.
-Current validation: `CMV-1946`.
-Current status: CM-1843 adds a pure source/test fixture contract for the approval-request boundary blocked state. Full M9 proposal mode, approval-request boundary readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1844 M9 approval request boundary blocked contract closeout / proposal mode gate review`.
+Current validation: `CMV-1947`.
+Current status: CM-1844 closes only the local approval-request boundary blocked fixture slice for planning. Full M9 proposal mode, approval-request boundary readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1844 M9 approval request boundary blocked contract closeout / proposal mode gate review. It should review CM-1842 and CM-1843, close only the local approval-request boundary blocked fixture slice for planning, and keep request body, request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness blocked. Push remains separate explicit authorization.
+Next safe action is CM-1845 M9 proposal mode blocked closeout refresh. It should summarize the current trusted-write-proposal chain and keep request body, request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
