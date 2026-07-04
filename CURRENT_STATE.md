@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1874 exact live runtime approval request gap fixture closeout |
-| Current task | `CM-1874 exact live runtime approval request gap fixture closeout` |
-| Current validation | `CMV-1977` |
-| Current route | Exact live runtime approval request gap fixture slice closed for planning only. Request assembly preflight may start next, but request assembly, approval packet/request/body/line, and runtime remain not authorized or ready. Next local-safe route is CM-1875 exact live runtime approval request assembly preflight |
+| Status | CM-1875 exact live runtime approval request assembly preflight fixture contract |
+| Current task | `CM-1875 exact live runtime approval request assembly preflight fixture contract` |
+| Current validation | `CMV-1978` |
+| Current route | Exact live runtime approval request assembly preflight fixture contract added; targeted tests `8/8` and default suite `3843/3843` passed. Request assembly/body/approval line and runtime remain blocked and unauthorized. Next local-safe route is CM-1876 exact live runtime approval request assembly preflight closeout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1875` adds `src/core/VcpMemoryExactLiveRuntimeApprovalRequestAssemblyPreflightContract.js`, `tests/vcp-memory-exact-live-runtime-approval-request-assembly-preflight-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1875_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_ASSEMBLY_PREFLIGHT_FIXTURE_CONTRACT.md`. The fixture contract accepts only the blocked assembly-preflight shape after CM-1874, reports L4 stops for exact value binding, request assembly, assembled request disclosure, request body generation/submission, approval-line handling, runtime/memory/provider/config/remote/readiness expansion, rejects raw/private/exact-value/request fields without echo, and requires zero side-effect counters. Targeted tests passed `8/8`; default `npm test` passed `3843/3843`. It does not fill live values, assemble a request, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1876 exact live runtime approval request assembly preflight closeout.
 
 `CM-1874` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1874_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_GAP_FIXTURE_CLOSEOUT.md`. It reviews CM-1872 and CM-1873, accepts the local gap fixture contract slice as closed for planning, and allows only a future request assembly preflight to start. It does not fill live values, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1875 exact live runtime approval request assembly preflight.
 
