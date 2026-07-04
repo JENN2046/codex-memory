@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1904 exact live runtime authorization request exact-material boundary preflight`.
-Current validation: `CMV-2007`.
-Current handoff: CM-1904 records only category-level future exact material families for a later authorization request boundary. No concrete exact values are bound, no authorization request/request packet/request body/approval line is created, and runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1905 exact live runtime authorization request exact-material boundary fixture contract`.
+Current validation: `CMV-2008`.
+Current handoff: CM-1905 adds a pure local fixture contract and targeted tests for the CM-1904 category-only exact-material boundary. Concrete exact values, authorization request/request packet/request body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1904 records only category-level future exact material famil
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1904 records only category-level future exact material families for a later authorization request boundary. No concrete exact values are bound. Authorization gate opening, authorization request creation/readiness/submission, approval request packet creation/readiness/submission, skeleton values, skeleton artifact creation/rendering/storage/submission, request packet creation/readiness/presence/rendering/storage/submission, request assembly, request body, approval line, runtime, memory read/write, config/startup/watchdog, provider/API, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next local-safe route is CM-1905 exact live runtime authorization request exact-material boundary fixture contract. Sanitized VCPToolBox target remains bound for planning only; no runtime or memory action is opened.
+Current status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1905 adds a pure local fixture contract for the CM-1904 category-only exact material boundary. Concrete exact values remain absent. Authorization gate opening, authorization request creation/readiness/submission, approval request packet creation/readiness/submission, skeleton values, skeleton artifact creation/rendering/storage/submission, request packet creation/readiness/presence/rendering/storage/submission, request assembly, request body, approval line, runtime, memory read/write, config/startup/watchdog, provider/API, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next local-safe route is CM-1906 exact live runtime authorization request exact-material boundary fixture closeout gate review. Sanitized VCPToolBox target remains bound for planning only; no runtime or memory action is opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpMemoryExactLiveRuntimeAuthorizationRequestExactMaterialBoundaryContract.js`
+- `tests/vcp-memory-exact-live-runtime-authorization-request-exact-material-boundary-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1905_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CONTRACT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1904_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1903_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
 - `src/core/VcpMemoryExactLiveRuntimeAuthorizationRequestReadinessBlockedContract.js`

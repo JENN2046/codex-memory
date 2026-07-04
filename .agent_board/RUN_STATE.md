@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1904 exact live runtime authorization request exact-material boundary preflight`.
-Current validation: `CMV-2007`.
-Current status: CM-1904 records only category-level future exact material families for a later authorization request boundary. No concrete exact values are bound, no authorization request/request packet/request body/approval line is created, and runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1905 exact live runtime authorization request exact-material boundary fixture contract`.
+Current validation: `CMV-2008`.
+Current status: CM-1905 adds a pure local fixture contract and targeted tests for the CM-1904 category-only exact-material boundary. Concrete exact values, authorization request/request packet/request body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1905 exact live runtime authorization request exact-material boundary fixture contract. It may only add a pure local fail-closed fixture contract for the CM-1904 category-only boundary. It must not fill live values, create/render/store/submit authorization requests or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1906 exact live runtime authorization request exact-material boundary fixture closeout gate review. It may only review and close the local CM-1904/CM-1905 category-only fixture slice for planning. It must not fill live values, create/render/store/submit authorization requests or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
