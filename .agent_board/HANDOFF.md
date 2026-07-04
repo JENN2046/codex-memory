@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1915 live read-only proof execution harness`.
-Current validation: `CMV-2018`.
-Current handoff: CM-1915 adds a pure local default no-run execution harness. It consumes the CM-1912 dry-run contract and CM-1914 request boundary, accepts dry-run without live calls, rejects missing exact approval and boundary violations in exact-approved-live mode, and only gates a later CM-1916 proof when exact approval and budgets are complete. Runtime, memory read/write, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1916 exact-approved live observe-lite proof`.
+Current validation: `CMV-2019`.
+Current handoff: CM-1916 consumed one Jenn exact-approved live/network observe-lite proof attempt against safe target reference `operator-vcp-toolbox-service-ref` for `KnowledgeBaseManager` / `knowledge_base.search`. Result: `transport_error`; runtime reachability, component/action reachability, and response shape were not established. No request body, response body read, log/config/secret/raw memory read, memory or durable write, approval line, release/deploy/cutover, or readiness claim occurred. Next route is CM-1917 closeout / route decision with recommended route `runtime_target_diagnosis`.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1915 adds a pure local default no-run execution harness. It 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_LIVE_READONLY_PROOF_EXECUTION_HARNESS_DEFAULT_NO_RUN_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; CM-1915 implements a default no-run harness with modes `dry_run` and `exact_approved_live`. Missing approval yields `exact_approval_required`; out-of-bound approval yields `boundary_violation`; complete exact approval only gates CM-1916 while preserving no runtime execution in CM-1915. Targeted tests passed `10/10`; adjacent CM-1912+CM-1913+CM-1915 tests passed `26/26`; default `npm test` passed `3975/3975`. Runtime execution, VCPToolBox calls, MCP memory tools, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write, durable writes, receipt writes, provider/API calls, public MCP expansion, authorization request creation/submission, approval line generation/submission, request body generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next route is CM-1916 first exact-approved live observe-lite proof; it requires Jenn explicit exact approval before any runtime call.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1916 executed exactly one approved live/network observe-lite proof attempt with `max_runtime_calls=1`, `max_network_calls=1`, write budget `0`, response body byte budget `0`, log read budget `0`, and shape-only projection. Result was `transport_error`: `runtimeReachable=false`, `selectedComponentActionReachable=not_proven_by_no_body_no_auth_boundary`, `responseShapeCategoryKnown=false`, `shapeKeys=[]`, `itemCount=0`, and `normalizedResultStatus=error`. Request body generation/submission, approval line generation/submission, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, MCP memory tools, memory read/write by agent, durable writes, provider/API calls, public MCP expansion, config/startup/watchdog changes, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and did not occur. Next route is CM-1917 live proof closeout / route decision; because CM-1916 failed with transport error after the single approved call, route to `runtime_target_diagnosis`, not read-shape proof.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1916_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_RECEIPT.md`
 - `src/core/VcpNativeReadOnlyProofExecutionHarness.js`
 - `tests/vcp-native-readonly-proof-execution-harness.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1915_LIVE_READONLY_PROOF_EXECUTION_HARNESS.md`

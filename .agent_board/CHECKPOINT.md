@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1915 live read-only proof execution harness`.
-Current validation: `CMV-2018`.
+Current checkpoint: `CM-1916 exact-approved live observe-lite proof`.
+Current validation: `CMV-2019`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1916 Exact-Approved Live Observe-Lite Proof
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1916_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_RECEIPT.md`.
+- Consumed one Jenn exact-approved live/network observe-lite proof attempt against safe target reference `operator-vcp-toolbox-service-ref`.
+- Kept the exact scope to profile `observe-lite`, component/action `KnowledgeBaseManager` / `knowledge_base.search`, max runtime calls `1`, max network calls `1`, write budget `0`, response body byte budget `0`, log read budget `0`, and shape-only projection.
+- Recorded low-disclosure result `statusCategory=transport_error`, `statusCodeClass=transport_error`, `runtimeReachable=false`, `selectedComponentActionReachable=not_proven_by_no_body_no_auth_boundary`, `responseShapeCategoryKnown=false`, `shapeKeys=[]`, `itemCount=0`, `durationBucket=lt_100ms`, and `normalizedResultStatus=error`.
+- Preserved `requestBodyGenerated=false`, `responseBodyRead=false`, `memoryWritten=false`, `durableWritePerformed=false`, `rawBodyPersisted=false`, `logRead=false`, `configEnvRead=false`, `secretRead=false`, `rawMemoryRead=false`, `approvalLineGenerated=false`, and `readinessClaimed=false`.
+- Preserved that no request body generation/submission, approval-line generation/submission/exposure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, MCP memory tool call, provider/API call, memory write, durable write, config/startup/watchdog/dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1917 live proof closeout / route decision, with recommended route `runtime_target_diagnosis` because CM-1916 did not prove runtime reachability, component/action reachability, or response shape.
+
+Validation: `CMV-2019`; CM-1913 receipt schema validation over the low-disclosure CM-1916 receipt passed; targeted receipt/harness tests passed; `git diff --check`, docs validation, current-facts JSON parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1915 Live Read-Only Proof Execution Harness
 

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1915 live read-only proof execution harness`.
-Current validation: `CMV-2018`.
-Current status: CM-1915 implements a pure local default no-run execution harness. Dry-run mode is accepted without live calls; exact-approved-live mode rejects missing approval or boundary violations and only gates a later CM-1916 proof when exact approval and budgets are complete. Runtime execution, memory read/write, receipt persistence, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1916 exact-approved live observe-lite proof`.
+Current validation: `CMV-2019`.
+Current status: CM-1916 consumed one Jenn exact-approved live/network observe-lite proof attempt against safe target reference `operator-vcp-toolbox-service-ref` for `KnowledgeBaseManager` / `knowledge_base.search`. Result: `transport_error`; runtime reachability, component/action reachability, and response shape were not established. No request body, response body read, log/config/secret/raw memory read, memory or durable write, approval line, release/deploy/cutover, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1916 first exact-approved live observe-lite proof. This is a hard-stop live runtime step and requires Jenn explicit exact approval before any runtime call. Without that approval, stop at the approval boundary and do not execute VCPToolBox, read response bodies/logs/config/secrets/raw memory, generate request bodies or approval lines, write memory, or claim readiness. Push remains separate explicit authorization.
+Next action is CM-1917 live proof closeout / route decision. CM-1916 exhausted the approved single network-call budget and produced `transport_error`, so do not retry live runtime, proceed to read-shape proof, read logs/config/secrets/raw memory, generate request bodies or approval lines, write memory, or claim readiness without a fresh exact approval. The recommended CM-1917 route decision is `runtime_target_diagnosis`. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
