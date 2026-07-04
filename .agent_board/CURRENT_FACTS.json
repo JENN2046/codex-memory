@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1847",
-  "validationId": "CMV-1950",
+  "taskId": "CM-1848",
+  "validationId": "CMV-1951",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m10_blocked_state_fixture_contract",
+    "scope": "vcp_memory_trusted_write_proposal_m10_blocked_state_fixture_closeout_m11_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1951",
+      "scope": "CM-1848 M10 blocked state fixture closeout / M11 gate review",
+      "status": "COMPLETED_VALIDATED_M10_BLOCKED_STATE_FIXTURE_CLOSEOUT_M11_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1950",
       "scope": "CM-1847 M10 blocked state fixture contract",
