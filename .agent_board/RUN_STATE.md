@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1855 M12 exact-boundary feasibility fixture contract`.
-Current validation: `CMV-1958`.
-Current status: CM-1855 adds a pure local source/test fixture contract for the CM-1854 M12 exact-boundary feasibility packet. Targeted tests passed `9/9`; default `npm test` passed `3827/3827`. Live M12 workflow remains blocked: no concrete live values, live execution packet, request body, approval line, workflow harness, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, or readiness is bound or opened.
+Current task: `CM-1856 M12 exact-boundary feasibility contract closeout / next gate review`.
+Current validation: `CMV-1959`.
+Current status: CM-1856 closes only the local M12 exact-boundary feasibility contract slice for planning. M12 live workflow remains blocked: no M11 live evidence, checkpoint/handoff write authority, exact live workflow boundary, Codex/Claude client-isolation proof, auditable workflow receipts, runtime, memory read/write, approval material, M14/M15 unlock, or readiness is bound or opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1856 M12 exact-boundary feasibility contract closeout / next gate review. It may only review the local fixture contract and route the next safe boundary, and must not start live workflow, generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1857 M13 fallback hardening evidence reconciliation. It may only review existing fallback hardening evidence against the plan entry/exit conditions, and must not run private runtime reads, real queries, live VCPToolBox calls, MCP memory tools, memory writes, durable writes, provider/API calls, public MCP expansion, config/startup/watchdog changes, release/deploy/cutover/push, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

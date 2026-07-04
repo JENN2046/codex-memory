@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1855 M12 exact-boundary feasibility fixture contract`.
-Current validation: `CMV-1958`.
+Current checkpoint: `CM-1856 M12 exact-boundary feasibility contract closeout / next gate review`.
+Current validation: `CMV-1959`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1856 M12 Exact-Boundary Feasibility Contract Closeout / Next Gate Review
+
+Status: `COMPLETED_VALIDATED_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1856_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW.md`.
+- Reviewed CM-1854 exact-boundary feasibility preflight.
+- Reviewed CM-1855 exact-boundary feasibility fixture contract.
+- Reviewed archived M12/M13 entry, exit, risk, and dependency boundaries.
+- Closed only the local M12 exact-boundary feasibility contract slice for planning.
+- Preserved that M12 live workflow remains blocked because M11 live evidence, checkpoint/handoff write authority, exact live workflow boundary, Codex/Claude client-isolation proof, and auditable workflow receipts remain absent.
+- Preserved that M12 stage completion, M14 unlock, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain unclaimed.
+- Routed next work to CM-1857 M13 fallback hardening evidence reconciliation.
+
+Validation: `CMV-1959`; CM-1854/CM-1855 review, archived M12/M13 plan review, targeted CM-1855 test, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1855 M12 Exact-Boundary Feasibility Fixture Contract
 

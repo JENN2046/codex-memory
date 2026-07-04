@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1855 M12 exact-boundary feasibility fixture contract`.
-Current validation: `CMV-1958`.
-Current handoff: CM-1855 adds a pure local source/test fixture contract for the CM-1854 M12 exact-boundary feasibility packet. Targeted tests passed `9/9`; default `npm test` passed `3827/3827`. Live M12 workflow remains blocked: no concrete live values, live execution packet, request body, approval line, workflow harness, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, or readiness is bound or opened.
+Current task: `CM-1856 M12 exact-boundary feasibility contract closeout / next gate review`.
+Current validation: `CMV-1959`.
+Current handoff: CM-1856 closes only the local M12 exact-boundary feasibility contract slice for planning. M12 live workflow remains blocked: no M11 live evidence, checkpoint/handoff write authority, exact live workflow boundary, Codex/Claude client-isolation proof, auditable workflow receipts, runtime, memory read/write, approval material, M14/M15 unlock, or readiness is bound or opened.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1855 adds a pure local source/test fixture contract for the 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M12_EXACT_BOUNDARY_FEASIBILITY_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 final blocked closeout is recorded for planning only; proposal mode remains blocked; local M10 blocked state fixture slice is closed for planning only; M10 gate remains blocked because M9 proposal mode is not complete; local M11 blocked route fixture slice is closed for planning only; M11 gate remains blocked because M10 is blocked and no runtime/write/receipt authority exists; prior M12 fixture/schema chain is aligned with the current CM-1852 route only as planning evidence; M12 exact-boundary feasibility is partial/blocked and now has a pure source/test fixture guard; no concrete live values, request body, approval line, workflow harness, runtime, memory read/write, checkpoint/handoff writes, workflow receipt acceptance, or config/startup/watchdog action is bound or scheduled by the current Green chain; next local-safe route is CM-1856 M12 exact-boundary feasibility contract closeout / next gate review; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M11, M12, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 final blocked closeout is recorded for planning only; proposal mode remains blocked; local M10 blocked state fixture slice is closed for planning only; M10 gate remains blocked because M9 proposal mode is not complete; local M11 blocked route fixture slice is closed for planning only; M11 gate remains blocked because M10 is blocked and no runtime/write/receipt authority exists; prior M12 fixture/schema chain is aligned with the current CM-1852 route only as planning evidence; local M12 exact-boundary feasibility contract slice is closed for planning only; M12 live workflow remains blocked because M11 live evidence, checkpoint/handoff write authority, exact live workflow boundary, Codex/Claude client-isolation proof, and auditable workflow receipts remain absent; next local-safe route is CM-1857 M13 fallback hardening evidence reconciliation; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M12 live workflow, M13 completion, M14, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -85,6 +85,7 @@ Current entrypoints:
 - `src/core/VcpMemoryCodexClaudeSustainedWorkflowExactBoundaryFeasibilityContract.js`
 - `tests/vcp-memory-codex-claude-sustained-workflow-exact-boundary-feasibility-contract.test.js`
 - `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1855_M12_EXACT_BOUNDARY_FEASIBILITY_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1856_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW.md`
 - `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`
 - `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`

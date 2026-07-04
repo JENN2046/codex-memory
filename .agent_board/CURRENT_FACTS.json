@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1855",
-  "validationId": "CMV-1958",
+  "taskId": "CM-1856",
+  "validationId": "CMV-1959",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_exact_boundary_feasibility_fixture_contract",
+    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_exact_boundary_feasibility_contract_closeout_next_gate_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1959",
+      "scope": "CM-1856 M12 exact-boundary feasibility contract closeout / next gate review",
+      "status": "COMPLETED_VALIDATED_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1958",
       "scope": "CM-1855 M12 exact-boundary feasibility fixture contract",
