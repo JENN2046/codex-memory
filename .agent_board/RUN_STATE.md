@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1866 exact live runtime approval boundary preflight`.
-Current validation: `CMV-1969`.
-Current status: CM-1866 defines a non-authorizing exact live runtime approval boundary preflight. Future request-packet skeleton preparation is allowed, but approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current task: `CM-1867 exact live runtime non-authorizing request packet skeleton`.
+Current validation: `CMV-1970`.
+Current status: CM-1867 creates a placeholder-only exact live runtime request packet skeleton. Approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1867 exact live runtime non-authorizing request packet skeleton. It may only prepare a skeleton with placeholders and false authorization fields, without filling live values, generating a request body, generating an approval line, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1868 exact live runtime request packet review boundary. It may only review the placeholder skeleton and keep live values, request bodies, approval lines, runtime execution, memory/log/raw reads, config/startup/watchdog changes, and readiness claims false. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

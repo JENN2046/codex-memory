@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1866 exact live runtime approval boundary preflight |
-| Current task | `CM-1866 exact live runtime approval boundary preflight` |
-| Current validation | `CMV-1969` |
-| Current route | Exact live runtime approval boundary preflight created; future non-authorizing request-packet skeleton may be prepared, but approval packet/request/body/line and runtime remain not ready. Next local-safe route is CM-1867 exact live runtime non-authorizing request packet skeleton |
+| Status | CM-1867 exact live runtime non-authorizing request packet skeleton |
+| Current task | `CM-1867 exact live runtime non-authorizing request packet skeleton` |
+| Current validation | `CMV-1970` |
+| Current route | Exact live runtime request packet skeleton created with placeholder-only fields; approval packet/request/body/line and runtime remain not ready. Next local-safe route is CM-1868 exact live runtime request packet review boundary |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1867` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1867_EXACT_LIVE_RUNTIME_NON_AUTHORIZING_REQUEST_PACKET_SKELETON.md`. It creates a placeholder-only field skeleton for a future exact live runtime request packet after CM-1866. It does not fill live values, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1868 exact live runtime request packet review boundary.
 
 `CM-1866` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1866_EXACT_LIVE_RUNTIME_APPROVAL_BOUNDARY_PREFLIGHT.md`. It defines the non-authorizing boundary shape for a future exact live runtime approval request after CM-1865, using CM-1807 and CM-1810 as scope-only evidence. It does not create an approval packet, approval request, request body, approval line, runtime action, VCPToolBox call, MCP memory tool call, response body read, log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1867 exact live runtime non-authorizing request packet skeleton.
 
