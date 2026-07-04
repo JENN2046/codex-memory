@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1914 exact-approved live read-only proof request packet`.
-Current validation: `CMV-2017`.
-Current status: CM-1914 prepares a non-authorizing request packet boundary for a future exact-approved live read-only VCP native proof. Target/component/action remain safe-reference-only and unbound until Jenn exact approval. Runtime execution, memory read/write, receipt persistence, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1915 live read-only proof execution harness`.
+Current validation: `CMV-2018`.
+Current status: CM-1915 implements a pure local default no-run execution harness. Dry-run mode is accepted without live calls; exact-approved-live mode rejects missing approval or boundary violations and only gates a later CM-1916 proof when exact approval and budgets are complete. Runtime execution, memory read/write, receipt persistence, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1915 live read-only proof execution harness. It may implement a default no-run harness with dry-run and exact-approved-live modes. It must reject execution without exact approval, reject boundary violations, avoid runtime calls by default, avoid request body and approval-line generation, avoid writes, avoid raw body/log persistence, and avoid readiness claims. Push remains separate explicit authorization.
+Next action is CM-1916 first exact-approved live observe-lite proof. This is a hard-stop live runtime step and requires Jenn explicit exact approval before any runtime call. Without that approval, stop at the approval boundary and do not execute VCPToolBox, read response bodies/logs/config/secrets/raw memory, generate request bodies or approval lines, write memory, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1914",
-  "validationId": "CMV-2017",
+  "taskId": "CM-1915",
+  "validationId": "CMV-2018",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_live_readonly_proof_request_packet_non_authorizing_no_runtime_no_approval_line",
+    "scope": "live_readonly_proof_execution_harness_default_no_run_no_runtime_no_write",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2018",
+      "scope": "CM-1915 live read-only proof execution harness",
+      "status": "COMPLETED_VALIDATED_LIVE_READONLY_PROOF_EXECUTION_HARNESS_DEFAULT_NO_RUN_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-2017",
       "scope": "CM-1914 exact-approved live read-only proof request packet",

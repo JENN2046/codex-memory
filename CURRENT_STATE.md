@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1914 exact-approved live read-only proof request packet |
-| Current task | `CM-1914 exact-approved live read-only proof request packet` |
-| Current validation | `CMV-2017` |
-| Current route | CM-1914 prepares a non-authorizing request packet boundary for a future exact-approved live read-only VCP native proof. Target/component/action stay safe-reference-only and unbound; no approval line, request body, runtime execution, or readiness claim occurred. Next local-safe route is CM-1915 live read-only proof execution harness default no-run |
+| Status | CM-1915 live read-only proof execution harness |
+| Current task | `CM-1915 live read-only proof execution harness` |
+| Current validation | `CMV-2018` |
+| Current route | CM-1915 implements a pure local default no-run execution harness. Dry-run mode is no-call; exact-approved-live mode gates CM-1916 only when exact approval and budgets are complete, while still executing no runtime in CM-1915. Next route is CM-1916 first exact-approved live observe-lite proof, which requires Jenn explicit exact approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1915` adds `src/core/VcpNativeReadOnlyProofExecutionHarness.js`, `tests/vcp-native-readonly-proof-execution-harness.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1915_LIVE_READONLY_PROOF_EXECUTION_HARNESS.md`. It consumes the CM-1912 dry-run runtime adapter contract and CM-1914 request boundary, defaults to `dry_run`, rejects missing exact approval in `exact_approved_live` mode as `exact_approval_required`, rejects over-budget or out-of-policy approvals as `boundary_violation`, rejects invalid harness modes without echoing unsafe mode values, and accepts complete exact approval only as a next-step gate to CM-1916 while keeping `runtimeExecuted=false`, `liveVcpToolBoxCalled=false`, `networkCalled=false`, `requestBodyGenerated=false`, `responseBodyRead=false`, `memoryWritten=false`, and `approvalLineGenerated=false`. Targeted tests passed `10/10`; adjacent CM-1912+CM-1913+CM-1915 tests passed `26/26`; default `npm test` passed `3975/3975`. It does not execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, write receipts, call providers/APIs, change config/startup/watchdog, expand public MCP, create/submit authorization requests, generate or submit request bodies, generate or submit approval lines, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1916 first exact-approved live observe-lite proof, which requires Jenn explicit exact approval before any runtime call.
 
 `CM-1914` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1914_EXACT_APPROVED_LIVE_READONLY_PROOF_REQUEST.md`. It prepares only a non-authorizing request boundary for a future `one_read_only_vcp_native_proof` using profile `observe-lite`, `max_runtime_calls=1`, `max_network_calls=1`, `write_budget=0`, `response_body_byte_budget=0`, `log_read_budget=0`, and `result_projection=shape_only`. Target, component, and component action remain safe references only and unbound until Jenn exact approval. It lists required Jenn exact approval fields, CM-1913 low-disclosure receipt constraints, and stop conditions. It does not execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, write receipts, call providers/APIs, change config/startup/watchdog, expand public MCP, create/submit authorization requests, generate or submit request bodies, generate or submit approval lines, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1915 live read-only proof execution harness default no-run.
 

@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1914 exact-approved live read-only proof request packet`.
-Current validation: `CMV-2017`.
+Current checkpoint: `CM-1915 live read-only proof execution harness`.
+Current validation: `CMV-2018`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1915 Live Read-Only Proof Execution Harness
+
+Status: `COMPLETED_VALIDATED_LIVE_READONLY_PROOF_EXECUTION_HARNESS_DEFAULT_NO_RUN_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpNativeReadOnlyProofExecutionHarness.js`.
+- Added `tests/vcp-native-readonly-proof-execution-harness.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1915_LIVE_READONLY_PROOF_EXECUTION_HARNESS.md`.
+- Implemented a pure local execution harness that consumes the CM-1912 dry-run runtime adapter contract and CM-1914 request boundary.
+- Implemented default `dry_run` mode with `live_call=false`.
+- Implemented `exact_approved_live` mode with external approval required.
+- Rejected missing exact approval as `exact_approval_required`.
+- Rejected out-of-bound approval values as `boundary_violation`.
+- Re-review repaired invalid harness mode projection so unsafe mode values fail closed without echo.
+- Accepted complete exact approval plus legal budgets only as a next-step gate to CM-1916, while still preserving `runtimeExecuted=false`, `liveVcpToolBoxCalled=false`, `networkCalled=false`, `requestBodyGenerated=false`, `responseBodyRead=false`, `memoryWritten=false`, and `approvalLineGenerated=false`.
+- Preserved that no runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory read/write, durable write, receipt write, provider/API call, config/startup/watchdog change, public MCP expansion, authorization request creation/submission, request body generation/submission, approval-line generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1916 first exact-approved live observe-lite proof, which requires Jenn explicit exact approval before any runtime call.
+
+Validation: `CMV-2018`; source/test `node --check`, targeted CM-1915 harness test `10/10`, adjacent CM-1912+CM-1913+CM-1915 test `26/26`, default `npm test` `3975/3975`, `git diff --check`, source-safety scan, and changed-scope re-review passed. Docs/board validation is recorded in CMV-2018.
 
 ## CM-1914 Exact-Approved Live Read-Only Proof Request Packet
 
