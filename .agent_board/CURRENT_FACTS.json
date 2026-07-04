@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1856",
-  "validationId": "CMV-1959",
+  "taskId": "CM-1857",
+  "validationId": "CMV-1960",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_exact_boundary_feasibility_contract_closeout_next_gate_review",
+    "scope": "vcp_memory_fallback_local_memory_m13_evidence_reconciliation",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1960",
+      "scope": "CM-1857 M13 fallback hardening evidence reconciliation",
+      "status": "COMPLETED_VALIDATED_M13_FALLBACK_HARDENING_EVIDENCE_RECONCILIATION_FIXTURE_DRY_RUN_ONLY_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1959",
       "scope": "CM-1856 M12 exact-boundary feasibility contract closeout / next gate review",

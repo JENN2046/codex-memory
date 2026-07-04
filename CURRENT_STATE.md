@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1856 M12 exact-boundary feasibility contract closeout / next gate review |
-| Current task | `CM-1856 M12 exact-boundary feasibility contract closeout / next gate review` |
-| Current validation | `CMV-1959` |
-| Current route | Local M12 exact-boundary feasibility contract slice closed for planning only; live M12 workflow remains blocked. Next local-safe route is CM-1857 M13 fallback hardening evidence reconciliation |
+| Status | CM-1857 M13 fallback hardening evidence reconciliation |
+| Current task | `CM-1857 M13 fallback hardening evidence reconciliation` |
+| Current validation | `CMV-1960` |
+| Current route | M13 fallback fixture/dry-run hardening chain reconciled after CM-1856; live/runtime fallback safety remains blocked. Next local-safe route is CM-1858 M14 health-report evidence boundary refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1857` adds `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_CM1857_M13_EVIDENCE_RECONCILIATION.md`. It reconciles the existing M13 fallback hardening evidence after CM-1856 and records that M13 is locally complete only for fixture/dry-run fallback hardening. Marker/receipt, scope/client isolation, secret rejection, lifecycle filter, and query-quality dry-run fixture evidence remain accepted for planning; live/runtime fallback safety, private runtime reads, real queries, MCP memory calls, VCPToolBox runtime calls, memory writes, durable writes, provider/API calls, request bodies, approval lines, config/startup/watchdog changes, public MCP expansion, M14 live dashboard, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1858 M14 health-report evidence boundary refresh.
 
 `CM-1856` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1856_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW.md`. It reviews CM-1854 and CM-1855, closes only the local M12 exact-boundary feasibility contract slice for planning, and records that M12 live workflow remains blocked because M11 live evidence, checkpoint/handoff write authority, exact live workflow boundary, Codex/Claude client-isolation proof, and auditable workflow receipts remain absent. It does not close M12 as live workflow proof, does not unlock M14/M15, and does not bind concrete live values, request bodies, approval lines, workflow harnesses, runtime, memory read/write, config/startup/watchdog, provider/API, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1857 M13 fallback hardening evidence reconciliation.
 

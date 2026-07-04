@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1856 M12 exact-boundary feasibility contract closeout / next gate review`.
-Current validation: `CMV-1959`.
+Current checkpoint: `CM-1857 M13 fallback hardening evidence reconciliation`.
+Current validation: `CMV-1960`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1857 M13 Fallback Hardening Evidence Reconciliation
+
+Status: `COMPLETED_VALIDATED_M13_FALLBACK_HARDENING_EVIDENCE_RECONCILIATION_FIXTURE_DRY_RUN_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_CM1857_M13_EVIDENCE_RECONCILIATION.md`.
+- Reviewed archived M13 entry, exit, risk, and dependency boundaries.
+- Reviewed CM-1763 through CM-1770 M13 precondition, gap matrix, marker/receipt, scope/client isolation, secret rejection, lifecycle filter, query-quality dry-run, and hardening report evidence.
+- Reviewed CM-1856 as the current M12/M13 transition boundary.
+- Reconciled M13 as locally complete only for fixture/dry-run fallback hardening.
+- Preserved that live/runtime fallback safety, private runtime reads, real queries, MCP memory calls, VCPToolBox runtime calls, memory writes, durable writes, request bodies, approval lines, config/startup/watchdog changes, M14 live dashboard, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+- Routed next work to CM-1858 M14 health-report evidence boundary refresh.
+
+Validation: `CMV-1960`; M13 plan review, CM-1763 through CM-1770 review, CM-1856 review, targeted M13 fixture tests, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1856 M12 Exact-Boundary Feasibility Contract Closeout / Next Gate Review
 

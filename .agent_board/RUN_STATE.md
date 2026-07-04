@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1856 M12 exact-boundary feasibility contract closeout / next gate review`.
-Current validation: `CMV-1959`.
-Current status: CM-1856 closes only the local M12 exact-boundary feasibility contract slice for planning. M12 live workflow remains blocked: no M11 live evidence, checkpoint/handoff write authority, exact live workflow boundary, Codex/Claude client-isolation proof, auditable workflow receipts, runtime, memory read/write, approval material, M14/M15 unlock, or readiness is bound or opened.
+Current task: `CM-1857 M13 fallback hardening evidence reconciliation`.
+Current validation: `CMV-1960`.
+Current status: CM-1857 reconciles existing M13 fallback hardening evidence after CM-1856. M13 is locally complete only for fixture/dry-run fallback hardening; live/runtime fallback safety, private runtime reads, real queries, MCP memory calls, VCPToolBox runtime calls, memory writes, durable writes, approval material, M14 live dashboard, M15, or readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1857 M13 fallback hardening evidence reconciliation. It may only review existing fallback hardening evidence against the plan entry/exit conditions, and must not run private runtime reads, real queries, live VCPToolBox calls, MCP memory tools, memory writes, durable writes, provider/API calls, public MCP expansion, config/startup/watchdog changes, release/deploy/cutover/push, or readiness claims. Push remains separate explicit authorization.
+Next safe action is CM-1858 M14 health-report evidence boundary refresh. It may only review existing health-report/dashboard evidence boundaries and prepare docs/fixture-only health-report gating, and must not run dashboard runtime, read logs, read raw private memory, run real queries, call VCPToolBox, call MCP memory tools, write memory, write durable audit/runtime state, call providers/APIs, expand public MCP, change config/startup/watchdog behavior, release/deploy/cutover/push, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
