@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1882",
-  "validationId": "CMV-1985",
+  "taskId": "CM-1883",
+  "validationId": "CMV-1986",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_approval_request_preparation_boundary_fixture_closeout",
+    "scope": "vcp_memory_exact_live_runtime_approval_request_readiness_gate_review_blocked",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1986",
+      "scope": "CM-1883 exact live runtime approval request readiness gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_READINESS_GATE_REVIEW_BLOCKED_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1985",
       "scope": "CM-1882 exact live runtime approval request preparation boundary fixture closeout",
