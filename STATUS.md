@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1922 transport diagnosis closeout`.
-Current validation: `CMV-2025`.
-Current project status: CM-1922 closes out the CM-1921 receipt as a valid failed transport diagnosis. CM-1921 consumed one approved live/network call and returned `transport_error`; `transportReachable=false`; approved budget remaining `0`; no retry is authorized. CM-1922 keeps component/action status probe and read-shape proof locked and routes next to `runtime_startup_or_target_locator_diagnosis`.
-Current route: `TRANSPORT_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS`.
+Current task: `CM-1923 runtime startup or target locator diagnosis preflight`.
+Current validation: `CMV-2026`.
+Current project status: CM-1923 defines source-only diagnostic lanes after CM-1921/CM-1922: runtime startup state, target locator binding, transport wrapper shape, service listener mismatch, and approval packet gap. It does not confirm live runtime facts. Next route is CM-1924 low-disclosure runtime startup / target locator diagnosis contract.
+Current route: `RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1923 runtime startup or target locator diagnosis preflight: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1923_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT.md`. It classifies possible causes of CM-1921 `transport_error` into runtime startup state, target locator binding, transport wrapper shape, service listener mismatch, and approval packet gap. It defines low-disclosure future evidence categories for process-state bucket, locator binding category, and transport attempt status-only evidence, and routes next to CM-1924 low-disclosure runtime startup / target locator diagnosis contract. CM-1923 does not perform a new live call, retry CM-1921, call VCPToolBox, inspect process state, disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion.
 
 CM-1922 transport diagnosis closeout: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1922_TRANSPORT_DIAGNOSIS_CLOSEOUT.md`. It reviews CM-1921 and records `cm1921_receipt_valid=true`, `live_budget_exhausted=true`, `transport_diagnosis_success=false`, `transportReachable=false`, `component_action_status_probe_unlocked=false`, `read_shape_unlocked=false`, `retry_allowed=false`, and `next_route=runtime_startup_or_target_locator_diagnosis`. CM-1922 does not perform a new live call, retry CM-1921, call VCPToolBox, inspect process state, disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next candidate is CM-1923 runtime startup or target locator diagnosis preflight, source-only/no-live unless Jenn gives a new exact approval.
 

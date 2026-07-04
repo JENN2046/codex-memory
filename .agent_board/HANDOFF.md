@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1922 transport diagnosis closeout`.
-Current validation: `CMV-2025`.
-Current handoff: CM-1922 closes out CM-1921 as a valid failed transport diagnosis. Transport remains unreachable, approved budget is exhausted, retry/read-shape/component-action status probe remain locked, and next route is CM-1923 runtime startup or target locator diagnosis preflight.
+Current task: `CM-1923 runtime startup or target locator diagnosis preflight`.
+Current validation: `CMV-2026`.
+Current handoff: CM-1923 defines source-only lanes for runtime startup state, target locator binding, transport wrapper shape, service listener mismatch, and approval packet gap. No live fact is confirmed, and the next route is CM-1924 low-disclosure diagnosis contract.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1922 closes out CM-1921 as a valid failed transport diagnosi
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_TRANSPORT_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS`; production/release/cutover ready no; complete V8 not claimed; CM-1922 closes the transport diagnosis route and blocks read-shape. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL`; production/release/cutover ready no; complete V8 not claimed; CM-1923 defines diagnostic lanes only and does not confirm runtime startup, locator binding, listener state, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1923_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1922_TRANSPORT_DIAGNOSIS_CLOSEOUT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1921_EXACT_APPROVED_TRANSPORT_DIAGNOSIS_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1920_TRANSPORT_DIAGNOSIS_EXACT_APPROVAL_REQUEST.md`

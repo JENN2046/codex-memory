@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1922 transport diagnosis closeout`.
-Current validation: `CMV-2025`.
+Current checkpoint: `CM-1923 runtime startup or target locator diagnosis preflight`.
+Current validation: `CMV-2026`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1923 Runtime Startup Or Target Locator Diagnosis Preflight
+
+Status: `COMPLETED_VALIDATED_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1923_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT.md`.
+- Accepted CM-1922 route decision after CM-1921 `transport_error`.
+- Classified possible cause lanes: runtime startup state, target locator binding, transport wrapper shape, service listener mismatch, and approval packet gap.
+- Defined low-disclosure future evidence categories for process state, locator binding, and transport attempt evidence.
+- Recorded source-only context over local VCP native adapter/gate/dry-run/diagnosis contracts without proving live runtime facts.
+- Routed next work to CM-1924 low-disclosure runtime startup / target locator diagnosis contract.
+- Preserved that no new live call, CM-1921 retry, VCPToolBox call, process-state inspection, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2026`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/secret/raw-output/readiness scan over changed files, and changed-scope re-review passed.
 
 ## CM-1922 Transport Diagnosis Closeout
 
