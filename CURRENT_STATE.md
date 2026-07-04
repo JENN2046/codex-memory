@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1923 runtime startup or target locator diagnosis preflight |
-| Current task | `CM-1923 runtime startup or target locator diagnosis preflight` |
-| Current validation | `CMV-2026` |
-| Current route | CM-1923 defines source-only diagnostic lanes for runtime startup state, target locator binding, transport wrapper shape, service listener mismatch, and approval packet gap; next route is CM-1924 low-disclosure diagnosis contract |
+| Status | CM-1924 low-disclosure runtime startup target locator diagnosis contract |
+| Current task | `CM-1924 low-disclosure runtime startup target locator diagnosis contract` |
+| Current validation | `CMV-2027` |
+| Current route | CM-1924 locks runtime startup / target locator diagnosis as a pure local low-disclosure contract; next route is CM-1925 exact approval request packet, still non-live and non-authorizing |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1924` adds `src/core/VcpNativeRuntimeStartupTargetLocatorDiagnosisContract.js`, `tests/vcp-native-runtime-startup-target-locator-diagnosis-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1924_LOW_DISCLOSURE_RUNTIME_STARTUP_TARGET_LOCATOR_DIAGNOSIS_CONTRACT.md`. It turns CM-1923 runtime startup / target locator diagnostic lanes into a source/test local contract. Accepted output keeps runtime startup state unknown, process count undisclosed, target locator binding unknown, locator value and endpoint undisclosed, transport wrapper source-reviewed but live-unproven, service listener mismatch unknown, component-action status probe locked, read-shape locked, and next live diagnostic requiring exact approval. It rejects endpoint/locator/config/env/token/log/stdout/stderr/body/raw error/raw memory/provider/process/approval-line/request-body material without echo, rejects live/process/listener/read-shape/readiness drift, and rejects nonzero or unknown counters. Targeted tests passed `8/8`; default `npm test -- --summary` passed `3990/3990`. CM-1924 does not perform a new live call, retry CM-1921, call VCPToolBox, inspect process state, disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1925 exact approval request packet for startup/locator diagnosis, still non-live and non-authorizing.
 
 `CM-1923` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1923_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT.md`. It classifies possible causes of CM-1921 `transport_error` into runtime startup state, target locator binding, transport wrapper shape, service listener mismatch, and approval packet gap. It defines low-disclosure future evidence categories for process-state bucket, locator binding category, and transport attempt status-only evidence, and routes next to CM-1924 low-disclosure runtime startup / target locator diagnosis contract. CM-1923 does not perform a new live call, retry CM-1921, call VCPToolBox, inspect process state, disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion.
 

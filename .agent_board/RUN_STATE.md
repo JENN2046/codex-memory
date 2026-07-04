@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1923 runtime startup or target locator diagnosis preflight`.
-Current validation: `CMV-2026`.
-Current status: CM-1923 defines source-only diagnostic lanes after the failed transport diagnosis. No live fact is confirmed; retry/read-shape/component-action status probe remain locked. Next route is CM-1924 low-disclosure runtime startup / target locator diagnosis contract.
+Current task: `CM-1924 low-disclosure runtime startup target locator diagnosis contract`.
+Current validation: `CMV-2027`.
+Current status: CM-1924 locks the runtime startup / target locator diagnosis lanes as a pure local source/test contract. No live fact is confirmed; retry/read-shape/component-action status probe remain locked. Next route is CM-1925 exact approval request packet, still non-live and non-authorizing.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1924 low-disclosure runtime startup / target locator diagnosis contract. Keep CM-1924 source/test local only: no new live call, no retry, no read-shape proof, no endpoint/config/env/secret/log/body/raw memory read, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
+Next action is CM-1925 exact approval request packet for startup/locator diagnosis. Keep CM-1925 docs/status non-executing and non-authorizing: no new live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

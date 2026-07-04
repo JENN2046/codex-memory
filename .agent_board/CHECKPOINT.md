@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1923 runtime startup or target locator diagnosis preflight`.
-Current validation: `CMV-2026`.
+Current checkpoint: `CM-1924 low-disclosure runtime startup target locator diagnosis contract`.
+Current validation: `CMV-2027`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1924 Low-Disclosure Runtime Startup Target Locator Diagnosis Contract
+
+Status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_RUNTIME_STARTUP_TARGET_LOCATOR_DIAGNOSIS_CONTRACT_NO_LIVE_CALL`
+
+Recorded:
+
+- Added `src/core/VcpNativeRuntimeStartupTargetLocatorDiagnosisContract.js`.
+- Added `tests/vcp-native-runtime-startup-target-locator-diagnosis-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1924_LOW_DISCLOSURE_RUNTIME_STARTUP_TARGET_LOCATOR_DIAGNOSIS_CONTRACT.md`.
+- Encoded CM-1923 lanes as a local contract for runtime startup state, target locator binding, transport wrapper shape, service listener mismatch, and approval packet gap.
+- Accepted only unknown/category-only/source-reviewed state and kept next live diagnostic behind exact approval.
+- Preserved that component-action status probe and read-shape proof remain locked.
+- Rejected endpoint/locator/config/env/token/log/stdout/stderr/body/raw error/raw memory/provider/process/approval-line/request-body fields without echoing unsafe values.
+- Preserved that no new live call, CM-1921 retry, VCPToolBox call, process-state inspection, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2027`; `node --check` source/test, targeted contract test `8/8`, default `npm test -- --summary` `3990/3990`, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/secret/raw-output/readiness scan over changed files, and changed-scope re-review passed.
 
 ## CM-1923 Runtime Startup Or Target Locator Diagnosis Preflight
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1923",
-  "validationId": "CMV-2026",
+  "taskId": "CM-1924",
+  "validationId": "CMV-2027",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "runtime_startup_or_target_locator_diagnosis_preflight_source_only_no_live_call",
+    "scope": "low_disclosure_runtime_startup_target_locator_diagnosis_contract_no_live_call",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2027",
+      "scope": "CM-1924 low-disclosure runtime startup target locator diagnosis contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_RUNTIME_STARTUP_TARGET_LOCATOR_DIAGNOSIS_CONTRACT_NO_LIVE_CALL"
+    },
     {
       "id": "CMV-2026",
       "scope": "CM-1923 runtime startup or target locator diagnosis preflight",
