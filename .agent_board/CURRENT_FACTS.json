@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1871",
-  "validationId": "CMV-1974",
+  "taskId": "CM-1872",
+  "validationId": "CMV-1975",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_request_packet_readiness_blocked_closeout",
+    "scope": "vcp_memory_exact_live_runtime_approval_request_field_gap_preflight",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1975",
+      "scope": "CM-1872 exact live runtime approval request field gap preflight",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_FIELD_GAP_PREFLIGHT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1974",
       "scope": "CM-1871 exact live runtime request packet readiness blocked closeout",

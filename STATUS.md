@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1871 exact live runtime request packet readiness blocked closeout`.
-Current validation: `CMV-1974`.
-Current project status: CM-1871 closes the exact live runtime request packet preparation slice only as blocked planning evidence. Approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
-Current route: `VCP_MEMORY_EXACT_LIVE_RUNTIME_REQUEST_PACKET_READINESS_BLOCKED_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
+Current task: `CM-1872 exact live runtime approval request field gap preflight`.
+Current validation: `CMV-1975`.
+Current project status: CM-1872 inventories missing exact fields and authorities as classifications only. Approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current route: `VCP_MEMORY_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_FIELD_GAP_PREFLIGHT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1872 exact live runtime approval request field gap preflight: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1872_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_FIELD_GAP_PREFLIGHT.md`. It inventories missing exact fields and authorities as classifications only, so a future fixture contract can validate gap shapes without assembling a request. It does not fill live values, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1873 exact live runtime approval request gap fixture contract.
 
 CM-1871 exact live runtime request packet readiness blocked closeout: added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1871_EXACT_LIVE_RUNTIME_REQUEST_PACKET_READINESS_BLOCKED_CLOSEOUT.md`. It closes the CM-1866 through CM-1870 request packet preparation slice only as blocked planning evidence and preserves that approval packet/request/body/line and runtime remain not ready. It does not fill live values, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1872 exact live runtime approval request field gap preflight.
 
