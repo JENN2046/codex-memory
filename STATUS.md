@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1858 M14 health-report evidence boundary refresh`.
-Current validation: `CMV-1961`.
-Current project status: CM-1858 refreshes the existing M14 health-report evidence boundary after CM-1857. M14 is locally complete only for fixture/schema/source-review health-report boundary work; live dashboard/runtime health evidence, logs, raw private memory, real queries, VCPToolBox calls, MCP memory calls, approval material, M15, or readiness are not opened.
-Current route: `VCP_MEMORY_HEALTH_REPORT_CM1858_M14_EVIDENCE_BOUNDARY_REFRESH_FIXTURE_SCHEMA_ONLY_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1859 M15 blocked precondition refresh`.
+Current validation: `CMV-1962`.
+Current project status: CM-1859 refreshes M15 blocked preconditions after CM-1858. M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current route: `VCP_MEMORY_M15_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1859 M15 blocked precondition refresh: added `docs/VCP_MEMORY_M15_CM1859_BLOCKED_PRECONDITION_REFRESH.md`. It refreshes M15 blocked preconditions after CM-1858 and records that M15 remains unopened because M0-M14 evidence is not complete for live/runtime proof, M14 live health-report evidence is absent, P0/P1 risks remain open, docs only match available fixture/schema evidence, and dedicated RC review approval is absent. It does not create an RC gate report, open RC review, generate or submit approval material, generate request bodies, run runtime, call VCPToolBox, call MCP memory tools, read logs/raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1860 M15 package evidence map refresh.
 
 CM-1858 M14 health-report evidence boundary refresh: added `docs/VCP_MEMORY_HEALTH_REPORT_CM1858_M14_EVIDENCE_BOUNDARY_REFRESH.md`. It refreshes existing M14 health-report evidence after CM-1857 and records that M14 is locally complete only for fixture/schema/source-review health-report boundary work. Health report sections, raw/private rejection, and conservative readiness labels remain covered by fixture tests; live dashboard/runtime health evidence, logs, raw private memory, real queries, VCPToolBox calls, MCP memory calls, memory writes, durable writes, provider/API calls, request bodies, approval lines, config/startup/watchdog changes, public MCP expansion, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1859 M15 blocked precondition refresh.
 

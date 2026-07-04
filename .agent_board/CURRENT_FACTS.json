@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1858",
-  "validationId": "CMV-1961",
+  "taskId": "CM-1859",
+  "validationId": "CMV-1962",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_health_report_m14_evidence_boundary_refresh",
+    "scope": "vcp_memory_m15_blocked_precondition_refresh",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1962",
+      "scope": "CM-1859 M15 blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_M15_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1961",
       "scope": "CM-1858 M14 health-report evidence boundary refresh",

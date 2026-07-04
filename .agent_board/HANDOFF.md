@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1858 M14 health-report evidence boundary refresh`.
-Current validation: `CMV-1961`.
-Current handoff: CM-1858 refreshes the existing M14 health-report evidence boundary after CM-1857. M14 is locally complete only for fixture/schema/source-review health-report boundary work; live dashboard/runtime health evidence, logs, raw private memory, real queries, VCPToolBox calls, MCP memory calls, approval material, M15, or readiness are not opened.
+Current task: `CM-1859 M15 blocked precondition refresh`.
+Current validation: `CMV-1962`.
+Current handoff: CM-1859 refreshes M15 blocked preconditions after CM-1858. M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1858 refreshes the existing M14 health-report evidence bound
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M14_HEALTH_REPORT_EVIDENCE_BOUNDARY_REFRESH_FIXTURE_SCHEMA_ONLY_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 final blocked closeout is recorded for planning only; proposal mode remains blocked; local M10 blocked state fixture slice is closed for planning only; M10 gate remains blocked because M9 proposal mode is not complete; local M11 blocked route fixture slice is closed for planning only; M11 gate remains blocked because M10 is blocked and no runtime/write/receipt authority exists; local M12 exact-boundary feasibility contract slice is closed for planning only; M12 live workflow remains blocked because M11 live evidence, checkpoint/handoff write authority, exact live workflow boundary, Codex/Claude client-isolation proof, and auditable workflow receipts remain absent; M13 fixture/dry-run fallback hardening chain is reconciled, but live/runtime fallback safety remains blocked; M14 fixture/schema/source-review health-report chain is refreshed, but live dashboard/runtime health evidence remains blocked; next local-safe route is CM-1859 M15 blocked precondition refresh; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M15_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 final blocked closeout is recorded for planning only; proposal mode remains blocked; local M10 blocked state fixture slice is closed for planning only; M10 gate remains blocked because M9 proposal mode is not complete; local M11 blocked route fixture slice is closed for planning only; M11 gate remains blocked because M10 is blocked and no runtime/write/receipt authority exists; local M12 exact-boundary feasibility contract slice is closed for planning only; M12 live workflow remains blocked because M11 live evidence, checkpoint/handoff write authority, exact live workflow boundary, Codex/Claude client-isolation proof, and auditable workflow receipts remain absent; M13 fixture/dry-run fallback hardening chain is reconciled, but live/runtime fallback safety remains blocked; M14 fixture/schema/source-review health-report chain is refreshed, but live dashboard/runtime health evidence remains blocked; M15 blocked preconditions are refreshed after CM-1858 and M15 remains unopened; next local-safe route is CM-1860 M15 package evidence map refresh; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; RC gate, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -127,6 +127,7 @@ Current entrypoints:
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1787_SERVICE_START_HANDSHAKE_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1786_OPERATOR_TARGET_LOCATOR_RECEIPT.md`
 - `docs/VCP_MEMORY_OBSERVE_LITE_CM1785_LIVE_TARGET_PREFLIGHT_RECEIPT.md`
+- `docs/VCP_MEMORY_M15_CM1859_BLOCKED_PRECONDITION_REFRESH.md`
 - `docs/VCP_MEMORY_M15_BLOCKED_CLOSEOUT_SUMMARY.md`
 - `docs/VCP_MEMORY_M15_RC_REVIEW_APPROVAL_PACKET_READINESS_BOUNDARY.md`
 - `docs/VCP_MEMORY_M15_RISK_REVIEW_SKELETON.md`

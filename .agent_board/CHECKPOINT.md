@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1858 M14 health-report evidence boundary refresh`.
-Current validation: `CMV-1961`.
+Current checkpoint: `CM-1859 M15 blocked precondition refresh`.
+Current validation: `CMV-1962`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1859 M15 Blocked Precondition Refresh
+
+Status: `COMPLETED_VALIDATED_M15_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_M15_CM1859_BLOCKED_PRECONDITION_REFRESH.md`.
+- Reviewed archived M15 entry, exit, risk, and dependency boundaries.
+- Reviewed CM-1858 as the current M14/M15 transition boundary.
+- Reviewed prior M15 blocked precondition, package evidence map, approval packet readiness boundary, and blocked closeout evidence.
+- Refreshed M15 entry conditions as blocked after CM-1858.
+- Recorded that M0-M14 evidence is not complete for live/runtime proof, M14 live health-report evidence is absent, P0/P1 risks remain open, docs match only available fixture/schema evidence, and dedicated RC review approval is absent.
+- Preserved that M15 remains unopened and no RC gate report, live RC request, approval line, request body, runtime, VCPToolBox call, MCP memory tool call, log/raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1860 M15 package evidence map refresh.
+
+Validation: `CMV-1962`; M15 plan review, CM-1858 review, CM-1779/CM-1780/CM-1783/CM-1784 review, prior M15 evidence map/approval boundary/closeout review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1858 M14 Health-Report Evidence Boundary Refresh
 
