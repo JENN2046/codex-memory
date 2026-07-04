@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1870 exact live runtime request packet abort boundary review`.
-Current validation: `CMV-1973`.
-Current status: CM-1870 defines abort conditions for future exact live runtime request packet/display work. Approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current task: `CM-1871 exact live runtime request packet readiness blocked closeout`.
+Current validation: `CMV-1974`.
+Current status: CM-1871 closes the exact live runtime request packet preparation slice only as blocked planning evidence. Approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1871 exact live runtime request packet readiness blocked closeout. It may only record the current blocked state without filling live values, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1872 exact live runtime approval request field gap preflight. It may only inventory missing exact fields without filling live values, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

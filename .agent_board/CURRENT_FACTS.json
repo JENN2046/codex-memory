@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1870",
-  "validationId": "CMV-1973",
+  "taskId": "CM-1871",
+  "validationId": "CMV-1974",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_request_packet_abort_boundary_review",
+    "scope": "vcp_memory_exact_live_runtime_request_packet_readiness_blocked_closeout",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1974",
+      "scope": "CM-1871 exact live runtime request packet readiness blocked closeout",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_REQUEST_PACKET_READINESS_BLOCKED_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1973",
       "scope": "CM-1870 exact live runtime request packet abort boundary review",
