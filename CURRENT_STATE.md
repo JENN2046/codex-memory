@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1897 exact live runtime authorization gate preflight fixture closeout gate review |
-| Current task | `CM-1897 exact live runtime authorization gate preflight fixture closeout gate review` |
-| Current validation | `CMV-2000` |
-| Current route | CM-1897 closes only the local exact live runtime authorization gate preflight fixture contract slice for planning. The gate is not opened; approval request packet creation, approval request submission, request packet readiness, request body generation/submission, approval line generation/submission, runtime, memory, config/startup/watchdog, release/deploy/cutover/push, and readiness remain blocked and unauthorized. Next local-safe route is CM-1898 exact live runtime authorization request boundary preflight |
+| Status | CM-1898 exact live runtime authorization request boundary preflight |
+| Current task | `CM-1898 exact live runtime authorization request boundary preflight` |
+| Current validation | `CMV-2001` |
+| Current route | CM-1898 defines only a category-level, non-authorizing boundary for a possible future exact live runtime authorization request. The authorization gate is not opened; approval request packet creation, approval request submission, request packet readiness, request body generation/submission, approval line generation/submission, runtime, memory, config/startup/watchdog, release/deploy/cutover/push, and readiness remain blocked and unauthorized. Next local-safe route is CM-1899 exact live runtime authorization request boundary fixture contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1898` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1898_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_PREFLIGHT.md`. It defines only a category-level, non-authorizing boundary for a possible future exact live runtime authorization request after CM-1897. It does not request approval, open the authorization gate, fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1899 exact live runtime authorization request boundary fixture contract.
 
 `CM-1897` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1897_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_FIXTURE_CLOSEOUT_GATE_REVIEW.md`. It reviews CM-1895 and CM-1896, accepts the local authorization-gate preflight fixture contract slice as closed for planning only, and records that the accepted fixture decision remains `authorization_gate_preflight_boundary_accepted_no_authority`. It does not request approval, open the authorization gate, fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1898 exact live runtime authorization request boundary preflight.
 
