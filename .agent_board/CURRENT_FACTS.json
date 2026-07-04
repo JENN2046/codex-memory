@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1836",
-  "validationId": "CMV-1939",
+  "taskId": "CM-1837",
+  "validationId": "CMV-1940",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_exact_field_binding_feasibility_contract_closeout_approval_request_readiness_gate_review",
+    "scope": "vcp_memory_trusted_write_proposal_m9_approval_request_readiness_blocked_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1940",
+      "scope": "CM-1837 M9 approval request readiness blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1939",
       "scope": "CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review",

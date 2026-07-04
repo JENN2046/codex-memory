@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review`.
-Current validation: `CMV-1939`.
+Current checkpoint: `CM-1837 M9 approval request readiness blocked fixture contract`.
+Current validation: `CMV-1940`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1837 M9 Approval Request Readiness Blocked Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalApprovalRequestReadinessBlockedContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-approval-request-readiness-blocked-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1837_APPROVAL_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3786/3786`.
+- Confirmed helper accepts only non-authorizing approval-request readiness blocked fixtures whose accepted state is `approval_request_readiness_blocked_missing_exact_authority`.
+- Confirmed helper routes approval request readiness / request body / approval line / proposal / runtime / write / M10 readiness claims to `stop_l4`, rejects raw/secret/exact-value/request/approval/readiness fields without echo, and keeps concrete exact values, request body, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness blocked.
+- Routed next work to CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review.
+
+Validation: `CMV-1940`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, source-safety scan, and changed-scope re-review passed.
 
 ## CM-1836 M9 Exact Field Binding Feasibility Contract Closeout / Approval-Request Readiness Gate Review
 

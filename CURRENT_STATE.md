@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review |
-| Current task | `CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review` |
-| Current validation | `CMV-1939` |
-| Current route | M9 exact-field binding feasibility fixture contract closed for planning; approval-request readiness remains blocked by missing concrete values and submission authority; exact request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked |
+| Status | CM-1837 M9 approval request readiness blocked fixture contract |
+| Current task | `CM-1837 M9 approval request readiness blocked fixture contract` |
+| Current validation | `CMV-1940` |
+| Current route | M9 approval-request readiness blocked fixture contract added; approval request readiness remains blocked by missing concrete values, request body, approval-line value handling, and submission authority; exact request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1837` adds `src/core/VcpMemoryTrustedWriteProposalApprovalRequestReadinessBlockedContract.js`, `tests/vcp-memory-trusted-write-proposal-approval-request-readiness-blocked-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1837_APPROVAL_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3786/3786`. The helper validates non-authorizing approval-request readiness blocked fixtures whose accepted state is `approval_request_readiness_blocked_missing_exact_authority`, routes approval request readiness / request body / approval line / proposal / runtime / write / M10 readiness claims to `stop_l4`, rejects raw/secret/exact-value/request/approval/readiness fields without echo, and reports no runtime/write side effects. It does not bind real target, transport, client, workspace, owner, visibility, proposal scope, proposal operation, payload shape, review route, rollback posture, budgets, L4 write-intent shield, real proposal receipt audit, request submission authority, approval-line value, or request body. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review.
 
 `CM-1836` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1836_EXACT_FIELD_BINDING_FEASIBILITY_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_READINESS_GATE_REVIEW.md`. It reviews CM-1834 and CM-1835, accepts the local exact-field binding feasibility fixture contract as closed for planning, and records that approval-request readiness is still blocked because concrete exact values, submission authority, request body, and approval-line value handling remain absent. It does not bind a real target, transport, client, workspace, owner, visibility scope, proposal payload, review route, approval line, or budget. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1837 M9 approval request readiness blocked fixture contract.
 
