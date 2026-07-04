@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1834 M9 exact request preparation boundary contract closeout / exact-field binding gate review`.
-Current validation: `CMV-1937`.
+Current checkpoint: `CM-1835 M9 exact field binding feasibility fixture contract`.
+Current validation: `CMV-1938`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1835 M9 Exact Field Binding Feasibility Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_FIELD_BINDING_FEASIBILITY_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalExactFieldBindingFeasibilityContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-exact-field-binding-feasibility-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1835_EXACT_FIELD_BINDING_FEASIBILITY_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3778/3778`.
+- Confirmed helper accepts only non-authorizing exact-field binding feasibility fixtures whose accepted state is `exact_field_binding_blocked_missing_concrete_values`.
+- Confirmed helper routes concrete value / request / proposal / runtime / write / M10 readiness claims to `stop_l4`, rejects raw/secret/exact-value/request/approval/readiness fields without echo, and keeps concrete exact values, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness blocked.
+- Routed next work to CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review.
+
+Validation: `CMV-1938`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, source-safety scan, and changed-scope re-review passed.
 
 ## CM-1834 M9 Exact Request Preparation Boundary Contract Closeout / Exact-Field Binding Gate Review
 

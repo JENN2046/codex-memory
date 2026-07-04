@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1834 M9 exact request preparation boundary contract closeout / exact-field binding gate review |
-| Current task | `CM-1834 M9 exact request preparation boundary contract closeout / exact-field binding gate review` |
-| Current validation | `CMV-1937` |
-| Current route | M9 request-preparation boundary fixture contract closed for planning; exact-field binding fixture work may start next; exact request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked |
+| Status | CM-1835 M9 exact field binding feasibility fixture contract |
+| Current task | `CM-1835 M9 exact field binding feasibility fixture contract` |
+| Current validation | `CMV-1938` |
+| Current route | M9 exact-field binding feasibility fixture contract added; exact field binding remains blocked because concrete values are missing; exact request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1835` adds `src/core/VcpMemoryTrustedWriteProposalExactFieldBindingFeasibilityContract.js`, `tests/vcp-memory-trusted-write-proposal-exact-field-binding-feasibility-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1835_EXACT_FIELD_BINDING_FEASIBILITY_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3778/3778`. The helper validates non-authorizing exact-field binding feasibility fixtures whose accepted state is `exact_field_binding_blocked_missing_concrete_values`, routes concrete value / request / proposal / runtime / write / M10 readiness claims to `stop_l4`, rejects raw/secret/exact-value/request/approval/readiness fields without echo, and reports no runtime/write side effects. It does not bind real target, transport, client, workspace, owner, visibility, proposal scope, proposal operation, payload shape, review route, rollback posture, budgets, L4 write-intent shield, real proposal receipt audit, request submission authority, or approval-line value. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review.
 
 `CM-1834` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1834_EXACT_REQUEST_PREPARATION_BOUNDARY_CONTRACT_CLOSEOUT_EXACT_FIELD_BINDING_GATE_REVIEW.md`. It reviews CM-1832 and CM-1833, accepts the local request-preparation boundary fixture contract as closed for planning, and opens only the next local-safe exact-field binding feasibility fixture route. It does not bind a real target, transport, client, workspace, owner, visibility scope, proposal payload, review route, approval line, or budget. It does not submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1835 M9 exact field binding feasibility fixture contract.
 
