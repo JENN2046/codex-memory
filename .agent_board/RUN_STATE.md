@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1925 startup locator diagnosis exact approval request packet`.
-Current validation: `CMV-2028`.
-Current status: CM-1925 prepares a non-executing, non-authorizing exact approval request packet for future CM-1926 startup / locator diagnosis. No live fact is confirmed; retry/read-shape/component-action status probe remain locked. CM-1926 remains blocked until Jenn gives matching exact approval.
+Current task: `CM-1926 exact-approved startup locator diagnosis receipt`.
+Current validation: `CMV-2029`.
+Current status: CM-1926 consumed one Jenn exact-approved startup / locator diagnosis attempt under the CM-1925 packet, but receipt capture failed at the tool layer after the attempt. No retry is authorized; runtime startup state, service listener status, locator binding success, component/action reachability, and read-shape support remain unproven.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1926 exact-approved startup / locator diagnosis execution, but only after Jenn provides current explicit exact approval matching the CM-1925 packet. Until then: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
+Next action is CM-1927 startup / locator diagnosis closeout. Do not retry CM-1926, do not perform another live/network/process-state diagnosis, do not proceed to component/action probe or read-shape proof, do not inspect endpoint/locator/config/env/secret/log/body/raw memory, do not generate a request body or approval line, do not write memory, and do not claim readiness/release/deploy/cutover. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
