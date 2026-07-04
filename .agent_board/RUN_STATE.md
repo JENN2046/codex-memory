@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1919 runtime target diagnosis contract`.
-Current validation: `CMV-2022`.
-Current status: CM-1919 adds a pure local source/test contract for the CM-1918 diagnosis matrix. It keeps transport reachability and runtime process state unknown, requires exact approval for the next live diagnostic, and rejects raw/sensitive/live/write/readiness drift without echo. No new live call, retry, VCPToolBox call, endpoint/config/env/secret/log/body/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
+Current task: `CM-1920 transport diagnosis exact approval request packet`.
+Current validation: `CMV-2023`.
+Current status: CM-1920 prepares a non-executing exact approval request packet for one future transport diagnosis. It does not approve, generate approval lines or request bodies, execute runtime, call VCPToolBox, read endpoint/config/env/secret/log/body/raw memory, write memory, release/deploy/cutover, push, or claim readiness.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1920 transport diagnosis exact approval request packet. Keep it docs-only and non-executing: prepare a narrow request boundary for one future transport diagnosis without generating an approval line, executing runtime, calling VCPToolBox, reading endpoint/config/env/secret/log/body/raw memory, generating a request body, writing memory, or claiming readiness. Push remains separate explicit authorization.
+Next action is CM-1921 exact-approved transport diagnosis execution only after Jenn provides current explicit exact approval matching `docs/VCP_MEMORY_PLAN_PACKAGE_CM1920_TRANSPORT_DIAGNOSIS_EXACT_APPROVAL_REQUEST.md`. Without that approval, stop before live/runtime/network action. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
