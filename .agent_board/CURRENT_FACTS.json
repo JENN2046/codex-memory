@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1838",
-  "validationId": "CMV-1941",
+  "taskId": "CM-1839",
+  "validationId": "CMV-1942",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_approval_request_readiness_blocked_contract_closeout_exact_request_packet_refresh_gate_review",
+    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_packet_refresh_blocked_preflight",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1942",
+      "scope": "CM-1839 M9 exact request packet refresh blocked preflight",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_PREFLIGHT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1941",
       "scope": "CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review",

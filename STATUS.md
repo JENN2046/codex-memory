@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review`.
-Current validation: `CMV-1941`.
-Current project status: CM-1838 closes only the local approval-request readiness blocked fixture slice for planning. Full M9 proposal mode, approval-request readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1838_APPROVAL_REQUEST_READINESS_BLOCKED_CONTRACT_CLOSEOUT_EXACT_REQUEST_PACKET_REFRESH_GATE_REVIEW_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1839 M9 exact request packet refresh blocked preflight`.
+Current validation: `CMV-1942`.
+Current project status: CM-1839 records a non-authorizing exact-request packet refresh blocked preflight. Full M9 proposal mode, approval-request readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1839_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_PREFLIGHT_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1839 M9 exact request packet refresh blocked preflight: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1839_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_PREFLIGHT.md`. It refreshes the non-authorizing exact-request packet state after CM-1838, records accepted local planning evidence from CM-1812 through CM-1838, and lists missing exact fields that block request readiness. It does not bind a real target, transport, client, workspace, owner, visibility scope, proposal payload, review route, approval line, or budget. It does not prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1840 M9 exact request packet refresh blocked fixture contract.
 
 CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1838_APPROVAL_REQUEST_READINESS_BLOCKED_CONTRACT_CLOSEOUT_EXACT_REQUEST_PACKET_REFRESH_GATE_REVIEW.md`. It reviews CM-1836 and CM-1837, accepts the local approval-request readiness blocked fixture contract as closed for planning, and opens only the next local-safe exact-request packet refresh blocked preflight. Approval-request readiness remains blocked because concrete exact values, request body, approval-line value handling, and submission authority remain absent. It does not bind a real target, transport, client, workspace, owner, visibility scope, proposal payload, review route, approval line, or budget. It does not prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1839 M9 exact request packet refresh blocked preflight.
 
