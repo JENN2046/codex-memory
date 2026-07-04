@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1872 exact live runtime approval request field gap preflight`.
-Current validation: `CMV-1975`.
+Current checkpoint: `CM-1873 exact live runtime approval request gap fixture contract`.
+Current validation: `CMV-1976`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1873 Exact Live Runtime Approval Request Gap Fixture Contract
+
+Status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_GAP_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryExactLiveRuntimeApprovalRequestGapContract.js`.
+- Added `tests/vcp-memory-exact-live-runtime-approval-request-gap-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1873_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_GAP_FIXTURE_CONTRACT.md`.
+- Implemented a pure fixture contract for missing exact field gap classifications only.
+- Verified targeted tests `8/8` and default `npm test` `3835/3835`.
+- Preserved that request assembly, approval packet readiness, approval request readiness, request body generation/submission, approval-line presence/generation, approval grant, runtime authorization, and runtime execution remain false.
+- Preserved that no approval packet, live RC request, approval line, request body, runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1874 exact live runtime approval request gap fixture closeout.
+
+Validation: `CMV-1976`; source/test `node --check`, targeted fixture test `8/8`, default `npm test` `3835/3835`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1872 Exact Live Runtime Approval Request Field Gap Preflight
 

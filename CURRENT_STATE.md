@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1872 exact live runtime approval request field gap preflight |
-| Current task | `CM-1872 exact live runtime approval request field gap preflight` |
-| Current validation | `CMV-1975` |
-| Current route | Exact live runtime approval request field gaps inventoried as missing classifications only; request assembly, approval packet/request/body/line, and runtime remain not ready. Next local-safe route is CM-1873 exact live runtime approval request gap fixture contract |
+| Status | CM-1873 exact live runtime approval request gap fixture contract |
+| Current task | `CM-1873 exact live runtime approval request gap fixture contract` |
+| Current validation | `CMV-1976` |
+| Current route | Exact live runtime approval request gap fixture contract added; targeted tests `8/8` and default suite `3835/3835` passed. Request assembly, approval packet/request/body/line, and runtime remain not ready. Next local-safe route is CM-1874 exact live runtime approval request gap fixture closeout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1873` adds `src/core/VcpMemoryExactLiveRuntimeApprovalRequestGapContract.js`, `tests/vcp-memory-exact-live-runtime-approval-request-gap-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1873_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_GAP_FIXTURE_CONTRACT.md`. The fixture contract accepts only missing-field gap classifications, reports L4 stops for request/approval/runtime/memory/provider/config/remote/readiness expansion, rejects raw/private/exact-value fields without echo, and requires zero side-effect counters. Targeted tests passed `8/8`; default `npm test` passed `3835/3835`. It does not fill live values, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1874 exact live runtime approval request gap fixture closeout.
 
 `CM-1872` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1872_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_FIELD_GAP_PREFLIGHT.md`. It inventories missing exact fields and authorities as classifications only, so a future fixture contract can validate gap shapes without assembling a request. It does not fill live values, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1873 exact live runtime approval request gap fixture contract.
 
