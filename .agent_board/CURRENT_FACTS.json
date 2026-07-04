@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1889",
-  "validationId": "CMV-1992",
+  "taskId": "CM-1890",
+  "validationId": "CMV-1993",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_approval_request_packet_skeleton_review_boundary",
+    "scope": "vcp_memory_exact_live_runtime_approval_request_packet_skeleton_boundary_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1993",
+      "scope": "CM-1890 exact live runtime approval request packet skeleton boundary fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_SKELETON_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1992",
       "scope": "CM-1889 exact live runtime approval request packet skeleton review boundary",
