@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1888 exact live runtime approval request packet boundary fixture closeout`.
-Current validation: `CMV-1991`.
-Current status: CM-1888 closes only the local exact live runtime approval request packet boundary fixture contract slice for planning. Request packet creation, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1889 exact live runtime approval request packet skeleton review boundary`.
+Current validation: `CMV-1992`.
+Current status: CM-1889 records only a category-level exact live runtime approval request packet skeleton review boundary. Skeleton section classes may be named, but skeleton values, request packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1889 exact live runtime approval request packet skeleton review boundary. It may only review a non-authorizing packet skeleton boundary without filling live values, creating request packets, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1890 exact live runtime approval request packet skeleton fixture or closeout gate. It may only add a pure local fixture contract for the CM-1889 section/class boundary or close the slice without filling live values, creating/rendering/storing/submitting request packets, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
