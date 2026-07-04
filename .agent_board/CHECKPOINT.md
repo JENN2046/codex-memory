@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1868 exact live runtime request packet review boundary`.
-Current validation: `CMV-1971`.
+Current checkpoint: `CM-1869 exact live runtime non-authorizing request packet display boundary`.
+Current validation: `CMV-1972`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1869 Exact Live Runtime Non-Authorizing Request Packet Display Boundary
+
+Status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_NON_AUTHORIZING_REQUEST_PACKET_DISPLAY_BOUNDARY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1869_EXACT_LIVE_RUNTIME_NON_AUTHORIZING_REQUEST_PACKET_DISPLAY_BOUNDARY.md`.
+- Reviewed CM-1868 exact live runtime request packet review boundary.
+- Defined a future display shape for low-disclosure human review only.
+- Preserved that the display is non-authorizing and contains no live values, request payload, approval text, ready packet, request body, approval line, runtime authorization, or runtime execution.
+- Preserved that no approval packet, live RC request, approval line, request body, runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1870 exact live runtime request packet abort boundary review.
+
+Validation: `CMV-1972`; CM-1868 review-boundary review, display-boundary review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1868 Exact Live Runtime Request Packet Review Boundary
 
