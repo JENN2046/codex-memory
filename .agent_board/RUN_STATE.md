@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1835 M9 exact field binding feasibility fixture contract`.
-Current validation: `CMV-1938`.
-Current status: CM-1835 adds a local non-authorizing exact-field binding feasibility fixture contract. Full M9 proposal mode, concrete exact values, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review`.
+Current validation: `CMV-1939`.
+Current status: CM-1836 closes only the local exact-field binding feasibility fixture contract for planning. Full M9 proposal mode, approval-request readiness, concrete exact values, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review. It should review CM-1834 and CM-1835, decide whether the local exact-field binding feasibility fixture slice can close for planning, and preserve that concrete exact values, exact request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
+Next safe action is CM-1837 M9 approval request readiness blocked fixture contract. It should turn the CM-1836 gate decision into a pure local source/test fixture that validates approval-request readiness remains blocked until concrete exact values, submission authority, request-body policy, and approval-line value handling are supplied by a later exact boundary, while preserving that request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

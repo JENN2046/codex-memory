@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1835 M9 exact field binding feasibility fixture contract`.
-Current validation: `CMV-1938`.
+Current checkpoint: `CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review`.
+Current validation: `CMV-1939`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1836 M9 Exact Field Binding Feasibility Contract Closeout / Approval-Request Readiness Gate Review
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_FIELD_BINDING_FEASIBILITY_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_READINESS_GATE_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1836_EXACT_FIELD_BINDING_FEASIBILITY_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_READINESS_GATE_REVIEW.md`.
+- Reviewed CM-1834 exact-field binding gate and CM-1835 exact-field binding feasibility fixture contract.
+- Closed only the local exact-field binding feasibility fixture preparation slice for planning.
+- Recorded approval-request readiness as blocked because concrete exact values, request submission authority, request body, and approval-line value handling remain absent.
+- Preserved that exact target/transport/client/workspace/owner/visibility/proposal fields, exact request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1837 M9 approval request readiness blocked fixture contract.
+
+Validation: `CMV-1939`; CM-1834/CM-1835 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1835 M9 Exact Field Binding Feasibility Fixture Contract
 
