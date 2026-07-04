@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1898 exact live runtime authorization request boundary preflight`.
-Current validation: `CMV-2001`.
+Current checkpoint: `CM-1899 exact live runtime authorization request boundary fixture contract`.
+Current validation: `CMV-2002`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1899 Exact Live Runtime Authorization Request Boundary Fixture Contract
+
+Status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryExactLiveRuntimeAuthorizationRequestBoundaryContract.js`.
+- Added `tests/vcp-memory-exact-live-runtime-authorization-request-boundary-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1899_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_FIXTURE_CONTRACT.md`.
+- Accepted CM-1898 exact live runtime authorization request boundary preflight for planning.
+- Added a pure local fixture contract that accepts only category-only, non-authorizing authorization request boundary fixtures.
+- Added targeted coverage for accepted boundary, incomplete evidence/declarations, L4 expansion, raw/private/exact value rejection without echo, unexpected fields, side-effect counters, invalid packet fields, decision mismatch, unsafe decision echo, vocabulary, and no-side-effect posture.
+- Preserved that the authorization gate is not opened, authorization request is not ready/submitted, approval is not requested/granted, and dedicated exact approval text is absent.
+- Preserved that approval request packet creation/readiness/submission, request packet creation/rendering/storage/submission, request packet readiness/presence, concrete exact values, request assembly, assembled request generation/disclosure, approval packet readiness, request body generation/submission, approval-line presence/generation/exposure/submission, runtime authorization, and runtime execution remain false.
+- Preserved that no approval packet, live RC request, approval line, request body, assembled request, runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1900 exact live runtime authorization request boundary fixture closeout gate review.
+
+Validation: `CMV-2002`; source/test `node --check`, targeted CM-1899 fixture test `8/8`, default `npm test` `3907/3907`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, source-safety scan, and changed-scope review passed.
 
 ## CM-1898 Exact Live Runtime Authorization Request Boundary Preflight
 

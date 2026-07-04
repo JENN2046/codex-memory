@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1898 exact live runtime authorization request boundary preflight`.
-Current validation: `CMV-2001`.
-Current status: CM-1898 defines only a category-level, non-authorizing boundary for a possible future exact live runtime authorization request. The authorization gate remains unopened; packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1899 exact live runtime authorization request boundary fixture contract`.
+Current validation: `CMV-2002`.
+Current status: CM-1899 adds a pure local source/test fixture contract for the CM-1898 exact live runtime authorization request boundary. The authorization gate remains unopened; packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1899 exact live runtime authorization request boundary fixture contract. It may only make the CM-1898 non-authorizing boundary machine-checkable. It must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1900 exact live runtime authorization request boundary fixture closeout gate review. It may only review CM-1898 and CM-1899 for planning. It must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
