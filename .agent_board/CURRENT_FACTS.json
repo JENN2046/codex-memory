@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1861",
-  "validationId": "CMV-1964",
+  "taskId": "CM-1862",
+  "validationId": "CMV-1965",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_m15_non_authorizing_rc_checklist_refresh",
+    "scope": "vcp_memory_m15_risk_review_refresh",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1965",
+      "scope": "CM-1862 M15 risk review refresh",
+      "status": "COMPLETED_VALIDATED_M15_RISK_REVIEW_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1964",
       "scope": "CM-1861 M15 non-authorizing RC checklist refresh",

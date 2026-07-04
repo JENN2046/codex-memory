@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1861 M15 non-authorizing RC checklist refresh`.
-Current validation: `CMV-1964`.
-Current project status: CM-1861 refreshes the M15 non-authorizing RC checklist against the CM-1860 package evidence map. M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
-Current route: `VCP_MEMORY_M15_NON_AUTHORIZING_RC_CHECKLIST_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
+Current task: `CM-1862 M15 risk review refresh`.
+Current validation: `CMV-1965`.
+Current project status: CM-1862 refreshes the M15 risk review against the CM-1861 checklist. P0/P1 risks remain open or blocked; M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current route: `VCP_MEMORY_M15_RISK_REVIEW_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1862 M15 risk review refresh: updated `docs/VCP_MEMORY_M15_RISK_REVIEW_SKELETON.md` against the CM-1861 checklist state. It records that P0/P1 risk closure, live M0-M14 evidence, M14 live health-report evidence, docs/runtime match, dedicated RC review approval, and RC gate report readiness remain absent. It does not close risks, create an RC gate report, open RC review, generate or submit approval material, generate request bodies, run runtime, call VCPToolBox, call MCP memory tools, read logs/raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1863 M15 RC review approval packet readiness boundary refresh.
 
 CM-1861 M15 non-authorizing RC checklist refresh: updated `docs/VCP_MEMORY_M15_NON_AUTHORIZING_RC_CHECKLIST_SKELETON.md` against the CM-1860 package evidence map. It records that live M0-M14 evidence, M14 live health-report evidence, P0/P1 closure, docs/runtime match, dedicated RC review approval, and RC gate report readiness remain absent. It does not create an RC gate report, open RC review, generate or submit approval material, generate request bodies, run runtime, call VCPToolBox, call MCP memory tools, read logs/raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1862 M15 risk review refresh.
 
