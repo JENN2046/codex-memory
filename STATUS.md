@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1842 M9 approval request boundary blocked preflight`.
-Current validation: `CMV-1945`.
-Current project status: CM-1842 records the approval-request boundary as blocked before any approval request body exists. Full M9 proposal mode, approval-request boundary readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1842_APPROVAL_REQUEST_BOUNDARY_BLOCKED_PREFLIGHT_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1843 M9 approval request boundary blocked fixture contract`.
+Current validation: `CMV-1946`.
+Current project status: CM-1843 adds a pure source/test fixture contract for the approval-request boundary blocked state. Full M9 proposal mode, approval-request boundary readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current route: `VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1843_APPROVAL_REQUEST_BOUNDARY_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1843 M9 approval request boundary blocked fixture contract: added `src/core/VcpMemoryTrustedWriteProposalApprovalRequestBoundaryBlockedContract.js`, `tests/vcp-memory-trusted-write-proposal-approval-request-boundary-blocked-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1843_APPROVAL_REQUEST_BOUNDARY_BLOCKED_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3802/3802`. The helper validates non-authorizing approval-request boundary blocked fixtures whose accepted state is `approval_request_boundary_blocked_missing_exact_request_body_authority`, reports incomplete local evidence as `approval_request_boundary_incomplete`, routes request body / request submission / approval line / proposal / runtime / write / unlock / readiness claims to `stop_l4`, rejects raw/secret/request/approval/readiness fields without echo, and reports no runtime/write side effects. It does not create a request template, prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1844 M9 approval request boundary blocked contract closeout / proposal mode gate review.
 
 CM-1842 M9 approval request boundary blocked preflight: added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1842_APPROVAL_REQUEST_BOUNDARY_BLOCKED_PREFLIGHT.md`. It records the approval-request boundary as blocked before any approval request body exists. It does not create a real request, template, approval line, proposal, runtime action, memory read/write, durable write, provider/API call, public MCP expansion, M10/M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion. Missing elements remain exact target, transport, client ids, workspace, owner, visibility, proposal scope, proposal operation, payload shape, review route, rollback posture, budgets, L4 write-intent shield, real proposal receipt audit, submission authority, approval-line value handling, and request body. Next safe route is CM-1843 M9 approval request boundary blocked fixture contract.
 

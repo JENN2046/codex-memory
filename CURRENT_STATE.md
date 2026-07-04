@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1842 M9 approval request boundary blocked preflight |
-| Current task | `CM-1842 M9 approval request boundary blocked preflight` |
-| Current validation | `CMV-1945` |
-| Current route | M9 approval request boundary blocked preflight recorded; it is not an approval request body, template, approval line, or authorization; concrete exact values, request body, request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked; next local-safe route is CM-1843 approval request boundary blocked fixture contract |
+| Status | CM-1843 M9 approval request boundary blocked fixture contract |
+| Current task | `CM-1843 M9 approval request boundary blocked fixture contract` |
+| Current validation | `CMV-1946` |
+| Current route | M9 approval request boundary blocked fixture contract added; it accepts only `approval_request_boundary_blocked_missing_exact_request_body_authority`; concrete exact values, request body, request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked; next local-safe route is CM-1844 approval request boundary blocked contract closeout / proposal mode gate review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1843` adds `src/core/VcpMemoryTrustedWriteProposalApprovalRequestBoundaryBlockedContract.js`, `tests/vcp-memory-trusted-write-proposal-approval-request-boundary-blocked-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1843_APPROVAL_REQUEST_BOUNDARY_BLOCKED_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3802/3802`. The helper validates only non-authorizing approval-request boundary blocked fixtures whose accepted state is `approval_request_boundary_blocked_missing_exact_request_body_authority`, reports incomplete local evidence as `approval_request_boundary_incomplete`, routes request body / request submission / approval line / proposal / runtime / write / unlock / readiness claims to `stop_l4`, rejects raw/secret/request/approval/readiness fields without echo, and reports no runtime/write side effects. It does not bind real target, transport, client, workspace, owner, visibility, proposal scope, proposal operation, payload shape, review route, rollback posture, budgets, L4 write-intent shield, real proposal receipt audit, submission authority, approval-line value, request template, or request body. It does not create a request template, prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1844 M9 approval request boundary blocked contract closeout / proposal mode gate review.
 
 `CM-1842` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1842_APPROVAL_REQUEST_BOUNDARY_BLOCKED_PREFLIGHT.md`. It records the approval-request boundary as blocked before any approval request body exists. It does not create a real request, template, approval line, proposal, runtime action, memory read/write, durable write, provider/API call, public MCP expansion, M10/M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion. Missing elements remain exact target, transport, client ids, workspace, owner, visibility, proposal scope, proposal operation, payload shape, review route, rollback posture, budgets, L4 write-intent shield, real proposal receipt audit, submission authority, approval-line value handling, and request body. Next safe route is CM-1843 M9 approval request boundary blocked fixture contract.
 

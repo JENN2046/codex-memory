@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1842",
-  "validationId": "CMV-1945",
+  "taskId": "CM-1843",
+  "validationId": "CMV-1946",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_approval_request_boundary_blocked_preflight",
+    "scope": "vcp_memory_trusted_write_proposal_m9_approval_request_boundary_blocked_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1946",
+      "scope": "CM-1843 M9 approval request boundary blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_BOUNDARY_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1945",
       "scope": "CM-1842 M9 approval request boundary blocked preflight",
