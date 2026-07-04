@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1909 exact live runtime authorization request exact-material readiness blocked fixture closeout gate review`.
-Current validation: `CMV-2012`.
+Current checkpoint: `CM-1910 VCP native invocation adapter skeleton / exact target-profile contract as code / low-disclosure result normalizer`.
+Current validation: `CMV-2013`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1910 VCP Native Invocation Adapter Skeleton / Exact Target-Profile Contract As Code / Low-Disclosure Result Normalizer
+
+Status: `COMPLETED_VALIDATED_VCP_NATIVE_INVOCATION_ADAPTER_SKELETON_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `src/core/VcpNativeInvocationAdapterSkeleton.js`.
+- Added `tests/vcp-native-invocation-adapter-skeleton.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1910_VCP_NATIVE_INVOCATION_ADAPTER_SKELETON.md`.
+- Implemented exact target/profile contract validation for source-only VCP native invocation adapter preparation.
+- Implemented low-disclosure result normalizer that rejects raw result fields without echo.
+- Implemented hardcoded no-write/no-body-leak runtime call wrapper budgets.
+- Prepared one exact-approved read-only proof path boundary without authorizing or executing runtime.
+- Added targeted coverage for accepted read-only skeleton, write profile/action/runtime authorization rejection, raw endpoint/body/log/memory-id/secret rejection without echo, low-disclosure result normalization, forbidden raw result fail-closed behavior, positive side-effect counters, readiness/public MCP claims, and forbidden vocabulary.
+- Preserved that no runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory read/write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, request body generation/submission, approval-line generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1911 VCP native invocation adapter focused review / exact-approved read-only proof path implementation gate.
+
+Validation: `CMV-2013`; source/test `node --check`, targeted CM-1910 adapter skeleton test `9/9`, default `npm test` `3940/3940`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, source-safety scan, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1909 Exact Live Runtime Authorization Request Exact-Material Readiness Blocked Fixture Closeout Gate Review
 

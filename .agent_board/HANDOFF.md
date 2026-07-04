@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1909 exact live runtime authorization request exact-material readiness blocked fixture closeout gate review`.
-Current validation: `CMV-2012`.
-Current handoff: CM-1909 closes only the local exact-material readiness blocked fixture contract slice for planning. Concrete exact values, authorization request/request packet/request body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1910 VCP native invocation adapter skeleton / exact target-profile contract as code / low-disclosure result normalizer`.
+Current validation: `CMV-2013`.
+Current handoff: CM-1910 adds a source-only VCP native invocation adapter skeleton with exact target/profile validation, low-disclosure result normalization, hardcoded no-write/no-body-leak runtime wrapper budgets, and one prepared exact-approved read-only proof path boundary. Runtime, memory read/write, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1909 closes only the local exact-material readiness blocked 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1909 closes the local exact-material readiness blocked fixture contract slice for planning only and keeps authorization request readiness blocked. It records that the accumulated blocking contracts are sufficient to protect the next exact-approved read-only runtime path preparation, and the remaining gap is bridge implementation rather than another readiness-blocked fixture layer. Concrete exact values remain absent. Authorization gate opening, authorization request creation/readiness/submission, approval request packet creation/readiness/submission, skeleton values, skeleton artifact creation/rendering/storage/submission, request packet creation/readiness/presence/rendering/storage/submission, request assembly, request body, approval line, runtime, memory read/write, config/startup/watchdog, provider/API, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next local-safe route is CM-1910 VCP native invocation adapter skeleton / exact target-profile contract as code / low-disclosure result normalizer. Sanitized VCPToolBox target remains bound for planning only; no runtime or memory action is opened.
+Current status: `COMPLETED_VALIDATED_VCP_NATIVE_INVOCATION_ADAPTER_SKELETON_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1910 implements local source/test bridge capability for a VCP native invocation adapter skeleton. Exact target/profile validation, low-disclosure result normalization, hardcoded no-write/no-body-leak wrapper budgets, and an exact-approved read-only proof path boundary are now code-backed. Runtime execution, VCPToolBox calls, MCP memory tools, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write, durable writes, provider/API calls, public MCP expansion, approval line generation/submission, request body generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next local-safe route is CM-1911 VCP native invocation adapter focused review / exact-approved read-only proof path implementation gate.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeInvocationAdapterSkeleton.js`
+- `tests/vcp-native-invocation-adapter-skeleton.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1910_VCP_NATIVE_INVOCATION_ADAPTER_SKELETON.md`
 - `src/core/VcpMemoryExactLiveRuntimeAuthorizationRequestExactMaterialReadinessBlockedContract.js`
 - `tests/vcp-memory-exact-live-runtime-authorization-request-exact-material-readiness-blocked-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1909_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
