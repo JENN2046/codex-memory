@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1890 exact live runtime approval request packet skeleton boundary fixture contract`.
-Current validation: `CMV-1993`.
-Current status: CM-1890 adds a pure local fixture contract for exact live runtime approval request packet skeleton boundary evidence. It validates only section/class-level non-authorizing fixtures; skeleton artifact creation/rendering/storage/submission, request packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1891 exact live runtime approval request packet skeleton fixture closeout gate review`.
+Current validation: `CMV-1994`.
+Current status: CM-1891 closes only the local exact live runtime approval request packet skeleton boundary fixture contract slice for planning. Skeleton evidence must not be treated as request packet readiness; skeleton artifact creation/rendering/storage/submission, request packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1891 exact live runtime approval request packet skeleton fixture closeout gate review. It may only review and close the local CM-1890 fixture contract slice without filling live values, creating/rendering/storing/submitting skeleton artifacts or request packets, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1892 exact live runtime approval request packet readiness blocked precondition refresh. It must keep CM-1889 through CM-1891 skeleton evidence from being treated as real request packet readiness and must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
