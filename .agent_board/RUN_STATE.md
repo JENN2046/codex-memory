@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1894 exact live runtime approval request packet readiness blocked fixture closeout gate review`.
-Current validation: `CMV-1997`.
-Current status: CM-1894 closes only the local blocked-readiness fixture contract slice for planning after CM-1893. Request packet readiness remains blocked; packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1895 exact live runtime authorization gate preflight boundary`.
+Current validation: `CMV-1998`.
+Current status: CM-1895 defines a non-authorizing preflight boundary for a future exact live runtime authorization gate. The gate remains unopened; packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1895 exact live runtime authorization gate preflight boundary. It may only prepare a non-authorizing preflight boundary and must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1896 exact live runtime authorization gate preflight fixture contract. It may only add a pure local fixture contract for the CM-1895 boundary and must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

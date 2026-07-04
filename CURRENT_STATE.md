@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1894 exact live runtime approval request packet readiness blocked fixture closeout gate review |
-| Current task | `CM-1894 exact live runtime approval request packet readiness blocked fixture closeout gate review` |
-| Current validation | `CMV-1997` |
-| Current route | CM-1894 closes only the local blocked-readiness fixture contract slice for planning. Exact request packet readiness, approval request readiness, request packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory, config/startup/watchdog, release/deploy/cutover/push, and readiness remain blocked and unauthorized. Next local-safe route is CM-1895 exact live runtime authorization gate preflight boundary |
+| Status | CM-1895 exact live runtime authorization gate preflight boundary |
+| Current task | `CM-1895 exact live runtime authorization gate preflight boundary` |
+| Current validation | `CMV-1998` |
+| Current route | CM-1895 defines a non-authorizing preflight boundary for a future exact live runtime authorization gate. The gate is not opened; approval request packet creation, approval request submission, request packet readiness, request body generation/submission, approval line generation/submission, runtime, memory, config/startup/watchdog, release/deploy/cutover/push, and readiness remain blocked and unauthorized. Next local-safe route is CM-1896 exact live runtime authorization gate preflight fixture contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1895` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1895_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_BOUNDARY.md`. It defines only the non-authorizing preflight boundary families for a future exact live runtime authorization gate: target, operation, memory policy, log/stdout/stderr policy, config policy, provider policy, output policy, budget/window/cleanup/rollback policy, validation command class, abort conditions, and evidence/receipt path class. It does not request approval, open the authorization gate, fill live values, create/render/store/submit a skeleton artifact or request packet, assemble a request, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1896 exact live runtime authorization gate preflight fixture contract.
 
 `CM-1894` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1894_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW.md`. It reviews CM-1892 and CM-1893, accepts the local request packet readiness blocked fixture contract slice as closed for planning only, and records that the accepted fixture state remains `request_packet_readiness_blocked_missing_exact_request_packet_material`. It does not fill live values, create/render/store/submit a skeleton artifact or request packet, assemble a request, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1895 exact live runtime authorization gate preflight boundary.
 
