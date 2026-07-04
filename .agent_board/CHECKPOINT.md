@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1837 M9 approval request readiness blocked fixture contract`.
-Current validation: `CMV-1940`.
+Current checkpoint: `CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review`.
+Current validation: `CMV-1941`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1838 M9 Approval Request Readiness Blocked Contract Closeout / Exact-Request Packet Refresh Gate Review
+
+Status: `COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_READINESS_BLOCKED_CONTRACT_CLOSEOUT_EXACT_REQUEST_PACKET_REFRESH_GATE_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1838_APPROVAL_REQUEST_READINESS_BLOCKED_CONTRACT_CLOSEOUT_EXACT_REQUEST_PACKET_REFRESH_GATE_REVIEW.md`.
+- Reviewed CM-1836 approval-request readiness gate and CM-1837 approval-request readiness blocked fixture contract.
+- Closed only the local approval-request readiness blocked fixture preparation slice for planning.
+- Recorded approval-request readiness as blocked because concrete exact values, request body, approval-line value handling, and submission authority remain absent.
+- Preserved that exact target/transport/client/workspace/owner/visibility/proposal fields, exact request body, exact request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1839 M9 exact request packet refresh blocked preflight.
+
+Validation: `CMV-1941`; CM-1836/CM-1837 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1837 M9 Approval Request Readiness Blocked Fixture Contract
 

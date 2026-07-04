@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1837 M9 approval request readiness blocked fixture contract`.
-Current validation: `CMV-1940`.
-Current status: CM-1837 adds a local non-authorizing approval-request readiness blocked fixture contract. Full M9 proposal mode, approval-request readiness, concrete exact values, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review`.
+Current validation: `CMV-1941`.
+Current status: CM-1838 closes only the local approval-request readiness blocked fixture slice for planning. Full M9 proposal mode, approval-request readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review. It should review CM-1836 and CM-1837, decide whether the local approval-request readiness blocked fixture slice can close for planning, and preserve that concrete exact values, request body, request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness remain blocked. Push remains separate explicit authorization.
+Next safe action is CM-1839 M9 exact request packet refresh blocked preflight. It should refresh the non-authorizing exact-request packet state from the closed local fixture evidence and keep concrete exact values, request body, request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
