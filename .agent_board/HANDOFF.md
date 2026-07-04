@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1926 exact-approved startup locator diagnosis receipt`.
-Current validation: `CMV-2029`.
-Current handoff: CM-1926 consumed one exact-approved startup / locator diagnosis attempt under the CM-1925 packet. Receipt capture failed at the tool layer, so runtime startup state, listener status, target locator binding success, component/action reachability, and read-shape support remain unproven. No retry is authorized; next route is CM-1927 diagnosis closeout.
+Current task: `CM-1927 startup locator diagnosis closeout`.
+Current validation: `CMV-2030`.
+Current handoff: CM-1927 closes CM-1926 as an inconclusive consumed startup / locator diagnosis attempt. Runtime startup state, listener status, target locator binding success, component/action reachability, and read-shape support remain unproven; no retry is authorized. Next route is CM-1928 receipt-capture hardening contract, source/test only and no-live.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1926 consumed one exact-approved startup / locator diagnosis
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_ERROR_NO_RETRY_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1926 records only a consumed exact-approved attempt with inconclusive low-disclosure receipt capture. It does not confirm runtime startup, locator binding, listener state, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RECEIPT_CAPTURE_HARDENING_NO_RETRY`; production/release/cutover ready no; complete V8 not claimed; CM-1927 closes only the inconclusive consumed-attempt state. It does not confirm runtime startup, locator binding, listener state, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1927_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1926_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1925_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST.md`
 - `src/core/VcpNativeRuntimeStartupTargetLocatorDiagnosisContract.js`

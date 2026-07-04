@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1926",
-  "validationId": "CMV-2029",
+  "taskId": "CM-1927",
+  "validationId": "CMV-2030",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_startup_locator_diagnosis_receipt_capture_error_no_retry",
+    "scope": "startup_locator_diagnosis_closeout_route_to_receipt_capture_hardening_no_retry",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2030",
+      "scope": "CM-1927 startup locator diagnosis closeout",
+      "status": "COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RECEIPT_CAPTURE_HARDENING_NO_RETRY"
+    },
     {
       "id": "CMV-2029",
       "scope": "CM-1926 exact-approved startup locator diagnosis receipt",

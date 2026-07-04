@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1926 exact-approved startup locator diagnosis receipt |
-| Current task | `CM-1926 exact-approved startup locator diagnosis receipt` |
-| Current validation | `CMV-2029` |
-| Current route | CM-1926 consumed one exact-approved startup / locator diagnosis attempt, but receipt capture failed at the tool layer; no retry is authorized and next route is CM-1927 diagnosis closeout |
+| Status | CM-1927 startup locator diagnosis closeout |
+| Current task | `CM-1927 startup locator diagnosis closeout` |
+| Current validation | `CMV-2030` |
+| Current route | CM-1927 closes CM-1926 as an inconclusive consumed attempt and routes next to CM-1928 receipt-capture hardening contract, source/test only and no-live |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1927` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1927_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT.md`. It closes CM-1926 as an inconclusive consumed exact-approved startup / locator diagnosis attempt. Accepted facts: CM-1926 attempt consumed, low-disclosure boundary preserved, receipt capture unsuccessful, diagnosis result unusable, runtime startup state unknown, process count unknown, target locator binding success unknown, service listener reachability unknown, component/action probe locked, read-shape locked, retry not allowed, and readiness not claimed. CM-1927 rejects any inference that runtime is not running, listener is unreachable, locator binding is invalid, live transport wrapper shape is confirmed, component/action probe is unlocked, read-shape is unlocked, retry is allowed, or readiness is claimed. It does not perform a live call, retry CM-1926, call VCPToolBox, inspect process state, disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1928 startup / locator diagnosis receipt-capture hardening contract, source/test only and no-live.
 
 `CM-1926` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1926_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT.md`. Under Jenn's current explicit exact approval, one startup / locator diagnosis attempt was consumed for safe target reference `operator-vcp-toolbox-service-ref` and purpose `runtime_startup_or_target_locator_diagnosis`; the approval line itself is not reproduced. The local execution wrapper was constrained to a no-body listener-level transport attempt. The command output returned to Codex was unavailable at the tool layer after the approved attempt, and no retry is authorized. The low-disclosure receipt records `statusCategory=receipt_capture_error_after_single_approved_attempt`, runtime startup state unknown, process count not checked, target locator binding not proven, transport wrapper shape attempted as no-body/no-request TCP connect, service listener status unknown, status class diagnosis result unknown, duration bucket unknown, and all response body/raw error/log/stdout/stderr/config/env/secret/endpoint/locator/memory read/write fields false. CM-1926 does not establish runtime startup state, service listener reachability, target locator binding success, component/action reachability, response shape, read-shape route support, readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1927 diagnosis closeout.
 
