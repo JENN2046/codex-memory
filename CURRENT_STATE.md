@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1841 M9 exact request packet refresh blocked contract closeout / approval request boundary review |
-| Current task | `CM-1841 M9 exact request packet refresh blocked contract closeout / approval request boundary review` |
-| Current validation | `CMV-1944` |
-| Current route | M9 exact request packet refresh blocked fixture slice closed only for planning; approval request boundary remains blocked and non-authorizing; concrete exact values, request body, request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked; next local-safe route is CM-1842 approval request boundary blocked preflight |
+| Status | CM-1842 M9 approval request boundary blocked preflight |
+| Current task | `CM-1842 M9 approval request boundary blocked preflight` |
+| Current validation | `CMV-1945` |
+| Current route | M9 approval request boundary blocked preflight recorded; it is not an approval request body, template, approval line, or authorization; concrete exact values, request body, request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked; next local-safe route is CM-1843 approval request boundary blocked fixture contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1842` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1842_APPROVAL_REQUEST_BOUNDARY_BLOCKED_PREFLIGHT.md`. It records the approval-request boundary as blocked before any approval request body exists. It does not create a real request, template, approval line, proposal, runtime action, memory read/write, durable write, provider/API call, public MCP expansion, M10/M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion. Missing elements remain exact target, transport, client ids, workspace, owner, visibility, proposal scope, proposal operation, payload shape, review route, rollback posture, budgets, L4 write-intent shield, real proposal receipt audit, submission authority, approval-line value handling, and request body. Next safe route is CM-1843 M9 approval request boundary blocked fixture contract.
 
 `CM-1841` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1841_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_BOUNDARY_REVIEW.md`. It reviews CM-1839 and CM-1840, accepts the local exact request packet refresh blocked fixture slice as closed for planning, and opens only the next local-safe approval request boundary blocked preflight. Approval request boundary readiness remains false: concrete exact values, request body, approval-line value handling, and submission authority remain absent. It does not bind a real target, transport, client, workspace, owner, visibility scope, proposal payload, review route, approval line, or budget. It does not prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1842 M9 approval request boundary blocked preflight.
 

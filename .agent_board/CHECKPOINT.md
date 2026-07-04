@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1841 M9 exact request packet refresh blocked contract closeout / approval request boundary review`.
-Current validation: `CMV-1944`.
+Current checkpoint: `CM-1842 M9 approval request boundary blocked preflight`.
+Current validation: `CMV-1945`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1842 M9 Approval Request Boundary Blocked Preflight
+
+Status: `COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_BOUNDARY_BLOCKED_PREFLIGHT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1842_APPROVAL_REQUEST_BOUNDARY_BLOCKED_PREFLIGHT.md`.
+- Recorded the approval-request boundary as blocked before any approval request body exists.
+- Confirmed the record is not a request body, request template, approval line, approval grant, proposal, runtime action, or authorization.
+- Preserved missing exact target, transport, client ids, workspace, owner, visibility, proposal scope, proposal operation, payload shape, review route, rollback posture, budgets, L4 write-intent shield, real proposal receipt audit, submission authority, approval-line value handling, and request body.
+- Preserved that request body preparation, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness remain blocked.
+- Routed next work to CM-1843 M9 approval request boundary blocked fixture contract.
+
+Validation: `CMV-1945`; CM-1841 review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1841 M9 Exact Request Packet Refresh Blocked Contract Closeout / Approval Request Boundary Review
 
