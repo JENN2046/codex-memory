@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1917 live proof closeout route decision`.
-Current validation: `CMV-2020`.
+Current checkpoint: `CM-1918 runtime target diagnosis preflight`.
+Current validation: `CMV-2021`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1918 Runtime Target Diagnosis Preflight
+
+Status: `COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1918_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT.md`.
+- Accepted CM-1917 input facts: CM-1916 receipt valid, `transport_error`, approved budget remaining `0`, runtime reachability false, component/action reachability not proven, response shape unknown, and read-shape route unsupported.
+- Listed possible cause families without confirming any root cause.
+- Defined low-disclosure diagnosis matrix dimensions: target reference resolution, transport reachability, runtime process state, component/action mapping, and harness binding.
+- Recorded allowed evidence categories and forbidden material for each diagnosis dimension.
+- Preserved that endpoint URLs, config/env values or paths, tokens, raw locator values, response bodies, raw error payloads, logs, raw plugin config, private memory content, actual request bodies, provider payloads, writes, and readiness claims remain forbidden.
+- Routed next work to CM-1919 runtime target diagnosis contract.
+- Preserved that no new live call, CM-1916 retry, VCPToolBox call, MCP memory tool call, endpoint/locator resolution or disclosure, live process inspection, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure, memory write, durable write, config/startup/watchdog/dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2021`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted secret/readiness/raw-output scan over changed files, and changed-scope re-review passed.
 
 ## CM-1917 Live Proof Closeout Route Decision
 

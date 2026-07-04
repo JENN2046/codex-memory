@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1917 live proof closeout route decision`.
-Current validation: `CMV-2020`.
-Current handoff: CM-1917 closes CM-1916 as a valid low-disclosure failed attempt and routes next work to CM-1918 runtime target diagnosis preflight. CM-1916 receipt valid yes; approved live/network budget remaining `0`; observe-lite success no; runtime reachable false; component/action reachable not proven; response shape known false; read-shape route locked. No new live call, retry, body/log/config/secret/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
+Current task: `CM-1918 runtime target diagnosis preflight`.
+Current validation: `CMV-2021`.
+Current handoff: CM-1918 defines source-only/docs-only low-disclosure diagnosis dimensions for CM-1916 `transport_error`: target reference resolution, transport reachability, runtime process state, component/action mapping, and harness binding. It does not decide a root cause or perform live checks. Next route is CM-1919 runtime target diagnosis contract. No new live call, retry, VCPToolBox call, endpoint/config/env/secret/log/body/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1917 closes CM-1916 as a valid low-disclosure failed attempt
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION_RUNTIME_TARGET_DIAGNOSIS_NO_RETRY_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1917 records `cm1916_receipt_valid=true`, `live_budget_exhausted=true`, `observe_lite_success=false`, `read_shape_unlocked=false`, and `next_route=runtime_target_diagnosis`. It defines CM-1918 as source-only/docs-only/no-live-call runtime target diagnosis preflight. Runtime execution, VCPToolBox calls, MCP memory tools, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write by agent, durable writes, provider/API calls, public MCP expansion, config/startup/watchdog/dependency changes, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and did not occur.
+Current status: `COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL`; production/release/cutover ready no; complete V8 not claimed; CM-1918 defines the diagnosis matrix and evidence boundaries only. It keeps endpoint URLs, config/env values or paths, tokens, raw locator values, response bodies, raw error payloads, logs, raw plugin config, private memory content, actual request bodies, provider payloads, writes, and readiness claims forbidden. Runtime execution, VCPToolBox calls, MCP memory tools, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write by agent, durable writes, provider/API calls, public MCP expansion, config/startup/watchdog/dependency changes, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and did not occur. Next route is CM-1919 runtime target diagnosis contract.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1918_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1917_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1916_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_RECEIPT.md`
 - `src/core/VcpNativeReadOnlyProofExecutionHarness.js`

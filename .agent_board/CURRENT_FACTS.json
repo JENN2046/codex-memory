@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1917",
-  "validationId": "CMV-2020",
+  "taskId": "CM-1918",
+  "validationId": "CMV-2021",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "live_proof_closeout_route_decision_runtime_target_diagnosis_no_retry_no_read_shape",
+    "scope": "runtime_target_diagnosis_preflight_source_only_no_live_call",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2021",
+      "scope": "CM-1918 runtime target diagnosis preflight",
+      "status": "COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL"
+    },
     {
       "id": "CMV-2020",
       "scope": "CM-1917 live proof closeout route decision",

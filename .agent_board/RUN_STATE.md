@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1917 live proof closeout route decision`.
-Current validation: `CMV-2020`.
-Current status: CM-1917 closes CM-1916 as a valid low-disclosure failed attempt. CM-1916 receipt valid yes; approved live/network budget remaining `0`; observe-lite success no; runtime reachable false; component/action reachable not proven; response shape known false; read-shape route locked. Next route is CM-1918 runtime target diagnosis preflight. No new live call, retry, body/log/config/secret/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
+Current task: `CM-1918 runtime target diagnosis preflight`.
+Current validation: `CMV-2021`.
+Current status: CM-1918 defines source-only/docs-only low-disclosure diagnosis dimensions for CM-1916 `transport_error`: target reference resolution, transport reachability, runtime process state, component/action mapping, and harness binding. It does not decide a root cause or perform live checks. No new live call, retry, VCPToolBox call, endpoint/config/env/secret/log/body/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1918 runtime target diagnosis preflight. Keep it source-only/docs-only/no-live-call: define diagnosis dimensions and low-disclosure evidence boundaries, but do not call VCPToolBox, retry CM-1916, enter read-shape proof, read logs/config/secrets/raw memory, generate request bodies or approval lines, write memory, or claim readiness. Push remains separate explicit authorization.
+Next action is CM-1919 runtime target diagnosis contract. Keep it source/test local only: encode the CM-1918 diagnosis matrix as a low-disclosure contract and tests without live calls, VCPToolBox calls, endpoint/config/env/secret/log/body/raw memory reads, request bodies, approval lines, memory writes, or readiness claims. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
