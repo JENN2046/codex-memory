@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1860 M15 package evidence map refresh`.
-Current validation: `CMV-1963`.
-Current status: CM-1860 refreshes the M15 package evidence map with CM-1852 through CM-1859 current-chain evidence. M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current task: `CM-1861 M15 non-authorizing RC checklist refresh`.
+Current validation: `CMV-1964`.
+Current status: CM-1861 refreshes the M15 non-authorizing RC checklist against the CM-1860 package evidence map. M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1861 M15 non-authorizing RC checklist refresh. It may only refresh checklist wording against CM-1860 evidence-map state and keep every approval, runtime, release, deploy, cutover, push, memory read/write, durable write, provider/API, config/startup/watchdog, public MCP expansion, and readiness field false. Push remains separate explicit authorization.
+Next safe action is CM-1862 M15 risk review refresh. It may only refresh risk review wording against CM-1861 checklist state and keep every approval, runtime, release, deploy, cutover, push, memory read/write, durable write, provider/API, config/startup/watchdog, public MCP expansion, and readiness field false. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

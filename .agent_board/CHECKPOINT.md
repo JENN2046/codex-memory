@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1860 M15 package evidence map refresh`.
-Current validation: `CMV-1963`.
+Current checkpoint: `CM-1861 M15 non-authorizing RC checklist refresh`.
+Current validation: `CMV-1964`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1861 M15 Non-Authorizing RC Checklist Refresh
+
+Status: `COMPLETED_VALIDATED_M15_NON_AUTHORIZING_RC_CHECKLIST_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Updated `docs/VCP_MEMORY_M15_NON_AUTHORIZING_RC_CHECKLIST_SKELETON.md`.
+- Reviewed CM-1860 package evidence map as the current checklist basis.
+- Reviewed the M15 risk review skeleton and approval packet readiness boundary as downstream blockers.
+- Refreshed the checklist status so live M0-M14 evidence, M14 live health-report evidence, P0/P1 closure, docs/runtime match, dedicated RC review approval, and RC gate report readiness remain absent.
+- Preserved that M15 remains unopened and no RC gate report, live RC request, approval line, request body, runtime, VCPToolBox call, MCP memory tool call, log/raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1862 M15 risk review refresh.
+
+Validation: `CMV-1964`; M15 checklist review, CM-1860 evidence map review, M15 risk/approval boundary review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1860 M15 Package Evidence Map Refresh
 
