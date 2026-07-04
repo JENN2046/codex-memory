@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1859 M15 blocked precondition refresh`.
-Current validation: `CMV-1962`.
-Current status: CM-1859 refreshes M15 blocked preconditions after CM-1858. M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current task: `CM-1860 M15 package evidence map refresh`.
+Current validation: `CMV-1963`.
+Current status: CM-1860 refreshes the M15 package evidence map with CM-1852 through CM-1859 current-chain evidence. M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1860 M15 package evidence map refresh. It may only update the local-safe evidence map to include CM-1852 through CM-1859 and separate completed fixture/docs evidence from missing live/runtime and approval evidence. It must not prepare a live RC request, run RC gate runtime, generate or submit an approval line, generate or submit a request body, tag, release, deploy, cut over, push, change configuration/startup/watchdog behavior, call VCPToolBox, call MCP memory tools, call providers/APIs, read raw private memory/logs/stores, write memory, write durable state, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1861 M15 non-authorizing RC checklist refresh. It may only refresh checklist wording against CM-1860 evidence-map state and keep every approval, runtime, release, deploy, cutover, push, memory read/write, durable write, provider/API, config/startup/watchdog, public MCP expansion, and readiness field false. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

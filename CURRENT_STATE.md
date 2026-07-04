@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1859 M15 blocked precondition refresh |
-| Current task | `CM-1859 M15 blocked precondition refresh` |
-| Current validation | `CMV-1962` |
-| Current route | M15 blocked preconditions refreshed after CM-1858; RC gate remains blocked. Next local-safe route is CM-1860 M15 package evidence map refresh |
+| Status | CM-1860 M15 package evidence map refresh |
+| Current task | `CM-1860 M15 package evidence map refresh` |
+| Current validation | `CMV-1963` |
+| Current route | M15 package evidence map refreshed with CM-1852 through CM-1859 current-chain overlay; RC gate remains blocked. Next local-safe route is CM-1861 M15 non-authorizing RC checklist refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1860` refreshes `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It adds a CM-1852 through CM-1859 current-chain overlay and separates accepted docs/fixture/schema/source-review planning evidence from missing live/runtime/approval evidence. It does not create an RC gate report, open M15, open RC review, generate or submit approval material, generate request bodies, run runtime, call VCPToolBox, call MCP memory tools, read logs/raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1861 M15 non-authorizing RC checklist refresh.
 
 `CM-1859` adds `docs/VCP_MEMORY_M15_CM1859_BLOCKED_PRECONDITION_REFRESH.md`. It refreshes M15 blocked preconditions after CM-1858 and records that M15 remains unopened because M0-M14 evidence is not complete for live/runtime proof, M14 live health-report evidence is absent, P0/P1 risks remain open, docs only match available fixture/schema evidence, and dedicated RC review approval is absent. It does not create an RC gate report, open RC review, generate or submit approval material, generate request bodies, run runtime, call VCPToolBox, call MCP memory tools, read logs/raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1860 M15 package evidence map refresh.
 

@@ -2,18 +2,27 @@
 
 Task id: `M15-K1-PACKAGE-EVIDENCE-MAP`
 Implementation slice: `CM-1780`
+Refresh slice: `CM-1860`
 Date: 2026-07-03
+Refresh date: 2026-07-04
 Source plan: `docs/archive/imported-plans/codex-memory-vcp-native-bridge-plan-20260703`
-Depends on: `docs/VCP_MEMORY_M15_BLOCKED_PRECONDITION_RECORD.md`
-Evidence type: `docs-only`, `package evidence map`, `no-runtime`, `no-release`
+Depends on: `docs/VCP_MEMORY_M15_BLOCKED_PRECONDITION_RECORD.md`,
+`docs/VCP_MEMORY_M15_CM1859_BLOCKED_PRECONDITION_REFRESH.md`
+Evidence type: `docs-only`, `package evidence map`,
+`evidence-map-refresh`, `non-authorizing`, `no-runtime`, `no-release`,
+`no-approval-line`, `no-readiness`
 
 ## Purpose
 
 This document maps the plan-package evidence now present in the repository
 against the M15 release-candidate gate requirements.
 
+CM-1860 refreshes this map after CM-1859 so the M12 through M15 current-chain
+evidence is visible in one place.
+
 It is not an RC gate report, release approval, runtime proof, production claim,
-cutover claim, approval request, approval line, or authorization packet.
+cutover claim, approval request, approval line, request body, or authorization
+packet.
 
 ## M15 Gate Requirement
 
@@ -30,6 +39,23 @@ evidence, no P0/P1 open risk, live proof chain complete, rollback posture
 validated, and a dedicated approval packet.
 
 Those requirements are not currently satisfied.
+
+## CM-1860 Current-Chain Refresh Overlay
+
+| Slice | Evidence | Evidence level | Accepted contribution | Still missing |
+|---|---|---|---|---|
+| `CM-1852` | `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1852_M12_BLOCKED_PRECONDITION_REFRESH.md` | docs-only | refreshes M12 as blocked after current M11 route | live M12 workflow authority and M11 live evidence |
+| `CM-1853` | `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1853_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW.md` | docs-only with existing fixture tests | accepts prior M12 fixture chain as planning evidence | live workflow proof and exact workflow authority |
+| `CM-1854` | `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1854_M12_EXACT_BOUNDARY_FEASIBILITY_PREFLIGHT.md` | docs-only | identifies shape-only future exact-boundary fields | concrete exact values and live execution packet |
+| `CM-1855` | `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1855_M12_EXACT_BOUNDARY_FEASIBILITY_FIXTURE_CONTRACT.md` | fixture contract, targeted `9/9` | locks shape-only M12 exact-boundary feasibility behavior | runtime, memory, request, approval, and workflow receipt authority |
+| `CM-1856` | `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1856_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW.md` | docs-only closeout | closes only the local M12 feasibility contract slice for planning | M12 live workflow proof |
+| `CM-1857` | `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_CM1857_M13_EVIDENCE_RECONCILIATION.md` | fixture/dry-run evidence reconciliation, targeted `64/64` | reconciles M13 fallback hardening at fixture/dry-run boundary | live/runtime fallback safety and private runtime evidence |
+| `CM-1858` | `docs/VCP_MEMORY_HEALTH_REPORT_CM1858_M14_EVIDENCE_BOUNDARY_REFRESH.md` | fixture/schema/source-review evidence, targeted `22/22` | refreshes M14 health-report evidence as local-safe only | live dashboard/runtime health report evidence |
+| `CM-1859` | `docs/VCP_MEMORY_M15_CM1859_BLOCKED_PRECONDITION_REFRESH.md` | docs-only blocked precondition refresh | refreshes M15 entry conditions as blocked after CM-1858 | complete M0-M14 live chain, no-P0/P1 proof, docs/runtime match, and dedicated RC review approval |
+
+This overlay updates the evidence map only. It does not promote fixture/docs
+evidence into runtime evidence, and it does not make M15 open, ready, or
+authorized.
 
 ## Phase Evidence Map
 
@@ -61,7 +87,8 @@ Completed local-safe evidence:
 - invocation/profile/receipt boundaries drafted without authorization;
 - M6-M10 approval/display/abort boundaries prepared without live execution;
 - M11-M14 fixture/schema/source-review chains built for local-safe proof;
-- M15 blocked precondition recorded.
+- CM-1852 through CM-1859 current-chain refresh evidence recorded;
+- M15 blocked precondition recorded and refreshed.
 
 Missing RC evidence:
 
@@ -78,39 +105,70 @@ Missing RC evidence:
 
 ```yaml
 m15_package_evidence_map_boundary:
+  cm1860_refresh_applied: true
+  cm1852_cm1859_overlay_present: true
+  current_chain_docs_evidence_complete_for_planning: true
   rc_gate_report_created: false
   rc_gate_ready: false
   m15_opened: false
+  m0_m14_evidence_complete: false
   m0_m14_live_evidence_complete: false
+  m14_live_health_report_accepted: false
+  m14_runtime_exit_condition_satisfied: false
+  docs_match_available_fixture_evidence: true
   docs_match_live_runtime_evidence: false
   no_p0_p1_open_risk: false
   dedicated_rc_review_approval_present: false
+  approval_packet_ready: false
+  approval_request_ready: false
+  approval_line_present: false
+  approval_line_generated: false
+  approval_granted: false
   source_runtime_behavior_changed: false
   dashboard_runtime_implemented: false
   dashboard_cli_called: false
+  dashboard_output_read: false
+  runtime_log_read: false
   vcp_toolbox_runtime_called: false
   mcp_memory_tool_called: false
   private_runtime_read_performed: false
   raw_store_read_performed: false
+  raw_audit_row_read_performed: false
   real_query_performed: false
-  provider_api_called: false
+  provider_api_called_by_agent: false
+  memory_read_performed_by_agent: false
   memory_write_performed: false
   durable_audit_write_performed: false
+  durable_memory_write_performed: false
+  request_body_generated: false
+  request_body_submitted: false
+  config_changed: false
+  startup_changed: false
+  watchdog_changed: false
   public_mcp_expansion_performed: false
-  approval_request_submitted: false
-  approval_line_generated: false
   release_tag_deploy_cutover_performed: false
+  push_performed: false
+  tag_performed: false
+  release_performed: false
+  deploy_performed: false
+  cutover_performed: false
   readiness_claimed: false
+  rc_ready_claimed: false
+  release_ready_claimed: false
+  production_ready_claimed: false
+  cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: m15_non_authorizing_rc_checklist_skeleton
+  next_safe_route: cm1861_m15_non_authorizing_rc_checklist_refresh
 ```
 
 ## Conclusion
 
 The package has substantial local-safe docs, fixture, schema, source-review, and
-approval-boundary evidence. It does not have the live/runtime/approval evidence
-needed for M15 RC gate consideration.
+approval-boundary evidence, including the CM-1852 through CM-1859 current-chain
+refresh. It does not have the live/runtime/approval evidence needed for M15 RC
+gate consideration.
 
-The next safe local route is a non-authorizing RC checklist skeleton that keeps
-all approval, runtime, release, deploy, cutover, and readiness fields false.
+The next safe local route is CM-1861 M15 non-authorizing RC checklist refresh
+that keeps all approval, runtime, release, deploy, cutover, and readiness fields
+false.
