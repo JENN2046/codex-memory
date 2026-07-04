@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1912 VCP native runtime adapter dry-run invocation contract`.
-Current validation: `CMV-2015`.
+Current checkpoint: `CM-1913 VCP native read-only execution receipt schema`.
+Current validation: `CMV-2016`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1913 VCP Native Read-Only Execution Receipt Schema
+
+Status: `COMPLETED_VALIDATED_VCP_NATIVE_READONLY_EXECUTION_RECEIPT_SCHEMA_NO_RUNTIME_NO_WRITE_NO_RAW_BODY`
+
+Recorded:
+
+- Added `src/core/VcpNativeReadOnlyExecutionReceipt.js`.
+- Added `tests/vcp-native-readonly-execution-receipt.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1913_VCP_NATIVE_READONLY_EXECUTION_RECEIPT_SCHEMA.md`.
+- Implemented a source-only low-disclosure receipt schema that can record only target reference name, profile, component, action, status category, shape keys, item count, duration bucket, normalized result status, and zero write counters.
+- Rejected raw response body, raw memory text, memory IDs, endpoint URL, approval line, token, config/env, stdout/stderr/log, provider payload, unknown top-level fields, unsafe values, nonzero counters, and unknown counters without echoing submitted sensitive values.
+- Preserved that accepted receipts are in-memory normalized objects only; no receipt file is written or persisted by CM-1913.
+- Preserved that no runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory read/write, durable write, receipt write, provider/API call, config/startup/watchdog change, public MCP expansion, authorization request creation/submission, request body generation/submission, approval-line generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1914 exact-approved live read-only proof request packet without approval-line generation, runtime execution, or request body generation/submission.
+
+Validation: `CMV-2016`; source/test `node --check`, targeted CM-1913 receipt schema test `7/7`, adjacent CM-1912+CM-1913 test `16/16`, default `npm test` `3965/3965`, `git diff --check`, source-safety scan, and changed-scope re-review passed. Docs/board validation is recorded in CMV-2016.
 
 ## CM-1912 VCP Native Runtime Adapter Dry-Run Invocation Contract
 

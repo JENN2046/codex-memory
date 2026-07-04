@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1912 VCP native runtime adapter dry-run invocation contract`.
-Current validation: `CMV-2015`.
-Current handoff: CM-1912 adds a source-only VCP native runtime adapter dry-run contract that consumes the CM-1911 invocationPlan, validates no-call/no-write/no-body-leak wrapper budgets, and emits the required `dry_run_result`. Runtime, memory read/write, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1913 VCP native read-only execution receipt schema`.
+Current validation: `CMV-2016`.
+Current handoff: CM-1913 adds a source-only low-disclosure read-only execution receipt schema that accepts only target/profile/component/action/status/shape/count/duration/normalized-status metadata plus zero write counters, rejects raw response/memory/endpoint/approval/token/config/log/provider material without echo, and writes no receipt. Runtime, memory read/write, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1912 adds a source-only VCP native runtime adapter dry-run c
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_VCP_NATIVE_RUNTIME_ADAPTER_DRY_RUN_CONTRACT_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1912 implements local source/test bridge capability for a VCP native runtime adapter dry-run contract. CM-1911 invocationPlan consumption, no-call/no-write/no-body-leak wrapper budget validation, and required `dry_run_result` output are now code-backed. Runtime execution, VCPToolBox calls, MCP memory tools, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write, durable writes, receipt writes, provider/API calls, public MCP expansion, authorization request creation/submission, approval line generation/submission, request body generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next local-safe route is CM-1913 low-disclosure execution receipt schema.
+Current status: `COMPLETED_VALIDATED_VCP_NATIVE_READONLY_EXECUTION_RECEIPT_SCHEMA_NO_RUNTIME_NO_WRITE_NO_RAW_BODY`; production/release/cutover ready no; complete V8 not claimed; CM-1913 implements local source/test bridge capability for a low-disclosure read-only execution receipt schema. Allowed receipt output fields are locked to target reference name, profile, component, action, status category, shape keys, item count, duration bucket, normalized result status, and zero write counters. Raw response body, raw memory text, memory IDs, endpoint URL, approval line, token, config/env, stdout/stderr/log, provider payload, unknown top-level fields, unsafe values, nonzero counters, and unknown counters reject without echo. Runtime execution, VCPToolBox calls, MCP memory tools, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write, durable writes, receipt writes, provider/API calls, public MCP expansion, authorization request creation/submission, approval line generation/submission, request body generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next local-safe route is CM-1914 exact-approved live read-only proof request packet, still non-authorizing and no approval-line/runtime/request-body.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeReadOnlyExecutionReceipt.js`
+- `tests/vcp-native-readonly-execution-receipt.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1913_VCP_NATIVE_READONLY_EXECUTION_RECEIPT_SCHEMA.md`
 - `src/core/VcpNativeRuntimeAdapterDryRunContract.js`
 - `tests/vcp-native-runtime-adapter-dry-run-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1912_VCP_NATIVE_RUNTIME_ADAPTER_DRY_RUN_CONTRACT.md`
