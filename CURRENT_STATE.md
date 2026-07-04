@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1910 VCP native invocation adapter skeleton |
-| Current task | `CM-1910 VCP native invocation adapter skeleton / exact target-profile contract as code / low-disclosure result normalizer` |
-| Current validation | `CMV-2013` |
-| Current route | CM-1910 implements a local source/test VCP native invocation adapter skeleton with exact target/profile contract, low-disclosure result normalizer, no-write/no-body-leak runtime wrapper boundary, and one prepared exact-approved read-only proof path. Next local-safe route is CM-1911 focused review / exact-approved read-only proof path implementation gate |
+| Status | CM-1911 VCP native read-only proof path gate |
+| Current task | `CM-1911 VCP native read-only proof path gate / pre-runtime invocation plan` |
+| Current validation | `CMV-2014` |
+| Current route | CM-1911 implements a local source/test pre-runtime gate that validates CM-1910 adapter input, binds a read-only proof path to accepted adapter target/profile/operation, verifies no-write/no-body-leak wrapper budgets, and emits a no-runtime invocation plan. Next local-safe route is CM-1912 VCP native runtime adapter dry-run invocation contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1911` adds `src/core/VcpNativeReadOnlyProofPathGate.js`, `tests/vcp-native-readonly-proof-path-gate.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1911_VCP_NATIVE_READONLY_PROOF_PATH_GATE.md`. It implements a source-only pre-runtime invocation gate that validates CM-1910 adapter input, binds proof path fields to accepted adapter target/profile/component/action/operation type, verifies the hardcoded no-write/no-body-leak runtime wrapper budget, rejects current exact approval/runtime authorization in this local gate, rejects raw endpoint/body/log/approval/secret fields without echo, rejects unsafe projection action/profile values without echo, rejects positive side-effect counters, and preserves the unchanged public MCP surface. Targeted tests passed `9/9`; default `npm test` passed `3949/3949`. It does not execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, write receipts, call providers/APIs, change config/startup/watchdog, expand public MCP, create/submit authorization requests, generate or submit request bodies, generate or submit approval lines, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1912 VCP native runtime adapter dry-run invocation contract.
 
 `CM-1910` adds `src/core/VcpNativeInvocationAdapterSkeleton.js`, `tests/vcp-native-invocation-adapter-skeleton.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1910_VCP_NATIVE_INVOCATION_ADAPTER_SKELETON.md`. It implements a source-only adapter skeleton for exact target/profile validation, low-disclosure result normalization, and a hardcoded no-write/no-body-leak runtime call wrapper boundary with one prepared exact-approved read-only proof path. Targeted tests passed `9/9`; default `npm test` passed `3940/3940`. It does not execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, generate or submit request bodies, generate or submit approval lines, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1911 VCP native invocation adapter focused review / exact-approved read-only proof path implementation gate.
 

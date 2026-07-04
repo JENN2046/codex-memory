@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1910 VCP native invocation adapter skeleton / exact target-profile contract as code / low-disclosure result normalizer`.
-Current validation: `CMV-2013`.
+Current checkpoint: `CM-1911 VCP native read-only proof path gate / pre-runtime invocation plan`.
+Current validation: `CMV-2014`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1911 VCP Native Read-Only Proof Path Gate / Pre-Runtime Invocation Plan
+
+Status: `COMPLETED_VALIDATED_VCP_NATIVE_READONLY_PROOF_PATH_GATE_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `src/core/VcpNativeReadOnlyProofPathGate.js`.
+- Added `tests/vcp-native-readonly-proof-path-gate.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1911_VCP_NATIVE_READONLY_PROOF_PATH_GATE.md`.
+- Implemented a source-only pre-runtime invocation gate that validates CM-1910 adapter input.
+- Bound proof path fields to accepted adapter target, profile, component, action, and operation type.
+- Verified hardcoded no-write/no-body-leak runtime wrapper budgets before accepting the gate.
+- Rejected current exact approval/runtime authorization in this local gate, preserving that no live execution is authorized here.
+- Added targeted coverage for accepted path, adapter rejection inheritance, proof path mismatch, current authorization/runtime flag rejection, raw endpoint/body/log/approval/secret rejection without echo, unsafe projection action/profile rejection without echo, positive side-effect counters, readiness/public MCP claims, and unchanged public MCP surface.
+- Preserved that no runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory read/write, durable write, receipt write, provider/API call, config/startup/watchdog change, public MCP expansion, authorization request creation/submission, request body generation/submission, approval-line generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1912 VCP native runtime adapter dry-run invocation contract.
+
+Validation: `CMV-2014`; source/test `node --check`, targeted CM-1911 proof path gate test `9/9`, default `npm test` `3949/3949`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, source-safety scan, secret/readiness/output scans, and changed-scope re-review passed.
 
 ## CM-1910 VCP Native Invocation Adapter Skeleton / Exact Target-Profile Contract As Code / Low-Disclosure Result Normalizer
 

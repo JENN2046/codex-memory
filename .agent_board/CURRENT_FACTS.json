@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1910",
-  "validationId": "CMV-2013",
+  "taskId": "CM-1911",
+  "validationId": "CMV-2014",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_native_invocation_adapter_skeleton_no_runtime_no_write_no_approval_line",
+    "scope": "vcp_native_readonly_proof_path_gate_no_runtime_no_write_no_approval_line",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2014",
+      "scope": "CM-1911 VCP native read-only proof path gate / pre-runtime invocation plan",
+      "status": "COMPLETED_VALIDATED_VCP_NATIVE_READONLY_PROOF_PATH_GATE_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-2013",
       "scope": "CM-1910 VCP native invocation adapter skeleton / exact target-profile contract as code / low-disclosure result normalizer",
