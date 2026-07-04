@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1854 M12 exact-boundary feasibility preflight`.
-Current validation: `CMV-1957`.
+Current checkpoint: `CM-1855 M12 exact-boundary feasibility fixture contract`.
+Current validation: `CMV-1958`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1855 M12 Exact-Boundary Feasibility Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M12_EXACT_BOUNDARY_FEASIBILITY_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryCodexClaudeSustainedWorkflowExactBoundaryFeasibilityContract.js`.
+- Added `tests/vcp-memory-codex-claude-sustained-workflow-exact-boundary-feasibility-contract.test.js`.
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1855_M12_EXACT_BOUNDARY_FEASIBILITY_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `9/9`.
+- Default `npm test` passed `3827/3827`.
+- Confirmed helper accepts only shape-only `partial_blocked` M12 exact-boundary feasibility fixtures with required M8/M11/M12 refs, candidate field flags, blocked reasons, false authorization fields, and present exactly zero counters.
+- Confirmed helper rejects missing fields, missing counters, concrete exact values, live execution packet binding, request/approval material, runtime/memory/write/unlock/readiness authority, raw/secret/request/approval/runtime/readiness fields without echo, and nonzero or invalid counters.
+- Preserved that workflow harness start, workflow step execution, runtime, memory read/write, checkpoint/handoff writes, durable writes, request body generation/submission, approval-line handling, proposal generation/submission, workflow receipt acceptance, config/startup/watchdog, provider/API, public MCP expansion, M12/M15, and readiness remain blocked.
+- Routed next work to CM-1856 M12 exact-boundary feasibility contract closeout / next gate review.
+
+Validation: `CMV-1958`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, source-safety scan, and changed-scope re-review passed.
 
 ## CM-1854 M12 Exact-Boundary Feasibility Preflight
 

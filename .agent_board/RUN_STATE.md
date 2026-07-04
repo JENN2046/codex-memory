@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1854 M12 exact-boundary feasibility preflight`.
-Current validation: `CMV-1957`.
-Current status: CM-1854 classifies shape-only candidate fields for a future M12 live workflow exact boundary. Feasibility remains partial/blocked because M11 live evidence and checkpoint/handoff write authority are absent. No concrete live values, live execution packet, request body, approval line, workflow harness, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, or readiness is bound or opened.
+Current task: `CM-1855 M12 exact-boundary feasibility fixture contract`.
+Current validation: `CMV-1958`.
+Current status: CM-1855 adds a pure local source/test fixture contract for the CM-1854 M12 exact-boundary feasibility packet. Targeted tests passed `9/9`; default `npm test` passed `3827/3827`. Live M12 workflow remains blocked: no concrete live values, live execution packet, request body, approval line, workflow harness, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, or readiness is bound or opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1855 M12 exact-boundary feasibility fixture contract. It may only validate the CM-1854 field packet as a local fixture and must not start live workflow, generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1856 M12 exact-boundary feasibility contract closeout / next gate review. It may only review the local fixture contract and route the next safe boundary, and must not start live workflow, generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

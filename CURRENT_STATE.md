@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1854 M12 exact-boundary feasibility preflight |
-| Current task | `CM-1854 M12 exact-boundary feasibility preflight` |
-| Current validation | `CMV-1957` |
-| Current route | M12 future exact-boundary fields classified as partial/blocked feasibility only; no concrete live values, request body, approval line, runtime, or memory action. Next local-safe route is CM-1855 M12 exact-boundary feasibility fixture contract |
+| Status | CM-1855 M12 exact-boundary feasibility fixture contract |
+| Current task | `CM-1855 M12 exact-boundary feasibility fixture contract` |
+| Current validation | `CMV-1958` |
+| Current route | Pure local fixture contract now validates CM-1854 M12 exact-boundary feasibility packets and fails closed on live/runtime/request/approval/write/unlock/readiness expansion. Next local-safe route is CM-1856 M12 exact-boundary feasibility contract closeout / next gate review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1855` adds `src/core/VcpMemoryCodexClaudeSustainedWorkflowExactBoundaryFeasibilityContract.js`, `tests/vcp-memory-codex-claude-sustained-workflow-exact-boundary-feasibility-contract.test.js`, and `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1855_M12_EXACT_BOUNDARY_FEASIBILITY_FIXTURE_CONTRACT.md`. Targeted tests passed `9/9`; default `npm test` passed `3827/3827`. The helper validates only shape-only M12 exact-boundary feasibility packets whose decision is `partial_blocked`, requires M8/M11/M12 source references, all CM-1854 candidate field flags, required blocked reasons, all authorization fields false, and all side-effect counters present and exactly zero. It rejects missing fields, missing counters, concrete exact values, live execution packet binding, request/approval material, runtime/memory/write/unlock/readiness authority, raw/secret/request/approval/runtime/readiness fields without echo, and nonzero or invalid counters. It does not bind concrete live values, create a live execution packet, generate or submit request bodies, generate/expose/submit approval lines, start a workflow harness, execute workflow steps, call runtime, read/write memory, accept workflow receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1856 M12 exact-boundary feasibility contract closeout / next gate review.
 
 `CM-1854` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1854_M12_EXACT_BOUNDARY_FEASIBILITY_PREFLIGHT.md`. It classifies shape-only candidate fields for a future M12 live workflow exact boundary and records the feasibility status as partial/blocked because M11 live evidence and checkpoint/handoff write authority are absent. It does not bind concrete exact values, create a live execution packet, generate or submit request bodies, generate/expose/submit approval lines, start a workflow harness, execute workflow steps, call runtime, read/write memory, accept workflow receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1855 M12 exact-boundary feasibility fixture contract.
 
