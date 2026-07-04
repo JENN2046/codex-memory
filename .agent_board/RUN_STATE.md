@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1839 M9 exact request packet refresh blocked preflight`.
-Current validation: `CMV-1942`.
-Current status: CM-1839 records a non-authorizing exact-request packet refresh blocked preflight. Full M9 proposal mode, approval-request readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1840 M9 exact request packet refresh blocked fixture contract`.
+Current validation: `CMV-1943`.
+Current status: CM-1840 adds a non-authorizing exact request packet refresh blocked fixture contract. Full M9 proposal mode, approval-request readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1840 M9 exact request packet refresh blocked fixture contract. It should turn the CM-1839 blocked preflight into a pure local source/test fixture contract and keep concrete exact values, request body, request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness blocked. Push remains separate explicit authorization.
+Next safe action is CM-1841 M9 exact request packet refresh blocked contract closeout / approval request boundary review. It should review CM-1839 and CM-1840, decide whether the local packet refresh blocked fixture slice can close for planning, and keep concrete exact values, request body, request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

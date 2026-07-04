@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1839 M9 exact request packet refresh blocked preflight`.
-Current validation: `CMV-1942`.
+Current checkpoint: `CM-1840 M9 exact request packet refresh blocked fixture contract`.
+Current validation: `CMV-1943`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1840 M9 Exact Request Packet Refresh Blocked Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalExactRequestPacketRefreshBlockedContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-exact-request-packet-refresh-blocked-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1840_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3794/3794`.
+- Confirmed helper accepts only non-authorizing exact request packet refresh blocked fixtures whose accepted state is `exact_request_packet_refresh_blocked_missing_exact_fields`.
+- Confirmed helper reports incomplete local evidence as `exact_request_packet_refresh_incomplete`.
+- Confirmed helper routes packet/request/approval/proposal/runtime/write/unlock/readiness claims to `stop_l4`, rejects raw/secret/request/approval/readiness fields without echo, and keeps exact request readiness, approval request readiness, concrete exact values, request body, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness blocked.
+- Routed next work to CM-1841 M9 exact request packet refresh blocked contract closeout / approval request boundary review.
+
+Validation: `CMV-1943`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, source-safety scan, and changed-scope re-review passed.
 
 ## CM-1839 M9 Exact Request Packet Refresh Blocked Preflight
 

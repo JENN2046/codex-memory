@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1839 M9 exact request packet refresh blocked preflight |
-| Current task | `CM-1839 M9 exact request packet refresh blocked preflight` |
-| Current validation | `CMV-1942` |
-| Current route | M9 exact request packet refresh blocked preflight recorded; accepted local planning evidence can feed a fixture contract, but approval request readiness remains blocked by missing concrete values, request body, approval-line value handling, and submission authority; next local-safe route is exact request packet refresh blocked fixture contract; exact request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked |
+| Status | CM-1840 M9 exact request packet refresh blocked fixture contract |
+| Current task | `CM-1840 M9 exact request packet refresh blocked fixture contract` |
+| Current validation | `CMV-1943` |
+| Current route | M9 exact request packet refresh blocked fixture contract added; targeted tests passed 8/8 and default npm test passed 3794/3794; exact request packet readiness, approval request readiness, concrete exact values, request body, request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked; next local-safe route is CM-1841 exact request packet refresh blocked contract closeout / approval request boundary review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1840` adds `src/core/VcpMemoryTrustedWriteProposalExactRequestPacketRefreshBlockedContract.js`, `tests/vcp-memory-trusted-write-proposal-exact-request-packet-refresh-blocked-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1840_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3794/3794`. The helper validates only non-authorizing exact request packet refresh blocked fixtures whose accepted state is `exact_request_packet_refresh_blocked_missing_exact_fields`, reports incomplete local evidence as `exact_request_packet_refresh_incomplete`, routes packet/request/approval/proposal/runtime/write/unlock/readiness claims to `stop_l4`, rejects raw/secret/request/approval/readiness fields without echo, and reports no runtime/write side effects. It does not bind real target, transport, client, workspace, owner, visibility, proposal scope, proposal operation, payload shape, review route, rollback posture, budgets, L4 write-intent shield, real proposal receipt audit, submission authority, approval-line value, or request body. It does not prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1841 M9 exact request packet refresh blocked contract closeout / approval request boundary review.
 
 `CM-1839` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1839_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_PREFLIGHT.md`. It refreshes the non-authorizing exact-request packet state after CM-1838, records accepted local planning evidence from CM-1812 through CM-1838, and lists missing exact fields that block request readiness. It does not bind a real target, transport, client, workspace, owner, visibility scope, proposal payload, review route, approval line, or budget. It does not prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1840 M9 exact request packet refresh blocked fixture contract.
 

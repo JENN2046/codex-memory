@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1839",
-  "validationId": "CMV-1942",
+  "taskId": "CM-1840",
+  "validationId": "CMV-1943",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_packet_refresh_blocked_preflight",
+    "scope": "vcp_memory_trusted_write_proposal_m9_exact_request_packet_refresh_blocked_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1943",
+      "scope": "CM-1840 M9 exact request packet refresh blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1942",
       "scope": "CM-1839 M9 exact request packet refresh blocked preflight",
