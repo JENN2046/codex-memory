@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1873 exact live runtime approval request gap fixture contract`.
-Current validation: `CMV-1976`.
-Current status: CM-1873 adds a source/test fixture contract for missing exact field gap classifications only. Approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current task: `CM-1874 exact live runtime approval request gap fixture closeout`.
+Current validation: `CMV-1977`.
+Current status: CM-1874 closes the local gap fixture contract slice for planning only. Request assembly preflight may start next, but approval packet/request/request body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1874 exact live runtime approval request gap fixture closeout. It may only close the fixture slice for planning without filling live values, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1875 exact live runtime approval request assembly preflight. It may only decide whether a non-authorizing assembly preflight can proceed from the gap fixture slice without filling live values, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
