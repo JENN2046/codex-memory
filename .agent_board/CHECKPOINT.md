@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1918 runtime target diagnosis preflight`.
-Current validation: `CMV-2021`.
+Current checkpoint: `CM-1919 runtime target diagnosis contract`.
+Current validation: `CMV-2022`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1919 Runtime Target Diagnosis Contract
+
+Status: `COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_CONTRACT_NO_RUNTIME_NO_LIVE_CALL_NO_RAW_OUTPUT`
+
+Recorded:
+
+- Added `src/core/VcpNativeRuntimeTargetDiagnosisContract.js`.
+- Added `tests/vcp-native-runtime-target-diagnosis-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1919_RUNTIME_TARGET_DIAGNOSIS_CONTRACT.md`.
+- Encoded the CM-1918 diagnosis matrix as a machine-verifiable low-disclosure contract.
+- Accepted source-only diagnosis input with target reference known, locator values undisclosed, endpoints undisclosed, transport reachability unknown, runtime process state unknown, component/action mapping known or unknown, and next live diagnostic requiring exact approval.
+- Rejected endpoint URLs, raw locator values, config/env paths or values, secrets/tokens/credentials, stdout/stderr/logs, command lines, request bodies, response bodies, raw error payloads, raw plugin config, private memory content, raw memory text, memory IDs, approval lines, live runtime/network/process-inspection claims, writes, public MCP expansion, and readiness claims without echoing unsafe values.
+- Preserved unchanged public MCP surface.
+- Routed next work to CM-1920 exact approval packet for one transport diagnosis.
+- Preserved that no new live call, CM-1916 retry, VCPToolBox call, MCP memory tool call, endpoint/locator resolution or disclosure, live process inspection, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure, memory write, durable write, config/startup/watchdog/dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2022`; source/test `node --check`, targeted CM-1919 contract test `7/7`, default `npm test` `3982/3982`, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted secret/readiness/raw-output scan over changed files, and changed-scope re-review passed.
 
 ## CM-1918 Runtime Target Diagnosis Preflight
 

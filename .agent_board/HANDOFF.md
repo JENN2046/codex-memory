@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1918 runtime target diagnosis preflight`.
-Current validation: `CMV-2021`.
-Current handoff: CM-1918 defines source-only/docs-only low-disclosure diagnosis dimensions for CM-1916 `transport_error`: target reference resolution, transport reachability, runtime process state, component/action mapping, and harness binding. It does not decide a root cause or perform live checks. Next route is CM-1919 runtime target diagnosis contract. No new live call, retry, VCPToolBox call, endpoint/config/env/secret/log/body/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
+Current task: `CM-1919 runtime target diagnosis contract`.
+Current validation: `CMV-2022`.
+Current handoff: CM-1919 adds a pure local source/test contract for the CM-1918 diagnosis matrix. It accepts only low-disclosure source-only diagnosis fields, keeps transport reachability and runtime process state unknown, rejects raw/sensitive/live/write/readiness drift without echo, and routes next to CM-1920 transport diagnosis exact approval request packet. No new live call, retry, VCPToolBox call, endpoint/config/env/secret/log/body/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1918 defines source-only/docs-only low-disclosure diagnosis 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL`; production/release/cutover ready no; complete V8 not claimed; CM-1918 defines the diagnosis matrix and evidence boundaries only. It keeps endpoint URLs, config/env values or paths, tokens, raw locator values, response bodies, raw error payloads, logs, raw plugin config, private memory content, actual request bodies, provider payloads, writes, and readiness claims forbidden. Runtime execution, VCPToolBox calls, MCP memory tools, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write by agent, durable writes, provider/API calls, public MCP expansion, config/startup/watchdog/dependency changes, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and did not occur. Next route is CM-1919 runtime target diagnosis contract.
+Current status: `COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_CONTRACT_NO_RUNTIME_NO_LIVE_CALL_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1919 locks the diagnosis matrix as code and tests. It keeps endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, and readiness claims forbidden. Runtime execution, VCPToolBox calls, MCP memory tools, live process inspection, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write by agent, durable writes, provider/API calls, public MCP expansion, config/startup/watchdog/dependency changes, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and did not occur. Next route is CM-1920 exact approval packet for one transport diagnosis.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeRuntimeTargetDiagnosisContract.js`
+- `tests/vcp-native-runtime-target-diagnosis-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1919_RUNTIME_TARGET_DIAGNOSIS_CONTRACT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1918_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1917_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1916_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_RECEIPT.md`

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1918 runtime target diagnosis preflight |
-| Current task | `CM-1918 runtime target diagnosis preflight` |
-| Current validation | `CMV-2021` |
-| Current route | CM-1918 defines source-only low-disclosure diagnosis dimensions for CM-1916 `transport_error`; it does not decide cause or perform live checks. Next route CM-1919 runtime target diagnosis contract |
+| Status | CM-1919 runtime target diagnosis contract |
+| Current task | `CM-1919 runtime target diagnosis contract` |
+| Current validation | `CMV-2022` |
+| Current route | CM-1919 locks the source-only diagnosis matrix as code and tests. It keeps transport reachability and runtime process state unknown, rejects raw/sensitive/live/write/readiness drift, and routes next to CM-1920 transport diagnosis exact approval request packet |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1919` adds `src/core/VcpNativeRuntimeTargetDiagnosisContract.js`, `tests/vcp-native-runtime-target-diagnosis-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1919_RUNTIME_TARGET_DIAGNOSIS_CONTRACT.md`. It turns the CM-1918 matrix into a source-only low-disclosure contract. Accepted output means target reference is known, locator value and endpoint are undisclosed, transport reachability is still unknown, runtime process state is still unknown, component/action mapping is known or unknown as declared, and the next live diagnostic still requires exact approval. It rejects endpoint URLs, raw locator values, config/env paths or values, secrets/tokens/credentials, stdout/stderr/logs, command lines, request bodies, response bodies, raw error payloads, raw plugin config, private memory content, raw memory text, memory IDs, approval lines, live runtime/network/process inspection claims, writes, public MCP expansion, and readiness claims without echoing unsafe values. Targeted tests passed `7/7`; default `npm test` passed `3982/3982`. CM-1919 does not perform a new live call, retry CM-1916, call VCPToolBox, call MCP memory tools, inspect live process state, read response bodies/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1920 exact approval packet for one transport diagnosis.
 
 `CM-1918` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1918_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT.md`. It accepts CM-1917's route decision and defines source-only diagnosis dimensions for target reference resolution, transport reachability, runtime process state, component/action mapping, and harness binding. Allowed evidence remains low-disclosure only; endpoint URLs, config/env values or paths, tokens, raw locator values, response bodies, raw error payloads, logs, raw plugin config, private memory content, actual request bodies, provider payloads, writes, and readiness claims remain forbidden. CM-1918 does not confirm any root cause, does not perform a new live call, retry CM-1916, call VCPToolBox, call MCP memory tools, inspect live process state, read response bodies/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1919 runtime target diagnosis contract.
 

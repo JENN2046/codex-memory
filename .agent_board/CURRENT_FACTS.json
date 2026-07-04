@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1918",
-  "validationId": "CMV-2021",
+  "taskId": "CM-1919",
+  "validationId": "CMV-2022",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "runtime_target_diagnosis_preflight_source_only_no_live_call",
+    "scope": "runtime_target_diagnosis_contract_no_runtime_no_live_call",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2022",
+      "scope": "CM-1919 runtime target diagnosis contract",
+      "status": "COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_CONTRACT_NO_RUNTIME_NO_LIVE_CALL_NO_RAW_OUTPUT"
+    },
     {
       "id": "CMV-2021",
       "scope": "CM-1918 runtime target diagnosis preflight",

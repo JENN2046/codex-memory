@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1918 runtime target diagnosis preflight`.
-Current validation: `CMV-2021`.
-Current status: CM-1918 defines source-only/docs-only low-disclosure diagnosis dimensions for CM-1916 `transport_error`: target reference resolution, transport reachability, runtime process state, component/action mapping, and harness binding. It does not decide a root cause or perform live checks. No new live call, retry, VCPToolBox call, endpoint/config/env/secret/log/body/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
+Current task: `CM-1919 runtime target diagnosis contract`.
+Current validation: `CMV-2022`.
+Current status: CM-1919 adds a pure local source/test contract for the CM-1918 diagnosis matrix. It keeps transport reachability and runtime process state unknown, requires exact approval for the next live diagnostic, and rejects raw/sensitive/live/write/readiness drift without echo. No new live call, retry, VCPToolBox call, endpoint/config/env/secret/log/body/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1919 runtime target diagnosis contract. Keep it source/test local only: encode the CM-1918 diagnosis matrix as a low-disclosure contract and tests without live calls, VCPToolBox calls, endpoint/config/env/secret/log/body/raw memory reads, request bodies, approval lines, memory writes, or readiness claims. Push remains separate explicit authorization.
+Next action is CM-1920 transport diagnosis exact approval request packet. Keep it docs-only and non-executing: prepare a narrow request boundary for one future transport diagnosis without generating an approval line, executing runtime, calling VCPToolBox, reading endpoint/config/env/secret/log/body/raw memory, generating a request body, writing memory, or claiming readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
