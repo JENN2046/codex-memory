@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1920",
-  "validationId": "CMV-2023",
+  "taskId": "CM-1921",
+  "validationId": "CMV-2024",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "transport_diagnosis_exact_approval_request_packet_non_executing",
+    "scope": "exact_approved_transport_diagnosis_transport_error_no_body_no_write",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2024",
+      "scope": "CM-1921 exact-approved transport diagnosis receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_TRANSPORT_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
     {
       "id": "CMV-2023",
       "scope": "CM-1920 transport diagnosis exact approval request packet",

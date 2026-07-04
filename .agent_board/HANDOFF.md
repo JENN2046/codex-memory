@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1920 transport diagnosis exact approval request packet`.
-Current validation: `CMV-2023`.
-Current handoff: CM-1920 prepares a non-executing exact approval request packet for one future transport diagnosis. It does not approve, generate approval lines or request bodies, execute runtime, call VCPToolBox, read endpoint/config/env/secret/log/body/raw memory, write memory, release/deploy/cutover, push, or claim readiness. CM-1921 remains blocked until Jenn provides current explicit exact approval matching the packet.
+Current task: `CM-1921 exact-approved transport diagnosis receipt`.
+Current validation: `CMV-2024`.
+Current handoff: CM-1921 consumed exactly one Jenn-approved transport diagnosis live/network call under the CM-1920 packet. Result: `transport_error`; `transportReachable=false`; approved call budget is exhausted; no retry or read-shape proof is authorized. Next route is CM-1922 transport diagnosis closeout.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1920 prepares a non-executing exact approval request packet 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_TRANSPORT_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_NON_EXECUTING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1920 defines the exact approval request boundary for one future transport diagnosis only. It keeps endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, and readiness claims forbidden. Runtime execution, VCPToolBox calls, MCP memory tools, live process inspection, response body/log/stdout/stderr reads, config/env/secret reads, raw memory/raw store/raw audit reads, real queries, memory read/write by agent, durable writes, provider/API calls, public MCP expansion, config/startup/watchdog/dependency changes, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and did not occur. Next route CM-1921 is blocked until Jenn exact approval is present.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_TRANSPORT_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1921 records a low-disclosure transport diagnosis receipt only. Transport reachability remains false, component/action reachability is not proven, read-shape route remains blocked, and the next route is CM-1922 closeout. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1921_EXACT_APPROVED_TRANSPORT_DIAGNOSIS_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1920_TRANSPORT_DIAGNOSIS_EXACT_APPROVAL_REQUEST.md`
 - `src/core/VcpNativeRuntimeTargetDiagnosisContract.js`
 - `tests/vcp-native-runtime-target-diagnosis-contract.test.js`

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1920 transport diagnosis exact approval request packet`.
-Current validation: `CMV-2023`.
-Current status: CM-1920 prepares a non-executing exact approval request packet for one future transport diagnosis. It does not approve, generate approval lines or request bodies, execute runtime, call VCPToolBox, read endpoint/config/env/secret/log/body/raw memory, write memory, release/deploy/cutover, push, or claim readiness.
+Current task: `CM-1921 exact-approved transport diagnosis receipt`.
+Current validation: `CMV-2024`.
+Current status: CM-1921 consumed exactly one Jenn-approved transport diagnosis live/network call under the CM-1920 packet. Result: `transport_error`; `transportReachable=false`; no retry or read-shape proof is authorized. It did not generate a request body or approval line, read body/log/config/secret/raw memory, write memory, release/deploy/cutover, push, or claim readiness.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1921 exact-approved transport diagnosis execution only after Jenn provides current explicit exact approval matching `docs/VCP_MEMORY_PLAN_PACKAGE_CM1920_TRANSPORT_DIAGNOSIS_EXACT_APPROVAL_REQUEST.md`. Without that approval, stop before live/runtime/network action. Push remains separate explicit authorization.
+Next action is CM-1922 transport diagnosis closeout / route decision. Keep CM-1922 docs/status only: no new live call, no retry, no read-shape proof, no endpoint/config/env/secret/log/body/raw memory read, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
