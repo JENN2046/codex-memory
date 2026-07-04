@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1846 M9 final blocked closeout / M10 gate preflight`.
-Current validation: `CMV-1949`.
+Current checkpoint: `CM-1847 M10 blocked state fixture contract`.
+Current validation: `CMV-1950`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1847 M10 Blocked State Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M10_BLOCKED_STATE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalM10BlockedStateContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-m10-blocked-state-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1847_M10_BLOCKED_STATE_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3810/3810`.
+- Confirmed helper accepts only non-authorizing M10 blocked state fixtures whose accepted state is `m10_gate_blocked_missing_m9_completion`.
+- Confirmed helper reports incomplete evidence/blockers as `m10_gate_incomplete`.
+- Confirmed helper routes M9 completion, M10 gate opening, runtime/write authorization, request body, approval-line, proposal receipt, M10/M15 unlock, provider/API, public MCP expansion, and readiness claims to `stop_l4`, rejects raw/secret/runtime/M10/readiness fields without echo, and keeps request body, request submission, approval-line generation, real proposal generation/submission, accepted real proposal receipts, runtime, memory read/write, durable write, provider/API, public MCP expansion, M10/M15, and readiness blocked.
+- Routed next work to CM-1848 M10 blocked state fixture closeout / M11 gate review.
+
+Validation: `CMV-1950`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, source-safety scan, and changed-scope re-review passed.
 
 ## CM-1846 M9 Final Blocked Closeout / M10 Gate Preflight
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1846 M9 final blocked closeout / M10 gate preflight |
-| Current task | `CM-1846 M9 final blocked closeout / M10 gate preflight` |
-| Current validation | `CMV-1949` |
-| Current route | M9 final blocked closeout recorded for planning only; M10 gate remains blocked because M9 proposal mode is not complete; concrete exact values, request body, request submission, approval line, proposal generation/submission, runtime, write, M10/M15, and readiness remain blocked; next local-safe route is CM-1847 M10 blocked state fixture contract |
+| Status | CM-1847 M10 blocked state fixture contract |
+| Current task | `CM-1847 M10 blocked state fixture contract` |
+| Current validation | `CMV-1950` |
+| Current route | Pure fixture contract validates the M10 blocked state as `m10_gate_blocked_missing_m9_completion`; M9 remains incomplete; M10/M15, exact boundary, request body, request submission, approval line, proposal generation/submission, runtime, write, provider/API, public MCP expansion, and readiness remain blocked; next local-safe route is CM-1848 M10 blocked state fixture closeout / M11 gate review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1847` adds `src/core/VcpMemoryTrustedWriteProposalM10BlockedStateContract.js`, `tests/vcp-memory-trusted-write-proposal-m10-blocked-state-contract.test.js`, and `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1847_M10_BLOCKED_STATE_FIXTURE_CONTRACT.md`. Targeted tests passed `8/8`; default `npm test` passed `3810/3810`. The helper validates only non-authorizing M10 blocked state fixtures whose accepted state is `m10_gate_blocked_missing_m9_completion`, reports incomplete evidence/blockers as `m10_gate_incomplete`, routes M9 completion, M10 gate opening, runtime/write authorization, request body, approval-line, proposal receipt, M10/M15 unlock, provider/API, public MCP expansion, and readiness claims to `stop_l4`, rejects raw/secret/runtime/M10/readiness fields without echo, and reports no runtime/write side effects. It does not complete M9, unlock M10/M15, bind concrete exact values, prepare request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1848 M10 blocked state fixture closeout / M11 gate review.
 
 `CM-1846` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1846_M9_FINAL_BLOCKED_CLOSEOUT_M10_GATE_PREFLIGHT.md`. It records M9 as a final blocked closeout for planning and preflights M10 as blocked because M9 proposal mode is not complete. It does not create a request template, prepare a request body, submit approval, generate approval line, generate/submit real proposals, accept real proposal receipts, call runtime, read memory by agent, write memory, perform durable write, call providers/APIs, expand public MCP, unlock M10/M15, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1847 M10 blocked state fixture contract.
 

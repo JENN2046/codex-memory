@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1846 M9 final blocked closeout / M10 gate preflight`.
-Current validation: `CMV-1949`.
-Current status: CM-1846 records M9 as a final blocked closeout for planning and preflights M10 as blocked because M9 proposal mode is not complete. Approval-request boundary readiness, concrete exact values, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, M10/M15 unlock, and readiness remain blocked.
+Current task: `CM-1847 M10 blocked state fixture contract`.
+Current validation: `CMV-1950`.
+Current status: CM-1847 adds a pure fixture contract for M10 blocked state. The accepted state remains `m10_gate_blocked_missing_m9_completion`; M9 completion/proposal mode, M10/M15 unlock, exact boundary, request body, exact request submission, approval line, real proposal generation/submission, accepted real proposal receipts, memory read/write, durable mutation, provider/API, public MCP expansion, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1847 M10 blocked state fixture contract. It should add a small source/test fixture guard for blocked M10 gate state and keep request body, request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness blocked. Push remains separate explicit authorization.
+Next safe action is CM-1848 M10 blocked state fixture closeout / M11 gate review. It should review CM-1846 and CM-1847, close only the local fixture slice for planning if evidence remains consistent, and keep request body, request submission, approval-line generation, runtime execution, real proposal generation/submission, accepted real proposal receipts, memory read/write, provider/API, public MCP expansion, M10/M15 unlock, and readiness blocked. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
