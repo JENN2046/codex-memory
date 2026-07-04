@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1852",
-  "validationId": "CMV-1955",
+  "taskId": "CM-1853",
+  "validationId": "CMV-1956",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_blocked_precondition_refresh",
+    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_fixture_chain_alignment_review",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1956",
+      "scope": "CM-1853 M12 fixture chain alignment review",
+      "status": "COMPLETED_VALIDATED_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1955",
       "scope": "CM-1852 M12 blocked precondition refresh",

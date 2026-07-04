@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1852 M12 blocked precondition refresh`.
-Current validation: `CMV-1955`.
-Current handoff: CM-1852 refreshes M12 as blocked for live Codex/Claude workflow integration. Prior CM-1758 through CM-1762 M12 fixture/schema work remains accepted only as planning evidence. M11 live evidence, exact workflow authority, live workflow harness, workflow receipts, checkpoint/handoff write authority, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, and readiness remain blocked.
+Current task: `CM-1853 M12 fixture chain alignment review`.
+Current validation: `CMV-1956`.
+Current handoff: CM-1853 aligns the prior CM-1758 through CM-1762 M12 fixture chain with the current CM-1852 blocked route as planning evidence only. Live M12 workflow remains blocked because M11 live evidence, exact workflow authority, live workflow harness, workflow receipts, checkpoint/handoff write authority, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, and readiness remain absent or blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1852 refreshes M12 as blocked for live Codex/Claude workflow
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M12_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 final blocked closeout is recorded for planning only; proposal mode remains blocked; local M10 blocked state fixture slice is closed for planning only; M10 gate remains blocked because M9 proposal mode is not complete; local M11 blocked route fixture slice is closed for planning only; M11 gate remains blocked because M10 is blocked and no runtime/write/receipt authority exists; prior M12 fixture/schema chain remains accepted only as planning evidence; live M12 workflow remains blocked because M11 live evidence and exact workflow authority are absent; true runtime execution, true memory read/write, checkpoint/handoff writes, request body generation/submission, approval-line generation/submission, proposal generation/submission, workflow receipt acceptance, and configuration/startup/watchdog changes are not scheduled by the current Green chain; next local-safe route is CM-1853 M12 fixture chain alignment review; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M11, M12, M15, release, readiness, and full bridge completion remain not opened.
+Current status: `COMPLETED_VALIDATED_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW_NO_RUNTIME_NO_WRITE`; production/release/cutover ready no; complete V8 not claimed; successful M6 low-disclosure memory capability status proof exists; successful M7 low-disclosure read-shape proof exists; successful narrow M8 low-disclosure workflow proof exists and is accepted; runtime client isolation is not claimed; M9 final blocked closeout is recorded for planning only; proposal mode remains blocked; local M10 blocked state fixture slice is closed for planning only; M10 gate remains blocked because M9 proposal mode is not complete; local M11 blocked route fixture slice is closed for planning only; M11 gate remains blocked because M10 is blocked and no runtime/write/receipt authority exists; prior M12 fixture/schema chain is aligned with the current CM-1852 route only as planning evidence; live M12 workflow remains blocked because M11 live evidence and exact workflow authority are absent; true runtime execution, true memory read/write, checkpoint/handoff writes, request body generation/submission, approval-line generation/submission, proposal generation/submission, workflow receipt acceptance, and configuration/startup/watchdog changes are not scheduled by the current Green chain; next local-safe route is CM-1854 M12 live workflow exact-boundary feasibility preflight; sanitized VCPToolBox target bound; endpoint HTTP transport and route guards reachable from CM-1790; source-only memory/capability surfaces mapped by CM-1791; DailyNoteSearcher exact invocation envelope preflight complete by CM-1792; `/health` is not a source-defined route; M10, M11, M12, M15, release, readiness, and full bridge completion remain not opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -80,6 +80,7 @@ Current entrypoints:
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1850_M11_BLOCKED_ROUTE_FIXTURE_CONTRACT.md`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1851_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW.md`
 - `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1852_M12_BLOCKED_PRECONDITION_REFRESH.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1853_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW.md`
 - `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`
 - `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`
 - `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`

@@ -4,13 +4,15 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1852 M12 blocked precondition refresh`.
-Current validation: `CMV-1955`.
-Current project status: CM-1852 refreshes M12 as blocked for live Codex/Claude workflow integration. Prior CM-1758 through CM-1762 M12 fixture/schema work remains accepted only as planning evidence. M11 live evidence, exact workflow authority, live workflow harness, workflow receipts, checkpoint/handoff write authority, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, and readiness remain blocked.
-Current route: `VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1852_M12_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_WRITE`.
+Current task: `CM-1853 M12 fixture chain alignment review`.
+Current validation: `CMV-1956`.
+Current project status: CM-1853 aligns the prior CM-1758 through CM-1762 M12 fixture chain with the current CM-1852 blocked route as planning evidence only. Live M12 workflow remains blocked because M11 live evidence, exact workflow authority, live workflow harness, workflow receipts, checkpoint/handoff write authority, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, and readiness remain absent or blocked.
+Current route: `VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1853_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW_NO_RUNTIME_NO_WRITE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-1853 M12 fixture chain alignment review: added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1853_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW.md`. It reviews the prior CM-1758 through CM-1762 M12 fixture boundary, envelope contract, receipt-chain contract, source review, and blocked closeout against the current CM-1852 M12 blocked precondition route. It accepts the M12 fixture chain as aligned planning evidence only and records that live workflow remains blocked because M11 live evidence and exact workflow authority are absent. It does not start a workflow harness, execute workflow steps, call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept workflow receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1854 M12 live workflow exact-boundary feasibility preflight.
 
 CM-1852 M12 blocked precondition refresh: added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1852_M12_BLOCKED_PRECONDITION_REFRESH.md`. It connects the current CM-1851 M11 blocked route closeout with the older CM-1758 through CM-1762 M12 fixture chain, accepts prior M12 fixture/schema work for planning, and records that live M12 workflow remains blocked because M11 live evidence and exact workflow authority are absent. It does not start a workflow harness, execute workflow steps, call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept workflow receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1853 M12 fixture chain alignment review.
 

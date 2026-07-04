@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1852 M12 blocked precondition refresh`.
-Current validation: `CMV-1955`.
+Current checkpoint: `CM-1853 M12 fixture chain alignment review`.
+Current validation: `CMV-1956`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1853 M12 Fixture Chain Alignment Review
+
+Status: `COMPLETED_VALIDATED_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1853_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW.md`.
+- Reviewed CM-1758 through CM-1762 M12 fixture boundary, envelope contract, receipt-chain contract, source review, and blocked closeout against CM-1852.
+- Accepted the prior M12 fixture chain as aligned planning evidence only.
+- Recorded that live M12 workflow remains blocked because M11 live evidence and exact workflow authority are absent.
+- Preserved that workflow harness start, workflow step execution, runtime, memory read/write, checkpoint/handoff writes, durable writes, request body generation/submission, approval-line handling, proposal generation/submission, workflow receipt acceptance, config/startup/watchdog, provider/API, public MCP expansion, M12/M15, and readiness remain blocked.
+- Routed next work to CM-1854 M12 live workflow exact-boundary feasibility preflight.
+
+Validation: `CMV-1956`; CM-1852 review, CM-1758 through CM-1762 review, M12 source/test review, targeted M12 fixture tests, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1852 M12 Blocked Precondition Refresh
 

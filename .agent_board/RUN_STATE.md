@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1852 M12 blocked precondition refresh`.
-Current validation: `CMV-1955`.
-Current status: CM-1852 refreshes M12 as blocked for live Codex/Claude workflow integration. Prior CM-1758 through CM-1762 M12 fixture/schema work remains accepted only as planning evidence. M11 live evidence, exact workflow authority, live workflow harness, workflow receipts, checkpoint/handoff write authority, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, and readiness remain blocked.
+Current task: `CM-1853 M12 fixture chain alignment review`.
+Current validation: `CMV-1956`.
+Current status: CM-1853 aligns the prior CM-1758 through CM-1762 M12 fixture chain with the current CM-1852 blocked route as planning evidence only. Live M12 workflow remains blocked because M11 live evidence, exact workflow authority, live workflow harness, workflow receipts, checkpoint/handoff write authority, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, and readiness remain absent or blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1853 M12 fixture chain alignment review. It may only review prior M12 fixture/source evidence against the current CM-1852 route and must not start live workflow, generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1854 M12 live workflow exact-boundary feasibility preflight. It may only classify missing exact fields and feasibility for a future live workflow boundary, and must not start live workflow, generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
