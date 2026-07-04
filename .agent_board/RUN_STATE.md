@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1901 exact live runtime authorization request readiness blocked precondition refresh`.
-Current validation: `CMV-2004`.
-Current status: CM-1901 records that CM-1898 through CM-1900 boundary/fixture closeout evidence is not authorization request readiness. Authorization request creation/readiness/submission, packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1902 exact live runtime authorization request readiness blocked fixture contract`.
+Current validation: `CMV-2005`.
+Current status: CM-1902 adds a pure local source/test fixture contract for blocked authorization request readiness. Authorization request creation/readiness/submission, packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1902 exact live runtime authorization request readiness blocked fixture contract. It may only add a pure local fixture contract for the CM-1901 blocked-readiness shape. It must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1903 exact live runtime authorization request readiness blocked fixture closeout gate review. It may only review and close the local CM-1901/CM-1902 blocked-readiness fixture slice for planning. It must not fill live values, create/render/store/submit skeleton artifacts or request packets, assemble requests, generate request bodies or approval lines, execute runtime, read memory/logs/raw data, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
