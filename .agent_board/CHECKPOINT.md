@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1911 VCP native read-only proof path gate / pre-runtime invocation plan`.
-Current validation: `CMV-2014`.
+Current checkpoint: `CM-1912 VCP native runtime adapter dry-run invocation contract`.
+Current validation: `CMV-2015`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1912 VCP Native Runtime Adapter Dry-Run Invocation Contract
+
+Status: `COMPLETED_VALIDATED_VCP_NATIVE_RUNTIME_ADAPTER_DRY_RUN_CONTRACT_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `src/core/VcpNativeRuntimeAdapterDryRunContract.js`.
+- Added `tests/vcp-native-runtime-adapter-dry-run-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1912_VCP_NATIVE_RUNTIME_ADAPTER_DRY_RUN_CONTRACT.md`.
+- Implemented a source-only dry-run runtime adapter contract that accepts the CM-1911 `invocationPlan` directly.
+- Verified the plan is still a read-only proof path and that hardcoded no-call/no-write/no-body-leak runtime wrapper budgets remain intact.
+- Produced the required `dry_run_result` with `accepted=true`, `wouldExecute=true`, `runtimeExecuted=false`, `liveVcpToolBoxCalled=false`, `networkCalled=false`, `requestBodyGenerated=false`, `responseBodyRead=false`, `memoryReadPerformed=false`, `memoryWritten=false`, `normalizedResultExpected=true`, and `exactApprovalStillRequired=true`.
+- Rejected current exact approval/runtime authorization, runtime/body/log/endpoint/secret fields, unsafe projection action/profile values, positive side-effect counters, unknown counters, runtime wrapper budget expansion, readiness claims, and public MCP expansion.
+- Preserved that no runtime, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr read, config/env/secret read, raw private memory/raw store/raw audit row read, real query, memory read/write, durable write, receipt write, provider/API call, config/startup/watchdog change, public MCP expansion, authorization request creation/submission, request body generation/submission, approval-line generation/submission, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1913 low-disclosure execution receipt schema.
+
+Validation: `CMV-2015`; source/test `node --check`, targeted CM-1912 dry-run adapter contract test `9/9`, adjacent CM-1911+CM-1912 test `18/18`, default `npm test` `3958/3958`, `git diff --check`, source-safety scan, and changed-scope re-review passed. Docs/board validation is recorded in CMV-2015.
 
 ## CM-1911 VCP Native Read-Only Proof Path Gate / Pre-Runtime Invocation Plan
 

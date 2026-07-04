@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1911 VCP native read-only proof path gate / pre-runtime invocation plan`.
-Current validation: `CMV-2014`.
-Current status: CM-1911 implements source-only proof path gate code for CM-1910 adapter validation, proof path binding, no-write/no-body-leak wrapper budget verification, and a no-runtime invocation plan. Runtime, memory read/write, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1912 VCP native runtime adapter dry-run invocation contract`.
+Current validation: `CMV-2015`.
+Current status: CM-1912 implements a source-only dry-run runtime adapter contract that consumes the CM-1911 invocationPlan, validates no-call/no-write/no-body-leak wrapper budgets, and emits the required `dry_run_result` while exact approval remains required. Runtime, memory read/write, approval line/request body generation, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1912 VCP native runtime adapter dry-run invocation contract. It may turn the CM-1911 invocation plan into a dry-run/no-call runtime adapter contract. It must not execute runtime, call VCPToolBox, read memory/logs/raw data, change config/startup/watchdog, expand public MCP, add write paths, generate request bodies or approval lines, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1913 low-disclosure execution receipt schema. It may define the shape-only receipt allowed after a future exact-approved read-only proof. It must not execute runtime, call VCPToolBox, read memory/logs/raw data, change config/startup/watchdog, expand public MCP, add write paths, generate request bodies or approval lines, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

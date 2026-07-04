@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1911",
-  "validationId": "CMV-2014",
+  "taskId": "CM-1912",
+  "validationId": "CMV-2015",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_native_readonly_proof_path_gate_no_runtime_no_write_no_approval_line",
+    "scope": "vcp_native_runtime_adapter_dry_run_contract_no_runtime_no_write_no_approval_line",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2015",
+      "scope": "CM-1912 VCP native runtime adapter dry-run invocation contract",
+      "status": "COMPLETED_VALIDATED_VCP_NATIVE_RUNTIME_ADAPTER_DRY_RUN_CONTRACT_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-2014",
       "scope": "CM-1911 VCP native read-only proof path gate / pre-runtime invocation plan",

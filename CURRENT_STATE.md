@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1911 VCP native read-only proof path gate |
-| Current task | `CM-1911 VCP native read-only proof path gate / pre-runtime invocation plan` |
-| Current validation | `CMV-2014` |
-| Current route | CM-1911 implements a local source/test pre-runtime gate that validates CM-1910 adapter input, binds a read-only proof path to accepted adapter target/profile/operation, verifies no-write/no-body-leak wrapper budgets, and emits a no-runtime invocation plan. Next local-safe route is CM-1912 VCP native runtime adapter dry-run invocation contract |
+| Status | CM-1912 VCP native runtime adapter dry-run invocation contract |
+| Current task | `CM-1912 VCP native runtime adapter dry-run invocation contract` |
+| Current validation | `CMV-2015` |
+| Current route | CM-1912 implements a local source/test dry-run adapter contract that consumes the CM-1911 invocationPlan, verifies no-call/no-write/no-body-leak wrapper budgets, emits the required dry_run_result, and keeps exact approval required. Next local-safe route is CM-1913 low-disclosure execution receipt schema |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1912` adds `src/core/VcpNativeRuntimeAdapterDryRunContract.js`, `tests/vcp-native-runtime-adapter-dry-run-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1912_VCP_NATIVE_RUNTIME_ADAPTER_DRY_RUN_CONTRACT.md`. It accepts the CM-1911 `invocationPlan` directly, validates that it is still a read-only proof path with hardcoded no-call/no-write/no-body-leak runtime wrapper budgets, enters only a dry-run adapter boundary, and returns `dry_run_result.accepted=true`, `wouldExecute=true`, `runtimeExecuted=false`, `liveVcpToolBoxCalled=false`, `networkCalled=false`, `requestBodyGenerated=false`, `responseBodyRead=false`, `memoryReadPerformed=false`, `memoryWritten=false`, `normalizedResultExpected=true`, and `exactApprovalStillRequired=true`. Targeted tests passed `9/9`; adjacent CM-1911+CM-1912 tests passed `18/18`; default `npm test` passed `3958/3958`. It does not execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, write receipts, call providers/APIs, change config/startup/watchdog, expand public MCP, create/submit authorization requests, generate or submit request bodies, generate or submit approval lines, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1913 low-disclosure execution receipt schema.
 
 `CM-1911` adds `src/core/VcpNativeReadOnlyProofPathGate.js`, `tests/vcp-native-readonly-proof-path-gate.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1911_VCP_NATIVE_READONLY_PROOF_PATH_GATE.md`. It implements a source-only pre-runtime invocation gate that validates CM-1910 adapter input, binds proof path fields to accepted adapter target/profile/component/action/operation type, verifies the hardcoded no-write/no-body-leak runtime wrapper budget, rejects current exact approval/runtime authorization in this local gate, rejects raw endpoint/body/log/approval/secret fields without echo, rejects unsafe projection action/profile values without echo, rejects positive side-effect counters, and preserves the unchanged public MCP surface. Targeted tests passed `9/9`; default `npm test` passed `3949/3949`. It does not execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, write receipts, call providers/APIs, change config/startup/watchdog, expand public MCP, create/submit authorization requests, generate or submit request bodies, generate or submit approval lines, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1912 VCP native runtime adapter dry-run invocation contract.
 
