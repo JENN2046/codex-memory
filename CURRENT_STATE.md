@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1851 M11 blocked route fixture closeout / next gate review |
-| Current task | `CM-1851 M11 blocked route fixture closeout / next gate review` |
-| Current validation | `CMV-1954` |
-| Current route | Local M11 blocked route fixture slice closed for planning only; M11 remains blocked and no live M12 workflow is opened. Next local-safe route is CM-1852 M12 blocked precondition refresh |
+| Status | CM-1852 M12 blocked precondition refresh |
+| Current task | `CM-1852 M12 blocked precondition refresh` |
+| Current validation | `CMV-1955` |
+| Current route | M12 preconditions refreshed as blocked for live workflow; prior M12 fixture/schema chain remains accepted only as planning evidence. Next local-safe route is CM-1853 M12 fixture chain alignment review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1852` adds `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1852_M12_BLOCKED_PRECONDITION_REFRESH.md`. It connects the current CM-1851 M11 blocked route closeout with the older CM-1758 through CM-1762 M12 fixture chain, accepts prior M12 fixture/schema work for planning, and records that live M12 workflow remains blocked because M11 live evidence and exact workflow authority are absent. It does not start a workflow harness, execute workflow steps, call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept workflow receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1853 M12 fixture chain alignment review.
 
 `CM-1851` adds `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1851_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW.md`. It reviews CM-1849 and CM-1850, closes only the local M11 blocked route fixture slice for planning, and records that M11 remains blocked while live M12 workflow remains unopened. It does not call runtime, read/write memory, generate or submit request bodies, generate/expose/submit approval lines, generate/submit proposals, accept real proposal receipts, change config/startup/watchdog, call providers/APIs, expand public MCP, release/deploy/cutover/push, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1852 M12 blocked precondition refresh.
 

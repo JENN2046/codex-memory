@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1851",
-  "validationId": "CMV-1954",
+  "taskId": "CM-1852",
+  "validationId": "CMV-1955",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_trusted_write_proposal_m11_blocked_route_closeout_next_gate_review",
+    "scope": "vcp_memory_codex_claude_sustained_workflow_m12_blocked_precondition_refresh",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1955",
+      "scope": "CM-1852 M12 blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_M12_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_WRITE"
+    },
     {
       "id": "CMV-1954",
       "scope": "CM-1851 M11 blocked route fixture closeout / next gate review",
