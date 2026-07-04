@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1916",
-  "validationId": "CMV-2019",
+  "taskId": "CM-1917",
+  "validationId": "CMV-2020",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_live_observe_lite_proof_transport_error_no_body_no_write_no_raw_output",
+    "scope": "live_proof_closeout_route_decision_runtime_target_diagnosis_no_retry_no_read_shape",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2020",
+      "scope": "CM-1917 live proof closeout route decision",
+      "status": "COMPLETED_VALIDATED_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION_RUNTIME_TARGET_DIAGNOSIS_NO_RETRY_NO_READ_SHAPE"
+    },
     {
       "id": "CMV-2019",
       "scope": "CM-1916 exact-approved live observe-lite proof",

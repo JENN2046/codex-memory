@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1916 exact-approved live observe-lite proof`.
-Current validation: `CMV-2019`.
+Current checkpoint: `CM-1917 live proof closeout route decision`.
+Current validation: `CMV-2020`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1917 Live Proof Closeout Route Decision
+
+Status: `COMPLETED_VALIDATED_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION_RUNTIME_TARGET_DIAGNOSIS_NO_RETRY_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1917_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION.md`.
+- Reviewed the CM-1916 exact-approved live observe-lite proof receipt.
+- Accepted CM-1916 as a valid low-disclosure failed attempt: `cm1916_receipt_valid=true`.
+- Recorded `live_budget_exhausted=true`, approved call budget remaining `0`, and no retry authorized.
+- Recorded `observe_lite_success=false`, `runtimeReachable=false`, `componentActionReachable=not_proven`, and `responseShapeKnown=false`.
+- Kept `read_shape_unlocked=false` and `read_shape_route_supported=false`.
+- Routed next work to CM-1918 runtime target diagnosis preflight.
+- Defined CM-1918 as source-only/docs-only/no-live-call diagnosis preflight, not implementation.
+- Preserved that no new live call, CM-1916 retry, VCPToolBox call, MCP memory tool call, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure, memory write, durable write, config/startup/watchdog/dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2020`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted secret/readiness/raw-output scan over changed files, and changed-scope re-review passed.
 
 ## CM-1916 Exact-Approved Live Observe-Lite Proof
 

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1916 exact-approved live observe-lite proof`.
-Current validation: `CMV-2019`.
-Current status: CM-1916 consumed one Jenn exact-approved live/network observe-lite proof attempt against safe target reference `operator-vcp-toolbox-service-ref` for `KnowledgeBaseManager` / `knowledge_base.search`. Result: `transport_error`; runtime reachability, component/action reachability, and response shape were not established. No request body, response body read, log/config/secret/raw memory read, memory or durable write, approval line, release/deploy/cutover, or readiness claim occurred.
+Current task: `CM-1917 live proof closeout route decision`.
+Current validation: `CMV-2020`.
+Current status: CM-1917 closes CM-1916 as a valid low-disclosure failed attempt. CM-1916 receipt valid yes; approved live/network budget remaining `0`; observe-lite success no; runtime reachable false; component/action reachable not proven; response shape known false; read-shape route locked. Next route is CM-1918 runtime target diagnosis preflight. No new live call, retry, body/log/config/secret/raw memory read, memory write, request body, approval line, release/deploy/cutover, push, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1917 live proof closeout / route decision. CM-1916 exhausted the approved single network-call budget and produced `transport_error`, so do not retry live runtime, proceed to read-shape proof, read logs/config/secrets/raw memory, generate request bodies or approval lines, write memory, or claim readiness without a fresh exact approval. The recommended CM-1917 route decision is `runtime_target_diagnosis`. Push remains separate explicit authorization.
+Next action is CM-1918 runtime target diagnosis preflight. Keep it source-only/docs-only/no-live-call: define diagnosis dimensions and low-disclosure evidence boundaries, but do not call VCPToolBox, retry CM-1916, enter read-shape proof, read logs/config/secrets/raw memory, generate request bodies or approval lines, write memory, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

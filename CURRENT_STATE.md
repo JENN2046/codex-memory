@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1916 exact-approved live observe-lite proof |
-| Current task | `CM-1916 exact-approved live observe-lite proof` |
-| Current validation | `CMV-2019` |
-| Current route | CM-1916 consumed one Jenn exact-approved live/network observe-lite proof attempt and returned `transport_error`. Runtime reachability, component/action reachability, and response shape were not established. Next route is CM-1917 live proof closeout / route decision, recommended `runtime_target_diagnosis` |
+| Status | CM-1917 live proof closeout route decision |
+| Current task | `CM-1917 live proof closeout route decision` |
+| Current validation | `CMV-2020` |
+| Current route | CM-1917 closes CM-1916 as a valid low-disclosure failed attempt. Receipt valid yes; live budget remaining `0`; observe-lite success no; read-shape unlocked no; next route CM-1918 runtime target diagnosis preflight |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1917` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1917_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION.md`. It reviews the CM-1916 receipt and records the route decision: `cm1916_receipt_valid=true`, `live_budget_exhausted=true`, `observe_lite_success=false`, `read_shape_unlocked=false`, and `next_route=runtime_target_diagnosis`. CM-1917 defines CM-1918 as runtime target diagnosis preflight, source-only/docs-only/no-live-call. It does not perform a new live call, retry CM-1916, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion.
 
 `CM-1916` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1916_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_RECEIPT.md`. Under Jenn's exact approval for safe target reference `operator-vcp-toolbox-service-ref`, profile `observe-lite`, component/action `KnowledgeBaseManager` / `knowledge_base.search`, max runtime calls `1`, max network calls `1`, write budget `0`, response body byte budget `0`, log read budget `0`, and shape-only projection, one live/network proof attempt was consumed. Result: `statusCategory=transport_error`, `runtimeReachable=false`, `selectedComponentActionReachable=not_proven_by_no_body_no_auth_boundary`, `responseShapeCategoryKnown=false`, `shapeKeys=[]`, `itemCount=0`, `durationBucket=lt_100ms`, and `normalizedResultStatus=error`. CM-1916 does not prove runtime reachability, does not prove component/action reachability, does not support read-shape routing, and routes next to CM-1917 live proof closeout / route decision with recommended route `runtime_target_diagnosis`. It does not start runtime, generate or submit a request body, generate or expose an approval line, read or persist response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit rows, call MCP memory tools, call providers/APIs, write memory, write durable state, change config/startup/watchdog/dependencies/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion.
 
