@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1849 M11 blocked precondition refresh`.
-Current validation: `CMV-1952`.
+Current checkpoint: `CM-1850 M11 blocked route fixture contract`.
+Current validation: `CMV-1953`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1850 M11 Blocked Route Fixture Contract
+
+Status: `COMPLETED_VALIDATED_M11_BLOCKED_ROUTE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `src/core/VcpMemoryTrustedWriteProposalM11BlockedRouteContract.js`.
+- Added `tests/vcp-memory-trusted-write-proposal-m11-blocked-route-contract.test.js`.
+- Added `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1850_M11_BLOCKED_ROUTE_FIXTURE_CONTRACT.md`.
+- Targeted tests passed `8/8`.
+- Default `npm test` passed `3818/3818`.
+- Confirmed helper accepts only non-authorizing M11 blocked route fixtures whose accepted state is `m11_route_blocked_missing_exact_runtime_memory_or_approval_material_authority`.
+- Confirmed helper reports incomplete evidence/blockers as `m11_route_incomplete`.
+- Confirmed helper routes runtime, memory read/write, request body generation/submission, approval-line handling, config/startup, proposal receipt, M11/M15 unlock, provider/API, public MCP expansion, and readiness claims to `stop_l4`, rejects raw/secret/runtime/memory/approval/config/readiness fields without echo, and keeps runtime, memory read/write, durable write, request body, approval line, proposal generation/submission, accepted real proposal receipts, config/startup/watchdog, provider/API, public MCP expansion, M11/M15, and readiness blocked.
+- Routed next work to CM-1851 M11 blocked route fixture closeout / next gate review.
+
+Validation: `CMV-1953`; source syntax checks, targeted `node --test`, default `npm test`, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, source-safety scan, and changed-scope re-review passed.
 
 ## CM-1849 M11 Blocked Precondition Refresh
 

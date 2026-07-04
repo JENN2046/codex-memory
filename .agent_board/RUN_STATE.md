@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1849 M11 blocked precondition refresh`.
-Current validation: `CMV-1952`.
-Current status: CM-1849 refreshes M11 as blocked and records that true runtime execution, true memory read/write, request body generation/submission, approval-line generation/submission, and configuration/startup/watchdog changes are not scheduled by the current Green chain. They remain future exact-gated work requiring concrete boundaries and fresh exact authorization where project policy requires it. M9 completion, M10/M11/M15 unlock, accepted real proposal receipts, memory read/write, durable mutation, provider/API, public MCP expansion, and readiness remain blocked.
+Current task: `CM-1850 M11 blocked route fixture contract`.
+Current validation: `CMV-1953`.
+Current status: CM-1850 adds a pure source/test fixture contract for the M11 blocked route. Targeted tests passed `8/8`; default `npm test` passed `3818/3818`. M11 remains blocked: true runtime execution, true memory read/write, request body generation/submission, approval-line generation/submission, proposal generation/submission, accepted real proposal receipts, configuration/startup/watchdog changes, provider/API, public MCP expansion, M10/M11/M15 unlock, and readiness remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1850 M11 blocked route fixture or closeout gate review. It should remain fixture/schema/governance-safe and must not generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1851 M11 blocked route fixture closeout / next gate review. It should review CM-1849 and CM-1850, close only the local M11 blocked route fixture slice for planning, and must not generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
