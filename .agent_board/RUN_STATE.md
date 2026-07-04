@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1853 M12 fixture chain alignment review`.
-Current validation: `CMV-1956`.
-Current status: CM-1853 aligns the prior CM-1758 through CM-1762 M12 fixture chain with the current CM-1852 blocked route as planning evidence only. Live M12 workflow remains blocked because M11 live evidence, exact workflow authority, live workflow harness, workflow receipts, checkpoint/handoff write authority, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, and readiness remain absent or blocked.
+Current task: `CM-1854 M12 exact-boundary feasibility preflight`.
+Current validation: `CMV-1957`.
+Current status: CM-1854 classifies shape-only candidate fields for a future M12 live workflow exact boundary. Feasibility remains partial/blocked because M11 live evidence and checkpoint/handoff write authority are absent. No concrete live values, live execution packet, request body, approval line, workflow harness, runtime, memory read/write, provider/API, public MCP expansion, M12/M15 unlock, or readiness is bound or opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1854 M12 live workflow exact-boundary feasibility preflight. It may only classify missing exact fields and feasibility for a future live workflow boundary, and must not start live workflow, generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1855 M12 exact-boundary feasibility fixture contract. It may only validate the CM-1854 field packet as a local fixture and must not start live workflow, generate request bodies, submit approval, generate/expose/submit approval lines, call runtime, read/write memory, change config/startup/watchdog, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
