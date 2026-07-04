@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1879 exact live runtime approval request assembly boundary fixture closeout`.
-Current validation: `CMV-1982`.
-Current status: CM-1879 closes only the local category-only request assembly boundary fixture slice for planning. Request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1880 exact live runtime approval request preparation boundary review`.
+Current validation: `CMV-1983`.
+Current status: CM-1880 defines only the non-authorizing request-preparation boundary for planning. Request packet creation, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1880 exact live runtime approval request preparation boundary review. It may only review the non-authorizing request-preparation boundary without filling live values, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1881 exact live runtime approval request preparation boundary fixture contract. It may only add a local fixture contract for the non-authorizing request-preparation boundary without filling live values, creating request packets, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

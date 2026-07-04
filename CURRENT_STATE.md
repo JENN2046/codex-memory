@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1879 exact live runtime approval request assembly boundary fixture closeout |
-| Current task | `CM-1879 exact live runtime approval request assembly boundary fixture closeout` |
-| Current validation | `CMV-1982` |
-| Current route | Exact live runtime approval request assembly boundary fixture slice closed for planning only after CM-1878. Request assembly/body/approval line and runtime remain blocked and unauthorized. Next local-safe route is CM-1880 exact live runtime approval request preparation boundary review |
+| Status | CM-1880 exact live runtime approval request preparation boundary review |
+| Current task | `CM-1880 exact live runtime approval request preparation boundary review` |
+| Current validation | `CMV-1983` |
+| Current route | Exact live runtime approval request preparation boundary defined as non-authorizing planning material only after CM-1879. Request packet creation, request assembly/body/approval line and runtime remain blocked and unauthorized. Next local-safe route is CM-1881 exact live runtime approval request preparation boundary fixture contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1880` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1880_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PREPARATION_BOUNDARY_REVIEW.md`. It reviews CM-1877 through CM-1879 and defines the future request-preparation boundary as category-only, non-authorizing planning material. It does not fill live values, create a request packet, assemble a request, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1881 exact live runtime approval request preparation boundary fixture contract.
 
 `CM-1879` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1879_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_ASSEMBLY_BOUNDARY_FIXTURE_CLOSEOUT.md`. It reviews CM-1877 and CM-1878, accepts the local assembly boundary fixture contract slice as closed for planning only, and routes next work to CM-1880 exact live runtime approval request preparation boundary review. It does not fill live values, assemble a request, create an approval packet, submit an approval request, generate or submit a request body, generate or submit an approval line, authorize or execute runtime, call VCPToolBox, call MCP memory tools, read response bodies/logs/stdout/stderr, read config/env/secrets, read raw private memory/raw stores/raw audit rows, run real queries, write memory, write durable state, call providers/APIs, change config/startup/watchdog, expand public MCP, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next safe route is CM-1880 exact live runtime approval request preparation boundary review.
 
