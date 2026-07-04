@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1924 low-disclosure runtime startup target locator diagnosis contract`.
-Current validation: `CMV-2027`.
-Current status: CM-1924 locks the runtime startup / target locator diagnosis lanes as a pure local source/test contract. No live fact is confirmed; retry/read-shape/component-action status probe remain locked. Next route is CM-1925 exact approval request packet, still non-live and non-authorizing.
+Current task: `CM-1925 startup locator diagnosis exact approval request packet`.
+Current validation: `CMV-2028`.
+Current status: CM-1925 prepares a non-executing, non-authorizing exact approval request packet for future CM-1926 startup / locator diagnosis. No live fact is confirmed; retry/read-shape/component-action status probe remain locked. CM-1926 remains blocked until Jenn gives matching exact approval.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1925 exact approval request packet for startup/locator diagnosis. Keep CM-1925 docs/status non-executing and non-authorizing: no new live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
+Next action is CM-1926 exact-approved startup / locator diagnosis execution, but only after Jenn provides current explicit exact approval matching the CM-1925 packet. Until then: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

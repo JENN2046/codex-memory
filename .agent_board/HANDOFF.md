@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1924 low-disclosure runtime startup target locator diagnosis contract`.
-Current validation: `CMV-2027`.
-Current handoff: CM-1924 locks the CM-1923 source-only lanes into a machine-verifiable low-disclosure contract. No live fact is confirmed, read-shape remains locked, and the next route is CM-1925 exact approval request packet.
+Current task: `CM-1925 startup locator diagnosis exact approval request packet`.
+Current validation: `CMV-2028`.
+Current handoff: CM-1925 prepares a non-executing, non-authorizing exact approval request packet for one future startup / locator diagnosis. No live fact is confirmed, no approval line exists, and CM-1926 remains blocked until Jenn gives matching exact approval.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1924 locks the CM-1923 source-only lanes into a machine-veri
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_RUNTIME_STARTUP_TARGET_LOCATOR_DIAGNOSIS_CONTRACT_NO_LIVE_CALL`; production/release/cutover ready no; complete V8 not claimed; CM-1924 implements only a local diagnosis contract and does not confirm runtime startup, locator binding, listener state, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_NON_EXECUTING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1925 prepares only a future exact approval request boundary and does not confirm runtime startup, locator binding, listener state, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1925_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST.md`
 - `src/core/VcpNativeRuntimeStartupTargetLocatorDiagnosisContract.js`
 - `tests/vcp-native-runtime-startup-target-locator-diagnosis-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1924_LOW_DISCLOSURE_RUNTIME_STARTUP_TARGET_LOCATOR_DIAGNOSIS_CONTRACT.md`
