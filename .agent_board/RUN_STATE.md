@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1875 exact live runtime approval request assembly preflight fixture contract`.
-Current validation: `CMV-1978`.
-Current status: CM-1875 adds a source/test fixture contract for request assembly preflight only. Request assembly/body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1876 exact live runtime approval request assembly preflight closeout`.
+Current validation: `CMV-1979`.
+Current status: CM-1876 closes the request assembly preflight fixture slice for planning only. Request assembly/body/approval line, runtime, memory read/write, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1876 exact live runtime approval request assembly preflight closeout. It may only close the fixture slice for planning without filling live values, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1877 exact live runtime approval request assembly boundary review. It may only review a future non-authorizing assembly boundary without filling live values, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
