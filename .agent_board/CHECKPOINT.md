@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1857 M13 fallback hardening evidence reconciliation`.
-Current validation: `CMV-1960`.
+Current checkpoint: `CM-1858 M14 health-report evidence boundary refresh`.
+Current validation: `CMV-1961`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1858 M14 Health-Report Evidence Boundary Refresh
+
+Status: `COMPLETED_VALIDATED_M14_HEALTH_REPORT_EVIDENCE_BOUNDARY_REFRESH_FIXTURE_SCHEMA_ONLY_NO_RUNTIME_NO_WRITE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_HEALTH_REPORT_CM1858_M14_EVIDENCE_BOUNDARY_REFRESH.md`.
+- Reviewed archived M14 entry, exit, risk, and dependency boundaries.
+- Reviewed CM-1771 through CM-1778 M14 preflight, schema contract, leak rejection, readiness label, section requiredness, counter specificity, source review, and blocked closeout evidence.
+- Reviewed CM-1857 as the current M13/M14 transition boundary.
+- Refreshed M14 as locally complete only for fixture/schema/source-review health-report boundary work.
+- Preserved that live dashboard/runtime health evidence, logs, raw private memory, real queries, MCP memory calls, VCPToolBox runtime calls, memory writes, durable writes, request bodies, approval lines, config/startup/watchdog changes, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+- Routed next work to CM-1859 M15 blocked precondition refresh.
+
+Validation: `CMV-1961`; M14 plan review, CM-1771 through CM-1778 review, CM-1857 review, targeted M14 fixture tests, source static no-runtime scan, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1857 M13 Fallback Hardening Evidence Reconciliation
 

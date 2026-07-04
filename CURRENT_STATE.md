@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1857 M13 fallback hardening evidence reconciliation |
-| Current task | `CM-1857 M13 fallback hardening evidence reconciliation` |
-| Current validation | `CMV-1960` |
-| Current route | M13 fallback fixture/dry-run hardening chain reconciled after CM-1856; live/runtime fallback safety remains blocked. Next local-safe route is CM-1858 M14 health-report evidence boundary refresh |
+| Status | CM-1858 M14 health-report evidence boundary refresh |
+| Current task | `CM-1858 M14 health-report evidence boundary refresh` |
+| Current validation | `CMV-1961` |
+| Current route | M14 health-report fixture/schema/source-review chain refreshed after CM-1857; live dashboard/runtime health evidence remains blocked. Next local-safe route is CM-1859 M15 blocked precondition refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1858` adds `docs/VCP_MEMORY_HEALTH_REPORT_CM1858_M14_EVIDENCE_BOUNDARY_REFRESH.md`. It refreshes existing M14 health-report evidence after CM-1857 and records that M14 is locally complete only for fixture/schema/source-review health-report boundary work. Health report sections, raw/private rejection, and conservative readiness labels remain covered by fixture tests; live dashboard/runtime health evidence, logs, raw private memory, real queries, VCPToolBox calls, MCP memory calls, memory writes, durable writes, provider/API calls, request bodies, approval lines, config/startup/watchdog changes, public MCP expansion, M15 unlock, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1859 M15 blocked precondition refresh.
 
 `CM-1857` adds `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_CM1857_M13_EVIDENCE_RECONCILIATION.md`. It reconciles the existing M13 fallback hardening evidence after CM-1856 and records that M13 is locally complete only for fixture/dry-run fallback hardening. Marker/receipt, scope/client isolation, secret rejection, lifecycle filter, and query-quality dry-run fixture evidence remain accepted for planning; live/runtime fallback safety, private runtime reads, real queries, MCP memory calls, VCPToolBox runtime calls, memory writes, durable writes, provider/API calls, request bodies, approval lines, config/startup/watchdog changes, public MCP expansion, M14 live dashboard, M15, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. Next safe route is CM-1858 M14 health-report evidence boundary refresh.
 

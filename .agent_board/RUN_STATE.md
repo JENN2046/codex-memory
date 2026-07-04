@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1857 M13 fallback hardening evidence reconciliation`.
-Current validation: `CMV-1960`.
-Current status: CM-1857 reconciles existing M13 fallback hardening evidence after CM-1856. M13 is locally complete only for fixture/dry-run fallback hardening; live/runtime fallback safety, private runtime reads, real queries, MCP memory calls, VCPToolBox runtime calls, memory writes, durable writes, approval material, M14 live dashboard, M15, or readiness are not opened.
+Current task: `CM-1858 M14 health-report evidence boundary refresh`.
+Current validation: `CMV-1961`.
+Current status: CM-1858 refreshes existing M14 health-report evidence after CM-1857. M14 is locally complete only for fixture/schema/source-review health-report boundary work; live dashboard/runtime health evidence, logs, raw private memory, real queries, VCPToolBox calls, MCP memory calls, approval material, M15, or readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1858 M14 health-report evidence boundary refresh. It may only review existing health-report/dashboard evidence boundaries and prepare docs/fixture-only health-report gating, and must not run dashboard runtime, read logs, read raw private memory, run real queries, call VCPToolBox, call MCP memory tools, write memory, write durable audit/runtime state, call providers/APIs, expand public MCP, change config/startup/watchdog behavior, release/deploy/cutover/push, or claim readiness. Push remains separate explicit authorization.
+Next safe action is CM-1859 M15 blocked precondition refresh. It may only review M15 entry conditions and existing package evidence maps to record why RC/v1 stable bridge remains blocked, and must not prepare a live RC request, run RC gate runtime, generate or submit an approval line, tag, release, deploy, cut over, push, change configuration/startup/watchdog behavior, call VCPToolBox, call MCP memory tools, call providers/APIs, read raw private memory/logs/stores, write memory, write durable state, or claim readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
