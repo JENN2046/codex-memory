@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1895",
-  "validationId": "CMV-1998",
+  "taskId": "CM-1896",
+  "validationId": "CMV-1999",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_authorization_gate_preflight_boundary",
+    "scope": "vcp_memory_exact_live_runtime_authorization_gate_preflight_fixture_contract",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1999",
+      "scope": "CM-1896 exact live runtime authorization gate preflight fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1998",
       "scope": "CM-1895 exact live runtime authorization gate preflight boundary",

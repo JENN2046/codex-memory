@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1895 exact live runtime authorization gate preflight boundary`.
-Current validation: `CMV-1998`.
-Current handoff: CM-1895 defines a non-authorizing preflight boundary for a future exact live runtime authorization gate and keeps the gate unopened. Packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1896 exact live runtime authorization gate preflight fixture contract`.
+Current validation: `CMV-1999`.
+Current handoff: CM-1896 adds a pure local fixture contract for the CM-1895 exact live runtime authorization gate preflight boundary and keeps the gate unopened. Packet creation/rendering/storage/submission, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1895 defines a non-authorizing preflight boundary for a futu
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_BOUNDARY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1895 defines only the non-authorizing preflight boundary families for a future exact live runtime authorization gate. Targeted CM-1893 tests passed `8/8` and default suite evidence remains `3891/3891`. Authorization gate opening, approval request packet creation/readiness/submission, skeleton values, skeleton artifact creation/rendering/storage/submission, request packet creation/readiness/presence/rendering/storage/submission, request assembly, request body, approval line, runtime, memory read/write, config/startup/watchdog, provider/API, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next local-safe route is CM-1896 exact live runtime authorization gate preflight fixture contract. Sanitized VCPToolBox target remains bound for planning only; no runtime or memory action is opened.
+Current status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1896 adds a pure local fixture contract for the CM-1895 exact live runtime authorization gate preflight boundary. Targeted CM-1896 tests passed `8/8` and default suite passed `3899/3899`. Authorization gate opening, approval request packet creation/readiness/submission, skeleton values, skeleton artifact creation/rendering/storage/submission, request packet creation/readiness/presence/rendering/storage/submission, request assembly, request body, approval line, runtime, memory read/write, config/startup/watchdog, provider/API, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked and unauthorized. Next local-safe route is CM-1897 exact live runtime authorization gate preflight fixture closeout gate review. Sanitized VCPToolBox target remains bound for planning only; no runtime or memory action is opened.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpMemoryExactLiveRuntimeAuthorizationGatePreflightContract.js`
+- `tests/vcp-memory-exact-live-runtime-authorization-gate-preflight-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1896_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_FIXTURE_CONTRACT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1895_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_BOUNDARY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1894_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
 - `src/core/VcpMemoryExactLiveRuntimeApprovalRequestPacketReadinessBlockedContract.js`
