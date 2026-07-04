@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1863 M15 RC review approval packet readiness boundary refresh`.
-Current validation: `CMV-1966`.
+Current checkpoint: `CM-1864 M15 blocked closeout refresh`.
+Current validation: `CMV-1967`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1864 M15 Blocked Closeout Refresh
+
+Status: `COMPLETED_VALIDATED_M15_BLOCKED_CLOSEOUT_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Updated `docs/VCP_MEMORY_M15_BLOCKED_CLOSEOUT_SUMMARY.md`.
+- Reviewed CM-1859 blocked precondition refresh, CM-1860 package evidence map, CM-1861 non-authorizing checklist, CM-1862 risk review, and CM-1863 approval packet readiness boundary.
+- Refreshed the M15 closeout decision so M15 local-safe documentation is current but M15 itself remains blocked.
+- Preserved that RC gate report creation, RC gate readiness, M15 opening, approval packet readiness, approval request readiness, request body generation/submission, approval-line presence/generation, approval grant, and RC review authorization remain false.
+- Preserved that live M0-M14 evidence, M14 live health-report evidence, live proof chain, docs/runtime match, P0/P1 risk closure, and dedicated RC review approval remain absent.
+- Preserved that no approval packet, live RC request, approval line, request body, runtime, VCPToolBox call, MCP memory tool call, log/raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1865 plan-package local-safe closeout refresh.
+
+Validation: `CMV-1967`; M15 blocked closeout review, CM-1863 approval readiness boundary review, CM-1862 risk review, CM-1861 checklist review, CM-1860 evidence map review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1863 M15 RC Review Approval Packet Readiness Boundary Refresh
 

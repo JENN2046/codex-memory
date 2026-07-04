@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1863",
-  "validationId": "CMV-1966",
+  "taskId": "CM-1864",
+  "validationId": "CMV-1967",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_m15_rc_review_approval_packet_readiness_boundary_refresh",
+    "scope": "vcp_memory_m15_blocked_closeout_refresh",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1967",
+      "scope": "CM-1864 M15 blocked closeout refresh",
+      "status": "COMPLETED_VALIDATED_M15_BLOCKED_CLOSEOUT_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1966",
       "scope": "CM-1863 M15 RC review approval packet readiness boundary refresh",
