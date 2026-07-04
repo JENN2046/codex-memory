@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-04",
-  "taskId": "CM-1867",
-  "validationId": "CMV-1970",
+  "taskId": "CM-1868",
+  "validationId": "CMV-1971",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "vcp_memory_exact_live_runtime_non_authorizing_request_packet_skeleton",
+    "scope": "vcp_memory_exact_live_runtime_request_packet_review_boundary",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-1971",
+      "scope": "CM-1868 exact live runtime request packet review boundary",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_REQUEST_PACKET_REVIEW_BOUNDARY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-1970",
       "scope": "CM-1867 exact live runtime non-authorizing request packet skeleton",
