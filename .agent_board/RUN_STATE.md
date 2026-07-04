@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1881 exact live runtime approval request preparation boundary fixture contract`.
-Current validation: `CMV-1984`.
-Current status: CM-1881 adds a pure source/test fixture contract for the non-authorizing request-preparation boundary. Request packet creation, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
+Current task: `CM-1882 exact live runtime approval request preparation boundary fixture closeout`.
+Current validation: `CMV-1985`.
+Current status: CM-1882 closes only the local request-preparation boundary fixture slice for planning. Request packet creation, request assembly/body/approval line, runtime, memory read/write, config/startup/watchdog changes, release/deploy/cutover/push, and readiness remain blocked and unauthorized.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1882 exact live runtime approval request preparation boundary fixture closeout. It may only close or review the local fixture slice for planning without filling live values, creating request packets, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
+Next safe action is CM-1883 exact live runtime approval request readiness gate review. It may only review whether the current local evidence can enter a future non-authorizing request-readiness boundary without filling live values, creating request packets, assembling requests, generating request bodies or approval lines, executing runtime, reading memory/logs/raw data, changing config/startup/watchdog, or claiming readiness. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
