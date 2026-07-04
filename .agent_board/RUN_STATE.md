@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1862 M15 risk review refresh`.
-Current validation: `CMV-1965`.
-Current status: CM-1862 refreshes the M15 risk review against the CM-1861 checklist. P0/P1 risks remain open or blocked; M15 remains unopened; RC gate report, live RC request, approval line/request body generation, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
+Current task: `CM-1863 M15 RC review approval packet readiness boundary refresh`.
+Current validation: `CMV-1966`.
+Current status: CM-1863 refreshes the M15 RC review approval packet readiness boundary against the CM-1862 risk review. Packet/request/request body/approval line remain not ready; M15 remains unopened; RC gate report, live RC request, runtime, memory read/write, release/deploy/cutover/push, and readiness are not opened.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1863 M15 RC review approval packet readiness boundary refresh. It may only refresh approval packet readiness wording against CM-1862 risk state and keep every approval, runtime, release, deploy, cutover, push, memory read/write, durable write, provider/API, config/startup/watchdog, public MCP expansion, and readiness field false. Push remains separate explicit authorization.
+Next safe action is CM-1864 M15 blocked closeout refresh. It may only summarize the refreshed CM-1859 through CM-1863 M15 blocked chain and keep every approval packet/request/request body/approval line, runtime, release, deploy, cutover, push, memory read/write, durable write, provider/API, config/startup/watchdog, public MCP expansion, and readiness field false. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

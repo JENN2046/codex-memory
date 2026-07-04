@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1862 M15 risk review refresh`.
-Current validation: `CMV-1965`.
+Current checkpoint: `CM-1863 M15 RC review approval packet readiness boundary refresh`.
+Current validation: `CMV-1966`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1863 M15 RC Review Approval Packet Readiness Boundary Refresh
+
+Status: `COMPLETED_VALIDATED_M15_RC_REVIEW_APPROVAL_PACKET_READINESS_BOUNDARY_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Updated `docs/VCP_MEMORY_M15_RC_REVIEW_APPROVAL_PACKET_READINESS_BOUNDARY.md`.
+- Reviewed CM-1862 risk review as the current approval packet readiness basis.
+- Reviewed CM-1861 non-authorizing checklist and CM-1860 package evidence map as upstream blockers.
+- Refreshed the readiness decision so approval packet readiness, approval request readiness, request body generation/submission, approval-line presence/generation, approval grant, RC review authorization, RC gate readiness, and M15 opening remain false.
+- Preserved that risk review is not satisfied, P0/P1 risks remain open or blocked, live M0-M14 evidence and M14 live health-report evidence remain absent, docs/runtime match remains unavailable, and dedicated RC review approval remains absent.
+- Preserved that no approval packet, live RC request, approval line, request body, runtime, VCPToolBox call, MCP memory tool call, log/raw private memory/raw store/raw audit row read, real query, memory write, durable write, provider/API call, config/startup/watchdog change, public MCP expansion, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+- Routed next work to CM-1864 M15 blocked closeout refresh.
+
+Validation: `CMV-1966`; M15 approval packet readiness boundary review, CM-1862 risk review, CM-1861 checklist review, CM-1860 evidence map review, docs/board validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
 ## CM-1862 M15 Risk Review Refresh
 
