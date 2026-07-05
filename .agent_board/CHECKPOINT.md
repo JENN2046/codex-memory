@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1986 exact-approved real disposable target binding probe abort receipt`.
-Current validation: `CMV-2089`.
+Current checkpoint: `CM-1987 real disposable target declaration evidence preparation`.
+Current validation: `CMV-2090`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1987 Real Disposable Target Declaration Evidence Preparation
+
+Status: `COMPLETED_VALIDATED_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS`
+
+Recorded:
+
+- Added `src/core/VcpNativeRealDisposableTargetDeclarationEvidencePreparationContract.js`.
+- Added `tests/vcp-native-real-disposable-target-declaration-evidence-preparation-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1987_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION.md`.
+- Consumed CM-1986 pre-execution abort evidence.
+- Defined a local no-live fail-closed contract for future real disposable target declaration evidence.
+- Accepted only category-level declaration evidence with real disposable target required, new/disposable target, target-scoped only, no existing operator target reuse, no non-target workspace access, no Jenn private information, no production secrets, no customer data, no real private memory, no persistent runtime artifacts, target binding not proven, existing operator reference not sufficient, and future exact approval required before probe.
+- Rejected stale CM-1986 abort facts, existing operator target reuse, private/persistent target posture, raw endpoint/locator/request/response/error/log/secret/private-memory/memory-id fields without echo, live counters, request-body generation, public MCP expansion, and readiness drift.
+- Targeted CM-1987 tests passed `6/6`.
+- Preserved no endpoint/locator binding or disclosure, request body generation/output/persistence, resolver/transport invocation, component/action invocation, runtime call, network call, response consumption, raw diagnostic persistence, MCP memory tool call, memory read/write/update/supersede/tombstone, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, readiness claim, `RC_READY`, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1988 exact real disposable target binding boundary packet / approval request readiness review, still no-live unless a future exact approval also supplies separately evidenced real disposable target material.
+
+Validation: `CMV-2090`; source/test, docs/status review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1986 Exact-Approved Real Disposable Target Binding Probe Abort Receipt
 

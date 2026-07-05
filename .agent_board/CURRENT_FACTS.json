@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-06",
-  "taskId": "CM-1986",
-  "validationId": "CMV-2089",
+  "taskId": "CM-1987",
+  "validationId": "CMV-2090",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_real_disposable_target_binding_pre_execution_abort_target_not_verified_disposable_no_runtime_no_read_shape_no_readiness",
+    "scope": "real_disposable_target_declaration_evidence_preparation_contract_no_live_no_read_shape_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2090",
+      "scope": "CM-1987 real disposable target declaration evidence preparation",
+      "status": "COMPLETED_VALIDATED_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS"
+    },
     {
       "id": "CMV-2089",
       "scope": "CM-1986 exact-approved real disposable target binding probe abort receipt",

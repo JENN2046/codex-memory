@@ -153,7 +153,16 @@ Completed local-safe evidence:
   It performed no request body generation, resolver/transport invocation,
   component/action invocation, runtime/network call, response consumption, raw
   diagnostic persistence, memory write, durable mutation, public MCP expansion,
-  M15 unlock, or readiness claim.
+  M15 unlock, or readiness claim;
+- CM-1987 real disposable target declaration evidence preparation added a
+  local no-live source/test/docs contract for future real disposable target
+  declaration evidence. It accepts only category-level declaration evidence and
+  rejects existing operator target reuse, raw values, private/persistent target
+  posture, stale CM-1986 abort facts, live counters, and readiness drift. It
+  does not prove real target binding, bind endpoint/locator values, generate
+  request bodies, invoke resolver/transport, call runtime/network, consume
+  responses, write memory, mutate durable state, expand public MCP, unlock
+  M15, or claim readiness.
 
 Missing RC evidence:
 
@@ -316,6 +325,29 @@ m15_package_evidence_map_boundary:
   cm1986_trusted_full_read_completed: false
   cm1986_m15_opened: false
   cm1986_readiness_claimed: false
+  cm1987_real_disposable_target_declaration_evidence_contract_present: true
+  cm1987_source_test_contract_present: true
+  cm1987_targeted_tests_passed: 6
+  cm1987_real_disposable_target_declaration_preparation_present: true
+  cm1987_real_disposable_target_binding_proven: false
+  cm1987_target_material_bound: false
+  cm1987_endpoint_locator_values_bound: false
+  cm1987_existing_operator_target_reuse_allowed: false
+  cm1987_existing_operator_reference_sufficient: false
+  cm1987_request_body_generated: false
+  cm1987_resolver_transport_invoked: false
+  cm1987_component_action_invoked: false
+  cm1987_runtime_called: false
+  cm1987_network_called: false
+  cm1987_response_body_consumed: false
+  cm1987_raw_value_persisted: false
+  cm1987_memory_read_performed: false
+  cm1987_memory_write_performed: false
+  cm1987_public_mcp_expansion_performed: false
+  cm1987_read_shape_unlocked: false
+  cm1987_trusted_full_read_completed: false
+  cm1987_m15_opened: false
+  cm1987_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false

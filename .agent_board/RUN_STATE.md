@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1986 exact-approved real disposable target binding probe abort receipt`.
-Current validation: `CMV-2089`.
-Current status: CM-1985 records current exact approval intake without reproducing approval text. CM-1986 evaluates the approved real disposable target binding route and aborts before request-body generation, resolver/transport invocation, runtime/network call, response consumption, raw output, write, public MCP expansion, push, release, deploy, cutover, or readiness claim because the target is not proven real/new/disposable and existing operator target reuse remains forbidden.
+Current task: `CM-1987 real disposable target declaration evidence preparation`.
+Current validation: `CMV-2090`.
+Current status: CM-1987 adds a local no-live source/test/docs contract for future real disposable target declaration evidence. It does not prove real target binding, generate request bodies, call runtime/network, consume responses, write memory, mutate durable state, expand public MCP, push, release, deploy, cut over, or claim readiness.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1987 real disposable target declaration remediation / verifiable target binding evidence preparation, local and no-live, or a new exact approval tied to separately evidenced real disposable target material. Do not retry CM-1986, execute runtime, call VCPToolBox, generate request bodies, generate approval lines, print or persist endpoint/locator/request/response/error/log/env/secret/memory values, reuse existing operator targets, write memory, mutate durable stores, expand public MCP, push/release/deploy/cut over, unlock M15/RC gate, or claim readiness without exact authority and fresh validation evidence.
+Next safe action is CM-1988 exact real disposable target binding boundary packet / approval request readiness review, still no-live unless a future exact approval also supplies separately evidenced real disposable target material. Do not retry CM-1986, execute runtime, call VCPToolBox, generate request bodies, generate approval lines, print or persist endpoint/locator/request/response/error/log/env/secret/memory values, reuse existing operator targets, write memory, mutate durable stores, expand public MCP, push/release/deploy/cut over, unlock M15/RC gate, or claim readiness without exact authority and fresh validation evidence.
 
 ## Historical Run Notes
 
