@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1950 exact-approved component/action status probe receipt`.
-Current validation: `CMV-2053`.
+Current checkpoint: `CM-1951 component/action status probe closeout / route decision`.
+Current validation: `CMV-2054`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1951 Component/Action Status Probe Closeout / Route Decision
+
+Status: `COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_CLOSEOUT_ROUTE_TO_REQUEST_BODY_BOUNDARY_PREFLIGHT_NO_RETRY_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1951_COMPONENT_ACTION_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`.
+- Reviewed only the committed CM-1950 low-disclosure receipt.
+- Accepted CM-1950 as valid consumed boundary-blocked evidence: approved attempt consumed, network/runtime budgets exhausted, retry not allowed, request body generated false, response body read false, raw error read false, read-shape locked, and readiness not claimed.
+- Recorded that component/action status probe success is false, component/action reachability is not proven, route success is not proven, route status is `request_body_required_boundary_blocked`, and request-body generation is required for any future route but disallowed now.
+- Routed next work to CM-1952 component/action request-body boundary preflight, docs/status/governance only.
+- Preserved that no retry, live/network/runtime call, process-state inspection, service start/stop/restart, listener recheck, request body generation/submission, approval-line generation/submission/exposure/storage, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, endpoint/locator disclosure, MCP memory call, provider/API call, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2054`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1950 Exact-Approved Component/Action Status Probe Receipt
 

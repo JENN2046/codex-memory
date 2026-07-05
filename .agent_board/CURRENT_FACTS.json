@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1950",
-  "validationId": "CMV-2053",
+  "taskId": "CM-1951",
+  "validationId": "CMV-2054",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_component_action_status_probe_boundary_blocked_no_body_no_write_no_raw_output",
+    "scope": "component_action_status_probe_closeout_route_to_request_body_boundary_preflight_no_retry_no_read_shape",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2054",
+      "scope": "CM-1951 component/action status probe closeout / route decision",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_CLOSEOUT_ROUTE_TO_REQUEST_BODY_BOUNDARY_PREFLIGHT_NO_RETRY_NO_READ_SHAPE"
+    },
     {
       "id": "CMV-2053",
       "scope": "CM-1950 exact-approved component/action status probe receipt",
