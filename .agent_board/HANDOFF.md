@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1932 exact-approved startup locator diagnosis receipt`.
-Current validation: `CMV-2035`.
-Current handoff: CM-1932 consumed one Jenn-approved startup / locator diagnosis attempt under the CM-1930 / CM-1931 boundary and recorded a low-disclosure `transport_error` receipt. The approved attempt is exhausted and retry is not authorized.
+Current task: `CM-1933 startup locator diagnosis closeout / route decision`.
+Current validation: `CMV-2036`.
+Current handoff: CM-1933 closes CM-1932 as valid consumed low-disclosure `transport_error` evidence, records retry not allowed and live/network budget exhausted, rejects broader runtime/locator/read-shape inferences, and routes next to CM-1934 runtime startup or service listener recovery preflight.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1932 consumed one Jenn-approved startup / locator diagnosis 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1932 records only a low-disclosure transport error receipt after one approved no-body/no-request listener-level attempt. It does not confirm runtime startup, locator binding, listener reachability, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_TO_STARTUP_LISTENER_RECOVERY_PREFLIGHT_NO_RETRY`; production/release/cutover ready no; complete V8 not claimed; CM-1933 accepts only the low-disclosure CM-1932 transport error evidence. It does not confirm runtime startup, locator binding, listener root cause, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, runtime start/stop/restart, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1933_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1932_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1931_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1930_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_REFRESH.md`

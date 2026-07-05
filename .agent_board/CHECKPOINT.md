@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1932 exact-approved startup locator diagnosis receipt`.
-Current validation: `CMV-2035`.
+Current checkpoint: `CM-1933 startup locator diagnosis closeout / route decision`.
+Current validation: `CMV-2036`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1933 Startup Locator Diagnosis Closeout / Route Decision
+
+Status: `COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_TO_STARTUP_LISTENER_RECOVERY_PREFLIGHT_NO_RETRY`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1933_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`.
+- Accepted CM-1932 receipt as valid low-disclosure evidence.
+- Recorded `cm1932_approved_attempt_consumed=true`, `cm1932_live_network_budget_exhausted=true`, and `retry_allowed=false`.
+- Accepted `statusCategory=transport_error` and `service_listener_not_reachable_by_approved_connect_attempt=true`.
+- Preserved runtime startup state unknown, process count unknown, target locator binding success unknown, target locator root cause unknown, service listener root cause unknown, component/action status probe locked, read-shape locked, and readiness not claimed.
+- Rejected inferences that runtime startup state, process count, target locator binding success or failure, service listener root cause, full transport wrapper correctness, component/action routing, read-shape support, VCP native bridge readiness, production readiness, release readiness, cutover readiness, complete V8, or full bridge completion are proven.
+- Routed next work to CM-1934 runtime startup or service listener recovery preflight, still docs/status/governance only unless later exact approval is given.
+- Preserved that no new live call, retry, VCPToolBox call, process-state inspection, runtime start/stop/restart, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2036`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1932 Exact-Approved Startup Locator Diagnosis Receipt
 

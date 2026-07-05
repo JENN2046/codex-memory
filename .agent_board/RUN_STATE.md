@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1932 exact-approved startup locator diagnosis receipt`.
-Current validation: `CMV-2035`.
-Current status: CM-1932 consumed one Jenn-approved startup / locator diagnosis attempt under the CM-1930 / CM-1931 boundary and recorded low-disclosure `transport_error`; retry is not allowed and live execution budget is exhausted.
+Current task: `CM-1933 startup locator diagnosis closeout / route decision`.
+Current validation: `CMV-2036`.
+Current status: CM-1933 closes CM-1932 as valid consumed `transport_error` evidence, rejects broader runtime/locator/read-shape inferences, and routes next to startup/listener recovery preflight. Retry is not allowed and live/network budget is exhausted.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1933 startup / locator diagnosis closeout and route decision. Keep CM-1933 docs/status/governance only: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
+Next action is CM-1934 runtime startup or service listener recovery preflight. Keep CM-1934 docs/status/governance only unless Jenn gives a separate exact approval later. Do not start, stop, or restart runtime; do not perform live/network calls, process-state inspection, endpoint/locator/config/env/secret/log/body/raw memory reads, request body generation, approval line generation, memory writes, readiness/release/deploy/cutover/push claims, or public MCP expansion. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
