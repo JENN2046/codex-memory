@@ -254,6 +254,7 @@ Commands that are slow, runtime-adjacent, provider-adjacent, or need caution:
 ```bash
 npm run gate:mainline:strict
 npm run test:all
+npm run test:provider
 npm run compare-active-memory -- --suite ./benchmarks/active-memory-suite/standard-suite.json --json --require-match
 npm run rollback-active-memory -- --suite ./benchmarks/active-memory-suite/standard-suite.json --json --require-ready
 npm run start:http:ensure
@@ -278,6 +279,11 @@ npm run provider-benchmark -- --json
 git push origin main
 git push --tags
 ```
+
+`npm run test:provider` exits with a documented skip by default. If
+`CODEX_MEMORY_RUN_PROVIDER_TESTS=true` and
+`CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=true` are set, it becomes provider-active
+and requires exact provider scope before running.
 
 Dry-run-only by default:
 
