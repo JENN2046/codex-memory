@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1947 low-disclosure component/action status probe contract`.
-Current validation: `CMV-2050`.
-Current handoff: CM-1947 implements the local low-disclosure component/action status probe contract and routes next to CM-1948 component/action status probe exact approval request packet, non-authorizing and no-live.
+Current task: `CM-1948 component/action status probe exact approval request packet`.
+Current validation: `CMV-2051`.
+Current handoff: CM-1948 prepares the non-authorizing exact approval request packet and routes next to CM-1949 exact approval request readiness review / Jenn boundary display.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1947 implements the local low-disclosure component/action st
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT_NO_LIVE_NO_REQUEST_BODY_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1947 implements only the local low-disclosure contract and requires a later non-authorizing exact approval request packet before any future component/action probe can be approved. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action probing, read-shape proof, and readiness claims remain forbidden now.
+Current status: `COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1948 prepares only the non-authorizing exact approval request packet and requires CM-1949 review before Jenn exact approval can be requested. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action probing, read-shape proof, and readiness claims remain forbidden now.
 
 Workspace: `A:\codex-memory`.
 
@@ -27,6 +27,7 @@ Current entrypoints:
 - `.agent_board/HANDOFF.md`
 - `src/core/VcpNativeComponentActionStatusProbeContract.js`
 - `tests/vcp-native-component-action-status-probe-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1948_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1947_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1946_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1945_STARTUP_FAILURE_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`

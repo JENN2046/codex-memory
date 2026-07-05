@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1947 low-disclosure component/action status probe contract |
-| Current task | `CM-1947 low-disclosure component/action status probe contract` |
-| Current validation | `CMV-2050` |
-| Current route | CM-1947 implements local low-disclosure component/action status probe contract and routes next to CM-1948 non-authorizing exact approval request packet |
+| Status | CM-1948 component/action status probe exact approval request packet |
+| Current task | `CM-1948 component/action status probe exact approval request packet` |
+| Current validation | `CMV-2051` |
+| Current route | CM-1948 prepares non-authorizing exact approval request packet and routes next to CM-1949 boundary display |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1948` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1948_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET.md`. It prepares a non-authorizing exact approval request packet for one future `component_action_status_probe` under CM-1947. It binds safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, one component/action status probe attempt, one network call, one runtime call, zero process/start/listener budgets, no request body, zero response/raw/log budgets, no endpoint/locator/config/env/secret/memory/write/provider/public MCP/release/push/readiness, no read-shape probe, and low-disclosure receipt projection only. It does not grant approval, generate approval lines or request bodies, perform live calls, execute component/action probing, unlock read-shape, or claim readiness. Next route is CM-1949 exact approval request readiness review / Jenn boundary display, still non-authorizing and no-live.
 
 `CM-1947` adds `src/core/VcpNativeComponentActionStatusProbeContract.js`, `tests/vcp-native-component-action-status-probe-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1947_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT.md`. It consumes CM-1946 and implements a local contract for a future component/action status probe. The contract accepts safe target/component/action identifiers and low-disclosure category/boolean/zero-counter evidence only, rejects raw/sensitive/live/request-body/read-shape/write/readiness drift without echo, keeps component/action status probe execution blocked now, keeps read-shape locked, preserves public MCP surface, and claims no readiness. Targeted tests passed `7/7`; default tests passed `4018/4018`. Next route is CM-1948 component/action status probe exact approval request packet, still non-authorizing and no-live.
 

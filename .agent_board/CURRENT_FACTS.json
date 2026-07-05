@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1947",
-  "validationId": "CMV-2050",
+  "taskId": "CM-1948",
+  "validationId": "CMV-2051",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "low_disclosure_component_action_status_probe_contract_no_live_no_request_body_no_read_shape",
+    "scope": "component_action_status_probe_exact_approval_request_packet_non_authorizing_no_live_no_request_body",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2051",
+      "scope": "CM-1948 component/action status probe exact approval request packet",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-2050",
       "scope": "CM-1947 low-disclosure component/action status probe contract",

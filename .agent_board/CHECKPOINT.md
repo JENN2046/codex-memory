@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1947 low-disclosure component/action status probe contract`.
-Current validation: `CMV-2050`.
+Current checkpoint: `CM-1948 component/action status probe exact approval request packet`.
+Current validation: `CMV-2051`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1948 Component/Action Status Probe Exact Approval Request Packet
+
+Status: `COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1948_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET.md`.
+- Consumed the CM-1947 local low-disclosure component/action status probe contract.
+- Prepared a non-authorizing exact approval request packet for one future `component_action_status_probe`.
+- Required safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, and CM-1947 `VcpNativeComponentActionStatusProbeContract` as the required pre-live boundary.
+- Required max component/action status probe attempts `1`, max network calls `1`, max runtime calls `1`, zero process-state inspection, zero service-start/stop/restart/listener-recheck budgets, no request-body generation, zero response-body/raw-error/log budgets, no stdout/stderr/config/env/secret/memory read, no memory/durable write, no endpoint/locator disclosure, no provider/API, no public MCP expansion, no config/startup/watchdog/dependency change, no release/deploy/cutover/push, no readiness claim, no read-shape probe, and low-disclosure receipt projection only.
+- Routed next work to CM-1949 exact approval request readiness review / Jenn boundary display, still non-authorizing and no-live.
+- Preserved that no retry, live/network call, VCPToolBox call, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe execution, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2051`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1947 Low-Disclosure Component/Action Status Probe Contract
 
