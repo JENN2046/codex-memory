@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1927 startup locator diagnosis closeout`.
-Current validation: `CMV-2030`.
-Current status: CM-1927 closes CM-1926 as an inconclusive consumed startup / locator diagnosis attempt. No retry is authorized; runtime startup state, service listener status, locator binding success, component/action reachability, and read-shape support remain unproven. Next route is CM-1928 receipt-capture hardening contract, source/test only and no-live.
+Current task: `CM-1928 startup locator diagnosis receipt-capture hardening contract`.
+Current validation: `CMV-2031`.
+Current status: CM-1928 adds a source/test-only receipt-capture hardening contract. It accepts only injected startup / locator diagnosis outcomes, projects deterministic low-disclosure receipt categories, rejects raw/sensitive/live/write/readiness drift without echo, and keeps runtime startup, service listener, locator binding, component/action, and read-shape facts unproven. Next route is CM-1929 receipt-capture hardening closeout / future live request route decision, still no-live.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1928 startup / locator diagnosis receipt-capture hardening contract. Keep CM-1928 source/test only: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
+Next action is CM-1929 receipt-capture hardening closeout / future live request route decision. Keep CM-1929 docs/status only unless a new exact approval packet is explicitly requested: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

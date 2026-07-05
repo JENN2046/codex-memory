@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1927 startup locator diagnosis closeout`.
-Current validation: `CMV-2030`.
+Current checkpoint: `CM-1928 startup locator diagnosis receipt-capture hardening contract`.
+Current validation: `CMV-2031`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1928 Startup Locator Diagnosis Receipt-Capture Hardening Contract
+
+Status: `COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_HARDENING_CONTRACT_NO_LIVE_CALL`
+
+Recorded:
+
+- Added `src/core/VcpNativeStartupLocatorDiagnosisReceiptCaptureContract.js`.
+- Added `tests/vcp-native-startup-locator-diagnosis-receipt-capture-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1928_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_HARDENING_CONTRACT.md`.
+- Locked a deterministic low-disclosure receipt projection over injected startup / locator diagnosis outcomes only.
+- Accepted outcome categories `connect_success`, `transport_error`, `timeout`, and `receipt_capture_error` as local contract material, not live runtime facts.
+- Preserved that runtime startup state, process count, target locator binding success, service listener reachability, component/action status probe, and read-shape route support remain unproven.
+- Rejected endpoint/URL values, raw locator values, config/env values or paths, tokens/credentials/secrets, request bodies, provider payloads, response bodies, raw error payloads, stdout/stderr/logs, raw memory text, memory ids, raw stores, raw audit rows, approval line material, process ids, command lines, unknown fields, nonzero counters, raw-body/log/endpoint/locator/write/readiness policy drift, and unsafe target references without echoing unsafe values.
+- Preserved unchanged public MCP surface.
+- Routed next work to CM-1929 receipt-capture hardening closeout / future live request route decision.
+- Preserved that no live call, retry, VCPToolBox call, process-state inspection, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2031`; source/test `node --check`, targeted contract test `7/7`, default `npm test -- --summary` `3997/3997`, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1927 Startup Locator Diagnosis Closeout
 

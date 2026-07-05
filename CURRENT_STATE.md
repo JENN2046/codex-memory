@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1927 startup locator diagnosis closeout |
-| Current task | `CM-1927 startup locator diagnosis closeout` |
-| Current validation | `CMV-2030` |
-| Current route | CM-1927 closes CM-1926 as an inconclusive consumed attempt and routes next to CM-1928 receipt-capture hardening contract, source/test only and no-live |
+| Status | CM-1928 startup locator diagnosis receipt-capture hardening contract |
+| Current task | `CM-1928 startup locator diagnosis receipt-capture hardening contract` |
+| Current validation | `CMV-2031` |
+| Current route | CM-1928 locks deterministic low-disclosure receipt capture for injected startup / locator diagnosis outcomes and routes next to CM-1929 receipt-capture hardening closeout before any future live request |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1928` adds `src/core/VcpNativeStartupLocatorDiagnosisReceiptCaptureContract.js`, `tests/vcp-native-startup-locator-diagnosis-receipt-capture-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1928_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_HARDENING_CONTRACT.md`. It hardens receipt capture after CM-1926's `receipt_capture_error_after_single_approved_attempt` by accepting only injected local outcome categories and projecting deterministic low-disclosure receipt categories. It rejects endpoint/URL values, raw locator values, config/env values or paths, tokens/credentials/secrets, request bodies, provider payloads, response bodies, raw error payloads, stdout/stderr/logs, raw memory text, memory ids, raw stores, raw audit rows, approval line material, process ids, command lines, unknown fields, nonzero counters, raw-body/log/endpoint/locator/write/readiness policy drift, and unsafe target references without echoing unsafe values. Targeted tests passed `7/7`; default tests passed `3997/3997`. CM-1928 does not retry CM-1926, perform a live call, call VCPToolBox, inspect process state, resolve or disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1929 receipt-capture hardening closeout / future live request route decision, still no-live unless Jenn later gives a new exact approval.
 
 `CM-1927` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1927_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT.md`. It closes CM-1926 as an inconclusive consumed exact-approved startup / locator diagnosis attempt. Accepted facts: CM-1926 attempt consumed, low-disclosure boundary preserved, receipt capture unsuccessful, diagnosis result unusable, runtime startup state unknown, process count unknown, target locator binding success unknown, service listener reachability unknown, component/action probe locked, read-shape locked, retry not allowed, and readiness not claimed. CM-1927 rejects any inference that runtime is not running, listener is unreachable, locator binding is invalid, live transport wrapper shape is confirmed, component/action probe is unlocked, read-shape is unlocked, retry is allowed, or readiness is claimed. It does not perform a live call, retry CM-1926, call VCPToolBox, inspect process state, disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1928 startup / locator diagnosis receipt-capture hardening contract, source/test only and no-live.
 
