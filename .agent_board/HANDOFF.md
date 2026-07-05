@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1946 component/action status probe preflight`.
-Current validation: `CMV-2049`.
-Current handoff: CM-1946 defines the no-live component/action status probe preflight and routes next to CM-1947 low-disclosure component/action status probe contract, local source/test/docs only.
+Current task: `CM-1947 low-disclosure component/action status probe contract`.
+Current validation: `CMV-2050`.
+Current handoff: CM-1947 implements the local low-disclosure component/action status probe contract and routes next to CM-1948 component/action status probe exact approval request packet, non-authorizing and no-live.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1946 defines the no-live component/action status probe prefl
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT_NO_LIVE_NO_REQUEST_BODY_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1946 defines only the preflight and requires a local low-disclosure contract before any exact approval request. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action probing, read-shape proof, and readiness claims remain forbidden now.
+Current status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT_NO_LIVE_NO_REQUEST_BODY_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1947 implements only the local low-disclosure contract and requires a later non-authorizing exact approval request packet before any future component/action probe can be approved. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action probing, read-shape proof, and readiness claims remain forbidden now.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeComponentActionStatusProbeContract.js`
+- `tests/vcp-native-component-action-status-probe-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1947_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1946_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1945_STARTUP_FAILURE_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1944_EXACT_APPROVED_STARTUP_FAILURE_DIAGNOSIS_RECEIPT.md`

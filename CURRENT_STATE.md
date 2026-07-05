@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1946 component/action status probe preflight |
-| Current task | `CM-1946 component/action status probe preflight` |
-| Current validation | `CMV-2049` |
-| Current route | CM-1946 defines no-live component/action status probe preflight and routes next to CM-1947 low-disclosure contract |
+| Status | CM-1947 low-disclosure component/action status probe contract |
+| Current task | `CM-1947 low-disclosure component/action status probe contract` |
+| Current validation | `CMV-2050` |
+| Current route | CM-1947 implements local low-disclosure component/action status probe contract and routes next to CM-1948 non-authorizing exact approval request packet |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1947` adds `src/core/VcpNativeComponentActionStatusProbeContract.js`, `tests/vcp-native-component-action-status-probe-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1947_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT.md`. It consumes CM-1946 and implements a local contract for a future component/action status probe. The contract accepts safe target/component/action identifiers and low-disclosure category/boolean/zero-counter evidence only, rejects raw/sensitive/live/request-body/read-shape/write/readiness drift without echo, keeps component/action status probe execution blocked now, keeps read-shape locked, preserves public MCP surface, and claims no readiness. Targeted tests passed `7/7`; default tests passed `4018/4018`. Next route is CM-1948 component/action status probe exact approval request packet, still non-authorizing and no-live.
 
 `CM-1946` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1946_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT.md`. It consumes CM-1945 and defines no-live preflight lanes for target safe-reference binding, component/action identifier binding, status probe shape, route outcome receipt, and read-shape separation. It carries forward safe target reference `operator-vcp-toolbox-service-ref` and safe component/action identifiers `KnowledgeBaseManager` / `knowledge_base.search` without resolving endpoint values, locator values, plugin config, auth material, runtime payloads, or memory content. Decision: CM-1945 route consumed, listener-level reachability accepted, target safe reference known, selected component/action safe identifiers known, component/action status probe preflight defined, component/action execution not allowed now, request body generation not allowed now, response body and raw error reads not allowed now, endpoint/locator disclosure not allowed now, exact approval required before any live probe, local contract required before exact approval request, read-shape locked, and readiness not claimed. Next route is CM-1947 low-disclosure component/action status probe contract, local source/test/docs only. CM-1946 does not retry CM-1944, perform live/network calls, call VCPToolBox, start/stop/restart runtime, inspect process state, recheck listener reachability, disclose endpoint/locator values, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, call MCP memory tools, probe component/action routing, perform read-shape proof, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, or claim readiness.
 

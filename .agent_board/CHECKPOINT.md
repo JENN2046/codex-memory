@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1946 component/action status probe preflight`.
-Current validation: `CMV-2049`.
+Current checkpoint: `CM-1947 low-disclosure component/action status probe contract`.
+Current validation: `CMV-2050`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1947 Low-Disclosure Component/Action Status Probe Contract
+
+Status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT_NO_LIVE_NO_REQUEST_BODY_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `src/core/VcpNativeComponentActionStatusProbeContract.js`.
+- Added `tests/vcp-native-component-action-status-probe-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1947_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT.md`.
+- Consumed the CM-1946 preflight and encoded a local low-disclosure contract for a future component/action status probe.
+- Accepted safe target reference `operator-vcp-toolbox-service-ref` and safe component/action identifiers `KnowledgeBaseManager` / `knowledge_base.search` only.
+- Locked evidence to category, boolean, safe identifier, and zero-counter fields across target safe-reference binding, component/action identifier binding, status probe shape, route outcome receipt, read-shape separation, and approval boundary lanes.
+- Rejected missing fields, unknown fields, nonzero or unknown counters, unsafe/mismatched target references, invalid component/action identifiers, sensitive/private/raw/live/request-body/read-shape/write/readiness drift, and private value echo.
+- Preserved that component/action probe execution is not allowed now, request body generation is false, response body read is not allowed, endpoint/locator values are undisclosed, read-shape remains locked, exact approval is required before any live probe, and readiness is not claimed.
+- Preserved public MCP surface unchanged.
+- Targeted tests passed `7/7`.
+- Default tests passed `4018/4018`.
+- Routed next work to CM-1948 component/action status probe exact approval request packet, non-authorizing and no-live.
+- Preserved that no retry, live/network call, VCPToolBox call, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe execution, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2050`; `node --check src/core/VcpNativeComponentActionStatusProbeContract.js`, `node --check tests/vcp-native-component-action-status-probe-contract.test.js`, targeted test `7/7`, `npm test -- --summary` `4018/4018`, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1946 Component/Action Status Probe Preflight
 
