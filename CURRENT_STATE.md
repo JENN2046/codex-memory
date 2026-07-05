@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1949 exact approval request readiness review / Jenn boundary display |
-| Current task | `CM-1949 exact approval request readiness review / Jenn boundary display` |
-| Current validation | `CMV-2052` |
-| Current route | CM-1949 displays non-authorizing Jenn boundary and blocks before CM-1950 until Jenn exact approval |
+| Status | CM-1950 exact-approved component/action status probe receipt |
+| Current task | `CM-1950 exact-approved component/action status probe receipt` |
+| Current validation | `CMV-2053` |
+| Current route | CM-1950 consumed the single approved component/action status probe and routes to CM-1951 closeout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1950` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1950_EXACT_APPROVED_COMPONENT_ACTION_STATUS_PROBE_RECEIPT.md`. Under Jenn's exact approval, it consumed exactly one component/action status probe for safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, and purpose `component_action_status_probe`. The CM-1947 pre-live contract accepted the boundary. Result: `statusCategory=component_action_status_probe_boundary_blocked`, `componentActionStatusCategory=boundary_blocked`, `routeStatusCategory=request_body_required_boundary_blocked`, target safe-reference category `listener_level_reachable_reference_only`, transport wrapper category `no_body_no_request_component_action_status_transport`, status class `boundary_blocked`, duration bucket `lt_100ms`, and zero write counters. CM-1950 consumed the single approved component/action status probe attempt, network call, and runtime call; retry is not authorized. It generated no request body, read no response body or raw error, read no logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclosed no endpoint or locator value, performed no process-state inspection, service start/stop/restart, listener recheck, MCP memory call, provider/API call, memory write, durable write, runtime/config/startup/watchdog/dependency/public MCP change, push, release, deploy, cutover, readiness, `RC_READY`, complete V8, or full bridge completion. Component/action reachability, route success, request-body safety, response shape, read-shape support, VCP native bridge readiness, production readiness, release readiness, cutover readiness, complete V8, and full bridge completion remain unproven. Next route is CM-1951 component/action status probe closeout / route decision, docs/status/governance only.
 
 `CM-1949` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1949_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It reviews CM-1948 as ready for Jenn boundary display and displays the exact boundary as non-authorizing material only. It grants no approval, generates no approval line or request body, performs no live action, keeps component/action status unknown, keeps route status unknown, keeps component/action probe execution blocked now, keeps read-shape locked, and claims no readiness. Next route is CM-1950 exact-approved component/action status probe execution, blocked until Jenn provides separate current exact approval matching the CM-1949 boundary.
 

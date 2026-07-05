@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1949 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2052`.
-Current handoff: CM-1949 displays the Jenn exact boundary as non-authorizing material and routes next to CM-1950 exact-approved component/action status probe execution, blocked until Jenn provides separate current exact approval.
+Current task: `CM-1950 exact-approved component/action status probe receipt`.
+Current validation: `CMV-2053`.
+Current handoff: CM-1950 consumed the single approved component/action status probe and routes next to CM-1951 closeout. Result is `boundary_blocked`; no request body was generated, no response body or raw error was read, component/action reachability is not proven, and read-shape remains locked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1949 displays the Jenn exact boundary as non-authorizing mat
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1949 displays only the non-authorizing Jenn boundary and does not authorize CM-1950. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action probing, read-shape proof, and readiness claims remain forbidden now.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_COMPONENT_ACTION_STATUS_PROBE_BOUNDARY_BLOCKED_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1950 consumed the one approved component/action status probe attempt and does not authorize retry or read-shape. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, read-shape proof, and readiness claims remain forbidden now.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1950_EXACT_APPROVED_COMPONENT_ACTION_STATUS_PROBE_RECEIPT.md`
 - `src/core/VcpNativeComponentActionStatusProbeContract.js`
 - `tests/vcp-native-component-action-status-probe-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1949_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
