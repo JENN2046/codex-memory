@@ -1,1366 +1,501 @@
-# AGENTS.md — codex-memory Sustained Autopilot v1.0
+# AGENTS.md - codex-memory Project-Level Operating Protocol
 
-Purpose: project-specific operating constitution for Codex/agents working inside the existing `codex-memory` repository.
+Version: Project-level filled template 1.0
+Date: 2026-07-05
+Use: Place this file at the `codex-memory` repository root, or use it as the project-specific source for a root `AGENTS.md`. It narrows and specializes Jenn's global L3 agent protocol for this repository.
 
-Default mode: `Smart Standing Authorization v3 - Budgeted Autonomy Envelope`.
-
-This file adapts the universal sustained local autopilot pattern to the real `codex-memory` project. It is not a blank-project scaffold. It is a continuation rail for an existing, mature `vcp_codex_memory` runtime.
-
-This file is the project constitution, not the live project journal. Keep durable operating rules here. Put volatile phase status, current commit facts, temporary blockers, active task state, approval packets, and handoff details in `STATUS.md`, `.agent_board`, or dedicated docs.
+This project-level file clarifies local workflow, commands, delivery surfaces, memory locations, branch rules, CI/deploy risks, and no-live governance boundaries for `codex-memory`. It may not bypass Jenn's global core hard stops.
 
 ---
 
-## Task Tier Matrix
+## 1. Project Identity and Scope
 
-Use the smallest governance tier that fits the work, but never below the minimum tier implied by touched files, systems, or evidence claims.
+Project name: `codex-memory`
+Repository: `/home/jenn/AGENTS_OS_Workspace/memory/codex-memory`; remote `origin` is `git@github.com:JENN2046/codex-memory.git`
+Primary language / stack: Node.js 22+, CommonJS, MCP server/runtime, CLI tools, local storage/index/audit helpers
+Package manager: `npm` with `package-lock.json`
+Main purpose: Local-first, auditable Codex/Claude memory governance bridge and compatibility runtime. The repository protects the existing `vcp_codex_memory` MCP service while governing VCPToolBox-native memory bridge work through low-disclosure contracts, receipts, validation gates, and status surfaces.
 
-## Context Intake Contract
+Authorized default work scope:
 
-Default project context must stay small and current. Use [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md), [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json), fresh Git output, changed files, validation output, explicit boundary declaration, and the requested decision before loading historical logs.
+* `src/`
+* `tests/`
+* `docs/`
+* `.agent_board/`
+* `scripts/`
+* `schemas/`
+* `examples/`
+* `benchmarks/active-memory-suite/` when validating active-memory fixtures
+* `README.md`, `STATUS.md`, `CURRENT_STATE.md`, `DOCS_GOVERNANCE.md`, `VALIDATION.md`, phase/backlog/taskbook markdown files when directly relevant
+* `package.json` scripts only when the task explicitly involves command wiring; dependency changes require exact scope
 
-Long historical surfaces such as `.agent_board/CHECKPOINT.md`, `.agent_board/HANDOFF.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/TASK_QUEUE.md`, and `STATUS.md` archives are not default context. Load them by targeted task id, validation id, evidence path, or archive index only when the current decision requires exact historical detail. The governing intake rules live in [docs/CONTEXT_INTAKE_CONTRACT.md](/A:/codex-memory/docs/CONTEXT_INTAKE_CONTRACT.md).
+Out of scope unless Jenn explicitly authorizes:
 
-### Tier 0 — Read / Explain
+* production configuration;
+* release automation;
+* deployment workflows;
+* billing / paid provider configuration;
+* credentials or secret values;
+* destructive migrations;
+* broad architecture rewrites;
+* VCPToolBox core-code modification;
+* public MCP tool or schema expansion;
+* real memory import/export/migration;
+* raw private memory, raw store, raw audit, raw log, or raw `.jsonl` reads;
+* readiness, release, deploy, cutover, or `RC_READY` claims.
 
-Use for read-only scans, explanations, summaries, and command-output reporting.
-No file writes, `.agent_board` update, or validation ledger entry is required unless the answer makes a claim that needs proof.
+Protected current realities:
 
-### Tier 1 — Light Local
-
-Use for small local changes that do not alter route, status, validation policy, runtime behavior, memory behavior, public contracts, current-facts schema, or external state.
-Examples include typo-level docs edits, narrow non-governance wording fixes, and tiny local helper comments.
-Use Git status, diff inspection, and targeted validation when useful.
-`.agent_board` and validation log updates are not required by default.
-
-### Tier 2 — Governed Local
-
-Tier 2 is the minimum for changes to:
-
-- `AGENTS.md`
-- `STATUS.md`
-- `DOCS_GOVERNANCE.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `PHASE_*_PLAN.md`
-- `.agent_board/*`
-- `.agent_board/CURRENT_FACTS.json`
-- `scripts/validate*`
-- `scripts/*gate*`
-- `scripts/*approval*`
-- package scripts
-- tests or fixtures that change governance, readiness, route, runtime policy, current-facts schema, or validation policy
-
-Tier 2 requires relevant validation and a validation log entry when the change affects route, status, validation gates, current-facts snapshot semantics, or sustained task state.
-For current status snapshots, keep schema v2 rules: `.agent_board/CURRENT_FACTS.json` is a committed status/validation snapshot, while live branch/head/origin/ahead-behind facts must come from fresh Git commands.
-
-### Tier 3 — Runtime / Red Lane
-
-Tier 3 covers hard-stop or exact-approval work. This tier does not cancel the Smart Standing Authorization v3 Amber exceptions in section 7.1.1; bounded/exact Amber work may proceed only when that section's scope, budget, validation, and receipt requirements are satisfied.
-
-- `.env`, secrets, tokens, provider keys, or credentials
-- provider/profile real calls, except task-relevant bounded provider smoke/benchmark calls that fit the v3 Amber envelope
-- real memory reads/writes, except exact `search_memory` / `memory_overview`, exact sanitized `record_memory`, and exact real-memory read queries that fit the v3 Amber envelope
-- raw `.jsonl`, raw audit, or real store access
-- startup/watchdog/config changes
-- public MCP tool or schema expansion
-- migration/import/export/apply/restore
-- durable memory/audit mutation outside temp-local test stores
-- push, PR, release, deploy, tag, cutover, or readiness claims
-
-Tier 3 requires exact approval where project gates require it, full validation evidence, and explicit blocker/rollback reporting.
+* MCP service identity remains `vcp_codex_memory`.
+* Public tools remain `record_memory`, `search_memory`, and `memory_overview`, unless a separately authorized project phase explicitly changes this.
+* VCPToolBox is the native memory runtime/intelligence owner for bridge work; `codex-memory` is the governance bridge/control plane.
+* Docs-only, fixture-only, no-mutation, and read-only evidence must not be described as live runtime readiness.
 
 ---
 
-## 0. Plain Meaning
+## 2. Applicable Global Protocol
 
-`codex-memory` is already alive.
+Follow Jenn's global `AGENTS.md` as the default authority for:
 
-It is not waiting for a skeleton.
+* L3 autonomous delivery;
+* core hard stops;
+* read-only boundaries;
+* Git safety;
+* validation truthfulness;
+* memory safety;
+* reporting.
 
-It already has HTTP/stdio MCP entrypoints, the `vcp_codex_memory` service contract, `record_memory` / `search_memory` / `memory_overview`, diary-compatible writes, SQLite shadow store, vector indexing, write/recall audit, active-memory compatibility, `DeepMemo` / `TopicMemo`, provider/profile tooling, compare/rollback harnesses, and mainline gates.
+This project file narrows and specializes those rules for this repository.
 
-Codex should continue this project by:
+Instruction precedence inside this repository:
 
-1. Reading the real README and source behavior.
-2. Inspecting workspace state.
-3. Maintaining `.agent_board`.
-4. Decomposing clear goals into task queues.
-5. Making small local verified changes.
-6. Running the correct project-specific validation gate.
-7. Updating checkpoints.
-8. Creating guarded local commits only when strict conditions are met.
-9. Continuing until complete or hard-stopped.
+1. Higher-level system / runtime / tool / safety limits.
+2. Jenn's explicit current instruction.
+3. Current task brief / issue / taskbook / authorization boundary.
+4. Nearest applicable directory-level `AGENTS.override.md` or `AGENTS.md`.
+5. This repository-root `AGENTS.md`.
+6. Jenn's global `AGENTS.md`.
+7. Project docs and tool outputs as contextual evidence.
 
-Do not replace the real README with generic vision.
+No project instruction may authorize bypassing global core hard stops.
 
-Do not redraw the four-layer architecture without evidence.
+Default project posture:
 
-Do not bypass the gates.
-
-Do not push unless the user explicitly authorizes it or the A4.8 safe-push policy applies and readiness is ready.
-
-If the A4.8 safe-push policy does not fully pass, or if push readiness is uncertain, stale, contradicted by repository reality, or missing required evidence, stop before push and report the blocker.
-
----
-
-## 1. Language Policy
-
-Default response language: Simplified Chinese.
-
-Keep the following in original language unless the user explicitly asks for translation:
-
-- code
-- commands
-- file paths
-- API names
-- package names
-- branch names
-- commit hashes
-- config keys
-- environment variable names
-- logs
-- errors
-- CLI output
-- tool names
-- test names
-
-Reports should be direct, compact, and evidence-first.
+* Standard profile: `AGENTS.md` plus `.agent_board/`.
+* BHA state is absent unless repository reality later proves BHA runtime surfaces exist.
+* Smart Standing Authorization v3 is the local governance model for bounded Green/Amber work.
+* Red Lane remains manual: push, PR, tag, release, deploy, destructive commands, secret reads, broad private data scans, public MCP expansion, config/watchdog/startup mutation, real memory migration, or readiness claims.
 
 ---
 
-## 2. Project Current Reality
+## 3. Repository Map
 
-The repository is an independent `vcp_codex_memory` implementation whose purpose is to let Codex memory write, retrieval, audit, and recall enhancement no longer depend on the `VCPToolBox` runtime.
+Key paths:
 
-Current protected realities include:
+| Path | Purpose | Agent behavior |
+|---|---|---|
+| `src/core/` | Memory domain services, contracts, gates, helpers, VCP-native governance contracts | Editable inside task scope; add targeted tests for behavior/boundary changes |
+| `src/storage/` | Diary, SQLite, vector index, chat index, audit, cache | High risk; prefer fixture/temp stores; do not read raw private runtime stores |
+| `src/recall/` | Candidate generation, TagMemo, EPA, ResidualPyramid, rerank, recall audit | Validate with targeted tests and active-memory compare/rollback when touched |
+| `src/adapters/` | Codex MCP and VCP compatibility adapters | Public contract sensitive; preserve tool/schema compatibility |
+| `src/cli/` | CLI entrypoints and validation/runtime utilities | Inspect before running; dry-run by default for migration/profile/cleanup commands |
+| `tests/` | Node test suite | Editable inside scope; prefer focused tests plus default suite for shared behavior |
+| `docs/` | Documentation, receipts, plans, archive, taskbooks | Approved project memory; keep claims aligned to source and validation evidence |
+| `.agent_board/` | Sustained task queue, current facts, validation log, handoff, ledger, checkpoint | Required active governance surface for non-trivial work |
+| `scripts/` | Local validation and helper scripts | Inspect before running; scripts must not push/deploy/edit secrets |
+| `benchmarks/` | Active-memory standard suite and fixtures | Fixture validation only unless current task explicitly authorizes broader runtime work |
+| `schemas/` | Contract/schema artifacts | Editable with corresponding tests/docs |
+| `examples/` | Examples and sample configs | Avoid real secrets or private paths |
+| `.github/workflows/ci.yml` | CI definition | High risk; workflow changes need explicit scope and local validation |
+| `data/` | Ignored local runtime storage and indexes | Treat as private/raw runtime state; do not inspect contents by default |
+| `logs/*.log`, `logs/*.jsonl` | Ignored generated logs/audit streams | Do not read raw logs/audit streams unless exact approval allows it |
+| `.colameta/`, `.omc/`, `.claude/`, `tmp/`, `.tmp/` | Local/private/scratch state | Do not move into tracked project state; inspect contents only when explicitly authorized and non-secret |
 
-- MCP service name: `vcp_codex_memory`
-- public tools:
-  - `record_memory`
-  - `search_memory`
-  - `memory_overview`
-- HTTP MCP and stdio MCP entrypoints
-- default recommendation: HTTP MCP for Codex Desktop stability
-- diary-compatible write path
-- parallel write path into SQLite shadow store, vector index, and audit logs
-- chunk index and candidate cache
-- write audit and recall audit
-- `Time` / `Group` / `Rerank` / `TagMemo` / dedup / rerank
-- `LightMemo` directory strategy
-- embedding provider adapter
-- embedding fallback chain: `bge-m3-local -> NVIDIA baai/bge-m3 -> local-hash`
-- rerank provider adapter
-- Phase C active memory
-- `DeepMemo` / `TopicMemo` donor-compatible behavior
-- compare and rollback harnesses
-- Phase D gray rollout records
-- Phase E hardening, diagnostics, standard suite, ordering tie-breaker work
-- default mainline gate
-- HTTP observe CLI
-- rollback mainline plan CLI
-- provider smoke / benchmark
-- profile health / profile gate
-- V8 diagnostic CLI
-
-Do not treat these as future features unless source proves otherwise.
+Add directory-level overrides if a sub-tree needs stricter rules.
 
 ---
 
-## 3. Project Final Goal
+## 4. Setup and Local Commands
 
-Final goal:
-
-`codex-memory` should become the default Codex- and Claude-oriented VCP memory mainline: local-first, auditable, rollback-ready, provider-flexible, VCP-compatible, and safe for sustained Codex/Claude workflows.
-
-This means hardening the existing runtime into a long-term memory spine for:
-
-- Codex
-- Claude
-- VCP-compatible donor behavior and migration references
-
-The goal is not to restart the project.
-
-The goal is to continue from existing Phase C/D/E work toward full VCP memory parity and stronger governance.
-
----
-
-## 4. Final Capability Target
-
-The final capability target is a map, not the current task queue.
-
-Codex must not attempt to implement all final capabilities at once.
-
-Current work must be selected from the user request, repository docs, `STATUS.md`, `PHASE_NAVIGATION.md`, `PHASE_E_BACKLOG.md`, source reality, or `.agent_board`.
-
-### 4.1 Current Implemented Capabilities to Protect
-
-Protect and preserve:
-
-- `vcp_codex_memory` MCP service identity
-- HTTP MCP default mainline
-- stdio MCP debug path
-- `record_memory`
-- `search_memory`
-- `memory_overview`
-- diary compatibility
-- SQLite shadow store
-- vector index
-- write audit
-- recall audit
-- candidate cache
-- active-memory index
-- DeepMemo CLI
-- TopicMemo CLI
-- compare harness
-- rollback readiness harness
-- mainline gate
-- HTTP observe
-- rollback plan
-- provider smoke
-- provider benchmark
-- profile health
-- profile gate
-- embedding profile fingerprint behavior
-- LightMemo directory semantics
-- donor-style errors and diagnostics
-- standard suite fixtures and manifests
-
-### 4.2 Protected Compatibility Capabilities
-
-Changing these is high risk:
-
-- MCP tool contract
-- donor-style `DeepMemo` envelope and result semantics
-- donor-style `TopicMemo` envelope and result semantics
-- donor-style error messages and diagnostics
-- error `meta` placement
-- blocked/effective keyword semantics
-- advanced query syntax behavior
-- `maid` / `folder` / excluded folders / directory alias behavior
-- topic ordering tie-breakers
-- active-memory standard suite behavior
-- rollback readiness criteria
-- HTTP MCP 7605 default mainline
-- legacy 6005 rollback target discovery and verification
-- embedding profile fingerprint and migration safety
-
-### 4.3 Final VCP Memory Parity Capabilities
-
-Long-term direction:
-
-- VCP passive memory parity
-- VCP active memory parity
-- DeepMemo / TopicMemo high compatibility
-- TagMemo semantic association hardening
-- EPA and ResidualPyramid recall-chain hardening
-- LightMemo directory semantics stability
-- recall quality evaluation
-- memory compaction
-- stale memory detection
-- supersession / tombstone / forget flow
-- memory proposal / approval flow
-- Codex/Claude client-scoped memory proposal and approval flow
-- project/user/agent/task/checkpoint/handoff memory layering
-- safe import/export/migration chain
-- profile migration quality gate
-- provider fallback quality benchmark
-- observability/admin review surface
-- safe integration with Codex and Claude MCP clients; VCPToolBox remains donor/reference only
-
-### 4.4 Next Strategic Direction
-
-Reasonable next-phase labels:
-
-```text
-Phase F — VCP full-memory parity hardening
-Phase G — memory governance / proposal / supersession / tombstone
-Phase H — Codex/Claude client governance and memory scoping
-Phase I — observability / admin review surface
-```
-
-These labels are strategic direction, not automatic authorization.
-
----
-
-## 5. Authority Order
-
-When instructions conflict, follow this order:
-
-1. Safety and hard stop gates.
-2. Current explicit user instruction.
-3. Current repository state and observed command output.
-4. Current source behavior.
-5. Existing README and tracked phase docs.
-6. Closest project `AGENTS.md`.
-7. `.agent_board` current state.
-8. Other checked-in docs.
-9. Global Codex guidance.
-10. Memory or previous summaries.
-11. General model knowledge.
-
-Source behavior and command output outrank old memory and old checkpoints.
-
-If README and source disagree, inspect tests/source and report drift.
-
----
-
-## 6. Existing Architecture Is Binding
-
-The current repository is organized around four primary layers:
-
-```text
-src/core/      unified memory domain services and flows
-src/storage/   diary, SQLite, vector index, chat index, audit, cache
-src/recall/    candidate generation, TagMemo, EPA, ResidualPyramid, rerank, audit
-src/adapters/  Codex MCP, VCP passive memory, VCP active memory compatibility
-```
-
-Main entrypoint families include:
-
-```text
-src/app.js
-src/index.js
-src/http-index.js
-src/cli/rebuild-shadow.js
-src/cli/active-memory.js
-src/cli/deepmemo.js
-src/cli/topicmemo.js
-src/cli/compare-vcp-active-memory.js
-src/cli/rollback-active-memory.js
-src/cli/mainline-gate.js
-src/cli/http-observe.js
-src/cli/mainline-rollback.js
-src/cli/provider-smoke.js
-src/cli/provider-benchmark.js
-src/cli/rebuild-profile.js
-src/cli/cleanup-legacy-chunks.js
-src/cli/profile-health.js
-src/cli/shadow-compare.js
-src/cli/profile-gate.js
-src/cli/v8-diagnose.js
-```
-
-Do not replace this with a speculative new architecture.
-
-New code should fit the existing four-layer map unless source evidence and user instruction justify otherwise.
-
----
-
-## 7. Default Autonomy: Smart Standing Authorization v3
-
-Default mode:
-
-```text
-Smart Standing Authorization v3 - Budgeted Autonomy Envelope
-```
-
-Meaning:
-
-Codex starts every project startup, resume, and Autopilot Rule Intake from the Smart Standing Authorization v3 model.
-
-Standing owner authorization grants Codex a bounded autonomy envelope. Within that envelope, Codex must not ask for step-by-step approval. Codex should plan, execute, validate, repair once when safe, record receipts, and continue until the goal is complete or a Red condition appears.
-
-Default movement is lane-based:
-
-- Green Lane: direct local work with after-the-fact recording, including docs, fixtures, tests, board updates, read-only checks, local validation, and small reversible repairs that do not touch external services, true memory, dependencies, secrets, config, watchdog, startup, production, or remote state.
-- Amber Lane: continuous automatic work inside the envelope without step-by-step approval, only when the goal is clear, scope is exact, budget remains, validation is obvious, and every meaningful external/write action records a receipt.
-- Red Lane: hard stop and explicit user approval required.
-
-Codex should not stop for ordinary implementation details.
-
-Codex should stop only for Red conditions, unsafe state, unclear goal that cannot be safely narrowed, or validation/design failure requiring human decision.
-
-### 7.1 A4.8 Legacy Local-Safe Rail And Green Lane Substrate
-
-`A4.8 Safe Project Operator Rail` remains available, but it is no longer the default authority model.
-
-A4.8 is now the legacy local-safe rail and Green Lane substrate for v3. It supplies the existing local inspection, roadmap/backlog/board selection, validation selection, guarded commit, push-readiness, and safe-push mechanics. It does not replace the v3 lane model, budget envelope, receipt rule, or Red Lane hard stops.
-
-When used as the Green Lane substrate, A4.8 lets Codex select the next safe local phase from the roadmap/backlog/board, split work into planning / fixture / dry-run / runtime / gate / observability subphases, run validation selection automatically, create guarded commits, run push readiness, and safe-push only when the safe-push policy fully passes.
-
-Fail-closed rule: if any safe-push requirement is unmet, unknown, stale, contradicted by Git state, blocked by A5 hard stops, or missing evidence, Codex must stop before push. Push-readiness checks are allowed under A4.8; actual push is allowed only when the safe-push policy applies completely or the user gives explicit push authorization.
-
-Reference docs:
-
-- [SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md)
-- [A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)
-- [STANDING_OWNER_SMART_AUTHORIZATION_V3.md](/A:/codex-memory/docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md)
-- [SAFE_PUSH_POLICY.md](/A:/codex-memory/docs/SAFE_PUSH_POLICY.md)
-- [VALIDATION_SELECTION_MATRIX.md](/A:/codex-memory/docs/VALIDATION_SELECTION_MATRIX.md)
-- [AUTOPILOT_FAILURE_RECOVERY.md](/A:/codex-memory/docs/AUTOPILOT_FAILURE_RECOVERY.md)
-
-A4.8 is not unlimited permission and is not a separate override above v3. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview` unless a dedicated approved phase explicitly authorizes expansion. Smart Standing Authorization v3 may allow exact, budgeted, receipted Amber work, but Red Lane remains manual, including broad real-memory scan/export, raw private data exposure, public MCP tool/schema expansion, secrets/env edits, config/watchdog/startup changes, release/tag/deploy, destructive commands, and stale branch merge/rebase/cherry-pick.
-
-### 7.1.1 Smart Standing Authorization v3
-
-Default standing owner authorization grants Codex a bounded autonomy envelope:
-
-```text
-Smart Standing Authorization v3 - Budgeted Autonomy Envelope
-```
-
-Core rule:
-
-```text
-Standing owner authorization grants Codex a bounded autonomy envelope.
-Within that envelope, Codex must not ask for step-by-step approval.
-Codex should plan, execute, validate, repair once when safe, record receipts, and continue until the goal is complete or a Red condition appears.
-```
-
-Lane model:
-
-- Green Lane: direct local work with after-the-fact recording, including docs, fixtures, tests, board updates, read-only checks, local validation, and small reversible repairs that do not touch external services, true memory, dependencies, secrets, config, watchdog, startup, production, or remote state.
-- Amber Lane: continuous automatic work inside the envelope without step-by-step approval, only when the goal is clear, scope is exact, budget remains, validation is obvious, and every meaningful external/write action records a receipt.
-- Red Lane: hard stop and explicit user approval required.
-
-Codex-memory Amber examples include bounded provider smoke/benchmark only when task-relevant, bounded runtime observe/local probe without config or startup change, exact `search_memory` / `memory_overview`, exact sanitized `record_memory` with default maximum one write, exact real-memory read query without broad scan/export, exact VCPChat/VCPToolBox read, exact small dependency action with package/action list, and local code/docs/tests/fixtures edits inside project gates.
-
-Red Lane includes push, PR, tag, release, deploy, force push, history rewrite, destructive action, secret value read/edit, raw private data or raw chat history exposure, broad real memory scan/export, real VCP memory import/migration, wide VCPChat/VCPToolBox write, public MCP expansion, Codex/Claude config change, watchdog/startup install/update/remove, dependency change without exact package/action list, audit fix, batch upgrade, package manager switch, uncapped cost, unbounded loops, overwrite without explicit allowance, non-obvious validation failure, and readiness/cutover/`RC_READY` claim without required evidence.
-
-Default autonomy envelope:
-
-```yaml
-default_autonomy_envelope:
-  max_provider_calls: 3
-  max_api_calls: 5
-  max_mcp_tool_calls: 5
-  max_runtime_probe_minutes: 10
-  max_external_read_files: 20
-  max_real_memory_read_queries: 5
-  max_memory_writes: 1
-  max_write_files: 10
-  max_dependency_actions: 2
-  max_retry_per_transient_failure: 1
-  overwrite_existing_files_allowed: false
-  secret_value_read_allowed: false
-  raw_private_data_print_allowed: false
-  broad_real_memory_scan_allowed: false
-  public_mcp_expansion_allowed: false
-  config_watchdog_startup_change_allowed: false
-  push_allowed: false
-  tag_release_deploy_allowed: false
-  destructive_action_allowed: false
-```
-
-Each meaningful Amber external or write action must record at least: `task_id`, `lane`, `envelope_id`, `action_performed`, `target_systems`, `calls_used`, `files_read`, `files_written`, `memory_queries_used`, `memory_writes_used`, `dependency_actions_used`, `validation_run`, `validation_result`, `rollback_or_cleanup_available`, `next_auto_step_allowed`, and `stop_reason`.
-
-This policy does not create readiness. It preserves `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`, keeps docs-only and fixture-only evidence separate from runtime readiness, and does not expand public MCP tools.
-
-### 7.1.2 AGENTS v0.3.1 Compatibility Boundary
-
-AGENTS v0.3.1 concepts may be used selectively as wording and review aids. They do not replace this project `AGENTS.md`, weaken codex-memory gates, or change current status vocabulary.
-
-Current repository profile is `Standard`: `AGENTS.md` plus `.agent_board/`.
-
-Current BHA state is `BHA_ABSENT`: no `.bha/`, no `scripts/bha-run.js`, and no `scripts/bha-verify.js`.
-
-Therefore, Codex must not claim BHA-backed runtime proof, BHA-enforced closeout, or BHA authorization in this repository unless BHA runtime surfaces are later added and verified against current repository reality.
-
----
-
-## 7.2 Push Authority Rule
-
-Push is allowed only through one of two routes:
-
-1. The user explicitly authorizes the exact push action.
-2. `A4.8 Safe Project Operator Rail` is explicitly active and the safe-push policy fully passes.
-
-Safe-push requires fresh repository reality, current validation evidence, clean scope, no unresolved A5 hard stop for the push target, no secret/dependency/config/runtime-data surprise, and no stale branch or remote ambiguity.
-
-If any push requirement is unmet, unknown, stale, contradicted by Git state, or missing evidence, Codex must stop before push and report the blocker. Push-readiness checks may continue locally; actual push must not occur.
-
----
-
-## 8. `.agent_board` Persistent Track
-
-Codex must maintain `.agent_board` at repository root for sustained work.
-
-Required files:
-
-```text
-.agent_board/TASK_QUEUE.md
-.agent_board/CHECKPOINT.md
-.agent_board/RUN_STATE.md
-.agent_board/HANDOFF.md
-.agent_board/BLOCKERS.md
-.agent_board/DECISIONS.md
-.agent_board/FILE_LOCKS.md
-.agent_board/RISK_REGISTER.md
-.agent_board/VALIDATION_LOG.md
-```
-
-`.agent_board` should track codex-memory-specific state:
-
-- current area
-- affected subsystem
-- required validation
-- last gate result
-- MCP mode assumption
-- HTTP health
-- compare result
-- rollback result
-- profile gate result
-- audit impact
-- recall impact
-- guarded auto-commit eligibility
-
-`.agent_board` is the rail.
-
-Repository reality is the ground.
-
----
-
-## 9. Work Categories
-
-Use these area labels in `.agent_board/TASK_QUEUE.md`:
-
-```text
-P0-mainline-health
-P1-donor-compatibility
-P2-active-memory
-P3-provider-profile
-P4-http-runtime
-P5-rollback-readiness
-P6-docs-drift
-P7-vcp-parity-hardening
-P8-memory-governance
-P9-codex-claude-client-scope
-P10-observability-admin
-```
-
-Each task should include:
-
-- task id
-- phase/area
-- target files
-- risk
-- status
-- required validation
-- rollback check
-- gate requirement
-- notes
-
----
-
-## 10. Initialization Loop
-
-At the beginning of non-trivial repository work, implementation work, validation work, branch-sensitive work, rollback-sensitive work, migration-sensitive work, release-like work, or commit/push work:
-
-1. Inspect Git state.
-2. Read `README.md`.
-3. Read `STATUS.md` if present.
-4. Read `PHASE_NAVIGATION.md` if present.
-5. Read `PHASE_E_BACKLOG.md` if present.
-6. Read existing `.agent_board`.
-7. Resolve stale board state against repository reality.
-8. Decompose the goal into queue items.
-9. Select one `in_progress` item.
-10. Begin safe local execution.
-
-For small read-only questions, narrow reviews, typo-level docs edits, or targeted single-file checks, use targeted inspection instead of the full initialization loop. Still inspect Git state before editing, validation, commit, push-readiness, or any action that could affect user-owned work.
-
-Required Git checks:
-
-```bash
-git branch --show-current
-git status --short
-git diff --stat
-```
-
-For branch-sensitive, rollback-sensitive, migration-sensitive, release-like, or commit work:
-
-```bash
-git log --oneline --decorate -n 10
-```
-
-### 10.1 Startup Fact Capsule
-
-For non-trivial repository work, report these startup facts when they materially affect scope, risk, validation, handoff, or push-readiness:
-
-- active profile: `Standard` unless BHA runtime surfaces are present and verified
-- BHA state: `BHA_ABSENT` unless BHA runtime surfaces are present and verified
-- current autonomy model: Smart Standing Authorization v3 - Budgeted Autonomy Envelope
-- A4.8 status: legacy local-safe rail and Green Lane substrate
-- branch and worktree state
-- current goal source
-- next safe local task
-
-This capsule is an orientation aid only. It does not weaken hard stops, validation gates, project-specific status vocabulary, or `NOT_READY_BLOCKED`.
-
----
-
-## 11. Sustained Execution Loop
-
-Continue until done or hard-stopped:
-
-1. Select next highest-priority safe task.
-2. Confirm affected subsystem.
-3. Inspect source/tests/docs.
-4. Make the smallest useful change.
-5. Inspect diff.
-6. Run targeted validation.
-7. Run gate-level validation if subsystem requires it.
-8. If validation passes after a repair, perform the Post-Fix Re-review Gate before marking task `done`.
-9. If validation passes and any required Post-Fix Re-review Gate has no actionable findings, mark task `done`.
-10. If validation fails and fix is obvious, attempt one narrow fix.
-11. Rerun validation.
-12. If still failing, mark `blocked`.
-13. Update `.agent_board`.
-14. Create checkpoint.
-15. Consider Guarded Auto-Commit.
-16. Continue to next safe task.
-
-Do not batch unrelated changes.
-
-Do not bypass validation because the change "looks small."
-
----
-
-## 12. Validation Contract
-
-Validation is part of completion.
-
-Use result labels:
-
-```text
-COMPLETED_VALIDATED
-COMPLETED_UNVALIDATED
-PARTIAL
-BLOCKED
-FAILED
-```
-
-Do not say tests passed if they were not run.
-
-Do not claim full validation if only targeted validation ran.
-
-If validation is unavailable, state why.
-
-### 12.0 Post-Fix Re-review Gate
-
-After every executed repair, Codex must perform at least one re-review pass before stopping.
-
-This gate applies after bug fixes, security fixes, review-finding fixes, validation-failure repairs, and follow-up fixes produced by a previous re-review.
-
-The re-review pass must:
-
-- inspect the final diff and the changed source/test/docs context
-- check whether the repair introduced regressions, side effects, contract drift, unsafe authorization changes, provider/API calls, secret exposure, data mutation, readiness overclaims, or other vulnerabilities inside the changed scope
-- verify that tests or validation evidence cover the repaired boundary, or state the validation gap plainly
-- record the re-review result in the final report and in `.agent_board` when sustained work is active
-
-If re-review finds an actionable issue that is safe and inside scope, Codex should fix it, rerun relevant validation, and perform another re-review pass.
-
-Codex may stop only when the re-review has no actionable findings in the changed scope, or when a hard stop / human decision blocker is reached.
-
-Do not overclaim global safety. Say "no actionable findings in the changed scope" unless broader audited evidence exists.
-
-### 12.1 Dry-Run Acceptance Wording
-
-Use precise acceptance wording:
-
-- `docs-only`: documentation or board state only
-- `fixture-only`: synthetic fixtures only, no real memory or runtime store
-- `no-mutation`: inspected or executed path produced no intended mutation
-- `read-only`: no write path, no service or config mutation, no durable state change
-- `live-runtime`: actual runtime or service evidence, never implied by docs-only or fixture-only work
-
-Do not treat docs-only, fixture-only, no-mutation, or read-only proof as runtime readiness, cutover readiness, production readiness, or `RC_READY`.
-
----
-
-## 13. Codex-Memory Validation Matrix
-
-### 13.1 Docs-only Change
-
-Minimum:
-
-```text
-inspect diff
-verify no contradiction with README/source reality
-verify no secret exposure
-```
-
-If docs mention commands, verify they exist in `package.json` where possible.
-
-### 13.2 Generic Source Change
-
-Minimum:
-
-```bash
-npm test
-```
-
-If a narrower relevant test exists, run it first.
-
-### 13.3 MCP Tool or Contract Change
-
-Run targeted tests, then:
-
-```bash
-npm run gate:mainline:strict
-```
-
-If HTTP runtime behavior is involved:
-
-```bash
-npm run start:http:ensure
-npm run observe:http -- --json
-```
-
-### 13.4 HTTP MCP Startup / Watchdog / Self-Healing Change
-
-Use:
-
-```bash
-npm run start:http:ensure
-npm run observe:http -- --json
-npm run start:http:watchdog:once
-npm run gate:mainline
-```
-
-Installing or modifying startup/watchdog tasks requires explicit approval.
-
-### 13.5 Active Memory / DeepMemo / TopicMemo Change
-
-Use:
-
-```bash
-npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match
-npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready
-```
-
-For broad/mainline-sensitive changes:
-
-```bash
-npm run gate:mainline:strict
-```
-
-### 13.6 Ordering / Tie-Breaker Change
-
-Use targeted ordering validation:
-
-```bash
-node --test .\tests\phase-c-active-recall.test.js
-npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category ordering --json --require-match
-npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category ordering --json --require-ready
-```
-
-Then run broader validation if shared recall code is touched.
-
-### 13.7 Recall Main Chain / TagMemo / EPA / ResidualPyramid / Rerank Change
-
-Use:
-
-```bash
-npm test
-npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match
-npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready
-npm run gate:mainline
-```
-
-If MCP/HTTP contract is touched:
-
-```bash
-npm run gate:mainline:strict
-```
-
-### 13.8 LightMemo Directory Strategy Change
-
-Validate:
-
-- `maid`
-- `folder`
-- `maid AND (folder1 OR folder2)`
-- `search_all_knowledge_bases=true`
-- excluded folders
-- directory alias map
-
-Run targeted tests plus standard suite compare/rollback.
-
-### 13.9 Provider / Embedding / Rerank Change
-
-Never expose provider keys.
-
-Use only when task is provider-related:
-
-```bash
-npm run provider-smoke -- --json
-npm run provider-benchmark -- --json
-```
-
-Provider calls may use external configured services. Do not run them casually for unrelated work.
-
-### 13.10 Embedding Profile / Fingerprint / Profile Migration Change
-
-Default to dry-run only:
-
-```bash
-npm run rebuild-profile -- --dry-run --json
-npm run profile-health
-npm run shadow-compare -- --query "embedding profile migration"
-npm run profile-gate -- --json --summary-only
-```
-
-Do not run:
-
-```bash
-npm run rebuild-profile -- --confirm --json
-```
-
-unless explicitly approved.
-
-### 13.11 Shadow Store / Diary / Vector Index / Candidate Cache Change
-
-Prefer fixture tests.
-
-Be cautious with:
-
-```bash
-npm run rebuild-shadow
-```
-
-Real shadow/index rebuild can affect local durable state. Run it only when user intent clearly authorizes maintenance or validation requires it and risk is understood.
-
-### 13.12 Cleanup / Legacy Chunk Change
-
-Dry-run only by default:
-
-```bash
-npm run cleanup-legacy-chunks -- --dry-run --json
-```
-
-No apply/confirm cleanup without explicit approval.
-
-### 13.13 Rollback Planning Change
-
-Read-only planning is allowed:
-
-```bash
-npm run rollback:mainline:plan -- --json
-```
-
-Do not apply generated config patches automatically.
-
-### 13.14 CI / Workflow Change
-
-High risk.
-
-Run local equivalent validation first.
-
-Do not push workflow changes without explicit approval.
-
----
-
-## 14. Local Validation Scripts
-
-If present, prefer project-specific local validation scripts:
-
-```text
-scripts/validate-local.ps1
-scripts/validate-local.sh
-```
-
-These scripts must remain local and safe.
-
-They must not:
-
-- push
-- deploy
-- edit secrets
-- edit `.env`
-- install dependencies
-- change provider keys
-- write production state
-- run destructive cleanup
-- write outside workspace root
-- run profile confirm/apply
-- change Codex config
-
-If a validation script appears unsafe, stop and report.
-
----
-
-## 15. Guarded Auto-Commit
-
-Local commit is allowed under strict guard.
-
-Push is never automatic.
-
-### 15.1 Conditions
-
-All must be true:
-
-1. User goal authorized local sustained implementation.
-2. Current task/stage is complete.
-3. Required codex-memory validation passed, or missing validation is documented.
-4. `.agent_board` is updated.
-5. Diff was inspected.
-6. Only intended files inside workspace root changed.
-7. No secrets in diff.
-8. No `.env` or secret file changed.
-9. No dependency manifest/lockfile changed unless explicitly approved or covered by an exact Smart Standing Authorization v3 Amber dependency action with package/action list, remaining budget, validation, and receipt.
-10. No real migration, profile confirm, cleanup apply, or config switch occurred.
-11. No watchdog/scheduled task/HKCU Run modification occurred.
-12. No user-owned uncommitted changes are included.
-13. Commit is coherent and related.
-14. Worktree state is understood immediately before commit.
-
-If uncertain, do not commit.
-
-### 15.2 Procedure
-
-Before commit:
-
-```bash
-git status --short
-git diff --stat
-git diff
-```
-
-Commit only intended files.
-
-After commit:
-
-```bash
-git status --short
-git log --oneline --decorate -n 3
-```
-
-Update `.agent_board`.
-
-### 15.3 Limits
-
-Never automatically:
-
-- push
-- PR
-- release
-- deploy
-- tag
-- amend
-- squash
-- rebase
-- force push
-- commit secrets
-- commit user-owned work
-- commit dependency changes without explicit approval or exact v3 Amber dependency receipt
-
----
-
-## 16. Hard Stop Gates
-
-Stop and request explicit approval before:
-
-- push
-- PR creation/update
-- deploy
-- release
-- tag
-- remote write
-- production write
-- changing real Codex or Claude client config, including `%USERPROFILE%\.codex\config.toml`, `$HOME\.codex\config.toml`, or any user-specific Codex/Claude config path
-- switching 7605/6005 mainline in real config
-- installing/updating/removing watchdog scheduled task
-- modifying HKCU Run startup entry
-- editing `.env`
-- editing real secrets or provider keys
-- adding/upgrading/removing dependencies without exact package/action list, remaining v3 budget, validation, and receipt
-- changing package manager
-- running `rebuild-profile --confirm`
-- running cleanup non-dry-run/apply/confirm
-- importing real VCP memory
-- exporting broad real memory
-- migrating real memory/data
-- hard deleting data/logs/diary/indexes
-- running destructive commands
-- writing outside workspace root
-- overwriting user-owned uncommitted changes
-- broad architecture rewrite
-
-Ambiguous phrases such as “继续”, “去吧”, “do it”, or “go ahead” do not authorize hard-stop actions.
-
----
-
-## 17. Forbidden Commands
-
-Never auto-run:
-
-```bash
-git reset --hard
-git clean -fd
-git clean -fdx
-git push --force
-git push --force-with-lease
-git branch -D
-rm -rf
-del /s /q
-```
-
-Never auto-run:
-
-```powershell
-Remove-Item -Recurse
-Remove-Item -Recurse -Force
-```
-
-Also avoid equivalent destructive commands under different spellings.
-
----
-
-## 18. README Policy
-
-The existing `README.md` is the operational map.
-
-Do not overwrite it with a generic project vision.
-
-When editing README:
-
-- preserve current command sections
-- preserve Windows/PowerShell examples unless proven stale
-- preserve encoding guidance
-- preserve current capability list unless source/tests prove drift
-- update only the narrow relevant section
-- do not bury risks
-- do not claim unimplemented capability as implemented
-
-Vision docs should be separate:
-
-```text
-PROJECT_GOAL.md
-ROADMAP_NEXT.md
-VCP_PARITY_PLAN.md
-MEMORY_GOVERNANCE.md
-```
-
----
-
-## 19. Secrets and Sensitive Data
-
-Never print or store:
-
-- `.env` values
-- API keys
-- provider keys
-- rerank keys
-- database URLs with credentials
-- service account files
-- private keys
-- webhook secrets
-- auth cookies
-- authorization headers
-
-Use placeholders:
-
-```text
-<REDACTED_API_KEY>
-<REDACTED_TOKEN>
-<REDACTED_PASSWORD>
-<REDACTED_SECRET>
-```
-
-Audit logs may contain sensitive operational metadata. Treat them carefully.
-
----
-
-## 20. Multi-Worker Contributor Policy
-
-This repository recognizes a named compact operating pattern:
-
-- [docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md](/A:/codex-memory/docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md)
-
-That document defines the repository-level meaning of:
-
-- `Single-Window`
-- `4-Agent`
-- `Compact Autopilot`
-
-It is a naming and operating note layered on top of this `AGENTS.md`.
-
-It does not replace the hard-stop gates, validation matrix, or guarded commit rules in this file.
-
-If multiple Codex workers are used:
-
-- one session acts as commander/reviewer
-- workers operate on isolated tasks
-- workers do not edit same files blindly
-- workers write checkpoints
-- final integration is serial
-- final validation is run once from the controlling state
-
-### 20.1 Commander Task Contract
-
-Before starting a temporary Worker, the Commander must write a small task contract.
-
-Required fields:
-
-```text
-Task ID:
-Objective:
-Role:
-Risk:
-Allowed files:
-Disallowed files:
-Validation:
-Stop conditions:
-Expected output:
-Handoff:
-```
-
-Rules:
-
-- one Worker gets one task contract
-- allowed files must be explicit paths or narrow globs
-- disallowed files must include secrets, `.env`, dependency manifests, runtime data, and unrelated modules
-- validation must name concrete commands or explicitly say docs/diff-only
-- stop conditions must include unexpected dirty worktree, user-owned changes, hard-stop gates, validation ambiguity, and scope expansion
-- the Worker must not broaden the task without Commander approval
-- the Worker must update only the files named in the contract, unless the contract explicitly allows `.agent_board` handoff updates
-- if the task needs a file already locked in `.agent_board/FILE_LOCKS.md`, the Worker must stop
-
-### 20.2 Read-Only Verifier Protocol
-
-A Verifier is read-only.
-
-The Verifier must not:
-
-- edit files
-- stage files
-- commit
-- push
-- tag
-- run destructive commands
-- run provider calls
-- change config
-- start long-running services
-- write outside the workspace
-
-The Verifier should inspect:
-
-```text
-git status --short
-git diff --stat
-git diff
-.agent_board/RUN_STATE.md
-.agent_board/TASK_QUEUE.md
-.agent_board/VALIDATION_LOG.md
-.agent_board/FILE_LOCKS.md
-.agent_board/RISK_REGISTER.md
-```
-
-Verifier checklist:
-
-- changed files are inside the task contract
-- no disallowed files changed
-- no `.env`, secret, dependency manifest, lockfile, generated durable data, or runtime config changed unless explicitly approved
-- validation evidence matches the risk level
-- hard-stop gates were respected
-- file locks were honored
-- `.agent_board` state is current enough for handoff
-- commit readiness is either `eligible`, `not eligible`, or `blocked`
-
-Verifier output:
-
-```text
-Result: PASS | NEEDS_FIX | BLOCKED
-Scope:
-Validation:
-Hard stops:
-Secrets/dependencies:
-Board state:
-Commit readiness:
-Required fixes:
-```
-
-For future Codex/Claude memory-governance work:
-
-- workers may create memory proposals
-- durable memory changes must pass policy/gate
-- policy review approves proposals
-- final write/audit path remains controlled
-
----
-
-## 21. Dependency Policy
-
-Dependency changes are Red by default, with one v3 Amber exception for exact small dependency actions.
-
-Do not automatically without exact package/action list, remaining v3 budget, validation, and receipt:
-
-- add dependency
-- remove dependency
-- upgrade dependency
-- downgrade dependency
-
-Always stop before:
-
-- change package manager
-- audit fix
-- batch upgrade
-- intentionally change lockfile
-
-Allowed only for local validation setup when safe:
+Allowed setup commands:
 
 ```bash
 npm ci
 ```
 
-Only if current project manifests already support it and it does not intentionally change manifests/lockfiles.
+Use lockfile-respecting install commands when possible. Do not run install or setup commands that require secrets, production credentials, live provider routing, production databases, irreversible external writes, or real-world notifications.
 
-If a lockfile changes unexpectedly, stop.
+Primary validation commands:
+
+```bash
+node --check <changed-js-file>
+node --test tests/<targeted-test>.test.js
+npm test -- --summary
+bash scripts/validate-local.sh docs
+bash scripts/validate-local.sh test
+bash scripts/validate-local.sh mainline
+npm run gate:mainline
+npm run gate:mainline:strict
+```
+
+Recommended validation ladder:
+
+1. `node --check <changed-js-file>`
+2. `node --test tests/<targeted-test>.test.js`
+3. `npm test -- --summary`
+4. `bash scripts/validate-local.sh docs` for docs/status/board updates
+5. `node scripts/validate_current_facts_drift.js`
+6. `node scripts/validate_autopilot_ledger_consistency.js`
+7. `npm run gate:mainline` for mainline-sensitive behavior
+8. `npm run gate:mainline:strict` for MCP/HTTP/mainline contract-sensitive work
+
+Known slow or expensive commands:
+
+```bash
+npm run gate:mainline:strict
+npm run compare-active-memory -- --suite ./benchmarks/active-memory-suite/standard-suite.json --json --require-match
+npm run rollback-active-memory -- --suite ./benchmarks/active-memory-suite/standard-suite.json --json --require-ready
+npm run provider-smoke -- --json
+npm run provider-benchmark -- --json
+npm run start:http:ensure
+npm run observe:http -- --json
+npm run start:http:watchdog:once
+```
+
+Commands that are blocked unless Jenn explicitly authorizes the exact scope:
+
+```bash
+npm run start:http:install-task
+npm run start:http:watchdog:install
+npm run start:http:watchdog:ensure
+npm run rebuild-profile -- --confirm --json
+npm run rebuild-shadow
+npm run cleanup-legacy-chunks -- --confirm
+npm run lifecycle:sqlite:migrate
+npm run provider-smoke -- --json
+npm run provider-benchmark -- --json
+git push origin main
+git push --tags
+```
+
+Dry-run-only by default:
+
+```bash
+npm run rebuild-profile -- --dry-run --json
+npm run cleanup-legacy-chunks -- --dry-run --json
+npm run rollback:mainline:plan -- --json
+npm run vcp-memory:migration-readiness -- --json
+```
 
 ---
 
-## 22. User-Owned Work Protection
+## 5. Branch, Remote, and Delivery Policy
 
-Treat pre-existing uncommitted changes as user-owned.
-
-Before editing:
-
-- inspect file status
-- inspect nearby diff if modified
-- avoid unrelated lines
-- do not stage user-owned changes
-- do not commit user-owned changes
-
-If conflict risk exists, stop and report.
-
----
-
-## 23. Handoff Policy
-
-For non-trivial work, update `.agent_board/HANDOFF.md`.
-
-Include:
+Default task branch pattern:
 
 ```text
-Goal:
-Workspace:
-Branch:
-Worktree:
-Current area:
+codex/<short-task-name>
+```
+
+Protected branches:
+
+* `main`
+* `master`
+* `production`
+* `release`
+
+Approved delivery remote:
+
+```text
+origin, only after fresh `git remote -v` confirms `git@github.com:JENN2046/codex-memory.git` and current push authorization allows the specific action.
+```
+
+Remote safety notes:
+
+* Push is not authorized by default for this project.
+* A remote named `origin` is not automatically safe.
+* Inspect `git remote -v` before push.
+* Inspect `git branch --show-current`, `git status --short`, and `git rev-list --left-right --count <branch>...origin/<branch>` before remote work.
+* Do not push to `upstream`.
+* Do not force push.
+* Do not push tags.
+* Do not push `main`, `master`, `production`, or `release`.
+* Do not push branches known to trigger release, deployment, production mutation, billing, paid external provider calls, customer-facing effects, or real-world notifications.
+
+Normal delivery surfaces:
+
+* local commit;
+* safe feature branch when authorized;
+* existing PR when authorized;
+* repository PR system when authorized;
+* `.agent_board/TASK_QUEUE.md`;
+* `.agent_board/VALIDATION_LOG.md`;
+* `.agent_board/CHECKPOINT.md`;
+* `.agent_board/HANDOFF.md`;
+* `.agent_board/AUTOPILOT_LEDGER.md`;
+* `STATUS.md`;
+* `CURRENT_STATE.md`;
+* `docs/`;
+* `docs/taskbooks/`;
+* `docs/archive/imported-plans/`;
+* task-specific receipt docs.
+
+Do not create external trackers, cloud resources, SaaS records, customer-facing posts, messages, or notifications unless Jenn explicitly authorizes them.
+
+---
+
+## 6. CI, Deployment, and Release Risk
+
+CI behavior on feature branches:
+
+```text
+Current observed workflow `.github/workflows/ci.yml` runs on pushes to `main` and pull requests targeting `main`. It runs `npm ci`, `npm test`, profile dry-run/profile health/profile gate, and `v8-diagnose`. No deployment or package publish step is currently observed.
+```
+
+Deployment triggers:
+
+```text
+No deployment trigger is currently observed in `.github/workflows/ci.yml`. Treat any new workflow, release, tag, package publish, workflow_dispatch, environment deployment, or branch protection bypass as high risk and blocked unless Jenn explicitly scopes it.
+```
+
+Release policy:
+
+* Agents may not tag releases.
+* Agents may not publish packages.
+* Agents may not deploy.
+* Agents may not run production migrations.
+* Agents may not modify release automation unless Jenn explicitly scopes the task and no hard stop is triggered.
+
+If push or PR update may trigger deployment, report `BLOCK` for that delivery step.
+
+---
+
+## 7. Secrets and Private State Map
+
+Secret-adjacent paths in this repository:
+
+* `.env`
+* `.env.*`
+* `.env.local`
+* `.env.*.local`
+* `data/`
+* `*.sqlite`
+* `*.sqlite-shm`
+* `*.sqlite-wal`
+* `logs/*.log`
+* `logs/*.jsonl`
+* `.colameta/`
+* `.omc/`
+* `.claude/`
+* `tmp/`
+* `.tmp/`
+* any bearer-token, provider-key, private-key, cookie, credential, or runtime-state file discovered during task work
+
+Rules:
+
+* Do not open or read secret/private-state contents.
+* Do not print, summarize, validate, transform, commit, store, or transmit secret values.
+* Agents may inspect file names, paths, git status, and whether secret-adjacent files are tracked.
+* Use `.env.example`, `.env.advanced.example`, config schemas, docs, mocks, or redacted error messages instead of real secret values.
+* Do not read raw memory stores, raw audit streams, raw `.jsonl`, runtime logs, provider payloads, response bodies, or private memory content unless Jenn gives exact scope and the project boundary allows it.
+
+Secret scanning command, if available and safe:
+
+```bash
+git diff --cached -U0 | rg -n "^\+[^+].*(sk-[A-Za-z0-9]|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|PRIVATE)|Authorization:|Bearer [A-Za-z0-9._-]+)"
+```
+
+When docs intentionally contain approval-token vocabulary such as `APPROVE_`, treat it as governance text only after manual review confirms it is not a live secret and is within scope.
+
+---
+
+## 8. Documentation and Project Memory
+
+Documentation paths:
+
+* `README.md`
+* `STATUS.md`
+* `CURRENT_STATE.md`
+* `DOCS_GOVERNANCE.md`
+* `VALIDATION.md`
+* `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+* `PHASE_NAVIGATION.md`
+* `docs/`
+* `.agent_board/`
+
+Update docs when commands, APIs, configuration, tests, directory structure, workflow, behavior, or architecture change inside task scope.
+
+Approved project memory paths:
+
+* `.agent_board/`
+* `docs/`
+* `docs/taskbooks/`
+* `docs/archive/`
+* `STATUS.md`
+* `CURRENT_STATE.md`
+* `MEMORY.md` only for safe, durable project facts already suitable for repository memory
+
+Project memory should be durable, useful for future agents, evidence-grounded or clearly marked as assumption, and safe to retain.
+
+Do not write personal long-term user memory from project work unless Jenn explicitly asks.
+
+Do not write secrets, credentials, tokens, cookies, `.env` values, private keys, verification codes, production credentials, `state-private` contents, low-value logs, short-lived noise, or unverified guesses as facts.
+
+---
+
+## 9. Read-Only / Audit-Only Behavior
+
+When Jenn asks for read-only review, audit-only work, no file changes, or no writes:
+
+* inspect only non-sensitive repository reality;
+* do not edit files;
+* do not create generated artifacts;
+* do not update docs, reports, task notes, issues, PRs, or memory;
+* do not commit;
+* do not push;
+* report findings in the allowed response surface.
+
+Read-only does not authorize:
+
+* raw private memory/store/audit/log reads;
+* secret reads;
+* runtime probes that call VCPToolBox, MCP tools, providers, or live services;
+* process-state inspection;
+* service start/stop/restart;
+* endpoint/locator disclosure.
+
+---
+
+## 10. Testing and Validation Policy
+
+For code changes, run the smallest relevant deterministic validation set first.
+
+Task-specific validation expectations:
+
+| Change type | Required validation |
+|---|---|
+| Unit-level bugfix | `node --check` for changed JS plus targeted `node --test tests/<target>.test.js` |
+| Source contract / governance helper | Targeted contract tests, negative-path tests, `npm test -- --summary`, docs/status validation when status changes |
+| MCP tool or public contract change | Targeted tests, public surface assertion, `npm run gate:mainline:strict`; public MCP expansion requires exact authorization |
+| HTTP runtime behavior change | Targeted tests, `npm run start:http:ensure`, `npm run observe:http -- --json`, and relevant gate only when runtime work is authorized |
+| Active memory / DeepMemo / TopicMemo change | Targeted tests plus compare/rollback standard suite |
+| Provider/profile change | Dry-run profile validation by default; provider smoke/benchmark only under exact provider scope |
+| Config/startup/watchdog change | Explicit Jenn authorization, local equivalent validation, and rollback notes |
+| Docs/status/board-only change | Diff review, no contradiction with source/README, `bash scripts/validate-local.sh docs`, current-facts drift, ledger consistency |
+| Memory / security / boundary change | Negative-path tests or dry-runs where practical; secret/raw-output/readiness scans |
+
+If broad validation fails, fix failures caused by the current change or directly related to the task. Treat failures as unrelated only with evidence.
+
+Do not report `PASS` for a required validation gate that failed.
+
+Do not claim:
+
+* production readiness;
+* release readiness;
+* deploy readiness;
+* cutover readiness;
+* `RC_READY`;
+* complete V8;
+* full bridge completion;
+* read-shape proof;
+* live runtime proof;
+
+unless the current task explicitly requires it and all required evidence exists.
+
+---
+
+## 11. Incidental Findings
+
+Handle incidental findings this way:
+
+* hard-stop finding: report `BLOCK`;
+* directly related to task or validation credibility: fix within smallest effective scope;
+* unrelated but useful: record as follow-up in `.agent_board/TASK_QUEUE.md`, `.agent_board/CHECKPOINT.md`, `docs/taskbooks/`, or a task-specific docs note when allowed;
+* unrelated architecture concern: do not fix during current task unless Jenn explicitly expands scope.
+
+Do not use incidental findings to justify broad rewrites, dependency churn, public MCP expansion, runtime mutation, or readiness claims.
+
+---
+
+## 12. Subagents and Review
+
+Use subagents when parallel work, independent review, or domain separation adds clear value.
+
+Suggested split for complex tasks:
+
+* Commander: scope, risks, hard stops, decomposition.
+* Worker A: implementation.
+* Worker B: tests.
+* Worker C: docs / project memory.
+* Reviewer: safety, validation, scope, secret handling.
+* Integrator: final consistency, validation, commit, safe push, PR update, report.
+
+Subagent output is not final truth. Integrator remains responsible for final delivery.
+
+For this repository, independent review is especially useful for:
+
+* public MCP contract changes;
+* memory read/write governance;
+* raw-output or secret-boundary changes;
+* HTTP runtime/startup/watchdog changes;
+* validation/ledger/current-facts gate changes;
+* release/cutover/readiness-adjacent work.
+
+---
+
+## 13. Reporting Template
+
+Every task must end with:
+
+```text
+Result:
+Scope:
 Changed files:
 Validation:
-Not validated:
-MCP mode:
-HTTP health:
-Compare:
-Rollback:
-Profile gate:
-Audit impact:
-Recall impact:
-Remaining risks:
-Next safe step:
-```
-
-Resume by verifying repository reality. Do not trust stale handoff blindly.
-
----
-
-## 24. Reporting Format
-
-For repository work:
-
-```text
-Workspace:
-Mode:
-Risk:
-Branch:
-Worktree:
-Area:
-Changed:
-Validated:
-Not validated:
-Committed:
-Result:
-Remaining risk:
-Next:
-```
-
-For runtime/MCP work add:
-
-```text
-MCP mode:
-Health:
-Gate:
-Compare:
-Rollback:
-Audit:
-```
-
-For provider/profile work add:
-
-```text
-Provider:
-Profile:
-Smoke:
-Benchmark:
-Profile gate:
-Secrets:
-```
-
-For blocked work:
-
-```text
-Blocked:
-Reason:
-Hard stop:
-Required approval/action:
-Safe state:
-Next after approval:
-```
-
-Whenever a report includes `Next:`, `Next safe step:`, `Next safe action:`, or `Next after approval:`, include one concise Simplified Chinese sentence explaining why that is the next safe action.
-
-### 24.1 Optional Profile-Aware Closeout
-
-When profile or BHA state is relevant, include:
-
-```text
-Profile:
-BHA state:
-Mode:
 Evidence:
-Validation:
-Skipped:
-Blocked:
-Risk:
-Next:
+Git delivery:
+Delivery surface:
+Memory:
+Risks:
+Incidental findings:
+Next step:
 ```
 
-If BHA is absent, write `BHA state: BHA_ABSENT`.
+Allowed result states: `PASS`, `PARTIAL`, `BLOCK`, `FAIL`, `FINDINGS_ONLY`, `NO_CHANGES`.
 
-This is reporting structure only, not BHA runtime proof.
+For commit / push / PR / issue / task note / memory write, include enough detail to audit the delivery:
 
-### 24.2 Chinese Task Summary Closeout
+* commit hash;
+* branch;
+* remote and push status;
+* PR or issue identifier when applicable;
+* validation status;
+* memory location/type when applicable;
+* whether release, deploy, cutover, production impact, paid action, force push, or tags occurred.
 
-Every final user-facing reply must end with one concise Simplified Chinese task summary.
-
-Use this format:
-
-```text
-任务总结：<one short Chinese sentence>
-```
-
-The summary must be factual, brief, and not overclaim. Mention the main completed action, current blocker, or next safe state. Keep code, commands, paths, identifiers, branch names, commit hashes, logs, errors, and test names in their original language.
+For `BLOCK`, include blocked reason, hard stop, evidence, safe actions completed, unsafe action not performed, and options for Jenn.
 
 ---
 
-## 25. Final Rule
+## 14. Project Fill-In Checklist
 
-This repository already has bones, blood, and memory.
+Filled for `codex-memory` on 2026-07-05:
 
-Do not rebuild it as a toy skeleton.
+* project name: `codex-memory`;
+* stack: Node.js 22+, CommonJS, MCP server/runtime and CLI tools;
+* editable source/test/docs paths: `src/`, `tests/`, `docs/`, `.agent_board/`, `scripts/`, `schemas/`, `examples/`, relevant root docs;
+* package manager: `npm`;
+* setup command: `npm ci`;
+* validation commands: targeted `node --check`, targeted `node --test`, `npm test -- --summary`, `bash scripts/validate-local.sh docs`, current-facts drift, ledger consistency, mainline gates as needed;
+* protected branches: `main`, `master`, `production`, `release`;
+* approved delivery remote: `origin` only after fresh verification and explicit/current push authority;
+* CI behavior: push to `main` and PR to `main` run tests/profile smoke; no deploy observed;
+* deployment triggers: none observed; treat new workflows/tags/releases/publish as blocked unless scoped;
+* release triggers: none authorized;
+* secret-adjacent paths: `.env*`, `data/`, SQLite files, raw logs/jsonl, `.colameta/`, `.omc/`, `.claude/`, temp/private runtime state;
+* docs paths: `README.md`, `STATUS.md`, `CURRENT_STATE.md`, `DOCS_GOVERNANCE.md`, `VALIDATION.md`, `docs/`, `.agent_board/`;
+* project memory paths: `.agent_board/`, `docs/`, `docs/taskbooks/`, `docs/archive/`, status/current-state files;
+* blocked scripts: persistent startup/watchdog install/ensure, confirm/apply migrations/profile rebuilds, provider smoke/benchmark outside exact scope, push/tag/release/deploy;
+* reporting conventions: use the Section 13 structured report and preserve low-disclosure/no-readiness wording.
 
-Keep the current contracts.
-
-Use the existing gates.
-
-Move in small verified steps.
-
-Commit locally only when guarded.
-
-Never push outside explicit user authorization or the A4.8 safe-push policy. If the A4.8 safe-push policy does not fully apply, stop before push.
-
-The goal is not more motion.
-
-The goal is trustworthy sustained motion.
+If repository reality changes, update this file with evidence and keep Jenn's global hard stops intact.
