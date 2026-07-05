@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1964",
-  "validationId": "CMV-2067",
+  "taskId": "CM-1965",
+  "validationId": "CMV-2068",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "disposable_target_request_read_shape_executor_prepared_no_live_no_write_no_readiness",
+    "scope": "request_read_shape_executor_route_decision_back_to_m9_no_live_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2068",
+      "scope": "CM-1965 request/read-shape executor route decision back to M9",
+      "status": "COMPLETED_VALIDATED_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION_BACK_TO_M9_NO_LIVE_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2067",
       "scope": "CM-1964 disposable target request/read-shape executor prepared",

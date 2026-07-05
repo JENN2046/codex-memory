@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1964 disposable target request/read-shape executor prepared`.
-Current validation: `CMV-2067`.
-Current status: CM-1964 adds a local low-disclosure request/read-shape executor and receipt projection layer for future disposable-target component/action probing. It validates the CM-1963 boundary before runtime invocation, generates the minimal probe request body in memory only, uses injected transport, consumes responses only for category/bucket shape projection, discloses no response field names, and keeps writes/provider/dependency/public-MCP/VCPToolBox-core/release/deploy/cutover/push/readiness at zero. Targeted tests passed `7/7`; no live/runtime/network/VCPToolBox call occurred.
+Current task: `CM-1965 request/read-shape executor route decision back to M9`.
+Current validation: `CMV-2068`.
+Current status: CM-1965 closes the CM-1962 through CM-1964 disposable-target component/action request/read-shape branch as executor-prepared optional evidence and routes the active plan-package work back to M9 governed mutation proposal mode. CM-1964 remains available for a future disposable-target live probe under a separate route, but it is not live read-shape proof, action-success proof, trusted-full-read proof, readiness proof, complete V8, or full bridge completion. No live/runtime/network/VCPToolBox call occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1965 disposable-target request/read-shape execution route decision. Decide whether to use the prepared executor for a live disposable-target probe or close the route as executor-prepared only. Stay inside disposable-target scope and do not persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
+Next action is CM-1966 M9 governed mutation proposal mode entry refresh. Treat M9 as proposal-only: local source/test/docs work may model proposal generation, accept/reject, audit, rollback posture, and scope receipts without durable write. Do not execute live VCPToolBox probes, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
 
 ## Historical Run Notes
 

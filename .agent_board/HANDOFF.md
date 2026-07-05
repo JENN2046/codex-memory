@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1964 disposable target request/read-shape executor prepared`.
-Current validation: `CMV-2067`.
-Current handoff: CM-1964 added a local low-disclosure executor/receipt projection layer for future disposable-target component/action request/read-shape probing. It validates CM-1963 before invocation, uses injected transport, discloses no response field names, rejects raw-value ingress without echo, and keeps writes, dependencies, public MCP expansion, VCPToolBox core changes, release/deploy/cutover/push, and readiness claims blocked. Targeted tests passed `7/7`; no live/runtime/network/VCPToolBox call occurred.
+Current task: `CM-1965 request/read-shape executor route decision back to M9`.
+Current validation: `CMV-2068`.
+Current handoff: CM-1965 closes the CM-1962 through CM-1964 disposable-target component/action request/read-shape branch as executor-prepared optional evidence and routes the active plan-package work back to M9 governed mutation proposal mode. CM-1964 remains available for a future disposable-target live probe under a separate route, but it is not live read-shape proof, action-success proof, trusted-full-read proof, readiness proof, complete V8, or full bridge completion.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1964 added a local low-disclosure executor/receipt projectio
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED_NO_LIVE_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1964 prepares a concrete executor for future disposable-target resolver/transport request/read-shape probing, but live VCPToolBox action success and live response shape remain unproven. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1965 disposable-target request/read-shape execution route decision.
+Current status: `COMPLETED_VALIDATED_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION_BACK_TO_M9_NO_LIVE_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1964 prepares a concrete executor for a future disposable-target resolver/transport request/read-shape probe, but live VCPToolBox action success and live response shape remain unproven. The active route no longer treats that optional live probe as a prerequisite for M9. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1966 M9 governed mutation proposal mode entry refresh.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1965_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION.md`
 - `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js`
 - `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1964_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED.md`

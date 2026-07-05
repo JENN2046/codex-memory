@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1964 disposable target request/read-shape executor prepared`.
-Current validation: `CMV-2067`.
+Current checkpoint: `CM-1965 request/read-shape executor route decision back to M9`.
+Current validation: `CMV-2068`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1965 Request/Read-Shape Executor Route Decision Back To M9
+
+Status: `COMPLETED_VALIDATED_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION_BACK_TO_M9_NO_LIVE_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1965_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION.md`.
+- Reviewed CM-1956 through CM-1964 low-disclosure route evidence.
+- Closed the CM-1962 through CM-1964 disposable-target component/action request/read-shape branch as executor-prepared optional evidence.
+- Recorded that CM-1964 remains useful for a future disposable-target live probe under a separate route.
+- Recorded that CM-1964 is not live read-shape proof, action-success proof, trusted-full-read proof, production/release/cutover readiness, `RC_READY`, complete V8, or full bridge completion.
+- Preserved that the active handoff and plan evidence route the imported plan package from accepted M6 observe-lite, accepted M7 read-shape, and accepted narrow M8 trusted-full-read workflow evidence into M9 preparation.
+- Routed the next active task to CM-1966 M9 governed mutation proposal mode entry refresh.
+- Preserved that CM-1965 performed no live/runtime/network/VCPToolBox call, retry, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw error read, raw memory/raw store/raw audit read, MCP memory tool call, memory write, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push/tag, readiness claim, read-shape proof, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-2068`; docs/status review, plan-package route review, `git diff --check`, docs validation, current-facts validation, ledger consistency validation, targeted secret/raw-output/readiness scan, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1964 Disposable Target Request/Read-Shape Executor Prepared
 

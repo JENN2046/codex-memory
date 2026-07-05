@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1964 disposable target request/read-shape executor prepared |
-| Current task | `CM-1964 disposable target request/read-shape executor prepared` |
-| Current validation | `CMV-2067` |
-| Current route | CM-1964 prepares concrete low-disclosure executor/receipt projection; no live VCPToolBox proof yet |
+| Status | CM-1965 request/read-shape executor route decision back to M9 |
+| Current task | `CM-1965 request/read-shape executor route decision back to M9` |
+| Current validation | `CMV-2068` |
+| Current route | CM-1965 closes the disposable-target request/read-shape branch as optional executor-prepared evidence and routes back to M9 proposal mode |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1965` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1965_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION.md`. It closes the CM-1962 through CM-1964 disposable-target component/action request/read-shape branch as executor-prepared optional evidence, not live proof, and routes the active plan-package work back to M9 governed mutation proposal mode. CM-1964 remains useful for a future disposable-target live probe under a separate route, but it is not live read-shape proof, action-success proof, trusted-full-read proof, production/release/cutover readiness, `RC_READY`, complete V8, or full bridge completion. CM-1965 performs no live/runtime/network/VCPToolBox call, retry, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw error read, raw memory/raw store/raw audit read, MCP memory tool call, memory write, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, or read-shape proof. Next route is CM-1966 M9 governed mutation proposal mode entry refresh.
 
 `CM-1964` adds `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js`, `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1964_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED.md`. It consumes CM-1963 and implements a local low-disclosure executor/receipt projection layer for a future disposable-target component/action request/read-shape probe. The executor validates the CM-1963 boundary before runtime invocation, generates the minimal probe request body in memory only, uses an injected component/action transport, consumes returned values only for category/bucket shape projection, classifies status without raw payload echo, discloses no response field names, and preserves zero write/provider/dependency/public-MCP/VCPToolBox-core/release/deploy/cutover/push/readiness counters. Targeted tests passed `7/7`. CM-1964 performs no live/runtime/network/VCPToolBox call, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, raw memory/raw store/raw audit read, memory write, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, or live read-shape proof. Next route is CM-1965 disposable-target request/read-shape execution route decision.
 
