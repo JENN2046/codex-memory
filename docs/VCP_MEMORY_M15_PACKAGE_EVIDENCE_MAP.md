@@ -140,7 +140,20 @@ Completed local-safe evidence:
   grants no approval, generates no approval line, executes no live/runtime
   action, binds no real target, generates no request body, reads no response or
   raw values, writes no memory, mutates no durable state, expands no public
-  MCP, and claims no readiness.
+  MCP, and claims no readiness;
+- CM-1985 exact approval intake recorded a current Jenn approval for the
+  CM-1985/CM-1986 real disposable target binding route without reproducing the
+  approval text, generating approval lines, generating/persisting request
+  bodies, executing runtime by intake, writing memory, mutating durable state,
+  expanding public MCP, or claiming readiness;
+- CM-1986 exact-approved real disposable target binding route evaluation
+  recorded a pre-execution abort because `operator-vcp-toolbox-service-ref` is
+  not proven by repository evidence to be a real, new/disposable,
+  target-scoped target and existing operator target reuse remains forbidden.
+  It performed no request body generation, resolver/transport invocation,
+  component/action invocation, runtime/network call, response consumption, raw
+  diagnostic persistence, memory write, durable mutation, public MCP expansion,
+  M15 unlock, or readiness claim.
 
 Missing RC evidence:
 
@@ -273,6 +286,36 @@ m15_package_evidence_map_boundary:
   cm1984_trusted_full_read_completed: false
   cm1984_m15_opened: false
   cm1984_readiness_claimed: false
+  cm1985_exact_approval_intake_present: true
+  cm1985_approval_text_reproduced: false
+  cm1985_approval_line_generated: false
+  cm1985_approval_line_persisted: false
+  cm1985_approval_matches_cm1984_boundary: true
+  cm1985_live_runtime_execution_performed: false
+  cm1985_request_body_generated: false
+  cm1985_memory_write_performed: false
+  cm1985_durable_write_performed: false
+  cm1985_public_mcp_expansion_performed: false
+  cm1985_readiness_claimed: false
+  cm1986_exact_approved_real_disposable_target_route_evaluated: true
+  cm1986_target_verified_real_new_disposable_target_scoped: false
+  cm1986_existing_operator_target_reuse_allowed: false
+  cm1986_pre_execution_abort_performed: true
+  cm1986_status_class: boundary_blocked
+  cm1986_route_status_category: not_executed
+  cm1986_request_body_generated: false
+  cm1986_resolver_transport_invoked: false
+  cm1986_component_action_invoked: false
+  cm1986_runtime_called: false
+  cm1986_network_called: false
+  cm1986_response_body_consumed: false
+  cm1986_raw_value_persisted: false
+  cm1986_memory_read_performed: false
+  cm1986_memory_write_performed: false
+  cm1986_read_shape_unlocked: false
+  cm1986_trusted_full_read_completed: false
+  cm1986_m15_opened: false
+  cm1986_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false

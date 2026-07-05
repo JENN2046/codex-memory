@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1984 exact approval request readiness review / Jenn boundary display for real disposable target binding`.
-Current validation: `CMV-2087`.
-Current handoff: CM-1984 reviews CM-1983 and displays the future real disposable target binding exact boundary as non-authorizing material. It grants no approval, generates no approval line, performs no live action, proves no real target binding, and routes next to CM-1985 exact approval intake / pre-execution gate for real disposable target binding.
+Current task: `CM-1986 exact-approved real disposable target binding probe abort receipt`.
+Current validation: `CMV-2089`.
+Current handoff: CM-1985 accepted the current exact approval intake without reproducing approval text. CM-1986 evaluated the approved real disposable target binding route and aborted before request-body generation and runtime because the target was not proven real/new/disposable and existing operator target reuse remains forbidden.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-1984 into CM-1985 exact approval intake / pre-execution gate for real disposable target binding without crossing request-body output, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries unless a future exact Jenn boundary explicitly authorizes the next action.
+Goal: continue from CM-1986 into CM-1987 real disposable target declaration remediation / verifiable target binding evidence preparation, local and no-live, without crossing request-body output, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries unless a future exact Jenn boundary explicitly authorizes the next action.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_BINDING_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1984 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1984_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_BINDING.md`. The review confirms CM-1983 is ready for Jenn boundary display only. It does not prove real VCPToolBox target binding, trusted-full-read workflow, production memory behavior, M15/RC readiness, release readiness, deploy readiness, cutover readiness, `RC_READY`, complete V8, or full bridge completion. CM-1984 does not perform approval intake, generate approval lines, start a workflow harness, execute workflow steps, execute fallback runtime, run dashboards, accept runtime health output, create RC gate reports, generate request bodies, bind targets, invoke component/action, consume responses, run real queries, read private runtime memory, scan raw stores or raw audit rows, call runtime, call MCP memory tools, write checkpoint/handoff memory, perform durable mutation, release/deploy/cutover/push, or unlock M15/RC gate. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1985 exact approval intake / pre-execution gate for real disposable target binding, blocked before runtime unless Jenn supplies matching current exact approval.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PRE_EXECUTION_ABORT_TARGET_NOT_VERIFIED_DISPOSABLE_NO_RUNTIME_NO_READ_SHAPE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1985 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1985_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING.md` and records current approval intake without reproducing approval text, generating approval lines, generating request bodies, executing runtime, or claiming readiness. CM-1986 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1986_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PROBE_ABORT_RECEIPT.md` and records that the approved real disposable target binding route aborted before request-body generation, resolver/transport invocation, component/action invocation, runtime/network call, response consumption, raw diagnostic persistence, memory write, durable mutation, public MCP expansion, or readiness claim because `operator-vcp-toolbox-service-ref` is not proven by repository evidence to be a real, new/disposable, target-scoped target and existing operator target reuse remains forbidden. It does not prove real VCPToolBox target binding, trusted-full-read workflow, production memory behavior, M15/RC readiness, release readiness, deploy readiness, cutover readiness, `RC_READY`, complete V8, or full bridge completion. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -26,6 +26,8 @@ Current entrypoints:
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1984_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_BINDING.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1986_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PROBE_ABORT_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1985_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1983_REAL_DISPOSABLE_TARGET_BINDING_EXACT_BOUNDARY_PACKET.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1982_FIXTURE_BACKED_PROBE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1981_EXACT_APPROVED_FIXTURE_BACKED_PROBE_RECEIPT.md`
