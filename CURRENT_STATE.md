@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1957 component/action route-status probe closeout / route decision |
-| Current task | `CM-1957 component/action route-status probe closeout / route decision` |
-| Current validation | `CMV-2060` |
-| Current route | CM-1957 closes CM-1956 as status-only `client_error` and routes to CM-1958 request/read-shape preparation |
+| Status | CM-1958 component/action request/read-shape preparation preflight |
+| Current task | `CM-1958 component/action request/read-shape preparation preflight` |
+| Current validation | `CMV-2061` |
+| Current route | CM-1958 defines no-live request/read-shape preparation lanes and routes to CM-1959 local contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1958` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1958_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_PREFLIGHT.md`. It consumes CM-1957 and defines no-live preflight lanes for client-error/request diagnosis boundary, action success preconditions, response-shape boundary, read-shape exact-approval preconditions, and zero-write/zero-raw-output constraints. It accepts only low-disclosure facts from CM-1956/CM-1957 and keeps action success unproven, response shape unknown, memory read false, read-shape locked, retry forbidden, and readiness not claimed. CM-1958 does not diagnose `client_error`, generate/output/persist concrete request bodies, generate approval lines, perform live/network/runtime calls, call VCPToolBox, inspect process state, start/stop/restart runtime, recheck listeners, read response bodies/raw error/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1959 low-disclosure component/action request/read-shape preparation contract, local source/test/docs only.
 
 `CM-1957` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1957_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`. It reviews only the committed CM-1956 low-disclosure receipt and records that the receipt is valid, the approved route-status probe attempt was consumed, route-probe/network/runtime budgets are exhausted, retry is not allowed, route status is known only as status-only `client_error`, action success is unproven, memory read is unproven, response shape is unknown, read-shape remains locked, and readiness is not claimed. CM-1957 does not perform a live call, retry CM-1956, call VCPToolBox, inspect process state, start/stop/restart runtime, recheck listeners, output or persist concrete request bodies, generate approval lines, read response bodies/raw error/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1958 component/action request/read-shape preparation preflight, docs/status/governance only unless Jenn later provides separate exact approval.
 

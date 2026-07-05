@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1957 component/action route-status probe closeout / route decision`.
-Current validation: `CMV-2060`.
+Current checkpoint: `CM-1958 component/action request/read-shape preparation preflight`.
+Current validation: `CMV-2061`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1958 Component/Action Request/Read-Shape Preparation Preflight
+
+Status: `COMPLETED_VALIDATED_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_PREFLIGHT_NO_LIVE_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1958_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_PREFLIGHT.md`.
+- Consumed CM-1957 and accepted only low-disclosure CM-1956/CM-1957 facts.
+- Defined no-live preflight lanes for client-error/request diagnosis boundary, action success preconditions, response-shape boundary, read-shape exact-approval preconditions, and zero-write/zero-raw-output constraints.
+- Preserved that `client_error` root cause is not diagnosed, action success is unproven, response shape is unknown, memory read/write remain false, retry is forbidden, read-shape is locked, and readiness is not claimed.
+- Preserved that CM-1958 performed no live/network/runtime call, no VCPToolBox call, no process-state inspection, no service start/stop/restart/listener recheck, no endpoint/locator disclosure, no response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, no MCP memory tool call, no memory/durable write, no concrete request body output or persistence, no approval line generation, no runtime/config/startup/watchdog/dependency/public MCP mutation, no push/tag/release/deploy/cutover, no readiness claim, and no read-shape proof.
+- Routed next work to CM-1959 low-disclosure component/action request/read-shape preparation contract, local source/test/docs only.
+
+Validation: `CMV-2061`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1957 Component/Action Route-Status Probe Closeout / Route Decision
 
