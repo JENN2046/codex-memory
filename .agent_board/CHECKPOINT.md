@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1945 startup failure diagnosis closeout / route decision`.
-Current validation: `CMV-2048`.
+Current checkpoint: `CM-1946 component/action status probe preflight`.
+Current validation: `CMV-2049`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1946 Component/Action Status Probe Preflight
+
+Status: `COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT_NO_LIVE_NO_REQUEST_BODY_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1946_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT.md`.
+- Consumed the CM-1945 route decision and defined no-live preflight lanes for target safe-reference binding, component/action identifier binding, status probe shape, route outcome receipt, and read-shape separation.
+- Carried forward safe target reference `operator-vcp-toolbox-service-ref` and safe component/action identifiers `KnowledgeBaseManager` / `knowledge_base.search` without resolving endpoint values, locator values, plugin config, auth material, runtime payloads, or memory content.
+- Recorded that component/action status probe preflight is defined, but component/action execution is not allowed now, request body generation is not allowed now, response body and raw error reads are not allowed now, endpoint/locator disclosure is not allowed now, exact approval is required before any live probe, local contract is required before an exact approval request, read-shape remains locked, and readiness is not claimed.
+- Routed next work to CM-1947 low-disclosure component/action status probe contract, local source/test/docs only.
+- Preserved that no retry, live/network call, VCPToolBox call, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe execution, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2049`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1945 Startup Failure Diagnosis Closeout / Route Decision
 

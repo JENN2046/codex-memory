@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1945 startup failure diagnosis closeout / route decision`.
-Current validation: `CMV-2048`.
-Current status: CM-1945 closes CM-1944 as valid listener-level progress and routes next to CM-1946 component/action status probe preflight. Component/action probe execution and read-shape remain locked; readiness is not claimed.
+Current task: `CM-1946 component/action status probe preflight`.
+Current validation: `CMV-2049`.
+Current status: CM-1946 defines the no-live component/action status probe preflight and routes next to CM-1947 low-disclosure component/action status probe contract. Component/action probe execution and read-shape remain locked; readiness is not claimed.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1946 component/action status probe preflight. Keep CM-1946 docs/status/governance only. Do not retry CM-1944, perform live/network calls, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator/config/env/secret/log/body/raw memory reads, request body generation, approval line generation, component/action probe execution, read-shape proof, memory write, readiness/release/deploy/cutover/push claim, or public MCP expansion. Push remains separate explicit authorization.
+Next action is CM-1947 low-disclosure component/action status probe contract. Keep CM-1947 local source/test/docs only. Do not retry CM-1944, perform live/network calls, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator/config/env/secret/log/body/raw memory reads, request body generation, approval line generation, component/action probe execution, read-shape proof, memory write, readiness/release/deploy/cutover/push claim, or public MCP expansion. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
