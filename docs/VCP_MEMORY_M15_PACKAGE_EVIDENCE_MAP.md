@@ -134,7 +134,13 @@ Completed local-safe evidence:
   line generation, live/runtime/network/VCPToolBox call, endpoint/locator
   resolution, request body generation, response consumption, raw/log/secret or
   private-memory read, memory write, durable mutation, public MCP expansion,
-  push/release/deploy/cutover, M15 unlock, or readiness claim.
+  push/release/deploy/cutover, M15 unlock, or readiness claim;
+- CM-1984 exact approval request readiness review / Jenn boundary display
+  recorded the CM-1983 packet as ready for Jenn boundary display only. It
+  grants no approval, generates no approval line, executes no live/runtime
+  action, binds no real target, generates no request body, reads no response or
+  raw values, writes no memory, mutates no durable state, expands no public
+  MCP, and claims no readiness.
 
 Missing RC evidence:
 
@@ -247,6 +253,26 @@ m15_package_evidence_map_boundary:
   cm1983_trusted_full_read_completed: false
   cm1983_m15_opened: false
   cm1983_readiness_claimed: false
+  cm1984_exact_approval_request_readiness_review_present: true
+  cm1984_jenn_boundary_display_present: true
+  cm1984_cm1983_packet_ready_for_boundary_display: true
+  cm1984_exact_execution_approval_supplied: false
+  cm1984_approval_granted: false
+  cm1984_approval_line_generated: false
+  cm1984_approval_request_submitted: false
+  cm1984_live_runtime_execution_performed: false
+  cm1984_real_disposable_target_binding_allowed_now: false
+  cm1984_real_disposable_target_binding_proven: false
+  cm1984_request_body_generated: false
+  cm1984_endpoint_locator_resolution_performed: false
+  cm1984_component_action_invoked: false
+  cm1984_response_body_consumed: false
+  cm1984_raw_value_persisted: false
+  cm1984_memory_read_performed: false
+  cm1984_memory_write_performed: false
+  cm1984_trusted_full_read_completed: false
+  cm1984_m15_opened: false
+  cm1984_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
@@ -302,7 +328,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1984_exact_approval_request_readiness_review_or_jenn_supplied_exact_approval_intake_for_real_disposable_target_binding
+  next_safe_route: cm1985_exact_approval_intake_or_pre_execution_gate_for_real_disposable_target_binding
 ```
 
 ## Conclusion
@@ -327,10 +353,10 @@ CM-1982 closes the fixture-backed route and selects real disposable target
 binding preparation as the next required boundary before trusted-full-read can
 be prepared safely. CM-1983 records that boundary as non-authorizing exact
 packet material only; it does not authorize execution and does not prove real
-disposable target binding.
+disposable target binding. CM-1984 displays the exact future boundary for Jenn
+review only; it does not grant approval or authorize runtime.
 
-The next route is CM-1984 exact approval request readiness review / Jenn
-boundary display or Jenn-supplied exact approval intake for real disposable
-target binding. Future live/runtime, memory read/write, approval, RC review,
-release, deploy, cutover, push, or readiness work requires separate exact
-authority and fresh evidence.
+The next route is CM-1985 exact approval intake / pre-execution gate for real
+disposable target binding. Future live/runtime, memory read/write, approval,
+RC review, release, deploy, cutover, push, or readiness work requires separate
+exact authority and fresh evidence.

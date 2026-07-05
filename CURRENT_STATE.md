@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1983 real disposable target binding exact boundary packet |
-| Current task | `CM-1983 real disposable target binding exact boundary packet` |
-| Current validation | `CMV-2086` |
-| Current route | CM-1983 prepares non-authorizing exact boundary material for a future real disposable target binding route; no approval intake, live action, request body, raw output, or readiness claim |
+| Status | CM-1984 exact approval request readiness review / Jenn boundary display for real disposable target binding |
+| Current task | `CM-1984 exact approval request readiness review / Jenn boundary display for real disposable target binding` |
+| Current validation | `CMV-2087` |
+| Current route | CM-1984 displays the future real disposable target binding exact boundary as non-authorizing review material; no approval intake, approval line, live action, request body, raw output, or readiness claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1984` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1984_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_BINDING.md`. It consumes CM-1983 and displays the exact future boundary Jenn would need to approve before any real disposable target binding probe. The review accepts CM-1983 as present and ready for boundary display, but records that no exact execution approval is supplied, no approval is granted, no approval line is generated, live execution is not allowed, real disposable target binding is not allowed now, component/action request/read-shape probing is not allowed now, real target binding is not proven, and readiness is not claimed. The displayed boundary requires CM-1959, CM-1963, CM-1964, CM-1978, CM-1982, and CM-1983; safe identifiers only; target-scoped real/new/disposable target posture; no existing operator target reuse; no private/production/customer/real-memory/persistent runtime artifacts; low-disclosure category/bucket receipt only; and no endpoint/locator/request/response/error/log/secret/private-memory/memory-id output or persistence. CM-1984 performs no approval intake, approval line generation, request body generation, endpoint/locator resolution, real target binding, live/runtime/network/VCPToolBox call, component/action invocation, response consumption, raw/log/config/env/secret/private-memory/raw-store/raw-audit read, memory write, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, M15/RC unlock, `RC_READY`, complete V8, full bridge completion, or readiness claim. Next route is CM-1985 exact approval intake / pre-execution gate for real disposable target binding, blocked before runtime unless Jenn supplies a matching current exact approval.
 
 `CM-1983` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1983_REAL_DISPOSABLE_TARGET_BINDING_EXACT_BOUNDARY_PACKET.md`. It consumes CM-1982 and prepares a non-authorizing exact boundary packet for a possible future real disposable target binding route. It requires CM-1959, CM-1963, CM-1964, CM-1978, and CM-1982; preserves safe identifiers only; requires the future target to be real, new or disposable, target-scoped, free of Jenn private information, production secrets, customer data, real private memory, and persistent runtime artifacts; rejects existing operator target reuse; and allows only category/bucket receipt fields if a later exact approval is supplied. CM-1983 is not approval, not approval intake, not an approval line, and not execution authority. It performs no live/runtime/network/VCPToolBox call, endpoint/locator resolution, request body generation/output/persistence/submission, component/action invocation, response consumption, raw/log/secret/private-memory read, memory write, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, M15/RC unlock, `RC_READY`, complete V8, full bridge completion, or readiness claim. Next route is CM-1984 exact approval request readiness review / Jenn boundary display or Jenn-supplied exact approval intake for real disposable target binding.
 
