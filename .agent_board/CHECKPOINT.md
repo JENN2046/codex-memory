@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1951 component/action status probe closeout / route decision`.
-Current validation: `CMV-2054`.
+Current checkpoint: `CM-1952 component/action request-body boundary preflight`.
+Current validation: `CMV-2055`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1952 Component/Action Request-Body Boundary Preflight
+
+Status: `COMPLETED_VALIDATED_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_PREFLIGHT_NO_BODY_NO_LIVE_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1952_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_PREFLIGHT.md`.
+- Consumed the CM-1951 route decision.
+- Defined category-only lanes for request-body shape boundary, future component/action route probe boundary, output projection boundary, and read-shape separation.
+- Defined request-body shape category `minimal_component_action_route_status_payload_category_only`.
+- Preserved concrete payload generated false, serialized payload unavailable, query text unbound, memory content unbound, provider payload unbound, endpoint/locator unbound, route probe unauthorized now, live execution disallowed now, response body/raw error reads disallowed now, read-shape locked, and readiness not claimed.
+- Routed next work to CM-1953 low-disclosure component/action request-body boundary contract, local source/test/docs only.
+- Preserved that no retry, live/network/runtime call, process-state inspection, service start/stop/restart, listener recheck, concrete request body generation/serialization/printing/storage/submission, approval-line generation/submission/exposure/storage, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, endpoint/locator disclosure, MCP memory call, provider/API call, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2055`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1951 Component/Action Status Probe Closeout / Route Decision
 

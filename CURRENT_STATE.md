@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1951 component/action status probe closeout / route decision |
-| Current task | `CM-1951 component/action status probe closeout / route decision` |
-| Current validation | `CMV-2054` |
-| Current route | CM-1951 closes CM-1950 and routes to request-body boundary preflight |
+| Status | CM-1952 component/action request-body boundary preflight |
+| Current task | `CM-1952 component/action request-body boundary preflight` |
+| Current validation | `CMV-2055` |
+| Current route | CM-1952 defines category-only request-body boundary and routes to local contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1952` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1952_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_PREFLIGHT.md`. It consumes CM-1951 and defines no-live category-only lanes for request-body shape boundary, future component/action route probe boundary, output projection boundary, and read-shape separation. It defines request-body shape category `minimal_component_action_route_status_payload_category_only` while keeping concrete payload generated false, serialized payload unavailable, query text unbound, memory content unbound, provider payload unbound, endpoint/locator unbound, component/action route probing unauthorized now, live execution disallowed now, response body/raw error reads disallowed now, read-shape locked, and readiness not claimed. CM-1952 does not retry CM-1950, perform live/network/runtime calls, generate/serialize/print/store/submit concrete request bodies, generate approval lines, read response bodies/raw error/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, or claim readiness. Next route is CM-1953 low-disclosure component/action request-body boundary contract, local source/test/docs only.
 
 `CM-1951` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1951_COMPONENT_ACTION_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`. It reviews only the committed CM-1950 low-disclosure receipt and records that the CM-1950 receipt is valid, approved attempt consumed, network/runtime budgets exhausted, retry not allowed, component/action status probe success false, component/action reachability not proven, route success not proven, route status `request_body_required_boundary_blocked`, request-body generation required for any future route but not allowed now, response body/raw error reads still disallowed, endpoint/locator disclosure still disallowed, read-shape locked, and readiness not claimed. CM-1951 does not perform a live call, retry CM-1950, inspect process state, start/stop/restart runtime, recheck listeners, generate request bodies or approval lines, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, or claim readiness. Next route is CM-1952 component/action request-body boundary preflight, docs/status/governance only.
 
