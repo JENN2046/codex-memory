@@ -4,11 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1958 component/action request/read-shape preparation preflight`.
-Current validation: `CMV-2061`.
+Current checkpoint: `CM-1959 low-disclosure component/action request/read-shape preparation contract`.
+Current validation: `CMV-2062`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1959 Low-Disclosure Component/Action Request/Read-Shape Preparation Contract
+
+Status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `src/core/VcpNativeComponentActionRequestReadShapePreparationContract.js`.
+- Added `tests/vcp-native-component-action-request-read-shape-preparation-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1959_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT.md`.
+- Consumed the CM-1958 request/read-shape preparation preflight.
+- Implemented a local contract that accepts only status-only `client_error` prior evidence, safe target reference `operator-vcp-toolbox-service-ref`, safe component/action identifiers `KnowledgeBaseManager` / `knowledge_base.search`, request-body shape category `minimal_component_action_route_status_payload_category_only`, client-error diagnosis not performed, action success unproven, response shape unknown, read-shape not authorized, future exact approval required, and zero counters.
+- Rejected missing fields, unknown fields, nonzero or unknown counters, unsafe/mismatched target references, invalid component/action identifiers, sensitive/private/raw/concrete request/read-shape/live/write/public MCP/readiness drift, and private value echo.
+- Preserved public MCP surface unchanged.
+- Targeted tests passed `7/7`.
+- Default tests passed `4032/4032`.
+- Routed next work to CM-1960 component/action request/read-shape exact approval packet, non-authorizing and no-live.
+- Preserved that no diagnosis, retry, live/network/runtime call, VCPToolBox call, process-state inspection, service start/stop/restart, listener recheck, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, MCP memory call, memory/durable write, concrete request body generation/output/persistence, approval line generation, response-shape inspection, runtime/config/startup/watchdog/dependency/public MCP mutation, push/tag/release/deploy/cutover, readiness claim, or read-shape proof occurred.
+
+Validation: `CMV-2062`; `node --check src/core/VcpNativeComponentActionRequestReadShapePreparationContract.js`, `node --check tests/vcp-native-component-action-request-read-shape-preparation-contract.test.js`, targeted test `7/7`, `npm test -- --summary` `4032/4032`, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1958 Component/Action Request/Read-Shape Preparation Preflight
 

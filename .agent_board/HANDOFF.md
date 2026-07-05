@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1958 component/action request/read-shape preparation preflight`.
-Current validation: `CMV-2061`.
-Current handoff: CM-1958 defined no-live request/read-shape preparation lanes after CM-1957, kept `client_error` diagnosis unperformed, action success and response shape unproven, no memory read/write occurred, retry forbidden, and read-shape locked.
+Current task: `CM-1959 low-disclosure component/action request/read-shape preparation contract`.
+Current validation: `CMV-2062`.
+Current handoff: CM-1959 added the local source/test/docs request/read-shape preparation contract after CM-1958, kept `client_error` diagnosis unperformed, action success and response shape unproven, no memory read/write occurred, retry forbidden, and read-shape locked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1958 defined no-live request/read-shape preparation lanes af
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_PREFLIGHT_NO_LIVE_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, read-shape proof, and readiness claims remain forbidden now. Next route is CM-1959 low-disclosure component/action request/read-shape preparation contract, local source/test/docs only.
+Current status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Targeted tests passed `7/7`; default tests passed `4032/4032`; public MCP surface remains unchanged. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, response-shape inspection, read-shape proof, and readiness claims remain forbidden now. Next route is CM-1960 component/action request/read-shape exact approval packet, non-authorizing and no-live.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeComponentActionRequestReadShapePreparationContract.js`
+- `tests/vcp-native-component-action-request-read-shape-preparation-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1959_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1958_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1957_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1956_EXACT_APPROVED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_RECEIPT.md`

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1958 component/action request/read-shape preparation preflight |
-| Current task | `CM-1958 component/action request/read-shape preparation preflight` |
-| Current validation | `CMV-2061` |
-| Current route | CM-1958 defines no-live request/read-shape preparation lanes and routes to CM-1959 local contract |
+| Status | CM-1959 low-disclosure component/action request/read-shape preparation contract |
+| Current task | `CM-1959 low-disclosure component/action request/read-shape preparation contract` |
+| Current validation | `CMV-2062` |
+| Current route | CM-1959 adds a local source/test/docs contract and routes to CM-1960 non-authorizing exact approval packet preparation |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1959` adds `src/core/VcpNativeComponentActionRequestReadShapePreparationContract.js`, `tests/vcp-native-component-action-request-read-shape-preparation-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1959_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT.md`. It consumes CM-1958 and validates only low-disclosure status-only `client_error` preparation evidence for safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, and request-body shape category `minimal_component_action_route_status_payload_category_only`. The contract locks client-error diagnosis as not performed, action success as unproven, response shape as unknown, read-shape as not authorized, exact future approval as required, zero side-effect counters, and public MCP surface unchanged. Targeted tests passed `7/7`; default tests passed `4032/4032`. CM-1959 performs no diagnosis, no concrete request body generation/output/persistence, no approval line generation, no live/network/runtime call, no VCPToolBox call, no response/raw/log/config/env/secret/raw memory read, no memory write, no read-shape proof, and no readiness claim. Next route is CM-1960 component/action request/read-shape exact approval packet, non-authorizing and no-live.
 
 `CM-1958` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1958_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_PREFLIGHT.md`. It consumes CM-1957 and defines no-live preflight lanes for client-error/request diagnosis boundary, action success preconditions, response-shape boundary, read-shape exact-approval preconditions, and zero-write/zero-raw-output constraints. It accepts only low-disclosure facts from CM-1956/CM-1957 and keeps action success unproven, response shape unknown, memory read false, read-shape locked, retry forbidden, and readiness not claimed. CM-1958 does not diagnose `client_error`, generate/output/persist concrete request bodies, generate approval lines, perform live/network/runtime calls, call VCPToolBox, inspect process state, start/stop/restart runtime, recheck listeners, read response bodies/raw error/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1959 low-disclosure component/action request/read-shape preparation contract, local source/test/docs only.
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1958",
-  "validationId": "CMV-2061",
+  "taskId": "CM-1959",
+  "validationId": "CMV-2062",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "component_action_request_read_shape_preparation_preflight_no_live_no_read_shape",
+    "scope": "low_disclosure_component_action_request_read_shape_preparation_contract_no_live_no_read_shape",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2062",
+      "scope": "CM-1959 low-disclosure component/action request/read-shape preparation contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE"
+    },
     {
       "id": "CMV-2061",
       "scope": "CM-1958 component/action request/read-shape preparation preflight",
