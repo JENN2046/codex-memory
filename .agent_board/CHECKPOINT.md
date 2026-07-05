@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1965 request/read-shape executor route decision back to M9`.
-Current validation: `CMV-2068`.
+Current checkpoint: `CM-1966 M9 governed mutation proposal mode contract`.
+Current validation: `CMV-2069`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1966 M9 Governed Mutation Proposal Mode Contract
+
+Status: `COMPLETED_VALIDATED_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT_NO_DURABLE_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `src/core/VcpMemoryGovernedMutationProposalModeContract.js`.
+- Added `tests/vcp-memory-governed-mutation-proposal-mode-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1966_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT.md`.
+- Updated `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`.
+- Implemented local source/test evidence for M9 governed mutation proposal mode.
+- Proved local contract paths for proposal generation, accept review, reject review, and audited low-disclosure receipts without durable write.
+- Required accepted M8 evidence flag, specified proposal envelope, L4 write-intent shield, safe target-reference category, bounded client scope, visibility category, shape-only intent/diff/rollback posture, explicit accept/reject review, low-disclosure audit receipt, and zero runtime/write/provider/public-MCP/approval/readiness side-effect counters.
+- Preserved that CM-1966 performs no live/runtime/network/VCPToolBox call, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw error read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write, durable write, proposal submission to runtime, approval request submission, approval line generation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push/tag, readiness claim, M10 unlock, complete V8 claim, or full bridge completion claim.
+- Targeted tests passed `7/7`; default tests passed `4054/4054`.
+- Routed next work to CM-1967 M10 bounded mutation blocked/exact-write-boundary gate refresh.
+
+Validation: `CMV-2069`; `node --check` source/test, targeted test `7/7`, and default test suite `4054/4054` passed. Broader docs/status validation and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1965 Request/Read-Shape Executor Route Decision Back To M9
 

@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1965",
-  "validationId": "CMV-2068",
+  "taskId": "CM-1966",
+  "validationId": "CMV-2069",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "request_read_shape_executor_route_decision_back_to_m9_no_live_no_write_no_readiness",
+    "scope": "m9_governed_mutation_proposal_mode_contract_no_durable_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2069",
+      "scope": "CM-1966 M9 governed mutation proposal mode contract",
+      "status": "COMPLETED_VALIDATED_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT_NO_DURABLE_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2068",
       "scope": "CM-1965 request/read-shape executor route decision back to M9",

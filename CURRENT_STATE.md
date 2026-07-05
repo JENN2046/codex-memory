@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1965 request/read-shape executor route decision back to M9 |
-| Current task | `CM-1965 request/read-shape executor route decision back to M9` |
-| Current validation | `CMV-2068` |
-| Current route | CM-1965 closes the disposable-target request/read-shape branch as optional executor-prepared evidence and routes back to M9 proposal mode |
+| Status | CM-1966 M9 governed mutation proposal mode contract |
+| Current task | `CM-1966 M9 governed mutation proposal mode contract` |
+| Current validation | `CMV-2069` |
+| Current route | CM-1966 implements local M9 proposal generate/accept/reject/audit contract without durable write |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1966` adds `src/core/VcpMemoryGovernedMutationProposalModeContract.js`, `tests/vcp-memory-governed-mutation-proposal-mode-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1966_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT.md`, and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It implements local source/test evidence for M9 governed mutation proposal mode: proposal generation, accept review, reject review, and audited low-disclosure receipts without durable write. Targeted tests passed `7/7`; default tests passed `4054/4054`. CM-1966 performs no live/runtime/network/VCPToolBox call, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw error read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write, durable write, proposal submission to runtime, approval request submission, approval line generation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, M10 unlock, complete V8, or full bridge completion. Next route is CM-1967 M10 bounded mutation blocked/exact-write-boundary gate refresh.
 
 `CM-1965` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1965_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION.md`. It closes the CM-1962 through CM-1964 disposable-target component/action request/read-shape branch as executor-prepared optional evidence, not live proof, and routes the active plan-package work back to M9 governed mutation proposal mode. CM-1964 remains useful for a future disposable-target live probe under a separate route, but it is not live read-shape proof, action-success proof, trusted-full-read proof, production/release/cutover readiness, `RC_READY`, complete V8, or full bridge completion. CM-1965 performs no live/runtime/network/VCPToolBox call, retry, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw error read, raw memory/raw store/raw audit read, MCP memory tool call, memory write, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, or read-shape proof. Next route is CM-1966 M9 governed mutation proposal mode entry refresh.
 

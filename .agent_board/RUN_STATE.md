@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1965 request/read-shape executor route decision back to M9`.
-Current validation: `CMV-2068`.
-Current status: CM-1965 closes the CM-1962 through CM-1964 disposable-target component/action request/read-shape branch as executor-prepared optional evidence and routes the active plan-package work back to M9 governed mutation proposal mode. CM-1964 remains available for a future disposable-target live probe under a separate route, but it is not live read-shape proof, action-success proof, trusted-full-read proof, readiness proof, complete V8, or full bridge completion. No live/runtime/network/VCPToolBox call occurred.
+Current task: `CM-1966 M9 governed mutation proposal mode contract`.
+Current validation: `CMV-2069`.
+Current status: CM-1966 adds local source/test evidence for M9 governed mutation proposal mode. The contract models proposal generation, accept review, reject review, and audited low-disclosure receipts without durable write, memory write, runtime, provider/API call, public MCP expansion, readiness, M10 unlock, complete V8, or full bridge completion. Targeted tests passed `7/7`; default tests passed `4054/4054`; no live/runtime/network/VCPToolBox call occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1966 M9 governed mutation proposal mode entry refresh. Treat M9 as proposal-only: local source/test/docs work may model proposal generation, accept/reject, audit, rollback posture, and scope receipts without durable write. Do not execute live VCPToolBox probes, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
+Next action is CM-1967 M10 bounded mutation blocked/exact-write-boundary gate refresh. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. Do not execute live VCPToolBox probes, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
 
 ## Historical Run Notes
 

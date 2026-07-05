@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1965 request/read-shape executor route decision back to M9`.
-Current validation: `CMV-2068`.
-Current handoff: CM-1965 closes the CM-1962 through CM-1964 disposable-target component/action request/read-shape branch as executor-prepared optional evidence and routes the active plan-package work back to M9 governed mutation proposal mode. CM-1964 remains available for a future disposable-target live probe under a separate route, but it is not live read-shape proof, action-success proof, trusted-full-read proof, readiness proof, complete V8, or full bridge completion.
+Current task: `CM-1966 M9 governed mutation proposal mode contract`.
+Current validation: `CMV-2069`.
+Current handoff: CM-1966 adds local source/test evidence for M9 governed mutation proposal mode. The contract models proposal generation, accept review, reject review, and audited low-disclosure receipts without durable write, memory write, runtime, provider/API call, public MCP expansion, readiness, M10 unlock, complete V8, or full bridge completion.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1965 closes the CM-1962 through CM-1964 disposable-target co
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION_BACK_TO_M9_NO_LIVE_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1964 prepares a concrete executor for a future disposable-target resolver/transport request/read-shape probe, but live VCPToolBox action success and live response shape remain unproven. The active route no longer treats that optional live probe as a prerequisite for M9. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1966 M9 governed mutation proposal mode entry refresh.
+Current status: `COMPLETED_VALIDATED_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT_NO_DURABLE_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1966 locally closes the M9 proposal-mode contract slice but does not execute runtime, submit proposals, submit approval requests, generate approval lines, write memory, perform durable mutation, or unlock M10. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1967 M10 bounded mutation blocked/exact-write-boundary gate refresh.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,10 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpMemoryGovernedMutationProposalModeContract.js`
+- `tests/vcp-memory-governed-mutation-proposal-mode-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1966_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT.md`
+- `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1965_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION.md`
 - `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js`
 - `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`
