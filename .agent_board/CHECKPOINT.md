@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1971 M13/M14 health-report route refresh`.
-Current validation: `CMV-2074`.
+Current checkpoint: `CM-1972 M14/M15 non-authorizing RC gate route refresh`.
+Current validation: `CMV-2075`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1972 M14/M15 Non-Authorizing RC Gate Route Refresh
+
+Status: `COMPLETED_VALIDATED_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH_NO_RUNTIME_NO_RELEASE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1972_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH.md`.
+- Updated `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`.
+- Consumed CM-1971 M14 health-report fixture/schema route refresh.
+- Accepted existing M15 blocked precondition, non-authorizing RC checklist, risk review skeleton, approval-packet readiness boundary, and blocked closeout chain for local planning.
+- Preserved that M15 remains unopened; RC gate report, RC gate readiness, approval packet readiness, approval request readiness, request body generation/submission, approval line presence/generation, readiness, complete V8, and full bridge completion remain false.
+- Preserved that CM-1972 performs no live/runtime/network/VCPToolBox call, dashboard execution, runtime health report acceptance, RC gate report creation, approval packet/request/body/line generation or submission, real query, private runtime read, raw store/raw audit scan, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, provider/API call, dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1973 plan-package local-safe completion closeout refresh.
+
+Validation: `CMV-2075`; docs/status review and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1971 M13/M14 Health-Report Route Refresh
 

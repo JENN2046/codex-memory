@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1971",
-  "validationId": "CMV-2074",
+  "taskId": "CM-1972",
+  "validationId": "CMV-2075",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "m13_fallback_fixture_to_m14_health_report_fixture_refresh_no_runtime_no_write_no_readiness",
+    "scope": "m14_health_report_fixture_to_m15_blocked_gate_refresh_no_runtime_no_release_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2075",
+      "scope": "CM-1972 M14/M15 non-authorizing RC gate route refresh",
+      "status": "COMPLETED_VALIDATED_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH_NO_RUNTIME_NO_RELEASE_NO_READINESS"
+    },
     {
       "id": "CMV-2074",
       "scope": "CM-1971 M13/M14 health-report route refresh",

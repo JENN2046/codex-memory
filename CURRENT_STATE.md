@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1971 M13/M14 health-report route refresh |
-| Current task | `CM-1971 M13/M14 health-report route refresh` |
-| Current validation | `CMV-2074` |
-| Current route | CM-1971 accepts M14 health-report fixture/schema chain for planning and keeps live dashboard/runtime health evidence blocked |
+| Status | CM-1972 M14/M15 non-authorizing RC gate route refresh |
+| Current task | `CM-1972 M14/M15 non-authorizing RC gate route refresh` |
+| Current validation | `CMV-2075` |
+| Current route | CM-1972 accepts M15 blocked gate docs for planning and keeps M15 unopened |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1972` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1972_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It consumes CM-1971, accepts the existing M15 blocked precondition, non-authorizing RC checklist, risk review skeleton, approval-packet readiness boundary, and blocked closeout chain for local planning, and keeps M15 unopened. CM-1972 performs no live/runtime/network/VCPToolBox call, dashboard execution, runtime health report acceptance, RC gate report creation, approval packet/request/body/line generation or submission, real query, private runtime read, raw store/raw audit scan, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, provider/API call, dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness claim, M15 unlock, complete V8, or full bridge completion. Next route is CM-1973 plan-package local-safe completion closeout refresh.
 
 `CM-1971` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1971_M13_M14_HEALTH_REPORT_ROUTE_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It consumes CM-1970, accepts the existing M14 low-disclosure health-report fixture/schema/source-review chain for local planning, and keeps M14 live dashboard/runtime health evidence blocked. Targeted M14 tests passed `22/22`. CM-1971 performs no live/runtime/network/VCPToolBox call, dashboard execution, runtime health report acceptance, workflow harness start, workflow step execution, local fallback runtime execution, real query, private runtime read, raw store/raw audit scan, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, release/deploy/cutover/push, readiness claim, M14/M15 unlock, complete V8, or full bridge completion. Next route is CM-1972 M14/M15 non-authorizing RC gate route refresh.
 
