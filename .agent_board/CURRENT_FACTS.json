@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1953",
-  "validationId": "CMV-2056",
+  "taskId": "CM-1954",
+  "validationId": "CMV-2057",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "low_disclosure_component_action_request_body_boundary_contract_no_body_no_live_no_read_shape",
+    "scope": "component_action_route_probe_exact_approval_request_packet_non_authorizing_no_approval_line",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2057",
+      "scope": "CM-1954 component/action route probe exact approval request packet",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_ROUTE_PROBE_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-2056",
       "scope": "CM-1953 low-disclosure component/action request-body boundary contract",
