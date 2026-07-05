@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1973 plan-package local-safe completion closeout refresh`.
-Current validation: `CMV-2076`.
+Current checkpoint: `CM-1974 live/runtime entry preflight`.
+Current validation: `CMV-2077`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1974 Live/Runtime Entry Preflight
+
+Status: `COMPLETED_VALIDATED_LIVE_RUNTIME_ENTRY_PREFLIGHT_NON_AUTHORIZING_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1974_LIVE_RUNTIME_ENTRY_PREFLIGHT.md`.
+- Consumed CM-1973 local-safe closeout.
+- Reviewed CM-1963 disposable-target resolver/transport boundary, CM-1964 low-disclosure executor, and CM-1965 optional future live route decision.
+- Selected the disposable-target component/action request/read-shape route as the next live/runtime candidate for a future exact boundary.
+- Preserved that CM-1974 creates no approval packet/request/body/line and grants no runtime authority.
+- Preserved that CM-1974 performs no live/runtime/network/VCPToolBox call, component/action probe, workflow execution, fallback runtime execution, dashboard execution, runtime health report acceptance, RC gate report creation, real query, private runtime read, raw store/raw audit scan, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, response body read, raw error read, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, readiness claim, M15 unlock, RC gate unlock, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1975 exact live/runtime boundary packet or Jenn-supplied exact approval intake.
+
+Validation: `CMV-2077`; targeted CM-1963/CM-1964 source/test validation, docs/status review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1973 Plan-Package Local-Safe Completion Closeout Refresh
 

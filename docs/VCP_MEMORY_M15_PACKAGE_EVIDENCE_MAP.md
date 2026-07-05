@@ -90,7 +90,9 @@ Completed local-safe evidence:
 - CM-1852 through CM-1859 current-chain refresh evidence recorded;
 - M15 blocked precondition recorded and refreshed;
 - CM-1966 through CM-1973 local-safe route refresh and closeout evidence
-  recorded.
+  recorded;
+- CM-1974 live/runtime entry preflight recorded as non-authorizing, no-live
+  candidate-route evidence only.
 
 Missing RC evidence:
 
@@ -110,6 +112,9 @@ m15_package_evidence_map_boundary:
   cm1860_refresh_applied: true
   cm1852_cm1859_overlay_present: true
   cm1966_cm1973_local_safe_refresh_present: true
+  cm1974_live_runtime_entry_preflight_present: true
+  cm1974_live_runtime_execution_performed: false
+  cm1974_approval_packet_created: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
@@ -163,16 +168,18 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1861_m15_non_authorizing_rc_checklist_refresh
+  next_safe_route: cm1975_exact_live_runtime_boundary_packet_or_jenn_supplied_exact_approval_intake
 ```
 
 ## Conclusion
 
 The package has substantial local-safe docs, fixture, schema, source-review, and
 approval-boundary evidence, including the CM-1852 through CM-1859 and CM-1966
-through CM-1973 local-safe refresh chains. It does not have the
-live/runtime/approval evidence needed for M15 RC gate consideration.
+through CM-1973 local-safe refresh chains. CM-1974 adds a non-authorizing
+live/runtime entry preflight, but it does not add live/runtime execution or
+approval evidence needed for M15 RC gate consideration.
 
-No automatic local-safe plan-package task remains after CM-1973. Future
-live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
-push, or readiness work requires separate exact authority and fresh evidence.
+The next route is CM-1975 exact live/runtime boundary packet or Jenn-supplied
+exact approval intake. Future live/runtime, memory read/write, approval, RC
+review, release, deploy, cutover, push, or readiness work requires separate
+exact authority and fresh evidence.
