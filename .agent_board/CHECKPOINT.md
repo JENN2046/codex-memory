@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1938 exact-approved startup/listener recovery diagnosis receipt`.
-Current validation: `CMV-2041`.
+Current checkpoint: `CM-1939 startup/listener recovery diagnosis closeout / route decision`.
+Current validation: `CMV-2042`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1939 Startup/Listener Recovery Diagnosis Closeout / Route Decision
+
+Status: `COMPLETED_VALIDATED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_CLOSEOUT_ROUTE_TO_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT_NO_RETRY`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1939_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`.
+- Reviewed only the committed CM-1938 low-disclosure receipt.
+- Accepted CM-1938 receipt as valid.
+- Recorded approved attempt consumed, service-start attempt consumed, listener recheck consumed, live/network and runtime-call budgets exhausted, and retry not allowed.
+- Recorded recovery success false and listener reachable after recovery false.
+- Preserved runtime startup state unknown, process count unknown, service startup result unknown, target locator binding success unknown, service listener root cause unknown, component/action probe locked, read-shape locked, and readiness not claimed.
+- Routed next work to CM-1940 startup failure diagnosis preflight.
+- Preserved that no new live call, retry, service start/stop/restart, listener recheck, process-state inspection, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2042`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1938 Exact-Approved Startup/Listener Recovery Diagnosis Receipt
 

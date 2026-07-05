@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1938 exact-approved startup/listener recovery diagnosis receipt`.
-Current validation: `CMV-2041`.
-Current handoff: CM-1938 consumed one Jenn-approved startup/listener recovery diagnosis attempt under the CM-1936 / CM-1937 boundary. The low-disclosure result is `transport_error`; service start attempt and listener recheck were consumed; retry is not allowed. It routes next to CM-1939 startup/listener recovery diagnosis closeout / route decision.
+Current task: `CM-1939 startup/listener recovery diagnosis closeout / route decision`.
+Current validation: `CMV-2042`.
+Current handoff: CM-1939 closes CM-1938 as a valid consumed recovery diagnosis attempt. Recovery success is false, listener reachability after recovery is false, retry is not allowed, component/action probe and read-shape remain locked, and it routes next to CM-1940 startup failure diagnosis preflight.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1938 consumed one Jenn-approved startup/listener recovery di
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1938 consumed the single approved recovery diagnosis attempt and recorded a low-disclosure receipt. It does not confirm runtime startup, process count, locator binding, listener root cause, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_CLOSEOUT_ROUTE_TO_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT_NO_RETRY`; production/release/cutover ready no; complete V8 not claimed; CM-1939 accepts CM-1938 as a valid consumed low-disclosure transport-error recovery attempt and keeps runtime startup, process count, locator binding, startup result, listener root cause, component/action routing, and read-shape support unproven. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1939_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1938_EXACT_APPROVED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1937_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1936_STARTUP_LISTENER_RECOVERY_EXACT_APPROVAL_REQUEST_PACKET.md`
