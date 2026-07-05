@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1955 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2058`.
+Current checkpoint: `CM-1956 exact-approved component/action route-status probe receipt`.
+Current validation: `CMV-2059`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1956 Exact-Approved Component/Action Route-Status Probe Receipt
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_STATUS_ONLY_CLIENT_ERROR_NO_BODY_NO_WRITE_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1956_EXACT_APPROVED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_RECEIPT.md`.
+- Checked CM-1953 `VcpNativeComponentActionRequestBodyBoundaryContract` before live execution.
+- Consumed exactly one Jenn-approved component/action route-status probe attempt for safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, and request-body shape category `minimal_component_action_route_status_payload_category_only`.
+- Recorded low-disclosure result: `componentActionRouteProbeCategory=route_status_known`, `routeStatusCategory=status_only_known`, `targetSafeReferenceBindingCategory=listener_level_reachable_reference_only`, `transportWrapperShapeCategory=component_action_route_status_transport_category_only`, `statusClass=client_error`, and `durationBucket=lt_100ms`.
+- Recorded request body generated true, concrete request body output false, request body persisted false, response body read false, raw error payload read false, endpoint disclosed false, locator value disclosed false, config/env read false, secret read false, log read false, stdout/stderr read false, memory read false, memory written false, read-shape unlocked false, readiness claimed false, and zero write counters true.
+- Preserved that the approved route-probe attempt, network call, and runtime call budgets are exhausted and retry is not allowed.
+- Preserved that action success, memory read, response shape, read-shape support, VCP native bridge readiness, production/release/cutover readiness, complete V8, and full bridge completion are not proven.
+- Routed next work to CM-1957 component/action route-status probe closeout / route decision, docs/status/governance only and no-live.
+
+Validation: `CMV-2059`; CM-1953 pre-live contract check, one exact-approved route-status probe attempt, targeted CM-1953 test, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1955 Exact Approval Request Readiness Review / Jenn Boundary Display
 
