@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1934",
-  "validationId": "CMV-2037",
+  "taskId": "CM-1935",
+  "validationId": "CMV-2038",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "runtime_startup_or_service_listener_recovery_preflight_no_live_no_mutation",
+    "scope": "low_disclosure_startup_listener_recovery_contract_no_live_no_mutation",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2038",
+      "scope": "CM-1935 low-disclosure startup/listener recovery contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_STARTUP_LISTENER_RECOVERY_CONTRACT_NO_LIVE_NO_MUTATION"
+    },
     {
       "id": "CMV-2037",
       "scope": "CM-1934 runtime startup or service listener recovery preflight",

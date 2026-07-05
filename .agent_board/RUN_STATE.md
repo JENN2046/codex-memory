@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1934 runtime startup or service listener recovery preflight`.
-Current validation: `CMV-2037`.
-Current status: CM-1934 defines the no-live/no-mutation recovery preflight after CM-1933. It separates future runtime process-state bucket, service startup / listener recovery, target safe-reference binding, listener recheck, and transport wrapper shape lanes. It does not authorize service start, process inspection, listener recheck, retry, or live execution.
+Current task: `CM-1935 low-disclosure startup/listener recovery contract`.
+Current validation: `CMV-2038`.
+Current status: CM-1935 implements the local low-disclosure startup/listener recovery contract and targeted tests. It accepts category/bucket/zero-counter recovery evidence only, rejects raw/sensitive/live/start/listener/readiness drift without echo, preserves public MCP surface, and does not authorize service start, process inspection, listener recheck, retry, or live execution.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1935 low-disclosure startup/listener recovery contract. Keep CM-1935 source/test local only if implemented: no live/network calls, no service start/stop/restart, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory reads, no request body, no approval line, no memory write, no readiness/release/deploy/cutover/push claim, and no public MCP expansion. Push remains separate explicit authorization.
+Next action is CM-1936 startup/listener recovery exact approval request packet. Keep CM-1936 docs/status only and non-authorizing: no live/network calls, no service start/stop/restart, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory reads, no request body, no approval line, no memory write, no readiness/release/deploy/cutover/push claim, and no public MCP expansion. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

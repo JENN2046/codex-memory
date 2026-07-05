@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1934 runtime startup or service listener recovery preflight`.
-Current validation: `CMV-2037`.
+Current checkpoint: `CM-1935 low-disclosure startup/listener recovery contract`.
+Current validation: `CMV-2038`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1935 Low-Disclosure Startup/Listener Recovery Contract
+
+Status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_STARTUP_LISTENER_RECOVERY_CONTRACT_NO_LIVE_NO_MUTATION`
+
+Recorded:
+
+- Added `src/core/VcpNativeStartupListenerRecoveryContract.js`.
+- Added `tests/vcp-native-startup-listener-recovery-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1935_LOW_DISCLOSURE_STARTUP_LISTENER_RECOVERY_CONTRACT.md`.
+- Consumed the CM-1934 recovery preflight as local source/test work only.
+- Locked accepted evidence to category/bucket/boolean/zero-counter fields for runtime process-state bucket, service startup/listener recovery boundary, target safe-reference binding, service listener recheck boundary, transport wrapper no-body/no-request shape, and exact approval boundary.
+- Preserved runtime process state unknown, process count undisclosed, service start unauthorized, listener recheck unauthorized, target locator binding unknown, endpoint/locator undisclosed, component/action probe locked, read-shape locked, readiness not claimed, and next live recovery requiring exact approval.
+- Rejected missing fields, unknown fields, unsafe/mismatched safe references, nonzero counters, raw/sensitive/live/start/listener/readiness drift, endpoint/locator/config/env/secret/log/stdout/stderr/process/command/request/response/raw error/raw memory/provider/approval-line material, and private value echo.
+- Preserved public MCP surface unchanged.
+- Routed next work to CM-1936 startup/listener recovery exact approval request packet, non-authorizing and no-live.
+- Preserved that no live call, retry, VCPToolBox call, process-state inspection, runtime start/stop/restart, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2038`; `node --check src/core/VcpNativeStartupListenerRecoveryContract.js`, `node --test tests/vcp-native-startup-listener-recovery-contract.test.js` passed `7/7`, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1934 Runtime Startup Or Service Listener Recovery Preflight
 
