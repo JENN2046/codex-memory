@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1944 exact-approved startup failure diagnosis receipt`.
-Current validation: `CMV-2047`.
+Current checkpoint: `CM-1945 startup failure diagnosis closeout / route decision`.
+Current validation: `CMV-2048`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1945 Startup Failure Diagnosis Closeout / Route Decision
+
+Status: `COMPLETED_VALIDATED_STARTUP_FAILURE_DIAGNOSIS_CLOSEOUT_ROUTE_TO_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT_NO_RETRY_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1945_STARTUP_FAILURE_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`.
+- Reviewed only the committed CM-1944 low-disclosure receipt.
+- Accepted CM-1944 as valid listener-level progress: approved attempt consumed, service-start attempt consumed, process-state inspection consumed, listener recheck consumed, live/network and runtime-call budgets exhausted, retry not allowed, listener after start reachable, safe target reference reached at no-body/no-request listener level, and zero write counters preserved.
+- Recorded that startup result, startup root cause, prior listener state, process identity, command line, endpoint/locator value, component/action routing, request-body safety, response shape, memory recall behavior, readiness, `RC_READY`, complete V8, and full bridge completion remain unproven.
+- Routed next work to CM-1946 component/action status probe preflight, docs/status/governance only.
+- Preserved that no retry, live/network call, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe execution, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2048`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1944 Exact-Approved Startup Failure Diagnosis Receipt
 
