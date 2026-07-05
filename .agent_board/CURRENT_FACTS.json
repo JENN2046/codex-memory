@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1939",
-  "validationId": "CMV-2042",
+  "taskId": "CM-1940",
+  "validationId": "CMV-2043",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "startup_listener_recovery_diagnosis_closeout_route_to_startup_failure_diagnosis_preflight_no_retry",
+    "scope": "startup_failure_diagnosis_preflight_no_live_no_mutation",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2043",
+      "scope": "CM-1940 startup failure diagnosis preflight",
+      "status": "COMPLETED_VALIDATED_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT_NO_LIVE_NO_MUTATION"
+    },
     {
       "id": "CMV-2042",
       "scope": "CM-1939 startup/listener recovery diagnosis closeout / route decision",

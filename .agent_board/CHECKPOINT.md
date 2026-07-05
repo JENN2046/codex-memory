@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1939 startup/listener recovery diagnosis closeout / route decision`.
-Current validation: `CMV-2042`.
+Current checkpoint: `CM-1940 startup failure diagnosis preflight`.
+Current validation: `CMV-2043`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1940 Startup Failure Diagnosis Preflight
+
+Status: `COMPLETED_VALIDATED_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT_NO_LIVE_NO_MUTATION`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1940_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT.md`.
+- Consumed the CM-1939 closeout route without adding runtime facts.
+- Defined startup failure diagnosis lanes for startup invocation shape, startup process lifecycle, startup result capture, listener after start, target safe-reference binding, and optional operator-mediated manual evidence.
+- Recorded startup failure diagnosis needed, CM-1938 retry not allowed, live execution not allowed now, process-state inspection not allowed now, service start not allowed now, listener recheck not allowed now, component/action probe locked, read-shape locked, and readiness not claimed.
+- Routed next work to CM-1941 low-disclosure startup failure diagnosis contract.
+- Preserved that no live call, retry, service start/stop/restart, listener recheck, process-state inspection, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2043`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1939 Startup/Listener Recovery Diagnosis Closeout / Route Decision
 

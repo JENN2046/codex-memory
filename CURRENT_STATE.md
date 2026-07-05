@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1939 startup/listener recovery diagnosis closeout / route decision |
-| Current task | `CM-1939 startup/listener recovery diagnosis closeout / route decision` |
-| Current validation | `CMV-2042` |
-| Current route | CM-1939 closes CM-1938 as consumed transport_error and routes next to CM-1940 startup failure diagnosis preflight |
+| Status | CM-1940 startup failure diagnosis preflight |
+| Current task | `CM-1940 startup failure diagnosis preflight` |
+| Current validation | `CMV-2043` |
+| Current route | CM-1940 defines startup failure diagnosis lanes and routes next to CM-1941 low-disclosure contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1940` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1940_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT.md`. It consumes the CM-1939 route and defines startup failure diagnosis lanes for startup invocation shape, startup process lifecycle, startup result capture, listener after start, target safe-reference binding, and optional operator-mediated manual evidence. It keeps CM-1938 retry blocked, live execution blocked, process-state inspection blocked, service start blocked, listener recheck blocked, component/action status probe locked, read-shape locked, and readiness not claimed. It does not add runtime facts, disclose endpoint or locator values, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim `RC_READY`, complete V8, or full bridge completion. Next route is CM-1941 low-disclosure startup failure diagnosis contract.
 
 `CM-1939` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1939_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`. It reviews the committed CM-1938 low-disclosure receipt and records that the CM-1938 receipt is valid, the approved attempt was consumed, service-start and listener-recheck budgets are exhausted, retry is not allowed, recovery success is false, listener reachable after recovery is false, runtime startup state remains unknown, process count remains unknown, service startup result remains unknown, target locator binding success remains unknown, service listener root cause remains unknown, component/action status probe remains locked, read-shape remains locked, and readiness is not claimed. CM-1939 rejects another retry/start/listener recheck/process-state inspection, endpoint/locator disclosure, raw output/log/stdout/stderr/config/env/secret/raw memory reads, request body or approval-line generation, component/action probe, read-shape proof, memory/durable write, runtime/config/startup/watchdog/dependency/runtime binding/public MCP schema changes, push/tag/release/deploy/cutover, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1940 startup failure diagnosis preflight, still source-only/docs-status-governance unless Jenn provides a separate exact diagnostic boundary.
 
