@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1975",
-  "validationId": "CMV-2078",
+  "taskId": "CM-1977",
+  "validationId": "CMV-2080",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_live_runtime_boundary_packet_non_authorizing_no_live_no_approval_line_no_readiness",
+    "scope": "exact_approved_disposable_target_probe_aborted_before_runtime_target_not_verified_disposable_no_live_no_read_shape",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,16 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2080",
+      "scope": "CM-1977 exact-approved disposable-target live/runtime probe abort receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_DISPOSABLE_TARGET_PROBE_ABORTED_BEFORE_RUNTIME_TARGET_NOT_VERIFIED_DISPOSABLE_NO_LIVE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2079",
+      "scope": "CM-1976 exact approval intake",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_NO_APPROVAL_LINE_NO_RUNTIME_NO_READINESS"
+    },
     {
       "id": "CMV-2078",
       "scope": "CM-1975 exact live/runtime boundary packet",

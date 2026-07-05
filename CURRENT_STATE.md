@@ -8,15 +8,19 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1975 exact live/runtime boundary packet |
-| Current task | `CM-1975 exact live/runtime boundary packet` |
-| Current validation | `CMV-2078` |
-| Current route | CM-1975 prepares a non-authorizing exact live/runtime boundary packet; no Jenn approval intake or live execution occurred |
+| Status | CM-1977 exact-approved disposable-target probe aborted before runtime |
+| Current task | `CM-1977 exact-approved disposable-target live/runtime probe abort receipt` |
+| Current validation | `CMV-2080` |
+| Current route | CM-1976 approval intake accepted; CM-1977 aborted before request/runtime because target was not verified disposable |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1977` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1977_EXACT_APPROVED_DISPOSABLE_TARGET_LIVE_RUNTIME_PROBE_ABORT_RECEIPT.md`. It consumes CM-1976 approval intake and evaluates the exact-approved disposable-target component/action request/read-shape route. The route aborts before request body generation, invocation, runtime, network, service mutation, or response consumption because the candidate target could not be verified as new/disposable under the boundary. It records only category/bucket receipt facts: route status not executed, status class boundary blocked, response shape not consumed, read-shape false, no raw diagnostic values persisted, no endpoint/locator/request/response/error/log/secret/private-memory/memory-id persistence, no memory or durable write, no public MCP expansion, no push/tag/release/deploy/cutover, no readiness, no M15 unlock, no RC gate unlock, no complete V8, and no full bridge completion. Next route is CM-1978 disposable-target binding remediation / exact disposable target fixture preparation, local and no-live unless a future exact boundary supplies a verifiably disposable target.
+
+`CM-1976` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1976_EXACT_APPROVAL_INTAKE.md`. It records current exact approval intake for the CM-1976/CM-1977 disposable-target route without reproducing the approval text, generating an approval line, generating or persisting a request body, executing runtime, disclosing endpoint/locator values, writing memory, mutating durable state, expanding public MCP, pushing/releasing/deploying/cutting over, or claiming readiness. It routes to CM-1977 subject to the disposable-target precondition.
 
 `CM-1975` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1975_EXACT_LIVE_RUNTIME_BOUNDARY_PACKET.md`. It consumes CM-1974 and prepares a non-authorizing exact boundary packet for one possible future disposable-target component/action request/read-shape live probe. No Jenn exact approval text was supplied, so approval intake is absent, approval is not granted, approval line generation is false, and runtime remains blocked. CM-1975 performs no live/runtime/network/VCPToolBox call, request body generation/submission, response/raw/log/secret/private-memory/raw-store/raw-audit read, memory or durable write, public MCP expansion, push/tag/release/deploy/cutover, readiness, M15 unlock, RC gate unlock, complete V8, or full bridge completion. Next route is CM-1976 exact approval request readiness review / Jenn boundary display, or Jenn-supplied exact approval intake.
 

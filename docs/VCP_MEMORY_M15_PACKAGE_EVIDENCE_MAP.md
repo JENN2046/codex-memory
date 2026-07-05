@@ -94,7 +94,13 @@ Completed local-safe evidence:
 - CM-1974 live/runtime entry preflight recorded as non-authorizing, no-live
   candidate-route evidence only;
 - CM-1975 exact live/runtime boundary packet recorded as non-authorizing,
-  no-approval-intake, no-live evidence only.
+  no-approval-intake, no-live evidence only;
+- CM-1976 exact approval intake recorded without reproducing approval text,
+  generating approval lines, or executing runtime;
+- CM-1977 exact-approved disposable-target route recorded as pre-runtime abort
+  evidence because the candidate target was not verified disposable; no
+  request body generation, invocation, runtime, network, response consumption,
+  read-shape proof, M15 unlock, or readiness claim occurred.
 
 Missing RC evidence:
 
@@ -121,6 +127,19 @@ m15_package_evidence_map_boundary:
   cm1975_packet_authorizes_execution: false
   cm1975_approval_intake_present: false
   cm1975_live_runtime_execution_performed: false
+  cm1976_exact_approval_intake_present: true
+  cm1976_approval_text_reproduced: false
+  cm1976_approval_line_generated: false
+  cm1976_live_runtime_execution_performed: false
+  cm1977_exact_approved_disposable_target_route_evaluated: true
+  cm1977_target_verified_disposable: false
+  cm1977_pre_runtime_abort_performed: true
+  cm1977_request_body_generated: false
+  cm1977_component_action_invoked: false
+  cm1977_runtime_called: false
+  cm1977_network_called: false
+  cm1977_response_body_consumed: false
+  cm1977_read_shape_unlocked: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
@@ -174,7 +193,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1976_exact_approval_request_readiness_review_jenn_boundary_display_or_exact_approval_intake
+  next_safe_route: cm1978_disposable_target_binding_remediation_exact_disposable_target_fixture_preparation
 ```
 
 ## Conclusion
@@ -183,10 +202,13 @@ The package has substantial local-safe docs, fixture, schema, source-review, and
 approval-boundary evidence, including the CM-1852 through CM-1859 and CM-1966
 through CM-1973 local-safe refresh chains. CM-1974 adds a non-authorizing
 live/runtime entry preflight. CM-1975 adds a non-authorizing exact
-live/runtime boundary packet. Neither adds live/runtime execution, approval
-intake, or approval evidence needed for M15 RC gate consideration.
+live/runtime boundary packet. CM-1976 records exact approval intake without
+approval-line output or runtime execution. CM-1977 records an exact-approved
+route evaluation that aborted before runtime because the target was not
+verified disposable. None of these add live request/read-shape proof, M15 RC
+gate readiness, or release/cutover evidence.
 
-The next route is CM-1976 exact approval request readiness review / Jenn
-boundary display, or Jenn-supplied exact approval intake. Future live/runtime,
-memory read/write, approval, RC review, release, deploy, cutover, push, or
-readiness work requires separate exact authority and fresh evidence.
+The next route is CM-1978 disposable-target binding remediation / exact
+disposable target fixture preparation. Future live/runtime, memory read/write,
+approval, RC review, release, deploy, cutover, push, or readiness work requires
+separate exact authority and fresh evidence.

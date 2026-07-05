@@ -4,11 +4,42 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1975 exact live/runtime boundary packet`.
-Current validation: `CMV-2078`.
+Current checkpoint: `CM-1977 exact-approved disposable-target live/runtime probe abort receipt`.
+Current validation: `CMV-2080`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1977 Exact-Approved Disposable-Target Live Runtime Probe Abort Receipt
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_DISPOSABLE_TARGET_PROBE_ABORTED_BEFORE_RUNTIME_TARGET_NOT_VERIFIED_DISPOSABLE_NO_LIVE_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1977_EXACT_APPROVED_DISPOSABLE_TARGET_LIVE_RUNTIME_PROBE_ABORT_RECEIPT.md`.
+- Consumed CM-1976 approval intake.
+- Evaluated the exact-approved disposable-target component/action request/read-shape route.
+- Aborted before request body generation, component/action invocation, runtime call, network call, service mutation, or response consumption because the candidate target was not verified as new/disposable under the approval boundary.
+- Recorded target-scoped diagnostics only as category-only disposable-precondition evidence; no raw diagnostic values are persisted.
+- Recorded `statusClass=boundary_blocked`, `routeStatusCategory=not_executed`, `responseShapeCategory=not_consumed`, `readShapeUnlocked=false`, `requestBodyGeneratedByHarness=false`, and zero write/durable/public-MCP/readiness counters.
+- Preserved that CM-1977 performs no endpoint/locator disclosure, concrete request body output/persistence, raw response/error/log output or persistence, config/env/secret/stdout/stderr raw value persistence, raw private memory access, memory ID disclosure, MCP memory tool call, memory read/write/update/supersede/tombstone, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, complete V8 claim, full bridge completion claim, or readiness claim.
+- Routed next work to CM-1978 disposable-target binding remediation / exact disposable target fixture preparation, local and no-live unless a future exact boundary supplies a verifiably disposable target.
+
+Validation: `CMV-2080`; targeted CM-1963/CM-1964 source/test validation, docs/status review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+## CM-1976 Exact Approval Intake
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_NO_APPROVAL_LINE_NO_RUNTIME_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1976_EXACT_APPROVAL_INTAKE.md`.
+- Recorded that Jenn supplied a current exact approval matching the CM-1975 route family for CM-1976/CM-1977.
+- Preserved `approval_text_reproduced=false`, `approval_line_generated=false`, `approval_line_persisted=false`, `request_body_generated_by_cm1976=false`, `live_execution_performed_by_cm1976=false`, `memory_written_by_cm1976=false`, `durable_write_by_cm1976=false`, and `readiness_claimed_by_cm1976=false`.
+- Performed no runtime/network/VCPToolBox call, component/action request, request body generation/output/persistence, endpoint/locator disclosure, response/raw/log/config/env/secret/private-memory read, MCP memory tool call, memory write, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, complete V8 claim, full bridge completion claim, or readiness claim.
+- Routed next work to CM-1977 subject to the disposable-target precondition.
+
+Validation: `CMV-2079`; approval-intake docs/status review is recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1975 Exact Live/Runtime Boundary Packet
 
