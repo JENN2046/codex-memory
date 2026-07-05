@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1959 low-disclosure component/action request/read-shape preparation contract |
-| Current task | `CM-1959 low-disclosure component/action request/read-shape preparation contract` |
-| Current validation | `CMV-2062` |
-| Current route | CM-1959 adds a local source/test/docs contract and routes to CM-1960 non-authorizing exact approval packet preparation |
+| Status | CM-1960 component/action request/read-shape exact approval packet |
+| Current task | `CM-1960 component/action request/read-shape exact approval packet` |
+| Current validation | `CMV-2063` |
+| Current route | CM-1960 adds a non-authorizing exact approval packet preparation artifact and routes to CM-1961 exact approval request readiness review / Jenn boundary display |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1960` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1960_COMPONENT_ACTION_REQUEST_READ_SHAPE_EXACT_APPROVAL_PACKET.md`. It consumes CM-1959 and prepares a non-authorizing exact approval packet shape for one future component/action request/read-shape probe. The packet carries forward only low-disclosure status-only `client_error` evidence for safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, and request-body shape category `minimal_component_action_route_status_payload_category_only`; records that action success, response shape, memory read, read-shape support, trusted-full-read workflow, and readiness remain unproven; defines future exact approval fields, response-shape projection limits, receipt projection, and stop conditions. CM-1960 grants no approval, generates no approval line, generates/outputs/persists no concrete request body, performs no live/network/runtime/VCPToolBox call, reads no response/raw/log/config/env/secret/raw memory material, writes no memory, unlocks no read-shape proof, and claims no readiness. Next route is CM-1961 exact approval request readiness review / Jenn boundary display, non-authorizing and no-live.
 
 `CM-1959` adds `src/core/VcpNativeComponentActionRequestReadShapePreparationContract.js`, `tests/vcp-native-component-action-request-read-shape-preparation-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1959_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT.md`. It consumes CM-1958 and validates only low-disclosure status-only `client_error` preparation evidence for safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, and request-body shape category `minimal_component_action_route_status_payload_category_only`. The contract locks client-error diagnosis as not performed, action success as unproven, response shape as unknown, read-shape as not authorized, exact future approval as required, zero side-effect counters, and public MCP surface unchanged. Targeted tests passed `7/7`; default tests passed `4032/4032`. CM-1959 performs no diagnosis, no concrete request body generation/output/persistence, no approval line generation, no live/network/runtime call, no VCPToolBox call, no response/raw/log/config/env/secret/raw memory read, no memory write, no read-shape proof, and no readiness claim. Next route is CM-1960 component/action request/read-shape exact approval packet, non-authorizing and no-live.
 
