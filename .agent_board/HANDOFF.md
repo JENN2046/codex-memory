@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1966 M9 governed mutation proposal mode contract`.
-Current validation: `CMV-2069`.
-Current handoff: CM-1966 adds local source/test evidence for M9 governed mutation proposal mode. The contract models proposal generation, accept review, reject review, and audited low-disclosure receipts without durable write, memory write, runtime, provider/API call, public MCP expansion, readiness, M10 unlock, complete V8, or full bridge completion.
+Current task: `CM-1967 M10 exact write boundary gate contract`.
+Current validation: `CMV-2070`.
+Current handoff: CM-1967 refreshes the M10 gate after CM-1966. M9 local proposal-mode evidence is accepted for the gate, but M10 remains blocked because no exact Jenn write boundary is present. Actual write/update/supersede/tombstone execution remains forbidden.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1966 adds local source/test evidence for M9 governed mutatio
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT_NO_DURABLE_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1966 locally closes the M9 proposal-mode contract slice but does not execute runtime, submit proposals, submit approval requests, generate approval lines, write memory, perform durable mutation, or unlock M10. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1967 M10 bounded mutation blocked/exact-write-boundary gate refresh.
+Current status: `COMPLETED_VALIDATED_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT_BLOCKED_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1967 keeps M10 blocked for real mutation; it does not bind target/client/scope/visibility/rollback/audit/mutation-family values, submit proposals to runtime, submit approval requests, generate approval lines, write memory, perform durable mutation, or unlock M10/M15. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1968 M10/M11 route decision and response-normalization gate refresh.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpMemoryM10ExactWriteBoundaryGateContract.js`
+- `tests/vcp-memory-m10-exact-write-boundary-gate-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1967_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT.md`
 - `src/core/VcpMemoryGovernedMutationProposalModeContract.js`
 - `tests/vcp-memory-governed-mutation-proposal-mode-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1966_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT.md`

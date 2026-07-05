@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1966 M9 governed mutation proposal mode contract`.
-Current validation: `CMV-2069`.
+Current checkpoint: `CM-1967 M10 exact write boundary gate contract`.
+Current validation: `CMV-2070`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1967 M10 Exact Write Boundary Gate Contract
+
+Status: `COMPLETED_VALIDATED_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT_BLOCKED_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `src/core/VcpMemoryM10ExactWriteBoundaryGateContract.js`.
+- Added `tests/vcp-memory-m10-exact-write-boundary-gate-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1967_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT.md`.
+- Updated `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`.
+- Refreshed the M10 gate after CM-1966: M9 local proposal-mode evidence is accepted, but M10 remains blocked because no exact Jenn write boundary is present.
+- Required exact write boundary absent, target/client/scope/visibility/rollback/audit/mutation-family fields unbound, write/update/supersede/tombstone execution disallowed, all runtime/write/provider/public-MCP/approval/readiness counters zero, and low-disclosure receipt only.
+- Preserved that CM-1967 performs no live/runtime/network/VCPToolBox call, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write/update/supersede/tombstone, durable write, proposal runtime submission, approval request submission, approval line generation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push/tag, readiness claim, M10/M15 unlock, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1968 M10/M11 route decision and response-normalization gate refresh.
+
+Validation: `CMV-2070`; `node --check` source/test, targeted test `6/6`, and default test suite `4060/4060` passed. Broader docs/status validation and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1966 M9 Governed Mutation Proposal Mode Contract
 

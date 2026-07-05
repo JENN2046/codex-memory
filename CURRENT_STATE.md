@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1966 M9 governed mutation proposal mode contract |
-| Current task | `CM-1966 M9 governed mutation proposal mode contract` |
-| Current validation | `CMV-2069` |
-| Current route | CM-1966 implements local M9 proposal generate/accept/reject/audit contract without durable write |
+| Status | CM-1967 M10 exact write boundary gate contract |
+| Current task | `CM-1967 M10 exact write boundary gate contract` |
+| Current validation | `CMV-2070` |
+| Current route | CM-1967 accepts M9 local proposal evidence and keeps M10 blocked without exact write boundary |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1967` adds `src/core/VcpMemoryM10ExactWriteBoundaryGateContract.js`, `tests/vcp-memory-m10-exact-write-boundary-gate-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1967_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT.md`, and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It refreshes the M10 gate after CM-1966: M9 local proposal-mode evidence is accepted, but M10 write/update/supersede/tombstone execution remains blocked because no exact Jenn write boundary is present. Targeted tests passed `6/6`; default tests passed `4060/4060`. CM-1967 performs no live/runtime/network/VCPToolBox call, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write/update/supersede/tombstone, durable write, proposal runtime submission, approval request submission, approval line generation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, M10/M15 unlock, complete V8, or full bridge completion. Next route is CM-1968 M10/M11 route decision and response-normalization gate refresh.
 
 `CM-1966` adds `src/core/VcpMemoryGovernedMutationProposalModeContract.js`, `tests/vcp-memory-governed-mutation-proposal-mode-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1966_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT.md`, and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It implements local source/test evidence for M9 governed mutation proposal mode: proposal generation, accept review, reject review, and audited low-disclosure receipts without durable write. Targeted tests passed `7/7`; default tests passed `4054/4054`. CM-1966 performs no live/runtime/network/VCPToolBox call, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw error read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write, durable write, proposal submission to runtime, approval request submission, approval line generation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, M10 unlock, complete V8, or full bridge completion. Next route is CM-1967 M10 bounded mutation blocked/exact-write-boundary gate refresh.
 
