@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1967",
-  "validationId": "CMV-2070",
+  "taskId": "CM-1968",
+  "validationId": "CMV-2071",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "m10_exact_write_boundary_gate_contract_blocked_no_write_no_readiness",
+    "scope": "m10_blocked_m11_fixture_refresh_no_runtime_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2071",
+      "scope": "CM-1968 M10/M11 route decision and response-normalization refresh",
+      "status": "COMPLETED_VALIDATED_M10_M11_ROUTE_DECISION_RESPONSE_NORMALIZATION_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2070",
       "scope": "CM-1967 M10 exact write boundary gate contract",

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1967 M10 exact write boundary gate contract`.
-Current validation: `CMV-2070`.
-Current status: CM-1967 refreshes the M10 gate after CM-1966. M9 local proposal-mode evidence is accepted for the gate, but M10 remains blocked because no exact Jenn write boundary is present. Targeted tests passed `6/6`; default tests passed `4060/4060`; no live/runtime/network/VCPToolBox call occurred and no write/update/supersede/tombstone execution occurred.
+Current task: `CM-1968 M10/M11 route decision and response-normalization refresh`.
+Current validation: `CMV-2071`.
+Current status: CM-1968 closes the current M10 automatic route as blocked because exact write boundary is absent and routes only to M11 fixture/schema response-normalization and audit-receipt refresh. Targeted M11 tests passed `18/18`; default tests passed `4060/4060`; no live/runtime/network/VCPToolBox call occurred and no write/update/supersede/tombstone execution occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1968 M10/M11 route decision and response-normalization gate refresh. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. M11 may proceed only as local response normalization/audit receipt contract refresh unless a future exact runtime/write boundary is supplied. Do not execute live VCPToolBox probes, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
+Next action is CM-1969 M11/M12 sustained workflow route refresh. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. Treat M11 as fixture/schema refreshed but live runtime exit incomplete. Do not execute live VCPToolBox probes, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
 
 ## Historical Run Notes
 

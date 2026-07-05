@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1967 M10 exact write boundary gate contract |
-| Current task | `CM-1967 M10 exact write boundary gate contract` |
-| Current validation | `CMV-2070` |
-| Current route | CM-1967 accepts M9 local proposal evidence and keeps M10 blocked without exact write boundary |
+| Status | CM-1968 M10/M11 route decision and response-normalization refresh |
+| Current task | `CM-1968 M10/M11 route decision and response-normalization refresh` |
+| Current validation | `CMV-2071` |
+| Current route | CM-1968 closes current M10 automatic route as blocked and allows only M11 fixture/schema refresh |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1968` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1968_M10_M11_ROUTE_DECISION_RESPONSE_NORMALIZATION_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It consumes CM-1966/CM-1967, closes the current M10 automatic route as blocked because no exact write boundary exists, and routes only to the existing M11 fixture/schema response-normalization and audit-receipt refresh. Targeted M11 tests passed `18/18`; default tests passed `4060/4060`. CM-1968 performs no live/runtime/network/VCPToolBox call, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body generation/output/persistence/submission, response body read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write/update/supersede/tombstone, durable write, proposal runtime submission, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, M10/M11/M12/M15 unlock, complete V8, or full bridge completion. Next route is CM-1969 M11/M12 sustained workflow route refresh.
 
 `CM-1967` adds `src/core/VcpMemoryM10ExactWriteBoundaryGateContract.js`, `tests/vcp-memory-m10-exact-write-boundary-gate-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1967_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT.md`, and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It refreshes the M10 gate after CM-1966: M9 local proposal-mode evidence is accepted, but M10 write/update/supersede/tombstone execution remains blocked because no exact Jenn write boundary is present. Targeted tests passed `6/6`; default tests passed `4060/4060`. CM-1967 performs no live/runtime/network/VCPToolBox call, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body output/persistence, response body read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write/update/supersede/tombstone, durable write, proposal runtime submission, approval request submission, approval line generation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, M10/M15 unlock, complete V8, or full bridge completion. Next route is CM-1968 M10/M11 route decision and response-normalization gate refresh.
 

@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1967 M10 exact write boundary gate contract`.
-Current validation: `CMV-2070`.
+Current checkpoint: `CM-1968 M10/M11 route decision and response-normalization refresh`.
+Current validation: `CMV-2071`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1968 M10/M11 Route Decision And Response Normalization Refresh
+
+Status: `COMPLETED_VALIDATED_M10_M11_ROUTE_DECISION_RESPONSE_NORMALIZATION_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1968_M10_M11_ROUTE_DECISION_RESPONSE_NORMALIZATION_REFRESH.md`.
+- Updated `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`.
+- Consumed CM-1966 M9 proposal-mode evidence and CM-1967 M10 exact write boundary gate evidence.
+- Closed the current M10 automatic route as blocked because exact Jenn write boundary is absent.
+- Routed only to existing M11 fixture/schema response-normalization and audit-receipt refresh.
+- Revalidated `src/core/VcpMemoryResponseNormalizationAuditReceiptContract.js` and `src/core/VcpMemoryTrustedWriteProposalM11BlockedRouteContract.js`.
+- Preserved that M11 live runtime exit, low-disclosure runtime receipt proof, live VCP-native parity proof, M12 live workflow, M15 unlock, complete V8, and full bridge completion remain unproven.
+- Preserved that CM-1968 performs no live/runtime/network/VCPToolBox call, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body generation/output/persistence/submission, response body read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write/update/supersede/tombstone, durable write, proposal runtime submission, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push/tag, readiness claim, M10/M11/M12/M15 unlock, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1969 M11/M12 sustained workflow route refresh.
+
+Validation: `CMV-2071`; `node --check` for both M11 source files, targeted M11 tests `18/18`, and default test suite `4060/4060` passed. Broader docs/status validation and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1967 M10 Exact Write Boundary Gate Contract
 
