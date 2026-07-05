@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1963 disposable target resolver/transport boundary contract`.
-Current validation: `CMV-2066`.
-Current handoff: CM-1963 added a local source/test/docs contract for disposable-target resolver/transport/runtime assist. It encodes Jenn's disposable/new-target autonomy preference while keeping non-target private/production material, writes, dependencies, public MCP expansion, VCPToolBox core changes, release/deploy/cutover/push, and readiness claims blocked. Targeted tests passed `8/8`; default tests passed `4040/4040`; no runtime execution occurred.
+Current task: `CM-1964 disposable target request/read-shape executor prepared`.
+Current validation: `CMV-2067`.
+Current handoff: CM-1964 added a local low-disclosure executor/receipt projection layer for future disposable-target component/action request/read-shape probing. It validates CM-1963 before invocation, uses injected transport, discloses no response field names, rejects raw-value ingress without echo, and keeps writes, dependencies, public MCP expansion, VCPToolBox core changes, release/deploy/cutover/push, and readiness claims blocked. Targeted tests passed `7/7`; no live/runtime/network/VCPToolBox call occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1963 added a local source/test/docs contract for disposable-
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT_NO_EXECUTION_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1963 prepares CM-1964 to use disposable-target resolver/transport/runtime assist with scoped raw diagnostics, but raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1964 execute disposable-target resolver/transport request/read-shape probe or prepare concrete executor.
+Current status: `COMPLETED_VALIDATED_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED_NO_LIVE_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1964 prepares a concrete executor for future disposable-target resolver/transport request/read-shape probing, but live VCPToolBox action success and live response shape remain unproven. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1965 disposable-target request/read-shape execution route decision.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js`
+- `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1964_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED.md`
 - `src/core/VcpNativeDisposableTargetResolverTransportBoundaryContract.js`
 - `tests/vcp-native-disposable-target-resolver-transport-boundary-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1963_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT.md`

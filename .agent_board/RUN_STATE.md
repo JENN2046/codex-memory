@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1963 disposable target resolver/transport boundary contract`.
-Current validation: `CMV-2066`.
-Current status: CM-1963 adds a local disposable-target resolver/transport/runtime assist boundary contract. It accepts only disposable target scope with no Jenn private information, no production secrets, no customer data, and no real private memory; prepares a later runtime assist window; keeps raw diagnostic authority scoped to disposable target; rejects raw value persistence, writes, provider/API, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness drift. Targeted tests passed `8/8`; default tests passed `4040/4040`; no runtime execution occurred.
+Current task: `CM-1964 disposable target request/read-shape executor prepared`.
+Current validation: `CMV-2067`.
+Current status: CM-1964 adds a local low-disclosure request/read-shape executor and receipt projection layer for future disposable-target component/action probing. It validates the CM-1963 boundary before runtime invocation, generates the minimal probe request body in memory only, uses injected transport, consumes responses only for category/bucket shape projection, discloses no response field names, and keeps writes/provider/dependency/public-MCP/VCPToolBox-core/release/deploy/cutover/push/readiness at zero. Targeted tests passed `7/7`; no live/runtime/network/VCPToolBox call occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1964 execute disposable-target resolver/transport request/read-shape probe or prepare the concrete executor. Stay inside CM-1963 budgets and disposable-target scope. Do not touch non-target private/production material, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
+Next action is CM-1965 disposable-target request/read-shape execution route decision. Decide whether to use the prepared executor for a live disposable-target probe or close the route as executor-prepared only. Stay inside disposable-target scope and do not persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
 
 ## Historical Run Notes
 

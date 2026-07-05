@@ -4,11 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1963 disposable target resolver/transport boundary contract`.
-Current validation: `CMV-2066`.
+Current checkpoint: `CM-1964 disposable target request/read-shape executor prepared`.
+Current validation: `CMV-2067`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1964 Disposable Target Request/Read-Shape Executor Prepared
+
+Status: `COMPLETED_VALIDATED_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED_NO_LIVE_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js`.
+- Added `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1964_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED.md`.
+- Consumed CM-1963 as the accepted disposable-target resolver/transport boundary.
+- Implemented a local low-disclosure executor/receipt projection layer for future disposable-target component/action request/read-shape probing.
+- Required CM-1963 acceptance before runtime invocation.
+- Generated the minimal probe request body in memory only and kept concrete request body output/persistence false.
+- Used an injected component/action transport instead of hardcoding endpoint or locator values.
+- Consumed returned values only for top-level category/bucket shape projection.
+- Classified success, client error, server error, and transport error without raw payload echo.
+- Disclosed no response field names.
+- Rejected raw-value ingress fields without echo.
+- Preserved zero write, durable write, provider/API, dependency, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push/tag, and readiness counters.
+- Preserved public MCP surface unchanged.
+- Preserved that CM-1964 performed no live/runtime/network/VCPToolBox call, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, raw memory/raw store/raw audit read, memory write, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push/tag, readiness claim, or live read-shape proof.
+- Routed next work to CM-1965 disposable-target request/read-shape execution route decision.
+
+Validation: `CMV-2067`; `node --check` source/test and targeted test `7/7` passed. Broader docs/status validation and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1963 Disposable Target Resolver/Transport Boundary Contract
 

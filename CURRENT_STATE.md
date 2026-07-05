@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1963 disposable target resolver/transport boundary contract |
-| Current task | `CM-1963 disposable target resolver/transport boundary contract` |
-| Current validation | `CMV-2066` |
-| Current route | CM-1963 prepares disposable-target resolver/transport/runtime assist boundary for CM-1964 without execution |
+| Status | CM-1964 disposable target request/read-shape executor prepared |
+| Current task | `CM-1964 disposable target request/read-shape executor prepared` |
+| Current validation | `CMV-2067` |
+| Current route | CM-1964 prepares concrete low-disclosure executor/receipt projection; no live VCPToolBox proof yet |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1964` adds `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js`, `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1964_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED.md`. It consumes CM-1963 and implements a local low-disclosure executor/receipt projection layer for a future disposable-target component/action request/read-shape probe. The executor validates the CM-1963 boundary before runtime invocation, generates the minimal probe request body in memory only, uses an injected component/action transport, consumes returned values only for category/bucket shape projection, classifies status without raw payload echo, discloses no response field names, and preserves zero write/provider/dependency/public-MCP/VCPToolBox-core/release/deploy/cutover/push/readiness counters. Targeted tests passed `7/7`. CM-1964 performs no live/runtime/network/VCPToolBox call, process inspection, listener recheck, service start/stop/restart, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, raw memory/raw store/raw audit read, memory write, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, or live read-shape proof. Next route is CM-1965 disposable-target request/read-shape execution route decision.
 
 `CM-1963` adds `src/core/VcpNativeDisposableTargetResolverTransportBoundaryContract.js`, `tests/vcp-native-disposable-target-resolver-transport-boundary-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1963_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT.md`. It consumes CM-1962 and encodes Jenn's disposable/new-target autonomy preference as a local contract: disposable target only, no Jenn private information, no production secrets, no customer data, no real private memory, target scope only, resolver/transport/runtime assist allowed for a later execution window, raw diagnostic authority scoped to the disposable target, raw diagnostic values not persisted to repo receipts, zero writes, no provider/API, no dependency change, no public MCP expansion, no VCPToolBox core modification, no release/deploy/cutover/push, and no readiness claim. Targeted tests passed `8/8`; default tests passed `4040/4040`; no runtime/network/VCPToolBox call or read-shape proof occurred. Next route is CM-1964 execute disposable-target resolver/transport request/read-shape probe or prepare concrete executor.
 

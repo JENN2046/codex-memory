@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1963",
-  "validationId": "CMV-2066",
+  "taskId": "CM-1964",
+  "validationId": "CMV-2067",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "disposable_target_resolver_transport_boundary_contract_no_execution_no_write_no_readiness",
+    "scope": "disposable_target_request_read_shape_executor_prepared_no_live_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2067",
+      "scope": "CM-1964 disposable target request/read-shape executor prepared",
+      "status": "COMPLETED_VALIDATED_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED_NO_LIVE_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2066",
       "scope": "CM-1963 disposable target resolver/transport boundary contract",
