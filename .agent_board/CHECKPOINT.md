@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1961 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2064`.
+Current checkpoint: `CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt`.
+Current validation: `CMV-2065`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1962 Exact-Approved Component/Action Request/Read-Shape Pre-Execution Gate Blocked Receipt
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED_NO_SAFE_RESOLVER_NO_LIVE_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1962_EXACT_APPROVED_COMPONENT_ACTION_REQUEST_READ_SHAPE_PRE_EXECUTION_GATE_BLOCKED_RECEIPT.md`.
+- Accepted Jenn's current exact approval as boundary input without reproducing or persisting the approval text.
+- Preserved the safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, CM-1959 required pre-live contract, request-body shape category `minimal_component_action_route_status_payload_category_only`, category-only neutral minimal route/read-shape query, max result count `1`, no field-name disclosure, in-memory shape projection only if execution were safe, and no raw response/raw error output or persistence.
+- Blocked before runtime because no verified target-reference-only executor was available that could consume the safe target reference without endpoint/locator disclosure, config/env reads, process-state inspection, listener recheck, service mutation, or guessed request/transport shape.
+- Recorded approval line generated false, approval line persisted false, concrete request body generated false, concrete request body output false, request body persisted false, runtime call false, network call false, VCPToolBox call false, response body read false, raw error read false, response-shape inspection false, endpoint/locator disclosed false, config/env/secret/log/stdout/stderr reads false, raw memory/raw store/raw audit read false, memory read/write false, durable write false, provider/API call false, public MCP expansion false, read-shape unlocked false, and readiness claimed false.
+- Recorded request/read-shape attempts used `0`, network calls used `0`, runtime calls used `0`, and approved runtime attempt consumed false.
+- Preserved that CM-1962 does not carry approval forward. Future execution requires a current exact approval plus a verified safe target-reference-only executor or separately approved resolver/transport boundary.
+- Routed next work to CM-1963 safe executor or resolver boundary preparation, local and no-live unless separately exact-approved.
+
+Validation: `CMV-2065`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1961 Exact Approval Request Readiness Review / Jenn Boundary Display
 

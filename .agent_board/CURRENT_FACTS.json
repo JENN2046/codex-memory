@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1961",
-  "validationId": "CMV-2064",
+  "taskId": "CM-1962",
+  "validationId": "CMV-2065",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approval_request_readiness_review_jenn_boundary_display_non_authorizing_no_live_no_read_shape",
+    "scope": "exact_approval_intake_pre_execution_gate_blocked_no_safe_resolver_no_live_no_read_shape",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2065",
+      "scope": "CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED_NO_SAFE_RESOLVER_NO_LIVE_NO_READ_SHAPE"
+    },
     {
       "id": "CMV-2064",
       "scope": "CM-1961 exact approval request readiness review / Jenn boundary display",

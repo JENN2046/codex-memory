@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1961 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2064`.
-Current handoff: CM-1961 added a non-authorizing Jenn boundary display after CM-1960. Approval remains absent, approval line not generated, concrete request body not generated/output/persisted, live execution absent, exact query/query-category unresolved, response-body handling unresolved, field-name disclosure policy unresolved, `client_error` diagnosis unperformed, action success and response shape unproven, no memory read/write occurred, retry forbidden, and read-shape locked.
+Current task: `CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt`.
+Current validation: `CMV-2065`.
+Current handoff: CM-1962 accepted Jenn's current exact approval as boundary input, then stopped before runtime because no verified target-reference-only executor was available. Approval text was not reproduced, approval line not generated or persisted, concrete request body not generated/output/persisted, no runtime/network/VCPToolBox call occurred, no approved attempt was consumed, no endpoint/locator/config/env/secret/log/stdout/stderr/body/raw error/raw memory/raw store/raw audit material was read or disclosed, no response shape was inspected, no memory read/write occurred, and read-shape remains locked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1961 added a non-authorizing Jenn boundary display after CM-
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action request/read-shape probing, response-shape inspection, read-shape proof, and readiness claims remain forbidden now. Next route is CM-1962 exact-approved component/action request/read-shape probe execution, blocked until Jenn provides separate current exact approval matching CM-1961.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED_NO_SAFE_RESOLVER_NO_LIVE_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1962 approval was received for the current turn but no execution happened because there is no verified target-reference-only executor. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action request/read-shape probing, response-shape inspection, read-shape proof, and readiness claims remain forbidden now. Next route is CM-1963 safe executor or resolver boundary preparation, local and no-live unless separately exact-approved.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1962_EXACT_APPROVED_COMPONENT_ACTION_REQUEST_READ_SHAPE_PRE_EXECUTION_GATE_BLOCKED_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1961_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1960_COMPONENT_ACTION_REQUEST_READ_SHAPE_EXACT_APPROVAL_PACKET.md`
 - `src/core/VcpNativeComponentActionRequestReadShapePreparationContract.js`

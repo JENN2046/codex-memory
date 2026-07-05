@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1961 exact approval request readiness review / Jenn boundary display |
-| Current task | `CM-1961 exact approval request readiness review / Jenn boundary display` |
-| Current validation | `CMV-2064` |
-| Current route | CM-1961 displays the non-authorizing future exact boundary and routes to CM-1962 only if Jenn provides separate current exact approval |
+| Status | CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt |
+| Current task | `CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt` |
+| Current validation | `CMV-2065` |
+| Current route | CM-1962 accepted Jenn's current exact approval as boundary input but blocked before runtime because no verified target-reference-only executor was available |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1962` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1962_EXACT_APPROVED_COMPONENT_ACTION_REQUEST_READ_SHAPE_PRE_EXECUTION_GATE_BLOCKED_RECEIPT.md`. It records that Jenn supplied current single-use exact approval for one component/action request/read-shape probe under the CM-1959/CM-1960/CM-1961 boundary, but the pre-execution gate blocked before runtime because no verified target-reference-only executor was available. The approval text is not reproduced, no approval line is generated or persisted, no concrete request body is generated/output/persisted, no runtime/network/VCPToolBox call is performed, no approved attempt is consumed, no endpoint/locator/config/env/secret/log/stdout/stderr/body/raw error/raw memory/raw store/raw audit material is read or disclosed, no response shape is inspected, no memory is read or written, read-shape remains locked, and readiness is not claimed. Future execution requires a current exact approval plus a verified safe target-reference-only executor or separately approved resolver/transport boundary. Next route is CM-1963 safe executor or resolver boundary preparation, local and no-live unless separately exact-approved.
 
 `CM-1961` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1961_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It reviews CM-1960 as present and ready for Jenn boundary display, requires CM-1959 `VcpNativeComponentActionRequestReadShapePreparationContract`, and displays the future exact boundary as non-authorizing material only. It keeps exact fields incomplete until Jenn supplies `exact_query_or_query_category`, `response_body_handling`, and `field_name_disclosure_policy`. It grants no approval, generates no approval line, generates/outputs/persists no concrete request body, performs no live/network/runtime/VCPToolBox call, reads no response/raw/log/config/env/secret/raw memory material, inspects no response shape, writes no memory, unlocks no read-shape proof, and claims no readiness. Next route is CM-1962 exact-approved component/action request/read-shape probe execution, blocked until Jenn provides separate current exact approval matching CM-1961.
 
