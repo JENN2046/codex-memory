@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1969",
-  "validationId": "CMV-2072",
+  "taskId": "CM-1970",
+  "validationId": "CMV-2073",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "m11_fixture_to_m12_fixture_refresh_no_runtime_no_write_no_readiness",
+    "scope": "m12_fixture_to_m13_fallback_fixture_refresh_no_runtime_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2073",
+      "scope": "CM-1970 M12/M13 fallback local memory route refresh",
+      "status": "COMPLETED_VALIDATED_M12_M13_FALLBACK_LOCAL_MEMORY_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2072",
       "scope": "CM-1969 M11/M12 sustained workflow route refresh",

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1969 M11/M12 sustained workflow route refresh`.
-Current validation: `CMV-2072`.
-Current handoff: CM-1969 accepts existing M12 envelope and receipt-chain fixture contracts for local planning after CM-1968 and keeps M12 live workflow integration blocked. Actual workflow runtime and checkpoint/handoff memory writes remain forbidden.
+Current task: `CM-1970 M12/M13 fallback local memory route refresh`.
+Current validation: `CMV-2073`.
+Current handoff: CM-1970 accepts existing M13 fallback local memory fixture/dry-run contracts for local planning after CM-1969 and keeps M13 live/runtime fallback safety blocked. Actual fallback runtime, real queries, private runtime reads, raw store scans, and memory writes remain forbidden.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1969 accepts existing M12 envelope and receipt-chain fixture
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M11_M12_SUSTAINED_WORKFLOW_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1969 keeps M10 blocked for real mutation, keeps M11 live runtime exit incomplete, and keeps M12 live workflow incomplete; it does not start a workflow harness, execute workflow steps, call runtime, use MCP memory tools, write checkpoint/handoff memory, perform durable mutation, or unlock M12/M13/M15. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1970 M12/M13 fallback local memory route refresh.
+Current status: `COMPLETED_VALIDATED_M12_M13_FALLBACK_LOCAL_MEMORY_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1970 keeps M10 blocked for real mutation, keeps M11 live runtime exit incomplete, keeps M12 live workflow incomplete, and keeps M13 live/runtime fallback safety incomplete; it does not start a workflow harness, execute workflow steps, execute fallback runtime, run real queries, read private runtime memory, scan raw stores, call runtime, use MCP memory tools, write checkpoint/handoff memory, perform durable mutation, or unlock M13/M14/M15. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1971 M13/M14 health-report route refresh.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1970_M12_M13_FALLBACK_LOCAL_MEMORY_ROUTE_REFRESH.md`
 - `src/core/VcpMemoryM10ExactWriteBoundaryGateContract.js`
 - `tests/vcp-memory-m10-exact-write-boundary-gate-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1967_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT.md`
