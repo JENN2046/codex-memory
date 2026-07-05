@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1960 component/action request/read-shape exact approval packet`.
-Current validation: `CMV-2063`.
+Current checkpoint: `CM-1961 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2064`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1961 Exact Approval Request Readiness Review / Jenn Boundary Display
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1961_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`.
+- Reviewed CM-1960 as present and ready for Jenn boundary display.
+- Required CM-1959 `VcpNativeComponentActionRequestReadShapePreparationContract`.
+- Displayed the future exact boundary as non-authorizing material only.
+- Kept exact fields incomplete until Jenn supplies `exact_query_or_query_category`, `response_body_handling`, and `field_name_disclosure_policy`.
+- Recorded approval false, approval line generated/submitted false, concrete request body generated/output/persisted false, live execution false, component/action request/read-shape probe allowed now false, response body/raw error reads now false, response-shape inspection now false, memory read/write now false, read-shape unlocked false, and readiness claimed false.
+- Preserved public MCP surface unchanged.
+- Routed next work to CM-1962 exact-approved component/action request/read-shape probe execution, blocked until Jenn provides separate current exact approval matching CM-1961.
+- Preserved that no diagnosis, retry, live/network/runtime call, VCPToolBox call, process-state inspection, service start/stop/restart, listener recheck, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, response-shape inspection, MCP memory call, memory/durable write, concrete request body generation/output/persistence, approval line generation, runtime/config/startup/watchdog/dependency/public MCP mutation, push/tag/release/deploy/cutover, readiness claim, or read-shape proof occurred.
+
+Validation: `CMV-2064`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1960 Component/Action Request/Read-Shape Exact Approval Packet
 

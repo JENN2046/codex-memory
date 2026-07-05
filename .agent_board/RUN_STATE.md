@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1960 component/action request/read-shape exact approval packet`.
-Current validation: `CMV-2063`.
-Current status: CM-1960 adds a non-authorizing exact approval packet preparation artifact after CM-1959, carries forward only status-only `client_error` evidence, keeps action success unproven, response shape unknown, memory read/write false, read-shape locked, retry forbidden, approval absent, approval line not generated, concrete request body not generated/output/persisted, live execution absent, and readiness unclaimed.
+Current task: `CM-1961 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2064`.
+Current status: CM-1961 reviews CM-1960 as present and ready for Jenn boundary display, requires CM-1959, keeps exact fields incomplete until Jenn supplies the exact query/query category, response-body handling, and field-name disclosure policy, displays the future boundary as non-authorizing material only, keeps approval absent, approval line not generated, concrete request body not generated/output/persisted, live execution absent, response-shape inspection absent, read-shape locked, memory read/write false, and readiness unclaimed.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1961 exact approval request readiness review / Jenn boundary display, non-authorizing and no-live. Do not retry CM-1956, perform live/network/runtime calls, call VCPToolBox, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator/config/env/secret/log/body/raw memory reads, concrete request body generation/output/persistence, approval line generation, component/action route probing, response-shape inspection, read-shape proof, memory read/write, readiness/release/deploy/cutover/push claim, or public MCP expansion. Push remains separate explicit authorization.
+Next action is CM-1962 exact-approved component/action request/read-shape probe execution only if Jenn provides a separate current exact approval matching the CM-1961 boundary. Without that approval, stop before execution. Do not retry CM-1956, perform live/network/runtime calls, call VCPToolBox, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator/config/env/secret/log/body/raw memory reads, concrete request body generation/output/persistence, approval line generation, component/action request/read-shape probing, response-shape inspection, read-shape proof, memory read/write, readiness/release/deploy/cutover/push claim, or public MCP expansion. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

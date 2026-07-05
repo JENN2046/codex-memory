@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1960 component/action request/read-shape exact approval packet |
-| Current task | `CM-1960 component/action request/read-shape exact approval packet` |
-| Current validation | `CMV-2063` |
-| Current route | CM-1960 adds a non-authorizing exact approval packet preparation artifact and routes to CM-1961 exact approval request readiness review / Jenn boundary display |
+| Status | CM-1961 exact approval request readiness review / Jenn boundary display |
+| Current task | `CM-1961 exact approval request readiness review / Jenn boundary display` |
+| Current validation | `CMV-2064` |
+| Current route | CM-1961 displays the non-authorizing future exact boundary and routes to CM-1962 only if Jenn provides separate current exact approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1961` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1961_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It reviews CM-1960 as present and ready for Jenn boundary display, requires CM-1959 `VcpNativeComponentActionRequestReadShapePreparationContract`, and displays the future exact boundary as non-authorizing material only. It keeps exact fields incomplete until Jenn supplies `exact_query_or_query_category`, `response_body_handling`, and `field_name_disclosure_policy`. It grants no approval, generates no approval line, generates/outputs/persists no concrete request body, performs no live/network/runtime/VCPToolBox call, reads no response/raw/log/config/env/secret/raw memory material, inspects no response shape, writes no memory, unlocks no read-shape proof, and claims no readiness. Next route is CM-1962 exact-approved component/action request/read-shape probe execution, blocked until Jenn provides separate current exact approval matching CM-1961.
 
 `CM-1960` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1960_COMPONENT_ACTION_REQUEST_READ_SHAPE_EXACT_APPROVAL_PACKET.md`. It consumes CM-1959 and prepares a non-authorizing exact approval packet shape for one future component/action request/read-shape probe. The packet carries forward only low-disclosure status-only `client_error` evidence for safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, and request-body shape category `minimal_component_action_route_status_payload_category_only`; records that action success, response shape, memory read, read-shape support, trusted-full-read workflow, and readiness remain unproven; defines future exact approval fields, response-shape projection limits, receipt projection, and stop conditions. CM-1960 grants no approval, generates no approval line, generates/outputs/persists no concrete request body, performs no live/network/runtime/VCPToolBox call, reads no response/raw/log/config/env/secret/raw memory material, writes no memory, unlocks no read-shape proof, and claims no readiness. Next route is CM-1961 exact approval request readiness review / Jenn boundary display, non-authorizing and no-live.
 
