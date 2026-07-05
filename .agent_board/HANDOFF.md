@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1956 exact-approved component/action route-status probe receipt`.
-Current validation: `CMV-2059`.
-Current handoff: CM-1956 consumed one exact-approved route-status probe and recorded status-only `client_error`. The approved live/network/runtime budgets are exhausted, retry is not allowed, no raw/body/log/config/env/secret/memory material was read, no memory write occurred, and read-shape remains locked.
+Current task: `CM-1957 component/action route-status probe closeout / route decision`.
+Current validation: `CMV-2060`.
+Current handoff: CM-1957 closed CM-1956 as valid status-only `client_error` evidence, confirmed the approved live/network/runtime budgets are exhausted, retry is not allowed, action success and response shape are unproven, no memory read/write occurred, and read-shape remains locked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1956 consumed one exact-approved route-status probe and reco
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_STATUS_ONLY_CLIENT_ERROR_NO_BODY_NO_WRITE_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, read-shape proof, and readiness claims remain forbidden now.
+Current status: `COMPLETED_VALIDATED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_TO_REQUEST_READ_SHAPE_PREPARATION_NO_RETRY_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, read-shape proof, and readiness claims remain forbidden now. Next route is CM-1958 component/action request/read-shape preparation preflight, still docs/status/governance only unless Jenn later provides separate exact approval.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1957_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1956_EXACT_APPROVED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1955_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1954_COMPONENT_ACTION_ROUTE_PROBE_EXACT_APPROVAL_REQUEST_PACKET.md`

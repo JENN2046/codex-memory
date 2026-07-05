@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1956 exact-approved component/action route-status probe receipt |
-| Current task | `CM-1956 exact-approved component/action route-status probe receipt` |
-| Current validation | `CMV-2059` |
-| Current route | CM-1956 consumed one exact-approved route-status probe and routes to CM-1957 closeout |
+| Status | CM-1957 component/action route-status probe closeout / route decision |
+| Current task | `CM-1957 component/action route-status probe closeout / route decision` |
+| Current validation | `CMV-2060` |
+| Current route | CM-1957 closes CM-1956 as status-only `client_error` and routes to CM-1958 request/read-shape preparation |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1957` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1957_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`. It reviews only the committed CM-1956 low-disclosure receipt and records that the receipt is valid, the approved route-status probe attempt was consumed, route-probe/network/runtime budgets are exhausted, retry is not allowed, route status is known only as status-only `client_error`, action success is unproven, memory read is unproven, response shape is unknown, read-shape remains locked, and readiness is not claimed. CM-1957 does not perform a live call, retry CM-1956, call VCPToolBox, inspect process state, start/stop/restart runtime, recheck listeners, output or persist concrete request bodies, generate approval lines, read response bodies/raw error/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1958 component/action request/read-shape preparation preflight, docs/status/governance only unless Jenn later provides separate exact approval.
 
 `CM-1956` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1956_EXACT_APPROVED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_RECEIPT.md`. Under Jenn's current exact approval, it consumed exactly one component/action route-status probe for safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, and request-body shape category `minimal_component_action_route_status_payload_category_only`. The CM-1953 pre-live contract accepted the boundary. Result: `componentActionRouteProbeCategory=route_status_known`, `routeStatusCategory=status_only_known`, target safe-reference category `listener_level_reachable_reference_only`, transport wrapper category `component_action_route_status_transport_category_only`, status class `client_error`, duration bucket `lt_100ms`, zero write counters, request body generated true, concrete request body output false, request body persisted false, response body read false, raw error payload read false, endpoint/locator disclosure false, config/env/secret/log/stdout/stderr/raw memory reads false, memory written false, read-shape unlocked false, and readiness claimed false. CM-1956 consumed the single approved route-probe attempt, network call, and runtime call; retry is not authorized. It does not prove action success, memory read, response shape, read-shape support, VCP native bridge readiness, production/release/cutover readiness, complete V8, or full bridge completion. Next route is CM-1957 component/action route-status probe closeout / route decision, docs/status/governance only and no-live.
 

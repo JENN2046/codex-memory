@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1956 exact-approved component/action route-status probe receipt`.
-Current validation: `CMV-2059`.
+Current checkpoint: `CM-1957 component/action route-status probe closeout / route decision`.
+Current validation: `CMV-2060`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1957 Component/Action Route-Status Probe Closeout / Route Decision
+
+Status: `COMPLETED_VALIDATED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_TO_REQUEST_READ_SHAPE_PREPARATION_NO_RETRY_NO_READ_SHAPE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1957_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`.
+- Reviewed only the committed CM-1956 low-disclosure receipt.
+- Recorded `cm1956_receipt_valid=true`, CM-1956 approved attempt consumed, route-probe/network/runtime budgets exhausted, and retry not allowed.
+- Recorded route status known only as status-only `client_error`; action success, memory read, response shape, read-shape support, readiness, complete V8, and full bridge completion remain unproven.
+- Preserved that CM-1957 performed no live call, no retry, no VCPToolBox call, no process-state inspection, no service start/stop/restart/listener recheck, no endpoint/locator disclosure, no response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, no MCP memory tool call, no memory/durable write, no concrete request body output or persistence, no approval line generation, no runtime/config/startup/watchdog/dependency/public MCP mutation, no push/tag/release/deploy/cutover, no readiness claim, and no read-shape proof.
+- Routed next work to CM-1958 component/action request/read-shape preparation preflight, docs/status/governance only unless Jenn later provides separate exact approval.
+
+Validation: `CMV-2060`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1956 Exact-Approved Component/Action Route-Status Probe Receipt
 
