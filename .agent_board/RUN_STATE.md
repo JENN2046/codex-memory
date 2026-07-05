@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt`.
-Current validation: `CMV-2065`.
-Current status: CM-1962 records current exact approval intake for one component/action request/read-shape probe, then blocks before runtime because no verified target-reference-only executor is available. Approval text reproduced false, approval line generated/persisted false, concrete request body generated/output/persisted false, runtime/network/VCPToolBox call false, approved attempt consumed false, endpoint/locator/config/env/secret/log/stdout/stderr/body/raw memory disclosure false, response-shape inspection false, memory read/write false, read-shape locked, and readiness unclaimed.
+Current task: `CM-1963 disposable target resolver/transport boundary contract`.
+Current validation: `CMV-2066`.
+Current status: CM-1963 adds a local disposable-target resolver/transport/runtime assist boundary contract. It accepts only disposable target scope with no Jenn private information, no production secrets, no customer data, and no real private memory; prepares a later runtime assist window; keeps raw diagnostic authority scoped to disposable target; rejects raw value persistence, writes, provider/API, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness drift. Targeted tests passed `8/8`; default tests passed `4040/4040`; no runtime execution occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1963 safe executor or resolver boundary preparation, local and no-live. Do not carry CM-1962 approval forward as execution authority. Do not perform live/network/runtime calls, call VCPToolBox, start/stop/restart services, inspect process state, recheck listeners, resolve or disclose endpoint/locator values, read config/env/secrets/logs/stdout/stderr/body/raw errors/raw memory/raw stores/raw audit rows, generate/output/persist concrete request bodies, generate/persist approval lines, inspect response shape, read/write memory, claim read-shape proof, claim readiness/release/deploy/cutover/push, or expand public MCP without a separate current exact boundary.
+Next action is CM-1964 execute disposable-target resolver/transport request/read-shape probe or prepare the concrete executor. Stay inside CM-1963 budgets and disposable-target scope. Do not touch non-target private/production material, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
 
 ## Historical Run Notes
 

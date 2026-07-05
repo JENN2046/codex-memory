@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt |
-| Current task | `CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt` |
-| Current validation | `CMV-2065` |
-| Current route | CM-1962 accepted Jenn's current exact approval as boundary input but blocked before runtime because no verified target-reference-only executor was available |
+| Status | CM-1963 disposable target resolver/transport boundary contract |
+| Current task | `CM-1963 disposable target resolver/transport boundary contract` |
+| Current validation | `CMV-2066` |
+| Current route | CM-1963 prepares disposable-target resolver/transport/runtime assist boundary for CM-1964 without execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1963` adds `src/core/VcpNativeDisposableTargetResolverTransportBoundaryContract.js`, `tests/vcp-native-disposable-target-resolver-transport-boundary-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1963_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT.md`. It consumes CM-1962 and encodes Jenn's disposable/new-target autonomy preference as a local contract: disposable target only, no Jenn private information, no production secrets, no customer data, no real private memory, target scope only, resolver/transport/runtime assist allowed for a later execution window, raw diagnostic authority scoped to the disposable target, raw diagnostic values not persisted to repo receipts, zero writes, no provider/API, no dependency change, no public MCP expansion, no VCPToolBox core modification, no release/deploy/cutover/push, and no readiness claim. Targeted tests passed `8/8`; default tests passed `4040/4040`; no runtime/network/VCPToolBox call or read-shape proof occurred. Next route is CM-1964 execute disposable-target resolver/transport request/read-shape probe or prepare concrete executor.
 
 `CM-1962` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1962_EXACT_APPROVED_COMPONENT_ACTION_REQUEST_READ_SHAPE_PRE_EXECUTION_GATE_BLOCKED_RECEIPT.md`. It records that Jenn supplied current single-use exact approval for one component/action request/read-shape probe under the CM-1959/CM-1960/CM-1961 boundary, but the pre-execution gate blocked before runtime because no verified target-reference-only executor was available. The approval text is not reproduced, no approval line is generated or persisted, no concrete request body is generated/output/persisted, no runtime/network/VCPToolBox call is performed, no approved attempt is consumed, no endpoint/locator/config/env/secret/log/stdout/stderr/body/raw error/raw memory/raw store/raw audit material is read or disclosed, no response shape is inspected, no memory is read or written, read-shape remains locked, and readiness is not claimed. Future execution requires a current exact approval plus a verified safe target-reference-only executor or separately approved resolver/transport boundary. Next route is CM-1963 safe executor or resolver boundary preparation, local and no-live unless separately exact-approved.
 

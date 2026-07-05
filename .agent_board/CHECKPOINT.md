@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt`.
-Current validation: `CMV-2065`.
+Current checkpoint: `CM-1963 disposable target resolver/transport boundary contract`.
+Current validation: `CMV-2066`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1963 Disposable Target Resolver/Transport Boundary Contract
+
+Status: `COMPLETED_VALIDATED_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT_NO_EXECUTION_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `src/core/VcpNativeDisposableTargetResolverTransportBoundaryContract.js`.
+- Added `tests/vcp-native-disposable-target-resolver-transport-boundary-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1963_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT.md`.
+- Consumed the CM-1962 pre-execution gate block and Jenn's disposable/new-target autonomy preference.
+- Encoded a local contract that accepts only disposable target declarations: new/disposable target true, target scope only, no Jenn private information, no production secrets, no customer data, no real private memory, and no non-target workspace access.
+- Prepared resolver/transport/runtime assist authority for safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, request-body shape category `minimal_component_action_route_status_payload_category_only`, neutral non-private max-1 no-broad-scan query boundary, and max result count `1`.
+- Locked budgets: resolver attempts `3`, request/read-shape attempts `2`, network calls `3`, runtime calls `3`, process-state inspections `3`, listener rechecks `3`, service start/ensure `1`, cleanup stop `1`, restart `0`, local repair files `3`, validation runs `3`, and transient retry `1`.
+- Scoped raw diagnostic authority to disposable target only while rejecting committed raw endpoint/locator/request/response/error/log/env/memory values in source/docs/status.
+- Rejected private/production/non-target declarations, over-broad budgets, unknown fields, nonzero counters, memory writes, durable writes, provider calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness drift.
+- Preserved public MCP surface unchanged.
+- Preserved that CM-1963 performed no runtime/network/VCPToolBox call, process inspection, listener recheck, service start, request body generation/submission, response body consumption, raw diagnostic output, memory read/write, durable write, provider/API call, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, or read-shape proof.
+- Routed next work to CM-1964 execute disposable-target resolver/transport request/read-shape probe or prepare concrete executor.
+
+Validation: `CMV-2066`; `node --check` source/test, targeted test `8/8`, `npm test -- --summary` `4040/4040`, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1962 Exact-Approved Component/Action Request/Read-Shape Pre-Execution Gate Blocked Receipt
 

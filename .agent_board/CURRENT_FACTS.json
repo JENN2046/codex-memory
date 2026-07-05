@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1962",
-  "validationId": "CMV-2065",
+  "taskId": "CM-1963",
+  "validationId": "CMV-2066",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approval_intake_pre_execution_gate_blocked_no_safe_resolver_no_live_no_read_shape",
+    "scope": "disposable_target_resolver_transport_boundary_contract_no_execution_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2066",
+      "scope": "CM-1963 disposable target resolver/transport boundary contract",
+      "status": "COMPLETED_VALIDATED_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT_NO_EXECUTION_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2065",
       "scope": "CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt",
