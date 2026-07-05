@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1937",
-  "validationId": "CMV-2040",
+  "taskId": "CM-1938",
+  "validationId": "CMV-2041",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approval_request_readiness_review_jenn_boundary_display_non_authorizing_no_approval_line",
+    "scope": "exact_approved_startup_listener_recovery_diagnosis_transport_error_no_body_no_write_no_raw_output",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2041",
+      "scope": "CM-1938 exact-approved startup/listener recovery diagnosis receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
     {
       "id": "CMV-2040",
       "scope": "CM-1937 exact approval request readiness review / Jenn boundary display",

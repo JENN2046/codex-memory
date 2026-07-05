@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1937 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2040`.
+Current checkpoint: `CM-1938 exact-approved startup/listener recovery diagnosis receipt`.
+Current validation: `CMV-2041`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1938 Exact-Approved Startup/Listener Recovery Diagnosis Receipt
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1938_EXACT_APPROVED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_RECEIPT.md`.
+- Consumed exactly one Jenn-approved startup/listener recovery diagnosis attempt under the CM-1936 / CM-1937 boundary.
+- Preserved that the approval line itself is not reproduced.
+- Checked CM-1935 `VcpNativeStartupListenerRecoveryContract` as the required pre-live contract; result accepted, locked, and low-disclosure.
+- Consumed one service-start attempt and one no-body/no-request listener recheck.
+- Recorded low-disclosure receipt: `statusCategory=transport_error`, `runtimeProcessStateCategory=not_checked`, `processCountBucket=not_checked`, `serviceStartupAttemptCategory=attempted`, `serviceStartupResultCategory=unknown`, `postStartListenerStatusCategory=not_reachable`, `targetSafeReferenceBindingCategory=reference_name_only`, `transportWrapperShapeCategory=no_body_no_request_listener_transport`, `serviceListenerRecheckStatusCategory=not_reachable`, `statusClass=tcp_connect_failed`, `durationBucket=lt_100ms`, and `zeroWriteCounters=true`.
+- Recorded consumed budget: service-start attempts `1`, listener recheck attempts `1`, network calls `1`, runtime calls `1`, process-state inspections `0`, service-stop attempts `0`, service-restart attempts `0`; retry not allowed.
+- Preserved runtime startup state unknown, process count unknown, target locator binding success unknown, service startup success unknown, service listener root cause unknown, component/action probe locked, read-shape locked, and readiness not claimed.
+- Routed next work to CM-1939 startup/listener recovery diagnosis closeout / route decision.
+- Preserved that no retry, component/action probe, read-shape proof, request body generation/submission, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, endpoint/locator disclosure, process identifier or command-line output, process-state inspection, runtime stop/restart, MCP memory call, provider/API call, memory write, durable write, config/startup/watchdog/dependency/runtime binding/public MCP change, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2041`; one exact-approved startup/listener recovery diagnosis attempt, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1937 Exact Approval Request Readiness Review / Jenn Boundary Display
 
