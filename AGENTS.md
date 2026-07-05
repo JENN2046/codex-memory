@@ -45,11 +45,26 @@ Current protected source realities:
 * `validate_memory`, `tombstone_memory`, and `supersede_memory` are public
   controlled-mutation preflight tools; durable confirmed mutation requires a
   separate exact approval and must not be inferred from registration.
+* Project/governance memory writes through approved secure memory channels may
+  be autonomous when they are high-value, low-disclosure, evidence-grounded,
+  scoped, and auditable.
+* Raw private memory store mutation, broad memory import/export, real migration,
+  cleanup confirm/apply, tombstone confirm, supersede confirm, or public MCP
+  schema/tool expansion requires Jenn's exact authorization.
+* Treat `record_memory` according to its current implementation mode: if it
+  performs durable raw/private memory mutation, it is blocked without exact
+  authorization; if it writes only approved low-disclosure project/governance
+  memory through the secure channel, it may proceed under the autonomous memory
+  rules.
 * Public MCP tool/schema expansion remains blocked unless Jenn explicitly
   authorizes the exact phase and boundary.
 * Docs-only, fixture-only, no-mutation, and read-only evidence must not be
   described as live runtime readiness, cutover readiness, production readiness,
   release readiness, or `RC_READY`.
+* "Real memory" means non-fixture, non-synthetic, user/project/runtime memory
+  content or stores that may contain private, sensitive, or persistent memory
+  data. Fixture, synthetic, redacted, and docs-only examples are not real
+  memory, but must not be described as live runtime proof.
 
 Authorized default repository scope, when the current task allows writes:
 
@@ -116,12 +131,17 @@ Instruction precedence inside this repository:
 Default repository posture:
 
 * Standard local profile: root `AGENTS.md` plus `.agent_board/`.
-* Smart Standing Authorization v3 is recognized by project docs, but this file
-  does not restate the global autonomy model.
-* Red Lane remains manual for this repository: push, PR, tag, release, deploy,
-  destructive commands, secret reads, broad private data scans, public MCP
-  expansion, config/watchdog/startup mutation, real memory migration, paid
-  provider calls, and readiness claims.
+* Smart Standing Authorization v3 and Jenn's global L3 protocol apply by
+  default.
+* This repository narrows L3 only for memory/runtime-sensitive actions. Safe
+  local edits, validation, documentation updates, local commits, approved
+  project-memory writes, safe task-branch pushes, and draft PR updates may
+  proceed when all repository safety checks pass.
+* Red Lane remains manual for secrets, raw private memory, broad private scans,
+  public MCP expansion, config/watchdog/startup mutation, real memory migration,
+  cleanup confirm/apply, paid provider calls, readiness claims, release, deploy,
+  tag, protected-branch push, upstream push, force push, and destructive
+  operations.
 * Default response language for project work is Simplified Chinese unless Jenn
   asks otherwise. Keep code, commands, paths, identifiers, logs, and errors in
   their original language.
@@ -274,14 +294,14 @@ npm run rollback:mainline:plan -- --json
 
 ## 5. Branch, Remote, and Delivery Policy
 
-Observed at fill time:
+Fill-time Git observation on 2026-07-05:
 
-* Current branch: `main`
-* Current remote: `origin` -> `git@github.com:JENN2046/codex-memory.git`
-* Current `main...origin/main`: ahead 248, behind 0
+* Branch was `main`.
+* Remote `origin` was `git@github.com:JENN2046/codex-memory.git`.
+* `main...origin/main` was ahead 248, behind 0.
 
-These are point-in-time facts. Re-run Git checks before branch-sensitive,
-commit, push-readiness, PR, release-like, or remote work:
+Treat these as historical evidence only. Always rerun fresh Git checks before
+branch-sensitive, commit, push-readiness, PR, release-like, or remote work:
 
 ```bash
 git branch --show-current
@@ -297,20 +317,27 @@ Protected branches:
 * `production`
 * `release`
 
-Remote policy:
+Push and PR policy for this repository is narrower than Jenn's global L3 default
+because memory/runtime state is high risk.
 
-* Push is not authorized by default for this project.
+Allowed without per-action confirmation when all safety checks pass:
+
+* local commit on a task branch;
+* push to a safe non-production branch on verified `origin`;
+* open or update a draft PR for review;
+* update task notes, receipts, and approved project memory surfaces.
+
+Still blocked unless Jenn explicitly authorizes the exact action:
+
 * A remote named `origin` is not automatically safe.
-* Do not push unless Jenn explicitly authorizes the exact push action or a
-  current project instruction explicitly activates a safe-push policy and every
-  safe-push requirement passes with fresh evidence.
 * Do not push to `main`, `master`, `production`, or `release`.
 * Do not push to `upstream`.
 * Do not force push.
 * Do not push tags.
-* Do not push branches known to trigger release, deployment, production
-  mutation, billing, paid provider calls, customer-facing effects, or
-  real-world notifications.
+* Do not release, deploy, publish, cutover, or claim readiness.
+* Do not push or update a PR/branch when it triggers deployment, release, paid
+  provider calls, production mutation, real memory migration, public MCP
+  expansion, customer-facing effects, or real-world notifications.
 
 Default task branch pattern when branch creation is in scope:
 
@@ -321,8 +348,8 @@ codex/<short-task-name>
 Normal delivery surfaces:
 
 * local commit
-* safe feature branch only when push is authorized and fresh safety checks pass
-* existing PR or repository PR system only when Jenn authorizes that delivery
+* safe feature branch push when all repository safety checks pass
+* draft PR creation/update when all repository safety checks pass
 * `.agent_board/TASK_QUEUE.md`
 * `.agent_board/VALIDATION_LOG.md`
 * `.agent_board/CHECKPOINT.md`
@@ -444,11 +471,14 @@ Rules:
   provider payloads, response bodies, or private memory content unless Jenn
   gives exact scope and the project boundary allows it.
 
-Secret scanning command, if available and safe:
+Basic staged-diff secret-pattern check, if `rg` is available and safe:
 
 ```bash
 git diff --cached -U0 | rg -n "^\+[^+].*(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|PRIVATE)|Authorization:|Bearer [A-Za-z0-9._-]{20,})"
 ```
+
+This is a limited pattern check, not a complete secret scanner. Passing it does
+not prove the diff is secret-free. Still review the staged diff manually.
 
 When docs intentionally contain approval-token vocabulary such as `APPROVE_`,
 treat it as governance text only after manual review confirms it is not a live
@@ -691,8 +721,11 @@ Filled for `codex-memory` on 2026-07-05 using repository evidence:
   `npm test -- --summary`, `bash scripts/validate-local.sh docs`, current-facts
   drift, ledger consistency, and mainline gates as needed;
 * protected branches: `main`, `master`, `production`, `release`;
-* push policy: not authorized by default; exact Jenn authorization or an
-  explicitly active safe-push policy with fresh passing evidence is required;
+* push/PR policy: safe non-production branch push to verified `origin` and
+  draft PR creation/update may proceed when all repository safety checks pass;
+  protected-branch push, upstream push, force push, tags, release, deploy,
+  cutover, readiness claim, or remote action with side effects remains blocked
+  without exact Jenn authorization;
 * CI behavior: `.github/workflows/ci.yml` runs on push to `main` and PR to
   `main`, with `npm ci`, `npm test`, profile dry-run/profile health/profile
   gate, and `v8-diagnose`;
@@ -720,10 +753,11 @@ Unresolved `UNKNOWN` / `NEEDS JENN CONFIRMATION` fields:
 * `UNKNOWN - no dedicated build package script observed in package.json`.
 * `UNKNOWN - repository settings, branch protections, GitHub environments, and
   external integrations outside checked-in files are not verified by local file
-  inspection; treat exact remote delivery as blocked until verified`.
-* `NEEDS JENN CONFIRMATION - any push/PR/release/deploy/cutover/readiness
-  action unless a current task explicitly authorizes it and all project/global
-  safety checks pass`.
+  inspection; treat any remote action that may trigger side effects as blocked
+  until verified`.
+* `NEEDS JENN CONFIRMATION - protected-branch push, upstream push, force push,
+  tag, release, deploy, publish, cutover, readiness claim, real memory
+  migration, paid provider call, production mutation, or public MCP expansion`.
 
 If repository reality changes, update this file with evidence and keep Jenn's
 global hard stops intact.
