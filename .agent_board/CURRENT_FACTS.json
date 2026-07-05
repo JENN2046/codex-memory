@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1948",
-  "validationId": "CMV-2051",
+  "taskId": "CM-1949",
+  "validationId": "CMV-2052",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "component_action_status_probe_exact_approval_request_packet_non_authorizing_no_live_no_request_body",
+    "scope": "exact_approval_request_readiness_review_jenn_boundary_display_non_authorizing_no_live",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2052",
+      "scope": "CM-1949 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-2051",
       "scope": "CM-1948 component/action status probe exact approval request packet",

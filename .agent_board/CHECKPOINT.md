@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1948 component/action status probe exact approval request packet`.
-Current validation: `CMV-2051`.
+Current checkpoint: `CM-1949 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2052`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1949 Exact Approval Request Readiness Review / Jenn Boundary Display
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1949_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`.
+- Reviewed CM-1948 as present and ready for Jenn boundary display.
+- Required CM-1947 `VcpNativeComponentActionStatusProbeContract` as the pre-live boundary.
+- Displayed the future exact boundary as non-authorizing material only.
+- Preserved approval not granted, approval line not generated/submitted, request body not generated, live execution not allowed, component/action status probe not allowed now, response body and raw error reads not allowed now, process-state inspection not allowed now, service start/listener recheck not allowed now, component/action status unknown, route status unknown, target locator binding success unknown, read-shape locked, and readiness not claimed.
+- Routed next work to CM-1950 exact-approved component/action status probe execution, blocked until Jenn provides separate current exact approval matching the CM-1949 boundary.
+- Preserved that no retry, live/network call, VCPToolBox call, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe execution, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2052`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1948 Component/Action Status Probe Exact Approval Request Packet
 

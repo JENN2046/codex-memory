@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1948 component/action status probe exact approval request packet |
-| Current task | `CM-1948 component/action status probe exact approval request packet` |
-| Current validation | `CMV-2051` |
-| Current route | CM-1948 prepares non-authorizing exact approval request packet and routes next to CM-1949 boundary display |
+| Status | CM-1949 exact approval request readiness review / Jenn boundary display |
+| Current task | `CM-1949 exact approval request readiness review / Jenn boundary display` |
+| Current validation | `CMV-2052` |
+| Current route | CM-1949 displays non-authorizing Jenn boundary and blocks before CM-1950 until Jenn exact approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1949` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1949_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It reviews CM-1948 as ready for Jenn boundary display and displays the exact boundary as non-authorizing material only. It grants no approval, generates no approval line or request body, performs no live action, keeps component/action status unknown, keeps route status unknown, keeps component/action probe execution blocked now, keeps read-shape locked, and claims no readiness. Next route is CM-1950 exact-approved component/action status probe execution, blocked until Jenn provides separate current exact approval matching the CM-1949 boundary.
 
 `CM-1948` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1948_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET.md`. It prepares a non-authorizing exact approval request packet for one future `component_action_status_probe` under CM-1947. It binds safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, one component/action status probe attempt, one network call, one runtime call, zero process/start/listener budgets, no request body, zero response/raw/log budgets, no endpoint/locator/config/env/secret/memory/write/provider/public MCP/release/push/readiness, no read-shape probe, and low-disclosure receipt projection only. It does not grant approval, generate approval lines or request bodies, perform live calls, execute component/action probing, unlock read-shape, or claim readiness. Next route is CM-1949 exact approval request readiness review / Jenn boundary display, still non-authorizing and no-live.
 
