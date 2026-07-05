@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1942 startup failure diagnosis exact approval request packet`.
-Current validation: `CMV-2045`.
-Current status: CM-1942 prepares a non-authorizing startup failure diagnosis exact approval request packet under the CM-1941 contract. It does not grant approval, generate approval lines or request bodies, execute runtime, inspect process state, start services, recheck listeners, or claim readiness.
+Current task: `CM-1943 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2046`.
+Current status: CM-1943 displays the exact boundary Jenn would need to approve for a future startup failure diagnosis. It is non-authorizing, grants no approval, generates no approval line or request body, and keeps runtime/process/start/listener actions blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1943 exact approval request readiness review / Jenn boundary display. Keep CM-1943 docs/status non-authorizing unless Jenn separately approves an exact diagnostic boundary. Do not retry CM-1938, perform live/network calls, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator/config/env/secret/log/body/raw memory reads, request body generation, approval line generation, component/action probe, read-shape proof, memory write, readiness/release/deploy/cutover/push claim, or public MCP expansion. Push remains separate explicit authorization.
+Next action is CM-1944 exact approval capture / pre-execution gate. Keep CM-1944 non-executing unless Jenn separately provides current exact approval matching the CM-1942 / CM-1943 boundary. Do not retry CM-1938, perform live/network calls, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator/config/env/secret/log/body/raw memory reads, request body generation, approval line generation, component/action probe, read-shape proof, memory write, readiness/release/deploy/cutover/push claim, or public MCP expansion. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
