@@ -4,11 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1940 startup failure diagnosis preflight`.
-Current validation: `CMV-2043`.
+Current checkpoint: `CM-1941 low-disclosure startup failure diagnosis contract`.
+Current validation: `CMV-2044`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1941 Low-Disclosure Startup Failure Diagnosis Contract
+
+Status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT_NO_LIVE_NO_MUTATION`
+
+Recorded:
+
+- Added `src/core/VcpNativeStartupFailureDiagnosisContract.js`.
+- Added `tests/vcp-native-startup-failure-diagnosis-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1941_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT.md`.
+- Consumed CM-1940 as local source/test/docs work only.
+- Locked accepted evidence to category/bucket/boolean/zero-counter fields for startup invocation shape, startup process lifecycle, startup result capture, listener after start, target safe-reference binding, optional operator-mediated manual evidence, and approval boundary.
+- Preserved runtime/process/startup-result/listener-after-start/locator facts unknown, endpoint/locator undisclosed, component/action probe locked, read-shape locked, next live diagnostic requiring exact approval, and readiness not claimed.
+- Rejected missing fields, unknown fields, nonzero or unknown counters, unsafe/mismatched target references, raw/sensitive/live/write/readiness drift, endpoint/locator/config/env/secret/log/stdout/stderr/process/command/request/response/raw error/raw memory/provider/approval-line material, and private value echo.
+- Preserved public MCP surface unchanged.
+- Targeted tests passed `7/7`.
+- Default tests passed `4011/4011`.
+- Routed next work to CM-1942 startup failure diagnosis exact approval request packet, non-authorizing.
+- Preserved that no live call, retry, service start/stop/restart, listener recheck, process-state inspection, endpoint/locator disclosure, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2044`; `node --check src/core/VcpNativeStartupFailureDiagnosisContract.js`, `node --check tests/vcp-native-startup-failure-diagnosis-contract.test.js`, targeted test `7/7`, `npm test -- --summary` `4011/4011`, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1940 Startup Failure Diagnosis Preflight
 

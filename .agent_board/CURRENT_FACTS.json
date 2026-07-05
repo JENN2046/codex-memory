@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1940",
-  "validationId": "CMV-2043",
+  "taskId": "CM-1941",
+  "validationId": "CMV-2044",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "startup_failure_diagnosis_preflight_no_live_no_mutation",
+    "scope": "low_disclosure_startup_failure_diagnosis_contract_no_live_no_mutation",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2044",
+      "scope": "CM-1941 low-disclosure startup failure diagnosis contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT_NO_LIVE_NO_MUTATION"
+    },
     {
       "id": "CMV-2043",
       "scope": "CM-1940 startup failure diagnosis preflight",

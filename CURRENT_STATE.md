@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1940 startup failure diagnosis preflight |
-| Current task | `CM-1940 startup failure diagnosis preflight` |
-| Current validation | `CMV-2043` |
-| Current route | CM-1940 defines startup failure diagnosis lanes and routes next to CM-1941 low-disclosure contract |
+| Status | CM-1941 low-disclosure startup failure diagnosis contract |
+| Current task | `CM-1941 low-disclosure startup failure diagnosis contract` |
+| Current validation | `CMV-2044` |
+| Current route | CM-1941 implements local low-disclosure startup failure diagnosis contract and routes next to CM-1942 request packet |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1941` adds `src/core/VcpNativeStartupFailureDiagnosisContract.js`, `tests/vcp-native-startup-failure-diagnosis-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1941_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT.md`. It consumes CM-1940 and implements a local contract that accepts only category/bucket/boolean/zero-counter startup failure diagnosis evidence. Decision: contract implemented, targeted tests added, targeted tests passed `7/7`, default tests passed `4011/4011`, public MCP surface unchanged, startup invocation shape contracted, runtime/process/startup-result/listener-after-start/locator facts unknown, target reference known, endpoint/locator undisclosed, component/action probe locked, read-shape locked, next live diagnostic requiring exact approval, and readiness not claimed. It rejects raw/sensitive/live/write/readiness drift without echo. It does not perform live/network calls, retry CM-1938, start/stop/restart runtime, inspect process state, recheck listeners, disclose endpoint/locator values, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim `RC_READY`, complete V8, or full bridge completion. Next route is CM-1942 startup failure diagnosis exact approval request packet, still non-authorizing unless Jenn later provides exact approval.
 
 `CM-1940` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1940_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT.md`. It consumes the CM-1939 route and defines startup failure diagnosis lanes for startup invocation shape, startup process lifecycle, startup result capture, listener after start, target safe-reference binding, and optional operator-mediated manual evidence. It keeps CM-1938 retry blocked, live execution blocked, process-state inspection blocked, service start blocked, listener recheck blocked, component/action status probe locked, read-shape locked, and readiness not claimed. It does not add runtime facts, disclose endpoint or locator values, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim `RC_READY`, complete V8, or full bridge completion. Next route is CM-1941 low-disclosure startup failure diagnosis contract.
 
