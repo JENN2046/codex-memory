@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1954 component/action route probe exact approval request packet`.
-Current validation: `CMV-2057`.
+Current checkpoint: `CM-1955 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2058`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1955 Exact Approval Request Readiness Review / Jenn Boundary Display
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1955_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`.
+- Reviewed CM-1954 as present and ready for Jenn boundary display.
+- Required CM-1953 `VcpNativeComponentActionRequestBodyBoundaryContract` as the pre-live boundary.
+- Displayed the future exact boundary as non-authorizing material only.
+- Preserved approval not granted, approval line not generated/submitted, concrete request body not generated/output/persisted, live execution not allowed, component/action route probe not allowed now, response body and raw error reads not allowed now, process-state inspection not allowed now, service start/listener recheck not allowed now, component/action route status unknown, response shape unknown, read-shape locked, and readiness not claimed.
+- Routed next work to CM-1956 exact-approved component/action route-status probe execution, blocked until Jenn provides separate current exact approval matching CM-1955.
+- Preserved that no retry, live/network/runtime call, process-state inspection, service start/stop/restart, listener recheck, concrete request body generation/serialization/printing/storage/submission, approval-line generation/submission/exposure/storage, response body/raw error/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, endpoint/locator disclosure, MCP memory call, provider/API call, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2058`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1954 Component/Action Route Probe Exact Approval Request Packet
 

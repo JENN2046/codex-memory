@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1954 component/action route probe exact approval request packet`.
-Current validation: `CMV-2057`.
-Current handoff: CM-1954 prepares the non-authorizing route probe exact approval request packet and routes next to CM-1955 boundary display. No approval is granted; no concrete request body exists; live route probing remains unauthorized; read-shape remains locked.
+Current task: `CM-1955 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2058`.
+Current handoff: CM-1955 displays the non-authorizing exact boundary for one future route-status probe and stops before CM-1956. No approval is granted; no concrete request body exists; live route probing remains unauthorized; read-shape remains locked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1954 prepares the non-authorizing route probe exact approval
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_COMPONENT_ACTION_ROUTE_PROBE_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1954 authorizes only CM-1955 non-authorizing boundary display. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, read-shape proof, and readiness claims remain forbidden now.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1955 stops before CM-1956 until Jenn provides separate current exact approval. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, read-shape proof, and readiness claims remain forbidden now.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1955_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1954_COMPONENT_ACTION_ROUTE_PROBE_EXACT_APPROVAL_REQUEST_PACKET.md`
 - `src/core/VcpNativeComponentActionRequestBodyBoundaryContract.js`
 - `tests/vcp-native-component-action-request-body-boundary-contract.test.js`
