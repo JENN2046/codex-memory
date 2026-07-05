@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1981 exact-approved fixture-backed probe receipt |
-| Current task | `CM-1981 exact-approved fixture-backed probe receipt` |
-| Current validation | `CMV-2084` |
-| Current route | CM-1981 consumed one exact-approved fixture-backed injected-transport probe attempt and produced low-disclosure fixture read-shape proof; no readiness claim |
+| Status | CM-1982 fixture-backed probe closeout / route decision |
+| Current task | `CM-1982 fixture-backed probe closeout / route decision` |
+| Current validation | `CMV-2085` |
+| Current route | CM-1982 closes the fixture-backed proof route and selects CM-1983 real disposable target binding preparation before trusted-full-read preparation; no live action or readiness claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1982` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1982_FIXTURE_BACKED_PROBE_CLOSEOUT_ROUTE_DECISION.md`. It accepts CM-1981 as valid fixture-backed read-shape proof and records that `readShapeUnlocked=true` applies only to the synthetic/empty injected-transport fixture posture. It rejects real VCPToolBox target binding, existing operator target reuse, endpoint/locator proof, real private memory read, trusted-full-read completion, M15/RC gate readiness, release/deploy/cutover readiness, `RC_READY`, complete V8, and full bridge completion inferences. CM-1982 performs no retry, request body generation/output/persistence/submission, live/runtime/network/VCPToolBox call, response/raw/log/config/env/secret/private-memory/raw-store/raw-audit read, memory write, durable mutation, provider/API call, public MCP expansion, push/tag/release/deploy/cutover, or readiness claim. Next route is CM-1983 real disposable target binding preparation / exact boundary packet before trusted-full-read preparation.
 
 `CM-1981` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1981_EXACT_APPROVED_FIXTURE_BACKED_PROBE_RECEIPT.md`. It consumes CM-1980 and executes one exact-approved fixture-backed disposable-target component/action request/read-shape probe through CM-1964 injected transport. Low-disclosure result: `statusClass=success`, `responseShapeCategory=array_item_count_bucket_only`, `topLevelKindCategory=array`, `itemCountBucket=zero`, `durationBucket=lt_100ms`, and `readShapeUnlocked=true`. Budgets consumed: resolver attempts `1/3`, component/action request-read-shape attempts `1/2`, network calls `0/3`, runtime calls `1/3`, no process/listener/service mutation, no local repair, no retry. CM-1981 does not disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id values, write memory, mutate durable stores, expand public MCP, modify VCPToolBox core, push/tag/release/deploy/cutover, unlock M15/RC gate, claim readiness, claim `RC_READY`, claim complete V8, or claim full bridge completion. This is fixture-backed read-shape proof only, not real VCPToolBox target binding or production readiness. Next route is CM-1982 fixture-backed probe closeout / route decision toward real disposable target binding or trusted-full-read preparation.
 

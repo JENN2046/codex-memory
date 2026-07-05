@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-06",
-  "taskId": "CM-1981",
-  "validationId": "CMV-2084",
+  "taskId": "CM-1982",
+  "validationId": "CMV-2085",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_fixture_backed_read_shape_probe_success_shape_projected_no_raw_output_no_write_no_readiness",
+    "scope": "fixture_backed_probe_closeout_route_to_real_disposable_target_binding_preparation_no_live_no_retry_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2085",
+      "scope": "CM-1982 fixture-backed probe closeout / route decision",
+      "status": "COMPLETED_VALIDATED_FIXTURE_BACKED_PROBE_CLOSEOUT_ROUTE_TO_REAL_DISPOSABLE_TARGET_BINDING_PREPARATION_NO_LIVE_NO_RETRY_NO_READINESS"
+    },
     {
       "id": "CMV-2084",
       "scope": "CM-1981 exact-approved fixture-backed probe receipt",

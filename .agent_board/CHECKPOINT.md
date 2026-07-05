@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1981 exact-approved fixture-backed probe receipt`.
-Current validation: `CMV-2084`.
+Current checkpoint: `CM-1982 fixture-backed probe closeout / route decision`.
+Current validation: `CMV-2085`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1982 Fixture-Backed Probe Closeout / Route Decision
+
+Status: `COMPLETED_VALIDATED_FIXTURE_BACKED_PROBE_CLOSEOUT_ROUTE_TO_REAL_DISPOSABLE_TARGET_BINDING_PREPARATION_NO_LIVE_NO_RETRY_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1982_FIXTURE_BACKED_PROBE_CLOSEOUT_ROUTE_DECISION.md`.
+- Accepted CM-1981 as valid low-disclosure fixture-backed read-shape proof.
+- Preserved that `readShapeUnlocked=true` is fixture-backed only and does not prove real VCPToolBox target binding, trusted-full-read workflow, M15/RC readiness, release/deploy/cutover readiness, complete V8, or full bridge completion.
+- Rejected direct trusted-full-read preparation from CM-1981 because real disposable target binding remains the immediate missing boundary.
+- Routed next work to CM-1983 real disposable target binding preparation / exact boundary packet.
+- Performed no CM-1981 retry, request body generation/output/persistence/submission, live/runtime/network/VCPToolBox call, response/raw/log/config/env/secret/private-memory/raw-store/raw-audit read, endpoint/locator disclosure, MCP memory tool call, memory read/write/update/supersede/tombstone, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, readiness claim, `RC_READY`, complete V8 claim, or full bridge completion claim.
+
+Validation: `CMV-2085`; docs/status review and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1981 Exact-Approved Fixture-Backed Probe Receipt
 

@@ -120,7 +120,11 @@ Completed local-safe evidence:
   `readShapeUnlocked=true`; no raw output/persistence, endpoint/locator
   disclosure, memory write, durable mutation, public MCP expansion, M15 unlock,
   or readiness claim occurred. This does not prove real VCPToolBox target
-  binding, trusted-full-read workflow, or M15 readiness.
+  binding, trusted-full-read workflow, or M15 readiness;
+- CM-1982 fixture-backed probe closeout recorded that CM-1981 is valid
+  fixture-backed read-shape proof only, rejected real VCPToolBox target
+  binding / trusted-full-read / M15 readiness inferences, and routed next to
+  CM-1983 real disposable target binding preparation / exact boundary packet.
 
 Missing RC evidence:
 
@@ -207,6 +211,15 @@ m15_package_evidence_map_boundary:
   cm1981_read_shape_unlocked: true
   cm1981_readiness_claimed: false
   cm1981_fixture_backed_only_not_real_vcp_target_binding: true
+  cm1982_fixture_backed_probe_closeout_present: true
+  cm1982_cm1981_receipt_valid: true
+  cm1982_cm1981_retry_authorized: false
+  cm1982_real_vcp_toolbox_target_binding_proven: false
+  cm1982_trusted_full_read_completed: false
+  cm1982_route_to_real_disposable_target_binding_preparation: true
+  cm1982_route_direct_to_trusted_full_read_preparation: false
+  cm1982_live_runtime_execution_performed: false
+  cm1982_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
@@ -262,7 +275,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1982_fixture_backed_probe_closeout_route_decision_toward_real_disposable_target_binding_or_trusted_full_read_preparation
+  next_safe_route: cm1983_real_disposable_target_binding_preparation_exact_boundary_packet
 ```
 
 ## Conclusion
@@ -283,8 +296,11 @@ one exact-approved fixture-backed injected-transport probe with low-disclosure
 shape projection and `readShapeUnlocked=true`. This is fixture-backed evidence
 only: it does not prove real VCPToolBox target binding, trusted-full-read
 workflow completion, M15 RC gate readiness, or release/cutover evidence.
+CM-1982 closes the fixture-backed route and selects real disposable target
+binding preparation as the next required boundary before trusted-full-read can
+be prepared safely.
 
-The next route is CM-1982 fixture-backed probe closeout / route decision
-toward real disposable target binding or trusted-full-read preparation. Future
-live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
-push, or readiness work requires separate exact authority and fresh evidence.
+The next route is CM-1983 real disposable target binding preparation / exact
+boundary packet. Future live/runtime, memory read/write, approval, RC review,
+release, deploy, cutover, push, or readiness work requires separate exact
+authority and fresh evidence.
