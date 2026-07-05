@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1943 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2046`.
-Current handoff: CM-1943 reviews the CM-1942 packet and displays the Jenn exact boundary as non-authorizing material. It routes next to CM-1944 exact approval capture / pre-execution gate, still blocked before runtime unless Jenn provides separate current exact approval matching CM-1942 / CM-1943.
+Current task: `CM-1944 exact-approved startup failure diagnosis receipt`.
+Current validation: `CMV-2047`.
+Current handoff: CM-1944 consumed one Jenn exact-approved startup failure diagnosis under CM-1942 / CM-1943 and recorded a low-disclosure listener-reachable receipt. It routes next to CM-1945 startup failure diagnosis closeout / route decision, docs/status/governance only.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1943 reviews the CM-1942 packet and displays the Jenn exact 
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1943 displays only the future exact boundary for `runtime_startup_failure_diagnosis`. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, and readiness claims remain forbidden now.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_FAILURE_DIAGNOSIS_LISTENER_REACHABLE_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1944 proves only a low-disclosure listener-reachable result after one approved startup failure diagnosis attempt. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action probing, read-shape proof, and readiness claims remain forbidden now.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1944_EXACT_APPROVED_STARTUP_FAILURE_DIAGNOSIS_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1943_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1942_STARTUP_FAILURE_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET.md`
 - `src/core/VcpNativeStartupFailureDiagnosisContract.js`

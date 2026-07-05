@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1943 exact approval request readiness review / Jenn boundary display |
-| Current task | `CM-1943 exact approval request readiness review / Jenn boundary display` |
-| Current validation | `CMV-2046` |
-| Current route | CM-1943 displays the non-authorizing Jenn boundary and routes next to CM-1944 pre-execution gate |
+| Status | CM-1944 exact-approved startup failure diagnosis receipt |
+| Current task | `CM-1944 exact-approved startup failure diagnosis receipt` |
+| Current validation | `CMV-2047` |
+| Current route | CM-1944 records one consumed exact-approved startup failure diagnosis and routes next to CM-1945 closeout |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1944` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1944_EXACT_APPROVED_STARTUP_FAILURE_DIAGNOSIS_RECEIPT.md`. Under Jenn's current exact approval, CM-1944 consumed exactly one startup failure diagnosis execution under the CM-1942 / CM-1943 boundary. The pre-live CM-1941 contract accepted the boundary. Low-disclosure receipt records safe target reference only, purpose `runtime_startup_failure_diagnosis`, status category `listener_reachable_after_start_attempt`, startup invocation shape `source_only_wrapper_plan_category`, startup process lifecycle `running_bucket_only`, process count bucket `multiple`, service startup attempted, startup result unknown, listener after start reachable, safe-reference binding reference-name-only, no-body/no-request listener transport, no operator manual evidence, status class `tcp_connect_success`, duration bucket `lt_5s`, and zero write counters. CM-1944 does not prove startup root cause, prior listener state, process identity, command line, endpoint/locator value, config/env correctness, component/action reachability, response shape, read-shape support, readiness, `RC_READY`, complete V8, or full bridge completion. It did not retry, proceed to component/action probe, perform read-shape proof, generate request bodies or approval lines, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, output process identifiers or command lines, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, or claim readiness. Next route is CM-1945 startup failure diagnosis closeout / route decision, docs/status/governance only.
 
 `CM-1943` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1943_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It reviews CM-1942 and displays the exact boundary Jenn would need to approve in a separate current message before future `runtime_startup_failure_diagnosis` execution. Decision: CM-1942 packet present, ready for boundary display, CM-1941 contract required, boundary display non-authorizing, approval not granted, approval line not generated or submitted, request body not generated, live execution blocked, process-state inspection blocked, service start blocked, listener recheck blocked, runtime startup state unknown, process count unknown, startup result unknown, listener after start unknown, target locator binding success unknown, component/action probe locked, read-shape locked, and readiness not claimed. CM-1943 does not perform live calls, call VCPToolBox, inspect process state, start/stop/restart runtime, recheck listeners, resolve or disclose endpoint/locator values, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, call MCP memory tools, perform component/action probing, perform read-shape proof, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim `RC_READY`, complete V8, or full bridge completion. Next route is CM-1944 exact approval capture / pre-execution gate, still blocked before runtime unless Jenn provides separate current exact approval matching CM-1942 / CM-1943.
 
