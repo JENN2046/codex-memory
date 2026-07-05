@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-06",
-  "taskId": "CM-1978",
-  "validationId": "CMV-2081",
+  "taskId": "CM-1979",
+  "validationId": "CMV-2082",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "disposable_target_binding_fixture_preparation_contract_no_live_no_read_shape_no_readiness",
+    "scope": "exact_disposable_target_fixture_backed_live_runtime_boundary_packet_non_authorizing_no_live_no_approval_intake_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2082",
+      "scope": "CM-1979 exact disposable target fixture-backed live/runtime boundary packet",
+      "status": "COMPLETED_VALIDATED_EXACT_DISPOSABLE_TARGET_FIXTURE_BACKED_LIVE_RUNTIME_BOUNDARY_PACKET_NON_AUTHORIZING_NO_LIVE_NO_APPROVAL_INTAKE_NO_READINESS"
+    },
     {
       "id": "CMV-2081",
       "scope": "CM-1978 disposable target binding fixture preparation",

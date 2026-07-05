@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1978 disposable target binding fixture preparation`.
-Current validation: `CMV-2081`.
+Current checkpoint: `CM-1979 exact disposable target fixture-backed live/runtime boundary packet`.
+Current validation: `CMV-2082`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1979 Exact Disposable Target Fixture-Backed Live/Runtime Boundary Packet
+
+Status: `COMPLETED_VALIDATED_EXACT_DISPOSABLE_TARGET_FIXTURE_BACKED_LIVE_RUNTIME_BOUNDARY_PACKET_NON_AUTHORIZING_NO_LIVE_NO_APPROVAL_INTAKE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1979_EXACT_DISPOSABLE_TARGET_FIXTURE_BACKED_LIVE_RUNTIME_BOUNDARY_PACKET.md`.
+- Consumed CM-1978 disposable-target binding fixture-preparation evidence.
+- Prepared non-authorizing exact boundary material for a possible future fixture-backed disposable-target component/action request/read-shape live runtime probe.
+- Required CM-1959, CM-1963, CM-1964, and CM-1978 before any future execution.
+- Bound only safe target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, request-body shape category `minimal_component_action_route_status_payload_category_only`, neutral minimal non-private max-1 query category, synthetic/empty disposable target category, no existing operator target reuse, injected fixture transport, low-disclosure receipt only, and zero write/provider/dependency/public-MCP/release/readiness authority.
+- Recorded `approval_received_current_turn=false`, `approval_intake_performed=false`, `approval_line_generated=false`, `request_body_generated=false`, `live_runtime_execution_performed=false`, `component_action_invoked=false`, `response_body_consumed=false`, `memory_read_performed=false`, `memory_write_performed=false`, `readShapeUnlocked=false`, and `readinessClaimed=false`.
+- Routed next work to CM-1980 exact approval request readiness review / Jenn boundary display or Jenn-supplied exact approval intake for the fixture-backed probe.
+
+Validation: `CMV-2082`; docs/status review, CM-1963/CM-1964/CM-1978 targeted source/test validation, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1978 Disposable Target Binding Fixture Preparation
 

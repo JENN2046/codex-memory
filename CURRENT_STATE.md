@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1978 disposable target binding fixture preparation |
-| Current task | `CM-1978 disposable target binding fixture preparation` |
-| Current validation | `CMV-2081` |
-| Current route | CM-1978 prepares local synthetic/empty disposable target fixture-binding contract; no live/read-shape proof occurred |
+| Status | CM-1979 exact disposable target fixture-backed live/runtime boundary packet |
+| Current task | `CM-1979 exact disposable target fixture-backed live/runtime boundary packet` |
+| Current validation | `CMV-2082` |
+| Current route | CM-1979 prepares non-authorizing fixture-backed live/runtime boundary material; no approval intake, live execution, or read-shape proof occurred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1979` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1979_EXACT_DISPOSABLE_TARGET_FIXTURE_BACKED_LIVE_RUNTIME_BOUNDARY_PACKET.md`. It consumes CM-1978 and prepares non-authorizing exact boundary material for a possible future fixture-backed disposable-target component/action request/read-shape live runtime probe. The packet requires CM-1959, CM-1963, CM-1964, and CM-1978, keeps target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, synthetic/empty disposable target category, no existing operator target reuse, injected fixture transport, max result count `1`, low-disclosure receipt only, and zero write/provider/dependency/public-MCP/release/readiness authority. No new Jenn exact approval text was supplied, so approval intake is absent, approval line generation is false, request body generation is false, live/runtime/network/VCPToolBox execution is false, response consumption is false, memory read/write is false, M15/RC unlock is false, and readiness is not claimed. Next route is CM-1980 exact approval request readiness review / Jenn boundary display or Jenn-supplied exact approval intake for the fixture-backed probe.
 
 `CM-1978` adds `src/core/VcpNativeDisposableTargetBindingFixturePreparationContract.js`, `tests/vcp-native-disposable-target-binding-fixture-preparation-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1978_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION.md`. It consumes CM-1977 and prepares local no-live rules for a future verifiably disposable target binding: synthetic/empty disposable target category only, no existing operator target reuse, injected fixture resolver/transport, endpoint/locator values unbound and unpersisted, CM-1963/CM-1964 plus future exact approval required, max result count `1`, low-disclosure receipt only, and zero side-effect counters. Targeted CM-1978 tests passed `6/6`. CM-1978 performs no live/runtime/network/VCPToolBox call, request body generation/submission, component/action invocation, response consumption, raw output or persistence, memory read/write/update/supersede/tombstone, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, readiness, M15 unlock, RC gate unlock, complete V8, or full bridge completion. Next route is CM-1979 exact disposable target fixture-backed live/runtime boundary packet or exact approval intake.
 
