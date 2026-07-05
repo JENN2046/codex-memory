@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1933 startup locator diagnosis closeout / route decision`.
-Current validation: `CMV-2036`.
+Current checkpoint: `CM-1934 runtime startup or service listener recovery preflight`.
+Current validation: `CMV-2037`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1934 Runtime Startup Or Service Listener Recovery Preflight
+
+Status: `COMPLETED_VALIDATED_RUNTIME_STARTUP_OR_SERVICE_LISTENER_RECOVERY_PREFLIGHT_NO_LIVE_NO_MUTATION`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1934_RUNTIME_STARTUP_OR_SERVICE_LISTENER_RECOVERY_PREFLIGHT.md`.
+- Consumed the CM-1933 route decision without executing runtime.
+- Accepted CM-1932 `transport_error` as the current route input.
+- Defined recovery preflight lanes for runtime process-state bucket, service startup / listener recovery, target safe-reference binding, service listener recheck, and transport wrapper no-body/no-request shape.
+- Preserved runtime startup state unknown, process count unknown, target locator binding success unknown, service listener root cause unknown, service start not allowed now, listener recheck not allowed now, live execution not allowed now, retry not allowed now, component/action status probe locked, read-shape locked, and readiness not claimed.
+- Routed next work to CM-1935 low-disclosure startup/listener recovery contract, source/test local only unless later exact approval is given.
+- Preserved that no live call, retry, VCPToolBox call, process-state inspection, runtime start/stop/restart, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2037`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1933 Startup Locator Diagnosis Closeout / Route Decision
 

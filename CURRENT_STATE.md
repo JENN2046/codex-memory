@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1933 startup locator diagnosis closeout / route decision |
-| Current task | `CM-1933 startup locator diagnosis closeout / route decision` |
-| Current validation | `CMV-2036` |
-| Current route | CM-1933 closes CM-1932 as valid consumed `transport_error` evidence and routes next to CM-1934 runtime startup or service listener recovery preflight |
+| Status | CM-1934 runtime startup or service listener recovery preflight |
+| Current task | `CM-1934 runtime startup or service listener recovery preflight` |
+| Current validation | `CMV-2037` |
+| Current route | CM-1934 defines no-live/no-mutation recovery lanes and routes next to CM-1935 low-disclosure startup/listener recovery contract |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1934` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1934_RUNTIME_STARTUP_OR_SERVICE_LISTENER_RECOVERY_PREFLIGHT.md`. It consumes the CM-1933 route and defines a no-live/no-mutation recovery preflight. Decision: CM-1933 route consumed, CM-1932 transport error accepted, recovery preflight defined, runtime startup state unknown, process count unknown, target locator binding success unknown, service listener root cause unknown, service start not allowed now, listener recheck not allowed now, live execution not allowed now, retry not allowed now, component/action status probe locked, read-shape locked, and readiness not claimed. It separates future diagnostic lanes for runtime process-state bucket, service startup / listener recovery, target safe-reference binding, service listener recheck, and transport wrapper no-body/no-request shape. Next route is CM-1935 low-disclosure startup/listener recovery contract. CM-1934 does not perform a live call, retry CM-1932, call VCPToolBox, inspect process state, start/stop/restart runtime, resolve or disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, call MCP memory tools, perform component/action probing, perform read-shape proof, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, or claim readiness.
 
 `CM-1933` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1933_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`. It closes CM-1932 as a valid consumed exact-approved startup / locator diagnosis attempt and records receipt valid, approved attempt consumed, live/network budget exhausted, retry not allowed, status category transport error, service listener not reachable by the approved connect attempt, runtime startup state unknown, process count unknown, target locator binding success unknown, target locator root cause unknown, service listener root cause unknown, component/action status probe locked, read-shape locked, and readiness not claimed. CM-1933 accepts only the low-disclosure transport error evidence and rejects inferences that runtime startup state, process count, target locator binding success or failure, service listener root cause, full transport wrapper correctness, component/action routing, read-shape support, VCP native bridge readiness, readiness, `RC_READY`, complete V8, or full bridge completion are proven. Next route is CM-1934 runtime startup or service listener recovery preflight, still no-live and non-mutating. CM-1933 does not perform a new live call, retry CM-1932, call VCPToolBox, inspect process state, start/stop/restart runtime, resolve or disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, call MCP memory tools, perform component/action probing, perform read-shape proof, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, or claim readiness.
 

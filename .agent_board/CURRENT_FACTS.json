@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1933",
-  "validationId": "CMV-2036",
+  "taskId": "CM-1934",
+  "validationId": "CMV-2037",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "startup_locator_diagnosis_closeout_route_to_startup_listener_recovery_preflight_no_retry",
+    "scope": "runtime_startup_or_service_listener_recovery_preflight_no_live_no_mutation",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2037",
+      "scope": "CM-1934 runtime startup or service listener recovery preflight",
+      "status": "COMPLETED_VALIDATED_RUNTIME_STARTUP_OR_SERVICE_LISTENER_RECOVERY_PREFLIGHT_NO_LIVE_NO_MUTATION"
+    },
     {
       "id": "CMV-2036",
       "scope": "CM-1933 startup locator diagnosis closeout / route decision",

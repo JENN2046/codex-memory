@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1933 startup locator diagnosis closeout / route decision`.
-Current validation: `CMV-2036`.
-Current handoff: CM-1933 closes CM-1932 as valid consumed low-disclosure `transport_error` evidence, records retry not allowed and live/network budget exhausted, rejects broader runtime/locator/read-shape inferences, and routes next to CM-1934 runtime startup or service listener recovery preflight.
+Current task: `CM-1934 runtime startup or service listener recovery preflight`.
+Current validation: `CMV-2037`.
+Current handoff: CM-1934 defines the no-live/no-mutation recovery preflight after CM-1933, separating runtime process-state bucket, service startup / listener recovery, target safe-reference binding, listener recheck, and transport wrapper shape lanes. It routes next to CM-1935 low-disclosure startup/listener recovery contract.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1933 closes CM-1932 as valid consumed low-disclosure `transp
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_TO_STARTUP_LISTENER_RECOVERY_PREFLIGHT_NO_RETRY`; production/release/cutover ready no; complete V8 not claimed; CM-1933 accepts only the low-disclosure CM-1932 transport error evidence. It does not confirm runtime startup, locator binding, listener root cause, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, runtime start/stop/restart, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_RUNTIME_STARTUP_OR_SERVICE_LISTENER_RECOVERY_PREFLIGHT_NO_LIVE_NO_MUTATION`; production/release/cutover ready no; complete V8 not claimed; CM-1934 defines recovery lanes only. It does not confirm runtime startup, process count, locator binding, listener root cause, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, live execution, runtime start/stop/restart, process-state inspection, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1934_RUNTIME_STARTUP_OR_SERVICE_LISTENER_RECOVERY_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1933_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1932_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1931_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
