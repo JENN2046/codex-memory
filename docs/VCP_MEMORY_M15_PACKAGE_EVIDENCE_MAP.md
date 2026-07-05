@@ -92,7 +92,9 @@ Completed local-safe evidence:
 - CM-1966 through CM-1973 local-safe route refresh and closeout evidence
   recorded;
 - CM-1974 live/runtime entry preflight recorded as non-authorizing, no-live
-  candidate-route evidence only.
+  candidate-route evidence only;
+- CM-1975 exact live/runtime boundary packet recorded as non-authorizing,
+  no-approval-intake, no-live evidence only.
 
 Missing RC evidence:
 
@@ -115,6 +117,10 @@ m15_package_evidence_map_boundary:
   cm1974_live_runtime_entry_preflight_present: true
   cm1974_live_runtime_execution_performed: false
   cm1974_approval_packet_created: false
+  cm1975_exact_live_runtime_boundary_packet_present: true
+  cm1975_packet_authorizes_execution: false
+  cm1975_approval_intake_present: false
+  cm1975_live_runtime_execution_performed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
@@ -168,7 +174,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1975_exact_live_runtime_boundary_packet_or_jenn_supplied_exact_approval_intake
+  next_safe_route: cm1976_exact_approval_request_readiness_review_jenn_boundary_display_or_exact_approval_intake
 ```
 
 ## Conclusion
@@ -176,10 +182,11 @@ m15_package_evidence_map_boundary:
 The package has substantial local-safe docs, fixture, schema, source-review, and
 approval-boundary evidence, including the CM-1852 through CM-1859 and CM-1966
 through CM-1973 local-safe refresh chains. CM-1974 adds a non-authorizing
-live/runtime entry preflight, but it does not add live/runtime execution or
-approval evidence needed for M15 RC gate consideration.
+live/runtime entry preflight. CM-1975 adds a non-authorizing exact
+live/runtime boundary packet. Neither adds live/runtime execution, approval
+intake, or approval evidence needed for M15 RC gate consideration.
 
-The next route is CM-1975 exact live/runtime boundary packet or Jenn-supplied
-exact approval intake. Future live/runtime, memory read/write, approval, RC
-review, release, deploy, cutover, push, or readiness work requires separate
-exact authority and fresh evidence.
+The next route is CM-1976 exact approval request readiness review / Jenn
+boundary display, or Jenn-supplied exact approval intake. Future live/runtime,
+memory read/write, approval, RC review, release, deploy, cutover, push, or
+readiness work requires separate exact authority and fresh evidence.

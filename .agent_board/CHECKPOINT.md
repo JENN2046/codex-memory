@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1974 live/runtime entry preflight`.
-Current validation: `CMV-2077`.
+Current checkpoint: `CM-1975 exact live/runtime boundary packet`.
+Current validation: `CMV-2078`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1975 Exact Live/Runtime Boundary Packet
+
+Status: `COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_BOUNDARY_PACKET_NON_AUTHORIZING_NO_LIVE_NO_APPROVAL_LINE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1975_EXACT_LIVE_RUNTIME_BOUNDARY_PACKET.md`.
+- Consumed CM-1974 live/runtime entry preflight.
+- Prepared a non-authorizing exact boundary packet for one possible future disposable-target component/action request/read-shape live probe.
+- Recorded that no Jenn exact approval text was supplied for CM-1975.
+- Preserved `approval_received_current_turn=false`, `approval_packet_authorizes_execution=false`, `approval_granted=false`, and `approval_line_generated=false`.
+- Preserved that CM-1975 performs no live/runtime/network/VCPToolBox call, component/action probe, workflow execution, fallback runtime execution, dashboard execution, runtime health report acceptance, RC gate report creation, request body generation/submission, response body read, raw error read, raw diagnostic read, real query, private runtime read, raw store/raw audit scan, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, readiness claim, M15 unlock, RC gate unlock, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1976 exact approval request readiness review / Jenn boundary display, or Jenn-supplied exact approval intake.
+
+Validation: `CMV-2078`; targeted CM-1963/CM-1964 source/test validation, docs/status review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1974 Live/Runtime Entry Preflight
 

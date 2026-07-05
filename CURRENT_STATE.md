@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1974 live/runtime entry preflight |
-| Current task | `CM-1974 live/runtime entry preflight` |
-| Current validation | `CMV-2077` |
-| Current route | CM-1974 selects the disposable-target component/action request/read-shape live candidate for future exact boundary; no live execution authorized |
+| Status | CM-1975 exact live/runtime boundary packet |
+| Current task | `CM-1975 exact live/runtime boundary packet` |
+| Current validation | `CMV-2078` |
+| Current route | CM-1975 prepares a non-authorizing exact live/runtime boundary packet; no Jenn approval intake or live execution occurred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1975` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1975_EXACT_LIVE_RUNTIME_BOUNDARY_PACKET.md`. It consumes CM-1974 and prepares a non-authorizing exact boundary packet for one possible future disposable-target component/action request/read-shape live probe. No Jenn exact approval text was supplied, so approval intake is absent, approval is not granted, approval line generation is false, and runtime remains blocked. CM-1975 performs no live/runtime/network/VCPToolBox call, request body generation/submission, response/raw/log/secret/private-memory/raw-store/raw-audit read, memory or durable write, public MCP expansion, push/tag/release/deploy/cutover, readiness, M15 unlock, RC gate unlock, complete V8, or full bridge completion. Next route is CM-1976 exact approval request readiness review / Jenn boundary display, or Jenn-supplied exact approval intake.
 
 `CM-1974` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1974_LIVE_RUNTIME_ENTRY_PREFLIGHT.md`. It consumes CM-1973, reviews CM-1963 through CM-1965, and selects the disposable-target component/action request/read-shape path as the next live/runtime candidate for a future exact boundary. It is non-authorizing and no-live: no approval packet/request/body/line creation, no live/runtime/network/VCPToolBox call, no response/raw error/log/secret/private-memory/raw-store/raw-audit read, no memory or durable write, no public MCP expansion, no push/tag/release/deploy/cutover, no readiness, no M15 unlock, no RC gate unlock, no complete V8, and no full bridge completion. Next route is CM-1975 exact live/runtime boundary packet or Jenn-supplied exact approval intake.
 

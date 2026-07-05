@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1974",
-  "validationId": "CMV-2077",
+  "taskId": "CM-1975",
+  "validationId": "CMV-2078",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "live_runtime_entry_preflight_non_authorizing_no_live_no_readiness",
+    "scope": "exact_live_runtime_boundary_packet_non_authorizing_no_live_no_approval_line_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2078",
+      "scope": "CM-1975 exact live/runtime boundary packet",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_BOUNDARY_PACKET_NON_AUTHORIZING_NO_LIVE_NO_APPROVAL_LINE_NO_READINESS"
+    },
     {
       "id": "CMV-2077",
       "scope": "CM-1974 live/runtime entry preflight",
