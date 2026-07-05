@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1952 component/action request-body boundary preflight`.
-Current validation: `CMV-2055`.
-Current handoff: CM-1952 defines a category-only request-body boundary and routes next to CM-1953 local contract. No concrete request body exists; live route probing remains unauthorized; read-shape remains locked.
+Current task: `CM-1953 low-disclosure component/action request-body boundary contract`.
+Current validation: `CMV-2056`.
+Current handoff: CM-1953 implements the local request-body boundary contract and routes next to CM-1954 non-authorizing exact approval request packet. No concrete request body exists; live route probing remains unauthorized; read-shape remains locked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1952 defines a category-only request-body boundary and route
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_PREFLIGHT_NO_BODY_NO_LIVE_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1952 authorizes only CM-1953 local source/test/docs contract. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, read-shape proof, and readiness claims remain forbidden now.
+Current status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_CONTRACT_NO_BODY_NO_LIVE_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1953 authorizes only CM-1954 non-authorizing request packet. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, concrete request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, component/action route probing, read-shape proof, and readiness claims remain forbidden now.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeComponentActionRequestBodyBoundaryContract.js`
+- `tests/vcp-native-component-action-request-body-boundary-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1953_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_CONTRACT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1952_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1951_COMPONENT_ACTION_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1950_EXACT_APPROVED_COMPONENT_ACTION_STATUS_PROBE_RECEIPT.md`

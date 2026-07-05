@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1952 component/action request-body boundary preflight |
-| Current task | `CM-1952 component/action request-body boundary preflight` |
-| Current validation | `CMV-2055` |
-| Current route | CM-1952 defines category-only request-body boundary and routes to local contract |
+| Status | CM-1953 low-disclosure component/action request-body boundary contract |
+| Current task | `CM-1953 low-disclosure component/action request-body boundary contract` |
+| Current validation | `CMV-2056` |
+| Current route | CM-1953 locks request-body boundary as local contract and routes to non-authorizing approval packet |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1953` adds `src/core/VcpNativeComponentActionRequestBodyBoundaryContract.js`, `tests/vcp-native-component-action-request-body-boundary-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1953_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_CONTRACT.md`. It consumes CM-1952 and implements a local contract for the category-only request-body boundary. The contract accepts safe target/component/action identifiers, request-body shape category `minimal_component_action_route_status_payload_category_only`, a future single-attempt route-probe budget, low-disclosure output projection, read-shape separation, exact-approval-required boundary, and zero side-effect counters. It rejects raw/sensitive/concrete-payload/live/read-shape/write/readiness drift without echo and preserves public MCP surface unchanged. Targeted tests passed `7/7`. CM-1953 does not generate concrete request bodies, execute runtime, disclose endpoint/locator values, read response/raw/log/config/secret/raw memory material, write memory, expand public MCP, push, or claim readiness. Next route is CM-1954 component/action route probe exact approval request packet, non-authorizing and no-live.
 
 `CM-1952` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1952_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_PREFLIGHT.md`. It consumes CM-1951 and defines no-live category-only lanes for request-body shape boundary, future component/action route probe boundary, output projection boundary, and read-shape separation. It defines request-body shape category `minimal_component_action_route_status_payload_category_only` while keeping concrete payload generated false, serialized payload unavailable, query text unbound, memory content unbound, provider payload unbound, endpoint/locator unbound, component/action route probing unauthorized now, live execution disallowed now, response body/raw error reads disallowed now, read-shape locked, and readiness not claimed. CM-1952 does not retry CM-1950, perform live/network/runtime calls, generate/serialize/print/store/submit concrete request bodies, generate approval lines, read response bodies/raw error/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, disclose endpoint/locator values, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, or claim readiness. Next route is CM-1953 low-disclosure component/action request-body boundary contract, local source/test/docs only.
 

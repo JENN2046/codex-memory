@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1952 component/action request-body boundary preflight`.
-Current validation: `CMV-2055`.
-Current status: CM-1952 defines a category-only request-body boundary preflight. It generates no concrete request body, performs no live action, keeps route probing unauthorized now, keeps read-shape locked, and claims no readiness.
+Current task: `CM-1953 low-disclosure component/action request-body boundary contract`.
+Current validation: `CMV-2056`.
+Current status: CM-1953 implements a local request-body boundary contract. Targeted tests passed 7/7; no concrete request body exists, route probing remains unauthorized, read-shape is locked, and readiness is not claimed.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1953 low-disclosure component/action request-body boundary contract, local source/test/docs only. Do not retry CM-1950, perform live/network/runtime calls, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator/config/env/secret/log/body/raw memory reads, concrete request body generation, approval line generation, component/action route probing, read-shape proof, memory write, readiness/release/deploy/cutover/push claim, or public MCP expansion. Push remains separate explicit authorization.
+Next action is CM-1954 component/action route probe exact approval request packet, non-authorizing docs/status only. Do not retry CM-1950, perform live/network/runtime calls, service start/stop/restart, process-state inspection, listener recheck, endpoint/locator/config/env/secret/log/body/raw memory reads, concrete request body generation, approval line generation, component/action route probing, read-shape proof, memory write, readiness/release/deploy/cutover/push claim, or public MCP expansion. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 
