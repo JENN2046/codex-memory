@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1977 exact-approved disposable-target probe aborted before runtime |
-| Current task | `CM-1977 exact-approved disposable-target live/runtime probe abort receipt` |
-| Current validation | `CMV-2080` |
-| Current route | CM-1976 approval intake accepted; CM-1977 aborted before request/runtime because target was not verified disposable |
+| Status | CM-1978 disposable target binding fixture preparation |
+| Current task | `CM-1978 disposable target binding fixture preparation` |
+| Current validation | `CMV-2081` |
+| Current route | CM-1978 prepares local synthetic/empty disposable target fixture-binding contract; no live/read-shape proof occurred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1978` adds `src/core/VcpNativeDisposableTargetBindingFixturePreparationContract.js`, `tests/vcp-native-disposable-target-binding-fixture-preparation-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1978_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION.md`. It consumes CM-1977 and prepares local no-live rules for a future verifiably disposable target binding: synthetic/empty disposable target category only, no existing operator target reuse, injected fixture resolver/transport, endpoint/locator values unbound and unpersisted, CM-1963/CM-1964 plus future exact approval required, max result count `1`, low-disclosure receipt only, and zero side-effect counters. Targeted CM-1978 tests passed `6/6`. CM-1978 performs no live/runtime/network/VCPToolBox call, request body generation/submission, component/action invocation, response consumption, raw output or persistence, memory read/write/update/supersede/tombstone, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, readiness, M15 unlock, RC gate unlock, complete V8, or full bridge completion. Next route is CM-1979 exact disposable target fixture-backed live/runtime boundary packet or exact approval intake.
 
 `CM-1977` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1977_EXACT_APPROVED_DISPOSABLE_TARGET_LIVE_RUNTIME_PROBE_ABORT_RECEIPT.md`. It consumes CM-1976 approval intake and evaluates the exact-approved disposable-target component/action request/read-shape route. The route aborts before request body generation, invocation, runtime, network, service mutation, or response consumption because the candidate target could not be verified as new/disposable under the boundary. It records only category/bucket receipt facts: route status not executed, status class boundary blocked, response shape not consumed, read-shape false, no raw diagnostic values persisted, no endpoint/locator/request/response/error/log/secret/private-memory/memory-id persistence, no memory or durable write, no public MCP expansion, no push/tag/release/deploy/cutover, no readiness, no M15 unlock, no RC gate unlock, no complete V8, and no full bridge completion. Next route is CM-1978 disposable-target binding remediation / exact disposable target fixture preparation, local and no-live unless a future exact boundary supplies a verifiably disposable target.
 

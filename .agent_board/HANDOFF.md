@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1977 exact-approved disposable-target live/runtime probe abort receipt`.
-Current validation: `CMV-2080`.
-Current handoff: CM-1976 accepted current exact approval intake without reproducing the approval text or generating an approval line. CM-1977 evaluated the approved disposable-target component/action request/read-shape route and aborted before request body generation, invocation, runtime, network, service mutation, or response consumption because the candidate target was not verified disposable. Read-shape remains locked; runtime execution, memory write, durable write, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+Current task: `CM-1978 disposable target binding fixture preparation`.
+Current validation: `CMV-2081`.
+Current handoff: CM-1978 adds a local source/test/docs contract for disposable-target binding remediation after CM-1977. It prepares only synthetic/empty disposable target fixture rules, rejects existing operator target reuse, requires injected fixture resolver/transport plus future exact approval, and performs no live/runtime/network/VCPToolBox call, request body generation, response consumption, memory write, durable write, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, or full bridge completion.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-1977 into disposable-target binding remediation / exact disposable target fixture preparation without crossing request-body, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries unless a future exact Jenn boundary supplies a verifiably disposable target and explicitly authorizes the next live action.
+Goal: continue from CM-1978 into CM-1979 exact disposable target fixture-backed live/runtime boundary packet or exact approval intake without crossing request-body, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries unless a future exact Jenn boundary supplies a verifiably disposable target and explicitly authorizes the next live action.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_DISPOSABLE_TARGET_PROBE_ABORTED_BEFORE_RUNTIME_TARGET_NOT_VERIFIED_DISPOSABLE_NO_LIVE_NO_READ_SHAPE`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1976 records approval intake only and does not reproduce the approval text or generate an approval line. CM-1977 records a category-only pre-runtime abort because the candidate target was not verified new/disposable. It does not start a workflow harness, execute workflow steps, execute fallback runtime, run dashboards, accept runtime health output, create RC gate reports, generate request bodies, invoke component/action, consume responses, run real queries, read private runtime memory, scan raw stores or raw audit rows, call runtime, use MCP memory tools, write checkpoint/handoff memory, perform durable mutation, release/deploy/cutover/push, or unlock M15/RC gate. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1978 disposable-target binding remediation / exact disposable target fixture preparation.
+Current status: `COMPLETED_VALIDATED_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1978 adds `VcpNativeDisposableTargetBindingFixturePreparationContract` and targeted tests. The contract accepts only synthetic/empty disposable target category evidence, no existing operator target reuse, injected fixture resolver/transport, endpoint/locator values unbound and unpersisted, CM-1963/CM-1964 required, and future exact approval required. It does not start a workflow harness, execute workflow steps, execute fallback runtime, run dashboards, accept runtime health output, create RC gate reports, generate request bodies, invoke component/action, consume responses, run real queries, read private runtime memory, scan raw stores or raw audit rows, call runtime, use MCP memory tools, write checkpoint/handoff memory, perform durable mutation, release/deploy/cutover/push, or unlock M15/RC gate. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1979 exact disposable target fixture-backed live/runtime boundary packet or exact approval intake.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeDisposableTargetBindingFixturePreparationContract.js`
+- `tests/vcp-native-disposable-target-binding-fixture-preparation-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1978_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1977_EXACT_APPROVED_DISPOSABLE_TARGET_LIVE_RUNTIME_PROBE_ABORT_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1976_EXACT_APPROVAL_INTAKE.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1975_EXACT_LIVE_RUNTIME_BOUNDARY_PACKET.md`

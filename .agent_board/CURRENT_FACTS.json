@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-07-05",
-  "taskId": "CM-1977",
-  "validationId": "CMV-2080",
+  "updatedAt": "2026-07-06",
+  "taskId": "CM-1978",
+  "validationId": "CMV-2081",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_disposable_target_probe_aborted_before_runtime_target_not_verified_disposable_no_live_no_read_shape",
+    "scope": "disposable_target_binding_fixture_preparation_contract_no_live_no_read_shape_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2081",
+      "scope": "CM-1978 disposable target binding fixture preparation",
+      "status": "COMPLETED_VALIDATED_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS"
+    },
     {
       "id": "CMV-2080",
       "scope": "CM-1977 exact-approved disposable-target live/runtime probe abort receipt",

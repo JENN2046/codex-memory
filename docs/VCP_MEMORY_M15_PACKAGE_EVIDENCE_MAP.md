@@ -100,7 +100,12 @@ Completed local-safe evidence:
 - CM-1977 exact-approved disposable-target route recorded as pre-runtime abort
   evidence because the candidate target was not verified disposable; no
   request body generation, invocation, runtime, network, response consumption,
-  read-shape proof, M15 unlock, or readiness claim occurred.
+  read-shape proof, M15 unlock, or readiness claim occurred;
+- CM-1978 disposable-target binding fixture-preparation contract recorded as
+  local source/test/docs evidence for a synthetic/empty disposable target
+  binding posture; no live target binding, request body generation, invocation,
+  runtime, network, response consumption, read-shape proof, M15 unlock, or
+  readiness claim occurred.
 
 Missing RC evidence:
 
@@ -140,6 +145,19 @@ m15_package_evidence_map_boundary:
   cm1977_network_called: false
   cm1977_response_body_consumed: false
   cm1977_read_shape_unlocked: false
+  cm1978_disposable_target_binding_fixture_preparation_present: true
+  cm1978_source_test_contract_present: true
+  cm1978_synthetic_empty_target_category_only: true
+  cm1978_existing_operator_target_reuse_allowed: false
+  cm1978_injected_fixture_transport_required: true
+  cm1978_endpoint_locator_values_bound: false
+  cm1978_endpoint_locator_values_persisted: false
+  cm1978_future_exact_approval_required: true
+  cm1978_live_runtime_execution_performed: false
+  cm1978_request_body_generated: false
+  cm1978_component_action_invoked: false
+  cm1978_response_body_consumed: false
+  cm1978_read_shape_unlocked: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
@@ -193,7 +211,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1978_disposable_target_binding_remediation_exact_disposable_target_fixture_preparation
+  next_safe_route: cm1979_exact_disposable_target_fixture_backed_live_runtime_boundary_packet_or_exact_approval_intake
 ```
 
 ## Conclusion
@@ -205,10 +223,12 @@ live/runtime entry preflight. CM-1975 adds a non-authorizing exact
 live/runtime boundary packet. CM-1976 records exact approval intake without
 approval-line output or runtime execution. CM-1977 records an exact-approved
 route evaluation that aborted before runtime because the target was not
-verified disposable. None of these add live request/read-shape proof, M15 RC
-gate readiness, or release/cutover evidence.
+verified disposable. CM-1978 records local source/test/docs disposable-target
+fixture-preparation evidence for a synthetic/empty target binding posture.
+None of these add live request/read-shape proof, M15 RC gate readiness, or
+release/cutover evidence.
 
-The next route is CM-1978 disposable-target binding remediation / exact
-disposable target fixture preparation. Future live/runtime, memory read/write,
-approval, RC review, release, deploy, cutover, push, or readiness work requires
-separate exact authority and fresh evidence.
+The next route is CM-1979 exact disposable target fixture-backed live/runtime
+boundary packet or exact approval intake. Future live/runtime, memory
+read/write, approval, RC review, release, deploy, cutover, push, or readiness
+work requires separate exact authority and fresh evidence.

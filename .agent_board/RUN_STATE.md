@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1977 exact-approved disposable-target live/runtime probe abort receipt`.
-Current validation: `CMV-2080`.
-Current status: CM-1976 records current exact approval intake without reproducing the approval text or generating an approval line. CM-1977 aborts before request body generation, invocation, runtime, network, service mutation, or response consumption because the candidate target was not verified disposable. Read-shape and readiness remain blocked.
+Current task: `CM-1978 disposable target binding fixture preparation`.
+Current validation: `CMV-2081`.
+Current status: CM-1978 adds a local source/test/docs disposable-target binding fixture-preparation contract after CM-1977. It remains no-live: no request body generation, invocation, runtime, network, response consumption, read-shape proof, or readiness claim occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1978 disposable-target binding remediation / exact disposable target fixture preparation. Keep CM-1978 local and no-live unless a future exact boundary supplies a verifiably disposable target and explicitly authorizes the next live action. Do not execute runtime, call VCPToolBox, generate approval lines, print or persist endpoint/locator/request/response/error/log/env/secret/memory values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cut over, unlock M15/RC gate, or claim readiness without exact authority and fresh validation evidence.
+Next safe action is CM-1979 exact disposable target fixture-backed live/runtime boundary packet or exact approval intake. Keep CM-1979 no-live unless a future exact boundary supplies a verifiably disposable target and explicitly authorizes the next live action. Do not execute runtime, call VCPToolBox, generate approval lines, print or persist endpoint/locator/request/response/error/log/env/secret/memory values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cut over, unlock M15/RC gate, or claim readiness without exact authority and fresh validation evidence.
 
 ## Historical Run Notes
 

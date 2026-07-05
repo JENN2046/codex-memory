@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1977 exact-approved disposable-target live/runtime probe abort receipt`.
-Current validation: `CMV-2080`.
+Current checkpoint: `CM-1978 disposable target binding fixture preparation`.
+Current validation: `CMV-2081`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1978 Disposable Target Binding Fixture Preparation
+
+Status: `COMPLETED_VALIDATED_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS`
+
+Recorded:
+
+- Added `src/core/VcpNativeDisposableTargetBindingFixturePreparationContract.js`.
+- Added `tests/vcp-native-disposable-target-binding-fixture-preparation-contract.test.js`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1978_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION.md`.
+- Consumed CM-1977 exact-approved pre-runtime abort evidence.
+- Defined a local no-live fixture-preparation contract for a future verifiably disposable target binding.
+- Accepted only synthetic/empty disposable target category evidence, no existing operator target reuse, injected fixture resolver/transport, endpoint/locator values unbound and unpersisted, CM-1963/CM-1964 required, future exact approval required, max result count `1`, low-disclosure receipt only, and zero side-effect counters.
+- Rejected missing CM-1977 abort facts, non-disposable target posture, raw endpoint/locator/request/response/error/log/secret/private-memory fields without echo, live/runtime/network/process/listener/service drift, request body output, response field-name disclosure, retry without exact approval, memory writes, durable writes, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, readiness claims, and public MCP surface drift.
+- Preserved no live/runtime/network/VCPToolBox call, request body generation, component/action invocation, response consumption, raw output or persistence, memory read/write/update/supersede/tombstone, durable mutation, public MCP expansion, release/deploy/cutover/push, M15 unlock, RC gate unlock, read-shape proof, complete V8 claim, full bridge completion claim, or readiness claim.
+- Routed next work to CM-1979 exact disposable target fixture-backed live/runtime boundary packet or exact approval intake.
+
+Validation: `CMV-2081`; targeted CM-1978 source/test validation and broader docs/status validation are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1977 Exact-Approved Disposable-Target Live Runtime Probe Abort Receipt
 
