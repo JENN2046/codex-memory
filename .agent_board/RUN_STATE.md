@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1930 startup locator diagnosis exact approval request packet refresh`.
-Current validation: `CMV-2033`.
-Current status: CM-1930 refreshes the non-authorizing startup / locator diagnosis exact approval request packet and requires CM-1928 receipt-capture contract as a pre-live boundary. It does not approve or execute runtime; retry/live execution remains blocked until a new exact approval exists.
+Current task: `CM-1931 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2034`.
+Current status: CM-1931 reviews the CM-1930 startup / locator diagnosis request packet and displays the Jenn exact approval boundary as non-authorizing review material. It does not approve, generate an approval line, generate a request body, execute runtime, or unlock live execution.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1931 exact approval request readiness review / Jenn exact approval boundary display. Keep CM-1931 non-executing and non-authorizing: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
+Next action is CM-1932 exact approval capture / pre-execution gate. Keep CM-1932 non-executing unless Jenn has already provided a separate current exact approval matching the CM-1930 / CM-1931 boundary. If exact approval is missing, stale, broader than the boundary, or ambiguous, stop before runtime. No live call, retry, process-state inspection, endpoint/locator/config/env/secret/log/body/raw memory read, request body, approval line, memory write, readiness/release/deploy/cutover/push claim, or public MCP expansion is authorized by CM-1931.
 
 ## Historical Run Notes
 
