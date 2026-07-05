@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1941 low-disclosure startup failure diagnosis contract`.
-Current validation: `CMV-2044`.
-Current handoff: CM-1941 implements a local low-disclosure startup failure diagnosis contract and targeted tests without adding runtime facts. It routes next to CM-1942 startup failure diagnosis exact approval request packet, non-authorizing.
+Current task: `CM-1942 startup failure diagnosis exact approval request packet`.
+Current validation: `CMV-2045`.
+Current handoff: CM-1942 prepares a non-authorizing exact approval request packet for one future startup failure diagnosis under the CM-1941 contract. It routes next to CM-1943 exact approval request readiness review / Jenn boundary display, still non-authorizing and no-live.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1941 implements a local low-disclosure startup failure diagn
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT_NO_LIVE_NO_MUTATION`; production/release/cutover ready no; complete V8 not claimed; CM-1941 accepts only category/bucket/boolean/zero-counter startup failure diagnosis evidence and rejects raw/sensitive/live/write/readiness drift without echo. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_STARTUP_FAILURE_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1942 defines only the future exact boundary for `runtime_startup_failure_diagnosis`. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, process-state inspection, service start/listener recheck, and readiness claims remain forbidden now.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1942_STARTUP_FAILURE_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET.md`
 - `src/core/VcpNativeStartupFailureDiagnosisContract.js`
 - `tests/vcp-native-startup-failure-diagnosis-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1941_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT.md`

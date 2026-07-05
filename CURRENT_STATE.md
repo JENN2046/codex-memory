@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1941 low-disclosure startup failure diagnosis contract |
-| Current task | `CM-1941 low-disclosure startup failure diagnosis contract` |
-| Current validation | `CMV-2044` |
-| Current route | CM-1941 implements local low-disclosure startup failure diagnosis contract and routes next to CM-1942 request packet |
+| Status | CM-1942 startup failure diagnosis exact approval request packet |
+| Current task | `CM-1942 startup failure diagnosis exact approval request packet` |
+| Current validation | `CMV-2045` |
+| Current route | CM-1942 prepares a non-authorizing startup failure diagnosis request packet and routes next to CM-1943 boundary display |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1942` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1942_STARTUP_FAILURE_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET.md`. The packet is non-authorizing and prepares the exact boundary for one future `runtime_startup_failure_diagnosis` under CM-1941 `VcpNativeStartupFailureDiagnosisContract`. It requires safe target reference `operator-vcp-toolbox-service-ref`, max process-state inspections `1`, max service-start attempts `1`, max service-stop attempts `0`, max service-restart attempts `0`, max listener recheck attempts `1`, max network calls `1`, max runtime calls `1`, zero request body generation, zero response-body/raw-error/log budgets, no stdout/stderr/config/env/secret/memory read, no memory/durable write, no endpoint/locator/command-line/process-identifier disclosure, no provider/API call, no public MCP expansion, no config/startup/watchdog/dependency change, no release/deploy/cutover/push, no readiness claim, and low-disclosure receipt projection only. CM-1942 does not grant approval, generate approval lines or request bodies, perform live calls, call VCPToolBox, inspect process state, start/stop/restart runtime, recheck listeners, resolve or disclose endpoint/locator values, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, call MCP memory tools, perform component/action probing, perform read-shape proof, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim `RC_READY`, complete V8, or full bridge completion. Next route is CM-1943 exact approval request readiness review / Jenn boundary display, still non-authorizing and no-live.
 
 `CM-1941` adds `src/core/VcpNativeStartupFailureDiagnosisContract.js`, `tests/vcp-native-startup-failure-diagnosis-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1941_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT.md`. It consumes CM-1940 and implements a local contract that accepts only category/bucket/boolean/zero-counter startup failure diagnosis evidence. Decision: contract implemented, targeted tests added, targeted tests passed `7/7`, default tests passed `4011/4011`, public MCP surface unchanged, startup invocation shape contracted, runtime/process/startup-result/listener-after-start/locator facts unknown, target reference known, endpoint/locator undisclosed, component/action probe locked, read-shape locked, next live diagnostic requiring exact approval, and readiness not claimed. It rejects raw/sensitive/live/write/readiness drift without echo. It does not perform live/network calls, retry CM-1938, start/stop/restart runtime, inspect process state, recheck listeners, disclose endpoint/locator values, read logs/stdout/stderr/config/env/secrets/body/raw output/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, call MCP memory tools, write memory or durable state, change runtime/config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim `RC_READY`, complete V8, or full bridge completion. Next route is CM-1942 startup failure diagnosis exact approval request packet, still non-authorizing unless Jenn later provides exact approval.
 
