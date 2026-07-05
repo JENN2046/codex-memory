@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1931 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2034`.
+Current checkpoint: `CM-1932 exact-approved startup locator diagnosis receipt`.
+Current validation: `CMV-2035`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1932 Exact-Approved Startup Locator Diagnosis Receipt
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1932_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT.md`.
+- Consumed exactly one Jenn-approved startup / locator diagnosis attempt under the CM-1930 / CM-1931 boundary.
+- Preserved safe target reference `operator-vcp-toolbox-service-ref` and purpose `runtime_startup_or_target_locator_diagnosis`.
+- Recorded low-disclosure receipt result `statusCategory=transport_error`, `runtimeStartupStateCategory=unknown`, `processCountBucket=not_checked`, `targetLocatorBindingCategory=not_proven_by_transport_error`, `transportWrapperShapeCategory=tcp_connect_no_body_no_request`, `serviceListenerStatusCategory=not_reachable`, `statusClass=tcp_connect_failed`, `durationBucket=lt_100ms`, and `receiptCaptureStatus=deterministic_capture_applied`.
+- Recorded that the allowed process-state inspection budget was not used.
+- Preserved component/action status probe locked, read-shape locked, retry not allowed, and readiness not claimed.
+- Routed next work to CM-1933 startup / locator diagnosis closeout and route decision, docs/status/governance only.
+- Preserved that no retry, request body generation/submission, approval-line generation/submission/exposure/storage, response body read, raw error payload read, runtime log read, stdout/stderr read, config/env read, secret read, endpoint/locator disclosure, process-state inspection, MCP memory call, provider/API call, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2035`; one exact-approved low-disclosure no-body/no-request listener-level attempt, docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1931 Exact Approval Request Readiness Review / Jenn Boundary Display
 

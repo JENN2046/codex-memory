@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1931 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2034`.
-Current status: CM-1931 reviews the CM-1930 startup / locator diagnosis request packet and displays the Jenn exact approval boundary as non-authorizing review material. It does not approve, generate an approval line, generate a request body, execute runtime, or unlock live execution.
+Current task: `CM-1932 exact-approved startup locator diagnosis receipt`.
+Current validation: `CMV-2035`.
+Current status: CM-1932 consumed one Jenn-approved startup / locator diagnosis attempt under the CM-1930 / CM-1931 boundary and recorded low-disclosure `transport_error`; retry is not allowed and live execution budget is exhausted.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1932 exact approval capture / pre-execution gate. Keep CM-1932 non-executing unless Jenn has already provided a separate current exact approval matching the CM-1930 / CM-1931 boundary. If exact approval is missing, stale, broader than the boundary, or ambiguous, stop before runtime. No live call, retry, process-state inspection, endpoint/locator/config/env/secret/log/body/raw memory read, request body, approval line, memory write, readiness/release/deploy/cutover/push claim, or public MCP expansion is authorized by CM-1931.
+Next action is CM-1933 startup / locator diagnosis closeout and route decision. Keep CM-1933 docs/status/governance only: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

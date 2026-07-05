@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1931",
-  "validationId": "CMV-2034",
+  "taskId": "CM-1932",
+  "validationId": "CMV-2035",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approval_request_readiness_review_jenn_boundary_display_non_authorizing_no_approval_line",
+    "scope": "exact_approved_startup_locator_diagnosis_transport_error_no_body_no_write_no_raw_output",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2035",
+      "scope": "CM-1932 exact-approved startup locator diagnosis receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
     {
       "id": "CMV-2034",
       "scope": "CM-1931 exact approval request readiness review / Jenn boundary display",

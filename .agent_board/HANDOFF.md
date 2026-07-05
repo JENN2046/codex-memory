@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1931 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2034`.
-Current handoff: CM-1931 reviews the CM-1930 startup / locator diagnosis request packet and displays the Jenn exact approval boundary as non-authorizing review material. Future live execution remains blocked until Jenn gives separate current exact approval matching the CM-1930 / CM-1931 boundary.
+Current task: `CM-1932 exact-approved startup locator diagnosis receipt`.
+Current validation: `CMV-2035`.
+Current handoff: CM-1932 consumed one Jenn-approved startup / locator diagnosis attempt under the CM-1930 / CM-1931 boundary and recorded a low-disclosure `transport_error` receipt. The approved attempt is exhausted and retry is not authorized.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1931 reviews the CM-1930 startup / locator diagnosis request
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1931 displays only a non-authorizing Jenn boundary for review. It does not confirm runtime startup, locator binding, listener state, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, live execution, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT`; production/release/cutover ready no; complete V8 not claimed; CM-1932 records only a low-disclosure transport error receipt after one approved no-body/no-request listener-level attempt. It does not confirm runtime startup, locator binding, listener reachability, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, further live execution, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1932_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1931_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1930_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_REFRESH.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1929_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_DECISION.md`
