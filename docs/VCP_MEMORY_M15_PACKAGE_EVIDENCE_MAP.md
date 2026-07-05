@@ -124,7 +124,17 @@ Completed local-safe evidence:
 - CM-1982 fixture-backed probe closeout recorded that CM-1981 is valid
   fixture-backed read-shape proof only, rejected real VCPToolBox target
   binding / trusted-full-read / M15 readiness inferences, and routed next to
-  CM-1983 real disposable target binding preparation / exact boundary packet.
+  CM-1983 real disposable target binding preparation / exact boundary packet;
+- CM-1983 real disposable target binding exact boundary packet recorded
+  non-authorizing boundary material for a future real disposable target binding
+  route. It requires a future real target to be new or disposable,
+  target-scoped only, free of Jenn private information, production secrets,
+  customer data, real private memory, and persistent runtime artifacts, and not
+  an existing operator target reuse. It performs no approval intake, approval
+  line generation, live/runtime/network/VCPToolBox call, endpoint/locator
+  resolution, request body generation, response consumption, raw/log/secret or
+  private-memory read, memory write, durable mutation, public MCP expansion,
+  push/release/deploy/cutover, M15 unlock, or readiness claim.
 
 Missing RC evidence:
 
@@ -220,6 +230,23 @@ m15_package_evidence_map_boundary:
   cm1982_route_direct_to_trusted_full_read_preparation: false
   cm1982_live_runtime_execution_performed: false
   cm1982_readiness_claimed: false
+  cm1983_real_disposable_target_binding_boundary_packet_present: true
+  cm1983_packet_authorizes_execution: false
+  cm1983_approval_intake_present: false
+  cm1983_approval_line_generated: false
+  cm1983_approval_request_submitted: false
+  cm1983_live_runtime_execution_performed: false
+  cm1983_real_disposable_target_binding_proven: false
+  cm1983_existing_operator_target_reuse_allowed: false
+  cm1983_request_body_generated: false
+  cm1983_component_action_invoked: false
+  cm1983_response_body_consumed: false
+  cm1983_raw_value_persisted: false
+  cm1983_memory_read_performed: false
+  cm1983_memory_write_performed: false
+  cm1983_trusted_full_read_completed: false
+  cm1983_m15_opened: false
+  cm1983_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
@@ -275,7 +302,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1983_real_disposable_target_binding_preparation_exact_boundary_packet
+  next_safe_route: cm1984_exact_approval_request_readiness_review_or_jenn_supplied_exact_approval_intake_for_real_disposable_target_binding
 ```
 
 ## Conclusion
@@ -298,9 +325,12 @@ only: it does not prove real VCPToolBox target binding, trusted-full-read
 workflow completion, M15 RC gate readiness, or release/cutover evidence.
 CM-1982 closes the fixture-backed route and selects real disposable target
 binding preparation as the next required boundary before trusted-full-read can
-be prepared safely.
+be prepared safely. CM-1983 records that boundary as non-authorizing exact
+packet material only; it does not authorize execution and does not prove real
+disposable target binding.
 
-The next route is CM-1983 real disposable target binding preparation / exact
-boundary packet. Future live/runtime, memory read/write, approval, RC review,
+The next route is CM-1984 exact approval request readiness review / Jenn
+boundary display or Jenn-supplied exact approval intake for real disposable
+target binding. Future live/runtime, memory read/write, approval, RC review,
 release, deploy, cutover, push, or readiness work requires separate exact
 authority and fresh evidence.

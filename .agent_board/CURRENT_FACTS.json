@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-06",
-  "taskId": "CM-1982",
-  "validationId": "CMV-2085",
+  "taskId": "CM-1983",
+  "validationId": "CMV-2086",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "fixture_backed_probe_closeout_route_to_real_disposable_target_binding_preparation_no_live_no_retry_no_readiness",
+    "scope": "real_disposable_target_binding_exact_boundary_packet_non_authorizing_no_live_no_approval_line_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2086",
+      "scope": "CM-1983 real disposable target binding exact boundary packet",
+      "status": "COMPLETED_VALIDATED_REAL_DISPOSABLE_TARGET_BINDING_EXACT_BOUNDARY_PACKET_NON_AUTHORIZING_NO_LIVE_NO_APPROVAL_LINE_NO_READINESS"
+    },
     {
       "id": "CMV-2085",
       "scope": "CM-1982 fixture-backed probe closeout / route decision",

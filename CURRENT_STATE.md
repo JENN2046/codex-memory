@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1982 fixture-backed probe closeout / route decision |
-| Current task | `CM-1982 fixture-backed probe closeout / route decision` |
-| Current validation | `CMV-2085` |
-| Current route | CM-1982 closes the fixture-backed proof route and selects CM-1983 real disposable target binding preparation before trusted-full-read preparation; no live action or readiness claim |
+| Status | CM-1983 real disposable target binding exact boundary packet |
+| Current task | `CM-1983 real disposable target binding exact boundary packet` |
+| Current validation | `CMV-2086` |
+| Current route | CM-1983 prepares non-authorizing exact boundary material for a future real disposable target binding route; no approval intake, live action, request body, raw output, or readiness claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1983` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1983_REAL_DISPOSABLE_TARGET_BINDING_EXACT_BOUNDARY_PACKET.md`. It consumes CM-1982 and prepares a non-authorizing exact boundary packet for a possible future real disposable target binding route. It requires CM-1959, CM-1963, CM-1964, CM-1978, and CM-1982; preserves safe identifiers only; requires the future target to be real, new or disposable, target-scoped, free of Jenn private information, production secrets, customer data, real private memory, and persistent runtime artifacts; rejects existing operator target reuse; and allows only category/bucket receipt fields if a later exact approval is supplied. CM-1983 is not approval, not approval intake, not an approval line, and not execution authority. It performs no live/runtime/network/VCPToolBox call, endpoint/locator resolution, request body generation/output/persistence/submission, component/action invocation, response consumption, raw/log/secret/private-memory read, memory write, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, M15/RC unlock, `RC_READY`, complete V8, full bridge completion, or readiness claim. Next route is CM-1984 exact approval request readiness review / Jenn boundary display or Jenn-supplied exact approval intake for real disposable target binding.
 
 `CM-1982` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1982_FIXTURE_BACKED_PROBE_CLOSEOUT_ROUTE_DECISION.md`. It accepts CM-1981 as valid fixture-backed read-shape proof and records that `readShapeUnlocked=true` applies only to the synthetic/empty injected-transport fixture posture. It rejects real VCPToolBox target binding, existing operator target reuse, endpoint/locator proof, real private memory read, trusted-full-read completion, M15/RC gate readiness, release/deploy/cutover readiness, `RC_READY`, complete V8, and full bridge completion inferences. CM-1982 performs no retry, request body generation/output/persistence/submission, live/runtime/network/VCPToolBox call, response/raw/log/config/env/secret/private-memory/raw-store/raw-audit read, memory write, durable mutation, provider/API call, public MCP expansion, push/tag/release/deploy/cutover, or readiness claim. Next route is CM-1983 real disposable target binding preparation / exact boundary packet before trusted-full-read preparation.
 
