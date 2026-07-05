@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1929 receipt-capture hardening closeout / future live request route decision`.
-Current validation: `CMV-2032`.
-Current status: CM-1929 closes CM-1928 receipt-capture hardening as valid local evidence and routes next to CM-1930 startup / locator diagnosis exact approval request packet refresh. Runtime startup, service listener, locator binding, component/action, and read-shape facts remain unproven; retry/live execution remains blocked until a new exact approval exists.
+Current task: `CM-1930 startup locator diagnosis exact approval request packet refresh`.
+Current validation: `CMV-2033`.
+Current status: CM-1930 refreshes the non-authorizing startup / locator diagnosis exact approval request packet and requires CM-1928 receipt-capture contract as a pre-live boundary. It does not approve or execute runtime; retry/live execution remains blocked until a new exact approval exists.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1930 startup / locator diagnosis exact approval request packet refresh. Keep CM-1930 non-executing and non-authorizing: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
+Next action is CM-1931 exact approval request readiness review / Jenn exact approval boundary display. Keep CM-1931 non-executing and non-authorizing: no live call, no retry, no process-state inspection, no endpoint/locator/config/env/secret/log/body/raw memory read, no request body, no approval line, no memory write, and no readiness/release/deploy/cutover/push claim. Push remains separate explicit authorization.
 
 ## Historical Run Notes
 

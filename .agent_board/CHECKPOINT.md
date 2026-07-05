@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1929 receipt-capture hardening closeout / future live request route decision`.
-Current validation: `CMV-2032`.
+Current checkpoint: `CM-1930 startup locator diagnosis exact approval request packet refresh`.
+Current validation: `CMV-2033`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1930 Startup Locator Diagnosis Exact Approval Request Packet Refresh
+
+Status: `COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_REFRESH_NON_EXECUTING_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1930_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_REFRESH.md`.
+- Refreshed the non-authorizing exact approval request packet for one future startup / locator diagnosis.
+- Preserved purpose `runtime_startup_or_target_locator_diagnosis`.
+- Preserved safe target reference `operator-vcp-toolbox-service-ref`.
+- Added CM-1928 `VcpNativeStartupLocatorDiagnosisReceiptCaptureContract` as a required future pre-live boundary.
+- Preserved diagnostic lanes for runtime startup state, target locator binding, transport wrapper shape, service listener mismatch, and receipt-capture contract.
+- Preserved max network calls `1`, max runtime calls `1`, max process-state inspections `1`, zero response body / raw error / log budgets, request body generation false, stdout/stderr read false, config/env read false, secret read false, endpoint disclosure false, locator value disclosure false, memory read false, memory write false, durable write false, provider/API call false, public MCP expansion false, and readiness claim false.
+- Routed next work to CM-1931 exact approval request readiness review / Jenn exact approval boundary display, still non-executing and non-authorizing.
+- Preserved that no approval was granted, no approval line was generated/exposed/stored/submitted, no request body was generated/submitted, no live call, retry, VCPToolBox call, process-state inspection, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2033`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1929 Receipt-Capture Hardening Closeout / Future Live Request Route Decision
 

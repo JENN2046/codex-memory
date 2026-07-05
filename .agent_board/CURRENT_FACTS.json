@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1929",
-  "validationId": "CMV-2032",
+  "taskId": "CM-1930",
+  "validationId": "CMV-2033",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "receipt_capture_hardening_closeout_route_to_cm1930_request_packet_refresh_no_live",
+    "scope": "startup_locator_diagnosis_exact_approval_request_packet_refresh_non_executing_no_approval_line",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2033",
+      "scope": "CM-1930 startup locator diagnosis exact approval request packet refresh",
+      "status": "COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_REFRESH_NON_EXECUTING_NO_APPROVAL_LINE"
+    },
     {
       "id": "CMV-2032",
       "scope": "CM-1929 receipt-capture hardening closeout / future live request route decision",
