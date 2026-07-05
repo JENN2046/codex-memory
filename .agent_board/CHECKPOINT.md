@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1972 M14/M15 non-authorizing RC gate route refresh`.
-Current validation: `CMV-2075`.
+Current checkpoint: `CM-1973 plan-package local-safe completion closeout refresh`.
+Current validation: `CMV-2076`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1973 Plan-Package Local-Safe Completion Closeout Refresh
+
+Status: `COMPLETED_VALIDATED_PLAN_PACKAGE_LOCAL_SAFE_COMPLETION_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1973_LOCAL_SAFE_COMPLETION_CLOSEOUT_REFRESH.md`.
+- Updated `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`.
+- Reviewed CM-1966 through CM-1972.
+- Closed the current imported plan-package route for local-safe docs/source/test/fixture/status/governance evidence.
+- Preserved that full live package completion, M15 RC gate, approval packet/request/body/line readiness, live health report, live memory read/write proof, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
+- Preserved that CM-1973 performs no live/runtime/network/VCPToolBox call, dashboard execution, runtime health report acceptance, RC gate report creation, approval packet/request/body/line generation or submission, real query, private runtime read, raw store/raw audit scan, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, provider/API call, dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness claim, M15 unlock, complete V8 claim, or full bridge completion claim.
+- Recorded that no automatic local-safe plan-package task remains; future live/runtime/RC work requires separate exact authority and fresh evidence.
+
+Validation: `CMV-2076`; docs/status review and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1972 M14/M15 Non-Authorizing RC Gate Route Refresh
 

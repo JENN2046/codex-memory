@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1972 M14/M15 non-authorizing RC gate route refresh`.
-Current validation: `CMV-2075`.
-Current status: CM-1972 accepts existing M15 blocked precondition, non-authorizing RC checklist, risk review skeleton, approval-packet readiness boundary, and blocked closeout chain for local planning after CM-1971 and keeps M15 unopened. No live/runtime/network/VCPToolBox call, dashboard execution, RC gate report creation, approval packet/request/body/line generation or submission, memory read/write, durable write, release/deploy/cutover, or readiness claim occurred.
+Current task: `CM-1973 plan-package local-safe completion closeout refresh`.
+Current validation: `CMV-2076`.
+Current status: CM-1973 closes the current imported plan-package route for local-safe docs/source/test/fixture/status/governance evidence after CM-1966 through CM-1972. Full live package completion, M15 RC gate, approval packet/request/body/line readiness, live health report, live memory read/write proof, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1973 plan-package local-safe completion closeout refresh. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. Treat M11 as fixture/schema refreshed but live runtime exit incomplete. Treat M12 as fixture-chain refreshed but live workflow incomplete. Treat M13 as fixture/dry-run fallback hardening refreshed but live/runtime fallback safety incomplete. Treat M14 as fixture/schema health-report refreshed but live dashboard/runtime health evidence incomplete. Treat M15 as blocked and unopened. Do not execute live VCPToolBox probes, run fallback runtime, run dashboards, accept runtime health output, create RC gate reports, generate approval packets/request bodies/approval lines, perform real queries, read private runtime memory, scan raw stores or raw audit rows, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, open M15 RC review, or claim readiness.
+No automatic local-safe plan-package task remains. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. Treat M11 as fixture/schema refreshed but live runtime exit incomplete. Treat M12 as fixture-chain refreshed but live workflow incomplete. Treat M13 as fixture/dry-run fallback hardening refreshed but live/runtime fallback safety incomplete. Treat M14 as fixture/schema health-report refreshed but live dashboard/runtime health evidence incomplete. Treat M15 as blocked and unopened. Future live/runtime, memory read/write, approval, RC review, release, deploy, cutover, push, or readiness work requires separate exact authority and fresh evidence.
 
 ## Historical Run Notes
 

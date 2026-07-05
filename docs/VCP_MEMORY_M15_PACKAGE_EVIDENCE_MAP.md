@@ -88,7 +88,9 @@ Completed local-safe evidence:
 - M6-M10 approval/display/abort boundaries prepared without live execution;
 - M11-M14 fixture/schema/source-review chains built for local-safe proof;
 - CM-1852 through CM-1859 current-chain refresh evidence recorded;
-- M15 blocked precondition recorded and refreshed.
+- M15 blocked precondition recorded and refreshed;
+- CM-1966 through CM-1973 local-safe route refresh and closeout evidence
+  recorded.
 
 Missing RC evidence:
 
@@ -107,7 +109,9 @@ Missing RC evidence:
 m15_package_evidence_map_boundary:
   cm1860_refresh_applied: true
   cm1852_cm1859_overlay_present: true
+  cm1966_cm1973_local_safe_refresh_present: true
   current_chain_docs_evidence_complete_for_planning: true
+  no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
   rc_gate_ready: false
   m15_opened: false
@@ -165,10 +169,10 @@ m15_package_evidence_map_boundary:
 ## Conclusion
 
 The package has substantial local-safe docs, fixture, schema, source-review, and
-approval-boundary evidence, including the CM-1852 through CM-1859 current-chain
-refresh. It does not have the live/runtime/approval evidence needed for M15 RC
-gate consideration.
+approval-boundary evidence, including the CM-1852 through CM-1859 and CM-1966
+through CM-1973 local-safe refresh chains. It does not have the
+live/runtime/approval evidence needed for M15 RC gate consideration.
 
-The next safe local route is CM-1861 M15 non-authorizing RC checklist refresh
-that keeps all approval, runtime, release, deploy, cutover, and readiness fields
-false.
+No automatic local-safe plan-package task remains after CM-1973. Future
+live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
+push, or readiness work requires separate exact authority and fresh evidence.

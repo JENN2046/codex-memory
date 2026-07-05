@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1972 M14/M15 non-authorizing RC gate route refresh |
-| Current task | `CM-1972 M14/M15 non-authorizing RC gate route refresh` |
-| Current validation | `CMV-2075` |
-| Current route | CM-1972 accepts M15 blocked gate docs for planning and keeps M15 unopened |
+| Status | CM-1973 plan-package local-safe completion closeout refresh |
+| Current task | `CM-1973 plan-package local-safe completion closeout refresh` |
+| Current validation | `CMV-2076` |
+| Current route | CM-1973 closes the current local-safe plan-package route and leaves live/runtime/RC work blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1973` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1973_LOCAL_SAFE_COMPLETION_CLOSEOUT_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It reviews CM-1966 through CM-1972 and closes the current plan-package local-safe route for docs/source/test/fixture/status/governance evidence. It does not close the full live/runtime bridge. Full live package completion, M15 RC gate, approval packet/request/body/line readiness, live health report, live memory read/write proof, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. No automatic local-safe plan-package task remains; future live/runtime/RC work requires separate exact authority and fresh evidence.
 
 `CM-1972` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1972_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It consumes CM-1971, accepts the existing M15 blocked precondition, non-authorizing RC checklist, risk review skeleton, approval-packet readiness boundary, and blocked closeout chain for local planning, and keeps M15 unopened. CM-1972 performs no live/runtime/network/VCPToolBox call, dashboard execution, runtime health report acceptance, RC gate report creation, approval packet/request/body/line generation or submission, real query, private runtime read, raw store/raw audit scan, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, provider/API call, dependency change, public MCP expansion, push/tag/release/deploy/cutover, readiness claim, M15 unlock, complete V8, or full bridge completion. Next route is CM-1973 plan-package local-safe completion closeout refresh.
 

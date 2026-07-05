@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1972 M14/M15 non-authorizing RC gate route refresh`.
-Current validation: `CMV-2075`.
-Current handoff: CM-1972 accepts existing M15 blocked gate documentation for local planning after CM-1971 and keeps M15 unopened. RC gate report creation, approval packet/request/body/line generation or submission, release/deploy/cutover, and readiness claims remain forbidden.
+Current task: `CM-1973 plan-package local-safe completion closeout refresh`.
+Current validation: `CMV-2076`.
+Current handoff: CM-1973 closes the current imported plan-package route for local-safe docs/source/test/fixture/status/governance evidence. Full live package completion, M15 RC gate, approval packet/request/body/line readiness, live health report, live memory read/write proof, release/deploy/cutover/push, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1972 accepts existing M15 blocked gate documentation for loc
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH_NO_RUNTIME_NO_RELEASE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1972 keeps M10 blocked for real mutation, keeps M11 live runtime exit incomplete, keeps M12 live workflow incomplete, keeps M13 live/runtime fallback safety incomplete, keeps M14 live dashboard/runtime health evidence incomplete, and keeps M15 unopened; it does not start a workflow harness, execute workflow steps, execute fallback runtime, run dashboards, accept runtime health output, create RC gate reports, generate approval packets/request bodies/approval lines, run real queries, read private runtime memory, scan raw stores or raw audit rows, call runtime, use MCP memory tools, write checkpoint/handoff memory, perform durable mutation, release/deploy/cutover/push, or unlock M15. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. Next route is CM-1973 plan-package local-safe completion closeout refresh.
+Current status: `COMPLETED_VALIDATED_PLAN_PACKAGE_LOCAL_SAFE_COMPLETION_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed; CM-1956 is consumed and cannot be retried. Public MCP surface remains unchanged. CM-1973 keeps M10 blocked for real mutation, keeps M11 live runtime exit incomplete, keeps M12 live workflow incomplete, keeps M13 live/runtime fallback safety incomplete, keeps M14 live dashboard/runtime health evidence incomplete, and keeps M15 unopened. It does not start a workflow harness, execute workflow steps, execute fallback runtime, run dashboards, accept runtime health output, create RC gate reports, generate approval packets/request bodies/approval lines, run real queries, read private runtime memory, scan raw stores or raw audit rows, call runtime, use MCP memory tools, write checkpoint/handoff memory, perform durable mutation, release/deploy/cutover/push, or unlock M15. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden. No automatic local-safe plan-package task remains; future live/runtime/RC work requires separate exact authority and fresh evidence.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1973_LOCAL_SAFE_COMPLETION_CLOSEOUT_REFRESH.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1972_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1971_M13_M14_HEALTH_REPORT_ROUTE_REFRESH.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1970_M12_M13_FALLBACK_LOCAL_MEMORY_ROUTE_REFRESH.md`
