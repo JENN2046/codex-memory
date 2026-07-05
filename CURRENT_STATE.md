@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1928 startup locator diagnosis receipt-capture hardening contract |
-| Current task | `CM-1928 startup locator diagnosis receipt-capture hardening contract` |
-| Current validation | `CMV-2031` |
-| Current route | CM-1928 locks deterministic low-disclosure receipt capture for injected startup / locator diagnosis outcomes and routes next to CM-1929 receipt-capture hardening closeout before any future live request |
+| Status | CM-1929 receipt-capture hardening closeout / future live request route decision |
+| Current task | `CM-1929 receipt-capture hardening closeout / future live request route decision` |
+| Current validation | `CMV-2032` |
+| Current route | CM-1929 closes CM-1928 receipt-capture hardening and routes next to CM-1930 startup / locator diagnosis exact approval request packet refresh, still non-executing and non-authorizing |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1929` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1929_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_DECISION.md`. It reviews CM-1926 through CM-1928 and records `cm1928_contract_valid=true`, `receipt_capture_hardening_closed=true`, `receipt_capture_deterministic_for_injected_outcomes=true`, `live_runtime_facts_created=false`, runtime startup state unknown, process count unknown, target locator binding success unknown, service listener reachability unknown, component/action probe locked, read-shape locked, CM-1926 retry not allowed, future live request packet preparation allowed, and future live execution not allowed. CM-1929 routes next to CM-1930 startup / locator diagnosis exact approval request packet refresh, still non-executing and non-authorizing. It does not retry CM-1926, perform a live call, call VCPToolBox, inspect process state, resolve or disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion.
 
 `CM-1928` adds `src/core/VcpNativeStartupLocatorDiagnosisReceiptCaptureContract.js`, `tests/vcp-native-startup-locator-diagnosis-receipt-capture-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1928_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_HARDENING_CONTRACT.md`. It hardens receipt capture after CM-1926's `receipt_capture_error_after_single_approved_attempt` by accepting only injected local outcome categories and projecting deterministic low-disclosure receipt categories. It rejects endpoint/URL values, raw locator values, config/env values or paths, tokens/credentials/secrets, request bodies, provider payloads, response bodies, raw error payloads, stdout/stderr/logs, raw memory text, memory ids, raw stores, raw audit rows, approval line material, process ids, command lines, unknown fields, nonzero counters, raw-body/log/endpoint/locator/write/readiness policy drift, and unsafe target references without echoing unsafe values. Targeted tests passed `7/7`; default tests passed `3997/3997`. CM-1928 does not retry CM-1926, perform a live call, call VCPToolBox, inspect process state, resolve or disclose endpoint/locator values, read response bodies/raw error payloads/logs/stdout/stderr/config/env/secrets/raw memory/raw stores/raw audit rows, generate request bodies or approval lines, write memory or durable state, change config/startup/watchdog/dependencies/runtime binding/public MCP schema, push/tag/release/deploy/cutover, claim readiness, `RC_READY`, complete V8, or full bridge completion. Next route is CM-1929 receipt-capture hardening closeout / future live request route decision, still no-live unless Jenn later gives a new exact approval.
 

@@ -4,11 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1928 startup locator diagnosis receipt-capture hardening contract`.
-Current validation: `CMV-2031`.
+Current checkpoint: `CM-1929 receipt-capture hardening closeout / future live request route decision`.
+Current validation: `CMV-2032`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1929 Receipt-Capture Hardening Closeout / Future Live Request Route Decision
+
+Status: `COMPLETED_VALIDATED_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_TO_CM1930_REQUEST_PACKET_REFRESH_NO_LIVE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1929_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_DECISION.md`.
+- Reviewed CM-1926 through CM-1928.
+- Accepted `cm1928_contract_valid=true`.
+- Accepted `receipt_capture_hardening_closed=true`.
+- Accepted `receipt_capture_deterministic_for_injected_outcomes=true`.
+- Recorded `live_runtime_facts_created=false`.
+- Preserved runtime startup state unknown, process count unknown, target locator binding success unknown, service listener reachability unknown, component/action status probe locked, read-shape locked, CM-1926 retry not allowed, and future live execution not allowed.
+- Allowed only future live request packet preparation as CM-1930.
+- Routed next work to CM-1930 startup / locator diagnosis exact approval request packet refresh, still non-executing and non-authorizing.
+- Preserved that no live call, retry, VCPToolBox call, process-state inspection, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2032`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1928 Startup Locator Diagnosis Receipt-Capture Hardening Contract
 

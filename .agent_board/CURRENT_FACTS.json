@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1928",
-  "validationId": "CMV-2031",
+  "taskId": "CM-1929",
+  "validationId": "CMV-2032",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "startup_locator_diagnosis_receipt_capture_hardening_contract_no_live_call",
+    "scope": "receipt_capture_hardening_closeout_route_to_cm1930_request_packet_refresh_no_live",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2032",
+      "scope": "CM-1929 receipt-capture hardening closeout / future live request route decision",
+      "status": "COMPLETED_VALIDATED_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_TO_CM1930_REQUEST_PACKET_REFRESH_NO_LIVE"
+    },
     {
       "id": "CMV-2031",
       "scope": "CM-1928 startup locator diagnosis receipt-capture hardening contract",

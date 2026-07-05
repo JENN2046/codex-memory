@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1928 startup locator diagnosis receipt-capture hardening contract`.
-Current validation: `CMV-2031`.
-Current handoff: CM-1928 adds a source/test-only receipt-capture hardening contract after CM-1926 receipt capture failed. It locks deterministic low-disclosure receipt projection over injected outcomes only, rejects raw/sensitive/live/write/readiness drift without echo, and keeps all live runtime facts unproven. Next route is CM-1929 receipt-capture hardening closeout / future live request route decision.
+Current task: `CM-1929 receipt-capture hardening closeout / future live request route decision`.
+Current validation: `CMV-2032`.
+Current handoff: CM-1929 closes CM-1928 receipt-capture hardening as valid local evidence, keeps all live runtime facts unproven, and routes next to CM-1930 startup / locator diagnosis exact approval request packet refresh. Future live execution remains blocked until a new exact approval exists.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1928 adds a source/test-only receipt-capture hardening contr
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_HARDENING_CONTRACT_NO_LIVE_CALL`; production/release/cutover ready no; complete V8 not claimed; CM-1928 hardens only local receipt capture after the inconclusive CM-1926 attempt. It does not confirm runtime startup, locator binding, listener state, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_TO_CM1930_REQUEST_PACKET_REFRESH_NO_LIVE`; production/release/cutover ready no; complete V8 not claimed; CM-1929 closes only the local receipt-capture hardening slice. It does not confirm runtime startup, locator binding, listener state, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, live execution, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1929_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_DECISION.md`
 - `src/core/VcpNativeStartupLocatorDiagnosisReceiptCaptureContract.js`
 - `tests/vcp-native-startup-locator-diagnosis-receipt-capture-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1928_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_HARDENING_CONTRACT.md`
