@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1979 exact disposable target fixture-backed live/runtime boundary packet`.
-Current validation: `CMV-2082`.
-Current status: CM-1979 adds a non-authorizing exact boundary packet for a possible future fixture-backed disposable-target component/action request/read-shape live runtime probe. It remains no-live: no approval intake, approval line generation, request body generation, invocation, runtime, network, response consumption, read-shape proof, or readiness claim occurred.
+Current task: `CM-1981 exact-approved fixture-backed probe receipt`.
+Current validation: `CMV-2084`.
+Current status: CM-1980 recorded exact approval intake for the fixture-backed route without reproducing approval text or generating approval lines. CM-1981 consumed one exact-approved fixture-backed injected-transport probe attempt and recorded low-disclosure shape projection evidence: `statusClass=success`, `responseShapeCategory=array_item_count_bucket_only`, `itemCountBucket=zero`, and `readShapeUnlocked=true`. This is fixture-backed proof only: no real VCPToolBox target binding, trusted-full-read completion, M15/RC readiness, release/deploy/cutover readiness, complete V8, or full bridge completion is claimed.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1980 exact approval request readiness review / Jenn boundary display or Jenn-supplied exact approval intake for the fixture-backed probe. Keep CM-1980 no-live unless a future exact boundary supplies a verifiably disposable target and explicitly authorizes the next live action. Do not execute runtime, call VCPToolBox, generate approval lines, print or persist endpoint/locator/request/response/error/log/env/secret/memory values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cut over, unlock M15/RC gate, or claim readiness without exact authority and fresh validation evidence.
+Next safe action is CM-1982 fixture-backed probe closeout / route decision toward real disposable target binding or trusted-full-read preparation. Keep CM-1982 docs/status/governance unless a future exact boundary authorizes additional live/runtime action. Do not retry CM-1981, execute runtime, call VCPToolBox, generate approval lines, print or persist endpoint/locator/request/response/error/log/env/secret/memory values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cut over, unlock M15/RC gate, or claim readiness without exact authority and fresh validation evidence.
 
 ## Historical Run Notes
 

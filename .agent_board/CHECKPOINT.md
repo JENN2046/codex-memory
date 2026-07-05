@@ -4,11 +4,41 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1979 exact disposable target fixture-backed live/runtime boundary packet`.
-Current validation: `CMV-2082`.
+Current checkpoint: `CM-1981 exact-approved fixture-backed probe receipt`.
+Current validation: `CMV-2084`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1981 Exact-Approved Fixture-Backed Probe Receipt
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_FIXTURE_BACKED_READ_SHAPE_PROBE_SUCCESS_SHAPE_PROJECTED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1981_EXACT_APPROVED_FIXTURE_BACKED_PROBE_RECEIPT.md`.
+- Consumed CM-1980 exact approval intake.
+- Executed one exact-approved fixture-backed disposable-target component/action request/read-shape probe through CM-1964 injected transport.
+- Recorded low-disclosure result: `statusClass=success`, `responseShapeCategory=array_item_count_bucket_only`, `topLevelKindCategory=array`, `itemCountBucket=zero`, `durationBucket=lt_100ms`, and `readShapeUnlocked=true`.
+- Consumed budgets: resolver attempts `1/3`, component/action request-read-shape attempts `1/2`, network calls `0/3`, runtime calls `1/3`, no process/listener/service mutation, no local repair, no retry.
+- Preserved no endpoint/locator output or persistence, concrete request body output or persistence, raw response/error/log output or persistence, config/env/secret/stdout/stderr raw value persistence, private memory content output or persistence, memory ID output or persistence, MCP memory tool call, memory read/write/update/supersede/tombstone, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, readiness claim, `RC_READY`, complete V8 claim, or full bridge completion claim.
+- Recorded this as fixture-backed read-shape proof only, not real VCPToolBox target binding, trusted-full-read completion, M15/RC readiness, or release/deploy/cutover readiness.
+- Routed next work to CM-1982 fixture-backed probe closeout / route decision toward real disposable target binding or trusted-full-read preparation.
+
+Validation: `CMV-2084`; exact-approved fixture-backed execution, docs/status review, CM-1963/CM-1964/CM-1978 targeted source/test validation, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+## CM-1980 Exact Approval Intake
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_FIXTURE_BACKED_ROUTE_NO_APPROVAL_LINE_NO_REQUEST_BODY_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1980_EXACT_APPROVAL_INTAKE.md`.
+- Recorded that Jenn supplied a current exact approval matching the CM-1979 fixture-backed route family for CM-1980/CM-1981.
+- Preserved `approval_text_reproduced=false`, `approval_line_generated=false`, `approval_line_persisted=false`, `request_body_generated_by_cm1980=false`, `live_execution_performed_by_cm1980=false`, `memory_written_by_cm1980=false`, `durable_write_by_cm1980=false`, and `readiness_claimed_by_cm1980=false`.
+- Routed next work to CM-1981 subject to the fixture-backed disposable-target precondition and approved output/persistence restrictions.
+
+Validation: `CMV-2083`; approval-intake docs/status review is recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1979 Exact Disposable Target Fixture-Backed Live/Runtime Boundary Packet
 

@@ -110,7 +110,17 @@ Completed local-safe evidence:
   recorded as non-authorizing boundary material only; no approval intake,
   approval line, request body generation, invocation, runtime, network,
   response consumption, read-shape proof, M15 unlock, or readiness claim
-  occurred.
+  occurred;
+- CM-1980 exact approval intake recorded without reproducing approval text,
+  generating approval lines, generating/persisting request bodies, executing
+  runtime by intake, writing memory, mutating durable state, or claiming
+  readiness;
+- CM-1981 exact-approved fixture-backed injected-transport probe recorded
+  low-disclosure success and fixture-backed shape projection evidence with
+  `readShapeUnlocked=true`; no raw output/persistence, endpoint/locator
+  disclosure, memory write, durable mutation, public MCP expansion, M15 unlock,
+  or readiness claim occurred. This does not prove real VCPToolBox target
+  binding, trusted-full-read workflow, or M15 readiness.
 
 Missing RC evidence:
 
@@ -175,6 +185,28 @@ m15_package_evidence_map_boundary:
   cm1979_response_body_consumed: false
   cm1979_read_shape_unlocked: false
   cm1979_readiness_claimed: false
+  cm1980_exact_approval_intake_present: true
+  cm1980_approval_text_reproduced: false
+  cm1980_approval_line_generated: false
+  cm1980_live_runtime_execution_performed: false
+  cm1981_exact_approved_fixture_backed_probe_executed: true
+  cm1981_fixture_target_category: synthetic_disposable_empty_target
+  cm1981_existing_operator_target_reuse_allowed: false
+  cm1981_request_body_generated_by_harness: true
+  cm1981_concrete_request_body_output: false
+  cm1981_request_body_persisted: false
+  cm1981_component_action_invoked: true
+  cm1981_network_called: false
+  cm1981_runtime_called: true
+  cm1981_response_body_consumed_for_shape_projection: true
+  cm1981_raw_response_body_persisted: false
+  cm1981_raw_error_payload_persisted: false
+  cm1981_endpoint_locator_disclosed: false
+  cm1981_memory_read_performed: false
+  cm1981_memory_write_performed: false
+  cm1981_read_shape_unlocked: true
+  cm1981_readiness_claimed: false
+  cm1981_fixture_backed_only_not_real_vcp_target_binding: true
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
@@ -209,7 +241,9 @@ m15_package_evidence_map_boundary:
   memory_write_performed: false
   durable_audit_write_performed: false
   durable_memory_write_performed: false
-  request_body_generated: false
+  request_body_generated: true
+  request_body_generation_scope: cm1981_fixture_harness_in_memory_only
+  request_body_output_or_persistence: false
   request_body_submitted: false
   config_changed: false
   startup_changed: false
@@ -228,7 +262,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1980_exact_approval_request_readiness_review_or_jenn_supplied_exact_approval_intake_for_fixture_backed_probe
+  next_safe_route: cm1982_fixture_backed_probe_closeout_route_decision_toward_real_disposable_target_binding_or_trusted_full_read_preparation
 ```
 
 ## Conclusion
@@ -243,11 +277,14 @@ route evaluation that aborted before runtime because the target was not
 verified disposable. CM-1978 records local source/test/docs disposable-target
 fixture-preparation evidence for a synthetic/empty target binding posture.
 CM-1979 records non-authorizing fixture-backed exact boundary material for a
-possible future live/runtime probe. None of these add live request/read-shape
-proof, M15 RC gate readiness, or release/cutover evidence.
+possible future live/runtime probe. CM-1980 records exact approval intake
+without approval-line output or runtime execution by intake. CM-1981 records
+one exact-approved fixture-backed injected-transport probe with low-disclosure
+shape projection and `readShapeUnlocked=true`. This is fixture-backed evidence
+only: it does not prove real VCPToolBox target binding, trusted-full-read
+workflow completion, M15 RC gate readiness, or release/cutover evidence.
 
-The next route is CM-1980 exact approval request readiness review / Jenn
-boundary display or Jenn-supplied exact approval intake for the fixture-backed
-probe. Future live/runtime, memory read/write, approval, RC review, release,
-deploy, cutover, push, or readiness work requires separate exact authority and
-fresh evidence.
+The next route is CM-1982 fixture-backed probe closeout / route decision
+toward real disposable target binding or trusted-full-read preparation. Future
+live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
+push, or readiness work requires separate exact authority and fresh evidence.

@@ -8,15 +8,19 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1979 exact disposable target fixture-backed live/runtime boundary packet |
-| Current task | `CM-1979 exact disposable target fixture-backed live/runtime boundary packet` |
-| Current validation | `CMV-2082` |
-| Current route | CM-1979 prepares non-authorizing fixture-backed live/runtime boundary material; no approval intake, live execution, or read-shape proof occurred |
+| Status | CM-1981 exact-approved fixture-backed probe receipt |
+| Current task | `CM-1981 exact-approved fixture-backed probe receipt` |
+| Current validation | `CMV-2084` |
+| Current route | CM-1981 consumed one exact-approved fixture-backed injected-transport probe attempt and produced low-disclosure fixture read-shape proof; no readiness claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1981` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1981_EXACT_APPROVED_FIXTURE_BACKED_PROBE_RECEIPT.md`. It consumes CM-1980 and executes one exact-approved fixture-backed disposable-target component/action request/read-shape probe through CM-1964 injected transport. Low-disclosure result: `statusClass=success`, `responseShapeCategory=array_item_count_bucket_only`, `topLevelKindCategory=array`, `itemCountBucket=zero`, `durationBucket=lt_100ms`, and `readShapeUnlocked=true`. Budgets consumed: resolver attempts `1/3`, component/action request-read-shape attempts `1/2`, network calls `0/3`, runtime calls `1/3`, no process/listener/service mutation, no local repair, no retry. CM-1981 does not disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id values, write memory, mutate durable stores, expand public MCP, modify VCPToolBox core, push/tag/release/deploy/cutover, unlock M15/RC gate, claim readiness, claim `RC_READY`, claim complete V8, or claim full bridge completion. This is fixture-backed read-shape proof only, not real VCPToolBox target binding or production readiness. Next route is CM-1982 fixture-backed probe closeout / route decision toward real disposable target binding or trusted-full-read preparation.
+
+`CM-1980` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1980_EXACT_APPROVAL_INTAKE.md`. It records current exact approval intake for the CM-1980/CM-1981 fixture-backed route without reproducing approval text, generating an approval line, generating or persisting a request body, executing runtime, disclosing endpoint/locator values, writing memory, mutating durable state, expanding public MCP, pushing/releasing/deploying/cutting over, or claiming readiness. It routes to CM-1981 subject to the approved output and persistence restrictions.
 
 `CM-1979` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1979_EXACT_DISPOSABLE_TARGET_FIXTURE_BACKED_LIVE_RUNTIME_BOUNDARY_PACKET.md`. It consumes CM-1978 and prepares non-authorizing exact boundary material for a possible future fixture-backed disposable-target component/action request/read-shape live runtime probe. The packet requires CM-1959, CM-1963, CM-1964, and CM-1978, keeps target reference `operator-vcp-toolbox-service-ref`, component `KnowledgeBaseManager`, action `knowledge_base.search`, synthetic/empty disposable target category, no existing operator target reuse, injected fixture transport, max result count `1`, low-disclosure receipt only, and zero write/provider/dependency/public-MCP/release/readiness authority. No new Jenn exact approval text was supplied, so approval intake is absent, approval line generation is false, request body generation is false, live/runtime/network/VCPToolBox execution is false, response consumption is false, memory read/write is false, M15/RC unlock is false, and readiness is not claimed. Next route is CM-1980 exact approval request readiness review / Jenn boundary display or Jenn-supplied exact approval intake for the fixture-backed probe.
 

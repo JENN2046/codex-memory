@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-06",
-  "taskId": "CM-1979",
-  "validationId": "CMV-2082",
+  "taskId": "CM-1981",
+  "validationId": "CMV-2084",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_disposable_target_fixture_backed_live_runtime_boundary_packet_non_authorizing_no_live_no_approval_intake_no_readiness",
+    "scope": "exact_approved_fixture_backed_read_shape_probe_success_shape_projected_no_raw_output_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,16 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2084",
+      "scope": "CM-1981 exact-approved fixture-backed probe receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_FIXTURE_BACKED_READ_SHAPE_PROBE_SUCCESS_SHAPE_PROJECTED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2083",
+      "scope": "CM-1980 exact approval intake",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_FIXTURE_BACKED_ROUTE_NO_APPROVAL_LINE_NO_REQUEST_BODY_NO_READINESS"
+    },
     {
       "id": "CMV-2082",
       "scope": "CM-1979 exact disposable target fixture-backed live/runtime boundary packet",
