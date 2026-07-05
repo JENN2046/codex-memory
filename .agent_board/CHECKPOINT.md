@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1935 low-disclosure startup/listener recovery contract`.
-Current validation: `CMV-2038`.
+Current checkpoint: `CM-1936 startup/listener recovery exact approval request packet`.
+Current validation: `CMV-2039`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1936 Startup/Listener Recovery Exact Approval Request Packet
+
+Status: `COMPLETED_VALIDATED_STARTUP_LISTENER_RECOVERY_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1936_STARTUP_LISTENER_RECOVERY_EXACT_APPROVAL_REQUEST_PACKET.md`.
+- Prepared a non-authorizing exact approval request packet for one future startup/listener recovery diagnosis.
+- Required CM-1935 `VcpNativeStartupListenerRecoveryContract` as the pre-live boundary.
+- Bound future request scope to safe target reference `operator-vcp-toolbox-service-ref`, max process-state inspections `1`, max service-start attempts `1`, max service-stop attempts `0`, max service-restart attempts `0`, max listener recheck attempts `1`, max network calls `1`, max runtime calls `1`, request body generation false, response body byte budget `0`, raw error payload budget `0`, log read budget `0`, stdout/stderr read false, config/env read false, secret read false, memory read false, memory write false, durable write false, endpoint disclosure false, locator value disclosure false, provider/API call false, public MCP expansion false, config/startup/watchdog change false, dependency change false, release/deploy/cutover/push false, readiness claim false, and low-disclosure receipt projection only.
+- Preserved that the packet grants no approval and does not generate approval lines or request bodies.
+- Routed next work to CM-1937 exact approval request readiness review / Jenn boundary display, still non-authorizing and no-live.
+- Preserved that no live call, retry, VCPToolBox call, process-state inspection, runtime start/stop/restart, listener recheck, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2039`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1935 Low-Disclosure Startup/Listener Recovery Contract
 
