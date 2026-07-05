@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1970 M12/M13 fallback local memory route refresh`.
-Current validation: `CMV-2073`.
-Current status: CM-1970 accepts existing M13 fallback local memory fixture/dry-run contracts for local planning after CM-1969 and keeps M13 live/runtime fallback safety blocked. Targeted M13 tests passed `64/64`; no live/runtime/network/VCPToolBox call, fallback runtime execution, real query, private runtime read, raw store scan, broad memory scan, MCP memory tool call, memory read/write, or durable write occurred.
+Current task: `CM-1971 M13/M14 health-report route refresh`.
+Current validation: `CMV-2074`.
+Current status: CM-1971 accepts existing M14 low-disclosure health-report fixture/schema/source-review chain for local planning after CM-1970 and keeps M14 live dashboard/runtime health evidence blocked. Targeted M14 tests passed `22/22`; no live/runtime/network/VCPToolBox call, dashboard execution, runtime health report acceptance, real query, private runtime read, raw store/raw audit scan, MCP memory tool call, memory read/write, or durable write occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1971 M13/M14 health-report route refresh. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. Treat M11 as fixture/schema refreshed but live runtime exit incomplete. Treat M12 as fixture-chain refreshed but live workflow incomplete. Treat M13 as fixture/dry-run fallback hardening refreshed but live/runtime fallback safety incomplete. Do not execute live VCPToolBox probes, run fallback runtime, perform real queries, read private runtime memory, scan raw stores, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
+Next action is CM-1972 M14/M15 non-authorizing RC gate route refresh. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. Treat M11 as fixture/schema refreshed but live runtime exit incomplete. Treat M12 as fixture-chain refreshed but live workflow incomplete. Treat M13 as fixture/dry-run fallback hardening refreshed but live/runtime fallback safety incomplete. Treat M14 as fixture/schema health-report refreshed but live dashboard/runtime health evidence incomplete. Do not execute live VCPToolBox probes, run fallback runtime, run dashboards, accept runtime health output, perform real queries, read private runtime memory, scan raw stores or raw audit rows, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, open M15 RC review, or claim readiness.
 
 ## Historical Run Notes
 

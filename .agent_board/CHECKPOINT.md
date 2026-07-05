@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1970 M12/M13 fallback local memory route refresh`.
-Current validation: `CMV-2073`.
+Current checkpoint: `CM-1971 M13/M14 health-report route refresh`.
+Current validation: `CMV-2074`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1971 M13/M14 Health-Report Route Refresh
+
+Status: `COMPLETED_VALIDATED_M13_M14_HEALTH_REPORT_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1971_M13_M14_HEALTH_REPORT_ROUTE_REFRESH.md`.
+- Updated `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`.
+- Consumed CM-1970 M13 fallback fixture/dry-run route refresh.
+- Accepted existing M14 low-disclosure health-report fixture/schema/source-review chain for local planning.
+- Revalidated `src/core/VcpMemoryHealthReportSchemaContract.js` and `tests/vcp-memory-health-report-schema-contract.test.js`.
+- Preserved that M14 live dashboard/runtime health evidence, accepted live health report, M15 unlock, complete V8, and full bridge completion remain unproven.
+- Preserved that CM-1971 performs no live/runtime/network/VCPToolBox call, dashboard execution, runtime health report acceptance, workflow harness start, workflow step execution, local fallback runtime execution, real query, private runtime read, raw store/raw audit scan, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, release/deploy/cutover/push/tag, readiness claim, M14/M15 unlock, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1972 M14/M15 non-authorizing RC gate route refresh.
+
+Validation: `CMV-2074`; `node --check` for M14 source/test and targeted M14 tests `22/22` passed. Broader docs/status validation and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1970 M12/M13 Fallback Local Memory Route Refresh
 

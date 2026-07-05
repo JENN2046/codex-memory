@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1970 M12/M13 fallback local memory route refresh |
-| Current task | `CM-1970 M12/M13 fallback local memory route refresh` |
-| Current validation | `CMV-2073` |
-| Current route | CM-1970 accepts M13 fallback fixture/dry-run chain for planning and keeps live/runtime fallback safety blocked |
+| Status | CM-1971 M13/M14 health-report route refresh |
+| Current task | `CM-1971 M13/M14 health-report route refresh` |
+| Current validation | `CMV-2074` |
+| Current route | CM-1971 accepts M14 health-report fixture/schema chain for planning and keeps live dashboard/runtime health evidence blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1971` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1971_M13_M14_HEALTH_REPORT_ROUTE_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It consumes CM-1970, accepts the existing M14 low-disclosure health-report fixture/schema/source-review chain for local planning, and keeps M14 live dashboard/runtime health evidence blocked. Targeted M14 tests passed `22/22`. CM-1971 performs no live/runtime/network/VCPToolBox call, dashboard execution, runtime health report acceptance, workflow harness start, workflow step execution, local fallback runtime execution, real query, private runtime read, raw store/raw audit scan, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, release/deploy/cutover/push, readiness claim, M14/M15 unlock, complete V8, or full bridge completion. Next route is CM-1972 M14/M15 non-authorizing RC gate route refresh.
 
 `CM-1970` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1970_M12_M13_FALLBACK_LOCAL_MEMORY_ROUTE_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It consumes CM-1969, accepts the existing M13 fallback local memory marker/receipt, scope isolation, secret rejection, lifecycle filter, and query-quality dry-run fixture contracts for local planning, and keeps M13 live/runtime fallback safety blocked. Targeted M13 tests passed `64/64`. CM-1970 performs no live/runtime/network/VCPToolBox call, workflow harness start, workflow step execution, local fallback runtime execution, real query, private runtime read, raw store scan, broad memory scan, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, release/deploy/cutover/push, readiness claim, M13/M14/M15 unlock, complete V8, or full bridge completion. Next route is CM-1971 M13/M14 health-report route refresh.
 
