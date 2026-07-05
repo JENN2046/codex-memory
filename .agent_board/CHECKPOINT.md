@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1936 startup/listener recovery exact approval request packet`.
-Current validation: `CMV-2039`.
+Current checkpoint: `CM-1937 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2040`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1937 Exact Approval Request Readiness Review / Jenn Boundary Display
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1937_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`.
+- Reviewed CM-1936 packet as present and ready for Jenn boundary display.
+- Displayed the exact boundary Jenn would need to approve in a separate current message before any future startup/listener recovery live execution.
+- Preserved that the boundary display is non-authorizing and no approval was granted.
+- Preserved approval line generated false, approval line submitted false, request body generated false, live execution allowed false, process-state inspection allowed now false, service start allowed now false, listener recheck allowed now false, component/action probe locked, read-shape locked, and readiness not claimed.
+- Displayed boundary remains scoped to safe target reference `operator-vcp-toolbox-service-ref`, CM-1935 `VcpNativeStartupListenerRecoveryContract`, max process-state inspections `1`, max service-start attempts `1`, max service-stop attempts `0`, max service-restart attempts `0`, max listener recheck attempts `1`, max network calls `1`, max runtime calls `1`, zero request body generation, zero response/raw/log budgets, no stdout/stderr/config/env/secret/memory read, no memory/durable write, no endpoint/locator disclosure, no provider/API call, no public MCP expansion, no config/startup/watchdog/dependency change, no release/deploy/cutover/push, no readiness claim, and low-disclosure receipt projection only.
+- Routed next work to CM-1938 exact approval capture / pre-execution gate, still blocked before runtime unless Jenn provides a separate current exact approval matching the CM-1936 / CM-1937 boundary.
+- Preserved that no live call, retry, VCPToolBox call, process-state inspection, runtime start/stop/restart, listener recheck, endpoint/locator disclosure, response body/log/stdout/stderr/config/env/secret/raw memory/raw store/raw audit read, request body generation/submission, approval-line generation/submission/exposure/storage, MCP memory call, component/action probe, read-shape proof, memory write, durable write, config/startup/watchdog/dependency/runtime binding change, public MCP expansion, push/tag/release/deploy/cutover, readiness, `RC_READY`, complete V8, or full bridge completion occurred.
+
+Validation: `CMV-2040`; docs/status review, `git diff --check`, `bash scripts/validate-local.sh docs`, `.agent_board/CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, targeted endpoint/locator/approval-line/secret/raw-output/readiness scan over changed files, and changed-scope re-review.
 
 ## CM-1936 Startup/Listener Recovery Exact Approval Request Packet
 

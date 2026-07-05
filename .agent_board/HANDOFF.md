@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1936 startup/listener recovery exact approval request packet`.
-Current validation: `CMV-2039`.
-Current handoff: CM-1936 prepares the non-authorizing exact approval request packet for one future startup/listener recovery diagnosis under the CM-1935 contract. It defines budgets, low-disclosure receipt projection, and stop conditions, and routes next to CM-1937 exact approval request readiness review / Jenn boundary display.
+Current task: `CM-1937 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2040`.
+Current handoff: CM-1937 reviews the CM-1936 request packet and displays the Jenn exact boundary as non-authorizing review material. It routes next to CM-1938 exact approval capture / pre-execution gate, still blocked before runtime unless Jenn provides separate current exact approval matching the CM-1936 / CM-1937 boundary.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -14,7 +14,7 @@ Current handoff: CM-1936 prepares the non-authorizing exact approval request pac
 
 Goal: continue the imported VCP memory plan from accepted `M6 observe-lite`, accepted `M7 read-shape`, and accepted narrow `M8 trusted-full-read workflow` into M9 preparation without crossing approval-line, proposal-generation, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries.
 
-Current status: `COMPLETED_VALIDATED_STARTUP_LISTENER_RECOVERY_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1936 adds a non-authorizing packet only. It does not confirm runtime startup, process count, locator binding, listener root cause, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, live execution, runtime start/stop/restart, process-state inspection, listener recheck, service start, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE`; production/release/cutover ready no; complete V8 not claimed; CM-1937 displays the boundary only. It does not confirm runtime startup, process count, locator binding, listener root cause, component/action routing, or read-shape support. Endpoint URLs, locator values, config/env values or paths, tokens, response bodies, raw error payloads, logs, raw plugin config, private memory content, request bodies, approval lines, writes, retries, live execution, runtime start/stop/restart, process-state inspection, listener recheck, service start, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1937_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1936_STARTUP_LISTENER_RECOVERY_EXACT_APPROVAL_REQUEST_PACKET.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1935_LOW_DISCLOSURE_STARTUP_LISTENER_RECOVERY_CONTRACT.md`
 - `src/core/VcpNativeStartupListenerRecoveryContract.js`
