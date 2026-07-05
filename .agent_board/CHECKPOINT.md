@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1968 M10/M11 route decision and response-normalization refresh`.
-Current validation: `CMV-2071`.
+Current checkpoint: `CM-1969 M11/M12 sustained workflow route refresh`.
+Current validation: `CMV-2072`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1969 M11/M12 Sustained Workflow Route Refresh
+
+Status: `COMPLETED_VALIDATED_M11_M12_SUSTAINED_WORKFLOW_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1969_M11_M12_SUSTAINED_WORKFLOW_ROUTE_REFRESH.md`.
+- Updated `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`.
+- Consumed CM-1968 M11 fixture/schema route refresh.
+- Accepted existing M12 envelope and receipt-chain fixture contracts for local planning.
+- Revalidated `src/core/VcpMemoryCodexClaudeSustainedWorkflowEnvelopeContract.js` and `src/core/VcpMemoryCodexClaudeSustainedWorkflowReceiptChainContract.js`.
+- Preserved that M12 live workflow integration, workflow harness execution, checkpoint/handoff memory writes, M13 runtime fallback, M15 unlock, complete V8, and full bridge completion remain unproven.
+- Preserved that CM-1969 performs no live/runtime/network/VCPToolBox call, workflow harness start, workflow step execution, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, release/deploy/cutover/push/tag, readiness claim, M12/M13/M15 unlock, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1970 M12/M13 fallback local memory route refresh.
+
+Validation: `CMV-2072`; `node --check` for both M12 source files and targeted M12 tests `17/17` passed. Broader docs/status validation and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1968 M10/M11 Route Decision And Response Normalization Refresh
 

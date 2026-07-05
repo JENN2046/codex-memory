@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-05",
-  "taskId": "CM-1968",
-  "validationId": "CMV-2071",
+  "taskId": "CM-1969",
+  "validationId": "CMV-2072",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "m10_blocked_m11_fixture_refresh_no_runtime_no_write_no_readiness",
+    "scope": "m11_fixture_to_m12_fixture_refresh_no_runtime_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2072",
+      "scope": "CM-1969 M11/M12 sustained workflow route refresh",
+      "status": "COMPLETED_VALIDATED_M11_M12_SUSTAINED_WORKFLOW_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2071",
       "scope": "CM-1968 M10/M11 route decision and response-normalization refresh",

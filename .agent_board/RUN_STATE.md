@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1968 M10/M11 route decision and response-normalization refresh`.
-Current validation: `CMV-2071`.
-Current status: CM-1968 closes the current M10 automatic route as blocked because exact write boundary is absent and routes only to M11 fixture/schema response-normalization and audit-receipt refresh. Targeted M11 tests passed `18/18`; default tests passed `4060/4060`; no live/runtime/network/VCPToolBox call occurred and no write/update/supersede/tombstone execution occurred.
+Current task: `CM-1969 M11/M12 sustained workflow route refresh`.
+Current validation: `CMV-2072`.
+Current status: CM-1969 accepts existing M12 envelope and receipt-chain fixture contracts for local planning after CM-1968 and keeps M12 live workflow integration blocked. Targeted M12 tests passed `17/17`; no live/runtime/network/VCPToolBox call occurred and no checkpoint/handoff memory write occurred.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next action is CM-1969 M11/M12 sustained workflow route refresh. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. Treat M11 as fixture/schema refreshed but live runtime exit incomplete. Do not execute live VCPToolBox probes, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
+Next action is CM-1970 M12/M13 fallback local memory route refresh. Treat M10 as blocked for actual write/update/supersede/tombstone execution until Jenn supplies a separate exact write boundary. Treat M11 as fixture/schema refreshed but live runtime exit incomplete. Treat M12 as fixture-chain refreshed but live workflow incomplete. Do not execute live VCPToolBox probes, persist raw endpoint/request/response/error/log/env/memory values, write memory, mutate durable stores, install/update dependencies, expand public MCP, modify VCPToolBox core, push/release/deploy/cutover, or claim readiness.
 
 ## Historical Run Notes
 

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1968 M10/M11 route decision and response-normalization refresh |
-| Current task | `CM-1968 M10/M11 route decision and response-normalization refresh` |
-| Current validation | `CMV-2071` |
-| Current route | CM-1968 closes current M10 automatic route as blocked and allows only M11 fixture/schema refresh |
+| Status | CM-1969 M11/M12 sustained workflow route refresh |
+| Current task | `CM-1969 M11/M12 sustained workflow route refresh` |
+| Current validation | `CMV-2072` |
+| Current route | CM-1969 accepts M12 fixture chain for planning and keeps live workflow blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1969` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1969_M11_M12_SUSTAINED_WORKFLOW_ROUTE_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It consumes CM-1968, accepts the existing M12 envelope and receipt-chain fixture contracts for local planning, and keeps M12 live workflow integration blocked. Targeted M12 tests passed `17/17`. CM-1969 performs no live/runtime/network/VCPToolBox call, workflow harness start, workflow step execution, MCP memory tool call, memory read/write/update/supersede/tombstone, checkpoint/handoff memory write, durable write, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, release/deploy/cutover/push, readiness claim, M12/M13/M15 unlock, complete V8, or full bridge completion. Next route is CM-1970 M12/M13 fallback local memory route refresh.
 
 `CM-1968` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1968_M10_M11_ROUTE_DECISION_RESPONSE_NORMALIZATION_REFRESH.md` and updates `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`. It consumes CM-1966/CM-1967, closes the current M10 automatic route as blocked because no exact write boundary exists, and routes only to the existing M11 fixture/schema response-normalization and audit-receipt refresh. Targeted M11 tests passed `18/18`; default tests passed `4060/4060`. CM-1968 performs no live/runtime/network/VCPToolBox call, endpoint/locator disclosure, config/env/secret/log/stdout/stderr read, request body generation/output/persistence/submission, response body read, raw memory/raw store/raw audit read, MCP memory tool call, memory read/write/update/supersede/tombstone, durable write, proposal runtime submission, approval request submission, approval line generation/submission, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, readiness claim, M10/M11/M12/M15 unlock, complete V8, or full bridge completion. Next route is CM-1969 M11/M12 sustained workflow route refresh.
 
