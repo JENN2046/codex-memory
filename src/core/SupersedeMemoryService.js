@@ -166,10 +166,18 @@ function createBaseAuditEvent({
 }
 
 class SupersedeMemoryService {
-  constructor({ config, shadowStore, auditLogStore }) {
+  constructor({
+    config,
+    shadowStore,
+    auditLogStore,
+    projectionCleanupService = null,
+    projectionCleanupAppendAudit = false
+  }) {
     this.config = config;
     this.shadowStore = shadowStore;
     this.auditLogStore = auditLogStore;
+    this.projectionCleanupService = projectionCleanupService;
+    this.projectionCleanupAppendAudit = projectionCleanupAppendAudit === true;
   }
 
   buildRejectedResult({
@@ -266,6 +274,36 @@ class SupersedeMemoryService {
       requestSource: requestSource || this.config.defaultRequestSource,
       mutationAuditEvent: auditEvent
     });
+  }
+
+  async applyProjectionCleanup({ record, lifecycleFamily, targetStatus, requestSource, timestamp }) {
+    if (!this.projectionCleanupService?.applySuppression) {
+      return {
+        status: 'not_configured',
+        report: null
+      };
+    }
+
+    try {
+      const report = await this.projectionCleanupService.applySuppression({
+        memoryId: record.memoryId,
+        target: record.target || 'process',
+        lifecycleFamily,
+        targetStatus,
+        requestSource,
+        timestamp,
+        appendProjectionAudit: this.projectionCleanupAppendAudit
+      });
+      return {
+        status: report.accepted ? 'accepted' : 'blocked',
+        report
+      };
+    } catch {
+      return {
+        status: 'failed_after_mutation',
+        report: null
+      };
+    }
   }
 
   async getPairRecords(oldMemoryId, newMemoryId) {
@@ -630,6 +668,42 @@ class SupersedeMemoryService {
       };
     }
 
+    const projectionCleanup = await this.applyProjectionCleanup({
+      record: oldRecord,
+      lifecycleFamily: 'supersede_memory',
+      targetStatus: 'superseded',
+      requestSource: normalizedPayload.request_source,
+      timestamp: auditPlan.committedEvent.committed_at
+    });
+    if (projectionCleanup.status === 'blocked' || projectionCleanup.status === 'failed_after_mutation') {
+      return {
+        success: true,
+        decision: 'superseded-with-warning',
+        toolCandidate: 'supersede_memory',
+        dryRun: false,
+        mutated: true,
+        oldMemoryId: oldRecord.memoryId,
+        newMemoryId: newRecord.memoryId,
+        oldFromStatus,
+        oldToStatus: 'superseded',
+        newFromStatus,
+        newToStatus: 'active',
+        pairCorrelationId: auditPlan.pairCorrelationId,
+        reason: 'projection cleanup did not fully complete after pair lifecycle mutation.',
+        auditEvent: auditPlan.committedEvent,
+        auditEventIntent: auditPlan.pendingEvent,
+        auditIntentStatus: 'appended',
+        auditCommitStatus: 'appended',
+        projectionCleanupStatus: projectionCleanup.status,
+        projectionCleanupReport: projectionCleanup.report,
+        policy: {
+          lifecycle_policy_applied: true,
+          scope_policy_applied: true,
+          redaction_applied: true
+        }
+      };
+    }
+
     return {
       success: true,
       decision: 'superseded',
@@ -647,6 +721,8 @@ class SupersedeMemoryService {
       auditEventIntent: auditPlan.pendingEvent,
       auditIntentStatus: 'appended',
       auditCommitStatus: 'appended',
+      projectionCleanupStatus: projectionCleanup.status,
+      projectionCleanupReport: projectionCleanup.report,
       policy: {
         lifecycle_policy_applied: true,
         scope_policy_applied: true,

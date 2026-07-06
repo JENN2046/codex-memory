@@ -8,6 +8,7 @@ const { MemoryWriteReconcileWorker } = require('./core/MemoryWriteReconcileWorke
 const { ValidateMemoryService } = require('./core/ValidateMemoryService');
 const { TombstoneMemoryService } = require('./core/TombstoneMemoryService');
 const { SupersedeMemoryService } = require('./core/SupersedeMemoryService');
+const { MemoryLifecycleProjectionCleanupService } = require('./core/MemoryLifecycleProjectionCleanupService');
 const { DeferredGovernanceRuntimeEntryAdapter } = require('./core/DeferredGovernanceRuntimeEntryAdapter');
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
@@ -847,6 +848,13 @@ function createCodexMemoryApplication(overrides = {}) {
   const memoryWriteReconcileWorker = new MemoryWriteReconcileWorker({
     reconcileService: memoryWriteReconcileService
   });
+  const memoryLifecycleProjectionCleanupService = new MemoryLifecycleProjectionCleanupService({
+    diaryStore,
+    shadowStore,
+    vectorStore,
+    candidateCacheStore,
+    auditLogStore
+  });
   const validateMemoryService = new ValidateMemoryService({
     config,
     shadowStore,
@@ -855,12 +863,16 @@ function createCodexMemoryApplication(overrides = {}) {
   const tombstoneMemoryService = new TombstoneMemoryService({
     config,
     shadowStore,
-    auditLogStore
+    auditLogStore,
+    projectionCleanupService: memoryLifecycleProjectionCleanupService,
+    projectionCleanupAppendAudit: overrides.projectionCleanupAppendAudit === true
   });
   const supersedeMemoryService = new SupersedeMemoryService({
     config,
     shadowStore,
-    auditLogStore
+    auditLogStore,
+    projectionCleanupService: memoryLifecycleProjectionCleanupService,
+    projectionCleanupAppendAudit: overrides.projectionCleanupAppendAudit === true
   });
   const deferredGovernanceRuntimeEntryAdapter = new DeferredGovernanceRuntimeEntryAdapter({
     memoryExcludeEnabled: internalMemoryExcludeRuntimeEntryEnabled,
@@ -995,6 +1007,7 @@ function createCodexMemoryApplication(overrides = {}) {
       writeService,
       memoryWriteReconcileService,
       memoryWriteReconcileWorker,
+      memoryLifecycleProjectionCleanupService,
       validateMemoryService,
       tombstoneMemoryService,
       supersedeMemoryService,
