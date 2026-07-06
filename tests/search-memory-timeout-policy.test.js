@@ -8,6 +8,13 @@ const {
   SearchMemoryTimeoutError
 } = require('../src/core/SearchMemoryTimeoutPolicy');
 
+function busyWait(ms) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < ms) {
+    // Intentional synchronous event-loop block for timeout boundary evidence.
+  }
+}
+
 test('runSearchMemoryWithTimeout rejects timeout even when abort listener resolves synchronously', async () => {
   let abortSeen = false;
 
@@ -28,4 +35,18 @@ test('runSearchMemoryWithTimeout rejects timeout even when abort listener resolv
   );
 
   assert.equal(abortSeen, true);
+});
+
+test('runSearchMemoryWithTimeout documents synchronous operation limitation', async () => {
+  const startedAt = Date.now();
+
+  const result = await runSearchMemoryWithTimeout(() => {
+    busyWait(20);
+    return 'sync-completed';
+  }, { timeoutMs: 1 });
+
+  const elapsedMs = Date.now() - startedAt;
+
+  assert.equal(result, 'sync-completed');
+  assert.ok(elapsedMs >= 20);
 });

@@ -138,6 +138,14 @@ prefiltering, avoid all-row chunk scans for normal recall, and consider moving
 large ranking work into an abortable worker/thread boundary or an async storage
 layer with hard query budgets.
 
+Post-audit evidence hardening:
+
+`F2_EVIDENCE_ADDED_LOCALLY` on 2026-07-06. Synthetic tests now document that
+`runSearchMemoryWithTimeout()` cannot preempt synchronous event-loop blocking
+and that `CandidateGenerator` currently consumes the full supplied chunk set
+before semantic pool slicing. This is evidence hardening only; it does not claim
+that the scale/timeout risk is fixed.
+
 ### F3 - Memory privacy and deletion risk are multiplied by storage fan-out
 
 Severity: `high`
