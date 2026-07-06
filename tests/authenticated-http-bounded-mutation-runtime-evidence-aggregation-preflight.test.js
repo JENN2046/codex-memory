@@ -497,6 +497,10 @@ function assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck) {
   assert.equal(precheck.readyForExactOwnerReview, true);
   assert.equal(precheck.executionBoundaryPrepared, true);
   assert.equal(precheck.executionBoundaryReadyForExactOwnerReview, true);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, true);
+  assert.equal(precheck.rcCutoverPreCandidatePackageAuditable, true);
+  assert.equal(precheck.additionalLocalWrapperRequired, false);
+  assert.equal(precheck.nextRequiredBoundary, 'separate_exact_owner_decision_or_stop');
   assert.equal(precheck.approvalRequestOnly, true);
   assert.equal(precheck.approvalRequestSubmitted, false);
   assert.equal(precheck.approvalLineGenerated, false);
@@ -538,6 +542,32 @@ function assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck) {
     precheck.executionBoundaryChecklist.rows.every(row => row.rawValueOutput === false),
     true
   );
+  assert.equal(
+    precheck.chainConvergence.convergenceStatus,
+    'terminal_local_pre_candidate_package_ready_for_owner_decision_not_authorization'
+  );
+  assert.equal(precheck.chainConvergence.localEvidenceAggregationTerminal, true);
+  assert.equal(precheck.chainConvergence.localRcGatePrecheckTerminal, true);
+  assert.equal(precheck.chainConvergence.noAdditionalLocalWrapperRequired, true);
+  assert.equal(precheck.chainConvergence.repairInsteadOfWrapWhenBlocked, true);
+  assert.equal(precheck.chainConvergence.stopsBeforeApprovalRequestSubmission, true);
+  assert.equal(precheck.chainConvergence.stopsBeforeOwnerApproval, true);
+  assert.equal(precheck.chainConvergence.stopsBeforeExecution, true);
+  assert.equal(precheck.chainConvergence.stopsBeforeReleaseDeployTag, true);
+  assert.equal(precheck.chainConvergence.stopsBeforeReadinessClaim, true);
+  assert.equal(precheck.chainConvergence.nextBoundaryType, 'separate_exact_owner_decision');
+  assert.equal(
+    precheck.chainConvergence.terminalArtifactSchemaVersion,
+    'p78-rc-cutover-owner-approval-execution-boundary-precheck-v1'
+  );
+  assert.equal(precheck.chainConvergence.priorLowDisclosureChain.length, 10);
+  assert.equal(
+    precheck.chainConvergence.priorLowDisclosureChain.at(-1),
+    'p78_rc_cutover_owner_approval_execution_boundary_precheck'
+  );
+  assert.ok(precheck.chainConvergence.omittedMaterial.includes('approval_text'));
+  assert.ok(precheck.chainConvergence.omittedMaterial.includes('endpoint_or_locator'));
+  assert.ok(precheck.chainConvergence.omittedMaterial.includes('secret'));
   assert.equal(
     precheck.sourceSummary.packageSchemaVersion,
     'p77-rc-cutover-final-owner-review-package-aggregation-v1'
@@ -1724,6 +1754,18 @@ test('v1 RC aggregator CLI can intake a P77 final owner-review package from stdi
     8
   );
   assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckTerminalLocalPreCandidatePackage,
+    true
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckNoAdditionalLocalWrapperRequired,
+    true
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckNextBoundaryRequiresExactOwnerDecision,
+    true
+  );
+  assert.equal(
     report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckApprovalGenerated,
     false
   );
@@ -1779,6 +1821,10 @@ test('v1 RC aggregator CLI can emit only the owner approval execution boundary p
   assert.equal(precheck.approvalTextGenerated, false);
   assert.equal(precheck.approvalTemplateGenerated, false);
   assert.equal(precheck.canProceedToCutoverExecution, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, true);
+  assert.equal(precheck.additionalLocalWrapperRequired, false);
+  assert.equal(precheck.chainConvergence.noAdditionalLocalWrapperRequired, true);
+  assert.equal(precheck.chainConvergence.nextBoundaryType, 'separate_exact_owner_decision');
   assert.equal(precheck.safety.submitsApprovalRequest, false);
   assert.equal(precheck.safety.executesCutover, false);
   assert.equal(precheck.safety.readinessClaimed, false);
@@ -1802,6 +1848,15 @@ test('RC cutover owner approval execution boundary precheck fails closed on pack
   assert.equal(precheck.decision, 'NOT_READY_BLOCKED');
   assert.equal(precheck.boundaryPrecheckAccepted, false);
   assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
+  assert.equal(precheck.additionalLocalWrapperRequired, false);
+  assert.equal(precheck.nextRequiredBoundary, 'repair_existing_input_not_add_wrapper');
+  assert.equal(
+    precheck.chainConvergence.convergenceStatus,
+    'terminal_local_pre_candidate_package_blocked_pending_input_repair'
+  );
+  assert.equal(precheck.chainConvergence.noAdditionalLocalWrapperRequired, true);
+  assert.equal(precheck.chainConvergence.repairInsteadOfWrapWhenBlocked, true);
   assert.ok(
     precheck.blockerIds.includes(
       'final_owner_review_package_contents_boundary_invalid'
@@ -1858,6 +1913,11 @@ test('v1 RC aggregator execution boundary precheck output fails closed without P
   assert.equal(precheck.finalOwnerReviewPackageInputProvided, false);
   assert.equal(precheck.boundaryPrecheckAccepted, false);
   assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
+  assert.equal(precheck.additionalLocalWrapperRequired, false);
+  assert.equal(precheck.nextRequiredBoundary, 'repair_existing_input_not_add_wrapper');
+  assert.equal(precheck.chainConvergence.noAdditionalLocalWrapperRequired, true);
+  assert.equal(precheck.chainConvergence.repairInsteadOfWrapWhenBlocked, true);
   assert.ok(
     precheck.blockerIds.includes(
       'final_owner_review_package_schema_version_mismatch'

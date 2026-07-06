@@ -2356,6 +2356,12 @@ function buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
     readyForExactOwnerReview: accepted,
     executionBoundaryPrepared: accepted,
     executionBoundaryReadyForExactOwnerReview: accepted,
+    terminalLocalPreCandidatePackage: accepted,
+    rcCutoverPreCandidatePackageAuditable: accepted,
+    additionalLocalWrapperRequired: false,
+    nextRequiredBoundary: accepted
+      ? 'separate_exact_owner_decision_or_stop'
+      : 'repair_existing_input_not_add_wrapper',
     approvalRequestOnly: true,
     approvalRequestSubmitted: false,
     approvalLineGenerated: false,
@@ -2378,6 +2384,46 @@ function buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
       valuesIncluded: false,
       rawValuesOutput: false,
       rows
+    },
+    chainConvergence: {
+      convergenceStatus: accepted
+        ? 'terminal_local_pre_candidate_package_ready_for_owner_decision_not_authorization'
+        : 'terminal_local_pre_candidate_package_blocked_pending_input_repair',
+      localEvidenceAggregationTerminal: accepted,
+      localRcGatePrecheckTerminal: accepted,
+      noAdditionalLocalWrapperRequired: true,
+      repairInsteadOfWrapWhenBlocked: true,
+      stopsBeforeApprovalRequestSubmission: true,
+      stopsBeforeOwnerApproval: true,
+      stopsBeforeExecution: true,
+      stopsBeforeReleaseDeployTag: true,
+      stopsBeforeReadinessClaim: true,
+      nextBoundaryType: 'separate_exact_owner_decision',
+      terminalArtifactSchemaVersion:
+        'p78-rc-cutover-owner-approval-execution-boundary-precheck-v1',
+      priorLowDisclosureChain: [
+        'p67_runtime_evidence_standard_input_preflight',
+        'p68_final_evidence_aggregation_rc_gate_precheck',
+        'p69_rc_cutover_pre_approval_candidate_package',
+        'p70_rc_cutover_owner_approval_readiness_summary',
+        'p71_rc_cutover_final_evidence_package_aggregation_outlet',
+        'p72_rc_cutover_candidate_artifact_export',
+        'p73_rc_cutover_candidate_artifact_intake_precheck',
+        'p75_rc_cutover_owner_approval_boundary_precheck',
+        'p77_rc_cutover_final_owner_review_package_aggregation',
+        'p78_rc_cutover_owner_approval_execution_boundary_precheck'
+      ],
+      omittedMaterial: [
+        'approval_text',
+        'approval_line',
+        'approval_template',
+        'endpoint_or_locator',
+        'request_body',
+        'raw_response',
+        'raw_error',
+        'secret',
+        'private_memory_content'
+      ]
     },
     sourceSummary: {
       packageSchemaVersion:
@@ -2789,6 +2835,15 @@ function buildCliReport(options = {}) {
             rcCutoverOwnerApprovalExecutionBoundaryPrecheckChecklistCount:
               rcCutoverOwnerApprovalExecutionBoundaryPrecheck
                 .executionBoundaryChecklist?.checkCount || 0,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckTerminalLocalPreCandidatePackage:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .terminalLocalPreCandidatePackage === true,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckNoAdditionalLocalWrapperRequired:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .chainConvergence?.noAdditionalLocalWrapperRequired === true,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckNextBoundaryRequiresExactOwnerDecision:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .chainConvergence?.nextBoundaryType === 'separate_exact_owner_decision',
             rcCutoverOwnerApprovalExecutionBoundaryPrecheckApprovalGenerated: false,
             rcCutoverOwnerApprovalExecutionBoundaryPrecheckExecutesCutover: false,
             rcCutoverOwnerApprovalExecutionBoundaryPrecheckCanClaimRcReady: false
