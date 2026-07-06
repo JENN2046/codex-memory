@@ -111,9 +111,9 @@ test('temp-local store-backed tombstone proof clears or suppresses actual derive
     assert.deepEqual(report.beforeCounts, {
       diary_record: 1,
       sqlite_shadow_record: 1,
-      sqlite_memory_chunks: 2,
+      sqlite_memory_chunks: 3,
       vector_index: 1,
-      embedding_cache: 1,
+      embedding_cache: 3,
       candidate_cache: 1,
       write_audit: 1,
       recall_audit: 1,
@@ -150,9 +150,11 @@ test('temp-local store-backed tombstone proof clears or suppresses actual derive
 
     assert.equal(record.status, 'tombstoned');
     assert.equal(await harness.shadowStore.countChunksForRecord(memoryId), 0);
+    assert.equal(await harness.shadowStore.countChunksForRecord(memoryId, { currentFingerprintOnly: false }), 0);
     assert.equal(await harness.vectorStore.hasRecord(memoryId), false);
     assert.equal(await harness.candidateCacheStore.countCurrentFingerprintByMemoryIds([memoryId]), 0);
     assert.equal(manifest.status, 'repaired');
+    assert.equal(manifest.record, null);
     assert.equal(reconcileTasks.length, 0);
   } finally {
     await cleanupTempHarness(harness);
@@ -190,4 +192,58 @@ test('temp-local store-backed proof fails closed when candidate-cache cleanup is
   }
 
   assert.equal(await pathExists(harness.rootPath), false);
+});
+
+test('temp-local store-backed proof fails closed for embedding, chunk, and manifest residuals', async () => {
+  const cases = [
+    {
+      memoryId: 'temp-store-proof-embedding-residual',
+      skipProjection: 'embedding_cache',
+      afterKey: 'embedding_cache',
+      expectedAfter: 3,
+      expectedResidual: 'embedding_cache'
+    },
+    {
+      memoryId: 'temp-store-proof-chunk-residual',
+      skipProjection: 'sqlite_memory_chunks',
+      afterKey: 'sqlite_memory_chunks',
+      expectedAfter: 3,
+      expectedResidual: 'sqlite_memory_chunks'
+    },
+    {
+      memoryId: 'temp-store-proof-manifest-residual',
+      skipProjection: 'degraded_payload',
+      afterKey: 'degraded_payload',
+      expectedAfter: 1,
+      expectedResidual: 'degraded_payload'
+    }
+  ];
+
+  for (const testCase of cases) {
+    const harness = await createTempHarness();
+
+    try {
+      const report = await executeTempStoreBackedLifecycleProjectionProof({
+        diaryStore: harness.diaryStore,
+        shadowStore: harness.shadowStore,
+        vectorStore: harness.vectorStore,
+        candidateCacheStore: harness.candidateCacheStore,
+        auditLogStore: harness.auditLogStore,
+        memoryId: testCase.memoryId,
+        lifecycleFamily: 'tombstone_memory',
+        skipProjections: [testCase.skipProjection]
+      });
+
+      assert.equal(report.tempStoreBackedProofAccepted, false, testCase.skipProjection);
+      assert.equal(report.decision, 'TEMP_STORE_BACKED_LIFECYCLE_PROJECTION_PROOF_BLOCKED');
+      assert.deepEqual(report.residualProjectionFamilies, [testCase.expectedResidual]);
+      assert.equal(report.afterCounts[testCase.afterKey], testCase.expectedAfter);
+      assert.equal(reportFor(report, testCase.expectedResidual).accepted, false);
+      assert.equal(report.execution.readinessClaimed, false);
+    } finally {
+      await cleanupTempHarness(harness);
+    }
+
+    assert.equal(await pathExists(harness.rootPath), false);
+  }
 });

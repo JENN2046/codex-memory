@@ -116,24 +116,6 @@ function buildSyntheticRecord({
   };
 }
 
-async function seedMemoryLinkedEmbeddingCache(vectorStore, {
-  memoryId,
-  target,
-  timestamp
-}) {
-  await vectorStore.ensureReady();
-  vectorStore.index.embeddingCache[`${memoryId}:embedding`] = {
-    memoryId,
-    target,
-    inputKind: 'document',
-    vector: new Array(vectorStore.config.embedDimensions).fill(0),
-    embeddingFingerprint: vectorStore.config.embeddingFingerprint,
-    createdAt: timestamp,
-    lastAccessedAt: timestamp
-  };
-  await vectorStore.flush();
-}
-
 async function countTempStoreProjectionTargets({
   diaryStore,
   shadowStore,
@@ -185,23 +167,39 @@ async function seedTempStoreBackedLifecycleProjection({
     WHERE memory_id = ?
   `).run(status, timestamp, 'codex', memoryId);
 
-  await shadowStore.replaceChunksForRecord(storedRecord, [
-    {
-      chunkId: `${memoryId}:chunk:0`,
-      chunkIndex: 0,
-      text: 'Synthetic temp-local chunk one.',
-      vector: [1, 0, 0]
-    },
-    {
-      chunkId: `${memoryId}:chunk:1`,
-      chunkIndex: 1,
-      text: 'Synthetic temp-local chunk two.',
-      vector: [0, 1, 0]
-    }
-  ]);
+  const chunkTexts = [
+    'Synthetic temp-local chunk one.',
+    'Synthetic temp-local chunk two.'
+  ];
+  const vectors = await vectorStore.getBatchEmbeddingsCached(chunkTexts, { inputKind: 'document' });
+  await shadowStore.replaceChunksForRecord(storedRecord, chunkTexts.map((text, index) => ({
+    chunkId: `${memoryId}:chunk:${index}`,
+    chunkIndex: index,
+    text,
+    vector: vectors[index] || []
+  })));
+  shadowStore.db.prepare(`
+    INSERT INTO memory_chunks (
+      chunk_id, memory_id, target, title, source_file, relative_path, chunk_index,
+      text, vector_json, embedding_fingerprint, tags_json, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    `${memoryId}:old-profile:chunk`,
+    memoryId,
+    target,
+    record.title,
+    null,
+    null,
+    99,
+    'Synthetic old-profile temp-local chunk.',
+    '[]',
+    'old-profile-fixture',
+    JSON.stringify(record.tags || []),
+    timestamp,
+    timestamp
+  );
 
   await vectorStore.upsertRecord(storedRecord);
-  await seedMemoryLinkedEmbeddingCache(vectorStore, { memoryId, target, timestamp });
   await candidateCacheStore.set(`${memoryId}:candidate`, [{ memoryId, target }], {
     target,
     memoryIds: [memoryId]

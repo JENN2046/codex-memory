@@ -27,6 +27,12 @@ function buildZeroCounts() {
   return Object.fromEntries(REQUIRED_PROJECTION_FAMILIES.map(projectionFamily => [projectionFamily, 0]));
 }
 
+function uniqueStrings(values = []) {
+  return [...new Set((Array.isArray(values) ? values : [values])
+    .map(normalizeString)
+    .filter(Boolean))];
+}
+
 class MemoryLifecycleProjectionCleanupService {
   constructor({
     diaryStore = null,
@@ -64,6 +70,57 @@ class MemoryLifecycleProjectionCleanupService {
     return removed;
   }
 
+  buildRecordEmbeddingText(record) {
+    if (!record) return '';
+    if (this.vectorStore?.buildRecordText) {
+      return this.vectorStore.buildRecordText(record);
+    }
+    return [
+      `Title: ${record.title}`,
+      record.content || '',
+      `Evidence: ${record.evidence || ''}`,
+      `Tag: ${(record.tags || []).join(', ')}`
+    ].join('\n');
+  }
+
+  async collectTargetProjectionContext({ memoryId } = {}) {
+    const normalizedMemoryId = normalizeString(memoryId);
+    const record = this.shadowStore?.getRecord
+      ? await this.shadowStore.getRecord(normalizedMemoryId)
+      : null;
+    const chunks = this.shadowStore?.listChunksForRecord
+      ? await this.shadowStore.listChunksForRecord(normalizedMemoryId, { currentFingerprintOnly: false })
+      : [];
+    const embeddingCacheTexts = uniqueStrings([
+      this.buildRecordEmbeddingText(record),
+      ...chunks.map(chunk => chunk?.text)
+    ]);
+
+    return {
+      record,
+      chunks,
+      embeddingCacheTexts
+    };
+  }
+
+  async countTargetDocumentEmbeddingCache(context = {}) {
+    const texts = uniqueStrings(context.embeddingCacheTexts || []);
+    if (texts.length === 0) return 0;
+    if (this.vectorStore?.countDocumentEmbeddingCacheByTexts) {
+      return this.vectorStore.countDocumentEmbeddingCacheByTexts(texts);
+    }
+    return this.countMemoryLinkedEmbeddingCache(context.memoryId);
+  }
+
+  async clearTargetDocumentEmbeddingCache(context = {}) {
+    const texts = uniqueStrings(context.embeddingCacheTexts || []);
+    if (texts.length === 0) return 0;
+    if (this.vectorStore?.deleteDocumentEmbeddingCacheByTexts) {
+      return this.vectorStore.deleteDocumentEmbeddingCacheByTexts(texts);
+    }
+    return this.clearMemoryLinkedEmbeddingCache(context.memoryId);
+  }
+
   async countDiaryRecords({ memoryId, target }) {
     if (!this.diaryStore?.listRecords) return 0;
     const records = await this.diaryStore.listRecords({ target });
@@ -85,14 +142,19 @@ class MemoryLifecycleProjectionCleanupService {
     };
   }
 
-  async countProjectionTargets({ memoryId, target = 'process', includeAuditCounts = false } = {}) {
+  async countProjectionTargets({
+    memoryId,
+    target = 'process',
+    includeAuditCounts = false,
+    projectionContext = null
+  } = {}) {
     const normalizedMemoryId = normalizeString(memoryId);
     const counts = buildZeroCounts();
     if (!normalizedMemoryId || !this.shadowStore) return counts;
+    const context = projectionContext || await this.collectTargetProjectionContext({
+      memoryId: normalizedMemoryId
+    });
 
-    const sqliteRecord = this.shadowStore.getRecord
-      ? await this.shadowStore.getRecord(normalizedMemoryId)
-      : null;
     const reconcileTasks = this.shadowStore.listReconcileTasksForMemoryId
       ? await this.shadowStore.listReconcileTasksForMemoryId(normalizedMemoryId, 50)
       : [];
@@ -101,17 +163,20 @@ class MemoryLifecycleProjectionCleanupService {
       : null;
 
     counts.diary_record = await this.countDiaryRecords({ memoryId: normalizedMemoryId, target });
-    counts.sqlite_shadow_record = sqliteRecord ? 1 : 0;
+    counts.sqlite_shadow_record = context.record ? 1 : 0;
     counts.sqlite_memory_chunks = this.shadowStore.countChunksForRecord
-      ? await this.shadowStore.countChunksForRecord(normalizedMemoryId)
+      ? await this.shadowStore.countChunksForRecord(normalizedMemoryId, { currentFingerprintOnly: false })
       : 0;
     counts.vector_index = this.vectorStore?.hasRecord && await this.vectorStore.hasRecord(normalizedMemoryId) ? 1 : 0;
-    counts.embedding_cache = await this.countMemoryLinkedEmbeddingCache(normalizedMemoryId);
+    counts.embedding_cache = await this.countTargetDocumentEmbeddingCache({
+      ...context,
+      memoryId: normalizedMemoryId
+    });
     counts.candidate_cache = this.candidateCacheStore?.countCurrentFingerprintByMemoryIds
-      ? await this.candidateCacheStore.countCurrentFingerprintByMemoryIds([normalizedMemoryId])
+      ? await this.candidateCacheStore.countCurrentFingerprintByMemoryIds([normalizedMemoryId], [target])
       : 0;
     counts.reconcile_queue = reconcileTasks.length;
-    counts.degraded_payload = manifest?.status === 'degraded' ? 1 : 0;
+    counts.degraded_payload = manifest?.record || manifest?.recordMalformed ? 1 : 0;
 
     if (includeAuditCounts) {
       const auditCounts = await this.countAuditEntries(normalizedMemoryId);
@@ -270,16 +335,22 @@ class MemoryLifecycleProjectionCleanupService {
       };
     }
 
+    const projectionContext = await this.collectTargetProjectionContext({
+      memoryId: normalizedMemoryId
+    });
     const beforeCounts = await this.countProjectionTargets({
       memoryId: normalizedMemoryId,
       target: normalizedTarget,
-      includeAuditCounts: appendProjectionAudit
+      includeAuditCounts: appendProjectionAudit,
+      projectionContext
     });
     const record = this.shadowStore.getRecord
       ? await this.shadowStore.getRecord(normalizedMemoryId)
       : null;
 
-    if (!skipSet.has('sqlite_memory_chunks') && record && this.shadowStore.replaceChunksForRecord) {
+    if (!skipSet.has('sqlite_memory_chunks') && this.shadowStore.deleteChunksForRecord) {
+      await this.shadowStore.deleteChunksForRecord(normalizedMemoryId);
+    } else if (!skipSet.has('sqlite_memory_chunks') && record && this.shadowStore.replaceChunksForRecord) {
       await this.shadowStore.replaceChunksForRecord(record, []);
     }
 
@@ -288,7 +359,10 @@ class MemoryLifecycleProjectionCleanupService {
     }
 
     if (!skipSet.has('embedding_cache')) {
-      await this.clearMemoryLinkedEmbeddingCache(normalizedMemoryId);
+      await this.clearTargetDocumentEmbeddingCache({
+        ...projectionContext,
+        memoryId: normalizedMemoryId
+      });
     }
 
     if (!skipSet.has('candidate_cache') && this.candidateCacheStore?.clearCurrentFingerprintByMemoryIds) {
@@ -299,9 +373,32 @@ class MemoryLifecycleProjectionCleanupService {
       await this.shadowStore.clearReconcileTasks(normalizedMemoryId);
     }
 
-    if (!skipSet.has('degraded_payload') && this.shadowStore.getMemoryWriteManifestByMemoryId && this.shadowStore.repairDegradedMemoryWriteManifest) {
+    if (!skipSet.has('degraded_payload') && this.shadowStore.getMemoryWriteManifestByMemoryId) {
       const manifest = await this.shadowStore.getMemoryWriteManifestByMemoryId(normalizedMemoryId);
-      if (manifest?.status === 'degraded') {
+      if (manifest?.record || manifest?.recordMalformed) {
+        const result = {
+          projectionFamily: 'degraded_payload',
+          repairReason: normalizedLifecycleFamily,
+          lowDisclosure: true,
+          rawContentIncluded: false,
+          recordPayloadSuppressed: true
+        };
+        if (this.shadowStore.suppressMemoryWriteManifestRecordPayload) {
+          await this.shadowStore.suppressMemoryWriteManifestRecordPayload({
+            idempotencyKey: manifest.idempotencyKey,
+            status: 'repaired',
+            result,
+            updatedAt: timestamp
+          });
+        } else if (manifest.status === 'degraded' && this.shadowStore.repairDegradedMemoryWriteManifest) {
+          await this.shadowStore.repairDegradedMemoryWriteManifest({
+            idempotencyKey: manifest.idempotencyKey,
+            status: 'repaired',
+            result,
+            updatedAt: timestamp
+          });
+        }
+      } else if (manifest?.status === 'degraded' && this.shadowStore.repairDegradedMemoryWriteManifest) {
         await this.shadowStore.repairDegradedMemoryWriteManifest({
           idempotencyKey: manifest.idempotencyKey,
           status: 'repaired',
@@ -330,7 +427,8 @@ class MemoryLifecycleProjectionCleanupService {
     const afterCounts = await this.countProjectionTargets({
       memoryId: normalizedMemoryId,
       target: normalizedTarget,
-      includeAuditCounts: appendProjectionAudit
+      includeAuditCounts: appendProjectionAudit,
+      projectionContext
     });
     const suppressionStatus = await this.getSuppressionStatus(normalizedMemoryId);
     const projectionReports = REQUIRED_PROJECTION_FAMILIES.map(projectionFamily =>

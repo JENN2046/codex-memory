@@ -219,9 +219,10 @@ test('tombstone-memory CLI applies active to tombstoned in temp fixture DB', () 
     assert.equal(row.status, 'tombstoned');
     assert.equal(row.status_reason, 'manual tombstone review');
     assert.equal(row.tombstone_reason, 'retention-expired');
-    assert.equal(auditEntries.length, 2);
+    assert.equal(auditEntries.length, 3);
     assert.equal(auditEntries[0].mutationAuditEvent.audit_phase, 'pending');
     assert.equal(auditEntries[1].mutationAuditEvent.audit_phase, 'committed');
+    assert.equal(auditEntries[2].eventType, 'lifecycle_projection_cleanup');
     assert.equal(report.auditEvent.event_type, 'memory_tombstone');
     assert.equal(report.rawWorkspaceIdExposed, false);
     assert.equal(JSON.stringify(report).includes('workspace-a'), false);

@@ -865,14 +865,14 @@ function createCodexMemoryApplication(overrides = {}) {
     shadowStore,
     auditLogStore,
     projectionCleanupService: memoryLifecycleProjectionCleanupService,
-    projectionCleanupAppendAudit: overrides.projectionCleanupAppendAudit === true
+    projectionCleanupAppendAudit: overrides.projectionCleanupAppendAudit !== false
   });
   const supersedeMemoryService = new SupersedeMemoryService({
     config,
     shadowStore,
     auditLogStore,
     projectionCleanupService: memoryLifecycleProjectionCleanupService,
-    projectionCleanupAppendAudit: overrides.projectionCleanupAppendAudit === true
+    projectionCleanupAppendAudit: overrides.projectionCleanupAppendAudit !== false
   });
   const deferredGovernanceRuntimeEntryAdapter = new DeferredGovernanceRuntimeEntryAdapter({
     memoryExcludeEnabled: internalMemoryExcludeRuntimeEntryEnabled,

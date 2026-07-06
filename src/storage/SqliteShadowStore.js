@@ -419,6 +419,21 @@ class SqliteShadowStore {
     }
   }
 
+  async deleteChunksForRecord(memoryId) {
+    await this.ensureReady();
+    const normalizedMemoryId = firstNonEmptyString(memoryId);
+    if (!normalizedMemoryId) {
+      return {
+        deleted: 0
+      };
+    }
+    const result = this.db.prepare('DELETE FROM memory_chunks WHERE memory_id = ?')
+      .run(normalizedMemoryId);
+    return {
+      deleted: result.changes
+    };
+  }
+
   async getRecord(memoryId) {
     await this.ensureReady();
     const row = this.db.prepare(`
@@ -656,6 +671,33 @@ class SqliteShadowStore {
         result_json = ?,
         updated_at = ?
       WHERE idempotency_key = ? AND status = 'degraded'
+    `).run(normalizedStatus, resultJson, updatedAt, idempotencyKey);
+
+    return {
+      updated: update.changes === 1,
+      changes: update.changes
+    };
+  }
+
+  async suppressMemoryWriteManifestRecordPayload({
+    idempotencyKey,
+    status = 'repaired',
+    result = null,
+    updatedAt = new Date().toISOString()
+  } = {}) {
+    await this.ensureReady();
+    const normalizedStatus = String(status || '').trim() || 'repaired';
+    const resultJson = result ? JSON.stringify(result) : null;
+    const update = this.db.prepare(`
+      UPDATE memory_write_manifests
+      SET status = CASE
+          WHEN status = 'degraded' THEN ?
+          ELSE status
+        END,
+        record_json = NULL,
+        result_json = ?,
+        updated_at = ?
+      WHERE idempotency_key = ?
     `).run(normalizedStatus, resultJson, updatedAt, idempotencyKey);
 
     return {
@@ -1460,6 +1502,26 @@ class SqliteShadowStore {
 
     return this.db.prepare('SELECT COUNT(*) AS count FROM memory_chunks WHERE memory_id = ?')
       .get(memoryId).count;
+  }
+
+  async listChunksForRecord(memoryId, { currentFingerprintOnly = false } = {}) {
+    await this.ensureReady();
+    const normalizedMemoryId = firstNonEmptyString(memoryId);
+    if (!normalizedMemoryId) return [];
+    if (currentFingerprintOnly) {
+      return this.db.prepare(`
+        SELECT * FROM memory_chunks
+        WHERE memory_id = ? AND embedding_fingerprint = ?
+        ORDER BY chunk_index ASC
+      `).all(normalizedMemoryId, this.config.embeddingFingerprint)
+        .map(row => this.mapChunkRow(row));
+    }
+
+    return this.db.prepare(`
+      SELECT * FROM memory_chunks
+      WHERE memory_id = ?
+      ORDER BY updated_at ASC, chunk_index ASC
+    `).all(normalizedMemoryId).map(row => this.mapChunkRow(row));
   }
 
   async listChunksByTimeRanges(target = 'both', ranges = [], filters = {}) {

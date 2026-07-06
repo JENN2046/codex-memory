@@ -199,9 +199,12 @@ test('internal tombstone runtime entry applies active record when enabled and ap
     assert.equal(row.status, 'tombstoned');
     assert.equal(row.tombstone_reason, 'retention-expired');
     assert.equal(row.lifecycle_actor_client_id, 'codex');
-    assert.equal(auditEntries.length, 2);
+    assert.equal(auditEntries.length, 3);
     assert.equal(auditEntries[0].mutationAuditEvent.audit_phase, 'pending');
     assert.equal(auditEntries[1].mutationAuditEvent.audit_phase, 'committed');
+    assert.equal(auditEntries[2].eventType, 'lifecycle_projection_cleanup');
+    assert.equal(auditEntries[2].lowDisclosure, true);
+    assert.equal(auditEntries[2].rawContentIncluded, false);
   });
 });
 
