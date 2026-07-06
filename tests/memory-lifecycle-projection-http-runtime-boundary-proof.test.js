@@ -14,6 +14,10 @@ const {
 const {
   seedTempStoreBackedLifecycleProjection
 } = require('../src/core/MemoryLifecycleProjectionTempStoreProof');
+const {
+  RECEIPT_SCHEMA_VERSION,
+  buildAuthenticatedHttpBoundedMutationProofReceipt
+} = require('../src/core/AuthenticatedHttpBoundedMutationProofReceipt');
 
 const HTTP_BEARER_TOKEN = 'bounded-cleanup-proof-token';
 const INTERNAL_TOMBSTONE_RUNTIME_ENTRY_SOURCE = 'internal-tombstone-runtime-entry';
@@ -220,6 +224,63 @@ function assertPublicConfirmedMutationRejected(result, toolName, serialized) {
   assert.doesNotMatch(serialized, /codex-memory-http-runtime-cleanup-proof/i);
 }
 
+function assertAcceptedReceipt(receipt, {
+  mutationFamily,
+  publicToolName,
+  targetCategory,
+  forbiddenValues = []
+}) {
+  assert.equal(receipt.schemaVersion, RECEIPT_SCHEMA_VERSION);
+  assert.equal(receipt.receiptType, 'authenticated_http_bounded_mutation_proof');
+  assert.equal(receipt.accepted, true);
+  assert.equal(receipt.decision, 'AUTHENTICATED_HTTP_BOUNDED_MUTATION_PROOF_ACCEPTED_NOT_READY');
+  assert.equal(receipt.mutationFamily, mutationFamily);
+  assert.equal(receipt.publicToolName, publicToolName);
+  assert.equal(receipt.targetCategory, targetCategory);
+  assert.deepEqual(receipt.blockers, []);
+  assert.equal(receipt.disclosure.lowDisclosure, true);
+  assert.equal(receipt.disclosure.rawContentIncluded, false);
+  assert.equal(receipt.disclosure.rawResponseIncluded, false);
+  assert.equal(receipt.disclosure.rawErrorIncluded, false);
+  assert.equal(receipt.disclosure.endpointOrLocatorIncluded, false);
+  assert.equal(receipt.disclosure.pathIncluded, false);
+  assert.equal(receipt.disclosure.memoryIdIncluded, false);
+  assert.equal(receipt.disclosure.secretIncluded, false);
+  assert.equal(receipt.disclosure.tokenIncluded, false);
+  assert.equal(receipt.publicHttpBoundary.authenticatedHttpRuntimeObserved, true);
+  assert.equal(receipt.publicHttpBoundary.publicConfirmedMutationAttempted, true);
+  assert.equal(receipt.publicHttpBoundary.publicPathRejected, true);
+  assert.equal(receipt.publicHttpBoundary.publicMutationPerformed, false);
+  assert.equal(receipt.publicHttpBoundary.approvalRequired, true);
+  assert.equal(receipt.publicHttpBoundary.countsChanged, false);
+  if (mutationFamily === 'supersede_memory') {
+    assert.equal(receipt.publicHttpBoundary.replacementCountsChanged, false);
+  }
+  assert.equal(receipt.internalRuntimeBoundary.internalBoundedPathObserved, true);
+  assert.equal(receipt.internalRuntimeBoundary.internalMutationPerformed, true);
+  assert.equal(receipt.internalRuntimeBoundary.projectionCleanupAccepted, true);
+  assert.equal(receipt.internalRuntimeBoundary.residualProjectionFamiliesBucket, 'zero');
+  assert.equal(receipt.internalRuntimeBoundary.targetProjectionResidualsCleared, true);
+  assert.equal(receipt.safety.tempLocalOnly, true);
+  assert.equal(receipt.safety.syntheticOnly, true);
+  assert.equal(receipt.safety.providerCalls, 0);
+  assert.equal(receipt.safety.publicMcpExpansion, false);
+  assert.equal(receipt.safety.durablePrivateMemoryWrite, false);
+  assert.equal(receipt.safety.rawStoreScan, false);
+  assert.equal(receipt.safety.readinessClaimed, false);
+  assert.equal(receipt.safety.releaseClaimed, false);
+  assert.equal(receipt.safety.rcReadyClaimed, false);
+
+  const serialized = JSON.stringify(receipt);
+  assert.doesNotMatch(serialized, /https?:\/\//i);
+  assert.doesNotMatch(serialized, /Authorization/i);
+  assert.doesNotMatch(serialized, /Bearer\s+/i);
+  assert.doesNotMatch(serialized, /Synthetic temp-local chunk/i);
+  for (const value of forbiddenValues) {
+    assert.equal(serialized.includes(value), false, value);
+  }
+}
+
 test('HTTP public tombstone confirm is rejected while internal bounded runtime cleanup suppresses projections', async () => {
   const harness = await createHttpRuntimeHarness();
   const { app, address, rootPath } = harness;
@@ -258,6 +319,19 @@ test('HTTP public tombstone confirm is rejected while internal bounded runtime c
     );
     const afterInternal = await countProjectionTargets(app, memoryId);
     const manifest = await app.stores.shadowStore.getMemoryWriteManifestByMemoryId(memoryId);
+    const receipt = buildAuthenticatedHttpBoundedMutationProofReceipt({
+      mutationFamily: 'tombstone_memory',
+      publicToolName: 'tombstone_memory',
+      authenticatedHttpRuntimeObserved: true,
+      tempLocalOnly: true,
+      syntheticOnly: true,
+      publicConfirmedMutationAttempted: true,
+      publicResult,
+      beforePublicCounts: beforePublic,
+      afterPublicCounts: afterPublic,
+      internalResult,
+      afterInternalCounts: afterInternal
+    });
 
     assert.equal(internalResult.decision, 'tombstoned');
     assert.equal(internalResult.mutated, true);
@@ -271,6 +345,12 @@ test('HTTP public tombstone confirm is rejected while internal bounded runtime c
     assert.equal(afterInternal.degraded_payload, 0);
     assert.equal(manifest.record, null);
     assert.equal((await app.stores.shadowStore.getRecord(memoryId)).status, 'tombstoned');
+    assertAcceptedReceipt(receipt, {
+      mutationFamily: 'tombstone_memory',
+      publicToolName: 'tombstone_memory',
+      targetCategory: 'single_target',
+      forbiddenValues: [memoryId]
+    });
   } finally {
     await cleanupHttpRuntimeHarness(harness);
   }
@@ -318,9 +398,11 @@ test('HTTP public supersede confirm is rejected while internal bounded runtime c
       'supersede_memory',
       supersedeHttpPayload(oldMemoryId, newMemoryId)
     );
+    const oldAfterPublic = await countProjectionTargets(app, oldMemoryId);
+    const newAfterPublic = await countProjectionTargets(app, newMemoryId);
     assertPublicConfirmedMutationRejected(publicResult, 'supersede_memory', JSON.stringify(publicResult));
-    assert.deepEqual(await countProjectionTargets(app, oldMemoryId), oldBeforePublic);
-    assert.deepEqual(await countProjectionTargets(app, newMemoryId), newBeforePublic);
+    assert.deepEqual(oldAfterPublic, oldBeforePublic);
+    assert.deepEqual(newAfterPublic, newBeforePublic);
     assert.equal((await app.stores.shadowStore.getRecord(oldMemoryId)).status, 'active');
     assert.equal((await app.stores.shadowStore.getRecord(newMemoryId)).status, 'proposal');
 
@@ -332,6 +414,22 @@ test('HTTP public supersede confirm is rejected while internal bounded runtime c
     const newAfterInternal = await countProjectionTargets(app, newMemoryId);
     const oldManifest = await app.stores.shadowStore.getMemoryWriteManifestByMemoryId(oldMemoryId);
     const newManifest = await app.stores.shadowStore.getMemoryWriteManifestByMemoryId(newMemoryId);
+    const receipt = buildAuthenticatedHttpBoundedMutationProofReceipt({
+      mutationFamily: 'supersede_memory',
+      publicToolName: 'supersede_memory',
+      authenticatedHttpRuntimeObserved: true,
+      tempLocalOnly: true,
+      syntheticOnly: true,
+      publicConfirmedMutationAttempted: true,
+      publicResult,
+      beforePublicCounts: oldBeforePublic,
+      afterPublicCounts: oldAfterPublic,
+      replacementBeforePublicCounts: newBeforePublic,
+      replacementAfterPublicCounts: newAfterPublic,
+      internalResult,
+      afterInternalCounts: oldAfterInternal,
+      replacementAfterInternalCounts: newAfterInternal
+    });
 
     assert.equal(internalResult.decision, 'superseded');
     assert.equal(internalResult.mutated, true);
@@ -351,6 +449,13 @@ test('HTTP public supersede confirm is rejected while internal bounded runtime c
     assert.equal(newAfterInternal.degraded_payload, 1);
     assert.equal(oldManifest.record, null);
     assert.notEqual(newManifest.record, null);
+    assert.equal(receipt.internalRuntimeBoundary.replacementProjectionRetained, true);
+    assertAcceptedReceipt(receipt, {
+      mutationFamily: 'supersede_memory',
+      publicToolName: 'supersede_memory',
+      targetCategory: 'pair_target',
+      forbiddenValues: [oldMemoryId, newMemoryId]
+    });
   } finally {
     await cleanupHttpRuntimeHarness(harness);
   }
