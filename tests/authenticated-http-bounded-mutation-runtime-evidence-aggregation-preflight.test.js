@@ -1052,6 +1052,78 @@ test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin withou
   assertNoForbiddenMaterial(report);
 });
 
+test('v1 RC aggregator CLI can pipe P72 stdout artifact into P73 intake without persistence', async () => {
+  const sourceReport = await buildZeroGapLowDisclosureReport();
+  const artifactResult = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--runtime-evidence-report',
+      '-',
+      '--runtime-evidence-current-head',
+      fixtureCommit,
+      '--runtime-evidence-expected-current-head',
+      fixtureCommit,
+      '--runtime-evidence-generated-at',
+      fixtureEvidenceGeneratedAt,
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z',
+      '--rc-cutover-candidate-artifact'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(sourceReport),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const artifact = JSON.parse(artifactResult.stdout);
+  const intakeResult = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-candidate-artifact-report',
+      '-',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: artifactResult.stdout,
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const report = JSON.parse(intakeResult.stdout);
+  const intake = report.evidence.p73RcCutoverCandidateArtifactIntakePrecheck;
+
+  assert.equal(artifactResult.status, 0, artifactResult.stderr);
+  assertAcceptedArtifactExport(artifact);
+  assert.equal(artifact.export.fileWritten, false);
+  assert.equal(artifact.export.durableArtifactWritten, false);
+  assert.equal(intakeResult.status, 0, intakeResult.stderr);
+  assert.equal(report.phase, 'P73-rc-cutover-candidate-artifact-intake-precheck');
+  assertAcceptedArtifactIntake(intake);
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.pathDisclosed, false);
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.rawInputPrinted, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeAccepted, true);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeApprovalSubmitted, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeExecutesCutover, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeCanClaimRcReady, false);
+  assertNoForbiddenMaterial(artifact);
+  assertNoForbiddenMaterial(report);
+});
+
 test('RC cutover candidate artifact intake fails closed on approval execution or output drift', async () => {
   const artifact = await buildAcceptedRcCutoverCandidateArtifact();
   const driftedArtifact = JSON.parse(JSON.stringify(artifact));
