@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1990 exact-approved real disposable target binding probe abort receipt`.
-Current validation: `CMV-2093`.
-Current handoff: CM-1990 consumed CM-1989 exact approval intake and aborted pre-execution because separately evidenced real disposable target material is absent. It did not generate a request body, resolve endpoint/locator values, invoke resolver/transport, call runtime, prove real target binding, or unlock read-shape; next route is CM-1991 real disposable target material evidence preparation, local and no-live, or a new exact approval intake tied to separately evidenced real disposable target material.
+Current task: `CM-1991 real disposable target material evidence preparation`.
+Current validation: `CMV-2094`.
+Current handoff: CM-1991 consumes the CM-1990 target-material-absent abort and adds a local no-live fail-closed contract for future real disposable target material evidence. It does not prove target material present, bind target material, generate request bodies, resolve endpoint/locator values, invoke resolver/transport, call runtime, prove real target binding, or unlock read-shape; next route is CM-1992 exact real disposable target material boundary packet / approval request readiness review, still local and no-live unless a future exact approval also supplies separately evidenced real disposable target material.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-1990 into CM-1991 real disposable target material evidence preparation, local and no-live. Keep the route blocked before any target binding, request-body generation, endpoint/locator resolution, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundary until separately evidenced real disposable target material exists and a fresh exact approval matches it.
+Goal: continue from CM-1991 into CM-1992 exact real disposable target material boundary packet / approval request readiness review, local and no-live. Keep the route blocked before any target binding, request-body generation, endpoint/locator resolution, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundary until separately evidenced real disposable target material exists and a fresh exact approval matches it.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PRE_EXECUTION_ABORT_TARGET_MATERIAL_ABSENT_NO_RUNTIME_NO_READ_SHAPE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1989 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1989_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING.md`; CM-1990 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1990_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PROBE_ABORT_RECEIPT.md`. CM-1989 records current exact approval intake without reproducing approval text or generating approval lines. CM-1990 evaluates the approved route and aborts before target binding or runtime because separately evidenced real disposable target material is absent or not separately evidenced. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_REAL_DISPOSABLE_TARGET_MATERIAL_EVIDENCE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1991 adds `src/core/VcpNativeRealDisposableTargetMaterialEvidencePreparationContract.js`, `tests/vcp-native-real-disposable-target-material-evidence-preparation-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1991_REAL_DISPOSABLE_TARGET_MATERIAL_EVIDENCE_PREPARATION.md`. Targeted CM-1991 tests passed `6/6`. The contract keeps target material not proven present, target material not bound, target binding not proven, existing operator reference not sufficient, and future exact approval required. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,9 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/VcpNativeRealDisposableTargetMaterialEvidencePreparationContract.js`
+- `tests/vcp-native-real-disposable-target-material-evidence-preparation-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1991_REAL_DISPOSABLE_TARGET_MATERIAL_EVIDENCE_PREPARATION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1990_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PROBE_ABORT_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1989_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1988_EXACT_REAL_DISPOSABLE_TARGET_BINDING_BOUNDARY_PACKET_READINESS_REVIEW.md`

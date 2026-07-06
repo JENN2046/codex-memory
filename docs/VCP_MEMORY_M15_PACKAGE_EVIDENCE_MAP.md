@@ -187,7 +187,18 @@ Completed local-safe evidence:
   binding, request body generation, resolver/transport invocation,
   component/action invocation, runtime/network call, response consumption, raw
   diagnostic persistence, memory read/write, durable mutation, public MCP
-  expansion, M15 unlock, or readiness claim.
+  expansion, M15 unlock, or readiness claim;
+- CM-1991 real disposable target material evidence preparation added a local
+  no-live source/test/docs contract for future real disposable target material
+  evidence. It accepts only category-level preparation after the CM-1990 abort:
+  target material required, separate evidence required, target-scoped
+  disposable material required, material not proven present, target material
+  not bound, target binding not proven, existing operator reference not
+  sufficient, zero side-effect counters, and future exact approval required. It
+  performs no target binding, request body generation, resolver/transport
+  invocation, runtime/network call, response consumption, raw diagnostic
+  persistence, memory read/write, durable mutation, public MCP expansion, M15
+  unlock, read-shape proof, or readiness claim.
 
 Missing RC evidence:
 
@@ -436,6 +447,31 @@ m15_package_evidence_map_boundary:
   cm1990_trusted_full_read_completed: false
   cm1990_m15_opened: false
   cm1990_readiness_claimed: false
+  cm1991_real_disposable_target_material_evidence_contract_present: true
+  cm1991_source_test_contract_present: true
+  cm1991_targeted_tests_passed: 6
+  cm1991_prior_abort_consumed: CM-1990
+  cm1991_real_disposable_target_material_required: true
+  cm1991_separately_evidenced_real_target_material_present: false
+  cm1991_target_material_bound: false
+  cm1991_target_binding_proven: false
+  cm1991_existing_operator_reference_sufficient: false
+  cm1991_existing_operator_target_reuse_allowed: false
+  cm1991_request_body_generated: false
+  cm1991_resolver_transport_invoked: false
+  cm1991_component_action_invoked: false
+  cm1991_runtime_called: false
+  cm1991_network_called: false
+  cm1991_response_body_consumed: false
+  cm1991_raw_value_persisted: false
+  cm1991_target_material_values_persisted: false
+  cm1991_memory_read_performed: false
+  cm1991_memory_write_performed: false
+  cm1991_public_mcp_expansion_performed: false
+  cm1991_read_shape_unlocked: false
+  cm1991_trusted_full_read_completed: false
+  cm1991_m15_opened: false
+  cm1991_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false

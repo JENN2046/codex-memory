@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1990 exact-approved real disposable target binding probe abort receipt |
-| Current task | `CM-1990 exact-approved real disposable target binding probe abort receipt` |
-| Current validation | `CMV-2093` |
-| Current route | CM-1990 consumes CM-1989 approval intake and aborts pre-execution because separately evidenced real disposable target material is absent; no request body, runtime, read-shape proof, or readiness claim |
+| Status | CM-1991 real disposable target material evidence preparation |
+| Current task | `CM-1991 real disposable target material evidence preparation` |
+| Current validation | `CMV-2094` |
+| Current route | CM-1991 consumes CM-1990 and prepares a local no-live fail-closed target-material evidence contract; target material remains not present, not bound, not proven sufficient, and no runtime, request body, read-shape proof, or readiness claim occurs |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1991` adds `src/core/VcpNativeRealDisposableTargetMaterialEvidencePreparationContract.js`, `tests/vcp-native-real-disposable-target-material-evidence-preparation-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1991_REAL_DISPOSABLE_TARGET_MATERIAL_EVIDENCE_PREPARATION.md`. It consumes CM-1990 and defines a local no-live fail-closed contract for future real disposable target material evidence. The contract accepts only category-level preparation: CM-1990 abort present, real disposable target material required, separate evidence required, target-scoped disposable material required, material not proven present, target material not bound, target binding not proven, existing operator reference not sufficient, no existing operator target reuse, no private/production/customer/real-memory/persistent target posture, zero side-effect counters, low-disclosure receipt only, and future exact approval required. Targeted CM-1991 tests passed `6/6`. CM-1991 does not prove real target material, bind endpoint/locator values, generate request bodies, invoke resolver/transport, call runtime/network, consume responses, write memory, mutate durable state, expand public MCP, unlock M15/RC, or claim readiness. Next route is CM-1992 exact real disposable target material boundary packet / approval request readiness review, still no-live unless a future exact approval also supplies separately evidenced real disposable target material.
 
 `CM-1990` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1990_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PROBE_ABORT_RECEIPT.md`. It consumes CM-1989 and evaluates the approved real disposable target binding route. It aborts before target binding, request-body generation, resolver/transport invocation, component/action invocation, runtime/network call, response consumption, raw diagnostic persistence, memory read/write, durable mutation, public MCP expansion, or readiness claim because separately evidenced real disposable target material is absent or not separately evidenced. Low-disclosure result: `targetMaterialEvidenceCategory=absent_or_not_separately_evidenced`, `statusClass=boundary_blocked`, `routeStatusCategory=not_executed`, `requestBodyGeneratedByHarness=false`, `readShapeUnlocked=false`, and `readinessClaimed=false`. Next route is CM-1991 real disposable target material evidence preparation, local and no-live, or a new exact approval intake tied to separately evidenced real disposable target material.
 
