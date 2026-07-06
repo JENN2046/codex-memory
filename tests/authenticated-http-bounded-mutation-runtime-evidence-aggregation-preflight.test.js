@@ -22,8 +22,10 @@ const {
   buildRcCutoverCandidateArtifactIntakePrecheck,
   buildRcCutoverFinalOwnerReviewPackageAggregation,
   buildRcCutoverOwnerApprovalBoundaryPrecheck,
+  buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck,
   parseArgs,
   readRcCutoverCandidateArtifactReportInput,
+  readRcCutoverFinalOwnerReviewPackageReportInput,
   readRcCutoverOwnerApprovalBoundaryReportInput,
   readRuntimeEvidenceReportInput
 } = require('../src/cli/v1-rc-validation-aggregator');
@@ -106,6 +108,14 @@ async function buildAcceptedRcCutoverOwnerApprovalBoundary() {
 
   return buildRcCutoverOwnerApprovalBoundaryPrecheck({
     rcCutoverCandidateArtifactIntakePrecheck: intake
+  });
+}
+
+async function buildAcceptedRcCutoverFinalOwnerReviewPackage() {
+  const boundary = await buildAcceptedRcCutoverOwnerApprovalBoundary();
+
+  return buildRcCutoverFinalOwnerReviewPackageAggregation({
+    rcCutoverOwnerApprovalBoundaryPrecheck: boundary
   });
 }
 
@@ -461,6 +471,109 @@ function assertAcceptedFinalOwnerReviewPackage(pkg) {
   assert.equal(pkg.canClaimFinalRcReady, false);
   assert.equal(pkg.canClaimV1RcReady, false);
   assert.equal(pkg.canClaimRcReady, false);
+}
+
+function assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck) {
+  assert.equal(
+    precheck.schemaVersion,
+    'p78-rc-cutover-owner-approval-execution-boundary-precheck-v1'
+  );
+  assert.equal(
+    precheck.precheckType,
+    'rc_cutover_owner_approval_execution_boundary_precheck'
+  );
+  assert.equal(
+    precheck.sourceMode,
+    'p77_rc_cutover_final_owner_review_package_aggregation'
+  );
+  assert.equal(
+    precheck.status,
+    'owner_approval_execution_boundary_precheck_ready_not_authorization'
+  );
+  assert.equal(precheck.decision, 'NOT_READY_BLOCKED');
+  assert.equal(precheck.finalOwnerReviewPackageInputProvided, true);
+  assert.equal(precheck.finalOwnerReviewPackageAcceptedByInput, true);
+  assert.equal(precheck.boundaryPrecheckAccepted, true);
+  assert.equal(precheck.readyForExactOwnerReview, true);
+  assert.equal(precheck.executionBoundaryPrepared, true);
+  assert.equal(precheck.executionBoundaryReadyForExactOwnerReview, true);
+  assert.equal(precheck.approvalRequestOnly, true);
+  assert.equal(precheck.approvalRequestSubmitted, false);
+  assert.equal(precheck.approvalLineGenerated, false);
+  assert.equal(precheck.approvalTextGenerated, false);
+  assert.equal(precheck.approvalTemplateGenerated, false);
+  assert.equal(precheck.ownerApprovalRequiredSeparately, true);
+  assert.equal(precheck.ownerApprovalPresent, false);
+  assert.equal(precheck.ownerApprovalAccepted, false);
+  assert.equal(precheck.ownerApprovalExecutionAllowed, false);
+  assert.equal(precheck.rcCutoverApproved, false);
+  assert.equal(precheck.rcCutoverExecuted, false);
+  assert.equal(precheck.rcCutoverExecutionAllowed, false);
+  assert.equal(precheck.canProceedToCutoverExecution, false);
+  assert.equal(precheck.rcReady, false);
+  assert.equal(precheck.executionBoundaryChecklist.lowDisclosure, true);
+  assert.equal(precheck.executionBoundaryChecklist.checkCount, 8);
+  assert.equal(precheck.executionBoundaryChecklist.missingCheckCount, 0);
+  assert.deepEqual(precheck.executionBoundaryChecklist.missingCheckIds, []);
+  assert.equal(precheck.executionBoundaryChecklist.valuesIncluded, false);
+  assert.equal(precheck.executionBoundaryChecklist.rawValuesOutput, false);
+  assert.deepEqual(
+    precheck.executionBoundaryChecklist.rows.map(row => row.id),
+    [
+      'exact_owner_approval_required',
+      'current_head_binding_required',
+      'single_use_owner_decision_required',
+      'remote_release_tag_deploy_action_list_required',
+      'config_watchdog_startup_scope_required',
+      'rollback_path_required',
+      'validation_commands_required',
+      'execution_stays_blocked'
+    ]
+  );
+  assert.equal(
+    precheck.executionBoundaryChecklist.rows.every(row => row.valueIncluded === false),
+    true
+  );
+  assert.equal(
+    precheck.executionBoundaryChecklist.rows.every(row => row.rawValueOutput === false),
+    true
+  );
+  assert.equal(
+    precheck.sourceSummary.packageSchemaVersion,
+    'p77-rc-cutover-final-owner-review-package-aggregation-v1'
+  );
+  assert.equal(precheck.sourceSummary.finalOwnerReviewPackageAccepted, true);
+  assert.equal(precheck.sourceSummary.readyForExactOwnerReview, true);
+  assert.equal(precheck.sourceSummary.packageBoundaryFieldCount, 6);
+  assert.equal(precheck.sourceSummary.sourceBlockerCount, 0);
+  assert.deepEqual(precheck.blockerIds, []);
+  assert.equal(precheck.disclosure.lowDisclosure, true);
+  assert.equal(precheck.disclosure.rawCurrentHeadCommitOutput, false);
+  assert.equal(precheck.disclosure.rawEvidenceGeneratedAtOutput, false);
+  assert.equal(precheck.disclosure.requiredOwnerApprovalFieldValuesOutput, false);
+  assert.equal(precheck.disclosure.approvalTextOutput, false);
+  assert.equal(precheck.disclosure.approvalLineOutput, false);
+  assert.equal(precheck.disclosure.approvalTemplateOutput, false);
+  assert.equal(precheck.disclosure.endpointOrLocatorOutput, false);
+  assert.equal(precheck.disclosure.rawResponseOutput, false);
+  assert.equal(precheck.disclosure.secretOutput, false);
+  assert.equal(precheck.disclosure.artifactPathOutput, false);
+  assert.equal(precheck.disclosure.rawInputPrinted, false);
+  assert.equal(precheck.safety.readsFinalOwnerReviewPackageInputOnly, true);
+  assert.equal(precheck.safety.executesCommands, false);
+  assert.equal(precheck.safety.callsProviders, false);
+  assert.equal(precheck.safety.callsMcpTools, false);
+  assert.equal(precheck.safety.readsRealMemory, false);
+  assert.equal(precheck.safety.writesDurableState, false);
+  assert.equal(precheck.safety.writesArtifactFile, false);
+  assert.equal(precheck.safety.remoteWrites, false);
+  assert.equal(precheck.safety.submitsApprovalRequest, false);
+  assert.equal(precheck.safety.executesCutover, false);
+  assert.equal(precheck.safety.readinessClaimed, false);
+  assert.equal(precheck.canClaimRuntimeReady, false);
+  assert.equal(precheck.canClaimFinalRcReady, false);
+  assert.equal(precheck.canClaimV1RcReady, false);
+  assert.equal(precheck.canClaimRcReady, false);
 }
 
 test('runtime evidence aggregation preflight accepts standard low-disclosure source but keeps aggregator replay blocked', async () => {
@@ -1546,6 +1659,224 @@ test('v1 RC aggregator final owner-review package output fails closed without P7
   assertNoForbiddenMaterial(pkg);
 });
 
+test('RC cutover owner approval execution boundary precheck accepts P77 package without executing', async () => {
+  const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
+  const precheck = buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
+    rcCutoverFinalOwnerReviewPackageAggregation: pkg
+  });
+
+  assertAcceptedFinalOwnerReviewPackage(pkg);
+  assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck);
+  assertNoForbiddenMaterial(precheck);
+});
+
+test('v1 RC aggregator CLI can intake a P77 final owner-review package from stdin', async () => {
+  const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-final-owner-review-package-report',
+      '-',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(pkg),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const report = JSON.parse(result.stdout);
+  const precheck = report.evidence.p78RcCutoverOwnerApprovalExecutionBoundaryPrecheck;
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(
+    report.phase,
+    'P78-rc-cutover-owner-approval-execution-boundary-precheck'
+  );
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.provided, true);
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.accepted, true);
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.rejected, false);
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.pathDisclosed, false);
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.rawInputPrinted, false);
+  assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReportInputProvided, true);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReportInputAccepted, true);
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckAccepted,
+    true
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckReadyForExactReview,
+    true
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckChecklistCount,
+    8
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckApprovalGenerated,
+    false
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckExecutesCutover,
+    false
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckCanClaimRcReady,
+    false
+  );
+  assert.equal(
+    Object.hasOwn(report.evidence, 'p77RcCutoverFinalOwnerReviewPackageAggregation'),
+    false
+  );
+  assertNoForbiddenMaterial(report);
+});
+
+test('v1 RC aggregator CLI can emit only the owner approval execution boundary precheck artifact', async () => {
+  const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-final-owner-review-package-report',
+      '-',
+      '--rc-cutover-execution-boundary-precheck',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(pkg),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const precheck = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0, result.stderr);
+  assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck);
+  assert.equal(Object.hasOwn(precheck, 'phase'), false);
+  assert.equal(Object.hasOwn(precheck, 'summary'), false);
+  assert.equal(Object.hasOwn(precheck, 'evidence'), false);
+  assert.equal(precheck.executionBoundaryChecklist.valuesIncluded, false);
+  assert.equal(precheck.approvalLineGenerated, false);
+  assert.equal(precheck.approvalTextGenerated, false);
+  assert.equal(precheck.approvalTemplateGenerated, false);
+  assert.equal(precheck.canProceedToCutoverExecution, false);
+  assert.equal(precheck.safety.submitsApprovalRequest, false);
+  assert.equal(precheck.safety.executesCutover, false);
+  assert.equal(precheck.safety.readinessClaimed, false);
+  assertNoForbiddenMaterial(precheck);
+});
+
+test('RC cutover owner approval execution boundary precheck fails closed on package drift', async () => {
+  const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
+  pkg.packageContents.approvalMaterialIncluded = true;
+  pkg.approvalTemplateGenerated = true;
+  pkg.ownerApprovalPresent = true;
+  pkg.safety.executesCutover = true;
+  const precheck = buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
+    rcCutoverFinalOwnerReviewPackageAggregation: pkg
+  });
+
+  assert.equal(
+    precheck.status,
+    'owner_approval_execution_boundary_precheck_blocked_fail_closed'
+  );
+  assert.equal(precheck.decision, 'NOT_READY_BLOCKED');
+  assert.equal(precheck.boundaryPrecheckAccepted, false);
+  assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_contents_boundary_invalid'
+    )
+  );
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_approval_execution_or_readiness_claim_present'
+    )
+  );
+  assert.ok(precheck.blockerIds.includes('final_owner_review_package_safety_executesCutover'));
+  assert.equal(precheck.approvalLineGenerated, false);
+  assert.equal(precheck.approvalTextGenerated, false);
+  assert.equal(precheck.rcCutoverExecutionAllowed, false);
+  assert.equal(precheck.canProceedToCutoverExecution, false);
+  assert.equal(precheck.rcReady, false);
+  assert.equal(precheck.canClaimRcReady, false);
+  assertNoForbiddenMaterial(precheck);
+});
+
+test('v1 RC aggregator execution boundary precheck output fails closed without P77 input', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-execution-boundary-precheck',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const precheck = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(
+    precheck.schemaVersion,
+    'p78-rc-cutover-owner-approval-execution-boundary-precheck-v1'
+  );
+  assert.equal(
+    precheck.status,
+    'owner_approval_execution_boundary_precheck_blocked_fail_closed'
+  );
+  assert.equal(precheck.decision, 'NOT_READY_BLOCKED');
+  assert.equal(precheck.finalOwnerReviewPackageInputProvided, false);
+  assert.equal(precheck.boundaryPrecheckAccepted, false);
+  assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_schema_version_mismatch'
+    )
+  );
+  assert.ok(precheck.blockerIds.includes('final_owner_review_package_not_accepted'));
+  assert.equal(precheck.executionBoundaryChecklist.valuesIncluded, false);
+  assert.equal(precheck.approvalLineGenerated, false);
+  assert.equal(precheck.approvalTextGenerated, false);
+  assert.equal(precheck.rcCutoverExecutionAllowed, false);
+  assert.equal(precheck.canProceedToCutoverExecution, false);
+  assert.equal(precheck.rcReady, false);
+  assert.equal(precheck.safety.submitsApprovalRequest, false);
+  assert.equal(precheck.safety.executesCutover, false);
+  assert.equal(precheck.safety.readinessClaimed, false);
+  assert.equal(precheck.canClaimRcReady, false);
+  assertNoForbiddenMaterial(precheck);
+});
+
 test('v1 RC aggregator CLI can pipe P72 stdout artifact into P73 intake without persistence', async () => {
   const sourceReport = await buildZeroGapLowDisclosureReport();
   const artifactResult = spawnSync(
@@ -1783,6 +2114,7 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
     rcCutoverCandidateArtifact: false,
     rcCutoverOwnerApprovalBoundary: false,
     rcCutoverFinalOwnerReviewPackage: false,
+    rcCutoverExecutionBoundaryPrecheck: false,
     generatedAt: null,
     runtimeEvidenceReportPath: '-',
     rejectedFlag: null
@@ -1806,6 +2138,7 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
       rcCutoverCandidateArtifact: false,
       rcCutoverOwnerApprovalBoundary: false,
       rcCutoverFinalOwnerReviewPackage: false,
+      rcCutoverExecutionBoundaryPrecheck: false,
       generatedAt: null,
       runtimeEvidenceReportPath: '-',
       runtimeEvidenceCurrentHead: fixtureCommit,
@@ -1838,6 +2171,16 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
   assert.equal(
     parseArgs(['--rc-cutover-final-owner-review-package'])
       .rcCutoverFinalOwnerReviewPackage,
+    true
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-final-owner-review-package-report', '-'])
+      .rcCutoverFinalOwnerReviewPackageReportPath,
+    '-'
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-execution-boundary-precheck'])
+      .rcCutoverExecutionBoundaryPrecheck,
     true
   );
 
@@ -1887,5 +2230,24 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
   assert.equal(
     rejectedBoundarySecret.reason,
     'rc_cutover_owner_approval_boundary_report_path_rejected'
+  );
+
+  const rejectedPackageEnv = readRcCutoverFinalOwnerReviewPackageReportInput('.env', {
+    cwd: repoRoot
+  });
+  assert.equal(rejectedPackageEnv.ok, false);
+  assert.equal(
+    rejectedPackageEnv.reason,
+    'rc_cutover_final_owner_review_package_report_path_rejected'
+  );
+
+  const rejectedPackageSecret = readRcCutoverFinalOwnerReviewPackageReportInput(
+    'tmp/secret-final-owner-review-package.json',
+    { cwd: repoRoot }
+  );
+  assert.equal(rejectedPackageSecret.ok, false);
+  assert.equal(
+    rejectedPackageSecret.reason,
+    'rc_cutover_final_owner_review_package_report_path_rejected'
   );
 });

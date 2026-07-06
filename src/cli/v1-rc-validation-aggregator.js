@@ -32,6 +32,7 @@ function parseArgs(argv = []) {
     rcCutoverCandidateArtifact: false,
     rcCutoverOwnerApprovalBoundary: false,
     rcCutoverFinalOwnerReviewPackage: false,
+    rcCutoverExecutionBoundaryPrecheck: false,
     generatedAt: null,
     rejectedFlag: null
   };
@@ -62,6 +63,10 @@ function parseArgs(argv = []) {
       options.rcCutoverFinalOwnerReviewPackage = true;
       continue;
     }
+    if (token === '--rc-cutover-execution-boundary-precheck') {
+      options.rcCutoverExecutionBoundaryPrecheck = true;
+      continue;
+    }
     if (token === '--generated-at') {
       options.generatedAt = argv[index + 1] || '';
       index += 1;
@@ -79,6 +84,11 @@ function parseArgs(argv = []) {
     }
     if (token === '--rc-cutover-owner-approval-boundary-report') {
       options.rcCutoverOwnerApprovalBoundaryReportPath = argv[index + 1] || '';
+      index += 1;
+      continue;
+    }
+    if (token === '--rc-cutover-final-owner-review-package-report') {
+      options.rcCutoverFinalOwnerReviewPackageReportPath = argv[index + 1] || '';
       index += 1;
       continue;
     }
@@ -119,6 +129,8 @@ function buildUsageText() {
     '            Read one low-disclosure RC cutover pre-candidate artifact JSON from a workspace JSON file or stdin, then validate it as owner-review input without generating approval.',
     '  --rc-cutover-owner-approval-boundary-report PATH|-',
     '            Read one low-disclosure owner approval boundary display JSON from a workspace JSON file or stdin, then aggregate it into a final owner-review package without generating approval.',
+    '  --rc-cutover-final-owner-review-package-report PATH|-',
+    '            Read one low-disclosure final owner-review package JSON from a workspace JSON file or stdin, then prepare an execution boundary precheck without generating approval or executing cutover.',
     '  --runtime-evidence-current-head COMMIT',
     '  --runtime-evidence-expected-current-head COMMIT',
     '  --runtime-evidence-generated-at ISO_TIMESTAMP',
@@ -129,6 +141,8 @@ function buildUsageText() {
     '            Emit only the low-disclosure owner approval boundary display JSON to stdout. Requires a candidate artifact report input for an accepted display.',
     '  --rc-cutover-final-owner-review-package',
     '            Emit only the low-disclosure final owner-review package JSON to stdout. Requires an owner approval boundary report input for an accepted package.',
+    '  --rc-cutover-execution-boundary-precheck',
+    '            Emit only the low-disclosure owner approval / execution boundary precheck JSON to stdout. Requires a final owner-review package report input for an accepted precheck.',
     '  --help    Show this usage text without running live checks.',
     '',
     'This minimal CLI never starts services, calls providers, applies migrations, writes memory, refreshes live MCP/HTTP evidence, or claims readiness.'
@@ -173,6 +187,17 @@ const REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS = Object.freeze([
   'rollback_path',
   'validation_commands',
   'single_use_statement'
+]);
+
+const REQUIRED_RC_CUTOVER_EXECUTION_BOUNDARY_CHECK_IDS = Object.freeze([
+  'exact_owner_approval_required',
+  'current_head_binding_required',
+  'single_use_owner_decision_required',
+  'remote_release_tag_deploy_action_list_required',
+  'config_watchdog_startup_scope_required',
+  'rollback_path_required',
+  'validation_commands_required',
+  'execution_stays_blocked'
 ]);
 
 function containsForbiddenRcCutoverCandidateArtifactMaterial(value) {
@@ -401,6 +426,65 @@ function readRcCutoverOwnerApprovalBoundaryReportInput(
   }
 }
 
+function readRcCutoverFinalOwnerReviewPackageReportInput(
+  inputPath,
+  { cwd = process.cwd() } = {}
+) {
+  if (!inputPath) {
+    return {
+      ok: false,
+      reason: 'rc_cutover_final_owner_review_package_report_path_required',
+      value: null
+    };
+  }
+
+  if (inputPath === '-') {
+    try {
+      return {
+        ok: true,
+        reason: '',
+        value: JSON.parse(fs.readFileSync(0, 'utf8'))
+      };
+    } catch {
+      return {
+        ok: false,
+        reason: 'rc_cutover_final_owner_review_package_report_stdin_json_invalid',
+        value: null
+      };
+    }
+  }
+
+  const resolvedPath = path.resolve(cwd, inputPath);
+  const workspaceRoot = path.resolve(cwd);
+  const relativePath = path.relative(workspaceRoot, resolvedPath);
+  if (
+    relativePath.startsWith('..') ||
+    path.isAbsolute(relativePath) ||
+    isSecretAdjacentPath(resolvedPath) ||
+    path.extname(resolvedPath).toLowerCase() !== '.json'
+  ) {
+    return {
+      ok: false,
+      reason: 'rc_cutover_final_owner_review_package_report_path_rejected',
+      value: null
+    };
+  }
+
+  try {
+    return {
+      ok: true,
+      reason: '',
+      value: JSON.parse(fs.readFileSync(resolvedPath, 'utf8'))
+    };
+  } catch {
+    return {
+      ok: false,
+      reason: 'rc_cutover_final_owner_review_package_report_file_json_invalid',
+      value: null
+    };
+  }
+}
+
 function buildRuntimeEvidenceReportLoadError(loadErrorReason, options = {}) {
   const report = buildV1RcValidationAggregatorReport({
     generatedAt: options.generatedAt || undefined
@@ -532,6 +616,56 @@ function buildRcCutoverOwnerApprovalBoundaryReportLoadError(
       'RC cutover owner approval boundary input was rejected before final owner-review package aggregation; no raw input or path was disclosed.'
     ],
     nextStep: 'Provide a workspace JSON P75 owner approval boundary display or pipe it on stdin with --rc-cutover-owner-approval-boundary-report -.'
+  };
+}
+
+function buildRcCutoverFinalOwnerReviewPackageReportLoadError(
+  loadErrorReason,
+  options = {}
+) {
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: options.generatedAt || undefined
+  });
+
+  return {
+    ...report,
+    phase: 'P78-rc-cutover-final-owner-review-package-input-rejected',
+    rcCutoverFinalOwnerReviewPackageReportInput: {
+      provided: true,
+      accepted: false,
+      rejected: true,
+      rejectReason: loadErrorReason,
+      pathDisclosed: false,
+      rawInputPrinted: false
+    },
+    evidence: {
+      ...report.evidence,
+      p78RcCutoverOwnerApprovalExecutionBoundaryPrecheck: {
+        status: 'owner_approval_execution_boundary_precheck_blocked_fail_closed',
+        decision: 'NOT_READY_BLOCKED',
+        finalOwnerReviewPackageInputProvided: false,
+        boundaryPrecheckAccepted: false,
+        rejectReason: loadErrorReason,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false,
+        canClaimRcReady: false
+      }
+    },
+    summary: {
+      ...report.summary,
+      rcCutoverFinalOwnerReviewPackageReportInputProvided: true,
+      rcCutoverFinalOwnerReviewPackageReportInputAccepted: false,
+      rcCutoverOwnerApprovalExecutionBoundaryPrecheckAccepted: false,
+      rcCutoverOwnerApprovalExecutionBoundaryPrecheckReadyForExactReview: false,
+      rcCutoverOwnerApprovalExecutionBoundaryPrecheckExecutesCutover: false,
+      rcCutoverOwnerApprovalExecutionBoundaryPrecheckCanClaimRcReady: false
+    },
+    warnings: [
+      ...report.warnings,
+      'RC cutover final owner-review package input was rejected before execution boundary precheck; no raw input or path was disclosed.'
+    ],
+    nextStep: 'Provide a workspace JSON P77 final owner-review package or pipe it on stdin with --rc-cutover-final-owner-review-package-report -.'
   };
 }
 
@@ -2005,6 +2139,310 @@ function buildRcCutoverFinalOwnerReviewPackageAggregation({
   };
 }
 
+function collectRcCutoverOwnerApprovalExecutionBoundaryBlockers(pkg = {}) {
+  const blockers = [];
+  const contents = isPlainObject(pkg.packageContents) ? pkg.packageContents : {};
+  const fields = Array.isArray(pkg.requiredBoundaryFields)
+    ? pkg.requiredBoundaryFields
+    : [];
+  const fieldIds = fields.map(field => (
+    typeof field?.id === 'string' ? field.id : ''
+  ));
+  const sourceSummary = isPlainObject(pkg.sourceSummary) ? pkg.sourceSummary : {};
+  const disclosure = isPlainObject(pkg.disclosure) ? pkg.disclosure : {};
+  const safety = isPlainObject(pkg.safety) ? pkg.safety : {};
+
+  if (!isPlainObject(pkg)) blockers.push('final_owner_review_package_shape_invalid');
+  if (pkg.schemaVersion !== 'p77-rc-cutover-final-owner-review-package-aggregation-v1') {
+    blockers.push('final_owner_review_package_schema_version_mismatch');
+  }
+  if (pkg.packageType !== 'rc_cutover_final_owner_review_package_aggregation') {
+    blockers.push('final_owner_review_package_type_mismatch');
+  }
+  if (pkg.sourceMode !== 'p75_rc_cutover_owner_approval_boundary_precheck') {
+    blockers.push('final_owner_review_package_source_mode_mismatch');
+  }
+  if (pkg.status !== 'final_owner_review_package_ready_not_authorization') {
+    blockers.push('final_owner_review_package_status_not_ready_for_review');
+  }
+  if (pkg.decision !== 'NOT_READY_BLOCKED') {
+    blockers.push('final_owner_review_package_decision_mismatch');
+  }
+  if (pkg.ownerApprovalBoundaryInputProvided !== true) {
+    blockers.push('final_owner_review_package_boundary_input_not_provided');
+  }
+  if (pkg.finalOwnerReviewPackageAccepted !== true) {
+    blockers.push('final_owner_review_package_not_accepted');
+  }
+  if (pkg.readyForExactOwnerReview !== true) {
+    blockers.push('final_owner_review_package_not_ready_for_exact_review');
+  }
+  if (pkg.approvalRequestOnly !== true) {
+    blockers.push('final_owner_review_package_not_review_only');
+  }
+
+  if (
+    contents.lowDisclosure !== true ||
+    contents.boundaryDisplayIncluded !== true ||
+    contents.boundaryFieldCount !== REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.length ||
+    contents.boundaryFieldValuesIncluded !== false ||
+    contents.approvalMaterialIncluded !== false ||
+    contents.executionAuthorizationIncluded !== false ||
+    contents.ownerApprovalIncluded !== false ||
+    contents.readinessClaimIncluded !== false
+  ) {
+    blockers.push('final_owner_review_package_contents_boundary_invalid');
+  }
+
+  for (const requiredId of REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS) {
+    if (!fieldIds.includes(requiredId)) {
+      blockers.push(`final_owner_review_package_missing_${requiredId}`);
+    }
+  }
+  if (new Set(fieldIds).size !== fieldIds.length) {
+    blockers.push('final_owner_review_package_duplicate_fields');
+  }
+  if (fields.length !== REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.length) {
+    blockers.push('final_owner_review_package_field_count_mismatch');
+  }
+  for (const field of fields) {
+    const fieldId = typeof field?.id === 'string' ? field.id : 'unknown';
+    if (!REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.includes(fieldId)) {
+      blockers.push('final_owner_review_package_unknown_field');
+    }
+    if (field?.valueIncluded !== false || field?.rawValueOutput !== false) {
+      blockers.push(`final_owner_review_package_field_value_disclosure_${fieldId}`);
+    }
+  }
+
+  if (
+    sourceSummary.boundarySchemaVersion !==
+      'p75-rc-cutover-owner-approval-boundary-precheck-v1' ||
+    sourceSummary.boundaryPrecheckAccepted !== true ||
+    sourceSummary.ownerApprovalBoundaryDisplayReady !== true ||
+    sourceSummary.boundaryFieldCount !== REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.length ||
+    sourceSummary.sourceBlockerCount !== 0
+  ) {
+    blockers.push('final_owner_review_package_source_summary_invalid');
+  }
+
+  if (
+    pkg.approvalRequestSubmitted === true ||
+    pkg.approvalLineGenerated === true ||
+    pkg.approvalTextGenerated === true ||
+    pkg.approvalTemplateGenerated === true ||
+    pkg.ownerApprovalPresent === true ||
+    pkg.ownerApprovalAccepted === true ||
+    pkg.ownerApprovalExecutionAllowed === true ||
+    pkg.rcCutoverApproved === true ||
+    pkg.rcCutoverExecuted === true ||
+    pkg.rcCutoverExecutionAllowed === true ||
+    pkg.rcReady === true ||
+    pkg.canClaimRuntimeReady === true ||
+    pkg.canClaimFinalRcReady === true ||
+    pkg.canClaimV1RcReady === true ||
+    pkg.canClaimRcReady === true
+  ) {
+    blockers.push('final_owner_review_package_approval_execution_or_readiness_claim_present');
+  }
+
+  for (const [key, value] of Object.entries(disclosure)) {
+    if (key !== 'lowDisclosure' && value === true) {
+      blockers.push(`final_owner_review_package_disclosure_${key}`);
+    }
+  }
+  if (disclosure.lowDisclosure !== true) {
+    blockers.push('final_owner_review_package_not_low_disclosure');
+  }
+
+  for (const [key, value] of Object.entries(safety)) {
+    if (key !== 'readsOwnerApprovalBoundaryInputOnly' && value === true) {
+      blockers.push(`final_owner_review_package_safety_${key}`);
+    }
+  }
+  if (Array.isArray(pkg.blockerIds) && pkg.blockerIds.length > 0) {
+    blockers.push('final_owner_review_package_blockers_present');
+  }
+  if (containsForbiddenRcCutoverCandidateArtifactMaterial(pkg)) {
+    blockers.push('final_owner_review_package_contains_forbidden_material');
+  }
+
+  return [...new Set(blockers)].sort();
+}
+
+function buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
+  rcCutoverFinalOwnerReviewPackageAggregation = null
+} = {}) {
+  const pkg = isPlainObject(rcCutoverFinalOwnerReviewPackageAggregation)
+    ? rcCutoverFinalOwnerReviewPackageAggregation
+    : {};
+  const blockerIds = collectRcCutoverOwnerApprovalExecutionBoundaryBlockers(pkg);
+  const accepted = blockerIds.length === 0;
+  const rows = [
+    {
+      id: 'exact_owner_approval_required',
+      category: 'separate_owner_decision',
+      requiredFor: 'any_future_cutover_execution',
+      valueIncluded: false,
+      rawValueOutput: false
+    },
+    {
+      id: 'current_head_binding_required',
+      category: 'fresh_head_binding',
+      requiredFor: 'single_use_owner_decision_scope',
+      valueIncluded: false,
+      rawValueOutput: false
+    },
+    {
+      id: 'single_use_owner_decision_required',
+      category: 'retry_and_reuse_limit',
+      requiredFor: 'prevent_boundary_expansion',
+      valueIncluded: false,
+      rawValueOutput: false
+    },
+    {
+      id: 'remote_release_tag_deploy_action_list_required',
+      category: 'delivery_surface_control',
+      requiredFor: 'prove_remote_release_deploy_tag_actions_are_not_implicit',
+      valueIncluded: false,
+      rawValueOutput: false
+    },
+    {
+      id: 'config_watchdog_startup_scope_required',
+      category: 'runtime_configuration_mutation_control',
+      requiredFor: 'prove_config_watchdog_startup_changes_are_not_implicit',
+      valueIncluded: false,
+      rawValueOutput: false
+    },
+    {
+      id: 'rollback_path_required',
+      category: 'rollback_or_abort_posture',
+      requiredFor: 'future_owner_risk_decision',
+      valueIncluded: false,
+      rawValueOutput: false
+    },
+    {
+      id: 'validation_commands_required',
+      category: 'fresh_replayable_validation',
+      requiredFor: 'future_owner_decision_evidence',
+      valueIncluded: false,
+      rawValueOutput: false
+    },
+    {
+      id: 'execution_stays_blocked',
+      category: 'execution_gate',
+      requiredFor: 'keep_cutover_blocked_until_separate_decision',
+      valueIncluded: false,
+      rawValueOutput: false
+    }
+  ];
+  const rowIds = rows.map(row => row.id);
+  const missingRowIds = REQUIRED_RC_CUTOVER_EXECUTION_BOUNDARY_CHECK_IDS
+    .filter(id => !rowIds.includes(id));
+
+  return {
+    schemaVersion: 'p78-rc-cutover-owner-approval-execution-boundary-precheck-v1',
+    precheckType: 'rc_cutover_owner_approval_execution_boundary_precheck',
+    sourceMode: 'p77_rc_cutover_final_owner_review_package_aggregation',
+    status: accepted
+      ? 'owner_approval_execution_boundary_precheck_ready_not_authorization'
+      : 'owner_approval_execution_boundary_precheck_blocked_fail_closed',
+    decision: 'NOT_READY_BLOCKED',
+    finalOwnerReviewPackageInputProvided:
+      isPlainObject(rcCutoverFinalOwnerReviewPackageAggregation),
+    finalOwnerReviewPackageAcceptedByInput:
+      pkg.finalOwnerReviewPackageAccepted === true,
+    boundaryPrecheckAccepted: accepted,
+    readyForExactOwnerReview: accepted,
+    executionBoundaryPrepared: accepted,
+    executionBoundaryReadyForExactOwnerReview: accepted,
+    approvalRequestOnly: true,
+    approvalRequestSubmitted: false,
+    approvalLineGenerated: false,
+    approvalTextGenerated: false,
+    approvalTemplateGenerated: false,
+    ownerApprovalRequiredSeparately: true,
+    ownerApprovalPresent: false,
+    ownerApprovalAccepted: false,
+    ownerApprovalExecutionAllowed: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    canProceedToCutoverExecution: false,
+    rcReady: false,
+    executionBoundaryChecklist: {
+      lowDisclosure: true,
+      checkCount: rows.length,
+      missingCheckCount: missingRowIds.length,
+      missingCheckIds: missingRowIds,
+      valuesIncluded: false,
+      rawValuesOutput: false,
+      rows
+    },
+    sourceSummary: {
+      packageSchemaVersion:
+        typeof pkg.schemaVersion === 'string' ? pkg.schemaVersion : '',
+      packageStatus: typeof pkg.status === 'string' ? pkg.status : '',
+      finalOwnerReviewPackageAccepted:
+        pkg.finalOwnerReviewPackageAccepted === true,
+      readyForExactOwnerReview: pkg.readyForExactOwnerReview === true,
+      packageBoundaryFieldCount: Number.isFinite(pkg.packageContents?.boundaryFieldCount)
+        ? pkg.packageContents.boundaryFieldCount
+        : 0,
+      sourceBlockerCount: Array.isArray(pkg.blockerIds) ? pkg.blockerIds.length : 0
+    },
+    blockerIds,
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      requiredOwnerApprovalFieldValuesOutput: false,
+      approvalTextOutput: false,
+      approvalLineOutput: false,
+      approvalTemplateOutput: false,
+      endpointOrLocatorOutput: false,
+      requestBodyOutput: false,
+      rawResponseOutput: false,
+      rawErrorOutput: false,
+      secretOutput: false,
+      privateMemoryContentOutput: false,
+      artifactPathOutput: false,
+      rawInputPrinted: false
+    },
+    safety: {
+      readsFinalOwnerReviewPackageInputOnly: true,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      writesArtifactFile: false,
+      mutatesConfig: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      pushes: false,
+      tags: false,
+      releases: false,
+      deploys: false,
+      submitsApprovalRequest: false,
+      executesCutover: false,
+      readinessClaimed: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: accepted
+      ? 'Use this precheck as owner-review boundary evidence only; separate exact owner decision remains required before any cutover execution.'
+      : 'Repair the final owner-review package input before preparing an owner approval / execution boundary precheck.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -2025,6 +2463,12 @@ function buildCliReport(options = {}) {
   if (options.rcCutoverOwnerApprovalBoundaryReportLoadError) {
     return buildRcCutoverOwnerApprovalBoundaryReportLoadError(
       options.rcCutoverOwnerApprovalBoundaryReportLoadError,
+      options
+    );
+  }
+  if (options.rcCutoverFinalOwnerReviewPackageReportLoadError) {
+    return buildRcCutoverFinalOwnerReviewPackageReportLoadError(
+      options.rcCutoverFinalOwnerReviewPackageReportLoadError,
       options
     );
   }
@@ -2104,10 +2548,19 @@ function buildCliReport(options = {}) {
             options.rcCutoverOwnerApprovalBoundaryReport
         })
       : null;
+  const rcCutoverOwnerApprovalExecutionBoundaryPrecheck =
+    options.rcCutoverFinalOwnerReviewPackageReport
+      ? buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
+          rcCutoverFinalOwnerReviewPackageAggregation:
+            options.rcCutoverFinalOwnerReviewPackageReport
+        })
+      : null;
 
   const outputReport = {
     ...report,
-    phase: rcCutoverFinalOwnerReviewPackageAggregation
+    phase: rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+      ? 'P78-rc-cutover-owner-approval-execution-boundary-precheck'
+      : rcCutoverFinalOwnerReviewPackageAggregation
       ? 'P77-rc-cutover-final-owner-review-package-aggregation'
       : rcCutoverCandidateArtifactIntakePrecheck
       ? 'P73-rc-cutover-candidate-artifact-intake-precheck'
@@ -2153,6 +2606,21 @@ function buildCliReport(options = {}) {
           }
         }
       : {}),
+    ...(rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+      ? {
+          rcCutoverFinalOwnerReviewPackageReportInput: {
+            provided: true,
+            accepted:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .boundaryPrecheckAccepted === true,
+            rejected:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .boundaryPrecheckAccepted !== true,
+            pathDisclosed: false,
+            rawInputPrinted: false
+          }
+        }
+      : {}),
     evidence: {
       ...report.evidence,
       p24Aggregator: {
@@ -2190,6 +2658,12 @@ function buildCliReport(options = {}) {
         ? {
             p77RcCutoverFinalOwnerReviewPackageAggregation:
               rcCutoverFinalOwnerReviewPackageAggregation
+          }
+        : {}),
+      ...(rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+        ? {
+            p78RcCutoverOwnerApprovalExecutionBoundaryPrecheck:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
           }
         : {})
     },
@@ -2299,6 +2773,26 @@ function buildCliReport(options = {}) {
             rcCutoverFinalOwnerReviewPackageExecutesCutover: false,
             rcCutoverFinalOwnerReviewPackageCanClaimRcReady: false
           }
+        : {}),
+      ...(rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+        ? {
+            rcCutoverFinalOwnerReviewPackageReportInputProvided: true,
+            rcCutoverFinalOwnerReviewPackageReportInputAccepted:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .boundaryPrecheckAccepted === true,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckAccepted:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .boundaryPrecheckAccepted === true,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckReadyForExactReview:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .readyForExactOwnerReview === true,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckChecklistCount:
+              rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+                .executionBoundaryChecklist?.checkCount || 0,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckApprovalGenerated: false,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckExecutesCutover: false,
+            rcCutoverOwnerApprovalExecutionBoundaryPrecheckCanClaimRcReady: false
+          }
         : {})
     },
     recommendations: [
@@ -2314,7 +2808,10 @@ function buildCliReport(options = {}) {
         : 'Add candidate artifact intake only when a P72 low-disclosure artifact is supplied explicitly.',
       rcCutoverFinalOwnerReviewPackageAggregation
         ? 'Use the final owner-review package as review input only; do not treat it as approval, cutover authorization, or RC readiness.'
-        : 'Add final owner-review package aggregation only when a P75 owner approval boundary display is supplied explicitly.'
+        : 'Add final owner-review package aggregation only when a P75 owner approval boundary display is supplied explicitly.',
+      rcCutoverOwnerApprovalExecutionBoundaryPrecheck
+        ? 'Use the execution boundary precheck as owner-review evidence only; do not execute cutover or claim RC readiness.'
+        : 'Add execution boundary precheck only when a P77 final owner-review package is supplied explicitly.'
     ]
   };
 
@@ -2338,6 +2835,12 @@ function selectCliOutput(report = {}, options = {}) {
     return (
       report.evidence?.p77RcCutoverFinalOwnerReviewPackageAggregation ||
       buildRcCutoverFinalOwnerReviewPackageAggregation()
+    );
+  }
+  if (options.rcCutoverExecutionBoundaryPrecheck) {
+    return (
+      report.evidence?.p78RcCutoverOwnerApprovalExecutionBoundaryPrecheck ||
+      buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck()
     );
   }
   return report;
@@ -2387,6 +2890,19 @@ function main() {
         rcCutoverOwnerApprovalBoundaryReport.reason;
     }
   }
+  if (options.rcCutoverFinalOwnerReviewPackageReportPath) {
+    const rcCutoverFinalOwnerReviewPackageReport =
+      readRcCutoverFinalOwnerReviewPackageReportInput(
+        options.rcCutoverFinalOwnerReviewPackageReportPath
+      );
+    if (rcCutoverFinalOwnerReviewPackageReport.ok) {
+      options.rcCutoverFinalOwnerReviewPackageReport =
+        rcCutoverFinalOwnerReviewPackageReport.value;
+    } else {
+      options.rcCutoverFinalOwnerReviewPackageReportLoadError =
+        rcCutoverFinalOwnerReviewPackageReport.reason;
+    }
+  }
 
   const report = buildCliReport(options);
   const output = selectCliOutput(report, options);
@@ -2399,7 +2915,8 @@ function main() {
       options.rejectedFlag ||
       options.runtimeEvidenceReportLoadError ||
       options.rcCutoverCandidateArtifactReportLoadError ||
-      options.rcCutoverOwnerApprovalBoundaryReportLoadError
+      options.rcCutoverOwnerApprovalBoundaryReportLoadError ||
+      options.rcCutoverFinalOwnerReviewPackageReportLoadError
     )
   });
 }
@@ -2421,6 +2938,7 @@ module.exports = {
   buildRcCutoverCandidateArtifactIntakePrecheck,
   buildRcCutoverOwnerApprovalBoundaryPrecheck,
   buildRcCutoverFinalOwnerReviewPackageAggregation,
+  buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck,
   parseArgs,
   buildUsageText,
   selectCliOutput,
@@ -2429,6 +2947,7 @@ module.exports = {
   readRuntimeEvidenceReportInput,
   readRcCutoverCandidateArtifactReportInput,
   readRcCutoverOwnerApprovalBoundaryReportInput,
+  readRcCutoverFinalOwnerReviewPackageReportInput,
   buildCliReport,
   buildRejectedReport
 };
