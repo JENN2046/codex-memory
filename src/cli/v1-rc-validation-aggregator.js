@@ -29,6 +29,7 @@ function parseArgs(argv = []) {
     pretty: false,
     strict: false,
     help: false,
+    rcCutoverCandidateArtifact: false,
     generatedAt: null,
     rejectedFlag: null
   };
@@ -45,6 +46,10 @@ function parseArgs(argv = []) {
     }
     if (token === '--pretty') {
       options.pretty = true;
+      continue;
+    }
+    if (token === '--rc-cutover-candidate-artifact') {
+      options.rcCutoverCandidateArtifact = true;
       continue;
     }
     if (token === '--generated-at') {
@@ -94,6 +99,8 @@ function buildUsageText() {
     '  --runtime-evidence-expected-current-head COMMIT',
     '  --runtime-evidence-generated-at ISO_TIMESTAMP',
     '            Optional exact head-bound runtime summary metadata supplied separately from the low-disclosure report. Values are used for aggregator replay and are not printed in output.',
+    '  --rc-cutover-candidate-artifact',
+    '            Emit only the low-disclosure RC cutover pre-candidate evidence artifact JSON to stdout. No file is written and no approval is generated.',
     '  --help    Show this usage text without running live checks.',
     '',
     'This minimal CLI never starts services, calls providers, applies migrations, writes memory, refreshes live MCP/HTTP evidence, or claims readiness.'
@@ -878,6 +885,142 @@ function buildRcCutoverFinalEvidencePackageAggregationOutlet({
   };
 }
 
+function buildRcCutoverCandidateArtifactExport({
+  rcCutoverFinalEvidencePackageAggregationOutlet = null
+} = {}) {
+  const outlet = rcCutoverFinalEvidencePackageAggregationOutlet || {};
+  const outletAccepted = outlet.aggregationOutletAccepted === true;
+  const sourceBlockerIds = Array.isArray(outlet.blockerIds)
+    ? outlet.blockerIds
+    : ['final_evidence_package_aggregation_outlet_unavailable'];
+  const blockerIds = outletAccepted
+    ? []
+    : [
+        'final_evidence_package_aggregation_outlet_not_accepted',
+        ...sourceBlockerIds
+      ];
+
+  return {
+    schemaVersion: 'p72-rc-cutover-candidate-artifact-export-v1',
+    artifactType: 'rc_cutover_pre_candidate_evidence_artifact_export',
+    sourceMode: 'p71_rc_cutover_final_evidence_package_aggregation_outlet',
+    status: outletAccepted
+      ? 'artifact_ready_for_exact_owner_review_not_authorization'
+      : 'artifact_blocked_pending_final_evidence_package_acceptance',
+    decision: 'NOT_READY_BLOCKED',
+    artifactAccepted: outletAccepted,
+    artifactReadyForOwnerReview: outlet.ownerReviewReady === true,
+    approvalRequestOnly: true,
+    approvalRequestSubmitted: false,
+    approvalLineGenerated: false,
+    approvalTextGenerated: false,
+    ownerApprovalPresent: false,
+    ownerApprovalAccepted: false,
+    ownerApprovalExecutionAllowed: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    export: {
+      mode: 'json_stdout_only',
+      jsonStdoutOnly: true,
+      fileWritten: false,
+      durableArtifactWritten: false,
+      pathOutput: false,
+      pathPersisted: false
+    },
+    manifest: {
+      manifestVersion: 'p72-rc-cutover-candidate-artifact-manifest-v1',
+      manifestType: 'low_disclosure_rc_cutover_pre_candidate_manifest',
+      sourceCli: 'src/cli/v1-rc-validation-aggregator.js',
+      sourceArtifactSchemaVersion:
+        typeof outlet.schemaVersion === 'string' ? outlet.schemaVersion : '',
+      sourceArtifactAccepted: outletAccepted,
+      requiredInputFamilies: [
+        'sanitized_runtime_evidence_report',
+        'separate_exact_head_bound_runtime_summary_input'
+      ],
+      includedPackageRefs: [
+        'p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight',
+        'p68FinalEvidenceAggregationRcGatePrecheck',
+        'p69RcCutoverPreApprovalCandidatePackage',
+        'p70RcCutoverOwnerApprovalReadinessSummary',
+        'p71RcCutoverFinalEvidencePackageAggregationOutlet'
+      ],
+      excludedMaterial: [
+        'raw_current_head_commit',
+        'raw_expected_current_head_commit',
+        'raw_evidence_generated_at',
+        'approval_text',
+        'approval_line',
+        'endpoint_or_locator',
+        'request_body',
+        'raw_response',
+        'raw_error',
+        'secret',
+        'private_memory_content'
+      ],
+      outputPolicy: 'low_disclosure_json_stdout_only',
+      ownerApprovalRequiredSeparately: true,
+      ownerApprovalIncluded: false,
+      executionAuthorizationIncluded: false,
+      canClaimRcReady: false
+    },
+    finalEvidencePackageAggregationOutlet:
+      outlet && typeof outlet === 'object' && !Array.isArray(outlet)
+        ? outlet
+        : null,
+    blockerIds: [...new Set(blockerIds)].sort(),
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      requiredOwnerApprovalFieldValuesOutput: false,
+      approvalTextOutput: false,
+      approvalLineOutput: false,
+      endpointOrLocatorOutput: false,
+      requestBodyOutput: false,
+      rawResponseOutput: false,
+      rawErrorOutput: false,
+      secretOutput: false,
+      privateMemoryContentOutput: false,
+      artifactPathOutput: false
+    },
+    safety: {
+      readsLowDisclosureEvidenceChainOnly: true,
+      readsFiles: false,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      writesArtifactFile: false,
+      mutatesConfig: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      pushes: false,
+      tags: false,
+      releases: false,
+      deploys: false,
+      submitsApprovalRequest: false,
+      executesCutover: false,
+      readinessClaimed: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: outletAccepted
+      ? 'Use this stdout JSON artifact as the local low-disclosure RC cutover pre-candidate package for separate exact owner review only.'
+      : 'Continue closing the final evidence package aggregation outlet before treating this artifact as owner-review-ready.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -939,6 +1082,12 @@ function buildCliReport(options = {}) {
           rcCutoverOwnerApprovalReadinessSummary
         })
       : null;
+  const rcCutoverCandidateArtifactExport =
+    rcCutoverFinalEvidencePackageAggregationOutlet
+      ? buildRcCutoverCandidateArtifactExport({
+          rcCutoverFinalEvidencePackageAggregationOutlet
+        })
+      : null;
 
   const outputReport = {
     ...report,
@@ -976,7 +1125,9 @@ function buildCliReport(options = {}) {
             p70RcCutoverOwnerApprovalReadinessSummary:
               rcCutoverOwnerApprovalReadinessSummary,
             p71RcCutoverFinalEvidencePackageAggregationOutlet:
-              rcCutoverFinalEvidencePackageAggregationOutlet
+              rcCutoverFinalEvidencePackageAggregationOutlet,
+            p72RcCutoverCandidateArtifactExport:
+              rcCutoverCandidateArtifactExport
           }
         : {})
     },
@@ -1030,6 +1181,12 @@ function buildCliReport(options = {}) {
               rcCutoverFinalEvidencePackageAggregationOutlet
                 ?.ownerReviewReady === true,
             rcCutoverFinalEvidencePackageAggregationOutletCanClaimRcReady: false,
+            rcCutoverCandidateArtifactExportAccepted:
+              rcCutoverCandidateArtifactExport?.artifactAccepted === true,
+            rcCutoverCandidateArtifactExportReadyForOwnerReview:
+              rcCutoverCandidateArtifactExport?.artifactReadyForOwnerReview === true,
+            rcCutoverCandidateArtifactExportFileWritten: false,
+            rcCutoverCandidateArtifactExportCanClaimRcReady: false,
             runtimeEvidenceReportCanClaimV1RcReady: false
           }
         : {})
@@ -1068,9 +1225,15 @@ function main() {
   }
 
   const report = buildCliReport(options);
+  const output = options.rcCutoverCandidateArtifact
+    ? (
+        report.evidence?.p72RcCutoverCandidateArtifactExport ||
+        buildRcCutoverCandidateArtifactExport()
+      )
+    : report;
   const spacing = options.pretty ? 2 : 0;
 
-  process.stdout.write(`${JSON.stringify(report, null, spacing)}\n`);
+  process.stdout.write(`${JSON.stringify(output, null, spacing)}\n`);
   process.exitCode = getExitCodeForDecision(report.decision, {
     strict: options.strict,
     rejected: Boolean(options.rejectedFlag || options.runtimeEvidenceReportLoadError)
@@ -1089,6 +1252,7 @@ module.exports = {
   buildRcCutoverPreApprovalCandidatePackage,
   buildRcCutoverOwnerApprovalReadinessSummary,
   buildRcCutoverFinalEvidencePackageAggregationOutlet,
+  buildRcCutoverCandidateArtifactExport,
   parseArgs,
   buildUsageText,
   redactExactRuntimeEvidenceValues,

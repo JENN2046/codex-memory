@@ -18,6 +18,7 @@ const {
 } = require('../src/core/AuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight');
 const {
   buildCliReport,
+  buildRcCutoverCandidateArtifactExport,
   parseArgs,
   readRuntimeEvidenceReportInput
 } = require('../src/cli/v1-rc-validation-aggregator');
@@ -77,6 +78,109 @@ async function buildZeroGapLowDisclosureReport() {
     locallyEvidencedRuntimeGaps: [...RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST],
     remainingRuntimeGaps: []
   });
+}
+
+function assertArtifactExportNeverExecutes(artifact) {
+  assert.equal(artifact.decision, 'NOT_READY_BLOCKED');
+  assert.equal(artifact.approvalRequestOnly, true);
+  assert.equal(artifact.approvalRequestSubmitted, false);
+  assert.equal(artifact.approvalLineGenerated, false);
+  assert.equal(artifact.approvalTextGenerated, false);
+  assert.equal(artifact.ownerApprovalPresent, false);
+  assert.equal(artifact.ownerApprovalAccepted, false);
+  assert.equal(artifact.ownerApprovalExecutionAllowed, false);
+  assert.equal(artifact.rcCutoverApproved, false);
+  assert.equal(artifact.rcCutoverExecuted, false);
+  assert.equal(artifact.rcCutoverExecutionAllowed, false);
+  assert.equal(artifact.rcReady, false);
+  assert.equal(artifact.export.mode, 'json_stdout_only');
+  assert.equal(artifact.export.jsonStdoutOnly, true);
+  assert.equal(artifact.export.fileWritten, false);
+  assert.equal(artifact.export.durableArtifactWritten, false);
+  assert.equal(artifact.export.pathOutput, false);
+  assert.equal(artifact.export.pathPersisted, false);
+  assert.equal(artifact.manifest.ownerApprovalRequiredSeparately, true);
+  assert.equal(artifact.manifest.ownerApprovalIncluded, false);
+  assert.equal(artifact.manifest.executionAuthorizationIncluded, false);
+  assert.equal(artifact.manifest.canClaimRcReady, false);
+  assert.equal(artifact.disclosure.lowDisclosure, true);
+  assert.equal(artifact.disclosure.rawCurrentHeadCommitOutput, false);
+  assert.equal(artifact.disclosure.rawEvidenceGeneratedAtOutput, false);
+  assert.equal(artifact.disclosure.approvalTextOutput, false);
+  assert.equal(artifact.disclosure.approvalLineOutput, false);
+  assert.equal(artifact.disclosure.endpointOrLocatorOutput, false);
+  assert.equal(artifact.disclosure.requestBodyOutput, false);
+  assert.equal(artifact.disclosure.rawResponseOutput, false);
+  assert.equal(artifact.disclosure.rawErrorOutput, false);
+  assert.equal(artifact.disclosure.secretOutput, false);
+  assert.equal(artifact.disclosure.privateMemoryContentOutput, false);
+  assert.equal(artifact.disclosure.artifactPathOutput, false);
+  assert.equal(artifact.safety.executesCommands, false);
+  assert.equal(artifact.safety.startsServices, false);
+  assert.equal(artifact.safety.callsProviders, false);
+  assert.equal(artifact.safety.callsMcpTools, false);
+  assert.equal(artifact.safety.readsRealMemory, false);
+  assert.equal(artifact.safety.writesDurableState, false);
+  assert.equal(artifact.safety.writesDurableMemory, false);
+  assert.equal(artifact.safety.writesDurableAudit, false);
+  assert.equal(artifact.safety.writesArtifactFile, false);
+  assert.equal(artifact.safety.expandsPublicMcp, false);
+  assert.equal(artifact.safety.remoteWrites, false);
+  assert.equal(artifact.safety.pushes, false);
+  assert.equal(artifact.safety.tags, false);
+  assert.equal(artifact.safety.releases, false);
+  assert.equal(artifact.safety.deploys, false);
+  assert.equal(artifact.safety.submitsApprovalRequest, false);
+  assert.equal(artifact.safety.executesCutover, false);
+  assert.equal(artifact.safety.readinessClaimed, false);
+  assert.equal(artifact.canClaimRuntimeReady, false);
+  assert.equal(artifact.canClaimFinalRcReady, false);
+  assert.equal(artifact.canClaimV1RcReady, false);
+  assert.equal(artifact.canClaimRcReady, false);
+}
+
+function assertBlockedArtifactExport(artifact, expectedBlockerId) {
+  assert.equal(artifact.schemaVersion, 'p72-rc-cutover-candidate-artifact-export-v1');
+  assert.equal(artifact.artifactType, 'rc_cutover_pre_candidate_evidence_artifact_export');
+  assert.equal(artifact.status, 'artifact_blocked_pending_final_evidence_package_acceptance');
+  assert.equal(artifact.artifactAccepted, false);
+  assert.equal(artifact.artifactReadyForOwnerReview, false);
+  assert.ok(
+    artifact.blockerIds.includes('final_evidence_package_aggregation_outlet_not_accepted')
+  );
+  assert.ok(artifact.blockerIds.includes(expectedBlockerId));
+  assert.equal(artifact.manifest.sourceArtifactAccepted, false);
+  assertArtifactExportNeverExecutes(artifact);
+}
+
+function assertAcceptedArtifactExport(artifact) {
+  assert.equal(artifact.schemaVersion, 'p72-rc-cutover-candidate-artifact-export-v1');
+  assert.equal(artifact.artifactType, 'rc_cutover_pre_candidate_evidence_artifact_export');
+  assert.equal(artifact.status, 'artifact_ready_for_exact_owner_review_not_authorization');
+  assert.equal(artifact.artifactAccepted, true);
+  assert.equal(artifact.artifactReadyForOwnerReview, true);
+  assert.deepEqual(artifact.blockerIds, []);
+  assert.equal(
+    artifact.manifest.sourceArtifactSchemaVersion,
+    'p71-rc-cutover-final-evidence-package-aggregation-outlet-v1'
+  );
+  assert.equal(artifact.manifest.sourceArtifactAccepted, true);
+  assert.ok(
+    artifact.manifest.includedPackageRefs.includes(
+      'p71RcCutoverFinalEvidencePackageAggregationOutlet'
+    )
+  );
+  assert.deepEqual(artifact.manifest.requiredInputFamilies, [
+    'sanitized_runtime_evidence_report',
+    'separate_exact_head_bound_runtime_summary_input'
+  ]);
+  assert.ok(artifact.manifest.excludedMaterial.includes('raw_current_head_commit'));
+  assert.ok(artifact.manifest.excludedMaterial.includes('approval_text'));
+  assert.ok(artifact.manifest.excludedMaterial.includes('endpoint_or_locator'));
+  assert.ok(artifact.manifest.excludedMaterial.includes('raw_response'));
+  assert.ok(artifact.manifest.excludedMaterial.includes('secret'));
+  assert.equal(artifact.finalEvidencePackageAggregationOutlet.aggregationOutletAccepted, true);
+  assertArtifactExportNeverExecutes(artifact);
 }
 
 test('runtime evidence aggregation preflight accepts standard low-disclosure source but keeps aggregator replay blocked', async () => {
@@ -203,6 +307,8 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
     report.evidence.p70RcCutoverOwnerApprovalReadinessSummary;
   const finalEvidencePackage =
     report.evidence.p71RcCutoverFinalEvidencePackageAggregationOutlet;
+  const artifactExport =
+    report.evidence.p72RcCutoverCandidateArtifactExport;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
@@ -290,6 +396,14 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   assert.equal(finalEvidencePackage.safety.submitsApprovalRequest, false);
   assert.equal(finalEvidencePackage.safety.executesCutover, false);
   assert.equal(finalEvidencePackage.canClaimRcReady, false);
+  assertBlockedArtifactExport(
+    artifactExport,
+    'p67_runtime_evidence_standard_input_preflight_not_accepted'
+  );
+  assert.equal(
+    artifactExport.finalEvidencePackageAggregationOutlet.aggregationOutletAccepted,
+    false
+  );
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
   assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, false);
   assert.equal(report.summary.rcGatePrecheckFreshCurrentHeadAccepted, false);
@@ -303,6 +417,10 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletAccepted, false);
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletReadyForOwnerReview, false);
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletCanClaimRcReady, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportAccepted, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportReadyForOwnerReview, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportFileWritten, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportCanClaimRcReady, false);
   assertNoForbiddenMaterial(report);
 });
 
@@ -346,6 +464,8 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
     report.evidence.p70RcCutoverOwnerApprovalReadinessSummary;
   const finalEvidencePackage =
     report.evidence.p71RcCutoverFinalEvidencePackageAggregationOutlet;
+  const artifactExport =
+    report.evidence.p72RcCutoverCandidateArtifactExport;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
@@ -459,6 +579,14 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assert.equal(finalEvidencePackage.safety.submitsApprovalRequest, false);
   assert.equal(finalEvidencePackage.safety.executesCutover, false);
   assert.equal(finalEvidencePackage.canClaimRcReady, false);
+  assertBlockedArtifactExport(
+    artifactExport,
+    'validation_aggregator_zero_gap_not_accepted'
+  );
+  assert.equal(
+    artifactExport.finalEvidencePackageAggregationOutlet.aggregationOutletAccepted,
+    false
+  );
   assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, true);
   assert.equal(report.summary.finalEvidenceAggregationRuntimeEvidenceSummaryAccepted, true);
   assert.equal(report.summary.finalEvidenceAggregationCurrentHeadBindingMatched, true);
@@ -478,6 +606,10 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletAccepted, false);
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletReadyForOwnerReview, false);
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletCanClaimRcReady, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportAccepted, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportReadyForOwnerReview, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportFileWritten, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportCanClaimRcReady, false);
   assertNoForbiddenMaterial(report);
 });
 
@@ -521,6 +653,8 @@ test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate 
     report.evidence.p70RcCutoverOwnerApprovalReadinessSummary;
   const finalEvidencePackage =
     report.evidence.p71RcCutoverFinalEvidencePackageAggregationOutlet;
+  const artifactExport =
+    report.evidence.p72RcCutoverCandidateArtifactExport;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
@@ -686,6 +820,11 @@ test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate 
   assert.equal(finalEvidencePackage.canClaimFinalRcReady, false);
   assert.equal(finalEvidencePackage.canClaimV1RcReady, false);
   assert.equal(finalEvidencePackage.canClaimRcReady, false);
+  assertAcceptedArtifactExport(artifactExport);
+  assert.equal(
+    artifactExport.finalEvidencePackageAggregationOutlet.ownerReviewReady,
+    true
+  );
   assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, true);
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
   assert.equal(report.summary.rcGatePrecheckCanClaimRcReady, false);
@@ -698,8 +837,77 @@ test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate 
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletAccepted, true);
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletReadyForOwnerReview, true);
   assert.equal(report.summary.rcCutoverFinalEvidencePackageAggregationOutletCanClaimRcReady, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportAccepted, true);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportReadyForOwnerReview, true);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportFileWritten, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactExportCanClaimRcReady, false);
   assert.equal(rcGatePrecheck.safety.readinessClaimed, false);
   assertNoForbiddenMaterial(report);
+});
+
+test('v1 RC aggregator CLI can emit only the low-disclosure RC cutover candidate artifact to stdout', async () => {
+  const sourceReport = await buildZeroGapLowDisclosureReport();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--runtime-evidence-report',
+      '-',
+      '--runtime-evidence-current-head',
+      fixtureCommit,
+      '--runtime-evidence-expected-current-head',
+      fixtureCommit,
+      '--runtime-evidence-generated-at',
+      fixtureEvidenceGeneratedAt,
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z',
+      '--rc-cutover-candidate-artifact',
+      '--pretty'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(sourceReport),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const artifact = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0, result.stderr);
+  assertAcceptedArtifactExport(artifact);
+  assert.equal(Object.hasOwn(artifact, 'phase'), false);
+  assert.equal(Object.hasOwn(artifact, 'summary'), false);
+  assert.equal(Object.hasOwn(artifact, 'evidence'), false);
+  assert.equal(artifact.export.mode, 'json_stdout_only');
+  assert.equal(artifact.export.fileWritten, false);
+  assert.equal(artifact.export.durableArtifactWritten, false);
+  assert.equal(artifact.manifest.outputPolicy, 'low_disclosure_json_stdout_only');
+  assert.equal(artifact.manifest.ownerApprovalRequiredSeparately, true);
+  assert.equal(artifact.ownerApprovalPresent, false);
+  assert.equal(artifact.ownerApprovalExecutionAllowed, false);
+  assert.equal(artifact.rcCutoverExecutionAllowed, false);
+  assert.equal(artifact.rcReady, false);
+  assert.equal(
+    artifact.finalEvidencePackageAggregationOutlet.aggregationOutletAccepted,
+    true
+  );
+  assertNoForbiddenMaterial(artifact);
+});
+
+test('RC cutover candidate artifact export helper fails closed without final package outlet', () => {
+  const artifact = buildRcCutoverCandidateArtifactExport();
+
+  assertBlockedArtifactExport(
+    artifact,
+    'final_evidence_package_aggregation_outlet_unavailable'
+  );
+  assert.deepEqual(artifact.finalEvidencePackageAggregationOutlet, {});
+  assertNoForbiddenMaterial(artifact);
 });
 
 test('runtime evidence aggregation preflight rejects unsupported artifact gap IDs fail-closed', async () => {
@@ -815,6 +1023,7 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
     pretty: true,
     strict: false,
     help: false,
+    rcCutoverCandidateArtifact: false,
     generatedAt: null,
     runtimeEvidenceReportPath: '-',
     rejectedFlag: null
@@ -835,6 +1044,7 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
       pretty: false,
       strict: false,
       help: false,
+      rcCutoverCandidateArtifact: false,
       generatedAt: null,
       runtimeEvidenceReportPath: '-',
       runtimeEvidenceCurrentHead: fixtureCommit,
@@ -842,6 +1052,12 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
       runtimeEvidenceGeneratedAt: fixtureEvidenceGeneratedAt,
       rejectedFlag: null
     }
+  );
+
+  assert.equal(
+    parseArgs(['--runtime-evidence-report', '-', '--rc-cutover-candidate-artifact'])
+      .rcCutoverCandidateArtifact,
+    true
   );
 
   const rejectedEnv = readRuntimeEvidenceReportInput('.env', { cwd: repoRoot });
