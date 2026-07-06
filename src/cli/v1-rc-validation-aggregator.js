@@ -30,6 +30,7 @@ function parseArgs(argv = []) {
     strict: false,
     help: false,
     rcCutoverCandidateArtifact: false,
+    rcCutoverOwnerApprovalBoundary: false,
     generatedAt: null,
     rejectedFlag: null
   };
@@ -50,6 +51,10 @@ function parseArgs(argv = []) {
     }
     if (token === '--rc-cutover-candidate-artifact') {
       options.rcCutoverCandidateArtifact = true;
+      continue;
+    }
+    if (token === '--rc-cutover-owner-approval-boundary') {
+      options.rcCutoverOwnerApprovalBoundary = true;
       continue;
     }
     if (token === '--generated-at') {
@@ -108,6 +113,8 @@ function buildUsageText() {
     '            Optional exact head-bound runtime summary metadata supplied separately from the low-disclosure report. Values are used for aggregator replay and are not printed in output.',
     '  --rc-cutover-candidate-artifact',
     '            Emit only the low-disclosure RC cutover pre-candidate evidence artifact JSON to stdout. No file is written and no approval is generated.',
+    '  --rc-cutover-owner-approval-boundary',
+    '            Emit only the low-disclosure owner approval boundary display JSON to stdout. Requires a candidate artifact report input for an accepted display.',
     '  --help    Show this usage text without running live checks.',
     '',
     'This minimal CLI never starts services, calls providers, applies migrations, writes memory, refreshes live MCP/HTTP evidence, or claims readiness.'
@@ -1879,6 +1886,22 @@ function buildCliReport(options = {}) {
   return redactExactRuntimeEvidenceValues(outputReport, exactHeadBoundRuntimeSummaryInput);
 }
 
+function selectCliOutput(report = {}, options = {}) {
+  if (options.rcCutoverCandidateArtifact) {
+    return (
+      report.evidence?.p72RcCutoverCandidateArtifactExport ||
+      buildRcCutoverCandidateArtifactExport()
+    );
+  }
+  if (options.rcCutoverOwnerApprovalBoundary) {
+    return (
+      report.evidence?.p75RcCutoverOwnerApprovalBoundaryPrecheck ||
+      buildRcCutoverOwnerApprovalBoundaryPrecheck()
+    );
+  }
+  return report;
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.help) {
@@ -1912,12 +1935,7 @@ function main() {
   }
 
   const report = buildCliReport(options);
-  const output = options.rcCutoverCandidateArtifact
-    ? (
-        report.evidence?.p72RcCutoverCandidateArtifactExport ||
-        buildRcCutoverCandidateArtifactExport()
-      )
-    : report;
+  const output = selectCliOutput(report, options);
   const spacing = options.pretty ? 2 : 0;
 
   process.stdout.write(`${JSON.stringify(output, null, spacing)}\n`);
@@ -1949,6 +1967,7 @@ module.exports = {
   buildRcCutoverOwnerApprovalBoundaryPrecheck,
   parseArgs,
   buildUsageText,
+  selectCliOutput,
   redactExactRuntimeEvidenceValues,
   getExitCodeForDecision,
   readRuntimeEvidenceReportInput,

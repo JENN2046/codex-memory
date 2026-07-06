@@ -1169,6 +1169,94 @@ test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin withou
   assertNoForbiddenMaterial(report);
 });
 
+test('v1 RC aggregator CLI can emit only the owner approval boundary display artifact', async () => {
+  const artifact = await buildAcceptedRcCutoverCandidateArtifact();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-candidate-artifact-report',
+      '-',
+      '--rc-cutover-owner-approval-boundary',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(artifact),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const boundary = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0, result.stderr);
+  assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
+  assert.equal(Object.hasOwn(boundary, 'phase'), false);
+  assert.equal(Object.hasOwn(boundary, 'summary'), false);
+  assert.equal(Object.hasOwn(boundary, 'evidence'), false);
+  assert.equal(boundary.requiredBoundaryFieldValuesIncluded, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalTemplateGenerated, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalLineGenerated, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalTextGenerated, false);
+  assert.equal(boundary.safety.submitsApprovalRequest, false);
+  assert.equal(boundary.safety.executesCutover, false);
+  assert.equal(boundary.safety.readinessClaimed, false);
+  assertNoForbiddenMaterial(boundary);
+});
+
+test('v1 RC aggregator owner approval boundary artifact output fails closed without P73 input', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-owner-approval-boundary',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const boundary = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(
+    boundary.schemaVersion,
+    'p75-rc-cutover-owner-approval-boundary-precheck-v1'
+  );
+  assert.equal(boundary.status, 'owner_approval_boundary_display_blocked_fail_closed');
+  assert.equal(boundary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(boundary.boundaryPrecheckAccepted, false);
+  assert.equal(boundary.ownerApprovalBoundaryDisplayReady, false);
+  assert.ok(boundary.blockerIds.includes('candidate_artifact_intake_not_accepted'));
+  assert.ok(boundary.blockerIds.includes('candidate_artifact_intake_unavailable'));
+  assert.equal(boundary.requiredBoundaryFieldValuesIncluded, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalLineGenerated, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalTextGenerated, false);
+  assert.equal(boundary.rcCutoverExecutionAllowed, false);
+  assert.equal(boundary.rcReady, false);
+  assert.equal(boundary.safety.submitsApprovalRequest, false);
+  assert.equal(boundary.safety.executesCutover, false);
+  assert.equal(boundary.safety.readinessClaimed, false);
+  assert.equal(boundary.canClaimRcReady, false);
+  assertNoForbiddenMaterial(boundary);
+});
+
 test('v1 RC aggregator CLI can pipe P72 stdout artifact into P73 intake without persistence', async () => {
   const sourceReport = await buildZeroGapLowDisclosureReport();
   const artifactResult = spawnSync(
@@ -1404,6 +1492,7 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
     strict: false,
     help: false,
     rcCutoverCandidateArtifact: false,
+    rcCutoverOwnerApprovalBoundary: false,
     generatedAt: null,
     runtimeEvidenceReportPath: '-',
     rejectedFlag: null
@@ -1425,6 +1514,7 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
       strict: false,
       help: false,
       rcCutoverCandidateArtifact: false,
+      rcCutoverOwnerApprovalBoundary: false,
       generatedAt: null,
       runtimeEvidenceReportPath: '-',
       runtimeEvidenceCurrentHead: fixtureCommit,
@@ -1443,6 +1533,11 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
     parseArgs(['--rc-cutover-candidate-artifact-report', '-'])
       .rcCutoverCandidateArtifactReportPath,
     '-'
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-owner-approval-boundary'])
+      .rcCutoverOwnerApprovalBoundary,
+    true
   );
 
   const rejectedEnv = readRuntimeEvidenceReportInput('.env', { cwd: repoRoot });
