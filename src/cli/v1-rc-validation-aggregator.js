@@ -31,6 +31,7 @@ function parseArgs(argv = []) {
     help: false,
     rcCutoverCandidateArtifact: false,
     rcCutoverOwnerApprovalBoundary: false,
+    rcCutoverFinalOwnerReviewPackage: false,
     generatedAt: null,
     rejectedFlag: null
   };
@@ -57,6 +58,10 @@ function parseArgs(argv = []) {
       options.rcCutoverOwnerApprovalBoundary = true;
       continue;
     }
+    if (token === '--rc-cutover-final-owner-review-package') {
+      options.rcCutoverFinalOwnerReviewPackage = true;
+      continue;
+    }
     if (token === '--generated-at') {
       options.generatedAt = argv[index + 1] || '';
       index += 1;
@@ -69,6 +74,11 @@ function parseArgs(argv = []) {
     }
     if (token === '--rc-cutover-candidate-artifact-report') {
       options.rcCutoverCandidateArtifactReportPath = argv[index + 1] || '';
+      index += 1;
+      continue;
+    }
+    if (token === '--rc-cutover-owner-approval-boundary-report') {
+      options.rcCutoverOwnerApprovalBoundaryReportPath = argv[index + 1] || '';
       index += 1;
       continue;
     }
@@ -107,6 +117,8 @@ function buildUsageText() {
     '            Read one explicit sanitized authenticated HTTP bounded mutation runtime evidence report from a workspace JSON file or stdin, then feed its sanitized summary into the aggregator preflight path.',
     '  --rc-cutover-candidate-artifact-report PATH|-',
     '            Read one low-disclosure RC cutover pre-candidate artifact JSON from a workspace JSON file or stdin, then validate it as owner-review input without generating approval.',
+    '  --rc-cutover-owner-approval-boundary-report PATH|-',
+    '            Read one low-disclosure owner approval boundary display JSON from a workspace JSON file or stdin, then aggregate it into a final owner-review package without generating approval.',
     '  --runtime-evidence-current-head COMMIT',
     '  --runtime-evidence-expected-current-head COMMIT',
     '  --runtime-evidence-generated-at ISO_TIMESTAMP',
@@ -115,6 +127,8 @@ function buildUsageText() {
     '            Emit only the low-disclosure RC cutover pre-candidate evidence artifact JSON to stdout. No file is written and no approval is generated.',
     '  --rc-cutover-owner-approval-boundary',
     '            Emit only the low-disclosure owner approval boundary display JSON to stdout. Requires a candidate artifact report input for an accepted display.',
+    '  --rc-cutover-final-owner-review-package',
+    '            Emit only the low-disclosure final owner-review package JSON to stdout. Requires an owner approval boundary report input for an accepted package.',
     '  --help    Show this usage text without running live checks.',
     '',
     'This minimal CLI never starts services, calls providers, applies migrations, writes memory, refreshes live MCP/HTTP evidence, or claims readiness.'
@@ -151,6 +165,15 @@ const FORBIDDEN_RC_CUTOVER_CANDIDATE_ARTIFACT_PATTERNS = Object.freeze([
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
+
+const REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS = Object.freeze([
+  'current_head_binding',
+  'remote_release_tag_deploy_action_list',
+  'config_watchdog_startup_change_scope',
+  'rollback_path',
+  'validation_commands',
+  'single_use_statement'
+]);
 
 function containsForbiddenRcCutoverCandidateArtifactMaterial(value) {
   const serialized = JSON.stringify(value);
@@ -319,6 +342,65 @@ function readRcCutoverCandidateArtifactReportInput(
   }
 }
 
+function readRcCutoverOwnerApprovalBoundaryReportInput(
+  inputPath,
+  { cwd = process.cwd() } = {}
+) {
+  if (!inputPath) {
+    return {
+      ok: false,
+      reason: 'rc_cutover_owner_approval_boundary_report_path_required',
+      value: null
+    };
+  }
+
+  if (inputPath === '-') {
+    try {
+      return {
+        ok: true,
+        reason: '',
+        value: JSON.parse(fs.readFileSync(0, 'utf8'))
+      };
+    } catch {
+      return {
+        ok: false,
+        reason: 'rc_cutover_owner_approval_boundary_report_stdin_json_invalid',
+        value: null
+      };
+    }
+  }
+
+  const resolvedPath = path.resolve(cwd, inputPath);
+  const workspaceRoot = path.resolve(cwd);
+  const relativePath = path.relative(workspaceRoot, resolvedPath);
+  if (
+    relativePath.startsWith('..') ||
+    path.isAbsolute(relativePath) ||
+    isSecretAdjacentPath(resolvedPath) ||
+    path.extname(resolvedPath).toLowerCase() !== '.json'
+  ) {
+    return {
+      ok: false,
+      reason: 'rc_cutover_owner_approval_boundary_report_path_rejected',
+      value: null
+    };
+  }
+
+  try {
+    return {
+      ok: true,
+      reason: '',
+      value: JSON.parse(fs.readFileSync(resolvedPath, 'utf8'))
+    };
+  } catch {
+    return {
+      ok: false,
+      reason: 'rc_cutover_owner_approval_boundary_report_file_json_invalid',
+      value: null
+    };
+  }
+}
+
 function buildRuntimeEvidenceReportLoadError(loadErrorReason, options = {}) {
   const report = buildV1RcValidationAggregatorReport({
     generatedAt: options.generatedAt || undefined
@@ -399,6 +481,57 @@ function buildRcCutoverCandidateArtifactReportLoadError(loadErrorReason, options
       'RC cutover candidate artifact input was rejected before intake; no raw input or path was disclosed.'
     ],
     nextStep: 'Provide a workspace JSON P72 candidate artifact or pipe it on stdin with --rc-cutover-candidate-artifact-report -.'
+  };
+}
+
+function buildRcCutoverOwnerApprovalBoundaryReportLoadError(
+  loadErrorReason,
+  options = {}
+) {
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: options.generatedAt || undefined
+  });
+
+  return {
+    ...report,
+    phase: 'P77-rc-cutover-owner-approval-boundary-input-rejected',
+    rcCutoverOwnerApprovalBoundaryReportInput: {
+      provided: true,
+      accepted: false,
+      rejected: true,
+      rejectReason: loadErrorReason,
+      pathDisclosed: false,
+      rawInputPrinted: false
+    },
+    evidence: {
+      ...report.evidence,
+      p77RcCutoverFinalOwnerReviewPackageAggregation: {
+        status: 'final_owner_review_package_blocked_fail_closed',
+        decision: 'NOT_READY_BLOCKED',
+        ownerApprovalBoundaryInputProvided: false,
+        finalOwnerReviewPackageAccepted: false,
+        rejectReason: loadErrorReason,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false,
+        canClaimRcReady: false
+      }
+    },
+    summary: {
+      ...report.summary,
+      rcCutoverOwnerApprovalBoundaryReportInputProvided: true,
+      rcCutoverOwnerApprovalBoundaryReportInputAccepted: false,
+      rcCutoverFinalOwnerReviewPackageAccepted: false,
+      rcCutoverFinalOwnerReviewPackageReadyForOwnerReview: false,
+      rcCutoverFinalOwnerReviewPackageApprovalGenerated: false,
+      rcCutoverFinalOwnerReviewPackageExecutesCutover: false,
+      rcCutoverFinalOwnerReviewPackageCanClaimRcReady: false
+    },
+    warnings: [
+      ...report.warnings,
+      'RC cutover owner approval boundary input was rejected before final owner-review package aggregation; no raw input or path was disclosed.'
+    ],
+    nextStep: 'Provide a workspace JSON P75 owner approval boundary display or pipe it on stdin with --rc-cutover-owner-approval-boundary-report -.'
   };
 }
 
@@ -1629,6 +1762,249 @@ function buildRcCutoverOwnerApprovalBoundaryPrecheck({
   };
 }
 
+function collectRcCutoverFinalOwnerReviewPackageBlockers(boundary = {}) {
+  const blockers = [];
+  const fields = Array.isArray(boundary.requiredBoundaryFields)
+    ? boundary.requiredBoundaryFields
+    : [];
+  const fieldIds = fields.map(field => (
+    typeof field?.id === 'string' ? field.id : ''
+  ));
+  const generated = isPlainObject(boundary.generatedApprovalMaterial)
+    ? boundary.generatedApprovalMaterial
+    : {};
+  const disclosure = isPlainObject(boundary.disclosure)
+    ? boundary.disclosure
+    : {};
+  const safety = isPlainObject(boundary.safety) ? boundary.safety : {};
+
+  if (!isPlainObject(boundary)) blockers.push('owner_approval_boundary_shape_invalid');
+  if (boundary.schemaVersion !== 'p75-rc-cutover-owner-approval-boundary-precheck-v1') {
+    blockers.push('owner_approval_boundary_schema_version_mismatch');
+  }
+  if (boundary.boundaryType !== 'rc_cutover_owner_approval_boundary_precheck_display') {
+    blockers.push('owner_approval_boundary_type_mismatch');
+  }
+  if (boundary.decision !== 'NOT_READY_BLOCKED') {
+    blockers.push('owner_approval_boundary_decision_mismatch');
+  }
+  if (boundary.status !== 'owner_approval_boundary_display_ready_not_authorization') {
+    blockers.push('owner_approval_boundary_status_not_ready_for_review');
+  }
+  if (boundary.boundaryPrecheckAccepted !== true) {
+    blockers.push('owner_approval_boundary_not_accepted');
+  }
+  if (boundary.ownerApprovalBoundaryDisplayReady !== true) {
+    blockers.push('owner_approval_boundary_display_not_ready');
+  }
+  if (boundary.ownerReviewInputAccepted !== true) {
+    blockers.push('owner_review_input_not_accepted');
+  }
+  if (boundary.ownerReviewInputReady !== true) {
+    blockers.push('owner_review_input_not_ready');
+  }
+  if (boundary.requiredBoundaryFieldValuesIncluded !== false) {
+    blockers.push('owner_approval_boundary_field_values_included');
+  }
+  if (boundary.requiredBoundaryRawValuesOutput !== false) {
+    blockers.push('owner_approval_boundary_raw_values_output');
+  }
+  if (boundary.requiredBoundaryRawValuesPersisted !== false) {
+    blockers.push('owner_approval_boundary_raw_values_persisted');
+  }
+
+  for (const requiredId of REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS) {
+    if (!fieldIds.includes(requiredId)) {
+      blockers.push(`owner_approval_boundary_missing_${requiredId}`);
+    }
+  }
+  if (new Set(fieldIds).size !== fieldIds.length) {
+    blockers.push('owner_approval_boundary_duplicate_fields');
+  }
+  if (fields.length !== REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.length) {
+    blockers.push('owner_approval_boundary_field_count_mismatch');
+  }
+  for (const field of fields) {
+    const fieldId = typeof field?.id === 'string' ? field.id : 'unknown';
+    if (!REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.includes(fieldId)) {
+      blockers.push('owner_approval_boundary_unknown_field');
+    }
+    if (field?.valueIncluded !== false || field?.rawValueOutput !== false) {
+      blockers.push(`owner_approval_boundary_field_value_disclosure_${fieldId}`);
+    }
+  }
+
+  if (
+    generated.approvalLineGenerated === true ||
+    generated.approvalTextGenerated === true ||
+    generated.approvalTemplateGenerated === true ||
+    generated.approvalRequestSubmitted === true ||
+    generated.ownerApprovalAccepted === true ||
+    generated.executionAuthorizationIncluded === true ||
+    boundary.approvalRequestSubmitted === true ||
+    boundary.approvalLineGenerated === true ||
+    boundary.approvalTextGenerated === true ||
+    boundary.ownerApprovalPresent === true ||
+    boundary.ownerApprovalAccepted === true ||
+    boundary.ownerApprovalExecutionAllowed === true ||
+    boundary.rcCutoverApproved === true ||
+    boundary.rcCutoverExecuted === true ||
+    boundary.rcCutoverExecutionAllowed === true ||
+    boundary.rcReady === true ||
+    boundary.canClaimRuntimeReady === true ||
+    boundary.canClaimFinalRcReady === true ||
+    boundary.canClaimV1RcReady === true ||
+    boundary.canClaimRcReady === true
+  ) {
+    blockers.push('owner_approval_boundary_authorization_execution_or_readiness_claim_present');
+  }
+
+  for (const [key, value] of Object.entries(disclosure)) {
+    if (key !== 'lowDisclosure' && value === true) {
+      blockers.push(`owner_approval_boundary_disclosure_${key}`);
+    }
+  }
+  if (disclosure.lowDisclosure !== true) {
+    blockers.push('owner_approval_boundary_not_low_disclosure');
+  }
+
+  for (const [key, value] of Object.entries(safety)) {
+    if (key !== 'readsCandidateArtifactIntakeOnly' && value === true) {
+      blockers.push(`owner_approval_boundary_safety_${key}`);
+    }
+  }
+  if (Array.isArray(boundary.blockerIds) && boundary.blockerIds.length > 0) {
+    blockers.push('owner_approval_boundary_blockers_present');
+  }
+  if (containsForbiddenRcCutoverCandidateArtifactMaterial(boundary)) {
+    blockers.push('owner_approval_boundary_contains_forbidden_material');
+  }
+
+  return [...new Set(blockers)].sort();
+}
+
+function buildRcCutoverFinalOwnerReviewPackageAggregation({
+  rcCutoverOwnerApprovalBoundaryPrecheck = null
+} = {}) {
+  const boundary = isPlainObject(rcCutoverOwnerApprovalBoundaryPrecheck)
+    ? rcCutoverOwnerApprovalBoundaryPrecheck
+    : {};
+  const fields = Array.isArray(boundary.requiredBoundaryFields)
+    ? boundary.requiredBoundaryFields
+    : [];
+  const blockerIds = collectRcCutoverFinalOwnerReviewPackageBlockers(boundary);
+  const accepted = blockerIds.length === 0;
+  const safeFields = fields
+    .filter(field => REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.includes(field?.id))
+    .map(field => ({
+      id: field.id,
+      category: typeof field.category === 'string' ? field.category : '',
+      requiredFor: typeof field.requiredFor === 'string' ? field.requiredFor : '',
+      valueIncluded: false,
+      rawValueOutput: false
+    }));
+
+  return {
+    schemaVersion: 'p77-rc-cutover-final-owner-review-package-aggregation-v1',
+    packageType: 'rc_cutover_final_owner_review_package_aggregation',
+    sourceMode: 'p75_rc_cutover_owner_approval_boundary_precheck',
+    status: accepted
+      ? 'final_owner_review_package_ready_not_authorization'
+      : 'final_owner_review_package_blocked_fail_closed',
+    decision: 'NOT_READY_BLOCKED',
+    ownerApprovalBoundaryInputProvided:
+      isPlainObject(rcCutoverOwnerApprovalBoundaryPrecheck),
+    finalOwnerReviewPackageAccepted: accepted,
+    readyForExactOwnerReview: accepted,
+    approvalRequestOnly: true,
+    approvalRequestSubmitted: false,
+    approvalLineGenerated: false,
+    approvalTextGenerated: false,
+    approvalTemplateGenerated: false,
+    ownerApprovalPresent: false,
+    ownerApprovalAccepted: false,
+    ownerApprovalExecutionAllowed: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    packageContents: {
+      lowDisclosure: true,
+      boundaryDisplayIncluded: true,
+      boundaryFieldCount: safeFields.length,
+      boundaryFieldValuesIncluded: false,
+      approvalMaterialIncluded: false,
+      executionAuthorizationIncluded: false,
+      ownerApprovalIncluded: false,
+      readinessClaimIncluded: false
+    },
+    requiredBoundaryFields: safeFields,
+    sourceSummary: {
+      boundarySchemaVersion:
+        typeof boundary.schemaVersion === 'string' ? boundary.schemaVersion : '',
+      boundaryStatus: typeof boundary.status === 'string' ? boundary.status : '',
+      boundaryPrecheckAccepted: boundary.boundaryPrecheckAccepted === true,
+      ownerApprovalBoundaryDisplayReady:
+        boundary.ownerApprovalBoundaryDisplayReady === true,
+      boundaryFieldCount: Number.isFinite(boundary.boundaryFieldCount)
+        ? boundary.boundaryFieldCount
+        : 0,
+      sourceBlockerCount: Array.isArray(boundary.blockerIds)
+        ? boundary.blockerIds.length
+        : 0
+    },
+    blockerIds,
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      requiredOwnerApprovalFieldValuesOutput: false,
+      approvalTextOutput: false,
+      approvalLineOutput: false,
+      approvalTemplateOutput: false,
+      endpointOrLocatorOutput: false,
+      requestBodyOutput: false,
+      rawResponseOutput: false,
+      rawErrorOutput: false,
+      secretOutput: false,
+      privateMemoryContentOutput: false,
+      artifactPathOutput: false,
+      rawInputPrinted: false
+    },
+    safety: {
+      readsOwnerApprovalBoundaryInputOnly: true,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      writesArtifactFile: false,
+      mutatesConfig: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      pushes: false,
+      tags: false,
+      releases: false,
+      deploys: false,
+      submitsApprovalRequest: false,
+      executesCutover: false,
+      readinessClaimed: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: accepted
+      ? 'Use this package as an auditable final owner-review candidate only; separate exact owner approval and execution boundary remain required.'
+      : 'Repair the owner approval boundary display input before using it as a final owner-review package.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -1643,6 +2019,12 @@ function buildCliReport(options = {}) {
   if (options.rcCutoverCandidateArtifactReportLoadError) {
     return buildRcCutoverCandidateArtifactReportLoadError(
       options.rcCutoverCandidateArtifactReportLoadError,
+      options
+    );
+  }
+  if (options.rcCutoverOwnerApprovalBoundaryReportLoadError) {
+    return buildRcCutoverOwnerApprovalBoundaryReportLoadError(
+      options.rcCutoverOwnerApprovalBoundaryReportLoadError,
       options
     );
   }
@@ -1715,10 +2097,19 @@ function buildCliReport(options = {}) {
           rcCutoverCandidateArtifactIntakePrecheck
         })
       : null;
+  const rcCutoverFinalOwnerReviewPackageAggregation =
+    options.rcCutoverOwnerApprovalBoundaryReport
+      ? buildRcCutoverFinalOwnerReviewPackageAggregation({
+          rcCutoverOwnerApprovalBoundaryPrecheck:
+            options.rcCutoverOwnerApprovalBoundaryReport
+        })
+      : null;
 
   const outputReport = {
     ...report,
-    phase: rcCutoverCandidateArtifactIntakePrecheck
+    phase: rcCutoverFinalOwnerReviewPackageAggregation
+      ? 'P77-rc-cutover-final-owner-review-package-aggregation'
+      : rcCutoverCandidateArtifactIntakePrecheck
       ? 'P73-rc-cutover-candidate-artifact-intake-precheck'
       : runtimeEvidencePreflight
       ? 'P67-runtime-evidence-standard-input-preflight'
@@ -1742,6 +2133,21 @@ function buildCliReport(options = {}) {
               rcCutoverCandidateArtifactIntakePrecheck.inputAccepted === true,
             rejected:
               rcCutoverCandidateArtifactIntakePrecheck.inputAccepted !== true,
+            pathDisclosed: false,
+            rawInputPrinted: false
+          }
+        }
+      : {}),
+    ...(rcCutoverFinalOwnerReviewPackageAggregation
+      ? {
+          rcCutoverOwnerApprovalBoundaryReportInput: {
+            provided: true,
+            accepted:
+              rcCutoverFinalOwnerReviewPackageAggregation
+                .finalOwnerReviewPackageAccepted === true,
+            rejected:
+              rcCutoverFinalOwnerReviewPackageAggregation
+                .finalOwnerReviewPackageAccepted !== true,
             pathDisclosed: false,
             rawInputPrinted: false
           }
@@ -1778,6 +2184,12 @@ function buildCliReport(options = {}) {
               rcCutoverCandidateArtifactIntakePrecheck,
             p75RcCutoverOwnerApprovalBoundaryPrecheck:
               rcCutoverOwnerApprovalBoundaryPrecheck
+          }
+        : {}),
+      ...(rcCutoverFinalOwnerReviewPackageAggregation
+        ? {
+            p77RcCutoverFinalOwnerReviewPackageAggregation:
+              rcCutoverFinalOwnerReviewPackageAggregation
           }
         : {})
     },
@@ -1867,6 +2279,26 @@ function buildCliReport(options = {}) {
             rcCutoverOwnerApprovalBoundaryExecutesCutover: false,
             rcCutoverOwnerApprovalBoundaryCanClaimRcReady: false
           }
+        : {}),
+      ...(rcCutoverFinalOwnerReviewPackageAggregation
+        ? {
+            rcCutoverOwnerApprovalBoundaryReportInputProvided: true,
+            rcCutoverOwnerApprovalBoundaryReportInputAccepted:
+              rcCutoverFinalOwnerReviewPackageAggregation
+                .finalOwnerReviewPackageAccepted === true,
+            rcCutoverFinalOwnerReviewPackageAccepted:
+              rcCutoverFinalOwnerReviewPackageAggregation
+                .finalOwnerReviewPackageAccepted === true,
+            rcCutoverFinalOwnerReviewPackageReadyForOwnerReview:
+              rcCutoverFinalOwnerReviewPackageAggregation
+                .readyForExactOwnerReview === true,
+            rcCutoverFinalOwnerReviewPackageFieldCount:
+              rcCutoverFinalOwnerReviewPackageAggregation
+                .packageContents?.boundaryFieldCount || 0,
+            rcCutoverFinalOwnerReviewPackageApprovalGenerated: false,
+            rcCutoverFinalOwnerReviewPackageExecutesCutover: false,
+            rcCutoverFinalOwnerReviewPackageCanClaimRcReady: false
+          }
         : {})
     },
     recommendations: [
@@ -1879,7 +2311,10 @@ function buildCliReport(options = {}) {
         : 'Plan full matrix aggregation separately from this minimal CLI wrapper.',
       rcCutoverCandidateArtifactIntakePrecheck
         ? 'Use the candidate artifact intake as owner-review input only; do not treat it as approval or RC readiness.'
-        : 'Add candidate artifact intake only when a P72 low-disclosure artifact is supplied explicitly.'
+        : 'Add candidate artifact intake only when a P72 low-disclosure artifact is supplied explicitly.',
+      rcCutoverFinalOwnerReviewPackageAggregation
+        ? 'Use the final owner-review package as review input only; do not treat it as approval, cutover authorization, or RC readiness.'
+        : 'Add final owner-review package aggregation only when a P75 owner approval boundary display is supplied explicitly.'
     ]
   };
 
@@ -1897,6 +2332,12 @@ function selectCliOutput(report = {}, options = {}) {
     return (
       report.evidence?.p75RcCutoverOwnerApprovalBoundaryPrecheck ||
       buildRcCutoverOwnerApprovalBoundaryPrecheck()
+    );
+  }
+  if (options.rcCutoverFinalOwnerReviewPackage) {
+    return (
+      report.evidence?.p77RcCutoverFinalOwnerReviewPackageAggregation ||
+      buildRcCutoverFinalOwnerReviewPackageAggregation()
     );
   }
   return report;
@@ -1933,6 +2374,19 @@ function main() {
         rcCutoverCandidateArtifactReport.reason;
     }
   }
+  if (options.rcCutoverOwnerApprovalBoundaryReportPath) {
+    const rcCutoverOwnerApprovalBoundaryReport =
+      readRcCutoverOwnerApprovalBoundaryReportInput(
+        options.rcCutoverOwnerApprovalBoundaryReportPath
+      );
+    if (rcCutoverOwnerApprovalBoundaryReport.ok) {
+      options.rcCutoverOwnerApprovalBoundaryReport =
+        rcCutoverOwnerApprovalBoundaryReport.value;
+    } else {
+      options.rcCutoverOwnerApprovalBoundaryReportLoadError =
+        rcCutoverOwnerApprovalBoundaryReport.reason;
+    }
+  }
 
   const report = buildCliReport(options);
   const output = selectCliOutput(report, options);
@@ -1944,7 +2398,8 @@ function main() {
     rejected: Boolean(
       options.rejectedFlag ||
       options.runtimeEvidenceReportLoadError ||
-      options.rcCutoverCandidateArtifactReportLoadError
+      options.rcCutoverCandidateArtifactReportLoadError ||
+      options.rcCutoverOwnerApprovalBoundaryReportLoadError
     )
   });
 }
@@ -1965,6 +2420,7 @@ module.exports = {
   buildRcCutoverCandidateArtifactExport,
   buildRcCutoverCandidateArtifactIntakePrecheck,
   buildRcCutoverOwnerApprovalBoundaryPrecheck,
+  buildRcCutoverFinalOwnerReviewPackageAggregation,
   parseArgs,
   buildUsageText,
   selectCliOutput,
@@ -1972,6 +2428,7 @@ module.exports = {
   getExitCodeForDecision,
   readRuntimeEvidenceReportInput,
   readRcCutoverCandidateArtifactReportInput,
+  readRcCutoverOwnerApprovalBoundaryReportInput,
   buildCliReport,
   buildRejectedReport
 };

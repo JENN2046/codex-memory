@@ -455,6 +455,7 @@ test('minimal validation aggregator CLI parses strict and help flags without imp
     help: false,
     rcCutoverCandidateArtifact: false,
     rcCutoverOwnerApprovalBoundary: false,
+    rcCutoverFinalOwnerReviewPackage: false,
     generatedAt: null,
     rejectedFlag: null
   });
@@ -463,6 +464,16 @@ test('minimal validation aggregator CLI parses strict and help flags without imp
   assert.equal(
     parseArgs(['--rc-cutover-owner-approval-boundary'])
       .rcCutoverOwnerApprovalBoundary,
+    true
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-owner-approval-boundary-report', '-'])
+      .rcCutoverOwnerApprovalBoundaryReportPath,
+    '-'
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-final-owner-review-package'])
+      .rcCutoverFinalOwnerReviewPackage,
     true
   );
   assert.equal(

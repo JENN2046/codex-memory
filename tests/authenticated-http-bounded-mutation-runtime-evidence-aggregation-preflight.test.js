@@ -20,9 +20,11 @@ const {
   buildCliReport,
   buildRcCutoverCandidateArtifactExport,
   buildRcCutoverCandidateArtifactIntakePrecheck,
+  buildRcCutoverFinalOwnerReviewPackageAggregation,
   buildRcCutoverOwnerApprovalBoundaryPrecheck,
   parseArgs,
   readRcCutoverCandidateArtifactReportInput,
+  readRcCutoverOwnerApprovalBoundaryReportInput,
   readRuntimeEvidenceReportInput
 } = require('../src/cli/v1-rc-validation-aggregator');
 
@@ -94,6 +96,17 @@ async function buildAcceptedRcCutoverCandidateArtifact() {
   });
 
   return report.evidence.p72RcCutoverCandidateArtifactExport;
+}
+
+async function buildAcceptedRcCutoverOwnerApprovalBoundary() {
+  const artifact = await buildAcceptedRcCutoverCandidateArtifact();
+  const intake = buildRcCutoverCandidateArtifactIntakePrecheck({
+    rcCutoverCandidateArtifactExport: artifact
+  });
+
+  return buildRcCutoverOwnerApprovalBoundaryPrecheck({
+    rcCutoverCandidateArtifactIntakePrecheck: intake
+  });
 }
 
 function assertArtifactExportNeverExecutes(artifact) {
@@ -356,6 +369,98 @@ function assertAcceptedOwnerApprovalBoundaryPrecheck(boundary) {
   assert.equal(boundary.canClaimFinalRcReady, false);
   assert.equal(boundary.canClaimV1RcReady, false);
   assert.equal(boundary.canClaimRcReady, false);
+}
+
+function assertAcceptedFinalOwnerReviewPackage(pkg) {
+  assert.equal(
+    pkg.schemaVersion,
+    'p77-rc-cutover-final-owner-review-package-aggregation-v1'
+  );
+  assert.equal(
+    pkg.packageType,
+    'rc_cutover_final_owner_review_package_aggregation'
+  );
+  assert.equal(pkg.sourceMode, 'p75_rc_cutover_owner_approval_boundary_precheck');
+  assert.equal(pkg.status, 'final_owner_review_package_ready_not_authorization');
+  assert.equal(pkg.decision, 'NOT_READY_BLOCKED');
+  assert.equal(pkg.ownerApprovalBoundaryInputProvided, true);
+  assert.equal(pkg.finalOwnerReviewPackageAccepted, true);
+  assert.equal(pkg.readyForExactOwnerReview, true);
+  assert.equal(pkg.approvalRequestOnly, true);
+  assert.equal(pkg.approvalRequestSubmitted, false);
+  assert.equal(pkg.approvalLineGenerated, false);
+  assert.equal(pkg.approvalTextGenerated, false);
+  assert.equal(pkg.approvalTemplateGenerated, false);
+  assert.equal(pkg.ownerApprovalPresent, false);
+  assert.equal(pkg.ownerApprovalAccepted, false);
+  assert.equal(pkg.ownerApprovalExecutionAllowed, false);
+  assert.equal(pkg.rcCutoverApproved, false);
+  assert.equal(pkg.rcCutoverExecuted, false);
+  assert.equal(pkg.rcCutoverExecutionAllowed, false);
+  assert.equal(pkg.rcReady, false);
+  assert.equal(pkg.packageContents.lowDisclosure, true);
+  assert.equal(pkg.packageContents.boundaryDisplayIncluded, true);
+  assert.equal(pkg.packageContents.boundaryFieldCount, 6);
+  assert.equal(pkg.packageContents.boundaryFieldValuesIncluded, false);
+  assert.equal(pkg.packageContents.approvalMaterialIncluded, false);
+  assert.equal(pkg.packageContents.executionAuthorizationIncluded, false);
+  assert.equal(pkg.packageContents.ownerApprovalIncluded, false);
+  assert.equal(pkg.packageContents.readinessClaimIncluded, false);
+  assert.deepEqual(
+    pkg.requiredBoundaryFields.map(field => field.id),
+    [
+      'current_head_binding',
+      'remote_release_tag_deploy_action_list',
+      'config_watchdog_startup_change_scope',
+      'rollback_path',
+      'validation_commands',
+      'single_use_statement'
+    ]
+  );
+  assert.equal(
+    pkg.requiredBoundaryFields.every(field => field.valueIncluded === false),
+    true
+  );
+  assert.equal(
+    pkg.requiredBoundaryFields.every(field => field.rawValueOutput === false),
+    true
+  );
+  assert.equal(
+    pkg.sourceSummary.boundarySchemaVersion,
+    'p75-rc-cutover-owner-approval-boundary-precheck-v1'
+  );
+  assert.equal(pkg.sourceSummary.boundaryPrecheckAccepted, true);
+  assert.equal(pkg.sourceSummary.ownerApprovalBoundaryDisplayReady, true);
+  assert.equal(pkg.sourceSummary.boundaryFieldCount, 6);
+  assert.equal(pkg.sourceSummary.sourceBlockerCount, 0);
+  assert.deepEqual(pkg.blockerIds, []);
+  assert.equal(pkg.disclosure.lowDisclosure, true);
+  assert.equal(pkg.disclosure.rawCurrentHeadCommitOutput, false);
+  assert.equal(pkg.disclosure.rawEvidenceGeneratedAtOutput, false);
+  assert.equal(pkg.disclosure.requiredOwnerApprovalFieldValuesOutput, false);
+  assert.equal(pkg.disclosure.approvalTextOutput, false);
+  assert.equal(pkg.disclosure.approvalLineOutput, false);
+  assert.equal(pkg.disclosure.approvalTemplateOutput, false);
+  assert.equal(pkg.disclosure.endpointOrLocatorOutput, false);
+  assert.equal(pkg.disclosure.rawResponseOutput, false);
+  assert.equal(pkg.disclosure.secretOutput, false);
+  assert.equal(pkg.disclosure.artifactPathOutput, false);
+  assert.equal(pkg.disclosure.rawInputPrinted, false);
+  assert.equal(pkg.safety.readsOwnerApprovalBoundaryInputOnly, true);
+  assert.equal(pkg.safety.executesCommands, false);
+  assert.equal(pkg.safety.callsProviders, false);
+  assert.equal(pkg.safety.callsMcpTools, false);
+  assert.equal(pkg.safety.readsRealMemory, false);
+  assert.equal(pkg.safety.writesDurableState, false);
+  assert.equal(pkg.safety.writesArtifactFile, false);
+  assert.equal(pkg.safety.remoteWrites, false);
+  assert.equal(pkg.safety.submitsApprovalRequest, false);
+  assert.equal(pkg.safety.executesCutover, false);
+  assert.equal(pkg.safety.readinessClaimed, false);
+  assert.equal(pkg.canClaimRuntimeReady, false);
+  assert.equal(pkg.canClaimFinalRcReady, false);
+  assert.equal(pkg.canClaimV1RcReady, false);
+  assert.equal(pkg.canClaimRcReady, false);
 }
 
 test('runtime evidence aggregation preflight accepts standard low-disclosure source but keeps aggregator replay blocked', async () => {
@@ -1257,6 +1362,190 @@ test('v1 RC aggregator owner approval boundary artifact output fails closed with
   assertNoForbiddenMaterial(boundary);
 });
 
+test('RC cutover final owner-review package aggregation accepts P75 boundary without authorization', async () => {
+  const boundary = await buildAcceptedRcCutoverOwnerApprovalBoundary();
+  const pkg = buildRcCutoverFinalOwnerReviewPackageAggregation({
+    rcCutoverOwnerApprovalBoundaryPrecheck: boundary
+  });
+
+  assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
+  assertAcceptedFinalOwnerReviewPackage(pkg);
+  assertNoForbiddenMaterial(pkg);
+});
+
+test('v1 RC aggregator CLI can intake a P75 owner approval boundary from stdin', async () => {
+  const boundary = await buildAcceptedRcCutoverOwnerApprovalBoundary();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-owner-approval-boundary-report',
+      '-',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(boundary),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const report = JSON.parse(result.stdout);
+  const pkg = report.evidence.p77RcCutoverFinalOwnerReviewPackageAggregation;
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(report.phase, 'P77-rc-cutover-final-owner-review-package-aggregation');
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.provided, true);
+  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.accepted, true);
+  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.rejected, false);
+  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.pathDisclosed, false);
+  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.rawInputPrinted, false);
+  assertAcceptedFinalOwnerReviewPackage(pkg);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryReportInputProvided, true);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryReportInputAccepted, true);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageAccepted, true);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReadyForOwnerReview, true);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageFieldCount, 6);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageApprovalGenerated, false);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageExecutesCutover, false);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageCanClaimRcReady, false);
+  assert.equal(Object.hasOwn(report.evidence, 'p75RcCutoverOwnerApprovalBoundaryPrecheck'), false);
+  assertNoForbiddenMaterial(report);
+});
+
+test('v1 RC aggregator CLI can emit only the final owner-review package artifact', async () => {
+  const boundary = await buildAcceptedRcCutoverOwnerApprovalBoundary();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-owner-approval-boundary-report',
+      '-',
+      '--rc-cutover-final-owner-review-package',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(boundary),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const pkg = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0, result.stderr);
+  assertAcceptedFinalOwnerReviewPackage(pkg);
+  assert.equal(Object.hasOwn(pkg, 'phase'), false);
+  assert.equal(Object.hasOwn(pkg, 'summary'), false);
+  assert.equal(Object.hasOwn(pkg, 'evidence'), false);
+  assert.equal(pkg.packageContents.boundaryFieldValuesIncluded, false);
+  assert.equal(pkg.packageContents.approvalMaterialIncluded, false);
+  assert.equal(pkg.approvalLineGenerated, false);
+  assert.equal(pkg.approvalTextGenerated, false);
+  assert.equal(pkg.approvalTemplateGenerated, false);
+  assert.equal(pkg.safety.submitsApprovalRequest, false);
+  assert.equal(pkg.safety.executesCutover, false);
+  assert.equal(pkg.safety.readinessClaimed, false);
+  assertNoForbiddenMaterial(pkg);
+});
+
+test('RC cutover final owner-review package aggregation fails closed on boundary drift', async () => {
+  const boundary = await buildAcceptedRcCutoverOwnerApprovalBoundary();
+  boundary.requiredBoundaryFields[0].valueIncluded = true;
+  boundary.generatedApprovalMaterial.approvalLineGenerated = true;
+  boundary.rcCutoverExecutionAllowed = true;
+  boundary.safety.readinessClaimed = true;
+  const pkg = buildRcCutoverFinalOwnerReviewPackageAggregation({
+    rcCutoverOwnerApprovalBoundaryPrecheck: boundary
+  });
+
+  assert.equal(pkg.status, 'final_owner_review_package_blocked_fail_closed');
+  assert.equal(pkg.decision, 'NOT_READY_BLOCKED');
+  assert.equal(pkg.finalOwnerReviewPackageAccepted, false);
+  assert.equal(pkg.readyForExactOwnerReview, false);
+  assert.ok(
+    pkg.blockerIds.includes(
+      'owner_approval_boundary_field_value_disclosure_current_head_binding'
+    )
+  );
+  assert.ok(
+    pkg.blockerIds.includes(
+      'owner_approval_boundary_authorization_execution_or_readiness_claim_present'
+    )
+  );
+  assert.ok(
+    pkg.blockerIds.includes('owner_approval_boundary_safety_readinessClaimed')
+  );
+  assert.equal(pkg.approvalLineGenerated, false);
+  assert.equal(pkg.approvalTextGenerated, false);
+  assert.equal(pkg.rcCutoverExecutionAllowed, false);
+  assert.equal(pkg.rcReady, false);
+  assert.equal(pkg.canClaimRcReady, false);
+  assertNoForbiddenMaterial(pkg);
+});
+
+test('v1 RC aggregator final owner-review package output fails closed without P75 input', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-final-owner-review-package',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const pkg = JSON.parse(result.stdout);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(
+    pkg.schemaVersion,
+    'p77-rc-cutover-final-owner-review-package-aggregation-v1'
+  );
+  assert.equal(pkg.status, 'final_owner_review_package_blocked_fail_closed');
+  assert.equal(pkg.decision, 'NOT_READY_BLOCKED');
+  assert.equal(pkg.ownerApprovalBoundaryInputProvided, false);
+  assert.equal(pkg.finalOwnerReviewPackageAccepted, false);
+  assert.equal(pkg.readyForExactOwnerReview, false);
+  assert.ok(pkg.blockerIds.includes('owner_approval_boundary_schema_version_mismatch'));
+  assert.ok(pkg.blockerIds.includes('owner_approval_boundary_not_accepted'));
+  assert.equal(pkg.packageContents.boundaryFieldValuesIncluded, false);
+  assert.equal(pkg.approvalLineGenerated, false);
+  assert.equal(pkg.approvalTextGenerated, false);
+  assert.equal(pkg.rcCutoverExecutionAllowed, false);
+  assert.equal(pkg.rcReady, false);
+  assert.equal(pkg.safety.submitsApprovalRequest, false);
+  assert.equal(pkg.safety.executesCutover, false);
+  assert.equal(pkg.safety.readinessClaimed, false);
+  assert.equal(pkg.canClaimRcReady, false);
+  assertNoForbiddenMaterial(pkg);
+});
+
 test('v1 RC aggregator CLI can pipe P72 stdout artifact into P73 intake without persistence', async () => {
   const sourceReport = await buildZeroGapLowDisclosureReport();
   const artifactResult = spawnSync(
@@ -1493,6 +1782,7 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
     help: false,
     rcCutoverCandidateArtifact: false,
     rcCutoverOwnerApprovalBoundary: false,
+    rcCutoverFinalOwnerReviewPackage: false,
     generatedAt: null,
     runtimeEvidenceReportPath: '-',
     rejectedFlag: null
@@ -1515,6 +1805,7 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
       help: false,
       rcCutoverCandidateArtifact: false,
       rcCutoverOwnerApprovalBoundary: false,
+      rcCutoverFinalOwnerReviewPackage: false,
       generatedAt: null,
       runtimeEvidenceReportPath: '-',
       runtimeEvidenceCurrentHead: fixtureCommit,
@@ -1537,6 +1828,16 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
   assert.equal(
     parseArgs(['--rc-cutover-owner-approval-boundary'])
       .rcCutoverOwnerApprovalBoundary,
+    true
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-owner-approval-boundary-report', '-'])
+      .rcCutoverOwnerApprovalBoundaryReportPath,
+    '-'
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-final-owner-review-package'])
+      .rcCutoverFinalOwnerReviewPackage,
     true
   );
 
@@ -1567,5 +1868,24 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
   assert.equal(
     rejectedArtifactSecret.reason,
     'rc_cutover_candidate_artifact_report_path_rejected'
+  );
+
+  const rejectedBoundaryEnv = readRcCutoverOwnerApprovalBoundaryReportInput('.env', {
+    cwd: repoRoot
+  });
+  assert.equal(rejectedBoundaryEnv.ok, false);
+  assert.equal(
+    rejectedBoundaryEnv.reason,
+    'rc_cutover_owner_approval_boundary_report_path_rejected'
+  );
+
+  const rejectedBoundarySecret = readRcCutoverOwnerApprovalBoundaryReportInput(
+    'tmp/secret-boundary.json',
+    { cwd: repoRoot }
+  );
+  assert.equal(rejectedBoundarySecret.ok, false);
+  assert.equal(
+    rejectedBoundarySecret.reason,
+    'rc_cutover_owner_approval_boundary_report_path_rejected'
   );
 });
