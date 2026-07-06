@@ -43,6 +43,57 @@ function normalizeNumber(value) {
   return Number.isFinite(value) ? value : 0;
 }
 
+function normalizeCommit(value) {
+  const normalized = normalizeString(value).toLowerCase();
+  return /^[a-f0-9]{7,40}$/.test(normalized) ? normalized : '';
+}
+
+function normalizeExactHeadBoundRuntimeSummaryInput(input = {}) {
+  const safeInput = isPlainObject(input) ? input : {};
+  const currentHeadCommit = normalizeCommit(safeInput.currentHeadCommit);
+  const expectedCurrentHeadCommit = normalizeCommit(safeInput.expectedCurrentHeadCommit);
+  const rawCurrentHeadCommit = normalizeString(safeInput.currentHeadCommit);
+  const rawExpectedCurrentHeadCommit = normalizeString(safeInput.expectedCurrentHeadCommit);
+  const evidenceGeneratedAt = normalizeString(safeInput.evidenceGeneratedAt);
+  const generatedAt = normalizeString(safeInput.generatedAt);
+  const provided =
+    rawCurrentHeadCommit ||
+    rawExpectedCurrentHeadCommit ||
+    evidenceGeneratedAt;
+  const timestamp = Date.parse(evidenceGeneratedAt);
+  let rejectReason = '';
+
+  if (provided && (!rawCurrentHeadCommit || !rawExpectedCurrentHeadCommit)) {
+    rejectReason = 'exact_current_head_binding_required';
+  } else if (provided && (!currentHeadCommit || !expectedCurrentHeadCommit)) {
+    rejectReason = 'exact_current_head_binding_malformed';
+  } else if (provided && currentHeadCommit !== expectedCurrentHeadCommit) {
+    rejectReason = 'exact_current_head_binding_mismatch';
+  } else if (provided && !evidenceGeneratedAt) {
+    rejectReason = 'exact_evidence_generated_at_required';
+  } else if (provided && !Number.isFinite(timestamp)) {
+    rejectReason = 'exact_evidence_generated_at_malformed';
+  }
+
+  return {
+    provided: Boolean(provided),
+    accepted: Boolean(provided) && !rejectReason,
+    rejected: Boolean(provided) && Boolean(rejectReason),
+    rejectReason,
+    currentHeadCommit,
+    expectedCurrentHeadCommit,
+    evidenceGeneratedAt,
+    generatedAt,
+    currentHeadCommitProvided: Boolean(rawCurrentHeadCommit),
+    expectedCurrentHeadCommitProvided: Boolean(rawExpectedCurrentHeadCommit),
+    evidenceGeneratedAtProvided: Boolean(evidenceGeneratedAt),
+    currentHeadBindingMatched:
+      Boolean(currentHeadCommit) &&
+      Boolean(expectedCurrentHeadCommit) &&
+      currentHeadCommit === expectedCurrentHeadCommit
+  };
+}
+
 function containsForbiddenReportMaterial(value) {
   const serialized = JSON.stringify(value);
   return FORBIDDEN_REPORT_PATTERNS.some(pattern => pattern.test(serialized));
@@ -53,7 +104,7 @@ function repeatBucket(prefix, count) {
   return Array.from({ length: safeCount }, (_, index) => `${prefix}_${index + 1}`);
 }
 
-function buildRuntimeEvidenceSummaryForAggregatorReplay(report = {}) {
+function buildRuntimeEvidenceSummaryForAggregatorReplay(report = {}, options = {}) {
   const artifact = isPlainObject(report.runtimeEvidenceArtifact)
     ? report.runtimeEvidenceArtifact
     : {};
@@ -63,6 +114,10 @@ function buildRuntimeEvidenceSummaryForAggregatorReplay(report = {}) {
   const bridge = isPlainObject(artifact.validationAggregatorBridge)
     ? artifact.validationAggregatorBridge
     : {};
+  const exactHeadBoundInput = normalizeExactHeadBoundRuntimeSummaryInput(
+    options.exactHeadBoundRuntimeSummaryInput
+  );
+  const includeExactValues = options.includeExactValues === true;
   const evidenceUnitsComplete =
     bridge.evidenceUnitsComplete === true &&
     normalizeNumber(summary.evidenceUnitCount) === REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS.length &&
@@ -89,9 +144,20 @@ function buildRuntimeEvidenceSummaryForAggregatorReplay(report = {}) {
       failed: normalizeNumber(summary.criticalGateFailedCount),
       allCriticalCommandsPassed: summary.allCriticalCommandsPassed === true
     },
-    currentHeadCommit: '',
-    expectedCurrentHeadCommit: '',
-    evidenceGeneratedAt: '',
+    currentHeadCommit: exactHeadBoundInput.accepted && includeExactValues
+      ? exactHeadBoundInput.currentHeadCommit
+      : '',
+    expectedCurrentHeadCommit: exactHeadBoundInput.accepted && includeExactValues
+      ? exactHeadBoundInput.expectedCurrentHeadCommit
+      : '',
+    evidenceGeneratedAt: exactHeadBoundInput.accepted && includeExactValues
+      ? exactHeadBoundInput.evidenceGeneratedAt
+      : '',
+    exactHeadBoundInputProvided: exactHeadBoundInput.provided,
+    exactHeadBoundInputAccepted: exactHeadBoundInput.accepted,
+    currentHeadCommitProvided: exactHeadBoundInput.currentHeadCommitProvided,
+    expectedCurrentHeadCommitProvided: exactHeadBoundInput.expectedCurrentHeadCommitProvided,
+    evidenceGeneratedAtProvided: exactHeadBoundInput.evidenceGeneratedAtProvided,
     evidenceUnitIds: evidenceUnitsComplete
       ? [...REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS]
       : [],
@@ -208,6 +274,7 @@ function summarizeAggregatorReplay(aggregatorReport = {}) {
   const bridge = isPlainObject(aggregatorReport.evidence?.p65ValidationAggregatorRuntimeEvidenceBridge)
     ? aggregatorReport.evidence.p65ValidationAggregatorRuntimeEvidenceBridge
     : {};
+  const summary = isPlainObject(bridge.summary) ? bridge.summary : {};
 
   return {
     fed: true,
@@ -217,6 +284,13 @@ function summarizeAggregatorReplay(aggregatorReport = {}) {
     accepted: aggregatorReport.summary?.runtimeEvidenceSummaryAccepted === true,
     rejected: aggregatorReport.summary?.runtimeEvidenceSummaryRejected === true,
     rejectReason: normalizeString(bridge.rejectReason),
+    currentHeadBindingStatus: normalizeString(summary.currentHeadBindingStatus),
+    currentHeadBindingMatched: summary.currentHeadBindingMatched === true,
+    evidenceFreshnessStatus: normalizeString(summary.evidenceFreshnessStatus),
+    evidenceUnitCount: normalizeNumber(summary.evidenceUnitCount),
+    requiredEvidenceUnitCount: normalizeNumber(summary.requiredEvidenceUnitCount),
+    missingEvidenceUnitCount: normalizeNumber(summary.missingEvidenceUnitCount),
+    evidenceUnitsComplete: summary.evidenceUnitsComplete === true,
     canClaimRuntimeReady: false,
     canClaimFinalRcReady: false,
     canClaimV1RcReady: false,
@@ -226,19 +300,36 @@ function summarizeAggregatorReplay(aggregatorReport = {}) {
 
 function buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight(
   report = {},
-  { generatedAt = new Date().toISOString() } = {}
+  {
+    exactHeadBoundRuntimeSummaryInput = {},
+    generatedAt = new Date().toISOString()
+  } = {}
 ) {
   const sourceBlockers = collectSourceBlockers(report);
+  const exactHeadBoundInput = normalizeExactHeadBoundRuntimeSummaryInput(
+    exactHeadBoundRuntimeSummaryInput
+  );
   const runtimeEvidenceSummaryForAggregator =
-    buildRuntimeEvidenceSummaryForAggregatorReplay(report);
+    buildRuntimeEvidenceSummaryForAggregatorReplay(report, {
+      exactHeadBoundRuntimeSummaryInput,
+      includeExactValues: false
+    });
+  const exactRuntimeEvidenceSummaryForAggregator =
+    buildRuntimeEvidenceSummaryForAggregatorReplay(report, {
+      exactHeadBoundRuntimeSummaryInput,
+      includeExactValues: true
+    });
   const aggregatorReport = buildV1RcValidationAggregatorReport({
     generatedAt,
-    runtimeEvidenceSummary: runtimeEvidenceSummaryForAggregator
+    runtimeEvidenceSummary: exactRuntimeEvidenceSummaryForAggregator
   });
   const aggregatorReplay = summarizeAggregatorReplay(aggregatorReport);
   const standardInputSourceAccepted = sourceBlockers.length === 0;
   const blockers = [...sourceBlockers];
 
+  if (exactHeadBoundInput.rejected) {
+    blockers.push(`exact_head_bound_runtime_summary_input_${exactHeadBoundInput.rejectReason}`);
+  }
   if (aggregatorReplay.decision !== 'NOT_READY_BLOCKED') {
     blockers.push('aggregator_decision_unexpected');
   }
@@ -246,15 +337,33 @@ function buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPrefligh
     blockers.push('aggregator_replay_readiness_overclaim');
   }
 
+  const status = blockers.length > 0
+    ? 'blocked_fail_closed'
+    : standardInputSourceAccepted && exactHeadBoundInput.accepted && aggregatorReplay.accepted
+    ? 'standard_source_and_exact_head_bound_input_accepted_not_ready'
+    : standardInputSourceAccepted
+    ? 'standard_source_accepted_aggregator_replay_blocked_not_ready'
+    : 'blocked_fail_closed';
+
   return {
     schemaVersion: AGGREGATION_PREFLIGHT_SCHEMA_VERSION,
     preflightType:
       'authenticated_http_bounded_mutation_runtime_evidence_standard_input_preflight',
-    status: standardInputSourceAccepted
-      ? 'standard_source_accepted_aggregator_replay_blocked_not_ready'
-      : 'blocked_fail_closed',
+    status,
     decision: 'NOT_READY_BLOCKED',
     standardInputSourceAccepted,
+    exactHeadBoundRuntimeSummaryInput: {
+      provided: exactHeadBoundInput.provided,
+      accepted: exactHeadBoundInput.accepted,
+      rejected: exactHeadBoundInput.rejected,
+      rejectReason: exactHeadBoundInput.rejectReason,
+      currentHeadCommitProvided: exactHeadBoundInput.currentHeadCommitProvided,
+      expectedCurrentHeadCommitProvided: exactHeadBoundInput.expectedCurrentHeadCommitProvided,
+      evidenceGeneratedAtProvided: exactHeadBoundInput.evidenceGeneratedAtProvided,
+      currentHeadBindingMatched: exactHeadBoundInput.currentHeadBindingMatched,
+      rawValuesOutput: false,
+      rawValuesPersisted: false
+    },
     sourceReport: {
       schemaVersion: normalizeString(report.schemaVersion),
       accepted: report.accepted === true,
@@ -302,8 +411,10 @@ function buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPrefligh
       readinessClaimed: false
     },
     blockers,
-    nextStep: standardInputSourceAccepted
-      ? 'Use this as a low-disclosure standard input preflight only; provide a separate exact head-bound runtime summary if aggregator acceptance is required.'
+    nextStep: standardInputSourceAccepted && !exactHeadBoundInput.accepted
+      ? 'Provide a separate exact head-bound runtime summary input if aggregator replay acceptance is required.'
+      : standardInputSourceAccepted && exactHeadBoundInput.accepted
+      ? 'Use this accepted exact-bound replay as local runtime evidence input only; do not claim readiness.'
       : 'Regenerate the runtime evidence report with exact metadata and low-disclosure output, then rerun the preflight.'
   };
 }
@@ -312,5 +423,6 @@ module.exports = {
   AGGREGATION_PREFLIGHT_SCHEMA_VERSION,
   buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight,
   buildRuntimeEvidenceSummaryForAggregatorReplay,
-  containsForbiddenReportMaterial
+  containsForbiddenReportMaterial,
+  normalizeExactHeadBoundRuntimeSummaryInput
 };

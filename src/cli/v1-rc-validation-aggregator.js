@@ -5,7 +5,8 @@ const {
   buildV1RcValidationAggregatorReport
 } = require('../core/ValidationAggregatorService');
 const {
-  buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight
+  buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight,
+  buildRuntimeEvidenceSummaryForAggregatorReplay
 } = require('../core/AuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight');
 
 const REJECTED_FLAGS = new Set([
@@ -56,6 +57,21 @@ function parseArgs(argv = []) {
       index += 1;
       continue;
     }
+    if (token === '--runtime-evidence-current-head') {
+      options.runtimeEvidenceCurrentHead = argv[index + 1] || '';
+      index += 1;
+      continue;
+    }
+    if (token === '--runtime-evidence-expected-current-head') {
+      options.runtimeEvidenceExpectedCurrentHead = argv[index + 1] || '';
+      index += 1;
+      continue;
+    }
+    if (token === '--runtime-evidence-generated-at') {
+      options.runtimeEvidenceGeneratedAt = argv[index + 1] || '';
+      index += 1;
+      continue;
+    }
     if (REJECTED_FLAGS.has(token)) {
       options.rejectedFlag = token;
       continue;
@@ -74,6 +90,10 @@ function buildUsageText() {
     '  --strict  Emit the same JSON report but exit non-zero unless the decision is READY_FOR_V1_0_RC.',
     '  --runtime-evidence-report PATH|-',
     '            Read one explicit sanitized authenticated HTTP bounded mutation runtime evidence report from a workspace JSON file or stdin, then feed its sanitized summary into the aggregator preflight path.',
+    '  --runtime-evidence-current-head COMMIT',
+    '  --runtime-evidence-expected-current-head COMMIT',
+    '  --runtime-evidence-generated-at ISO_TIMESTAMP',
+    '            Optional exact head-bound runtime summary metadata supplied separately from the low-disclosure report. Values are used for aggregator replay and are not printed in output.',
     '  --help    Show this usage text without running live checks.',
     '',
     'This minimal CLI never starts services, calls providers, applies migrations, writes memory, refreshes live MCP/HTTP evidence, or claims readiness.'
@@ -229,6 +249,64 @@ function buildRuntimeEvidenceReportLoadError(loadErrorReason, options = {}) {
   };
 }
 
+function buildExactHeadBoundRuntimeSummaryInputFromOptions(options = {}) {
+  const input = {};
+  let exactMetadataProvided = false;
+  if (Object.hasOwn(options, 'runtimeEvidenceCurrentHead')) {
+    input.currentHeadCommit = options.runtimeEvidenceCurrentHead;
+    exactMetadataProvided = true;
+  }
+  if (Object.hasOwn(options, 'runtimeEvidenceExpectedCurrentHead')) {
+    input.expectedCurrentHeadCommit = options.runtimeEvidenceExpectedCurrentHead;
+    exactMetadataProvided = true;
+  }
+  if (Object.hasOwn(options, 'runtimeEvidenceGeneratedAt')) {
+    input.evidenceGeneratedAt = options.runtimeEvidenceGeneratedAt;
+    exactMetadataProvided = true;
+  }
+  if (options.generatedAt) {
+    input.generatedAt = options.generatedAt;
+  }
+  return exactMetadataProvided ? input : null;
+}
+
+function collectExactRuntimeEvidenceRedactionValues(exactInput = null) {
+  if (!exactInput || typeof exactInput !== 'object') return [];
+  const values = [
+    exactInput.currentHeadCommit,
+    exactInput.expectedCurrentHeadCommit,
+    exactInput.evidenceGeneratedAt
+  ].filter(value => typeof value === 'string' && value.trim()).map(value => value.trim());
+  return [...new Set([
+    ...values,
+    ...values.map(value => value.toLowerCase()),
+    ...values.map(value => value.toUpperCase())
+  ])];
+}
+
+function redactExactRuntimeEvidenceValues(value, exactInput = null) {
+  const redactions = collectExactRuntimeEvidenceRedactionValues(exactInput);
+  if (redactions.length === 0) return value;
+  if (typeof value === 'string') {
+    return redactions.reduce(
+      (current, redaction) => current.split(redaction).join('[redacted]'),
+      value
+    );
+  }
+  if (Array.isArray(value)) {
+    return value.map(item => redactExactRuntimeEvidenceValues(item, exactInput));
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        key,
+        redactExactRuntimeEvidenceValues(entry, exactInput)
+      ])
+    );
+  }
+  return value;
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -241,19 +319,30 @@ function buildCliReport(options = {}) {
     );
   }
 
+  const exactHeadBoundRuntimeSummaryInput =
+    buildExactHeadBoundRuntimeSummaryInputFromOptions(options);
   const runtimeEvidencePreflight = options.runtimeEvidenceReport
     ? buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight(
         options.runtimeEvidenceReport,
-        { generatedAt: options.generatedAt || undefined }
+        {
+          exactHeadBoundRuntimeSummaryInput: exactHeadBoundRuntimeSummaryInput || {},
+          generatedAt: options.generatedAt || undefined
+        }
       )
     : null;
+  const runtimeEvidenceSummaryForReport =
+    runtimeEvidencePreflight && exactHeadBoundRuntimeSummaryInput
+      ? buildRuntimeEvidenceSummaryForAggregatorReplay(options.runtimeEvidenceReport, {
+          exactHeadBoundRuntimeSummaryInput,
+          includeExactValues: true
+        })
+      : runtimeEvidencePreflight?.runtimeEvidenceSummaryForAggregator || null;
   const report = buildV1RcValidationAggregatorReport({
     generatedAt: options.generatedAt || undefined,
-    runtimeEvidenceSummary:
-      runtimeEvidencePreflight?.runtimeEvidenceSummaryForAggregator || null
+    runtimeEvidenceSummary: runtimeEvidenceSummaryForReport
   });
 
-  return {
+  const outputReport = {
     ...report,
     phase: runtimeEvidencePreflight
       ? 'P67-runtime-evidence-standard-input-preflight'
@@ -298,6 +387,12 @@ function buildCliReport(options = {}) {
               runtimeEvidencePreflight.aggregatorReplay?.accepted === true,
             runtimeEvidenceReportAggregatorReplayRejected:
               runtimeEvidencePreflight.aggregatorReplay?.rejected === true,
+            runtimeEvidenceReportExactHeadBoundInputProvided:
+              runtimeEvidencePreflight.exactHeadBoundRuntimeSummaryInput?.provided === true,
+            runtimeEvidenceReportExactHeadBoundInputAccepted:
+              runtimeEvidencePreflight.exactHeadBoundRuntimeSummaryInput?.accepted === true,
+            runtimeEvidenceReportExactHeadBoundInputRejected:
+              runtimeEvidencePreflight.exactHeadBoundRuntimeSummaryInput?.rejected === true,
             runtimeEvidenceReportCanClaimV1RcReady: false
           }
         : {})
@@ -312,6 +407,8 @@ function buildCliReport(options = {}) {
         : 'Plan full matrix aggregation separately from this minimal CLI wrapper.'
     ]
   };
+
+  return redactExactRuntimeEvidenceValues(outputReport, exactHeadBoundRuntimeSummaryInput);
 }
 
 function main() {
@@ -350,8 +447,10 @@ if (require.main === module) {
 module.exports = {
   REJECTED_FLAGS,
   buildRuntimeEvidenceReportLoadError,
+  buildExactHeadBoundRuntimeSummaryInputFromOptions,
   parseArgs,
   buildUsageText,
+  redactExactRuntimeEvidenceValues,
   getExitCodeForDecision,
   readRuntimeEvidenceReportInput,
   buildCliReport,

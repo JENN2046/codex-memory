@@ -24,6 +24,7 @@ const {
 const repoRoot = path.resolve(__dirname, '..');
 const aggregatorCliPath = path.join('src', 'cli', 'v1-rc-validation-aggregator.js');
 const fixtureCommit = 'abc1234def5678';
+const fixtureEvidenceGeneratedAt = '2026-07-07T00:30:00.000Z';
 
 function assertNoForbiddenMaterial(payload) {
   const scannedPayload = payload && typeof payload === 'object' && !Array.isArray(payload)
@@ -44,7 +45,8 @@ function assertNoForbiddenMaterial(payload) {
     /http-runner-supersede-old-memory/i,
     /http-runner-supersede-new-memory/i,
     /Synthetic temp-local chunk/i,
-    new RegExp(fixtureCommit, 'i')
+    new RegExp(fixtureCommit, 'i'),
+    new RegExp(fixtureEvidenceGeneratedAt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
   ]) {
     assert.doesNotMatch(serialized, pattern);
   }
@@ -54,7 +56,7 @@ async function buildExactLowDisclosureReport() {
   return buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport({
     currentHeadCommit: fixtureCommit,
     expectedCurrentHeadCommit: fixtureCommit,
-    evidenceGeneratedAt: '2026-07-07T00:30:00.000Z',
+    evidenceGeneratedAt: fixtureEvidenceGeneratedAt,
     generatedAt: '2026-07-07T01:00:00.000Z',
     evidenceUnitIds: [...REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS],
     localRuntimeEvidenceMatrixExecuted: true,
@@ -98,6 +100,55 @@ test('runtime evidence aggregation preflight accepts standard low-disclosure sou
   assert.equal(preflight.disclosure.currentHeadCommitIncluded, false);
   assert.equal(preflight.safety.executesCommands, false);
   assert.equal(preflight.safety.callsProviders, false);
+  assert.equal(preflight.safety.readinessClaimed, false);
+  assert.deepEqual(preflight.blockers, []);
+  assertNoForbiddenMaterial(preflight);
+});
+
+test('runtime evidence aggregation preflight accepts separate exact head-bound input without leaking raw values', async () => {
+  const sourceReport = await buildExactLowDisclosureReport();
+  const preflight = buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight(
+    sourceReport,
+    {
+      generatedAt: '2026-07-07T01:00:00.000Z',
+      exactHeadBoundRuntimeSummaryInput: {
+        currentHeadCommit: fixtureCommit,
+        expectedCurrentHeadCommit: fixtureCommit,
+        evidenceGeneratedAt: fixtureEvidenceGeneratedAt
+      }
+    }
+  );
+
+  assert.equal(
+    preflight.status,
+    'standard_source_and_exact_head_bound_input_accepted_not_ready'
+  );
+  assert.equal(preflight.decision, 'NOT_READY_BLOCKED');
+  assert.equal(preflight.standardInputSourceAccepted, true);
+  assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.provided, true);
+  assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.accepted, true);
+  assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rejected, false);
+  assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.currentHeadBindingMatched, true);
+  assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rawValuesOutput, false);
+  assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rawValuesPersisted, false);
+  assert.equal(preflight.runtimeEvidenceSummaryForAggregator.currentHeadCommit, '');
+  assert.equal(preflight.runtimeEvidenceSummaryForAggregator.expectedCurrentHeadCommit, '');
+  assert.equal(preflight.runtimeEvidenceSummaryForAggregator.evidenceGeneratedAt, '');
+  assert.equal(preflight.runtimeEvidenceSummaryForAggregator.exactHeadBoundInputProvided, true);
+  assert.equal(preflight.runtimeEvidenceSummaryForAggregator.exactHeadBoundInputAccepted, true);
+  assert.equal(preflight.aggregatorReplay.accepted, true);
+  assert.equal(preflight.aggregatorReplay.rejected, false);
+  assert.equal(preflight.aggregatorReplay.rejectReason, '');
+  assert.equal(preflight.aggregatorReplay.currentHeadBindingStatus, 'matched');
+  assert.equal(preflight.aggregatorReplay.currentHeadBindingMatched, true);
+  assert.equal(preflight.aggregatorReplay.evidenceFreshnessStatus, 'fresh');
+  assert.equal(preflight.aggregatorReplay.evidenceUnitCount, 5);
+  assert.equal(preflight.aggregatorReplay.requiredEvidenceUnitCount, 5);
+  assert.equal(preflight.aggregatorReplay.missingEvidenceUnitCount, 0);
+  assert.equal(preflight.aggregatorReplay.evidenceUnitsComplete, true);
+  assert.equal(preflight.aggregatorReplay.canClaimV1RcReady, false);
+  assert.equal(preflight.disclosure.currentHeadCommitIncluded, false);
+  assert.equal(preflight.disclosure.evidenceGeneratedAtIncluded, false);
   assert.equal(preflight.safety.readinessClaimed, false);
   assert.deepEqual(preflight.blockers, []);
   assertNoForbiddenMaterial(preflight);
@@ -151,6 +202,64 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   assert.equal(preflight.aggregatorReplay.rejectReason, 'current_head_binding_required');
   assert.equal(preflight.aggregatorReplay.canClaimV1RcReady, false);
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
+  assertNoForbiddenMaterial(report);
+});
+
+test('v1 RC aggregator CLI accepts exact head-bound metadata separately and redacts raw values', async () => {
+  const sourceReport = await buildExactLowDisclosureReport();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--runtime-evidence-report',
+      '-',
+      '--runtime-evidence-current-head',
+      fixtureCommit,
+      '--runtime-evidence-expected-current-head',
+      fixtureCommit,
+      '--runtime-evidence-generated-at',
+      fixtureEvidenceGeneratedAt,
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(sourceReport),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const report = JSON.parse(result.stdout);
+  const preflight =
+    report.evidence.p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight;
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.summary.runtimeEvidenceReportInputProvided, true);
+  assert.equal(report.summary.runtimeEvidenceReportStandardInputSourceAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputProvided, true);
+  assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputRejected, false);
+  assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayRejected, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryRejected, false);
+  assert.equal(
+    report.summary.runtimeEvidenceSummaryStatus,
+    'explicit_runtime_evidence_summary_available'
+  );
+  assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
+  assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rawValuesOutput, false);
+  assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rawValuesPersisted, false);
+  assert.equal(preflight.aggregatorReplay.accepted, true);
+  assert.equal(preflight.aggregatorReplay.currentHeadBindingStatus, 'matched');
+  assert.equal(preflight.aggregatorReplay.evidenceFreshnessStatus, 'fresh');
   assertNoForbiddenMaterial(report);
 });
 
@@ -220,6 +329,30 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
     runtimeEvidenceReportPath: '-',
     rejectedFlag: null
   });
+
+  assert.deepEqual(
+    parseArgs([
+      '--runtime-evidence-report',
+      '-',
+      '--runtime-evidence-current-head',
+      fixtureCommit,
+      '--runtime-evidence-expected-current-head',
+      fixtureCommit,
+      '--runtime-evidence-generated-at',
+      fixtureEvidenceGeneratedAt
+    ]),
+    {
+      pretty: false,
+      strict: false,
+      help: false,
+      generatedAt: null,
+      runtimeEvidenceReportPath: '-',
+      runtimeEvidenceCurrentHead: fixtureCommit,
+      runtimeEvidenceExpectedCurrentHead: fixtureCommit,
+      runtimeEvidenceGeneratedAt: fixtureEvidenceGeneratedAt,
+      rejectedFlag: null
+    }
+  );
 
   const rejectedEnv = readRuntimeEvidenceReportInput('.env', { cwd: repoRoot });
   assert.equal(rejectedEnv.ok, false);
