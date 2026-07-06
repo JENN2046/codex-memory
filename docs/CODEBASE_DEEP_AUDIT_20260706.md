@@ -158,6 +158,14 @@ cleanup or suppression handling before any runtime apply can be considered.
 This is contract evidence only, not a real cleanup execution or readiness
 claim.
 
+Local follow-up: F3_RUNTIME_PROOF_ADDED_LOCALLY in commit-pending work adds a
+fixture-backed runtime proof helper and tests. The proof seeds all derived
+projection families with synthetic data, executes lifecycle cleanup/suppression
+against that fixture, and asserts before/after results for diary, SQLite
+record/chunks, vector index, embedding cache, candidate cache, write audit,
+recall audit, reconcile queue, and degraded payload. This remains fixture-only
+evidence, not real private memory cleanup and not readiness.
+
 Accepted memory content is intentionally persisted to multiple projections:
 
 - diary files include `Memory-ID`, `Content`, and `Evidence`
