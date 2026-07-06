@@ -212,6 +212,13 @@ profile with trusted full-access behavior.
 
 Severity: `medium-high`
 
+Local follow-up: F5_VISIBILITY_ADDED_LOCALLY in commit-pending work adds a
+low-disclosure `runtimePosture` overview summary. It distinguishes trusted/full,
+public selected, and authenticated bounded overview projections; exposes
+security-profile and policy booleans; and states that overview itself did not
+make external model calls. It does not expose endpoints, tokens, raw provider
+payloads, paths, fingerprints, raw memory, or readiness evidence.
+
 The MCP server formats successful tool payloads both as `structuredContent` and
 as JSON text. The full trusted MCP path can return sensitive operational fields,
 including `memoryId`, `filePath`, paths, recent files, memory links, and content

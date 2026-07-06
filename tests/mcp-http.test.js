@@ -21,6 +21,7 @@ const NO_TOKEN_OVERVIEW_KEYS = [
   'cacheHealth',
   'indexHealth',
   'recall',
+  'runtimePosture',
   'shadowSync',
   'summary'
 ];
