@@ -150,6 +150,14 @@ that the scale/timeout risk is fixed.
 
 Severity: `high`
 
+Local follow-up: F3_CONTRACT_ADDED_LOCALLY in commit-pending work adds
+`MemoryLifecycleProjectionCleanupContract` and fixture tests that require every
+governance lifecycle family to declare diary, SQLite record/chunk, vector,
+embedding cache, candidate cache, audit, reconcile queue, and degraded payload
+cleanup or suppression handling before any runtime apply can be considered.
+This is contract evidence only, not a real cleanup execution or readiness
+claim.
+
 Accepted memory content is intentionally persisted to multiple projections:
 
 - diary files include `Memory-ID`, `Content`, and `Evidence`
