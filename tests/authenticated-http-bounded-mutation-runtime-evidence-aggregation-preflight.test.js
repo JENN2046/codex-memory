@@ -6,7 +6,8 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
-  REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS
+  REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS,
+  RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST
 } = require('../src/core/AuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake');
 const {
   buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport
@@ -61,6 +62,20 @@ async function buildExactLowDisclosureReport() {
     evidenceUnitIds: [...REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS],
     localRuntimeEvidenceMatrixExecuted: true,
     allowlistedFinalRcEvidenceRunnerExecuted: true
+  });
+}
+
+async function buildZeroGapLowDisclosureReport() {
+  return buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport({
+    currentHeadCommit: fixtureCommit,
+    expectedCurrentHeadCommit: fixtureCommit,
+    evidenceGeneratedAt: fixtureEvidenceGeneratedAt,
+    generatedAt: '2026-07-07T01:00:00.000Z',
+    evidenceUnitIds: [...REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS],
+    localRuntimeEvidenceMatrixExecuted: true,
+    allowlistedFinalRcEvidenceRunnerExecuted: true,
+    locallyEvidencedRuntimeGaps: [...RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST],
+    remainingRuntimeGaps: []
   });
 }
 
@@ -314,6 +329,113 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   );
   assert.equal(report.summary.rcGatePrecheckCanClaimRcReady, false);
   assertNoForbiddenMaterial(report);
+});
+
+test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate precheck without readiness', async () => {
+  const sourceReport = await buildZeroGapLowDisclosureReport();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--runtime-evidence-report',
+      '-',
+      '--runtime-evidence-current-head',
+      fixtureCommit,
+      '--runtime-evidence-expected-current-head',
+      fixtureCommit,
+      '--runtime-evidence-generated-at',
+      fixtureEvidenceGeneratedAt,
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(sourceReport),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const report = JSON.parse(result.stdout);
+  const preflight =
+    report.evidence.p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight;
+  const rcGatePrecheck =
+    report.evidence.p68FinalEvidenceAggregationRcGatePrecheck;
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.summary.runtimeEvidenceReportInputProvided, true);
+  assert.equal(report.summary.runtimeEvidenceReportStandardInputSourceAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, true);
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingZeroGap,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingReadyToRequestRcCutoverApproval,
+    true
+  );
+  assert.equal(preflight.standardInputSourceAccepted, true);
+  assert.equal(preflight.aggregatorReplay.accepted, true);
+  assert.deepEqual(
+    preflight.runtimeEvidenceSummaryForAggregator.locallyEvidencedRuntimeGaps,
+    [...RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST].sort()
+  );
+  assert.deepEqual(preflight.runtimeEvidenceSummaryForAggregator.remainingRuntimeGaps, []);
+  assert.equal(
+    rcGatePrecheck.status,
+    'exact_head_bound_runtime_summary_accepted_by_final_aggregation_not_ready'
+  );
+  assert.equal(rcGatePrecheck.decision, 'NOT_READY_BLOCKED');
+  assert.equal(rcGatePrecheck.rc9DecisionPacketAvailable, true);
+  assert.equal(rcGatePrecheck.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(rcGatePrecheck.rc9DecisionPacketReadyToRequestRcCutoverApproval, true);
+  assert.equal(
+    rcGatePrecheck.rc9CompletenessChecklistStatus,
+    'complete_for_cutover_approval_request_not_rc_ready'
+  );
+  assert.equal(rcGatePrecheck.rcGateRows.freshCurrentHeadAccepted, true);
+  assert.equal(rcGatePrecheck.rcGateRows.strictGateAccepted, true);
+  assert.equal(rcGatePrecheck.rcGateRows.liveHttpNoWriteAccepted, true);
+  assert.equal(rcGatePrecheck.rcGateRows.validationAggregatorZeroGapAccepted, true);
+  assert.equal(rcGatePrecheck.canClaimRcReady, false);
+  assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, true);
+  assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
+  assert.equal(report.summary.rcGatePrecheckCanClaimRcReady, false);
+  assert.equal(rcGatePrecheck.safety.readinessClaimed, false);
+  assertNoForbiddenMaterial(report);
+});
+
+test('runtime evidence aggregation preflight rejects unsupported artifact gap IDs fail-closed', async () => {
+  const sourceReport = await buildZeroGapLowDisclosureReport();
+  sourceReport.runtimeEvidenceArtifact.runtimeEvidenceSummary.locallyEvidencedRuntimeGaps = [
+    'unsupported_private_runtime_gap_id'
+  ];
+  const preflight = buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight(
+    sourceReport,
+    {
+      generatedAt: '2026-07-07T01:00:00.000Z',
+      exactHeadBoundRuntimeSummaryInput: {
+        currentHeadCommit: fixtureCommit,
+        expectedCurrentHeadCommit: fixtureCommit,
+        evidenceGeneratedAt: fixtureEvidenceGeneratedAt
+      }
+    }
+  );
+
+  assert.equal(preflight.status, 'blocked_fail_closed');
+  assert.equal(preflight.standardInputSourceAccepted, false);
+  assert.ok(preflight.blockers.includes('source_runtime_gap_allowlist_rejected'));
+  assert.deepEqual(preflight.runtimeEvidenceSummaryForAggregator.locallyEvidencedRuntimeGaps, []);
+  assert.equal(preflight.aggregatorReplay.canClaimV1RcReady, false);
+  assert.doesNotMatch(JSON.stringify(preflight), /unsupported_private_runtime_gap_id/);
 });
 
 test('v1 RC aggregator CLI rejects unsafe runtime evidence report material fail-closed', () => {

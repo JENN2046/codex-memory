@@ -15,6 +15,17 @@ const REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS = Object.freeze([
   'A5-GAP-4',
   'A5-GAP-5'
 ]);
+const RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST = Object.freeze([
+  'validation_aggregator_full_implementation_incomplete',
+  'governance_review_approval_audit_runtime_loop_not_executed',
+  'recall_isolation_runtime_proof_not_executed',
+  'migration_import_export_backup_restore_approval_execution_blocked',
+  'live_http_operation_readiness_not_claimed',
+  'mainline_strict_gate_not_executed_for_cutover',
+  'rc_cutover_not_executed'
+]);
+const RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST_SET =
+  new Set(RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST);
 
 const FORBIDDEN_INTAKE_PATTERNS = Object.freeze([
   /https?:\/\//i,
@@ -61,6 +72,26 @@ function uniqueSorted(values) {
   return [...new Set(values)].sort();
 }
 
+function normalizeAllowlistedRuntimeGapIds(values) {
+  return uniqueSorted(
+    normalizeStringArray(values)
+      .filter(value => RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST_SET.has(value))
+  );
+}
+
+function countUnsupportedRuntimeGapIds(values) {
+  return normalizeStringArray(values)
+    .filter(value => !RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST_SET.has(value))
+    .length;
+}
+
+function normalizeExplicitRuntimeGapSelection(values) {
+  return {
+    gapIds: normalizeAllowlistedRuntimeGapIds(values),
+    unsupportedGapCount: countUnsupportedRuntimeGapIds(values)
+  };
+}
+
 function containsForbiddenIntakeMaterial(value) {
   const serialized = JSON.stringify(value);
   return FORBIDDEN_INTAKE_PATTERNS.some(pattern => pattern.test(serialized));
@@ -88,6 +119,21 @@ function buildRuntimeEvidenceSummaryForAggregatorIntake(routeSummary = {}, optio
   const evidenceGeneratedAt = normalizeString(options.evidenceGeneratedAt);
   const criticalGates = normalizeCriticalGates(routeSummary);
   const observedFamilies = normalizeStringArray(routeSummary.mutationFamilies?.observed);
+  const explicitLocallyEvidencedRuntimeGaps =
+    Object.hasOwn(options, 'locallyEvidencedRuntimeGaps');
+  const explicitRemainingRuntimeGaps =
+    Object.hasOwn(options, 'remainingRuntimeGaps');
+  const locallyEvidencedRuntimeGapSelection =
+    normalizeExplicitRuntimeGapSelection(options.locallyEvidencedRuntimeGaps);
+  const remainingRuntimeGapSelection =
+    normalizeExplicitRuntimeGapSelection(options.remainingRuntimeGaps);
+  const unsupportedRuntimeGapCount =
+    (explicitLocallyEvidencedRuntimeGaps
+      ? locallyEvidencedRuntimeGapSelection.unsupportedGapCount
+      : 0) +
+    (explicitRemainingRuntimeGaps
+      ? remainingRuntimeGapSelection.unsupportedGapCount
+      : 0);
 
   return {
     status: routeAccepted
@@ -110,11 +156,23 @@ function buildRuntimeEvidenceSummaryForAggregatorIntake(routeSummary = {}, optio
     v1RcReady: false,
     rcReady: false,
     criticalGates,
-    locallyEvidencedRuntimeGaps: uniqueSorted([
-      ...normalizeStringArray(candidate.locallyEvidencedRuntimeGaps),
-      ...observedFamilies.map(family => `${family}_authenticated_http_cleanup_suppression_route_evidenced`)
-    ]),
-    remainingRuntimeGaps: uniqueSorted(normalizeStringArray(candidate.remainingRuntimeGaps)),
+    locallyEvidencedRuntimeGaps: explicitLocallyEvidencedRuntimeGaps
+      ? locallyEvidencedRuntimeGapSelection.gapIds
+      : uniqueSorted([
+          ...normalizeStringArray(candidate.locallyEvidencedRuntimeGaps),
+          ...observedFamilies.map(
+            family => `${family}_authenticated_http_cleanup_suppression_route_evidenced`
+          )
+        ]),
+    remainingRuntimeGaps: explicitRemainingRuntimeGaps
+      ? remainingRuntimeGapSelection.gapIds
+      : uniqueSorted(normalizeStringArray(candidate.remainingRuntimeGaps)),
+    runtimeGapAllowlist: {
+      explicitLocallyEvidencedRuntimeGaps,
+      explicitRemainingRuntimeGaps,
+      unsupportedRuntimeGapCount,
+      accepted: unsupportedRuntimeGapCount === 0
+    },
     safety: {
       mutated: false,
       providerCalls: 0,
@@ -137,7 +195,7 @@ function buildRuntimeEvidenceSummaryForAggregatorIntake(routeSummary = {}, optio
   };
 }
 
-function collectIntakeBlockers(routeSummary = {}, bridge = {}) {
+function collectIntakeBlockers(routeSummary = {}, bridge = {}, runtimeEvidenceSummary = {}) {
   const blockers = [];
 
   if (!isPlainObject(routeSummary)) blockers.push('route_summary_shape_invalid');
@@ -166,6 +224,9 @@ function collectIntakeBlockers(routeSummary = {}, bridge = {}) {
   }
   if (bridge.accepted !== true) {
     blockers.push(`validation_aggregator_runtime_evidence_summary_${bridge.rejectReason || 'not_accepted'}`);
+  }
+  if (runtimeEvidenceSummary.runtimeGapAllowlist?.accepted === false) {
+    blockers.push('runtime_gap_allowlist_rejected');
   }
 
   return uniqueSorted(blockers);
@@ -255,7 +316,7 @@ function buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake(routeSu
   });
   const bridge = aggregatorReport.evidence.p65ValidationAggregatorRuntimeEvidenceBridge;
   const validationAggregatorBridge = buildValidationAggregatorBridgeSummary(bridge);
-  const blockers = collectIntakeBlockers(routeSummary, bridge);
+  const blockers = collectIntakeBlockers(routeSummary, bridge, runtimeEvidenceSummary);
   const accepted = blockers.length === 0;
 
   const intake = {
@@ -359,6 +420,9 @@ function buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake(routeSu
 module.exports = {
   INTAKE_SCHEMA_VERSION,
   REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS,
+  RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST,
   buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake,
-  buildRuntimeEvidenceSummaryForAggregatorIntake
+  buildRuntimeEvidenceSummaryForAggregatorIntake,
+  countUnsupportedRuntimeGapIds,
+  normalizeAllowlistedRuntimeGapIds
 };

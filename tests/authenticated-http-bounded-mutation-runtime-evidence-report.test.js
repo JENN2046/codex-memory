@@ -6,7 +6,8 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
-  REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS
+  REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS,
+  RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST
 } = require('../src/core/AuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake');
 const {
   buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport
@@ -57,6 +58,14 @@ function exactMetadata() {
     evidenceUnitIds: [...REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS],
     localRuntimeEvidenceMatrixExecuted: true,
     allowlistedFinalRcEvidenceRunnerExecuted: true
+  };
+}
+
+function zeroGapMetadata() {
+  return {
+    ...exactMetadata(),
+    locallyEvidencedRuntimeGaps: [...RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST],
+    remainingRuntimeGaps: []
   };
 }
 
@@ -172,6 +181,59 @@ test('runtime evidence report runner feeds exact metadata to aggregator without 
   assert.deepEqual(report.blockers, []);
 });
 
+test('runtime evidence report runner can carry allowlisted zero-gap IDs without raw values', async () => {
+  const report = await buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport(
+    zeroGapMetadata()
+  );
+
+  assertCommonLowDisclosureReport(report);
+  assert.equal(report.status, 'ok');
+  assert.equal(report.accepted, true);
+  assert.equal(
+    report.runtimeEvidenceArtifact.runtimeEvidenceSummary.runtimeGapIdDisclosurePolicy,
+    'allowlisted_static_gap_ids_only'
+  );
+  assert.deepEqual(
+    report.runtimeEvidenceArtifact.runtimeEvidenceSummary.locallyEvidencedRuntimeGaps,
+    [...RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST].sort()
+  );
+  assert.deepEqual(
+    report.runtimeEvidenceArtifact.runtimeEvidenceSummary.remainingRuntimeGaps,
+    []
+  );
+  assert.equal(
+    report.runtimeEvidenceArtifact.runtimeEvidenceSummary.runtimeGapAllowlistAccepted,
+    true
+  );
+  assert.equal(
+    report.runtimeEvidenceArtifact.runtimeEvidenceSummary.unsupportedRuntimeGapCount,
+    0
+  );
+  assert.equal(report.runtimeEvidenceArtifact.validationAggregatorReport.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.runtimeEvidenceArtifact.validationAggregatorReport.canClaimRcReady, false);
+  assert.equal(report.safety.readinessClaimed, false);
+});
+
+test('runtime evidence report runner rejects unsupported gap IDs without echoing them', async () => {
+  const report = await buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport({
+    ...exactMetadata(),
+    locallyEvidencedRuntimeGaps: ['unsupported_private_runtime_gap_id'],
+    remainingRuntimeGaps: []
+  });
+
+  assertCommonLowDisclosureReport(report);
+  assert.equal(report.status, 'blocked');
+  assert.equal(report.accepted, false);
+  assert.equal(report.runtimeEvidenceArtifact.runtimeEvidenceSummary.runtimeGapAllowlistAccepted, false);
+  assert.equal(report.runtimeEvidenceArtifact.runtimeEvidenceSummary.unsupportedRuntimeGapCount, 1);
+  assert.deepEqual(
+    report.runtimeEvidenceArtifact.runtimeEvidenceSummary.locallyEvidencedRuntimeGaps,
+    []
+  );
+  assert.ok(report.blockers.includes('runtime_gap_allowlist_rejected'));
+  assert.doesNotMatch(JSON.stringify(report), /unsupported_private_runtime_gap_id/);
+});
+
 test('runtime evidence CLI default report is blocked but aggregator-fed and low-disclosure', () => {
   const result = runCli(['--json', '--generated-at', '2026-07-07T01:00:00.000Z']);
   assert.equal(result.status, 1);
@@ -211,6 +273,43 @@ test('runtime evidence CLI accepts explicit metadata while keeping readiness fal
   assert.equal(report.safety.readinessClaimed, false);
 });
 
+test('runtime evidence CLI accepts allowlisted gap IDs while keeping readiness false', () => {
+  const result = runCli([
+    '--json',
+    '--current-head',
+    fixtureCommit,
+    '--expected-current-head',
+    fixtureCommit,
+    '--evidence-generated-at',
+    '2026-07-07T00:30:00.000Z',
+    '--generated-at',
+    '2026-07-07T01:00:00.000Z',
+    '--evidence-units',
+    REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS.join(','),
+    '--local-runtime-matrix-executed',
+    '--allowlisted-final-rc-evidence-runner-executed',
+    '--locally-evidenced-runtime-gaps',
+    RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST.join(','),
+    '--remaining-runtime-gaps',
+    ''
+  ]);
+  assert.equal(result.status, 0, result.stderr);
+  const report = parseJson(result);
+
+  assertCommonLowDisclosureReport(report);
+  assert.equal(report.status, 'ok');
+  assert.deepEqual(
+    report.runtimeEvidenceArtifact.runtimeEvidenceSummary.locallyEvidencedRuntimeGaps,
+    [...RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST].sort()
+  );
+  assert.deepEqual(
+    report.runtimeEvidenceArtifact.runtimeEvidenceSummary.remainingRuntimeGaps,
+    []
+  );
+  assert.equal(report.runtimeEvidenceArtifact.validationAggregatorReport.canClaimRcReady, false);
+  assert.equal(report.safety.readinessClaimed, false);
+});
+
 test('runtime evidence CLI rejects unsafe flags without running the proof path', () => {
   const result = runCli(['--json', '--provider']);
   assert.equal(result.status, 1);
@@ -237,6 +336,8 @@ test('runtime evidence CLI help documents aggregation metadata and local-only po
   assert.match(result.stdout, /authenticated-http-bounded-mutation-runtime-evidence\.js/);
   assert.match(result.stdout, /feeds it into the validation aggregator intake path/);
   assert.match(result.stdout, /--evidence-units/);
+  assert.match(result.stdout, /--locally-evidenced-runtime-gaps/);
+  assert.match(result.stdout, /static allowlist/);
   assert.match(result.stdout, /writes no report file/);
   assert.match(result.stdout, /makes no provider calls/);
 });

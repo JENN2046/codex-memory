@@ -9,6 +9,7 @@ const {
 const {
   INTAKE_SCHEMA_VERSION,
   REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS,
+  normalizeAllowlistedRuntimeGapIds,
   buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake,
   buildRuntimeEvidenceSummaryForAggregatorIntake
 } = require('./AuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake');
@@ -48,6 +49,13 @@ function summarizeRuntimeEvidenceArtifact({
   const intakeShape = intake.runtimeEvidenceSummaryIntake || {};
   const bridge = intake.validationAggregatorBridge || {};
   const report = intake.validationAggregatorReport || {};
+  const runtimeGapAllowlist = runtimeEvidenceSummary.runtimeGapAllowlist || {};
+  const locallyEvidencedRuntimeGaps = normalizeAllowlistedRuntimeGapIds(
+    runtimeEvidenceSummary.locallyEvidencedRuntimeGaps
+  );
+  const remainingRuntimeGaps = normalizeAllowlistedRuntimeGapIds(
+    runtimeEvidenceSummary.remainingRuntimeGaps
+  );
 
   return {
     schemaVersion: RUNTIME_EVIDENCE_ARTIFACT_SCHEMA_VERSION,
@@ -87,7 +95,18 @@ function summarizeRuntimeEvidenceArtifact({
       locallyEvidencedRuntimeGapCount:
         normalizeStringArray(runtimeEvidenceSummary.locallyEvidencedRuntimeGaps).length,
       remainingRuntimeGapCount:
-        normalizeStringArray(runtimeEvidenceSummary.remainingRuntimeGaps).length
+        normalizeStringArray(runtimeEvidenceSummary.remainingRuntimeGaps).length,
+      runtimeGapIdDisclosurePolicy: 'allowlisted_static_gap_ids_only',
+      ...(runtimeGapAllowlist.explicitLocallyEvidencedRuntimeGaps === true
+        ? { locallyEvidencedRuntimeGaps }
+        : {}),
+      ...(runtimeGapAllowlist.explicitRemainingRuntimeGaps === true
+        ? { remainingRuntimeGaps }
+        : {}),
+      runtimeGapAllowlistAccepted:
+        runtimeGapAllowlist.accepted !== false,
+      unsupportedRuntimeGapCount:
+        normalizeNumber(runtimeGapAllowlist.unsupportedRuntimeGapCount)
     },
     validationAggregatorBridge: {
       status: normalizeString(bridge.status),
@@ -174,6 +193,14 @@ async function buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport(o
     allowlistedFinalRcEvidenceRunnerExecuted:
       normalizeBoolean(options.allowlistedFinalRcEvidenceRunnerExecuted)
   };
+  if (Object.hasOwn(options, 'locallyEvidencedRuntimeGaps')) {
+    runtimeEvidenceOptions.locallyEvidencedRuntimeGaps =
+      normalizeStringArray(options.locallyEvidencedRuntimeGaps);
+  }
+  if (Object.hasOwn(options, 'remainingRuntimeGaps')) {
+    runtimeEvidenceOptions.remainingRuntimeGaps =
+      normalizeStringArray(options.remainingRuntimeGaps);
+  }
   const runtimeEvidenceSummary = buildRuntimeEvidenceSummaryForAggregatorIntake(
     routeSummary,
     runtimeEvidenceOptions

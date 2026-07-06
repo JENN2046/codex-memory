@@ -116,6 +116,38 @@ function parseArgs(argv = []) {
       options.allowlistedFinalRcEvidenceRunnerExecuted = true;
       continue;
     }
+    if (token === '--locally-evidenced-runtime-gap') {
+      if (!Object.hasOwn(options, 'locallyEvidencedRuntimeGaps')) {
+        options.locallyEvidencedRuntimeGaps = [];
+      }
+      options.locallyEvidencedRuntimeGaps.push(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--locally-evidenced-runtime-gaps') {
+      if (!Object.hasOwn(options, 'locallyEvidencedRuntimeGaps')) {
+        options.locallyEvidencedRuntimeGaps = [];
+      }
+      options.locallyEvidencedRuntimeGaps.push(...parseCsvList(argv[index + 1] || ''));
+      index += 1;
+      continue;
+    }
+    if (token === '--remaining-runtime-gap') {
+      if (!Object.hasOwn(options, 'remainingRuntimeGaps')) {
+        options.remainingRuntimeGaps = [];
+      }
+      options.remainingRuntimeGaps.push(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--remaining-runtime-gaps') {
+      if (!Object.hasOwn(options, 'remainingRuntimeGaps')) {
+        options.remainingRuntimeGaps = [];
+      }
+      options.remainingRuntimeGaps.push(...parseCsvList(argv[index + 1] || ''));
+      index += 1;
+      continue;
+    }
     if (REJECTED_FLAGS.has(token)) {
       options.rejectedFlag = token;
       continue;
@@ -144,7 +176,12 @@ function renderHelp() {
     '  --evidence-units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5',
     '  --local-runtime-matrix-executed',
     '  --allowlisted-final-rc-evidence-runner-executed',
+    '  --locally-evidenced-runtime-gap GAP_ID',
+    '  --locally-evidenced-runtime-gaps GAP_ID,GAP_ID',
+    '  --remaining-runtime-gap GAP_ID',
+    '  --remaining-runtime-gaps GAP_ID,GAP_ID',
     '',
+    'Runtime gap IDs are accepted only from the static allowlist used by the validation aggregator; unsupported IDs fail closed without printing the raw value.',
     `Required evidence units for accepted aggregator intake: ${REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS.join(', ')}`,
     `Rejected flags: ${[...REJECTED_FLAGS].join(' ')}`,
     '',

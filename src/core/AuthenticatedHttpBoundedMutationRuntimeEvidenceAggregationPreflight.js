@@ -1,7 +1,9 @@
 'use strict';
 
 const {
-  REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS
+  REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS,
+  countUnsupportedRuntimeGapIds,
+  normalizeAllowlistedRuntimeGapIds
 } = require('./AuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake');
 const {
   buildV1RcValidationAggregatorReport
@@ -104,6 +106,18 @@ function repeatBucket(prefix, count) {
   return Array.from({ length: safeCount }, (_, index) => `${prefix}_${index + 1}`);
 }
 
+function buildRuntimeGapReplayValues(summary = {}, key = '', fallbackPrefix = '', fallbackCount = 0) {
+  if (Object.hasOwn(summary, key) && Array.isArray(summary[key])) {
+    return normalizeAllowlistedRuntimeGapIds(summary[key]);
+  }
+  return repeatBucket(fallbackPrefix, fallbackCount);
+}
+
+function countUnsupportedArtifactRuntimeGapIds(summary = {}) {
+  return countUnsupportedRuntimeGapIds(summary.locallyEvidencedRuntimeGaps) +
+    countUnsupportedRuntimeGapIds(summary.remainingRuntimeGaps);
+}
+
 function buildRuntimeEvidenceSummaryForAggregatorReplay(report = {}, options = {}) {
   const artifact = isPlainObject(report.runtimeEvidenceArtifact)
     ? report.runtimeEvidenceArtifact
@@ -161,11 +175,15 @@ function buildRuntimeEvidenceSummaryForAggregatorReplay(report = {}, options = {
     evidenceUnitIds: evidenceUnitsComplete
       ? [...REQUIRED_RUNTIME_EVIDENCE_UNIT_IDS]
       : [],
-    locallyEvidencedRuntimeGaps: repeatBucket(
+    locallyEvidencedRuntimeGaps: buildRuntimeGapReplayValues(
+      summary,
+      'locallyEvidencedRuntimeGaps',
       'sanitized_local_runtime_gap_bucket',
       summary.locallyEvidencedRuntimeGapCount
     ),
-    remainingRuntimeGaps: repeatBucket(
+    remainingRuntimeGaps: buildRuntimeGapReplayValues(
+      summary,
+      'remainingRuntimeGaps',
       'sanitized_remaining_runtime_gap_bucket',
       summary.remainingRuntimeGapCount
     ),
@@ -265,6 +283,9 @@ function collectSourceBlockers(report = {}) {
   }
   if (containsForbiddenReportMaterial(report)) {
     blockers.push('source_report_contains_forbidden_material');
+  }
+  if (countUnsupportedArtifactRuntimeGapIds(summary) > 0) {
+    blockers.push('source_runtime_gap_allowlist_rejected');
   }
 
   return [...new Set(blockers)].sort();
