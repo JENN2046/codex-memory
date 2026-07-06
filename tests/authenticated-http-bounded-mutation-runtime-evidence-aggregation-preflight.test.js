@@ -20,6 +20,7 @@ const {
   buildCliReport,
   buildRcCutoverCandidateArtifactExport,
   buildRcCutoverCandidateArtifactIntakePrecheck,
+  buildRcCutoverOwnerApprovalBoundaryPrecheck,
   parseArgs,
   readRcCutoverCandidateArtifactReportInput,
   readRuntimeEvidenceReportInput
@@ -262,6 +263,99 @@ function assertAcceptedArtifactIntake(intake) {
   assert.equal(intake.canClaimFinalRcReady, false);
   assert.equal(intake.canClaimV1RcReady, false);
   assert.equal(intake.canClaimRcReady, false);
+}
+
+function assertAcceptedOwnerApprovalBoundaryPrecheck(boundary) {
+  assert.equal(
+    boundary.schemaVersion,
+    'p75-rc-cutover-owner-approval-boundary-precheck-v1'
+  );
+  assert.equal(
+    boundary.boundaryType,
+    'rc_cutover_owner_approval_boundary_precheck_display'
+  );
+  assert.equal(boundary.sourceMode, 'p73_rc_cutover_candidate_artifact_intake_precheck');
+  assert.equal(
+    boundary.status,
+    'owner_approval_boundary_display_ready_not_authorization'
+  );
+  assert.equal(boundary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(boundary.boundaryPrecheckAccepted, true);
+  assert.equal(boundary.ownerReviewInputAccepted, true);
+  assert.equal(boundary.ownerReviewInputReady, true);
+  assert.equal(boundary.ownerApprovalBoundaryDisplayReady, true);
+  assert.equal(boundary.approvalRequestOnly, true);
+  assert.equal(boundary.approvalRequestSubmitted, false);
+  assert.equal(boundary.approvalLineGenerated, false);
+  assert.equal(boundary.approvalTextGenerated, false);
+  assert.equal(boundary.ownerApprovalPresent, false);
+  assert.equal(boundary.ownerApprovalAccepted, false);
+  assert.equal(boundary.ownerApprovalExecutionAllowed, false);
+  assert.equal(boundary.rcCutoverApproved, false);
+  assert.equal(boundary.rcCutoverExecuted, false);
+  assert.equal(boundary.rcCutoverExecutionAllowed, false);
+  assert.equal(boundary.rcReady, false);
+  assert.equal(boundary.boundaryFieldCount, 6);
+  assert.deepEqual(
+    boundary.requiredBoundaryFields.map(field => field.id),
+    [
+      'current_head_binding',
+      'remote_release_tag_deploy_action_list',
+      'config_watchdog_startup_change_scope',
+      'rollback_path',
+      'validation_commands',
+      'single_use_statement'
+    ]
+  );
+  assert.equal(
+    boundary.requiredBoundaryFields.every(field => field.valueIncluded === false),
+    true
+  );
+  assert.equal(
+    boundary.requiredBoundaryFields.every(field => field.rawValueOutput === false),
+    true
+  );
+  assert.equal(boundary.requiredBoundaryFieldValuesIncluded, false);
+  assert.equal(boundary.requiredBoundaryRawValuesOutput, false);
+  assert.equal(boundary.requiredBoundaryRawValuesPersisted, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalLineGenerated, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalTextGenerated, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalTemplateGenerated, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalRequestSubmitted, false);
+  assert.equal(boundary.generatedApprovalMaterial.ownerApprovalAccepted, false);
+  assert.equal(boundary.generatedApprovalMaterial.executionAuthorizationIncluded, false);
+  assert.equal(boundary.sourceSummary.manifestOwnerApprovalRequiredSeparately, true);
+  assert.equal(boundary.sourceSummary.finalEvidencePackageAggregationOutletAccepted, true);
+  assert.equal(boundary.sourceSummary.finalEvidencePackageOwnerReviewReady, true);
+  assert.equal(boundary.sourceSummary.finalEvidencePackageMissingRowCount, 0);
+  assert.equal(boundary.sourceSummary.finalEvidencePackageBlockerCount, 0);
+  assert.deepEqual(boundary.blockerIds, []);
+  assert.equal(boundary.disclosure.lowDisclosure, true);
+  assert.equal(boundary.disclosure.rawCurrentHeadCommitOutput, false);
+  assert.equal(boundary.disclosure.rawEvidenceGeneratedAtOutput, false);
+  assert.equal(boundary.disclosure.requiredOwnerApprovalFieldValuesOutput, false);
+  assert.equal(boundary.disclosure.approvalTextOutput, false);
+  assert.equal(boundary.disclosure.approvalLineOutput, false);
+  assert.equal(boundary.disclosure.approvalTemplateOutput, false);
+  assert.equal(boundary.disclosure.endpointOrLocatorOutput, false);
+  assert.equal(boundary.disclosure.rawResponseOutput, false);
+  assert.equal(boundary.disclosure.secretOutput, false);
+  assert.equal(boundary.disclosure.artifactPathOutput, false);
+  assert.equal(boundary.safety.readsCandidateArtifactIntakeOnly, true);
+  assert.equal(boundary.safety.executesCommands, false);
+  assert.equal(boundary.safety.callsProviders, false);
+  assert.equal(boundary.safety.callsMcpTools, false);
+  assert.equal(boundary.safety.readsRealMemory, false);
+  assert.equal(boundary.safety.writesDurableState, false);
+  assert.equal(boundary.safety.writesArtifactFile, false);
+  assert.equal(boundary.safety.remoteWrites, false);
+  assert.equal(boundary.safety.submitsApprovalRequest, false);
+  assert.equal(boundary.safety.executesCutover, false);
+  assert.equal(boundary.safety.readinessClaimed, false);
+  assert.equal(boundary.canClaimRuntimeReady, false);
+  assert.equal(boundary.canClaimFinalRcReady, false);
+  assert.equal(boundary.canClaimV1RcReady, false);
+  assert.equal(boundary.canClaimRcReady, false);
 }
 
 test('runtime evidence aggregation preflight accepts standard low-disclosure source but keeps aggregator replay blocked', async () => {
@@ -1001,6 +1095,20 @@ test('RC cutover candidate artifact intake accepts P72 artifact only as owner-re
   assertNoForbiddenMaterial(intake);
 });
 
+test('RC cutover owner approval boundary precheck displays requirements without authorization', async () => {
+  const artifact = await buildAcceptedRcCutoverCandidateArtifact();
+  const intake = buildRcCutoverCandidateArtifactIntakePrecheck({
+    rcCutoverCandidateArtifactExport: artifact
+  });
+  const boundary = buildRcCutoverOwnerApprovalBoundaryPrecheck({
+    rcCutoverCandidateArtifactIntakePrecheck: intake
+  });
+
+  assertAcceptedArtifactIntake(intake);
+  assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
+  assertNoForbiddenMaterial(boundary);
+});
+
 test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin without approval or readiness', async () => {
   const artifact = await buildAcceptedRcCutoverCandidateArtifact();
   const result = spawnSync(
@@ -1027,6 +1135,7 @@ test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin withou
   );
   const report = JSON.parse(result.stdout);
   const intake = report.evidence.p73RcCutoverCandidateArtifactIntakePrecheck;
+  const boundary = report.evidence.p75RcCutoverOwnerApprovalBoundaryPrecheck;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P73-rc-cutover-candidate-artifact-intake-precheck');
@@ -1037,6 +1146,7 @@ test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin withou
   assert.equal(report.rcCutoverCandidateArtifactReportInput.pathDisclosed, false);
   assert.equal(report.rcCutoverCandidateArtifactReportInput.rawInputPrinted, false);
   assertAcceptedArtifactIntake(intake);
+  assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
   assert.equal(report.summary.rcCutoverCandidateArtifactReportInputProvided, true);
   assert.equal(report.summary.rcCutoverCandidateArtifactReportInputAccepted, true);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeAccepted, true);
@@ -1048,6 +1158,13 @@ test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin withou
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeApprovalSubmitted, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeExecutesCutover, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeCanClaimRcReady, false);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryPrecheckAccepted, true);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryDisplayReady, true);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryFieldCount, 6);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryFieldValuesIncluded, false);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryApprovalGenerated, false);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryExecutesCutover, false);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryCanClaimRcReady, false);
   assert.equal(Object.hasOwn(report.evidence, 'p72RcCutoverCandidateArtifactExport'), false);
   assertNoForbiddenMaterial(report);
 });
@@ -1106,6 +1223,7 @@ test('v1 RC aggregator CLI can pipe P72 stdout artifact into P73 intake without 
   );
   const report = JSON.parse(intakeResult.stdout);
   const intake = report.evidence.p73RcCutoverCandidateArtifactIntakePrecheck;
+  const boundary = report.evidence.p75RcCutoverOwnerApprovalBoundaryPrecheck;
 
   assert.equal(artifactResult.status, 0, artifactResult.stderr);
   assertAcceptedArtifactExport(artifact);
@@ -1114,12 +1232,17 @@ test('v1 RC aggregator CLI can pipe P72 stdout artifact into P73 intake without 
   assert.equal(intakeResult.status, 0, intakeResult.stderr);
   assert.equal(report.phase, 'P73-rc-cutover-candidate-artifact-intake-precheck');
   assertAcceptedArtifactIntake(intake);
+  assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
   assert.equal(report.rcCutoverCandidateArtifactReportInput.pathDisclosed, false);
   assert.equal(report.rcCutoverCandidateArtifactReportInput.rawInputPrinted, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeAccepted, true);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeApprovalSubmitted, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeExecutesCutover, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeCanClaimRcReady, false);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryDisplayReady, true);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryApprovalGenerated, false);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryExecutesCutover, false);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryCanClaimRcReady, false);
   assertNoForbiddenMaterial(artifact);
   assertNoForbiddenMaterial(report);
 });
@@ -1133,6 +1256,9 @@ test('RC cutover candidate artifact intake fails closed on approval execution or
   driftedArtifact.safety.readinessClaimed = true;
   const intake = buildRcCutoverCandidateArtifactIntakePrecheck({
     rcCutoverCandidateArtifactExport: driftedArtifact
+  });
+  const boundary = buildRcCutoverOwnerApprovalBoundaryPrecheck({
+    rcCutoverCandidateArtifactIntakePrecheck: intake
   });
 
   assert.equal(intake.status, 'candidate_artifact_intake_blocked_fail_closed');
@@ -1148,7 +1274,20 @@ test('RC cutover candidate artifact intake fails closed on approval execution or
   assert.equal(intake.rcCutoverExecutionAllowed, false);
   assert.equal(intake.rcReady, false);
   assert.equal(intake.canClaimRcReady, false);
+  assert.equal(boundary.status, 'owner_approval_boundary_display_blocked_fail_closed');
+  assert.equal(boundary.boundaryPrecheckAccepted, false);
+  assert.equal(boundary.ownerApprovalBoundaryDisplayReady, false);
+  assert.ok(boundary.blockerIds.includes('candidate_artifact_intake_not_accepted'));
+  assert.ok(boundary.blockerIds.includes('owner_review_input_not_ready'));
+  assert.ok(boundary.blockerIds.includes('artifact_export_policy_not_stdout_only'));
+  assert.equal(boundary.requiredBoundaryFieldValuesIncluded, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalLineGenerated, false);
+  assert.equal(boundary.generatedApprovalMaterial.approvalTextGenerated, false);
+  assert.equal(boundary.rcCutoverExecutionAllowed, false);
+  assert.equal(boundary.rcReady, false);
+  assert.equal(boundary.canClaimRcReady, false);
   assertNoForbiddenMaterial(intake);
+  assertNoForbiddenMaterial(boundary);
 });
 
 test('runtime evidence aggregation preflight rejects unsupported artifact gap IDs fail-closed', async () => {

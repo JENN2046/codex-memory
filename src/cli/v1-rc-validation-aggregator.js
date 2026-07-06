@@ -1415,6 +1415,213 @@ function buildRcCutoverCandidateArtifactIntakePrecheck({
   };
 }
 
+function buildRcCutoverOwnerApprovalBoundaryPrecheck({
+  rcCutoverCandidateArtifactIntakePrecheck = null
+} = {}) {
+  const intake = isPlainObject(rcCutoverCandidateArtifactIntakePrecheck)
+    ? rcCutoverCandidateArtifactIntakePrecheck
+    : {};
+  const intakeAccepted = intake.inputAccepted === true;
+  const ownerReviewInputReady = intake.ownerReviewInputReady === true;
+  const finalEvidenceSummary = isPlainObject(intake.finalEvidencePackageSummary)
+    ? intake.finalEvidencePackageSummary
+    : {};
+  const manifestSummary = isPlainObject(intake.manifestSummary)
+    ? intake.manifestSummary
+    : {};
+  const sourceBlockers = Array.isArray(intake.blockerIds)
+    ? intake.blockerIds
+    : ['candidate_artifact_intake_unavailable'];
+  const blockerIds = [];
+
+  if (intakeAccepted !== true) {
+    blockerIds.push('candidate_artifact_intake_not_accepted');
+  }
+  if (ownerReviewInputReady !== true) {
+    blockerIds.push('owner_review_input_not_ready');
+  }
+  if (manifestSummary.ownerApprovalRequiredSeparately !== true) {
+    blockerIds.push('owner_approval_required_separately_not_declared');
+  }
+  if (manifestSummary.ownerApprovalIncluded === true) {
+    blockerIds.push('owner_approval_already_included');
+  }
+  if (manifestSummary.executionAuthorizationIncluded === true) {
+    blockerIds.push('execution_authorization_included');
+  }
+  if (finalEvidenceSummary.aggregationOutletAccepted !== true) {
+    blockerIds.push('final_evidence_package_outlet_not_accepted');
+  }
+  if (finalEvidenceSummary.ownerReviewReady !== true) {
+    blockerIds.push('final_evidence_package_owner_review_not_ready');
+  }
+  if (finalEvidenceSummary.missingRowCount !== 0) {
+    blockerIds.push('final_evidence_package_missing_rows_present');
+  }
+  if (finalEvidenceSummary.blockerCount !== 0) {
+    blockerIds.push('final_evidence_package_blockers_present');
+  }
+  if (finalEvidenceSummary.rcCutoverExecutionAllowed === true) {
+    blockerIds.push('final_evidence_package_execution_allowed');
+  }
+  if (finalEvidenceSummary.rcReady === true) {
+    blockerIds.push('final_evidence_package_readiness_claim_present');
+  }
+  blockerIds.push(...sourceBlockers);
+
+  const boundaryPrecheckAccepted = blockerIds.length === 0;
+  const requiredBoundaryFields = [
+    {
+      id: 'current_head_binding',
+      category: 'fresh_head_binding',
+      valueIncluded: false,
+      rawValueOutput: false,
+      requiredFor: 'owner_single_use_cutover_decision'
+    },
+    {
+      id: 'remote_release_tag_deploy_action_list',
+      category: 'explicit_delivery_surface_and_forbidden_actions',
+      valueIncluded: false,
+      rawValueOutput: false,
+      requiredFor: 'prove_no_unintended_remote_release_deploy_tag'
+    },
+    {
+      id: 'config_watchdog_startup_change_scope',
+      category: 'runtime_configuration_mutation_scope',
+      valueIncluded: false,
+      rawValueOutput: false,
+      requiredFor: 'prove_no_unapproved_config_watchdog_startup_change'
+    },
+    {
+      id: 'rollback_path',
+      category: 'rollback_or_abort_posture',
+      valueIncluded: false,
+      rawValueOutput: false,
+      requiredFor: 'owner_risk_acceptance_before_any_cutover'
+    },
+    {
+      id: 'validation_commands',
+      category: 'exact_validation_evidence_requirements',
+      valueIncluded: false,
+      rawValueOutput: false,
+      requiredFor: 'fresh_replayable_validation_before_owner_decision'
+    },
+    {
+      id: 'single_use_statement',
+      category: 'single_use_owner_authorization_limit',
+      valueIncluded: false,
+      rawValueOutput: false,
+      requiredFor: 'prevent_reuse_or_retry_expansion'
+    }
+  ];
+
+  return {
+    schemaVersion: 'p75-rc-cutover-owner-approval-boundary-precheck-v1',
+    boundaryType: 'rc_cutover_owner_approval_boundary_precheck_display',
+    sourceMode: 'p73_rc_cutover_candidate_artifact_intake_precheck',
+    status: boundaryPrecheckAccepted
+      ? 'owner_approval_boundary_display_ready_not_authorization'
+      : 'owner_approval_boundary_display_blocked_fail_closed',
+    decision: 'NOT_READY_BLOCKED',
+    boundaryPrecheckAccepted,
+    ownerReviewInputAccepted: intakeAccepted,
+    ownerReviewInputReady,
+    ownerApprovalBoundaryDisplayReady: boundaryPrecheckAccepted,
+    approvalRequestOnly: true,
+    approvalRequestSubmitted: false,
+    approvalLineGenerated: false,
+    approvalTextGenerated: false,
+    ownerApprovalPresent: false,
+    ownerApprovalAccepted: false,
+    ownerApprovalExecutionAllowed: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    requiredBoundaryFields,
+    boundaryFieldCount: requiredBoundaryFields.length,
+    requiredBoundaryFieldValuesIncluded: false,
+    requiredBoundaryRawValuesOutput: false,
+    requiredBoundaryRawValuesPersisted: false,
+    generatedApprovalMaterial: {
+      approvalLineGenerated: false,
+      approvalTextGenerated: false,
+      approvalTemplateGenerated: false,
+      approvalRequestSubmitted: false,
+      ownerApprovalAccepted: false,
+      executionAuthorizationIncluded: false
+    },
+    sourceSummary: {
+      intakeSchemaVersion:
+        typeof intake.schemaVersion === 'string' ? intake.schemaVersion : '',
+      intakeStatus: typeof intake.status === 'string' ? intake.status : '',
+      manifestOwnerApprovalRequiredSeparately:
+        manifestSummary.ownerApprovalRequiredSeparately === true,
+      finalEvidencePackageAggregationOutletAccepted:
+        finalEvidenceSummary.aggregationOutletAccepted === true,
+      finalEvidencePackageOwnerReviewReady:
+        finalEvidenceSummary.ownerReviewReady === true,
+      finalEvidencePackageMissingRowCount:
+        Number.isFinite(finalEvidenceSummary.missingRowCount)
+          ? finalEvidenceSummary.missingRowCount
+          : 0,
+      finalEvidencePackageBlockerCount:
+        Number.isFinite(finalEvidenceSummary.blockerCount)
+          ? finalEvidenceSummary.blockerCount
+          : 0
+    },
+    blockerIds: [...new Set(blockerIds)].sort(),
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      requiredOwnerApprovalFieldValuesOutput: false,
+      approvalTextOutput: false,
+      approvalLineOutput: false,
+      approvalTemplateOutput: false,
+      endpointOrLocatorOutput: false,
+      requestBodyOutput: false,
+      rawResponseOutput: false,
+      rawErrorOutput: false,
+      secretOutput: false,
+      privateMemoryContentOutput: false,
+      artifactPathOutput: false,
+      rawInputPrinted: false
+    },
+    safety: {
+      readsCandidateArtifactIntakeOnly: true,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      writesArtifactFile: false,
+      mutatesConfig: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      pushes: false,
+      tags: false,
+      releases: false,
+      deploys: false,
+      submitsApprovalRequest: false,
+      executesCutover: false,
+      readinessClaimed: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: boundaryPrecheckAccepted
+      ? 'Use this display as the structural owner approval boundary checklist only; separate exact owner approval is still required before any execution.'
+      : 'Repair the P73 candidate artifact intake before preparing an owner approval boundary display.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -1495,6 +1702,12 @@ function buildCliReport(options = {}) {
             options.rcCutoverCandidateArtifactReport
         })
       : null;
+  const rcCutoverOwnerApprovalBoundaryPrecheck =
+    rcCutoverCandidateArtifactIntakePrecheck
+      ? buildRcCutoverOwnerApprovalBoundaryPrecheck({
+          rcCutoverCandidateArtifactIntakePrecheck
+        })
+      : null;
 
   const outputReport = {
     ...report,
@@ -1555,7 +1768,9 @@ function buildCliReport(options = {}) {
       ...(rcCutoverCandidateArtifactIntakePrecheck
         ? {
             p73RcCutoverCandidateArtifactIntakePrecheck:
-              rcCutoverCandidateArtifactIntakePrecheck
+              rcCutoverCandidateArtifactIntakePrecheck,
+            p75RcCutoverOwnerApprovalBoundaryPrecheck:
+              rcCutoverOwnerApprovalBoundaryPrecheck
           }
         : {})
     },
@@ -1631,7 +1846,19 @@ function buildCliReport(options = {}) {
               rcCutoverCandidateArtifactIntakePrecheck.blockerIds.length,
             rcCutoverCandidateArtifactIntakeApprovalSubmitted: false,
             rcCutoverCandidateArtifactIntakeExecutesCutover: false,
-            rcCutoverCandidateArtifactIntakeCanClaimRcReady: false
+            rcCutoverCandidateArtifactIntakeCanClaimRcReady: false,
+            rcCutoverOwnerApprovalBoundaryPrecheckAccepted:
+              rcCutoverOwnerApprovalBoundaryPrecheck
+                ?.boundaryPrecheckAccepted === true,
+            rcCutoverOwnerApprovalBoundaryDisplayReady:
+              rcCutoverOwnerApprovalBoundaryPrecheck
+                ?.ownerApprovalBoundaryDisplayReady === true,
+            rcCutoverOwnerApprovalBoundaryFieldCount:
+              rcCutoverOwnerApprovalBoundaryPrecheck?.boundaryFieldCount || 0,
+            rcCutoverOwnerApprovalBoundaryFieldValuesIncluded: false,
+            rcCutoverOwnerApprovalBoundaryApprovalGenerated: false,
+            rcCutoverOwnerApprovalBoundaryExecutesCutover: false,
+            rcCutoverOwnerApprovalBoundaryCanClaimRcReady: false
           }
         : {})
     },
@@ -1719,6 +1946,7 @@ module.exports = {
   buildRcCutoverFinalEvidencePackageAggregationOutlet,
   buildRcCutoverCandidateArtifactExport,
   buildRcCutoverCandidateArtifactIntakePrecheck,
+  buildRcCutoverOwnerApprovalBoundaryPrecheck,
   parseArgs,
   buildUsageText,
   redactExactRuntimeEvidenceValues,
