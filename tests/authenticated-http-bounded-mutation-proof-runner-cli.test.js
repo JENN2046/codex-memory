@@ -237,6 +237,47 @@ test('authenticated HTTP bounded mutation proof CLI route summary text mode rend
   assertOutputHasNoRawRuntimeValues(result.stdout);
 });
 
+test('authenticated HTTP bounded mutation proof CLI route-only intake reaches aggregator and remains blocked', () => {
+  const result = runCli(['--json', '--intake']);
+  assert.equal(result.status, 1);
+  const intake = parseJson(result);
+
+  assert.equal(
+    intake.schemaVersion,
+    'authenticated-http-bounded-mutation-proof-runtime-evidence-intake-v1'
+  );
+  assert.equal(intake.status, 'blocked');
+  assert.equal(
+    intake.decision,
+    'AUTHENTICATED_HTTP_BOUNDED_CLEANUP_SUPPRESSION_RUNTIME_EVIDENCE_INTAKE_BLOCKED'
+  );
+  assert.equal(intake.accepted, false);
+  assert.equal(intake.routeSummaryAccepted, true);
+  assert.equal(intake.runtimeEvidenceSummaryIntake.runnerExecuted, true);
+  assert.equal(intake.runtimeEvidenceSummaryIntake.commandsExecuted, true);
+  assert.equal(intake.runtimeEvidenceSummaryIntake.localRuntimeEvidenceMatrixExecuted, false);
+  assert.equal(intake.runtimeEvidenceSummaryIntake.allowlistedFinalRcEvidenceRunnerExecuted, false);
+  assert.equal(intake.validationAggregatorBridge.accepted, false);
+  assert.equal(intake.validationAggregatorBridge.rejected, true);
+  assert.equal(
+    intake.validationAggregatorBridge.rejectReason,
+    'source_runtime_matrix_execution_required'
+  );
+  assert.equal(intake.validationAggregatorReport.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(intake.validationAggregatorReport.runtimeEvidenceSummaryRejected, true);
+  assert.equal(intake.validationAggregatorReport.canClaimV1RcReady, false);
+  assert.equal(intake.disclosure.currentHeadCommitIncluded, false);
+  assert.equal(intake.disclosure.endpointOrLocatorIncluded, false);
+  assert.equal(intake.safety.providerCalls, 0);
+  assert.equal(intake.safety.readinessClaimed, false);
+  assert.ok(
+    intake.blockers.includes(
+      'validation_aggregator_runtime_evidence_summary_source_runtime_matrix_execution_required'
+    )
+  );
+  assertOutputHasNoRawRuntimeValues(result.stdout);
+});
+
 test('authenticated HTTP bounded mutation proof CLI can narrow to tombstone family', () => {
   const result = runCli(['--json', '--family', 'tombstone_memory']);
   assert.equal(result.status, 0, result.stderr);
@@ -323,6 +364,7 @@ test('authenticated HTTP bounded mutation proof CLI help documents local-only ev
   assert.match(result.stdout, /Usage: node src\/cli\/authenticated-http-bounded-mutation-proof\.js/);
   assert.match(result.stdout, /temp-local synthetic authenticated HTTP bounded mutation proof/);
   assert.match(result.stdout, /--summary/);
+  assert.match(result.stdout, /--intake/);
   assert.match(result.stdout, /writes no report file/);
   assert.match(result.stdout, /makes no provider calls/);
 });

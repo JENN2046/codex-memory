@@ -34,6 +34,7 @@ function parseArgs(argv = []) {
     pretty: false,
     help: false,
     summary: false,
+    intake: false,
     family: 'both',
     rejectedFlag: null
   };
@@ -50,6 +51,10 @@ function parseArgs(argv = []) {
     }
     if (token === '--summary') {
       options.summary = true;
+      continue;
+    }
+    if (token === '--intake') {
+      options.intake = true;
       continue;
     }
     if (token === '--help' || token === '-h') {
@@ -79,6 +84,7 @@ function renderHelp() {
     '',
     'Runs a temp-local synthetic authenticated HTTP bounded mutation proof and emits a low-disclosure receipt report.',
     'Use --summary to emit the higher-level bounded cleanup/suppression route summary instead of the source report.',
+    'Use --intake to feed the route summary into the explicit runtime evidence summary intake helper; route-only intake remains blocked until exact head-bound runtime evidence metadata is supplied.',
     'The command starts only a loopback port-0 test server, writes no report file, returns no endpoint, token, path, memory id, raw content, raw response, or raw error, and makes no provider calls.',
     '',
     `Default families: ${DEFAULT_MUTATION_FAMILIES.join(', ')}`,
@@ -217,11 +223,17 @@ async function main(argv = process.argv.slice(2)) {
     report = await runAuthenticatedHttpBoundedMutationProofReport({ family: options.family });
   }
 
-  if (options.summary) {
+  if (options.summary || options.intake) {
     const {
       buildAuthenticatedHttpBoundedMutationProofRouteSummary
     } = require('../core/AuthenticatedHttpBoundedMutationProofRouteSummary');
     report = buildAuthenticatedHttpBoundedMutationProofRouteSummary(report);
+  }
+  if (options.intake) {
+    const {
+      buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake
+    } = require('../core/AuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake');
+    report = buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake(report);
   }
 
   if (options.json) {
