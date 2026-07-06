@@ -703,6 +703,181 @@ function buildRcCutoverOwnerApprovalReadinessSummary({
   };
 }
 
+function buildRcCutoverFinalEvidencePackageAggregationOutlet({
+  runtimeEvidencePreflight = null,
+  finalEvidenceAggregationRcGatePrecheck = null,
+  rcCutoverPreApprovalCandidatePackage = null,
+  rcCutoverOwnerApprovalReadinessSummary = null
+} = {}) {
+  const preflight = runtimeEvidencePreflight || {};
+  const precheck = finalEvidenceAggregationRcGatePrecheck || {};
+  const candidate = rcCutoverPreApprovalCandidatePackage || {};
+  const ownerSummary = rcCutoverOwnerApprovalReadinessSummary || {};
+  const chainRows = [
+    {
+      id: 'p67_runtime_evidence_standard_input_preflight',
+      accepted:
+        preflight.standardInputSourceAccepted === true &&
+        preflight.aggregatorReplay?.accepted === true,
+      sourceMode: 'sanitized_runtime_evidence_report_plus_optional_exact_head_input',
+      canClaimReadiness: false
+    },
+    {
+      id: 'p68_final_evidence_aggregation_rc_gate_precheck',
+      accepted: precheck.rcGatePrecheckAccepted === true,
+      sourceMode: 'final_evidence_aggregation_rc_gate_precheck',
+      canClaimReadiness: false
+    },
+    {
+      id: 'p69_rc_cutover_pre_approval_candidate_package',
+      accepted: candidate.candidatePackageAccepted === true,
+      sourceMode: 'rc_cutover_pre_approval_candidate_package',
+      canClaimReadiness: false
+    },
+    {
+      id: 'p70_rc_cutover_owner_approval_readiness_summary',
+      accepted: ownerSummary.ownerReviewReady === true,
+      sourceMode: 'rc_cutover_owner_approval_readiness_summary',
+      canClaimReadiness: false
+    }
+  ];
+  const missingChainIds = chainRows
+    .filter(row => row.accepted !== true)
+    .map(row => row.id);
+  const candidateBlockerIds = Array.isArray(candidate.blockerIds)
+    ? candidate.blockerIds
+    : [];
+  const ownerBlockerIds = Array.isArray(ownerSummary.blockerIds)
+    ? ownerSummary.blockerIds
+    : [];
+  const blockerIds = [
+    ...missingChainIds.map(id => `${id}_not_accepted`),
+    ...candidateBlockerIds,
+    ...ownerBlockerIds
+  ];
+  const aggregationOutletAccepted =
+    missingChainIds.length === 0 &&
+    ownerSummary.ownerReviewReady === true &&
+    ownerSummary.ownerApprovalPresent === false &&
+    ownerSummary.rcCutoverExecutionAllowed === false &&
+    ownerSummary.rcReady === false;
+
+  return {
+    schemaVersion: 'p71-rc-cutover-final-evidence-package-aggregation-outlet-v1',
+    packageType: 'rc_cutover_final_evidence_package_aggregation_outlet',
+    sourceMode: 'p67_p68_p69_p70_low_disclosure_chain',
+    status: aggregationOutletAccepted
+      ? 'final_evidence_package_ready_for_exact_owner_review_not_authorization'
+      : 'final_evidence_package_blocked_pending_complete_low_disclosure_chain',
+    decision: 'NOT_READY_BLOCKED',
+    aggregationOutletAccepted,
+    ownerReviewReady: ownerSummary.ownerReviewReady === true,
+    approvalRequestOnly: true,
+    approvalRequestSubmitted: false,
+    approvalLineGenerated: false,
+    approvalTextGenerated: false,
+    ownerApprovalPresent: false,
+    ownerApprovalAccepted: false,
+    ownerApprovalBoundToHead: false,
+    ownerApprovalExecutionAllowed: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    chain: {
+      rowCount: chainRows.length,
+      acceptedRowCount: chainRows.length - missingChainIds.length,
+      missingRowCount: missingChainIds.length,
+      missingIds: missingChainIds,
+      rows: chainRows
+    },
+    evidenceSummary: {
+      runtimeEvidenceStandardInputAccepted:
+        preflight.standardInputSourceAccepted === true,
+      runtimeEvidenceAggregatorReplayAccepted:
+        preflight.aggregatorReplay?.accepted === true,
+      exactHeadBoundInputAccepted:
+        preflight.exactHeadBoundRuntimeSummaryInput?.accepted === true,
+      currentHeadBindingMatched: precheck.currentHeadBindingMatched === true,
+      evidenceFreshnessStatus:
+        typeof precheck.evidenceFreshnessStatus === 'string'
+          ? precheck.evidenceFreshnessStatus
+          : '',
+      evidenceUnitsComplete: precheck.evidenceUnitsComplete === true,
+      rcGatePrecheckAccepted: precheck.rcGatePrecheckAccepted === true,
+      candidatePackageAccepted: candidate.candidatePackageAccepted === true,
+      ownerApprovalReadinessAccepted: ownerSummary.ownerReviewReady === true
+    },
+    rcGateRows: {
+      freshCurrentHeadAccepted:
+        precheck.rcGateRows?.freshCurrentHeadAccepted === true,
+      strictGateAccepted: precheck.rcGateRows?.strictGateAccepted === true,
+      liveHttpNoWriteAccepted:
+        precheck.rcGateRows?.liveHttpNoWriteAccepted === true,
+      validationAggregatorZeroGapAccepted:
+        precheck.rcGateRows?.validationAggregatorZeroGapAccepted === true
+    },
+    ownerApprovalBoundary: {
+      required: true,
+      present: false,
+      accepted: false,
+      submitted: false,
+      executionAllowed: false,
+      requiredFieldCount: Array.isArray(ownerSummary.requiredOwnerApprovalFields)
+        ? ownerSummary.requiredOwnerApprovalFields.length
+        : 0,
+      requiredFieldValuesIncluded: false,
+      canClaimRcReady: false
+    },
+    blockerIds: [...new Set(blockerIds)].sort(),
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      requiredOwnerApprovalFieldValuesOutput: false,
+      approvalTextOutput: false,
+      approvalLineOutput: false,
+      endpointOrLocatorOutput: false,
+      requestBodyOutput: false,
+      rawResponseOutput: false,
+      rawErrorOutput: false,
+      secretOutput: false,
+      privateMemoryContentOutput: false
+    },
+    safety: {
+      readsLowDisclosureEvidenceChainOnly: true,
+      readsFiles: false,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      mutatesConfig: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      pushes: false,
+      tags: false,
+      releases: false,
+      deploys: false,
+      submitsApprovalRequest: false,
+      executesCutover: false,
+      readinessClaimed: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: aggregationOutletAccepted
+      ? 'Use this outlet as the local low-disclosure evidence package for separate exact owner review only; do not execute cutover or claim readiness.'
+      : 'Continue closing missing low-disclosure evidence chain rows before preparing exact owner review.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -755,6 +930,15 @@ function buildCliReport(options = {}) {
           rcCutoverPreApprovalCandidatePackage
         })
       : null;
+  const rcCutoverFinalEvidencePackageAggregationOutlet =
+    rcCutoverOwnerApprovalReadinessSummary
+      ? buildRcCutoverFinalEvidencePackageAggregationOutlet({
+          runtimeEvidencePreflight,
+          finalEvidenceAggregationRcGatePrecheck,
+          rcCutoverPreApprovalCandidatePackage,
+          rcCutoverOwnerApprovalReadinessSummary
+        })
+      : null;
 
   const outputReport = {
     ...report,
@@ -790,7 +974,9 @@ function buildCliReport(options = {}) {
             p69RcCutoverPreApprovalCandidatePackage:
               rcCutoverPreApprovalCandidatePackage,
             p70RcCutoverOwnerApprovalReadinessSummary:
-              rcCutoverOwnerApprovalReadinessSummary
+              rcCutoverOwnerApprovalReadinessSummary,
+            p71RcCutoverFinalEvidencePackageAggregationOutlet:
+              rcCutoverFinalEvidencePackageAggregationOutlet
           }
         : {})
     },
@@ -837,6 +1023,13 @@ function buildCliReport(options = {}) {
               rcCutoverOwnerApprovalReadinessSummary?.ownerReviewReady === true,
             rcCutoverOwnerApprovalReadinessSummaryApprovalSubmitted: false,
             rcCutoverOwnerApprovalReadinessSummaryCanClaimRcReady: false,
+            rcCutoverFinalEvidencePackageAggregationOutletAccepted:
+              rcCutoverFinalEvidencePackageAggregationOutlet
+                ?.aggregationOutletAccepted === true,
+            rcCutoverFinalEvidencePackageAggregationOutletReadyForOwnerReview:
+              rcCutoverFinalEvidencePackageAggregationOutlet
+                ?.ownerReviewReady === true,
+            rcCutoverFinalEvidencePackageAggregationOutletCanClaimRcReady: false,
             runtimeEvidenceReportCanClaimV1RcReady: false
           }
         : {})
@@ -895,6 +1088,7 @@ module.exports = {
   buildFinalEvidenceAggregationRcGatePrecheck,
   buildRcCutoverPreApprovalCandidatePackage,
   buildRcCutoverOwnerApprovalReadinessSummary,
+  buildRcCutoverFinalEvidencePackageAggregationOutlet,
   parseArgs,
   buildUsageText,
   redactExactRuntimeEvidenceValues,
