@@ -180,6 +180,8 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   const report = JSON.parse(result.stdout);
   const preflight =
     report.evidence.p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight;
+  const rcGatePrecheck =
+    report.evidence.p68FinalEvidenceAggregationRcGatePrecheck;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
@@ -201,7 +203,19 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   assert.equal(preflight.standardInputSourceAccepted, true);
   assert.equal(preflight.aggregatorReplay.rejectReason, 'current_head_binding_required');
   assert.equal(preflight.aggregatorReplay.canClaimV1RcReady, false);
+  assert.equal(rcGatePrecheck.standardInputSourceAccepted, true);
+  assert.equal(rcGatePrecheck.exactHeadBoundInputProvided, false);
+  assert.equal(rcGatePrecheck.exactHeadBoundInputAccepted, false);
+  assert.equal(rcGatePrecheck.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(rcGatePrecheck.rcGatePrecheckAccepted, false);
+  assert.equal(rcGatePrecheck.currentHeadBindingStatus, 'not_provided');
+  assert.equal(rcGatePrecheck.rcGateRows.freshCurrentHeadAccepted, false);
+  assert.equal(rcGatePrecheck.canClaimRcReady, false);
+  assert.equal(rcGatePrecheck.safety.readinessClaimed, false);
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
+  assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, false);
+  assert.equal(report.summary.rcGatePrecheckFreshCurrentHeadAccepted, false);
+  assert.equal(report.summary.rcGatePrecheckCanClaimRcReady, false);
   assertNoForbiddenMaterial(report);
 });
 
@@ -237,6 +251,8 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   const report = JSON.parse(result.stdout);
   const preflight =
     report.evidence.p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight;
+  const rcGatePrecheck =
+    report.evidence.p68FinalEvidenceAggregationRcGatePrecheck;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
@@ -260,6 +276,43 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assert.equal(preflight.aggregatorReplay.accepted, true);
   assert.equal(preflight.aggregatorReplay.currentHeadBindingStatus, 'matched');
   assert.equal(preflight.aggregatorReplay.evidenceFreshnessStatus, 'fresh');
+  assert.equal(rcGatePrecheck.status, 'exact_head_bound_runtime_summary_accepted_by_final_aggregation_not_ready');
+  assert.equal(rcGatePrecheck.decision, 'NOT_READY_BLOCKED');
+  assert.equal(rcGatePrecheck.standardInputSourceAccepted, true);
+  assert.equal(rcGatePrecheck.exactHeadBoundInputProvided, true);
+  assert.equal(rcGatePrecheck.exactHeadBoundInputAccepted, true);
+  assert.equal(rcGatePrecheck.runtimeEvidenceSummaryAccepted, true);
+  assert.equal(rcGatePrecheck.finalEvidenceAggregationAccepted, true);
+  assert.equal(rcGatePrecheck.rcGatePrecheckAccepted, true);
+  assert.equal(rcGatePrecheck.currentHeadBindingStatus, 'matched');
+  assert.equal(rcGatePrecheck.currentHeadBindingMatched, true);
+  assert.equal(rcGatePrecheck.evidenceFreshnessStatus, 'fresh');
+  assert.equal(rcGatePrecheck.evidenceUnitsComplete, true);
+  assert.equal(rcGatePrecheck.rc9DecisionPacketAvailable, true);
+  assert.equal(rcGatePrecheck.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(
+    rcGatePrecheck.rc9CompletenessChecklistStatus,
+    'incomplete_missing_required_evidence'
+  );
+  assert.equal(rcGatePrecheck.rcGateRows.freshCurrentHeadAccepted, true);
+  assert.equal(rcGatePrecheck.rcGateRows.strictGateAccepted, true);
+  assert.equal(rcGatePrecheck.rcGateRows.liveHttpNoWriteAccepted, true);
+  assert.equal(rcGatePrecheck.rcGateRows.validationAggregatorZeroGapAccepted, false);
+  assert.equal(rcGatePrecheck.disclosure.rawCurrentHeadCommitOutput, false);
+  assert.equal(rcGatePrecheck.disclosure.rawEvidenceGeneratedAtOutput, false);
+  assert.equal(rcGatePrecheck.safety.executesCommands, false);
+  assert.equal(rcGatePrecheck.safety.readinessClaimed, false);
+  assert.equal(rcGatePrecheck.canClaimRcReady, false);
+  assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, true);
+  assert.equal(report.summary.finalEvidenceAggregationRuntimeEvidenceSummaryAccepted, true);
+  assert.equal(report.summary.finalEvidenceAggregationCurrentHeadBindingMatched, true);
+  assert.equal(report.summary.finalEvidenceAggregationEvidenceFreshnessStatus, 'fresh');
+  assert.equal(report.summary.rcGatePrecheckFreshCurrentHeadAccepted, true);
+  assert.equal(
+    report.summary.rcGatePrecheckCompletenessChecklistStatus,
+    'incomplete_missing_required_evidence'
+  );
+  assert.equal(report.summary.rcGatePrecheckCanClaimRcReady, false);
   assertNoForbiddenMaterial(report);
 });
 

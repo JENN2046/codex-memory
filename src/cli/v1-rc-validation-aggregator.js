@@ -307,6 +307,142 @@ function redactExactRuntimeEvidenceValues(value, exactInput = null) {
   return value;
 }
 
+function findRc9ChecklistRow(report = {}, rowId = '') {
+  const rows = Array.isArray(report.evidence?.rc9DecisionPacket?.completenessChecklist)
+    ? report.evidence.rc9DecisionPacket.completenessChecklist
+    : [];
+  return rows.find(row => row && row.id === rowId) || {};
+}
+
+function buildFinalEvidenceAggregationRcGatePrecheck({
+  report = {},
+  runtimeEvidencePreflight = null
+} = {}) {
+  const preflight = runtimeEvidencePreflight || {};
+  const exactInput = preflight.exactHeadBoundRuntimeSummaryInput || {};
+  const summary = report.summary || {};
+  const freshHeadRow = findRc9ChecklistRow(report, 'fresh_current_head');
+  const strictGateRow = findRc9ChecklistRow(report, 'strict_gate');
+  const liveHttpNoWriteRow = findRc9ChecklistRow(report, 'live_http_no_write');
+  const zeroGapRow = findRc9ChecklistRow(report, 'validation_aggregator_zero_gap');
+  const standardSourceAccepted = preflight.standardInputSourceAccepted === true;
+  const exactHeadBoundInputAccepted = exactInput.accepted === true;
+  const runtimeEvidenceSummaryAccepted =
+    summary.runtimeEvidenceSummaryAccepted === true;
+  const rc9PacketAvailable = summary.rc9DecisionPacketAvailable === true;
+  const rcGatePrecheckAccepted =
+    standardSourceAccepted &&
+    exactHeadBoundInputAccepted &&
+    runtimeEvidenceSummaryAccepted &&
+    rc9PacketAvailable &&
+    freshHeadRow.accepted === true;
+
+  return {
+    schemaVersion: 'p68-final-evidence-aggregation-rc-gate-precheck-v1',
+    sourceMode:
+      'runtime_evidence_standard_input_plus_exact_head_bound_summary_input',
+    status: rcGatePrecheckAccepted
+      ? 'exact_head_bound_runtime_summary_accepted_by_final_aggregation_not_ready'
+      : 'blocked_pending_exact_head_bound_runtime_summary_acceptance',
+    decision: 'NOT_READY_BLOCKED',
+    standardInputSourceAccepted: standardSourceAccepted,
+    exactHeadBoundInputProvided: exactInput.provided === true,
+    exactHeadBoundInputAccepted,
+    exactHeadBoundInputRejected: exactInput.rejected === true,
+    runtimeEvidenceSummaryAccepted,
+    runtimeEvidenceSummaryRejected:
+      summary.runtimeEvidenceSummaryRejected === true,
+    finalEvidenceAggregationAccepted: runtimeEvidenceSummaryAccepted,
+    rcGatePrecheckAccepted,
+    currentHeadBindingStatus:
+      typeof summary.runtimeEvidenceSummaryCurrentHeadBindingStatus === 'string'
+        ? summary.runtimeEvidenceSummaryCurrentHeadBindingStatus
+        : '',
+    currentHeadBindingMatched:
+      summary.runtimeEvidenceSummaryCurrentHeadBindingMatched === true,
+    evidenceFreshnessStatus:
+      typeof summary.runtimeEvidenceSummaryEvidenceFreshnessStatus === 'string'
+        ? summary.runtimeEvidenceSummaryEvidenceFreshnessStatus
+        : '',
+    evidenceUnitCount: Number.isFinite(summary.runtimeEvidenceSummaryEvidenceUnitCount)
+      ? summary.runtimeEvidenceSummaryEvidenceUnitCount
+      : 0,
+    requiredEvidenceUnitCount:
+      Number.isFinite(summary.runtimeEvidenceSummaryRequiredEvidenceUnitCount)
+        ? summary.runtimeEvidenceSummaryRequiredEvidenceUnitCount
+        : 0,
+    missingEvidenceUnitCount:
+      Number.isFinite(summary.runtimeEvidenceSummaryMissingEvidenceUnitCount)
+        ? summary.runtimeEvidenceSummaryMissingEvidenceUnitCount
+        : 0,
+    evidenceUnitsComplete:
+      summary.runtimeEvidenceSummaryEvidenceUnitsComplete === true,
+    rc9DecisionPacketAvailable: rc9PacketAvailable,
+    rc9DecisionPacketStatus:
+      typeof summary.rc9DecisionPacketStatus === 'string'
+        ? summary.rc9DecisionPacketStatus
+        : '',
+    rc9DecisionPacketDecision:
+      typeof summary.rc9DecisionPacketDecision === 'string'
+        ? summary.rc9DecisionPacketDecision
+        : '',
+    rc9DecisionPacketReadyToRequestRcCutoverApproval:
+      summary.rc9DecisionPacketReadyToRequestRcCutoverApproval === true,
+    rc9CompletenessChecklistStatus:
+      typeof summary.rc9DecisionPacketCompletenessChecklistStatus === 'string'
+        ? summary.rc9DecisionPacketCompletenessChecklistStatus
+        : '',
+    rc9CompletenessChecklistRequiredCount:
+      Number.isFinite(summary.rc9DecisionPacketCompletenessChecklistRequiredCount)
+        ? summary.rc9DecisionPacketCompletenessChecklistRequiredCount
+        : 0,
+    rc9CompletenessChecklistAcceptedCount:
+      Number.isFinite(summary.rc9DecisionPacketCompletenessChecklistAcceptedCount)
+        ? summary.rc9DecisionPacketCompletenessChecklistAcceptedCount
+        : 0,
+    rc9CompletenessChecklistMissingCount:
+      Number.isFinite(summary.rc9DecisionPacketCompletenessChecklistMissingCount)
+        ? summary.rc9DecisionPacketCompletenessChecklistMissingCount
+        : 0,
+    rcGateRows: {
+      freshCurrentHeadAccepted: freshHeadRow.accepted === true,
+      strictGateAccepted: strictGateRow.accepted === true,
+      liveHttpNoWriteAccepted: liveHttpNoWriteRow.accepted === true,
+      validationAggregatorZeroGapAccepted: zeroGapRow.accepted === true
+    },
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      rawCurrentHeadCommitPersisted: false,
+      rawExpectedCurrentHeadCommitPersisted: false,
+      rawEvidenceGeneratedAtPersisted: false
+    },
+    safety: {
+      readsStandardInputOnly: true,
+      readsSeparateExactMetadataInputOnly: true,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      readinessClaimed: false,
+      rcCutoverAuthorized: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: rcGatePrecheckAccepted
+      ? 'Use this as a higher-level RC gate precheck input only; keep RC readiness blocked.'
+      : 'Provide accepted standard runtime evidence plus separate exact head-bound freshness input before RC gate precheck acceptance.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -341,6 +477,12 @@ function buildCliReport(options = {}) {
     generatedAt: options.generatedAt || undefined,
     runtimeEvidenceSummary: runtimeEvidenceSummaryForReport
   });
+  const finalEvidenceAggregationRcGatePrecheck = runtimeEvidencePreflight
+    ? buildFinalEvidenceAggregationRcGatePrecheck({
+        report,
+        runtimeEvidencePreflight
+      })
+    : null;
 
   const outputReport = {
     ...report,
@@ -370,7 +512,9 @@ function buildCliReport(options = {}) {
       ...(runtimeEvidencePreflight
         ? {
             p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight:
-              runtimeEvidencePreflight
+              runtimeEvidencePreflight,
+            p68FinalEvidenceAggregationRcGatePrecheck:
+              finalEvidenceAggregationRcGatePrecheck
           }
         : {})
     },
@@ -393,6 +537,21 @@ function buildCliReport(options = {}) {
               runtimeEvidencePreflight.exactHeadBoundRuntimeSummaryInput?.accepted === true,
             runtimeEvidenceReportExactHeadBoundInputRejected:
               runtimeEvidencePreflight.exactHeadBoundRuntimeSummaryInput?.rejected === true,
+            finalEvidenceAggregationRcGatePrecheckAccepted:
+              finalEvidenceAggregationRcGatePrecheck?.rcGatePrecheckAccepted === true,
+            finalEvidenceAggregationRuntimeEvidenceSummaryAccepted:
+              finalEvidenceAggregationRcGatePrecheck?.runtimeEvidenceSummaryAccepted === true,
+            finalEvidenceAggregationCurrentHeadBindingMatched:
+              finalEvidenceAggregationRcGatePrecheck?.currentHeadBindingMatched === true,
+            finalEvidenceAggregationEvidenceFreshnessStatus:
+              finalEvidenceAggregationRcGatePrecheck?.evidenceFreshnessStatus || '',
+            rcGatePrecheckFreshCurrentHeadAccepted:
+              finalEvidenceAggregationRcGatePrecheck?.rcGateRows
+                ?.freshCurrentHeadAccepted === true,
+            rcGatePrecheckCompletenessChecklistStatus:
+              finalEvidenceAggregationRcGatePrecheck
+                ?.rc9CompletenessChecklistStatus || '',
+            rcGatePrecheckCanClaimRcReady: false,
             runtimeEvidenceReportCanClaimV1RcReady: false
           }
         : {})
@@ -448,6 +607,7 @@ module.exports = {
   REJECTED_FLAGS,
   buildRuntimeEvidenceReportLoadError,
   buildExactHeadBoundRuntimeSummaryInputFromOptions,
+  buildFinalEvidenceAggregationRcGatePrecheck,
   parseArgs,
   buildUsageText,
   redactExactRuntimeEvidenceValues,
