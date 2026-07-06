@@ -198,7 +198,19 @@ Completed local-safe evidence:
   performs no target binding, request body generation, resolver/transport
   invocation, runtime/network call, response consumption, raw diagnostic
   persistence, memory read/write, durable mutation, public MCP expansion, M15
-  unlock, read-shape proof, or readiness claim.
+  unlock, read-shape proof, or readiness claim;
+- CM-1992 exact real disposable target material boundary packet / approval
+  request readiness review recorded non-authorizing future boundary material
+  for separately evidenced real disposable target material. It requires a
+  future current single-use exact approval and separately evidenced real
+  disposable target material before any material use, target binding, request
+  body generation, resolver/transport invocation, runtime execution, or
+  response-shape projection. It grants no approval, generates no approval
+  line, generates no request body, supplies or binds no target material,
+  resolves no endpoint/locator value, invokes no resolver/transport or
+  component/action, calls no runtime/network, consumes no response, writes no
+  memory, mutates no durable state, expands no public MCP, unlocks no M15
+  gate, and claims no readiness.
 
 Missing RC evidence:
 
@@ -472,6 +484,33 @@ m15_package_evidence_map_boundary:
   cm1991_trusted_full_read_completed: false
   cm1991_m15_opened: false
   cm1991_readiness_claimed: false
+  cm1992_exact_real_disposable_target_material_boundary_packet_present: true
+  cm1992_approval_request_readiness_review_present: true
+  cm1992_packet_authorizes_execution: false
+  cm1992_approval_intake_present: false
+  cm1992_approval_granted: false
+  cm1992_approval_line_generated: false
+  cm1992_approval_request_submitted: false
+  cm1992_separately_evidenced_real_target_material_required: true
+  cm1992_separately_evidenced_real_target_material_present: false
+  cm1992_target_material_bound: false
+  cm1992_target_binding_proven: false
+  cm1992_existing_operator_reference_sufficient: false
+  cm1992_request_body_generated: false
+  cm1992_endpoint_locator_resolution_performed: false
+  cm1992_resolver_transport_invoked: false
+  cm1992_component_action_invoked: false
+  cm1992_runtime_called: false
+  cm1992_network_called: false
+  cm1992_response_body_consumed: false
+  cm1992_raw_value_persisted: false
+  cm1992_memory_read_performed: false
+  cm1992_memory_write_performed: false
+  cm1992_public_mcp_expansion_performed: false
+  cm1992_read_shape_unlocked: false
+  cm1992_trusted_full_read_completed: false
+  cm1992_m15_opened: false
+  cm1992_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
