@@ -4,11 +4,42 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1988 exact real disposable target binding boundary packet / approval request readiness review`.
-Current validation: `CMV-2091`.
+Current checkpoint: `CM-1990 exact-approved real disposable target binding probe abort receipt`.
+Current validation: `CMV-2093`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1990 Exact-Approved Real Disposable Target Binding Probe Abort Receipt
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PRE_EXECUTION_ABORT_TARGET_MATERIAL_ABSENT_NO_RUNTIME_NO_READ_SHAPE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1990_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PROBE_ABORT_RECEIPT.md`.
+- Consumed CM-1989 exact approval intake.
+- Evaluated the approved real disposable target binding route.
+- Aborted before target binding, request-body generation, resolver/transport invocation, component/action invocation, runtime call, network call, response consumption, raw diagnostic persistence, memory read/write/update/supersede/tombstone, durable mutation, public MCP expansion, or readiness claim because separately evidenced real disposable target material is absent or not separately evidenced.
+- Recorded low-disclosure result: `targetMaterialEvidenceCategory=absent_or_not_separately_evidenced`, `statusClass=boundary_blocked`, `routeStatusCategory=not_executed`, `responseShapeCategory=not_consumed`, `topLevelKindCategory=not_consumed`, `itemCountBucket=not_consumed`, `requestBodyGeneratedByHarness=false`, `responseBodyConsumedForShapeProjection=false`, `readShapeUnlocked=false`, and `readinessClaimed=false`.
+- Consumed budgets: target declaration validation attempts `1/2`, target binding attempts `0/2`, resolver attempts `0/3`, component/action request-read-shape attempts `0/2`, network calls `0/3`, runtime calls `0/3`, process/listener/service attempts `0/0`, local repair files `0/3`, retry `0/1`.
+- Preserved no endpoint/locator output or persistence, concrete request body output or persistence, raw response/error/log output or persistence, config/env/secret/stdout/stderr raw value persistence, private memory content output or persistence, memory ID output or persistence, MCP memory tool call, memory read/write/update/supersede/tombstone, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, readiness claim, `RC_READY`, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1991 real disposable target material evidence preparation, local and no-live, or a new exact approval intake tied to separately evidenced real disposable target material.
+
+Validation: `CMV-2093`; docs/status review, CM-1989/CM-1990 boundary review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+## CM-1989 Exact Approval Intake for Real Disposable Target Binding
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING_ROUTE_NO_APPROVAL_LINE_NO_REQUEST_BODY_TARGET_MATERIAL_ABSENT_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1989_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING.md`.
+- Recorded that Jenn supplied a current exact approval matching the CM-1988 boundary family for CM-1989/CM-1990.
+- Preserved `approval_text_reproduced=false`, `approval_line_generated=false`, `approval_line_persisted=false`, `request_body_generated_by_cm1989=false`, `live_execution_performed_by_cm1989=false`, `memory_written_by_cm1989=false`, `durable_write_by_cm1989=false`, `public_mcp_expansion_by_cm1989=false`, and `readiness_claimed_by_cm1989=false`.
+- Recorded `separately_evidenced_real_target_material_supplied_by_intake=false`.
+- Routed next work to CM-1990 subject to the separately evidenced real disposable target material pre-execution requirement and approved output/persistence restrictions.
+
+Validation: `CMV-2092`; approval-intake docs/status review is recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1988 Exact Real Disposable Target Binding Boundary Packet / Approval Request Readiness Review
 

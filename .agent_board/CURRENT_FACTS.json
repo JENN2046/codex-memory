@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-06",
-  "taskId": "CM-1988",
-  "validationId": "CMV-2091",
+  "taskId": "CM-1990",
+  "validationId": "CMV-2093",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_real_disposable_target_binding_boundary_packet_readiness_review_non_authorizing_no_live_no_readiness",
+    "scope": "exact_approved_real_disposable_target_binding_pre_execution_abort_target_material_absent_no_runtime_no_read_shape_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,16 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2093",
+      "scope": "CM-1990 exact-approved real disposable target binding probe abort receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PRE_EXECUTION_ABORT_TARGET_MATERIAL_ABSENT_NO_RUNTIME_NO_READ_SHAPE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2092",
+      "scope": "CM-1989 exact approval intake for real disposable target binding",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING_ROUTE_NO_APPROVAL_LINE_NO_REQUEST_BODY_TARGET_MATERIAL_ABSENT_NO_READINESS"
+    },
     {
       "id": "CMV-2091",
       "scope": "CM-1988 exact real disposable target binding boundary packet / approval request readiness review",

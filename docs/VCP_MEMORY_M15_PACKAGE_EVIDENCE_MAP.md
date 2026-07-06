@@ -172,7 +172,22 @@ Completed local-safe evidence:
   endpoint/locator value, invokes no resolver/transport or component/action,
   calls no runtime/network, consumes no response, writes no memory, mutates no
   durable state, expands no public MCP, unlocks no M15 gate, and claims no
-  readiness.
+  readiness;
+- CM-1989 exact approval intake recorded a current approval for the
+  CM-1989/CM-1990 real disposable target binding route without reproducing
+  approval text, generating approval lines, generating/persisting request
+  bodies, resolving endpoint/locator values, binding target material, executing
+  runtime by intake, writing memory, mutating durable state, expanding public
+  MCP, or claiming readiness. Boundary alignment with CM-1988 is accepted, but
+  separately evidenced real disposable target material supplied by intake is
+  false;
+- CM-1990 exact-approved real disposable target binding route evaluation
+  recorded a pre-execution abort because separately evidenced real disposable
+  target material is absent or not separately evidenced. It performed no target
+  binding, request body generation, resolver/transport invocation,
+  component/action invocation, runtime/network call, response consumption, raw
+  diagnostic persistence, memory read/write, durable mutation, public MCP
+  expansion, M15 unlock, or readiness claim.
 
 Missing RC evidence:
 
@@ -386,6 +401,41 @@ m15_package_evidence_map_boundary:
   cm1988_trusted_full_read_completed: false
   cm1988_m15_opened: false
   cm1988_readiness_claimed: false
+  cm1989_exact_approval_intake_present: true
+  cm1989_approval_text_reproduced: false
+  cm1989_approval_line_generated: false
+  cm1989_approval_line_persisted: false
+  cm1989_approval_matches_cm1988_boundary: true
+  cm1989_separately_evidenced_real_target_material_required: true
+  cm1989_separately_evidenced_real_target_material_supplied_by_intake: false
+  cm1989_live_runtime_execution_performed: false
+  cm1989_request_body_generated: false
+  cm1989_target_material_bound: false
+  cm1989_memory_write_performed: false
+  cm1989_durable_write_performed: false
+  cm1989_public_mcp_expansion_performed: false
+  cm1989_readiness_claimed: false
+  cm1990_exact_approved_real_disposable_target_route_evaluated: true
+  cm1990_separately_evidenced_real_target_material_present: false
+  cm1990_target_material_evidence_category: absent_or_not_separately_evidenced
+  cm1990_pre_execution_abort_performed: true
+  cm1990_status_class: boundary_blocked
+  cm1990_route_status_category: not_executed
+  cm1990_target_binding_attempts: 0
+  cm1990_request_body_generated: false
+  cm1990_resolver_transport_invoked: false
+  cm1990_component_action_invoked: false
+  cm1990_runtime_called: false
+  cm1990_network_called: false
+  cm1990_response_body_consumed: false
+  cm1990_raw_value_persisted: false
+  cm1990_memory_read_performed: false
+  cm1990_memory_write_performed: false
+  cm1990_public_mcp_expansion_performed: false
+  cm1990_read_shape_unlocked: false
+  cm1990_trusted_full_read_completed: false
+  cm1990_m15_opened: false
+  cm1990_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
