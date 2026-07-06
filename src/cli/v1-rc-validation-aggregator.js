@@ -443,6 +443,147 @@ function buildFinalEvidenceAggregationRcGatePrecheck({
   };
 }
 
+function buildRcCutoverPreApprovalCandidatePackage({
+  finalEvidenceAggregationRcGatePrecheck = null
+} = {}) {
+  const precheck = finalEvidenceAggregationRcGatePrecheck || {};
+  const rows = precheck.rcGateRows || {};
+  const rcGatePrecheckAccepted = precheck.rcGatePrecheckAccepted === true;
+  const readyToRequestRcCutoverApproval =
+    precheck.rc9DecisionPacketReadyToRequestRcCutoverApproval === true;
+  const completenessChecklistComplete =
+    precheck.rc9CompletenessChecklistStatus ===
+    'complete_for_cutover_approval_request_not_rc_ready';
+  const candidatePackageAccepted =
+    rcGatePrecheckAccepted &&
+    readyToRequestRcCutoverApproval &&
+    completenessChecklistComplete &&
+    rows.validationAggregatorZeroGapAccepted === true;
+  const blockerIds = [];
+
+  if (precheck.standardInputSourceAccepted !== true) {
+    blockerIds.push('standard_runtime_evidence_source_not_accepted');
+  }
+  if (precheck.exactHeadBoundInputAccepted !== true) {
+    blockerIds.push('exact_head_bound_runtime_summary_input_not_accepted');
+  }
+  if (precheck.runtimeEvidenceSummaryAccepted !== true) {
+    blockerIds.push('runtime_evidence_summary_not_accepted');
+  }
+  if (rcGatePrecheckAccepted !== true) {
+    blockerIds.push('final_evidence_rc_gate_precheck_not_accepted');
+  }
+  if (readyToRequestRcCutoverApproval !== true) {
+    blockerIds.push('rc9_cutover_approval_request_not_ready');
+  }
+  if (completenessChecklistComplete !== true) {
+    blockerIds.push('rc9_completeness_checklist_not_complete');
+  }
+  if (rows.validationAggregatorZeroGapAccepted !== true) {
+    blockerIds.push('validation_aggregator_zero_gap_not_accepted');
+  }
+
+  return {
+    schemaVersion: 'p69-rc-cutover-pre-approval-candidate-package-v1',
+    packageType: 'rc_cutover_pre_approval_candidate_package',
+    sourceMode: 'p68_final_evidence_aggregation_rc_gate_precheck',
+    status: candidatePackageAccepted
+      ? 'candidate_package_ready_for_owner_cutover_approval_request_not_ready'
+      : 'candidate_package_blocked_pending_required_preapproval_evidence',
+    decision: 'NOT_READY_BLOCKED',
+    candidatePackageAccepted,
+    approvalRequestOnly: true,
+    readyToRequestRcCutoverApproval,
+    rcCutoverApprovalPresent: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    rcGatePrecheckAccepted,
+    finalEvidenceAggregationAccepted:
+      precheck.finalEvidenceAggregationAccepted === true,
+    runtimeEvidenceSummaryAccepted:
+      precheck.runtimeEvidenceSummaryAccepted === true,
+    currentHeadBindingMatched: precheck.currentHeadBindingMatched === true,
+    evidenceFreshnessStatus:
+      typeof precheck.evidenceFreshnessStatus === 'string'
+        ? precheck.evidenceFreshnessStatus
+        : '',
+    evidenceUnitsComplete: precheck.evidenceUnitsComplete === true,
+    rc9DecisionPacket: {
+      available: precheck.rc9DecisionPacketAvailable === true,
+      decision:
+        typeof precheck.rc9DecisionPacketDecision === 'string'
+          ? precheck.rc9DecisionPacketDecision
+          : '',
+      readyToRequestRcCutoverApproval,
+      completenessChecklistStatus:
+        typeof precheck.rc9CompletenessChecklistStatus === 'string'
+          ? precheck.rc9CompletenessChecklistStatus
+          : '',
+      completenessChecklistRequiredCount:
+        Number.isFinite(precheck.rc9CompletenessChecklistRequiredCount)
+          ? precheck.rc9CompletenessChecklistRequiredCount
+          : 0,
+      completenessChecklistAcceptedCount:
+        Number.isFinite(precheck.rc9CompletenessChecklistAcceptedCount)
+          ? precheck.rc9CompletenessChecklistAcceptedCount
+          : 0,
+      completenessChecklistMissingCount:
+        Number.isFinite(precheck.rc9CompletenessChecklistMissingCount)
+          ? precheck.rc9CompletenessChecklistMissingCount
+          : 0
+    },
+    rcGateRows: {
+      freshCurrentHeadAccepted: rows.freshCurrentHeadAccepted === true,
+      strictGateAccepted: rows.strictGateAccepted === true,
+      liveHttpNoWriteAccepted: rows.liveHttpNoWriteAccepted === true,
+      validationAggregatorZeroGapAccepted:
+        rows.validationAggregatorZeroGapAccepted === true
+    },
+    blockerIds: [...new Set(blockerIds)].sort(),
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      endpointOrLocatorOutput: false,
+      requestBodyOutput: false,
+      rawResponseOutput: false,
+      rawErrorOutput: false,
+      secretOutput: false,
+      privateMemoryContentOutput: false
+    },
+    safety: {
+      readsAggregatedSummaryOnly: true,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      mutatesConfig: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      pushes: false,
+      tags: false,
+      releases: false,
+      deploys: false,
+      executesCutover: false,
+      readinessClaimed: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: candidatePackageAccepted
+      ? 'Use this package as an owner approval request candidate only; do not execute cutover or claim readiness.'
+      : 'Continue closing local evidence prerequisites before preparing an owner cutover approval request candidate.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -483,6 +624,12 @@ function buildCliReport(options = {}) {
         runtimeEvidencePreflight
       })
     : null;
+  const rcCutoverPreApprovalCandidatePackage =
+    finalEvidenceAggregationRcGatePrecheck
+      ? buildRcCutoverPreApprovalCandidatePackage({
+          finalEvidenceAggregationRcGatePrecheck
+        })
+      : null;
 
   const outputReport = {
     ...report,
@@ -514,7 +661,9 @@ function buildCliReport(options = {}) {
             p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight:
               runtimeEvidencePreflight,
             p68FinalEvidenceAggregationRcGatePrecheck:
-              finalEvidenceAggregationRcGatePrecheck
+              finalEvidenceAggregationRcGatePrecheck,
+            p69RcCutoverPreApprovalCandidatePackage:
+              rcCutoverPreApprovalCandidatePackage
           }
         : {})
     },
@@ -552,6 +701,11 @@ function buildCliReport(options = {}) {
               finalEvidenceAggregationRcGatePrecheck
                 ?.rc9CompletenessChecklistStatus || '',
             rcGatePrecheckCanClaimRcReady: false,
+            rcCutoverPreApprovalCandidatePackageAccepted:
+              rcCutoverPreApprovalCandidatePackage?.candidatePackageAccepted === true,
+            rcCutoverPreApprovalCandidatePackageReadyToRequestApproval:
+              rcCutoverPreApprovalCandidatePackage?.readyToRequestRcCutoverApproval === true,
+            rcCutoverPreApprovalCandidatePackageCanClaimRcReady: false,
             runtimeEvidenceReportCanClaimV1RcReady: false
           }
         : {})
@@ -608,6 +762,7 @@ module.exports = {
   buildRuntimeEvidenceReportLoadError,
   buildExactHeadBoundRuntimeSummaryInputFromOptions,
   buildFinalEvidenceAggregationRcGatePrecheck,
+  buildRcCutoverPreApprovalCandidatePackage,
   parseArgs,
   buildUsageText,
   redactExactRuntimeEvidenceValues,

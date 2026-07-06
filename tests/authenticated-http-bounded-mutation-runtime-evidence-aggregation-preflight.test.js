@@ -197,6 +197,8 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
     report.evidence.p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight;
   const rcGatePrecheck =
     report.evidence.p68FinalEvidenceAggregationRcGatePrecheck;
+  const candidatePackage =
+    report.evidence.p69RcCutoverPreApprovalCandidatePackage;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
@@ -227,10 +229,21 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   assert.equal(rcGatePrecheck.rcGateRows.freshCurrentHeadAccepted, false);
   assert.equal(rcGatePrecheck.canClaimRcReady, false);
   assert.equal(rcGatePrecheck.safety.readinessClaimed, false);
+  assert.equal(candidatePackage.status, 'candidate_package_blocked_pending_required_preapproval_evidence');
+  assert.equal(candidatePackage.candidatePackageAccepted, false);
+  assert.equal(candidatePackage.readyToRequestRcCutoverApproval, false);
+  assert.equal(candidatePackage.rcCutoverApprovalPresent, false);
+  assert.equal(candidatePackage.rcCutoverExecutionAllowed, false);
+  assert.equal(candidatePackage.rcReady, false);
+  assert.ok(candidatePackage.blockerIds.includes('exact_head_bound_runtime_summary_input_not_accepted'));
+  assert.equal(candidatePackage.canClaimRcReady, false);
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
   assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, false);
   assert.equal(report.summary.rcGatePrecheckFreshCurrentHeadAccepted, false);
   assert.equal(report.summary.rcGatePrecheckCanClaimRcReady, false);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageAccepted, false);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageReadyToRequestApproval, false);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageCanClaimRcReady, false);
   assertNoForbiddenMaterial(report);
 });
 
@@ -268,6 +281,8 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
     report.evidence.p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight;
   const rcGatePrecheck =
     report.evidence.p68FinalEvidenceAggregationRcGatePrecheck;
+  const candidatePackage =
+    report.evidence.p69RcCutoverPreApprovalCandidatePackage;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
@@ -318,6 +333,19 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assert.equal(rcGatePrecheck.safety.executesCommands, false);
   assert.equal(rcGatePrecheck.safety.readinessClaimed, false);
   assert.equal(rcGatePrecheck.canClaimRcReady, false);
+  assert.equal(candidatePackage.status, 'candidate_package_blocked_pending_required_preapproval_evidence');
+  assert.equal(candidatePackage.candidatePackageAccepted, false);
+  assert.equal(candidatePackage.approvalRequestOnly, true);
+  assert.equal(candidatePackage.readyToRequestRcCutoverApproval, false);
+  assert.equal(candidatePackage.rcCutoverApproved, false);
+  assert.equal(candidatePackage.rcCutoverExecuted, false);
+  assert.equal(candidatePackage.rcCutoverExecutionAllowed, false);
+  assert.equal(candidatePackage.rcReady, false);
+  assert.equal(candidatePackage.rcGateRows.validationAggregatorZeroGapAccepted, false);
+  assert.ok(candidatePackage.blockerIds.includes('validation_aggregator_zero_gap_not_accepted'));
+  assert.equal(candidatePackage.safety.executesCutover, false);
+  assert.equal(candidatePackage.safety.readinessClaimed, false);
+  assert.equal(candidatePackage.canClaimRcReady, false);
   assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, true);
   assert.equal(report.summary.finalEvidenceAggregationRuntimeEvidenceSummaryAccepted, true);
   assert.equal(report.summary.finalEvidenceAggregationCurrentHeadBindingMatched, true);
@@ -328,6 +356,9 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
     'incomplete_missing_required_evidence'
   );
   assert.equal(report.summary.rcGatePrecheckCanClaimRcReady, false);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageAccepted, false);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageReadyToRequestApproval, false);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageCanClaimRcReady, false);
   assertNoForbiddenMaterial(report);
 });
 
@@ -365,6 +396,8 @@ test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate 
     report.evidence.p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight;
   const rcGatePrecheck =
     report.evidence.p68FinalEvidenceAggregationRcGatePrecheck;
+  const candidatePackage =
+    report.evidence.p69RcCutoverPreApprovalCandidatePackage;
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
@@ -406,9 +439,48 @@ test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate 
   assert.equal(rcGatePrecheck.rcGateRows.liveHttpNoWriteAccepted, true);
   assert.equal(rcGatePrecheck.rcGateRows.validationAggregatorZeroGapAccepted, true);
   assert.equal(rcGatePrecheck.canClaimRcReady, false);
+  assert.equal(
+    candidatePackage.status,
+    'candidate_package_ready_for_owner_cutover_approval_request_not_ready'
+  );
+  assert.equal(candidatePackage.decision, 'NOT_READY_BLOCKED');
+  assert.equal(candidatePackage.candidatePackageAccepted, true);
+  assert.equal(candidatePackage.approvalRequestOnly, true);
+  assert.equal(candidatePackage.readyToRequestRcCutoverApproval, true);
+  assert.equal(candidatePackage.rcCutoverApprovalPresent, false);
+  assert.equal(candidatePackage.rcCutoverApproved, false);
+  assert.equal(candidatePackage.rcCutoverExecuted, false);
+  assert.equal(candidatePackage.rcCutoverExecutionAllowed, false);
+  assert.equal(candidatePackage.rcReady, false);
+  assert.equal(candidatePackage.rcGatePrecheckAccepted, true);
+  assert.equal(candidatePackage.rc9DecisionPacket.readyToRequestRcCutoverApproval, true);
+  assert.equal(
+    candidatePackage.rc9DecisionPacket.completenessChecklistStatus,
+    'complete_for_cutover_approval_request_not_rc_ready'
+  );
+  assert.deepEqual(candidatePackage.blockerIds, []);
+  assert.equal(candidatePackage.disclosure.lowDisclosure, true);
+  assert.equal(candidatePackage.disclosure.rawCurrentHeadCommitOutput, false);
+  assert.equal(candidatePackage.disclosure.rawEvidenceGeneratedAtOutput, false);
+  assert.equal(candidatePackage.disclosure.endpointOrLocatorOutput, false);
+  assert.equal(candidatePackage.safety.executesCommands, false);
+  assert.equal(candidatePackage.safety.callsProviders, false);
+  assert.equal(candidatePackage.safety.callsMcpTools, false);
+  assert.equal(candidatePackage.safety.readsRealMemory, false);
+  assert.equal(candidatePackage.safety.writesDurableState, false);
+  assert.equal(candidatePackage.safety.remoteWrites, false);
+  assert.equal(candidatePackage.safety.executesCutover, false);
+  assert.equal(candidatePackage.safety.readinessClaimed, false);
+  assert.equal(candidatePackage.canClaimRuntimeReady, false);
+  assert.equal(candidatePackage.canClaimFinalRcReady, false);
+  assert.equal(candidatePackage.canClaimV1RcReady, false);
+  assert.equal(candidatePackage.canClaimRcReady, false);
   assert.equal(report.summary.rc9DecisionPacketReadyToRequestRcCutoverApproval, true);
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
   assert.equal(report.summary.rcGatePrecheckCanClaimRcReady, false);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageAccepted, true);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageReadyToRequestApproval, true);
+  assert.equal(report.summary.rcCutoverPreApprovalCandidatePackageCanClaimRcReady, false);
   assert.equal(rcGatePrecheck.safety.readinessClaimed, false);
   assertNoForbiddenMaterial(report);
 });
