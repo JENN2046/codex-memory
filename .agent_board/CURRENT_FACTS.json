@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-06",
-  "taskId": "CM-1987",
-  "validationId": "CMV-2090",
+  "taskId": "CM-1988",
+  "validationId": "CMV-2091",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "real_disposable_target_declaration_evidence_preparation_contract_no_live_no_read_shape_no_readiness",
+    "scope": "exact_real_disposable_target_binding_boundary_packet_readiness_review_non_authorizing_no_live_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2091",
+      "scope": "CM-1988 exact real disposable target binding boundary packet / approval request readiness review",
+      "status": "COMPLETED_VALIDATED_EXACT_REAL_DISPOSABLE_TARGET_BINDING_BOUNDARY_PACKET_READINESS_REVIEW_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS"
+    },
     {
       "id": "CMV-2090",
       "scope": "CM-1987 real disposable target declaration evidence preparation",

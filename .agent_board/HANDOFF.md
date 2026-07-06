@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1987 real disposable target declaration evidence preparation`.
-Current validation: `CMV-2090`.
-Current handoff: CM-1987 added a local no-live source/test/docs contract for future real disposable target declaration evidence. It does not prove real target binding or read-shape; next route is CM-1988 exact boundary / approval request readiness review, still no-live unless a future exact approval supplies separately evidenced real disposable target material.
+Current task: `CM-1988 exact real disposable target binding boundary packet / approval request readiness review`.
+Current validation: `CMV-2091`.
+Current handoff: CM-1988 added a non-authorizing exact boundary packet / approval request readiness review. It requires separately evidenced real disposable target material before any future intake, does not grant approval, generate approval lines, generate request bodies, resolve endpoint/locator values, execute runtime, prove real target binding, or unlock read-shape; next route is CM-1989 exact approval request readiness review / Jenn boundary display, or Jenn-supplied exact approval intake with separately evidenced real disposable target material.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-1987 into CM-1988 exact real disposable target binding boundary packet / approval request readiness review, still no-live, without crossing request-body output, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries unless a future exact Jenn boundary explicitly authorizes the next action and supplies separately evidenced real disposable target material.
+Goal: continue from CM-1988 into CM-1989 exact approval request readiness review / Jenn boundary display, or intake a future exact Jenn approval only if it also supplies separately evidenced real disposable target material. Keep the route no-live without crossing approval-line, request-body output, endpoint/locator, runtime, log, secret, raw output, provider, write, release, deploy, cutover, push, or readiness boundaries unless a future exact boundary explicitly authorizes the next action and the target material evidence matches.
 
-Current status: `COMPLETED_VALIDATED_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1987 adds `src/core/VcpNativeRealDisposableTargetDeclarationEvidencePreparationContract.js`, `tests/vcp-native-real-disposable-target-declaration-evidence-preparation-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1987_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION.md`. It consumes CM-1986 and defines a local no-live fail-closed contract for future real disposable target declaration evidence. It accepts only category-level declaration evidence and rejects existing operator target reuse, raw values, private/persistent target posture, stale abort facts, live counters, and readiness drift. It does not prove real VCPToolBox target binding, trusted-full-read workflow, production memory behavior, M15/RC readiness, release readiness, deploy readiness, cutover readiness, `RC_READY`, complete V8, or full bridge completion. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_EXACT_REAL_DISPOSABLE_TARGET_BINDING_BOUNDARY_PACKET_READINESS_REVIEW_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1988 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1988_EXACT_REAL_DISPOSABLE_TARGET_BINDING_BOUNDARY_PACKET_READINESS_REVIEW.md`. It consumes CM-1987 and records a non-authorizing exact boundary packet / approval request readiness review. It requires separately evidenced real disposable target material before any future intake, rejects existing operator target reuse and existing operator reference sufficiency, and records approval absent, approval line generation false, request body generation false, endpoint/locator resolution blocked now, live/runtime/network execution blocked now, real target binding false, response consumption false, memory read/write false, durable mutation false, public MCP expansion false, and readiness false. Raw diagnostic values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1988_EXACT_REAL_DISPOSABLE_TARGET_BINDING_BOUNDARY_PACKET_READINESS_REVIEW.md`
 - `src/core/VcpNativeRealDisposableTargetDeclarationEvidencePreparationContract.js`
 - `tests/vcp-native-real-disposable-target-declaration-evidence-preparation-contract.test.js`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1987_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION.md`

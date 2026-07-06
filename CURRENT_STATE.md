@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1987 real disposable target declaration evidence preparation |
-| Current task | `CM-1987 real disposable target declaration evidence preparation` |
-| Current validation | `CMV-2090` |
-| Current route | CM-1987 adds a local no-live source/test/docs declaration evidence contract; no real target binding, request body, runtime, read-shape proof, or readiness claim |
+| Status | CM-1988 exact real disposable target binding boundary packet / approval request readiness review |
+| Current task | `CM-1988 exact real disposable target binding boundary packet / approval request readiness review` |
+| Current validation | `CMV-2091` |
+| Current route | CM-1988 adds non-authorizing exact boundary material; no approval intake, approval line, request body, real target binding, runtime, read-shape proof, or readiness claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1988` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1988_EXACT_REAL_DISPOSABLE_TARGET_BINDING_BOUNDARY_PACKET_READINESS_REVIEW.md`. It consumes CM-1987 and prepares non-authorizing exact boundary material for a possible future real disposable target binding route. It requires separately evidenced real disposable target material for any future intake, rejects existing operator target reuse and existing operator reference sufficiency, and records approval absent, approval line generation false, request body generation false, endpoint/locator resolution blocked now, live/runtime/network execution blocked now, response consumption false, memory read/write false, durable mutation false, public MCP expansion false, and readiness false. CM-1988 does not prove real target binding, bind endpoint/locator values, generate request bodies, invoke resolver/transport, call runtime/network, consume responses, write memory, mutate durable state, expand public MCP, unlock M15/RC, or claim readiness. Next route is CM-1989 exact approval request readiness review / Jenn boundary display, or Jenn-supplied exact approval intake with separately evidenced real disposable target material.
 
 `CM-1987` adds `src/core/VcpNativeRealDisposableTargetDeclarationEvidencePreparationContract.js`, `tests/vcp-native-real-disposable-target-declaration-evidence-preparation-contract.test.js`, and `docs/VCP_MEMORY_PLAN_PACKAGE_CM1987_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION.md`. It consumes CM-1986 and defines a local no-live fail-closed contract for future real disposable target declaration evidence. The contract accepts only category-level declaration evidence and rejects existing operator target reuse, raw values, private/persistent target posture, live counters, and readiness drift. Targeted CM-1987 tests passed `6/6`. CM-1987 does not prove real target binding, bind endpoint/locator values, generate request bodies, invoke resolver/transport, call runtime/network, consume responses, write memory, mutate durable state, expand public MCP, or claim readiness. Next route is CM-1988 exact real disposable target binding boundary packet / approval request readiness review, still no-live unless a future exact approval also supplies separately evidenced real disposable target material.
 

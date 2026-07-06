@@ -162,7 +162,17 @@ Completed local-safe evidence:
   does not prove real target binding, bind endpoint/locator values, generate
   request bodies, invoke resolver/transport, call runtime/network, consume
   responses, write memory, mutate durable state, expand public MCP, unlock
-  M15, or claim readiness.
+  M15, or claim readiness;
+- CM-1988 exact real disposable target binding boundary packet / approval
+  request readiness review recorded non-authorizing future boundary material
+  after CM-1987. It requires separately evidenced real disposable target
+  material before any future approval intake, rejects existing operator target
+  reuse and existing operator reference sufficiency, grants no approval,
+  generates no approval line, generates no request body, resolves no
+  endpoint/locator value, invokes no resolver/transport or component/action,
+  calls no runtime/network, consumes no response, writes no memory, mutates no
+  durable state, expands no public MCP, unlocks no M15 gate, and claims no
+  readiness.
 
 Missing RC evidence:
 
@@ -348,6 +358,34 @@ m15_package_evidence_map_boundary:
   cm1987_trusted_full_read_completed: false
   cm1987_m15_opened: false
   cm1987_readiness_claimed: false
+  cm1988_exact_real_disposable_target_binding_boundary_packet_present: true
+  cm1988_approval_request_readiness_review_present: true
+  cm1988_packet_authorizes_execution: false
+  cm1988_approval_intake_present: false
+  cm1988_approval_granted: false
+  cm1988_approval_line_generated: false
+  cm1988_approval_request_submitted: false
+  cm1988_separately_evidenced_real_target_material_required: true
+  cm1988_real_target_material_bound: false
+  cm1988_real_disposable_target_binding_allowed_now: false
+  cm1988_real_disposable_target_binding_proven: false
+  cm1988_existing_operator_target_reuse_allowed: false
+  cm1988_existing_operator_reference_sufficient: false
+  cm1988_request_body_generated: false
+  cm1988_endpoint_locator_resolution_performed: false
+  cm1988_resolver_transport_invoked: false
+  cm1988_component_action_invoked: false
+  cm1988_runtime_called: false
+  cm1988_network_called: false
+  cm1988_response_body_consumed: false
+  cm1988_raw_value_persisted: false
+  cm1988_memory_read_performed: false
+  cm1988_memory_write_performed: false
+  cm1988_public_mcp_expansion_performed: false
+  cm1988_read_shape_unlocked: false
+  cm1988_trusted_full_read_completed: false
+  cm1988_m15_opened: false
+  cm1988_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: true
   rc_gate_report_created: false
