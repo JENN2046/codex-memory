@@ -9,6 +9,7 @@ const {
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
   FIXTURE_DRIFT_FILES,
+  buildExcludedSummary,
   buildSpawnOptions,
   formatSummaryOutput,
   parseNodeMajor,
@@ -47,14 +48,12 @@ test('default runner excludes all self-referential files', () => {
   }
 });
 
-test('default runner excludes all fixture-drift files', () => {
+test('default runner has no active fixture-drift exclusions after rebaseline', () => {
   const testsDir = path.join(process.cwd(), 'tests');
   const { excludedDetails } = resolveDefaultSafeFiles(testsDir);
   const driftExcluded = excludedDetails.filter(e => e.reason === 'fixture_drift');
-  const expected = FIXTURE_DRIFT_FILES;
-  for (const file of expected) {
-    assert.ok(driftExcluded.some(e => e.file === file), `${file} should be excluded as fixture_drift`);
-  }
+  assert.deepEqual(FIXTURE_DRIFT_FILES, []);
+  assert.deepEqual(driftExcluded, []);
 });
 
 test('default runner safe files are a subset of total test files', () => {
@@ -72,6 +71,20 @@ test('default runner reports excluded details with correct reasons', () => {
     assert.ok(validReasons.includes(detail.reason), `unexpected reason: ${detail.reason} for ${detail.file}`);
     assert.ok(typeof detail.file === 'string');
   }
+});
+
+test('default runner summarizes active fixture drift as clear when none is excluded', () => {
+  const testsDir = path.join(process.cwd(), 'tests');
+  const { excludedDetails } = resolveDefaultSafeFiles(testsDir);
+  const summary = buildExcludedSummary(excludedDetails);
+
+  assert.equal(summary.fixtureDriftStatus, 'clear');
+  assert.deepEqual(summary.fixtureDriftFiles, []);
+  assert.deepEqual(summary.expectedExcludedReasons, [
+    'provider_dependent',
+    'daemon_dependent',
+    'self_referential'
+  ]);
 });
 
 test('buildSpawnOptions does not include wrapper-level timeout by default', () => {

@@ -41,7 +41,7 @@ test('migration import-export approval packet CLI emits fixture-only JSON', () =
   assert.equal(report.nextStep, 'review-approval-packet-before-any-non-fixture-action');
 });
 
-test('migration import-export approval packet CLI preserves public MCP three-tool freeze', () => {
+test('migration import-export approval packet CLI preserves current bounded public MCP surface', () => {
   const report = parseJsonResult(runCli(['--json']));
 
   assert.deepEqual(report.publicMcpTools, PUBLIC_MCP_TOOLS);

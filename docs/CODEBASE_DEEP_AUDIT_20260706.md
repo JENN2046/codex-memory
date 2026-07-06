@@ -99,6 +99,15 @@ Rebaseline or repair the four fixture drift tests against the current seven-tool
 surface, then decide whether they should return to default-safe coverage or stay
 as a separate explicit fixture-drift gate with visible failure status.
 
+Post-audit remediation:
+
+`F1_REMEDIATED_LOCALLY` on 2026-07-06. The migration/import-export CLI public
+tool constants were reconnected to the current MCP tool definitions, stale
+"three-tool freeze" test names were updated to the current bounded public MCP
+surface, and the active fixture-drift exclusion list was cleared so these tests
+return to default-safe coverage. This remediation does not expand the public MCP
+surface and does not claim readiness.
+
 ### F2 - Search timeout is cooperative, not a hard runtime cutoff
 
 Severity: `high`

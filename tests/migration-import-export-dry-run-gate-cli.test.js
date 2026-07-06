@@ -38,7 +38,7 @@ test('migration import-export dry-run gate CLI emits fixture-only JSON', () => {
   assert.equal(report.nextStep, 'review-dry-run-evidence-before-apply-approval');
 });
 
-test('migration import-export dry-run gate CLI preserves public MCP three-tool freeze', () => {
+test('migration import-export dry-run gate CLI preserves current bounded public MCP surface', () => {
   const report = parseJsonResult(runCli(['--json']));
 
   assert.deepEqual(report.publicMcpTools, PUBLIC_MCP_TOOLS);

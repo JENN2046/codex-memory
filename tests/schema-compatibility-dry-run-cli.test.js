@@ -37,7 +37,7 @@ test('schema compatibility dry-run CLI emits fixture-only JSON and exits success
   assert.equal(report.compatibility.importExportApplyRequired, false);
 });
 
-test('schema compatibility dry-run CLI preserves public MCP three-tool freeze', () => {
+test('schema compatibility dry-run CLI preserves current bounded public MCP surface', () => {
   const report = parseJsonResult(runCli(['--json']));
 
   assert.equal(report.publicMcpTools.frozen, true);

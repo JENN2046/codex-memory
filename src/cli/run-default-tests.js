@@ -20,15 +20,9 @@ const MIN_NODE_MAJOR = 22;
 // on slow CI runners.
 // ---------------------------------------------------------------------------
 
-// Pre-existing fixture drift — generated CLI manifests do not match committed
-// fixtures. These are NOT provider-dependent; they require a separate
-// fixture-regeneration pass to be re-enabled in default-safe tests.
-const FIXTURE_DRIFT_FILES = [
-  'migration-import-export-approval-packet-cli.test.js',
-  'migration-import-export-dry-run-gate-cli.test.js',
-  'schema-compatibility-dry-run-cli.test.js',
-  'v1-rc-validation-aggregator-cli.test.js'
-];
+// Active fixture drift must be empty. If a fixture drift file is added here,
+// the default-safe report exposes it as fixture_drift until it is repaired.
+const FIXTURE_DRIFT_FILES = [];
 
 const PROVIDER_DEPENDENT_FILES = [
   'phase-b-sync-cache-rerank.test.js',
@@ -76,6 +70,24 @@ function resolveDefaultSafeFiles(testsDir) {
     });
 
   return { safeFiles, excludedDetails, totalFiles: allFiles.length };
+}
+
+function buildExcludedSummary(excludedDetails = []) {
+  const reasonCounts = {};
+  for (const detail of excludedDetails) {
+    const reason = detail?.reason || 'unknown';
+    reasonCounts[reason] = (reasonCounts[reason] || 0) + 1;
+  }
+  const fixtureDriftFiles = excludedDetails
+    .filter(detail => detail.reason === 'fixture_drift')
+    .map(detail => detail.file)
+    .sort();
+  return {
+    reasonCounts,
+    expectedExcludedReasons: ['provider_dependent', 'daemon_dependent', 'self_referential'],
+    fixtureDriftStatus: fixtureDriftFiles.length === 0 ? 'clear' : 'active_unacceptable',
+    fixtureDriftFiles
+  };
 }
 
 function buildDefaultSafeEnv(env = process.env) {
@@ -168,7 +180,8 @@ function main() {
       mode: 'no_provider_no_network_no_daemon',
       totalTestFiles: totalFiles,
       defaultSafeFiles: safeFiles.length,
-      excludedDetails
+      excludedDetails,
+      excludedSummary: buildExcludedSummary(excludedDetails)
     };
     process.stderr.write(`${JSON.stringify(contract, null, 2)}\n`);
   }
@@ -219,6 +232,7 @@ module.exports = {
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
   FIXTURE_DRIFT_FILES,
+  buildExcludedSummary,
   buildDefaultSafeEnv,
   buildSpawnOptions,
   formatSummaryOutput,

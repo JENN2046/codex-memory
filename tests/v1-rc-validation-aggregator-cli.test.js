@@ -304,7 +304,7 @@ test('minimal validation aggregator CLI preserves honest blocked decision', () =
   assert.equal(report.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
 });
 
-test('minimal validation aggregator CLI preserves public MCP three-tool freeze', () => {
+test('minimal validation aggregator CLI preserves current bounded public MCP surface', () => {
   const report = parseJsonResult(runCli());
 
   assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
