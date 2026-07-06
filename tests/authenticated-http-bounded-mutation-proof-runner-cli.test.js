@@ -89,6 +89,88 @@ function assertOutputHasNoRawRuntimeValues(stdout) {
   assert.doesNotMatch(stdout, /bounded-cleanup-proof-runner/i);
 }
 
+function assertLowDisclosureRouteSummary(summary) {
+  assert.equal(summary.schemaVersion, 'authenticated-http-bounded-mutation-proof-route-summary-v1');
+  assert.equal(summary.summaryType, 'authenticated_http_bounded_cleanup_suppression_route_summary');
+  assert.equal(summary.status, 'ok');
+  assert.equal(
+    summary.decision,
+    'AUTHENTICATED_HTTP_BOUNDED_CLEANUP_SUPPRESSION_ROUTE_SUMMARY_ACCEPTED_NOT_READY'
+  );
+  assert.equal(summary.accepted, true);
+  assert.equal(summary.routeFamily, 'bounded_cleanup_suppression');
+  assert.equal(summary.sourceReport.schemaVersion, 'authenticated-http-bounded-mutation-proof-report-v1');
+  assert.equal(summary.sourceReport.status, 'ok');
+  assert.equal(summary.sourceReport.accepted, true);
+  assert.equal(summary.receiptCount, 2);
+  assert.equal(summary.acceptedReceiptCount, 2);
+  assert.deepEqual(summary.mutationFamilies.required, ['tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(summary.mutationFamilies.observed, ['supersede_memory', 'tombstone_memory']);
+  assert.deepEqual(summary.mutationFamilies.missing, []);
+  assert.equal(summary.mutationFamilies.complete, true);
+  assert.equal(summary.proofCoverage.authenticatedHttpRuntimeObserved, true);
+  assert.equal(summary.proofCoverage.publicConfirmedMutationSuppressionProven, true);
+  assert.equal(summary.proofCoverage.internalCleanupSuppressionProven, true);
+  assert.equal(summary.proofCoverage.targetProjectionResidualSuppressionProven, true);
+  assert.equal(summary.proofCoverage.replacementProjectionRetentionProven, true);
+  assert.equal(summary.proofCoverage.receiptCoverageComplete, true);
+  assert.equal(summary.disclosure.lowDisclosure, true);
+  assert.equal(summary.disclosure.endpointOrLocatorIncluded, false);
+  assert.equal(summary.disclosure.tokenIncluded, false);
+  assert.equal(summary.disclosure.memoryIdIncluded, false);
+  assert.equal(summary.disclosure.rawContentIncluded, false);
+  assert.equal(summary.disclosure.rawResponseIncluded, false);
+  assert.equal(summary.artifact.jsonStdoutOnly, true);
+  assert.equal(summary.artifact.fileWritten, false);
+  assert.equal(summary.artifact.durableArtifactWritten, false);
+  assert.equal(summary.safety.tempLocalOnly, true);
+  assert.equal(summary.safety.syntheticOnly, true);
+  assert.equal(summary.safety.providerCalls, 0);
+  assert.equal(summary.safety.publicMcpExpansion, false);
+  assert.equal(summary.safety.durablePrivateMemoryWrite, false);
+  assert.equal(summary.safety.realPrivateMemoryAccess, false);
+  assert.equal(summary.safety.endpointOrLocatorReturned, false);
+  assert.equal(summary.safety.tokenReturned, false);
+  assert.equal(summary.safety.memoryIdReturned, false);
+  assert.equal(summary.safety.rawContentReturned, false);
+  assert.equal(summary.safety.readinessClaimed, false);
+  assert.equal(summary.safety.releaseClaimed, false);
+  assert.equal(summary.safety.rcReadyClaimed, false);
+  assert.equal(summary.safety.tempLocalSyntheticStoreMutationObserved, true);
+  assert.equal(
+    summary.runtimeEvidenceSummaryCandidate.status,
+    'local_bounded_cleanup_suppression_evidence_passed_rc_still_blocked'
+  );
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.decision, 'NOT_READY_BLOCKED');
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.runnerExecuted, true);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.commandsExecuted, true);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.localRuntimeEvidenceMatrixExecuted, false);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.allowlistedFinalRcEvidenceRunnerExecuted, false);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.runtimeReady, false);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.finalRcMatrixReady, false);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.v1RcReady, false);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.rcReady, false);
+  assert.deepEqual(summary.runtimeEvidenceSummaryCandidate.criticalGates, {
+    total: 2,
+    passed: 2,
+    failed: 0,
+    allCriticalCommandsPassed: true
+  });
+  assert.deepEqual(summary.runtimeEvidenceSummaryCandidate.locallyEvidencedRuntimeGaps, [
+    'authenticated_http_bounded_cleanup_suppression_route_summary'
+  ]);
+  assert.ok(
+    summary.runtimeEvidenceSummaryCandidate.remainingRuntimeGaps.includes(
+      'real_private_memory_cleanup_suppression_not_executed'
+    )
+  );
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.safety.mutated, false);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.safety.providerCalls, 0);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.safety.writesDurableMemory, false);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.safety.readsRealMemory, false);
+  assert.deepEqual(summary.blockers, []);
+}
+
 test('authenticated HTTP bounded mutation proof CLI emits low-disclosure JSON report for both families', () => {
   const result = runCli(['--json']);
   assert.equal(result.status, 0, result.stderr);
@@ -102,6 +184,56 @@ test('authenticated HTTP bounded mutation proof CLI emits low-disclosure JSON re
     'tombstone_memory',
     'supersede_memory'
   ]);
+  assertOutputHasNoRawRuntimeValues(result.stdout);
+});
+
+test('authenticated HTTP bounded mutation proof CLI emits route summary for aggregator intake', () => {
+  const result = runCli(['--json', '--summary']);
+  assert.equal(result.status, 0, result.stderr);
+  const summary = parseJson(result);
+
+  assertLowDisclosureRouteSummary(summary);
+  assertOutputHasNoRawRuntimeValues(result.stdout);
+});
+
+test('authenticated HTTP bounded mutation proof CLI route summary blocks incomplete family coverage', () => {
+  const result = runCli(['--json', '--summary', '--family', 'tombstone_memory']);
+  assert.equal(result.status, 1);
+  const summary = parseJson(result);
+
+  assert.equal(summary.schemaVersion, 'authenticated-http-bounded-mutation-proof-route-summary-v1');
+  assert.equal(summary.status, 'blocked');
+  assert.equal(summary.accepted, false);
+  assert.equal(summary.routeFamily, 'bounded_cleanup_suppression');
+  assert.deepEqual(summary.mutationFamilies.missing, ['supersede_memory']);
+  assert.equal(summary.proofCoverage.receiptCoverageComplete, false);
+  assert.ok(summary.blockers.includes('required_mutation_family_missing'));
+  assert.ok(summary.blockers.includes('required_receipt_coverage_incomplete'));
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.decision, 'NOT_READY_BLOCKED');
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.runtimeReady, false);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.criticalGates.passed, 1);
+  assert.equal(summary.runtimeEvidenceSummaryCandidate.criticalGates.failed, 1);
+  assert.equal(summary.safety.readinessClaimed, false);
+  assertOutputHasNoRawRuntimeValues(result.stdout);
+});
+
+test('authenticated HTTP bounded mutation proof CLI route summary text mode renders low-disclosure summary', () => {
+  const result = runCli(['--summary']);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /status: ok/);
+  assert.match(
+    result.stdout,
+    /AUTHENTICATED_HTTP_BOUNDED_CLEANUP_SUPPRESSION_ROUTE_SUMMARY_ACCEPTED_NOT_READY/
+  );
+  assert.match(result.stdout, /accepted: true/);
+  assert.match(result.stdout, /receiptCount: 2/);
+  assert.match(result.stdout, /mutationFamilies: supersede_memory, tombstone_memory/);
+  assert.match(result.stdout, /endpointOrLocatorReturned: false/);
+  assert.match(result.stdout, /tokenReturned: false/);
+  assert.match(result.stdout, /rawContentReturned: false/);
+  assert.match(result.stdout, /providerCalls: 0/);
+  assert.match(result.stdout, /fileWritten: false/);
   assertOutputHasNoRawRuntimeValues(result.stdout);
 });
 
@@ -190,6 +322,7 @@ test('authenticated HTTP bounded mutation proof CLI help documents local-only ev
   assert.equal(result.stderr, '');
   assert.match(result.stdout, /Usage: node src\/cli\/authenticated-http-bounded-mutation-proof\.js/);
   assert.match(result.stdout, /temp-local synthetic authenticated HTTP bounded mutation proof/);
+  assert.match(result.stdout, /--summary/);
   assert.match(result.stdout, /writes no report file/);
   assert.match(result.stdout, /makes no provider calls/);
 });

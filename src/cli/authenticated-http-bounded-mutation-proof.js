@@ -33,6 +33,7 @@ function parseArgs(argv = []) {
     json: false,
     pretty: false,
     help: false,
+    summary: false,
     family: 'both',
     rejectedFlag: null
   };
@@ -45,6 +46,10 @@ function parseArgs(argv = []) {
     }
     if (token === '--pretty') {
       options.pretty = true;
+      continue;
+    }
+    if (token === '--summary') {
+      options.summary = true;
       continue;
     }
     if (token === '--help' || token === '-h') {
@@ -73,6 +78,7 @@ function renderHelp() {
     'Usage: node src/cli/authenticated-http-bounded-mutation-proof.js [--json] [--pretty] [--family both|tombstone_memory|supersede_memory]',
     '',
     'Runs a temp-local synthetic authenticated HTTP bounded mutation proof and emits a low-disclosure receipt report.',
+    'Use --summary to emit the higher-level bounded cleanup/suppression route summary instead of the source report.',
     'The command starts only a loopback port-0 test server, writes no report file, returns no endpoint, token, path, memory id, raw content, raw response, or raw error, and makes no provider calls.',
     '',
     `Default families: ${DEFAULT_MUTATION_FAMILIES.join(', ')}`,
@@ -158,6 +164,16 @@ function buildUnsupportedFamilyReport() {
   };
 }
 
+function formatMutationFamilies(report = {}) {
+  if (Array.isArray(report.mutationFamilies)) {
+    return report.mutationFamilies.join(', ') || '<none>';
+  }
+  if (Array.isArray(report.mutationFamilies?.observed)) {
+    return report.mutationFamilies.observed.join(', ') || '<none>';
+  }
+  return '<none>';
+}
+
 function renderText(report = {}) {
   const lines = [
     `status: ${report.status}`,
@@ -165,7 +181,7 @@ function renderText(report = {}) {
     `accepted: ${report.accepted === true}`,
     `receiptCount: ${Number.isInteger(report.receiptCount) ? report.receiptCount : 0}`,
     `acceptedReceiptCount: ${Number.isInteger(report.acceptedReceiptCount) ? report.acceptedReceiptCount : 0}`,
-    `mutationFamilies: ${(report.mutationFamilies || []).join(', ') || '<none>'}`,
+    `mutationFamilies: ${formatMutationFamilies(report)}`,
     `endpointOrLocatorReturned: ${report.safety?.endpointOrLocatorReturned === true}`,
     `tokenReturned: ${report.safety?.tokenReturned === true}`,
     `memoryIdReturned: ${report.safety?.memoryIdReturned === true}`,
@@ -201,6 +217,13 @@ async function main(argv = process.argv.slice(2)) {
     report = await runAuthenticatedHttpBoundedMutationProofReport({ family: options.family });
   }
 
+  if (options.summary) {
+    const {
+      buildAuthenticatedHttpBoundedMutationProofRouteSummary
+    } = require('../core/AuthenticatedHttpBoundedMutationProofRouteSummary');
+    report = buildAuthenticatedHttpBoundedMutationProofRouteSummary(report);
+  }
+
   if (options.json) {
     process.stdout.write(JSON.stringify(report, null, options.pretty ? 2 : 0));
     process.stdout.write('\n');
@@ -223,6 +246,7 @@ if (require.main === module) {
 module.exports = {
   buildRejectedReport,
   buildUnsupportedFamilyReport,
+  formatMutationFamilies,
   isSupportedFamily,
   main,
   parseArgs,
