@@ -62,6 +62,11 @@ function parseArgs(argv = []) {
       index += 1;
       continue;
     }
+    if (token === '--rc-cutover-candidate-artifact-report') {
+      options.rcCutoverCandidateArtifactReportPath = argv[index + 1] || '';
+      index += 1;
+      continue;
+    }
     if (token === '--runtime-evidence-current-head') {
       options.runtimeEvidenceCurrentHead = argv[index + 1] || '';
       index += 1;
@@ -95,6 +100,8 @@ function buildUsageText() {
     '  --strict  Emit the same JSON report but exit non-zero unless the decision is READY_FOR_V1_0_RC.',
     '  --runtime-evidence-report PATH|-',
     '            Read one explicit sanitized authenticated HTTP bounded mutation runtime evidence report from a workspace JSON file or stdin, then feed its sanitized summary into the aggregator preflight path.',
+    '  --rc-cutover-candidate-artifact-report PATH|-',
+    '            Read one low-disclosure RC cutover pre-candidate artifact JSON from a workspace JSON file or stdin, then validate it as owner-review input without generating approval.',
     '  --runtime-evidence-current-head COMMIT',
     '  --runtime-evidence-expected-current-head COMMIT',
     '  --runtime-evidence-generated-at ISO_TIMESTAMP',
@@ -115,6 +122,33 @@ function getExitCodeForDecision(decision, { strict = false, rejected = false } =
     return 0;
   }
   return decision === 'READY_FOR_V1_0_RC' ? 0 : 1;
+}
+
+const FORBIDDEN_RC_CUTOVER_CANDIDATE_ARTIFACT_PATTERNS = Object.freeze([
+  /https?:\/\//i,
+  /\bBearer\b/i,
+  /\bAuthorization\b/i,
+  /\/tmp\/|\\AppData\\|\\Users\\|[A-Z]:\\/i,
+  /\.env\b/i,
+  /Synthetic temp-local chunk/i,
+  /codex-memory-http-bounded-mutation-proof/i,
+  /bounded-cleanup-proof-runner/i,
+  /http-runner-tombstone-memory/i,
+  /http-runner-supersede-old-memory/i,
+  /http-runner-supersede-new-memory/i,
+  /sk-[A-Za-z0-9_-]{20,}/,
+  /AKIA[0-9A-Z]{16}/,
+  /BEGIN (RSA|OPENSSH|PRIVATE)/i
+]);
+
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function containsForbiddenRcCutoverCandidateArtifactMaterial(value) {
+  const serialized = JSON.stringify(value);
+  return FORBIDDEN_RC_CUTOVER_CANDIDATE_ARTIFACT_PATTERNS
+    .some(pattern => pattern.test(serialized));
 }
 
 function buildRejectedReport(rejectedFlag) {
@@ -219,6 +253,65 @@ function readRuntimeEvidenceReportInput(inputPath, { cwd = process.cwd() } = {})
   }
 }
 
+function readRcCutoverCandidateArtifactReportInput(
+  inputPath,
+  { cwd = process.cwd() } = {}
+) {
+  if (!inputPath) {
+    return {
+      ok: false,
+      reason: 'rc_cutover_candidate_artifact_report_path_required',
+      value: null
+    };
+  }
+
+  if (inputPath === '-') {
+    try {
+      return {
+        ok: true,
+        reason: '',
+        value: JSON.parse(fs.readFileSync(0, 'utf8'))
+      };
+    } catch {
+      return {
+        ok: false,
+        reason: 'rc_cutover_candidate_artifact_report_stdin_json_invalid',
+        value: null
+      };
+    }
+  }
+
+  const resolvedPath = path.resolve(cwd, inputPath);
+  const workspaceRoot = path.resolve(cwd);
+  const relativePath = path.relative(workspaceRoot, resolvedPath);
+  if (
+    relativePath.startsWith('..') ||
+    path.isAbsolute(relativePath) ||
+    isSecretAdjacentPath(resolvedPath) ||
+    path.extname(resolvedPath).toLowerCase() !== '.json'
+  ) {
+    return {
+      ok: false,
+      reason: 'rc_cutover_candidate_artifact_report_path_rejected',
+      value: null
+    };
+  }
+
+  try {
+    return {
+      ok: true,
+      reason: '',
+      value: JSON.parse(fs.readFileSync(resolvedPath, 'utf8'))
+    };
+  } catch {
+    return {
+      ok: false,
+      reason: 'rc_cutover_candidate_artifact_report_file_json_invalid',
+      value: null
+    };
+  }
+}
+
 function buildRuntimeEvidenceReportLoadError(loadErrorReason, options = {}) {
   const report = buildV1RcValidationAggregatorReport({
     generatedAt: options.generatedAt || undefined
@@ -253,6 +346,52 @@ function buildRuntimeEvidenceReportLoadError(loadErrorReason, options = {}) {
       'Runtime evidence report input was rejected before aggregation; no raw input or path was disclosed.'
     ],
     nextStep: 'Provide a workspace JSON runtime evidence report or pipe it on stdin with --runtime-evidence-report -.'
+  };
+}
+
+function buildRcCutoverCandidateArtifactReportLoadError(loadErrorReason, options = {}) {
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: options.generatedAt || undefined
+  });
+
+  return {
+    ...report,
+    phase: 'P73-rc-cutover-candidate-artifact-input-rejected',
+    rcCutoverCandidateArtifactReportInput: {
+      provided: true,
+      accepted: false,
+      rejected: true,
+      rejectReason: loadErrorReason,
+      pathDisclosed: false,
+      rawInputPrinted: false
+    },
+    evidence: {
+      ...report.evidence,
+      p73RcCutoverCandidateArtifactIntakePrecheck: {
+        status: 'candidate_artifact_intake_blocked_fail_closed',
+        decision: 'NOT_READY_BLOCKED',
+        artifactInputProvided: false,
+        inputAccepted: false,
+        rejectReason: loadErrorReason,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false,
+        canClaimRcReady: false
+      }
+    },
+    summary: {
+      ...report.summary,
+      rcCutoverCandidateArtifactReportInputProvided: true,
+      rcCutoverCandidateArtifactReportInputAccepted: false,
+      rcCutoverCandidateArtifactIntakeAccepted: false,
+      rcCutoverCandidateArtifactIntakeReadyForOwnerReview: false,
+      rcCutoverCandidateArtifactIntakeCanClaimRcReady: false
+    },
+    warnings: [
+      ...report.warnings,
+      'RC cutover candidate artifact input was rejected before intake; no raw input or path was disclosed.'
+    ],
+    nextStep: 'Provide a workspace JSON P72 candidate artifact or pipe it on stdin with --rc-cutover-candidate-artifact-report -.'
   };
 }
 
@@ -1021,6 +1160,261 @@ function buildRcCutoverCandidateArtifactExport({
   };
 }
 
+function collectRcCutoverCandidateArtifactIntakeBlockers(artifact = {}) {
+  const blockers = [];
+  const exportPolicy = isPlainObject(artifact.export) ? artifact.export : {};
+  const manifest = isPlainObject(artifact.manifest) ? artifact.manifest : {};
+  const finalOutlet = isPlainObject(artifact.finalEvidencePackageAggregationOutlet)
+    ? artifact.finalEvidencePackageAggregationOutlet
+    : {};
+  const disclosure = isPlainObject(artifact.disclosure) ? artifact.disclosure : {};
+  const safety = isPlainObject(artifact.safety) ? artifact.safety : {};
+
+  if (!isPlainObject(artifact)) blockers.push('artifact_shape_invalid');
+  if (artifact.schemaVersion !== 'p72-rc-cutover-candidate-artifact-export-v1') {
+    blockers.push('artifact_schema_version_mismatch');
+  }
+  if (artifact.artifactType !== 'rc_cutover_pre_candidate_evidence_artifact_export') {
+    blockers.push('artifact_type_mismatch');
+  }
+  if (artifact.decision !== 'NOT_READY_BLOCKED') {
+    blockers.push('artifact_decision_mismatch');
+  }
+  if (artifact.status !== 'artifact_ready_for_exact_owner_review_not_authorization') {
+    blockers.push('artifact_status_not_owner_review_ready');
+  }
+  if (artifact.artifactAccepted !== true) blockers.push('artifact_not_accepted');
+  if (artifact.artifactReadyForOwnerReview !== true) {
+    blockers.push('artifact_owner_review_not_ready');
+  }
+  if (Array.isArray(artifact.blockerIds) && artifact.blockerIds.length > 0) {
+    blockers.push('artifact_blockers_present');
+  }
+
+  if (
+    exportPolicy.mode !== 'json_stdout_only' ||
+    exportPolicy.jsonStdoutOnly !== true ||
+    exportPolicy.fileWritten !== false ||
+    exportPolicy.durableArtifactWritten !== false ||
+    exportPolicy.pathOutput !== false ||
+    exportPolicy.pathPersisted !== false
+  ) {
+    blockers.push('artifact_export_policy_not_stdout_only');
+  }
+
+  if (
+    manifest.manifestVersion !==
+      'p72-rc-cutover-candidate-artifact-manifest-v1' ||
+    manifest.manifestType !== 'low_disclosure_rc_cutover_pre_candidate_manifest' ||
+    manifest.outputPolicy !== 'low_disclosure_json_stdout_only' ||
+    manifest.ownerApprovalRequiredSeparately !== true ||
+    manifest.ownerApprovalIncluded !== false ||
+    manifest.executionAuthorizationIncluded !== false ||
+    manifest.canClaimRcReady !== false ||
+    manifest.sourceArtifactAccepted !== true
+  ) {
+    blockers.push('artifact_manifest_boundary_invalid');
+  }
+  const requiredInputFamilies = Array.isArray(manifest.requiredInputFamilies)
+    ? manifest.requiredInputFamilies
+    : [];
+  for (const requiredFamily of [
+    'sanitized_runtime_evidence_report',
+    'separate_exact_head_bound_runtime_summary_input'
+  ]) {
+    if (!requiredInputFamilies.includes(requiredFamily)) {
+      blockers.push(`artifact_manifest_missing_${requiredFamily}`);
+    }
+  }
+  const includedPackageRefs = Array.isArray(manifest.includedPackageRefs)
+    ? manifest.includedPackageRefs
+    : [];
+  if (!includedPackageRefs.includes('p71RcCutoverFinalEvidencePackageAggregationOutlet')) {
+    blockers.push('artifact_manifest_missing_p71_final_outlet_ref');
+  }
+
+  if (
+    finalOutlet.schemaVersion !==
+      'p71-rc-cutover-final-evidence-package-aggregation-outlet-v1' ||
+    finalOutlet.aggregationOutletAccepted !== true ||
+    finalOutlet.ownerReviewReady !== true ||
+    finalOutlet.rcCutoverExecutionAllowed !== false ||
+    finalOutlet.rcReady !== false
+  ) {
+    blockers.push('artifact_final_evidence_package_outlet_not_accepted');
+  }
+
+  if (
+    artifact.approvalRequestSubmitted === true ||
+    artifact.approvalLineGenerated === true ||
+    artifact.approvalTextGenerated === true ||
+    artifact.ownerApprovalPresent === true ||
+    artifact.ownerApprovalAccepted === true ||
+    artifact.ownerApprovalExecutionAllowed === true ||
+    artifact.rcCutoverApproved === true ||
+    artifact.rcCutoverExecuted === true ||
+    artifact.rcCutoverExecutionAllowed === true ||
+    artifact.rcReady === true ||
+    artifact.canClaimRuntimeReady === true ||
+    artifact.canClaimFinalRcReady === true ||
+    artifact.canClaimV1RcReady === true ||
+    artifact.canClaimRcReady === true
+  ) {
+    blockers.push('artifact_approval_execution_or_readiness_claim_present');
+  }
+
+  for (const [key, value] of Object.entries(disclosure)) {
+    if (key !== 'lowDisclosure' && value === true) {
+      blockers.push(`artifact_disclosure_${key}`);
+    }
+  }
+  for (const [key, value] of Object.entries(safety)) {
+    if (key !== 'readsLowDisclosureEvidenceChainOnly' && value === true) {
+      blockers.push(`artifact_safety_${key}`);
+    }
+  }
+  if (disclosure.lowDisclosure !== true) {
+    blockers.push('artifact_not_low_disclosure');
+  }
+  if (containsForbiddenRcCutoverCandidateArtifactMaterial(artifact)) {
+    blockers.push('artifact_contains_forbidden_material');
+  }
+
+  return [...new Set(blockers)].sort();
+}
+
+function buildRcCutoverCandidateArtifactIntakePrecheck({
+  rcCutoverCandidateArtifactExport = null
+} = {}) {
+  const artifact = isPlainObject(rcCutoverCandidateArtifactExport)
+    ? rcCutoverCandidateArtifactExport
+    : {};
+  const manifest = isPlainObject(artifact.manifest) ? artifact.manifest : {};
+  const finalOutlet = isPlainObject(artifact.finalEvidencePackageAggregationOutlet)
+    ? artifact.finalEvidencePackageAggregationOutlet
+    : {};
+  const blockerIds = collectRcCutoverCandidateArtifactIntakeBlockers(artifact);
+  const inputAccepted = blockerIds.length === 0;
+
+  return {
+    schemaVersion: 'p73-rc-cutover-candidate-artifact-intake-precheck-v1',
+    intakeType: 'rc_cutover_candidate_artifact_intake_precheck',
+    sourceMode: 'p72_rc_cutover_candidate_artifact_export',
+    status: inputAccepted
+      ? 'candidate_artifact_intake_accepted_for_owner_review_not_authorization'
+      : 'candidate_artifact_intake_blocked_fail_closed',
+    decision: 'NOT_READY_BLOCKED',
+    artifactInputProvided: isPlainObject(rcCutoverCandidateArtifactExport),
+    inputAccepted,
+    ownerReviewInputReady: inputAccepted,
+    artifactAcceptedByInput: artifact.artifactAccepted === true,
+    artifactReadyForOwnerReview: artifact.artifactReadyForOwnerReview === true,
+    approvalRequestOnly: true,
+    approvalRequestSubmitted: false,
+    approvalLineGenerated: false,
+    approvalTextGenerated: false,
+    ownerApprovalPresent: false,
+    ownerApprovalAccepted: false,
+    ownerApprovalExecutionAllowed: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    manifestSummary: {
+      manifestVersion:
+        typeof manifest.manifestVersion === 'string'
+          ? manifest.manifestVersion
+          : '',
+      outputPolicy:
+        typeof manifest.outputPolicy === 'string' ? manifest.outputPolicy : '',
+      sourceArtifactAccepted: manifest.sourceArtifactAccepted === true,
+      requiredInputFamilyCount: Array.isArray(manifest.requiredInputFamilies)
+        ? manifest.requiredInputFamilies.length
+        : 0,
+      includedPackageRefCount: Array.isArray(manifest.includedPackageRefs)
+        ? manifest.includedPackageRefs.length
+        : 0,
+      ownerApprovalRequiredSeparately:
+        manifest.ownerApprovalRequiredSeparately === true,
+      ownerApprovalIncluded: manifest.ownerApprovalIncluded === true,
+      executionAuthorizationIncluded:
+        manifest.executionAuthorizationIncluded === true,
+      canClaimRcReady: manifest.canClaimRcReady === true
+    },
+    finalEvidencePackageSummary: {
+      schemaVersion:
+        typeof finalOutlet.schemaVersion === 'string'
+          ? finalOutlet.schemaVersion
+          : '',
+      aggregationOutletAccepted:
+        finalOutlet.aggregationOutletAccepted === true,
+      ownerReviewReady: finalOutlet.ownerReviewReady === true,
+      chainRowCount: Number.isFinite(finalOutlet.chain?.rowCount)
+        ? finalOutlet.chain.rowCount
+        : 0,
+      acceptedRowCount: Number.isFinite(finalOutlet.chain?.acceptedRowCount)
+        ? finalOutlet.chain.acceptedRowCount
+        : 0,
+      missingRowCount: Number.isFinite(finalOutlet.chain?.missingRowCount)
+        ? finalOutlet.chain.missingRowCount
+        : 0,
+      blockerCount: Array.isArray(finalOutlet.blockerIds)
+        ? finalOutlet.blockerIds.length
+        : 0,
+      rcCutoverExecutionAllowed:
+        finalOutlet.rcCutoverExecutionAllowed === true,
+      rcReady: finalOutlet.rcReady === true
+    },
+    blockerIds,
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      approvalTextOutput: false,
+      approvalLineOutput: false,
+      endpointOrLocatorOutput: false,
+      requestBodyOutput: false,
+      rawResponseOutput: false,
+      rawErrorOutput: false,
+      secretOutput: false,
+      privateMemoryContentOutput: false,
+      artifactPathOutput: false,
+      rawInputPrinted: false
+    },
+    safety: {
+      readsCandidateArtifactInputOnly: true,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      writesArtifactFile: false,
+      mutatesConfig: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      pushes: false,
+      tags: false,
+      releases: false,
+      deploys: false,
+      submitsApprovalRequest: false,
+      executesCutover: false,
+      readinessClaimed: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: inputAccepted
+      ? 'Treat this artifact as an owner-review input only; a separate exact owner approval and execution boundary is still required.'
+      : 'Regenerate or repair the P72 low-disclosure artifact before using it as owner-review input.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -1029,6 +1423,12 @@ function buildCliReport(options = {}) {
   if (options.runtimeEvidenceReportLoadError) {
     return buildRuntimeEvidenceReportLoadError(
       options.runtimeEvidenceReportLoadError,
+      options
+    );
+  }
+  if (options.rcCutoverCandidateArtifactReportLoadError) {
+    return buildRcCutoverCandidateArtifactReportLoadError(
+      options.rcCutoverCandidateArtifactReportLoadError,
       options
     );
   }
@@ -1088,10 +1488,19 @@ function buildCliReport(options = {}) {
           rcCutoverFinalEvidencePackageAggregationOutlet
         })
       : null;
+  const rcCutoverCandidateArtifactIntakePrecheck =
+    options.rcCutoverCandidateArtifactReport
+      ? buildRcCutoverCandidateArtifactIntakePrecheck({
+          rcCutoverCandidateArtifactExport:
+            options.rcCutoverCandidateArtifactReport
+        })
+      : null;
 
   const outputReport = {
     ...report,
-    phase: runtimeEvidencePreflight
+    phase: rcCutoverCandidateArtifactIntakePrecheck
+      ? 'P73-rc-cutover-candidate-artifact-intake-precheck'
+      : runtimeEvidencePreflight
       ? 'P67-runtime-evidence-standard-input-preflight'
       : 'P24.4-validation-aggregator-decision-exit-code-semantics',
     ...(runtimeEvidencePreflight
@@ -1100,6 +1509,19 @@ function buildCliReport(options = {}) {
             provided: true,
             accepted: runtimeEvidencePreflight.standardInputSourceAccepted === true,
             rejected: runtimeEvidencePreflight.standardInputSourceAccepted !== true,
+            pathDisclosed: false,
+            rawInputPrinted: false
+          }
+        }
+      : {}),
+    ...(rcCutoverCandidateArtifactIntakePrecheck
+      ? {
+          rcCutoverCandidateArtifactReportInput: {
+            provided: true,
+            accepted:
+              rcCutoverCandidateArtifactIntakePrecheck.inputAccepted === true,
+            rejected:
+              rcCutoverCandidateArtifactIntakePrecheck.inputAccepted !== true,
             pathDisclosed: false,
             rawInputPrinted: false
           }
@@ -1128,6 +1550,12 @@ function buildCliReport(options = {}) {
               rcCutoverFinalEvidencePackageAggregationOutlet,
             p72RcCutoverCandidateArtifactExport:
               rcCutoverCandidateArtifactExport
+          }
+        : {}),
+      ...(rcCutoverCandidateArtifactIntakePrecheck
+        ? {
+            p73RcCutoverCandidateArtifactIntakePrecheck:
+              rcCutoverCandidateArtifactIntakePrecheck
           }
         : {})
     },
@@ -1189,6 +1617,22 @@ function buildCliReport(options = {}) {
             rcCutoverCandidateArtifactExportCanClaimRcReady: false,
             runtimeEvidenceReportCanClaimV1RcReady: false
           }
+        : {}),
+      ...(rcCutoverCandidateArtifactIntakePrecheck
+        ? {
+            rcCutoverCandidateArtifactReportInputProvided: true,
+            rcCutoverCandidateArtifactReportInputAccepted:
+              rcCutoverCandidateArtifactIntakePrecheck.inputAccepted === true,
+            rcCutoverCandidateArtifactIntakeAccepted:
+              rcCutoverCandidateArtifactIntakePrecheck.inputAccepted === true,
+            rcCutoverCandidateArtifactIntakeReadyForOwnerReview:
+              rcCutoverCandidateArtifactIntakePrecheck.ownerReviewInputReady === true,
+            rcCutoverCandidateArtifactIntakeBlockerCount:
+              rcCutoverCandidateArtifactIntakePrecheck.blockerIds.length,
+            rcCutoverCandidateArtifactIntakeApprovalSubmitted: false,
+            rcCutoverCandidateArtifactIntakeExecutesCutover: false,
+            rcCutoverCandidateArtifactIntakeCanClaimRcReady: false
+          }
         : {})
     },
     recommendations: [
@@ -1198,7 +1642,10 @@ function buildCliReport(options = {}) {
       'Use --strict only for future gate semantics; the current NOT_READY_BLOCKED report intentionally exits 1 in strict mode.',
       runtimeEvidencePreflight
         ? 'Use the runtime evidence report input as a low-disclosure standard source preflight only; do not treat sanitized replay as readiness.'
-        : 'Plan full matrix aggregation separately from this minimal CLI wrapper.'
+        : 'Plan full matrix aggregation separately from this minimal CLI wrapper.',
+      rcCutoverCandidateArtifactIntakePrecheck
+        ? 'Use the candidate artifact intake as owner-review input only; do not treat it as approval or RC readiness.'
+        : 'Add candidate artifact intake only when a P72 low-disclosure artifact is supplied explicitly.'
     ]
   };
 
@@ -1223,6 +1670,19 @@ function main() {
       options.runtimeEvidenceReportLoadError = runtimeEvidenceReport.reason;
     }
   }
+  if (options.rcCutoverCandidateArtifactReportPath) {
+    const rcCutoverCandidateArtifactReport =
+      readRcCutoverCandidateArtifactReportInput(
+        options.rcCutoverCandidateArtifactReportPath
+      );
+    if (rcCutoverCandidateArtifactReport.ok) {
+      options.rcCutoverCandidateArtifactReport =
+        rcCutoverCandidateArtifactReport.value;
+    } else {
+      options.rcCutoverCandidateArtifactReportLoadError =
+        rcCutoverCandidateArtifactReport.reason;
+    }
+  }
 
   const report = buildCliReport(options);
   const output = options.rcCutoverCandidateArtifact
@@ -1236,7 +1696,11 @@ function main() {
   process.stdout.write(`${JSON.stringify(output, null, spacing)}\n`);
   process.exitCode = getExitCodeForDecision(report.decision, {
     strict: options.strict,
-    rejected: Boolean(options.rejectedFlag || options.runtimeEvidenceReportLoadError)
+    rejected: Boolean(
+      options.rejectedFlag ||
+      options.runtimeEvidenceReportLoadError ||
+      options.rcCutoverCandidateArtifactReportLoadError
+    )
   });
 }
 
@@ -1247,17 +1711,20 @@ if (require.main === module) {
 module.exports = {
   REJECTED_FLAGS,
   buildRuntimeEvidenceReportLoadError,
+  buildRcCutoverCandidateArtifactReportLoadError,
   buildExactHeadBoundRuntimeSummaryInputFromOptions,
   buildFinalEvidenceAggregationRcGatePrecheck,
   buildRcCutoverPreApprovalCandidatePackage,
   buildRcCutoverOwnerApprovalReadinessSummary,
   buildRcCutoverFinalEvidencePackageAggregationOutlet,
   buildRcCutoverCandidateArtifactExport,
+  buildRcCutoverCandidateArtifactIntakePrecheck,
   parseArgs,
   buildUsageText,
   redactExactRuntimeEvidenceValues,
   getExitCodeForDecision,
   readRuntimeEvidenceReportInput,
+  readRcCutoverCandidateArtifactReportInput,
   buildCliReport,
   buildRejectedReport
 };

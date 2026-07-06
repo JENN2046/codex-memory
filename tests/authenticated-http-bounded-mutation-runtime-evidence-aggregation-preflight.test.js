@@ -19,7 +19,9 @@ const {
 const {
   buildCliReport,
   buildRcCutoverCandidateArtifactExport,
+  buildRcCutoverCandidateArtifactIntakePrecheck,
   parseArgs,
+  readRcCutoverCandidateArtifactReportInput,
   readRuntimeEvidenceReportInput
 } = require('../src/cli/v1-rc-validation-aggregator');
 
@@ -78,6 +80,19 @@ async function buildZeroGapLowDisclosureReport() {
     locallyEvidencedRuntimeGaps: [...RUNTIME_EVIDENCE_GAP_ID_ALLOWLIST],
     remainingRuntimeGaps: []
   });
+}
+
+async function buildAcceptedRcCutoverCandidateArtifact() {
+  const sourceReport = await buildZeroGapLowDisclosureReport();
+  const report = buildCliReport({
+    runtimeEvidenceReport: sourceReport,
+    runtimeEvidenceCurrentHead: fixtureCommit,
+    runtimeEvidenceExpectedCurrentHead: fixtureCommit,
+    runtimeEvidenceGeneratedAt: fixtureEvidenceGeneratedAt,
+    generatedAt: '2026-07-07T01:00:00.000Z'
+  });
+
+  return report.evidence.p72RcCutoverCandidateArtifactExport;
 }
 
 function assertArtifactExportNeverExecutes(artifact) {
@@ -181,6 +196,72 @@ function assertAcceptedArtifactExport(artifact) {
   assert.ok(artifact.manifest.excludedMaterial.includes('secret'));
   assert.equal(artifact.finalEvidencePackageAggregationOutlet.aggregationOutletAccepted, true);
   assertArtifactExportNeverExecutes(artifact);
+}
+
+function assertAcceptedArtifactIntake(intake) {
+  assert.equal(
+    intake.schemaVersion,
+    'p73-rc-cutover-candidate-artifact-intake-precheck-v1'
+  );
+  assert.equal(intake.intakeType, 'rc_cutover_candidate_artifact_intake_precheck');
+  assert.equal(intake.sourceMode, 'p72_rc_cutover_candidate_artifact_export');
+  assert.equal(
+    intake.status,
+    'candidate_artifact_intake_accepted_for_owner_review_not_authorization'
+  );
+  assert.equal(intake.decision, 'NOT_READY_BLOCKED');
+  assert.equal(intake.artifactInputProvided, true);
+  assert.equal(intake.inputAccepted, true);
+  assert.equal(intake.ownerReviewInputReady, true);
+  assert.equal(intake.artifactAcceptedByInput, true);
+  assert.equal(intake.artifactReadyForOwnerReview, true);
+  assert.equal(intake.approvalRequestOnly, true);
+  assert.equal(intake.approvalRequestSubmitted, false);
+  assert.equal(intake.approvalLineGenerated, false);
+  assert.equal(intake.approvalTextGenerated, false);
+  assert.equal(intake.ownerApprovalPresent, false);
+  assert.equal(intake.ownerApprovalAccepted, false);
+  assert.equal(intake.ownerApprovalExecutionAllowed, false);
+  assert.equal(intake.rcCutoverApproved, false);
+  assert.equal(intake.rcCutoverExecuted, false);
+  assert.equal(intake.rcCutoverExecutionAllowed, false);
+  assert.equal(intake.rcReady, false);
+  assert.equal(intake.manifestSummary.sourceArtifactAccepted, true);
+  assert.equal(intake.manifestSummary.ownerApprovalRequiredSeparately, true);
+  assert.equal(intake.manifestSummary.ownerApprovalIncluded, false);
+  assert.equal(intake.manifestSummary.executionAuthorizationIncluded, false);
+  assert.equal(intake.manifestSummary.canClaimRcReady, false);
+  assert.equal(intake.finalEvidencePackageSummary.aggregationOutletAccepted, true);
+  assert.equal(intake.finalEvidencePackageSummary.ownerReviewReady, true);
+  assert.equal(intake.finalEvidencePackageSummary.missingRowCount, 0);
+  assert.equal(intake.finalEvidencePackageSummary.blockerCount, 0);
+  assert.equal(intake.finalEvidencePackageSummary.rcCutoverExecutionAllowed, false);
+  assert.equal(intake.finalEvidencePackageSummary.rcReady, false);
+  assert.deepEqual(intake.blockerIds, []);
+  assert.equal(intake.disclosure.lowDisclosure, true);
+  assert.equal(intake.disclosure.rawCurrentHeadCommitOutput, false);
+  assert.equal(intake.disclosure.rawEvidenceGeneratedAtOutput, false);
+  assert.equal(intake.disclosure.approvalTextOutput, false);
+  assert.equal(intake.disclosure.endpointOrLocatorOutput, false);
+  assert.equal(intake.disclosure.rawResponseOutput, false);
+  assert.equal(intake.disclosure.secretOutput, false);
+  assert.equal(intake.disclosure.artifactPathOutput, false);
+  assert.equal(intake.disclosure.rawInputPrinted, false);
+  assert.equal(intake.safety.readsCandidateArtifactInputOnly, true);
+  assert.equal(intake.safety.executesCommands, false);
+  assert.equal(intake.safety.callsProviders, false);
+  assert.equal(intake.safety.callsMcpTools, false);
+  assert.equal(intake.safety.readsRealMemory, false);
+  assert.equal(intake.safety.writesDurableState, false);
+  assert.equal(intake.safety.writesArtifactFile, false);
+  assert.equal(intake.safety.remoteWrites, false);
+  assert.equal(intake.safety.submitsApprovalRequest, false);
+  assert.equal(intake.safety.executesCutover, false);
+  assert.equal(intake.safety.readinessClaimed, false);
+  assert.equal(intake.canClaimRuntimeReady, false);
+  assert.equal(intake.canClaimFinalRcReady, false);
+  assert.equal(intake.canClaimV1RcReady, false);
+  assert.equal(intake.canClaimRcReady, false);
 }
 
 test('runtime evidence aggregation preflight accepts standard low-disclosure source but keeps aggregator replay blocked', async () => {
@@ -910,6 +991,94 @@ test('RC cutover candidate artifact export helper fails closed without final pac
   assertNoForbiddenMaterial(artifact);
 });
 
+test('RC cutover candidate artifact intake accepts P72 artifact only as owner-review input', async () => {
+  const artifact = await buildAcceptedRcCutoverCandidateArtifact();
+  const intake = buildRcCutoverCandidateArtifactIntakePrecheck({
+    rcCutoverCandidateArtifactExport: artifact
+  });
+
+  assertAcceptedArtifactIntake(intake);
+  assertNoForbiddenMaterial(intake);
+});
+
+test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin without approval or readiness', async () => {
+  const artifact = await buildAcceptedRcCutoverCandidateArtifact();
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-candidate-artifact-report',
+      '-',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(artifact),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const report = JSON.parse(result.stdout);
+  const intake = report.evidence.p73RcCutoverCandidateArtifactIntakePrecheck;
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(report.phase, 'P73-rc-cutover-candidate-artifact-intake-precheck');
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.provided, true);
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.accepted, true);
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.rejected, false);
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.pathDisclosed, false);
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.rawInputPrinted, false);
+  assertAcceptedArtifactIntake(intake);
+  assert.equal(report.summary.rcCutoverCandidateArtifactReportInputProvided, true);
+  assert.equal(report.summary.rcCutoverCandidateArtifactReportInputAccepted, true);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeAccepted, true);
+  assert.equal(
+    report.summary.rcCutoverCandidateArtifactIntakeReadyForOwnerReview,
+    true
+  );
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeBlockerCount, 0);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeApprovalSubmitted, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeExecutesCutover, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeCanClaimRcReady, false);
+  assert.equal(Object.hasOwn(report.evidence, 'p72RcCutoverCandidateArtifactExport'), false);
+  assertNoForbiddenMaterial(report);
+});
+
+test('RC cutover candidate artifact intake fails closed on approval execution or output drift', async () => {
+  const artifact = await buildAcceptedRcCutoverCandidateArtifact();
+  const driftedArtifact = JSON.parse(JSON.stringify(artifact));
+  driftedArtifact.export.fileWritten = true;
+  driftedArtifact.approvalLineGenerated = true;
+  driftedArtifact.rcCutoverExecutionAllowed = true;
+  driftedArtifact.safety.readinessClaimed = true;
+  const intake = buildRcCutoverCandidateArtifactIntakePrecheck({
+    rcCutoverCandidateArtifactExport: driftedArtifact
+  });
+
+  assert.equal(intake.status, 'candidate_artifact_intake_blocked_fail_closed');
+  assert.equal(intake.inputAccepted, false);
+  assert.equal(intake.ownerReviewInputReady, false);
+  assert.ok(intake.blockerIds.includes('artifact_export_policy_not_stdout_only'));
+  assert.ok(
+    intake.blockerIds.includes(
+      'artifact_approval_execution_or_readiness_claim_present'
+    )
+  );
+  assert.ok(intake.blockerIds.includes('artifact_safety_readinessClaimed'));
+  assert.equal(intake.rcCutoverExecutionAllowed, false);
+  assert.equal(intake.rcReady, false);
+  assert.equal(intake.canClaimRcReady, false);
+  assertNoForbiddenMaterial(intake);
+});
+
 test('runtime evidence aggregation preflight rejects unsupported artifact gap IDs fail-closed', async () => {
   const sourceReport = await buildZeroGapLowDisclosureReport();
   sourceReport.runtimeEvidenceArtifact.runtimeEvidenceSummary.locallyEvidencedRuntimeGaps = [
@@ -1059,6 +1228,11 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
       .rcCutoverCandidateArtifact,
     true
   );
+  assert.equal(
+    parseArgs(['--rc-cutover-candidate-artifact-report', '-'])
+      .rcCutoverCandidateArtifactReportPath,
+    '-'
+  );
 
   const rejectedEnv = readRuntimeEvidenceReportInput('.env', { cwd: repoRoot });
   assert.equal(rejectedEnv.ok, false);
@@ -1069,4 +1243,23 @@ test('v1 RC aggregator runtime evidence report argument is parsed and secret-adj
   });
   assert.equal(rejectedSecret.ok, false);
   assert.equal(rejectedSecret.reason, 'runtime_evidence_report_path_rejected');
+
+  const rejectedArtifactEnv = readRcCutoverCandidateArtifactReportInput('.env', {
+    cwd: repoRoot
+  });
+  assert.equal(rejectedArtifactEnv.ok, false);
+  assert.equal(
+    rejectedArtifactEnv.reason,
+    'rc_cutover_candidate_artifact_report_path_rejected'
+  );
+
+  const rejectedArtifactSecret = readRcCutoverCandidateArtifactReportInput(
+    'tmp/secret-artifact.json',
+    { cwd: repoRoot }
+  );
+  assert.equal(rejectedArtifactSecret.ok, false);
+  assert.equal(
+    rejectedArtifactSecret.reason,
+    'rc_cutover_candidate_artifact_report_path_rejected'
+  );
 });

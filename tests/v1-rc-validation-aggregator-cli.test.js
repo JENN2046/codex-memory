@@ -459,6 +459,11 @@ test('minimal validation aggregator CLI parses strict and help flags without imp
   });
   assert.equal(parseArgs(['--help']).help, true);
   assert.equal(parseArgs(['--rc-cutover-candidate-artifact']).rcCutoverCandidateArtifact, true);
+  assert.equal(
+    parseArgs(['--rc-cutover-candidate-artifact-report', '-'])
+      .rcCutoverCandidateArtifactReportPath,
+    '-'
+  );
 });
 
 test('minimal validation aggregator CLI package manifests remain untouched', () => {
