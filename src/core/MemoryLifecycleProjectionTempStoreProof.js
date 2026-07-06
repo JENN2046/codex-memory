@@ -98,8 +98,8 @@ function buildSyntheticRecord({
     memoryId,
     target,
     title: 'Temp Store Lifecycle Projection Proof',
-    content: 'Synthetic temp-local lifecycle projection proof content.',
-    evidence: 'Synthetic temp-local evidence; no private or production memory.',
+    content: `Synthetic temp-local lifecycle projection proof content for ${memoryId}.`,
+    evidence: `Synthetic temp-local evidence for ${memoryId}; no private or production memory.`,
     tags: ['proof', 'temp-store-proof', `status:${status}`],
     validated: true,
     reusable: false,
@@ -168,8 +168,8 @@ async function seedTempStoreBackedLifecycleProjection({
   `).run(status, timestamp, 'codex', memoryId);
 
   const chunkTexts = [
-    'Synthetic temp-local chunk one.',
-    'Synthetic temp-local chunk two.'
+    `Synthetic temp-local chunk one for ${memoryId}.`,
+    `Synthetic temp-local chunk two for ${memoryId}.`
   ];
   const vectors = await vectorStore.getBatchEmbeddingsCached(chunkTexts, { inputKind: 'document' });
   await shadowStore.replaceChunksForRecord(storedRecord, chunkTexts.map((text, index) => ({
@@ -191,7 +191,7 @@ async function seedTempStoreBackedLifecycleProjection({
     null,
     null,
     99,
-    'Synthetic old-profile temp-local chunk.',
+    `Synthetic old-profile temp-local chunk for ${memoryId}.`,
     '[]',
     'old-profile-fixture',
     JSON.stringify(record.tags || []),
