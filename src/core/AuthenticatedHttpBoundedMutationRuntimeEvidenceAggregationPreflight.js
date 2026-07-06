@@ -118,6 +118,13 @@ function countUnsupportedArtifactRuntimeGapIds(summary = {}) {
     countUnsupportedRuntimeGapIds(summary.remainingRuntimeGaps);
 }
 
+function runtimeGapArrayShapeInvalid(summary = {}) {
+  return [
+    'locallyEvidencedRuntimeGaps',
+    'remainingRuntimeGaps'
+  ].some(key => Object.hasOwn(summary, key) && !Array.isArray(summary[key]));
+}
+
 function buildRuntimeEvidenceSummaryForAggregatorReplay(report = {}, options = {}) {
   const artifact = isPlainObject(report.runtimeEvidenceArtifact)
     ? report.runtimeEvidenceArtifact
@@ -286,6 +293,9 @@ function collectSourceBlockers(report = {}) {
   }
   if (countUnsupportedArtifactRuntimeGapIds(summary) > 0) {
     blockers.push('source_runtime_gap_allowlist_rejected');
+  }
+  if (runtimeGapArrayShapeInvalid(summary)) {
+    blockers.push('source_runtime_gap_array_shape_invalid');
   }
 
   return [...new Set(blockers)].sort();

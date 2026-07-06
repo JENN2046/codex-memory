@@ -438,6 +438,32 @@ test('runtime evidence aggregation preflight rejects unsupported artifact gap ID
   assert.doesNotMatch(JSON.stringify(preflight), /unsupported_private_runtime_gap_id/);
 });
 
+test('runtime evidence aggregation preflight rejects non-array artifact gap fields fail-closed', async () => {
+  const sourceReport = await buildZeroGapLowDisclosureReport();
+  sourceReport.runtimeEvidenceArtifact.runtimeEvidenceSummary.locallyEvidencedRuntimeGaps =
+    'validation_aggregator_full_implementation_incomplete';
+  const preflight = buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight(
+    sourceReport,
+    {
+      generatedAt: '2026-07-07T01:00:00.000Z',
+      exactHeadBoundRuntimeSummaryInput: {
+        currentHeadCommit: fixtureCommit,
+        expectedCurrentHeadCommit: fixtureCommit,
+        evidenceGeneratedAt: fixtureEvidenceGeneratedAt
+      }
+    }
+  );
+
+  assert.equal(preflight.status, 'blocked_fail_closed');
+  assert.equal(preflight.standardInputSourceAccepted, false);
+  assert.ok(preflight.blockers.includes('source_runtime_gap_array_shape_invalid'));
+  assert.notDeepEqual(
+    preflight.runtimeEvidenceSummaryForAggregator.locallyEvidencedRuntimeGaps,
+    ['validation_aggregator_full_implementation_incomplete']
+  );
+  assert.equal(preflight.aggregatorReplay.canClaimV1RcReady, false);
+});
+
 test('v1 RC aggregator CLI rejects unsafe runtime evidence report material fail-closed', () => {
   const unsafeReport = {
     schemaVersion: 'authenticated-http-bounded-mutation-proof-runtime-evidence-report-v1',
