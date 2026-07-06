@@ -584,6 +584,125 @@ function buildRcCutoverPreApprovalCandidatePackage({
   };
 }
 
+function buildRcCutoverOwnerApprovalReadinessSummary({
+  rcCutoverPreApprovalCandidatePackage = null
+} = {}) {
+  const candidate = rcCutoverPreApprovalCandidatePackage || {};
+  const candidateAccepted = candidate.candidatePackageAccepted === true;
+  const ownerReviewReady =
+    candidateAccepted &&
+    candidate.readyToRequestRcCutoverApproval === true &&
+    candidate.rcCutoverApprovalPresent === false &&
+    candidate.rcCutoverExecutionAllowed === false &&
+    candidate.rcReady === false;
+  const blockerIds = candidateAccepted
+    ? []
+    : [
+        'rc_cutover_pre_approval_candidate_package_not_accepted',
+        ...(
+          Array.isArray(candidate.blockerIds)
+            ? candidate.blockerIds
+            : ['candidate_package_blockers_unavailable']
+        )
+      ];
+
+  return {
+    schemaVersion: 'p70-rc-cutover-owner-approval-readiness-summary-v1',
+    summaryType: 'rc_cutover_owner_approval_readiness_summary',
+    sourceMode: 'p69_rc_cutover_pre_approval_candidate_package',
+    status: ownerReviewReady
+      ? 'owner_approval_readiness_summary_ready_for_exact_owner_review_not_authorization'
+      : 'owner_approval_readiness_summary_blocked_pending_candidate_package_acceptance',
+    decision: 'NOT_READY_BLOCKED',
+    candidatePackageAccepted: candidateAccepted,
+    ownerReviewReady,
+    approvalRequestOnly: true,
+    approvalRequestSubmitted: false,
+    approvalLineGenerated: false,
+    approvalTextGenerated: false,
+    ownerApprovalPresent: false,
+    ownerApprovalAccepted: false,
+    ownerApprovalBoundToHead: false,
+    ownerApprovalExecutionAllowed: false,
+    rcCutoverApproved: false,
+    rcCutoverExecuted: false,
+    rcCutoverExecutionAllowed: false,
+    rcReady: false,
+    requiredOwnerApprovalFields: [
+      'current_head_binding',
+      'remote_release_tag_deploy_action_list',
+      'config_watchdog_startup_change_scope',
+      'rollback_path',
+      'validation_commands',
+      'single_use_statement'
+    ],
+    requiredOwnerApprovalFieldValuesIncluded: false,
+    candidatePackage: {
+      schemaVersion:
+        typeof candidate.schemaVersion === 'string'
+          ? candidate.schemaVersion
+          : '',
+      status: typeof candidate.status === 'string'
+        ? candidate.status
+        : '',
+      readyToRequestRcCutoverApproval:
+        candidate.readyToRequestRcCutoverApproval === true,
+      rcGatePrecheckAccepted: candidate.rcGatePrecheckAccepted === true,
+      rc9CompletenessChecklistStatus:
+        typeof candidate.rc9DecisionPacket?.completenessChecklistStatus === 'string'
+          ? candidate.rc9DecisionPacket.completenessChecklistStatus
+          : '',
+      blockerCount: Array.isArray(candidate.blockerIds)
+        ? candidate.blockerIds.length
+        : 0
+    },
+    blockerIds: [...new Set(blockerIds)].sort(),
+    disclosure: {
+      lowDisclosure: true,
+      rawCurrentHeadCommitOutput: false,
+      rawExpectedCurrentHeadCommitOutput: false,
+      rawEvidenceGeneratedAtOutput: false,
+      requiredOwnerApprovalFieldValuesOutput: false,
+      approvalTextOutput: false,
+      approvalLineOutput: false,
+      endpointOrLocatorOutput: false,
+      requestBodyOutput: false,
+      rawResponseOutput: false,
+      rawErrorOutput: false,
+      secretOutput: false,
+      privateMemoryContentOutput: false
+    },
+    safety: {
+      readsCandidatePackageOnly: true,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      callsMcpTools: false,
+      readsRealMemory: false,
+      writesDurableState: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      mutatesConfig: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      pushes: false,
+      tags: false,
+      releases: false,
+      deploys: false,
+      submitsApprovalRequest: false,
+      executesCutover: false,
+      readinessClaimed: false
+    },
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false,
+    canClaimRcReady: false,
+    nextStep: ownerReviewReady
+      ? 'Jenn may supply a separate exact RC cutover approval bound to current repository reality; this summary is not approval and does not authorize execution.'
+      : 'Continue closing local evidence prerequisites before owner approval readiness review.'
+  };
+}
+
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
@@ -630,6 +749,12 @@ function buildCliReport(options = {}) {
           finalEvidenceAggregationRcGatePrecheck
         })
       : null;
+  const rcCutoverOwnerApprovalReadinessSummary =
+    rcCutoverPreApprovalCandidatePackage
+      ? buildRcCutoverOwnerApprovalReadinessSummary({
+          rcCutoverPreApprovalCandidatePackage
+        })
+      : null;
 
   const outputReport = {
     ...report,
@@ -663,7 +788,9 @@ function buildCliReport(options = {}) {
             p68FinalEvidenceAggregationRcGatePrecheck:
               finalEvidenceAggregationRcGatePrecheck,
             p69RcCutoverPreApprovalCandidatePackage:
-              rcCutoverPreApprovalCandidatePackage
+              rcCutoverPreApprovalCandidatePackage,
+            p70RcCutoverOwnerApprovalReadinessSummary:
+              rcCutoverOwnerApprovalReadinessSummary
           }
         : {})
     },
@@ -706,6 +833,10 @@ function buildCliReport(options = {}) {
             rcCutoverPreApprovalCandidatePackageReadyToRequestApproval:
               rcCutoverPreApprovalCandidatePackage?.readyToRequestRcCutoverApproval === true,
             rcCutoverPreApprovalCandidatePackageCanClaimRcReady: false,
+            rcCutoverOwnerApprovalReadinessSummaryReadyForOwnerReview:
+              rcCutoverOwnerApprovalReadinessSummary?.ownerReviewReady === true,
+            rcCutoverOwnerApprovalReadinessSummaryApprovalSubmitted: false,
+            rcCutoverOwnerApprovalReadinessSummaryCanClaimRcReady: false,
             runtimeEvidenceReportCanClaimV1RcReady: false
           }
         : {})
@@ -763,6 +894,7 @@ module.exports = {
   buildExactHeadBoundRuntimeSummaryInputFromOptions,
   buildFinalEvidenceAggregationRcGatePrecheck,
   buildRcCutoverPreApprovalCandidatePackage,
+  buildRcCutoverOwnerApprovalReadinessSummary,
   parseArgs,
   buildUsageText,
   redactExactRuntimeEvidenceValues,
