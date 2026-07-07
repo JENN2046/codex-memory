@@ -236,6 +236,9 @@ const REQUIRED_P77_SOURCE_CHAIN_IDS = Object.freeze([
 ]);
 
 const SOURCE_CHAIN_PROOF_VERSION = 'rc-cutover-source-chain-proof-v1';
+const SOURCE_CHAIN_IN_PROCESS_BRAND = Symbol(
+  'rc-cutover-source-chain-in-process-brand'
+);
 
 const SOURCE_CHAIN_PROOF_STAGE_IDS = Object.freeze([
   'p67_runtime_evidence_standard_input_preflight',
@@ -295,6 +298,24 @@ function omitTopLevelSourceChainProof(value = {}) {
   const clone = { ...value };
   delete clone.sourceChainProof;
   return clone;
+}
+
+function markInProcessSourceChainArtifact(artifact, stageId) {
+  if (!isPlainObject(artifact)) return artifact;
+  Object.defineProperty(artifact, SOURCE_CHAIN_IN_PROCESS_BRAND, {
+    value: stageId,
+    enumerable: false,
+    configurable: false,
+    writable: false
+  });
+  return artifact;
+}
+
+function isInProcessSourceChainArtifact(artifact, stageId) {
+  return (
+    isPlainObject(artifact) &&
+    artifact[SOURCE_CHAIN_IN_PROCESS_BRAND] === stageId
+  );
 }
 
 function getExpectedSourceChainProofStageIds(stageId) {
@@ -387,6 +408,9 @@ function collectSourceChainProofBlockers(
   if (!isPlainObject(artifact.sourceChainProof)) {
     blockers.push(`${blockerPrefix}_source_chain_proof_missing`);
     return blockers;
+  }
+  if (!isInProcessSourceChainArtifact(artifact, stageId)) {
+    blockers.push(`${blockerPrefix}_source_chain_not_same_process`);
   }
   if (
     createLowDisclosureDigest(proof) !==
@@ -965,12 +989,19 @@ function redactExactRuntimeEvidenceValues(value, exactInput = null) {
     return value.map(item => redactExactRuntimeEvidenceValues(item, exactInput));
   }
   if (value && typeof value === 'object') {
-    return Object.fromEntries(
+    const redacted = Object.fromEntries(
       Object.entries(value).map(([key, entry]) => [
         key,
         redactExactRuntimeEvidenceValues(entry, exactInput)
       ])
     );
+    if (typeof value[SOURCE_CHAIN_IN_PROCESS_BRAND] === 'string') {
+      markInProcessSourceChainArtifact(
+        redacted,
+        value[SOURCE_CHAIN_IN_PROCESS_BRAND]
+      );
+    }
+    return redacted;
   }
   return value;
 }
@@ -1544,13 +1575,16 @@ function buildRcCutoverFinalEvidencePackageAggregationOutlet({
       ? 'Use this outlet as the local low-disclosure evidence package for separate exact owner review only; do not execute cutover or claim readiness.'
       : 'Continue closing missing low-disclosure evidence chain rows before preparing exact owner review.'
   };
-  return {
-    ...outlet,
-    sourceChainProof: buildSourceChainProof(
-      'p71_rc_cutover_final_evidence_package_aggregation_outlet',
-      outlet
-    )
-  };
+  return markInProcessSourceChainArtifact(
+    {
+      ...outlet,
+      sourceChainProof: buildSourceChainProof(
+        'p71_rc_cutover_final_evidence_package_aggregation_outlet',
+        outlet
+      )
+    },
+    'p71_rc_cutover_final_evidence_package_aggregation_outlet'
+  );
 }
 
 function buildRcCutoverCandidateArtifactExport({
@@ -1687,18 +1721,21 @@ function buildRcCutoverCandidateArtifactExport({
       ? 'Use this stdout JSON artifact as the local low-disclosure RC cutover pre-candidate package for separate exact owner review only.'
       : 'Continue closing the final evidence package aggregation outlet before treating this artifact as owner-review-ready.'
   };
-  return {
-    ...artifact,
-    sourceChainProof: buildSourceChainProof(
-      'p72_rc_cutover_candidate_artifact_export',
-      artifact,
-      {
-        upstreamProof: isPlainObject(outlet.sourceChainProof)
-          ? outlet.sourceChainProof
-          : null
-      }
-    )
-  };
+  return markInProcessSourceChainArtifact(
+    {
+      ...artifact,
+      sourceChainProof: buildSourceChainProof(
+        'p72_rc_cutover_candidate_artifact_export',
+        artifact,
+        {
+          upstreamProof: isPlainObject(outlet.sourceChainProof)
+            ? outlet.sourceChainProof
+            : null
+        }
+      )
+    },
+    'p72_rc_cutover_candidate_artifact_export'
+  );
 }
 
 function collectRcCutoverCandidateArtifactIntakeBlockers(artifact = {}) {
@@ -1973,18 +2010,21 @@ function buildRcCutoverCandidateArtifactIntakePrecheck({
       ? 'Treat this artifact as an owner-review input only; a separate exact owner approval and execution boundary is still required.'
       : 'Regenerate or repair the P72 low-disclosure artifact before using it as owner-review input.'
   };
-  return {
-    ...intake,
-    sourceChainProof: buildSourceChainProof(
-      'p73_rc_cutover_candidate_artifact_intake_precheck',
-      intake,
-      {
-        upstreamProof: isPlainObject(artifact.sourceChainProof)
-          ? artifact.sourceChainProof
-          : null
-      }
-    )
-  };
+  return markInProcessSourceChainArtifact(
+    {
+      ...intake,
+      sourceChainProof: buildSourceChainProof(
+        'p73_rc_cutover_candidate_artifact_intake_precheck',
+        intake,
+        {
+          upstreamProof: isPlainObject(artifact.sourceChainProof)
+            ? artifact.sourceChainProof
+            : null
+        }
+      )
+    },
+    'p73_rc_cutover_candidate_artifact_intake_precheck'
+  );
 }
 
 function buildRcCutoverOwnerApprovalBoundaryPrecheck({
@@ -2201,18 +2241,21 @@ function buildRcCutoverOwnerApprovalBoundaryPrecheck({
       ? 'Use this display as the structural owner approval boundary checklist only; separate exact owner approval is still required before any execution.'
       : 'Repair the P73 candidate artifact intake before preparing an owner approval boundary display.'
   };
-  return {
-    ...boundary,
-    sourceChainProof: buildSourceChainProof(
-      'p75_rc_cutover_owner_approval_boundary_precheck',
-      boundary,
-      {
-        upstreamProof: isPlainObject(intake.sourceChainProof)
-          ? intake.sourceChainProof
-          : null
-      }
-    )
-  };
+  return markInProcessSourceChainArtifact(
+    {
+      ...boundary,
+      sourceChainProof: buildSourceChainProof(
+        'p75_rc_cutover_owner_approval_boundary_precheck',
+        boundary,
+        {
+          upstreamProof: isPlainObject(intake.sourceChainProof)
+            ? intake.sourceChainProof
+            : null
+        }
+      )
+    },
+    'p75_rc_cutover_owner_approval_boundary_precheck'
+  );
 }
 
 function collectRcCutoverFinalOwnerReviewPackageBlockers(boundary = {}) {
@@ -2494,18 +2537,21 @@ function buildRcCutoverFinalOwnerReviewPackageAggregation({
       ? 'Use this package as an auditable final owner-review candidate only; separate exact owner approval and execution boundary remain required.'
       : 'Repair the owner approval boundary display input before using it as a final owner-review package.'
   };
-  return {
-    ...pkg,
-    sourceChainProof: buildSourceChainProof(
-      'p77_rc_cutover_final_owner_review_package_aggregation',
-      pkg,
-      {
-        upstreamProof: isPlainObject(boundary.sourceChainProof)
-          ? boundary.sourceChainProof
-          : null
-      }
-    )
-  };
+  return markInProcessSourceChainArtifact(
+    {
+      ...pkg,
+      sourceChainProof: buildSourceChainProof(
+        'p77_rc_cutover_final_owner_review_package_aggregation',
+        pkg,
+        {
+          upstreamProof: isPlainObject(boundary.sourceChainProof)
+            ? boundary.sourceChainProof
+            : null
+        }
+      )
+    },
+    'p77_rc_cutover_final_owner_review_package_aggregation'
+  );
 }
 
 function collectP77SourceChainProvenanceBlockers(sourceChainProvenance = {}) {

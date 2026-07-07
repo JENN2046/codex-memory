@@ -1489,7 +1489,7 @@ test('RC cutover owner approval boundary precheck displays requirements without 
   assertNoForbiddenMaterial(boundary);
 });
 
-test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin without approval or readiness', async () => {
+test('v1 RC aggregator CLI rejects external P72 candidate artifact stdin for owner-review promotion', async () => {
   const artifact = await buildAcceptedRcCutoverCandidateArtifact();
   const result = spawnSync(
     process.execPath,
@@ -1521,25 +1521,34 @@ test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin withou
   assert.equal(report.phase, 'P73-rc-cutover-candidate-artifact-intake-precheck');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.rcCutoverCandidateArtifactReportInput.provided, true);
-  assert.equal(report.rcCutoverCandidateArtifactReportInput.accepted, true);
-  assert.equal(report.rcCutoverCandidateArtifactReportInput.rejected, false);
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.accepted, false);
+  assert.equal(report.rcCutoverCandidateArtifactReportInput.rejected, true);
   assert.equal(report.rcCutoverCandidateArtifactReportInput.pathDisclosed, false);
   assert.equal(report.rcCutoverCandidateArtifactReportInput.rawInputPrinted, false);
-  assertAcceptedArtifactIntake(intake);
-  assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
+  assert.equal(intake.status, 'candidate_artifact_intake_blocked_fail_closed');
+  assert.equal(intake.inputAccepted, false);
+  assert.equal(intake.ownerReviewInputReady, false);
+  assert.ok(
+    intake.blockerIds.includes(
+      'artifact_final_evidence_package_outlet_source_chain_not_same_process'
+    )
+  );
+  assert.ok(intake.blockerIds.includes('artifact_source_chain_not_same_process'));
+  assert.equal(boundary.status, 'owner_approval_boundary_display_blocked_fail_closed');
+  assert.equal(boundary.boundaryPrecheckAccepted, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactReportInputProvided, true);
-  assert.equal(report.summary.rcCutoverCandidateArtifactReportInputAccepted, true);
-  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeAccepted, true);
+  assert.equal(report.summary.rcCutoverCandidateArtifactReportInputAccepted, false);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeAccepted, false);
   assert.equal(
     report.summary.rcCutoverCandidateArtifactIntakeReadyForOwnerReview,
-    true
+    false
   );
-  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeBlockerCount, 0);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeBlockerCount, 2);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeApprovalSubmitted, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeExecutesCutover, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeCanClaimRcReady, false);
-  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryPrecheckAccepted, true);
-  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryDisplayReady, true);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryPrecheckAccepted, false);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryDisplayReady, false);
   assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryFieldCount, 6);
   assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryFieldValuesIncluded, false);
   assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryApprovalGenerated, false);
@@ -1549,7 +1558,7 @@ test('v1 RC aggregator CLI can intake a P72 candidate artifact from stdin withou
   assertNoForbiddenMaterial(report);
 });
 
-test('v1 RC aggregator CLI can emit only the owner approval boundary display artifact', async () => {
+test('v1 RC aggregator CLI emits blocked owner approval boundary for external P72 artifact', async () => {
   const artifact = await buildAcceptedRcCutoverCandidateArtifact();
   const result = spawnSync(
     process.execPath,
@@ -1577,7 +1586,11 @@ test('v1 RC aggregator CLI can emit only the owner approval boundary display art
   const boundary = JSON.parse(result.stdout);
 
   assert.equal(result.status, 0, result.stderr);
-  assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
+  assert.equal(boundary.status, 'owner_approval_boundary_display_blocked_fail_closed');
+  assert.equal(boundary.boundaryPrecheckAccepted, false);
+  assert.equal(boundary.ownerApprovalBoundaryDisplayReady, false);
+  assert.ok(boundary.blockerIds.includes('candidate_artifact_intake_not_accepted'));
+  assert.ok(boundary.blockerIds.includes('artifact_source_chain_not_same_process'));
   assert.equal(Object.hasOwn(boundary, 'phase'), false);
   assert.equal(Object.hasOwn(boundary, 'summary'), false);
   assert.equal(Object.hasOwn(boundary, 'evidence'), false);
@@ -1670,7 +1683,7 @@ test('RC cutover final owner-review package aggregation rejects self-attested P7
   assertNoForbiddenMaterial(pkg);
 });
 
-test('v1 RC aggregator CLI can intake a P75 owner approval boundary from stdin', async () => {
+test('v1 RC aggregator CLI rejects external P75 owner approval boundary stdin for package promotion', async () => {
   const boundary = await buildAcceptedRcCutoverOwnerApprovalBoundary();
   const result = spawnSync(
     process.execPath,
@@ -1701,15 +1714,20 @@ test('v1 RC aggregator CLI can intake a P75 owner approval boundary from stdin',
   assert.equal(report.phase, 'P77-rc-cutover-final-owner-review-package-aggregation');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.provided, true);
-  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.accepted, true);
-  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.rejected, false);
+  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.accepted, false);
+  assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.rejected, true);
   assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.pathDisclosed, false);
   assert.equal(report.rcCutoverOwnerApprovalBoundaryReportInput.rawInputPrinted, false);
-  assertAcceptedFinalOwnerReviewPackage(pkg);
+  assert.equal(pkg.status, 'final_owner_review_package_blocked_fail_closed');
+  assert.equal(pkg.finalOwnerReviewPackageAccepted, false);
+  assert.equal(pkg.readyForExactOwnerReview, false);
+  assert.ok(
+    pkg.blockerIds.includes('owner_approval_boundary_source_chain_not_same_process')
+  );
   assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryReportInputProvided, true);
-  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryReportInputAccepted, true);
-  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageAccepted, true);
-  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReadyForOwnerReview, true);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryReportInputAccepted, false);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageAccepted, false);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReadyForOwnerReview, false);
   assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageFieldCount, 6);
   assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageApprovalGenerated, false);
   assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageExecutesCutover, false);
@@ -1718,7 +1736,7 @@ test('v1 RC aggregator CLI can intake a P75 owner approval boundary from stdin',
   assertNoForbiddenMaterial(report);
 });
 
-test('v1 RC aggregator CLI can emit only the final owner-review package artifact', async () => {
+test('v1 RC aggregator CLI emits blocked final owner-review package for external P75 boundary', async () => {
   const boundary = await buildAcceptedRcCutoverOwnerApprovalBoundary();
   const result = spawnSync(
     process.execPath,
@@ -1746,7 +1764,12 @@ test('v1 RC aggregator CLI can emit only the final owner-review package artifact
   const pkg = JSON.parse(result.stdout);
 
   assert.equal(result.status, 0, result.stderr);
-  assertAcceptedFinalOwnerReviewPackage(pkg);
+  assert.equal(pkg.status, 'final_owner_review_package_blocked_fail_closed');
+  assert.equal(pkg.finalOwnerReviewPackageAccepted, false);
+  assert.equal(pkg.readyForExactOwnerReview, false);
+  assert.ok(
+    pkg.blockerIds.includes('owner_approval_boundary_source_chain_not_same_process')
+  );
   assert.equal(Object.hasOwn(pkg, 'phase'), false);
   assert.equal(Object.hasOwn(pkg, 'summary'), false);
   assert.equal(Object.hasOwn(pkg, 'evidence'), false);
@@ -1960,7 +1983,7 @@ test('RC cutover owner approval execution boundary precheck rejects contradictor
   assertNoForbiddenMaterial(precheck);
 });
 
-test('v1 RC aggregator CLI can intake a P77 final owner-review package from stdin', async () => {
+test('v1 RC aggregator CLI rejects external P77 final owner-review package stdin for execution-boundary promotion', async () => {
   const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
   const result = spawnSync(
     process.execPath,
@@ -1994,20 +2017,31 @@ test('v1 RC aggregator CLI can intake a P77 final owner-review package from stdi
   );
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.provided, true);
-  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.accepted, true);
-  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.rejected, false);
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.accepted, false);
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.rejected, true);
   assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.pathDisclosed, false);
   assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.rawInputPrinted, false);
-  assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck);
+  assert.equal(
+    precheck.status,
+    'owner_approval_execution_boundary_precheck_blocked_fail_closed'
+  );
+  assert.equal(precheck.boundaryPrecheckAccepted, false);
+  assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_source_chain_not_same_process'
+    )
+  );
   assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReportInputProvided, true);
-  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReportInputAccepted, true);
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReportInputAccepted, false);
   assert.equal(
     report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckAccepted,
-    true
+    false
   );
   assert.equal(
     report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckReadyForExactReview,
-    true
+    false
   );
   assert.equal(
     report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckChecklistCount,
@@ -2015,7 +2049,7 @@ test('v1 RC aggregator CLI can intake a P77 final owner-review package from stdi
   );
   assert.equal(
     report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckTerminalLocalPreCandidatePackage,
-    true
+    false
   );
   assert.equal(
     report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckNoAdditionalLocalWrapperRequired,
@@ -2109,7 +2143,7 @@ test('v1 RC aggregator CLI rejects self-attested P77 stdin package without sourc
   assertNoForbiddenMaterial(report);
 });
 
-test('v1 RC aggregator CLI can emit only the owner approval execution boundary precheck artifact', async () => {
+test('v1 RC aggregator CLI emits blocked execution boundary precheck for external P77 package', async () => {
   const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
   const result = spawnSync(
     process.execPath,
@@ -2137,7 +2171,18 @@ test('v1 RC aggregator CLI can emit only the owner approval execution boundary p
   const precheck = JSON.parse(result.stdout);
 
   assert.equal(result.status, 0, result.stderr);
-  assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck);
+  assert.equal(
+    precheck.status,
+    'owner_approval_execution_boundary_precheck_blocked_fail_closed'
+  );
+  assert.equal(precheck.boundaryPrecheckAccepted, false);
+  assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_source_chain_not_same_process'
+    )
+  );
   assert.equal(Object.hasOwn(precheck, 'phase'), false);
   assert.equal(Object.hasOwn(precheck, 'summary'), false);
   assert.equal(Object.hasOwn(precheck, 'evidence'), false);
@@ -2146,7 +2191,7 @@ test('v1 RC aggregator CLI can emit only the owner approval execution boundary p
   assert.equal(precheck.approvalTextGenerated, false);
   assert.equal(precheck.approvalTemplateGenerated, false);
   assert.equal(precheck.canProceedToCutoverExecution, false);
-  assert.equal(precheck.terminalLocalPreCandidatePackage, true);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
   assert.equal(precheck.additionalLocalWrapperRequired, false);
   assert.equal(precheck.chainConvergence.noAdditionalLocalWrapperRequired, true);
   assert.equal(precheck.chainConvergence.nextBoundaryType, 'separate_exact_owner_decision');
@@ -2262,7 +2307,7 @@ test('v1 RC aggregator execution boundary precheck output fails closed without P
   assertNoForbiddenMaterial(precheck);
 });
 
-test('v1 RC aggregator CLI can pipe P72 stdout artifact into P73 intake without persistence', async () => {
+test('v1 RC aggregator CLI rejects piped P72 stdout artifact as cross-process input', async () => {
   const sourceReport = await buildZeroGapLowDisclosureReport();
   const artifactResult = spawnSync(
     process.execPath,
@@ -2324,15 +2369,24 @@ test('v1 RC aggregator CLI can pipe P72 stdout artifact into P73 intake without 
   assert.equal(artifact.export.durableArtifactWritten, false);
   assert.equal(intakeResult.status, 0, intakeResult.stderr);
   assert.equal(report.phase, 'P73-rc-cutover-candidate-artifact-intake-precheck');
-  assertAcceptedArtifactIntake(intake);
-  assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
+  assert.equal(intake.status, 'candidate_artifact_intake_blocked_fail_closed');
+  assert.equal(intake.inputAccepted, false);
+  assert.equal(intake.ownerReviewInputReady, false);
+  assert.ok(
+    intake.blockerIds.includes(
+      'artifact_final_evidence_package_outlet_source_chain_not_same_process'
+    )
+  );
+  assert.ok(intake.blockerIds.includes('artifact_source_chain_not_same_process'));
+  assert.equal(boundary.status, 'owner_approval_boundary_display_blocked_fail_closed');
+  assert.equal(boundary.boundaryPrecheckAccepted, false);
   assert.equal(report.rcCutoverCandidateArtifactReportInput.pathDisclosed, false);
   assert.equal(report.rcCutoverCandidateArtifactReportInput.rawInputPrinted, false);
-  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeAccepted, true);
+  assert.equal(report.summary.rcCutoverCandidateArtifactIntakeAccepted, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeApprovalSubmitted, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeExecutesCutover, false);
   assert.equal(report.summary.rcCutoverCandidateArtifactIntakeCanClaimRcReady, false);
-  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryDisplayReady, true);
+  assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryDisplayReady, false);
   assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryApprovalGenerated, false);
   assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryExecutesCutover, false);
   assert.equal(report.summary.rcCutoverOwnerApprovalBoundaryCanClaimRcReady, false);
