@@ -732,7 +732,10 @@ test('runtime evidence aggregation preflight accepts standard low-disclosure sou
   assert.equal(preflight.aggregatorReplay.decision, 'NOT_READY_BLOCKED');
   assert.equal(preflight.aggregatorReplay.accepted, false);
   assert.equal(preflight.aggregatorReplay.rejected, true);
-  assert.equal(preflight.aggregatorReplay.rejectReason, 'current_head_binding_required');
+  assert.equal(
+    preflight.aggregatorReplay.rejectReason,
+    'current_head_binding_required'
+  );
   assert.equal(preflight.aggregatorReplay.canClaimV1RcReady, false);
   assert.equal(preflight.disclosure.currentHeadCommitIncluded, false);
   assert.equal(preflight.safety.executesCommands, false);
@@ -847,7 +850,10 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   assert.equal(report.runtimeEvidenceReportInput.rawInputPrinted, false);
   assert.equal(preflight.standardInputSourceAccepted, false);
   assert.ok(preflight.blockers.includes('source_report_not_same_process'));
-  assert.equal(preflight.aggregatorReplay.rejectReason, 'current_head_binding_required');
+  assert.equal(
+    preflight.aggregatorReplay.rejectReason,
+    'runtime_evidence_summary_not_same_process'
+  );
   assert.equal(preflight.aggregatorReplay.canClaimV1RcReady, false);
   assert.equal(rcGatePrecheck.standardInputSourceAccepted, false);
   assert.equal(rcGatePrecheck.exactHeadBoundInputProvided, false);
@@ -994,43 +1000,48 @@ test('v1 RC aggregator CLI treats exact head-bound runtime evidence JSON as revi
   assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputProvided, true);
   assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputAccepted, true);
   assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputRejected, false);
-  assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayAccepted, true);
-  assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayRejected, false);
-  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, true);
-  assert.equal(report.summary.runtimeEvidenceSummaryRejected, false);
+  assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayRejected, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryRejected, true);
   assert.equal(
     report.summary.runtimeEvidenceSummaryStatus,
-    'explicit_runtime_evidence_summary_available'
+    'runtime_evidence_summary_rejected'
   );
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
   assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rawValuesOutput, false);
   assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rawValuesPersisted, false);
   assert.equal(preflight.standardInputSourceAccepted, false);
   assert.ok(preflight.blockers.includes('source_report_not_same_process'));
-  assert.equal(preflight.aggregatorReplay.accepted, true);
-  assert.equal(preflight.aggregatorReplay.currentHeadBindingStatus, 'matched');
-  assert.equal(preflight.aggregatorReplay.evidenceFreshnessStatus, 'fresh');
+  assert.equal(preflight.aggregatorReplay.accepted, false);
+  assert.equal(preflight.aggregatorReplay.rejected, true);
+  assert.equal(
+    preflight.aggregatorReplay.rejectReason,
+    'runtime_evidence_summary_not_same_process'
+  );
+  assert.equal(preflight.aggregatorReplay.currentHeadBindingStatus, 'not_provided');
+  assert.equal(preflight.aggregatorReplay.evidenceFreshnessStatus, 'not_provided');
   assert.equal(rcGatePrecheck.status, 'blocked_pending_exact_head_bound_runtime_summary_acceptance');
   assert.equal(rcGatePrecheck.decision, 'NOT_READY_BLOCKED');
   assert.equal(rcGatePrecheck.standardInputSourceAccepted, false);
   assert.equal(rcGatePrecheck.exactHeadBoundInputProvided, true);
   assert.equal(rcGatePrecheck.exactHeadBoundInputAccepted, true);
-  assert.equal(rcGatePrecheck.runtimeEvidenceSummaryAccepted, true);
-  assert.equal(rcGatePrecheck.finalEvidenceAggregationAccepted, true);
+  assert.equal(rcGatePrecheck.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(rcGatePrecheck.finalEvidenceAggregationAccepted, false);
   assert.equal(rcGatePrecheck.rcGatePrecheckAccepted, false);
-  assert.equal(rcGatePrecheck.currentHeadBindingStatus, 'matched');
-  assert.equal(rcGatePrecheck.currentHeadBindingMatched, true);
-  assert.equal(rcGatePrecheck.evidenceFreshnessStatus, 'fresh');
-  assert.equal(rcGatePrecheck.evidenceUnitsComplete, true);
+  assert.equal(rcGatePrecheck.currentHeadBindingStatus, 'not_provided');
+  assert.equal(rcGatePrecheck.currentHeadBindingMatched, false);
+  assert.equal(rcGatePrecheck.evidenceFreshnessStatus, 'not_provided');
+  assert.equal(rcGatePrecheck.evidenceUnitsComplete, false);
   assert.equal(rcGatePrecheck.rc9DecisionPacketAvailable, true);
   assert.equal(rcGatePrecheck.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
   assert.equal(
     rcGatePrecheck.rc9CompletenessChecklistStatus,
     'incomplete_missing_required_evidence'
   );
-  assert.equal(rcGatePrecheck.rcGateRows.freshCurrentHeadAccepted, true);
-  assert.equal(rcGatePrecheck.rcGateRows.strictGateAccepted, true);
-  assert.equal(rcGatePrecheck.rcGateRows.liveHttpNoWriteAccepted, true);
+  assert.equal(rcGatePrecheck.rcGateRows.freshCurrentHeadAccepted, false);
+  assert.equal(rcGatePrecheck.rcGateRows.strictGateAccepted, false);
+  assert.equal(rcGatePrecheck.rcGateRows.liveHttpNoWriteAccepted, false);
   assert.equal(rcGatePrecheck.rcGateRows.validationAggregatorZeroGapAccepted, false);
   assert.equal(rcGatePrecheck.disclosure.rawCurrentHeadCommitOutput, false);
   assert.equal(rcGatePrecheck.disclosure.rawEvidenceGeneratedAtOutput, false);
@@ -1102,7 +1113,7 @@ test('v1 RC aggregator CLI treats exact head-bound runtime evidence JSON as revi
   );
   assert.equal(
     finalEvidencePackage.evidenceSummary.currentHeadBindingMatched,
-    true
+    false
   );
   assert.equal(finalEvidencePackage.evidenceSummary.rcGatePrecheckAccepted, false);
   assert.equal(finalEvidencePackage.evidenceSummary.candidatePackageAccepted, false);
@@ -1120,10 +1131,10 @@ test('v1 RC aggregator CLI treats exact head-bound runtime evidence JSON as revi
     false
   );
   assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, false);
-  assert.equal(report.summary.finalEvidenceAggregationRuntimeEvidenceSummaryAccepted, true);
-  assert.equal(report.summary.finalEvidenceAggregationCurrentHeadBindingMatched, true);
-  assert.equal(report.summary.finalEvidenceAggregationEvidenceFreshnessStatus, 'fresh');
-  assert.equal(report.summary.rcGatePrecheckFreshCurrentHeadAccepted, true);
+  assert.equal(report.summary.finalEvidenceAggregationRuntimeEvidenceSummaryAccepted, false);
+  assert.equal(report.summary.finalEvidenceAggregationCurrentHeadBindingMatched, false);
+  assert.equal(report.summary.finalEvidenceAggregationEvidenceFreshnessStatus, 'not_provided');
+  assert.equal(report.summary.rcGatePrecheckFreshCurrentHeadAccepted, false);
   assert.equal(
     report.summary.rcGatePrecheckCompletenessChecklistStatus,
     'incomplete_missing_required_evidence'

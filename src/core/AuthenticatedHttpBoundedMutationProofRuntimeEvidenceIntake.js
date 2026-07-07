@@ -1,7 +1,8 @@
 'use strict';
 
 const {
-  buildV1RcValidationAggregatorReport
+  buildV1RcValidationAggregatorReport,
+  markInProcessRuntimeEvidenceSummary
 } = require('./ValidationAggregatorService');
 const {
   ROUTE_SUMMARY_SCHEMA_VERSION
@@ -309,7 +310,9 @@ function buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake(routeSu
   const generatedAt = normalizeString(options.generatedAt) ||
     normalizeString(options.evidenceGeneratedAt) ||
     new Date().toISOString();
-  const runtimeEvidenceSummary = buildRuntimeEvidenceSummaryForAggregatorIntake(routeSummary, options);
+  const runtimeEvidenceSummary = markInProcessRuntimeEvidenceSummary(
+    buildRuntimeEvidenceSummaryForAggregatorIntake(routeSummary, options)
+  );
   const aggregatorReport = buildV1RcValidationAggregatorReport({
     generatedAt,
     runtimeEvidenceSummary

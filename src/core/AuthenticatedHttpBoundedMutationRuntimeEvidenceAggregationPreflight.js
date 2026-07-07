@@ -6,7 +6,8 @@ const {
   normalizeAllowlistedRuntimeGapIds
 } = require('./AuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake');
 const {
-  buildV1RcValidationAggregatorReport
+  buildV1RcValidationAggregatorReport,
+  markInProcessRuntimeEvidenceSummary
 } = require('./ValidationAggregatorService');
 
 const AGGREGATION_PREFLIGHT_SCHEMA_VERSION =
@@ -369,11 +370,14 @@ function buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPrefligh
       exactHeadBoundRuntimeSummaryInput,
       includeExactValues: false
     });
-  const exactRuntimeEvidenceSummaryForAggregator =
+  const replayRuntimeEvidenceSummaryForAggregator =
     buildRuntimeEvidenceSummaryForAggregatorReplay(report, {
       exactHeadBoundRuntimeSummaryInput,
       includeExactValues: true
     });
+  const exactRuntimeEvidenceSummaryForAggregator = sourceBlockers.length === 0
+    ? markInProcessRuntimeEvidenceSummary(replayRuntimeEvidenceSummaryForAggregator)
+    : replayRuntimeEvidenceSummaryForAggregator;
   const aggregatorReport = buildV1RcValidationAggregatorReport({
     generatedAt,
     runtimeEvidenceSummary: exactRuntimeEvidenceSummaryForAggregator

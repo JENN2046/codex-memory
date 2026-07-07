@@ -3,7 +3,8 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const {
-  buildV1RcValidationAggregatorReport
+  buildV1RcValidationAggregatorReport,
+  markInProcessRuntimeEvidenceSummary
 } = require('../core/ValidationAggregatorService');
 const {
   buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight,
@@ -3015,13 +3016,20 @@ function buildCliReport(options = {}) {
         }
       )
     : null;
-  const runtimeEvidenceSummaryForReport =
-    runtimeEvidencePreflight && exactHeadBoundRuntimeSummaryInput
+  let runtimeEvidenceSummaryForReport = null;
+  if (runtimeEvidencePreflight) {
+    runtimeEvidenceSummaryForReport = exactHeadBoundRuntimeSummaryInput
       ? buildRuntimeEvidenceSummaryForAggregatorReplay(options.runtimeEvidenceReport, {
           exactHeadBoundRuntimeSummaryInput,
           includeExactValues: true
         })
-      : runtimeEvidencePreflight?.runtimeEvidenceSummaryForAggregator || null;
+      : runtimeEvidencePreflight.runtimeEvidenceSummaryForAggregator;
+    if (runtimeEvidencePreflight.standardInputSourceAccepted === true) {
+      runtimeEvidenceSummaryForReport = markInProcessRuntimeEvidenceSummary(
+        runtimeEvidenceSummaryForReport
+      );
+    }
+  }
   const report = buildV1RcValidationAggregatorReport({
     generatedAt: options.generatedAt || undefined,
     runtimeEvidenceSummary: runtimeEvidenceSummaryForReport

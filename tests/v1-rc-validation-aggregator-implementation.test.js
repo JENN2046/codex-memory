@@ -16,7 +16,8 @@ const {
   RUNTIME_EVIDENCE_SUMMARY_STATUSES,
   buildRc9MarkdownAudit,
   buildRc9DecisionPacketFromAggregatorReport,
-  buildV1RcValidationAggregatorReport,
+  buildV1RcValidationAggregatorReport: buildRawV1RcValidationAggregatorReport,
+  markInProcessRuntimeEvidenceSummary,
   normalizeValidationEvidenceSources,
   renderRc9DecisionPacketFromAggregatorReport
 } = require('../src/core/ValidationAggregatorService');
@@ -25,6 +26,31 @@ const fixturePath = path.join(__dirname, 'fixtures', 'v1-rc-validation-aggregato
 
 function loadFixture() {
   return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+}
+
+function withInProcessRuntimeEvidenceSummary(options = {}) {
+  if (
+    !options ||
+    !Object.hasOwn(options, 'runtimeEvidenceSummary') ||
+    !options.runtimeEvidenceSummary ||
+    typeof options.runtimeEvidenceSummary !== 'object' ||
+    Array.isArray(options.runtimeEvidenceSummary)
+  ) {
+    return options;
+  }
+
+  return {
+    ...options,
+    runtimeEvidenceSummary: markInProcessRuntimeEvidenceSummary({
+      ...options.runtimeEvidenceSummary
+    })
+  };
+}
+
+function buildV1RcValidationAggregatorReport(options = {}) {
+  return buildRawV1RcValidationAggregatorReport(
+    withInProcessRuntimeEvidenceSummary(options)
+  );
 }
 
 function hasNestedKey(value, key) {
@@ -2761,6 +2787,26 @@ test('minimal implementation preserves public MCP readonly audit tool freeze', (
   const report = buildV1RcValidationAggregatorReport();
 
   assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+});
+
+test('validation aggregator rejects serialized runtime evidence summary without same-process brand', () => {
+  const report = buildRawV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      runnerExecuted: true,
+      commandsExecuted: true
+    }
+  });
+  const bridge = report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge;
+
+  assert.equal(bridge.status, 'runtime_evidence_summary_rejected');
+  assert.equal(bridge.accepted, false);
+  assert.equal(bridge.rejected, true);
+  assert.equal(bridge.rejectReason, 'runtime_evidence_summary_not_same_process');
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryRejected, true);
 });
 
 test('validation aggregator ingests explicit sanitized runtime evidence summary without executing or claiming readiness', () => {

@@ -77,6 +77,35 @@ const VALIDATION_EVIDENCE_REJECTION_REASONS = [
   'side_effect_evidence_rejected'
 ];
 
+const RUNTIME_EVIDENCE_SUMMARY_IN_PROCESS_BRAND = Symbol(
+  'validation-aggregator-runtime-evidence-summary-in-process-brand'
+);
+
+function markInProcessRuntimeEvidenceSummary(summary) {
+  if (!summary || typeof summary !== 'object' || Array.isArray(summary)) {
+    return summary;
+  }
+  if (summary[RUNTIME_EVIDENCE_SUMMARY_IN_PROCESS_BRAND] === true) {
+    return summary;
+  }
+  Object.defineProperty(summary, RUNTIME_EVIDENCE_SUMMARY_IN_PROCESS_BRAND, {
+    value: true,
+    enumerable: false,
+    configurable: false,
+    writable: false
+  });
+  return summary;
+}
+
+function isInProcessRuntimeEvidenceSummary(summary) {
+  return Boolean(
+    summary &&
+    typeof summary === 'object' &&
+    !Array.isArray(summary) &&
+    summary[RUNTIME_EVIDENCE_SUMMARY_IN_PROCESS_BRAND] === true
+  );
+}
+
 const VALIDATION_EVIDENCE_CONFIDENCE_POSTURE_STATUSES = [
   'no_explicit_evidence',
   'failed_or_blocked_signal',
@@ -2186,6 +2215,8 @@ function normalizeRuntimeEvidenceSummary(summary = null, {
     callsProviders: false,
     mutatesDurableState: false,
     acceptsRealMemoryPreview: false,
+    requiresInProcessBrand: true,
+    acceptsSerializedRuntimeEvidenceSummary: false,
     acceptsRuntimeReadyClaim: false,
     acceptsFinalRcReadyClaim: false,
     acceptsV1RcReadyClaim: false
@@ -2260,6 +2291,15 @@ function normalizeRuntimeEvidenceSummary(summary = null, {
       status: 'runtime_evidence_summary_rejected',
       rejected: true,
       rejectReason: 'invalid_summary_shape'
+    };
+  }
+
+  if (!isInProcessRuntimeEvidenceSummary(summary)) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'runtime_evidence_summary_not_same_process'
     };
   }
 
@@ -5959,6 +5999,8 @@ module.exports = {
   buildRc9DecisionPacketFromAggregatorReport,
   renderRc9DecisionPacketFromAggregatorReport,
   buildV1RcValidationAggregatorReport,
+  isInProcessRuntimeEvidenceSummary,
+  markInProcessRuntimeEvidenceSummary,
   normalizeRuntimeEvidenceSummary,
   normalizeValidationEvidenceSources,
   summarizeValidationEvidenceFreshness,
