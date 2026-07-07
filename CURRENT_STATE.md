@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1998 trusted-full-read preparation preflight |
-| Current task | `CM-1998 trusted-full-read preparation preflight` |
-| Current validation | `CMV-2100` |
-| Current route | CM-1998 prepares the trusted-full-read boundary locally and non-authorizingly, accepts CM-1996 only as temp-local disposable material read-shape evidence, and requires future fresh exact approval plus separately evidenced target-scoped disposable material before any trusted-full-read execution; no live action, retry, approval reuse, request body, memory read/write, public MCP expansion, or readiness claim occurred |
+| Status | CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display |
+| Current task | `CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display` |
+| Current validation | `CMV-2101` |
+| Current route | CM-1999 displays the future exact approval boundary Jenn would need to approve before trusted-full-read execution; no approval is supplied or granted, and no live action, approval line, request body, target binding, endpoint/locator disclosure, memory read/write, public MCP expansion, or readiness claim occurred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1999` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It consumes CM-1998 and displays the future exact boundary Jenn would need to approve before trusted-full-read execution. The display is non-authorizing: approval absent, approval granted false, approval line generation false, approval request submission false, request body generation false, target material supply/use/binding false, endpoint/locator resolution false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, durable mutation false, public MCP expansion false, M15/RC unlock false, and readiness false. It requires any future execution route to have fresh current single-use exact approval, no CM-1994/CM-1996 authority reuse, separately evidenced target-scoped disposable material, no existing operator target reuse, zero write/mutation/public-MCP authority, and low-disclosure receipt projection only. Next route is CM-2000 exact approval intake / pre-execution gate only if Jenn supplies fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999; otherwise local/no-live blocker review or non-authorizing preparation remains the safe continuation.
 
 `CM-1998` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`. It consumes CM-1997 as the current route decision and prepares a local, non-authorizing trusted-full-read boundary. It accepts CM-1811 through CM-1813 as historical M8 planning input, CM-1959 through CM-1964 as local request/read-shape contract input, CM-1981/CM-1982 as fixture-backed read-shape input, and CM-1994 through CM-1997 as temp-local disposable material read-shape input only. It requires any future trusted-full-read execution to use a fresh current exact approval and separately evidenced target-scoped disposable material; CM-1994 approval reuse, CM-1996 retry, existing operator target reuse, endpoint/locator disclosure, request-body generation, response consumption, real private memory read, memory write, durable mutation, public MCP expansion, M15/RC unlock, readiness, `RC_READY`, complete V8, and full bridge completion remain blocked. CM-1998 performs no runtime/network/VCPToolBox call, process/listener/service action, response/raw/log/config/env/secret/private-memory/raw-store/raw-audit read, MCP memory tool call, memory read/write/update/supersede/tombstone, provider/API call, dependency change, VCPToolBox core modification, push/tag/release/deploy/cutover, or readiness claim. Next route is CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display, still local and non-authorizing unless Jenn supplies a fresh exact boundary later.
 

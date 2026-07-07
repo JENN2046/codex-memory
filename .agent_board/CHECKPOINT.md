@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1998 trusted-full-read preparation preflight`.
-Current validation: `CMV-2100`.
+Current checkpoint: `CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2101`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1999 Trusted-Full-Read Exact Approval Request Readiness Review / Jenn Boundary Display
+
+Status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_APPROVAL_REQUEST_READINESS_REVIEW_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`.
+- Consumed CM-1998 and displayed the future exact boundary Jenn would need to approve before trusted-full-read execution.
+- Recorded approval absent, approval granted false, approval line generation false, approval request submission false, request body generation false, target material supply/use/binding false, endpoint/locator resolution false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, durable mutation false, public MCP expansion false, M15/RC unlock false, and readiness false.
+- Required any future trusted-full-read execution route to have fresh current single-use exact approval, no CM-1994/CM-1996 authority reuse, separately evidenced target-scoped disposable material, no existing operator target reuse, zero write/mutation/public-MCP authority, and low-disclosure receipt projection only.
+- Routed next work to CM-2000 exact approval intake / pre-execution gate only if Jenn supplies fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999; otherwise local/no-live blocker review or non-authorizing preparation remains the safe continuation.
+
+Validation: `CMV-2101`; docs/status review, CM-1998 preflight review, historical M8 boundary review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1998 Trusted-Full-Read Preparation Preflight
 

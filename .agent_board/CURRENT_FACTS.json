@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-07",
-  "taskId": "CM-1998",
-  "validationId": "CMV-2100",
+  "taskId": "CM-1999",
+  "validationId": "CMV-2101",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "trusted_full_read_preparation_preflight_non_authorizing_no_live_no_readiness",
+    "scope": "trusted_full_read_approval_request_readiness_review_boundary_display_non_authorizing_no_live_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2101",
+      "scope": "CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_APPROVAL_REQUEST_READINESS_REVIEW_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_LIVE_NO_READINESS"
+    },
     {
       "id": "CMV-2100",
       "scope": "CM-1998 trusted-full-read preparation preflight",

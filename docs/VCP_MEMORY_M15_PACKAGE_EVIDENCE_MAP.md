@@ -281,6 +281,16 @@ Completed local-safe evidence:
   projection only. It performs no runtime/network/VCPToolBox call, response
   consumption, memory read/write, durable mutation, public MCP expansion, M15
   unlock, RC unlock, or readiness claim.
+- CM-1999 trusted-full-read exact approval request readiness review / Jenn
+  boundary display consumed CM-1998 and displayed the future exact boundary
+  Jenn would need to approve before trusted-full-read execution. It records no
+  approval supplied or granted, no approval line generated, no approval request
+  submitted, no request body generated, no target material supplied or bound,
+  no endpoint/locator disclosure, no runtime/network/VCPToolBox call, no
+  response consumption, no memory read/write, no durable mutation, no public
+  MCP expansion, no M15/RC unlock, and no readiness claim. Any future
+  execution still requires fresh current single-use exact approval and
+  separately evidenced target-scoped disposable material.
 
 Missing RC evidence:
 
@@ -603,6 +613,26 @@ m15_package_evidence_map_boundary:
   cm1998_m15_opened: false
   cm1998_rc_gate_opened: false
   cm1998_readiness_claimed: false
+  cm1999_trusted_full_read_boundary_display_present: true
+  cm1999_boundary_authorizes_execution: false
+  cm1999_exact_execution_approval_supplied: false
+  cm1999_approval_granted: false
+  cm1999_approval_line_generated: false
+  cm1999_approval_request_submitted: false
+  cm1999_request_body_generated: false
+  cm1999_target_material_supplied: false
+  cm1999_target_material_bound: false
+  cm1999_endpoint_locator_disclosed: false
+  cm1999_runtime_called: false
+  cm1999_network_called: false
+  cm1999_vcp_toolbox_called: false
+  cm1999_response_body_consumed: false
+  cm1999_memory_read_performed: false
+  cm1999_memory_write_performed: false
+  cm1999_public_mcp_expansion_performed: false
+  cm1999_m15_opened: false
+  cm1999_rc_gate_opened: false
+  cm1999_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: false
   rc_gate_report_created: false
@@ -658,7 +688,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1999_trusted_full_read_exact_approval_request_readiness_review_jenn_boundary_display_local_non_authorizing
+  next_safe_route: cm2000_exact_approval_intake_pre_execution_gate_only_if_fresh_exact_approval_and_target_material_match_cm1999_otherwise_local_no_live_blocker_review
 ```
 
 ## Conclusion
@@ -693,8 +723,12 @@ converts that closeout into trusted-full-read preparation material only. It
 does not authorize trusted-full-read execution, prove live VCPToolBox target
 binding, allow existing operator target reuse, read real private memory, open
 M15/RC, or claim readiness.
+CM-1999 displays the exact future boundary for Jenn review only; it does not
+grant approval, generate an approval line, generate a request body, execute
+runtime, or authorize trusted-full-read execution.
 
-The next route is CM-1999 trusted-full-read exact approval request readiness
-review / Jenn boundary display. Future trusted-full-read execution,
+The next route is CM-2000 exact approval intake / pre-execution gate only if
+Jenn supplies fresh exact approval and separately evidenced target-scoped
+disposable material matching CM-1999. Future trusted-full-read execution,
 live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
 push, or readiness work requires separate exact authority and fresh evidence.

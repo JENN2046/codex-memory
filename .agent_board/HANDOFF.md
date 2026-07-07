@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1998 trusted-full-read preparation preflight`.
-Current validation: `CMV-2100`.
-Current handoff: CM-1998 prepared the trusted-full-read boundary locally and non-authorizingly after CM-1997. It accepts CM-1996 only as temp-local disposable material read-shape evidence and requires fresh exact approval plus separately evidenced target-scoped disposable material before any future trusted-full-read execution. It performed no live action, retry, approval reuse, approval line generation, request-body generation, memory read/write, durable mutation, public MCP expansion, push/release/deploy/cutover, M15/RC unlock, or readiness claim.
+Current task: `CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2101`.
+Current handoff: CM-1999 displayed the future exact approval boundary Jenn would need to approve before trusted-full-read execution. It supplied or granted no approval, generated no approval line or request body, bound no target material, called no runtime/VCPToolBox, read or wrote no memory, expanded no public MCP, pushed/released/deployed/cut over nothing, unlocked no M15/RC gate, and claimed no readiness.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-1998 into CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display. Keep CM-1998 as local, non-authorizing preparation only: no trusted-full-read execution, no CM-1994 approval reuse, no CM-1996 retry, no request-body generation, no endpoint/locator disclosure, no response consumption, no real private memory read, no memory write, no durable mutation, no M15 opening, no RC readiness, no release/deploy/cutover readiness, no `RC_READY`, no complete V8, and no full bridge completion.
+Goal: continue from CM-1999 only within safe local/no-live boundaries unless Jenn supplies fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999. CM-2000 exact approval intake / pre-execution gate is conditional; without matching approval/material, continue local blocker review or non-authorizing preparation.
 
-Current status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT_NON_AUTHORIZING_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1998 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`. It accepts CM-1811 through CM-1813 as historical M8 planning input, CM-1959 through CM-1964 as local request/read-shape contract input, CM-1981/CM-1982 as fixture-backed input, and CM-1994 through CM-1997 as temp-local disposable material input only. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_APPROVAL_REQUEST_READINESS_REVIEW_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1999 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It displays future approval requirements only: fresh current single-use exact approval, no CM-1994/CM-1996 authority reuse, separately evidenced target-scoped disposable material, no existing operator target reuse, zero write/mutation/public-MCP authority, and low-disclosure receipt projection. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -27,6 +27,7 @@ Current entrypoints:
 - `.agent_board/HANDOFF.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1996_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_MATERIAL_BOUND_READ_SHAPE_PROBE_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1995_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_PRE_EXECUTION_GATE.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1994_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING.md`

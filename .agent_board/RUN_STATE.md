@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1998 trusted-full-read preparation preflight`.
-Current validation: `CMV-2100`.
-Current status: CM-1998 prepares the trusted-full-read boundary locally and non-authorizingly after CM-1997. It accepts CM-1996 only as temp-local disposable material read-shape evidence and requires fresh exact approval plus separately evidenced target-scoped disposable material before any future trusted-full-read execution. It performs no live action, retry, approval reuse, approval line generation, request-body generation, memory read/write, durable mutation, public MCP expansion, push, release, deploy, cutover, M15/RC unlock, or readiness claim.
+Current task: `CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2101`.
+Current status: CM-1999 displays the future exact approval boundary Jenn would need to approve before trusted-full-read execution. It supplies or grants no approval, generates no approval line or request body, binds no target material, calls no runtime/VCPToolBox, reads or writes no memory, expands no public MCP, pushes/releases/deploys/cuts over nothing, unlocks no M15/RC gate, and claims no readiness.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display. Keep CM-1999 local and non-authorizing unless Jenn supplies a separate current exact approval for a future read boundary. Do not retry CM-1996, reuse CM-1994 approval, generate request bodies or approval lines, call runtime/VCPToolBox, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness.
+Next safe action is CM-2000 exact approval intake / pre-execution gate only if Jenn supplies fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999. Otherwise continue local/no-live blocker review or non-authorizing preparation. Do not retry CM-1996, reuse CM-1994 approval, generate request bodies or approval lines, call runtime/VCPToolBox, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness.
 
 ## Historical Run Notes
 
