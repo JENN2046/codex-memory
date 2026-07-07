@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1997 temp-local read-shape closeout / route decision`.
-Current validation: `CMV-2099`.
+Current checkpoint: `CM-1998 trusted-full-read preparation preflight`.
+Current validation: `CMV-2100`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1998 Trusted-Full-Read Preparation Preflight
+
+Status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT_NON_AUTHORIZING_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`.
+- Consumed CM-1997 as the current route decision and prepared a trusted-full-read boundary as local, non-authorizing material only.
+- Accepted CM-1811 through CM-1813 as historical M8 planning input, CM-1959 through CM-1964 as local request/read-shape contract input, CM-1981/CM-1982 as fixture-backed read-shape input, and CM-1994 through CM-1997 as temp-local disposable material read-shape input only.
+- Required any future trusted-full-read execution to use fresh current exact approval and separately evidenced target-scoped disposable material.
+- Preserved no CM-1994 approval reuse, no CM-1996 retry, no approval line generation, no request-body generation/output/persistence/submission, no target material binding, no endpoint/locator resolution or disclosure, no runtime/network/VCPToolBox call, no process/listener/service action, no response/raw/log/config/env/secret/private-memory/raw-store/raw-audit read, no MCP memory tool call, no memory read/write/update/supersede/tombstone, no durable mutation, no provider/API call, no dependency change, no public MCP expansion, no VCPToolBox core modification, no push/tag/release/deploy/cutover, no M15 unlock, no RC gate unlock, no readiness claim, no `RC_READY`, no complete V8, and no full bridge completion.
+- Routed next work to CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display, still local and non-authorizing unless Jenn supplies a fresh exact boundary later.
+
+Validation: `CMV-2100`; docs/status review, CM-1997/CM-1996 receipt review, historical M8 boundary review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1997 Temp-Local Read-Shape Closeout / Route Decision
 

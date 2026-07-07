@@ -269,6 +269,18 @@ Completed local-safe evidence:
   expansion, M15 unlock, or readiness claim. It routes next work to
   CM-1998 trusted-full-read preparation preflight, still local and
   non-authorizing.
+- CM-1998 trusted-full-read preparation preflight recorded the next boundary as
+  local and non-authorizing only. It accepts CM-1811 through CM-1813 as
+  historical M8 planning input, CM-1959 through CM-1964 as local
+  request/read-shape contract input, CM-1981/CM-1982 as fixture-backed
+  read-shape input, and CM-1994 through CM-1997 as temp-local disposable
+  material read-shape input only. It requires any future trusted-full-read
+  execution to use fresh exact approval and separately evidenced target-scoped
+  disposable material, with no CM-1994 approval reuse, no existing operator
+  target reuse, no endpoint/locator disclosure, and low-disclosure receipt
+  projection only. It performs no runtime/network/VCPToolBox call, response
+  consumption, memory read/write, durable mutation, public MCP expansion, M15
+  unlock, RC unlock, or readiness claim.
 
 Missing RC evidence:
 
@@ -569,8 +581,30 @@ m15_package_evidence_map_boundary:
   cm1992_trusted_full_read_completed: false
   cm1992_m15_opened: false
   cm1992_readiness_claimed: false
+  cm1998_trusted_full_read_preparation_preflight_present: true
+  cm1998_boundary_authorizes_execution: false
+  cm1998_fresh_exact_approval_required: true
+  cm1998_cm1994_approval_reuse_allowed: false
+  cm1998_cm1996_retry_authorized: false
+  cm1998_historical_m8_evidence_planning_only: true
+  cm1998_cm1996_temp_local_read_shape_only: true
+  cm1998_separately_evidenced_target_material_required: true
+  cm1998_existing_operator_target_reuse_allowed: false
+  cm1998_approval_line_generated: false
+  cm1998_request_body_generated: false
+  cm1998_endpoint_locator_disclosed: false
+  cm1998_runtime_called: false
+  cm1998_network_called: false
+  cm1998_vcp_toolbox_called: false
+  cm1998_response_body_consumed: false
+  cm1998_memory_read_performed: false
+  cm1998_memory_write_performed: false
+  cm1998_public_mcp_expansion_performed: false
+  cm1998_m15_opened: false
+  cm1998_rc_gate_opened: false
+  cm1998_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
-  no_automatic_local_safe_plan_package_task_remains: true
+  no_automatic_local_safe_plan_package_task_remains: false
   rc_gate_report_created: false
   rc_gate_ready: false
   m15_opened: false
@@ -604,7 +638,7 @@ m15_package_evidence_map_boundary:
   durable_audit_write_performed: false
   durable_memory_write_performed: false
   request_body_generated: true
-  request_body_generation_scope: cm1981_fixture_harness_in_memory_only
+  request_body_generation_scope: cm1981_fixture_harness_in_memory_only_and_cm1996_temp_local_harness_in_memory_only
   request_body_output_or_persistence: false
   request_body_submitted: false
   config_changed: false
@@ -624,7 +658,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm1985_exact_approval_intake_or_pre_execution_gate_for_real_disposable_target_binding
+  next_safe_route: cm1999_trusted_full_read_exact_approval_request_readiness_review_jenn_boundary_display_local_non_authorizing
 ```
 
 ## Conclusion
@@ -652,7 +686,15 @@ packet material only; it does not authorize execution and does not prove real
 disposable target binding. CM-1984 displays the exact future boundary for Jenn
 review only; it does not grant approval or authorize runtime.
 
-The next route is CM-1985 exact approval intake / pre-execution gate for real
-disposable target binding. Future live/runtime, memory read/write, approval,
-RC review, release, deploy, cutover, push, or readiness work requires separate
-exact authority and fresh evidence.
+CM-1985 through CM-1997 then exercise the real disposable target binding
+preparation family, ending with an exact-approved temp-local disposable
+material read-shape proof that is valid only for that narrow route. CM-1998
+converts that closeout into trusted-full-read preparation material only. It
+does not authorize trusted-full-read execution, prove live VCPToolBox target
+binding, allow existing operator target reuse, read real private memory, open
+M15/RC, or claim readiness.
+
+The next route is CM-1999 trusted-full-read exact approval request readiness
+review / Jenn boundary display. Future trusted-full-read execution,
+live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
+push, or readiness work requires separate exact authority and fresh evidence.

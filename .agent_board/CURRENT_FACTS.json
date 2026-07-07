@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-07",
-  "taskId": "CM-1997",
-  "validationId": "CMV-2099",
+  "taskId": "CM-1998",
+  "validationId": "CMV-2100",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "temp_local_read_shape_closeout_route_to_trusted_full_read_preparation_no_live_no_retry_no_readiness",
+    "scope": "trusted_full_read_preparation_preflight_non_authorizing_no_live_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2100",
+      "scope": "CM-1998 trusted-full-read preparation preflight",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT_NON_AUTHORIZING_NO_LIVE_NO_READINESS"
+    },
     {
       "id": "CMV-2099",
       "scope": "CM-1997 temp-local read-shape closeout / route decision",
