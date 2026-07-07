@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2002 trusted-full-read route-binding / repair boundary preparation`.
-Current validation: `CMV-2104`.
-Current status: CM-2002 prepares a future exact route-binding/repair boundary after CM-2001. It grants no approval, binds no route, edits no source/tests, generates no request body, binds no target material, calls no runtime/VCPToolBox, reads or writes no memory, expands no public MCP, pushes/releases/deploys/cuts over nothing, unlocks no M15/RC gate, and claims no readiness.
+Current task: `CM-2003 trusted-full-read route-binding / repair intake packet display`.
+Current validation: `CMV-2105`.
+Current status: CM-2003 displays a recommended fresh exact packet selecting bounded local source/test repair for a future Jenn approval. It grants no approval, accepts no approval intake, binds no route, edits no source/tests, generates no request body, binds no target material, calls no runtime/VCPToolBox, reads or writes no memory, expands no public MCP, pushes/releases/deploys/cuts over nothing, unlocks no M15/RC gate, and claims no readiness.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-2003 exact route-binding/repair intake only if Jenn supplies a fresh exact packet matching CM-2002; otherwise continue local blocker review. Trusted-full-read execution remains blocked until a future gate can bind an approved route without endpoint/locator/raw/private disclosure. Do not retry CM-1996, reuse CM-1994 approval, generate request bodies or approval lines, call runtime/VCPToolBox, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness.
+Next safe action is CM-2004 exact intake gate only if Jenn supplies the CM-2003 packet as fresh current exact approval for bounded local source/test repair. Trusted-full-read execution remains blocked until a future repaired or bound route passes a separate exact execution gate without endpoint/locator/raw/private disclosure. Do not retry CM-1996, reuse CM-1994/CM-1996/CM-2001/CM-2002 authority, perform source/test repair, bind routes, generate request bodies or approval lines, call runtime/VCPToolBox, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness without fresh exact authority.
 
 ## Historical Run Notes
 

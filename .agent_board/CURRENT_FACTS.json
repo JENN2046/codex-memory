@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-07-07",
-  "taskId": "CM-2002",
-  "validationId": "CMV-2104",
+  "updatedAt": "2026-07-08",
+  "taskId": "CM-2003",
+  "validationId": "CMV-2105",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "trusted_full_read_route_binding_repair_boundary_prepared_non_authorizing_no_source_change_no_live_no_readiness",
+    "scope": "trusted_full_read_route_binding_repair_intake_packet_display_non_authorizing_no_repair_no_live_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2105",
+      "scope": "CM-2003 trusted-full-read route-binding / repair intake packet display",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_PACKET_DISPLAY_NON_AUTHORIZING_NO_REPAIR_NO_LIVE_NO_READINESS"
+    },
     {
       "id": "CMV-2104",
       "scope": "CM-2002 trusted-full-read route-binding / repair boundary preparation",

@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2002 trusted-full-read route-binding / repair boundary preparation |
-| Current task | `CM-2002 trusted-full-read route-binding / repair boundary preparation` |
-| Current validation | `CMV-2104` |
-| Current route | CM-2002 prepares a non-authorizing boundary for a future exact packet that chooses either a concrete existing route or a bounded local source/test repair window; no source change, route binding, request body, runtime, memory action, public MCP expansion, or readiness occurred |
+| Status | CM-2003 trusted-full-read route-binding / repair intake packet display |
+| Current task | `CM-2003 trusted-full-read route-binding / repair intake packet display` |
+| Current validation | `CMV-2105` |
+| Current route | CM-2003 displays a recommended fresh exact packet selecting the bounded local source/test repair window for future Jenn approval; no approval intake, source/test repair, route binding, request body, runtime, memory action, public MCP expansion, or readiness occurred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2003` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2003_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_PACKET_DISPLAY.md`. It consumes CM-2002 and displays the recommended fresh exact packet Jenn can supply in a future turn. The recommended path is bounded local source/test repair, not a concrete existing route, because CM-2001/CM-2002 recorded no CM-2001-capable bounded trusted-full-read executor without source repair or route rebinding. CM-2003 authorizes nothing by itself: approval intake false, approval grant false, route binding false, source/test repair false, CM-2001 attempt consumed false, request body generated false, target material binding false, endpoint/locator disclosure false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, public MCP expansion false, M15/RC unlock false, and readiness false. Next route is CM-2004 exact intake gate only if Jenn supplies the CM-2003 packet as a fresh current exact approval.
 
 `CM-2002` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2002_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARATION.md`. It consumes CM-2001 and records a future boundary for resolving the missing CM-2001-capable bounded trusted-full-read executor. It authorizes nothing by itself: approval grant false, route binding false, source/test repair false, CM-2001 attempt consumed false, request body generated false, target material binding false, endpoint/locator disclosure false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, public MCP expansion false, M15/RC unlock false, and readiness false. Next route is CM-2003 exact route-binding/repair intake only if Jenn supplies a fresh exact packet selecting a concrete existing route or bounded local source/test repair window.
 

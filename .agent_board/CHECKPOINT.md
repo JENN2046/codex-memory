@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2002 trusted-full-read route-binding / repair boundary preparation`.
-Current validation: `CMV-2104`.
+Current checkpoint: `CM-2003 trusted-full-read route-binding / repair intake packet display`.
+Current validation: `CMV-2105`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2003 Trusted-Full-Read Route-Binding / Repair Intake Packet Display
+
+Status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_PACKET_DISPLAY_NON_AUTHORIZING_NO_REPAIR_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM2003_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_PACKET_DISPLAY.md`.
+- Consumed CM-2002 and displayed a recommended fresh exact packet Jenn can supply in a future turn.
+- Selected bounded local source/test repair window as the recommended option because no CM-2001-capable bounded trusted-full-read executor is currently available without source repair or route rebinding.
+- Classified the current turn as a packet-display request, not a bindable exact repair approval.
+- Authorized no approval intake/grant, route binding, source/test repair, request body generation, target material binding, endpoint/locator disclosure, runtime/network/VCPToolBox call, response consumption, memory read/write, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, M15/RC unlock, or readiness claim.
+- Routed next work to CM-2004 exact intake gate only if Jenn supplies the CM-2003 packet as fresh current exact approval.
+
+Validation: `CMV-2105`; docs/status review, CM-2002 boundary review, CM-2001 gate review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-2002 Trusted-Full-Read Route-Binding / Repair Boundary Preparation
 
