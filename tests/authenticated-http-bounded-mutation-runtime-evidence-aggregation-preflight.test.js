@@ -832,7 +832,7 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.summary.runtimeEvidenceReportInputProvided, true);
-  assert.equal(report.summary.runtimeEvidenceReportStandardInputSourceAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceReportStandardInputSourceAccepted, false);
   assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayFed, true);
   assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayAccepted, false);
   assert.equal(report.summary.runtimeEvidenceReportAggregatorReplayRejected, true);
@@ -845,10 +845,11 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   );
   assert.equal(report.runtimeEvidenceReportInput.pathDisclosed, false);
   assert.equal(report.runtimeEvidenceReportInput.rawInputPrinted, false);
-  assert.equal(preflight.standardInputSourceAccepted, true);
+  assert.equal(preflight.standardInputSourceAccepted, false);
+  assert.ok(preflight.blockers.includes('source_report_not_same_process'));
   assert.equal(preflight.aggregatorReplay.rejectReason, 'current_head_binding_required');
   assert.equal(preflight.aggregatorReplay.canClaimV1RcReady, false);
-  assert.equal(rcGatePrecheck.standardInputSourceAccepted, true);
+  assert.equal(rcGatePrecheck.standardInputSourceAccepted, false);
   assert.equal(rcGatePrecheck.exactHeadBoundInputProvided, false);
   assert.equal(rcGatePrecheck.exactHeadBoundInputAccepted, false);
   assert.equal(rcGatePrecheck.runtimeEvidenceSummaryAccepted, false);
@@ -942,7 +943,7 @@ test('v1 RC aggregator CLI can consume runtime evidence JSON from stdin without 
   assertNoForbiddenMaterial(report);
 });
 
-test('v1 RC aggregator CLI accepts exact head-bound metadata separately and redacts raw values', async () => {
+test('v1 RC aggregator CLI treats exact head-bound runtime evidence JSON as review-only cross-process input', async () => {
   const sourceReport = await buildExactLowDisclosureReport();
   const result = spawnSync(
     process.execPath,
@@ -989,7 +990,7 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.summary.runtimeEvidenceReportInputProvided, true);
-  assert.equal(report.summary.runtimeEvidenceReportStandardInputSourceAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceReportStandardInputSourceAccepted, false);
   assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputProvided, true);
   assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputAccepted, true);
   assert.equal(report.summary.runtimeEvidenceReportExactHeadBoundInputRejected, false);
@@ -1004,17 +1005,19 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
   assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rawValuesOutput, false);
   assert.equal(preflight.exactHeadBoundRuntimeSummaryInput.rawValuesPersisted, false);
+  assert.equal(preflight.standardInputSourceAccepted, false);
+  assert.ok(preflight.blockers.includes('source_report_not_same_process'));
   assert.equal(preflight.aggregatorReplay.accepted, true);
   assert.equal(preflight.aggregatorReplay.currentHeadBindingStatus, 'matched');
   assert.equal(preflight.aggregatorReplay.evidenceFreshnessStatus, 'fresh');
-  assert.equal(rcGatePrecheck.status, 'exact_head_bound_runtime_summary_accepted_by_final_aggregation_not_ready');
+  assert.equal(rcGatePrecheck.status, 'blocked_pending_exact_head_bound_runtime_summary_acceptance');
   assert.equal(rcGatePrecheck.decision, 'NOT_READY_BLOCKED');
-  assert.equal(rcGatePrecheck.standardInputSourceAccepted, true);
+  assert.equal(rcGatePrecheck.standardInputSourceAccepted, false);
   assert.equal(rcGatePrecheck.exactHeadBoundInputProvided, true);
   assert.equal(rcGatePrecheck.exactHeadBoundInputAccepted, true);
   assert.equal(rcGatePrecheck.runtimeEvidenceSummaryAccepted, true);
   assert.equal(rcGatePrecheck.finalEvidenceAggregationAccepted, true);
-  assert.equal(rcGatePrecheck.rcGatePrecheckAccepted, true);
+  assert.equal(rcGatePrecheck.rcGatePrecheckAccepted, false);
   assert.equal(rcGatePrecheck.currentHeadBindingStatus, 'matched');
   assert.equal(rcGatePrecheck.currentHeadBindingMatched, true);
   assert.equal(rcGatePrecheck.evidenceFreshnessStatus, 'fresh');
@@ -1043,6 +1046,7 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assert.equal(candidatePackage.rcCutoverExecutionAllowed, false);
   assert.equal(candidatePackage.rcReady, false);
   assert.equal(candidatePackage.rcGateRows.validationAggregatorZeroGapAccepted, false);
+  assert.ok(candidatePackage.blockerIds.includes('standard_runtime_evidence_source_not_accepted'));
   assert.ok(candidatePackage.blockerIds.includes('validation_aggregator_zero_gap_not_accepted'));
   assert.equal(candidatePackage.safety.executesCutover, false);
   assert.equal(candidatePackage.safety.readinessClaimed, false);
@@ -1074,11 +1078,21 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assert.equal(finalEvidencePackage.aggregationOutletAccepted, false);
   assert.equal(finalEvidencePackage.ownerReviewReady, false);
   assert.equal(finalEvidencePackage.chain.rowCount, 4);
-  assert.equal(finalEvidencePackage.chain.acceptedRowCount, 2);
-  assert.equal(finalEvidencePackage.chain.missingRowCount, 2);
+  assert.equal(finalEvidencePackage.chain.acceptedRowCount, 0);
+  assert.equal(finalEvidencePackage.chain.missingRowCount, 4);
+  assert.ok(
+    finalEvidencePackage.chain.missingIds.includes(
+      'p67_runtime_evidence_standard_input_preflight'
+    )
+  );
   assert.ok(
     finalEvidencePackage.chain.missingIds.includes(
       'p69_rc_cutover_pre_approval_candidate_package'
+    )
+  );
+  assert.ok(
+    finalEvidencePackage.blockerIds.includes(
+      'p67_runtime_evidence_standard_input_preflight_not_accepted'
     )
   );
   assert.ok(
@@ -1090,7 +1104,7 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
     finalEvidencePackage.evidenceSummary.currentHeadBindingMatched,
     true
   );
-  assert.equal(finalEvidencePackage.evidenceSummary.rcGatePrecheckAccepted, true);
+  assert.equal(finalEvidencePackage.evidenceSummary.rcGatePrecheckAccepted, false);
   assert.equal(finalEvidencePackage.evidenceSummary.candidatePackageAccepted, false);
   assert.equal(finalEvidencePackage.ownerApprovalBoundary.present, false);
   assert.equal(finalEvidencePackage.ownerApprovalBoundary.executionAllowed, false);
@@ -1105,7 +1119,7 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
     artifactExport.finalEvidencePackageAggregationOutlet.aggregationOutletAccepted,
     false
   );
-  assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, true);
+  assert.equal(report.summary.finalEvidenceAggregationRcGatePrecheckAccepted, false);
   assert.equal(report.summary.finalEvidenceAggregationRuntimeEvidenceSummaryAccepted, true);
   assert.equal(report.summary.finalEvidenceAggregationCurrentHeadBindingMatched, true);
   assert.equal(report.summary.finalEvidenceAggregationEvidenceFreshnessStatus, 'fresh');
@@ -1131,36 +1145,15 @@ test('v1 RC aggregator CLI accepts exact head-bound metadata separately and reda
   assertNoForbiddenMaterial(report);
 });
 
-test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate precheck without readiness', async () => {
+test('v1 RC aggregator can promote same-process allowlisted zero-gap artifact to RC gate precheck without readiness', async () => {
   const sourceReport = await buildZeroGapLowDisclosureReport();
-  const result = spawnSync(
-    process.execPath,
-    [
-      aggregatorCliPath,
-      '--runtime-evidence-report',
-      '-',
-      '--runtime-evidence-current-head',
-      fixtureCommit,
-      '--runtime-evidence-expected-current-head',
-      fixtureCommit,
-      '--runtime-evidence-generated-at',
-      fixtureEvidenceGeneratedAt,
-      '--generated-at',
-      '2026-07-07T01:00:00.000Z'
-    ],
-    {
-      cwd: repoRoot,
-      input: JSON.stringify(sourceReport),
-      encoding: 'utf8',
-      timeout: 30000,
-      env: {
-        ...process.env,
-        NODE_NO_WARNINGS: '1',
-        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
-      }
-    }
-  );
-  const report = JSON.parse(result.stdout);
+  const report = buildCliReport({
+    runtimeEvidenceReport: sourceReport,
+    runtimeEvidenceCurrentHead: fixtureCommit,
+    runtimeEvidenceExpectedCurrentHead: fixtureCommit,
+    runtimeEvidenceGeneratedAt: fixtureEvidenceGeneratedAt,
+    generatedAt: '2026-07-07T01:00:00.000Z'
+  });
   const preflight =
     report.evidence.p67AuthenticatedHttpBoundedMutationRuntimeEvidencePreflight;
   const rcGatePrecheck =
@@ -1174,7 +1167,6 @@ test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate 
   const artifactExport =
     report.evidence.p72RcCutoverCandidateArtifactExport;
 
-  assert.equal(result.status, 0, result.stderr);
   assert.equal(report.phase, 'P67-runtime-evidence-standard-input-preflight');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.summary.runtimeEvidenceReportInputProvided, true);
@@ -1363,7 +1355,7 @@ test('v1 RC aggregator CLI can promote allowlisted zero-gap artifact to RC gate 
   assertNoForbiddenMaterial(report);
 });
 
-test('v1 RC aggregator CLI can emit only the low-disclosure RC cutover candidate artifact to stdout', async () => {
+test('v1 RC aggregator CLI emits blocked RC cutover candidate artifact for cross-process runtime evidence JSON', async () => {
   const sourceReport = await buildZeroGapLowDisclosureReport();
   const result = spawnSync(
     process.execPath,
@@ -1397,7 +1389,10 @@ test('v1 RC aggregator CLI can emit only the low-disclosure RC cutover candidate
   const artifact = JSON.parse(result.stdout);
 
   assert.equal(result.status, 0, result.stderr);
-  assertAcceptedArtifactExport(artifact);
+  assertBlockedArtifactExport(
+    artifact,
+    'p67_runtime_evidence_standard_input_preflight_not_accepted'
+  );
   assert.equal(Object.hasOwn(artifact, 'phase'), false);
   assert.equal(Object.hasOwn(artifact, 'summary'), false);
   assert.equal(Object.hasOwn(artifact, 'evidence'), false);
@@ -1412,7 +1407,7 @@ test('v1 RC aggregator CLI can emit only the low-disclosure RC cutover candidate
   assert.equal(artifact.rcReady, false);
   assert.equal(
     artifact.finalEvidencePackageAggregationOutlet.aggregationOutletAccepted,
-    true
+    false
   );
   assertNoForbiddenMaterial(artifact);
 });
@@ -2307,7 +2302,7 @@ test('v1 RC aggregator execution boundary precheck output fails closed without P
   assertNoForbiddenMaterial(precheck);
 });
 
-test('v1 RC aggregator CLI rejects piped P72 stdout artifact as cross-process input', async () => {
+test('v1 RC aggregator CLI rejects piped blocked P72 stdout artifact as cross-process input', async () => {
   const sourceReport = await buildZeroGapLowDisclosureReport();
   const artifactResult = spawnSync(
     process.execPath,
@@ -2364,7 +2359,10 @@ test('v1 RC aggregator CLI rejects piped P72 stdout artifact as cross-process in
   const boundary = report.evidence.p75RcCutoverOwnerApprovalBoundaryPrecheck;
 
   assert.equal(artifactResult.status, 0, artifactResult.stderr);
-  assertAcceptedArtifactExport(artifact);
+  assertBlockedArtifactExport(
+    artifact,
+    'p67_runtime_evidence_standard_input_preflight_not_accepted'
+  );
   assert.equal(artifact.export.fileWritten, false);
   assert.equal(artifact.export.durableArtifactWritten, false);
   assert.equal(intakeResult.status, 0, intakeResult.stderr);
@@ -2372,6 +2370,8 @@ test('v1 RC aggregator CLI rejects piped P72 stdout artifact as cross-process in
   assert.equal(intake.status, 'candidate_artifact_intake_blocked_fail_closed');
   assert.equal(intake.inputAccepted, false);
   assert.equal(intake.ownerReviewInputReady, false);
+  assert.ok(intake.blockerIds.includes('artifact_not_accepted'));
+  assert.ok(intake.blockerIds.includes('artifact_status_not_owner_review_ready'));
   assert.ok(
     intake.blockerIds.includes(
       'artifact_final_evidence_package_outlet_source_chain_not_same_process'

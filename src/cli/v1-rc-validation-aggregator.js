@@ -148,6 +148,7 @@ function buildUsageText() {
     '  --strict  Emit the same JSON report but exit non-zero unless the decision is READY_FOR_V1_0_RC.',
     '  --runtime-evidence-report PATH|-',
     '            Read one explicit sanitized authenticated HTTP bounded mutation runtime evidence report from a workspace JSON file or stdin, then feed its sanitized summary into the aggregator preflight path.',
+    '            Serialized stdin/file runtime evidence is review-only and cannot promote to P72; promotion requires an in-process runtime evidence report source.',
     '  --rc-cutover-candidate-artifact-report PATH|-',
     '            Read one low-disclosure RC cutover pre-candidate artifact JSON from a workspace JSON file or stdin, then validate it as owner-review input without generating approval.',
     '  --rc-cutover-owner-approval-boundary-report PATH|-',

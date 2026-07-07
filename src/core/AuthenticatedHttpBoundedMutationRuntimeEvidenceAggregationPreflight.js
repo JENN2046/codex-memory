@@ -15,6 +15,9 @@ const EXPECTED_REPORT_SCHEMA_VERSION =
   'authenticated-http-bounded-mutation-proof-runtime-evidence-report-v1';
 const EXPECTED_ARTIFACT_SCHEMA_VERSION =
   'authenticated-http-bounded-mutation-proof-runtime-evidence-artifact-v1';
+const RUNTIME_EVIDENCE_REPORT_IN_PROCESS_BRAND = Symbol(
+  'authenticated-http-bounded-mutation-runtime-evidence-report-in-process-brand'
+);
 
 const FORBIDDEN_REPORT_PATTERNS = Object.freeze([
   /https?:\/\//i,
@@ -35,6 +38,24 @@ const FORBIDDEN_REPORT_PATTERNS = Object.freeze([
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function markInProcessRuntimeEvidenceReport(report) {
+  if (!isPlainObject(report)) return report;
+  Object.defineProperty(report, RUNTIME_EVIDENCE_REPORT_IN_PROCESS_BRAND, {
+    value: true,
+    enumerable: false,
+    configurable: false,
+    writable: false
+  });
+  return report;
+}
+
+function isInProcessRuntimeEvidenceReport(report) {
+  return (
+    isPlainObject(report) &&
+    report[RUNTIME_EVIDENCE_REPORT_IN_PROCESS_BRAND] === true
+  );
 }
 
 function normalizeString(value) {
@@ -231,6 +252,9 @@ function collectSourceBlockers(report = {}) {
   const safety = isPlainObject(artifact.safety) ? artifact.safety : {};
 
   if (!isPlainObject(report)) blockers.push('report_shape_invalid');
+  if (!isInProcessRuntimeEvidenceReport(report)) {
+    blockers.push('source_report_not_same_process');
+  }
   if (report.schemaVersion !== EXPECTED_REPORT_SCHEMA_VERSION) {
     blockers.push('report_schema_version_mismatch');
   }
@@ -446,7 +470,7 @@ function buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPrefligh
       ? 'Provide a separate exact head-bound runtime summary input if aggregator replay acceptance is required.'
       : standardInputSourceAccepted && exactHeadBoundInput.accepted
       ? 'Use this accepted exact-bound replay as local runtime evidence input only; do not claim readiness.'
-      : 'Regenerate the runtime evidence report with exact metadata and low-disclosure output, then rerun the preflight.'
+      : 'Provide an in-process runtime evidence report from the local runner, or keep serialized JSON input review-only without promotion.'
   };
 }
 
@@ -455,5 +479,7 @@ module.exports = {
   buildAuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight,
   buildRuntimeEvidenceSummaryForAggregatorReplay,
   containsForbiddenReportMaterial,
+  isInProcessRuntimeEvidenceReport,
+  markInProcessRuntimeEvidenceReport,
   normalizeExactHeadBoundRuntimeSummaryInput
 };

@@ -13,6 +13,9 @@ const {
   buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake,
   buildRuntimeEvidenceSummaryForAggregatorIntake
 } = require('./AuthenticatedHttpBoundedMutationProofRuntimeEvidenceIntake');
+const {
+  markInProcessRuntimeEvidenceReport
+} = require('./AuthenticatedHttpBoundedMutationRuntimeEvidenceAggregationPreflight');
 
 const RUNTIME_EVIDENCE_REPORT_SCHEMA_VERSION =
   'authenticated-http-bounded-mutation-proof-runtime-evidence-report-v1';
@@ -217,7 +220,7 @@ async function buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport(o
   const blockers = collectReportBlockers({ routeSummary, intake });
   const accepted = blockers.length === 0;
 
-  return {
+  return markInProcessRuntimeEvidenceReport({
     schemaVersion: RUNTIME_EVIDENCE_REPORT_SCHEMA_VERSION,
     reportType: 'authenticated_http_bounded_cleanup_suppression_runtime_evidence_aggregation_report',
     status: accepted ? 'ok' : 'blocked',
@@ -296,7 +299,7 @@ async function buildAuthenticatedHttpBoundedMutationProofRuntimeEvidenceReport(o
     nextStep: accepted
       ? 'Use this low-disclosure aggregation report as accepted runtime evidence input only; do not claim readiness.'
       : 'Supply exact head-bound runtime matrix metadata or keep aggregator runtime evidence blocked.'
-  };
+  });
 }
 
 module.exports = {
