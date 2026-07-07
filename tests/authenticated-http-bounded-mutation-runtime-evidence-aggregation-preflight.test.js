@@ -443,6 +443,37 @@ function assertAcceptedFinalOwnerReviewPackage(pkg) {
   assert.equal(pkg.sourceSummary.ownerApprovalBoundaryDisplayReady, true);
   assert.equal(pkg.sourceSummary.boundaryFieldCount, 6);
   assert.equal(pkg.sourceSummary.sourceBlockerCount, 0);
+  assert.equal(
+    pkg.sourceChainProvenance.provenanceVersion,
+    'p77-source-chain-provenance-v1'
+  );
+  assert.equal(pkg.sourceChainProvenance.generatedBy, 'v1-rc-validation-aggregator');
+  assert.equal(pkg.sourceChainProvenance.lowDisclosure, true);
+  assert.equal(
+    pkg.sourceChainProvenance.sourceBoundarySchemaVersion,
+    'p75-rc-cutover-owner-approval-boundary-precheck-v1'
+  );
+  assert.equal(pkg.sourceChainProvenance.sourceBoundaryAccepted, true);
+  assert.equal(pkg.sourceChainProvenance.sourceBoundaryBlockerCount, 0);
+  assert.deepEqual(pkg.sourceChainProvenance.priorLowDisclosureChain, [
+    'p67_runtime_evidence_standard_input_preflight',
+    'p68_final_evidence_aggregation_rc_gate_precheck',
+    'p69_rc_cutover_pre_approval_candidate_package',
+    'p70_rc_cutover_owner_approval_readiness_summary',
+    'p71_rc_cutover_final_evidence_package_aggregation_outlet',
+    'p72_rc_cutover_candidate_artifact_export',
+    'p73_rc_cutover_candidate_artifact_intake_precheck',
+    'p75_rc_cutover_owner_approval_boundary_precheck',
+    'p77_rc_cutover_final_owner_review_package_aggregation'
+  ]);
+  assert.equal(pkg.sourceChainProvenance.requiredChainRowCount, 9);
+  assert.equal(pkg.sourceChainProvenance.acceptedChainRowCount, 9);
+  assert.equal(pkg.sourceChainProvenance.allPriorRowsAccepted, true);
+  assert.equal(pkg.sourceChainProvenance.fieldValueDisclosure, false);
+  assert.equal(pkg.sourceChainProvenance.approvalMaterialIncluded, false);
+  assert.equal(pkg.sourceChainProvenance.executionAuthorizationIncluded, false);
+  assert.equal(pkg.sourceChainProvenance.readinessClaimIncluded, false);
+  assert.equal(pkg.sourceChainProvenance.rawValuesOutput, false);
   assert.deepEqual(pkg.blockerIds, []);
   assert.equal(pkg.disclosure.lowDisclosure, true);
   assert.equal(pkg.disclosure.rawCurrentHeadCommitOutput, false);
@@ -576,6 +607,8 @@ function assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck) {
   assert.equal(precheck.sourceSummary.readyForExactOwnerReview, true);
   assert.equal(precheck.sourceSummary.packageBoundaryFieldCount, 6);
   assert.equal(precheck.sourceSummary.sourceBlockerCount, 0);
+  assert.equal(precheck.sourceSummary.sourceChainProvenanceAccepted, true);
+  assert.equal(precheck.sourceSummary.sourceChainRowCount, 9);
   assert.deepEqual(precheck.blockerIds, []);
   assert.equal(precheck.disclosure.lowDisclosure, true);
   assert.equal(precheck.disclosure.rawCurrentHeadCommitOutput, false);
@@ -1697,6 +1730,43 @@ test('RC cutover owner approval execution boundary precheck accepts P77 package 
 
   assertAcceptedFinalOwnerReviewPackage(pkg);
   assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck);
+  assertNoForbiddenMaterial(precheck);
+});
+
+test('RC cutover owner approval execution boundary precheck rejects self-attested P77 package without provenance', async () => {
+  const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
+  delete pkg.sourceChainProvenance;
+  const precheck = buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
+    rcCutoverFinalOwnerReviewPackageAggregation: pkg
+  });
+
+  assert.equal(
+    precheck.status,
+    'owner_approval_execution_boundary_precheck_blocked_fail_closed'
+  );
+  assert.equal(precheck.decision, 'NOT_READY_BLOCKED');
+  assert.equal(precheck.boundaryPrecheckAccepted, false);
+  assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
+  assert.equal(precheck.executionBoundaryPrepared, false);
+  assert.equal(precheck.sourceSummary.sourceChainProvenanceAccepted, false);
+  assert.equal(precheck.sourceSummary.sourceChainRowCount, 0);
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_source_chain_provenance_invalid'
+    )
+  );
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_source_chain_row_count_mismatch'
+    )
+  );
+  assert.equal(precheck.approvalLineGenerated, false);
+  assert.equal(precheck.approvalTextGenerated, false);
+  assert.equal(precheck.canProceedToCutoverExecution, false);
+  assert.equal(precheck.rcCutoverExecutionAllowed, false);
+  assert.equal(precheck.rcReady, false);
+  assert.equal(precheck.canClaimRcReady, false);
   assertNoForbiddenMaterial(precheck);
 });
 

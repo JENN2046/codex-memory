@@ -492,6 +492,56 @@ test('minimal validation aggregator CLI parses strict and help flags without imp
       .rcCutoverCandidateArtifactReportPath,
     '-'
   );
+  assert.deepEqual(
+    parseArgs([
+      '--rc-cutover-final-owner-review-package',
+      '--rc-cutover-execution-boundary-precheck'
+    ]).outputModeConflict,
+    {
+      selectedModeCount: 2,
+      selectedFlags: [
+        '--rc-cutover-final-owner-review-package',
+        '--rc-cutover-execution-boundary-precheck'
+      ],
+      selectedKeys: [
+        'rcCutoverFinalOwnerReviewPackage',
+        'rcCutoverExecutionBoundaryPrecheck'
+      ]
+    }
+  );
+});
+
+test('minimal validation aggregator CLI rejects conflicting artifact-only output modes', () => {
+  const result = runCli([
+    '--rc-cutover-final-owner-review-package',
+    '--rc-cutover-execution-boundary-precheck',
+    '--pretty',
+    '--generated-at',
+    '2026-05-16T00:00:00.000Z'
+  ]);
+
+  assert.equal(result.status, 1, result.stderr);
+  const report = parseJsonResult(result);
+  assert.equal(report.schemaVersion, 'v1-rc-validation-aggregator-v1');
+  assert.equal(report.phase, 'artifact-output-mode-conflict-rejected');
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.artifactOutputModeConflict.rejected, true);
+  assert.equal(report.artifactOutputModeConflict.selectedModeCount, 2);
+  assert.deepEqual(report.artifactOutputModeConflict.selectedFlags, [
+    '--rc-cutover-final-owner-review-package',
+    '--rc-cutover-execution-boundary-precheck'
+  ]);
+  assert.equal(report.artifactOutputModeConflict.pathDisclosed, false);
+  assert.equal(report.artifactOutputModeConflict.rawInputPrinted, false);
+  assert.equal(
+    report.evidence.artifactOutputModeConflictRejection.artifactOnlyOutputEmitted,
+    false
+  );
+  assert.equal(report.summary.artifactOutputModeConflictRejected, true);
+  assert.equal(report.summary.artifactOutputModeConflictArtifactOnlyOutputEmitted, false);
+  assert.equal(report.summary.artifactOutputModeConflictCanClaimRcReady, false);
+  assert.equal(Object.hasOwn(report, 'packageType'), false);
+  assert.equal(Object.hasOwn(report, 'precheckType'), false);
 });
 
 test('minimal validation aggregator CLI package manifests remain untouched', () => {

@@ -24,6 +24,19 @@ const REJECTED_FLAGS = new Set([
   '--push'
 ]);
 
+const ARTIFACT_OUTPUT_MODE_FLAGS = Object.freeze([
+  ['rcCutoverCandidateArtifact', '--rc-cutover-candidate-artifact'],
+  ['rcCutoverOwnerApprovalBoundary', '--rc-cutover-owner-approval-boundary'],
+  ['rcCutoverFinalOwnerReviewPackage', '--rc-cutover-final-owner-review-package'],
+  ['rcCutoverExecutionBoundaryPrecheck', '--rc-cutover-execution-boundary-precheck']
+]);
+
+function collectSelectedArtifactOutputModes(options = {}) {
+  return ARTIFACT_OUTPUT_MODE_FLAGS
+    .filter(([key]) => options[key] === true)
+    .map(([key, flag]) => ({ key, flag }));
+}
+
 function parseArgs(argv = []) {
   const options = {
     pretty: false,
@@ -113,6 +126,15 @@ function parseArgs(argv = []) {
     }
   }
 
+  const selectedArtifactOutputModes = collectSelectedArtifactOutputModes(options);
+  if (selectedArtifactOutputModes.length > 1) {
+    options.outputModeConflict = {
+      selectedModeCount: selectedArtifactOutputModes.length,
+      selectedFlags: selectedArtifactOutputModes.map(mode => mode.flag),
+      selectedKeys: selectedArtifactOutputModes.map(mode => mode.key)
+    };
+  }
+
   return options;
 }
 
@@ -200,6 +222,21 @@ const REQUIRED_RC_CUTOVER_EXECUTION_BOUNDARY_CHECK_IDS = Object.freeze([
   'execution_stays_blocked'
 ]);
 
+const REQUIRED_P77_SOURCE_CHAIN_IDS = Object.freeze([
+  'p67_runtime_evidence_standard_input_preflight',
+  'p68_final_evidence_aggregation_rc_gate_precheck',
+  'p69_rc_cutover_pre_approval_candidate_package',
+  'p70_rc_cutover_owner_approval_readiness_summary',
+  'p71_rc_cutover_final_evidence_package_aggregation_outlet',
+  'p72_rc_cutover_candidate_artifact_export',
+  'p73_rc_cutover_candidate_artifact_intake_precheck',
+  'p75_rc_cutover_owner_approval_boundary_precheck',
+  'p77_rc_cutover_final_owner_review_package_aggregation'
+]);
+
+const P77_SOURCE_CHAIN_PROVENANCE_VERSION =
+  'p77-source-chain-provenance-v1';
+
 function containsForbiddenRcCutoverCandidateArtifactMaterial(value) {
   const serialized = JSON.stringify(value);
   return FORBIDDEN_RC_CUTOVER_CANDIDATE_ARTIFACT_PATTERNS
@@ -237,6 +274,57 @@ function buildRejectedReport(rejectedFlag) {
     serviceStarted: report.safety.serviceStarted,
     durableMemoryTouched: report.safety.durableMemoryTouched,
     nextStep: 'Re-run without live/provider/apply/deploy/release flags.'
+  };
+}
+
+function buildArtifactOutputModeConflictReport(conflict = {}, options = {}) {
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: options.generatedAt || undefined
+  });
+  const selectedFlags = Array.isArray(conflict.selectedFlags)
+    ? conflict.selectedFlags
+    : [];
+
+  return {
+    ...report,
+    phase: 'artifact-output-mode-conflict-rejected',
+    decision: 'NOT_READY_BLOCKED',
+    artifactOutputModeConflict: {
+      rejected: true,
+      selectedModeCount: selectedFlags.length,
+      selectedFlags,
+      pathDisclosed: false,
+      rawInputPrinted: false
+    },
+    evidence: {
+      ...report.evidence,
+      artifactOutputModeConflictRejection: {
+        rejected: true,
+        selectedModeCount: selectedFlags.length,
+        selectedFlags,
+        artifactOnlyOutputEmitted: false,
+        lowDisclosure: true,
+        approvalGenerated: false,
+        executesCutover: false,
+        readinessClaimed: false
+      }
+    },
+    summary: {
+      ...report.summary,
+      artifactOutputModeConflictRejected: true,
+      artifactOutputModeConflictSelectedModeCount: selectedFlags.length,
+      artifactOutputModeConflictArtifactOnlyOutputEmitted: false,
+      artifactOutputModeConflictCanClaimRcReady: false
+    },
+    warnings: [
+      ...report.warnings,
+      'Multiple artifact-only output modes were rejected fail-closed.'
+    ],
+    recommendations: [
+      ...report.recommendations,
+      'Select exactly one artifact-only output mode.'
+    ],
+    nextStep: 'Select exactly one artifact-only output mode.'
   };
 }
 
@@ -2028,6 +2116,11 @@ function buildRcCutoverFinalOwnerReviewPackageAggregation({
     : [];
   const blockerIds = collectRcCutoverFinalOwnerReviewPackageBlockers(boundary);
   const accepted = blockerIds.length === 0;
+  const sourceChainAccepted = accepted &&
+    boundary.boundaryPrecheckAccepted === true &&
+    boundary.ownerApprovalBoundaryDisplayReady === true &&
+    Array.isArray(boundary.blockerIds) &&
+    boundary.blockerIds.length === 0;
   const safeFields = fields
     .filter(field => REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.includes(field?.id))
     .map(field => ({
@@ -2087,6 +2180,30 @@ function buildRcCutoverFinalOwnerReviewPackageAggregation({
         ? boundary.blockerIds.length
         : 0
     },
+    sourceChainProvenance: {
+      provenanceVersion: P77_SOURCE_CHAIN_PROVENANCE_VERSION,
+      generatedBy: 'v1-rc-validation-aggregator',
+      lowDisclosure: true,
+      sourceBoundarySchemaVersion:
+        typeof boundary.schemaVersion === 'string' ? boundary.schemaVersion : '',
+      sourceBoundaryStatus:
+        typeof boundary.status === 'string' ? boundary.status : '',
+      sourceBoundaryAccepted: boundary.boundaryPrecheckAccepted === true,
+      sourceBoundaryBlockerCount: Array.isArray(boundary.blockerIds)
+        ? boundary.blockerIds.length
+        : 0,
+      priorLowDisclosureChain: [...REQUIRED_P77_SOURCE_CHAIN_IDS],
+      requiredChainRowCount: REQUIRED_P77_SOURCE_CHAIN_IDS.length,
+      acceptedChainRowCount: sourceChainAccepted
+        ? REQUIRED_P77_SOURCE_CHAIN_IDS.length
+        : 0,
+      allPriorRowsAccepted: sourceChainAccepted,
+      fieldValueDisclosure: false,
+      approvalMaterialIncluded: false,
+      executionAuthorizationIncluded: false,
+      readinessClaimIncluded: false,
+      rawValuesOutput: false
+    },
     blockerIds,
     disclosure: {
       lowDisclosure: true,
@@ -2139,6 +2256,49 @@ function buildRcCutoverFinalOwnerReviewPackageAggregation({
   };
 }
 
+function collectP77SourceChainProvenanceBlockers(sourceChainProvenance = {}) {
+  const blockers = [];
+  const sourceChainIds = Array.isArray(sourceChainProvenance.priorLowDisclosureChain)
+    ? sourceChainProvenance.priorLowDisclosureChain
+    : [];
+
+  if (
+    sourceChainProvenance.provenanceVersion !==
+      P77_SOURCE_CHAIN_PROVENANCE_VERSION ||
+    sourceChainProvenance.generatedBy !== 'v1-rc-validation-aggregator' ||
+    sourceChainProvenance.lowDisclosure !== true ||
+    sourceChainProvenance.sourceBoundarySchemaVersion !==
+      'p75-rc-cutover-owner-approval-boundary-precheck-v1' ||
+    sourceChainProvenance.sourceBoundaryAccepted !== true ||
+    sourceChainProvenance.sourceBoundaryBlockerCount !== 0 ||
+    sourceChainProvenance.requiredChainRowCount !==
+      REQUIRED_P77_SOURCE_CHAIN_IDS.length ||
+    sourceChainProvenance.acceptedChainRowCount !==
+      REQUIRED_P77_SOURCE_CHAIN_IDS.length ||
+    sourceChainProvenance.allPriorRowsAccepted !== true ||
+    sourceChainProvenance.fieldValueDisclosure !== false ||
+    sourceChainProvenance.approvalMaterialIncluded !== false ||
+    sourceChainProvenance.executionAuthorizationIncluded !== false ||
+    sourceChainProvenance.readinessClaimIncluded !== false ||
+    sourceChainProvenance.rawValuesOutput !== false
+  ) {
+    blockers.push('final_owner_review_package_source_chain_provenance_invalid');
+  }
+  if (sourceChainIds.length !== REQUIRED_P77_SOURCE_CHAIN_IDS.length) {
+    blockers.push('final_owner_review_package_source_chain_row_count_mismatch');
+  }
+  if (new Set(sourceChainIds).size !== sourceChainIds.length) {
+    blockers.push('final_owner_review_package_source_chain_duplicate_rows');
+  }
+  for (const requiredId of REQUIRED_P77_SOURCE_CHAIN_IDS) {
+    if (!sourceChainIds.includes(requiredId)) {
+      blockers.push(`final_owner_review_package_source_chain_missing_${requiredId}`);
+    }
+  }
+
+  return [...new Set(blockers)].sort();
+}
+
 function collectRcCutoverOwnerApprovalExecutionBoundaryBlockers(pkg = {}) {
   const blockers = [];
   const contents = isPlainObject(pkg.packageContents) ? pkg.packageContents : {};
@@ -2149,6 +2309,9 @@ function collectRcCutoverOwnerApprovalExecutionBoundaryBlockers(pkg = {}) {
     typeof field?.id === 'string' ? field.id : ''
   ));
   const sourceSummary = isPlainObject(pkg.sourceSummary) ? pkg.sourceSummary : {};
+  const sourceChainProvenance = isPlainObject(pkg.sourceChainProvenance)
+    ? pkg.sourceChainProvenance
+    : {};
   const disclosure = isPlainObject(pkg.disclosure) ? pkg.disclosure : {};
   const safety = isPlainObject(pkg.safety) ? pkg.safety : {};
 
@@ -2226,6 +2389,10 @@ function collectRcCutoverOwnerApprovalExecutionBoundaryBlockers(pkg = {}) {
     blockers.push('final_owner_review_package_source_summary_invalid');
   }
 
+  blockers.push(
+    ...collectP77SourceChainProvenanceBlockers(sourceChainProvenance)
+  );
+
   if (
     pkg.approvalRequestSubmitted === true ||
     pkg.approvalLineGenerated === true ||
@@ -2276,6 +2443,11 @@ function buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
   const pkg = isPlainObject(rcCutoverFinalOwnerReviewPackageAggregation)
     ? rcCutoverFinalOwnerReviewPackageAggregation
     : {};
+  const sourceChainProvenance = isPlainObject(pkg.sourceChainProvenance)
+    ? pkg.sourceChainProvenance
+    : {};
+  const sourceChainProvenanceAccepted =
+    collectP77SourceChainProvenanceBlockers(sourceChainProvenance).length === 0;
   const blockerIds = collectRcCutoverOwnerApprovalExecutionBoundaryBlockers(pkg);
   const accepted = blockerIds.length === 0;
   const rows = [
@@ -2402,15 +2574,7 @@ function buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
       terminalArtifactSchemaVersion:
         'p78-rc-cutover-owner-approval-execution-boundary-precheck-v1',
       priorLowDisclosureChain: [
-        'p67_runtime_evidence_standard_input_preflight',
-        'p68_final_evidence_aggregation_rc_gate_precheck',
-        'p69_rc_cutover_pre_approval_candidate_package',
-        'p70_rc_cutover_owner_approval_readiness_summary',
-        'p71_rc_cutover_final_evidence_package_aggregation_outlet',
-        'p72_rc_cutover_candidate_artifact_export',
-        'p73_rc_cutover_candidate_artifact_intake_precheck',
-        'p75_rc_cutover_owner_approval_boundary_precheck',
-        'p77_rc_cutover_final_owner_review_package_aggregation',
+        ...REQUIRED_P77_SOURCE_CHAIN_IDS,
         'p78_rc_cutover_owner_approval_execution_boundary_precheck'
       ],
       omittedMaterial: [
@@ -2435,7 +2599,11 @@ function buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
       packageBoundaryFieldCount: Number.isFinite(pkg.packageContents?.boundaryFieldCount)
         ? pkg.packageContents.boundaryFieldCount
         : 0,
-      sourceBlockerCount: Array.isArray(pkg.blockerIds) ? pkg.blockerIds.length : 0
+      sourceBlockerCount: Array.isArray(pkg.blockerIds) ? pkg.blockerIds.length : 0,
+      sourceChainProvenanceAccepted,
+      sourceChainRowCount: Array.isArray(sourceChainProvenance.priorLowDisclosureChain)
+        ? sourceChainProvenance.priorLowDisclosureChain.length
+        : 0
     },
     blockerIds,
     disclosure: {
@@ -2492,6 +2660,12 @@ function buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
 function buildCliReport(options = {}) {
   if (options.rejectedFlag) {
     return buildRejectedReport(options.rejectedFlag);
+  }
+  if (options.outputModeConflict) {
+    return buildArtifactOutputModeConflictReport(
+      options.outputModeConflict,
+      options
+    );
   }
 
   if (options.runtimeEvidenceReportLoadError) {
@@ -2874,6 +3048,9 @@ function buildCliReport(options = {}) {
 }
 
 function selectCliOutput(report = {}, options = {}) {
+  if (options.outputModeConflict) {
+    return report;
+  }
   if (options.rcCutoverCandidateArtifact) {
     return (
       report.evidence?.p72RcCutoverCandidateArtifactExport ||
@@ -2968,6 +3145,7 @@ function main() {
     strict: options.strict,
     rejected: Boolean(
       options.rejectedFlag ||
+      options.outputModeConflict ||
       options.runtimeEvidenceReportLoadError ||
       options.rcCutoverCandidateArtifactReportLoadError ||
       options.rcCutoverOwnerApprovalBoundaryReportLoadError ||
