@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2001 trusted-full-read exact approval/material intake gate blocked`.
-Current validation: `CMV-2103`.
+Current checkpoint: `CM-2002 trusted-full-read route-binding / repair boundary preparation`.
+Current validation: `CMV-2104`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2002 Trusted-Full-Read Route-Binding / Repair Boundary Preparation
+
+Status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARED_NON_AUTHORIZING_NO_SOURCE_CHANGE_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM2002_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARATION.md`.
+- Consumed CM-2001 and prepared a future exact route-binding/repair boundary.
+- Recorded the blocker as missing CM-2001-capable bounded trusted-full-read executor.
+- Preserved historical M8 trusted-full-read evidence as planning-only, CM-1964 as not directly reusable for CM-2001, and CM-1996 as non-reusable.
+- Prepared two future options: concrete existing route packet or bounded local source/test repair window.
+- Authorized no approval grant, route binding, source/test repair, request body generation, target material binding, endpoint/locator disclosure, runtime/network/VCPToolBox call, response consumption, memory read/write, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, M15/RC unlock, or readiness claim.
+- Routed next work to CM-2003 exact route-binding/repair intake only if Jenn supplies a fresh exact packet matching CM-2002.
+
+Validation: `CMV-2104`; docs/status review, CM-2001 gate review, CM-1811/CM-1813 historical route review, CM-1964/CM-1981/CM-1996 route-scope review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-2001 Trusted-Full-Read Exact Approval / Material Intake Gate Blocked
 

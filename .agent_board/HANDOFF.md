@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2001 trusted-full-read exact approval/material intake gate blocked`.
-Current validation: `CMV-2103`.
-Current handoff: CM-2001 accepted Jenn's current exact approval/material packet for gate evaluation and then blocked before request-body generation/runtime because no CM-2001-capable bounded trusted-full-read executor exists without source repair or route rebinding. It consumed no approved attempt, called no runtime/VCPToolBox, read or wrote no memory, expanded no public MCP, pushed/released/deployed/cut over nothing, unlocked no M15/RC gate, and claimed no readiness.
+Current task: `CM-2002 trusted-full-read route-binding / repair boundary preparation`.
+Current validation: `CMV-2104`.
+Current handoff: CM-2002 prepared a non-authorizing future route-binding/repair boundary after CM-2001. It did not grant approval, bind a route, edit source/tests, generate request bodies, bind target material, call runtime/VCPToolBox, read or write memory, expand public MCP, push/release/deploy/cut over, unlock M15/RC, or claim readiness.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-2001 only within safe local/no-live boundaries. CM-2002 can prepare a route-binding/repair boundary or new exact packet for a concrete existing route or bounded local source/test repair window.
+Goal: continue from CM-2002 only within safe local/no-live boundaries unless Jenn supplies a fresh exact CM-2003 packet selecting a concrete existing route or bounded local source/test repair window matching CM-2002.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_MATERIAL_INTAKE_ACCEPTED_PRE_EXECUTION_GATE_BLOCKED_NO_CM2001_BOUNDED_TRUSTED_FULL_READ_EXECUTOR_NO_ATTEMPT_CONSUMED_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-2001 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2001_TRUSTED_FULL_READ_EXACT_APPROVAL_MATERIAL_INTAKE_GATE_BLOCKED.md`. It accepts current approval/material for gate evaluation, records target-scoped synthetic empty disposable material by safe id, and blocks because no current CM-2001 bounded trusted-full-read executor can consume it without code repair/route rebinding. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARED_NON_AUTHORIZING_NO_SOURCE_CHANGE_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-2002 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2002_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARATION.md`. It prepares, but does not authorize, either a concrete existing route packet or a bounded local source/test repair window. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -30,6 +30,7 @@ Current entrypoints:
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM2000_TRUSTED_FULL_READ_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM2001_TRUSTED_FULL_READ_EXACT_APPROVAL_MATERIAL_INTAKE_GATE_BLOCKED.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2002_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARATION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1996_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_MATERIAL_BOUND_READ_SHAPE_PROBE_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1995_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_PRE_EXECUTION_GATE.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1994_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING.md`

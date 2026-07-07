@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2001 trusted-full-read exact approval/material intake gate blocked |
-| Current task | `CM-2001 trusted-full-read exact approval/material intake gate blocked` |
-| Current validation | `CMV-2103` |
-| Current route | CM-2001 accepts current exact approval/material intake for gate evaluation, then blocks before request-body generation/runtime because no CM-2001-capable bounded trusted-full-read executor exists without source repair or route rebinding |
+| Status | CM-2002 trusted-full-read route-binding / repair boundary preparation |
+| Current task | `CM-2002 trusted-full-read route-binding / repair boundary preparation` |
+| Current validation | `CMV-2104` |
+| Current route | CM-2002 prepares a non-authorizing boundary for a future exact packet that chooses either a concrete existing route or a bounded local source/test repair window; no source change, route binding, request body, runtime, memory action, public MCP expansion, or readiness occurred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2002` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2002_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARATION.md`. It consumes CM-2001 and records a future boundary for resolving the missing CM-2001-capable bounded trusted-full-read executor. It authorizes nothing by itself: approval grant false, route binding false, source/test repair false, CM-2001 attempt consumed false, request body generated false, target material binding false, endpoint/locator disclosure false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, public MCP expansion false, M15/RC unlock false, and readiness false. Next route is CM-2003 exact route-binding/repair intake only if Jenn supplies a fresh exact packet selecting a concrete existing route or bounded local source/test repair window.
 
 `CM-2001` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2001_TRUSTED_FULL_READ_EXACT_APPROVAL_MATERIAL_INTAKE_GATE_BLOCKED.md`. It accepts Jenn's current packet as exact approval/material intake for gate evaluation and records target-scoped synthetic empty disposable material evidence by safe id only. Gate result: blocked before request body and runtime because no CM-2001-capable bounded trusted-full-read executor is available without source repair or route rebinding; approved attempt consumed false, target material bound false, request body generated false, endpoint/locator resolution false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, public MCP expansion false, M15/RC unlock false, and readiness false. Next route is CM-2002 route-binding/repair boundary preparation or a new exact packet for a concrete route.
 

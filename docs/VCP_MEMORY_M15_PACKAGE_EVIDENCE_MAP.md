@@ -308,6 +308,14 @@ Completed local-safe evidence:
   material was bound; no request body, endpoint/locator disclosure,
   runtime/network/VCPToolBox call, response consumption, memory read/write,
   public MCP expansion, M15/RC unlock, or readiness claim occurred.
+- CM-2002 trusted-full-read route-binding / repair boundary preparation
+  consumed CM-2001 and prepared a future exact boundary for either a concrete
+  existing route packet or a bounded local source/test repair window. It
+  records no approval grant, no route binding, no source/test repair, no
+  CM-2001 approved attempt consumed, no request body, no target material
+  binding, no endpoint/locator disclosure, no runtime/network/VCPToolBox call,
+  no response consumption, no memory read/write, no public MCP expansion, no
+  M15/RC unlock, and no readiness claim.
 
 Missing RC evidence:
 
@@ -696,6 +704,31 @@ m15_package_evidence_map_boundary:
   cm2001_m15_opened: false
   cm2001_rc_gate_opened: false
   cm2001_readiness_claimed: false
+  cm2002_route_binding_repair_boundary_preparation_present: true
+  cm2002_boundary_authorizes_approval_grant: false
+  cm2002_boundary_authorizes_route_binding: false
+  cm2002_boundary_authorizes_source_repair: false
+  cm2002_boundary_authorizes_execution: false
+  cm2002_cm2001_approved_attempt_consumed: false
+  cm2002_missing_cm2001_capable_executor_recorded: true
+  cm2002_concrete_existing_route_packet_option_prepared: true
+  cm2002_bounded_local_source_test_repair_window_option_prepared: true
+  cm2002_route_bindings_performed: 0
+  cm2002_source_files_changed_for_repair: 0
+  cm2002_test_files_changed_for_repair: 0
+  cm2002_request_body_generated: false
+  cm2002_target_material_bound: false
+  cm2002_endpoint_locator_disclosed: false
+  cm2002_runtime_called: false
+  cm2002_network_called: false
+  cm2002_vcp_toolbox_called: false
+  cm2002_response_body_consumed: false
+  cm2002_memory_read_performed: false
+  cm2002_memory_write_performed: false
+  cm2002_public_mcp_expansion_performed: false
+  cm2002_m15_opened: false
+  cm2002_rc_gate_opened: false
+  cm2002_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: false
   rc_gate_report_created: false
@@ -751,7 +784,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm2002_route_binding_or_repair_boundary_preparation_or_new_exact_packet_for_concrete_route
+  next_safe_route: cm2003_exact_route_binding_repair_intake_only_if_fresh_exact_packet_matches_cm2002
 ```
 
 ## Conclusion
@@ -796,9 +829,12 @@ CM-2001 accepts Jenn's current exact approval/material packet for gate
 evaluation, but blocks before request-body generation/runtime because no
 CM-2001-capable bounded trusted-full-read executor exists without source repair
 or route rebinding.
+CM-2002 prepares the future route-binding/repair boundary but does not
+authorize source repair, route binding, request-body generation, runtime, or
+trusted-full-read execution.
 
-The next route is local CM-2002 route-binding/repair boundary preparation or a
-new exact packet for a concrete existing route. Future
+The next route is CM-2003 exact route-binding/repair intake only if Jenn
+supplies a fresh exact packet matching CM-2002. Future
 trusted-full-read execution,
 live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
 push, or readiness work requires separate exact authority and fresh evidence.
