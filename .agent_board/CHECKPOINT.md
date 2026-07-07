@@ -4,11 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1993 exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2097`.
+Current checkpoint: `CM-1996 exact-approved real disposable target material bound read-shape probe receipt`.
+Current validation: `CMV-2098`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1994 / CM-1995 / CM-1996 Exact-Approved Temp-Local Disposable Material Read-Shape Route
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_TEMP_LOCAL_DISPOSABLE_MATERIAL_BOUND_READ_SHAPE_PROBE_SUCCESS_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1994_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING.md`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1995_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_PRE_EXECUTION_GATE.md`.
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1996_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_MATERIAL_BOUND_READ_SHAPE_PROBE_RECEIPT.md`.
+- Updated `src/core/VcpNativeDisposableTargetResolverTransportBoundaryContract.js` and CM-1963/CM-1964 tests so the route can use the stricter zero process/listener/service/raw-diagnostic boundary required by the CM-1994 approval.
+- Consumed a current single-use exact approval without reproducing approval text, generating approval lines, or persisting approval text.
+- Accepted separately evidenced temp-local disposable target material categories by safe identifier only.
+- Passed the CM-1995 pre-execution gate with existing operator target reuse false, non-target workspace access false, no Jenn private information, no production secrets, no customer data, no real private memory, no persistent runtime artifacts, no endpoint/locator disclosure, no raw output/persistence, no memory write, no durable write, no provider/API call, no public MCP expansion, no VCPToolBox core modification, and no readiness claim.
+- Executed one CM-1996 bounded component/action request/read-shape attempt through `local_direct_component_action_invoker`.
+- Low-disclosure result: statusClass success, route status action success with shape projected, top-level kind array, item count bucket zero, duration bucket under 100 ms, and readShapeUnlocked true.
+- Consumed budgets: target material evidence validation `1/2`, target binding `1/2`, resolver `1/3`, component/action request-read-shape `1/2`, network `0/3`, runtime `1/3`, process/listener/service `0/0`, local repair files `3/3`, retry `0/1`, max result count `1/1`.
+- Preserved no endpoint/locator output or persistence, concrete request body output or persistence, raw response/error/log output or persistence, config/env/secret/stdout/stderr raw value persistence, private memory content output or persistence, memory ID output or persistence, target material raw value output or persistence, MCP memory tool call, memory read/write/update/supersede/tombstone, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, readiness claim, `RC_READY`, complete V8 claim, or full bridge completion claim.
+- Classified CM-1996 as exact-approved temp-local disposable material read-shape proof only; not trusted-full-read completion, live VCPToolBox target binding proof, production readiness, release readiness, deploy readiness, cutover readiness, M15 open, or RC ready.
+- Routed next work to CM-1997 closeout / route decision toward trusted-full-read preparation or the next bounded runtime evidence boundary.
+
+Validation: `CMV-2098`; source/test validation, exact-approved probe execution, docs/status review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1993 Exact Approval Request Readiness Review / Jenn Boundary Display
 

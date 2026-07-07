@@ -439,7 +439,11 @@ function invalidResolverTransportFields(boundary, input) {
     'resolverMayReadTargetEnvValues',
     'resolverMayReadTargetLogs',
     'resolverMayResolveEndpointLocatorInMemory',
-    'transportMayUseResolvedEndpointLocator',
+    'transportMayUseResolvedEndpointLocator'
+  ]) {
+    if (typeof boundary[field] !== 'boolean') invalid.push(`resolverTransportBoundary.${field}`);
+  }
+  for (const field of [
     'transportMayGenerateMinimalRequestBodyInMemory',
     'transportMaySubmitProbe',
     'transportMayConsumeResponseForShapeProjection'
@@ -464,14 +468,16 @@ function invalidResolverTransportFields(boundary, input) {
 function invalidExecutionPermissionFields(permissions) {
   const invalid = [];
   if (!isPlainObject(permissions)) return ['executionPermissions'];
+  if (permissions.runtimeExecutionWindowAuthorized !== true) {
+    invalid.push('executionPermissions.runtimeExecutionWindowAuthorized');
+  }
   for (const field of [
-    'runtimeExecutionWindowAuthorized',
     'processStateInspectionAllowed',
     'listenerRecheckAllowed',
     'serviceStartEnsureAllowed',
     'serviceStopForCleanupAllowed'
   ]) {
-    if (permissions[field] !== true) invalid.push(`executionPermissions.${field}`);
+    if (typeof permissions[field] !== 'boolean') invalid.push(`executionPermissions.${field}`);
   }
   for (const field of [
     'serviceRestartAllowed',
@@ -490,32 +496,41 @@ function invalidExecutionPermissionFields(permissions) {
 }
 
 function invalidBudgetFields(budgets) {
-  const expected = {
+  const exactExpected = {
     maxResolverAttempts: 3,
     maxComponentActionRequestReadShapeAttempts: 2,
     maxNetworkCalls: 3,
     maxRuntimeCalls: 3,
-    maxProcessStateInspections: 3,
-    maxListenerRecheckAttempts: 3,
-    maxServiceStartOrEnsureAttempts: 1,
-    maxServiceStopAttempts: 1,
     maxServiceRestartAttempts: 0,
     maxLocalRepairFiles: 3,
     maxValidationRuns: 3,
     maxRetriesAfterTransientFailure: 1,
     maxResultCount: 1
   };
+  const boundedExpected = {
+    maxProcessStateInspections: 3,
+    maxListenerRecheckAttempts: 3,
+    maxServiceStartOrEnsureAttempts: 1,
+    maxServiceStopAttempts: 1
+  };
   if (!isPlainObject(budgets)) return ['executionBudgets'];
-  return Object.entries(expected)
+  const invalid = Object.entries(exactExpected)
     .filter(([field, value]) => budgets[field] !== value)
     .map(([field]) => `executionBudgets.${field}`);
+  for (const [field, value] of Object.entries(boundedExpected)) {
+    if (![0, value].includes(budgets[field])) invalid.push(`executionBudgets.${field}`);
+  }
+  return invalid;
 }
 
 function invalidRawDiagnosticFields(policy) {
   const invalid = [];
   if (!isPlainObject(policy)) return ['rawDiagnosticPolicy'];
+  if (typeof policy.rawDiagnosticAuthority !== 'boolean') {
+    invalid.push('rawDiagnosticPolicy.rawDiagnosticAuthority');
+  }
+  const rawDiagnosticAuthority = policy.rawDiagnosticAuthority;
   for (const field of [
-    'rawDiagnosticAuthority',
     'rawEndpointLocatorInspectionAllowed',
     'rawRequestInspectionAllowed',
     'rawResponseInspectionAllowed',
@@ -525,7 +540,7 @@ function invalidRawDiagnosticFields(policy) {
     'targetRawMemoryStoreAuditInspectionAllowed',
     'rawDiagnosticOutputAllowed'
   ]) {
-    if (policy[field] !== true) invalid.push(`rawDiagnosticPolicy.${field}`);
+    if (policy[field] !== rawDiagnosticAuthority) invalid.push(`rawDiagnosticPolicy.${field}`);
   }
   for (const field of [
     'rawDiagnosticRepoPersistenceAllowed',
@@ -699,7 +714,7 @@ function buildVcpNativeDisposableTargetResolverTransportBoundaryContract(input =
       disposableTargetAuthorityAccepted: true,
       resolverTransportAuthorityPrepared: true,
       runtimeAssistWindowPrepared: true,
-      rawDiagnosticAuthorityScopedToDisposableTarget: true,
+      rawDiagnosticAuthorityScopedToDisposableTarget: input.rawDiagnosticPolicy.rawDiagnosticAuthority,
       rawDiagnosticRepoPersistenceAllowed: false,
       localRepairBoundaryPrepared: true,
       zeroWriteRuleHeld: true,

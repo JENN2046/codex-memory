@@ -164,6 +164,58 @@ test('CM1963 accepts disposable target resolver/transport runtime assist boundar
   assert.equal(result.readinessClaimed, false);
 });
 
+test('CM1963 accepts stricter zero process service and raw diagnostic boundary', () => {
+  const result = buildVcpNativeDisposableTargetResolverTransportBoundaryContract(boundaryInput({
+    resolverTransportBoundary: {
+      ...boundaryInput().resolverTransportBoundary,
+      resolverMayReadTargetFiles: false,
+      resolverMayReadTargetEnvValues: false,
+      resolverMayReadTargetLogs: false,
+      resolverMayResolveEndpointLocatorInMemory: false,
+      transportMayUseResolvedEndpointLocator: false
+    },
+    executionPermissions: {
+      ...boundaryInput().executionPermissions,
+      processStateInspectionAllowed: false,
+      listenerRecheckAllowed: false,
+      serviceStartEnsureAllowed: false,
+      serviceStopForCleanupAllowed: false
+    },
+    executionBudgets: {
+      ...boundaryInput().executionBudgets,
+      maxProcessStateInspections: 0,
+      maxListenerRecheckAttempts: 0,
+      maxServiceStartOrEnsureAttempts: 0,
+      maxServiceStopAttempts: 0
+    },
+    rawDiagnosticPolicy: {
+      ...boundaryInput().rawDiagnosticPolicy,
+      rawDiagnosticAuthority: false,
+      rawEndpointLocatorInspectionAllowed: false,
+      rawRequestInspectionAllowed: false,
+      rawResponseInspectionAllowed: false,
+      rawErrorInspectionAllowed: false,
+      rawLogStdoutStderrInspectionAllowed: false,
+      targetEnvValueInspectionAllowed: false,
+      targetRawMemoryStoreAuditInspectionAllowed: false,
+      rawDiagnosticOutputAllowed: false
+    }
+  }));
+
+  assert.equal(result.accepted, true);
+  assert.equal(result.disposable_resolver_transport_boundary_result.accepted, true);
+  assert.equal(result.disposable_resolver_transport_boundary_result.runtimeAssistWindowPrepared, true);
+  assert.equal(result.disposable_resolver_transport_boundary_result.rawDiagnosticAuthorityScopedToDisposableTarget, false);
+  assert.equal(result.executionWindow.budgets.maxProcessStateInspections, 0);
+  assert.equal(result.executionWindow.budgets.maxListenerRecheckAttempts, 0);
+  assert.equal(result.executionWindow.budgets.maxServiceStartOrEnsureAttempts, 0);
+  assert.equal(result.executionWindow.budgets.maxServiceStopAttempts, 0);
+  assert.equal(result.contractExecutedRuntime, false);
+  assert.equal(result.runtimeCalled, false);
+  assert.equal(result.memoryWritten, false);
+  assert.equal(result.readinessClaimed, false);
+});
+
 test('CM1963 rejects non-disposable private or production target declarations', () => {
   const result = buildVcpNativeDisposableTargetResolverTransportBoundaryContract(boundaryInput({
     disposableTargetDeclaration: {

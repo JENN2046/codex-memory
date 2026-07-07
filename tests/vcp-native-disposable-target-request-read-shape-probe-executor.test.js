@@ -204,6 +204,68 @@ test('CM1964 projects empty array shape as success with zero item bucket', async
   assert.equal(result.receipt.zeroWriteCounters.publicMcpExpansions, 0);
 });
 
+test('CM1964 executes under stricter zero process service raw diagnostic boundary', async () => {
+  const strictBoundary = boundaryInput({
+    resolverTransportBoundary: {
+      ...boundaryInput().resolverTransportBoundary,
+      resolverMayReadTargetFiles: false,
+      resolverMayReadTargetEnvValues: false,
+      resolverMayReadTargetLogs: false,
+      resolverMayResolveEndpointLocatorInMemory: false,
+      transportMayUseResolvedEndpointLocator: false
+    },
+    executionPermissions: {
+      ...boundaryInput().executionPermissions,
+      processStateInspectionAllowed: false,
+      listenerRecheckAllowed: false,
+      serviceStartEnsureAllowed: false,
+      serviceStopForCleanupAllowed: false
+    },
+    executionBudgets: {
+      ...boundaryInput().executionBudgets,
+      maxProcessStateInspections: 0,
+      maxListenerRecheckAttempts: 0,
+      maxServiceStartOrEnsureAttempts: 0,
+      maxServiceStopAttempts: 0
+    },
+    rawDiagnosticPolicy: {
+      ...boundaryInput().rawDiagnosticPolicy,
+      rawDiagnosticAuthority: false,
+      rawEndpointLocatorInspectionAllowed: false,
+      rawRequestInspectionAllowed: false,
+      rawResponseInspectionAllowed: false,
+      rawErrorInspectionAllowed: false,
+      rawLogStdoutStderrInspectionAllowed: false,
+      targetEnvValueInspectionAllowed: false,
+      targetRawMemoryStoreAuditInspectionAllowed: false,
+      rawDiagnosticOutputAllowed: false
+    }
+  });
+  const result = await executeVcpNativeDisposableTargetRequestReadShapeProbe(executorInput({
+    resolverCategory: 'target_reference_to_disposable_component_action_invoker',
+    transportCategory: 'local_direct_component_action_invoker',
+    boundaryContractInput: strictBoundary,
+    invokeComponentAction: async () => []
+  }));
+
+  assert.equal(result.accepted, true);
+  assert.equal(result.receipt.resolverCategory, 'target_reference_to_disposable_component_action_invoker');
+  assert.equal(result.receipt.transportCategory, 'local_direct_component_action_invoker');
+  assert.equal(result.receipt.statusClass, 'success');
+  assert.equal(result.receipt.responseShapeCategory, 'array_item_count_bucket_only');
+  assert.equal(result.receipt.itemCountBucket, 'zero');
+  assert.equal(result.counters.networkCallsUsed, 0);
+  assert.equal(result.counters.processStateInspectionsUsed, 0);
+  assert.equal(result.counters.listenerRechecksUsed, 0);
+  assert.equal(result.counters.serviceStartEnsureAttemptsUsed, 0);
+  assert.equal(result.counters.serviceStopAttemptsUsed, 0);
+  assert.equal(result.receipt.endpointDisclosed, false);
+  assert.equal(result.receipt.rawResponseBodyPersisted, false);
+  assert.equal(result.receipt.memoryWritten, false);
+  assert.equal(result.receipt.readShapeUnlocked, true);
+  assert.equal(result.receipt.readinessClaimed, false);
+});
+
 test('CM1964 classifies client errors without raw error echo or read-shape unlock', async () => {
   const rawError = new Error('RAW_ERROR_SHOULD_NOT_ECHO');
   rawError.status = 400;

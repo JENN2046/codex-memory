@@ -221,6 +221,41 @@ Completed local-safe evidence:
   resolver/transport or component/action, calls no runtime/network, consumes
   no response, writes no memory, mutates no durable state, expands no public
   MCP, unlocks no M15 gate, and claims no readiness.
+- CM-1994 exact approval intake recorded a current Jenn approval for the
+  CM-1994/CM-1995/CM-1996 real disposable target material binding route without
+  reproducing the approval text, generating approval lines, generating or
+  persisting request bodies, binding target material by intake, resolving
+  endpoint/locator values, executing runtime by intake, writing memory,
+  mutating durable state, expanding public MCP, or claiming readiness.
+  Boundary alignment with CM-1993 is accepted and separately evidenced
+  temp-local disposable target material categories are present;
+- CM-1995 real disposable target material binding pre-execution gate accepted
+  the current approval and separately evidenced temp-local disposable material
+  categories, rejected existing operator target reuse, and recorded a narrow
+  local harness/adapter repair so CM-1963 can accept the stricter zero
+  process/listener/service/raw-diagnostic boundary required by the current
+  approval. Local repair files used `3/3`; no dependency change, public MCP
+  expansion, VCPToolBox core modification, startup/watchdog change,
+  memory-store mutation, M15 unlock, or readiness claim occurred;
+- CM-1996 exact-approved temp-local disposable material bound read-shape probe
+  executed one bounded component/action request/read-shape attempt through the
+  local direct component/action invoker. Low-disclosure result:
+  `statusClass=success`, `responseShapeCategory=array_item_count_bucket_only`,
+  `topLevelKindCategory=array`, `itemCountBucket=zero`,
+  `durationBucket=lt_100ms`, and `readShapeUnlocked=true`. It used target
+  material evidence validation `1/2`, target binding `1/2`, resolver `1/3`,
+  component/action request-read-shape `1/2`, network `0/3`, runtime `1/3`,
+  process/listener/service `0/0`, local repair files `3/3`, retry `0/1`, and
+  max result count `1/1`. It output or persisted no endpoint/locator,
+  concrete request body, raw response/error/log, secret, private memory,
+  memory id, or raw target material value; wrote no memory; mutated no durable
+  state; called no provider/API; changed no dependency; expanded no public MCP;
+  modified no VCPToolBox core; pushed/released/deployed/cut over nothing; and
+  claimed no readiness. This is exact-approved temp-local disposable material
+  read-shape proof only, not trusted-full-read completion, live VCPToolBox
+  target binding proof, M15 opening, RC readiness, release readiness, deploy
+  readiness, cutover readiness, `RC_READY`, complete V8, or full bridge
+  completion.
 
 Missing RC evidence:
 

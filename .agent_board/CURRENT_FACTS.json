@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-07",
-  "taskId": "CM-1993",
-  "validationId": "CMV-2097",
+  "taskId": "CM-1996",
+  "validationId": "CMV-2098",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approval_request_readiness_review_real_disposable_target_material_binding_jenn_boundary_display_non_authorizing_no_live_no_read_shape_no_readiness",
+    "scope": "exact_approved_temp_local_disposable_material_bound_read_shape_probe_success_no_raw_output_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2098",
+      "scope": "CM-1996 exact-approved real disposable target material bound read-shape probe receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_TEMP_LOCAL_DISPOSABLE_MATERIAL_BOUND_READ_SHAPE_PROBE_SUCCESS_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2097",
       "scope": "CM-1993 exact approval request readiness review / Jenn boundary display",
