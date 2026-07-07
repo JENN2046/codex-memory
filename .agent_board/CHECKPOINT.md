@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked`.
-Current validation: `CMV-2102`.
+Current checkpoint: `CM-2001 trusted-full-read exact approval/material intake gate blocked`.
+Current validation: `CMV-2103`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2001 Trusted-Full-Read Exact Approval / Material Intake Gate Blocked
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_MATERIAL_INTAKE_ACCEPTED_PRE_EXECUTION_GATE_BLOCKED_NO_CM2001_BOUNDED_TRUSTED_FULL_READ_EXECUTOR_NO_ATTEMPT_CONSUMED_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM2001_TRUSTED_FULL_READ_EXACT_APPROVAL_MATERIAL_INTAKE_GATE_BLOCKED.md`.
+- Accepted Jenn's current packet as a fresh single-use exact approval/material intake for CM-1999/CM-2000 gate evaluation without reproducing approval text.
+- Recorded target-scoped synthetic empty disposable material evidence by safe id only.
+- Blocked before request-body generation/runtime because no CM-2001-capable bounded trusted-full-read executor exists without source repair or route rebinding.
+- Consumed no approved attempt.
+- Preserved no approval line generation, target material binding, endpoint/locator disclosure, request-body generation, runtime/network/VCPToolBox call, response consumption, memory read/write, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, M15/RC unlock, or readiness claim.
+- Routed next work to CM-2002 route-binding/repair boundary preparation or a new exact packet that authorizes a concrete existing route or bounded local source/test repair window.
+
+Validation: `CMV-2103`; docs/status review, CM-1999/CM-2000 boundary review, CM-1811/CM-1813 historical route review, CM-1964 executor review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-2000 Trusted-Full-Read Exact Approval Intake / Pre-Execution Gate Blocked
 

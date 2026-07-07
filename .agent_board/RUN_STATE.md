@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked`.
-Current validation: `CMV-2102`.
-Current status: CM-2000 evaluates the current user turn against CM-1999 and blocks before request-body generation/runtime because no bindable fresh current single-use exact approval and no separately evidenced target-scoped disposable material were supplied. It consumes no approved attempt, calls no runtime/VCPToolBox, reads or writes no memory, expands no public MCP, pushes/releases/deploys/cuts over nothing, unlocks no M15/RC gate, and claims no readiness.
+Current task: `CM-2001 trusted-full-read exact approval/material intake gate blocked`.
+Current validation: `CMV-2103`.
+Current status: CM-2001 accepts Jenn's current exact approval/material packet for gate evaluation and blocks before request-body generation/runtime because no CM-2001-capable bounded trusted-full-read executor exists without source repair or route rebinding. It consumes no approved attempt, calls no runtime/VCPToolBox, reads or writes no memory, expands no public MCP, pushes/releases/deploys/cuts over nothing, unlocks no M15/RC gate, and claims no readiness.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-2001 local approval/material packet checklist or blocker review. Trusted-full-read execution remains blocked until a future intake supplies bindable fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999. Do not retry CM-1996, reuse CM-1994 approval, generate request bodies or approval lines, call runtime/VCPToolBox, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness.
+Next safe action is CM-2002 route-binding/repair boundary preparation or a new exact packet for a concrete existing route. Trusted-full-read execution remains blocked until a future gate can bind an approved route without endpoint/locator/raw/private disclosure. Do not retry CM-1996, reuse CM-1994 approval, generate request bodies or approval lines, call runtime/VCPToolBox, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness.
 
 ## Historical Run Notes
 

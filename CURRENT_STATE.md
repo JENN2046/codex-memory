@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked |
-| Current task | `CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked` |
-| Current validation | `CMV-2102` |
-| Current route | CM-2000 evaluates the current user turn against CM-1999 and blocks before request-body generation/runtime because no bindable fresh current single-use exact approval and no separately evidenced target-scoped disposable material were supplied |
+| Status | CM-2001 trusted-full-read exact approval/material intake gate blocked |
+| Current task | `CM-2001 trusted-full-read exact approval/material intake gate blocked` |
+| Current validation | `CMV-2103` |
+| Current route | CM-2001 accepts current exact approval/material intake for gate evaluation, then blocks before request-body generation/runtime because no CM-2001-capable bounded trusted-full-read executor exists without source repair or route rebinding |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2001` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2001_TRUSTED_FULL_READ_EXACT_APPROVAL_MATERIAL_INTAKE_GATE_BLOCKED.md`. It accepts Jenn's current packet as exact approval/material intake for gate evaluation and records target-scoped synthetic empty disposable material evidence by safe id only. Gate result: blocked before request body and runtime because no CM-2001-capable bounded trusted-full-read executor is available without source repair or route rebinding; approved attempt consumed false, target material bound false, request body generated false, endpoint/locator resolution false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, public MCP expansion false, M15/RC unlock false, and readiness false. Next route is CM-2002 route-binding/repair boundary preparation or a new exact packet for a concrete route.
 
 `CM-2000` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2000_TRUSTED_FULL_READ_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED.md`. It consumes CM-1999 and classifies the current user turn as `conditional_fragment_not_bindable_exact_approval_or_target_material`. Gate result: missing bindable fresh current single-use exact approval, missing separately evidenced target-scoped disposable material, approved attempt consumed false, target material binding false, request body generated false, endpoint/locator resolution false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, durable mutation false, public MCP expansion false, M15/RC unlock false, and readiness false. Next route is local CM-2001 approval/material packet checklist or blocker review unless a future intake supplies a matching fresh exact approval and separately evidenced target-scoped disposable material.
 

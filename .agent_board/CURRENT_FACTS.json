@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-07",
-  "taskId": "CM-2000",
-  "validationId": "CMV-2102",
+  "taskId": "CM-2001",
+  "validationId": "CMV-2103",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "trusted_full_read_exact_approval_intake_pre_execution_gate_blocked_missing_bindable_approval_and_target_material_no_live_no_readiness",
+    "scope": "trusted_full_read_exact_approval_material_intake_accepted_gate_blocked_no_cm2001_bounded_executor_no_attempt_consumed_no_live_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2103",
+      "scope": "CM-2001 trusted-full-read exact approval/material intake gate blocked",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_MATERIAL_INTAKE_ACCEPTED_PRE_EXECUTION_GATE_BLOCKED_NO_CM2001_BOUNDED_TRUSTED_FULL_READ_EXECUTOR_NO_ATTEMPT_CONSUMED_NO_LIVE_NO_READINESS"
+    },
     {
       "id": "CMV-2102",
       "scope": "CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked",
