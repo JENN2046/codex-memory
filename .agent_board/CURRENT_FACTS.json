@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-07",
-  "taskId": "CM-1996",
-  "validationId": "CMV-2098",
+  "taskId": "CM-1997",
+  "validationId": "CMV-2099",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_approved_temp_local_disposable_material_bound_read_shape_probe_success_no_raw_output_no_write_no_readiness",
+    "scope": "temp_local_read_shape_closeout_route_to_trusted_full_read_preparation_no_live_no_retry_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2099",
+      "scope": "CM-1997 temp-local read-shape closeout / route decision",
+      "status": "COMPLETED_VALIDATED_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_TO_TRUSTED_FULL_READ_PREPARATION_NO_LIVE_NO_RETRY_NO_READINESS"
+    },
     {
       "id": "CMV-2098",
       "scope": "CM-1996 exact-approved real disposable target material bound read-shape probe receipt",

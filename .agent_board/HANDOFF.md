@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1996 exact-approved real disposable target material bound read-shape probe receipt`.
-Current validation: `CMV-2098`.
-Current handoff: CM-1994 accepted the exact approval intake without reproducing approval text; CM-1995 passed the target-material pre-execution gate after a narrow strict-boundary harness/adapter repair; CM-1996 executed one exact-approved temp-local disposable material bound request/read-shape probe with low-disclosure success and `readShapeUnlocked=true`. It did not output or persist raw values, write memory, mutate durable state, expand public MCP, modify VCPToolBox core, unlock M15/RC, or claim readiness. Next route is CM-1997 closeout / route decision toward trusted-full-read preparation or the next bounded runtime evidence boundary.
+Current task: `CM-1997 temp-local read-shape closeout / route decision`.
+Current validation: `CMV-2099`.
+Current handoff: CM-1997 accepted CM-1996 as exact-approved temp-local disposable material read-shape proof only, rejected trusted-full-read / live VCPToolBox / M15 / RC / readiness inferences, and routed next work to CM-1998 trusted-full-read preparation preflight. It performed no live action, retry, approval reuse, request-body generation, memory read/write, durable mutation, public MCP expansion, push/release/deploy/cutover, M15/RC unlock, or readiness claim.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-1996 into CM-1997 closeout / route decision. Keep CM-1996 scoped as exact-approved temp-local disposable material read-shape proof only, not trusted-full-read completion, live VCPToolBox target binding proof, M15 opening, RC readiness, release readiness, deploy readiness, cutover readiness, `RC_READY`, complete V8, or full bridge completion.
+Goal: continue from CM-1997 into CM-1998 trusted-full-read preparation preflight. Keep CM-1996 scoped as exact-approved temp-local disposable material read-shape proof only, not trusted-full-read completion, live VCPToolBox target binding proof, M15 opening, RC readiness, release readiness, deploy readiness, cutover readiness, `RC_READY`, complete V8, or full bridge completion.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_TEMP_LOCAL_DISPOSABLE_MATERIAL_BOUND_READ_SHAPE_PROBE_SUCCESS_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1996 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1996_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_MATERIAL_BOUND_READ_SHAPE_PROBE_RECEIPT.md`. It records statusClass success, array shape, zero item bucket, and readShapeUnlocked true for the exact-approved temp-local disposable material route only. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_TO_TRUSTED_FULL_READ_PREPARATION_NO_LIVE_NO_RETRY_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1997 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`. It accepts CM-1996's low-disclosure success and `readShapeUnlocked=true` only for the temp-local disposable material route, rejects broader inferences, and selects CM-1998 trusted-full-read preparation preflight. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1996_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_MATERIAL_BOUND_READ_SHAPE_PROBE_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1995_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_PRE_EXECUTION_GATE.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1994_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING.md`

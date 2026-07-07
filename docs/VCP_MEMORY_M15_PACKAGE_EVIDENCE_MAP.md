@@ -256,6 +256,19 @@ Completed local-safe evidence:
   target binding proof, M15 opening, RC readiness, release readiness, deploy
   readiness, cutover readiness, `RC_READY`, complete V8, or full bridge
   completion.
+- CM-1997 temp-local read-shape closeout / route decision accepted CM-1996 as
+  valid exact-approved temp-local disposable material read-shape proof and
+  rejected broader inferences. It records that CM-1996 does not prove
+  trusted-full-read completion, live VCPToolBox target binding, existing
+  operator target reuse, endpoint/locator values, real private memory read,
+  public MCP expansion, write/mutation authority, M9-M15 capability closure,
+  RC gate opening, readiness, `RC_READY`, complete V8, or full bridge
+  completion. It performs no retry, approval reuse, approval line generation,
+  request-body generation, target binding, runtime/network/VCPToolBox call,
+  response consumption, memory read/write, durable mutation, public MCP
+  expansion, M15 unlock, or readiness claim. It routes next work to
+  CM-1998 trusted-full-read preparation preflight, still local and
+  non-authorizing.
 
 Missing RC evidence:
 

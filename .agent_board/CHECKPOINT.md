@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1996 exact-approved real disposable target material bound read-shape probe receipt`.
-Current validation: `CMV-2098`.
+Current checkpoint: `CM-1997 temp-local read-shape closeout / route decision`.
+Current validation: `CMV-2099`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1997 Temp-Local Read-Shape Closeout / Route Decision
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_TO_TRUSTED_FULL_READ_PREPARATION_NO_LIVE_NO_RETRY_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`.
+- Accepted CM-1996 as valid exact-approved temp-local disposable material read-shape proof only.
+- Preserved CM-1996 low-disclosure result: statusClass success, response shape array item-count bucket only, top-level kind array, item count bucket zero, duration under 100 ms, and readShapeUnlocked true.
+- Rejected trusted-full-read completion, live VCPToolBox target binding proof, existing operator target reuse, endpoint/locator proof, real private memory read, public MCP expansion, write/mutation authority, M9-M15 capability closure, RC gate opening, readiness, `RC_READY`, complete V8, and full bridge completion inferences.
+- Performed no CM-1996 retry, CM-1994 approval reuse, approval line generation, request-body generation/output/persistence/submission, target material binding, runtime/network/VCPToolBox call, process/listener/service action, response/raw/log/config/env/secret/private-memory/raw-store/raw-audit read, MCP memory tool call, memory read/write/update/supersede/tombstone, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, readiness claim, `RC_READY`, complete V8, or full bridge completion.
+- Routed next work to CM-1998 trusted-full-read preparation preflight, local and non-authorizing.
+
+Validation: `CMV-2099`; docs/status review, CM-1996 receipt review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1994 / CM-1995 / CM-1996 Exact-Approved Temp-Local Disposable Material Read-Shape Route
 

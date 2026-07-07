@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1996 exact-approved real disposable target material bound read-shape probe receipt`.
-Current validation: `CMV-2098`.
-Current status: CM-1994 intake accepted current exact approval without reproducing approval text; CM-1995 passed the pre-execution gate and used a 3/3 local harness/adapter repair for the stricter zero process/listener/service/raw-diagnostic boundary; CM-1996 executed one exact-approved temp-local disposable material bound component/action request/read-shape probe. Low-disclosure result: statusClass success, array top-level shape, zero item bucket, readShapeUnlocked true, readinessClaimed false. It did not output or persist endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-target-material values, write memory, mutate durable state, expand public MCP, modify VCPToolBox core, push, release, deploy, cut over, unlock M15/RC, or claim readiness.
+Current task: `CM-1997 temp-local read-shape closeout / route decision`.
+Current validation: `CMV-2099`.
+Current status: CM-1997 accepts CM-1996 as valid exact-approved temp-local disposable material read-shape proof only and rejects trusted-full-read, live VCPToolBox target binding, existing operator target reuse, endpoint/locator proof, real private memory read, public MCP expansion, write/mutation authority, M9-M15 capability closure, RC gate opening, readiness, `RC_READY`, complete V8, and full bridge completion inferences. It routes next work to CM-1998 trusted-full-read preparation preflight and performs no live action, retry, approval reuse, request-body generation, memory read/write, durable mutation, public MCP expansion, push, release, deploy, cutover, M15/RC unlock, or readiness claim.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1997 closeout / route decision toward trusted-full-read preparation or the next bounded runtime evidence boundary. Do not treat CM-1996 as trusted-full-read completion, live VCPToolBox target binding proof, M15 opening, RC readiness, release readiness, deploy readiness, cutover readiness, `RC_READY`, complete V8, or full bridge completion.
+Next safe action is CM-1998 trusted-full-read preparation preflight. Keep CM-1998 local and non-authorizing unless Jenn supplies a separate current exact approval for a future read boundary. Do not retry CM-1996, reuse CM-1994 approval, generate request bodies or approval lines, call runtime/VCPToolBox, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness.
 
 ## Historical Run Notes
 
