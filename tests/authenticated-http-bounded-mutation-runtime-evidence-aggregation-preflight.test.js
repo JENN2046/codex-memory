@@ -439,6 +439,10 @@ function assertAcceptedFinalOwnerReviewPackage(pkg) {
     pkg.sourceSummary.boundarySchemaVersion,
     'p75-rc-cutover-owner-approval-boundary-precheck-v1'
   );
+  assert.equal(
+    pkg.sourceSummary.boundaryStatus,
+    'owner_approval_boundary_display_ready_not_authorization'
+  );
   assert.equal(pkg.sourceSummary.boundaryPrecheckAccepted, true);
   assert.equal(pkg.sourceSummary.ownerApprovalBoundaryDisplayReady, true);
   assert.equal(pkg.sourceSummary.boundaryFieldCount, 6);
@@ -452,6 +456,10 @@ function assertAcceptedFinalOwnerReviewPackage(pkg) {
   assert.equal(
     pkg.sourceChainProvenance.sourceBoundarySchemaVersion,
     'p75-rc-cutover-owner-approval-boundary-precheck-v1'
+  );
+  assert.equal(
+    pkg.sourceChainProvenance.sourceBoundaryStatus,
+    'owner_approval_boundary_display_ready_not_authorization'
   );
   assert.equal(pkg.sourceChainProvenance.sourceBoundaryAccepted, true);
   assert.equal(pkg.sourceChainProvenance.sourceBoundaryBlockerCount, 0);
@@ -1759,6 +1767,45 @@ test('RC cutover owner approval execution boundary precheck rejects self-atteste
   assert.ok(
     precheck.blockerIds.includes(
       'final_owner_review_package_source_chain_row_count_mismatch'
+    )
+  );
+  assert.equal(precheck.approvalLineGenerated, false);
+  assert.equal(precheck.approvalTextGenerated, false);
+  assert.equal(precheck.canProceedToCutoverExecution, false);
+  assert.equal(precheck.rcCutoverExecutionAllowed, false);
+  assert.equal(precheck.rcReady, false);
+  assert.equal(precheck.canClaimRcReady, false);
+  assertNoForbiddenMaterial(precheck);
+});
+
+test('RC cutover owner approval execution boundary precheck rejects contradictory P75 status provenance', async () => {
+  const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
+  pkg.sourceSummary.boundaryStatus =
+    'owner_approval_boundary_display_blocked_fail_closed';
+  pkg.sourceChainProvenance.sourceBoundaryStatus =
+    'owner_approval_boundary_display_blocked_fail_closed';
+  const precheck = buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
+    rcCutoverFinalOwnerReviewPackageAggregation: pkg
+  });
+
+  assert.equal(
+    precheck.status,
+    'owner_approval_execution_boundary_precheck_blocked_fail_closed'
+  );
+  assert.equal(precheck.decision, 'NOT_READY_BLOCKED');
+  assert.equal(precheck.boundaryPrecheckAccepted, false);
+  assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
+  assert.equal(precheck.sourceSummary.sourceChainProvenanceAccepted, false);
+  assert.equal(precheck.sourceSummary.sourceChainRowCount, 9);
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_source_summary_invalid'
+    )
+  );
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_source_chain_provenance_invalid'
     )
   );
   assert.equal(precheck.approvalLineGenerated, false);

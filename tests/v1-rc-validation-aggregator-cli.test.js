@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
+const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 const {
@@ -542,6 +543,42 @@ test('minimal validation aggregator CLI rejects conflicting artifact-only output
   assert.equal(report.summary.artifactOutputModeConflictCanClaimRcReady, false);
   assert.equal(Object.hasOwn(report, 'packageType'), false);
   assert.equal(Object.hasOwn(report, 'precheckType'), false);
+});
+
+test('minimal validation aggregator CLI rejects conflicting artifact-only output modes before reading report inputs', (t) => {
+  const tempDir = fs.mkdtempSync(
+    path.join(workspaceRoot, '.tmp-artifact-output-conflict-')
+  );
+  const fifoPath = path.join(tempDir, 'blocked.json');
+
+  try {
+    const mkfifo = spawnSync('mkfifo', [fifoPath], {
+      cwd: workspaceRoot,
+      encoding: 'utf8',
+      timeout: 30000
+    });
+    if (mkfifo.status !== 0) {
+      t.skip('mkfifo is unavailable on this platform');
+      return;
+    }
+
+    const result = runCli([
+      '--rc-cutover-final-owner-review-package',
+      '--rc-cutover-execution-boundary-precheck',
+      '--runtime-evidence-report',
+      path.relative(workspaceRoot, fifoPath)
+    ]);
+
+    assert.equal(result.error, undefined, result.error?.message);
+    assert.equal(result.status, 1, result.stderr);
+    const report = parseJsonResult(result);
+    assert.equal(report.phase, 'artifact-output-mode-conflict-rejected');
+    assert.equal(report.artifactOutputModeConflict.rejected, true);
+    assert.equal(report.summary.artifactOutputModeConflictArtifactOnlyOutputEmitted, false);
+    assert.equal(Object.hasOwn(report, 'runtimeEvidenceReportInput'), false);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 test('minimal validation aggregator CLI package manifests remain untouched', () => {

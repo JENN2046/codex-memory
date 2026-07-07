@@ -237,6 +237,9 @@ const REQUIRED_P77_SOURCE_CHAIN_IDS = Object.freeze([
 const P77_SOURCE_CHAIN_PROVENANCE_VERSION =
   'p77-source-chain-provenance-v1';
 
+const P75_OWNER_APPROVAL_BOUNDARY_READY_STATUS =
+  'owner_approval_boundary_display_ready_not_authorization';
+
 function containsForbiddenRcCutoverCandidateArtifactMaterial(value) {
   const serialized = JSON.stringify(value);
   return FORBIDDEN_RC_CUTOVER_CANDIDATE_ARTIFACT_PATTERNS
@@ -1882,7 +1885,7 @@ function buildRcCutoverOwnerApprovalBoundaryPrecheck({
     boundaryType: 'rc_cutover_owner_approval_boundary_precheck_display',
     sourceMode: 'p73_rc_cutover_candidate_artifact_intake_precheck',
     status: boundaryPrecheckAccepted
-      ? 'owner_approval_boundary_display_ready_not_authorization'
+      ? P75_OWNER_APPROVAL_BOUNDARY_READY_STATUS
       : 'owner_approval_boundary_display_blocked_fail_closed',
     decision: 'NOT_READY_BLOCKED',
     boundaryPrecheckAccepted,
@@ -2010,7 +2013,7 @@ function collectRcCutoverFinalOwnerReviewPackageBlockers(boundary = {}) {
   if (boundary.decision !== 'NOT_READY_BLOCKED') {
     blockers.push('owner_approval_boundary_decision_mismatch');
   }
-  if (boundary.status !== 'owner_approval_boundary_display_ready_not_authorization') {
+  if (boundary.status !== P75_OWNER_APPROVAL_BOUNDARY_READY_STATUS) {
     blockers.push('owner_approval_boundary_status_not_ready_for_review');
   }
   if (boundary.boundaryPrecheckAccepted !== true) {
@@ -2269,6 +2272,8 @@ function collectP77SourceChainProvenanceBlockers(sourceChainProvenance = {}) {
     sourceChainProvenance.lowDisclosure !== true ||
     sourceChainProvenance.sourceBoundarySchemaVersion !==
       'p75-rc-cutover-owner-approval-boundary-precheck-v1' ||
+    sourceChainProvenance.sourceBoundaryStatus !==
+      P75_OWNER_APPROVAL_BOUNDARY_READY_STATUS ||
     sourceChainProvenance.sourceBoundaryAccepted !== true ||
     sourceChainProvenance.sourceBoundaryBlockerCount !== 0 ||
     sourceChainProvenance.requiredChainRowCount !==
@@ -2381,6 +2386,7 @@ function collectRcCutoverOwnerApprovalExecutionBoundaryBlockers(pkg = {}) {
   if (
     sourceSummary.boundarySchemaVersion !==
       'p75-rc-cutover-owner-approval-boundary-precheck-v1' ||
+    sourceSummary.boundaryStatus !== P75_OWNER_APPROVAL_BOUNDARY_READY_STATUS ||
     sourceSummary.boundaryPrecheckAccepted !== true ||
     sourceSummary.ownerApprovalBoundaryDisplayReady !== true ||
     sourceSummary.boundaryFieldCount !== REQUIRED_OWNER_APPROVAL_BOUNDARY_FIELD_IDS.length ||
@@ -3078,11 +3084,35 @@ function selectCliOutput(report = {}, options = {}) {
   return report;
 }
 
+function writeCliReportAndSetExitCode(options = {}) {
+  const report = buildCliReport(options);
+  const output = selectCliOutput(report, options);
+  const spacing = options.pretty ? 2 : 0;
+
+  process.stdout.write(`${JSON.stringify(output, null, spacing)}\n`);
+  process.exitCode = getExitCodeForDecision(report.decision, {
+    strict: options.strict,
+    rejected: Boolean(
+      options.rejectedFlag ||
+      options.outputModeConflict ||
+      options.runtimeEvidenceReportLoadError ||
+      options.rcCutoverCandidateArtifactReportLoadError ||
+      options.rcCutoverOwnerApprovalBoundaryReportLoadError ||
+      options.rcCutoverFinalOwnerReviewPackageReportLoadError
+    )
+  });
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.help) {
     process.stdout.write(`${buildUsageText()}\n`);
     process.exitCode = 0;
+    return;
+  }
+
+  if (options.rejectedFlag || options.outputModeConflict) {
+    writeCliReportAndSetExitCode(options);
     return;
   }
 
@@ -3136,22 +3166,7 @@ function main() {
     }
   }
 
-  const report = buildCliReport(options);
-  const output = selectCliOutput(report, options);
-  const spacing = options.pretty ? 2 : 0;
-
-  process.stdout.write(`${JSON.stringify(output, null, spacing)}\n`);
-  process.exitCode = getExitCodeForDecision(report.decision, {
-    strict: options.strict,
-    rejected: Boolean(
-      options.rejectedFlag ||
-      options.outputModeConflict ||
-      options.runtimeEvidenceReportLoadError ||
-      options.rcCutoverCandidateArtifactReportLoadError ||
-      options.rcCutoverOwnerApprovalBoundaryReportLoadError ||
-      options.rcCutoverFinalOwnerReviewPackageReportLoadError
-    )
-  });
+  writeCliReportAndSetExitCode(options);
 }
 
 if (require.main === module) {
