@@ -34,6 +34,32 @@ const repoRoot = path.resolve(__dirname, '..');
 const aggregatorCliPath = path.join('src', 'cli', 'v1-rc-validation-aggregator.js');
 const fixtureCommit = 'abc1234def5678';
 const fixtureEvidenceGeneratedAt = '2026-07-07T00:30:00.000Z';
+const SHA256_HEX_RE = /^[a-f0-9]{64}$/;
+
+function assertSourceChainProof(
+  proof,
+  { stageId, upstreamStageId, requiredChainRowCount }
+) {
+  assert.equal(proof.proofVersion, 'rc-cutover-source-chain-proof-v1');
+  assert.equal(proof.stageId, stageId);
+  assert.equal(proof.generatedBy, 'v1-rc-validation-aggregator');
+  assert.equal(proof.lowDisclosure, true);
+  assert.equal(proof.stageAccepted, true);
+  assert.equal(proof.requiredChainRowCount, requiredChainRowCount);
+  assert.equal(proof.acceptedChainRowCount, requiredChainRowCount);
+  assert.equal(proof.upstreamStageId, upstreamStageId);
+  if (upstreamStageId) {
+    assert.match(proof.upstreamProofDigest, SHA256_HEX_RE);
+  } else {
+    assert.equal(proof.upstreamProofDigest, '');
+  }
+  assert.match(proof.artifactDigest, SHA256_HEX_RE);
+  assert.equal(proof.fieldValueDisclosure, false);
+  assert.equal(proof.approvalMaterialIncluded, false);
+  assert.equal(proof.executionAuthorizationIncluded, false);
+  assert.equal(proof.readinessClaimIncluded, false);
+  assert.equal(proof.rawValuesOutput, false);
+}
 
 function assertNoForbiddenMaterial(payload) {
   const scannedPayload = payload && typeof payload === 'object' && !Array.isArray(payload)
@@ -219,6 +245,19 @@ function assertAcceptedArtifactExport(artifact) {
   assert.ok(artifact.manifest.excludedMaterial.includes('raw_response'));
   assert.ok(artifact.manifest.excludedMaterial.includes('secret'));
   assert.equal(artifact.finalEvidencePackageAggregationOutlet.aggregationOutletAccepted, true);
+  assertSourceChainProof(
+    artifact.finalEvidencePackageAggregationOutlet.sourceChainProof,
+    {
+      stageId: 'p71_rc_cutover_final_evidence_package_aggregation_outlet',
+      upstreamStageId: '',
+      requiredChainRowCount: 5
+    }
+  );
+  assertSourceChainProof(artifact.sourceChainProof, {
+    stageId: 'p72_rc_cutover_candidate_artifact_export',
+    upstreamStageId: 'p71_rc_cutover_final_evidence_package_aggregation_outlet',
+    requiredChainRowCount: 6
+  });
   assertArtifactExportNeverExecutes(artifact);
 }
 
@@ -286,6 +325,11 @@ function assertAcceptedArtifactIntake(intake) {
   assert.equal(intake.canClaimFinalRcReady, false);
   assert.equal(intake.canClaimV1RcReady, false);
   assert.equal(intake.canClaimRcReady, false);
+  assertSourceChainProof(intake.sourceChainProof, {
+    stageId: 'p73_rc_cutover_candidate_artifact_intake_precheck',
+    upstreamStageId: 'p72_rc_cutover_candidate_artifact_export',
+    requiredChainRowCount: 7
+  });
 }
 
 function assertAcceptedOwnerApprovalBoundaryPrecheck(boundary) {
@@ -379,6 +423,11 @@ function assertAcceptedOwnerApprovalBoundaryPrecheck(boundary) {
   assert.equal(boundary.canClaimFinalRcReady, false);
   assert.equal(boundary.canClaimV1RcReady, false);
   assert.equal(boundary.canClaimRcReady, false);
+  assertSourceChainProof(boundary.sourceChainProof, {
+    stageId: 'p75_rc_cutover_owner_approval_boundary_precheck',
+    upstreamStageId: 'p73_rc_cutover_candidate_artifact_intake_precheck',
+    requiredChainRowCount: 8
+  });
 }
 
 function assertAcceptedFinalOwnerReviewPackage(pkg) {
@@ -510,6 +559,11 @@ function assertAcceptedFinalOwnerReviewPackage(pkg) {
   assert.equal(pkg.canClaimFinalRcReady, false);
   assert.equal(pkg.canClaimV1RcReady, false);
   assert.equal(pkg.canClaimRcReady, false);
+  assertSourceChainProof(pkg.sourceChainProof, {
+    stageId: 'p77_rc_cutover_final_owner_review_package_aggregation',
+    upstreamStageId: 'p75_rc_cutover_owner_approval_boundary_precheck',
+    requiredChainRowCount: 9
+  });
 }
 
 function assertAcceptedOwnerApprovalExecutionBoundaryPrecheck(precheck) {
@@ -1384,6 +1438,43 @@ test('RC cutover candidate artifact intake accepts P72 artifact only as owner-re
   assertNoForbiddenMaterial(intake);
 });
 
+test('RC cutover candidate artifact intake rejects self-attested P72 artifact without source-chain proof', async () => {
+  const artifact = await buildAcceptedRcCutoverCandidateArtifact();
+  delete artifact.sourceChainProof;
+  delete artifact.finalEvidencePackageAggregationOutlet.sourceChainProof;
+  const intake = buildRcCutoverCandidateArtifactIntakePrecheck({
+    rcCutoverCandidateArtifactExport: artifact
+  });
+  const boundary = buildRcCutoverOwnerApprovalBoundaryPrecheck({
+    rcCutoverCandidateArtifactIntakePrecheck: intake
+  });
+
+  assert.equal(intake.status, 'candidate_artifact_intake_blocked_fail_closed');
+  assert.equal(intake.inputAccepted, false);
+  assert.equal(intake.ownerReviewInputReady, false);
+  assert.ok(
+    intake.blockerIds.includes(
+      'artifact_final_evidence_package_outlet_source_chain_proof_missing'
+    )
+  );
+  assert.ok(intake.blockerIds.includes('artifact_source_chain_proof_missing'));
+  assert.equal(intake.approvalLineGenerated, false);
+  assert.equal(intake.approvalTextGenerated, false);
+  assert.equal(intake.rcCutoverExecutionAllowed, false);
+  assert.equal(intake.rcReady, false);
+  assert.equal(intake.canClaimRcReady, false);
+  assert.equal(boundary.status, 'owner_approval_boundary_display_blocked_fail_closed');
+  assert.equal(boundary.boundaryPrecheckAccepted, false);
+  assert.equal(boundary.ownerApprovalBoundaryDisplayReady, false);
+  assert.ok(boundary.blockerIds.includes('candidate_artifact_intake_not_accepted'));
+  assert.ok(boundary.blockerIds.includes('artifact_source_chain_proof_missing'));
+  assert.equal(boundary.rcCutoverExecutionAllowed, false);
+  assert.equal(boundary.rcReady, false);
+  assert.equal(boundary.canClaimRcReady, false);
+  assertNoForbiddenMaterial(intake);
+  assertNoForbiddenMaterial(boundary);
+});
+
 test('RC cutover owner approval boundary precheck displays requirements without authorization', async () => {
   const artifact = await buildAcceptedRcCutoverCandidateArtifact();
   const intake = buildRcCutoverCandidateArtifactIntakePrecheck({
@@ -1554,6 +1645,28 @@ test('RC cutover final owner-review package aggregation accepts P75 boundary wit
 
   assertAcceptedOwnerApprovalBoundaryPrecheck(boundary);
   assertAcceptedFinalOwnerReviewPackage(pkg);
+  assertNoForbiddenMaterial(pkg);
+});
+
+test('RC cutover final owner-review package aggregation rejects self-attested P75 boundary without source-chain proof', async () => {
+  const boundary = await buildAcceptedRcCutoverOwnerApprovalBoundary();
+  delete boundary.sourceChainProof;
+  const pkg = buildRcCutoverFinalOwnerReviewPackageAggregation({
+    rcCutoverOwnerApprovalBoundaryPrecheck: boundary
+  });
+
+  assert.equal(pkg.status, 'final_owner_review_package_blocked_fail_closed');
+  assert.equal(pkg.decision, 'NOT_READY_BLOCKED');
+  assert.equal(pkg.finalOwnerReviewPackageAccepted, false);
+  assert.equal(pkg.readyForExactOwnerReview, false);
+  assert.ok(
+    pkg.blockerIds.includes('owner_approval_boundary_source_chain_proof_missing')
+  );
+  assert.equal(pkg.approvalLineGenerated, false);
+  assert.equal(pkg.approvalTextGenerated, false);
+  assert.equal(pkg.rcCutoverExecutionAllowed, false);
+  assert.equal(pkg.rcReady, false);
+  assert.equal(pkg.canClaimRcReady, false);
   assertNoForbiddenMaterial(pkg);
 });
 
@@ -1778,6 +1891,36 @@ test('RC cutover owner approval execution boundary precheck rejects self-atteste
   assertNoForbiddenMaterial(precheck);
 });
 
+test('RC cutover owner approval execution boundary precheck rejects self-attested P77 package without source-chain proof', async () => {
+  const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
+  delete pkg.sourceChainProof;
+  const precheck = buildRcCutoverOwnerApprovalExecutionBoundaryPrecheck({
+    rcCutoverFinalOwnerReviewPackageAggregation: pkg
+  });
+
+  assert.equal(
+    precheck.status,
+    'owner_approval_execution_boundary_precheck_blocked_fail_closed'
+  );
+  assert.equal(precheck.decision, 'NOT_READY_BLOCKED');
+  assert.equal(precheck.boundaryPrecheckAccepted, false);
+  assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
+  assert.equal(precheck.executionBoundaryPrepared, false);
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_source_chain_proof_missing'
+    )
+  );
+  assert.equal(precheck.approvalLineGenerated, false);
+  assert.equal(precheck.approvalTextGenerated, false);
+  assert.equal(precheck.canProceedToCutoverExecution, false);
+  assert.equal(precheck.rcCutoverExecutionAllowed, false);
+  assert.equal(precheck.rcReady, false);
+  assert.equal(precheck.canClaimRcReady, false);
+  assertNoForbiddenMaterial(precheck);
+});
+
 test('RC cutover owner approval execution boundary precheck rejects contradictory P75 status provenance', async () => {
   const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
   pkg.sourceSummary.boundaryStatus =
@@ -1896,6 +2039,71 @@ test('v1 RC aggregator CLI can intake a P77 final owner-review package from stdi
   );
   assert.equal(
     Object.hasOwn(report.evidence, 'p77RcCutoverFinalOwnerReviewPackageAggregation'),
+    false
+  );
+  assertNoForbiddenMaterial(report);
+});
+
+test('v1 RC aggregator CLI rejects self-attested P77 stdin package without source-chain proof', async () => {
+  const pkg = await buildAcceptedRcCutoverFinalOwnerReviewPackage();
+  delete pkg.sourceChainProof;
+  const result = spawnSync(
+    process.execPath,
+    [
+      aggregatorCliPath,
+      '--rc-cutover-final-owner-review-package-report',
+      '-',
+      '--pretty',
+      '--generated-at',
+      '2026-07-07T01:00:00.000Z'
+    ],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(pkg),
+      encoding: 'utf8',
+      timeout: 30000,
+      env: {
+        ...process.env,
+        NODE_NO_WARNINGS: '1',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+      }
+    }
+  );
+  const report = JSON.parse(result.stdout);
+  const precheck = report.evidence.p78RcCutoverOwnerApprovalExecutionBoundaryPrecheck;
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(
+    report.phase,
+    'P78-rc-cutover-owner-approval-execution-boundary-precheck'
+  );
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.provided, true);
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.accepted, false);
+  assert.equal(report.rcCutoverFinalOwnerReviewPackageReportInput.rejected, true);
+  assert.equal(precheck.boundaryPrecheckAccepted, false);
+  assert.equal(precheck.readyForExactOwnerReview, false);
+  assert.equal(precheck.terminalLocalPreCandidatePackage, false);
+  assert.ok(
+    precheck.blockerIds.includes(
+      'final_owner_review_package_source_chain_proof_missing'
+    )
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckAccepted,
+    false
+  );
+  assert.equal(report.summary.rcCutoverFinalOwnerReviewPackageReportInputAccepted, false);
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckTerminalLocalPreCandidatePackage,
+    false
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckExecutesCutover,
+    false
+  );
+  assert.equal(
+    report.summary.rcCutoverOwnerApprovalExecutionBoundaryPrecheckCanClaimRcReady,
     false
   );
   assertNoForbiddenMaterial(report);
