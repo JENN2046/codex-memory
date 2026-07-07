@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1992 exact real disposable target material boundary packet / approval request readiness review`.
-Current validation: `CMV-2095`.
+Current checkpoint: `CM-1993 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2097`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-1993 Exact Approval Request Readiness Review / Jenn Boundary Display
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM1993_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`.
+- Consumed CM-1992 exact real disposable target material boundary packet / approval request readiness review.
+- Displayed the future exact boundary Jenn would need to approve before any real disposable target material binding route can proceed.
+- Required a separate current exact approval, separately evidenced real disposable target material matching CM-1993, target-scoped disposable material posture, no existing operator target reuse, no non-target workspace access, no private/production/customer/real-memory/persistent target posture, and matching low-disclosure output/persistence policy before CM-1994 can execute any pre-execution gate.
+- Recorded approval absent, approval granted false, approval line generation false, approval request submission false, request body generation false, target material supply false, target material binding false, endpoint/locator resolution blocked now, live/runtime/network execution blocked now, response consumption false, memory read/write false, durable mutation false, public MCP expansion false, read-shape not unlocked by CM-1993, and readiness false.
+- Preserved no approval intake, approval line generation/output/persistence/submission, request body generation/output/persistence/submission, target material supply/use/output/persistence/binding, endpoint/locator binding or disclosure, resolver/transport invocation, component/action invocation, runtime call, network call, process/listener/service inspection, response consumption, raw diagnostic persistence, MCP memory tool call, memory read/write/update/supersede/tombstone, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, push/tag/release/deploy/cutover, M15 unlock, RC gate unlock, readiness claim, `RC_READY`, complete V8 claim, or full bridge completion claim.
+- Routed next work to CM-1994 exact approval intake / pre-execution gate only if Jenn supplies a separate current exact approval and separately evidenced real disposable target material matching CM-1993; otherwise local/no-live preparation or blocker remediation remains the safe continuation.
+
+Validation: `CMV-2097`; docs/status review, CM-1992 boundary review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1992 Exact Real Disposable Target Material Boundary Packet / Approval Request Readiness Review
 

@@ -210,7 +210,17 @@ Completed local-safe evidence:
   resolves no endpoint/locator value, invokes no resolver/transport or
   component/action, calls no runtime/network, consumes no response, writes no
   memory, mutates no durable state, expands no public MCP, unlocks no M15
-  gate, and claims no readiness.
+  gate, and claims no readiness;
+- CM-1993 exact approval request readiness review / Jenn boundary display
+  consumed CM-1992 and displayed the exact future boundary Jenn would need to
+  approve before any real disposable target material binding probe. It requires
+  the same pre-live evidence chain plus a future current single-use exact
+  approval and separately evidenced real disposable target material. It grants
+  no approval, generates no approval line, generates no request body, supplies
+  or binds no target material, resolves no endpoint/locator value, invokes no
+  resolver/transport or component/action, calls no runtime/network, consumes
+  no response, writes no memory, mutates no durable state, expands no public
+  MCP, unlocks no M15 gate, and claims no readiness.
 
 Missing RC evidence:
 

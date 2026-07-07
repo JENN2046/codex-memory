@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1992 exact real disposable target material boundary packet / approval request readiness review |
-| Current task | `CM-1992 exact real disposable target material boundary packet / approval request readiness review` |
-| Current validation | `CMV-2095` |
-| Current route | CM-1992 consumes CM-1991 and records a non-authorizing exact future boundary packet for separately evidenced real disposable target material; approval, approval line, request body, target material binding, endpoint/locator resolution, runtime, response consumption, read-shape proof, and readiness remain false |
+| Status | CM-1993 exact approval request readiness review / Jenn boundary display |
+| Current task | `CM-1993 exact approval request readiness review / Jenn boundary display` |
+| Current validation | `CMV-2097` |
+| Current route | CM-1993 consumes CM-1992 and displays the exact future boundary Jenn would need to approve before real disposable target material binding; approval, approval line, request body, target material supply/binding, endpoint/locator resolution, runtime, response consumption, read-shape proof, and readiness remain false |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-1993` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1993_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It consumes CM-1992 and displays the exact future boundary Jenn would need to approve before any real disposable target material binding probe. It requires CM-1959, CM-1963, CM-1964, CM-1978, CM-1982, CM-1987, CM-1988, CM-1990, CM-1991, and CM-1992 as pre-live evidence; requires a future current single-use exact approval, separately evidenced real disposable target material, target-scoped disposable material posture, no existing operator target reuse, and low-disclosure category/bucket receipt projection only. CM-1993 does not intake or grant approval, generate approval lines, generate request bodies, supply or bind target material, resolve endpoint/locator values, invoke resolver/transport, call runtime/network, inspect process/listener/service state, consume responses, write memory, mutate durable state, expand public MCP, unlock M15/RC, or claim readiness. Next route is CM-1994 exact approval intake / pre-execution gate for real disposable target material binding only if Jenn supplies separate current exact approval and separately evidenced real disposable target material matching CM-1993; otherwise continue local/no-live preparation or blocker remediation.
 
 `CM-1992` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1992_EXACT_REAL_DISPOSABLE_TARGET_MATERIAL_BOUNDARY_PACKET_READINESS_REVIEW.md`. It consumes CM-1991 and records non-authorizing exact future boundary material for separately evidenced real disposable target material binding. It requires a future current single-use exact approval, separately evidenced real disposable target material, target-scoped disposable material posture, no existing operator target reuse, and low-disclosure category/bucket receipt projection only. CM-1992 does not intake or grant approval, generate approval lines, generate request bodies, supply or bind target material, resolve endpoint/locator values, invoke resolver/transport, call runtime/network, inspect process/listener/service state, consume responses, write memory, mutate durable state, expand public MCP, unlock M15/RC, or claim readiness. Next route is CM-1993 exact approval request readiness review / Jenn boundary display, or Jenn-supplied exact approval intake with separately evidenced real disposable target material; still no-live unless the future approval and target material evidence both match.
 

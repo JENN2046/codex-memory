@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1992 exact real disposable target material boundary packet / approval request readiness review`.
-Current validation: `CMV-2095`.
-Current status: CM-1992 consumes CM-1991 and records a non-authorizing exact future boundary packet for separately evidenced real disposable target material. It keeps approval absent, approval line false, request body false, target material not present, target material not bound, target binding not proven, existing operator reference not sufficient, existing operator target reuse forbidden, and future exact approval plus target material evidence required. It does not bind target material, generate request bodies, resolve endpoint/locator values, call runtime/network, consume responses, write memory, mutate durable state, expand public MCP, push, release, deploy, cut over, or claim readiness.
+Current task: `CM-1993 exact approval request readiness review / Jenn boundary display`.
+Current validation: `CMV-2097`.
+Current status: CM-1993 consumes CM-1992 and records a non-authorizing Jenn boundary display for a possible future real disposable target material binding route. It keeps approval absent, approval granted false, approval line false, request body false, target material not supplied, target material not bound, target binding not proven, endpoint/locator resolution blocked now, runtime/network blocked now, and future exact approval plus separately evidenced target material required. It does not generate approval lines, bind target material, generate request bodies, resolve endpoint/locator values, call runtime/network/VCPToolBox, consume responses, write memory, mutate durable state, expand public MCP, push, release, deploy, cut over, unlock M15/RC, or claim readiness.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is CM-1993 exact approval request readiness review / Jenn boundary display, local and no-live, or a new exact approval intake tied to separately evidenced real disposable target material. Do not reuse the CM-1989/CM-1990 approval, retry CM-1990, execute runtime, call VCPToolBox, generate request bodies, generate approval lines, print or persist endpoint/locator/request/response/error/log/env/secret/memory/raw-material values, reuse existing operator targets, write memory, mutate durable stores, expand public MCP, push/release/deploy/cut over, unlock M15/RC gate, or claim readiness without fresh exact authority and target material evidence.
+Next safe action is CM-1994 exact approval intake / pre-execution gate only if Jenn supplies a separate current exact approval and separately evidenced real disposable target material matching CM-1993; otherwise continue local/no-live preparation or blocker remediation. Do not reuse the CM-1989/CM-1990 approval, retry CM-1990, execute runtime, call VCPToolBox, generate request bodies, generate approval lines, print or persist endpoint/locator/request/response/error/log/env/secret/memory/raw-material values, reuse existing operator targets, write memory, mutate durable stores, expand public MCP, push/release/deploy/cut over, unlock M15/RC gate, or claim readiness without fresh exact authority and target material evidence.
 
 ## Historical Run Notes
 

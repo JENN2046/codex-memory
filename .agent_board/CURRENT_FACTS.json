@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-07-06",
-  "taskId": "CM-1992",
-  "validationId": "CMV-2095",
+  "updatedAt": "2026-07-07",
+  "taskId": "CM-1993",
+  "validationId": "CMV-2097",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "exact_real_disposable_target_material_boundary_packet_readiness_review_non_authorizing_no_live_no_read_shape_no_readiness",
+    "scope": "exact_approval_request_readiness_review_real_disposable_target_material_binding_jenn_boundary_display_non_authorizing_no_live_no_read_shape_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2097",
+      "scope": "CM-1993 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS"
+    },
     {
       "id": "CMV-2095",
       "scope": "CM-1992 exact real disposable target material boundary packet / approval request readiness review",
