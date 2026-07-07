@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2101`.
+Current checkpoint: `CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked`.
+Current validation: `CMV-2102`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2000 Trusted-Full-Read Exact Approval Intake / Pre-Execution Gate Blocked
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED_MISSING_BINDABLE_APPROVAL_AND_TARGET_MATERIAL_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM2000_TRUSTED_FULL_READ_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED.md`.
+- Consumed CM-1999 and evaluated the current user turn as a conditional fragment, not a bindable exact approval/material packet.
+- Recorded fresh current single-use exact approval supplied false, exact approval matches CM-1999 false, separately evidenced target-scoped disposable material supplied false, target material evidence id present false, target material bound false, and approved attempt consumed false.
+- Blocked before request body generation and runtime.
+- Preserved no approval acceptance, approval text reproduction, approval line generation, approval request submission, target material supply/use/binding/output/persistence, request body generation/output/persistence/submission, endpoint/locator resolution/disclosure, runtime/network/VCPToolBox call, response consumption, memory read/write, durable mutation, public MCP expansion, push/tag/release/deploy/cutover, M15/RC unlock, or readiness claim.
+- Routed next work to local CM-2001 approval/material packet checklist or blocker review unless Jenn supplies a future fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999.
+
+Validation: `CMV-2102`; docs/status review, CM-1999 boundary review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-1999 Trusted-Full-Read Exact Approval Request Readiness Review / Jenn Boundary Display
 

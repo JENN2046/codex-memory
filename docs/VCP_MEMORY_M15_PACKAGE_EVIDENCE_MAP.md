@@ -291,6 +291,14 @@ Completed local-safe evidence:
   MCP expansion, no M15/RC unlock, and no readiness claim. Any future
   execution still requires fresh current single-use exact approval and
   separately evidenced target-scoped disposable material.
+- CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked
+  consumed CM-1999 and evaluated the current user turn as a conditional
+  fragment, not a bindable exact approval/material packet. It records missing
+  bindable fresh current single-use exact approval, missing separately
+  evidenced target-scoped disposable material, approved attempt consumed false,
+  target material bound false, request body generated false, runtime/network
+  call false, memory read/write false, public MCP expansion false, M15/RC
+  unlock false, and readiness false.
 
 Missing RC evidence:
 
@@ -633,6 +641,28 @@ m15_package_evidence_map_boundary:
   cm1999_m15_opened: false
   cm1999_rc_gate_opened: false
   cm1999_readiness_claimed: false
+  cm2000_exact_approval_intake_gate_present: true
+  cm2000_incoming_user_statement_category: conditional_fragment_not_exact_approval
+  cm2000_fresh_current_single_use_exact_approval_supplied: false
+  cm2000_exact_approval_matches_cm1999_boundary: false
+  cm2000_separately_evidenced_target_scoped_disposable_material_supplied: false
+  cm2000_target_material_evidence_id_present: false
+  cm2000_target_material_bound: false
+  cm2000_pre_execution_gate_result: blocked_before_request_body_and_runtime
+  cm2000_approved_attempt_consumed: false
+  cm2000_trusted_full_read_attempts_used: 0
+  cm2000_request_body_generated: false
+  cm2000_endpoint_locator_disclosed: false
+  cm2000_runtime_called: false
+  cm2000_network_called: false
+  cm2000_vcp_toolbox_called: false
+  cm2000_response_body_consumed: false
+  cm2000_memory_read_performed: false
+  cm2000_memory_write_performed: false
+  cm2000_public_mcp_expansion_performed: false
+  cm2000_m15_opened: false
+  cm2000_rc_gate_opened: false
+  cm2000_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: false
   rc_gate_report_created: false
@@ -688,7 +718,7 @@ m15_package_evidence_map_boundary:
   cutover_ready_claimed: false
   complete_v8_claimed: false
   full_bridge_completion_claimed: false
-  next_safe_route: cm2000_exact_approval_intake_pre_execution_gate_only_if_fresh_exact_approval_and_target_material_match_cm1999_otherwise_local_no_live_blocker_review
+  next_safe_route: cm2001_local_approval_material_packet_checklist_or_blocker_review_unless_future_exact_approval_and_material_match_cm1999
 ```
 
 ## Conclusion
@@ -726,9 +756,13 @@ M15/RC, or claim readiness.
 CM-1999 displays the exact future boundary for Jenn review only; it does not
 grant approval, generate an approval line, generate a request body, execute
 runtime, or authorize trusted-full-read execution.
+CM-2000 evaluates the latest user turn as a conditional fragment rather than a
+bindable exact approval/material packet and blocks before request-body
+generation or runtime.
 
-The next route is CM-2000 exact approval intake / pre-execution gate only if
-Jenn supplies fresh exact approval and separately evidenced target-scoped
-disposable material matching CM-1999. Future trusted-full-read execution,
+The next route is local CM-2001 approval/material packet checklist or blocker
+review unless Jenn supplies fresh exact approval and separately evidenced
+target-scoped disposable material matching CM-1999 in a future intake. Future
+trusted-full-read execution,
 live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
 push, or readiness work requires separate exact authority and fresh evidence.

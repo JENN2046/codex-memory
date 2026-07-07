@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display`.
-Current validation: `CMV-2101`.
-Current handoff: CM-1999 displayed the future exact approval boundary Jenn would need to approve before trusted-full-read execution. It supplied or granted no approval, generated no approval line or request body, bound no target material, called no runtime/VCPToolBox, read or wrote no memory, expanded no public MCP, pushed/released/deployed/cut over nothing, unlocked no M15/RC gate, and claimed no readiness.
+Current task: `CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked`.
+Current validation: `CMV-2102`.
+Current handoff: CM-2000 evaluated the current user turn against CM-1999 and blocked before request-body generation/runtime because no bindable fresh current single-use exact approval and no separately evidenced target-scoped disposable material were supplied. It consumed no approved attempt, called no runtime/VCPToolBox, read or wrote no memory, expanded no public MCP, pushed/released/deployed/cut over nothing, unlocked no M15/RC gate, and claimed no readiness.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-1999 only within safe local/no-live boundaries unless Jenn supplies fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999. CM-2000 exact approval intake / pre-execution gate is conditional; without matching approval/material, continue local blocker review or non-authorizing preparation.
+Goal: continue from CM-2000 only within safe local/no-live boundaries unless Jenn supplies a future bindable fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999. CM-2001 can prepare a stricter approval/material packet checklist or continue blocker review.
 
-Current status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_APPROVAL_REQUEST_READINESS_REVIEW_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-1999 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It displays future approval requirements only: fresh current single-use exact approval, no CM-1994/CM-1996 authority reuse, separately evidenced target-scoped disposable material, no existing operator target reuse, zero write/mutation/public-MCP authority, and low-disclosure receipt projection. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
+Current status: `COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED_MISSING_BINDABLE_APPROVAL_AND_TARGET_MATERIAL_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-2000 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2000_TRUSTED_FULL_READ_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED.md`. It classifies the latest user turn as a conditional fragment, not an exact approval/material packet; approval supplied false, target material supplied false, approved attempt consumed false, and runtime execution false. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Non-target private/production material, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden.
 
 Workspace: `A:\codex-memory`.
 
@@ -28,6 +28,7 @@ Current entrypoints:
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2000_TRUSTED_FULL_READ_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1996_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_MATERIAL_BOUND_READ_SHAPE_PROBE_RECEIPT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1995_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_PRE_EXECUTION_GATE.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1994_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING.md`

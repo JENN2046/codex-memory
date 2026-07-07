@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display |
-| Current task | `CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display` |
-| Current validation | `CMV-2101` |
-| Current route | CM-1999 displays the future exact approval boundary Jenn would need to approve before trusted-full-read execution; no approval is supplied or granted, and no live action, approval line, request body, target binding, endpoint/locator disclosure, memory read/write, public MCP expansion, or readiness claim occurred |
+| Status | CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked |
+| Current task | `CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked` |
+| Current validation | `CMV-2102` |
+| Current route | CM-2000 evaluates the current user turn against CM-1999 and blocks before request-body generation/runtime because no bindable fresh current single-use exact approval and no separately evidenced target-scoped disposable material were supplied |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2000` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2000_TRUSTED_FULL_READ_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED.md`. It consumes CM-1999 and classifies the current user turn as `conditional_fragment_not_bindable_exact_approval_or_target_material`. Gate result: missing bindable fresh current single-use exact approval, missing separately evidenced target-scoped disposable material, approved attempt consumed false, target material binding false, request body generated false, endpoint/locator resolution false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, durable mutation false, public MCP expansion false, M15/RC unlock false, and readiness false. Next route is local CM-2001 approval/material packet checklist or blocker review unless a future intake supplies a matching fresh exact approval and separately evidenced target-scoped disposable material.
 
 `CM-1999` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`. It consumes CM-1998 and displays the future exact boundary Jenn would need to approve before trusted-full-read execution. The display is non-authorizing: approval absent, approval granted false, approval line generation false, approval request submission false, request body generation false, target material supply/use/binding false, endpoint/locator resolution false, runtime/network/VCPToolBox call false, response consumption false, memory read/write false, durable mutation false, public MCP expansion false, M15/RC unlock false, and readiness false. It requires any future execution route to have fresh current single-use exact approval, no CM-1994/CM-1996 authority reuse, separately evidenced target-scoped disposable material, no existing operator target reuse, zero write/mutation/public-MCP authority, and low-disclosure receipt projection only. Next route is CM-2000 exact approval intake / pre-execution gate only if Jenn supplies fresh exact approval and separately evidenced target-scoped disposable material matching CM-1999; otherwise local/no-live blocker review or non-authorizing preparation remains the safe continuation.
 

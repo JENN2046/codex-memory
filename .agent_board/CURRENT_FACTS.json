@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-07",
-  "taskId": "CM-1999",
-  "validationId": "CMV-2101",
+  "taskId": "CM-2000",
+  "validationId": "CMV-2102",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "trusted_full_read_approval_request_readiness_review_boundary_display_non_authorizing_no_live_no_readiness",
+    "scope": "trusted_full_read_exact_approval_intake_pre_execution_gate_blocked_missing_bindable_approval_and_target_material_no_live_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2102",
+      "scope": "CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED_MISSING_BINDABLE_APPROVAL_AND_TARGET_MATERIAL_NO_LIVE_NO_READINESS"
+    },
     {
       "id": "CMV-2101",
       "scope": "CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display",
