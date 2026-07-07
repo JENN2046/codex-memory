@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2004 trusted-full-read route-binding / repair intake and local repair receipt`.
-Current validation: `CMV-2106`.
+Current checkpoint: `CM-2006 trusted-full-read receipt closeout / route decision`.
+Current validation: `CMV-2107`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2006 Trusted-Full-Read Receipt Closeout / Route Decision
+
+Status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_CM2005_BOUNDED_ATTEMPT_COMPLETED_READ_SHAPE_UNLOCKED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md`.
+- Accepted only the CM-2005 low-disclosure receipt projection for closeout.
+- Recorded CM-2005 bounded attempt completed, route status `action_success_response_shape_projected`, response shape `array_item_count_bucket_only`, top-level kind `array`, item count bucket `zero`, duration bucket `lt_100ms`, and read-shape unlocked true.
+- Recorded raw output persisted false, write/mutation counters zero, and readiness false.
+- Recorded CM-2005 single-use execution authority consumed and not reusable for retry, target binding, runtime/VCPToolBox calls, memory action, or readiness.
+- Performed no retry, no new trusted-full-read attempt, no target material binding attempt, no request-body generation, no endpoint/locator disclosure, no runtime/network/VCPToolBox call, no response consumption, no memory read/write, no durable mutation, no provider/API call, no dependency change, no public MCP expansion, no push/tag/release/deploy/cutover, no M15/RC unlock, or readiness claim.
+- Routed next work to local planning or a new exact boundary if Jenn wants any additional attempt or broader inference.
+
+Validation: `CMV-2107`; docs/status review, CM-2005 low-disclosure receipt projection review, CM-2004 repair evidence review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-2004 Trusted-Full-Read Route-Binding / Repair Intake And Local Repair Receipt
 

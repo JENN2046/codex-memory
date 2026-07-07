@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2004 trusted-full-read route-binding / repair intake and local repair receipt`.
-Current validation: `CMV-2106`.
-Current handoff: CM-2004 accepted Jenn's fresh exact repair packet and completed one bounded local source/test repair. The existing low-disclosure executor task gate now includes `CM-2001` and `CM-2004`; no trusted-full-read execution, target binding, runtime/VCPToolBox call, memory action, public MCP expansion, push/release/deploy/cutover, M15/RC unlock, or readiness claim occurred.
+Current task: `CM-2006 trusted-full-read receipt closeout / route decision`.
+Current validation: `CMV-2107`.
+Current handoff: CM-2006 closes out the CM-2005 low-disclosure trusted-full-read receipt: bounded attempt completed, array/zero-item shape projected, read-shape unlocked true, raw output persisted false, write counters zero, readiness false. CM-2005 single-use authority is consumed and cannot be reused.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-2004 only within safe local/no-live boundaries unless Jenn supplies a separate fresh exact execution approval for a bounded trusted-full-read attempt through the repaired task gate.
+Goal: continue from CM-2006 only within safe local/no-live planning boundaries unless Jenn supplies a new fresh exact boundary for any additional trusted-full-read attempt or broader inference.
 
-Current status: `COMPLETED_VALIDATED_EXACT_APPROVED_ROUTE_BINDING_REPAIR_COMPLETED_CM2001_CM2004_TASK_GATE_BOUND_NO_EXECUTION_NO_LIVE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-2004 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2004_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_AND_LOCAL_REPAIR_RECEIPT.md` and repairs `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js` plus targeted tests. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. Trusted-full-read execution, target material binding, runtime/network/VCPToolBox calls, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, and readiness claims remain forbidden without separate exact authority.
+Current status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_CM2005_BOUNDED_ATTEMPT_COMPLETED_READ_SHAPE_UNLOCKED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-2006 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md` and records the CM-2005 low-disclosure projection only. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. CM-2005 approval reuse, retry, new trusted-full-read execution, target material binding, runtime/network/VCPToolBox calls, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, M15/RC unlock, and readiness claims remain forbidden without new exact authority.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,6 +25,7 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`

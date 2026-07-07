@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-08",
-  "taskId": "CM-2004",
-  "validationId": "CMV-2106",
+  "taskId": "CM-2006",
+  "validationId": "CMV-2107",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "trusted_full_read_route_binding_repair_completed_cm2001_cm2004_task_gate_bound_no_execution_no_live_no_readiness",
+    "scope": "trusted_full_read_receipt_closeout_cm2005_bounded_attempt_completed_read_shape_unlocked_no_raw_output_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2107",
+      "scope": "CM-2006 trusted-full-read receipt closeout / route decision",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_CM2005_BOUNDED_ATTEMPT_COMPLETED_READ_SHAPE_UNLOCKED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS"
+    },
     {
       "id": "CMV-2106",
       "scope": "CM-2004 trusted-full-read route-binding / repair intake and local repair receipt",

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2004 trusted-full-read route-binding / repair intake and local repair receipt`.
-Current validation: `CMV-2106`.
-Current status: CM-2004 accepted the fresh exact repair packet and completed one bounded local source/test repair. The existing low-disclosure executor task gate now includes `CM-2001` and `CM-2004`. It does not authorize trusted-full-read execution, target binding, request-body generation by the CM-2004 repair path, runtime/VCPToolBox calls, memory actions, public MCP expansion, pushes/releases/deploys/cuts over, M15/RC unlock, or readiness.
+Current task: `CM-2006 trusted-full-read receipt closeout / route decision`.
+Current validation: `CMV-2107`.
+Current status: CM-2006 closes out the CM-2005 low-disclosure trusted-full-read receipt. The CM-2005 bounded attempt completed with array/zero-item shape projection and read-shape unlocked true, while raw output persisted false, write counters zero, and readiness false. CM-2005 single-use authority is consumed and cannot be reused.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is a separate exact execution approval request/display if Jenn wants a bounded trusted-full-read attempt through the repaired task gate. Trusted-full-read execution remains blocked until a separate exact execution gate passes without endpoint/locator/raw/private disclosure. Do not retry CM-1996, reuse CM-1994/CM-1996/CM-2001/CM-2002 authority, generate request bodies or approval lines, call runtime/VCPToolBox, bind target material, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness without fresh exact execution authority.
+Next safe action is local planning or a new exact boundary display if Jenn wants another bounded attempt or any broader inference from CM-2005. Do not reuse CM-2005 authority, retry trusted-full-read, generate request bodies or approval lines, call runtime/VCPToolBox, bind target material, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness without fresh exact authority.
 
 ## Historical Run Notes
 

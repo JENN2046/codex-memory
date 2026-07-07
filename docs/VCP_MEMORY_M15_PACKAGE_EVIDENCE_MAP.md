@@ -334,6 +334,18 @@ Completed local-safe evidence:
   endpoint/locator disclosure, runtime/network/VCPToolBox call, response
   consumption by the CM-2004 repair path, memory read/write, public MCP
   expansion, M15/RC unlock, or readiness claim.
+- CM-2006 trusted-full-read receipt closeout / route decision records only the
+  CM-2005 low-disclosure receipt projection. CM-2005 bounded attempt completed
+  with `route_status_category=action_success_response_shape_projected`,
+  `response_shape_category=array_item_count_bucket_only`,
+  `top_level_kind_category=array`, `item_count_bucket=zero`,
+  `duration_bucket=lt_100ms`, and `read_shape_unlocked_boolean=true`.
+  CM-2006 records raw output persisted false, write/mutation counters zero, and
+  readiness false. It performs no retry, no new trusted-full-read attempt, no
+  target material binding attempt, no request body, no endpoint/locator
+  disclosure, no runtime/network/VCPToolBox call, no response consumption, no
+  memory read/write, no public MCP expansion, no M15/RC unlock, and no
+  readiness claim.
 
 Missing RC evidence:
 
@@ -802,6 +814,39 @@ m15_package_evidence_map_boundary:
   cm2004_m15_opened: false
   cm2004_rc_gate_opened: false
   cm2004_readiness_claimed: false
+  cm2006_receipt_closeout_present: true
+  cm2006_source_receipt_task: CM-2005
+  cm2006_source_repair_task: CM-2004
+  cm2006_cm2005_single_use_execution_attempt_consumed: true
+  cm2006_cm2005_retry_authorized: false
+  cm2006_receipt_closeout_status: accepted_low_disclosure_projection_only
+  cm2006_trusted_full_read_attempt_status: bounded_attempt_completed
+  cm2006_target_material_category: target_scoped_synthetic_empty_disposable_material
+  cm2006_target_binding_category: bound_in_memory_synthetic_empty_disposable_context
+  cm2006_route_status_category: action_success_response_shape_projected
+  cm2006_execution_status_category: bounded_attempt_completed
+  cm2006_response_shape_category: array_item_count_bucket_only
+  cm2006_top_level_kind_category: array
+  cm2006_item_count_bucket: zero
+  cm2006_duration_bucket: lt_100ms
+  cm2006_read_shape_unlocked: true
+  cm2006_raw_output_persisted: false
+  cm2006_memory_writes: 0
+  cm2006_durable_writes: 0
+  cm2006_provider_api_calls: 0
+  cm2006_public_mcp_expansions: 0
+  cm2006_new_trusted_full_read_attempt_performed: false
+  cm2006_request_body_generated: false
+  cm2006_endpoint_locator_disclosed: false
+  cm2006_runtime_called: false
+  cm2006_network_called: false
+  cm2006_vcp_toolbox_called: false
+  cm2006_response_body_consumed: false
+  cm2006_memory_read_performed: false
+  cm2006_memory_write_performed: false
+  cm2006_m15_opened: false
+  cm2006_rc_gate_opened: false
+  cm2006_readiness_claimed: false
   current_chain_docs_evidence_complete_for_planning: true
   no_automatic_local_safe_plan_package_task_remains: false
   rc_gate_report_created: false
@@ -910,13 +955,13 @@ future bounded local source/test repair approval, but does not accept approval,
 authorize source repair, bind a route, generate a request body, execute
 runtime, or authorize trusted-full-read execution.
 CM-2004 accepts the exact local repair approval and binds the CM-2001/CM-2004
-task gate to the existing low-disclosure executor, but still does not authorize
-trusted-full-read execution, target binding, request-body generation by the
-repair path, runtime, or readiness.
+task gate to the existing low-disclosure executor. CM-2005 then consumes the
+single-use execution approval and produces a low-disclosure shape projection.
+CM-2006 closes out that receipt as a bounded attempt completed with read-shape
+unlocked true, zero item bucket, no raw output persistence, zero write/mutation
+counters, and no readiness claim.
 
-The next route is a separate exact execution approval request/display if Jenn
-wants a bounded trusted-full-read attempt through the repaired task gate.
-Future
-trusted-full-read execution,
+The next route is local planning or a new exact boundary if Jenn wants any
+additional attempt or broader inference. Future trusted-full-read execution,
 live/runtime, memory read/write, approval, RC review, release, deploy, cutover,
 push, or readiness work requires separate exact authority and fresh evidence.
