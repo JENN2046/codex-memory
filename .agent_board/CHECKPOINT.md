@@ -4,11 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2003 trusted-full-read route-binding / repair intake packet display`.
-Current validation: `CMV-2105`.
+Current checkpoint: `CM-2004 trusted-full-read route-binding / repair intake and local repair receipt`.
+Current validation: `CMV-2106`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2004 Trusted-Full-Read Route-Binding / Repair Intake And Local Repair Receipt
+
+Status: `COMPLETED_VALIDATED_EXACT_APPROVED_ROUTE_BINDING_REPAIR_COMPLETED_CM2001_CM2004_TASK_GATE_BOUND_NO_EXECUTION_NO_LIVE_NO_READINESS`
+
+Recorded:
+
+- Added `docs/VCP_MEMORY_PLAN_PACKAGE_CM2004_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_AND_LOCAL_REPAIR_RECEIPT.md`.
+- Accepted Jenn's current CM-2004 packet as fresh/current/single-use/exact approval for one bounded local source/test repair only.
+- Updated `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js` so `ALLOWED_TASK_IDS` includes `CM-2001` and `CM-2004`.
+- Updated `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js` with a CM-2004 fail-closed task-gate binding test.
+- Used 1 of 2 source files and 1 of 2 test files.
+- Performed no trusted-full-read execution, target material binding, endpoint/locator disclosure, runtime/network/VCPToolBox call, MCP memory tool call, memory read/write, durable mutation, provider/API call, dependency change, public MCP expansion, VCPToolBox core modification, startup/watchdog change, push/tag/release/deploy/cutover, M15/RC unlock, or readiness claim.
+- Routed next work to a separate exact execution approval request/display if Jenn wants a bounded trusted-full-read attempt through the repaired task gate.
+
+Validation: `CMV-2106`; source/test syntax checks, targeted CM-2004 repair subtest, full executor test file, docs/status review, CM-2003 packet review, M15 evidence map review, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-2003 Trusted-Full-Read Route-Binding / Repair Intake Packet Display
 

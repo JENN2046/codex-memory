@@ -8,6 +8,7 @@ const {
   ZERO_COUNTERS
 } = require('../src/core/VcpNativeDisposableTargetResolverTransportBoundaryContract');
 const {
+  ALLOWED_TASK_IDS,
   FIELD_NAME_DISCLOSURE_POLICY,
   buildInMemoryProbeRequestBody,
   executeVcpNativeDisposableTargetRequestReadShapeProbe
@@ -368,4 +369,42 @@ test('CM1964 rejects invalid executor input before runtime invocation', async ()
   assert.equal(invoked, false);
   assert.equal(result.requestBodyGeneratedByHarness, false);
   assert.equal(result.memoryWritten, false);
+});
+
+test('CM2004 repair binds CM2001 and CM2004 task ids without execution', async () => {
+  assert.ok(ALLOWED_TASK_IDS.includes('CM-1964'));
+  assert.ok(ALLOWED_TASK_IDS.includes('CM-2001'));
+  assert.ok(ALLOWED_TASK_IDS.includes('CM-2004'));
+
+  for (const taskId of ['CM-2001', 'CM-2004']) {
+    let invoked = false;
+    const result = await executeVcpNativeDisposableTargetRequestReadShapeProbe(executorInput({
+      taskId,
+      boundaryContractInput: boundaryInput({
+        disposableTargetDeclaration: {
+          ...boundaryInput().disposableTargetDeclaration,
+          containsRealPrivateMemory: true
+        }
+      }),
+      invokeComponentAction: async () => {
+        invoked = true;
+        return [];
+      }
+    }));
+
+    assert.equal(result.accepted, false);
+    assert.equal(result.reasonCode, 'cm1963_disposable_boundary_not_accepted');
+    assert.equal(result.boundaryReasonCode, 'invalid_disposable_resolver_transport_boundary_contract');
+    assert.equal(invoked, false);
+    assert.equal(result.requestBodyGeneratedByHarness, false);
+    assert.equal(result.requestBodyPersisted, false);
+    assert.equal(result.responseBodyConsumedForShapeProjection, false);
+    assert.equal(result.endpointDisclosed, false);
+    assert.equal(result.locatorValueDisclosed, false);
+    assert.equal(result.memoryWritten, false);
+    assert.equal(result.readShapeUnlocked, false);
+    assert.equal(result.readinessClaimed, false);
+    assert.equal(result.counters.runtimeCallsUsed, 0);
+    assert.equal(result.counters.networkCallsUsed, 0);
+  }
 });

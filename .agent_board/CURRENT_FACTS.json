@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-08",
-  "taskId": "CM-2003",
-  "validationId": "CMV-2105",
+  "taskId": "CM-2004",
+  "validationId": "CMV-2106",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "trusted_full_read_route_binding_repair_intake_packet_display_non_authorizing_no_repair_no_live_no_readiness",
+    "scope": "trusted_full_read_route_binding_repair_completed_cm2001_cm2004_task_gate_bound_no_execution_no_live_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2106",
+      "scope": "CM-2004 trusted-full-read route-binding / repair intake and local repair receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_ROUTE_BINDING_REPAIR_COMPLETED_CM2001_CM2004_TASK_GATE_BOUND_NO_EXECUTION_NO_LIVE_NO_READINESS"
+    },
     {
       "id": "CMV-2105",
       "scope": "CM-2003 trusted-full-read route-binding / repair intake packet display",

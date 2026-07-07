@@ -17,7 +17,9 @@ const PURPOSE = 'component_action_request_read_shape_probe';
 const FIELD_NAME_DISCLOSURE_POLICY = 'no_field_names_disclosed_category_bucket_shape_only';
 
 const ALLOWED_TASK_IDS = Object.freeze([
-  'CM-1964'
+  'CM-1964',
+  'CM-2001',
+  'CM-2004'
 ]);
 
 const ALLOWED_RESOLVER_CATEGORIES = Object.freeze([
@@ -372,6 +374,7 @@ async function executeVcpNativeDisposableTargetRequestReadShapeProbe(input = {})
 }
 
 module.exports = {
+  ALLOWED_TASK_IDS,
   ALLOWED_RESOLVER_CATEGORIES,
   ALLOWED_TRANSPORT_CATEGORIES,
   EXECUTOR_MODE,
