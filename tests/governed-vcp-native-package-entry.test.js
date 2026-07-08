@@ -4,6 +4,10 @@ const test = require('node:test');
 
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const readme = fs.readFileSync('README.md', 'utf8');
+const wslNewApiServiceScript = fs.readFileSync(
+  'scripts/codex-mcp-vcp-native-wsl-newapi-service.sh',
+  'utf8'
+);
 
 test('package exposes governed VCP native shim and acceptance operator entries', () => {
   assert.equal(
@@ -39,4 +43,17 @@ test('README documents low-disclosure governed VCP native live proof path', () =
   assert.equal(readme.includes('writeRollbackEvidence'), true);
   assert.equal(readme.includes('不会返回 rollback plan reference 或 raw rollback plan'), true);
   assert.equal(readme.includes('不写 endpoint、token、raw request/response、raw memory、raw audit 或 output path'), true);
+});
+
+test('managed WSL NewAPI service exports shim endpoint under createConfig key', () => {
+  assert.equal(
+    wslNewApiServiceScript.includes(
+      'CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT="http://$shim_host:$shim_port/mcp/vcp-native"'
+    ),
+    true
+  );
+  assert.equal(
+    wslNewApiServiceScript.includes('CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_HTTP_MCP_ENDPOINT='),
+    false
+  );
 });
