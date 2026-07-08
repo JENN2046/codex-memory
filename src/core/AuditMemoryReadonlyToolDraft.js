@@ -92,6 +92,8 @@ const inputSchema = Object.freeze({
       additionalProperties: false,
       properties: {
         project_id: { type: 'string', maxLength: 200 },
+        scope_id: { type: 'string', maxLength: 200 },
+        workspace_id: { type: 'string', maxLength: 200 },
         workspace_id_present: { type: 'boolean' },
         client_id: { type: 'string', maxLength: 200 },
         visibility: { type: 'string', maxLength: 200 },

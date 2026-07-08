@@ -1,6 +1,47 @@
 # PROJECT_GOAL.md — codex-memory
 
-## 1. Final Goal
+## 0. Current Product Goal
+
+Current product goal:
+
+```yaml
+product_goal:
+  primary_runtime: VCPToolBox native memory
+  primary_value: governance, not memory intelligence
+  clients:
+    - Codex
+  access_path: governed MCP tools
+  governed_dimensions:
+    - client_id
+    - scope
+    - visibility
+    - runtime target
+    - invocation profile
+    - read/write authority
+    - output disclosure budget
+    - audit receipt
+    - rollback posture
+  local_memory_role:
+    - fallback
+    - audit
+    - validation fixture
+    - compatibility
+    - offline continuity
+```
+
+This current goal narrows the active implementation direction. VCPToolBox native
+memory is the primary runtime. `codex-memory` provides the governed MCP access
+path, policy checks, low-disclosure receipts, audit/rollback posture, fallback
+continuity, compatibility, and validation fixtures. The product value is
+governance around native memory behavior, not replacing VCPToolBox memory
+intelligence with a parallel local intelligence engine.
+
+## 1. Legacy Long-Term Context (Not Current Product Goal)
+
+The material below is legacy roadmap context. It must not override Section 0.
+For the current governed VCPToolBox-native bridge work, the active client is
+Codex only, the primary runtime is VCPToolBox native memory, and
+`codex-memory` provides governance rather than memory intelligence.
 
 `codex-memory` is the independent Codex- and Claude-oriented implementation of the full VCP memory system.
 

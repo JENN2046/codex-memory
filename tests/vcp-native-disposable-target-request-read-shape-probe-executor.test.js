@@ -10,9 +10,102 @@ const {
 const {
   ALLOWED_TASK_IDS,
   FIELD_NAME_DISCLOSURE_POLICY,
+  GOVERNANCE_METADATA_PATH,
   buildInMemoryProbeRequestBody,
   executeVcpNativeDisposableTargetRequestReadShapeProbe
 } = require('../src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor');
+
+const GOVERNANCE_METADATA_SCHEMA_VERSION = 'codex_memory_governed_native_bridge_call_governance_v1';
+
+function validReadGovernanceMeta(overrides = {}) {
+  return {
+    schemaVersion: GOVERNANCE_METADATA_SCHEMA_VERSION,
+    trustedExecutionContext: {
+      accepted: true,
+      source: 'trusted_execution_context_or_transport',
+      executionContext: {
+        agentAlias: 'Codex',
+        clientId: 'Codex',
+        projectId: 'codex-memory',
+        scopeId: null,
+        workspaceId: 'workspace-alpha',
+        visibility: 'private'
+      },
+      ...(overrides.trustedExecutionContext || {})
+    },
+    runtimeTarget: {
+      primaryRuntime: 'VCPToolBox native memory',
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      targetKind: 'mcp_server',
+      sourceAuthority: 'bridge_runtime_or_static_config',
+      bound: true,
+      toolArgumentsMayOverride: false,
+      governanceMetadataMayOverride: false,
+      ...(overrides.runtimeTarget || {})
+    },
+    invocationProfile: {
+      profile: 'governed_read_only',
+      source: 'bridge_tool_binding',
+      transport: 'mcp',
+      toolName: 'search_memory',
+      bound: true,
+      toolArgumentsMayOverride: false,
+      governanceMetadataMayOverride: false,
+      ...(overrides.invocationProfile || {})
+    },
+    readWriteAuthority: {
+      readAllowed: true,
+      writeAllowed: false,
+      source: 'bridge_tool_binding',
+      bound: true,
+      mixedReadWriteAllowed: false,
+      unboundedWriteAllowed: false,
+      writeRequiresExactApproval: false,
+      toolArgumentsMayOverride: false,
+      governanceMetadataMayOverride: false,
+      ...(overrides.readWriteAuthority || {})
+    },
+    outputDisclosureBudget: {
+      level: 'summary',
+      lowDisclosure: true,
+      rawOutput: false,
+      maxItems: 2,
+      maxBytes: 512,
+      source: 'bridge_gate_normalized_governance',
+      bound: true,
+      toolArgumentsMayOverride: false,
+      governanceMetadataMayOverride: false,
+      ...(overrides.outputDisclosureBudget || {})
+    },
+    auditReceipt: {
+      receipt_id: 'cm-governed-readonly-receipt',
+      required: true,
+      lowDisclosure: true,
+      source: 'bridge_gate_normalized_governance',
+      toolArgumentsMayOverride: false,
+      governanceMetadataMayOverride: false,
+      ...(overrides.auditReceipt || {})
+    },
+    rollbackPosture: {
+      mode: 'no_runtime_state_to_rollback',
+      source: 'bridge_gate_normalized_governance',
+      bound: true,
+      toolArgumentsMayOverride: false,
+      governanceMetadataMayOverride: false,
+      automaticRollbackAppliedByBridge: false,
+      ...(overrides.rollbackPosture || {})
+    },
+    governanceTransport: {
+      metadataPath: GOVERNANCE_METADATA_PATH,
+      toolArgumentsMayCarryGovernance: false,
+      trustedExecutionContextMustMatchTransportContext: true,
+      transportContextFieldsOverrideGovernanceMetadata: true,
+      ...(overrides.governanceTransport || {})
+    },
+    lowDisclosure: true,
+    readinessClaimed: false
+  };
+}
 
 function boundaryInput(overrides = {}) {
   return {
@@ -154,6 +247,7 @@ function executorInput(overrides = {}) {
     requestBodyShapeCategory: 'minimal_component_action_route_status_payload_category_only',
     queryBoundaryCategory: 'neutral_minimal_route_read_shape_probe_non_private_max_1_no_broad_scan',
     boundaryContractInput: boundaryInput(),
+    governanceMeta: validReadGovernanceMeta(),
     invokeComponentAction: async () => [],
     ...overrides
   };
@@ -181,6 +275,9 @@ test('CM1964 projects successful read shape without field names or raw response'
   assert.equal(result.receipt.responseBodyConsumedForShapeProjection, true);
   assert.equal(result.receipt.rawResponseBodyPrinted, false);
   assert.equal(result.receipt.rawResponseBodyPersisted, false);
+  assert.equal(result.receipt.governanceMetadataSent, true);
+  assert.equal(result.receipt.governanceMetadataPath, GOVERNANCE_METADATA_PATH);
+  assert.equal(result.receipt.governanceMetadataRawValueDisclosed, false);
   assert.equal(result.receipt.readShapeUnlocked, true);
   assert.equal(result.receipt.readinessClaimed, false);
   assert.equal(result.counters.resolverAttemptsUsed, 1);
@@ -285,9 +382,54 @@ test('CM1964 classifies client errors without raw error echo or read-shape unloc
   assert.equal(result.receipt.responseShapeCategory, 'not_consumed');
   assert.equal(result.receipt.rawErrorPayloadPrinted, false);
   assert.equal(result.receipt.rawErrorPayloadPersisted, false);
+  assert.equal(result.receipt.governanceMetadataSent, true);
+  assert.equal(result.receipt.governanceMetadataPath, GOVERNANCE_METADATA_PATH);
+  assert.equal(result.receipt.governanceMetadataRawValueDisclosed, false);
   assert.equal(result.receipt.readShapeUnlocked, false);
   assert.equal(result.counters.networkCallsUsed, 1);
   assert.equal(serialized.includes('RAW_ERROR_SHOULD_NOT_ECHO'), false);
+});
+
+test('CM1964 rejects missing governed metadata before runtime invocation', async () => {
+  let invoked = false;
+  const result = await executeVcpNativeDisposableTargetRequestReadShapeProbe(executorInput({
+    governanceMeta: undefined,
+    invokeComponentAction: async () => {
+      invoked = true;
+      return [];
+    }
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'invalid_disposable_target_read_shape_probe_executor_input');
+  assert.ok(result.invalidFields.includes('governanceMeta'));
+  assert.equal(invoked, false);
+  assert.equal(result.counters.runtimeCallsUsed, 0);
+  assert.equal(result.counters.networkCallsUsed, 0);
+  assert.equal(result.readShapeUnlocked, false);
+});
+
+test('CM1964 whitelists thrown statusClass before low-disclosure receipt projection', async () => {
+  const rawError = new Error('RAW_PRIVATE_PROBE_ERROR_SHOULD_NOT_ECHO');
+  rawError.statusClass = 'https://PRIVATE_PROBE_STATUS_SHOULD_NOT_ECHO';
+
+  const result = await executeVcpNativeDisposableTargetRequestReadShapeProbe(executorInput({
+    transportCategory: 'local_http_transport',
+    invokeComponentAction: async () => {
+      throw rawError;
+    }
+  }));
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, true);
+  assert.equal(result.receipt.statusClass, 'transport_error');
+  assert.equal(result.receipt.routeStatusCategory, 'transport_error_no_shape_unlock');
+  assert.equal(result.receipt.responseShapeCategory, 'not_consumed');
+  assert.equal(result.receipt.rawErrorPayloadPrinted, false);
+  assert.equal(result.receipt.rawErrorPayloadPersisted, false);
+  assert.equal(result.receipt.readShapeUnlocked, false);
+  assert.equal(serialized.includes('PRIVATE_PROBE_STATUS_SHOULD_NOT_ECHO'), false);
+  assert.equal(serialized.includes('RAW_PRIVATE_PROBE_ERROR_SHOULD_NOT_ECHO'), false);
 });
 
 test('CM1964 rejects raw values in executor input without echo', async () => {

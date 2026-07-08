@@ -64,11 +64,23 @@ function buildRecordMemoryTrustedExecutionContext({
     base.workspace_id,
     config.defaultWorkspaceId
   ));
+  maybeSet(context, 'scopeId', firstNonEmptyString(
+    env.CODEX_MEMORY_SCOPE_ID,
+    base.scopeId,
+    base.scope_id,
+    config.defaultScopeId
+  ));
   maybeSet(context, 'clientId', firstNonEmptyString(
     env.CODEX_MEMORY_CLIENT_ID,
     base.clientId,
     base.client_id,
     config.defaultClientId
+  ));
+  maybeSet(context, 'visibility', firstNonEmptyString(
+    env.CODEX_MEMORY_VISIBILITY,
+    base.visibility,
+    base.visibility_policy,
+    config.defaultVisibility
   ));
 
   return context;

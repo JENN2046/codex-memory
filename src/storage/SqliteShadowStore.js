@@ -103,6 +103,7 @@ class SqliteShadowStore {
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         client_id TEXT,
+        scope_id TEXT,
         workspace_id TEXT,
         project_id TEXT,
         task_id TEXT,
@@ -159,6 +160,7 @@ class SqliteShadowStore {
     `);
     this.ensureColumn('memory_chunks', 'embedding_fingerprint', 'TEXT');
     this.ensureColumn('memory_records', 'project_id', 'TEXT');
+    this.ensureColumn('memory_records', 'scope_id', 'TEXT');
     this.ensureColumn('memory_records', 'workspace_id', 'TEXT');
     this.ensureColumn('memory_records', 'client_id', 'TEXT');
     this.ensureColumn('memory_records', 'task_id', 'TEXT');
@@ -170,6 +172,7 @@ class SqliteShadowStore {
     this.ensureColumn('memory_write_manifests', 'audited_at', 'TEXT');
     this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_memory_records_project ON memory_records(project_id);
+      CREATE INDEX IF NOT EXISTS idx_memory_records_scope ON memory_records(scope_id);
       CREATE INDEX IF NOT EXISTS idx_memory_records_visibility ON memory_records(visibility);
       CREATE INDEX IF NOT EXISTS idx_memory_records_client ON memory_records(client_id);
     `);
@@ -319,11 +322,11 @@ class SqliteShadowStore {
       INSERT INTO memory_records (
         memory_id, target, title, content, evidence, tags_json, validated, reusable, sensitivity,
         file_path, relative_path, raw_text, created_at, updated_at,
-        project_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy
+        project_id, scope_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy
       ) VALUES (
         $memory_id, $target, $title, $content, $evidence, $tags_json, $validated, $reusable, $sensitivity,
         $file_path, $relative_path, $raw_text, $created_at, $updated_at,
-        $project_id, $workspace_id, $client_id, $task_id, $conversation_id, $visibility, $retention_policy
+        $project_id, $scope_id, $workspace_id, $client_id, $task_id, $conversation_id, $visibility, $retention_policy
       )
       ON CONFLICT(memory_id) DO UPDATE SET
         target = excluded.target,
@@ -339,6 +342,7 @@ class SqliteShadowStore {
         raw_text = excluded.raw_text,
         updated_at = excluded.updated_at,
         project_id = excluded.project_id,
+        scope_id = excluded.scope_id,
         workspace_id = excluded.workspace_id,
         client_id = excluded.client_id,
         task_id = excluded.task_id,
@@ -363,6 +367,7 @@ class SqliteShadowStore {
       $created_at: record.createdAt || new Date().toISOString(),
       $updated_at: record.updatedAt || record.createdAt || new Date().toISOString(),
       $project_id: this.getScopeWriteValue('project_id', record.projectId),
+      $scope_id: this.getScopeWriteValue('scope_id', record.scopeId),
       $workspace_id: this.getScopeWriteValue('workspace_id', record.workspaceId),
       $client_id: this.getScopeWriteValue('client_id', record.clientId),
       $task_id: record.taskId || null,
@@ -846,6 +851,7 @@ class SqliteShadowStore {
       params.push(expectedValue);
     };
 
+    addScopeGuard('scope_id', 'scopeId');
     addScopeGuard('project_id', 'projectId');
     addScopeGuard('workspace_id', 'workspaceId');
     addScopeGuard('client_id', 'clientId');
@@ -856,7 +862,7 @@ class SqliteShadowStore {
 
     const rows = this.db.prepare(`
       SELECT memory_id, target, title, content, evidence, tags_json,
-        project_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy
+        project_id, scope_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy
         ${hasStatus ? ', status' : ''}
       FROM memory_records
       WHERE ${whereClauses.join(' AND ')}
@@ -880,6 +886,7 @@ class SqliteShadowStore {
         evidence: row.evidence,
         tags,
         projectId: row.project_id || null,
+        scopeId: row.scope_id || null,
         workspaceId: row.workspace_id || null,
         clientId: row.client_id || null,
         taskId: row.task_id || null,
@@ -911,7 +918,7 @@ class SqliteShadowStore {
 
     const placeholders = uniqueIds.map(() => '?').join(',');
     const rows = this.db.prepare(`
-      SELECT memory_id, project_id, workspace_id, client_id, visibility
+      SELECT memory_id, project_id, scope_id, workspace_id, client_id, visibility
       FROM memory_records WHERE memory_id IN (${placeholders})
     `).all(...uniqueIds);
 
@@ -919,6 +926,7 @@ class SqliteShadowStore {
     for (const row of rows) {
       result.set(row.memory_id, {
         projectId: row.project_id || null,
+        scopeId: row.scope_id || null,
         workspaceId: row.workspace_id || null,
         clientId: row.client_id || null,
         visibility: row.visibility || null
@@ -1039,7 +1047,7 @@ class SqliteShadowStore {
     result.lifecycleColumnAvailable = hasStatus;
     const placeholders = uniqueIds.map(() => '?').join(',');
     const rows = this.db.prepare(`
-      SELECT memory_id, project_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy${hasStatus ? ', status' : ''}
+      SELECT memory_id, project_id, scope_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy${hasStatus ? ', status' : ''}
       FROM memory_records WHERE memory_id IN (${placeholders})
     `).all(...uniqueIds);
 
@@ -1049,6 +1057,7 @@ class SqliteShadowStore {
         lifecycleStatus: hasStatus ? (row.status || null) : null,
         scope: {
           projectId: row.project_id || null,
+          scopeId: row.scope_id || null,
           workspaceId: row.workspace_id || null,
           clientId: row.client_id || null,
           taskId: row.task_id || null,
@@ -1415,6 +1424,10 @@ class SqliteShadowStore {
 
     const recordScopeClauses = [];
     const recordScopeParams = [];
+    if (filters.scopeId) {
+      recordScopeClauses.push('mr.scope_id = ?');
+      recordScopeParams.push(filters.scopeId);
+    }
     if (filters.projectId) {
       recordScopeClauses.push('mr.project_id = ?');
       recordScopeParams.push(filters.projectId);
@@ -1817,6 +1830,7 @@ class SqliteShadowStore {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       projectId: row.project_id || null,
+      scopeId: row.scope_id || null,
       workspaceId: row.workspace_id || null,
       clientId: row.client_id || null,
       taskId: row.task_id || null,

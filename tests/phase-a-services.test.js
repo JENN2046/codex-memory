@@ -132,6 +132,8 @@ test('execution context resolver falls through blank camel-case scope to snake-c
         requestSource: 'phase-a-blank-camel-scope-test',
         projectId: '   ',
         project_id: 'snake-project',
+        scopeId: '   ',
+        scope_id: 'snake-scope',
         workspaceId: '   ',
         workspace_id: 'snake-workspace',
         clientId: '   ',
@@ -150,6 +152,7 @@ test('execution context resolver falls through blank camel-case scope to snake-c
     assert.equal(result.decision, 'accepted');
     const stored = await app.stores.shadowStore.getRecord(result.memoryId);
     assert.equal(stored.projectId, 'snake-project');
+    assert.equal(stored.scopeId, 'snake-scope');
     assert.equal(stored.workspaceId, 'snake-workspace');
     assert.equal(stored.clientId, 'claude');
     assert.equal(stored.taskId, 'CM-BLANK-CAMEL');

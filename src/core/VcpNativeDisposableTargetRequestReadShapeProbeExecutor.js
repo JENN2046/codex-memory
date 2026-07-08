@@ -9,12 +9,16 @@ const {
 } = require('./VcpNativeDisposableTargetResolverTransportBoundaryContract');
 
 const { isSafeReferenceName } = require('./VcpToolBoxSafeReference');
+const {
+  validateGovernedMcpNativeGovernanceMetadataCoversCurrentProductGoal
+} = require('./CurrentProductGoalContract');
 
 const EXECUTOR_NAME = 'VcpNativeDisposableTargetRequestReadShapeProbeExecutor';
 const EXECUTOR_MODE = 'disposable_target_request_read_shape_probe_low_disclosure_executor';
 const SCHEMA_VERSION = 1;
 const PURPOSE = 'component_action_request_read_shape_probe';
 const FIELD_NAME_DISCLOSURE_POLICY = 'no_field_names_disclosed_category_bucket_shape_only';
+const GOVERNANCE_METADATA_PATH = 'params._meta.codexMemoryGovernance';
 
 const ALLOWED_TASK_IDS = Object.freeze([
   'CM-1964',
@@ -31,6 +35,12 @@ const ALLOWED_TRANSPORT_CATEGORIES = Object.freeze([
   'local_direct_component_action_invoker',
   'local_http_transport',
   'injected_test_transport'
+]);
+
+const ALLOWED_ERROR_STATUS_CLASSES = Object.freeze([
+  'transport_error',
+  'client_error',
+  'server_error'
 ]);
 
 const SIDE_EFFECT_COUNTERS = Object.freeze({
@@ -109,7 +119,11 @@ function responseShapeCategory(value) {
 }
 
 function statusClassFromError(error) {
-  if (error && typeof error.statusClass === 'string') return error.statusClass;
+  if (error && typeof error.statusClass === 'string') {
+    return ALLOWED_ERROR_STATUS_CLASSES.includes(error.statusClass)
+      ? error.statusClass
+      : 'transport_error';
+  }
   const status = Number(error?.status || error?.statusCode || error?.httpStatus);
   if (Number.isInteger(status) && status >= 400 && status < 500) return 'client_error';
   if (Number.isInteger(status) && status >= 500 && status < 600) return 'server_error';
@@ -161,9 +175,11 @@ function buildLowDisclosureReceipt({
   statusClass,
   responseValue,
   durationMs,
-  consumedResponseForShapeProjection
+  consumedResponseForShapeProjection,
+  governanceMetadataCoverage
 }) {
   const readShapeUnlocked = statusClass === 'success' && consumedResponseForShapeProjection === true;
+  const governanceMetadataSent = governanceMetadataCoverage?.accepted === true;
   return {
     targetReferenceName: boundary.targetReferenceName,
     purpose: PURPOSE,
@@ -198,6 +214,9 @@ function buildLowDisclosureReceipt({
     privateMemoryContentDisclosed: false,
     memoryIdsDisclosed: false,
     memoryWritten: false,
+    governanceMetadataSent,
+    governanceMetadataPath: governanceMetadataSent ? GOVERNANCE_METADATA_PATH : null,
+    governanceMetadataRawValueDisclosed: false,
     readShapeUnlocked,
     readinessClaimed: false
   };
@@ -262,6 +281,9 @@ function validateStaticInput(input) {
     invalidFields.push('queryBoundaryCategory');
   }
   if (typeof input.invokeComponentAction !== 'function') invalidFields.push('invokeComponentAction');
+  const governanceMetadataCoverage =
+    validateGovernedMcpNativeGovernanceMetadataCoversCurrentProductGoal(input.governanceMeta);
+  if (governanceMetadataCoverage.accepted !== true) invalidFields.push('governanceMeta');
   return invalidFields;
 }
 
@@ -313,6 +335,8 @@ async function executeVcpNativeDisposableTargetRequestReadShapeProbe(input = {})
 
   const startedAt = Date.now();
   const requestBody = buildInMemoryProbeRequestBody();
+  const governanceMetadataCoverage =
+    validateGovernedMcpNativeGovernanceMetadataCoversCurrentProductGoal(input.governanceMeta);
   let statusClass = 'success';
   let responseValue = null;
   let consumedResponseForShapeProjection = false;
@@ -323,6 +347,7 @@ async function executeVcpNativeDisposableTargetRequestReadShapeProbe(input = {})
       component: boundary.component,
       action: boundary.action,
       requestBody,
+      governanceMeta: input.governanceMeta,
       maxResultCount: 1
     });
     consumedResponseForShapeProjection = true;
@@ -341,7 +366,8 @@ async function executeVcpNativeDisposableTargetRequestReadShapeProbe(input = {})
     statusClass,
     responseValue,
     durationMs,
-    consumedResponseForShapeProjection
+    consumedResponseForShapeProjection,
+    governanceMetadataCoverage
   });
 
   return {
@@ -380,6 +406,7 @@ module.exports = {
   EXECUTOR_MODE,
   EXECUTOR_NAME,
   FIELD_NAME_DISCLOSURE_POLICY,
+  GOVERNANCE_METADATA_PATH,
   PURPOSE,
   SCHEMA_VERSION,
   SIDE_EFFECT_COUNTERS,

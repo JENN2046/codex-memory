@@ -8,9 +8,12 @@ const {
   PROVIDER_DEPENDENT_FILES,
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
+  CHILD_PROCESS_STDIO_DEPENDENT_FILES,
   FIXTURE_DRIFT_FILES,
+  GOVERNED_NATIVE_BRIDGE_DEFAULT_SAFE_REQUIRED_FILES,
   buildExcludedSummary,
   buildSpawnOptions,
+  detectChildProcessStdioSupportSync,
   formatSummaryOutput,
   parseNodeMajor,
   selectSummaryOutput,
@@ -48,6 +51,30 @@ test('default runner excludes all self-referential files', () => {
   }
 });
 
+test('default runner keeps child-process stdio files when child-process stdio is supported', () => {
+  const testsDir = path.join(process.cwd(), 'tests');
+  const { excludedDetails } = resolveDefaultSafeFiles(testsDir, { childProcessStdioSupported: true });
+  const stdioExcluded = excludedDetails.filter(e => e.reason === 'child_process_stdio_unavailable');
+
+  assert.deepEqual(stdioExcluded, []);
+});
+
+test('default runner excludes known child-process stdio files when capture is unavailable', () => {
+  const testsDir = path.join(process.cwd(), 'tests');
+  const { excludedDetails, environment } = resolveDefaultSafeFiles(testsDir, {
+    childProcessStdioSupported: false
+  });
+  const stdioExcluded = excludedDetails.filter(e => e.reason === 'child_process_stdio_unavailable');
+
+  assert.equal(environment.childProcessStdioSupported, false);
+  for (const file of CHILD_PROCESS_STDIO_DEPENDENT_FILES) {
+    assert.ok(
+      stdioExcluded.some(e => e.file === file),
+      `${file} should be excluded as child_process_stdio_unavailable`
+    );
+  }
+});
+
 test('default runner has no active fixture-drift exclusions after rebaseline', () => {
   const testsDir = path.join(process.cwd(), 'tests');
   const { excludedDetails } = resolveDefaultSafeFiles(testsDir);
@@ -63,10 +90,32 @@ test('default runner safe files are a subset of total test files', () => {
   assert.ok(safeFiles.length + excludedDetails.length === totalFiles, 'safe + excluded = total');
 });
 
+test('default runner keeps governed native bridge critical tests in default-safe coverage', () => {
+  const testsDir = path.join(process.cwd(), 'tests');
+  const { safeFiles, excludedDetails } = resolveDefaultSafeFiles(testsDir, {
+    childProcessStdioSupported: true
+  });
+
+  for (const file of GOVERNED_NATIVE_BRIDGE_DEFAULT_SAFE_REQUIRED_FILES) {
+    assert.ok(safeFiles.includes(file), `${file} must remain default-safe for governed bridge coverage`);
+    assert.equal(
+      excludedDetails.some(detail => detail.file === file),
+      false,
+      `${file} must not be excluded from default-safe governed bridge coverage`
+    );
+  }
+});
+
 test('default runner reports excluded details with correct reasons', () => {
   const testsDir = path.join(process.cwd(), 'tests');
   const { excludedDetails } = resolveDefaultSafeFiles(testsDir);
-  const validReasons = ['provider_dependent', 'daemon_dependent', 'self_referential', 'fixture_drift'];
+  const validReasons = [
+    'provider_dependent',
+    'daemon_dependent',
+    'self_referential',
+    'fixture_drift',
+    'child_process_stdio_unavailable'
+  ];
   for (const detail of excludedDetails) {
     assert.ok(validReasons.includes(detail.reason), `unexpected reason: ${detail.reason} for ${detail.file}`);
     assert.ok(typeof detail.file === 'string');
@@ -83,8 +132,13 @@ test('default runner summarizes active fixture drift as clear when none is exclu
   assert.deepEqual(summary.expectedExcludedReasons, [
     'provider_dependent',
     'daemon_dependent',
-    'self_referential'
+    'self_referential',
+    'child_process_stdio_unavailable'
   ]);
+});
+
+test('child-process stdio detector returns a boolean', () => {
+  assert.equal(typeof detectChildProcessStdioSupportSync(), 'boolean');
 });
 
 test('buildSpawnOptions does not include wrapper-level timeout by default', () => {

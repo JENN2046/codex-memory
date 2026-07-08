@@ -1,3 +1,5 @@
+const crypto = require('node:crypto');
+
 const { createConfig } = require('./config/createConfig');
 const { ExecutionContextResolver } = require('./core/ExecutionContextResolver');
 const { buildInternalRuntimeEntryPayload } = require('./core/InternalRuntimeEntryGate');
@@ -48,6 +50,58 @@ const {
 const {
   buildRecordMemoryPrincipalScopeAuthorizationRuntime
 } = require('./core/RecordMemoryPrincipalScopeAuthorizationConfig');
+const {
+  buildGovernedMcpVcpNativeBridgeGateInput
+} = require('./core/GovernedMcpVcpNativeBridgeRequestProjection');
+const {
+  REQUIRED_ACCESS_PATH,
+  REQUIRED_PRIMARY_RUNTIME,
+  validateGovernedMcpOverviewStatusCoversCurrentProductGoal
+} = require('./core/CurrentProductGoalContract');
+const {
+  validateGovernedMcpVcpNativeBridgeGate
+} = require('./core/GovernedMcpVcpNativeBridgeGate');
+const {
+  buildGovernedMcpVcpNativeReadOnlyProbeAdapter,
+  executeGovernedMcpVcpNativeReadShapeProbe
+} = require('./core/GovernedMcpVcpNativeReadOnlyProbeAdapter');
+const {
+  resolveGovernedMcpVcpNativeReadShapeProbeTarget
+} = require('./core/GovernedMcpVcpNativeReadShapeProbeTargetResolver');
+const {
+  createGovernedMcpVcpNativeHttpMcpToolCaller,
+  createGovernedMcpVcpNativeHttpMcpClientInvoker
+} = require('./core/GovernedMcpVcpNativeHttpMcpClientInvoker');
+const {
+  getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig
+} = require('./core/GovernedMcpVcpNativeHttpMcpTargetConfig');
+const {
+  executeGovernedMcpVcpNativeReadDelegation
+} = require('./core/GovernedMcpVcpNativeReadDelegationAdapter');
+const {
+  executeGovernedMcpVcpNativeWriteDelegation
+} = require('./core/GovernedMcpVcpNativeWriteDelegationAdapter');
+const {
+  attachBridgeAuditReceiptStatus,
+  recordGovernedMcpVcpNativeBridgeAuditReceipt,
+  recordGovernedMcpVcpNativeReadFallbackAuditReceipt
+} = require('./core/GovernedMcpVcpNativeBridgeAuditReceiptRecorder');
+const {
+  isSafeReferenceName
+} = require('./core/VcpToolBoxSafeReference');
+const {
+  SOURCE_AUTHORITY
+} = require('./core/GovernedMcpVcpNativeRuntimeTargetConfig');
+const {
+  buildGovernedNativeBridgeAuditMemoryDecisionProvider
+} = require('./core/GovernedNativeBridgeAuditMemoryProjection');
+
+const GOVERNED_MCP_VCP_NATIVE_FALLBACK_VISIBILITIES = Object.freeze([
+  'private',
+  'project',
+  'workspace'
+]);
+const GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE = 'trusted_execution_context_or_transport';
 
 function normalizeScopeVisibility(value) {
   if (Array.isArray(value)) {
@@ -65,12 +119,18 @@ function buildScopeCandidateFilters(scope) {
     return {};
   }
 
+  const scopeId = typeof scope.scope_id === 'string'
+    ? scope.scope_id.trim()
+    : typeof scope.scopeId === 'string'
+      ? scope.scopeId.trim()
+      : '';
   const projectId = typeof scope.project_id === 'string' ? scope.project_id.trim() : '';
   const workspaceId = typeof scope.workspace_id === 'string' ? scope.workspace_id.trim() : '';
   const clientId = typeof scope.client_id === 'string' ? scope.client_id.trim() : '';
   const visibility = normalizeScopeVisibility(scope.visibility);
 
   return {
+    ...(scopeId ? { scopeId } : {}),
     ...(projectId ? { projectId } : {}),
     ...(workspaceId ? { workspaceId } : {}),
     ...(clientId ? { clientId } : {}),
@@ -81,6 +141,7 @@ function buildScopeCandidateFilters(scope) {
 function buildScopeAuditContext(scope) {
   const filters = buildScopeCandidateFilters(scope);
   const scopeDimensions = [
+    filters.scopeId ? 'scope_id' : null,
     filters.projectId ? 'project_id' : null,
     filters.workspaceId ? 'workspace_id' : null,
     filters.clientId ? 'client_id' : null,
@@ -93,6 +154,7 @@ function buildScopeAuditContext(scope) {
     scopeMode: scopeApplied ? 'sql-candidate+post-filter' : 'none',
     scopeDimensions,
     scopeStrict: !!scope?.strict,
+    scopeIdPresent: !!filters.scopeId,
     scopeProjectId: filters.projectId || null,
     scopeClientId: filters.clientId || null,
     scopeVisibility: filters.visibility || [],
@@ -102,7 +164,8 @@ function buildScopeAuditContext(scope) {
 
 async function applyScopeFilter(results, scope, shadowStore) {
   const filters = buildScopeCandidateFilters(scope);
-  const hasScope = !!(filters.projectId
+  const hasScope = !!(filters.scopeId
+    || filters.projectId
     || filters.workspaceId
     || filters.clientId
     || (Array.isArray(filters.visibility) && filters.visibility.length > 0));
@@ -120,6 +183,7 @@ async function applyScopeFilter(results, scope, shadowStore) {
     const memoryId = normalizeResultMemoryId(item);
     const recordScope = scopeMap.get(memoryId) || {};
 
+    if (filters.scopeId && recordScope.scopeId !== filters.scopeId) return false;
     if (filters.projectId && recordScope.projectId !== filters.projectId) return false;
     if (filters.workspaceId && recordScope.workspaceId !== filters.workspaceId) return false;
     if (filters.clientId && recordScope.clientId !== filters.clientId) return false;
@@ -501,6 +565,1377 @@ function buildPublicControlledMutationRejectedResult(toolName, args = {}, reason
     decision: 'rejected',
     reason
   }, args);
+}
+
+function buildGovernedMcpVcpNativeBridgeRejectedToolResult(gateResult = {}) {
+  return {
+    decision: 'rejected',
+    reasonCode: 'governed_mcp_vcp_native_bridge_gate_rejected',
+    reason: 'MCP tool call rejected by governed VCPToolBox native bridge preflight.',
+    access: {
+      mode: 'governed_mcp_vcp_native_bridge_gate',
+      selectedProjection: true,
+      lowDisclosure: true,
+      rawOutputReturned: false,
+      runtimeCalled: false,
+      vcpToolBoxCalled: false,
+      mcpToolCalled: false,
+      memoryReadPerformed: false,
+      memoryWritePerformed: false,
+      localMemoryRole: 'not_used',
+      localMemoryFallbackAttempted: false,
+      localMemoryFallbackUsed: false,
+      localMemoryFallbackReadPerformed: false,
+      localMemoryFallbackReturned: false
+    },
+    gate: gateResult.lowDisclosureRejection || {
+      code: 'governed_mcp_vcp_native_bridge_gate_rejected',
+      lowDisclosure: true,
+      blockers: gateResult.blockers || []
+    },
+    readinessClaimed: false
+  };
+}
+
+const GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_TOOLS = Object.freeze([
+  'search_memory',
+  'memory_overview',
+  'audit_memory'
+]);
+
+const GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_TOOLS = Object.freeze([
+  'record_memory',
+  'tombstone_memory',
+  'supersede_memory'
+]);
+
+function isGovernedMcpVcpNativeReadDelegationTool(toolName) {
+  return GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_TOOLS.includes(toolName);
+}
+
+function isGovernedMcpVcpNativeWriteDelegationTool(toolName) {
+  return GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_TOOLS.includes(toolName);
+}
+
+function isGovernedMcpVcpNativeBridgeTool(toolName) {
+  return isGovernedMcpVcpNativeReadDelegationTool(toolName) ||
+    isGovernedMcpVcpNativeWriteDelegationTool(toolName);
+}
+
+function governedMcpVcpNativeDelegationRequested(config = {}, toolName = '') {
+  return (
+    isGovernedMcpVcpNativeReadDelegationTool(toolName) &&
+    config.governedMcpVcpNativeReadDelegationMode !== 'off'
+  ) || (
+    isGovernedMcpVcpNativeWriteDelegationTool(toolName) &&
+    config.governedMcpVcpNativeWriteDelegationMode !== 'off'
+  );
+}
+
+function buildGovernedMcpVcpNativeDelegationRequiresGateRejection(toolName = '') {
+  const blockers = ['native_delegation_requires_bridge_gate_mode_not_off'];
+  return buildGovernedMcpVcpNativeBridgeRejectedToolResult({
+    accepted: false,
+    blockers,
+    lowDisclosureRejection: {
+      reason: 'native_delegation_not_governed',
+      code: 'governed_mcp_vcp_native_delegation_requires_bridge_gate',
+      lowDisclosure: true,
+      blockers,
+      direction: isGovernedMcpVcpNativeWriteDelegationTool(toolName) ? 'write' : 'read'
+    }
+  });
+}
+
+function buildGovernedMcpVcpNativeWriteDelegationRequiredRejection() {
+  const blockers = ['native_write_delegation_required_for_governed_write_tool'];
+  return buildGovernedMcpVcpNativeBridgeRejectedToolResult({
+    accepted: false,
+    blockers,
+    lowDisclosureRejection: {
+      reason: 'native_write_delegation_not_configured',
+      code: 'governed_mcp_vcp_native_write_delegation_required',
+      lowDisclosure: true,
+      blockers,
+      direction: 'write'
+    }
+  });
+}
+
+function buildGovernedMcpVcpNativeReadShapeProbeInvokerRegistry(config = {}, overrides = {}) {
+  const registry = new Map();
+  const configuredTarget = config.governedMcpVcpNativeRuntimeTarget || {};
+  const inputRegistry = overrides.governedMcpVcpNativeReadShapeProbeInvokerRegistry;
+  const httpMcpTarget = overrides.governedMcpVcpNativeReadShapeProbeHttpMcpTarget ||
+    getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(config);
+
+  if (inputRegistry instanceof Map) {
+    for (const [referenceName, invoker] of inputRegistry.entries()) {
+      registry.set(referenceName, invoker);
+    }
+  } else if (inputRegistry && typeof inputRegistry === 'object' && !Array.isArray(inputRegistry)) {
+    for (const [referenceName, invoker] of Object.entries(inputRegistry)) {
+      registry.set(referenceName, invoker);
+    }
+  }
+
+  if (
+    typeof overrides.governedMcpVcpNativeReadShapeProbeInvoker === 'function' &&
+    typeof configuredTarget.targetReferenceName === 'string' &&
+    configuredTarget.targetReferenceName.trim()
+  ) {
+    registry.set(configuredTarget.targetReferenceName, overrides.governedMcpVcpNativeReadShapeProbeInvoker);
+  }
+
+  if (httpMcpTarget && typeof httpMcpTarget === 'object' && !Array.isArray(httpMcpTarget)) {
+    const targetReferenceName = typeof httpMcpTarget.targetReferenceName === 'string'
+      ? httpMcpTarget.targetReferenceName
+      : configuredTarget.targetReferenceName;
+    const httpInvoker = createGovernedMcpVcpNativeHttpMcpClientInvoker({
+      ...httpMcpTarget,
+      targetReferenceName
+    });
+    if (httpInvoker.accepted === true) {
+      registry.set(targetReferenceName, httpInvoker.entry);
+    }
+  }
+
+  return registry;
+}
+
+function buildGovernedMcpVcpNativeReadDelegationToolCaller(config = {}, overrides = {}) {
+  if (typeof overrides.governedMcpVcpNativeReadDelegationToolCaller === 'function') {
+    return overrides.governedMcpVcpNativeReadDelegationToolCaller;
+  }
+
+  const httpMcpTarget = overrides.governedMcpVcpNativeReadDelegationHttpMcpTarget ||
+    getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(config);
+  if (!httpMcpTarget || typeof httpMcpTarget !== 'object' || Array.isArray(httpMcpTarget)) {
+    return null;
+  }
+
+  const toolCaller = createGovernedMcpVcpNativeHttpMcpToolCaller(httpMcpTarget);
+  if (toolCaller.accepted !== true) return null;
+  const callTool = async payload => toolCaller.callTool(payload);
+  callTool.callWithReceipt = async payload => toolCaller.callToolWithReceipt(payload);
+  return callTool;
+}
+
+function buildGovernedMcpVcpNativeWriteDelegationToolCaller(config = {}, overrides = {}) {
+  if (typeof overrides.governedMcpVcpNativeWriteDelegationToolCaller === 'function') {
+    return overrides.governedMcpVcpNativeWriteDelegationToolCaller;
+  }
+
+  const httpMcpTarget = overrides.governedMcpVcpNativeWriteDelegationHttpMcpTarget ||
+    getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(config);
+  if (!httpMcpTarget || typeof httpMcpTarget !== 'object' || Array.isArray(httpMcpTarget)) {
+    return null;
+  }
+
+  const toolCaller = createGovernedMcpVcpNativeHttpMcpToolCaller(httpMcpTarget);
+  if (toolCaller.accepted !== true) return null;
+  const callTool = async payload => toolCaller.callTool(payload);
+  callTool.callWithReceipt = async payload => toolCaller.callToolWithReceipt(payload);
+  return callTool;
+}
+
+function projectReadShapeProbeTargetResolverObservation(resolverResult) {
+  if (!resolverResult) return null;
+  const { invokeComponentAction, ...projection } = resolverResult;
+  return projection;
+}
+
+function safeBridgeMode(value) {
+  return ['off', 'observe', 'strict'].includes(value) ? value : 'off';
+}
+
+function safeBridgeTransportCategory(value) {
+  return ['local_direct_component_action_invoker', 'local_http_transport']
+    .includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeStatusClass(value) {
+  return ['success', 'not_available', 'transport_error', 'client_error', 'server_error', 'not_executed']
+    .includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeJsonRpcErrorReasonCode(value) {
+  return [
+    'invalid_governance_metadata',
+    'native_mutation_tool_unavailable',
+    'native_runtime_call_failed',
+    'native_tool_public_binding_mismatch',
+    'native_write_disabled',
+    'unsupported_native_tool'
+  ].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeDelegationStatusClass(value) {
+  return [
+    'success',
+    'not_available',
+    'not_consumed',
+    'rejected',
+    'transport_error',
+    'client_error',
+    'server_error',
+    'runtime_error',
+    'invalid_response',
+    'output_budget_exceeded',
+    'native_invocation_receipt_unbound',
+    'audit_receipt_not_appended',
+    'fallback_audit_receipt_not_appended',
+    'not_attempted',
+    'unknown'
+  ].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeDelegationReasonCode(value) {
+  return [
+    'invalid_governed_native_read_delegation_boundary',
+    'invalid_governed_native_write_delegation_boundary',
+    'native_read_delegation_transport_error',
+    'native_read_delegation_client_error',
+    'native_read_delegation_server_error',
+    'native_read_delegation_output_budget_exceeded',
+    'native_read_delegation_native_invocation_receipt_unbound',
+    'native_write_delegation_transport_error',
+    'native_write_delegation_client_error',
+    'native_write_delegation_server_error',
+    'native_write_delegation_output_budget_exceeded',
+    'native_write_delegation_native_invocation_receipt_unbound',
+    'required_bridge_audit_receipt_not_appended',
+    'required_read_fallback_audit_receipt_not_appended'
+  ].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeHttpStatusClass(value) {
+  return ['success', 'transport_error', 'client_error', 'server_error'].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeMcpMethod(value) {
+  return value === 'tools/call' ? 'tools/call' : null;
+}
+
+function safeBridgeToolName(value) {
+  return isGovernedMcpVcpNativeBridgeTool(value) ? value : null;
+}
+
+function safeBridgeWritePolicy(value) {
+  return value === 'exact_approval' ? 'exact_approval' : null;
+}
+
+function safeBridgeExactApprovalAction(value) {
+  return [
+    'live_bridge_record_memory_proof',
+    'live_bridge_tombstone_memory_proof',
+    'live_bridge_supersede_memory_proof'
+  ].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeRollbackPosture(value) {
+  return [
+    'no_runtime_state_to_rollback',
+    'read_only_no_write',
+    'bounded_rollback_plan',
+    'mutation_cleanup_plan'
+  ].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeRollbackDisposition(value) {
+  return ['no_rollback_required', 'no_runtime_write_to_rollback', 'rollback_required_not_applied']
+    .includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeRollbackReasonCode(value) {
+  return [
+    'write_post_commit_output_budget_exceeded',
+    'write_post_commit_native_invocation_receipt_unbound',
+    'write_post_commit_audit_receipt_not_appended'
+  ].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeRollbackApplyPolicy(value) {
+  return ['not_applicable', 'manual_governed_followup_required'].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeClientId(value) {
+  return value === 'Codex' ? 'Codex' : null;
+}
+
+function safeBridgeVisibility(value) {
+  return ['private', 'project', 'workspace'].includes(value) ? value : null;
+}
+
+function safeBridgeInvocationProfile(value) {
+  return ['governed_read_only', 'governed_bounded_write'].includes(value) ? value : null;
+}
+
+function safeBridgeDisclosureLevel(value) {
+  return ['none', 'receipt_only', 'metadata', 'shape_only', 'summary', 'structured'].includes(value)
+    ? value
+    : null;
+}
+
+function boundedBridgeInteger(value, min, max) {
+  return Number.isInteger(value) && value >= min && value <= max ? value : null;
+}
+
+function projectScopeFieldNames(scope) {
+  if (!scope || typeof scope !== 'object' || Array.isArray(scope)) return [];
+  return Object.keys(scope)
+    .filter(field => [
+      'client_id',
+      'project_id',
+      'scope_id',
+      'visibility',
+      'workspace_id'
+    ].includes(field))
+    .sort();
+}
+
+function buildStableGovernedMcpVcpNativeScopeFingerprint(scope) {
+  const scopeFieldNames = projectScopeFieldNames(scope);
+  if (scopeFieldNames.length === 0) return null;
+  const fingerprintSource = scopeFieldNames.reduce((output, fieldName) => {
+    output[fieldName] = scope[fieldName];
+    return output;
+  }, {});
+  return crypto
+    .createHash('sha256')
+    .update(JSON.stringify(fingerprintSource), 'utf8')
+    .digest('hex');
+}
+
+function buildGovernedMcpVcpNativeReadFallbackScopeContext(gateResult = {}) {
+  const request = gateResult?.normalizedBridgeRequest || {};
+  const scope = request.scope && typeof request.scope === 'object' && !Array.isArray(request.scope)
+    ? request.scope
+    : {};
+  const scopeFieldNames = projectScopeFieldNames(scope);
+  const scopeIdentifierFieldNames = scopeFieldNames.filter(fieldName =>
+    ['project_id', 'scope_id', 'workspace_id'].includes(fieldName)
+  );
+
+  return {
+    clientId: safeBridgeClientId(request.client_id),
+    visibility: safeBridgeVisibility(request.visibility || scope.visibility),
+    scopePresent: request.scope_present === true && scopeFieldNames.length > 0,
+    scopeIdentifierPresent: request.scope_identifier_present === true &&
+      scopeIdentifierFieldNames.length > 0,
+    scopeFieldNames,
+    scopeIdentifierFieldNames,
+    scopeFingerprint: buildStableGovernedMcpVcpNativeScopeFingerprint(scope),
+    rawScopePersisted: false
+  };
+}
+
+function safeBridgeResponseShapeCategory(value) {
+  return [
+    'array_item_count_bucket_only',
+    'array_top_level_kind_only',
+    'object_top_level_kind_only_no_field_names',
+    'null_top_level_kind_only',
+    'primitive_top_level_kind_only',
+    'unknown_shape',
+    'not_consumed'
+  ].includes(value)
+    ? value
+    : null;
+}
+
+function projectGovernedNativeBridgeObservationSummary(observation = {}) {
+  const resolver = observation.readShapeProbeTargetResolverResult || {};
+  const probe = observation.readShapeProbeExecutionResult || {};
+  const receipt = probe.readShapeProbeExecutionResult?.receipt || {};
+  const request = observation.gateResult?.normalizedBridgeRequest || {};
+  const runtimeTargetForbiddenFieldCount = boundedBridgeInteger(
+    request.runtime_target_forbidden_field_count,
+    0,
+    50
+  );
+  const invocationProfileForbiddenFieldCount = boundedBridgeInteger(
+    request.invocation_profile_forbidden_field_count,
+    0,
+    50
+  );
+  const readWriteAuthorityForbiddenFieldCount = boundedBridgeInteger(
+    request.read_write_authority_forbidden_field_count,
+    0,
+    50
+  );
+  const readDelegationPresent = Boolean(observation.readDelegationResult);
+  const writeDelegationPresent = Boolean(observation.writeDelegationResult);
+  const delegationResult = writeDelegationPresent
+    ? observation.writeDelegationResult
+    : readDelegationPresent
+      ? observation.readDelegationResult
+      : {};
+  const delegationReceipt = delegationResult.receipt || {};
+  const nativeInvocationReceipt = delegationReceipt.nativeInvocationReceipt || {};
+  const scopeFieldNames = projectScopeFieldNames(request.scope);
+  const scopeIdentifierFieldNames = scopeFieldNames.filter(fieldName =>
+    ['project_id', 'scope_id', 'workspace_id'].includes(fieldName)
+  );
+  const scopeFingerprint = buildStableGovernedMcpVcpNativeScopeFingerprint(request.scope);
+  const targetReferenceName = runtimeTargetForbiddenFieldCount === 0 &&
+    isSafeReferenceName(request.runtime_target_reference_name)
+    ? request.runtime_target_reference_name
+    : null;
+  const runtimeTargetBound = request.runtime_target === REQUIRED_PRIMARY_RUNTIME &&
+    request.runtime_target_configured === true &&
+    request.runtime_target_kind === 'mcp_server' &&
+    request.runtime_target_source_authority === SOURCE_AUTHORITY &&
+    runtimeTargetForbiddenFieldCount === 0 &&
+    targetReferenceName !== null;
+  const invocationProfile = invocationProfileForbiddenFieldCount === 0
+    ? safeBridgeInvocationProfile(request.invocation_profile)
+    : null;
+  const invocationProfileBound = invocationProfileForbiddenFieldCount === 0 &&
+    request.transport === 'mcp' &&
+    invocationProfile !== null &&
+    isGovernedMcpVcpNativeBridgeTool(request.mcp_tool_name) &&
+    (
+      (invocationProfile === 'governed_read_only' && request.write_allowed !== true) ||
+      (invocationProfile === 'governed_bounded_write' && request.write_allowed === true)
+    );
+  const readAllowed = readWriteAuthorityForbiddenFieldCount === 0 && request.read_allowed === true;
+  const writeAllowed = readWriteAuthorityForbiddenFieldCount === 0 && request.write_allowed === true;
+  const writeRequiresExactApproval = writeAllowed === true && request.write_policy === 'exact_approval';
+  const readWriteAuthorityBound = readWriteAuthorityForbiddenFieldCount === 0 &&
+    ((readAllowed === true && writeAllowed === false && request.write_policy == null) ||
+      (readAllowed === false && writeAllowed === true && request.write_policy === 'exact_approval'));
+  const scopeBoundaryBound = request.scope_present === true &&
+    request.scope_identifier_present === true &&
+    request.scope_identifier_safe === true &&
+    scopeFieldNames.includes('client_id') &&
+    scopeFieldNames.includes('visibility') &&
+    safeBridgeVisibility(request.visibility) !== null;
+  const rollbackPosture = safeBridgeRollbackPosture(delegationReceipt.rollbackPosture || request.rollback_posture);
+  const rollbackPostureForbiddenFieldCount = boundedBridgeInteger(
+    request.rollback_posture_forbidden_field_count,
+    0,
+    50
+  );
+  const rollbackPostureBound = delegationReceipt.rollbackPostureBound === true ||
+    (
+      rollbackPostureForbiddenFieldCount === 0 &&
+      readAllowed === true &&
+      writeAllowed === false &&
+      ['no_runtime_state_to_rollback', 'read_only_no_write'].includes(rollbackPosture) &&
+      request.rollback_plan_reference_present !== true
+    ) ||
+    (
+      rollbackPostureForbiddenFieldCount === 0 &&
+      readAllowed === false &&
+      writeAllowed === true &&
+      ['bounded_rollback_plan', 'mutation_cleanup_plan'].includes(rollbackPosture) &&
+      request.rollback_plan_reference_present === true &&
+      request.rollback_plan_reference_safe === true
+    );
+
+  return {
+    schemaVersion: 'governed_native_bridge_observation_summary_v1',
+    toolName: isGovernedMcpVcpNativeBridgeTool(observation.toolName) ? observation.toolName : null,
+    mode: safeBridgeMode(observation.mode),
+    gateAccepted: observation.gateResult?.accepted === true,
+    accessPath: request.access_path === REQUIRED_ACCESS_PATH ? REQUIRED_ACCESS_PATH : null,
+    clientId: safeBridgeClientId(request.client_id),
+    visibility: safeBridgeVisibility(request.visibility),
+    scopePresent: request.scope_present === true && scopeFieldNames.length > 0,
+    scopeIdentifierPresent: request.scope_identifier_present === true &&
+      scopeIdentifierFieldNames.length > 0,
+    scopeIdentifierSafe: request.scope_identifier_safe === true,
+    scopeFieldNames,
+    scopeIdentifierFieldNames,
+    scopeFingerprintPresent: typeof scopeFingerprint === 'string' && /^[a-f0-9]{64}$/.test(scopeFingerprint),
+    rawScopePersisted: false,
+    rawScopeValueReturned: false,
+    clientIdentitySource: GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE,
+    clientIdentityBound: request.client_id === 'Codex',
+    clientIdentityToolArgumentsMayOverride: false,
+    clientIdentityGovernanceMetadataMayOverride: false,
+    scopeBoundarySource: GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE,
+    scopeBoundaryBound,
+    scopeToolArgumentsMayOverride: false,
+    scopeGovernanceMetadataMayOverride: false,
+    visibilityBound: safeBridgeVisibility(request.visibility) !== null,
+    trustedExecutionContextSupplied: request.trusted_execution_context_supplied === true,
+    trustedExecutionContextAccepted: request.trusted_execution_context_accepted === true,
+    trustedExecutionContextScopeMatched: request.trusted_execution_context_scope_matched === true,
+    primaryRuntime: request.runtime_target === REQUIRED_PRIMARY_RUNTIME ? REQUIRED_PRIMARY_RUNTIME : null,
+    runtimeTargetConfigured: request.runtime_target_configured === true,
+    runtimeTargetKind: request.runtime_target_kind === 'mcp_server' ? 'mcp_server' : null,
+    runtimeTargetSourceAuthority: request.runtime_target_source_authority === SOURCE_AUTHORITY
+      ? SOURCE_AUTHORITY
+      : null,
+    runtimeTargetForbiddenFieldCount,
+    runtimeTargetBound,
+    runtimeTargetToolArgumentsMayOverride: false,
+    runtimeTargetGovernanceMetadataMayOverride: false,
+    targetReferenceName,
+    runtimeTargetLocatorDisclosed: false,
+    runtimeTargetEndpointDisclosed: false,
+    runtimeTargetTokenMaterialDisclosed: false,
+    invocationProfile,
+    invocationProfileSource: 'bridge_tool_binding',
+    invocationProfileBound,
+    invocationProfileToolArgumentsMayOverride: false,
+    invocationProfileGovernanceMetadataMayOverride: false,
+    invocationProfileForbiddenFieldCount,
+    readAllowed,
+    writeAllowed,
+    readWriteAuthoritySource: readWriteAuthorityForbiddenFieldCount === 0 ? 'bridge_tool_binding' : null,
+    readWriteAuthorityBound,
+    mixedReadWriteAllowed: readAllowed === true && writeAllowed === true,
+    unboundedWriteAllowed: false,
+    writeRequiresExactApproval,
+    readWriteAuthorityForbiddenFieldCount,
+    disclosureLevel: safeBridgeDisclosureLevel(request.disclosure_level),
+    outputDisclosureBudgetSource: 'bridge_gate_normalized_governance',
+    outputDisclosureBudgetBound: request.raw_output_allowed === false &&
+      safeBridgeDisclosureLevel(request.disclosure_level) !== null &&
+      boundedBridgeInteger(request.disclosure_max_items, 0, 5) !== null &&
+      boundedBridgeInteger(request.disclosure_max_bytes, 0, 4096) !== null &&
+      boundedBridgeInteger(request.disclosure_forbidden_field_count, 0, 50) === 0,
+    outputDisclosureBudgetToolArgumentsMayOverride: false,
+    outputDisclosureBudgetGovernanceMetadataMayOverride: false,
+    disclosureMaxItems: boundedBridgeInteger(request.disclosure_max_items, 0, 5),
+    disclosureMaxBytes: boundedBridgeInteger(request.disclosure_max_bytes, 0, 4096),
+    disclosureForbiddenFieldCount: boundedBridgeInteger(request.disclosure_forbidden_field_count, 0, 50),
+    rawOutputAllowed: request.raw_output_allowed === true,
+    readOnlyProbeAccepted: observation.readOnlyProbeResult?.accepted === true,
+    readShapeProbeTargetResolverAccepted: resolver.accepted === true,
+    readShapeProbeTargetResolved: resolver.targetResolved === true,
+    readShapeProbeExecuted: probe.accepted === true,
+    readDelegationAttempted: readDelegationPresent,
+    readDelegationAccepted: observation.readDelegationResult?.accepted === true,
+    writeDelegationAttempted: writeDelegationPresent,
+    writeDelegationAccepted: observation.writeDelegationResult?.accepted === true,
+    delegationDirection: writeDelegationPresent ? 'write' : readDelegationPresent ? 'read' : null,
+    delegationStatusClass: safeBridgeDelegationStatusClass(delegationReceipt.statusClass),
+    delegationReasonCode: safeBridgeDelegationReasonCode(delegationResult.reasonCode),
+    bridgeAuditReceiptAppended:
+      observation.bridgeAuditReceiptResult?.accepted === true &&
+      observation.bridgeAuditReceiptResult?.appended === true,
+    bridgeAuditReceiptStatus:
+      delegationReceipt.localAuditReceipt?.status === 'appended' ||
+      delegationReceipt.localAuditReceipt?.status === 'not_appended'
+        ? delegationReceipt.localAuditReceipt.status
+        : null,
+    bridgeAuditReceiptRequired: delegationReceipt.auditReceiptRequired === true,
+    auditReceiptSource: 'bridge_gate_normalized_governance',
+    auditReceiptLowDisclosure: request.audit_receipt_low_disclosure === true,
+    auditReceiptLowDisclosureBound: request.audit_receipt_required === true &&
+      request.audit_receipt_low_disclosure === true &&
+      request.audit_receipt_reference_present === true &&
+      request.audit_receipt_reference_safe === true &&
+      boundedBridgeInteger(request.audit_receipt_forbidden_field_count, 0, 50) === 0,
+    auditReceiptToolArgumentsMayOverride: false,
+    auditReceiptGovernanceMetadataMayOverride: false,
+    bridgeReceiptLowDisclosure: delegationReceipt.localAuditReceipt?.lowDisclosure === true,
+    localMemoryRole: delegationReceipt.localMemoryRole === 'not_used' || observation.gateResult?.accepted === true
+      ? 'not_used'
+      : null,
+    localMemorySourceRuntime: null,
+    localMemoryPrimaryRuntime: false,
+    localMemoryFallbackUsed: false,
+    localMemoryResultReturned: false,
+    localMemoryResultCanBeMistakenForVcpNative: false,
+    localMemoryRawContentDisclosed: false,
+    auditReceiptReferencePresent: request.audit_receipt_reference_present === true,
+    auditReceiptReferenceSafe: request.audit_receipt_reference_safe === true,
+    auditReceiptReferenceName: request.audit_receipt_forbidden_field_count === 0 &&
+      isSafeReferenceName(request.audit_receipt_reference_name)
+      ? request.audit_receipt_reference_name
+      : null,
+    auditReceiptForbiddenFieldCount: boundedBridgeInteger(request.audit_receipt_forbidden_field_count, 0, 50),
+    transportCategory: safeBridgeTransportCategory(resolver.transportCategory),
+    statusClass: safeBridgeStatusClass(receipt.statusClass),
+    responseShapeCategory: safeBridgeResponseShapeCategory(receipt.responseShapeCategory),
+    nativeInvocationAttempted: delegationReceipt.nativeInvocationAttempted === true,
+    nativeMcpToolInvocationAttempted: delegationReceipt.nativeMcpToolInvocationAttempted === true,
+    nativeInvocationReceiptBindingMatched: nativeInvocationReceipt.invocationBindingMatched === true,
+    nativeInvocationGovernanceMetadataPath:
+      nativeInvocationReceipt.governanceMetadataPath === 'params._meta.codexMemoryGovernance'
+        ? 'params._meta.codexMemoryGovernance'
+        : null,
+    nativeInvocationGovernanceMetadataSent: nativeInvocationReceipt.governanceMetadataSent === true,
+    nativeInvocationGovernanceMetadataRawValueDisclosed:
+      nativeInvocationReceipt.governanceMetadataRawValueDisclosed === true,
+    nativeInvocationToolName: safeBridgeToolName(nativeInvocationReceipt.toolName),
+    nativeInvocationTransportCategory: safeBridgeTransportCategory(nativeInvocationReceipt.transportCategory),
+    nativeInvocationMcpMethod: safeBridgeMcpMethod(nativeInvocationReceipt.mcpMethod),
+    nativeInvocationRequestIdCategory:
+      nativeInvocationReceipt.requestIdCategory === 'generated_bridge_request_id'
+        ? 'generated_bridge_request_id'
+        : null,
+    nativeInvocationJsonRpcResponseIdMatched:
+      nativeInvocationReceipt.jsonRpcResponseIdMatched === true,
+    nativeInvocationStatusClass: safeBridgeStatusClass(nativeInvocationReceipt.statusClass),
+    nativeInvocationHttpStatusClass: safeBridgeHttpStatusClass(nativeInvocationReceipt.httpStatusClass),
+    nativeInvocationJsonRpcErrorPresent:
+      nativeInvocationReceipt.jsonRpcErrorPresent === true,
+    nativeInvocationJsonRpcErrorReasonCode:
+      safeBridgeJsonRpcErrorReasonCode(nativeInvocationReceipt.jsonRpcErrorReasonCode),
+    nativeInvocationResponseShapeCategory:
+      safeBridgeResponseShapeCategory(nativeInvocationReceipt.responseShapeCategory),
+    writePolicy: safeBridgeWritePolicy(delegationReceipt.writePolicy),
+    exactApprovalAction: safeBridgeExactApprovalAction(delegationReceipt.exactApprovalAction),
+    exactApprovalActionMatched: delegationReceipt.exactApprovalActionMatched === true,
+    exactApprovalScopeMatched: delegationReceipt.exactApprovalScopeMatched === true,
+    exactApprovalRuntimeTargetMatched: delegationReceipt.exactApprovalRuntimeTargetMatched === true,
+    exactApprovalRollbackPlanMatched: delegationReceipt.exactApprovalRollbackPlanMatched === true,
+    exactApprovalForbiddenFieldCount:
+      Number.isInteger(delegationReceipt.exactApprovalForbiddenFieldCount) &&
+      delegationReceipt.exactApprovalForbiddenFieldCount >= 0
+        ? delegationReceipt.exactApprovalForbiddenFieldCount
+        : null,
+    rollbackPosture,
+    rollbackPostureSource: 'bridge_gate_normalized_governance',
+    rollbackPostureForbiddenFieldCount,
+    rollbackPlanReferencePresent: request.rollback_plan_reference_present === true,
+    rollbackPlanReferenceSafe: request.rollback_plan_reference_safe === true,
+    rollbackPlanBound: delegationReceipt.rollbackPlanBound === true,
+    rollbackPostureBound,
+    rollbackPostureToolArgumentsMayOverride: false,
+    rollbackPostureGovernanceMetadataMayOverride: false,
+    rollbackPlanShapeOnly: delegationReceipt.rollbackPlanShapeOnly === true,
+    rollbackRequired: delegationReceipt.rollbackRequired === true,
+    rollbackReasonCode: safeBridgeRollbackReasonCode(delegationReceipt.rollbackReasonCode),
+    rollbackDisposition: safeBridgeRollbackDisposition(delegationReceipt.rollbackDisposition),
+    rollbackFollowupRequired: delegationReceipt.rollbackFollowupRequired === true,
+    rollbackApplyPolicy: safeBridgeRollbackApplyPolicy(delegationReceipt.rollbackApplyPolicy),
+    rollbackApplyAttempted: delegationReceipt.rollbackApplyAttempted === true,
+    rollbackAutoApplyAllowed: delegationReceipt.rollbackAutoApplyAllowed === true,
+    rollbackRawPlanDisclosed: false,
+    rollbackRawPlanPersisted: false,
+    runtimeExecuted: probe.runtimeExecuted === true,
+    networkCalled: probe.networkCalled === true,
+    memoryReadPerformed:
+      probe.memoryReadPerformed === true ||
+      observation.readDelegationResult?.memoryReadPerformed === true,
+    memoryWritePerformed:
+      probe.memoryWritten === true ||
+      observation.readDelegationResult?.memoryWritePerformed === true ||
+      observation.writeDelegationResult?.memoryWritePerformed === true,
+    localMemoryFallbackUsed: observation.readDelegationResult?.localMemoryFallbackUsed === true,
+    endpointDisclosed: false,
+    tokenMaterialDisclosed: false,
+    rawRequestBodyDisclosed: false,
+    rawResponseBodyDisclosed: false,
+    rawMemoryReturned: false,
+    readinessClaimed: false
+  };
+}
+
+function createGovernedNativeBridgeObservationStore({ limit = 5 } = {}) {
+  const boundedLimit = Number.isInteger(limit) && limit > 0 && limit <= 20 ? limit : 5;
+  const summaries = [];
+
+  function buildStatus(latest = null) {
+    return {
+      schemaVersion: 'governed_native_bridge_observation_status_v1',
+      available: true,
+      retainedObservationLimit: boundedLimit,
+      observationCount: summaries.length,
+      latest,
+      endpointDisclosed: false,
+      tokenMaterialDisclosed: false,
+      rawRequestBodyDisclosed: false,
+      rawResponseBodyDisclosed: false,
+      rawMemoryReturned: false,
+      readinessClaimed: false
+    };
+  }
+
+  return {
+    record(observation = {}) {
+      const summary = projectGovernedNativeBridgeObservationSummary(observation);
+      const coverage = validateGovernedMcpOverviewStatusCoversCurrentProductGoal(
+        buildStatus(summary)
+      );
+      if (coverage.accepted !== true) return summary;
+      summaries.push(summary);
+      while (summaries.length > boundedLimit) summaries.shift();
+      return summary;
+    },
+    getStatus() {
+      return buildStatus(summaries.length > 0 ? summaries[summaries.length - 1] : null);
+    }
+  };
+}
+
+function attachGovernedNativeBridgeOverviewStatus(result, observationStore) {
+  if (!result || typeof result !== 'object' || Array.isArray(result)) return result;
+  if (!observationStore || typeof observationStore.getStatus !== 'function') return result;
+  return {
+    ...result,
+    governedNativeBridge: observationStore.getStatus()
+  };
+}
+
+function buildGovernedMcpVcpNativeReadDelegationRejectedToolResult(delegationResult = {}) {
+  const receipt = delegationResult && typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
+    ? delegationResult.receipt
+    : {};
+  return {
+    status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_REJECTED',
+    accepted: false,
+    decision: 'rejected',
+    reasonCode: delegationResult.reasonCode || 'governed_mcp_vcp_native_read_delegation_rejected',
+    access: {
+      mode: 'governed_mcp_vcp_native_primary_read',
+      selectedProjection: true,
+      lowDisclosure: true,
+      rawOutputReturned: false,
+      rawMemoryReturned: false,
+      tokenMaterialReturned: false,
+      runtimeCalled: delegationResult.runtimeCalled === true,
+      vcpToolBoxCalled: delegationResult.vcpToolBoxCalled === true,
+      mcpToolCalled: delegationResult.mcpToolCalled === true,
+      memoryReadPerformed: delegationResult.memoryReadPerformed === true,
+      localMemoryFallbackEligible: delegationResult.localMemoryFallbackEligible === true,
+      localMemoryFallbackUsed: false,
+      auditReceiptRequiredButNotAppended: receipt.auditReceiptRequiredButNotAppended === true,
+      delegationStatusClass: safeBridgeDelegationStatusClass(receipt.statusClass),
+      delegationReasonCode: safeBridgeDelegationReasonCode(delegationResult.reasonCode),
+      rollbackRequired: false,
+      rollbackFollowupRequired: false
+    },
+    receipt: delegationResult.receipt || null,
+    readinessClaimed: false
+  };
+}
+
+function buildGovernedMcpVcpNativeReadFallbackContext(delegationResult = {}, gateResult = {}) {
+  const receipt = delegationResult && typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
+    ? delegationResult.receipt
+    : null;
+  return {
+    ...buildGovernedMcpVcpNativeReadFallbackScopeContext(gateResult),
+    used: true,
+    reasonCode: delegationResult.reasonCode || 'native_read_delegation_failed',
+    primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
+    localMemoryRole: 'fallback',
+    localMemorySourceRuntime: 'codex_memory_local_fallback',
+    vcpNativeResult: false,
+    resultCanBeMistakenForVcpNative: false,
+    lowDisclosure: true,
+    nativeRuntimeCalled: delegationResult.runtimeCalled === true,
+    nativeMcpToolCalled: delegationResult.mcpToolCalled === true,
+    nativeInvocationAttempted: receipt?.nativeInvocationAttempted === true,
+    nativeMcpToolInvocationAttempted: receipt?.nativeMcpToolInvocationAttempted === true,
+    nativeMemoryReadPerformed: delegationResult.memoryReadPerformed === true,
+    nativeStatusClass: receipt?.statusClass || null,
+    nativeResponseShapeCategory: receipt?.responseShapeCategory || null,
+    nativeTopLevelKindCategory: receipt?.topLevelKindCategory || null,
+    nativeItemCountBucket: receipt?.itemCountBucket || null,
+    nativeByteCountBucket: receipt?.byteCountBucket || null,
+    auditReceiptStatus: receipt?.localAuditReceipt?.status || null,
+    fallbackRequiresAuditReceipt: true,
+    fallbackAfterAuditReceiptAppended: receipt?.localAuditReceipt?.status === 'appended',
+    rawNativeOutputReturned: false,
+    rawNativeMemoryReturned: false,
+    tokenMaterialReturned: false,
+    endpointReturned: false,
+    readinessClaimed: false
+  };
+}
+
+function buildGovernedMcpVcpNativeReadFallbackAuditRejectedToolResult(
+  fallbackContext,
+  localFallbackAuditReceipt,
+  reasonCode = 'required_read_fallback_audit_receipt_not_appended'
+) {
+  const auditReceiptRequiredButNotAppended = localFallbackAuditReceipt?.appended !== true;
+  const statusClass = auditReceiptRequiredButNotAppended
+    ? 'fallback_audit_receipt_not_appended'
+    : 'fallback_audit_receipt_not_authorized';
+  const fallbackContextWithAudit = {
+    ...(fallbackContext || {}),
+    used: false,
+    localMemoryFallbackAttempted: true,
+    localMemoryFallbackReadPerformed: false,
+    localMemoryFallbackReturned: false,
+    localFallbackAuditReceipt,
+    rawNativeOutputReturned: false,
+    rawNativeMemoryReturned: false,
+    tokenMaterialReturned: false,
+    endpointReturned: false,
+    readinessClaimed: false
+  };
+
+  return {
+    accepted: false,
+    decision: 'rejected',
+    status: 'GOVERNED_MCP_VCP_NATIVE_READ_FALLBACK_REJECTED',
+    reasonCode,
+    access: {
+      mode: 'governed_mcp_vcp_native_primary_read_local_fallback',
+      selectedProjection: true,
+      lowDisclosure: true,
+      primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
+      localMemoryRole: 'fallback',
+      localMemorySourceRuntime: 'codex_memory_local_fallback',
+      localMemoryFallbackAttempted: true,
+      localMemoryFallbackUsed: false,
+      localMemoryFallbackReadPerformed: false,
+      localMemoryFallbackReturned: false,
+      localMemoryFallbackReasonCode: fallbackContext?.reasonCode || null,
+      localFallbackAuditReceiptStatus: localFallbackAuditReceipt?.status || 'not_appended',
+      localFallbackAuditReceiptAuthorized: localFallbackAuditReceipt?.authorized === true,
+      fallbackRequiresAuditReceipt: true,
+      fallbackAfterAuditReceiptAppended: fallbackContext?.fallbackAfterAuditReceiptAppended === true,
+      vcpNativeResult: false,
+      resultCanBeMistakenForVcpNative: false,
+      nativeInvocationAttempted: fallbackContext?.nativeInvocationAttempted === true,
+      nativeMcpToolInvocationAttempted: fallbackContext?.nativeMcpToolInvocationAttempted === true,
+      rawOutputReturned: false,
+      rawMemoryReturned: false,
+      rawNativeOutputReturned: false,
+      rawNativeMemoryReturned: false,
+      tokenMaterialReturned: false,
+      endpointReturned: false,
+      readinessClaimed: false
+    },
+    governedNativeReadFallback: fallbackContextWithAudit,
+    receipt: {
+      localFallbackAuditReceipt,
+      auditReceiptRequiredButNotAppended,
+      auditReceiptAppendedButNotAuthorized: !auditReceiptRequiredButNotAppended,
+      statusClass,
+      lowDisclosure: true,
+      rawPayloadReturned: false,
+      tokenMaterialReturned: false,
+      readinessClaimed: false
+    },
+    readinessClaimed: false
+  };
+}
+
+function buildGovernedMcpVcpNativeReadFallbackLocalAuditReceipt(fallbackAuditReceiptResult = {}) {
+  const appended = fallbackAuditReceiptResult.accepted === true && fallbackAuditReceiptResult.appended === true;
+  return {
+    eventType: fallbackAuditReceiptResult.eventType,
+    appended,
+    status: appended ? 'appended' : 'not_appended',
+    authorized: fallbackAuditReceiptResult.localMemoryFallbackAuthorized === true,
+    reasonCode: fallbackAuditReceiptResult.reasonCode || null,
+    lowDisclosure: true,
+    rawPayloadPersisted: false,
+    tokenMaterialPersisted: false
+  };
+}
+
+function clampGovernedMcpVcpNativeFallbackInt(value, fallback, min, max) {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  if (!Number.isInteger(parsed)) return fallback;
+  return Math.max(min, Math.min(max, parsed));
+}
+
+function governedMcpVcpNativeFallbackMaxItems(gateResult = {}) {
+  const request = gateResult && typeof gateResult.normalizedBridgeRequest === 'object'
+    ? gateResult.normalizedBridgeRequest
+    : {};
+  return clampGovernedMcpVcpNativeFallbackInt(request.disclosure_max_items, 5, 0, 5);
+}
+
+function governedMcpVcpNativeFallbackScope(gateResult = {}) {
+  const request = gateResult && typeof gateResult.normalizedBridgeRequest === 'object'
+    ? gateResult.normalizedBridgeRequest
+    : {};
+  const scope = request.scope && typeof request.scope === 'object' && !Array.isArray(request.scope)
+    ? request.scope
+    : null;
+  if (!scope) return undefined;
+
+  const projected = {};
+  for (const key of ['project_id', 'workspace_id', 'scope_id']) {
+    if (typeof scope[key] === 'string' && isSafeReferenceName(scope[key])) {
+      projected[key] = scope[key];
+    }
+  }
+  if (scope.client_id === 'Codex') {
+    projected.client_id = 'Codex';
+  }
+  if (GOVERNED_MCP_VCP_NATIVE_FALLBACK_VISIBILITIES.includes(scope.visibility)) {
+    projected.visibility = scope.visibility;
+  }
+  return Object.keys(projected).length > 0 ? projected : undefined;
+}
+
+function buildGovernedMcpVcpNativeReadFallbackArguments(toolName, args = {}, gateResult = {}) {
+  const maxItems = governedMcpVcpNativeFallbackMaxItems(gateResult);
+  const scope = governedMcpVcpNativeFallbackScope(gateResult);
+  const safeArgs = args && typeof args === 'object' && !Array.isArray(args) ? args : {};
+
+  if (toolName === 'search_memory') {
+    return {
+      query: typeof safeArgs.query === 'string' ? safeArgs.query : '',
+      target: ['process', 'knowledge', 'both'].includes(safeArgs.target) ? safeArgs.target : 'both',
+      limit: clampGovernedMcpVcpNativeFallbackInt(safeArgs.limit, maxItems, 0, maxItems),
+      include_content: false,
+      ...(typeof safeArgs.context_text === 'string' && safeArgs.context_text.trim()
+        ? { context_text: safeArgs.context_text }
+        : {}),
+      ...(scope ? { scope } : {})
+    };
+  }
+
+  if (toolName === 'memory_overview') {
+    return {
+      auditWindow: clampGovernedMcpVcpNativeFallbackInt(safeArgs.auditWindow, maxItems, 0, maxItems),
+      limit: clampGovernedMcpVcpNativeFallbackInt(safeArgs.limit, maxItems, 0, maxItems),
+      ...(scope ? { scope } : {})
+    };
+  }
+
+  if (toolName === 'audit_memory') {
+    return {
+      audit_family: ['write', 'recall', 'governance', 'all'].includes(safeArgs.audit_family)
+        ? safeArgs.audit_family
+        : 'all',
+      window: clampGovernedMcpVcpNativeFallbackInt(safeArgs.window, maxItems, 0, maxItems),
+      ...(scope ? { scope } : {}),
+      include_raw: false
+    };
+  }
+
+  return safeArgs;
+}
+
+async function prepareGovernedMcpVcpNativeReadFallbackAuditReceipt(fallbackContext, options = {}) {
+  if (!fallbackContext) {
+    return {
+      accepted: true,
+      localFallbackAuditReceipt: null,
+      rejectedToolResult: null
+    };
+  }
+
+  const recordFallbackAuditReceipt = typeof options.recordFallbackAuditReceipt === 'function'
+    ? options.recordFallbackAuditReceipt
+    : recordGovernedMcpVcpNativeReadFallbackAuditReceipt;
+  const fallbackAuditReceiptResult = await recordFallbackAuditReceipt({
+    auditLogStore: options.auditLogStore,
+    toolName: options.toolName,
+    fallbackContext
+  });
+  const localFallbackAuditReceipt =
+    buildGovernedMcpVcpNativeReadFallbackLocalAuditReceipt(fallbackAuditReceiptResult);
+
+  if (localFallbackAuditReceipt.appended !== true ||
+    localFallbackAuditReceipt.authorized !== true) {
+    const reasonCode = localFallbackAuditReceipt.appended === true
+      ? 'required_read_fallback_audit_receipt_not_authorized'
+      : 'required_read_fallback_audit_receipt_not_appended';
+    return {
+      accepted: false,
+      localFallbackAuditReceipt,
+      rejectedToolResult: buildGovernedMcpVcpNativeReadFallbackAuditRejectedToolResult(
+        fallbackContext,
+        localFallbackAuditReceipt,
+        reasonCode
+      )
+    };
+  }
+
+  return {
+    accepted: true,
+    localFallbackAuditReceipt,
+    rejectedToolResult: null
+  };
+}
+
+const GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_TOP_LEVEL_RESULT_FIELDS = Object.freeze([
+  'id',
+  'memoryId',
+  'memory_id',
+  'recordId',
+  'record_id',
+  'title',
+  'snippet',
+  'text',
+  'content',
+  'rawContent',
+  'rawMemory',
+  'rawOutput',
+  'rawAudit',
+  'evidence',
+  'path',
+  'filePath',
+  'file_path',
+  'paths',
+  'recentAudit',
+  'recentFiles',
+  'memoryLinks',
+  'memoryIds',
+  'memory_ids',
+  'filesystemPaths',
+  'tokenMaterial',
+  'token',
+  'endpoint',
+  'locator'
+]);
+const GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_RESULT_KEY_NORMAL_FORMS = new Set([
+  ...GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_TOP_LEVEL_RESULT_FIELDS.map(
+    key => normalizeGovernedMcpVcpNativeReadFallbackResultKey(key)
+  ),
+  'absolutepath',
+  'accesskey',
+  'accesstoken',
+  'apikey',
+  'authorization',
+  'bearer',
+  'bearertoken',
+  'credential',
+  'credentials',
+  'fileurl',
+  'fulloutput',
+  'providerapikey',
+  'privatekey',
+  'rawbody',
+  'rawpayload',
+  'refreshtoken',
+  'secret',
+  'secrets',
+  'url'
+]);
+const GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_RESULT_KEY_CONTAINS = Object.freeze([
+  'apikey',
+  'accesstoken',
+  'authorization',
+  'bearertoken',
+  'credential',
+  'endpoint',
+  'locator',
+  'privatekey',
+  'refreshtoken',
+  'secret'
+]);
+const GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_RESULT_KEY_PREFIXES = Object.freeze([
+  'raw'
+]);
+const GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_RESULT_KEY_SUFFIXES = Object.freeze([
+  'path',
+  'token',
+  'url'
+]);
+const GOVERNED_MCP_VCP_NATIVE_BRIDGE_RECEIPT_FALSE_PROOF_FIELDS = Object.freeze([
+  'endpointDisclosed',
+  'rawOutputAllowed',
+  'rawRequestBodyPersisted',
+  'rawResponseBodyPersisted',
+  'rawScopePersisted',
+  'rawScopeValueReturned'
+]);
+const GOVERNED_MCP_VCP_NATIVE_READ_FALLBACK_RECEIPT_FALSE_PROOF_FIELDS = Object.freeze([
+  'rawScopePersisted',
+  'rawNativeOutputReturned',
+  'rawNativeMemoryReturned',
+  'rawFallbackMemoryPersisted',
+  'rawFallbackMemoryReturned',
+  'tokenMaterialDisclosed',
+  'endpointDisclosed',
+  'memoryContentDisclosed',
+  'memoryIdsDisclosed',
+  'nativeFieldNamesDisclosed',
+  'readinessClaimed'
+]);
+const GOVERNED_NATIVE_BRIDGE_OBSERVATION_STATUS_FALSE_PROOF_FIELDS = Object.freeze([
+  'endpointDisclosed',
+  'tokenMaterialDisclosed',
+  'rawRequestBodyDisclosed',
+  'rawResponseBodyDisclosed',
+  'rawMemoryReturned',
+  'readinessClaimed'
+]);
+const GOVERNED_NATIVE_BRIDGE_OBSERVATION_SUMMARY_FALSE_PROOF_FIELDS = Object.freeze([
+  'endpointDisclosed',
+  'localMemoryPrimaryRuntime',
+  'localMemoryFallbackUsed',
+  'localMemoryResultReturned',
+  'localMemoryResultCanBeMistakenForVcpNative',
+  'localMemoryRawContentDisclosed',
+  'rawOutputAllowed',
+  'rawRequestBodyDisclosed',
+  'rawResponseBodyDisclosed',
+  'rawMemoryReturned',
+  'rawScopePersisted',
+  'rawScopeValueReturned',
+  'readinessClaimed',
+  'rollbackApplyAttempted',
+  'rollbackAutoApplyAllowed',
+  'rollbackRawPlanDisclosed',
+  'rollbackRawPlanPersisted',
+  'runtimeTargetEndpointDisclosed',
+  'runtimeTargetLocatorDisclosed',
+  'runtimeTargetTokenMaterialDisclosed',
+  'tokenMaterialDisclosed'
+]);
+
+function normalizeGovernedMcpVcpNativeReadFallbackResultKey(key) {
+  return typeof key === 'string'
+    ? key.toLowerCase().replace(/[^a-z0-9]/g, '')
+    : '';
+}
+
+function isForbiddenGovernedMcpVcpNativeReadFallbackResultKey(key) {
+  const normalizedKey = normalizeGovernedMcpVcpNativeReadFallbackResultKey(key);
+  return GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_RESULT_KEY_NORMAL_FORMS.has(normalizedKey) ||
+    GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_RESULT_KEY_CONTAINS.some(pattern =>
+      normalizedKey.includes(pattern)
+    ) ||
+    GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_RESULT_KEY_PREFIXES.some(prefix =>
+      normalizedKey.startsWith(prefix)
+    ) ||
+    GOVERNED_MCP_VCP_NATIVE_FALLBACK_FORBIDDEN_RESULT_KEY_SUFFIXES.some(suffix =>
+      normalizedKey.endsWith(suffix)
+    );
+}
+
+function isGovernedMcpVcpNativeBridgeReceiptProjection(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    value.schemaVersion === 'governed_native_bridge_audit_memory_projection_v1' &&
+    value.eventType === 'governed_mcp_vcp_native_bridge_receipt';
+}
+
+function isGovernedMcpVcpNativeReadFallbackReceiptProjection(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    value.schemaVersion === 'governed_native_read_fallback_audit_memory_projection_v1' &&
+    value.eventType === 'governed_mcp_vcp_native_read_fallback_receipt';
+}
+
+function isGovernedNativeBridgeObservationStatusProjection(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    value.schemaVersion === 'governed_native_bridge_observation_status_v1';
+}
+
+function isGovernedNativeBridgeObservationSummaryProjection(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    value.schemaVersion === 'governed_native_bridge_observation_summary_v1';
+}
+
+function isAllowedGovernedMcpVcpNativeFalseProofField(key, value, container) {
+  if (value !== false) return false;
+  if (isGovernedMcpVcpNativeBridgeReceiptProjection(container)) {
+    return GOVERNED_MCP_VCP_NATIVE_BRIDGE_RECEIPT_FALSE_PROOF_FIELDS.includes(key);
+  }
+  if (isGovernedMcpVcpNativeReadFallbackReceiptProjection(container)) {
+    return GOVERNED_MCP_VCP_NATIVE_READ_FALLBACK_RECEIPT_FALSE_PROOF_FIELDS.includes(key);
+  }
+  if (isGovernedNativeBridgeObservationStatusProjection(container)) {
+    return GOVERNED_NATIVE_BRIDGE_OBSERVATION_STATUS_FALSE_PROOF_FIELDS.includes(key);
+  }
+  if (isGovernedNativeBridgeObservationSummaryProjection(container)) {
+    return GOVERNED_NATIVE_BRIDGE_OBSERVATION_SUMMARY_FALSE_PROOF_FIELDS.includes(key);
+  }
+  return false;
+}
+
+function isAllowedGovernedMcpVcpNativeSafeGovernanceField(key, value, container) {
+  if (
+    key === 'nativeInvocationGovernanceMetadataPath' &&
+    value === 'params._meta.codexMemoryGovernance' &&
+    (
+      isGovernedMcpVcpNativeBridgeReceiptProjection(container) ||
+      isGovernedNativeBridgeObservationStatusProjection(container) ||
+      isGovernedNativeBridgeObservationSummaryProjection(container)
+    )
+  ) {
+    return true;
+  }
+  if (
+    key === 'accessPath' &&
+    value === REQUIRED_ACCESS_PATH &&
+    isGovernedNativeBridgeObservationSummaryProjection(container)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function sanitizeGovernedMcpVcpNativeReadFallbackValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(item => sanitizeGovernedMcpVcpNativeReadFallbackValue(item));
+  }
+  if (!value || typeof value !== 'object') return value;
+  const sanitized = {};
+  for (const [key, nested] of Object.entries(value)) {
+    if (
+      isForbiddenGovernedMcpVcpNativeReadFallbackResultKey(key) &&
+      !isAllowedGovernedMcpVcpNativeFalseProofField(key, nested, value) &&
+      !isAllowedGovernedMcpVcpNativeSafeGovernanceField(key, nested, value)
+    ) {
+      continue;
+    }
+    sanitized[key] = sanitizeGovernedMcpVcpNativeReadFallbackValue(nested);
+  }
+  return sanitized;
+}
+
+function sanitizeGovernedMcpVcpNativeReadFallbackResult(result) {
+  const base = result && typeof result === 'object' && !Array.isArray(result)
+    ? result
+    : { value: result };
+  return sanitizeGovernedMcpVcpNativeReadFallbackValue(base);
+}
+
+async function attachGovernedMcpVcpNativeReadFallbackProjection(result, fallbackContext, options = {}) {
+  if (!fallbackContext) return result;
+  let localFallbackAuditReceipt = options.localFallbackAuditReceipt || null;
+  if (!localFallbackAuditReceipt) {
+    const prepared = await prepareGovernedMcpVcpNativeReadFallbackAuditReceipt(fallbackContext, options);
+    if (prepared.accepted !== true) return prepared.rejectedToolResult;
+    localFallbackAuditReceipt = prepared.localFallbackAuditReceipt;
+  }
+
+  const fallbackContextWithAudit = {
+    ...fallbackContext,
+    used: true,
+    localMemoryFallbackAttempted: true,
+    localMemoryFallbackReadPerformed: true,
+    localMemoryFallbackReturned: true,
+    localFallbackAuditReceipt
+  };
+  const base = sanitizeGovernedMcpVcpNativeReadFallbackResult(result);
+  const access = base.access && typeof base.access === 'object' && !Array.isArray(base.access)
+    ? base.access
+    : {};
+
+  return {
+    ...base,
+    access: {
+      ...access,
+      primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
+      localMemoryRole: 'fallback',
+      localMemorySourceRuntime: 'codex_memory_local_fallback',
+      localMemoryFallbackAttempted: true,
+      localMemoryFallbackUsed: true,
+      localMemoryFallbackReadPerformed: true,
+      localMemoryFallbackReturned: true,
+      localMemoryFallbackReasonCode: fallbackContext.reasonCode,
+      vcpNativeResult: false,
+      resultCanBeMistakenForVcpNative: false,
+      fallbackRequiresAuditReceipt: true,
+      fallbackAfterAuditReceiptAppended: fallbackContext.fallbackAfterAuditReceiptAppended === true,
+      localFallbackAuditReceiptStatus: localFallbackAuditReceipt.status,
+      nativeInvocationAttempted: fallbackContext.nativeInvocationAttempted === true,
+      nativeMcpToolInvocationAttempted: fallbackContext.nativeMcpToolInvocationAttempted === true,
+      lowDisclosure: access.lowDisclosure !== false,
+      rawOutputReturned: false,
+      rawMemoryReturned: false,
+      rawAuditReturned: false,
+      rawNativeOutputReturned: false,
+      rawNativeMemoryReturned: false,
+      filesystemPathsReturned: false,
+      pathsReturned: false,
+      recentAuditReturned: false,
+      recentFilesReturned: false,
+      memoryLinksReturned: false,
+      tokenMaterialReturned: false,
+      providerPayloadReturned: false,
+      memoryContentReturned: false,
+      memoryIdsReturned: false,
+      titlesReturned: false,
+      snippetsReturned: false,
+      endpointReturned: false,
+      locatorReturned: false,
+      readinessClaimed: false
+    },
+    governedNativeReadFallback: fallbackContextWithAudit,
+    readinessClaimed: false
+  };
+}
+
+function buildGovernedMcpVcpNativeWriteDelegationRejectedToolResult(delegationResult = {}) {
+  const receipt = delegationResult && typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
+    ? delegationResult.receipt
+    : {};
+  return {
+    status: 'GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_REJECTED',
+    accepted: false,
+    decision: 'rejected',
+    reasonCode: delegationResult.reasonCode || 'governed_mcp_vcp_native_write_delegation_rejected',
+    access: {
+      mode: 'governed_mcp_vcp_native_bounded_write',
+      selectedProjection: true,
+      lowDisclosure: true,
+      rawOutputReturned: false,
+      rawMemoryReturned: false,
+      tokenMaterialReturned: false,
+      memoryContentReturned: false,
+      runtimeCalled: delegationResult.runtimeCalled === true,
+      vcpToolBoxCalled: delegationResult.vcpToolBoxCalled === true,
+      mcpToolCalled: delegationResult.mcpToolCalled === true,
+      memoryWritePerformed: delegationResult.memoryWritePerformed === true,
+      localMemoryFallbackEligible: delegationResult.localMemoryFallbackEligible === true,
+      localMemoryFallbackUsed: delegationResult.localMemoryFallbackUsed === true,
+      auditReceiptRequiredButNotAppended: receipt.auditReceiptRequiredButNotAppended === true,
+      delegationStatusClass: safeBridgeDelegationStatusClass(receipt.statusClass),
+      delegationReasonCode: safeBridgeDelegationReasonCode(delegationResult.reasonCode),
+      rollbackRequired: receipt.rollbackRequired === true,
+      rollbackReasonCode: safeBridgeRollbackReasonCode(receipt.rollbackReasonCode),
+      rollbackDisposition: safeBridgeRollbackDisposition(receipt.rollbackDisposition),
+      rollbackFollowupRequired: receipt.rollbackFollowupRequired === true,
+      rollbackApplyPolicy: safeBridgeRollbackApplyPolicy(receipt.rollbackApplyPolicy),
+      rollbackApplyAttempted: receipt.rollbackApplyAttempted === true,
+      rollbackAutoApplyAllowed: receipt.rollbackAutoApplyAllowed === true
+    },
+    receipt: delegationResult.receipt || null,
+    readinessClaimed: false
+  };
+}
+
+function enforceRequiredBridgeAuditReceipt(delegationResult, auditReceiptResult, reasonCode, direction = null) {
+  if (!delegationResult || !auditReceiptResult || auditReceiptResult.accepted === true) {
+    return delegationResult;
+  }
+
+  const writePostCommitFailure = direction === 'write' &&
+    delegationResult.memoryWritePerformed === true;
+  delegationResult.accepted = false;
+  delegationResult.reasonCode = reasonCode;
+  delegationResult.delegatedResult = null;
+  delegationResult.localMemoryFallbackEligible = false;
+  delegationResult.localMemoryFallbackUsed = false;
+  if (delegationResult.receipt && typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)) {
+    delegationResult.receipt.auditReceiptRequiredButNotAppended = true;
+    delegationResult.receipt.statusClass = 'audit_receipt_not_appended';
+    if (writePostCommitFailure) {
+      delegationResult.receipt.rollbackRequired = true;
+      delegationResult.receipt.rollbackReasonCode = 'write_post_commit_audit_receipt_not_appended';
+      delegationResult.receipt.rollbackDisposition = 'rollback_required_not_applied';
+      delegationResult.receipt.rollbackFollowupRequired = true;
+      delegationResult.receipt.rollbackApplyPolicy = 'manual_governed_followup_required';
+      delegationResult.receipt.rollbackApplyAttempted = false;
+      delegationResult.receipt.rollbackAutoApplyAllowed = false;
+    }
+  }
+  return delegationResult;
 }
 
 async function executePublicControlledMutationTool(toolName, args = {}, requestContext = {}, serviceCall) {
@@ -898,7 +2333,20 @@ function createCodexMemoryApplication(overrides = {}) {
     candidateCacheStore,
     chatHistoryIndexStore
   });
-  const auditMemoryReadonlyService = new AuditMemoryReadonlyService();
+  const auditMemoryReadonlyService = new AuditMemoryReadonlyService({
+    decisionProvider: buildGovernedNativeBridgeAuditMemoryDecisionProvider({ auditLogStore })
+  });
+  const governedMcpVcpNativeBridgeGateObserver =
+    typeof overrides.governedMcpVcpNativeBridgeGateObserver === 'function'
+      ? overrides.governedMcpVcpNativeBridgeGateObserver
+      : null;
+  const governedMcpVcpNativeReadShapeProbeInvokerRegistry =
+    buildGovernedMcpVcpNativeReadShapeProbeInvokerRegistry(config, overrides);
+  const governedMcpVcpNativeReadDelegationToolCaller =
+    buildGovernedMcpVcpNativeReadDelegationToolCaller(config, overrides);
+  const governedMcpVcpNativeWriteDelegationToolCaller =
+    buildGovernedMcpVcpNativeWriteDelegationToolCaller(config, overrides);
+  const governedNativeBridgeObservationStore = createGovernedNativeBridgeObservationStore();
 
   const vcpPassiveMemoryAdapter = new VcpPassiveMemoryAdapter({
     passiveRecallService,
@@ -1015,7 +2463,8 @@ function createCodexMemoryApplication(overrides = {}) {
       passiveRecallService,
       activeRecallService,
       overviewService,
-      auditMemoryReadonlyService
+      auditMemoryReadonlyService,
+      governedNativeBridgeObservationStore
     },
     adapters: {
       compatibilitySyntaxAdapter,
@@ -1057,36 +2506,286 @@ function createCodexMemoryApplication(overrides = {}) {
       }
     },
     async callTool(toolName, args = {}, requestContext = {}) {
+      let governedNativeReadFallbackContext = null;
+      let governedNativeReadFallbackAuditReceipt = null;
+      let governedNativeReadFallbackArgs = null;
+      if (
+        (
+          config.governedMcpVcpNativeBridgeGateMode !== 'off' ||
+          governedMcpVcpNativeDelegationRequested(config, toolName)
+        ) &&
+        isGovernedMcpVcpNativeBridgeTool(toolName)
+      ) {
+        if (
+          config.governedMcpVcpNativeBridgeGateMode === 'off' &&
+          governedMcpVcpNativeDelegationRequested(config, toolName)
+        ) {
+          return buildGovernedMcpVcpNativeDelegationRequiresGateRejection(toolName);
+        }
+        const gateResult = validateGovernedMcpVcpNativeBridgeGate(
+          buildGovernedMcpVcpNativeBridgeGateInput({
+            toolName,
+            args,
+            requestContext,
+            config
+          })
+        );
+        const readOnlyProbeResult = gateResult.accepted === true
+          ? buildGovernedMcpVcpNativeReadOnlyProbeAdapter({ toolName, gateResult })
+          : null;
+        const readShapeProbeTargetResolverResult = gateResult.accepted === true
+          ? resolveGovernedMcpVcpNativeReadShapeProbeTarget({
+            gateResult,
+            config,
+            invokerRegistry: governedMcpVcpNativeReadShapeProbeInvokerRegistry
+          })
+          : null;
+        const readShapeProbeExecutionResult =
+          readShapeProbeTargetResolverResult?.accepted === true
+            ? await executeGovernedMcpVcpNativeReadShapeProbe({
+              toolName,
+              gateResult,
+              invokeComponentAction: readShapeProbeTargetResolverResult.invokeComponentAction,
+              resolverCategory: readShapeProbeTargetResolverResult.resolverCategory,
+              transportCategory: readShapeProbeTargetResolverResult.transportCategory
+            })
+            : null;
+        const readDelegationEnabled = config.governedMcpVcpNativeReadDelegationMode !== 'off' &&
+          gateResult.accepted === true &&
+          gateResult.normalizedBridgeRequest?.read_allowed === true &&
+          gateResult.normalizedBridgeRequest?.write_allowed === false;
+        const readDelegationResult = readDelegationEnabled
+          ? await executeGovernedMcpVcpNativeReadDelegation({
+            toolName,
+            args,
+            gateResult,
+            callMcpTool: governedMcpVcpNativeReadDelegationToolCaller
+          })
+          : null;
+        const writeDelegationEnabled = config.governedMcpVcpNativeWriteDelegationMode !== 'off' &&
+          gateResult.accepted === true &&
+          gateResult.normalizedBridgeRequest?.read_allowed === false &&
+          gateResult.normalizedBridgeRequest?.write_allowed === true;
+        const writeDelegationResult = writeDelegationEnabled
+          ? await executeGovernedMcpVcpNativeWriteDelegation({
+            toolName,
+            args,
+            gateResult,
+            callMcpTool: governedMcpVcpNativeWriteDelegationToolCaller
+          })
+          : null;
+        const bridgeAuditReceiptResult = readDelegationResult || writeDelegationResult
+          ? await recordGovernedMcpVcpNativeBridgeAuditReceipt({
+            auditLogStore,
+            toolName,
+            gateResult,
+            readDelegationResult,
+            writeDelegationResult
+          })
+          : null;
+        attachBridgeAuditReceiptStatus(readDelegationResult, bridgeAuditReceiptResult);
+        attachBridgeAuditReceiptStatus(writeDelegationResult, bridgeAuditReceiptResult);
+        enforceRequiredBridgeAuditReceipt(
+          readDelegationResult,
+          bridgeAuditReceiptResult,
+          'required_bridge_audit_receipt_not_appended',
+          'read'
+        );
+        enforceRequiredBridgeAuditReceipt(
+          writeDelegationResult,
+          bridgeAuditReceiptResult,
+          'required_bridge_audit_receipt_not_appended',
+          'write'
+        );
+        const governedNativeBridgeObservation = {
+            toolName,
+            mode: config.governedMcpVcpNativeBridgeGateMode,
+            gateResult,
+            readOnlyProbeResult,
+            readShapeProbeTargetResolverResult:
+              projectReadShapeProbeTargetResolverObservation(readShapeProbeTargetResolverResult),
+            readShapeProbeExecutionResult,
+            readDelegationResult,
+            writeDelegationResult,
+            bridgeAuditReceiptResult
+          };
+        governedNativeBridgeObservationStore.record(governedNativeBridgeObservation);
+        if (governedMcpVcpNativeBridgeGateObserver) {
+          governedMcpVcpNativeBridgeGateObserver(governedNativeBridgeObservation);
+        }
+        if (config.governedMcpVcpNativeBridgeGateMode === 'strict' && !gateResult.accepted) {
+          return buildGovernedMcpVcpNativeBridgeRejectedToolResult(gateResult);
+        }
+        if (
+          config.governedMcpVcpNativeReadDelegationMode !== 'off' &&
+          isGovernedMcpVcpNativeReadDelegationTool(toolName) &&
+          gateResult.accepted !== true
+        ) {
+          return buildGovernedMcpVcpNativeBridgeRejectedToolResult(gateResult);
+        }
+        if (
+          config.governedMcpVcpNativeWriteDelegationMode === 'primary' &&
+          gateResult.accepted !== true &&
+          gateResult.normalizedBridgeRequest?.write_allowed === true
+        ) {
+          return buildGovernedMcpVcpNativeBridgeRejectedToolResult(gateResult);
+        }
+        if (readDelegationResult?.accepted === true) {
+          return readDelegationResult.delegatedResult;
+        }
+        if (
+          readDelegationResult &&
+          config.governedMcpVcpNativeReadDelegationMode === 'primary'
+        ) {
+          return buildGovernedMcpVcpNativeReadDelegationRejectedToolResult(readDelegationResult);
+        }
+        if (
+          readDelegationResult &&
+          config.governedMcpVcpNativeReadDelegationMode === 'primary_with_local_fallback' &&
+          readDelegationResult.localMemoryFallbackEligible !== true
+        ) {
+          return buildGovernedMcpVcpNativeReadDelegationRejectedToolResult(readDelegationResult);
+        }
+        if (
+          readDelegationResult &&
+          config.governedMcpVcpNativeReadDelegationMode === 'primary_with_local_fallback' &&
+          readDelegationResult.localMemoryFallbackEligible === true
+        ) {
+          governedNativeReadFallbackContext =
+            buildGovernedMcpVcpNativeReadFallbackContext(readDelegationResult, gateResult);
+          governedNativeReadFallbackArgs =
+            buildGovernedMcpVcpNativeReadFallbackArguments(toolName, args, gateResult);
+          const preparedFallbackAuditReceipt =
+            await prepareGovernedMcpVcpNativeReadFallbackAuditReceipt(
+              governedNativeReadFallbackContext,
+              { auditLogStore, toolName }
+            );
+          if (preparedFallbackAuditReceipt.accepted !== true) {
+            return preparedFallbackAuditReceipt.rejectedToolResult;
+          }
+          governedNativeReadFallbackAuditReceipt =
+            preparedFallbackAuditReceipt.localFallbackAuditReceipt;
+        }
+        if (writeDelegationResult?.accepted === true) {
+          return writeDelegationResult.delegatedResult;
+        }
+        if (
+          writeDelegationResult &&
+          config.governedMcpVcpNativeWriteDelegationMode === 'primary'
+        ) {
+          return buildGovernedMcpVcpNativeWriteDelegationRejectedToolResult(writeDelegationResult);
+        }
+        if (
+          isGovernedMcpVcpNativeWriteDelegationTool(toolName) &&
+          gateResult.accepted === true &&
+          gateResult.normalizedBridgeRequest?.write_allowed === true &&
+          !writeDelegationResult
+        ) {
+          return buildGovernedMcpVcpNativeWriteDelegationRequiredRejection();
+        }
+      }
+
       if (toolName === 'record_memory') {
         return writeService.record(args, requestContext);
       }
 
       if (toolName === 'search_memory') {
-        return runSearchMemoryWithTimeout(
-          ({ signal }) => executeSearchMemory(args, requestContext, { signal }),
+        const effectiveArgs = governedNativeReadFallbackArgs || args;
+        const result = await runSearchMemoryWithTimeout(
+          ({ signal }) => executeSearchMemory(effectiveArgs, requestContext, { signal }),
           { timeoutMs: config.searchMemoryTimeoutMs }
+        );
+        return await attachGovernedMcpVcpNativeReadFallbackProjection(
+          result,
+          governedNativeReadFallbackContext,
+          {
+            auditLogStore,
+            toolName,
+            localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
+          }
         );
       }
 
       if (toolName === 'memory_overview') {
+        const effectiveArgs = governedNativeReadFallbackArgs || args;
+        if (governedNativeReadFallbackContext) {
+          const result = attachGovernedNativeBridgeOverviewStatus(
+            await overviewService.getAuthenticatedBoundedOverview({
+              auditWindow: effectiveArgs.auditWindow
+            }),
+            governedNativeBridgeObservationStore
+          );
+          return await attachGovernedMcpVcpNativeReadFallbackProjection(
+            result,
+            governedNativeReadFallbackContext,
+            {
+              auditLogStore,
+              toolName,
+              localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
+            }
+          );
+        }
         if (requestContext.noTokenReadOnly === true) {
-          return overviewService.getNoTokenSelectedOverview({
-            auditWindow: args.auditWindow
+          const result = await overviewService.getNoTokenSelectedOverview({
+            auditWindow: effectiveArgs.auditWindow
           });
+          return await attachGovernedMcpVcpNativeReadFallbackProjection(
+            result,
+            governedNativeReadFallbackContext,
+            {
+              auditLogStore,
+              toolName,
+              localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
+            }
+          );
         }
         if (requestContext.authenticatedBoundedOverview === true) {
-          return overviewService.getAuthenticatedBoundedOverview({
-            auditWindow: args.auditWindow
-          });
+          const result = attachGovernedNativeBridgeOverviewStatus(
+            await overviewService.getAuthenticatedBoundedOverview({
+              auditWindow: effectiveArgs.auditWindow
+            }),
+            governedNativeBridgeObservationStore
+          );
+          return await attachGovernedMcpVcpNativeReadFallbackProjection(
+            result,
+            governedNativeReadFallbackContext,
+            {
+              auditLogStore,
+              toolName,
+              localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
+            }
+          );
         }
-        return overviewService.getOverview({
-          auditWindow: args.auditWindow,
-          limit: args.limit
-        });
+        const result = attachGovernedNativeBridgeOverviewStatus(
+          await overviewService.getOverview({
+            auditWindow: effectiveArgs.auditWindow,
+            limit: effectiveArgs.limit
+          }),
+          governedNativeBridgeObservationStore
+        );
+        return await attachGovernedMcpVcpNativeReadFallbackProjection(
+          result,
+          governedNativeReadFallbackContext,
+          {
+            auditLogStore,
+            toolName,
+            localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
+          }
+        );
       }
 
       if (toolName === 'audit_memory') {
-        return auditMemoryReadonlyService.run(args);
+        const effectiveArgs = governedNativeReadFallbackArgs || args;
+        const result = await auditMemoryReadonlyService.run(effectiveArgs);
+        return await attachGovernedMcpVcpNativeReadFallbackProjection(
+          result,
+          governedNativeReadFallbackContext,
+          {
+            auditLogStore,
+            toolName,
+            localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
+          }
+        );
       }
 
       if (toolName === 'validate_memory') {
@@ -1194,6 +2893,8 @@ module.exports = {
   applyLifecycleReadPolicy,
   applyLifecycleScopeGovernanceReadPolicy,
   applySoftReadPolicy,
+  buildGovernedMcpVcpNativeReadFallbackLocalAuditReceipt,
+  prepareGovernedMcpVcpNativeReadFallbackAuditReceipt,
   inferRequestClientId,
   createCodexMemoryApplication
 };

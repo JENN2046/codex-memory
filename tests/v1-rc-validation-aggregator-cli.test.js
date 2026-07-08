@@ -23,6 +23,16 @@ function parseJsonResult(result) {
   return JSON.parse(result.stdout);
 }
 
+function readPackageManifestSnapshot() {
+  const packageLockPath = path.join(workspaceRoot, 'package-lock.json');
+  return {
+    packageJson: fs.readFileSync(path.join(workspaceRoot, 'package.json'), 'utf8'),
+    packageLock: fs.existsSync(packageLockPath)
+      ? fs.readFileSync(packageLockPath, 'utf8')
+      : null
+  };
+}
+
 test('minimal validation aggregator CLI emits valid JSON and exits successfully', () => {
   const result = runCli(['--generated-at', '2026-05-16T00:00:00.000Z']);
 
@@ -582,14 +592,12 @@ test('minimal validation aggregator CLI rejects conflicting artifact-only output
 });
 
 test('minimal validation aggregator CLI package manifests remain untouched', () => {
-  const result = spawnSync('git', ['diff', '--name-only', '--', 'package.json', 'package-lock.json'], {
-    cwd: workspaceRoot,
-    encoding: 'utf8',
-    timeout: 30000
-  });
+  const before = readPackageManifestSnapshot();
+  const result = runCli(['--json']);
+  const after = readPackageManifestSnapshot();
 
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout.trim(), '');
+  assert.equal(result.status, 0, result.stderr || 'non-zero exit');
+  assert.deepEqual(after, before);
 });
 
 test('minimal validation aggregator CLI rejects live or side-effect flags', () => {

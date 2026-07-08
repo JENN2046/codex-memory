@@ -68,15 +68,21 @@ function normalizeScopeField(payload = {}, executionContext = {}, camelKey, snak
 }
 
 function buildWritePreflightAllowedScope(payload = {}, executionContext = {}) {
-  return {
-    projectId: normalizeScopeField(payload, executionContext, 'projectId', 'project_id'),
-    workspaceId: normalizeScopeField(payload, executionContext, 'workspaceId', 'workspace_id'),
-    clientId: normalizeScopeField(payload, executionContext, 'clientId', 'client_id'),
-    taskId: normalizeScopeField(payload, executionContext, 'taskId', 'task_id'),
-    conversationId: normalizeScopeField(payload, executionContext, 'conversationId', 'conversation_id'),
-    visibility: normalizeScopeField(payload, executionContext, 'visibility', 'visibility_policy'),
-    retentionPolicy: normalizeScopeField(payload, executionContext, 'retentionPolicy', 'retention_policy')
-  };
+  const scope = {};
+  for (const [outputKey, camelKey, snakeKey] of [
+    ['scopeId', 'scopeId', 'scope_id'],
+    ['projectId', 'projectId', 'project_id'],
+    ['workspaceId', 'workspaceId', 'workspace_id'],
+    ['clientId', 'clientId', 'client_id'],
+    ['taskId', 'taskId', 'task_id'],
+    ['conversationId', 'conversationId', 'conversation_id'],
+    ['visibility', 'visibility', 'visibility_policy'],
+    ['retentionPolicy', 'retentionPolicy', 'retention_policy']
+  ]) {
+    const value = normalizeScopeField(payload, executionContext, camelKey, snakeKey);
+    if (value) scope[outputKey] = value;
+  }
+  return scope;
 }
 
 function buildWritePreflightProposedWrite(payload = {}, normalized = {}) {
@@ -708,6 +714,7 @@ class MemoryWriteService {
       updatedAt: createdAt,
       visibilityPolicy: VisibilityPolicy.CODEX_ONLY,
       namespace: target === 'knowledge' ? Namespace.KNOWLEDGE : Namespace.PROCESS,
+      scopeId: effectiveScope.scopeId || null,
       projectId: effectiveScope.projectId || null,
       workspaceId: effectiveScope.workspaceId || null,
       clientId: effectiveScope.clientId || null,

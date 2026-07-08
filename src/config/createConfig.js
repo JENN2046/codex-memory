@@ -14,6 +14,13 @@ const { applyRagProfileToConfig, loadRagProfileConfig } = require('./ragProfileC
 const {
   normalizeRecordMemoryPrincipalScopeAuthorizationConfig
 } = require('../core/RecordMemoryPrincipalScopeAuthorizationConfig');
+const {
+  normalizeGovernedMcpVcpNativeRuntimeTargetConfig
+} = require('../core/GovernedMcpVcpNativeRuntimeTargetConfig');
+const {
+  attachGovernedMcpVcpNativeHttpMcpTargetPrivateConfig,
+  normalizeGovernedMcpVcpNativeHttpMcpTargetConfig
+} = require('../core/GovernedMcpVcpNativeHttpMcpTargetConfig');
 
 function toBoolean(value, fallback = false) {
   if (typeof value === 'boolean') return value;
@@ -183,6 +190,118 @@ function buildRecordMemoryPrincipalScopeAuthorizationConfigSource({
   };
 }
 
+function buildGovernedMcpVcpNativeRuntimeTargetConfigSource({
+  overrides = {},
+  env = process.env,
+  profileParams = {},
+  runtimeProfile = {}
+} = {}) {
+  const overrideConfig = getNestedPlainObject(overrides, 'governedMcpVcpNativeRuntimeTarget');
+  const profileConfig = getNestedPlainObject(profileParams, 'governedMcpVcpNativeRuntimeTarget');
+
+  return {
+    ...runtimeProfile.runtimeTarget,
+    ...profileConfig,
+    ...overrideConfig,
+    targetReferenceName: pickFirstNonEmpty(
+      overrideConfig.targetReferenceName,
+      overrideConfig.target_reference_name,
+      overrides.governedMcpVcpNativeTargetReferenceName,
+      env.CODEX_MEMORY_VCP_NATIVE_TARGET_REFERENCE_NAME,
+      profileConfig.targetReferenceName,
+      profileConfig.target_reference_name,
+      runtimeProfile.runtimeTarget?.targetReferenceName,
+      runtimeProfile.runtimeTarget?.target_reference_name
+    ),
+    targetKind: pickFirstNonEmpty(
+      overrideConfig.targetKind,
+      overrideConfig.target_kind,
+      overrides.governedMcpVcpNativeTargetKind,
+      env.CODEX_MEMORY_VCP_NATIVE_TARGET_KIND,
+      profileConfig.targetKind,
+      profileConfig.target_kind,
+      runtimeProfile.runtimeTarget?.targetKind,
+      runtimeProfile.runtimeTarget?.target_kind
+    )
+  };
+}
+
+function buildGovernedMcpVcpNativeHttpMcpTargetConfigSource({
+  overrides = {},
+  env = process.env,
+  profileParams = {},
+  runtimeTarget = {},
+  runtimeProfile = {}
+} = {}) {
+  const overrideConfig = getNestedPlainObject(overrides, 'governedMcpVcpNativeHttpMcpTarget');
+  const profileConfig = getNestedPlainObject(profileParams, 'governedMcpVcpNativeHttpMcpTarget');
+
+  return {
+    ...runtimeProfile.httpMcpTarget,
+    ...profileConfig,
+    ...overrideConfig,
+    targetReferenceName: pickFirstNonEmpty(
+      overrideConfig.targetReferenceName,
+      overrideConfig.target_reference_name,
+      overrides.governedMcpVcpNativeHttpMcpTargetReferenceName,
+      env.CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TARGET_REFERENCE_NAME,
+      runtimeTarget.targetReferenceName,
+      profileConfig.targetReferenceName,
+      profileConfig.target_reference_name,
+      runtimeProfile.httpMcpTarget?.targetReferenceName,
+      runtimeProfile.httpMcpTarget?.target_reference_name
+    ),
+    endpoint: pickFirstNonEmpty(
+      overrideConfig.endpoint,
+      overrideConfig.url,
+      overrides.governedMcpVcpNativeHttpMcpEndpoint,
+      env.CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT,
+      profileConfig.endpoint,
+      profileConfig.url,
+      runtimeProfile.httpMcpTarget?.endpoint,
+      runtimeProfile.httpMcpTarget?.url
+    ),
+    bearerToken: pickFirstNonEmpty(
+      overrideConfig.bearerToken,
+      overrideConfig.token,
+      overrides.governedMcpVcpNativeHttpMcpBearerToken,
+      env.CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN,
+      profileConfig.bearerToken,
+      profileConfig.token,
+      runtimeProfile.httpMcpTarget?.bearerToken,
+      runtimeProfile.httpMcpTarget?.token
+    ),
+    mcpToolName: pickFirstNonEmpty(
+      overrideConfig.mcpToolName,
+      overrideConfig.mcp_tool_name,
+      overrides.governedMcpVcpNativeHttpMcpToolName,
+      env.CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOOL_NAME,
+      profileConfig.mcpToolName,
+      profileConfig.mcp_tool_name,
+      runtimeProfile.httpMcpTarget?.mcpToolName,
+      runtimeProfile.httpMcpTarget?.mcp_tool_name
+    ),
+    mcpToolNameByAction: overrideConfig.mcpToolNameByAction ||
+      overrideConfig.mcp_tool_name_by_action ||
+      overrides.governedMcpVcpNativeHttpMcpToolNameByAction ||
+      env.CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOOL_NAME_BY_ACTION ||
+      profileConfig.mcpToolNameByAction ||
+      profileConfig.mcp_tool_name_by_action ||
+      runtimeProfile.httpMcpTarget?.mcpToolNameByAction ||
+      runtimeProfile.httpMcpTarget?.mcp_tool_name_by_action,
+    requestTimeoutMs: pickFirstNonEmpty(
+      overrideConfig.requestTimeoutMs,
+      overrideConfig.request_timeout_ms,
+      overrides.governedMcpVcpNativeHttpMcpRequestTimeoutMs,
+      env.CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TIMEOUT_MS,
+      profileConfig.requestTimeoutMs,
+      profileConfig.request_timeout_ms,
+      runtimeProfile.httpMcpTarget?.requestTimeoutMs,
+      runtimeProfile.httpMcpTarget?.request_timeout_ms
+    )
+  };
+}
+
 function parsePositiveInteger(value, fallback) {
   const parsed = Number.parseInt(String(value ?? ''), 10);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
@@ -202,6 +321,117 @@ function normalizeHttpPath(value, fallback = '/mcp/codex-memory') {
 
 function normalizeProvider(value) {
   return typeof value === 'string' ? value.trim().toLowerCase() : '';
+}
+
+function normalizeGovernedMcpVcpNativeBridgeGateMode(value) {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return ['off', 'observe', 'strict'].includes(normalized) ? normalized : 'off';
+}
+
+function normalizeGovernedMcpVcpNativeReadDelegationMode(value) {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return ['off', 'primary', 'primary_with_local_fallback'].includes(normalized) ? normalized : 'off';
+}
+
+function normalizeGovernedMcpVcpNativeWriteDelegationMode(value) {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return ['off', 'primary'].includes(normalized) ? normalized : 'off';
+}
+
+function normalizeGovernedMcpVcpNativeRuntimeProfile(value) {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return [
+    'off',
+    'wsl-newapi-prod',
+    'wsl_newapi_prod',
+    'vcp-native-shim-local',
+    'vcp_native_shim_local'
+  ].includes(normalized)
+    ? normalized.replaceAll('_', '-')
+    : 'off';
+}
+
+function buildGovernedMcpVcpNativeRuntimeProfileDefaults(profileName) {
+  if (profileName !== 'wsl-newapi-prod' && profileName !== 'vcp-native-shim-local') {
+    return {
+      profileName: 'off',
+      enabled: false,
+      runtimeTarget: {},
+      httpMcpTarget: {},
+      bridgeGateMode: 'off',
+      readDelegationMode: 'off',
+      writeDelegationMode: 'off'
+    };
+  }
+
+  return {
+    profileName,
+    enabled: true,
+    runtimeTarget: {
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      targetKind: 'mcp_server'
+    },
+    httpMcpTarget: {
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      endpoint: 'http://127.0.0.1:7615/mcp/vcp-native',
+      requestTimeoutMs: 30000,
+      mcpToolNameByAction: {
+        search_memory: 'knowledge_base.search',
+        memory_overview: 'knowledge_base.search',
+        audit_memory: 'knowledge_base.search',
+        record_memory: 'knowledge_base.record',
+        tombstone_memory: 'knowledge_base.tombstone',
+        supersede_memory: 'knowledge_base.supersede'
+      }
+    },
+    bridgeGateMode: 'observe',
+    readDelegationMode: 'primary_with_local_fallback',
+    writeDelegationMode: 'off'
+  };
+}
+
+function buildGovernedMcpVcpNativeBridgeConfigWarnings({
+  bridgeGateMode = 'off',
+  readDelegationMode = 'off',
+  writeDelegationMode = 'off',
+  runtimeTarget = {},
+  httpMcpTarget = {}
+} = {}) {
+  const warnings = [];
+  const readDelegationRequested = readDelegationMode !== 'off';
+  const writeDelegationRequested = writeDelegationMode !== 'off';
+  const nativeTargetAccepted =
+    runtimeTarget?.accepted === true && httpMcpTarget?.accepted === true;
+
+  if (bridgeGateMode === 'off' && readDelegationRequested) {
+    warnings.push({
+      code: 'native_read_delegation_requires_bridge_gate',
+      lowDisclosure: true,
+      effect: 'read_delegation_fail_closed'
+    });
+  }
+  if (bridgeGateMode === 'off' && writeDelegationRequested) {
+    warnings.push({
+      code: 'native_write_delegation_requires_bridge_gate',
+      lowDisclosure: true,
+      effect: 'write_delegation_fail_closed'
+    });
+  }
+  if (readDelegationRequested && !nativeTargetAccepted) {
+    warnings.push({
+      code: 'native_read_delegation_requires_accepted_native_target',
+      lowDisclosure: true,
+      effect: 'read_delegation_fail_closed'
+    });
+  }
+  if (writeDelegationRequested && !nativeTargetAccepted) {
+    warnings.push({
+      code: 'native_write_delegation_requires_accepted_native_target',
+      lowDisclosure: true,
+      effect: 'write_delegation_fail_closed'
+    });
+  }
+  return warnings;
 }
 
 function inferEmbeddingDimensions(model) {
@@ -399,6 +629,64 @@ function createConfig(overrides = {}) {
     ),
     embeddingFingerprint
   });
+  const governedMcpVcpNativeRuntimeProfile =
+    buildGovernedMcpVcpNativeRuntimeProfileDefaults(
+      normalizeGovernedMcpVcpNativeRuntimeProfile(
+        pickFirstNonEmpty(
+          overrides.governedMcpVcpNativeRuntimeProfile,
+          process.env.CODEX_MEMORY_VCP_NATIVE_RUNTIME_PROFILE,
+          'off'
+        )
+      )
+    );
+  const governedMcpVcpNativeRuntimeTarget = normalizeGovernedMcpVcpNativeRuntimeTargetConfig(
+    buildGovernedMcpVcpNativeRuntimeTargetConfigSource({
+      overrides,
+      profileParams: ragProfileConfig.params,
+      runtimeProfile: governedMcpVcpNativeRuntimeProfile
+    })
+  );
+  const governedMcpVcpNativeHttpMcpTarget =
+    normalizeGovernedMcpVcpNativeHttpMcpTargetConfig(
+      buildGovernedMcpVcpNativeHttpMcpTargetConfigSource({
+        overrides,
+        profileParams: ragProfileConfig.params,
+        runtimeTarget: governedMcpVcpNativeRuntimeTarget,
+        runtimeProfile: governedMcpVcpNativeRuntimeProfile
+      })
+    );
+  const governedMcpVcpNativeBridgeGateMode = normalizeGovernedMcpVcpNativeBridgeGateMode(
+    pickFirstNonEmpty(
+      overrides.governedMcpVcpNativeBridgeGateMode,
+      process.env.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE,
+      governedMcpVcpNativeRuntimeProfile.bridgeGateMode,
+      'off'
+    )
+  );
+  const governedMcpVcpNativeReadDelegationMode = normalizeGovernedMcpVcpNativeReadDelegationMode(
+    pickFirstNonEmpty(
+      overrides.governedMcpVcpNativeReadDelegationMode,
+      process.env.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE,
+      governedMcpVcpNativeRuntimeProfile.readDelegationMode,
+      'off'
+    )
+  );
+  const governedMcpVcpNativeWriteDelegationMode = normalizeGovernedMcpVcpNativeWriteDelegationMode(
+    pickFirstNonEmpty(
+      overrides.governedMcpVcpNativeWriteDelegationMode,
+      process.env.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE,
+      governedMcpVcpNativeRuntimeProfile.writeDelegationMode,
+      'off'
+    )
+  );
+  const governedMcpVcpNativeBridgeConfigWarnings =
+    buildGovernedMcpVcpNativeBridgeConfigWarnings({
+      bridgeGateMode: governedMcpVcpNativeBridgeGateMode,
+      readDelegationMode: governedMcpVcpNativeReadDelegationMode,
+      writeDelegationMode: governedMcpVcpNativeWriteDelegationMode,
+      runtimeTarget: governedMcpVcpNativeRuntimeTarget,
+      httpMcpTarget: governedMcpVcpNativeHttpMcpTarget.publicConfig
+    });
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
   const vectorIndexPath = resolveAbsolutePath(
     basePath,
@@ -451,7 +739,9 @@ function createConfig(overrides = {}) {
     defaultRequestSource: overrides.defaultRequestSource || process.env.CODEX_MEMORY_REQUEST_SOURCE || 'codex-memory-mcp',
     defaultProjectId: overrides.defaultProjectId || process.env.CODEX_MEMORY_PROJECT_ID || '',
     defaultWorkspaceId: overrides.defaultWorkspaceId || process.env.CODEX_MEMORY_WORKSPACE_ID || '',
+    defaultScopeId: overrides.defaultScopeId || process.env.CODEX_MEMORY_SCOPE_ID || '',
     defaultClientId: overrides.defaultClientId || process.env.CODEX_MEMORY_CLIENT_ID || '',
+    defaultVisibility: overrides.defaultVisibility || process.env.CODEX_MEMORY_VISIBILITY || '',
     httpHost: overrides.httpHost || process.env.CODEX_MEMORY_HTTP_HOST || '127.0.0.1',
     httpPort: parsePositiveInteger(overrides.httpPort || process.env.CODEX_MEMORY_HTTP_PORT || '7605', 7605),
     httpMcpPath: normalizeHttpPath(overrides.httpMcpPath || process.env.CODEX_MEMORY_HTTP_PATH || '/mcp/codex-memory'),
@@ -504,6 +794,19 @@ function createConfig(overrides = {}) {
     enableSoftReadPolicy: _resolveBool(overrides.enableSoftReadPolicy, 'CODEX_MEMORY_ENABLE_SOFT_READ_POLICY', isHardened),
     enableLifecycleReadPolicy: _resolveBool(overrides.enableLifecycleReadPolicy, 'CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY', isHardened),
     enableWritePreflight: _resolveBool(overrides.enableWritePreflight, 'CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT', isHardened),
+    governedMcpVcpNativeBridgeGateMode,
+    governedMcpVcpNativeReadDelegationMode,
+    governedMcpVcpNativeWriteDelegationMode,
+    governedMcpVcpNativeRuntimeProfile: {
+      profileName: governedMcpVcpNativeRuntimeProfile.profileName,
+      enabled: governedMcpVcpNativeRuntimeProfile.enabled,
+      endpointDisclosed: false,
+      tokenMaterialDisclosed: false,
+      readinessClaimed: false
+    },
+    governedMcpVcpNativeBridgeConfigWarnings,
+    governedMcpVcpNativeRuntimeTarget,
+    governedMcpVcpNativeHttpMcpTarget: governedMcpVcpNativeHttpMcpTarget.publicConfig,
     recordMemoryPrincipalScopeAuthorization:
       normalizeRecordMemoryPrincipalScopeAuthorizationConfig(
         buildRecordMemoryPrincipalScopeAuthorizationConfigSource({
@@ -562,14 +865,22 @@ function createConfig(overrides = {}) {
     autoRebuildActiveMemoryOnStart: toBoolean(overrides.autoRebuildActiveMemoryOnStart ?? process.env.CODEX_MEMORY_AUTO_REBUILD_ACTIVE_MEMORY, false)
   };
 
-  return applyRagProfileToConfig(
+  const finalConfig = applyRagProfileToConfig(
     baseConfig,
     ragProfileConfig
+  );
+  return attachGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(
+    finalConfig,
+    governedMcpVcpNativeHttpMcpTarget.privateConfig
   );
 }
 
 module.exports = {
   createConfig,
+  normalizeGovernedMcpVcpNativeBridgeGateMode,
+  buildGovernedMcpVcpNativeBridgeConfigWarnings,
+  normalizeGovernedMcpVcpNativeReadDelegationMode,
+  normalizeGovernedMcpVcpNativeWriteDelegationMode,
   normalizeHttpPath,
   parseJsonObject,
   resolveAbsolutePath,
