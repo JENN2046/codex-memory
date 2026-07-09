@@ -33,6 +33,17 @@ function uniqueStrings(values = []) {
     .filter(Boolean))];
 }
 
+function candidateCacheLifecycleTargets(target = 'process') {
+  const normalizedTarget = normalizeString(target) || 'process';
+  if (normalizedTarget === 'process') {
+    return ['process', 'both'];
+  }
+  if (normalizedTarget === 'knowledge') {
+    return ['knowledge', 'both'];
+  }
+  return [normalizedTarget];
+}
+
 class MemoryLifecycleProjectionCleanupService {
   constructor({
     diaryStore = null,
@@ -173,7 +184,10 @@ class MemoryLifecycleProjectionCleanupService {
       memoryId: normalizedMemoryId
     });
     counts.candidate_cache = this.candidateCacheStore?.countCurrentFingerprintByMemoryIds
-      ? await this.candidateCacheStore.countCurrentFingerprintByMemoryIds([normalizedMemoryId], [target])
+      ? await this.candidateCacheStore.countCurrentFingerprintByMemoryIds(
+        [normalizedMemoryId],
+        candidateCacheLifecycleTargets(target)
+      )
       : 0;
     counts.reconcile_queue = reconcileTasks.length;
     counts.degraded_payload = manifest?.record || manifest?.recordMalformed ? 1 : 0;
@@ -366,7 +380,10 @@ class MemoryLifecycleProjectionCleanupService {
     }
 
     if (!skipSet.has('candidate_cache') && this.candidateCacheStore?.clearCurrentFingerprintByMemoryIds) {
-      await this.candidateCacheStore.clearCurrentFingerprintByMemoryIds([normalizedMemoryId], [normalizedTarget]);
+      await this.candidateCacheStore.clearCurrentFingerprintByMemoryIds(
+        [normalizedMemoryId],
+        candidateCacheLifecycleTargets(normalizedTarget)
+      );
     }
 
     if (!skipSet.has('reconcile_queue') && this.shadowStore.clearReconcileTasks) {
@@ -480,6 +497,7 @@ class MemoryLifecycleProjectionCleanupService {
 }
 
 module.exports = {
+  candidateCacheLifecycleTargets,
   MemoryLifecycleProjectionCleanupService,
   SUPPRESSING_LIFECYCLE_FAMILIES
 };

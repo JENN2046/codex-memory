@@ -196,6 +196,67 @@ test('bounded app runtime tombstone path invokes lifecycle projection cleanup ro
   assert.equal(await pathExists(rootPath), false);
 });
 
+test('bounded app runtime tombstone path clears target-only both candidate caches', async () => {
+  const harness = await createTempApp();
+  const { app, rootPath } = harness;
+  const memoryId = 'bounded-runtime-both-target-candidate-cache-memory';
+
+  try {
+    await seedTempStoreBackedLifecycleProjection({
+      diaryStore: app.stores.diaryStore,
+      shadowStore: app.stores.shadowStore,
+      vectorStore: app.stores.vectorStore,
+      candidateCacheStore: app.stores.candidateCacheStore,
+      auditLogStore: app.stores.auditLogStore,
+      memoryId,
+      target: 'process',
+      status: 'active',
+      timestamp: '2026-07-06T00:00:00.000Z'
+    });
+    await app.stores.candidateCacheStore.set(`${memoryId}:process-target-only`, [], {
+      target: 'process'
+    });
+    await app.stores.candidateCacheStore.set(`${memoryId}:both-target-only`, [], {
+      target: 'both'
+    });
+    await app.stores.candidateCacheStore.set(`${memoryId}:knowledge-target-only`, [], {
+      target: 'knowledge'
+    });
+
+    assert.equal(
+      await app.stores.candidateCacheStore.countCurrentFingerprintByMemoryIds(
+        [memoryId],
+        ['process', 'both']
+      ),
+      3
+    );
+    assert.deepEqual(await app.stores.candidateCacheStore.get(`${memoryId}:knowledge-target-only`), []);
+
+    const result = await app.executeInternalTombstone(tombstonePayload(memoryId), approvedRuntimeContext());
+    const cleanupReport = result.projectionCleanupReport;
+
+    assert.equal(result.decision, 'tombstoned');
+    assert.equal(result.projectionCleanupStatus, 'accepted');
+    assert.equal(cleanupReport.accepted, true);
+    assert.equal(cleanupReport.beforeCounts.candidate_cache, 3);
+    assert.equal(cleanupReport.afterCounts.candidate_cache, 0);
+    assert.equal(
+      await app.stores.candidateCacheStore.countCurrentFingerprintByMemoryIds(
+        [memoryId],
+        ['process', 'both']
+      ),
+      0
+    );
+    assert.equal(await app.stores.candidateCacheStore.get(`${memoryId}:process-target-only`), null);
+    assert.equal(await app.stores.candidateCacheStore.get(`${memoryId}:both-target-only`), null);
+    assert.deepEqual(await app.stores.candidateCacheStore.get(`${memoryId}:knowledge-target-only`), []);
+  } finally {
+    await cleanupTempApp(harness);
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
 test('bounded app runtime supersede path cleans old projections and retains replacement projections', async () => {
   const harness = await createTempApp();
   const { app, rootPath } = harness;
