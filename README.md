@@ -21,6 +21,7 @@ Long-term goal and boundary documents:
 - [Codex Memory Final Goal](docs/CODEX_MEMORY_FINAL_GOAL.md)
 - [Capability Layer Model](docs/CAPABILITY_LAYER_MODEL.md)
 - [Non-Claims](docs/NON_CLAIMS.md)
+- [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 
 ## Current Status
 
@@ -80,9 +81,8 @@ npm run vcp-native:acceptance -- --json --verify-evidence /tmp/codex-memory-vcp-
 
 Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public
-response shapes. The included search-shaped shim can prove `search_memory`;
-overview/audit require native overview/audit tools or explicit compatible
-mapping before they are counted as accepted.
+response shapes. The included shim exposes `knowledge_base.search`,
+`memory_overview`, and `audit_memory` for the read suite by default.
 Write proof requires explicit `--enable-write`; accepted evidence must include
 `accepted=true`, `native memory performed`, `governanceEvidenceMatrix`,
 `localMemoryAuxiliaryEvidence`, and `writeRollbackEvidence`. Evidence can be

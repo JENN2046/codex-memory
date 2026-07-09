@@ -22,6 +22,7 @@ VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改
 - [Codex Memory Final Goal](docs/CODEX_MEMORY_FINAL_GOAL.md)
 - [Capability Layer Model](docs/CAPABILITY_LAYER_MODEL.md)
 - [Non-Claims](docs/NON_CLAIMS.md)
+- [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 
 ## 当前生产路径
 
@@ -351,12 +352,13 @@ npm run vcp-native:acceptance -- \
 
 重要：`--include-read-suite` 只有在 native target 暴露 shape-compatible 工具时，才能证明对应 public response shape。
 
-included shim 默认暴露的是 `knowledge_base.search`。因此：
+included shim 默认暴露 read suite 所需的三个 shape-compatible 工具：
 
-- `search_memory` 可以用 search-shaped native 工具证明
-- `memory_overview` 需要 shape-compatible overview native tool 或明确映射
-- `audit_memory` 需要 shape-compatible audit native tool 或明确映射
-- 不再把 overview/audit 硬塞进 `knowledge_base.search` 里当作已证明
+- `knowledge_base.search` -> `search_memory`
+- `memory_overview` -> `memory_overview`
+- `audit_memory` -> `audit_memory`
+
+不再把 overview/audit 硬塞进 `knowledge_base.search` 里当作已证明。
 
 write proof 需要显式 `--enable-write`。accepted evidence 应包含：
 
