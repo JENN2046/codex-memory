@@ -89,6 +89,7 @@ function lowDisclosurePublicConfig({
   configured,
   targetReferenceName,
   mcpToolName,
+  mcpToolNameConfigured,
   requestTimeoutMs,
   mcpToolNameByAction,
   bearerTokenConfigured,
@@ -101,6 +102,7 @@ function lowDisclosurePublicConfig({
     targetKind: 'mcp_server',
     transportCategory: 'local_http_transport',
     mcpToolName: isSafeReferenceName(mcpToolName) ? mcpToolName : null,
+    mcpToolNameConfigured: mcpToolNameConfigured === true,
     mcpToolNameByAction: isPlainObject(mcpToolNameByAction)
       ? Object.fromEntries(Object.entries(mcpToolNameByAction).sort(([a], [b]) => a.localeCompare(b)))
       : null,
@@ -145,6 +147,7 @@ function normalizeGovernedMcpVcpNativeHttpMcpTargetConfig(source = {}) {
     input.mcp_tool_name,
     DEFAULT_MCP_TOOL_NAME
   );
+  const mcpToolNameConfigured = Boolean(firstString(input.mcpToolName, input.mcp_tool_name));
   const requestTimeoutMs = normalizeTimeoutMs(
     input.requestTimeoutMs ?? input.request_timeout_ms
   );
@@ -173,6 +176,7 @@ function normalizeGovernedMcpVcpNativeHttpMcpTargetConfig(source = {}) {
     configured,
     targetReferenceName,
     mcpToolName,
+    mcpToolNameConfigured,
     mcpToolNameByAction: accepted ? toolNameMapping.accepted : null,
     requestTimeoutMs,
     bearerTokenConfigured: Boolean(bearerToken),
@@ -184,6 +188,7 @@ function normalizeGovernedMcpVcpNativeHttpMcpTargetConfig(source = {}) {
         endpoint,
         bearerToken,
         mcpToolName,
+        mcpToolNameConfigured,
         ...(toolNameMapping.accepted ? { mcpToolNameByAction: toolNameMapping.accepted } : {}),
         requestTimeoutMs
       }

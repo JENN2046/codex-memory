@@ -699,6 +699,7 @@ test('HTTP MCP tool caller maps public governed tool to native MCP tool without 
       targetReferenceName: 'operator-vcp-toolbox-service-ref',
       endpoint: server.url,
       requestTimeoutMs: 1000,
+      mcpToolName: 'knowledge_base.default',
       mcpToolNameByAction: {
         search_memory: 'knowledge_base.search'
       }
@@ -720,6 +721,54 @@ test('HTTP MCP tool caller maps public governed tool to native MCP tool without 
     assert.equal(invocation.receipt.invocationBindingMatched, undefined);
     assert.equal(invocation.receipt.jsonRpcResponseIdMatched, true);
     assert.equal(invocation.receipt.governanceMetadataPath, GOVERNANCE_METADATA_PATH);
+    assert.equal(invocation.receipt.governanceMetadataSent, true);
+  } finally {
+    await server.close();
+  }
+});
+
+test('HTTP MCP tool caller uses configured single native MCP tool name', async () => {
+  const server = await withJsonRpcServer(async (req, res, body) => {
+    assert.equal(body.method, 'tools/call');
+    assert.equal(body.params.name, 'knowledge_base.search');
+    assert.equal(
+      body.params._meta.codexMemoryGovernance.invocationProfile.toolName,
+      'search_memory'
+    );
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({
+      jsonrpc: '2.0',
+      id: body.id,
+      result: {
+        structuredContent: {
+          results: []
+        }
+      }
+    }));
+  });
+
+  try {
+    const result = createGovernedMcpVcpNativeHttpMcpToolCaller({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      endpoint: server.url,
+      requestTimeoutMs: 1000,
+      mcpToolName: 'knowledge_base.search'
+    });
+
+    const invocation = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: {
+        query: 'needle',
+        include_content: false
+      },
+      governanceMeta: validReadGovernanceMeta()
+    });
+
+    assert.equal(server.requests.length, 1);
+    assert.equal(server.requests[0].body.params.name, 'knowledge_base.search');
+    assert.equal(invocation.receipt.toolName, 'search_memory');
+    assert.equal(invocation.receipt.jsonRpcResponseIdMatched, true);
     assert.equal(invocation.receipt.governanceMetadataSent, true);
   } finally {
     await server.close();

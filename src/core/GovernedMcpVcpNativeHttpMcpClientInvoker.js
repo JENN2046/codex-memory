@@ -107,7 +107,7 @@ function normalizeMcpToolName({ action, mcpToolName, mcpToolNameByAction }) {
   const mapped = isPlainObject(mcpToolNameByAction) && typeof mcpToolNameByAction[action] === 'string'
     ? mcpToolNameByAction[action]
     : null;
-  const candidate = String(mcpToolName || mapped || action || '').trim();
+  const candidate = String(mapped || mcpToolName || action || '').trim();
   return isSafeReferenceName(candidate) ? candidate : null;
 }
 
@@ -565,6 +565,12 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
   const mcpToolNameByAction = isPlainObject(input.mcpToolNameByAction)
     ? { ...input.mcpToolNameByAction }
     : null;
+  const configuredMcpToolName = typeof input.mcpToolName === 'string'
+    ? input.mcpToolName.trim()
+    : '';
+  const configuredMcpToolNameEnabled = input.mcpToolNameConfigured === false
+    ? ''
+    : configuredMcpToolName;
   let idCounter = 0;
 
   async function callToolWithReceipt(payload = {}) {
@@ -589,7 +595,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
     }
     const nativeToolName = normalizeMcpToolName({
       action: publicToolName,
-      mcpToolName: null,
+      mcpToolName: mcpToolNameByAction ? null : configuredMcpToolNameEnabled,
       mcpToolNameByAction
     });
     if (!nativeToolName) {

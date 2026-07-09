@@ -1990,9 +1990,6 @@ test('primary read delegation returns governed VCP native low-disclosure result 
         endpoint: server.url,
         bearerToken: secretToken,
         mcpToolName: 'knowledge_base.search',
-        mcpToolNameByAction: {
-          search_memory: 'knowledge_base.search'
-        },
         requestTimeoutMs: 1000
       }
     }, async app => {

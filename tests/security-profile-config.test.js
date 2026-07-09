@@ -311,6 +311,7 @@ test('governed HTTP MCP VCP native target keeps endpoint and token out of enumer
     record_memory: 'knowledge_base.record',
     search_memory: 'knowledge_base.search'
   });
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameConfigured, true);
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameByActionConfigured, true);
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.requestTimeoutMs, 1200);
   assert.equal(serialized.includes(privateEndpoint), false);
@@ -318,6 +319,7 @@ test('governed HTTP MCP VCP native target keeps endpoint and token out of enumer
   assert.equal(Object.keys(config).includes('__governedMcpVcpNativeHttpMcpTargetPrivateConfig'), false);
   assert.equal(privateConfig.endpoint, privateEndpoint);
   assert.equal(privateConfig.bearerToken, privateToken);
+  assert.equal(privateConfig.mcpToolNameConfigured, true);
   assert.deepEqual(privateConfig.mcpToolNameByAction, {
     search_memory: 'knowledge_base.search',
     record_memory: 'knowledge_base.record'
@@ -351,10 +353,12 @@ test('governed HTTP MCP VCP native target can be sourced from env without raw di
       record_memory: 'knowledge_base.record',
       search_memory: 'knowledge_base.search'
     });
+    assert.equal(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameConfigured, true);
     assert.equal(serialized.includes(privateEndpoint), false);
     assert.equal(serialized.includes(privateToken), false);
     assert.equal(privateConfig.endpoint, privateEndpoint);
     assert.equal(privateConfig.bearerToken, privateToken);
+    assert.equal(privateConfig.mcpToolNameConfigured, true);
   });
 });
 
@@ -387,7 +391,9 @@ test('governed MCP VCP native WSL NewAPI profile installs default read target wi
     supersede_memory: 'knowledge_base.supersede',
     tombstone_memory: 'knowledge_base.tombstone'
   });
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameConfigured, false);
   assert.equal(privateConfig.endpoint, 'http://127.0.0.1:7615/mcp/vcp-native');
+  assert.equal(privateConfig.mcpToolNameConfigured, false);
   assert.equal(serialized.includes('http://127.0.0.1:7615'), false);
 });
 
