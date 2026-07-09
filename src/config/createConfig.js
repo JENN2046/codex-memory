@@ -377,8 +377,6 @@ function buildGovernedMcpVcpNativeRuntimeProfileDefaults(profileName) {
       requestTimeoutMs: 30000,
       mcpToolNameByAction: {
         search_memory: 'knowledge_base.search',
-        memory_overview: 'knowledge_base.search',
-        audit_memory: 'knowledge_base.search',
         record_memory: 'knowledge_base.record',
         tombstone_memory: 'knowledge_base.tombstone',
         supersede_memory: 'knowledge_base.supersede'

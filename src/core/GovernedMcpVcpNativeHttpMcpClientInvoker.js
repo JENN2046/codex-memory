@@ -104,10 +104,11 @@ function parseEndpoint(value) {
 }
 
 function normalizeMcpToolName({ action, mcpToolName, mcpToolNameByAction }) {
-  const mapped = isPlainObject(mcpToolNameByAction) && typeof mcpToolNameByAction[action] === 'string'
+  const hasActionMap = isPlainObject(mcpToolNameByAction);
+  const mapped = hasActionMap && typeof mcpToolNameByAction[action] === 'string'
     ? mcpToolNameByAction[action]
-    : null;
-  const candidate = String(mapped || mcpToolName || action || '').trim();
+    : '';
+  const candidate = String(hasActionMap ? mapped : (mcpToolName || action || '')).trim();
   return isSafeReferenceName(candidate) ? candidate : null;
 }
 

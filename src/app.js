@@ -636,6 +636,14 @@ function governedMcpVcpNativeDelegationRequested(config = {}, toolName = '') {
   );
 }
 
+function shouldSkipGovernedMcpVcpNativeReadDelegationForUnmappedAction(config = {}, toolName = '') {
+  if (!isGovernedMcpVcpNativeReadDelegationTool(toolName)) return false;
+  const target = config.governedMcpVcpNativeHttpMcpTarget || {};
+  if (target.mcpToolNameByActionConfigured !== true) return false;
+  const toolNameByAction = target.mcpToolNameByAction || {};
+  return !Object.prototype.hasOwnProperty.call(toolNameByAction, toolName);
+}
+
 function buildGovernedMcpVcpNativeDelegationRequiresGateRejection(toolName = '') {
   const blockers = ['native_delegation_requires_bridge_gate_mode_not_off'];
   return buildGovernedMcpVcpNativeBridgeRejectedToolResult({
@@ -2546,7 +2554,10 @@ function createCodexMemoryApplication(overrides = {}) {
         const readOnlyProbeResult = gateResult.accepted === true
           ? buildGovernedMcpVcpNativeReadOnlyProbeAdapter({ toolName, gateResult })
           : null;
-        const readShapeProbeTargetResolverResult = gateResult.accepted === true
+        const skipUnmappedNativeReadAction =
+          shouldSkipGovernedMcpVcpNativeReadDelegationForUnmappedAction(config, toolName);
+        const readShapeProbeTargetResolverResult = gateResult.accepted === true &&
+          !skipUnmappedNativeReadAction
           ? resolveGovernedMcpVcpNativeReadShapeProbeTarget({
             gateResult,
             config,
@@ -2564,6 +2575,7 @@ function createCodexMemoryApplication(overrides = {}) {
             })
             : null;
         const readDelegationEnabled = config.governedMcpVcpNativeReadDelegationMode !== 'off' &&
+          !skipUnmappedNativeReadAction &&
           gateResult.accepted === true &&
           gateResult.normalizedBridgeRequest?.read_allowed === true &&
           gateResult.normalizedBridgeRequest?.write_allowed === false;

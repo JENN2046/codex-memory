@@ -384,8 +384,6 @@ test('governed MCP VCP native WSL NewAPI profile installs default read target wi
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.endpointDisclosed, false);
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.tokenMaterialDisclosed, false);
   assert.deepEqual(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameByAction, {
-    audit_memory: 'knowledge_base.search',
-    memory_overview: 'knowledge_base.search',
     record_memory: 'knowledge_base.record',
     search_memory: 'knowledge_base.search',
     supersede_memory: 'knowledge_base.supersede',

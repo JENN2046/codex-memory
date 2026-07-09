@@ -727,6 +727,44 @@ test('HTTP MCP tool caller maps public governed tool to native MCP tool without 
   }
 });
 
+test('HTTP MCP tool caller rejects unmapped actions when an action map is configured', async () => {
+  let fetchCalls = 0;
+  const result = createGovernedMcpVcpNativeHttpMcpToolCaller({
+    targetReferenceName: 'operator-vcp-toolbox-service-ref',
+    endpoint: 'http://127.0.0.1:65535/mcp/vcp-native',
+    requestTimeoutMs: 1000,
+    fetchImpl: async () => {
+      fetchCalls += 1;
+      throw new Error('network must not be called for unmapped actions');
+    },
+    mcpToolName: 'knowledge_base.search',
+    mcpToolNameByAction: {
+      search_memory: 'knowledge_base.search'
+    }
+  });
+
+  await assert.rejects(
+    result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'memory_overview',
+      arguments: {},
+      governanceMeta: validReadGovernanceMeta({
+        invocationProfile: {
+          toolName: 'memory_overview'
+        }
+      })
+    }),
+    error => {
+      assert.equal(error.governedMcpVcpNativeHttpMcpStatusError, true);
+      assert.equal(error.message, 'invalid_native_mcp_tool_mapping');
+      assert.equal(error.statusClass, 'client_error');
+      assert.equal(error.lowDisclosureReceipt.toolName, 'memory_overview');
+      return true;
+    }
+  );
+  assert.equal(fetchCalls, 0);
+});
+
 test('HTTP MCP tool caller uses configured single native MCP tool name', async () => {
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');

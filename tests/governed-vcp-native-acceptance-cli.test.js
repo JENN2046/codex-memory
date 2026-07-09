@@ -637,7 +637,7 @@ test('governed VCP native acceptance CLI runs read and write through full govern
     assert.equal(serializedArtifact.includes(evidenceOutputPath), false);
     assert.equal(result.config.httpMcpTarget.endpointDisclosed, false);
     assert.equal(result.config.httpMcpTarget.tokenMaterialDisclosed, false);
-    assert.equal(server.requests.filter(request => request.body.method === 'tools/call').length, 3);
+    assert.equal(server.requests.filter(request => request.body.method === 'tools/call').length, 2);
   } finally {
     await server.close();
   }

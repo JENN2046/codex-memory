@@ -1764,7 +1764,7 @@ test('observe mode can run one governed HTTP MCP tools/call probe without exposi
   }
 });
 
-test('WSL NewAPI runtime profile routes read tools to configured governed native HTTP MCP target', async () => {
+test('WSL NewAPI runtime profile routes search only to shape-compatible governed native HTTP MCP target', async () => {
   const observations = [];
   const secretToken = 'PROFILE_SECRET_TOKEN_SHOULD_NOT_ECHO';
   const rawNativeValue = 'PROFILE_RAW_NATIVE_VALUE_SHOULD_NOT_ECHO';
@@ -1834,16 +1834,32 @@ test('WSL NewAPI runtime profile routes read tools to configured governed native
       assert.equal(app.config.governedMcpVcpNativeRuntimeProfile.profileName, 'wsl-newapi-prod');
       assert.equal(app.config.governedMcpVcpNativeReadDelegationMode, 'primary_with_local_fallback');
       assert.equal(app.config.governedMcpVcpNativeWriteDelegationMode, 'off');
-      assert.equal(server.requests.length, 2);
+      assert.equal(server.requests.length, 1);
       assert.equal(server.requests[0].headers.authorization, `Bearer ${secretToken}`);
-      assert.equal(server.requests[1].headers.authorization, `Bearer ${secretToken}`);
-      assert.equal(server.requests[1].body.params.arguments.query, 'profile proof query');
+      assert.equal(server.requests[0].body.params.arguments.query, 'profile proof query');
       assert.equal(result.status, 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED');
       assert.equal(result.access.primaryRuntime, 'VCPToolBox native memory');
       assert.equal(result.access.memoryReadPerformed, true);
       assert.equal(result.access.localMemoryFallbackUsed, false);
       assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.providerApiCalled, true);
       assert.equal(observations[0].readDelegationResult.accepted, true);
+
+      const overview = await app.callTool('memory_overview', {}, codexContext({
+        executionContext: {
+          scopeId: 'scope-alpha'
+        },
+        requestContext: {
+          authenticatedBoundedOverview: true
+        }
+      }));
+
+      assert.equal(server.requests.length, 1);
+      assert.equal(overview.access.mode, 'authenticated_bounded_overview');
+      assert.equal(overview.access.pathsReturned, false);
+      assert.equal(overview.access.recentAuditReturned, false);
+      assert.equal(observations[1].readShapeProbeTargetResolverResult, null);
+      assert.equal(observations[1].readShapeProbeExecutionResult, null);
+      assert.equal(observations[1].readDelegationResult, null);
       assert.equal(serializedConfig.includes(server.url), false);
       assert.equal(serializedConfig.includes(secretToken), false);
       assert.equal(serializedResult.includes(server.url), false);
