@@ -17,8 +17,8 @@ const {
 const GOVERNANCE_METADATA_PATH = 'params._meta.codexMemoryGovernance';
 const PUBLIC_TOOL_TO_NATIVE_TOOLS = Object.freeze({
   search_memory: Object.freeze(['knowledge_base.search']),
-  memory_overview: Object.freeze(['knowledge_base.search']),
-  audit_memory: Object.freeze(['knowledge_base.search']),
+  memory_overview: Object.freeze(['memory_overview']),
+  audit_memory: Object.freeze(['audit_memory']),
   record_memory: Object.freeze(['knowledge_base.record', 'knowledge_base.write']),
   tombstone_memory: Object.freeze(['knowledge_base.tombstone']),
   supersede_memory: Object.freeze(['knowledge_base.supersede'])
@@ -121,6 +121,8 @@ function toolInputSchema(nativeToolName, publicToolNames = []) {
     'tombstone_memory',
     'supersede_memory'
   ].includes(toolName));
+  const overviewTool = publicToolNames.includes('memory_overview') || nativeToolName === 'memory_overview';
+  const auditTool = publicToolNames.includes('audit_memory') || nativeToolName === 'audit_memory';
   return {
     type: 'object',
     additionalProperties: true,
@@ -132,6 +134,12 @@ function toolInputSchema(nativeToolName, publicToolNames = []) {
         memory_id: { type: 'string' },
         old_memory_id: { type: 'string' },
         new_memory_id: { type: 'string' }
+      } : overviewTool ? {
+        limit: { type: 'number' }
+      } : auditTool ? {
+        audit_family: { type: 'string' },
+        window: { type: 'number' },
+        include_raw: { type: 'boolean' }
       } : {
         query: { type: 'string' },
         limit: { type: 'number' },
@@ -153,14 +161,36 @@ function toolInputSchema(nativeToolName, publicToolNames = []) {
 function nativeToolDescriptors(enableWrite = false) {
   const descriptors = [{
     name: 'knowledge_base.search',
-    description: 'Governed VCPToolBox native memory read surface for Codex public read tools.',
-    inputSchema: toolInputSchema('knowledge_base.search', [
-      'search_memory',
-      'memory_overview',
-      'audit_memory'
-    ]),
+    description: 'Governed VCPToolBox native memory search surface for Codex search_memory.',
+    inputSchema: toolInputSchema('knowledge_base.search', ['search_memory']),
     _meta: {
-      publicToolNames: ['search_memory', 'memory_overview', 'audit_memory'],
+      publicToolNames: ['search_memory'],
+      readAllowed: true,
+      writeAllowed: false,
+      exactApprovalRequired: false,
+      lowDisclosure: true,
+      rawOutputAllowed: false,
+      readinessClaimed: false
+    }
+  }, {
+    name: 'memory_overview',
+    description: 'Governed VCPToolBox native memory overview surface for Codex memory_overview.',
+    inputSchema: toolInputSchema('memory_overview', ['memory_overview']),
+    _meta: {
+      publicToolNames: ['memory_overview'],
+      readAllowed: true,
+      writeAllowed: false,
+      exactApprovalRequired: false,
+      lowDisclosure: true,
+      rawOutputAllowed: false,
+      readinessClaimed: false
+    }
+  }, {
+    name: 'audit_memory',
+    description: 'Governed VCPToolBox native memory audit surface for Codex audit_memory.',
+    inputSchema: toolInputSchema('audit_memory', ['audit_memory']),
+    _meta: {
+      publicToolNames: ['audit_memory'],
       readAllowed: true,
       writeAllowed: false,
       exactApprovalRequired: false,
@@ -383,6 +413,36 @@ function normalizeLimit(value, fallback = 1) {
   return Math.max(0, Math.min(parsed, 5));
 }
 
+function bucketCount(value) {
+  const count = Number.parseInt(String(value ?? ''), 10);
+  if (!Number.isInteger(count) || count <= 0) return 'zero';
+  if (count <= 5) return 'bounded';
+  return 'over_budget';
+}
+
+function defaultReadRuntimeReceipt({
+  providerApiCalled = false,
+  memoryReadPerformed = true,
+  isolatedRuntimeStoreUsed = false
+} = {}) {
+  return nativeRuntimeReceipt({
+    nativeRuntimeCalled: true,
+    nativeRuntimeInitialized: true,
+    providerApiCalled,
+    memoryReadPerformed,
+    memoryWritePerformed: false,
+    durableWritePerformed: providerApiCalled === true && memoryReadPerformed === true,
+    durableWriteScope: providerApiCalled === true && memoryReadPerformed === true
+      ? isolatedRuntimeStoreUsed
+        ? 'isolated_derived_index'
+        : 'native_runtime_store'
+      : null,
+    isolatedRuntimeStoreUsed,
+    primaryMemoryStoreWritePerformed: false,
+    derivedIndexWritePerformed: providerApiCalled === true && memoryReadPerformed === true
+  });
+}
+
 function projectReadResults(results = []) {
   if (!Array.isArray(results)) return [];
   return results.slice(0, 5).map(item => ({
@@ -506,11 +566,10 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     }
   }
 
-  async function search(args = {}) {
+  async function runNativeReadProbe(args = {}, fallbackQuery = 'codex memory governed native read proof') {
     await ensureReady();
-    const query = boundedString(args.query, 1000);
+    const query = boundedString(args.query, 1000) || fallbackQuery;
     const limit = normalizeLimit(args.limit ?? args.max_results, 1);
-    if (!query.trim()) return { results: [] };
     const embeddings = await embeddingUtils.getEmbeddingsBatch([query], {
       apiUrl: process.env.API_URL,
       apiKey: process.env.API_Key,
@@ -523,18 +582,59 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     const results = await knowledgeBaseManager.search(vector, limit, 0);
     return {
       results: projectReadResults(results),
-      _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: true,
-        nativeRuntimeInitialized: true,
+      rawResultCount: Array.isArray(results) ? results.length : 0,
+      runtimeReceipt: defaultReadRuntimeReceipt({
         providerApiCalled: true,
         memoryReadPerformed: true,
-        memoryWritePerformed: false,
-        durableWritePerformed: true,
-        durableWriteScope: isolatedRuntimeStoreUsed ? 'isolated_derived_index' : 'native_runtime_store',
-        isolatedRuntimeStoreUsed,
-        primaryMemoryStoreWritePerformed: false,
-        derivedIndexWritePerformed: true
+        isolatedRuntimeStoreUsed
       })
+    };
+  }
+
+  async function search(args = {}) {
+    const query = boundedString(args.query, 1000);
+    if (!query.trim()) return { results: [] };
+    const readProbe = await runNativeReadProbe(args, 'codex memory governed native search proof');
+    return {
+      results: readProbe.results,
+      _nativeRuntimeReceipt: readProbe.runtimeReceipt
+    };
+  }
+
+  async function overview(args = {}) {
+    const readProbe = await runNativeReadProbe(
+      { ...args, limit: normalizeLimit(args.limit ?? args.max_results, 1) },
+      'codex memory governed native overview proof'
+    );
+    return {
+      overview: {
+        status: 'available',
+        resultCountBucket: bucketCount(readProbe.rawResultCount),
+        rawMemoryContentDisclosed: false,
+        readinessClaimed: false
+      },
+      _nativeRuntimeReceipt: readProbe.runtimeReceipt
+    };
+  }
+
+  async function audit(args = {}) {
+    const readProbe = await runNativeReadProbe(
+      {
+        ...args,
+        limit: normalizeLimit(args.window ?? args.limit ?? args.max_results, 1)
+      },
+      'codex memory governed native audit proof'
+    );
+    return {
+      audit: {
+        status: 'available',
+        findingCountBucket: 'zero',
+        sampledReadResultCountBucket: bucketCount(readProbe.rawResultCount),
+        includeRawHonored: args.include_raw !== true,
+        rawMemoryContentDisclosed: false,
+        readinessClaimed: false
+      },
+      _nativeRuntimeReceipt: readProbe.runtimeReceipt
     };
   }
 
@@ -608,6 +708,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
 
   return {
     search,
+    overview,
+    audit,
     record,
     tombstone: args => mutationMarker('tombstone_memory', args),
     supersede: args => mutationMarker('supersede_memory', args)
@@ -659,22 +761,22 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
       governanceMeta
     );
     try {
-      if (nativeToolName === 'knowledge_base.search') {
-        const nativeResult = await adapter.search(args, {
+      if (['knowledge_base.search', 'memory_overview', 'audit_memory'].includes(nativeToolName)) {
+        const methodName = nativeToolName === 'knowledge_base.search'
+          ? 'search'
+          : nativeToolName === 'memory_overview'
+            ? 'overview'
+            : 'audit';
+        if (typeof adapter[methodName] !== 'function') {
+          return jsonRpcError(body.id, -32602, 'Native read tool unavailable', {
+            reasonCode: 'native_read_tool_unavailable',
+            lowDisclosure: true
+          });
+        }
+        const nativeResult = await adapter[methodName](args, {
           publicToolName: governance.publicToolName
         });
-        const runtimeReceipt = nativeResult?._nativeRuntimeReceipt || nativeRuntimeReceipt({
-          nativeRuntimeCalled: true,
-          nativeRuntimeInitialized: true,
-          providerApiCalled: false,
-          memoryReadPerformed: true,
-          memoryWritePerformed: false,
-          durableWritePerformed: false,
-          durableWriteScope: null,
-          isolatedRuntimeStoreUsed: false,
-          primaryMemoryStoreWritePerformed: false,
-          derivedIndexWritePerformed: false
-        });
+        const runtimeReceipt = nativeResult?._nativeRuntimeReceipt || defaultReadRuntimeReceipt();
         const { _nativeRuntimeReceipt, ...structuredContent } = isPlainObject(nativeResult) ? nativeResult : {};
         return jsonRpcResult(body.id, structuredContent, runtimeReceipt);
       }

@@ -670,6 +670,11 @@ test('governed VCP native acceptance CLI rejects search-shaped read-suite accept
       scopeId: 'scope-alpha',
       visibility: 'private',
       query: 'acceptance read suite',
+      toolNameByAction: JSON.stringify({
+        search_memory: 'knowledge_base.search',
+        memory_overview: 'knowledge_base.search',
+        audit_memory: 'knowledge_base.search'
+      }),
       evidenceOutputPath
     });
     const serialized = JSON.stringify(result);
@@ -699,12 +704,16 @@ test('governed VCP native acceptance CLI rejects search-shaped read-suite accept
     assert.equal(result.summary.nativeMcpTargetPreflightEvidence.initializeAccepted, true);
     assert.equal(result.summary.nativeMcpTargetPreflightEvidence.toolsListAccepted, true);
     assert.equal(result.summary.nativeMcpTargetPreflightEvidence.requiredNativeToolsPresent, false);
-    assert.equal(result.operations.memoryOverview.access.memoryReadPerformed, false);
-    assert.equal(result.operations.audit.access.memoryReadPerformed, false);
-    assert.deepEqual(nativeToolNames, ['knowledge_base.search']);
+    assert.equal(result.operations.memoryOverview.access.memoryReadPerformed, true);
+    assert.equal(result.operations.audit.access.memoryReadPerformed, true);
+    assert.deepEqual(nativeToolNames, [
+      'knowledge_base.search',
+      'knowledge_base.search',
+      'knowledge_base.search'
+    ]);
     assert.equal(publicToolNames.includes('search_memory'), true);
-    assert.equal(publicToolNames.includes('memory_overview'), false);
-    assert.equal(publicToolNames.includes('audit_memory'), false);
+    assert.equal(publicToolNames.includes('memory_overview'), true);
+    assert.equal(publicToolNames.includes('audit_memory'), true);
     assert.ok(artifact.summary.acceptanceBlockers.all.includes('native_mcp_required_tool_missing'));
     assert.equal(serialized.includes(server.url), false);
     assert.equal(JSON.stringify(artifact).includes(server.url), false);
@@ -713,7 +722,7 @@ test('governed VCP native acceptance CLI rejects search-shaped read-suite accept
   }
 });
 
-test('governed VCP native acceptance CLI can prove read suite with shape-compatible native tools', async () => {
+test('governed VCP native acceptance CLI can prove read suite with default shape-compatible native tools', async () => {
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
     assert.ok(['knowledge_base.search', 'memory_overview', 'audit_memory'].includes(body.params.name));
@@ -746,11 +755,6 @@ test('governed VCP native acceptance CLI can prove read suite with shape-compati
       scopeId: 'scope-alpha',
       visibility: 'private',
       query: 'acceptance read suite',
-      toolNameByAction: JSON.stringify({
-        search_memory: 'knowledge_base.search',
-        memory_overview: 'memory_overview',
-        audit_memory: 'audit_memory'
-      }),
       evidenceOutputPath
     });
     const artifact = JSON.parse(await fs.readFile(evidenceOutputPath, 'utf8'));

@@ -1764,17 +1764,19 @@ test('observe mode can run one governed HTTP MCP tools/call probe without exposi
   }
 });
 
-test('WSL NewAPI runtime profile routes search only to shape-compatible governed native HTTP MCP target', async () => {
+test('WSL NewAPI runtime profile routes read tools to shape-compatible governed native HTTP MCP target', async () => {
   const observations = [];
   const secretToken = 'PROFILE_SECRET_TOKEN_SHOULD_NOT_ECHO';
   const rawNativeValue = 'PROFILE_RAW_NATIVE_VALUE_SHOULD_NOT_ECHO';
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
-    assert.equal(body.params.name, 'knowledge_base.search');
-    assert.ok([
-      'neutral route read shape probe',
-      'profile proof query'
-    ].includes(body.params.arguments.query));
+    assert.ok(['knowledge_base.search', 'memory_overview'].includes(body.params.name));
+    if (body.params.name === 'knowledge_base.search') {
+      assert.ok([
+        'neutral route read shape probe',
+        'profile proof query'
+      ].includes(body.params.arguments.query));
+    }
     assert.equal(body.params._meta.codexMemoryGovernance.runtimeTarget.targetReferenceName, 'operator-vcp-toolbox-service-ref');
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({
@@ -1853,13 +1855,14 @@ test('WSL NewAPI runtime profile routes search only to shape-compatible governed
         }
       }));
 
-      assert.equal(server.requests.length, 1);
-      assert.equal(overview.access.mode, 'authenticated_bounded_overview');
-      assert.equal(overview.access.pathsReturned, false);
-      assert.equal(overview.access.recentAuditReturned, false);
-      assert.equal(observations[1].readShapeProbeTargetResolverResult, null);
-      assert.equal(observations[1].readShapeProbeExecutionResult, null);
-      assert.equal(observations[1].readDelegationResult, null);
+      assert.equal(server.requests.length, 2);
+      assert.equal(server.requests[1].headers.authorization, `Bearer ${secretToken}`);
+      assert.equal(server.requests[1].body.params.name, 'memory_overview');
+      assert.equal(overview.status, 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED');
+      assert.equal(overview.access.primaryRuntime, 'VCPToolBox native memory');
+      assert.equal(overview.access.memoryReadPerformed, true);
+      assert.equal(overview.access.localMemoryFallbackUsed, false);
+      assert.equal(observations[1].readDelegationResult.accepted, true);
       assert.equal(serializedConfig.includes(server.url), false);
       assert.equal(serializedConfig.includes(secretToken), false);
       assert.equal(serializedResult.includes(server.url), false);

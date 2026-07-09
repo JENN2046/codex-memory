@@ -366,6 +366,30 @@ test('governed HTTP MCP VCP native target can be sourced from env without raw di
   });
 });
 
+test('governed HTTP MCP VCP native target preserves bounded live proof timeout', () => {
+  const privateEndpoint = 'http://127.0.0.1:8765/mcp/vcp-native';
+  const config = createIsolatedConfig({
+    governedMcpVcpNativeRuntimeTarget: {
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      targetKind: 'mcp_server'
+    },
+    governedMcpVcpNativeHttpMcpTarget: {
+      endpoint: privateEndpoint,
+      bearerToken: 'SECRET_TOKEN_SHOULD_NOT_ECHO',
+      mcpToolNameByAction: {
+        search_memory: 'knowledge_base.search'
+      },
+      requestTimeoutMs: 180000
+    }
+  });
+  const privateConfig = getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(config);
+
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.accepted, true);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.requestTimeoutMs, 180000);
+  assert.equal(privateConfig.requestTimeoutMs, 180000);
+  assert.equal(JSON.stringify(config).includes(privateEndpoint), false);
+});
+
 test('governed MCP VCP native WSL NewAPI profile installs default read target without enabling writes', () => {
   const config = createIsolatedConfig({
     governedMcpVcpNativeRuntimeProfile: 'wsl-newapi-prod'
@@ -388,6 +412,8 @@ test('governed MCP VCP native WSL NewAPI profile installs default read target wi
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.endpointDisclosed, false);
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.tokenMaterialDisclosed, false);
   assert.deepEqual(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameByAction, {
+    audit_memory: 'audit_memory',
+    memory_overview: 'memory_overview',
     record_memory: 'knowledge_base.record',
     search_memory: 'knowledge_base.search',
     supersede_memory: 'knowledge_base.supersede',

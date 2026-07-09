@@ -3,10 +3,13 @@
 const {
   isSafeReferenceName
 } = require('./VcpToolBoxSafeReference');
+const {
+  DEFAULT_REQUEST_TIMEOUT_MS,
+  normalizeHttpMcpRequestTimeoutMs
+} = require('./GovernedMcpVcpNativeHttpMcpTimeoutPolicy');
 
 const PRIVATE_CONFIG_KEY = '__governedMcpVcpNativeHttpMcpTargetPrivateConfig';
 const DEFAULT_MCP_TOOL_NAME = 'knowledge_base.search';
-const DEFAULT_REQUEST_TIMEOUT_MS = 3000;
 const GOVERNED_NATIVE_BRIDGE_TOOL_NAMES = Object.freeze([
   'search_memory',
   'memory_overview',
@@ -30,14 +33,6 @@ function firstString(...values) {
     if (normalized) return normalized;
   }
   return '';
-}
-
-function normalizeTimeoutMs(value) {
-  const parsed = Number.parseInt(String(value ?? ''), 10);
-  if (!Number.isInteger(parsed) || parsed <= 0 || parsed > 30_000) {
-    return DEFAULT_REQUEST_TIMEOUT_MS;
-  }
-  return parsed;
 }
 
 function parsePlainObject(value) {
@@ -148,7 +143,7 @@ function normalizeGovernedMcpVcpNativeHttpMcpTargetConfig(source = {}) {
     DEFAULT_MCP_TOOL_NAME
   );
   const mcpToolNameConfigured = Boolean(firstString(input.mcpToolName, input.mcp_tool_name));
-  const requestTimeoutMs = normalizeTimeoutMs(
+  const requestTimeoutMs = normalizeHttpMcpRequestTimeoutMs(
     input.requestTimeoutMs ?? input.request_timeout_ms
   );
   const toolNameMapping = normalizeMcpToolNameByAction(

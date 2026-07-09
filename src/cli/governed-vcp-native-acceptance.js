@@ -245,6 +245,10 @@ function optionalOverride(value) {
 function defaultToolNameByAction(options = {}) {
   return {
     search_memory: 'knowledge_base.search',
+    ...(options.includeReadSuite ? {
+      memory_overview: 'memory_overview',
+      audit_memory: 'audit_memory'
+    } : {}),
     ...((options.includeWrite || options.includeWriteSuite) ? {
       record_memory: 'knowledge_base.record'
     } : {}),

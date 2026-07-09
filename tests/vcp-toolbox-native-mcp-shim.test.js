@@ -287,21 +287,23 @@ test('VCPToolBox native MCP shim tools/list exposes only low-disclosure governed
     const toolNames = result.result.tools.map(tool => tool.name);
     const serialized = JSON.stringify(result);
 
-    assert.deepEqual(toolNames, ['knowledge_base.search']);
+    assert.deepEqual(toolNames, ['knowledge_base.search', 'memory_overview', 'audit_memory']);
     assert.equal(result.result._meta.writeEnabled, false);
     assert.equal(result.result.tools[0]._meta.readAllowed, true);
     assert.equal(result.result.tools[0]._meta.writeAllowed, false);
-    assert.deepEqual(result.result.tools[0]._meta.publicToolNames, [
-      'search_memory',
-      'memory_overview',
-      'audit_memory'
-    ]);
-    assert.equal(
-      result.result.tools[0].inputSchema._meta.governanceMetadataPath,
-      'params._meta.codexMemoryGovernance'
-    );
-    assert.equal(result.result.tools[0].inputSchema._meta.toolArgumentsMayCarryGovernance, false);
-    assert.equal(result.result.tools[0].inputSchema._meta.rawOutputAllowed, false);
+    assert.deepEqual(result.result.tools[0]._meta.publicToolNames, ['search_memory']);
+    assert.deepEqual(result.result.tools[1]._meta.publicToolNames, ['memory_overview']);
+    assert.deepEqual(result.result.tools[2]._meta.publicToolNames, ['audit_memory']);
+    for (const tool of result.result.tools) {
+      assert.equal(
+        tool.inputSchema._meta.governanceMetadataPath,
+        'params._meta.codexMemoryGovernance'
+      );
+      assert.equal(tool.inputSchema._meta.toolArgumentsMayCarryGovernance, false);
+      assert.equal(tool.inputSchema._meta.rawOutputAllowed, false);
+      assert.equal(tool._meta.readAllowed, true, tool.name);
+      assert.equal(tool._meta.writeAllowed, false, tool.name);
+    }
     assert.equal(result.result._meta.endpointDisclosed, false);
     assert.equal(result.result._meta.tokenMaterialDisclosed, false);
     assert.equal(result.result._meta.nativeRuntimeCalled, false);
@@ -324,13 +326,15 @@ test('VCPToolBox native MCP shim tools/list exposes only low-disclosure governed
 
     assert.deepEqual(toolNames, [
       'knowledge_base.search',
+      'memory_overview',
+      'audit_memory',
       'knowledge_base.record',
       'knowledge_base.write',
       'knowledge_base.tombstone',
       'knowledge_base.supersede'
     ]);
     assert.equal(result.result._meta.writeEnabled, true);
-    for (const tool of result.result.tools.slice(1)) {
+    for (const tool of result.result.tools.slice(3)) {
       assert.equal(tool._meta.writeAllowed, true, tool.name);
       assert.equal(tool._meta.exactApprovalRequired, true, tool.name);
       assert.equal(tool._meta.rawOutputAllowed, false, tool.name);
@@ -401,13 +405,21 @@ test('VCPToolBox native MCP shim fails closed when native read cannot produce a 
   }
 });
 
-test('VCPToolBox native MCP shim binds governed read tools to native search action', async () => {
+test('VCPToolBox native MCP shim binds governed read tools to shape-compatible native actions', async () => {
   const calls = [];
   const shim = await withShimServer({
     adapter: {
       async search(args, context) {
         calls.push({ args, context });
         return { results: [] };
+      },
+      async overview(args, context) {
+        calls.push({ args, context });
+        return { overview: { status: 'available' } };
+      },
+      async audit(args, context) {
+        calls.push({ args, context });
+        return { audit: { status: 'available' } };
       },
       async record() {
         throw new Error('not used');
@@ -416,9 +428,46 @@ test('VCPToolBox native MCP shim binds governed read tools to native search acti
   });
   try {
     for (const publicToolName of ['memory_overview', 'audit_memory']) {
+      const nativeToolName = publicToolName;
       const result = await postJson(shim.url, {
         jsonrpc: '2.0',
         id: publicToolName,
+        method: 'tools/call',
+        params: {
+          name: nativeToolName,
+          arguments: { query: 'bounded read' },
+          _meta: {
+            codexMemoryGovernance: governanceMeta(publicToolName)
+          }
+        }
+      });
+
+      assert.equal(result.error, undefined, publicToolName);
+      assert.equal(Object.keys(result.result.structuredContent)[0], publicToolName === 'memory_overview'
+        ? 'overview'
+        : 'audit');
+    }
+
+    assert.deepEqual(calls.map(call => call.context.publicToolName), [
+      'memory_overview',
+      'audit_memory'
+    ]);
+    assert.deepEqual(calls.map(call => call.args.governed_bridge.native_tool_name), [
+      'memory_overview',
+      'audit_memory'
+    ]);
+  } finally {
+    await shim.close();
+  }
+});
+
+test('VCPToolBox native MCP shim rejects search-shaped overview and audit drift', async () => {
+  const shim = await withShimServer();
+  try {
+    for (const publicToolName of ['memory_overview', 'audit_memory']) {
+      const result = await postJson(shim.url, {
+        jsonrpc: '2.0',
+        id: `${publicToolName}-search-drift`,
         method: 'tools/call',
         params: {
           name: 'knowledge_base.search',
@@ -429,14 +478,11 @@ test('VCPToolBox native MCP shim binds governed read tools to native search acti
         }
       });
 
-      assert.equal(result.error, undefined, publicToolName);
-      assert.deepEqual(result.result.structuredContent, { results: [] });
+      assert.equal(result.error.code, -32602);
+      assert.equal(result.error.data.reasonCode, 'native_tool_public_binding_mismatch');
+      assert.equal(result.error.data.lowDisclosure, true);
     }
-
-    assert.deepEqual(calls.map(call => call.context.publicToolName), [
-      'memory_overview',
-      'audit_memory'
-    ]);
+    assert.equal(shim.calls.length, 0);
   } finally {
     await shim.close();
   }

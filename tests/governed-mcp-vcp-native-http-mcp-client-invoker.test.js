@@ -10,6 +10,7 @@ const {
   extractJsonRpcToolResultValue,
   GOVERNANCE_METADATA_PATH,
   GOVERNANCE_METADATA_SCHEMA_VERSION,
+  normalizeHttpMcpRequestTimeoutMs,
   projectJsonRpcToolResultForReadShape
 } = require('../src/core/GovernedMcpVcpNativeHttpMcpClientInvoker');
 
@@ -1128,4 +1129,11 @@ test('JSON-RPC tool result extraction supports structuredContent and text conten
       }]
     }
   }), { ok: true });
+});
+
+test('HTTP MCP timeout policy accepts bounded production-provider proof timeouts', () => {
+  assert.equal(normalizeHttpMcpRequestTimeoutMs('180000'), 180000);
+  assert.equal(normalizeHttpMcpRequestTimeoutMs(300000), 300000);
+  assert.equal(normalizeHttpMcpRequestTimeoutMs(300001), 3000);
+  assert.equal(normalizeHttpMcpRequestTimeoutMs('not-a-timeout'), 3000);
 });

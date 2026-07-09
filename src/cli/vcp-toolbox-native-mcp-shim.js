@@ -71,7 +71,12 @@ async function main() {
     status: 'listening',
     endpoint: `http://${options.host}:${port}/mcp/vcp-native`,
     targetReferenceName: 'operator-vcp-toolbox-service-ref',
-    nativeTools: ['knowledge_base.search', ...(options.enableWrite ? ['knowledge_base.record'] : [])],
+    nativeTools: [
+      'knowledge_base.search',
+      'memory_overview',
+      'audit_memory',
+      ...(options.enableWrite ? ['knowledge_base.record'] : [])
+    ],
     endpointDisclosed: true,
     isolatedRuntimeStoreConfigured: Boolean(options.knowledgeBaseStorePath),
     runtimeStorePathDisclosed: false,

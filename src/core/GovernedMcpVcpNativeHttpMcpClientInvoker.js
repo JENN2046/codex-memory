@@ -6,10 +6,13 @@ const {
 const {
   validateGovernedMcpNativeGovernanceMetadataCoversCurrentProductGoal
 } = require('./CurrentProductGoalContract');
+const {
+  DEFAULT_REQUEST_TIMEOUT_MS,
+  normalizeHttpMcpRequestTimeoutMs
+} = require('./GovernedMcpVcpNativeHttpMcpTimeoutPolicy');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeHttpMcpClientInvoker';
 const CONTRACT_MODE = 'safe_reference_bound_http_jsonrpc_tools_call_invoker';
-const DEFAULT_REQUEST_TIMEOUT_MS = 3000;
 const ALLOWED_STATUS_CLASSES = Object.freeze([
   'success',
   'not_available',
@@ -81,14 +84,6 @@ function isPlainObject(value) {
 
 function safeEnum(value, allowedValues, fallback = null) {
   return typeof value === 'string' && allowedValues.includes(value) ? value : fallback;
-}
-
-function safeTimeoutMs(value) {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 30_000) {
-    return DEFAULT_REQUEST_TIMEOUT_MS;
-  }
-  return Math.floor(parsed);
 }
 
 function parseEndpoint(value) {
@@ -445,7 +440,7 @@ function createGovernedMcpVcpNativeHttpMcpClientInvoker(input = {}) {
 
   const endpointHref = endpoint.href;
   const bearerToken = typeof input.bearerToken === 'string' ? input.bearerToken : '';
-  const requestTimeoutMs = safeTimeoutMs(input.requestTimeoutMs);
+  const requestTimeoutMs = normalizeHttpMcpRequestTimeoutMs(input.requestTimeoutMs);
   const targetReferenceName = input.targetReferenceName;
   const mcpToolNameByAction = isPlainObject(input.mcpToolNameByAction)
     ? { ...input.mcpToolNameByAction }
@@ -561,7 +556,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
 
   const endpointHref = endpoint.href;
   const bearerToken = typeof input.bearerToken === 'string' ? input.bearerToken : '';
-  const requestTimeoutMs = safeTimeoutMs(input.requestTimeoutMs);
+  const requestTimeoutMs = normalizeHttpMcpRequestTimeoutMs(input.requestTimeoutMs);
   const targetReferenceName = input.targetReferenceName;
   const mcpToolNameByAction = isPlainObject(input.mcpToolNameByAction)
     ? { ...input.mcpToolNameByAction }
@@ -790,5 +785,6 @@ module.exports = {
   extractJsonRpcToolResultValue,
   GOVERNANCE_METADATA_PATH,
   GOVERNANCE_METADATA_SCHEMA_VERSION,
+  normalizeHttpMcpRequestTimeoutMs,
   projectJsonRpcToolResultForReadShape
 };
