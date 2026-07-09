@@ -3088,6 +3088,76 @@ test('primary_with_local_fallback returns empty local audit fallback for zero-it
   });
 });
 
+test('primary_with_local_fallback returns empty local overview fallback for zero-item disclosure budget', async () => {
+  let nativeCalls = 0;
+  let boundedOverviewCalls = 0;
+  let fullOverviewCalls = 0;
+  const observations = [];
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeReadDelegationToolCaller: async payload => {
+      nativeCalls += 1;
+      throw governedNativeTransportErrorForPayload(payload, 'PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO');
+    }
+  }, async app => {
+    app.services.overviewService.getAuthenticatedBoundedOverview = async () => {
+      boundedOverviewCalls += 1;
+      throw new Error('bounded local overview must not run for zero-item fallback');
+    };
+    app.services.overviewService.getOverview = async () => {
+      fullOverviewCalls += 1;
+      throw new Error('full local overview must not run for zero-item fallback');
+    };
+
+    const result = await app.callTool('memory_overview', {
+      auditWindow: 10,
+      limit: 10,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'workspace-alpha',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, codexContext({
+      requestContext: {
+        outputDisclosureBudget: {
+          level: 'summary',
+          lowDisclosure: true,
+          rawOutput: false,
+          maxItems: 0,
+          maxBytes: 4096
+        }
+      }
+    }));
+    const serializedResult = JSON.stringify(result);
+    const serializedObservation = JSON.stringify(observations[0]);
+
+    assert.equal(nativeCalls, 1);
+    assert.equal(boundedOverviewCalls, 0);
+    assert.equal(fullOverviewCalls, 0);
+    assert.equal(result.access.mode, 'authenticated_bounded_overview');
+    assert.equal(result.access.localMemoryFallbackAttempted, true);
+    assert.equal(result.access.localMemoryFallbackUsed, true);
+    assert.equal(result.access.localMemoryFallbackReadPerformed, false);
+    assert.equal(result.access.localMemoryFallbackReturned, true);
+    assert.equal(result.access.localFallbackAuditReceiptStatus, 'appended');
+    assert.equal(result.summary.auditWindow, 0);
+    assert.equal(result.summary.totalWrites, 0);
+    assert.equal(result.recall.totalRecalls, 0);
+    assert.equal(result.recentAudit, undefined);
+    assert.equal(result.recentFiles, undefined);
+    assert.equal(result.memoryLinks, undefined);
+    assert.equal(result.governedNativeReadFallback.localMemoryFallbackReadPerformed, false);
+    assert.equal(observations[0].gateResult.normalizedBridgeRequest.disclosure_max_items, 0);
+    assert.equal(serializedResult.includes('PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
+    assert.equal(serializedResult.includes('workspace-alpha'), false);
+    assert.equal(serializedResult.includes('codex-memory'), false);
+    assert.equal(serializedObservation.includes('PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
+  });
+});
+
 test('primary_with_local_fallback strips raw local fallback result fields at projection boundary', async () => {
   await withTempApp({
     governedMcpVcpNativeBridgeGateMode: 'observe',

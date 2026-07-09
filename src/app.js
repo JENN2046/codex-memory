@@ -1541,6 +1541,47 @@ function buildGovernedMcpVcpNativeReadFallbackArguments(toolName, args = {}, gat
   return safeArgs;
 }
 
+function buildZeroItemGovernedMcpVcpNativeOverviewFallbackResult() {
+  return {
+    access: {
+      mode: 'authenticated_bounded_overview',
+      selectedProjection: true,
+      selectedProjectionVersion: 2,
+      publicAccess: 'bounded',
+      pathsReturned: false,
+      embeddingFingerprintReturned: false,
+      recentAuditReturned: false,
+      recentFilesReturned: false,
+      memoryLinksReturned: false,
+      recallRecentReturned: false,
+      detailFieldsReturned: false
+    },
+    summary: {
+      totalWrites: 0,
+      acceptedWrites: 0,
+      rejectedWrites: 0,
+      auditWindow: 0
+    },
+    recall: {
+      totalRecalls: 0,
+      recentCount: 0,
+      summary: {
+        total: 0,
+        byTarget: {},
+        byScope: {}
+      }
+    },
+    policy: {
+      selectedProjection: true,
+      rawAuditScanPerformed: false,
+      providerCalled: false,
+      durableMutationPerformed: false,
+      publicMcpExpanded: false,
+      readinessClaimed: false
+    }
+  };
+}
+
 async function prepareGovernedMcpVcpNativeReadFallbackAuditReceipt(fallbackContext, options = {}) {
   if (!fallbackContext) {
     return {
@@ -2745,6 +2786,22 @@ function createCodexMemoryApplication(overrides = {}) {
 
       if (toolName === 'memory_overview') {
         const effectiveArgs = governedNativeReadFallbackArgs || args;
+        if (
+          governedNativeReadFallbackContext &&
+          effectiveArgs.auditWindow === 0 &&
+          effectiveArgs.limit === 0
+        ) {
+          return await attachGovernedMcpVcpNativeReadFallbackProjection(
+            buildZeroItemGovernedMcpVcpNativeOverviewFallbackResult(),
+            governedNativeReadFallbackContext,
+            {
+              auditLogStore,
+              toolName,
+              localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt,
+              localFallbackReadPerformed: false
+            }
+          );
+        }
         if (governedNativeReadFallbackContext) {
           const result = attachGovernedNativeBridgeOverviewStatus(
             await overviewService.getAuthenticatedBoundedOverview({
