@@ -4,27 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2006 trusted-full-read receipt closeout / route decision`.
-Current validation: `CMV-2107`.
-Current handoff: CM-2006 closes out the CM-2005 low-disclosure trusted-full-read receipt: bounded attempt completed, array/zero-item shape projected, read-shape unlocked true, raw output persisted false, write counters zero, readiness false. CM-2005 single-use authority is consumed and cannot be reused.
+Current task: `CM-2007 near-model-memory plan pack primary goal selection`.
+Current validation: `CMV-2108`.
+Current handoff: CM-2007 records complete implementation of `docs/near-model-memory-plan-pack/` as the recent primary work goal. The immediate next active milestone is Phase 3 `prepare_memory_context` MVP, reusing existing recall/write pipelines instead of rebuilding from zero.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-2006 only within safe local/no-live planning boundaries unless Jenn supplies a new fresh exact boundary for any additional trusted-full-read attempt or broader inference.
+Goal: complete the imported near-model-memory plan pack. Immediate next step: implement Phase 3 `prepare_memory_context` MVP.
 
-Current status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_CM2005_BOUNDED_ATTEMPT_COMPLETED_READ_SHAPE_UNLOCKED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-2006 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md` and records the CM-2005 low-disclosure projection only. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. CM-2005 approval reuse, retry, new trusted-full-read execution, target material binding, runtime/network/VCPToolBox calls, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, M15/RC unlock, and readiness claims remain forbidden without new exact authority.
+Current status: `COMPLETED_VALIDATED_FULL_PLAN_PACK_PRIMARY_GOAL_RECORDED_NEXT_PHASE3_REUSES_EXISTING_RECALL_WRITE_PIPELINES`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface should remain read-only while Phase 3 is implemented. The next tool target is `prepare_memory_context`, default-exposed only after contract/schema/tests. It should reuse existing local memory, SQLite shadow, vector index, `KnowledgeBaseRecallPipeline`, `CandidateGenerator`, `TagMemoEngine`, scope/lifecycle filters, `AuditLogStore`, and `MemoryOverviewService`, then convert bounded search results into must-know facts, recent decisions, current state, blockers, risks, forbidden assumptions, recommended next step, source breakdown, and audit receipt. Local write governance should be reused later for `propose_memory_delta`, staging, and audit, not default production write. VCPToolBox native memory remains final memory intelligence owner. Operator-only full surface, native write production, durable mutation, release/deploy/cutover/push, M15/RC unlock, and readiness claims remain forbidden without separate evidence and approval.
 
 Workspace: `A:\codex-memory`.
 
 Current entrypoints:
 
 - `CURRENT_STATE.md`
+- `PROJECT_GOAL.md`
 - `.agent_board/CURRENT_FACTS.json`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `docs/near-model-memory-plan-pack/00_README.md`
+- `docs/near-model-memory-plan-pack/04_PHASE_PLAN.md`
+- `docs/near-model-memory-plan-pack/06_ACCEPTANCE_MATRIX.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`

@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-07-08",
-  "taskId": "CM-2006",
-  "validationId": "CMV-2107",
+  "updatedAt": "2026-07-10",
+  "taskId": "CM-2007",
+  "validationId": "CMV-2108",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -29,7 +29,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "trusted_full_read_receipt_closeout_cm2005_bounded_attempt_completed_read_shape_unlocked_no_raw_output_no_write_no_readiness",
+    "scope": "full_near_model_memory_plan_pack_primary_goal_next_phase3_prepare_memory_context_reuse_existing_recall_write_pipelines",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2108",
+      "scope": "CM-2007 near-model-memory plan pack primary goal selection",
+      "status": "COMPLETED_VALIDATED_FULL_PLAN_PACK_PRIMARY_GOAL_RECORDED_NEXT_PHASE3_REUSES_EXISTING_RECALL_WRITE_PIPELINES"
+    },
     {
       "id": "CMV-2107",
       "scope": "CM-2006 trusted-full-read receipt closeout / route decision",
@@ -2994,6 +2999,10 @@
     }
   ],
   "notValidated": [
+    "Phase 3 prepare_memory_context MVP implementation",
+    "prepare_memory_context contract/schema tests",
+    "prepare_memory_context context package quality baseline",
+    "task-start automatic recall workflow integration",
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
     "live provider/API calls",

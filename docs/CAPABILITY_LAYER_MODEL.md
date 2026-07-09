@@ -57,6 +57,20 @@ returns a bounded memory context package:
 - source breakdown
 - audit receipt
 
+Implementation should reuse the existing local recall and support stack:
+
+- `KnowledgeBaseRecallPipeline`
+- `CandidateGenerator`
+- `TagMemoEngine`
+- scope and lifecycle filters
+- SQLite shadow
+- vector index
+- `AuditLogStore`
+- `MemoryOverviewService`
+
+The layer converts bounded search results into a task-oriented memory context
+package. It is not a from-zero recall rewrite.
+
 This layer is the first step toward a near-model-memory experience.
 
 ## L3: Task-Start Automatic Recall
@@ -81,6 +95,10 @@ Default behavior:
 
 This layer lets Codex suggest what should be remembered after a task without
 writing production memory by default.
+
+It should reuse the local write pipeline and write governance for proposal,
+staging, validation, and audit receipt. It must not become default production
+write.
 
 ## L5: Operator-Only Full Surface
 

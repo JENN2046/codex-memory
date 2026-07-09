@@ -8,15 +8,17 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2006 trusted-full-read receipt closeout / route decision |
-| Current task | `CM-2006 trusted-full-read receipt closeout / route decision` |
-| Current validation | `CMV-2107` |
-| Current route | CM-2006 closes out the CM-2005 bounded trusted-full-read attempt using only the low-disclosure receipt projection: bounded attempt completed, array/zero-item shape projected, read-shape unlocked true, raw output persisted false, write counters zero, readiness false; CM-2005 single-use authority is consumed and cannot be reused |
+| Status | CM-2007 near-model-memory plan pack primary goal selection |
+| Current task | `CM-2007 near-model-memory plan pack primary goal selection` |
+| Current validation | `CMV-2108` |
+| Current route | The recent primary work goal is complete implementation of the imported near-model-memory plan pack. Immediate next milestone is Phase 3 `prepare_memory_context` MVP, reusing existing local memory, SQLite shadow, vector index, `KnowledgeBaseRecallPipeline`, `CandidateGenerator`, `TagMemoEngine`, scope/lifecycle filters, `AuditLogStore`, `MemoryOverviewService`, and write governance; VCPToolBox native memory remains the final memory intelligence owner |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2007` records `docs/near-model-memory-plan-pack/` as the recent primary implementation plan source. The actual goal is complete implementation of the plan pack. The immediate active route is Phase 3 `prepare_memory_context` MVP: reuse the existing recall pipeline and support services, convert bounded search results into task-oriented memory context sections, keep default read-only/no durable mutation, and keep VCPToolBox native memory as final memory intelligence owner. Later `propose_memory_delta` / staging / audit work should reuse local write governance without becoming default production write.
 
 `CM-2006` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md` and closes out the CM-2005 bounded trusted-full-read attempt. It records only the allowed low-disclosure projection: `execution_status_category=bounded_attempt_completed`, `route_status_category=action_success_response_shape_projected`, `response_shape_category=array_item_count_bucket_only`, `top_level_kind_category=array`, `item_count_bucket=zero`, `duration_bucket=lt_100ms`, `read_shape_unlocked_boolean=true`, `raw_output_persisted_boolean=false`, zero write/mutation counters, and `readiness_claimed_boolean=false`. CM-2006 performs no retry, no new trusted-full-read attempt, no request-body generation, no endpoint/locator disclosure, no runtime/network/VCPToolBox call, no response consumption, no memory read/write, no public MCP expansion, no M15/RC unlock, and no readiness claim. CM-2005 single-use execution authority is consumed; any additional attempt requires a new exact boundary.
 

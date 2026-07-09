@@ -25,6 +25,14 @@ Long-term goal and boundary documents:
 
 ## Current Status
 
+Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
+
+Current primary work goal: complete the imported near-model-memory plan pack.
+The immediate next milestone is Phase 3 `prepare_memory_context`, implemented
+by reusing the existing recall/write support pipelines rather than rebuilding
+recall from zero. VCPToolBox native memory remains the final memory
+intelligence owner.
+
 Current active path:
 
 ```text

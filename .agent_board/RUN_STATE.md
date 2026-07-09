@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2006 trusted-full-read receipt closeout / route decision`.
-Current validation: `CMV-2107`.
-Current status: CM-2006 closes out the CM-2005 low-disclosure trusted-full-read receipt. The CM-2005 bounded attempt completed with array/zero-item shape projection and read-shape unlocked true, while raw output persisted false, write counters zero, and readiness false. CM-2005 single-use authority is consumed and cannot be reused.
+Current task: `CM-2007 near-model-memory plan pack primary goal selection`.
+Current validation: `CMV-2108`.
+Current status: CM-2007 records complete implementation of `docs/near-model-memory-plan-pack/` as the recent primary work goal. The active next milestone is Phase 3 `prepare_memory_context` MVP, implemented by reusing existing local memory, SQLite shadow, vector index, `KnowledgeBaseRecallPipeline`, `CandidateGenerator`, `TagMemoEngine`, scope/lifecycle filters, `AuditLogStore`, `MemoryOverviewService`, and write governance. VCPToolBox native memory remains final memory intelligence owner; EPA / Residual Pyramid / advanced TagMemo narratives are experimental recall heuristics.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is local planning or a new exact boundary display if Jenn wants another bounded attempt or any broader inference from CM-2005. Do not reuse CM-2005 authority, retry trusted-full-read, generate request bodies or approval lines, call runtime/VCPToolBox, bind target material, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness without fresh exact authority.
+Next safe action is implementing Phase 3 `prepare_memory_context` MVP through local source/tests/docs: define the tool contract and response schema, reuse `KnowledgeBaseRecallPipeline` and support services, convert bounded search results into task-oriented context package sections, add read-only MCP exposure after validation, enforce disclosure budgets, and add a context quality baseline. Do not enable operator-only full surface, native write production, release/deploy/cutover, or readiness claims without separate evidence and approval.
 
 ## Historical Run Notes
 

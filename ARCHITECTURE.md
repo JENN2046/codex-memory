@@ -2,15 +2,26 @@
 
 ## 1. Architecture Purpose
 
-`codex-memory` is an independent, Codex-oriented implementation of the full VCP memory system.
+`codex-memory` is a governed MCP bridge and auxiliary local memory runtime for
+Codex. Its product goal is to let Codex use VCPToolBox native memory through
+governed tools, not to reimplement VCPToolBox as a competing memory
+intelligence owner.
 
-This architecture defines how the system should grow from a safe local memory core into a VCP-compatible, MCP-accessible, auditable memory kernel for Codex and Claude.
+This architecture defines how the existing local memory, SQLite shadow, vector
+index, recall pipeline, and write-governance pipeline are retained and used as
+fallback, audit, validation, compatibility, offline continuity, context
+packaging, and proposal staging around the VCPToolBox native memory runtime.
 
-Current repository reality: the local memory core already exists and the project is in Phase E maintenance/refinement. This document is an evolution guide; it must not be read as a request to rebuild the current CommonJS runtime from a new Phase 1 skeleton.
+Current repository reality: the local memory core already exists. The active
+roadmap is the imported near-model-memory plan pack, with Phase 3
+`prepare_memory_context` as the immediate next milestone. This document is an
+evolution guide; it must not be read as a request to rebuild the current
+CommonJS runtime from a new Phase 1 skeleton.
 
 The architecture must support two truths at the same time:
 
-1. The final target is large: VCP memory parity and evolution.
+1. The final plan-pack target is large: governed near-model-memory experience
+   for Codex through VCPToolBox native memory plus local support pipelines.
 2. Each implementation step must remain small, testable, reversible, and safe.
 
 This document describes the intended architecture, not a claim that every module already exists.
@@ -19,7 +30,7 @@ This document describes the intended architecture, not a claim that every module
 
 ## 2. System Role
 
-`codex-memory` sits between agents and durable memory.
+`codex-memory` sits between Codex and memory runtimes.
 
 ```text
 Codex / Agents / Workers
@@ -31,10 +42,14 @@ MCP Tools / CLI / Local API
 Policy + Sanitization + Audit
         |
         v
-Memory Core
+Governed Runtime Router
         |
-        v
-Storage + Retrieval + VCP Intelligence
+        +--> VCPToolBox native memory
+        |      primary source of truth / memory intelligence owner
+        |
+        +--> Local memory support runtime
+               fallback / audit / validation fixture / compatibility /
+               offline continuity / context packaging / proposal staging
 ```
 
 It does not execute arbitrary project tasks.
@@ -43,7 +58,10 @@ It does not replace `codex-router`.
 
 It does not replace VCPToolBox runtime tools.
 
-It governs what becomes durable memory, how memory is retrieved, how memory is corrected, and how memory can be forgotten.
+It governs who can access memory, which runtime is targeted, how much output
+can be disclosed, how evidence is recorded, and when local fallback, staging,
+or audit support may be used. VCPToolBox native memory remains the final owner
+of memory intelligence and production durable memory behavior.
 
 ---
 
@@ -83,11 +101,15 @@ The system should be able to answer:
 - whether it superseded older memory
 - how it can be corrected or forgotten
 
-### 3.5 Advanced VCP Capabilities Must Be Layered
+### 3.5 Advanced Recall Heuristics Must Be Layered
 
-TagMemo, semantic gravity, EPA, Residual Pyramid, SVD/PCA basis modeling, and background association should be separate modules.
+TagMemo, semantic gravity, EPA, Residual Pyramid, SVD/PCA basis modeling, and
+background association are experimental recall heuristics inside the local
+support runtime.
 
-They must not be buried inside basic storage or basic retrieval.
+They may help rank, group, explain, or package candidates. They must not be
+presented as production memory intelligence, and they must not silently mutate
+durable memory.
 
 ---
 
@@ -96,7 +118,7 @@ They must not be buried inside basic storage or basic retrieval.
 ```text
 Layer 7  Ecosystem Integration
 Layer 6  MCP / CLI / Agent Interfaces
-Layer 5  VCP Memory Intelligence
+Layer 5  Experimental Recall Heuristics
 Layer 4  Retrieval Engine
 Layer 3  Memory Governance
 Layer 2  Storage Core
@@ -151,30 +173,26 @@ Purpose:
 
 ### Layer 2 — Storage Core
 
-Initial storage:
+Existing retained local storage:
 
-- JSONL or SQLite
-- local-only
-- append-friendly
-- auditable
-- easy to inspect
-- easy to back up
-
-Future storage:
-
-- SQLite WAL
-- USearch
-- Qdrant
-- LanceDB
+- diary-compatible local memory files
+- SQLite shadow store
+- vector index
 - embedding cache
-- pluggable storage adapters
+- candidate cache
+- audit stores
+- reconcile / validation support state
 
 Purpose:
 
-- persist memory safely
+- persist local support memory safely
 - preserve audit events
-- support import/export
-- provide predictable local behavior
+- provide fallback, validation fixtures, compatibility, offline continuity, and
+  proposal staging
+- support `prepare_memory_context` when native reads need local fallback or
+  audit corroboration
+- provide predictable local behavior without becoming the production memory
+  intelligence owner
 
 ### Layer 3 — Memory Governance
 
@@ -198,6 +216,18 @@ Purpose:
 
 ### Layer 4 — Retrieval Engine
 
+Existing retained retrieval modules:
+
+- `KnowledgeBaseRecallPipeline`
+- `CandidateGenerator`
+- `TagMemoEngine`
+- scope filters
+- lifecycle filters
+- reranking / grouping / candidate cache
+- vector index access
+- `MemoryOverviewService`
+- `AuditLogStore`
+
 Retrieval modes:
 
 - exact lookup
@@ -217,10 +247,11 @@ Purpose:
 - make confidence and freshness visible
 - distinguish stale/superseded/current memory
 - avoid duplicate dominance
+- convert search results into task-oriented memory context packages
 
-### Layer 5 — VCP Memory Intelligence
+### Layer 5 — Experimental Recall Heuristics
 
-VCP-inspired engines:
+VCP-inspired local support engines:
 
 - TagMemo engine
 - tag graph
@@ -237,9 +268,11 @@ VCP-inspired engines:
 
 Purpose:
 
-- reproduce and evolve the practical capability set of VCP memory
-- support semantic association across time
-- compress long-term context without destroying signal
+- improve candidate generation, ranking, grouping, and context packaging
+- support semantic association across time as recall evidence
+- compress or summarize local support context without destroying signal
+- remain experimental unless backed by specific quality gates
+- never become the primary memory intelligence owner
 
 ### Layer 6 — MCP / CLI / Agent Interfaces
 
@@ -253,20 +286,27 @@ External surfaces:
 
 Agent-facing tools:
 
-Current public MCP tools are limited to `record_memory`, `search_memory`, and `memory_overview`. The remaining names in this list are planned governance surfaces.
+Current default public MCP tools are read-only:
 
-- `record_memory`
 - `search_memory`
 - `memory_overview`
-- `update_memory`
-- `supersede_memory`
-- `forget_memory`
-- `checkpoint_memory`
-- `handoff_memory`
 - `audit_memory`
+
+Near-term default read-only context tool:
+
+- `prepare_memory_context`
+
+Proposal/staging surfaces:
+
+- `propose_memory_delta`
+
+Operator-only or approval-only governance surfaces:
+
+- `record_memory`
 - `validate_memory`
-- `import_memory`
-- `export_memory`
+- `commit_memory_delta`
+- `tombstone_memory`
+- `supersede_memory`
 
 Purpose:
 
@@ -285,9 +325,10 @@ Targets:
 
 Purpose:
 
-- make `codex-memory` the shared memory spine for Codex and Claude
+- make `codex-memory` the governed Codex access path for VCPToolBox native
+  memory and local support pipelines
 - keep project scopes separate
-- enable reusable cross-project memory without privacy leakage
+- enable reusable cross-project memory context without privacy leakage
 
 ---
 
@@ -502,7 +543,18 @@ Audit event should store metadata and counts, not secret content.
 
 ## 7. Write Pipeline
 
-All durable writes should pass through a controlled pipeline.
+All durable writes should pass through a controlled pipeline. For the
+near-model-memory plan pack, the existing local write pipeline is retained for:
+
+- `propose_memory_delta`
+- staging
+- local validation
+- audit receipts
+- compatibility/offline continuity
+
+It must not become default production write. Production native write remains
+separate and requires exact approval, native receipt, verify-write, rollback
+posture, and later gates.
 
 ```text
 Input
@@ -526,10 +578,10 @@ Duplicate Check
 Trust / Confidence Assignment
   |
   v
-MemoryRecord Construction
+MemoryRecord / MemoryProposal Construction
   |
   v
-Storage Write
+Proposal / Staging / Approved Storage Write
   |
   v
 Index Update
@@ -567,11 +619,18 @@ Audit event:
 Validation:
 ```
 
+Default `propose_memory_delta` output should be proposal-only and low
+disclosure. `commit_memory_delta` is operator-only / approval-only and must
+remain separate from the default Codex runtime.
+
 ---
 
 ## 8. Retrieval Pipeline
 
-Retrieval should be controlled and explainable.
+Retrieval should be controlled and explainable. `prepare_memory_context` should
+not start from zero; it should call the existing recall and support services,
+then transform their bounded results into a task-oriented memory context
+package.
 
 ```text
 Query
@@ -596,6 +655,29 @@ Freshness / Confidence Annotation
   |
   v
 Result Explanation
+```
+
+`prepare_memory_context` implementation mapping:
+
+```text
+Task request
+  |
+  v
+Scope / lifecycle / disclosure budget policy
+  |
+  v
+KnowledgeBaseRecallPipeline
+  |
+  +--> CandidateGenerator
+  +--> TagMemoEngine experimental heuristics
+  +--> vector index / candidate cache
+  +--> scope and lifecycle filters
+  |
+  v
+MemoryOverviewService + AuditLogStore support projections
+  |
+  v
+Task-oriented memory context package
 ```
 
 ### Retrieval Rules
@@ -661,9 +743,12 @@ It requires explicit approval unless the user clearly requested deletion of the 
 
 ---
 
-## 10. VCP Memory Intelligence Modules
+## 10. Experimental Recall Heuristic Modules
 
-The system should expose advanced VCP-style intelligence as modular engines.
+The system may expose advanced VCP-style recall heuristics as modular engines.
+They are not the primary memory intelligence layer; VCPToolBox native memory
+keeps that role. These modules should feed `search_memory` ranking and
+`prepare_memory_context` packaging, not replace native memory behavior.
 
 ### 10.1 TagMemo Engine
 
@@ -704,7 +789,7 @@ Purpose:
 
 - analyze embedding or semantic projection behavior
 - identify dominant semantic axes
-- support memory reshaping and ranking
+- support candidate ranking and context packaging experiments
 
 EPA must not become a black box that silently rewrites memory truth.
 
@@ -713,7 +798,7 @@ EPA must not become a black box that silently rewrites memory truth.
 Purpose:
 
 - decompose memory into base signal and residual novelty
-- support compaction
+- support recall/summary experiments
 - prevent repeated memories from drowning new signal
 
 ### 10.5 Compaction Engine
@@ -760,23 +845,39 @@ Audit
 Structured Response
 ```
 
-Current implemented public tools:
+Current default public tools:
 
-- `record_memory`
 - `search_memory`
 - `memory_overview`
-
-Planned governance tools:
-
 - `audit_memory`
-- `update_memory`
+
+Near-term default read-only context tool:
+
+- `prepare_memory_context`
+
+Proposal/staging tool:
+
+- `propose_memory_delta`
+
+Operator-only or approval-only tools:
+
+- `record_memory`
+- `commit_memory_delta`
+- `validate_memory`
+- `tombstone_memory`
 - `supersede_memory`
+
+Legacy or future governance names that may remain internal or compatibility-only:
+
+- `update_memory`
 - `forget_memory`
 - `checkpoint_memory`
 - `handoff_memory`
-- `validate_memory`
 - `import_memory`
 - `export_memory`
+
+The default Codex runtime must not expose production write or destructive
+mutation tools.
 
 ### Tool Response Discipline
 

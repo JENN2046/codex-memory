@@ -4,11 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2006 trusted-full-read receipt closeout / route decision`.
-Current validation: `CMV-2107`.
+Current checkpoint: `CM-2007 near-model-memory plan pack primary goal selection`.
+Current validation: `CMV-2108`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2007 Near-Model-Memory Plan Pack Primary Goal Selection
+
+Status: `COMPLETED_VALIDATED_FULL_PLAN_PACK_PRIMARY_GOAL_RECORDED_NEXT_PHASE3_REUSES_EXISTING_RECALL_WRITE_PIPELINES`
+
+Recorded:
+
+- Recorded `docs/near-model-memory-plan-pack/` as the recent primary implementation plan source.
+- Recorded the actual target as complete implementation of the full plan pack, not only Phase 3.
+- Set the immediate next milestone to Phase 3 / Memory Context Package MVP.
+- Set the immediate implementation target to `prepare_memory_context`.
+- Recorded that `prepare_memory_context` must reuse existing local memory, SQLite shadow, vector index, `KnowledgeBaseRecallPipeline`, `CandidateGenerator`, `TagMemoEngine`, scope/lifecycle filters, `AuditLogStore`, and `MemoryOverviewService`.
+- Recorded that EPA, Residual Pyramid, and advanced TagMemo narratives are experimental recall heuristics only.
+- Recorded that local write governance is retained for `propose_memory_delta`, staging, and audit, not default production write.
+- Preserved VCPToolBox native memory as the final memory intelligence owner.
+- Preserved the milestone boundary: this is not operator-only full surface, not native write production, not release/tag/deploy/cutover readiness.
+
+Validation: `CMV-2108`; docs/status review, plan-pack phase/acceptance review, `CURRENT_FACTS.json` parse, manifest file presence check, and changed-scope re-review are recorded in `.agent_board/VALIDATION_LOG.md`.
 
 ## CM-2006 Trusted-Full-Read Receipt Closeout / Route Decision
 

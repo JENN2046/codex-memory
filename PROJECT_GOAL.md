@@ -36,6 +36,41 @@ continuity, compatibility, and validation fixtures. The product value is
 governance around native memory behavior, not replacing VCPToolBox memory
 intelligence with a parallel local intelligence engine.
 
+## 0.1 Recent Primary Work Goal
+
+The recent primary work goal is now complete implementation of the imported
+near-model-memory implementation plan pack:
+
+- source: `docs/near-model-memory-plan-pack/00_README.md`
+- total target: implement the full plan-pack sequence from read-only native
+  access, memory context package, workflow integration, recall quality, memory
+  delta proposal/staging, operator-only full surface, native write proof, and
+  observation/review gates
+- immediate milestone: Phase 3 / Memory Context Package MVP
+- immediate implementation target: `prepare_memory_context`
+- implementation posture: reuse existing local memory, SQLite shadow, vector
+  index, `KnowledgeBaseRecallPipeline`, `CandidateGenerator`, `TagMemoEngine`,
+  scope/lifecycle filters, `AuditLogStore`, `MemoryOverviewService`, and write
+  governance instead of rebuilding from zero
+- default posture: read-only context packaging first; no durable mutation; no
+  default production write
+- runtime ownership: VCPToolBox native memory remains the final memory
+  intelligence owner
+- heuristics posture: EPA, Residual Pyramid, and advanced TagMemo narratives are
+  experimental recall heuristics, not production memory intelligence claims
+
+`prepare_memory_context` should produce a bounded, task-start memory context
+package for Codex from governed native reads and local fallback/audit evidence.
+It should transform existing search/recall results into near-model-use
+sections: must-know facts, recent
+decisions, current state, blockers, risks, forbidden assumptions, recommended
+next step, source breakdown, and audit receipt.
+
+`propose_memory_delta` and future staging/audit work should reuse the existing
+local write pipeline and write governance. They must remain proposal/staging
+paths unless a later operator-only or native-write gate explicitly permits a
+durable production write.
+
 ## 1. Legacy Long-Term Context (Not Current Product Goal)
 
 The material below is legacy roadmap context. It must not override Section 0.
@@ -43,11 +78,16 @@ For the current governed VCPToolBox-native bridge work, the active client is
 Codex only, the primary runtime is VCPToolBox native memory, and
 `codex-memory` provides governance rather than memory intelligence.
 
-`codex-memory` is the independent Codex- and Claude-oriented implementation of the full VCP memory system.
+Historical wording described `codex-memory` as an independent replacement-style
+memory implementation. That wording is no longer the active product goal.
+The current goal is complete implementation of the near-model-memory plan pack:
+a governed Codex bridge to VCPToolBox native memory, with local memory retained
+as support infrastructure.
 
 It is designed as a local-first, auditable, reversible, privacy-safe, MCP-accessible long-term memory kernel for Codex and Claude.
 
-The project must eventually reproduce and evolve the practical capability set of the VCP memory system, while adding stronger governance for Codex-style autonomous execution.
+The project must preserve useful local recall/write-governance capabilities
+while keeping VCPToolBox native memory as the final memory intelligence owner.
 
 `codex-memory` is not a basic note app, chat archive, or simple vector database.
 
@@ -408,7 +448,12 @@ The project does not target a general-purpose multi-agent arbitration platform.
 
 ## 13. Phase Roadmap
 
-This phase roadmap is the long-term evolution model. The current repository has already completed the starter local memory path and is in Phase E maintenance/refinement with HTTP MCP, diary-compatible writes, SQLite shadow storage, vector/profile artifacts, active-memory compatibility, compare/rollback harnesses, and gate workflows.
+This phase roadmap is legacy evolution context. The current repository has
+already completed the starter local memory path and now follows the imported
+near-model-memory plan pack as the active roadmap. Existing HTTP MCP,
+diary-compatible writes, SQLite shadow storage, vector/profile artifacts,
+active-memory compatibility, compare/rollback harnesses, and gate workflows
+must be preserved and reused.
 
 Do not interpret Phase 0 or Phase 1 below as the current next task.
 
@@ -591,7 +636,8 @@ Acceptance:
 
 Goal:
 
-Become the shared memory spine for the user's Codex and Claude workflows.
+Become the governed Codex memory bridge and local support runtime for the user's
+near-model-memory workflow.
 
 Deliverables:
 
@@ -645,7 +691,10 @@ First make the memory safe.
 
 Then make it deep.
 
-Current repository note: the safe local memory spine already exists. Future milestones should start from the Phase E maintenance baseline and preserve current contracts while adding governance, supersession, forgetting, import/export, and Codex/Claude client scoping incrementally.
+Current repository note: the safe local memory spine already exists. Future
+milestones should start from the imported near-model-memory plan pack and
+preserve current contracts while adding context packaging, proposal/staging,
+governance, native proof, observation, and review gates incrementally.
 
 ---
 
@@ -676,7 +725,11 @@ A feature is complete only when behavior is clear and validation status is hones
 
 ## 16. Completion Definition
 
-The full project is complete only when `codex-memory` can safely reproduce and evolve the practical capabilities of the VCP memory system in a Codex-compatible form.
+The full project is complete only when `codex-memory` has implemented the
+near-model-memory plan pack: governed VCPToolBox native memory access,
+task-start context packaging, recall quality gates, proposal/staging/audit
+flows, operator-only full-surface gates, native write proof, observation, and
+external review, without becoming the VCPToolBox memory intelligence owner.
 
 Completion requires:
 
