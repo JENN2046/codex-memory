@@ -1567,6 +1567,54 @@ test('observe mode records governed bridge gate receipt on real app.callTool pat
   });
 });
 
+test('no-token memory_overview bypasses governed native bridge work', async () => {
+  const observations = [];
+  let readShapeProbeCalls = 0;
+  let readDelegationCalls = 0;
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeReadShapeProbeInvoker: async () => {
+      readShapeProbeCalls += 1;
+      throw new Error('no-token memory_overview must not run native read-shape probe');
+    },
+    governedMcpVcpNativeReadDelegationToolCaller: async () => {
+      readDelegationCalls += 1;
+      throw new Error('no-token memory_overview must not run native read delegation');
+    }
+  }, async app => {
+    const result = await app.callTool('memory_overview', {
+      auditWindow: 10,
+      limit: 5
+    }, codexContext({
+      requestContext: {
+        noTokenReadOnly: true,
+        outputDisclosureBudget: {
+          level: 'summary',
+          lowDisclosure: true,
+          rawOutput: false,
+          maxItems: 5,
+          maxBytes: 4096
+        },
+        auditReceipt: {
+          receipt_id: 'cm-app-no-token-overview-receipt'
+        },
+        rollbackPosture: {
+          mode: 'read_only_no_write'
+        }
+      }
+    }));
+
+    assert.equal(result.access.mode, 'public_selected_overview');
+    assert.equal(result.access.selectedProjection, true);
+    assert.equal(observations.length, 0);
+    assert.equal(readShapeProbeCalls, 0);
+    assert.equal(readDelegationCalls, 0);
+    assert.equal(result.governedNativeBridge, undefined);
+  });
+});
+
 test('observe mode can run one injected governed VCP native read-shape probe without raw disclosure', async () => {
   const observations = [];
   let invocations = 0;

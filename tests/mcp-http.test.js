@@ -5209,6 +5209,9 @@ test('HTTP MCP no-token search_memory should reject include_content raw reads', 
 });
 
 test('HTTP MCP no-token memory_overview should return selected safe overview without full overview execution', async () => {
+  const observations = [];
+  let readShapeProbeCalls = 0;
+  let readDelegationCalls = 0;
   await withHttpServer(async ({ app, address }) => {
     const originalGetOverview = app.services.overviewService.getOverview;
     app.services.overviewService.getOverview = async () => {
@@ -5244,6 +5247,9 @@ test('HTTP MCP no-token memory_overview should return selected safe overview wit
       assert.equal(overview.access.mode, 'public_selected_overview');
       assert.equal(overview.access.selectedProjection, true);
       assert.equal(overview.access.selectedProjectionVersion, 2);
+      assert.equal(observations.length, 0);
+      assert.equal(readShapeProbeCalls, 0);
+      assert.equal(readDelegationCalls, 0);
       assert.deepEqual(Object.keys(overview).sort(), NO_TOKEN_OVERVIEW_KEYS);
       assert.deepEqual(Object.keys(overview.access).sort(), NO_TOKEN_OVERVIEW_ACCESS_KEYS);
       assert.equal(overview.access.publicAccess, 'blocked');
@@ -5279,6 +5285,26 @@ test('HTTP MCP no-token memory_overview should return selected safe overview wit
       assert.doesNotMatch(serialized, /"embeddingFingerprint"\s*:/);
     } finally {
       app.services.overviewService.getOverview = originalGetOverview;
+    }
+  }, {}, {
+    defaultProjectId: 'codex-memory',
+    defaultWorkspaceId: 'workspace-alpha',
+    defaultClientId: 'codex',
+    defaultVisibility: 'private',
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeRuntimeTarget: {
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      targetKind: 'mcp_server'
+    },
+    governedMcpVcpNativeReadShapeProbeInvoker: async () => {
+      readShapeProbeCalls += 1;
+      throw new Error('no-token memory_overview must not run native read-shape probe');
+    },
+    governedMcpVcpNativeReadDelegationToolCaller: async () => {
+      readDelegationCalls += 1;
+      throw new Error('no-token memory_overview must not run native read delegation');
     }
   });
 });

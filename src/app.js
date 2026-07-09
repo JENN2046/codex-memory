@@ -2514,6 +2514,11 @@ function createCodexMemoryApplication(overrides = {}) {
       let governedNativeReadFallbackContext = null;
       let governedNativeReadFallbackAuditReceipt = null;
       let governedNativeReadFallbackArgs = null;
+      if (toolName === 'memory_overview' && requestContext.noTokenReadOnly === true) {
+        return overviewService.getNoTokenSelectedOverview({
+          auditWindow: args?.auditWindow
+        });
+      }
       if (
         (
           config.governedMcpVcpNativeBridgeGateMode !== 'off' ||
@@ -2732,20 +2737,6 @@ function createCodexMemoryApplication(overrides = {}) {
             }),
             governedNativeBridgeObservationStore
           );
-          return await attachGovernedMcpVcpNativeReadFallbackProjection(
-            result,
-            governedNativeReadFallbackContext,
-            {
-              auditLogStore,
-              toolName,
-              localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
-            }
-          );
-        }
-        if (requestContext.noTokenReadOnly === true) {
-          const result = await overviewService.getNoTokenSelectedOverview({
-            auditWindow: effectiveArgs.auditWindow
-          });
           return await attachGovernedMcpVcpNativeReadFallbackProjection(
             result,
             governedNativeReadFallbackContext,
