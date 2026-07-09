@@ -1204,7 +1204,9 @@ test('native write transport failure is low-disclosure and not locally fallback 
       evidence: 'reviewed',
       tombstone_reason: 'duplicate',
       actor_client_id: 'codex',
-      request_source: 'test'
+      request_source: 'test',
+      dry_run: false,
+      confirm: true
     },
     gateResult: acceptedGate({
       mcp_tool_name: 'tombstone_memory',
@@ -1239,6 +1241,94 @@ test('native write transport failure is low-disclosure and not locally fallback 
   assert.equal(serializedResult.includes('PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
 });
 
+test('rejects native tombstone and supersede without explicit confirm and dry_run=false', async () => {
+  const cases = [
+    {
+      toolName: 'tombstone_memory',
+      args: {
+        memory_id: 'RAW_TOMBSTONE_MEMORY_ID_SHOULD_NOT_ECHO',
+        reason: 'duplicate',
+        tombstone_reason: 'duplicate',
+        evidence: 'reviewed',
+        actor_client_id: 'codex',
+        request_source: 'test'
+      },
+      expectedInvalidFields: ['args.dry_run', 'args.confirm']
+    },
+    {
+      toolName: 'tombstone_memory',
+      args: {
+        memory_id: 'RAW_TOMBSTONE_MEMORY_ID_SHOULD_NOT_ECHO',
+        reason: 'duplicate',
+        tombstone_reason: 'duplicate',
+        evidence: 'reviewed',
+        actor_client_id: 'codex',
+        request_source: 'test',
+        dry_run: false
+      },
+      expectedInvalidFields: ['args.confirm']
+    },
+    {
+      toolName: 'supersede_memory',
+      args: {
+        old_memory_id: 'RAW_OLD_MEMORY_ID_SHOULD_NOT_ECHO',
+        new_memory_id: 'RAW_NEW_MEMORY_ID_SHOULD_NOT_ECHO',
+        reason: 'newer evidence',
+        evidence: 'reviewed',
+        supersedes_link: 'raw-old-memory-link',
+        superseded_by_link: 'raw-new-memory-link',
+        actor_client_id: 'codex',
+        request_source: 'test'
+      },
+      expectedInvalidFields: ['args.dry_run', 'args.confirm']
+    },
+    {
+      toolName: 'supersede_memory',
+      args: {
+        old_memory_id: 'RAW_OLD_MEMORY_ID_SHOULD_NOT_ECHO',
+        new_memory_id: 'RAW_NEW_MEMORY_ID_SHOULD_NOT_ECHO',
+        reason: 'newer evidence',
+        evidence: 'reviewed',
+        supersedes_link: 'raw-old-memory-link',
+        superseded_by_link: 'raw-new-memory-link',
+        actor_client_id: 'codex',
+        request_source: 'test',
+        confirm: true
+      },
+      expectedInvalidFields: ['args.dry_run']
+    }
+  ];
+
+  for (const testCase of cases) {
+    let calls = 0;
+    const result = await executeGovernedMcpVcpNativeWriteDelegation({
+      toolName: testCase.toolName,
+      args: testCase.args,
+      gateResult: acceptedGateForTool(testCase.toolName),
+      callMcpTool: receiptAwareCallMcpTool(async () => {
+        calls += 1;
+        return { status: 'native_should_not_be_called' };
+      })
+    });
+    const serialized = JSON.stringify(result);
+
+    assert.equal(result.accepted, false, testCase.toolName);
+    assert.equal(result.reasonCode, 'invalid_governed_native_write_delegation_boundary');
+    for (const field of testCase.expectedInvalidFields) {
+      assert.ok(result.invalidFields.includes(field), `${testCase.toolName} missing ${field}`);
+    }
+    assert.equal(result.runtimeCalled, false);
+    assert.equal(result.vcpToolBoxCalled, false);
+    assert.equal(result.mcpToolCalled, false);
+    assert.equal(result.memoryWritePerformed, false);
+    assert.equal(result.localMemoryFallbackEligible, false);
+    assert.equal(calls, 0);
+    assert.equal(serialized.includes('RAW_TOMBSTONE_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+    assert.equal(serialized.includes('RAW_OLD_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+    assert.equal(serialized.includes('RAW_NEW_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+  }
+});
+
 test('delegates bounded tombstone_memory write with tool-bound exact approval action', async () => {
   let call = null;
   const result = await executeGovernedMcpVcpNativeWriteDelegation({
@@ -1250,6 +1340,8 @@ test('delegates bounded tombstone_memory write with tool-bound exact approval ac
       evidence: 'reviewed',
       actor_client_id: 'codex',
       request_source: 'test',
+      dry_run: false,
+      confirm: true,
       endpoint: 'http://PRIVATE_TOMBSTONE_ENDPOINT_SHOULD_NOT_FORWARD'
     },
     gateResult: acceptedGateForTool('tombstone_memory'),
@@ -1267,6 +1359,7 @@ test('delegates bounded tombstone_memory write with tool-bound exact approval ac
   assert.equal(call.toolName, 'tombstone_memory');
   assert.equal(call.arguments.endpoint, undefined);
   assert.equal(call.arguments.dry_run, false);
+  assert.equal(call.arguments.confirm, true);
   assert.equal(
     call.arguments.governed_bridge.exact_approval_action,
     'live_bridge_tombstone_memory_proof'
@@ -1292,6 +1385,8 @@ test('delegates bounded supersede_memory write with tool-bound exact approval ac
       superseded_by_link: 'raw-new-memory-link',
       actor_client_id: 'codex',
       request_source: 'test',
+      dry_run: false,
+      confirm: true,
       token: 'PRIVATE_SUPERSEDE_TOKEN_SHOULD_NOT_FORWARD'
     },
     gateResult: acceptedGateForTool('supersede_memory'),
@@ -1309,6 +1404,7 @@ test('delegates bounded supersede_memory write with tool-bound exact approval ac
   assert.equal(call.toolName, 'supersede_memory');
   assert.equal(call.arguments.token, undefined);
   assert.equal(call.arguments.dry_run, false);
+  assert.equal(call.arguments.confirm, true);
   assert.equal(
     call.arguments.governed_bridge.exact_approval_action,
     'live_bridge_supersede_memory_proof'

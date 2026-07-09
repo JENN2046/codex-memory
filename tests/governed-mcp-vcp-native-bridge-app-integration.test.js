@@ -4065,6 +4065,114 @@ test('primary write delegation binds every governed write tool on the real app p
   }
 });
 
+test('primary write delegation rejects tombstone and supersede without explicit confirm', async () => {
+  const writeCases = [
+    {
+      toolName: 'tombstone_memory',
+      exactApprovalAction: 'live_bridge_tombstone_memory_proof',
+      args: {
+        memory_id: 'RAW_TOMBSTONE_MEMORY_ID_SHOULD_NOT_ECHO',
+        reason: 'governed native tombstone proof',
+        evidence: 'exact approval recorded',
+        tombstone_reason: 'duplicate',
+        actor_client_id: 'Codex',
+        request_source: 'governed-mcp-vcp-native-bridge-app-integration'
+      },
+      localCounterName: 'tombstone'
+    },
+    {
+      toolName: 'supersede_memory',
+      exactApprovalAction: 'live_bridge_supersede_memory_proof',
+      args: {
+        old_memory_id: 'RAW_OLD_MEMORY_ID_SHOULD_NOT_ECHO',
+        new_memory_id: 'RAW_NEW_MEMORY_ID_SHOULD_NOT_ECHO',
+        reason: 'governed native supersede proof',
+        evidence: 'exact approval recorded',
+        supersedes_link: 'raw-old-memory-link',
+        superseded_by_link: 'raw-new-memory-link',
+        actor_client_id: 'Codex',
+        request_source: 'governed-mcp-vcp-native-bridge-app-integration'
+      },
+      localCounterName: 'supersede'
+    }
+  ];
+
+  for (const writeCase of writeCases) {
+    const observations = [];
+    let nativeCalls = 0;
+    await withTempApp({
+      governedMcpVcpNativeBridgeGateMode: 'observe',
+      governedMcpVcpNativeWriteDelegationMode: 'primary',
+      governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+      governedMcpVcpNativeWriteDelegationToolCaller: async () => {
+        nativeCalls += 1;
+        return { status: 'native_should_not_be_called' };
+      }
+    }, async app => {
+      const localWrites = {
+        tombstone: 0,
+        supersede: 0
+      };
+      app.services.tombstoneMemoryService.tombstone = async () => {
+        localWrites.tombstone += 1;
+        return { success: true };
+      };
+      app.services.supersedeMemoryService.supersede = async () => {
+        localWrites.supersede += 1;
+        return { success: true };
+      };
+
+      const result = await app.callTool(writeCase.toolName, writeCase.args, codexContext({
+        executionContext: {
+          scopeId: 'scope-alpha'
+        },
+        requestContext: {
+          exactApprovalResult: exactWriteApprovalResult({
+            allowedAction: writeCase.exactApprovalAction,
+            allowedScope: {
+              project_id: 'codex-memory',
+              scope_id: 'scope-alpha',
+              workspace_id: 'workspace-alpha',
+              client_id: 'Codex',
+              visibility: 'private'
+            }
+          }),
+          rollbackPosture: {
+            mode: 'bounded_rollback_plan',
+            rollback_plan_ref: 'cm-governed-write-rollback-plan'
+          }
+        }
+      }));
+      const serializedResult = JSON.stringify(result);
+      const serializedObservation = JSON.stringify(observations[0]);
+
+      assert.equal(nativeCalls, 0, writeCase.toolName);
+      assert.equal(localWrites[writeCase.localCounterName], 0, writeCase.toolName);
+      assert.equal(result.status, 'GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_REJECTED');
+      assert.equal(result.reasonCode, 'invalid_governed_native_write_delegation_boundary');
+      assert.equal(result.access.runtimeCalled, false, writeCase.toolName);
+      assert.equal(result.access.vcpToolBoxCalled, false, writeCase.toolName);
+      assert.equal(result.access.mcpToolCalled, false, writeCase.toolName);
+      assert.equal(result.access.memoryWritePerformed, false, writeCase.toolName);
+      assert.equal(result.access.localMemoryFallbackEligible, false, writeCase.toolName);
+      assert.equal(result.access.localMemoryFallbackUsed, false, writeCase.toolName);
+      assert.equal(result.access.delegationReasonCode, 'invalid_governed_native_write_delegation_boundary');
+      assert.equal(observations[0].writeDelegationResult.accepted, false, writeCase.toolName);
+      assert.equal(
+        observations[0].writeDelegationResult.reasonCode,
+        'invalid_governed_native_write_delegation_boundary',
+        writeCase.toolName
+      );
+      assert.equal(serializedResult.includes('RAW_TOMBSTONE_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+      assert.equal(serializedResult.includes('RAW_OLD_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+      assert.equal(serializedResult.includes('RAW_NEW_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+      assert.equal(serializedObservation.includes('RAW_TOMBSTONE_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+      assert.equal(serializedObservation.includes('RAW_OLD_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+      assert.equal(serializedObservation.includes('RAW_NEW_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+    });
+  }
+});
+
 test('primary write delegation rejects over-budget native response without local write fallback', async () => {
   const observations = [];
   await withTempApp({

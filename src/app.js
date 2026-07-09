@@ -1302,7 +1302,8 @@ function attachGovernedNativeBridgeOverviewStatus(result, observationStore) {
 }
 
 function buildGovernedMcpVcpNativeReadDelegationRejectedToolResult(delegationResult = {}) {
-  const receipt = delegationResult && typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
+  const receipt = delegationResult && delegationResult.receipt !== null &&
+    typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
     ? delegationResult.receipt
     : {};
   return {
@@ -1335,7 +1336,8 @@ function buildGovernedMcpVcpNativeReadDelegationRejectedToolResult(delegationRes
 }
 
 function buildGovernedMcpVcpNativeReadFallbackContext(delegationResult = {}, gateResult = {}) {
-  const receipt = delegationResult && typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
+  const receipt = delegationResult && delegationResult.receipt !== null &&
+    typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
     ? delegationResult.receipt
     : null;
   return {
@@ -1877,7 +1879,8 @@ async function attachGovernedMcpVcpNativeReadFallbackProjection(result, fallback
 }
 
 function buildGovernedMcpVcpNativeWriteDelegationRejectedToolResult(delegationResult = {}) {
-  const receipt = delegationResult && typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
+  const receipt = delegationResult && delegationResult.receipt !== null &&
+    typeof delegationResult.receipt === 'object' && !Array.isArray(delegationResult.receipt)
     ? delegationResult.receipt
     : {};
   return {

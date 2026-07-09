@@ -453,6 +453,14 @@ function invalidWriteBooleanField(args, field) {
   return typeof args[field] === 'boolean' ? null : `args.${field}`;
 }
 
+function invalidNativeControlledMutationConfirmFields(toolName, args = {}) {
+  const invalidFields = [];
+  if (toolName !== 'tombstone_memory' && toolName !== 'supersede_memory') return invalidFields;
+  if (args.dry_run !== false) invalidFields.push('args.dry_run');
+  if (args.confirm !== true) invalidFields.push('args.confirm');
+  return invalidFields;
+}
+
 function invalidWriteArgumentFields(toolName, args = {}) {
   const invalidFields = [];
   if (!DELEGATABLE_WRITE_TOOLS.includes(toolName)) return invalidFields;
@@ -484,6 +492,7 @@ function invalidWriteArgumentFields(toolName, args = {}) {
     const invalidTagsField = invalidWriteTagsField(args);
     if (invalidTagsField) invalidFields.push(invalidTagsField);
   }
+  invalidFields.push(...invalidNativeControlledMutationConfirmFields(toolName, args));
   return invalidFields;
 }
 
@@ -1030,8 +1039,6 @@ function buildDelegatedArguments(toolName, args = {}, gateResult = {}) {
     low_disclosure: true
   };
 
-  if (toolName === 'tombstone_memory' && delegated.dry_run === undefined) delegated.dry_run = false;
-  if (toolName === 'supersede_memory' && delegated.dry_run === undefined) delegated.dry_run = false;
   return delegated;
 }
 
