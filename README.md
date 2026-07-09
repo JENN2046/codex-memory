@@ -29,8 +29,11 @@ Codex
   -> WSL-local NewAPI provider on 127.0.0.1:3000
 ```
 
-The live read path has passed production-provider proof through WSL-local
-NewAPI. Real Codex client dogfood has called:
+The live read path was previously observed through WSL-local NewAPI with a
+production-provider read proof. This fix commit does not claim a freshly rerun
+live proof; release review should require a new dated live-proof artifact before
+treating the observation as current evidence. Real Codex client dogfood has
+called:
 
 - `search_memory`
 - `memory_overview`

@@ -10,7 +10,8 @@ const {
   buildGovernedMcpEffectiveRequestContext,
   buildGovernedMcpServerMetadata,
   buildGovernedMcpToolMetadata,
-  buildGovernedMcpRequestContextFromParams
+  buildGovernedMcpRequestContextFromParams,
+  getPublicToolDefinitions
 } = require('../src/adapters/codex-mcp/server');
 const {
   validateGovernedMcpMetadataCoversCurrentProductGoal,
@@ -646,6 +647,49 @@ test('codex-memory MCP defaults to read-only public surface', async () => {
     assert.equal(hiddenWrite.response.error.code, -32001);
     assert.equal(hiddenWrite.response.error.data.code, 'mcp_tool_not_exposed');
   });
+});
+
+test('hardened MCP surface ignores explicit public tool names defensively', async () => {
+  const config = {
+    securityProfile: 'hardened',
+    mcpPublicToolSurface: 'full',
+    mcpPublicToolNames: ['record_memory', 'validate_memory'],
+    exposeControlledMutationMcpTools: true,
+    exposeWriteMcpTools: true
+  };
+  assert.deepEqual(
+    getPublicToolDefinitions(config).map(tool => tool.name).sort(),
+    ['audit_memory', 'memory_overview', 'search_memory']
+  );
+
+  const server = new CodexMemoryMcpServer({
+    app: {
+      config,
+      callTool: async () => {
+        throw new Error('hidden tool must not reach app handler');
+      }
+    }
+  });
+  const hiddenWrite = await server.handleJsonRpc({
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'tools/call',
+    params: {
+      name: 'record_memory',
+      arguments: {
+        target: 'process',
+        title: 'Hidden write',
+        content: 'This write must not pass through a hardened MCP surface.',
+        evidence: 'hardened explicit tool list regression',
+        validated: true,
+        reusable: false,
+        sensitivity: 'none'
+      }
+    }
+  });
+
+  assert.equal(hiddenWrite.response.error.code, -32001);
+  assert.equal(hiddenWrite.response.error.data.code, 'mcp_tool_not_exposed');
 });
 
 test('codex-memory MCP full surface can execute record/search/overview', async () => {

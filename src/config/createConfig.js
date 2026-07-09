@@ -718,6 +718,13 @@ function createConfig(overrides = {}) {
   const mcpPublicToolSurface = isHardened
     ? 'read_only'
     : requestedMcpPublicToolSurface;
+  const requestedMcpPublicToolNames = normalizeStringList(
+    pickFirstNonEmpty(
+      overrides.mcpPublicToolNames,
+      process.env.CODEX_MEMORY_MCP_PUBLIC_TOOLS,
+      ''
+    )
+  );
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
   const vectorIndexPath = resolveAbsolutePath(
     basePath,
@@ -778,13 +785,7 @@ function createConfig(overrides = {}) {
     httpMcpPath: normalizeHttpPath(overrides.httpMcpPath || process.env.CODEX_MEMORY_HTTP_PATH || '/mcp/codex-memory'),
     httpBearerToken: overrides.httpBearerToken || process.env.CODEX_MEMORY_HTTP_TOKEN || '',
     mcpPublicToolSurface,
-    mcpPublicToolNames: normalizeStringList(
-      pickFirstNonEmpty(
-        overrides.mcpPublicToolNames,
-        process.env.CODEX_MEMORY_MCP_PUBLIC_TOOLS,
-        ''
-      )
-    ),
+    mcpPublicToolNames: isHardened ? [] : requestedMcpPublicToolNames,
     exposeControlledMutationMcpTools: isHardened ? false : exposeControlledMutationMcpTools,
     exposeWriteMcpTools: isHardened ? false : exposeWriteMcpTools,
     embedDimensions: inferredEmbedDimensions,

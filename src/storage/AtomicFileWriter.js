@@ -46,6 +46,21 @@ async function readLockMetadata(lockPath) {
   }
 }
 
+async function readLockSnapshot(lockPath) {
+  try {
+    const raw = await fs.readFile(lockPath, 'utf8');
+    return {
+      raw,
+      metadata: parseLockMetadata(raw)
+    };
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      return null;
+    }
+    throw error;
+  }
+}
+
 function isProcessAlive(pid) {
   const normalizedPid = Number(pid);
   if (!Number.isInteger(normalizedPid) || normalizedPid <= 0) {
@@ -66,21 +81,50 @@ function isProcessAlive(pid) {
 }
 
 async function isLockStale(lockPath, staleMs) {
+  const result = await inspectLockStaleness(lockPath, staleMs);
+  return result.stale;
+}
+
+async function inspectLockStaleness(lockPath, staleMs) {
   const stats = await fs.stat(lockPath);
   if (Date.now() - stats.mtimeMs <= staleMs) {
-    return false;
+    return { stale: false, snapshot: null };
   }
 
-  const metadata = await readLockMetadata(lockPath);
-  if (metadata?.pid && isProcessAlive(metadata.pid)) {
-    return false;
+  const snapshot = await readLockSnapshot(lockPath);
+  if (snapshot?.metadata?.pid && isProcessAlive(snapshot.metadata.pid)) {
+    return { stale: false, snapshot };
   }
-  return true;
+  return { stale: true, snapshot };
 }
 
 async function unlinkLockIfOwned(lockPath, ownerToken) {
   const metadata = await readLockMetadata(lockPath);
   if (metadata?.ownerToken !== ownerToken) {
+    return false;
+  }
+  await unlinkIfExists(lockPath);
+  return true;
+}
+
+function lockSnapshotMatches(left, right) {
+  if (!left || !right) {
+    return false;
+  }
+  if (left.raw !== right.raw) {
+    return false;
+  }
+  const leftToken = left.metadata?.ownerToken;
+  const rightToken = right.metadata?.ownerToken;
+  if (leftToken || rightToken) {
+    return leftToken === rightToken;
+  }
+  return true;
+}
+
+async function unlinkStaleLockIfUnchanged(lockPath, observedSnapshot) {
+  const currentSnapshot = await readLockSnapshot(lockPath);
+  if (!lockSnapshotMatches(observedSnapshot, currentSnapshot)) {
     return false;
   }
   await unlinkIfExists(lockPath);
@@ -138,8 +182,8 @@ async function withFileLock(lockPath, handler, options = {}) {
       }
 
       try {
-        if (await isLockStale(lockPath, staleMs)) {
-          await unlinkIfExists(lockPath);
+        const staleness = await inspectLockStaleness(lockPath, staleMs);
+        if (staleness.stale && await unlinkStaleLockIfUnchanged(lockPath, staleness.snapshot)) {
           continue;
         }
       } catch (statError) {
@@ -233,5 +277,6 @@ module.exports = {
   atomicWriteFile,
   quarantineFile,
   isLockStale,
+  unlinkStaleLockIfUnchanged,
   withFileLock
 };

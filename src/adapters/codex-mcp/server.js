@@ -610,6 +610,10 @@ function normalizePublicToolNameSet(values = []) {
 }
 
 function getPublicToolNameSet(config = {}) {
+  if (String(config.securityProfile || '').trim().toLowerCase() === 'hardened') {
+    return new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS);
+  }
+
   const explicitTools = normalizePublicToolNameSet(config.mcpPublicToolNames);
   if (explicitTools.size > 0) {
     return explicitTools;

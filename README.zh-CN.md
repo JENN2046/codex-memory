@@ -38,7 +38,7 @@ http://127.0.0.1:3000
 
 已完成的真实路径：
 
-- production-provider live read proof 已通过
+- production-provider live read proof 此前已观察通过；本修复提交不宣称已经重跑 fresh live proof，release 审查前需要重新生成带日期的 live-proof artifact
 - Codex client dogfood 已调用 `search_memory`
 - Codex client dogfood 已调用 `memory_overview`
 - Codex client dogfood 已调用 `audit_memory`

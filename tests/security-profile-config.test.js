@@ -37,6 +37,10 @@ const PROVIDER_ENV_KEYS = [
   'CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE',
   'CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE',
   'CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE',
+  'CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE',
+  'CODEX_MEMORY_MCP_PUBLIC_TOOLS',
+  'CODEX_MEMORY_EXPOSE_CONTROLLED_MUTATION_TOOLS',
+  'CODEX_MEMORY_EXPOSE_WRITE_TOOLS',
   'CODEX_MEMORY_VCP_NATIVE_RUNTIME_PROFILE',
   'CODEX_MEMORY_VCP_NATIVE_TARGET_REFERENCE_NAME',
   'CODEX_MEMORY_VCP_NATIVE_TARGET_KIND',
@@ -414,6 +418,48 @@ test('hardened profile enables soft read policy', () => {
     assert.equal(config.enableLifecycleReadPolicy, true);
     assert.equal(config.enableWritePreflight, true);
     assert.equal(config.allowExternalProvider, false);
+  });
+});
+
+test('hardened profile forces MCP public surface back to read-only', () => {
+  const config = createIsolatedConfig({
+    securityProfile: 'hardened',
+    mcpPublicToolSurface: 'full',
+    exposeControlledMutationMcpTools: true,
+    exposeWriteMcpTools: true
+  });
+
+  assert.equal(config.securityProfile, 'hardened');
+  assert.equal(config.mcpPublicToolSurface, 'read_only');
+  assert.equal(config.exposeControlledMutationMcpTools, false);
+  assert.equal(config.exposeWriteMcpTools, false);
+});
+
+test('hardened profile ignores explicit MCP public tool override list', () => {
+  const config = createIsolatedConfig({
+    securityProfile: 'hardened',
+    mcpPublicToolNames: ['record_memory', 'validate_memory']
+  });
+
+  assert.equal(config.securityProfile, 'hardened');
+  assert.deepEqual(config.mcpPublicToolNames, []);
+});
+
+test('hardened profile ignores explicit MCP public tools from env', () => {
+  withEnv({
+    CODEX_MEMORY_SECURITY_PROFILE: 'hardened',
+    CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'full',
+    CODEX_MEMORY_EXPOSE_CONTROLLED_MUTATION_TOOLS: '1',
+    CODEX_MEMORY_EXPOSE_WRITE_TOOLS: '1',
+    CODEX_MEMORY_MCP_PUBLIC_TOOLS: 'record_memory,validate_memory,tombstone_memory'
+  }, () => {
+    const config = createConfig();
+
+    assert.equal(config.securityProfile, 'hardened');
+    assert.equal(config.mcpPublicToolSurface, 'read_only');
+    assert.deepEqual(config.mcpPublicToolNames, []);
+    assert.equal(config.exposeControlledMutationMcpTools, false);
+    assert.equal(config.exposeWriteMcpTools, false);
   });
 });
 
