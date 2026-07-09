@@ -2798,6 +2798,67 @@ test('primary_with_local_fallback clamps local search fallback to governed discl
   });
 });
 
+test('primary_with_local_fallback returns empty local search fallback for zero-item disclosure budget', async () => {
+  let nativeCalls = 0;
+  let localSearchCalled = false;
+  const observations = [];
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeReadDelegationToolCaller: async payload => {
+      nativeCalls += 1;
+      throw governedNativeTransportErrorForPayload(payload, 'PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO');
+    }
+  }, async app => {
+    app.services.passiveRecallService.search = async () => {
+      localSearchCalled = true;
+      return [{
+        memoryId: 'LOCAL_FALLBACK_ITEM_SHOULD_NOT_RETURN',
+        content: 'LOCAL_FALLBACK_CONTENT_SHOULD_NOT_RETURN'
+      }];
+    };
+
+    const result = await app.callTool('search_memory', {
+      query: 'zero disclosure budget should return no fallback items',
+      target: 'both',
+      limit: 10,
+      include_content: false,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'workspace-alpha',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, codexContext({
+      requestContext: {
+        outputDisclosureBudget: {
+          level: 'summary',
+          lowDisclosure: true,
+          rawOutput: false,
+          maxItems: 0,
+          maxBytes: 4096
+        }
+      }
+    }));
+    const serialized = JSON.stringify({ result, observations });
+
+    assert.equal(nativeCalls, 1);
+    assert.equal(localSearchCalled, false);
+    assert.deepEqual(result.results, []);
+    assert.equal(result.access.localMemoryFallbackAttempted, true);
+    assert.equal(result.access.localMemoryFallbackUsed, true);
+    assert.equal(result.access.localMemoryFallbackReadPerformed, false);
+    assert.equal(result.access.localMemoryFallbackReturned, true);
+    assert.equal(result.access.localFallbackAuditReceiptStatus, 'appended');
+    assert.equal(result.governedNativeReadFallback.localMemoryFallbackReadPerformed, false);
+    assert.equal(observations[0].gateResult.normalizedBridgeRequest.disclosure_max_items, 0);
+    assert.equal(serialized.includes('LOCAL_FALLBACK_ITEM_SHOULD_NOT_RETURN'), false);
+    assert.equal(serialized.includes('LOCAL_FALLBACK_CONTENT_SHOULD_NOT_RETURN'), false);
+    assert.equal(serialized.includes('PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
+  });
+});
+
 test('primary_with_local_fallback sanitizes forged fallback scope before local read', async () => {
   let nativeCalls = 0;
   let localSearchInput = null;

@@ -1813,11 +1813,12 @@ async function attachGovernedMcpVcpNativeReadFallbackProjection(result, fallback
     localFallbackAuditReceipt = prepared.localFallbackAuditReceipt;
   }
 
+  const localFallbackReadPerformed = options.localFallbackReadPerformed !== false;
   const fallbackContextWithAudit = {
     ...fallbackContext,
     used: true,
     localMemoryFallbackAttempted: true,
-    localMemoryFallbackReadPerformed: true,
+    localMemoryFallbackReadPerformed: localFallbackReadPerformed,
     localMemoryFallbackReturned: true,
     localFallbackAuditReceipt
   };
@@ -1835,7 +1836,7 @@ async function attachGovernedMcpVcpNativeReadFallbackProjection(result, fallback
       localMemorySourceRuntime: 'codex_memory_local_fallback',
       localMemoryFallbackAttempted: true,
       localMemoryFallbackUsed: true,
-      localMemoryFallbackReadPerformed: true,
+      localMemoryFallbackReadPerformed: localFallbackReadPerformed,
       localMemoryFallbackReturned: true,
       localMemoryFallbackReasonCode: fallbackContext.reasonCode,
       vcpNativeResult: false,
@@ -2691,6 +2692,18 @@ function createCodexMemoryApplication(overrides = {}) {
 
       if (toolName === 'search_memory') {
         const effectiveArgs = governedNativeReadFallbackArgs || args;
+        if (governedNativeReadFallbackContext && effectiveArgs.limit === 0) {
+          return await attachGovernedMcpVcpNativeReadFallbackProjection(
+            { results: [] },
+            governedNativeReadFallbackContext,
+            {
+              auditLogStore,
+              toolName,
+              localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt,
+              localFallbackReadPerformed: false
+            }
+          );
+        }
         const result = await runSearchMemoryWithTimeout(
           ({ signal }) => executeSearchMemory(effectiveArgs, requestContext, { signal }),
           { timeoutMs: config.searchMemoryTimeoutMs }
