@@ -550,6 +550,14 @@ function nativeInvocationReceiptExecutionBound(receipt) {
     receipt.jsonRpcErrorPresent === false;
 }
 
+function nativeInvocationReceiptReadSideEffectsAbsent(receipt) {
+  const nativeRuntimeReceipt = isPlainObject(receipt?.nativeRuntimeReceipt)
+    ? receipt.nativeRuntimeReceipt
+    : {};
+  return nativeRuntimeReceipt.memoryWritePerformed !== true &&
+    nativeRuntimeReceipt.primaryMemoryStoreWritePerformed !== true;
+}
+
 function sanitizeScope(scope) {
   if (!isPlainObject(scope)) return undefined;
   const output = {};
@@ -1129,6 +1137,28 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
       vcpToolBoxCalled: true,
       mcpToolCalled: true,
       memoryReadPerformed: true,
+      localMemoryFallbackEligible: false
+    };
+  }
+
+  if (nativeInvocationReceiptReadSideEffectsAbsent(receipt.nativeInvocationReceipt) !== true) {
+    return {
+      ...rejected('native_read_delegation_native_write_side_effect_reported', input),
+      receipt: {
+        ...receipt,
+        statusClass: 'native_write_side_effect_reported',
+        outputBudgetExceeded: false,
+        rollbackRequired: true,
+        rollbackReasonCode: 'native_read_reported_write_side_effect',
+        rollbackDisposition: 'rollback_required_not_applied',
+        rollbackFollowupRequired: true,
+        rollbackApplyPolicy: 'manual_governed_followup_required'
+      },
+      runtimeCalled: true,
+      vcpToolBoxCalled: true,
+      mcpToolCalled: true,
+      memoryReadPerformed: true,
+      memoryWritten: true,
       localMemoryFallbackEligible: false
     };
   }

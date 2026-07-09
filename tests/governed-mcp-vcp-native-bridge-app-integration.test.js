@@ -3496,6 +3496,86 @@ test('primary_with_local_fallback rejects over-budget native read without local 
   });
 });
 
+test('primary read delegation rejects native success receipts that report write side effects', async () => {
+  const observations = [];
+  const nativeCaller = async () => ({
+    results: []
+  });
+  nativeCaller.callWithReceipt = async payload => ({
+    value: {
+      results: []
+    },
+    receipt: nativeInvocationReceiptForPayload(payload, {
+      nativeRuntimeReceipt: {
+        present: true,
+        nativeRuntimeCalled: true,
+        nativeRuntimeInitialized: true,
+        providerApiCalled: false,
+        memoryReadPerformed: true,
+        memoryWritePerformed: true,
+        durableWritePerformed: true,
+        durableWriteScope: 'primary_memory_write',
+        isolatedRuntimeStoreUsed: false,
+        primaryMemoryStoreWritePerformed: true,
+        derivedIndexWritePerformed: false,
+        rawRuntimeOutputDisclosed: false,
+        rawMemoryContentDisclosed: false,
+        runtimeLocatorDisclosed: false,
+        tokenMaterialDisclosed: false,
+        readinessClaimed: false
+      }
+    })
+  });
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeReadDelegationToolCaller: nativeCaller
+  }, async app => {
+    let localSearchCalls = 0;
+    app.services.passiveRecallService.search = async () => {
+      localSearchCalls += 1;
+      return { results: [{ content: 'LOCAL_FALLBACK_CONTENT_SHOULD_NOT_ECHO' }] };
+    };
+
+    const result = await app.callTool('search_memory', {
+      query: 'native read with write side effect',
+      target: 'both',
+      limit: 1,
+      include_content: false,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'workspace-alpha',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, codexContext());
+    const serializedResult = JSON.stringify(result);
+
+    assert.equal(localSearchCalls, 0);
+    assert.equal(result.status, 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_REJECTED');
+    assert.equal(result.reasonCode, 'native_read_delegation_native_write_side_effect_reported');
+    assert.equal(result.access.runtimeCalled, true);
+    assert.equal(result.access.memoryReadPerformed, true);
+    assert.equal(result.access.localMemoryFallbackEligible, false);
+    assert.equal(result.receipt.statusClass, 'native_write_side_effect_reported');
+    assert.equal(result.receipt.rollbackRequired, true);
+    assert.equal(result.receipt.rollbackFollowupRequired, true);
+    assert.equal(observations[0].readDelegationResult.accepted, false);
+    assert.equal(observations[0].readDelegationResult.memoryWritten, true);
+    assert.equal(
+      observations[0].readDelegationResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.memoryWritePerformed,
+      true
+    );
+    assert.equal(
+      observations[0].readDelegationResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.primaryMemoryStoreWritePerformed,
+      true
+    );
+    assert.equal(serializedResult.includes('LOCAL_FALLBACK_CONTENT_SHOULD_NOT_ECHO'), false);
+  });
+});
+
 test('primary read delegation ignores raw-output tool argument before native read', async () => {
   const observations = [];
   let nativePayload = null;

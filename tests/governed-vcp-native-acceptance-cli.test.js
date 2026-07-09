@@ -643,10 +643,10 @@ test('governed VCP native acceptance CLI runs read and write through full govern
   }
 });
 
-test('governed VCP native acceptance CLI can prove the governed read suite without disclosure', async () => {
+test('governed VCP native acceptance CLI rejects search-shaped read-suite acceptance maps', async () => {
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
-    assert.equal(body.params.name, 'knowledge_base.search');
+    assert.ok(['knowledge_base.search', 'memory_overview', 'audit_memory'].includes(body.params.name));
     assert.equal(body.params._meta.codexMemoryGovernance.governanceTransport.metadataPath, 'params._meta.codexMemoryGovernance');
     assert.equal(body.params._meta.codexMemoryGovernance.readWriteAuthority.readAllowed, true);
     assert.equal(body.params._meta.codexMemoryGovernance.readWriteAuthority.writeAllowed, false);
@@ -679,9 +679,12 @@ test('governed VCP native acceptance CLI can prove the governed read suite witho
       .map(request =>
       request.body.params._meta.codexMemoryGovernance.invocationProfile.toolName
     );
+    const nativeToolNames = server.requests
+      .filter(request => request.body.method === 'tools/call')
+      .map(request => request.body.params.name);
 
-    assert.equal(result.accepted, true);
-    assert.equal(result.status, 'accepted');
+    assert.equal(result.accepted, false);
+    assert.equal(result.status, 'not_accepted');
     assert.deepEqual(result.summary.selectedOperations, [
       'search_memory',
       'memory_overview',
@@ -692,17 +695,81 @@ test('governed VCP native acceptance CLI can prove the governed read suite witho
       'memoryOverview',
       'audit'
     ]);
-    assert.equal(result.summary.acceptanceBlockers.count, 0);
+    assert.ok(result.summary.acceptanceBlockers.all.includes('native_mcp_required_tool_missing'));
     assert.equal(result.summary.nativeMcpTargetPreflightEvidence.initializeAccepted, true);
     assert.equal(result.summary.nativeMcpTargetPreflightEvidence.toolsListAccepted, true);
-    assert.equal(result.summary.nativeMcpTargetPreflightEvidence.requiredNativeToolsPresent, true);
-    assert.equal(result.operations.memoryOverview.access.memoryReadPerformed, true);
-    assert.equal(result.operations.audit.access.memoryReadPerformed, true);
+    assert.equal(result.summary.nativeMcpTargetPreflightEvidence.requiredNativeToolsPresent, false);
+    assert.equal(result.operations.memoryOverview.access.memoryReadPerformed, false);
+    assert.equal(result.operations.audit.access.memoryReadPerformed, false);
+    assert.deepEqual(nativeToolNames, ['knowledge_base.search']);
     assert.equal(publicToolNames.includes('search_memory'), true);
-    assert.equal(publicToolNames.includes('memory_overview'), true);
-    assert.equal(publicToolNames.includes('audit_memory'), true);
-    assert.equal(artifact.summary.acceptanceBlockers.count, 0);
+    assert.equal(publicToolNames.includes('memory_overview'), false);
+    assert.equal(publicToolNames.includes('audit_memory'), false);
+    assert.ok(artifact.summary.acceptanceBlockers.all.includes('native_mcp_required_tool_missing'));
     assert.equal(serialized.includes(server.url), false);
+    assert.equal(JSON.stringify(artifact).includes(server.url), false);
+  } finally {
+    await server.close();
+  }
+});
+
+test('governed VCP native acceptance CLI can prove read suite with shape-compatible native tools', async () => {
+  const server = await withJsonRpcServer(async (req, res, body) => {
+    assert.equal(body.method, 'tools/call');
+    assert.ok(['knowledge_base.search', 'memory_overview', 'audit_memory'].includes(body.params.name));
+    assert.equal(body.params._meta.codexMemoryGovernance.governanceTransport.metadataPath, 'params._meta.codexMemoryGovernance');
+    assert.equal(body.params._meta.codexMemoryGovernance.readWriteAuthority.readAllowed, true);
+    assert.equal(body.params._meta.codexMemoryGovernance.readWriteAuthority.writeAllowed, false);
+
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify(testJsonRpcToolResult(body)));
+  }, {
+    toolNames: [
+      'knowledge_base.search',
+      'memory_overview',
+      'audit_memory'
+    ]
+  });
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-native-read-suite-'));
+  const evidenceOutputPath = path.join(tempBasePath, 'evidence', 'governed-native-read-suite.json');
+
+  try {
+    const result = await runGovernedVcpNativeAcceptance({
+      includeReadSuite: true,
+      endpoint: server.url,
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      projectBasePath: tempBasePath,
+      dataDir: path.join(tempBasePath, 'data'),
+      logsDir: path.join(tempBasePath, 'logs'),
+      projectId: 'codex-memory',
+      workspaceId: 'workspace-alpha',
+      scopeId: 'scope-alpha',
+      visibility: 'private',
+      query: 'acceptance read suite',
+      toolNameByAction: JSON.stringify({
+        search_memory: 'knowledge_base.search',
+        memory_overview: 'memory_overview',
+        audit_memory: 'audit_memory'
+      }),
+      evidenceOutputPath
+    });
+    const artifact = JSON.parse(await fs.readFile(evidenceOutputPath, 'utf8'));
+    const nativeToolNames = server.requests
+      .filter(request => request.body.method === 'tools/call')
+      .map(request => request.body.params.name);
+
+    assert.equal(result.accepted, true);
+    assert.equal(result.status, 'accepted');
+    assert.deepEqual(result.summary.selectedOperations, [
+      'search_memory',
+      'memory_overview',
+      'audit_memory'
+    ]);
+    assert.equal(result.summary.acceptanceBlockers.count, 0);
+    assert.equal(result.summary.nativeMcpTargetPreflightEvidence.requiredNativeToolsPresent, true);
+    assert.deepEqual(nativeToolNames, ['knowledge_base.search', 'memory_overview', 'audit_memory']);
+    assert.equal(artifact.summary.acceptanceBlockers.count, 0);
+    assert.equal(JSON.stringify(result).includes(server.url), false);
     assert.equal(JSON.stringify(artifact).includes(server.url), false);
   } finally {
     await server.close();

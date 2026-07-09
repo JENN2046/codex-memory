@@ -21,6 +21,8 @@ const DEFAULT_ROLLBACK_PLAN_REF = 'cm-governed-write-rollback-plan';
 const GOVERNANCE_METADATA_PATH = 'params._meta.codexMemoryGovernance';
 const MCP_PREFLIGHT_NATIVE_TOOL_NAMES = Object.freeze([
   'knowledge_base.search',
+  'memory_overview',
+  'audit_memory',
   'knowledge_base.record',
   'knowledge_base.write',
   'knowledge_base.tombstone',
@@ -243,10 +245,6 @@ function optionalOverride(value) {
 function defaultToolNameByAction(options = {}) {
   return {
     search_memory: 'knowledge_base.search',
-    ...(options.includeReadSuite ? {
-      memory_overview: 'knowledge_base.search',
-      audit_memory: 'knowledge_base.search'
-    } : {}),
     ...((options.includeWrite || options.includeWriteSuite) ? {
       record_memory: 'knowledge_base.record'
     } : {}),
@@ -976,9 +974,14 @@ function buildNativeMcpTargetPreflightEvidence({
   };
 }
 
-function expectedNativeMcpTools({ includeWrite = false, includeWriteSuite = false } = {}) {
+function expectedNativeMcpTools({
+  includeReadSuite = false,
+  includeWrite = false,
+  includeWriteSuite = false
+} = {}) {
   return [
     'knowledge_base.search',
+    ...(includeReadSuite ? ['memory_overview', 'audit_memory'] : []),
     ...(includeWrite ? ['knowledge_base.record'] : []),
     ...(includeWriteSuite ? [
       'knowledge_base.tombstone',
@@ -1049,9 +1052,16 @@ async function postNativeMcpJsonRpc(privateConfig = {}, method, params = {}, id 
 
 async function runNativeMcpTargetPreflight({
   privateConfig,
+  includeReadSuite = false,
   includeWrite = false,
   includeWriteSuite = false
 } = {}) {
+  const expectedTools = expectedNativeMcpTools({
+    includeReadSuite,
+    includeWrite,
+    includeWriteSuite
+  });
+
   if (!privateConfig || typeof privateConfig.endpoint !== 'string' || !privateConfig.endpoint) {
     return buildNativeMcpTargetPreflightEvidence({
       included: false,
@@ -1115,8 +1125,7 @@ async function runNativeMcpTargetPreflight({
   const writeAliasNativeToolPresent = toolNames.has('knowledge_base.write');
   const tombstoneNativeToolPresent = toolNames.has('knowledge_base.tombstone');
   const supersedeNativeToolPresent = toolNames.has('knowledge_base.supersede');
-  const requiredNativeToolsPresent = expectedNativeMcpTools({ includeWrite, includeWriteSuite })
-    .every(name => toolNames.has(name));
+  const requiredNativeToolsPresent = expectedTools.every(name => toolNames.has(name));
   const writeToolsExposed = [
     recordNativeToolPresent,
     writeAliasNativeToolPresent,
@@ -1126,7 +1135,7 @@ async function runNativeMcpTargetPreflight({
   const toolsListGovernancePathBound =
     toolsListResult._meta?.governanceMetadataPath === GOVERNANCE_METADATA_PATH ||
     tools
-      .filter(tool => expectedNativeMcpTools({ includeWrite, includeWriteSuite }).includes(tool.name))
+      .filter(tool => expectedTools.includes(tool.name))
       .every(tool => tool?.inputSchema?._meta?.governanceMetadataPath === GOVERNANCE_METADATA_PATH);
   const governanceMetadataPathBound = initializeGovernancePathBound && toolsListGovernancePathBound;
   const reasonCode =
@@ -1785,6 +1794,7 @@ async function runGovernedVcpNativeAcceptance(rawOptions = {}) {
   const app = createCodexMemoryApplication(configOverrides);
   const nativeMcpTargetPreflightEvidence = await runNativeMcpTargetPreflight({
     privateConfig: getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(config),
+    includeReadSuite: options.includeReadSuite,
     includeWrite: options.includeWrite,
     includeWriteSuite: options.includeWriteSuite
   });
