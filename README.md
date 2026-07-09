@@ -1,9 +1,13 @@
 # codex-memory
 
-[中文说明](README.zh-CN.md)
+Primary manual: [中文使用说明书](README.zh-CN.md)
 
 `codex-memory` is the governed MCP bridge that lets Codex access VCPToolBox
 native memory without making `codex-memory` the memory-intelligence owner.
+
+The Chinese manual is the canonical usage guide for the current deployment.
+This English README is kept as a short project summary and compatibility entry
+for package-level checks.
 
 The product goal is governance: who may access memory, which scope and runtime
 they may use, how much output can be disclosed, what evidence is recorded, and
@@ -35,8 +39,11 @@ NewAPI. Real Codex client dogfood has called:
 Those tools are currently exposed as read-only. The legacy `7605` service is
 kept as rollback while `7625` is observed in real use.
 
-Write tools are not part of the current Codex client surface. Native writes
-require exact operator approval, bounded rollback posture, and a separate
+The default server MCP surface is also read-only: `tools/list` exposes only
+`search_memory`, `memory_overview`, and `audit_memory`, and `tools/call`
+adapter-blocks hidden tools. Controlled mutation or write tools require an
+explicit operator surface configuration before they are exposed. Native writes
+still require exact operator approval, bounded rollback posture, and a separate
 real-root write proof.
 
 ## Quick Start
@@ -58,10 +65,15 @@ Manual low-disclosure native proof entry points:
 
 ```bash
 npm run vcp-native:shim -- --vcp-root /path/to/VCPToolBox --kb-store /tmp/codex-memory-vcp-derived-store
-npm run vcp-native:acceptance -- --endpoint http://127.0.0.1:7615/mcp/vcp-native --target-ref operator-vcp-toolbox-service-ref --include-read-suite --verify-evidence /tmp/codex-memory-vcp-native-evidence.json
+npm run vcp-native:acceptance -- --endpoint http://127.0.0.1:7615/mcp/vcp-native --target-ref operator-vcp-toolbox-service-ref --include-read-suite --evidence-output /tmp/codex-memory-vcp-native-evidence.json
+npm run vcp-native:acceptance -- --json --verify-evidence /tmp/codex-memory-vcp-native-evidence.json
 ```
 
-Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`.
+Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
+only when the native target exposes shape-compatible tools for those public
+response shapes. The included search-shaped shim can prove `search_memory`;
+overview/audit require native overview/audit tools or explicit compatible
+mapping before they are counted as accepted.
 Write proof requires explicit `--enable-write`; accepted evidence must include
 `accepted=true`, `native memory performed`, `governanceEvidenceMatrix`,
 `localMemoryAuxiliaryEvidence`, and `writeRollbackEvidence`. Evidence can be
@@ -132,6 +144,8 @@ Local `codex-memory` storage is auxiliary only:
   must not be disclosed through MCP results.
 - Fixture provider proof is not production-provider proof.
 - Read proof is not write proof.
+- Default `tools/list` is read-only; core handlers for write/controlled
+  mutation are not the default server contract.
 - Dogfood on `7625` is not yet formal replacement of legacy `7605`.
 
 ## Development

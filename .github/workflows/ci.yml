@@ -31,7 +31,10 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test
+        run: npm run test:all
+
+      - name: Run release gate summary
+        run: npm run gate:ci -- --json
 
       - name: Profile CLI smoke
         run: |

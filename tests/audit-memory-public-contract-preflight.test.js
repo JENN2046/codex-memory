@@ -10,6 +10,7 @@ const {
   AuditMemoryReadonlyService
 } = require('../src/core/AuditMemoryReadonlyService');
 const {
+  CORE_TOOL_DEFINITION_NAMES,
   PUBLIC_EXPOSURE_REQUIREMENTS,
   PUBLIC_MCP_TOOL_NAMES,
   TOOL_NAME,
@@ -46,7 +47,7 @@ test('CM1461 public contract registration exposes only approved TOOL_DEFINITIONS
   const toolNames = sorted(TOOL_DEFINITIONS.map(tool => tool.name));
 
   assert.equal(toolNames.length, PUBLIC_TOOL_COUNT);
-  assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
+  assert.deepEqual(toolNames, sorted(CORE_TOOL_DEFINITION_NAMES));
   assert.equal(toolNames.includes(TOOL_NAME), true);
 });
 
@@ -61,7 +62,7 @@ test('CM1461 public contract registration exposes audit_memory in MCP tools/list
     });
 
     const toolNames = sorted(list.response.result.tools.map(tool => tool.name));
-    assert.equal(toolNames.length, PUBLIC_TOOL_COUNT);
+    assert.equal(toolNames.length, PUBLIC_MCP_TOOL_NAMES.length);
     assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
     assert.equal(toolNames.includes(TOOL_NAME), true);
     const auditMemory = list.response.result.tools.find(tool => tool.name === TOOL_NAME);

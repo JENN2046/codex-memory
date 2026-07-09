@@ -55,7 +55,8 @@ async function withStdioApp(handler) {
     dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
     logsDir: path.join(tempBasePath, 'logs'),
     dataDir: path.join(tempBasePath, 'data'),
-    allowExternalProvider: false
+    allowExternalProvider: false,
+    mcpPublicToolSurface: 'full'
   });
 
   await app.initialize();

@@ -10,6 +10,7 @@ const { TOOL_DEFINITIONS } = require('../src/core/constants');
 const {
   CANDIDATE_TOOL_DEFINITIONS,
   CANDIDATE_TOOL_NAMES,
+  CORE_TOOL_NAMES_FROZEN,
   DISCLOSURE_FLAGS,
   PUBLIC_EXPOSURE_REQUIREMENTS,
   PUBLIC_TOOL_NAMES_FROZEN,
@@ -23,13 +24,14 @@ function sorted(values) {
   return [...values].sort();
 }
 
-async function withApp(handler) {
+async function withApp(handler, overrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'controlled-mutation-preflight-'));
   const app = createCodexMemoryApplication({
     projectBasePath: tempBasePath,
     dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
     logsDir: path.join(tempBasePath, 'logs'),
-    dataDir: path.join(tempBasePath, 'data')
+    dataDir: path.join(tempBasePath, 'data'),
+    ...overrides
   });
 
   await app.initialize();
@@ -48,12 +50,14 @@ test('CM1468 controlled mutation preflight tracks CM1472 public registration', (
   assert.equal(report.status, STATUS_ACCEPTED);
   assert.equal(report.acceptedForPlanning, true);
   assert.deepEqual(sorted(report.candidateToolNames), sorted(['validate_memory', 'tombstone_memory', 'supersede_memory']));
-  assert.equal(report.draftOnly, false);
-  assert.equal(report.registeredPublicly, true);
-  assert.equal(report.publicMcpExpanded, true);
+  assert.equal(report.draftOnly, true);
+  assert.equal(report.registeredPublicly, false);
+  assert.equal(report.publicMcpExpanded, false);
+  assert.equal(report.coreToolsFrozen, true);
+  assert.deepEqual(sorted(report.coreTools), sorted(CORE_TOOL_NAMES_FROZEN));
   assert.equal(report.publicToolsFrozen, true);
   assert.deepEqual(sorted(report.publicTools), sorted(PUBLIC_TOOL_NAMES_FROZEN));
-  assert.equal(report.approvalRequiredBeforeRegistration, false);
+  assert.equal(report.approvalRequiredBeforeRegistration, true);
   assert.deepEqual(report.publicExposureRequirements, PUBLIC_EXPOSURE_REQUIREMENTS);
   assert.equal(report.lowDisclosure, true);
   assert.equal(report.selectedProjection, true);
@@ -64,7 +68,7 @@ test('CM1468 controlled mutation preflight tracks CM1472 public registration', (
     assert.equal(report.disclosure[flag], false, `${flag} should be false`);
   }
   for (const flag of SIDE_EFFECT_FLAGS) {
-    assert.equal(report.sideEffects[flag], flag === 'publicMcpExpanded', `${flag} should reflect only approved registration`);
+    assert.equal(report.sideEffects[flag], false, `${flag} should remain false until operator surface is enabled`);
   }
 });
 
@@ -97,13 +101,12 @@ test('CM1468 candidate schemas are bounded and reject additional properties', ()
   assert.equal(supersede.inputSchema.required.includes('superseded_by_link'), true);
 });
 
-test('CM1472 public MCP tools freeze includes controlled mutation candidates', async () => {
-  const publicTools = TOOL_DEFINITIONS.map(tool => tool.name);
+test('CM1472 core tool freeze includes controlled mutation candidates while default MCP surface remains read-only', async () => {
+  const coreTools = TOOL_DEFINITIONS.map(tool => tool.name);
 
-  assert.equal(publicToolsRemainFrozen(publicTools), true);
-  assert.deepEqual(sorted(publicTools), sorted(PUBLIC_TOOL_NAMES_FROZEN));
+  assert.deepEqual(sorted(coreTools), sorted(CORE_TOOL_NAMES_FROZEN));
   for (const candidate of CANDIDATE_TOOL_NAMES) {
-    assert.equal(publicTools.includes(candidate), true, `${candidate} must be public after exact approval`);
+    assert.equal(coreTools.includes(candidate), true, `${candidate} must remain available in core definitions`);
   }
 
   await withApp(async ({ app }) => {
@@ -118,9 +121,26 @@ test('CM1472 public MCP tools freeze includes controlled mutation candidates', a
     const toolNames = list.response.result.tools.map(tool => tool.name);
     assert.deepEqual(sorted(toolNames), sorted(PUBLIC_TOOL_NAMES_FROZEN));
     for (const candidate of CANDIDATE_TOOL_NAMES) {
-      assert.equal(toolNames.includes(candidate), true, `${candidate} must appear in tools/list`);
+      assert.equal(toolNames.includes(candidate), false, `${candidate} must stay hidden in default tools/list`);
     }
   });
+});
+
+test('CM1472 operator MCP surface can explicitly expose controlled mutation candidates', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const list = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/list',
+      params: {}
+    });
+
+    const toolNames = list.response.result.tools.map(tool => tool.name);
+    for (const candidate of CANDIDATE_TOOL_NAMES) {
+      assert.equal(toolNames.includes(candidate), true, `${candidate} must appear when operator surface is enabled`);
+    }
+  }, { exposeControlledMutationMcpTools: true });
 });
 
 test('CM1472 app.callTool accepts controlled mutation candidates as dry-run bounded public tools', async () => {

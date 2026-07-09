@@ -87,6 +87,18 @@ function retainedReplacementCountsValid(counts = {}) {
 }
 
 function publicPathRejected(publicResult = {}) {
+  if (
+    publicResult?.decision === 'rejected' &&
+    publicResult?.mutated === false &&
+    publicResult?.reasonCode === 'mcp_tool_not_exposed' &&
+    publicResult?.policy?.durableMutationPerformed === false &&
+    publicResult?.policy?.providerCalled === false &&
+    publicResult?.policy?.readinessClaimed === false &&
+    publicResult?.approvalRequired === true
+  ) {
+    return true;
+  }
+
   return publicResult?.decision === 'rejected' &&
     publicResult?.dryRun === true &&
     publicResult?.mutated === false &&

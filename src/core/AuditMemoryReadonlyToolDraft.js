@@ -8,7 +8,7 @@ const SCHEMA_VERSION = 'audit-memory-readonly-tool-draft-v1';
 const RESULT_STATUS_ACCEPTED = 'AUDIT_MEMORY_READONLY_TOOL_DRAFT_ACCEPTED_NOT_PUBLIC_NOT_READY';
 const RESULT_STATUS_BLOCKED = 'AUDIT_MEMORY_READONLY_TOOL_DRAFT_BLOCKED_NOT_READY';
 
-const PUBLIC_MCP_TOOL_NAMES = Object.freeze([
+const CORE_TOOL_DEFINITION_NAMES = Object.freeze([
   'record_memory',
   'search_memory',
   'memory_overview',
@@ -16,6 +16,12 @@ const PUBLIC_MCP_TOOL_NAMES = Object.freeze([
   'validate_memory',
   'tombstone_memory',
   'supersede_memory'
+]);
+
+const PUBLIC_MCP_TOOL_NAMES = Object.freeze([
+  'search_memory',
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const ALLOWED_AUDIT_FAMILIES = Object.freeze([
@@ -120,7 +126,9 @@ function isPlainObject(value) {
 }
 
 function publicMcpToolNames() {
-  return TOOL_DEFINITIONS.map(tool => tool.name);
+  return TOOL_DEFINITIONS
+    .map(tool => tool.name)
+    .filter(name => PUBLIC_MCP_TOOL_NAMES.includes(name));
 }
 
 function hasExactPublicToolFreeze(names) {
@@ -217,6 +225,7 @@ module.exports = {
   ALLOWED_AUDIT_FAMILIES,
   DISCLOSURE_FLAGS,
   MUTATION_INPUT_KEYS,
+  CORE_TOOL_DEFINITION_NAMES,
   PUBLIC_EXPOSURE_REQUIREMENTS,
   PUBLIC_MCP_TOOL_NAMES,
   RESULT_STATUS_ACCEPTED,

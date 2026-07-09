@@ -135,6 +135,19 @@ const GOVERNED_NATIVE_WRITE_TOOLS = new Set([
   'tombstone_memory',
   'supersede_memory'
 ]);
+const DEFAULT_PUBLIC_MCP_READ_TOOLS = Object.freeze([
+  'search_memory',
+  'memory_overview',
+  'audit_memory'
+]);
+const CONTROLLED_MUTATION_MCP_TOOLS = Object.freeze([
+  'validate_memory',
+  'tombstone_memory',
+  'supersede_memory'
+]);
+const WRITE_MCP_TOOLS = Object.freeze([
+  'record_memory'
+]);
 
 const GOVERNED_NATIVE_WRITE_APPROVAL_ACTIONS = Object.freeze({
   record_memory: 'live_bridge_record_memory_proof',
@@ -586,6 +599,71 @@ function buildGovernedMcpToolMetadata(toolName, config = {}) {
       nativeFieldNamesReturned: false
     }
   };
+}
+
+function normalizePublicToolNameSet(values = []) {
+  return new Set(
+    (Array.isArray(values) ? values : [])
+      .map(value => String(value || '').trim())
+      .filter(Boolean)
+  );
+}
+
+function getPublicToolNameSet(config = {}) {
+  const explicitTools = normalizePublicToolNameSet(config.mcpPublicToolNames);
+  if (explicitTools.size > 0) {
+    return explicitTools;
+  }
+
+  const toolNames = new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS);
+  const surface = String(config.mcpPublicToolSurface || 'read_only').trim().toLowerCase();
+  if (
+    config.exposeControlledMutationMcpTools === true ||
+    surface === 'controlled_mutation' ||
+    surface === 'full'
+  ) {
+    for (const toolName of CONTROLLED_MUTATION_MCP_TOOLS) {
+      toolNames.add(toolName);
+    }
+  }
+  if (
+    config.exposeWriteMcpTools === true ||
+    surface === 'write' ||
+    surface === 'full'
+  ) {
+    for (const toolName of WRITE_MCP_TOOLS) {
+      toolNames.add(toolName);
+    }
+  }
+  return toolNames;
+}
+
+function getPublicToolDefinitions(config = {}) {
+  const publicToolNames = getPublicToolNameSet(config);
+  return TOOL_DEFINITIONS.filter(tool => publicToolNames.has(tool.name));
+}
+
+function isPublicMcpToolExposed(toolName, config = {}) {
+  return getPublicToolNameSet(config).has(toolName);
+}
+
+function buildMcpToolNotExposedErrorData(toolName) {
+  return {
+    code: 'mcp_tool_not_exposed',
+    status: 'rejected',
+    reason: 'tool_not_in_current_mcp_surface',
+    toolName: typeof toolName === 'string' ? toolName : 'unknown',
+    lowDisclosure: true
+  };
+}
+
+function buildInstructions(config = {}) {
+  const exposedTools = getPublicToolDefinitions(config).map(tool => tool.name);
+  const exposesOnlyReadTools = exposedTools.every(toolName => DEFAULT_PUBLIC_MCP_READ_TOOLS.includes(toolName));
+  if (exposesOnlyReadTools) {
+    return 'Current MCP surface is read-only by default. Use search_memory for Codex diary recall, memory_overview for bridge observability, and audit_memory for readonly bounded audit explanations. Governed native-memory calls carry trusted execution context and disclosure budget through params._meta.codexMemoryGovernance, never through tool arguments. Controlled mutation or write tools are hidden and adapter-blocked unless an operator profile explicitly exposes them.';
+  }
+  return 'Use exposed tools according to the configured MCP surface. Governed native-memory calls carry exact approval, rollback posture, audit receipt, and trusted execution context through params._meta.codexMemoryGovernance, never through tool arguments. Hidden tools are adapter-blocked even if the core application still supports them internally.';
 }
 
 function buildGovernedMcpServerMetadata(config = {}) {
@@ -1589,7 +1667,7 @@ class CodexMemoryMcpServer {
           _meta: {
             codexMemoryGovernedBridge: buildGovernedMcpServerMetadata(this.app.config)
           },
-          instructions: 'Use record_memory for normal Codex memory writes, search_memory for Codex diary recall, memory_overview for bridge observability, audit_memory for readonly bounded audit explanations, and validate_memory/tombstone_memory/supersede_memory only as dry-run bounded controlled mutation preflights unless a separate exact mutation approval exists. Governed native-memory calls carry exact approval, rollback posture, audit receipt, and trusted execution context through params._meta.codexMemoryGovernance, never through tool arguments.'
+          instructions: buildInstructions(this.app.config)
         })
       };
     }
@@ -1605,7 +1683,8 @@ class CodexMemoryMcpServer {
     if (method === 'tools/list') {
       return {
         response: jsonRpcSuccess(id, {
-          tools: TOOL_DEFINITIONS.map(tool => buildToolDefinitionForList(tool, this.app.config))
+          tools: getPublicToolDefinitions(this.app.config)
+            .map(tool => buildToolDefinitionForList(tool, this.app.config))
         })
       };
     }
@@ -1629,6 +1708,12 @@ class CodexMemoryMcpServer {
     if (method === 'tools/call') {
       if (!params?.name || typeof params.name !== 'string') {
         return { response: jsonRpcError(id, -32602, 'Invalid params', 'tools/call requires a tool name') };
+      }
+
+      if (!isPublicMcpToolExposed(params.name, this.app.config)) {
+        return {
+          response: jsonRpcError(id, -32001, 'Forbidden', buildMcpToolNotExposedErrorData(params.name))
+        };
       }
 
       const args = params.arguments || {};
@@ -1685,10 +1770,13 @@ module.exports = {
   CodexMemoryMcpServer,
   buildGovernedMcpServerMetadata,
   buildGovernedMcpEffectiveRequestContext,
+  buildMcpToolNotExposedErrorData,
   buildGovernedMcpToolMetadata,
   buildGovernedMcpRequestContextFromParams,
   buildToolDefinitionForList,
   formatToolResult,
+  getPublicToolDefinitions,
+  isPublicMcpToolExposed,
   jsonRpcError,
   jsonRpcSuccess
 };

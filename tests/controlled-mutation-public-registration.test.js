@@ -18,6 +18,11 @@ const APPROVED_PUBLIC_TOOLS = [
   'tombstone_memory',
   'validate_memory'
 ];
+const DEFAULT_MCP_PUBLIC_TOOLS = [
+  'audit_memory',
+  'memory_overview',
+  'search_memory'
+];
 
 const CONTROLLED_MUTATION_TOOLS = [
   'validate_memory',
@@ -83,13 +88,14 @@ function insertRecord(dbPath, {
   }
 }
 
-async function withApp(handler) {
+async function withApp(handler, overrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'controlled-mutation-public-registration-'));
   const app = createCodexMemoryApplication({
     projectBasePath: tempBasePath,
     dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
     logsDir: path.join(tempBasePath, 'logs'),
-    dataDir: path.join(tempBasePath, 'data')
+    dataDir: path.join(tempBasePath, 'data'),
+    ...overrides
   });
 
   await app.initialize();
@@ -220,7 +226,25 @@ test('CM1472 registers only approved controlled mutation public MCP tools', asyn
       method: 'tools/list',
       params: {}
     });
-    assert.deepEqual(sorted(list.response.result.tools.map(tool => tool.name)), sorted(APPROVED_PUBLIC_TOOLS));
+    assert.deepEqual(sorted(list.response.result.tools.map(tool => tool.name)), sorted(DEFAULT_MCP_PUBLIC_TOOLS));
+  });
+});
+
+test('operator MCP surface can explicitly expose controlled mutation tools', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const list = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/list',
+      params: {}
+    });
+    assert.deepEqual(
+      sorted(list.response.result.tools.map(tool => tool.name)),
+      sorted([...DEFAULT_MCP_PUBLIC_TOOLS, ...CONTROLLED_MUTATION_TOOLS])
+    );
+  }, {
+    exposeControlledMutationMcpTools: true
   });
 });
 
@@ -350,6 +374,22 @@ test('CM1472 MCP tools/call validates schema and preserves low-disclosure result
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
 
+    const hidden = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'validate_memory',
+        arguments: validArgs('validate_memory')
+      }
+    }, publicRequestContext());
+    assert.equal(hidden.response.error.code, -32001);
+    assert.equal(hidden.response.error.data.code, 'mcp_tool_not_exposed');
+  });
+
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+
     const valid = await server.handleJsonRpc({
       jsonrpc: '2.0',
       id: 2,
@@ -376,6 +416,8 @@ test('CM1472 MCP tools/call validates schema and preserves low-disclosure result
     });
     assert.equal(invalid.response.error.code, -32602);
     assert.match(invalid.response.error.data, /raw/);
+  }, {
+    exposeControlledMutationMcpTools: true
   });
 });
 

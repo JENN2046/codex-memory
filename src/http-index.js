@@ -17,7 +17,7 @@ function appendLogLine(logPath, level, message) {
     // ignore log file failures
   }
 
-  const stream = level === 'error' ? process.stderr : process.stderr;
+  const stream = level === 'error' ? process.stderr : process.stdout;
   try {
     stream.write(line);
   } catch {

@@ -126,6 +126,31 @@ async function callHttpTool(address, sessionId, id, name, args) {
     })
   });
   const payload = await response.json();
+  if (
+    response.status === 200 &&
+    payload?.id === id &&
+    payload?.error?.data?.code === 'mcp_tool_not_exposed'
+  ) {
+    return {
+      tool: name,
+      decision: 'rejected',
+      dryRun: true,
+      mutated: false,
+      reasonCode: 'mcp_tool_not_exposed',
+      approvalRequired: true,
+      confirmGate: {
+        confirmRequested: args?.confirm === true,
+        confirmAccepted: false,
+        confirmedMutationAllowed: false
+      },
+      policy: {
+        durableMutationPerformed: false,
+        rawStoreScanned: false,
+        providerCalled: false,
+        readinessClaimed: false
+      }
+    };
+  }
   if (response.status !== 200 || payload?.id !== id || !payload?.result?.structuredContent) {
     throw new Error('authenticated HTTP tools/call failed');
   }

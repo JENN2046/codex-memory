@@ -18,7 +18,8 @@ async function withApp(handler) {
     projectBasePath: tempBasePath,
     dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
     logsDir: path.join(tempBasePath, 'logs'),
-    dataDir: path.join(tempBasePath, 'data')
+    dataDir: path.join(tempBasePath, 'data'),
+    mcpPublicToolSurface: 'full'
   });
 
   await app.initialize();

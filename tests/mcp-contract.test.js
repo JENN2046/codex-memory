@@ -101,7 +101,7 @@ test('codex-memory MCP should initialize a session and expose expected server in
     assert.ok(result.sessionId);
     assert.equal(result.response.result.protocolVersion, '2025-06-18');
     assert.equal(result.response.result.serverInfo.name, 'vcp_codex_memory');
-    assert.match(result.response.result.instructions, /record_memory/);
+    assert.match(result.response.result.instructions, /read-only by default/);
     assert.match(result.response.result.instructions, /params\._meta\.codexMemoryGovernance/);
     assert.equal(
       result.response.result._meta.codexMemoryGovernedBridge.productGoal.primaryRuntime,
@@ -403,6 +403,7 @@ test('MCP initialize governed bridge metadata stays low-disclosure', async () =>
     assert.equal(serialized.includes('PRIVATE_ENDPOINT_SHOULD_NOT_ECHO'), false);
     assert.equal(serialized.includes('SECRET_TOKEN_SHOULD_NOT_ECHO'), false);
   }, {
+    mcpPublicToolSurface: 'full',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary',
     governedMcpVcpNativeWriteDelegationMode: 'primary',
@@ -611,7 +612,43 @@ test('governed native bridge tool metadata sanitizes unsafe runtime target confi
   assert.equal(serialized.includes('SECRET_SOURCE_SHOULD_NOT_ECHO'), false);
 });
 
-test('codex-memory MCP should expose tools and execute record/search/overview', async () => {
+test('codex-memory MCP defaults to read-only public surface', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const list = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/list',
+      params: {}
+    });
+    assert.deepEqual(
+      list.response.result.tools.map(tool => tool.name).sort(),
+      ['audit_memory', 'memory_overview', 'search_memory']
+    );
+
+    const hiddenWrite = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Hidden write',
+          content: 'This write must not pass through the default MCP surface.',
+          evidence: 'default surface contract test',
+          validated: true,
+          reusable: false,
+          sensitivity: 'none'
+        }
+      }
+    });
+    assert.equal(hiddenWrite.response.error.code, -32001);
+    assert.equal(hiddenWrite.response.error.data.code, 'mcp_tool_not_exposed');
+  });
+});
+
+test('codex-memory MCP full surface can execute record/search/overview', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
     const requestContext = {
@@ -708,6 +745,8 @@ test('codex-memory MCP should expose tools and execute record/search/overview', 
     assert.ok(overview.response.result.structuredContent.paths.auditLogPath.endsWith('codex-memory-bridge.jsonl'));
     assert.equal(overview.response.result.isError, false);
     assert.equal(overview.response.result.structuredContent.shadowSync.available, true);
+  }, {
+    mcpPublicToolSurface: 'full'
   });
 });
 
@@ -735,6 +774,8 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
     assert.ok(schema.properties.task_id);
     assert.ok(schema.properties.conversation_id);
     assert.ok(schema.properties.retention_policy);
+  }, {
+    mcpPublicToolSurface: 'full'
   });
 });
 
@@ -1066,6 +1107,7 @@ test('MCP tools/list exposes governed native bridge metadata without locator dis
     assert.equal(serialized.includes('PRIVATE_ENDPOINT_SHOULD_NOT_ECHO'), false);
     assert.equal(serialized.includes('SECRET_TOKEN_SHOULD_NOT_ECHO'), false);
   }, {
+    mcpPublicToolSurface: 'full',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary',
     governedMcpVcpNativeWriteDelegationMode: 'primary',
@@ -1444,6 +1486,7 @@ test('MCP tools/list binds each native bridge tool to the public governed access
       assert.equal(meta.disclosure.endpointReturned, false, expected.toolName);
     }
   }, {
+    mcpPublicToolSurface: 'full',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
     governedMcpVcpNativeWriteDelegationMode: 'primary',
@@ -1630,6 +1673,7 @@ test('MCP tools/list covers current product-goal native bridge tool surface', as
     assert.equal(coverage.memoryWritePerformed, false);
     assert.equal(coverage.readinessClaimed, false);
   }, {
+    mcpPublicToolSurface: 'full',
     governedMcpVcpNativeRuntimeTarget: {
       targetReferenceName: 'operator-vcp-toolbox-service-ref',
       targetKind: 'mcp_server'
@@ -1780,6 +1824,8 @@ test('MCP runtime schema validation should reject unknown fields with -32602', a
 
     assert.equal(result.response.error.code, -32602);
     assert.match(result.response.error.data, /unexpected_field/);
+  }, {
+    mcpPublicToolSurface: 'full'
   });
 });
 
@@ -1807,6 +1853,8 @@ test('MCP runtime schema validation should reject enum mismatch with -32602', as
 
     assert.equal(result.response.error.code, -32602);
     assert.match(result.response.error.data, /client_id/);
+  }, {
+    mcpPublicToolSurface: 'full'
   });
 });
 
@@ -2522,6 +2570,7 @@ test('MCP tools/call can carry governed metadata to primary native write delegat
     assert.equal(serializedResponse.includes('RAW_MCP_GOVERNED_WRITE_CONTENT_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedResponse.includes('RAW_NATIVE_VALUE_SHOULD_NOT_ECHO'), false);
   }, {
+    mcpPublicToolSurface: 'full',
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     governedMcpVcpNativeBridgeGateMode: 'observe',
@@ -2575,6 +2624,8 @@ test('MCP tools/call rejects malformed governed metadata without echoing raw val
     assert.deepEqual(result.response.error.data.invalidFields, ['exactApprovalResult.accepted']);
     assert.equal(serializedResponse.includes('RAW_REJECTED_METADATA_CONTENT_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedResponse.includes('SECRET_TOKEN_SHOULD_NOT_ECHO'), false);
+  }, {
+    mcpPublicToolSurface: 'full'
   });
 });
 
@@ -2777,6 +2828,7 @@ test('MCP tools/call binds sparse trusted context metadata to transport scope be
     assert.equal(serializedResponse.includes('workspace-alpha'), false);
     assert.equal(serializedResponse.includes('workspace-beta'), false);
   }, {
+    mcpPublicToolSurface: 'full',
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-beta',
     governedMcpVcpNativeBridgeGateMode: 'strict',
@@ -2872,6 +2924,7 @@ test('MCP tools/call rejects unsafe rollback posture reference without echoing i
     assert.equal(serializedResponse.includes('PRIVATE_ROLLBACK_ENDPOINT_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedResponse.includes('SECRET_ROLLBACK_TOKEN_SHOULD_NOT_ECHO'), false);
   }, {
+    mcpPublicToolSurface: 'full',
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     governedMcpVcpNativeBridgeGateMode: 'observe',

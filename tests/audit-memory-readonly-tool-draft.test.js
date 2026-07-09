@@ -7,6 +7,7 @@ const path = require('node:path');
 const { createCodexMemoryApplication } = require('../src/app');
 const { CodexMemoryMcpServer } = require('../src/adapters/codex-mcp/server');
 const {
+  CORE_TOOL_DEFINITION_NAMES,
   DISCLOSURE_FLAGS,
   MUTATION_INPUT_KEYS,
   PUBLIC_EXPOSURE_REQUIREMENTS,
@@ -147,7 +148,7 @@ test('CM1414 audit_memory readonly draft rejects mutation-like input', () => {
 test('CM1461 audit_memory readonly public registration changes only the approved tool definition', () => {
   const toolNames = sorted(TOOL_DEFINITIONS.map(tool => tool.name));
 
-  assert.deepEqual(toolNames, sorted(PUBLIC_MCP_TOOL_NAMES));
+  assert.deepEqual(toolNames, sorted(CORE_TOOL_DEFINITION_NAMES));
   assert.equal(toolNames.includes(TOOL_NAME), true);
 });
 

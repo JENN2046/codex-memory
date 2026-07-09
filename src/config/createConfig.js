@@ -351,6 +351,18 @@ function normalizeGovernedMcpVcpNativeRuntimeProfile(value) {
     : 'off';
 }
 
+function normalizeMcpPublicToolSurface(value) {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase().replaceAll('-', '_') : '';
+  return [
+    'read_only',
+    'controlled_mutation',
+    'write',
+    'full'
+  ].includes(normalized)
+    ? normalized
+    : 'read_only';
+}
+
 function buildGovernedMcpVcpNativeRuntimeProfileDefaults(profileName) {
   if (profileName !== 'wsl-newapi-prod' && profileName !== 'vcp-native-shim-local') {
     return {
@@ -685,6 +697,27 @@ function createConfig(overrides = {}) {
       runtimeTarget: governedMcpVcpNativeRuntimeTarget,
       httpMcpTarget: governedMcpVcpNativeHttpMcpTarget.publicConfig
     });
+  const requestedMcpPublicToolSurface = normalizeMcpPublicToolSurface(
+    pickFirstNonEmpty(
+      overrides.mcpPublicToolSurface,
+      process.env.CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE,
+      process.env.CODEX_MEMORY_MCP_TOOL_SURFACE,
+      'read_only'
+    )
+  );
+  const exposeControlledMutationMcpTools = _resolveBool(
+    overrides.exposeControlledMutationMcpTools,
+    'CODEX_MEMORY_EXPOSE_CONTROLLED_MUTATION_TOOLS',
+    false
+  );
+  const exposeWriteMcpTools = _resolveBool(
+    overrides.exposeWriteMcpTools,
+    'CODEX_MEMORY_EXPOSE_WRITE_TOOLS',
+    false
+  );
+  const mcpPublicToolSurface = isHardened
+    ? 'read_only'
+    : requestedMcpPublicToolSurface;
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
   const vectorIndexPath = resolveAbsolutePath(
     basePath,
@@ -744,6 +777,16 @@ function createConfig(overrides = {}) {
     httpPort: parsePositiveInteger(overrides.httpPort || process.env.CODEX_MEMORY_HTTP_PORT || '7605', 7605),
     httpMcpPath: normalizeHttpPath(overrides.httpMcpPath || process.env.CODEX_MEMORY_HTTP_PATH || '/mcp/codex-memory'),
     httpBearerToken: overrides.httpBearerToken || process.env.CODEX_MEMORY_HTTP_TOKEN || '',
+    mcpPublicToolSurface,
+    mcpPublicToolNames: normalizeStringList(
+      pickFirstNonEmpty(
+        overrides.mcpPublicToolNames,
+        process.env.CODEX_MEMORY_MCP_PUBLIC_TOOLS,
+        ''
+      )
+    ),
+    exposeControlledMutationMcpTools: isHardened ? false : exposeControlledMutationMcpTools,
+    exposeWriteMcpTools: isHardened ? false : exposeWriteMcpTools,
     embedDimensions: inferredEmbedDimensions,
     embeddingFingerprint,
     embeddingProfileVersion,

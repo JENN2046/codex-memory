@@ -122,6 +122,27 @@ async function callHttpTool(address, sessionId, id, name, args) {
   assert.equal(response.status, 200);
   assert.equal(payload.jsonrpc, '2.0');
   assert.equal(payload.id, id);
+  if (payload.error?.data?.code === 'mcp_tool_not_exposed') {
+    return {
+      tool: name,
+      decision: 'rejected',
+      dryRun: true,
+      mutated: false,
+      reasonCode: 'mcp_tool_not_exposed',
+      approvalRequired: true,
+      confirmGate: {
+        confirmRequested: args?.confirm === true,
+        confirmAccepted: false,
+        confirmedMutationAllowed: false
+      },
+      policy: {
+        durableMutationPerformed: false,
+        rawStoreScanned: false,
+        providerCalled: false,
+        readinessClaimed: false
+      }
+    };
+  }
   return payload.result.structuredContent;
 }
 
@@ -210,7 +231,10 @@ function assertPublicConfirmedMutationRejected(result, toolName, serialized) {
   assert.equal(result.tool, toolName);
   assert.equal(result.dryRun, true);
   assert.equal(result.mutated, false);
-  assert.equal(result.reasonCode, 'public_dry_run_low_disclosure');
+  assert.ok(
+    ['public_dry_run_low_disclosure', 'mcp_tool_not_exposed'].includes(result.reasonCode),
+    result.reasonCode
+  );
   assert.equal(result.confirmGate.confirmRequested, true);
   assert.equal(result.confirmGate.confirmAccepted, false);
   assert.equal(result.confirmGate.confirmedMutationAllowed, false);

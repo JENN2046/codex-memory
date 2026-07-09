@@ -4,9 +4,9 @@ const { TOOL_DEFINITIONS } = require('./constants');
 
 const TASK_ID = 'CM-1468';
 const SCHEMA_VERSION = 'controlled-mutation-public-contract-preflight-v1';
-const STATUS_ACCEPTED = 'CONTROLLED_MUTATION_PUBLIC_CONTRACT_REGISTERED_CM1472';
+const STATUS_ACCEPTED = 'CONTROLLED_MUTATION_PUBLIC_CONTRACT_OPERATOR_SURFACE_READY_CM1472';
 
-const PUBLIC_TOOL_NAMES_FROZEN = Object.freeze([
+const CORE_TOOL_NAMES_FROZEN = Object.freeze([
   'record_memory',
   'search_memory',
   'memory_overview',
@@ -14,6 +14,12 @@ const PUBLIC_TOOL_NAMES_FROZEN = Object.freeze([
   'validate_memory',
   'tombstone_memory',
   'supersede_memory'
+]);
+
+const PUBLIC_TOOL_NAMES_FROZEN = Object.freeze([
+  'search_memory',
+  'memory_overview',
+  'audit_memory'
 ]);
 
 const CANDIDATE_TOOL_NAMES = Object.freeze([
@@ -72,7 +78,7 @@ function falseFlagMap(flags) {
   return Object.fromEntries(flags.map(flag => [flag, false]));
 }
 
-function currentPublicToolNames() {
+function currentCoreToolNames() {
   return TOOL_DEFINITIONS.map(tool => tool.name);
 }
 
@@ -80,8 +86,14 @@ function sorted(values) {
   return [...values].sort();
 }
 
-function publicToolsRemainFrozen(names = currentPublicToolNames()) {
+function publicToolsRemainFrozen(names = PUBLIC_TOOL_NAMES_FROZEN) {
   const expected = sorted(PUBLIC_TOOL_NAMES_FROZEN);
+  const actual = sorted(names);
+  return actual.length === expected.length && actual.every((name, index) => name === expected[index]);
+}
+
+function coreToolsRemainFrozen(names = currentCoreToolNames()) {
+  const expected = sorted(CORE_TOOL_NAMES_FROZEN);
   const actual = sorted(names);
   return actual.length === expected.length && actual.every((name, index) => name === expected[index]);
 }
@@ -176,7 +188,8 @@ const CANDIDATE_TOOL_DEFINITIONS = Object.freeze([
 ]);
 
 function buildControlledMutationPublicContractPreflightReport() {
-  const publicTools = currentPublicToolNames();
+  const publicTools = [...PUBLIC_TOOL_NAMES_FROZEN];
+  const coreTools = currentCoreToolNames();
   const publicMcpExpanded = CANDIDATE_TOOL_NAMES.some(name => publicTools.includes(name));
   const sideEffects = falseFlagMap(SIDE_EFFECT_FLAGS);
   sideEffects.publicMcpExpanded = publicMcpExpanded;
@@ -187,6 +200,8 @@ function buildControlledMutationPublicContractPreflightReport() {
     acceptedForPlanning: true,
     candidateToolNames: CANDIDATE_TOOL_NAMES,
     candidateToolDefinitions: CANDIDATE_TOOL_DEFINITIONS,
+    coreTools,
+    coreToolsFrozen: coreToolsRemainFrozen(coreTools),
     publicTools,
     publicToolsFrozen: publicToolsRemainFrozen(publicTools),
     publicMcpExpanded,
@@ -227,6 +242,7 @@ function buildControlledMutationPublicContractPreflightReport() {
 module.exports = {
   CANDIDATE_TOOL_DEFINITIONS,
   CANDIDATE_TOOL_NAMES,
+  CORE_TOOL_NAMES_FROZEN,
   DISCLOSURE_FLAGS,
   FORBIDDEN_PUBLIC_BEHAVIOR,
   PUBLIC_EXPOSURE_REQUIREMENTS,

@@ -272,7 +272,7 @@ test('http.js catch block produces redacted error', async () => {
 });
 
 test('ToolArgumentValidationError still returns detailed message', async () => {
-  const server = new CodexMemoryMcpServer({ app: createMockApp() });
+  const server = new CodexMemoryMcpServer({ app: createMockApp({ mcpPublicToolSurface: 'full' }) });
   const result = await server.handleJsonRpc({
     jsonrpc: '2.0',
     id: 7,
