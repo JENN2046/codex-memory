@@ -15,7 +15,11 @@ const { DeferredGovernanceRuntimeEntryAdapter } = require('./core/DeferredGovern
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
-const { AuditMemoryReadonlyService } = require('./core/AuditMemoryReadonlyService');
+const {
+  ACCESS_MODE: AUDIT_MEMORY_ACCESS_MODE,
+  AuditMemoryReadonlyService,
+  SERVICE_STATUS_ACCEPTED: AUDIT_MEMORY_SERVICE_STATUS_ACCEPTED
+} = require('./core/AuditMemoryReadonlyService');
 const {
   runSearchMemoryWithTimeout,
   throwIfSearchMemoryAborted
@@ -2789,6 +2793,55 @@ function createCodexMemoryApplication(overrides = {}) {
 
       if (toolName === 'audit_memory') {
         const effectiveArgs = governedNativeReadFallbackArgs || args;
+        if (governedNativeReadFallbackContext && effectiveArgs.window === 0) {
+          return await attachGovernedMcpVcpNativeReadFallbackProjection(
+            {
+              status: AUDIT_MEMORY_SERVICE_STATUS_ACCEPTED,
+              accepted: true,
+              blockerReasons: [],
+              access: {
+                mode: AUDIT_MEMORY_ACCESS_MODE,
+                selectedProjection: true,
+                rawMemoryReturned: false,
+                rawAuditReturned: false,
+                filesystemPathsReturned: false,
+                tokenMaterialReturned: false,
+                providerPayloadReturned: false,
+                memoryIdsReturned: false,
+                titlesReturned: false,
+                snippetsReturned: false,
+                contentReturned: false
+              },
+              summary: {
+                requestedFamily: effectiveArgs.audit_family || 'all',
+                window: 0,
+                visibleDecisionCount: 0,
+                hiddenDecisionCount: 0,
+                suppressedDecisionCount: 0
+              },
+              policy: {
+                lifecyclePolicyExplained: true,
+                scopePolicyExplained: true,
+                redactionApplied: true,
+                governedNativeBridgeAuditReceiptProjection: false,
+                rawAuditScanPerformed: false,
+                providerCalled: false,
+                durableMutationPerformed: false,
+                publicMcpExpanded: false,
+                readinessClaimed: false,
+                rcReadyClaimed: false
+              },
+              findings: []
+            },
+            governedNativeReadFallbackContext,
+            {
+              auditLogStore,
+              toolName,
+              localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt,
+              localFallbackReadPerformed: false
+            }
+          );
+        }
         const result = await auditMemoryReadonlyService.run(effectiveArgs);
         return await attachGovernedMcpVcpNativeReadFallbackProjection(
           result,

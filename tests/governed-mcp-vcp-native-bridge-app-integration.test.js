@@ -2957,6 +2957,76 @@ test('primary_with_local_fallback sanitizes local audit fallback raw flag and wi
   });
 });
 
+test('primary_with_local_fallback returns empty local audit fallback for zero-item disclosure budget', async () => {
+  let nativeCalls = 0;
+  let localAuditCalled = false;
+  const observations = [];
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeReadDelegationToolCaller: async payload => {
+      nativeCalls += 1;
+      throw governedNativeTransportErrorForPayload(payload, 'PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO');
+    }
+  }, async app => {
+    app.services.auditMemoryReadonlyService.run = async () => {
+      localAuditCalled = true;
+      return {
+        findings: [{
+          auditFamily: 'governance',
+          decision: 'visible',
+          reasonCode: 'LOCAL_AUDIT_FINDING_SHOULD_NOT_RETURN',
+          lifecyclePolicy: 'LOCAL_AUDIT_POLICY_SHOULD_NOT_RETURN',
+          scopePolicy: 'LOCAL_AUDIT_SCOPE_SHOULD_NOT_RETURN',
+          redacted: true
+        }]
+      };
+    };
+
+    const result = await app.callTool('audit_memory', {
+      audit_family: 'governance',
+      window: 10,
+      include_raw: false,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'workspace-alpha',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, codexContext({
+      requestContext: {
+        outputDisclosureBudget: {
+          level: 'summary',
+          lowDisclosure: true,
+          rawOutput: false,
+          maxItems: 0,
+          maxBytes: 4096
+        }
+      }
+    }));
+    const serialized = JSON.stringify({ result, observations });
+
+    assert.equal(nativeCalls, 1);
+    assert.equal(localAuditCalled, false);
+    assert.equal(result.status, 'AUDIT_MEMORY_READONLY_BOUNDED_ACCEPTED_NOT_PUBLIC');
+    assert.deepEqual(result.findings, []);
+    assert.equal(result.summary.requestedFamily, 'governance');
+    assert.equal(result.summary.window, 0);
+    assert.equal(result.access.localMemoryFallbackAttempted, true);
+    assert.equal(result.access.localMemoryFallbackUsed, true);
+    assert.equal(result.access.localMemoryFallbackReadPerformed, false);
+    assert.equal(result.access.localMemoryFallbackReturned, true);
+    assert.equal(result.access.localFallbackAuditReceiptStatus, 'appended');
+    assert.equal(result.governedNativeReadFallback.localMemoryFallbackReadPerformed, false);
+    assert.equal(observations[0].gateResult.normalizedBridgeRequest.disclosure_max_items, 0);
+    assert.equal(serialized.includes('LOCAL_AUDIT_FINDING_SHOULD_NOT_RETURN'), false);
+    assert.equal(serialized.includes('LOCAL_AUDIT_POLICY_SHOULD_NOT_RETURN'), false);
+    assert.equal(serialized.includes('LOCAL_AUDIT_SCOPE_SHOULD_NOT_RETURN'), false);
+    assert.equal(serialized.includes('PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
+  });
+});
+
 test('primary_with_local_fallback strips raw local fallback result fields at projection boundary', async () => {
   await withTempApp({
     governedMcpVcpNativeBridgeGateMode: 'observe',
