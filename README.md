@@ -16,6 +16,12 @@ how rollback stays bounded.
 当前目标是让 Codex 通过 `codex-memory` 治理桥，完整、受控、可审计地
 使用 VCPToolBox native memory runtime。
 
+Long-term goal and boundary documents:
+
+- [Codex Memory Final Goal](docs/CODEX_MEMORY_FINAL_GOAL.md)
+- [Capability Layer Model](docs/CAPABILITY_LAYER_MODEL.md)
+- [Non-Claims](docs/NON_CLAIMS.md)
+
 ## Current Status
 
 Current active path:

@@ -17,6 +17,12 @@
 
 VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改 VCPToolBox 原生源码。
 
+长期目标和边界文档：
+
+- [Codex Memory Final Goal](docs/CODEX_MEMORY_FINAL_GOAL.md)
+- [Capability Layer Model](docs/CAPABILITY_LAYER_MODEL.md)
+- [Non-Claims](docs/NON_CLAIMS.md)
+
 ## 当前生产路径
 
 当前推荐路径是 `7625` 上的 governed Codex MCP 服务：
