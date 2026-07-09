@@ -42,6 +42,7 @@ const TOOL_DEFINITIONS = [
           ]
         },
         sensitivity: { type: 'string', maxLength: 80 },
+        scope_id: { type: 'string', maxLength: 200 },
         project_id: { type: 'string', maxLength: 200 },
         workspace_id: { type: 'string', maxLength: 200 },
         client_id: { type: 'string', enum: CLIENT_ID_VALUES, maxLength: 200 },
@@ -68,10 +69,11 @@ const TOOL_DEFINITIONS = [
         context_text: { type: 'string', maxLength: 8000 },
         scope: {
           type: 'object',
-          description: 'Optional recall scope filter. project_id, workspace_id, client_id, and visibility restrict candidates whenever they are supplied; strict only records hard-isolation intent.',
+          description: 'Optional recall scope filter. scope_id, project_id, workspace_id, client_id, and visibility restrict candidates whenever they are supplied; strict only records hard-isolation intent.',
           additionalProperties: false,
           properties: {
             project_id: { type: 'string', maxLength: 200, description: 'Restrict recall to records with this project_id.' },
+            scope_id: { type: 'string', maxLength: 200, description: 'Restrict recall to records with this scope_id.' },
             workspace_id: { type: 'string', maxLength: 200, description: 'Restrict recall to records with this workspace_id. The raw value is not written to recall audit summaries.' },
             client_id: { type: 'string', enum: CLIENT_ID_VALUES, maxLength: 200, description: 'Restrict recall to records with this client_id.' },
             visibility: {
@@ -116,6 +118,8 @@ const TOOL_DEFINITIONS = [
           additionalProperties: false,
           properties: {
             project_id: { type: 'string', maxLength: 200 },
+            scope_id: { type: 'string', maxLength: 200 },
+            workspace_id: { type: 'string', maxLength: 200 },
             workspace_id_present: { type: 'boolean' },
             client_id: { type: 'string', maxLength: 200 },
             visibility: { type: 'string', maxLength: 200 },

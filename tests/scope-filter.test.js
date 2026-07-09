@@ -882,14 +882,14 @@ test('schema: record_memory and search_memory tool definitions cover scope field
 
   // record_memory scope fields
   const recordProps = Object.keys(recordSchema.inputSchema.properties);
-  for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'task_id', 'conversation_id', 'retention_policy']) {
+  for (const field of ['project_id', 'scope_id', 'workspace_id', 'client_id', 'visibility', 'task_id', 'conversation_id', 'retention_policy']) {
     assert.ok(recordProps.includes(field), `record_memory schema must include ${field}`);
   }
   assert.ok(recordSchema.inputSchema.additionalProperties === false, 'record_memory must reject additional properties');
 
   // search_memory scope fields
   const searchScopeProps = Object.keys(searchSchema.inputSchema.properties.scope.properties);
-  for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'strict']) {
+  for (const field of ['project_id', 'scope_id', 'workspace_id', 'client_id', 'visibility', 'strict']) {
     assert.ok(searchScopeProps.includes(field), `search_memory scope schema must include ${field}`);
   }
   const visibilitySchema = searchSchema.inputSchema.properties.scope.properties.visibility;
@@ -907,7 +907,7 @@ test('old DB schema drift report: verify scope columns exist', async () => {
     const tableInfo = shadowStore.db.prepare('PRAGMA table_info(memory_records)').all();
     const columnNames = tableInfo.map(col => col.name);
 
-    const requiredScopeColumns = ['client_id', 'workspace_id', 'project_id', 'task_id', 'conversation_id', 'visibility', 'retention_policy'];
+    const requiredScopeColumns = ['client_id', 'scope_id', 'workspace_id', 'project_id', 'task_id', 'conversation_id', 'visibility', 'retention_policy'];
 
     for (const col of requiredScopeColumns) {
       assert.ok(columnNames.includes(col), `Schema should have ${col} column`);
@@ -937,6 +937,7 @@ test('scope durability: diary rebuild preserves scope metadata into fresh shadow
       reusable: false,
       tags: ['scope', 'durability'],
       sensitivity: 'none',
+      scope_id: 'durable-scope',
       project_id: 'durable-project',
       workspace_id: 'durable-workspace',
       client_id: 'codex',
@@ -950,6 +951,7 @@ test('scope durability: diary rebuild preserves scope metadata into fresh shadow
 
     const diaryText = await fs.readFile(record.filePath, 'utf8');
     assert.match(diaryText, /^Project-ID:\s*durable-project$/m);
+    assert.match(diaryText, /^Scope-ID:\s*durable-scope$/m);
     assert.match(diaryText, /^Workspace-ID:\s*durable-workspace$/m);
     assert.match(diaryText, /^Client-ID:\s*codex$/m);
     assert.match(diaryText, /^Task-ID:\s*task-123$/m);
@@ -969,6 +971,7 @@ test('scope durability: diary rebuild preserves scope metadata into fresh shadow
 
     const restored = await rebuiltApp.stores.shadowStore.getRecord(memoryId);
     assert.equal(restored.projectId, 'durable-project');
+    assert.equal(restored.scopeId, 'durable-scope');
     assert.equal(restored.workspaceId, 'durable-workspace');
     assert.equal(restored.clientId, 'codex');
     assert.equal(restored.taskId, 'task-123');
@@ -982,6 +985,7 @@ test('scope durability: diary rebuild preserves scope metadata into fresh shadow
       limit: 10,
       include_content: true,
       scope: {
+        scope_id: 'durable-scope',
         project_id: 'durable-project',
         workspace_id: 'durable-workspace',
         client_id: 'codex',
@@ -996,6 +1000,8 @@ test('scope durability: diary rebuild preserves scope metadata into fresh shadow
       text: matched.text
     });
     assert.equal(returnedText.includes('Workspace-ID'), false, 'scope header label must not appear in recall output');
+    assert.equal(returnedText.includes('Scope-ID'), false, 'scope_id header label must not appear in recall output');
+    assert.equal(returnedText.includes('durable-scope'), false, 'raw scope_id must not appear in recall output');
     assert.equal(returnedText.includes('durable-workspace'), false, 'raw workspace_id must not appear in recall output');
     assert.equal(returnedText.includes('Task-ID'), false, 'task header label must not appear in recall output');
     assert.equal(returnedText.includes('Conversation-ID'), false, 'conversation header label must not appear in recall output');

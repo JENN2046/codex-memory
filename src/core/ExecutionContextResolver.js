@@ -15,6 +15,7 @@ class ExecutionContextResolver {
       requestSource: this.normalizeString(context.requestSource) || this.config.defaultRequestSource,
       userId: this.firstNormalizedString(context.userId, context.user_id) || null,
       projectId: this.firstNormalizedString(context.projectId, context.project_id) || null,
+      scopeId: this.firstNormalizedString(context.scopeId, context.scope_id) || null,
       workspaceId: this.firstNormalizedString(context.workspaceId, context.workspace_id) || null,
       clientId: this.firstNormalizedString(context.clientId, context.client_id) || null,
       taskId: this.firstNormalizedString(context.taskId, context.task_id) || null,

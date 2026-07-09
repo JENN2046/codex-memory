@@ -7,6 +7,9 @@ const { CodexMemoryMcpServer, jsonRpcError } = require('./server');
 const {
   buildRecordMemoryTrustedExecutionContext
 } = require('../../core/RecordMemoryTrustedExecutionContext');
+const {
+  projectGovernedMcpVcpNativeBridgeConfigWarnings
+} = require('../../core/GovernedMcpVcpNativeBridgeConfigWarningProjection');
 
 const SESSION_HEADER = 'Mcp-Session-Id';
 const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
@@ -222,8 +225,25 @@ function summarizeWriteReconcileWorkerStatus(app) {
 }
 
 function buildRuntimeHealth(app) {
+  const governedNativeBridgeStore = app?.services?.governedNativeBridgeObservationStore;
   return {
-    writeReconcileWorker: summarizeWriteReconcileWorkerStatus(app)
+    writeReconcileWorker: summarizeWriteReconcileWorkerStatus(app),
+    governedNativeBridge: governedNativeBridgeStore &&
+      typeof governedNativeBridgeStore.getStatus === 'function'
+      ? governedNativeBridgeStore.getStatus()
+      : {
+          schemaVersion: 'governed_native_bridge_observation_status_v1',
+          available: false,
+          retainedObservationLimit: 0,
+          observationCount: 0,
+          latest: null,
+          endpointDisclosed: false,
+          tokenMaterialDisclosed: false,
+          rawRequestBodyDisclosed: false,
+          rawResponseBodyDisclosed: false,
+          rawMemoryReturned: false,
+          readinessClaimed: false
+        }
   };
 }
 
@@ -243,7 +263,10 @@ function buildPolicyGateSummary(app) {
     softReadPolicyEnabled: config.enableSoftReadPolicy === true,
     lifecycleReadPolicyEnabled: config.enableLifecycleReadPolicy === true,
     writePreflightEnabled: config.enableWritePreflight === true,
-    externalProviderAllowed: config.allowExternalProvider === true
+    externalProviderAllowed: config.allowExternalProvider === true,
+    governedNativeBridgeWarnings: projectGovernedMcpVcpNativeBridgeConfigWarnings(
+      config.governedMcpVcpNativeBridgeConfigWarnings
+    )
   };
 }
 

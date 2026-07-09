@@ -1,6 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
+const fs = require('node:fs');
 const path = require('node:path');
 const {
   getExitCode,
@@ -22,6 +23,16 @@ function parseJsonResult(result) {
   return JSON.parse(result.stdout);
 }
 
+function readPackageManifestSnapshot() {
+  const packageLockPath = path.join(workspaceRoot, 'package-lock.json');
+  return {
+    packageJson: fs.readFileSync(path.join(workspaceRoot, 'package.json'), 'utf8'),
+    packageLock: fs.existsSync(packageLockPath)
+      ? fs.readFileSync(packageLockPath, 'utf8')
+      : null
+  };
+}
+
 test('schema compatibility dry-run CLI emits fixture-only JSON and exits successfully', () => {
   const result = runCli(['--json']);
 
@@ -37,7 +48,7 @@ test('schema compatibility dry-run CLI emits fixture-only JSON and exits success
   assert.equal(report.compatibility.importExportApplyRequired, false);
 });
 
-test('schema compatibility dry-run CLI preserves public MCP three-tool freeze', () => {
+test('schema compatibility dry-run CLI preserves current bounded public MCP surface', () => {
   const report = parseJsonResult(runCli(['--json']));
 
   assert.equal(report.publicMcpTools.frozen, true);
@@ -169,12 +180,10 @@ test('schema compatibility dry-run CLI exit-code helper fails closed only for st
 });
 
 test('schema compatibility dry-run CLI package manifests remain untouched', () => {
-  const result = spawnSync('git', ['diff', '--name-only', '--', 'package.json', 'package-lock.json'], {
-    cwd: workspaceRoot,
-    encoding: 'utf8',
-    timeout: 30000
-  });
+  const before = readPackageManifestSnapshot();
+  const result = runCli(['--json']);
+  const after = readPackageManifestSnapshot();
 
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout.trim(), '');
+  assert.equal(result.status, 0, result.stderr || 'non-zero exit');
+  assert.deepEqual(after, before);
 });

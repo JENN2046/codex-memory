@@ -15,6 +15,11 @@ test('no-token selected overview sanitizes core overview dependencies directly',
       vectorIndexPath: 'A:/sensitive/data/vector.json',
       chatIndexPath: 'A:/sensitive/data/chat.json',
       candidateCachePath: 'A:/sensitive/data/cache.json',
+      securityProfile: 'hardened',
+      enableSoftReadPolicy: true,
+      enableLifecycleReadPolicy: true,
+      enableWritePreflight: true,
+      allowExternalProvider: false,
       embeddingFingerprint: 'raw-fingerprint-should-not-leak',
       embeddingProfileVersion: 9,
       embeddingModel: 'provider-model-should-not-leak',
@@ -159,6 +164,7 @@ test('no-token selected overview sanitizes core overview dependencies directly',
     'cacheHealth',
     'indexHealth',
     'recall',
+    'runtimePosture',
     'shadowSync',
     'summary'
   ]);
@@ -213,6 +219,38 @@ test('no-token selected overview sanitizes core overview dependencies directly',
   assert.equal(overview.recall.summary.scopedRecallCount, 1);
   assert.equal(overview.shadowSync.schemaGate.currentVersion, 1);
   assert.equal(overview.cacheHealth.candidate.governanceStateRevisionTargetCount, 1);
+  assert.deepEqual(Object.keys(overview.runtimePosture).sort(), [
+    'embeddingDetailReturned',
+    'externalModelCallsAllowed',
+    'externalModelCallsMadeByOverview',
+    'externalModelEvidence',
+    'governedReadPolicyEnabled',
+    'overviewMode',
+    'pathsReturned',
+    'projectionClass',
+    'readinessClaimed',
+    'securityProfile',
+    'selectedLowDisclosure',
+    'softReadPolicyEnabled',
+    'transportClass',
+    'trustedFullDetail',
+    'writePreflightEnabled'
+  ]);
+  assert.equal(overview.runtimePosture.overviewMode, 'public_selected_overview');
+  assert.equal(overview.runtimePosture.projectionClass, 'selected_low_disclosure');
+  assert.equal(overview.runtimePosture.transportClass, 'http_mcp');
+  assert.equal(overview.runtimePosture.securityProfile, 'hardened');
+  assert.equal(overview.runtimePosture.softReadPolicyEnabled, true);
+  assert.equal(overview.runtimePosture.governedReadPolicyEnabled, true);
+  assert.equal(overview.runtimePosture.writePreflightEnabled, true);
+  assert.equal(overview.runtimePosture.externalModelCallsAllowed, false);
+  assert.equal(overview.runtimePosture.externalModelCallsMadeByOverview, false);
+  assert.equal(overview.runtimePosture.externalModelEvidence, 'not_checked_by_overview');
+  assert.equal(overview.runtimePosture.selectedLowDisclosure, true);
+  assert.equal(overview.runtimePosture.trustedFullDetail, false);
+  assert.equal(overview.runtimePosture.pathsReturned, false);
+  assert.equal(overview.runtimePosture.embeddingDetailReturned, false);
+  assert.equal(overview.runtimePosture.readinessClaimed, false);
 
   assert.doesNotMatch(serialized, /"paths"\s*:/);
   assert.doesNotMatch(serialized, /"embeddingProfile"\s*:/);
@@ -247,4 +285,76 @@ test('no-token selected overview sanitizes core overview dependencies directly',
   assert.doesNotMatch(serialized, /provider/i);
   assert.doesNotMatch(serialized, /api/i);
   assert.doesNotMatch(serialized, /client/i);
+});
+
+test('overview runtime posture separates full, selected, and bounded projections', async () => {
+  const service = new MemoryOverviewService({
+    config: {
+      auditLogPath: 'A:/trusted/logs/audit.jsonl',
+      recallLogPath: 'A:/trusted/logs/recall.jsonl',
+      dailyNoteRootPath: 'A:/trusted/dailynote',
+      dbPath: 'A:/trusted/data/shadow.sqlite',
+      vectorIndexPath: 'A:/trusted/data/vector.json',
+      chatIndexPath: 'A:/trusted/data/chat.json',
+      candidateCachePath: 'A:/trusted/data/cache.json',
+      securityProfile: 'local',
+      enableSoftReadPolicy: false,
+      enableLifecycleReadPolicy: false,
+      enableWritePreflight: false,
+      allowExternalProvider: true,
+      embeddingFingerprint: 'trusted-full-fingerprint',
+      embeddingProfileVersion: 2,
+      embeddingModel: 'trusted-model',
+      embeddingProvider: 'trusted-provider',
+      embedDimensions: 384
+    },
+    auditLogStore: {
+      readRecentWriteAudit: async () => [],
+      readRecentRecallAudit: async () => []
+    },
+    diaryStore: {
+      listRecentFiles: async () => []
+    },
+    shadowStore: {
+      getHealth: async () => ({ available: true })
+    },
+    vectorStore: {
+      getHealth: async () => ({ available: true })
+    },
+    candidateCacheStore: {
+      getHealth: async () => ({ available: true })
+    },
+    chatHistoryIndexStore: {
+      getHealth: async () => ({ available: false, status: 'disabled' })
+    }
+  });
+
+  const full = await service.getOverview();
+  const selected = await service.getNoTokenSelectedOverview();
+  const bounded = await service.getAuthenticatedBoundedOverview();
+
+  assert.equal(full.runtimePosture.overviewMode, 'trusted_full_overview');
+  assert.equal(full.runtimePosture.projectionClass, 'trusted_full');
+  assert.equal(full.runtimePosture.transportClass, 'internal_service');
+  assert.equal(full.runtimePosture.selectedLowDisclosure, false);
+  assert.equal(full.runtimePosture.trustedFullDetail, true);
+  assert.equal(full.runtimePosture.pathsReturned, true);
+  assert.equal(full.runtimePosture.embeddingDetailReturned, true);
+  assert.equal(full.runtimePosture.externalModelCallsAllowed, true);
+  assert.equal(full.runtimePosture.externalModelCallsMadeByOverview, false);
+  assert.equal(full.runtimePosture.readinessClaimed, false);
+
+  assert.equal(selected.runtimePosture.overviewMode, 'public_selected_overview');
+  assert.equal(selected.runtimePosture.projectionClass, 'selected_low_disclosure');
+  assert.equal(selected.runtimePosture.selectedLowDisclosure, true);
+  assert.equal(selected.runtimePosture.trustedFullDetail, false);
+  assert.equal(selected.runtimePosture.pathsReturned, false);
+  assert.equal(selected.runtimePosture.embeddingDetailReturned, false);
+
+  assert.equal(bounded.runtimePosture.overviewMode, 'authenticated_bounded_overview');
+  assert.equal(bounded.runtimePosture.projectionClass, 'bounded_low_disclosure');
+  assert.equal(bounded.runtimePosture.selectedLowDisclosure, true);
+  assert.equal(bounded.runtimePosture.trustedFullDetail, false);
+  assert.equal(bounded.runtimePosture.pathsReturned, false);
+  assert.equal(bounded.runtimePosture.embeddingDetailReturned, false);
 });

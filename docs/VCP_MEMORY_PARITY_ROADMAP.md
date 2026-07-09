@@ -1,9 +1,16 @@
 # VCP Memory Practical Parity Roadmap
 
-Status: source of truth for long-term post-P9 roadmap.
+Status: fallback/reference roadmap after the 2026-07-03 VCPToolBox-native bridge
+pivot.
 Last updated: 2026-05-14.
 
-This document is the single long-form roadmap for `codex-memory` after P9 scoped memory runtime integration. Other docs should link here or summarize the current priority only. Do not copy the whole roadmap into README, backlog, or `.agent_board`.
+This document remains a compatibility, fallback, donor-behavior, and local
+runtime hardening reference. For the archived
+`codex-memory-vcp-native-bridge-plan-20260703` implementation goal, the primary
+route is now VCPToolBox-native-first governed bridge work, not cloning all
+VCPToolBox memory intelligence into `codex-memory`.
+
+Do not copy the whole roadmap into README, backlog, or `.agent_board`.
 
 ## Route
 

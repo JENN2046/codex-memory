@@ -479,6 +479,36 @@ function buildAdaptiveProfile(writeEntries, recallEntries) {
   };
 }
 
+function buildRuntimePosture(config = {}, access = null) {
+  const selectedProjection = access?.selectedProjection === true;
+  const overviewMode = typeof access?.mode === 'string'
+    ? access.mode
+    : 'trusted_full_overview';
+  const publicAccess = typeof access?.publicAccess === 'string'
+    ? access.publicAccess
+    : 'trusted';
+
+  return {
+    overviewMode,
+    projectionClass: selectedProjection
+      ? (publicAccess === 'bounded' ? 'bounded_low_disclosure' : 'selected_low_disclosure')
+      : 'trusted_full',
+    transportClass: selectedProjection ? 'http_mcp' : 'internal_service',
+    securityProfile: typeof config.securityProfile === 'string' ? config.securityProfile : 'unknown',
+    softReadPolicyEnabled: config.enableSoftReadPolicy === true,
+    governedReadPolicyEnabled: config.enableLifecycleReadPolicy === true,
+    writePreflightEnabled: config.enableWritePreflight === true,
+    externalModelCallsAllowed: config.allowExternalProvider === true,
+    externalModelCallsMadeByOverview: false,
+    externalModelEvidence: 'not_checked_by_overview',
+    selectedLowDisclosure: selectedProjection,
+    trustedFullDetail: selectedProjection === false,
+    pathsReturned: selectedProjection === false,
+    embeddingDetailReturned: selectedProjection === false,
+    readinessClaimed: false
+  };
+}
+
 class MemoryOverviewService {
   constructor({ config, auditLogStore, diaryStore, shadowStore, vectorStore, candidateCacheStore = null, chatHistoryIndexStore = null }) {
     this.config = config;
@@ -529,6 +559,7 @@ class MemoryOverviewService {
           error: this.config.ragProfile?.error || null
         }
       },
+      runtimePosture: buildRuntimePosture(this.config),
       summary: buildWriteSummary(writeEntries),
       recentAudit: normalizeAuditEntries(writeEntries, listLimit),
       rejectionReasons: summarizeReasons(writeEntries.filter(entry => entry.decision === 'rejected')).slice(0, 8),
@@ -614,6 +645,7 @@ class MemoryOverviewService {
 
     return {
       access,
+      runtimePosture: buildRuntimePosture(this.config, access),
       summary: buildNoTokenWriteSummary(buildWriteSummary(writeEntries)),
       recall: {
         ...buildRecallStatus(recallSummary),
@@ -635,5 +667,6 @@ class MemoryOverviewService {
 }
 
 module.exports = {
+  buildRuntimePosture,
   MemoryOverviewService
 };

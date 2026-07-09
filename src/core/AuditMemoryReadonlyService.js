@@ -72,6 +72,7 @@ function buildPolicy() {
     lifecyclePolicyExplained: true,
     scopePolicyExplained: true,
     redactionApplied: true,
+    governedNativeBridgeAuditReceiptProjection: false,
     rawAuditScanPerformed: false,
     providerCalled: false,
     durableMutationPerformed: false,
@@ -96,7 +97,7 @@ function sanitizeReason(value) {
 
 function sanitizeFinding(decision) {
   const decisionType = DECISION_TYPES.includes(decision?.decision) ? decision.decision : 'hidden';
-  return {
+  const finding = {
     auditFamily: normalizeFamily(decision?.auditFamily),
     decision: decisionType,
     reasonCode: sanitizeReason(decision?.reasonCode),
@@ -104,6 +105,20 @@ function sanitizeFinding(decision) {
     scopePolicy: sanitizeReason(decision?.scopePolicy),
     redacted: true
   };
+  if (
+    isPlainObject(decision?.governedNativeBridgeReceipt) &&
+    decision.governedNativeBridgeReceipt.schemaVersion === 'governed_native_bridge_audit_memory_projection_v1'
+  ) {
+    finding.governedNativeBridgeReceipt = decision.governedNativeBridgeReceipt;
+  }
+  if (
+    isPlainObject(decision?.governedNativeReadFallbackReceipt) &&
+    decision.governedNativeReadFallbackReceipt.schemaVersion ===
+      'governed_native_read_fallback_audit_memory_projection_v1'
+  ) {
+    finding.governedNativeReadFallbackReceipt = decision.governedNativeReadFallbackReceipt;
+  }
+  return finding;
 }
 
 function ensureNoForbiddenOutputKeys(value, path = []) {
@@ -173,7 +188,13 @@ class AuditMemoryReadonlyService {
         window,
         ...counts
       },
-      policy: buildPolicy(),
+      policy: {
+        ...buildPolicy(),
+        governedNativeBridgeAuditReceiptProjection: findings.some(finding =>
+          isPlainObject(finding.governedNativeBridgeReceipt) ||
+          isPlainObject(finding.governedNativeReadFallbackReceipt)
+        )
+      },
       findings
     };
 

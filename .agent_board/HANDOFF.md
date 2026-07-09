@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`.
-Current validation: `CMV-1805`.
-Current handoff: CM-1700 fixture-only target-specific runtime inspection execution approval draft added; no approval-line issue or consumption, no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
+Current task: `CM-2006 trusted-full-read receipt closeout / route decision`.
+Current validation: `CMV-2107`.
+Current handoff: CM-2006 closes out the CM-2005 low-disclosure trusted-full-read receipt: bounded attempt completed, array/zero-item shape projected, read-shape unlocked true, raw output persisted false, write counters zero, readiness false. CM-2005 single-use authority is consumed and cannot be reused.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: add fixture-only VCPToolBox target-specific runtime inspection execution approval draft coverage.
+Goal: continue from CM-2006 only within safe local/no-live planning boundaries unless Jenn supplies a new fresh exact boundary for any additional trusted-full-read attempt or broader inference.
 
-Current status: `COMPLETED_VALIDATED_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT_FIXTURE_ONLY_NO_EXECUTION`; production/release/cutover ready no; complete V8 not claimed.
+Current status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_CM2005_BOUNDED_ATTEMPT_COMPLETED_READ_SHAPE_UNLOCKED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-2006 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md` and records the CM-2005 low-disclosure projection only. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. CM-2005 approval reuse, retry, new trusted-full-read execution, target material binding, runtime/network/VCPToolBox calls, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, M15/RC unlock, and readiness claims remain forbidden without new exact authority.
 
 Workspace: `A:\codex-memory`.
 
@@ -25,21 +25,380 @@ Current entrypoints:
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
-- `docs/CM1700_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1999_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2000_TRUSTED_FULL_READ_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2001_TRUSTED_FULL_READ_EXACT_APPROVAL_MATERIAL_INTAKE_GATE_BLOCKED.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2002_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARATION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2003_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_PACKET_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM2004_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_AND_LOCAL_REPAIR_RECEIPT.md`
+- `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js`
+- `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1996_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_MATERIAL_BOUND_READ_SHAPE_PROBE_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1995_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_PRE_EXECUTION_GATE.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1994_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING.md`
+- `src/core/VcpNativeDisposableTargetResolverTransportBoundaryContract.js`
+- `tests/vcp-native-disposable-target-resolver-transport-boundary-contract.test.js`
+- `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1993_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1992_EXACT_REAL_DISPOSABLE_TARGET_MATERIAL_BOUNDARY_PACKET_READINESS_REVIEW.md`
+- `src/core/VcpNativeRealDisposableTargetMaterialEvidencePreparationContract.js`
+- `tests/vcp-native-real-disposable-target-material-evidence-preparation-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1991_REAL_DISPOSABLE_TARGET_MATERIAL_EVIDENCE_PREPARATION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1990_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PROBE_ABORT_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1989_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1988_EXACT_REAL_DISPOSABLE_TARGET_BINDING_BOUNDARY_PACKET_READINESS_REVIEW.md`
+- `src/core/VcpNativeRealDisposableTargetDeclarationEvidencePreparationContract.js`
+- `tests/vcp-native-real-disposable-target-declaration-evidence-preparation-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1987_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1984_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_BINDING.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1986_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PROBE_ABORT_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1985_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1983_REAL_DISPOSABLE_TARGET_BINDING_EXACT_BOUNDARY_PACKET.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1982_FIXTURE_BACKED_PROBE_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1981_EXACT_APPROVED_FIXTURE_BACKED_PROBE_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1980_EXACT_APPROVAL_INTAKE.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1979_EXACT_DISPOSABLE_TARGET_FIXTURE_BACKED_LIVE_RUNTIME_BOUNDARY_PACKET.md`
+- `src/core/VcpNativeDisposableTargetBindingFixturePreparationContract.js`
+- `tests/vcp-native-disposable-target-binding-fixture-preparation-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1978_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1977_EXACT_APPROVED_DISPOSABLE_TARGET_LIVE_RUNTIME_PROBE_ABORT_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1976_EXACT_APPROVAL_INTAKE.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1975_EXACT_LIVE_RUNTIME_BOUNDARY_PACKET.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1974_LIVE_RUNTIME_ENTRY_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1973_LOCAL_SAFE_COMPLETION_CLOSEOUT_REFRESH.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1972_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1971_M13_M14_HEALTH_REPORT_ROUTE_REFRESH.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1970_M12_M13_FALLBACK_LOCAL_MEMORY_ROUTE_REFRESH.md`
+- `src/core/VcpMemoryM10ExactWriteBoundaryGateContract.js`
+- `tests/vcp-memory-m10-exact-write-boundary-gate-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1967_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1968_M10_M11_ROUTE_DECISION_RESPONSE_NORMALIZATION_REFRESH.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1969_M11_M12_SUSTAINED_WORKFLOW_ROUTE_REFRESH.md`
+- `src/core/VcpMemoryGovernedMutationProposalModeContract.js`
+- `tests/vcp-memory-governed-mutation-proposal-mode-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1966_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT.md`
+- `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1965_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION.md`
+- `src/core/VcpNativeDisposableTargetRequestReadShapeProbeExecutor.js`
+- `tests/vcp-native-disposable-target-request-read-shape-probe-executor.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1964_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED.md`
+- `src/core/VcpNativeDisposableTargetResolverTransportBoundaryContract.js`
+- `tests/vcp-native-disposable-target-resolver-transport-boundary-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1963_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1962_EXACT_APPROVED_COMPONENT_ACTION_REQUEST_READ_SHAPE_PRE_EXECUTION_GATE_BLOCKED_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1961_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1960_COMPONENT_ACTION_REQUEST_READ_SHAPE_EXACT_APPROVAL_PACKET.md`
+- `src/core/VcpNativeComponentActionRequestReadShapePreparationContract.js`
+- `tests/vcp-native-component-action-request-read-shape-preparation-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1959_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1958_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1957_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1956_EXACT_APPROVED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1955_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1954_COMPONENT_ACTION_ROUTE_PROBE_EXACT_APPROVAL_REQUEST_PACKET.md`
+- `src/core/VcpNativeComponentActionRequestBodyBoundaryContract.js`
+- `tests/vcp-native-component-action-request-body-boundary-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1953_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1952_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1951_COMPONENT_ACTION_STATUS_PROBE_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1950_EXACT_APPROVED_COMPONENT_ACTION_STATUS_PROBE_RECEIPT.md`
+- `src/core/VcpNativeComponentActionStatusProbeContract.js`
+- `tests/vcp-native-component-action-status-probe-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1949_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1948_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1947_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1946_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1945_STARTUP_FAILURE_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1944_EXACT_APPROVED_STARTUP_FAILURE_DIAGNOSIS_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1943_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1942_STARTUP_FAILURE_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET.md`
+- `src/core/VcpNativeStartupFailureDiagnosisContract.js`
+- `tests/vcp-native-startup-failure-diagnosis-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1941_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1940_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1939_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1938_EXACT_APPROVED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1937_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1936_STARTUP_LISTENER_RECOVERY_EXACT_APPROVAL_REQUEST_PACKET.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1935_LOW_DISCLOSURE_STARTUP_LISTENER_RECOVERY_CONTRACT.md`
+- `src/core/VcpNativeStartupListenerRecoveryContract.js`
+- `tests/vcp-native-startup-listener-recovery-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1934_RUNTIME_STARTUP_OR_SERVICE_LISTENER_RECOVERY_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1933_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1932_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1931_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1930_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_REFRESH.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1929_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_DECISION.md`
+- `src/core/VcpNativeStartupLocatorDiagnosisReceiptCaptureContract.js`
+- `tests/vcp-native-startup-locator-diagnosis-receipt-capture-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1928_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_HARDENING_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1927_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1926_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1925_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST.md`
+- `src/core/VcpNativeRuntimeStartupTargetLocatorDiagnosisContract.js`
+- `tests/vcp-native-runtime-startup-target-locator-diagnosis-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1924_LOW_DISCLOSURE_RUNTIME_STARTUP_TARGET_LOCATOR_DIAGNOSIS_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1923_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1922_TRANSPORT_DIAGNOSIS_CLOSEOUT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1921_EXACT_APPROVED_TRANSPORT_DIAGNOSIS_RECEIPT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1920_TRANSPORT_DIAGNOSIS_EXACT_APPROVAL_REQUEST.md`
+- `src/core/VcpNativeRuntimeTargetDiagnosisContract.js`
+- `tests/vcp-native-runtime-target-diagnosis-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1919_RUNTIME_TARGET_DIAGNOSIS_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1918_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1917_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1916_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_RECEIPT.md`
+- `src/core/VcpNativeReadOnlyProofExecutionHarness.js`
+- `tests/vcp-native-readonly-proof-execution-harness.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1915_LIVE_READONLY_PROOF_EXECUTION_HARNESS.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1914_EXACT_APPROVED_LIVE_READONLY_PROOF_REQUEST.md`
+- `src/core/VcpNativeReadOnlyExecutionReceipt.js`
+- `tests/vcp-native-readonly-execution-receipt.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1913_VCP_NATIVE_READONLY_EXECUTION_RECEIPT_SCHEMA.md`
+- `src/core/VcpNativeRuntimeAdapterDryRunContract.js`
+- `tests/vcp-native-runtime-adapter-dry-run-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1912_VCP_NATIVE_RUNTIME_ADAPTER_DRY_RUN_CONTRACT.md`
+- `src/core/VcpNativeReadOnlyProofPathGate.js`
+- `tests/vcp-native-readonly-proof-path-gate.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1911_VCP_NATIVE_READONLY_PROOF_PATH_GATE.md`
+- `src/core/VcpNativeInvocationAdapterSkeleton.js`
+- `tests/vcp-native-invocation-adapter-skeleton.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1910_VCP_NATIVE_INVOCATION_ADAPTER_SKELETON.md`
+- `src/core/VcpMemoryExactLiveRuntimeAuthorizationRequestExactMaterialReadinessBlockedContract.js`
+- `tests/vcp-memory-exact-live-runtime-authorization-request-exact-material-readiness-blocked-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1909_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1908_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_READINESS_BLOCKED_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1907_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_READINESS_BLOCKED_PRECONDITION_REFRESH.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1906_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
+- `src/core/VcpMemoryExactLiveRuntimeAuthorizationRequestExactMaterialBoundaryContract.js`
+- `tests/vcp-memory-exact-live-runtime-authorization-request-exact-material-boundary-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1905_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1904_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1903_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
+- `src/core/VcpMemoryExactLiveRuntimeAuthorizationRequestReadinessBlockedContract.js`
+- `tests/vcp-memory-exact-live-runtime-authorization-request-readiness-blocked-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1902_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1901_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_PRECONDITION_REFRESH.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1900_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
+- `src/core/VcpMemoryExactLiveRuntimeAuthorizationRequestBoundaryContract.js`
+- `tests/vcp-memory-exact-live-runtime-authorization-request-boundary-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1899_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1898_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_PREFLIGHT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1897_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
+- `src/core/VcpMemoryExactLiveRuntimeAuthorizationGatePreflightContract.js`
+- `tests/vcp-memory-exact-live-runtime-authorization-gate-preflight-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1896_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1895_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_BOUNDARY.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1894_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
+- `src/core/VcpMemoryExactLiveRuntimeApprovalRequestPacketReadinessBlockedContract.js`
+- `tests/vcp-memory-exact-live-runtime-approval-request-packet-readiness-blocked-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1893_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_FIXTURE_CONTRACT.md`
+- `src/core/VcpMemoryExactLiveRuntimeApprovalRequestPacketSkeletonBoundaryContract.js`
+- `tests/vcp-memory-exact-live-runtime-approval-request-packet-skeleton-boundary-contract.test.js`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1892_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_PRECONDITION_REFRESH.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1891_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_SKELETON_FIXTURE_CLOSEOUT_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1890_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_SKELETON_BOUNDARY_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_PLAN_PACKAGE_CM1889_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_SKELETON_REVIEW_BOUNDARY.md`
+- `src/core/VcpMemoryTrustedWriteProposalReceiptShapeContract.js`
+- `tests/vcp-memory-trusted-write-proposal-receipt-shape-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1822_RECEIPT_SHAPE_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1823_RECEIPT_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`
+- `src/core/VcpMemoryTrustedWriteProposalCloseoutGateContract.js`
+- `tests/vcp-memory-trusted-write-proposal-closeout-gate-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1824_CLOSEOUT_GATE_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1825_BLOCKED_TO_EXACT_BOUNDARY_DECISION_PACKET_REFRESH.md`
+- `src/core/VcpMemoryTrustedWriteProposalExactBoundaryPacketSkeletonContract.js`
+- `tests/vcp-memory-trusted-write-proposal-exact-boundary-packet-skeleton-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1826_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1827_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1828_EXACT_REQUEST_FIELD_CANDIDATE_SELECTION_PREFLIGHT.md`
+- `src/core/VcpMemoryTrustedWriteProposalExactRequestFieldCandidateContract.js`
+- `tests/vcp-memory-trusted-write-proposal-exact-request-field-candidate-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1829_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1830_EXACT_REQUEST_FIELD_CANDIDATE_CONTRACT_CLOSEOUT_PACKET_READINESS_GATE_REVIEW.md`
+- `src/core/VcpMemoryTrustedWriteProposalExactRequestPacketReadinessContract.js`
+- `tests/vcp-memory-trusted-write-proposal-exact-request-packet-readiness-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1831_EXACT_REQUEST_PACKET_READINESS_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1832_EXACT_REQUEST_PACKET_READINESS_CONTRACT_CLOSEOUT_REQUEST_PREPARATION_GATE_REVIEW.md`
+- `src/core/VcpMemoryTrustedWriteProposalExactRequestPreparationBoundaryContract.js`
+- `tests/vcp-memory-trusted-write-proposal-exact-request-preparation-boundary-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1833_EXACT_REQUEST_PREPARATION_BOUNDARY_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1834_EXACT_REQUEST_PREPARATION_BOUNDARY_CONTRACT_CLOSEOUT_EXACT_FIELD_BINDING_GATE_REVIEW.md`
+- `src/core/VcpMemoryTrustedWriteProposalExactFieldBindingFeasibilityContract.js`
+- `tests/vcp-memory-trusted-write-proposal-exact-field-binding-feasibility-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1835_EXACT_FIELD_BINDING_FEASIBILITY_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1836_EXACT_FIELD_BINDING_FEASIBILITY_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_READINESS_GATE_REVIEW.md`
+- `src/core/VcpMemoryTrustedWriteProposalApprovalRequestReadinessBlockedContract.js`
+- `tests/vcp-memory-trusted-write-proposal-approval-request-readiness-blocked-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1837_APPROVAL_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1838_APPROVAL_REQUEST_READINESS_BLOCKED_CONTRACT_CLOSEOUT_EXACT_REQUEST_PACKET_REFRESH_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1839_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_PREFLIGHT.md`
+- `src/core/VcpMemoryTrustedWriteProposalExactRequestPacketRefreshBlockedContract.js`
+- `tests/vcp-memory-trusted-write-proposal-exact-request-packet-refresh-blocked-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1840_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1841_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_BOUNDARY_REVIEW.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1842_APPROVAL_REQUEST_BOUNDARY_BLOCKED_PREFLIGHT.md`
+- `src/core/VcpMemoryTrustedWriteProposalApprovalRequestBoundaryBlockedContract.js`
+- `tests/vcp-memory-trusted-write-proposal-approval-request-boundary-blocked-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1843_APPROVAL_REQUEST_BOUNDARY_BLOCKED_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1844_APPROVAL_REQUEST_BOUNDARY_BLOCKED_CONTRACT_CLOSEOUT_PROPOSAL_MODE_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1845_PROPOSAL_MODE_BLOCKED_CLOSEOUT_REFRESH.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1846_M9_FINAL_BLOCKED_CLOSEOUT_M10_GATE_PREFLIGHT.md`
+- `src/core/VcpMemoryTrustedWriteProposalM10BlockedStateContract.js`
+- `tests/vcp-memory-trusted-write-proposal-m10-blocked-state-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1847_M10_BLOCKED_STATE_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1848_M10_BLOCKED_STATE_CLOSEOUT_M11_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1849_M11_BLOCKED_PRECONDITION_REFRESH.md`
+- `src/core/VcpMemoryTrustedWriteProposalM11BlockedRouteContract.js`
+- `tests/vcp-memory-trusted-write-proposal-m11-blocked-route-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1850_M11_BLOCKED_ROUTE_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1851_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1852_M12_BLOCKED_PRECONDITION_REFRESH.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1853_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1854_M12_EXACT_BOUNDARY_FEASIBILITY_PREFLIGHT.md`
+- `src/core/VcpMemoryCodexClaudeSustainedWorkflowExactBoundaryFeasibilityContract.js`
+- `tests/vcp-memory-codex-claude-sustained-workflow-exact-boundary-feasibility-contract.test.js`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1855_M12_EXACT_BOUNDARY_FEASIBILITY_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_CM1856_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW.md`
+- `src/core/VcpMemoryTrustedWriteProposalEnvelopeContract.js`
+- `tests/vcp-memory-trusted-write-proposal-envelope-contract.test.js`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1821_ENVELOPE_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1820_EXACT_BOUNDARY_FIELD_FEASIBILITY_PREFLIGHT.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1819_BLOCKED_CLOSEOUT_REFRESH_AFTER_M8_ACCEPTANCE.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1818_RUNTIME_ABORT_RECEIPT_REFRESH.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1817_NON_AUTHORIZING_REQUEST_DISPLAY_REFRESH.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1816_EXACT_APPROVAL_DECISION_REVIEW_REFRESH.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1815_EXACT_APPROVAL_PACKET_REFRESH.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_CM1814_PRECONDITION_REFRESH_AFTER_M8_ACCEPTANCE.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1813_WORKFLOW_RECEIPT_CLOSEOUT_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1812_WORKFLOW_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_CM1811_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_CM1810_READ_SHAPE_RECEIPT_CLOSEOUT_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_CM1809_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_CM1808_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1807_M6_SUCCESSFUL_PROOF_CLOSEOUT_NEXT_STAGE_GATE_REVIEW.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1806_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1805_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1804_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1803_ISOLATED_RUSTUP_TOOLCHAIN_INSTALL_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1802_DAILYNOTESEARCHER_LOCKED_LOCAL_X64_BUILD_ATTEMPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1801_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1800_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1799_DAILYNOTESEARCHER_BINARY_COMPATIBILITY_DIAGNOSIS.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1798_EXECUTABLE_BIT_REPAIR_STATUS_ONLY_RERUN_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1797_DAILYNOTESEARCHER_FAILURE_SOURCE_DIAGNOSIS.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1796_WHITELIST_TEMP_AUTH_STATUS_ONLY_PROBE_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1795_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1794_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1793_DAILYNOTESEARCHER_PROBE_DECISION_ABORT_BOUNDARY.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1792_DAILYNOTESEARCHER_INVOCATION_ENVELOPE_PREFLIGHT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1791_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1790_STATUS_ONLY_ROUTE_MATRIX_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1789_EXTENDED_NO_LOG_STARTUP_WINDOW_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1788_STARTUP_FAILURE_SOURCE_DIAGNOSIS.md`
+- `src/core/VcpMemoryHealthReportSchemaContract.js`
+- `tests/vcp-memory-health-report-schema-contract.test.js`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1787_SERVICE_START_HANDSHAKE_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1786_OPERATOR_TARGET_LOCATOR_RECEIPT.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_CM1785_LIVE_TARGET_PREFLIGHT_RECEIPT.md`
+- `docs/VCP_MEMORY_M15_CM1859_BLOCKED_PRECONDITION_REFRESH.md`
+- `docs/VCP_MEMORY_M15_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_M15_RC_REVIEW_APPROVAL_PACKET_READINESS_BOUNDARY.md`
+- `docs/VCP_MEMORY_M15_RISK_REVIEW_SKELETON.md`
+- `docs/VCP_MEMORY_M15_NON_AUTHORIZING_RC_CHECKLIST_SKELETON.md`
+- `docs/VCP_MEMORY_M15_PACKAGE_EVIDENCE_MAP.md`
+- `docs/VCP_MEMORY_M15_BLOCKED_PRECONDITION_RECORD.md`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_SOURCE_REVIEW.md`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_COUNTER_REASON_SPECIFICITY.md`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_SECTION_REQUIREDNESS.md`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_READINESS_LABEL_ACCURACY.md`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_RAW_PRIVATE_LEAK_REJECTION.md`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_SCHEMA_CONTRACT.md`
+- `docs/VCP_MEMORY_HEALTH_REPORT_M14_PREFLIGHT.md`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_HARDENING_REPORT.md`
+- `src/core/VcpMemoryFallbackLocalMemoryQueryQualityDryRunContract.js`
+- `tests/vcp-memory-fallback-local-memory-query-quality-dry-run-contract.test.js`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_QUERY_QUALITY_DRY_RUN_CONTRACT.md`
+- `src/core/VcpMemoryFallbackLocalMemoryLifecycleFilterContract.js`
+- `tests/vcp-memory-fallback-local-memory-lifecycle-filter-contract.test.js`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_LIFECYCLE_FILTER_CONTRACT.md`
+- `src/core/VcpMemoryFallbackLocalMemorySecretRejectionContract.js`
+- `tests/vcp-memory-fallback-local-memory-secret-rejection-contract.test.js`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_SECRET_REJECTION_CONTRACT.md`
+- `src/core/VcpMemoryFallbackLocalMemoryScopeIsolationContract.js`
+- `tests/vcp-memory-fallback-local-memory-scope-isolation-contract.test.js`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_SCOPE_ISOLATION_CONTRACT.md`
+- `src/core/VcpMemoryFallbackLocalMemoryMarkerReceiptContract.js`
+- `tests/vcp-memory-fallback-local-memory-marker-receipt-contract.test.js`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_MARKER_RECEIPT_CONTRACT.md`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_GAP_MATRIX.md`
+- `docs/VCP_MEMORY_FALLBACK_LOCAL_MEMORY_M13_PRECONDITION_REVIEW.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_SOURCE_REVIEW.md`
+- `src/core/VcpMemoryCodexClaudeSustainedWorkflowReceiptChainContract.js`
+- `tests/vcp-memory-codex-claude-sustained-workflow-receipt-chain-contract.test.js`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_RECEIPT_CHAIN_CONTRACT.md`
+- `src/core/VcpMemoryCodexClaudeSustainedWorkflowEnvelopeContract.js`
+- `tests/vcp-memory-codex-claude-sustained-workflow-envelope-contract.test.js`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_ENVELOPE_CONTRACT.md`
+- `docs/VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_M12_FIXTURE_BOUNDARY.md`
+- `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_M8_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX.md`
+- `src/core/VcpMemoryResponseNormalizationAuditReceiptContract.js`
+- `tests/vcp-memory-response-normalization-audit-receipt-contract.test.js`
+- `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_FIXTURE_CONTRACT.md`
+- `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_GAP_MATRIX.md`
+- `docs/VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_M11_PRECONDITION_REVIEW.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_M10_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_RUNTIME_ABORT_RECEIPT_SKELETON.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_DECISION_REVIEW.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_PACKET_PREPARATION.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_HARNESS_DRAFT_BOUNDARY.md`
+- `docs/VCP_MEMORY_BOUNDED_MUTATION_M10_BLOCKED_PRECONDITION_RECORD.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_M9_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_RUNTIME_ABORT_RECEIPT_SKELETON.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_PACKET_PREPARATION.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_HARNESS_DRAFT_BOUNDARY.md`
+- `docs/VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_M9_BLOCKED_PRECONDITION_RECORD.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_M8_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_RUNTIME_ABORT_RECEIPT_SKELETON.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_PACKET_PREPARATION.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_HARNESS_DRAFT_BOUNDARY.md`
+- `docs/VCP_MEMORY_TRUSTED_FULL_READ_M8_BLOCKED_PRECONDITION_RECORD.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_RUNTIME_ABORT_RECEIPT_SKELETON.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_PACKET_PREPARATION.md`
+- `docs/VCP_MEMORY_OBSERVE_FULL_M7_BLOCKED_PRECONDITION_RECORD.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_M6_BLOCKED_CLOSEOUT_SUMMARY.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_RUNTIME_ABORT_RECEIPT_SKELETON.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY.md`
+- `docs/VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION.md`
 
 Completed in this slice:
 
-- Added `src/core/VcpToolBoxTargetSpecificRuntimeInspectionExecutionApprovalDraft.js`.
-- Added `tests/vcp-toolbox-target-specific-runtime-inspection-execution-approval-draft.test.js`.
-- Added `docs/CM1700_VCPTOOLBOX_TARGET_SPECIFIC_RUNTIME_INSPECTION_EXECUTION_APPROVAL_DRAFT.md`.
-- Used ColaMeta prompt preview `prompt_preview_CM_1700_vcptoolbox_t_20260701T183842_a57a7a4e`; no executor run or plan apply occurred.
-- Validated future target-specific runtime inspection execution approval draft shape without issuing or consuming an approval line.
-- Confirmed referenced CM-1699 approval packet binding, execution-scope binding, allowed runtime actions limited to target presence / runtime handshake / no-memory target-specific runtime inspection, current-facts value omission, approval-line value omission, capped runtime budget, zero memory/provider/write budget, low-disclosure output policy, no raw/secret/readiness receipt fields, fail-closed stop conditions, forbidden expansion flags false, and zero counters.
-- Confirmed no approval-line issue or consumption, target-specific runtime inspection, runtime wiring, live VCPToolBox call, real path/endpoint/secret/config/env/commit/branch/expiry persistence, `config.env` read, `.env` read/edit, raw memory/runtime read, memory write, provider/API, public MCP expansion, readiness claim, or complete V8 claim occurred.
+- Added `docs/VCP_MEMORY_OBSERVE_LITE_CM1802_DAILYNOTESEARCHER_LOCKED_LOCAL_X64_BUILD_ATTEMPT.md`.
+- Attempted `cargo build --release --locked`; exit code `101`.
+- Confirmed build failed before target generation because Cargo 1.75 cannot parse `Cargo.lock` version `4`.
+- Confirmed no `target` directory was created and VCPToolBox status did not change from the build attempt.
+- Confirmed apt `rustup` simulation would remove installed `cargo`/`rustc`; next route is isolated rustup under VCPToolBox-local toolchain directories.
+- Confirmed no runtime start, binary service execution, response body read, stdout/stderr read, runtime log read, config/env content read, secret read, raw memory/raw store read by agent, provider/API by agent, MCP memory tool call, memory write, public MCP expansion, remote action, readiness claim, M6 full completion claim, M15 unlock, complete V8 claim, or full bridge completion claim occurred.
 
-Validation: `CMV-1805`; targeted CM-1700 test passed `14/14`; adjacent CM-1700/1699/1698 regression passed `43/43`; default `npm test` passed `3457/3457`; `git diff --check`, `CURRENT_FACTS.json` parse, and docs validation passed.
+Validation: `CMV-1905`; cargo build failure output, Cargo.lock header, VCPToolBox status/target-dir check, apt rustup simulation, docs validation, `git diff --check`, `CURRENT_FACTS.json` parse, current-facts drift validation, autopilot ledger consistency validation, secret/readiness/output scans, and changed-scope review passed.
 
-Next safe route: `CM-1701 VCPToolBox target-specific runtime inspection execution boundary review`, or request explicit push if remote update is intended.
+Next safe route: CM-1803 isolated rustup stable toolchain install. Use VCPToolBox-local `RUSTUP_HOME` and `CARGO_HOME`, `--profile minimal`, `--default-toolchain stable`, and `--no-modify-path`. Do not start runtime, read logs, read response bodies, read stdout/stderr from runtime, read config/env contents, read raw memory/stores, call provider APIs, or claim readiness in CM-1803. Do not open M7/M8/M15 until a later rerun proves successful memory-capability status under the same low-disclosure rules. Push remains separate explicit authorization.
 
 ## Previous Active Handoff
 

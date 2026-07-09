@@ -78,10 +78,18 @@ function createPreviousSnapshotRef(record, fromStatus) {
 }
 
 class TombstoneMemoryService {
-  constructor({ config, shadowStore, auditLogStore }) {
+  constructor({
+    config,
+    shadowStore,
+    auditLogStore,
+    projectionCleanupService = null,
+    projectionCleanupAppendAudit = false
+  }) {
     this.config = config;
     this.shadowStore = shadowStore;
     this.auditLogStore = auditLogStore;
+    this.projectionCleanupService = projectionCleanupService;
+    this.projectionCleanupAppendAudit = projectionCleanupAppendAudit === true;
   }
 
   buildRejectedResult({
@@ -188,6 +196,36 @@ class TombstoneMemoryService {
       requestSource: requestSource || this.config.defaultRequestSource,
       mutationAuditEvent: auditEvent
     });
+  }
+
+  async applyProjectionCleanup({ record, lifecycleFamily, targetStatus, requestSource, timestamp }) {
+    if (!this.projectionCleanupService?.applySuppression) {
+      return {
+        status: 'not_configured',
+        report: null
+      };
+    }
+
+    try {
+      const report = await this.projectionCleanupService.applySuppression({
+        memoryId: record.memoryId,
+        target: record.target || 'process',
+        lifecycleFamily,
+        targetStatus,
+        requestSource,
+        timestamp,
+        appendProjectionAudit: this.projectionCleanupAppendAudit
+      });
+      return {
+        status: report.accepted ? 'accepted' : 'blocked',
+        report
+      };
+    } catch {
+      return {
+        status: 'failed_after_mutation',
+        report: null
+      };
+    }
   }
 
   async tombstone(payload = {}) {
@@ -438,6 +476,38 @@ class TombstoneMemoryService {
       };
     }
 
+    const projectionCleanup = await this.applyProjectionCleanup({
+      record,
+      lifecycleFamily: 'tombstone_memory',
+      targetStatus: 'tombstoned',
+      requestSource: normalizedPayload.request_source,
+      timestamp: committedAt
+    });
+    if (projectionCleanup.status === 'blocked' || projectionCleanup.status === 'failed_after_mutation') {
+      return {
+        success: true,
+        decision: 'tombstoned-with-warning',
+        toolCandidate: 'memory_tombstone',
+        dryRun: false,
+        mutated: true,
+        memoryId: record.memoryId,
+        fromStatus,
+        toStatus: 'tombstoned',
+        reason: 'projection cleanup did not fully complete after lifecycle mutation.',
+        tombstoneReason: normalizedPayload.tombstone_reason,
+        auditEvent: committedAuditEvent,
+        auditIntentStatus: 'appended',
+        auditCommitStatus: 'appended',
+        projectionCleanupStatus: projectionCleanup.status,
+        projectionCleanupReport: projectionCleanup.report,
+        policy: {
+          lifecycle_policy_applied: true,
+          scope_policy_applied: true,
+          redaction_applied: true
+        }
+      };
+    }
+
     return {
       success: true,
       decision: 'tombstoned',
@@ -451,6 +521,8 @@ class TombstoneMemoryService {
       auditEvent: committedAuditEvent,
       auditIntentStatus: 'appended',
       auditCommitStatus: 'appended',
+      projectionCleanupStatus: projectionCleanup.status,
+      projectionCleanupReport: projectionCleanup.report,
       policy: {
         lifecycle_policy_applied: true,
         scope_policy_applied: true,

@@ -4,6 +4,9 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
 const { createConfig } = require('../src/config/createConfig');
+const {
+  getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig
+} = require('../src/core/GovernedMcpVcpNativeHttpMcpTargetConfig');
 
 const PROVIDER_ENV_KEYS = [
   'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
@@ -31,6 +34,18 @@ const PROVIDER_ENV_KEYS = [
   'CODEX_MEMORY_FALLBACK_EMBEDDING_HEADERS_JSON',
   'CODEX_MEMORY_FALLBACK_EMBEDDING_TIMEOUT_MS',
   'CODEX_MEMORY_FALLBACK_EMBED_DIMS',
+  'CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE',
+  'CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE',
+  'CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE',
+  'CODEX_MEMORY_VCP_NATIVE_RUNTIME_PROFILE',
+  'CODEX_MEMORY_VCP_NATIVE_TARGET_REFERENCE_NAME',
+  'CODEX_MEMORY_VCP_NATIVE_TARGET_KIND',
+  'CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TARGET_REFERENCE_NAME',
+  'CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT',
+  'CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN',
+  'CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOOL_NAME',
+  'CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOOL_NAME_BY_ACTION',
+  'CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TIMEOUT_MS',
   'CODEX_MEMORY_RERANK_URL',
   'CODEX_MEMORY_RERANK_API_KEY',
   'CODEX_MEMORY_RERANK_MODEL',
@@ -95,6 +110,300 @@ test('local profile does not enable security policies by default', () => {
 test('local profile allows external provider is false by default', () => {
   const config = createIsolatedConfig();
   assert.equal(config.allowExternalProvider, false);
+});
+
+test('governed MCP VCP native bridge gate defaults off and normalizes modes', () => {
+  const defaultConfig = createIsolatedConfig();
+  const observeConfig = createIsolatedConfig({
+    governedMcpVcpNativeBridgeGateMode: 'observe'
+  });
+  const strictConfig = createIsolatedConfig({
+    governedMcpVcpNativeBridgeGateMode: 'STRICT'
+  });
+  const invalidConfig = createIsolatedConfig({
+    governedMcpVcpNativeBridgeGateMode: 'enabled'
+  });
+
+  assert.equal(defaultConfig.governedMcpVcpNativeBridgeGateMode, 'off');
+  assert.deepEqual(defaultConfig.governedMcpVcpNativeBridgeConfigWarnings, []);
+  assert.equal(observeConfig.governedMcpVcpNativeBridgeGateMode, 'observe');
+  assert.equal(strictConfig.governedMcpVcpNativeBridgeGateMode, 'strict');
+  assert.equal(invalidConfig.governedMcpVcpNativeBridgeGateMode, 'off');
+});
+
+test('governed MCP VCP native read delegation defaults off and normalizes modes', () => {
+  const defaultConfig = createIsolatedConfig();
+  const primaryConfig = createIsolatedConfig({
+    governedMcpVcpNativeReadDelegationMode: 'primary'
+  });
+  const fallbackConfig = createIsolatedConfig({
+    governedMcpVcpNativeReadDelegationMode: 'PRIMARY_WITH_LOCAL_FALLBACK'
+  });
+  const invalidConfig = createIsolatedConfig({
+    governedMcpVcpNativeReadDelegationMode: 'enabled'
+  });
+
+  assert.equal(defaultConfig.governedMcpVcpNativeReadDelegationMode, 'off');
+  assert.equal(primaryConfig.governedMcpVcpNativeReadDelegationMode, 'primary');
+  assert.equal(fallbackConfig.governedMcpVcpNativeReadDelegationMode, 'primary_with_local_fallback');
+  assert.equal(invalidConfig.governedMcpVcpNativeReadDelegationMode, 'off');
+});
+
+test('governed MCP VCP native write delegation defaults off and normalizes modes', () => {
+  const defaultConfig = createIsolatedConfig();
+  const primaryConfig = createIsolatedConfig({
+    governedMcpVcpNativeWriteDelegationMode: 'primary'
+  });
+  const upperConfig = createIsolatedConfig({
+    governedMcpVcpNativeWriteDelegationMode: 'PRIMARY'
+  });
+  const invalidConfig = createIsolatedConfig({
+    governedMcpVcpNativeWriteDelegationMode: 'primary_with_local_fallback'
+  });
+
+  assert.equal(defaultConfig.governedMcpVcpNativeWriteDelegationMode, 'off');
+  assert.equal(primaryConfig.governedMcpVcpNativeWriteDelegationMode, 'primary');
+  assert.equal(upperConfig.governedMcpVcpNativeWriteDelegationMode, 'primary');
+  assert.equal(invalidConfig.governedMcpVcpNativeWriteDelegationMode, 'off');
+});
+
+test('governed MCP VCP native delegation modes warn when bridge gate is off', () => {
+  const config = createIsolatedConfig({
+    governedMcpVcpNativeBridgeGateMode: 'off',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeWriteDelegationMode: 'primary'
+  });
+  const serialized = JSON.stringify(config.governedMcpVcpNativeBridgeConfigWarnings);
+
+  assert.equal(config.governedMcpVcpNativeReadDelegationMode, 'primary_with_local_fallback');
+  assert.equal(config.governedMcpVcpNativeWriteDelegationMode, 'primary');
+  assert.deepEqual(config.governedMcpVcpNativeBridgeConfigWarnings, [
+    {
+      code: 'native_read_delegation_requires_bridge_gate',
+      lowDisclosure: true,
+      effect: 'read_delegation_fail_closed'
+    },
+    {
+      code: 'native_write_delegation_requires_bridge_gate',
+      lowDisclosure: true,
+      effect: 'write_delegation_fail_closed'
+    },
+    {
+      code: 'native_read_delegation_requires_accepted_native_target',
+      lowDisclosure: true,
+      effect: 'read_delegation_fail_closed'
+    },
+    {
+      code: 'native_write_delegation_requires_accepted_native_target',
+      lowDisclosure: true,
+      effect: 'write_delegation_fail_closed'
+    }
+  ]);
+  assert.equal(serialized.includes('http://'), false);
+  assert.equal(serialized.includes('SECRET'), false);
+});
+
+test('governed MCP VCP native delegation modes warn when accepted native target is missing', () => {
+  const config = createIsolatedConfig({
+    governedMcpVcpNativeBridgeGateMode: 'strict',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeWriteDelegationMode: 'primary'
+  });
+  const serialized = JSON.stringify(config.governedMcpVcpNativeBridgeConfigWarnings);
+
+  assert.deepEqual(config.governedMcpVcpNativeBridgeConfigWarnings, [
+    {
+      code: 'native_read_delegation_requires_accepted_native_target',
+      lowDisclosure: true,
+      effect: 'read_delegation_fail_closed'
+    },
+    {
+      code: 'native_write_delegation_requires_accepted_native_target',
+      lowDisclosure: true,
+      effect: 'write_delegation_fail_closed'
+    }
+  ]);
+  assert.equal(serialized.includes('http://'), false);
+  assert.equal(serialized.includes('SECRET'), false);
+});
+
+test('governed MCP VCP native delegation modes do not warn when bridge gate and native target are accepted', () => {
+  const config = createIsolatedConfig({
+    governedMcpVcpNativeBridgeGateMode: 'strict',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeWriteDelegationMode: 'primary',
+    governedMcpVcpNativeRuntimeTarget: {
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      targetKind: 'mcp_server'
+    },
+    governedMcpVcpNativeHttpMcpTarget: {
+      endpoint: 'http://127.0.0.1:7654/mcp/vcp-native',
+      bearerToken: 'SECRET_TOKEN_SHOULD_NOT_ECHO'
+    }
+  });
+
+  assert.deepEqual(config.governedMcpVcpNativeBridgeConfigWarnings, []);
+});
+
+test('governed MCP VCP native runtime target requires a safe bridge-owned reference', () => {
+  const defaultConfig = createIsolatedConfig();
+  const configured = createIsolatedConfig({
+    governedMcpVcpNativeRuntimeTarget: {
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      targetKind: 'mcp_server'
+    }
+  });
+  const unsafe = createIsolatedConfig({
+    governedMcpVcpNativeRuntimeTarget: {
+      targetReferenceName: 'http://PRIVATE_ENDPOINT_SHOULD_NOT_ECHO',
+      targetKind: 'service_url',
+      token: 'SHOULD_NOT_ECHO'
+    }
+  });
+
+  assert.equal(defaultConfig.governedMcpVcpNativeRuntimeTarget.accepted, false);
+  assert.equal(defaultConfig.governedMcpVcpNativeRuntimeTarget.configured, false);
+  assert.equal(configured.governedMcpVcpNativeRuntimeTarget.accepted, true);
+  assert.equal(configured.governedMcpVcpNativeRuntimeTarget.targetReferenceName, 'operator-vcp-toolbox-service-ref');
+  assert.equal(configured.governedMcpVcpNativeRuntimeTarget.targetKind, 'mcp_server');
+  assert.equal(unsafe.governedMcpVcpNativeRuntimeTarget.accepted, false);
+  assert.ok(unsafe.governedMcpVcpNativeRuntimeTarget.invalidFields.includes('targetReferenceName'));
+  assert.ok(unsafe.governedMcpVcpNativeRuntimeTarget.invalidFields.includes('token'));
+  assert.equal(unsafe.governedMcpVcpNativeRuntimeTarget.targetReferenceName, null);
+  assert.equal(configured.governedMcpVcpNativeRuntimeTarget.locatorDisclosed, false);
+  assert.equal(configured.governedMcpVcpNativeRuntimeTarget.endpointDisclosed, false);
+  assert.equal(configured.governedMcpVcpNativeRuntimeTarget.tokenMaterialDisclosed, false);
+  assert.equal(JSON.stringify(unsafe.governedMcpVcpNativeRuntimeTarget).includes('PRIVATE_ENDPOINT_SHOULD_NOT_ECHO'), false);
+  assert.equal(JSON.stringify(unsafe.governedMcpVcpNativeRuntimeTarget).includes('SHOULD_NOT_ECHO'), false);
+});
+
+test('governed HTTP MCP VCP native target keeps endpoint and token out of enumerable config', () => {
+  const privateEndpoint = 'http://127.0.0.1:7654/mcp/vcp-native';
+  const privateToken = 'SECRET_TOKEN_SHOULD_NOT_ECHO';
+  const config = createIsolatedConfig({
+    governedMcpVcpNativeRuntimeTarget: {
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      targetKind: 'mcp_server'
+    },
+    governedMcpVcpNativeHttpMcpTarget: {
+      endpoint: privateEndpoint,
+      bearerToken: privateToken,
+      mcpToolName: 'knowledge_base.search',
+      mcpToolNameByAction: {
+        search_memory: 'knowledge_base.search',
+        record_memory: 'knowledge_base.record'
+      },
+      requestTimeoutMs: 1200
+    }
+  });
+  const serialized = JSON.stringify(config);
+  const privateConfig = getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(config);
+
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.accepted, true);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.targetReferenceName, 'operator-vcp-toolbox-service-ref');
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.endpointConfigured, true);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.bearerTokenConfigured, true);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.endpointIncluded, false);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.tokenMaterialIncluded, false);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.endpointDisclosed, false);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.tokenMaterialDisclosed, false);
+  assert.deepEqual(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameByAction, {
+    record_memory: 'knowledge_base.record',
+    search_memory: 'knowledge_base.search'
+  });
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameConfigured, true);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameByActionConfigured, true);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.requestTimeoutMs, 1200);
+  assert.equal(serialized.includes(privateEndpoint), false);
+  assert.equal(serialized.includes(privateToken), false);
+  assert.equal(Object.keys(config).includes('__governedMcpVcpNativeHttpMcpTargetPrivateConfig'), false);
+  assert.equal(privateConfig.endpoint, privateEndpoint);
+  assert.equal(privateConfig.bearerToken, privateToken);
+  assert.equal(privateConfig.mcpToolNameConfigured, true);
+  assert.deepEqual(privateConfig.mcpToolNameByAction, {
+    search_memory: 'knowledge_base.search',
+    record_memory: 'knowledge_base.record'
+  });
+});
+
+test('governed HTTP MCP VCP native target can be sourced from env without raw disclosure', () => {
+  const privateEndpoint = 'http://127.0.0.1:8765/mcp/vcp-native';
+  const privateToken = 'SECRET_TOKEN_SHOULD_NOT_ECHO';
+
+  withEnv({
+    CODEX_MEMORY_VCP_NATIVE_TARGET_REFERENCE_NAME: 'operator-vcp-toolbox-service-ref',
+    CODEX_MEMORY_VCP_NATIVE_TARGET_KIND: 'mcp_server',
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT: privateEndpoint,
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN: privateToken,
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOOL_NAME: 'knowledge_base.search',
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOOL_NAME_BY_ACTION: JSON.stringify({
+      search_memory: 'knowledge_base.search',
+      record_memory: 'knowledge_base.record'
+    }),
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TIMEOUT_MS: '1500'
+  }, () => {
+    const config = createConfig();
+    const serialized = JSON.stringify(config);
+    const privateConfig = getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(config);
+
+    assert.equal(config.governedMcpVcpNativeRuntimeTarget.accepted, true);
+    assert.equal(config.governedMcpVcpNativeHttpMcpTarget.accepted, true);
+    assert.equal(config.governedMcpVcpNativeHttpMcpTarget.requestTimeoutMs, 1500);
+    assert.deepEqual(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameByAction, {
+      record_memory: 'knowledge_base.record',
+      search_memory: 'knowledge_base.search'
+    });
+    assert.equal(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameConfigured, true);
+    assert.equal(serialized.includes(privateEndpoint), false);
+    assert.equal(serialized.includes(privateToken), false);
+    assert.equal(privateConfig.endpoint, privateEndpoint);
+    assert.equal(privateConfig.bearerToken, privateToken);
+    assert.equal(privateConfig.mcpToolNameConfigured, true);
+  });
+});
+
+test('governed MCP VCP native WSL NewAPI profile installs default read target without enabling writes', () => {
+  const config = createIsolatedConfig({
+    governedMcpVcpNativeRuntimeProfile: 'wsl-newapi-prod'
+  });
+  const serialized = JSON.stringify(config);
+  const privateConfig = getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(config);
+
+  assert.equal(config.governedMcpVcpNativeRuntimeProfile.profileName, 'wsl-newapi-prod');
+  assert.equal(config.governedMcpVcpNativeRuntimeProfile.enabled, true);
+  assert.equal(config.governedMcpVcpNativeBridgeGateMode, 'observe');
+  assert.equal(config.governedMcpVcpNativeReadDelegationMode, 'primary_with_local_fallback');
+  assert.equal(config.governedMcpVcpNativeWriteDelegationMode, 'off');
+  assert.equal(config.governedMcpVcpNativeRuntimeTarget.accepted, true);
+  assert.equal(
+    config.governedMcpVcpNativeRuntimeTarget.targetReferenceName,
+    'operator-vcp-toolbox-service-ref'
+  );
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.accepted, true);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.endpointConfigured, true);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.endpointDisclosed, false);
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.tokenMaterialDisclosed, false);
+  assert.deepEqual(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameByAction, {
+    record_memory: 'knowledge_base.record',
+    search_memory: 'knowledge_base.search',
+    supersede_memory: 'knowledge_base.supersede',
+    tombstone_memory: 'knowledge_base.tombstone'
+  });
+  assert.equal(config.governedMcpVcpNativeHttpMcpTarget.mcpToolNameConfigured, false);
+  assert.equal(privateConfig.endpoint, 'http://127.0.0.1:7615/mcp/vcp-native');
+  assert.equal(privateConfig.mcpToolNameConfigured, false);
+  assert.equal(serialized.includes('http://127.0.0.1:7615'), false);
+});
+
+test('governed MCP VCP native WSL NewAPI profile allows explicit write delegation override', () => {
+  const config = createIsolatedConfig({
+    governedMcpVcpNativeRuntimeProfile: 'wsl-newapi-prod',
+    governedMcpVcpNativeWriteDelegationMode: 'primary'
+  });
+
+  assert.equal(config.governedMcpVcpNativeReadDelegationMode, 'primary_with_local_fallback');
+  assert.equal(config.governedMcpVcpNativeWriteDelegationMode, 'primary');
+  assert.deepEqual(config.governedMcpVcpNativeBridgeConfigWarnings, []);
 });
 
 test('hardened profile enables soft read policy', () => {

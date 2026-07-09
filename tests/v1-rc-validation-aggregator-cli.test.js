@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
+const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 const {
@@ -20,6 +21,16 @@ function runCli(args = []) {
 
 function parseJsonResult(result) {
   return JSON.parse(result.stdout);
+}
+
+function readPackageManifestSnapshot() {
+  const packageLockPath = path.join(workspaceRoot, 'package-lock.json');
+  return {
+    packageJson: fs.readFileSync(path.join(workspaceRoot, 'package.json'), 'utf8'),
+    packageLock: fs.existsSync(packageLockPath)
+      ? fs.readFileSync(packageLockPath, 'utf8')
+      : null
+  };
 }
 
 test('minimal validation aggregator CLI emits valid JSON and exits successfully', () => {
@@ -304,7 +315,7 @@ test('minimal validation aggregator CLI preserves honest blocked decision', () =
   assert.equal(report.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
 });
 
-test('minimal validation aggregator CLI preserves public MCP three-tool freeze', () => {
+test('minimal validation aggregator CLI preserves current bounded public MCP surface', () => {
   const report = parseJsonResult(runCli());
 
   assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
@@ -453,21 +464,140 @@ test('minimal validation aggregator CLI parses strict and help flags without imp
     pretty: true,
     strict: true,
     help: false,
+    rcCutoverCandidateArtifact: false,
+    rcCutoverOwnerApprovalBoundary: false,
+    rcCutoverFinalOwnerReviewPackage: false,
+    rcCutoverExecutionBoundaryPrecheck: false,
     generatedAt: null,
     rejectedFlag: null
   });
   assert.equal(parseArgs(['--help']).help, true);
+  assert.equal(parseArgs(['--rc-cutover-candidate-artifact']).rcCutoverCandidateArtifact, true);
+  assert.equal(
+    parseArgs(['--rc-cutover-owner-approval-boundary'])
+      .rcCutoverOwnerApprovalBoundary,
+    true
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-owner-approval-boundary-report', '-'])
+      .rcCutoverOwnerApprovalBoundaryReportPath,
+    '-'
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-final-owner-review-package'])
+      .rcCutoverFinalOwnerReviewPackage,
+    true
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-final-owner-review-package-report', '-'])
+      .rcCutoverFinalOwnerReviewPackageReportPath,
+    '-'
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-execution-boundary-precheck'])
+      .rcCutoverExecutionBoundaryPrecheck,
+    true
+  );
+  assert.equal(
+    parseArgs(['--rc-cutover-candidate-artifact-report', '-'])
+      .rcCutoverCandidateArtifactReportPath,
+    '-'
+  );
+  assert.deepEqual(
+    parseArgs([
+      '--rc-cutover-final-owner-review-package',
+      '--rc-cutover-execution-boundary-precheck'
+    ]).outputModeConflict,
+    {
+      selectedModeCount: 2,
+      selectedFlags: [
+        '--rc-cutover-final-owner-review-package',
+        '--rc-cutover-execution-boundary-precheck'
+      ],
+      selectedKeys: [
+        'rcCutoverFinalOwnerReviewPackage',
+        'rcCutoverExecutionBoundaryPrecheck'
+      ]
+    }
+  );
+});
+
+test('minimal validation aggregator CLI rejects conflicting artifact-only output modes', () => {
+  const result = runCli([
+    '--rc-cutover-final-owner-review-package',
+    '--rc-cutover-execution-boundary-precheck',
+    '--pretty',
+    '--generated-at',
+    '2026-05-16T00:00:00.000Z'
+  ]);
+
+  assert.equal(result.status, 1, result.stderr);
+  const report = parseJsonResult(result);
+  assert.equal(report.schemaVersion, 'v1-rc-validation-aggregator-v1');
+  assert.equal(report.phase, 'artifact-output-mode-conflict-rejected');
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.artifactOutputModeConflict.rejected, true);
+  assert.equal(report.artifactOutputModeConflict.selectedModeCount, 2);
+  assert.deepEqual(report.artifactOutputModeConflict.selectedFlags, [
+    '--rc-cutover-final-owner-review-package',
+    '--rc-cutover-execution-boundary-precheck'
+  ]);
+  assert.equal(report.artifactOutputModeConflict.pathDisclosed, false);
+  assert.equal(report.artifactOutputModeConflict.rawInputPrinted, false);
+  assert.equal(
+    report.evidence.artifactOutputModeConflictRejection.artifactOnlyOutputEmitted,
+    false
+  );
+  assert.equal(report.summary.artifactOutputModeConflictRejected, true);
+  assert.equal(report.summary.artifactOutputModeConflictArtifactOnlyOutputEmitted, false);
+  assert.equal(report.summary.artifactOutputModeConflictCanClaimRcReady, false);
+  assert.equal(Object.hasOwn(report, 'packageType'), false);
+  assert.equal(Object.hasOwn(report, 'precheckType'), false);
+});
+
+test('minimal validation aggregator CLI rejects conflicting artifact-only output modes before reading report inputs', (t) => {
+  const tempDir = fs.mkdtempSync(
+    path.join(workspaceRoot, '.tmp-artifact-output-conflict-')
+  );
+  const fifoPath = path.join(tempDir, 'blocked.json');
+
+  try {
+    const mkfifo = spawnSync('mkfifo', [fifoPath], {
+      cwd: workspaceRoot,
+      encoding: 'utf8',
+      timeout: 30000
+    });
+    if (mkfifo.status !== 0) {
+      t.skip('mkfifo is unavailable on this platform');
+      return;
+    }
+
+    const result = runCli([
+      '--rc-cutover-final-owner-review-package',
+      '--rc-cutover-execution-boundary-precheck',
+      '--runtime-evidence-report',
+      path.relative(workspaceRoot, fifoPath)
+    ]);
+
+    assert.equal(result.error, undefined, result.error?.message);
+    assert.equal(result.status, 1, result.stderr);
+    const report = parseJsonResult(result);
+    assert.equal(report.phase, 'artifact-output-mode-conflict-rejected');
+    assert.equal(report.artifactOutputModeConflict.rejected, true);
+    assert.equal(report.summary.artifactOutputModeConflictArtifactOnlyOutputEmitted, false);
+    assert.equal(Object.hasOwn(report, 'runtimeEvidenceReportInput'), false);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 test('minimal validation aggregator CLI package manifests remain untouched', () => {
-  const result = spawnSync('git', ['diff', '--name-only', '--', 'package.json', 'package-lock.json'], {
-    cwd: workspaceRoot,
-    encoding: 'utf8',
-    timeout: 30000
-  });
+  const before = readPackageManifestSnapshot();
+  const result = runCli(['--json']);
+  const after = readPackageManifestSnapshot();
 
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout.trim(), '');
+  assert.equal(result.status, 0, result.stderr || 'non-zero exit');
+  assert.deepEqual(after, before);
 });
 
 test('minimal validation aggregator CLI rejects live or side-effect flags', () => {

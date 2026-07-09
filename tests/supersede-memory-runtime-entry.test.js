@@ -233,9 +233,12 @@ test('internal supersede runtime entry applies pair mutation when enabled and ap
     assert.equal(newRow.status, 'active');
     assert.equal(newRow.supersedes_memory_id, 'mem-old');
     assert.equal(newRow.lifecycle_actor_client_id, 'codex');
-    assert.equal(auditEntries.length, 2);
+    assert.equal(auditEntries.length, 3);
     assert.equal(auditEntries[0].mutationAuditEvent.audit_phase, 'pending');
     assert.equal(auditEntries[1].mutationAuditEvent.audit_phase, 'committed');
+    assert.equal(auditEntries[2].eventType, 'lifecycle_projection_cleanup');
+    assert.equal(auditEntries[2].lowDisclosure, true);
+    assert.equal(auditEntries[2].rawContentIncluded, false);
   });
 });
 

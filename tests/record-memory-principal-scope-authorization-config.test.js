@@ -218,7 +218,8 @@ test('CM1642 trusted execution context uses env/base/config sources only', async
   await withEnv({
     CODEX_MEMORY_PROJECT_ID: 'codex-memory-env',
     CODEX_MEMORY_WORKSPACE_ID: 'workspace-env',
-    CODEX_MEMORY_CLIENT_ID: 'codex-env'
+    CODEX_MEMORY_CLIENT_ID: 'codex-env',
+    CODEX_MEMORY_VISIBILITY: 'workspace'
   }, async () => {
     const context = buildRecordMemoryTrustedExecutionContext({
       config: {
@@ -227,13 +228,15 @@ test('CM1642 trusted execution context uses env/base/config sources only', async
         defaultRequestSource: 'codex-memory-mcp',
         defaultProjectId: 'codex-memory-config',
         defaultWorkspaceId: 'workspace-config',
-        defaultClientId: 'codex-config'
+        defaultClientId: 'codex-config',
+        defaultVisibility: 'project'
       },
       baseRequestContext: {
         executionContext: {
           projectId: 'codex-memory-base',
           workspaceId: 'workspace-base',
-          clientId: 'codex-base'
+          clientId: 'codex-base',
+          visibility: 'private'
         }
       }
     });
@@ -244,7 +247,8 @@ test('CM1642 trusted execution context uses env/base/config sources only', async
       requestSource: 'codex-memory-mcp',
       projectId: 'codex-memory-env',
       workspaceId: 'workspace-env',
-      clientId: 'codex-env'
+      clientId: 'codex-env',
+      visibility: 'workspace'
     });
   });
 });

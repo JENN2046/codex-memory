@@ -21,7 +21,10 @@
     "codex-memory-v8-diagnose": "./src/cli/v8-diagnose.js",
     "codex-memory-a5-approval-check": "./src/cli/a5-approval-check.js",
     "codex-memory-provider-smoke": "./src/cli/provider-smoke.js",
-    "codex-memory-provider-benchmark": "./src/cli/provider-benchmark.js"
+    "codex-memory-provider-benchmark": "./src/cli/provider-benchmark.js",
+    "codex-memory-vcp-toolbox-native-mcp-shim": "./src/cli/vcp-toolbox-native-mcp-shim.js",
+    "codex-memory-governed-vcp-native-acceptance": "./src/cli/governed-vcp-native-acceptance.js",
+    "codex-memory-governed-vcp-native-live-read-proof": "./src/cli/governed-vcp-native-live-read-proof.js"
   },
   "scripts": {
     "start": "node ./src/index.js",
@@ -65,6 +68,15 @@
     "query:quality:temp-db": "node ./src/cli/query-quality-temp-db-gate.js",
     "provider-smoke": "node ./src/cli/provider-smoke.js",
     "provider-benchmark": "node ./src/cli/provider-benchmark.js",
+    "vcp-native:shim": "node ./src/cli/vcp-toolbox-native-mcp-shim.js",
+    "vcp-native:shim:wsl-newapi": "bash ./scripts/start-vcp-native-shim-wsl-newapi.sh",
+    "vcp-native:codex-mcp:wsl-newapi": "bash ./scripts/codex-mcp-vcp-native-wsl-newapi-service.sh",
+    "vcp-native:codex-mcp:wsl-newapi:start": "bash ./scripts/codex-mcp-vcp-native-wsl-newapi-service.sh start",
+    "vcp-native:codex-mcp:wsl-newapi:stop": "bash ./scripts/codex-mcp-vcp-native-wsl-newapi-service.sh stop",
+    "vcp-native:codex-mcp:wsl-newapi:status": "bash ./scripts/codex-mcp-vcp-native-wsl-newapi-service.sh status",
+    "vcp-native:acceptance": "node ./src/cli/governed-vcp-native-acceptance.js",
+    "vcp-native:live-read-proof": "node ./src/cli/governed-vcp-native-live-read-proof.js",
+    "vcp-native:prod-proof:wsl-newapi": "bash ./scripts/run-vcp-native-prod-proof-wsl-newapi.sh",
     "test": "node ./src/cli/run-default-tests.js",
     "test:migration": "node ./src/cli/run-release-gate-tests.js migration",
     "test:parity": "node ./src/cli/run-release-gate-tests.js parity",

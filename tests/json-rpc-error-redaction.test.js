@@ -44,6 +44,26 @@ function createMockApp(configOverrides = {}) {
           err.jsonRpcData = { code: 'RATE_LIMITED', retryAfterMs: 5000 };
           throw err;
         }
+        if (q.includes('nested_sensitive_data')) {
+          const err = new Error('safe nested msg');
+          err.jsonRpcCode = -32005;
+          err.jsonRpcMessage = 'Nested provider error';
+          err.jsonRpcData = {
+            code: 'NESTED_PROVIDER_ERROR',
+            retryAfterMs: 1000,
+            provider: {
+              endpoint: 'https://nested.internal.provider.test/v1/memory',
+              token: 'sk-nested-secret-1234567890',
+              diagnostics: [
+                {
+                  path: '/home/jenn/.env',
+                  reason: 'Authorization: bearer sk-nested-reason-1234567890'
+                }
+              ]
+            }
+          };
+          throw err;
+        }
         if (q.includes('sensitive_data')) {
           const err = new Error('safe msg');
           err.jsonRpcCode = -32004;
@@ -212,6 +232,31 @@ test('jsonRpcCode errors with sensitive data get redacted', async () => {
 
   // Structured code preserved, requestId present
   assert.ok(result.response.error.data.requestId.startsWith('cm-'));
+});
+
+test('jsonRpcCode errors recursively redact nested structured data', async () => {
+  const server = new CodexMemoryMcpServer({ app: createMockApp() });
+  const result = await server.handleJsonRpc({
+    jsonrpc: '2.0',
+    id: 9,
+    method: 'tools/call',
+    params: {
+      name: 'search_memory',
+      arguments: { query: 'nested_sensitive_data_test', target: 'process', limit: 3 }
+    }
+  });
+  const serialized = JSON.stringify(result.response);
+
+  assert.equal(result.response.error.code, -32005);
+  assert.equal(result.response.error.message, 'Nested provider error');
+  assert.equal(result.response.error.data.code, 'NESTED_PROVIDER_ERROR');
+  assert.equal(result.response.error.data.retryAfterMs, 1000);
+  assert.ok(result.response.error.data.requestId.startsWith('cm-'));
+  assert.doesNotMatch(serialized, /nested\.internal\.provider/i);
+  assert.doesNotMatch(serialized, /sk-nested/i);
+  assert.doesNotMatch(serialized, /bearer/i);
+  assert.doesNotMatch(serialized, /\/home\/jenn/);
+  assert.doesNotMatch(serialized, /\.env/);
 });
 
 test('http.js catch block produces redacted error', async () => {

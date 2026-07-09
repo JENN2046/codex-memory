@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
 const path = require('node:path');
+const { TOOL_DEFINITIONS } = require('../core/constants');
 
 const WORKSPACE_ROOT = path.resolve(__dirname, '..', '..');
 const DEFAULT_FIXTURE_PATH = path.join(
@@ -10,12 +11,7 @@ const DEFAULT_FIXTURE_PATH = path.join(
   'migration-import-export-dry-run-gate-v1.json'
 );
 
-const PUBLIC_MCP_TOOLS = [
-  'record_memory',
-  'search_memory',
-  'memory_overview',
-  'audit_memory'
-];
+const PUBLIC_MCP_TOOLS = TOOL_DEFINITIONS.map(tool => tool.name);
 
 const REJECTED_FLAGS = new Set([
   '--apply',

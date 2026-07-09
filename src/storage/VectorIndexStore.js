@@ -135,6 +135,51 @@ class VectorIndexStore {
     })).digest('hex');
   }
 
+  createDocumentEmbeddingCacheKey(text) {
+    return this.createEmbeddingCacheKey(text, { inputKind: 'document' });
+  }
+
+  normalizeEmbeddingTextSet(texts = []) {
+    return [...new Set((Array.isArray(texts) ? texts : [texts])
+      .map(text => this.normalizeEmbeddingText(text))
+      .filter(Boolean))];
+  }
+
+  async countDocumentEmbeddingCacheByTexts(texts = []) {
+    if (!this.config.enableEmbeddingCache) return 0;
+    await this.ensureReady();
+    return this.normalizeEmbeddingTextSet(texts)
+      .map(text => this.createDocumentEmbeddingCacheKey(text))
+      .filter(cacheKey => {
+        const entry = this.index.embeddingCache?.[cacheKey];
+        return entry?.embeddingFingerprint === this.config.embeddingFingerprint &&
+          (entry.inputKind || 'document') === 'document' &&
+          Array.isArray(entry.vector);
+      }).length;
+  }
+
+  async deleteDocumentEmbeddingCacheByTexts(texts = []) {
+    if (!this.config.enableEmbeddingCache) return 0;
+    await this.ensureReady();
+    let removed = 0;
+    for (const text of this.normalizeEmbeddingTextSet(texts)) {
+      const cacheKey = this.createDocumentEmbeddingCacheKey(text);
+      const entry = this.index.embeddingCache?.[cacheKey];
+      if (
+        entry?.embeddingFingerprint !== this.config.embeddingFingerprint ||
+        (entry.inputKind || 'document') !== 'document'
+      ) {
+        continue;
+      }
+      delete this.index.embeddingCache[cacheKey];
+      removed += 1;
+    }
+    if (removed > 0) {
+      await this.flush();
+    }
+    return removed;
+  }
+
   embedText(text) {
     const dimensions = this.config.embedDimensions;
     const vector = new Array(dimensions).fill(0);

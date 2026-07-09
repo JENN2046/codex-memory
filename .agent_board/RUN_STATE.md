@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-1700 VCPToolBox target-specific runtime inspection execution approval draft`.
-Current validation: `CMV-1805`.
-Current status: CM-1700 fixture-only target-specific runtime inspection execution approval draft added; no approval-line issue or consumption, no target-specific runtime inspection, no live VCPToolBox call, no runtime call.
+Current task: `CM-2006 trusted-full-read receipt closeout / route decision`.
+Current validation: `CMV-2107`.
+Current status: CM-2006 closes out the CM-2005 low-disclosure trusted-full-read receipt. The CM-2005 bounded attempt completed with array/zero-item shape projection and read-shape unlocked true, while raw output persisted false, write counters zero, and readiness false. CM-2005 single-use authority is consumed and cannot be reused.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-`CM-1700` records fixture-only target-specific runtime inspection execution approval draft coverage for future VCPToolBox target inspection. Next safe local action is `CM-1701 VCPToolBox target-specific runtime inspection execution boundary review`, or requesting explicit push if remote update is intended.
+Next safe action is local planning or a new exact boundary display if Jenn wants another bounded attempt or any broader inference from CM-2005. Do not reuse CM-2005 authority, retry trusted-full-read, generate request bodies or approval lines, call runtime/VCPToolBox, bind target material, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness without fresh exact authority.
 
 ## Historical Run Notes
 

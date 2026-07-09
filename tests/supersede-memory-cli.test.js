@@ -245,9 +245,10 @@ test('supersede-memory CLI applies pair mutation in temp fixture DB', () => {
     assert.equal(newRow.status, 'active');
     assert.equal(newRow.status_reason, 'replacement memory approved after governance review');
     assert.equal(newRow.supersedes_memory_id, 'mem-old');
-    assert.equal(auditEntries.length, 2);
+    assert.equal(auditEntries.length, 3);
     assert.equal(auditEntries[0].mutationAuditEvent.audit_phase, 'pending');
     assert.equal(auditEntries[1].mutationAuditEvent.audit_phase, 'committed');
+    assert.equal(auditEntries[2].eventType, 'lifecycle_projection_cleanup');
     assert.equal(report.auditEvent.event_type, 'memory_supersede');
     assert.equal(report.rawWorkspaceIdExposed, false);
   } finally {

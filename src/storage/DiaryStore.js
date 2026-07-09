@@ -48,6 +48,7 @@ function buildDiaryText(record, datePart) {
   ];
 
   const scopeLines = [
+    ['Scope-ID', record.scopeId],
     ['Project-ID', record.projectId],
     ['Workspace-ID', record.workspaceId],
     ['Client-ID', record.clientId],
@@ -83,7 +84,7 @@ function stripMemoryMarkers(text) {
     return '';
   }
 
-  const markerPattern = /^(?:Memory-ID|Project-ID|Workspace-ID|Client-ID|Task-ID|Conversation-ID|Visibility|Retention-Policy):\s*.*\r?\n?/gmi;
+  const markerPattern = /^(?:Memory-ID|Scope-ID|Project-ID|Workspace-ID|Client-ID|Task-ID|Conversation-ID|Visibility|Retention-Policy):\s*.*\r?\n?/gmi;
   const contentMatch = text.match(/\r?\nContent:\r?\n/);
   if (!contentMatch || contentMatch.index === undefined) {
     return text.trim();
@@ -249,6 +250,7 @@ class DiaryStore {
     const target = String(recordType).trim().toLowerCase() === 'knowledge' ? 'knowledge' : 'process';
     const validated = parseBooleanFlag(this.matchSingleLine(headerBlock, /^Validated:\s*(.+)$/mi));
     const reusable = parseBooleanFlag(this.matchSingleLine(headerBlock, /^Reusable:\s*(.+)$/mi));
+    const scopeId = this.matchSingleLine(headerBlock, /^Scope-ID:\s*(.+)$/mi) || null;
     const projectId = this.matchSingleLine(headerBlock, /^Project-ID:\s*(.+)$/mi) || null;
     const workspaceId = this.matchSingleLine(headerBlock, /^Workspace-ID:\s*(.+)$/mi) || null;
     const clientId = this.matchSingleLine(headerBlock, /^Client-ID:\s*(.+)$/mi) || null;
@@ -274,6 +276,7 @@ class DiaryStore {
       tags,
       validated,
       reusable,
+      scopeId,
       projectId,
       workspaceId,
       clientId,

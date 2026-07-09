@@ -231,7 +231,7 @@ class CandidateCacheStore {
     return removedEntries;
   }
 
-  async countCurrentFingerprintByMemoryIds(memoryIds = []) {
+  async countCurrentFingerprintByMemoryIds(memoryIds = [], targets = []) {
     await this.ensureReady();
     this.pruneExpiredEntries();
     const normalizedMemoryIds = new Set(
@@ -242,6 +242,11 @@ class CandidateCacheStore {
     if (normalizedMemoryIds.size === 0) {
       return 0;
     }
+    const normalizedTargets = new Set(
+      (Array.isArray(targets) ? targets : [targets])
+        .map(target => String(target || '').trim())
+        .filter(Boolean)
+    );
 
     let matchingEntries = 0;
     for (const entry of Object.values(this.cache.entries || {})) {
@@ -253,8 +258,10 @@ class CandidateCacheStore {
         ? entry.memoryIds.map(memoryId => String(memoryId || '').trim()).filter(Boolean)
         : [];
       const hasDependencyMatch = entryMemoryIds.some(memoryId => normalizedMemoryIds.has(memoryId));
+      const fallbackTargetMatch = normalizedTargets.size > 0
+        && normalizedTargets.has(String(entry?.target || 'both'));
 
-      if (hasDependencyMatch) {
+      if (hasDependencyMatch || (entryMemoryIds.length === 0 && fallbackTargetMatch)) {
         matchingEntries += 1;
       }
     }

@@ -9,9 +9,9 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-07-03",
-  "taskId": "CM-1713",
-  "validationId": "CMV-1816",
+  "updatedAt": "2026-07-08",
+  "taskId": "CM-2006",
+  "validationId": "CMV-2107",
   "branch": "main",
   "baseBranch": "main",
   "pr": {
@@ -27,9 +27,9 @@
     "presentInLocalCheckout": null
   },
   "status": {
-    "project": "READY",
-    "rc": "RC_READY",
-    "scope": "scoped_status_snapshot",
+    "project": "NOT_READY_BLOCKED",
+    "rc": "RC_NOT_READY_BLOCKED",
+    "scope": "trusted_full_read_receipt_closeout_cm2005_bounded_attempt_completed_read_shape_unlocked_no_raw_output_no_write_no_readiness",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +37,1456 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2107",
+      "scope": "CM-2006 trusted-full-read receipt closeout / route decision",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_CM2005_BOUNDED_ATTEMPT_COMPLETED_READ_SHAPE_UNLOCKED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2106",
+      "scope": "CM-2004 trusted-full-read route-binding / repair intake and local repair receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_ROUTE_BINDING_REPAIR_COMPLETED_CM2001_CM2004_TASK_GATE_BOUND_NO_EXECUTION_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2105",
+      "scope": "CM-2003 trusted-full-read route-binding / repair intake packet display",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_INTAKE_PACKET_DISPLAY_NON_AUTHORIZING_NO_REPAIR_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2104",
+      "scope": "CM-2002 trusted-full-read route-binding / repair boundary preparation",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_ROUTE_BINDING_REPAIR_BOUNDARY_PREPARED_NON_AUTHORIZING_NO_SOURCE_CHANGE_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2103",
+      "scope": "CM-2001 trusted-full-read exact approval/material intake gate blocked",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_MATERIAL_INTAKE_ACCEPTED_PRE_EXECUTION_GATE_BLOCKED_NO_CM2001_BOUNDED_TRUSTED_FULL_READ_EXECUTOR_NO_ATTEMPT_CONSUMED_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2102",
+      "scope": "CM-2000 trusted-full-read exact approval intake / pre-execution gate blocked",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED_MISSING_BINDABLE_APPROVAL_AND_TARGET_MATERIAL_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2101",
+      "scope": "CM-1999 trusted-full-read exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_APPROVAL_REQUEST_READINESS_REVIEW_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2100",
+      "scope": "CM-1998 trusted-full-read preparation preflight",
+      "status": "COMPLETED_VALIDATED_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT_NON_AUTHORIZING_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2099",
+      "scope": "CM-1997 temp-local read-shape closeout / route decision",
+      "status": "COMPLETED_VALIDATED_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_TO_TRUSTED_FULL_READ_PREPARATION_NO_LIVE_NO_RETRY_NO_READINESS"
+    },
+    {
+      "id": "CMV-2098",
+      "scope": "CM-1996 exact-approved real disposable target material bound read-shape probe receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_TEMP_LOCAL_DISPOSABLE_MATERIAL_BOUND_READ_SHAPE_PROBE_SUCCESS_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2097",
+      "scope": "CM-1993 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_MATERIAL_BINDING_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2095",
+      "scope": "CM-1992 exact real disposable target material boundary packet / approval request readiness review",
+      "status": "COMPLETED_VALIDATED_EXACT_REAL_DISPOSABLE_TARGET_MATERIAL_BOUNDARY_PACKET_READINESS_REVIEW_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2094",
+      "scope": "CM-1991 real disposable target material evidence preparation",
+      "status": "COMPLETED_VALIDATED_REAL_DISPOSABLE_TARGET_MATERIAL_EVIDENCE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2093",
+      "scope": "CM-1990 exact-approved real disposable target binding probe abort receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PRE_EXECUTION_ABORT_TARGET_MATERIAL_ABSENT_NO_RUNTIME_NO_READ_SHAPE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2092",
+      "scope": "CM-1989 exact approval intake for real disposable target binding",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING_ROUTE_NO_APPROVAL_LINE_NO_REQUEST_BODY_TARGET_MATERIAL_ABSENT_NO_READINESS"
+    },
+    {
+      "id": "CMV-2091",
+      "scope": "CM-1988 exact real disposable target binding boundary packet / approval request readiness review",
+      "status": "COMPLETED_VALIDATED_EXACT_REAL_DISPOSABLE_TARGET_BINDING_BOUNDARY_PACKET_READINESS_REVIEW_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2090",
+      "scope": "CM-1987 real disposable target declaration evidence preparation",
+      "status": "COMPLETED_VALIDATED_REAL_DISPOSABLE_TARGET_DECLARATION_EVIDENCE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2089",
+      "scope": "CM-1986 exact-approved real disposable target binding probe abort receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_REAL_DISPOSABLE_TARGET_BINDING_PRE_EXECUTION_ABORT_TARGET_NOT_VERIFIED_DISPOSABLE_NO_RUNTIME_NO_READ_SHAPE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2088",
+      "scope": "CM-1985 exact approval intake for real disposable target binding",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_REAL_DISPOSABLE_TARGET_BINDING_ROUTE_NO_APPROVAL_LINE_NO_REQUEST_BODY_NO_READINESS"
+    },
+    {
+      "id": "CMV-2087",
+      "scope": "CM-1984 exact approval request readiness review / Jenn boundary display for real disposable target binding",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_REAL_DISPOSABLE_TARGET_BINDING_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2086",
+      "scope": "CM-1983 real disposable target binding exact boundary packet",
+      "status": "COMPLETED_VALIDATED_REAL_DISPOSABLE_TARGET_BINDING_EXACT_BOUNDARY_PACKET_NON_AUTHORIZING_NO_LIVE_NO_APPROVAL_LINE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2085",
+      "scope": "CM-1982 fixture-backed probe closeout / route decision",
+      "status": "COMPLETED_VALIDATED_FIXTURE_BACKED_PROBE_CLOSEOUT_ROUTE_TO_REAL_DISPOSABLE_TARGET_BINDING_PREPARATION_NO_LIVE_NO_RETRY_NO_READINESS"
+    },
+    {
+      "id": "CMV-2084",
+      "scope": "CM-1981 exact-approved fixture-backed probe receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_FIXTURE_BACKED_READ_SHAPE_PROBE_SUCCESS_SHAPE_PROJECTED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2083",
+      "scope": "CM-1980 exact approval intake",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_FIXTURE_BACKED_ROUTE_NO_APPROVAL_LINE_NO_REQUEST_BODY_NO_READINESS"
+    },
+    {
+      "id": "CMV-2082",
+      "scope": "CM-1979 exact disposable target fixture-backed live/runtime boundary packet",
+      "status": "COMPLETED_VALIDATED_EXACT_DISPOSABLE_TARGET_FIXTURE_BACKED_LIVE_RUNTIME_BOUNDARY_PACKET_NON_AUTHORIZING_NO_LIVE_NO_APPROVAL_INTAKE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2081",
+      "scope": "CM-1978 disposable target binding fixture preparation",
+      "status": "COMPLETED_VALIDATED_DISPOSABLE_TARGET_BINDING_FIXTURE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2080",
+      "scope": "CM-1977 exact-approved disposable-target live/runtime probe abort receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_DISPOSABLE_TARGET_PROBE_ABORTED_BEFORE_RUNTIME_TARGET_NOT_VERIFIED_DISPOSABLE_NO_LIVE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2079",
+      "scope": "CM-1976 exact approval intake",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_NO_APPROVAL_LINE_NO_RUNTIME_NO_READINESS"
+    },
+    {
+      "id": "CMV-2078",
+      "scope": "CM-1975 exact live/runtime boundary packet",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_BOUNDARY_PACKET_NON_AUTHORIZING_NO_LIVE_NO_APPROVAL_LINE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2077",
+      "scope": "CM-1974 live/runtime entry preflight",
+      "status": "COMPLETED_VALIDATED_LIVE_RUNTIME_ENTRY_PREFLIGHT_NON_AUTHORIZING_NO_LIVE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2076",
+      "scope": "CM-1973 plan-package local-safe completion closeout refresh",
+      "status": "COMPLETED_VALIDATED_PLAN_PACKAGE_LOCAL_SAFE_COMPLETION_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2075",
+      "scope": "CM-1972 M14/M15 non-authorizing RC gate route refresh",
+      "status": "COMPLETED_VALIDATED_M14_M15_NON_AUTHORIZING_RC_GATE_ROUTE_REFRESH_NO_RUNTIME_NO_RELEASE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2074",
+      "scope": "CM-1971 M13/M14 health-report route refresh",
+      "status": "COMPLETED_VALIDATED_M13_M14_HEALTH_REPORT_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2073",
+      "scope": "CM-1970 M12/M13 fallback local memory route refresh",
+      "status": "COMPLETED_VALIDATED_M12_M13_FALLBACK_LOCAL_MEMORY_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2072",
+      "scope": "CM-1969 M11/M12 sustained workflow route refresh",
+      "status": "COMPLETED_VALIDATED_M11_M12_SUSTAINED_WORKFLOW_ROUTE_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2071",
+      "scope": "CM-1968 M10/M11 route decision and response-normalization refresh",
+      "status": "COMPLETED_VALIDATED_M10_M11_ROUTE_DECISION_RESPONSE_NORMALIZATION_REFRESH_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2070",
+      "scope": "CM-1967 M10 exact write boundary gate contract",
+      "status": "COMPLETED_VALIDATED_M10_EXACT_WRITE_BOUNDARY_GATE_CONTRACT_BLOCKED_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2069",
+      "scope": "CM-1966 M9 governed mutation proposal mode contract",
+      "status": "COMPLETED_VALIDATED_M9_GOVERNED_MUTATION_PROPOSAL_MODE_CONTRACT_NO_DURABLE_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2068",
+      "scope": "CM-1965 request/read-shape executor route decision back to M9",
+      "status": "COMPLETED_VALIDATED_REQUEST_READ_SHAPE_EXECUTOR_ROUTE_DECISION_BACK_TO_M9_NO_LIVE_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2067",
+      "scope": "CM-1964 disposable target request/read-shape executor prepared",
+      "status": "COMPLETED_VALIDATED_DISPOSABLE_TARGET_REQUEST_READ_SHAPE_EXECUTOR_PREPARED_NO_LIVE_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2066",
+      "scope": "CM-1963 disposable target resolver/transport boundary contract",
+      "status": "COMPLETED_VALIDATED_DISPOSABLE_TARGET_RESOLVER_TRANSPORT_BOUNDARY_CONTRACT_NO_EXECUTION_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2065",
+      "scope": "CM-1962 exact-approved component/action request/read-shape pre-execution gate blocked receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_INTAKE_PRE_EXECUTION_GATE_BLOCKED_NO_SAFE_RESOLVER_NO_LIVE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2064",
+      "scope": "CM-1961 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2063",
+      "scope": "CM-1960 component/action request/read-shape exact approval packet",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_REQUEST_READ_SHAPE_EXACT_APPROVAL_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE_NO_LIVE"
+    },
+    {
+      "id": "CMV-2062",
+      "scope": "CM-1959 low-disclosure component/action request/read-shape preparation contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_CONTRACT_NO_LIVE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2061",
+      "scope": "CM-1958 component/action request/read-shape preparation preflight",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_REQUEST_READ_SHAPE_PREPARATION_PREFLIGHT_NO_LIVE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2060",
+      "scope": "CM-1957 component/action route-status probe closeout / route decision",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_CLOSEOUT_ROUTE_TO_REQUEST_READ_SHAPE_PREPARATION_NO_RETRY_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2059",
+      "scope": "CM-1956 exact-approved component/action route-status probe receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_COMPONENT_ACTION_ROUTE_STATUS_PROBE_STATUS_ONLY_CLIENT_ERROR_NO_BODY_NO_WRITE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2058",
+      "scope": "CM-1955 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2057",
+      "scope": "CM-1954 component/action route probe exact approval request packet",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_ROUTE_PROBE_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2056",
+      "scope": "CM-1953 low-disclosure component/action request-body boundary contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_CONTRACT_NO_BODY_NO_LIVE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2055",
+      "scope": "CM-1952 component/action request-body boundary preflight",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_REQUEST_BODY_BOUNDARY_PREFLIGHT_NO_BODY_NO_LIVE_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2054",
+      "scope": "CM-1951 component/action status probe closeout / route decision",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_CLOSEOUT_ROUTE_TO_REQUEST_BODY_BOUNDARY_PREFLIGHT_NO_RETRY_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2053",
+      "scope": "CM-1950 exact-approved component/action status probe receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_COMPONENT_ACTION_STATUS_PROBE_BOUNDARY_BLOCKED_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
+    {
+      "id": "CMV-2052",
+      "scope": "CM-1949 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2051",
+      "scope": "CM-1948 component/action status probe exact approval request packet",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2050",
+      "scope": "CM-1947 low-disclosure component/action status probe contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_COMPONENT_ACTION_STATUS_PROBE_CONTRACT_NO_LIVE_NO_REQUEST_BODY_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2049",
+      "scope": "CM-1946 component/action status probe preflight",
+      "status": "COMPLETED_VALIDATED_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT_NO_LIVE_NO_REQUEST_BODY_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2048",
+      "scope": "CM-1945 startup failure diagnosis closeout / route decision",
+      "status": "COMPLETED_VALIDATED_STARTUP_FAILURE_DIAGNOSIS_CLOSEOUT_ROUTE_TO_COMPONENT_ACTION_STATUS_PROBE_PREFLIGHT_NO_RETRY_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2047",
+      "scope": "CM-1944 exact-approved startup failure diagnosis receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_FAILURE_DIAGNOSIS_LISTENER_REACHABLE_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
+    {
+      "id": "CMV-2046",
+      "scope": "CM-1943 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2045",
+      "scope": "CM-1942 startup failure diagnosis exact approval request packet",
+      "status": "COMPLETED_VALIDATED_STARTUP_FAILURE_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2044",
+      "scope": "CM-1941 low-disclosure startup failure diagnosis contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_STARTUP_FAILURE_DIAGNOSIS_CONTRACT_NO_LIVE_NO_MUTATION"
+    },
+    {
+      "id": "CMV-2043",
+      "scope": "CM-1940 startup failure diagnosis preflight",
+      "status": "COMPLETED_VALIDATED_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT_NO_LIVE_NO_MUTATION"
+    },
+    {
+      "id": "CMV-2042",
+      "scope": "CM-1939 startup/listener recovery diagnosis closeout / route decision",
+      "status": "COMPLETED_VALIDATED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_CLOSEOUT_ROUTE_TO_STARTUP_FAILURE_DIAGNOSIS_PREFLIGHT_NO_RETRY"
+    },
+    {
+      "id": "CMV-2041",
+      "scope": "CM-1938 exact-approved startup/listener recovery diagnosis receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LISTENER_RECOVERY_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
+    {
+      "id": "CMV-2040",
+      "scope": "CM-1937 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2039",
+      "scope": "CM-1936 startup/listener recovery exact approval request packet",
+      "status": "COMPLETED_VALIDATED_STARTUP_LISTENER_RECOVERY_EXACT_APPROVAL_REQUEST_PACKET_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2038",
+      "scope": "CM-1935 low-disclosure startup/listener recovery contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_STARTUP_LISTENER_RECOVERY_CONTRACT_NO_LIVE_NO_MUTATION"
+    },
+    {
+      "id": "CMV-2037",
+      "scope": "CM-1934 runtime startup or service listener recovery preflight",
+      "status": "COMPLETED_VALIDATED_RUNTIME_STARTUP_OR_SERVICE_LISTENER_RECOVERY_PREFLIGHT_NO_LIVE_NO_MUTATION"
+    },
+    {
+      "id": "CMV-2036",
+      "scope": "CM-1933 startup locator diagnosis closeout / route decision",
+      "status": "COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_TO_STARTUP_LISTENER_RECOVERY_PREFLIGHT_NO_RETRY"
+    },
+    {
+      "id": "CMV-2035",
+      "scope": "CM-1932 exact-approved startup locator diagnosis receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
+    {
+      "id": "CMV-2034",
+      "scope": "CM-1931 exact approval request readiness review / Jenn boundary display",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVAL_REQUEST_READINESS_REVIEW_JENN_BOUNDARY_DISPLAY_NON_AUTHORIZING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2033",
+      "scope": "CM-1930 startup locator diagnosis exact approval request packet refresh",
+      "status": "COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_REFRESH_NON_EXECUTING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2032",
+      "scope": "CM-1929 receipt-capture hardening closeout / future live request route decision",
+      "status": "COMPLETED_VALIDATED_RECEIPT_CAPTURE_HARDENING_CLOSEOUT_ROUTE_TO_CM1930_REQUEST_PACKET_REFRESH_NO_LIVE"
+    },
+    {
+      "id": "CMV-2031",
+      "scope": "CM-1928 startup locator diagnosis receipt-capture hardening contract",
+      "status": "COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_HARDENING_CONTRACT_NO_LIVE_CALL"
+    },
+    {
+      "id": "CMV-2030",
+      "scope": "CM-1927 startup locator diagnosis closeout",
+      "status": "COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RECEIPT_CAPTURE_HARDENING_NO_RETRY"
+    },
+    {
+      "id": "CMV-2029",
+      "scope": "CM-1926 exact-approved startup locator diagnosis receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_STARTUP_LOCATOR_DIAGNOSIS_RECEIPT_CAPTURE_ERROR_NO_RETRY_NO_RAW_OUTPUT"
+    },
+    {
+      "id": "CMV-2028",
+      "scope": "CM-1925 startup locator diagnosis exact approval request packet",
+      "status": "COMPLETED_VALIDATED_STARTUP_LOCATOR_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_NON_EXECUTING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2027",
+      "scope": "CM-1924 low-disclosure runtime startup target locator diagnosis contract",
+      "status": "COMPLETED_VALIDATED_LOW_DISCLOSURE_RUNTIME_STARTUP_TARGET_LOCATOR_DIAGNOSIS_CONTRACT_NO_LIVE_CALL"
+    },
+    {
+      "id": "CMV-2026",
+      "scope": "CM-1923 runtime startup or target locator diagnosis preflight",
+      "status": "COMPLETED_VALIDATED_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL"
+    },
+    {
+      "id": "CMV-2025",
+      "scope": "CM-1922 transport diagnosis closeout",
+      "status": "COMPLETED_VALIDATED_TRANSPORT_DIAGNOSIS_CLOSEOUT_ROUTE_TO_RUNTIME_STARTUP_OR_TARGET_LOCATOR_DIAGNOSIS"
+    },
+    {
+      "id": "CMV-2024",
+      "scope": "CM-1921 exact-approved transport diagnosis receipt",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_TRANSPORT_DIAGNOSIS_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
+    {
+      "id": "CMV-2023",
+      "scope": "CM-1920 transport diagnosis exact approval request packet",
+      "status": "COMPLETED_VALIDATED_TRANSPORT_DIAGNOSIS_EXACT_APPROVAL_REQUEST_PACKET_NON_EXECUTING_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2022",
+      "scope": "CM-1919 runtime target diagnosis contract",
+      "status": "COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_CONTRACT_NO_RUNTIME_NO_LIVE_CALL_NO_RAW_OUTPUT"
+    },
+    {
+      "id": "CMV-2021",
+      "scope": "CM-1918 runtime target diagnosis preflight",
+      "status": "COMPLETED_VALIDATED_RUNTIME_TARGET_DIAGNOSIS_PREFLIGHT_SOURCE_ONLY_NO_LIVE_CALL"
+    },
+    {
+      "id": "CMV-2020",
+      "scope": "CM-1917 live proof closeout route decision",
+      "status": "COMPLETED_VALIDATED_LIVE_PROOF_CLOSEOUT_ROUTE_DECISION_RUNTIME_TARGET_DIAGNOSIS_NO_RETRY_NO_READ_SHAPE"
+    },
+    {
+      "id": "CMV-2019",
+      "scope": "CM-1916 exact-approved live observe-lite proof",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_LIVE_OBSERVE_LITE_PROOF_TRANSPORT_ERROR_NO_BODY_NO_WRITE_NO_RAW_OUTPUT"
+    },
+    {
+      "id": "CMV-2018",
+      "scope": "CM-1915 live read-only proof execution harness",
+      "status": "COMPLETED_VALIDATED_LIVE_READONLY_PROOF_EXECUTION_HARNESS_DEFAULT_NO_RUN_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-2017",
+      "scope": "CM-1914 exact-approved live read-only proof request packet",
+      "status": "COMPLETED_VALIDATED_EXACT_APPROVED_LIVE_READONLY_PROOF_REQUEST_PACKET_NON_AUTHORIZING_NO_RUNTIME_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2016",
+      "scope": "CM-1913 VCP native read-only execution receipt schema",
+      "status": "COMPLETED_VALIDATED_VCP_NATIVE_READONLY_EXECUTION_RECEIPT_SCHEMA_NO_RUNTIME_NO_WRITE_NO_RAW_BODY"
+    },
+    {
+      "id": "CMV-2015",
+      "scope": "CM-1912 VCP native runtime adapter dry-run invocation contract",
+      "status": "COMPLETED_VALIDATED_VCP_NATIVE_RUNTIME_ADAPTER_DRY_RUN_CONTRACT_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2014",
+      "scope": "CM-1911 VCP native read-only proof path gate / pre-runtime invocation plan",
+      "status": "COMPLETED_VALIDATED_VCP_NATIVE_READONLY_PROOF_PATH_GATE_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2013",
+      "scope": "CM-1910 VCP native invocation adapter skeleton / exact target-profile contract as code / low-disclosure result normalizer",
+      "status": "COMPLETED_VALIDATED_VCP_NATIVE_INVOCATION_ADAPTER_SKELETON_NO_RUNTIME_NO_WRITE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2012",
+      "scope": "CM-1909 exact live runtime authorization request exact-material readiness blocked fixture closeout gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2011",
+      "scope": "CM-1908 exact live runtime authorization request exact-material readiness blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_READINESS_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2010",
+      "scope": "CM-1907 exact live runtime authorization request exact-material readiness blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_READINESS_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2009",
+      "scope": "CM-1906 exact live runtime authorization request exact-material boundary fixture closeout gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2008",
+      "scope": "CM-1905 exact live runtime authorization request exact-material boundary fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2007",
+      "scope": "CM-1904 exact live runtime authorization request exact-material boundary preflight",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_EXACT_MATERIAL_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2006",
+      "scope": "CM-1903 exact live runtime authorization request readiness blocked fixture closeout gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2005",
+      "scope": "CM-1902 exact live runtime authorization request readiness blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2004",
+      "scope": "CM-1901 exact live runtime authorization request readiness blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_READINESS_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2003",
+      "scope": "CM-1900 exact live runtime authorization request boundary fixture closeout gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2002",
+      "scope": "CM-1899 exact live runtime authorization request boundary fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2001",
+      "scope": "CM-1898 exact live runtime authorization request boundary preflight",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_REQUEST_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-2000",
+      "scope": "CM-1897 exact live runtime authorization gate preflight fixture closeout gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1999",
+      "scope": "CM-1896 exact live runtime authorization gate preflight fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1998",
+      "scope": "CM-1895 exact live runtime authorization gate preflight boundary",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_AUTHORIZATION_GATE_PREFLIGHT_BOUNDARY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1997",
+      "scope": "CM-1894 exact live runtime approval request packet readiness blocked fixture closeout gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1996",
+      "scope": "CM-1893 exact live runtime approval request packet readiness blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1995",
+      "scope": "CM-1892 exact live runtime approval request packet readiness blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_READINESS_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1994",
+      "scope": "CM-1891 exact live runtime approval request packet skeleton fixture closeout gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_SKELETON_FIXTURE_CLOSEOUT_GATE_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1993",
+      "scope": "CM-1890 exact live runtime approval request packet skeleton boundary fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_SKELETON_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1992",
+      "scope": "CM-1889 exact live runtime approval request packet skeleton review boundary",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_SKELETON_REVIEW_BOUNDARY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1991",
+      "scope": "CM-1888 exact live runtime approval request packet boundary fixture closeout",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_BOUNDARY_FIXTURE_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1990",
+      "scope": "CM-1887 exact live runtime approval request packet boundary fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1989",
+      "scope": "CM-1886 exact live runtime approval request packet boundary review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PACKET_BOUNDARY_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1988",
+      "scope": "CM-1885 exact live runtime approval request readiness blocked fixture closeout",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_READINESS_BLOCKED_FIXTURE_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1987",
+      "scope": "CM-1884 exact live runtime approval request readiness blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1986",
+      "scope": "CM-1883 exact live runtime approval request readiness gate review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_READINESS_GATE_REVIEW_BLOCKED_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1985",
+      "scope": "CM-1882 exact live runtime approval request preparation boundary fixture closeout",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PREPARATION_BOUNDARY_FIXTURE_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1984",
+      "scope": "CM-1881 exact live runtime approval request preparation boundary fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PREPARATION_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1983",
+      "scope": "CM-1880 exact live runtime approval request preparation boundary review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_PREPARATION_BOUNDARY_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1982",
+      "scope": "CM-1879 exact live runtime approval request assembly boundary fixture closeout",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_ASSEMBLY_BOUNDARY_FIXTURE_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1981",
+      "scope": "CM-1878 exact live runtime approval request assembly boundary fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_ASSEMBLY_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1980",
+      "scope": "CM-1877 exact live runtime approval request assembly boundary review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_ASSEMBLY_BOUNDARY_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1979",
+      "scope": "CM-1876 exact live runtime approval request assembly preflight closeout",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_ASSEMBLY_PREFLIGHT_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1978",
+      "scope": "CM-1875 exact live runtime approval request assembly preflight fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_ASSEMBLY_PREFLIGHT_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1977",
+      "scope": "CM-1874 exact live runtime approval request gap fixture closeout",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_GAP_FIXTURE_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1976",
+      "scope": "CM-1873 exact live runtime approval request gap fixture contract",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_GAP_FIXTURE_CONTRACT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1975",
+      "scope": "CM-1872 exact live runtime approval request field gap preflight",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_REQUEST_FIELD_GAP_PREFLIGHT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1974",
+      "scope": "CM-1871 exact live runtime request packet readiness blocked closeout",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_REQUEST_PACKET_READINESS_BLOCKED_CLOSEOUT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1973",
+      "scope": "CM-1870 exact live runtime request packet abort boundary review",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_REQUEST_PACKET_ABORT_BOUNDARY_REVIEW_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1972",
+      "scope": "CM-1869 exact live runtime non-authorizing request packet display boundary",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_NON_AUTHORIZING_REQUEST_PACKET_DISPLAY_BOUNDARY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1971",
+      "scope": "CM-1868 exact live runtime request packet review boundary",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_REQUEST_PACKET_REVIEW_BOUNDARY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1970",
+      "scope": "CM-1867 exact live runtime non-authorizing request packet skeleton",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_NON_AUTHORIZING_REQUEST_PACKET_SKELETON_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1969",
+      "scope": "CM-1866 exact live runtime approval boundary preflight",
+      "status": "COMPLETED_VALIDATED_EXACT_LIVE_RUNTIME_APPROVAL_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1968",
+      "scope": "CM-1865 plan-package local-safe closeout refresh",
+      "status": "COMPLETED_VALIDATED_PLAN_PACKAGE_LOCAL_SAFE_CLOSEOUT_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1967",
+      "scope": "CM-1864 M15 blocked closeout refresh",
+      "status": "COMPLETED_VALIDATED_M15_BLOCKED_CLOSEOUT_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1966",
+      "scope": "CM-1863 M15 RC review approval packet readiness boundary refresh",
+      "status": "COMPLETED_VALIDATED_M15_RC_REVIEW_APPROVAL_PACKET_READINESS_BOUNDARY_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1965",
+      "scope": "CM-1862 M15 risk review refresh",
+      "status": "COMPLETED_VALIDATED_M15_RISK_REVIEW_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1964",
+      "scope": "CM-1861 M15 non-authorizing RC checklist refresh",
+      "status": "COMPLETED_VALIDATED_M15_NON_AUTHORIZING_RC_CHECKLIST_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1963",
+      "scope": "CM-1860 M15 package evidence map refresh",
+      "status": "COMPLETED_VALIDATED_M15_PACKAGE_EVIDENCE_MAP_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1962",
+      "scope": "CM-1859 M15 blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_M15_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1961",
+      "scope": "CM-1858 M14 health-report evidence boundary refresh",
+      "status": "COMPLETED_VALIDATED_M14_HEALTH_REPORT_EVIDENCE_BOUNDARY_REFRESH_FIXTURE_SCHEMA_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1960",
+      "scope": "CM-1857 M13 fallback hardening evidence reconciliation",
+      "status": "COMPLETED_VALIDATED_M13_FALLBACK_HARDENING_EVIDENCE_RECONCILIATION_FIXTURE_DRY_RUN_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1959",
+      "scope": "CM-1856 M12 exact-boundary feasibility contract closeout / next gate review",
+      "status": "COMPLETED_VALIDATED_M12_EXACT_BOUNDARY_FEASIBILITY_CONTRACT_CLOSEOUT_NEXT_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1958",
+      "scope": "CM-1855 M12 exact-boundary feasibility fixture contract",
+      "status": "COMPLETED_VALIDATED_M12_EXACT_BOUNDARY_FEASIBILITY_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1957",
+      "scope": "CM-1854 M12 exact-boundary feasibility preflight",
+      "status": "COMPLETED_VALIDATED_M12_EXACT_BOUNDARY_FEASIBILITY_PREFLIGHT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1956",
+      "scope": "CM-1853 M12 fixture chain alignment review",
+      "status": "COMPLETED_VALIDATED_M12_FIXTURE_CHAIN_ALIGNMENT_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1955",
+      "scope": "CM-1852 M12 blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_M12_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1954",
+      "scope": "CM-1851 M11 blocked route fixture closeout / next gate review",
+      "status": "COMPLETED_VALIDATED_M11_BLOCKED_ROUTE_CLOSEOUT_NEXT_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1953",
+      "scope": "CM-1850 M11 blocked route fixture contract",
+      "status": "COMPLETED_VALIDATED_M11_BLOCKED_ROUTE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1952",
+      "scope": "CM-1849 M11 blocked precondition refresh",
+      "status": "COMPLETED_VALIDATED_M11_BLOCKED_PRECONDITION_REFRESH_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1951",
+      "scope": "CM-1848 M10 blocked state fixture closeout / M11 gate review",
+      "status": "COMPLETED_VALIDATED_M10_BLOCKED_STATE_FIXTURE_CLOSEOUT_M11_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1950",
+      "scope": "CM-1847 M10 blocked state fixture contract",
+      "status": "COMPLETED_VALIDATED_M10_BLOCKED_STATE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1949",
+      "scope": "CM-1846 M9 final blocked closeout / M10 gate preflight",
+      "status": "COMPLETED_VALIDATED_M9_FINAL_BLOCKED_CLOSEOUT_M10_GATE_PREFLIGHT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1948",
+      "scope": "CM-1845 M9 proposal mode blocked closeout refresh",
+      "status": "COMPLETED_VALIDATED_M9_PROPOSAL_MODE_BLOCKED_CLOSEOUT_REFRESH_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1947",
+      "scope": "CM-1844 M9 approval request boundary blocked contract closeout / proposal mode gate review",
+      "status": "COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_BOUNDARY_BLOCKED_CONTRACT_CLOSEOUT_PROPOSAL_MODE_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1946",
+      "scope": "CM-1843 M9 approval request boundary blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_BOUNDARY_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1945",
+      "scope": "CM-1842 M9 approval request boundary blocked preflight",
+      "status": "COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_BOUNDARY_BLOCKED_PREFLIGHT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1944",
+      "scope": "CM-1841 M9 exact request packet refresh blocked contract closeout / approval request boundary review",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_BOUNDARY_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1943",
+      "scope": "CM-1840 M9 exact request packet refresh blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1942",
+      "scope": "CM-1839 M9 exact request packet refresh blocked preflight",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_REFRESH_BLOCKED_PREFLIGHT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1941",
+      "scope": "CM-1838 M9 approval request readiness blocked contract closeout / exact-request packet refresh gate review",
+      "status": "COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_READINESS_BLOCKED_CONTRACT_CLOSEOUT_EXACT_REQUEST_PACKET_REFRESH_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1940",
+      "scope": "CM-1837 M9 approval request readiness blocked fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_APPROVAL_REQUEST_READINESS_BLOCKED_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1939",
+      "scope": "CM-1836 M9 exact field binding feasibility contract closeout / approval-request readiness gate review",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_FIELD_BINDING_FEASIBILITY_CONTRACT_CLOSEOUT_APPROVAL_REQUEST_READINESS_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1938",
+      "scope": "CM-1835 M9 exact field binding feasibility fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_FIELD_BINDING_FEASIBILITY_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1937",
+      "scope": "CM-1834 M9 exact request preparation boundary contract closeout / exact-field binding gate review",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PREPARATION_BOUNDARY_CONTRACT_CLOSEOUT_EXACT_FIELD_BINDING_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1936",
+      "scope": "CM-1833 M9 exact request preparation boundary fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PREPARATION_BOUNDARY_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1935",
+      "scope": "CM-1832 M9 exact request packet-readiness contract closeout / request-preparation gate review",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_READINESS_CONTRACT_CLOSEOUT_REQUEST_PREPARATION_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1934",
+      "scope": "CM-1831 M9 exact request packet-readiness fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_PACKET_READINESS_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1933",
+      "scope": "CM-1830 M9 exact request field candidate contract closeout / packet-readiness gate review",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_CONTRACT_CLOSEOUT_PACKET_READINESS_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1932",
+      "scope": "CM-1829 M9 exact request field candidate fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1931",
+      "scope": "CM-1828 M9 exact request field candidate selection preflight",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_REQUEST_FIELD_CANDIDATE_SELECTION_PREFLIGHT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1930",
+      "scope": "CM-1827 M9 packet skeleton closeout / request-boundary gate review",
+      "status": "COMPLETED_VALIDATED_M9_PACKET_SKELETON_CLOSEOUT_REQUEST_BOUNDARY_GATE_REVIEW_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1929",
+      "scope": "CM-1826 M9 non-authorizing exact-boundary packet skeleton fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_EXACT_BOUNDARY_PACKET_SKELETON_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1928",
+      "scope": "CM-1825 M9 blocked-to-exact-boundary decision packet refresh",
+      "status": "COMPLETED_VALIDATED_M9_BLOCKED_TO_EXACT_BOUNDARY_DECISION_PACKET_REFRESH_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1927",
+      "scope": "CM-1824 M9 proposal-mode closeout gate fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_CLOSEOUT_GATE_FIXTURE_CONTRACT_M9_STILL_BLOCKED_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1926",
+      "scope": "CM-1823 M9 trusted-write-proposal receipt closeout / next-stage gate review",
+      "status": "COMPLETED_VALIDATED_M9_RECEIPT_CLOSEOUT_FIXTURE_PREPARATION_CLOSED_M9_STILL_BLOCKED_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1925",
+      "scope": "CM-1822 M9 trusted-write-proposal receipt shape fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_RECEIPT_SHAPE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1924",
+      "scope": "CM-1821 M9 trusted-write-proposal envelope fixture contract",
+      "status": "COMPLETED_VALIDATED_M9_ENVELOPE_FIXTURE_CONTRACT_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1923",
+      "scope": "CM-1820 M9 trusted-write-proposal exact boundary field feasibility preflight",
+      "status": "COMPLETED_VALIDATED_M9_FIELD_FEASIBILITY_PREFLIGHT_PARTIAL_CONTRACT_WORK_CAN_START_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1922",
+      "scope": "CM-1819 M9 trusted-write-proposal blocked closeout refresh after M8 acceptance",
+      "status": "COMPLETED_VALIDATED_M9_BLOCKED_CLOSEOUT_REFRESH_M8_ACCEPTED_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1921",
+      "scope": "CM-1818 M9 trusted-write-proposal runtime abort receipt refresh",
+      "status": "COMPLETED_VALIDATED_M9_ABORT_RECEIPT_REFRESH_NO_RUNTIME_NO_REQUEST_NO_PROPOSAL_NO_WRITE"
+    },
+    {
+      "id": "CMV-1920",
+      "scope": "CM-1817 M9 trusted-write-proposal non-authorizing request display refresh",
+      "status": "COMPLETED_VALIDATED_M9_REQUEST_DISPLAY_REFRESH_NOT_SUBMITTED_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1919",
+      "scope": "CM-1816 M9 trusted-write-proposal exact approval decision review refresh",
+      "status": "COMPLETED_VALIDATED_M9_DECISION_REVIEW_REFRESH_DISPLAY_ONLY_NO_REQUEST_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1918",
+      "scope": "CM-1815 M9 trusted-write-proposal exact approval packet refresh",
+      "status": "COMPLETED_VALIDATED_M9_PACKET_REFRESH_M8_PRESENT_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1917",
+      "scope": "CM-1814 M9 trusted-write-proposal precondition refresh after M8 acceptance",
+      "status": "COMPLETED_VALIDATED_M9_PRECONDITION_REFRESH_M8_ACCEPTED_EXACT_PROPOSAL_BOUNDARY_MISSING_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1916",
+      "scope": "CM-1813 M8 workflow receipt closeout gate review",
+      "status": "COMPLETED_VALIDATED_M8_WORKFLOW_RECEIPT_CLOSEOUT_M9_PREPARATION_UNLOCKED_NO_RUNTIME_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-1915",
+      "scope": "CM-1812 M8 trusted-full-read workflow low-disclosure execution",
+      "status": "COMPLETED_VALIDATED_M8_WORKFLOW_LOW_DISCLOSURE_EXECUTION_TWO_STEPS_HTTP_2XX_SHAPE_ONLY_NO_RAW_OUTPUT_NO_WRITE"
+    },
+    {
+      "id": "CMV-1914",
+      "scope": "CM-1811 M8 trusted-full-read workflow harness boundary preflight",
+      "status": "COMPLETED_VALIDATED_M8_WORKFLOW_HARNESS_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS"
+    },
+    {
+      "id": "CMV-1913",
+      "scope": "CM-1810 M7 read-shape receipt closeout gate review",
+      "status": "COMPLETED_VALIDATED_M7_READ_SHAPE_RECEIPT_CLOSEOUT_M8_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS"
+    },
+    {
+      "id": "CMV-1912",
+      "scope": "CM-1809 M7 observe-full read-shape low-disclosure execution",
+      "status": "COMPLETED_VALIDATED_M7_READ_SHAPE_LOW_DISCLOSURE_EXECUTION_HTTP_2XX_SHAPE_ONLY_NO_RAW_OUTPUT_NO_WRITE"
+    },
+    {
+      "id": "CMV-1911",
+      "scope": "CM-1808 M7 observe-full read-shape exact boundary preflight",
+      "status": "COMPLETED_VALIDATED_M7_READ_SHAPE_EXACT_BOUNDARY_PREFLIGHT_NO_RUNTIME_NO_READINESS"
+    },
+    {
+      "id": "CMV-1910",
+      "scope": "CM-1807 M6 observe-lite successful proof closeout / next-stage gate review",
+      "status": "COMPLETED_VALIDATED_M6_OBSERVE_LITE_SUCCESSFUL_PROOF_CLOSEOUT_M7_PREPARATION_UNLOCKED_NO_RUNTIME_NO_READINESS"
+    },
+    {
+      "id": "CMV-1909",
+      "scope": "CM-1806 M6 observe-lite DailyNoteSearcher primary-candidate status-only rerun",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PRIMARY_CANDIDATE_STATUS_ONLY_RERUN_HTTP_2XX_NO_BODY_NO_LOG_NO_SECRET_NO_MEMORY_WRITE"
+    },
+    {
+      "id": "CMV-1908",
+      "scope": "CM-1805 M6 observe-lite DailyNoteSearcher primary Linux candidate install",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PRIMARY_LINUX_CANDIDATE_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE"
+    },
+    {
+      "id": "CMV-1907",
+      "scope": "CM-1804 M6 observe-lite DailyNoteSearcher isolated-toolchain locked x64 build",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_ISOLATED_TOOLCHAIN_LOCKED_X64_BUILD_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE"
+    },
+    {
+      "id": "CMV-1906",
+      "scope": "CM-1803 M6 observe-lite isolated rustup toolchain install",
+      "status": "COMPLETED_VALIDATED_M6_ISOLATED_RUSTUP_TOOLCHAIN_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE"
+    },
+    {
+      "id": "CMV-1905",
+      "scope": "CM-1802 M6 observe-lite DailyNoteSearcher locked local x64 build attempt",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_LOCKED_BUILD_BLOCKED_BY_LOCKFILE_V4_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE"
+    },
+    {
+      "id": "CMV-1904",
+      "scope": "CM-1801 M6 observe-lite Rust toolchain dependency install",
+      "status": "COMPLETED_VALIDATED_M6_RUST_TOOLCHAIN_DEPENDENCY_INSTALL_NO_RUNTIME_NO_SECRET_NO_MEMORY_WRITE"
+    },
+    {
+      "id": "CMV-1903",
+      "scope": "CM-1800 M6 observe-lite DailyNoteSearcher local x64 build/install preflight",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_LOCAL_X64_BUILD_INSTALL_PREFLIGHT_NO_RUNTIME_NO_SECRET_NO_WRITE"
+    },
+    {
+      "id": "CMV-1902",
+      "scope": "CM-1799 M6 observe-lite DailyNoteSearcher binary compatibility diagnosis",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_BINARY_COMPATIBILITY_DIAGNOSIS_SOURCE_METADATA_NO_RUNTIME_NO_SECRET_NO_WRITE"
+    },
+    {
+      "id": "CMV-1901",
+      "scope": "CM-1798 M6 observe-lite executable-bit repair status-only rerun",
+      "status": "COMPLETED_VALIDATED_M6_EXECUTABLE_BIT_REPAIR_STATUS_ONLY_RERUN_TIMEOUT_NO_BODY_NO_LOG_NO_SECRET_NO_MEMORY_WRITE"
+    },
+    {
+      "id": "CMV-1900",
+      "scope": "CM-1797 M6 observe-lite DailyNoteSearcher failure source diagnosis",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_EXECUTABLE_BIT_DIAGNOSIS_SOURCE_ONLY_NO_RUNTIME_NO_SECRET_NO_WRITE"
+    },
+    {
+      "id": "CMV-1899",
+      "scope": "CM-1796 M6 observe-lite whitelist temporary auth status-only probe",
+      "status": "COMPLETED_VALIDATED_M6_TEMP_AUTH_HUMAN_TOOL_ROUTE_STATUS_PROOF_HTTP_5XX_NO_BODY_NO_LOG_NO_SECRET_NO_WRITE"
+    },
+    {
+      "id": "CMV-1898",
+      "scope": "CM-1795 M6 observe-lite source scan boundary repair abort receipt",
+      "status": "COMPLETED_VALIDATED_M6_SOURCE_SCAN_BOUNDARY_REPAIR_ABORT_NO_RUNTIME_NO_SECRET_NO_WRITE"
+    },
+    {
+      "id": "CMV-1897",
+      "scope": "CM-1794 M6 observe-lite temporary disposable auth boundary packet",
+      "status": "COMPLETED_VALIDATED_M6_TEMPORARY_DISPOSABLE_AUTH_BOUNDARY_PACKET_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER"
+    },
+    {
+      "id": "CMV-1896",
+      "scope": "CM-1793 M6 observe-lite DailyNoteSearcher probe decision abort boundary",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_PROBE_ABORT_BOUNDARY_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER"
+    },
+    {
+      "id": "CMV-1895",
+      "scope": "CM-1792 M6 observe-lite DailyNoteSearcher invocation envelope preflight",
+      "status": "COMPLETED_VALIDATED_M6_DAILYNOTESEARCHER_INVOCATION_ENVELOPE_PREFLIGHT_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER"
+    },
+    {
+      "id": "CMV-1894",
+      "scope": "CM-1791 M6 observe-lite source-only memory capability endpoint map",
+      "status": "COMPLETED_VALIDATED_M6_SOURCE_ONLY_MEMORY_CAPABILITY_ENDPOINT_MAP_NO_RUNTIME_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER"
+    },
+    {
+      "id": "CMV-1893",
+      "scope": "CM-1790 M6 observe-lite status-only route matrix",
+      "status": "COMPLETED_VALIDATED_M6_STATUS_ONLY_ROUTE_MATRIX_HTTP_GUARDS_REACHED_NO_BODY_NO_LOG_NO_MEMORY_NO_PROVIDER"
+    },
+    {
+      "id": "CMV-1892",
+      "scope": "CM-1789 M6 observe-lite extended no-log startup window",
+      "status": "COMPLETED_VALIDATED_M6_EXTENDED_NO_LOG_STARTUP_WINDOW_TRANSPORT_REACHABLE_HTTP_4XX_NO_BODY_NO_LOG_NO_MEMORY"
+    },
+    {
+      "id": "CMV-1891",
+      "scope": "CM-1788 M6 observe-lite startup failure source diagnosis",
+      "status": "COMPLETED_VALIDATED_M6_STARTUP_SOURCE_DIAGNOSIS_NO_LOG_NO_SECRET_NO_RUNTIME_NO_MEMORY"
+    },
+    {
+      "id": "CMV-1890",
+      "scope": "CM-1787 M6 observe-lite service start handshake receipt",
+      "status": "COMPLETED_VALIDATED_M6_SERVICE_START_ATTEMPT_TRANSPORT_NOT_REACHABLE_LOW_DISCLOSURE_NO_MEMORY_NO_WRITE"
+    },
+    {
+      "id": "CMV-1889",
+      "scope": "CM-1786 M6 observe-lite operator target locator receipt",
+      "status": "COMPLETED_VALIDATED_M6_OPERATOR_TARGET_LOCATOR_TARGET_BOUND_TRANSPORT_NOT_RUNNING_READ_ONLY_NO_WRITE_LOW_DISCLOSURE"
+    },
+    {
+      "id": "CMV-1888",
+      "scope": "CM-1785 M6 live observe-lite target preflight receipt",
+      "status": "COMPLETED_VALIDATED_M6_LIVE_OBSERVE_LITE_TARGET_PREFLIGHT_NO_TARGET_FOUND_READ_ONLY_NO_WRITE_LOW_DISCLOSURE"
+    },
+    {
+      "id": "CMV-1887",
+      "scope": "CM-1784 M15-K5 VCP memory blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M15_K5_VCP_MEMORY_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1886",
+      "scope": "CM-1783 M15-K4 VCP memory RC review approval packet readiness boundary",
+      "status": "COMPLETED_VALIDATED_M15_K4_VCP_MEMORY_RC_REVIEW_APPROVAL_PACKET_READINESS_BOUNDARY_DOCS_ONLY_NO_RUNTIME_NO_RELEASE_NO_APPROVAL_LINE"
+    },
+    {
+      "id": "CMV-1885",
+      "scope": "CM-1782 M15-K3 VCP memory risk review skeleton",
+      "status": "COMPLETED_VALIDATED_M15_K3_VCP_MEMORY_RISK_REVIEW_SKELETON_DOCS_ONLY_NO_RUNTIME_NO_RELEASE"
+    },
+    {
+      "id": "CMV-1884",
+      "scope": "CM-1781 M15-K2 VCP memory non-authorizing RC checklist skeleton",
+      "status": "COMPLETED_VALIDATED_M15_K2_VCP_MEMORY_NON_AUTHORIZING_RC_CHECKLIST_SKELETON_DOCS_ONLY_NO_RUNTIME_NO_RELEASE"
+    },
+    {
+      "id": "CMV-1883",
+      "scope": "CM-1780 M15-K1 VCP memory package evidence map",
+      "status": "COMPLETED_VALIDATED_M15_K1_VCP_MEMORY_PACKAGE_EVIDENCE_MAP_DOCS_ONLY_NO_RUNTIME_NO_RELEASE"
+    },
+    {
+      "id": "CMV-1882",
+      "scope": "CM-1779 M15-K0 VCP memory blocked precondition record",
+      "status": "COMPLETED_VALIDATED_M15_K0_VCP_MEMORY_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_RUNTIME_NO_RELEASE"
+    },
+    {
+      "id": "CMV-1881",
+      "scope": "CM-1778 M14-K7 VCP memory health report blocked closeout",
+      "status": "COMPLETED_VALIDATED_M14_K7_VCP_MEMORY_HEALTH_REPORT_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1880",
+      "scope": "CM-1777 M14-K6 VCP memory health report source review",
+      "status": "COMPLETED_VALIDATED_M14_K6_VCP_MEMORY_HEALTH_REPORT_SOURCE_REVIEW_NO_ACTIONABLE_FINDINGS_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1879",
+      "scope": "CM-1776 M14-K5 VCP memory health report counter reason specificity",
+      "status": "COMPLETED_VALIDATED_M14_K5_VCP_MEMORY_HEALTH_REPORT_COUNTER_REASON_SPECIFICITY_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1878",
+      "scope": "CM-1775 M14-K4 VCP memory health report section requiredness",
+      "status": "COMPLETED_VALIDATED_M14_K4_VCP_MEMORY_HEALTH_REPORT_SECTION_REQUIREDNESS_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1877",
+      "scope": "CM-1774 M14-K3 VCP memory health report readiness label accuracy",
+      "status": "COMPLETED_VALIDATED_M14_K3_VCP_MEMORY_HEALTH_REPORT_READINESS_LABEL_ACCURACY_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1876",
+      "scope": "CM-1773 M14-K2 VCP memory health report raw/private leak rejection",
+      "status": "COMPLETED_VALIDATED_M14_K2_VCP_MEMORY_HEALTH_REPORT_RAW_PRIVATE_LEAK_REJECTION_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1875",
+      "scope": "CM-1772 M14-K1 VCP memory health report schema contract",
+      "status": "COMPLETED_VALIDATED_M14_K1_VCP_MEMORY_HEALTH_REPORT_SCHEMA_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1874",
+      "scope": "CM-1771 M14-K0 VCP memory health report preflight",
+      "status": "COMPLETED_VALIDATED_M14_K0_VCP_MEMORY_HEALTH_REPORT_PREFLIGHT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1873",
+      "scope": "CM-1770 M13-K7 VCP memory fallback local memory hardening report",
+      "status": "COMPLETED_VALIDATED_M13_K7_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_HARDENING_REPORT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1872",
+      "scope": "CM-1769 M13-K6 VCP memory fallback local memory query-quality dry-run contract",
+      "status": "COMPLETED_VALIDATED_M13_K6_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_QUERY_QUALITY_DRY_RUN_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1871",
+      "scope": "CM-1768 M13-K5 VCP memory fallback local memory lifecycle filter contract",
+      "status": "COMPLETED_VALIDATED_M13_K5_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_LIFECYCLE_FILTER_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1870",
+      "scope": "CM-1767 M13-K4 VCP memory fallback local memory secret rejection contract",
+      "status": "COMPLETED_VALIDATED_M13_K4_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_SECRET_REJECTION_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1869",
+      "scope": "CM-1766 M13-K3 VCP memory fallback local memory scope isolation contract",
+      "status": "COMPLETED_VALIDATED_M13_K3_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_SCOPE_ISOLATION_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1868",
+      "scope": "CM-1765 M13-K2 VCP memory fallback local memory marker receipt contract",
+      "status": "COMPLETED_VALIDATED_M13_K2_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_MARKER_RECEIPT_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1867",
+      "scope": "CM-1764 M13-K1 VCP memory fallback local memory gap matrix",
+      "status": "COMPLETED_VALIDATED_M13_K1_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_GAP_MATRIX_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1866",
+      "scope": "CM-1763 M13-K0 VCP memory fallback local memory precondition review",
+      "status": "COMPLETED_VALIDATED_M13_K0_VCP_MEMORY_FALLBACK_LOCAL_MEMORY_PRECONDITION_REVIEW_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1865",
+      "scope": "CM-1762 M12-K4 VCP memory Codex Claude sustained workflow blocked closeout",
+      "status": "COMPLETED_VALIDATED_M12_K4_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1864",
+      "scope": "CM-1761 M12-K3 VCP memory Codex Claude sustained workflow source review",
+      "status": "COMPLETED_VALIDATED_M12_K3_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_SOURCE_REVIEW_NO_ACTIONABLE_FINDINGS_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1863",
+      "scope": "CM-1760 M12-K2 VCP memory Codex Claude sustained workflow receipt chain contract",
+      "status": "COMPLETED_VALIDATED_M12_K2_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_RECEIPT_CHAIN_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1862",
+      "scope": "CM-1759 M12-K1 VCP memory Codex Claude sustained workflow envelope contract",
+      "status": "COMPLETED_VALIDATED_M12_K1_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_ENVELOPE_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1861",
+      "scope": "CM-1758 M12-K0 VCP memory Codex Claude sustained workflow fixture boundary",
+      "status": "COMPLETED_VALIDATED_M12_K0_VCP_MEMORY_CODEX_CLAUDE_SUSTAINED_WORKFLOW_FIXTURE_BOUNDARY_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1860",
+      "scope": "CM-1757 M11-K3 VCP memory response normalization audit receipts blocked closeout",
+      "status": "COMPLETED_VALIDATED_M11_K3_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_BLOCKED_CLOSEOUT_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1859",
+      "scope": "CM-1756 M11-K2 VCP memory response normalization audit receipt fixture contract",
+      "status": "COMPLETED_VALIDATED_M11_K2_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPT_CONTRACT_FIXTURE_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1858",
+      "scope": "CM-1755 M11-K1 VCP memory response normalization audit receipts gap matrix",
+      "status": "COMPLETED_VALIDATED_M11_K1_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_GAP_MATRIX_DOCS_ONLY_FIXTURE_SCHEMA_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1857",
+      "scope": "CM-1754 M11-K0 VCP memory response normalization audit receipts precondition review",
+      "status": "COMPLETED_VALIDATED_M11_K0_VCP_MEMORY_RESPONSE_NORMALIZATION_AUDIT_RECEIPTS_PRECONDITION_REVIEW_DOCS_ONLY_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1856",
+      "scope": "CM-1753 M10-K6 VCP memory bounded mutation blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M10_K6_VCP_MEMORY_BOUNDED_MUTATION_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1855",
+      "scope": "CM-1752 M10-K5 VCP memory bounded mutation runtime abort receipt skeleton",
+      "status": "COMPLETED_VALIDATED_M10_K5_VCP_MEMORY_BOUNDED_MUTATION_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1854",
+      "scope": "CM-1751 M10-K4 VCP memory bounded mutation exact approval request display boundary",
+      "status": "COMPLETED_VALIDATED_M10_K4_VCP_MEMORY_BOUNDED_MUTATION_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1853",
+      "scope": "CM-1750 M10-K3 VCP memory bounded mutation exact write boundary decision review",
+      "status": "COMPLETED_VALIDATED_M10_K3_VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_DECISION_REVIEW_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1852",
+      "scope": "CM-1749 M10-K2 VCP memory bounded mutation exact write boundary packet preparation",
+      "status": "COMPLETED_VALIDATED_M10_K2_VCP_MEMORY_BOUNDED_MUTATION_EXACT_WRITE_BOUNDARY_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1851",
+      "scope": "CM-1748 M10-K1 VCP memory bounded mutation harness draft boundary",
+      "status": "COMPLETED_VALIDATED_M10_K1_VCP_MEMORY_BOUNDED_MUTATION_HARNESS_DRAFT_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1850",
+      "scope": "CM-1747 M10-K0 VCP memory bounded mutation blocked precondition record",
+      "status": "COMPLETED_VALIDATED_M10_K0_VCP_MEMORY_BOUNDED_MUTATION_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1849",
+      "scope": "CM-1746 M9-K6 VCP memory trusted-write-proposal blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M9_K6_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1848",
+      "scope": "CM-1745 M9-K5 VCP memory trusted-write-proposal runtime abort receipt skeleton",
+      "status": "COMPLETED_VALIDATED_M9_K5_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1847",
+      "scope": "CM-1744 M9-K4 VCP memory trusted-write-proposal exact approval request display boundary",
+      "status": "COMPLETED_VALIDATED_M9_K4_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1846",
+      "scope": "CM-1743 M9-K3 VCP memory trusted-write-proposal exact approval decision review boundary",
+      "status": "COMPLETED_VALIDATED_M9_K3_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1845",
+      "scope": "CM-1742 M9-K2 VCP memory trusted-write-proposal exact approval packet preparation",
+      "status": "COMPLETED_VALIDATED_M9_K2_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1844",
+      "scope": "CM-1741 M9-K1 VCP memory trusted-write-proposal harness draft boundary",
+      "status": "COMPLETED_VALIDATED_M9_K1_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_HARNESS_DRAFT_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1843",
+      "scope": "CM-1740 M9-K0 VCP memory trusted-write-proposal blocked precondition record",
+      "status": "COMPLETED_VALIDATED_M9_K0_VCP_MEMORY_TRUSTED_WRITE_PROPOSAL_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME_NO_WRITE"
+    },
+    {
+      "id": "CMV-1842",
+      "scope": "CM-1739 M8-K6 VCP memory trusted-full-read blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M8_K6_VCP_MEMORY_TRUSTED_FULL_READ_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1841",
+      "scope": "CM-1738 M8-K5 VCP memory trusted-full-read runtime abort receipt skeleton",
+      "status": "COMPLETED_VALIDATED_M8_K5_VCP_MEMORY_TRUSTED_FULL_READ_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1840",
+      "scope": "CM-1737 M8-K4 VCP memory trusted-full-read exact approval request display boundary",
+      "status": "COMPLETED_VALIDATED_M8_K4_VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1839",
+      "scope": "CM-1736 M8-K3 VCP memory trusted-full-read exact approval decision review boundary",
+      "status": "COMPLETED_VALIDATED_M8_K3_VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1838",
+      "scope": "CM-1735 M8-K2 VCP memory trusted-full-read exact approval packet preparation",
+      "status": "COMPLETED_VALIDATED_M8_K2_VCP_MEMORY_TRUSTED_FULL_READ_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1837",
+      "scope": "CM-1734 M8-K1 VCP memory trusted-full-read harness draft boundary",
+      "status": "COMPLETED_VALIDATED_M8_K1_VCP_MEMORY_TRUSTED_FULL_READ_HARNESS_DRAFT_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1836",
+      "scope": "CM-1733 M8-K0 VCP memory trusted-full-read blocked precondition record",
+      "status": "COMPLETED_VALIDATED_M8_K0_VCP_MEMORY_TRUSTED_FULL_READ_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1835",
+      "scope": "CM-1732 M7-K5 VCP memory observe-full blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M7_K5_VCP_MEMORY_OBSERVE_FULL_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1834",
+      "scope": "CM-1731 M7-K4 VCP memory observe-full runtime abort receipt skeleton",
+      "status": "COMPLETED_VALIDATED_M7_K4_VCP_MEMORY_OBSERVE_FULL_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1833",
+      "scope": "CM-1730 M7-K3 VCP memory observe-full exact approval request display boundary",
+      "status": "COMPLETED_VALIDATED_M7_K3_VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1832",
+      "scope": "CM-1729 M7-K2 VCP memory observe-full exact approval decision review boundary",
+      "status": "COMPLETED_VALIDATED_M7_K2_VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1831",
+      "scope": "CM-1728 M7-K1 VCP memory observe-full exact approval packet preparation",
+      "status": "COMPLETED_VALIDATED_M7_K1_VCP_MEMORY_OBSERVE_FULL_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1830",
+      "scope": "CM-1727 M7-K0 VCP memory observe-full blocked precondition record",
+      "status": "COMPLETED_VALIDATED_M7_K0_VCP_MEMORY_OBSERVE_FULL_BLOCKED_PRECONDITION_RECORD_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1829",
+      "scope": "CM-1726 M6-K5 VCP memory observe-lite blocked closeout summary",
+      "status": "COMPLETED_VALIDATED_M6_K5_VCP_MEMORY_OBSERVE_LITE_BLOCKED_CLOSEOUT_SUMMARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1828",
+      "scope": "CM-1725 M6-K4 VCP memory observe-lite runtime abort receipt skeleton",
+      "status": "COMPLETED_VALIDATED_M6_K4_VCP_MEMORY_OBSERVE_LITE_RUNTIME_ABORT_RECEIPT_SKELETON_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1827",
+      "scope": "CM-1724 M6-K3 VCP memory observe-lite exact approval request display boundary",
+      "status": "COMPLETED_VALIDATED_M6_K3_VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_REQUEST_DISPLAY_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1826",
+      "scope": "CM-1723 M6-K2 VCP memory observe-lite exact approval decision review boundary",
+      "status": "COMPLETED_VALIDATED_M6_K2_VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_DECISION_REVIEW_BOUNDARY_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1825",
+      "scope": "CM-1722 M6-K1 VCP memory observe-lite exact approval packet preparation",
+      "status": "COMPLETED_VALIDATED_M6_K1_VCP_MEMORY_OBSERVE_LITE_EXACT_APPROVAL_PACKET_PREPARATION_DOCS_ONLY_NO_APPROVAL_LINE_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1824",
+      "scope": "CM-1721 M5-K2 VCP memory client scope visibility matrix",
+      "status": "COMPLETED_VALIDATED_M5_K2_VCP_MEMORY_CLIENT_SCOPE_VISIBILITY_MATRIX_DOCS_ONLY_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1823",
+      "scope": "CM-1720 M5-K1 VCP memory governance policy shield truth table",
+      "status": "COMPLETED_VALIDATED_M5_K1_VCP_MEMORY_GOVERNANCE_POLICY_SHIELD_TRUTH_TABLE_DOCS_ONLY_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1822",
+      "scope": "CM-1719 M4-K2 VCP memory result normalization contract",
+      "status": "COMPLETED_VALIDATED_M4_K2_VCP_MEMORY_RESULT_NORMALIZATION_CONTRACT_DOCS_ONLY_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1821",
+      "scope": "CM-1718 M4-K1 VCP memory invocation contract spec",
+      "status": "COMPLETED_VALIDATED_M4_K1_VCP_MEMORY_INVOCATION_CONTRACT_SPEC_DOCS_ONLY_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1820",
+      "scope": "CM-1717 M3-T3 local fallback memory role contract",
+      "status": "COMPLETED_VALIDATED_M3_T3_LOCAL_FALLBACK_ROLE_CONTRACT_DOCS_ONLY_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1819",
+      "scope": "CM-1716 M3-T2 VCP memory invocation boundary templates",
+      "status": "COMPLETED_VALIDATED_M3_T2_INVOCATION_BOUNDARY_TEMPLATES_NON_AUTHORIZING_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1818",
+      "scope": "CM-1715 M3-T1 VCPToolBox native memory capability inventory",
+      "status": "COMPLETED_VALIDATED_M3_T1_VCPTOOLBOX_NATIVE_CAPABILITY_INVENTORY_DOCS_ONLY_NO_RUNTIME"
+    },
+    {
+      "id": "CMV-1817",
+      "scope": "CM-1714 M0-M2 VCP-native bridge plan intake and docs/state synchronization",
+      "status": "COMPLETED_VALIDATED_M0_M2_VCP_NATIVE_BRIDGE_PLAN_INTAKE_DOCS_STATE_SYNC_NO_RUNTIME"
+    },
     {
       "id": "CMV-1816",
       "scope": "CM-1713 Stage 02 exact approval request packet final display / request boundary",

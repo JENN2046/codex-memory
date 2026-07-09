@@ -235,7 +235,7 @@ test('CM-1062 builds a store-backed dry-run preview without applying cleanup', a
     assert.equal(report.storeReadSummary.storeReadCount, 4);
     assert.equal(report.storeReadSummary.sqliteShadowRecordPresent, true);
     assert.equal(report.storeReadSummary.vectorIndexRecordPresent, true);
-    assert.equal(report.storeReadSummary.candidateCacheEntryCount, 1);
+    assert.equal(report.storeReadSummary.candidateCacheEntryCount, 2);
     assert.equal(report.storeReadSummary.reconcileTaskCount, 2);
     assert.deepEqual(report.plannedActions, [
       {
@@ -254,7 +254,7 @@ test('CM-1062 builds a store-backed dry-run preview without applying cleanup', a
         action: 'clear_candidate_cache_entries',
         store: 'candidate_cache_entries',
         memoryId,
-        expectedEntryCount: 1,
+        expectedEntryCount: 2,
         applies: false
       },
       {
