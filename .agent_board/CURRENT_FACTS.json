@@ -10,9 +10,9 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2078",
-  "validationId": "CMV-2179",
-  "branch": "main",
+  "taskId": "CM-2079",
+  "validationId": "CMV-2180",
+  "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -27,12 +27,15 @@
     "presentInLocalCheckout": null
   },
   "evidenceBaseline": {
-    "sourceCommit": "ddfc67d2f227d3e726ce5f1829751c783eccddc8",
-    "worktreeClean": false,
-    "loadedRuntimeHead": "2537f31e178e5a61059cca2505bb5d4f01e498ec",
-    "runtimeHeadMatchesSourceCommit": false,
-    "phase2MachineEvidenceEligible": false,
-    "phase9MachineObservationEligible": false,
+    "sourceCommit": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+    "worktreeClean": true,
+    "loadedRuntimeHead": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+    "runtimeHeadMatchesSourceCommit": true,
+    "phase2MachineEvidenceEligible": true,
+    "phase9MachineObservationEligible": true,
+    "canonicalPayloadSha256": "2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2",
+    "validationFixtureUsed": true,
+    "productionProviderProofClaimed": false,
     "completionAuditBeforeTagApprovalOrderEnforced": true,
     "externalReviewPassed": false,
     "externalReviewEvidenceBundleAppliedToCompletionAudit": false,
@@ -42,7 +45,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_machine_evidence_rebaseline_replay_required_all_decisions_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_clean_frozen_replay_passed_external_review_reapplication_required_all_decisions_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -50,6 +53,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2180",
+      "scope": "CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication",
+      "status": "COMPLETED_CLEAN_FROZEN_REPLAY_PASSED_EXTERNAL_REVIEW_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2179",
       "scope": "CM-2078 machine-verifiable review evidence rebaseline and canonical bundle",

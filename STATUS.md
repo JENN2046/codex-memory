@@ -4,13 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2078 machine-verifiable review evidence rebaseline and canonical bundle`.
-Current validation: `CMV-2179`.
-Current project status: The supplied review contains conflicting positive and changes-required decisions, so the effective review result is fail-closed `externalReviewPassed=false`. CM-2077/2078 add machine-generated low-disclosure Phase 2 and Phase 9 artifacts, real `test:all`/`gate:ci` execution references, and a hash-self-verifying canonical Markdown review bundle. The current checkout is dirty and the loaded runtime HEAD differs from the source commit, therefore Phase 2 and Phase 9 machine completion eligibility remain false. Review application, tag approval, and Phase 8 write authorization also remain false. No primary/native memory write, remote action, or readiness claim occurred.
-Current route: `CM2078_MACHINE_EVIDENCE_SHAPE_VALID_FROZEN_RUNTIME_MATCHED_REPLAY_REQUIRED_ALL_FOUR_DECISIONS_FALSE`.
+Current task: `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication`.
+Current validation: `CMV-2180`.
+Current project status: The clean frozen checkout at source commit `1822d7e8…` completed a machine-orchestrated Phase 2/9 replay. The Phase 2 manifest, Windows/WSL receipt, actual stdio tools/list, default-policy gate, `test:all`, `gate:ci`, and canonical review bundle all verify. This is fixture-backed validation, not production-provider proof. The earlier conflicting review still resolves fail-closed, so external review, Completion Audit application, Tag Approval Packet, and Phase 8 native-write authorization all remain false. No primary/native memory write, remote action, or readiness claim occurred.
+Current route: `CM2079_CLEAN_FROZEN_REPLAY_PASSED_EXTERNAL_REVIEW_REAPPLICATION_REQUIRED_ALL_FOUR_DECISIONS_FALSE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2079 clean frozen runtime-matched replay: executed the reusable evidence
+generator from clean source commit `1822d7e8492424cd4b8849d544df087cf9c8edad`.
+The three governed native read operations, Windows/WSL smoke, actual stdio
+`tools/list`, policy gate, `test:all` (`5091/5091`, `94/94`, `6/6`), and
+fixture-only `gate:ci` all passed. Phase 2 and Phase 9 machine artifacts now
+derive eligible=true. The canonical payload SHA-256 is
+`2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2`.
+All four independent authorization decisions remain false pending a new,
+unambiguous external review and later separate gates.
 
 CM-2078 machine-verifiable review rebaseline and canonical bundle: records the
 actual five-tool default surface and current policy-gate summary, binds the

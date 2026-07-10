@@ -1,13 +1,19 @@
 {
   "schemaVersion": 2,
   "taskId": "CM-2078",
+  "replayTaskId": "CM-2079",
   "mode": "canonical-external-review-bundle-v2",
+  "canonicalPayloadSha256": "2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2",
   "payload": {
-    "generatedAt": "2026-07-10T17:48:21.238Z",
-    "sourceCommit": "ddfc67d2f227d3e726ce5f1829751c783eccddc8",
-    "worktreeClean": false,
-    "loadedRuntimeHead": "2537f31e178e5a61059cca2505bb5d4f01e498ec",
-    "runtimeHeadMatchesSourceCommit": false,
+    "generatedAt": "2026-07-10T19:11:53.099Z",
+    "sourceCommit": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+    "sourceTree": "bac696fac692509572ecd1ab889a5b3aedc4b9a6",
+    "worktreeClean": true,
+    "loadedRuntimeHead": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+    "runtimeHeadMatchesSourceCommit": true,
+    "runtimeEvidenceClass": "clean_frozen_local_process_replay",
+    "validationFixtureUsed": true,
+    "productionProviderProofClaimed": false,
     "reviewDisposition": "changes_required_fail_closed",
     "reviewReferences": [
       "CM-2076-ER-20260710-H3-fba72d91-bedadb40-f18fe2de",
@@ -15,28 +21,28 @@
     ],
     "evidenceEntries": [
       {
-        "sourceRef": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
-        "sha256": "e9d87b41dfbea3ed80506729429f69d6784ac8e0722df809fc3c165a7a9bc662",
         "evidenceClass": "machine_generated_phase2_execution_manifest",
-        "lowDisclosureOnly": true
+        "lowDisclosureOnly": true,
+        "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+        "sourceRef": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json"
       },
       {
-        "sourceRef": "docs/near-model-memory-plan-pack/windows_wsl_machine_smoke_receipt.json",
-        "sha256": "eed480499cb1d820e2506c06f8e2e0ac8d4dc71c3413f9004ec25b6ad71d9121",
         "evidenceClass": "machine_generated_windows_wsl_smoke_receipt",
-        "lowDisclosureOnly": true
+        "lowDisclosureOnly": true,
+        "sha256": "60b38d4025d567aa8ac7b839b00aa3539884d67450647157cbe22b9c2363718d",
+        "sourceRef": "docs/near-model-memory-plan-pack/windows_wsl_machine_smoke_receipt.json"
       },
       {
-        "sourceRef": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
-        "sha256": "c97f302e91ee9b202e3b0eaba6442d97d557e36d3fcad7fb680f92196e0fb005",
         "evidenceClass": "machine_generated_phase9_observation",
-        "lowDisclosureOnly": true
+        "lowDisclosureOnly": true,
+        "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+        "sourceRef": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json"
       },
       {
-        "sourceRef": "docs/near-model-memory-plan-pack/external_review_conflict_resolution_report.md",
-        "sha256": "0e6c6f285c0f8f6caec80c46588ce78ae51829d5bdaa2498882b0fae42a96014",
         "evidenceClass": "fail_closed_external_review_conflict_resolution",
-        "lowDisclosureOnly": true
+        "lowDisclosureOnly": true,
+        "sha256": "0e6c6f285c0f8f6caec80c46588ce78ae51829d5bdaa2498882b0fae42a96014",
+        "sourceRef": "docs/near-model-memory-plan-pack/external_review_conflict_resolution_report.md"
       }
     ],
     "effectiveDecisions": {
@@ -45,16 +51,15 @@
       "tagApprovalPacketPassed": false,
       "phase8NativeWriteAuthorizationGranted": false
     },
-    "canonicalRenderedBundleRef": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_canonical.md",
-    "canonicalRenderedBundleAvailable": true,
     "completionDerivation": {
       "eligible": false,
       "fullPlanPackCompleted": false,
-      "reason": "dirty_checkout_runtime_head_mismatch_and_four_independent_decisions_false"
+      "reason": "machine_replay_eligible_but_four_independent_decisions_remain_false"
     },
+    "canonicalRenderedBundleRef": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_canonical.md",
+    "canonicalRenderedBundleAvailable": true,
     "rawPrivateMemoryAccessed": false,
     "defaultMcpExpanded": false,
     "readinessClaimed": false
-  },
-  "canonicalPayloadSha256": "bbd3eeeabf6cfb02f43af5da944804aed6aa3192cca0b7d604be6bb9bccaaca3"
+  }
 }

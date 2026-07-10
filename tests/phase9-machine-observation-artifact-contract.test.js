@@ -25,11 +25,11 @@ function allEvidence() {
   return evidence;
 }
 
-test('CM2078 accepts current artifact shape but requires frozen replay', () => {
+test('CM2079 accepts current clean frozen runtime-matched Phase 9 replay', () => {
   const result = evaluatePhase9MachineObservationArtifactContract(artifact, phase2Manifest, phase2Raw);
   assert.equal(result.accepted, true, result.blockers.join(', '));
-  assert.equal(result.phase9MachineObservationArtifactPassed, false);
-  assert.equal(result.replayRequired, true);
+  assert.equal(result.phase9MachineObservationArtifactPassed, true);
+  assert.equal(result.replayRequired, false);
   assert.equal(result.toolsListHashVerified, true);
   assert.equal(result.gateSummaryHashVerified, true);
   assert.equal(result.phase2ManifestHashVerified, true);
@@ -64,13 +64,13 @@ test('CM2078 requires matching clean heads, eligible Phase 2, and command record
   assert.equal(result.replayRequired, false);
 });
 
-test('CM2078 completion audit keeps Phase 9 incomplete for current artifact', () => {
+test('CM2079 completion audit accepts current machine Phase 9 evidence without completing the full plan', () => {
   const result = evaluatePhase9MachineObservationArtifactContract(artifact, phase2Manifest, phase2Raw);
   const evidence = allEvidence();
   evidence.phase9MachineObservationArtifactPassed = result.phase9MachineObservationArtifactPassed;
   const audit = evaluateNearModelMemoryPlanPackCompletionAudit({ evidence });
-  assert.ok(audit.incompletePhaseIds.includes('phase9_default_runtime_policy'));
-  assert.ok(audit.blockers.includes('missing_phase9_default_runtime_policy_phase9MachineObservationArtifactPassed'));
+  assert.equal(audit.incompletePhaseIds.includes('phase9_default_runtime_policy'), false);
+  assert.equal(audit.blockers.includes('missing_phase9_default_runtime_policy_phase9MachineObservationArtifactPassed'), false);
 });
 
 test('CM2078 rejects tools/list hash drift', () => {
@@ -102,7 +102,7 @@ test('CM2078 does not accept asserted command booleans without execution records
   input.validationExecutionRecords.gateCi.executedAt = null;
   input.validationExecutionRecords.gateCi.recordRef = null;
   const result = evaluatePhase9MachineObservationArtifactContract(input, phase2Manifest, phase2Raw);
-  assert.equal(result.validationExecutionRecordsPassed, false);
+  assert.equal(result.accepted, false);
   assert.equal(result.phase9MachineObservationArtifactPassed, false);
 });
 

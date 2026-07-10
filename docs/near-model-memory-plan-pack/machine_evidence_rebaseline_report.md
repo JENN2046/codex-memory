@@ -1,34 +1,27 @@
-# Machine Evidence Rebaseline Report
+# Machine Evidence Frozen Replay Report
 
-Tasks: `CM-2077`, `CM-2078`
+Tasks: `CM-2077`, `CM-2078`, `CM-2079`
 
-Result: `MACHINE_EVIDENCE_CAPTURED_FROZEN_REPLAY_REQUIRED`
+Result: `CLEAN_FROZEN_RUNTIME_MATCHED_REPLAY_PASSED_EXTERNAL_REVIEW_REQUIRED`
 
-## Why the Earlier Completion Claim Was Withdrawn
-
-The external-review input contained conflicting decisions. The stricter and
-later review identified that the CM-2073 through CM-2075 evidence was
-hash-bound but not independently replayable: the working tree was dirty and the
-loaded runtime HEAD did not match the reviewed checkout.
-
-The new machine artifacts therefore fail closed. They accept the low-disclosure
-evidence shape but do not satisfy Phase 2 or Phase 9 completion:
+## Frozen Baseline
 
 ```text
-sourceCommit=ddfc67d2f227d3e726ce5f1829751c783eccddc8
-loadedRuntimeHead=2537f31e178e5a61059cca2505bb5d4f01e498ec
-worktreeClean=false
-runtimeHeadMatchesSourceCommit=false
+sourceCommit=1822d7e8492424cd4b8849d544df087cf9c8edad
+sourceTree=bac696fac692509572ecd1ab889a5b3aedc4b9a6
+worktreeClean=true
+loadedRuntimeHead=1822d7e8492424cd4b8849d544df087cf9c8edad
+runtimeHeadMatchesSourceCommit=true
 ```
+
+The reusable generator executed from that clean commit and delayed all tracked
+artifact writes until runtime and validation checks had completed. The earlier
+dirty/mismatched CM-2077/2078 artifact versions are superseded.
 
 ## Phase 2 Machine Evidence
 
-Artifacts:
-
-- `phase2_machine_execution_evidence_manifest.json`
-- `windows_wsl_machine_smoke_receipt.json`
-
-The manifest was produced from a fresh bounded execution of:
+The generator started a disposable VCPToolBox native shim, used a fixture
+embedding provider and isolated derived store, and executed exactly:
 
 ```text
 search_memory
@@ -36,77 +29,90 @@ memory_overview
 audit_memory
 ```
 
-Each call contains a safe call reference and SHA-256 over its complete
-low-disclosure receipt projection. The manifest records three native reads,
-three provider calls, three local audit appends, three isolated derived-index
-writes, and zero memory writes, primary-store writes, fallback uses, raw/private
-returns, or readiness claims.
-
-The contract derives:
+Observed aggregate:
 
 ```text
-phase2MachineExecutionEvidenceManifestPassed=false
-completionEligible=false
-replayRequired=true
+native read attempts/successes: 3/3
+provider calls: 3
+memory reads: 3
+isolated derived-index writes: 3
+local audit appends: 3
+primary memory-store writes: 0
+native memory writes: 0
+fallback uses: 0
+raw/private returns: 0
+readiness claims: 0
 ```
 
-This is stronger than the earlier caller-supplied boolean contract because the
-call projections and their hashes are machine-verifiable. It also prevents the
-current mismatched runtime evidence from completing Phase 2.
+Both `cmd.exe` and `powershell.exe` Windows/WSL bridge checks passed with output
+suppressed. The Phase 2 machine contract derives:
+
+```text
+phase2MachineExecutionEvidenceManifestPassed=true
+completionEligible=true
+replayRequired=false
+```
+
+This is validation-fixture proof, not production-provider proof and not Phase 8
+native-write proof.
 
 ## Phase 9 Machine Observation
 
-Artifact:
-
-- `phase9_machine_observation_artifact.json`
-
-It binds:
-
-- the actual five-tool public surface and its SHA-256;
-- the actual `DefaultRuntimePolicyObservationGate` output summary and SHA-256;
-- the Phase 2 machine manifest file hash and three safe call references;
-- actual `test:all` and `gate:ci` execution records with low-disclosure
-  timestamp/category references.
-
-The current command records pass (`5082/5082`, `94/94`, `6/6`, and
-`gate:ci` ok), but the artifact still derives:
+An actual stdio `initialize` plus `tools/list` against the frozen checkout
+returned exactly:
 
 ```text
-phase9MachineObservationArtifactPassed=false
-completionEligible=false
-replayRequired=true
+audit_memory
+memory_overview
+prepare_memory_context
+propose_memory_delta
+search_memory
 ```
 
-Command success cannot override the dirty checkout or loaded-runtime HEAD
-mismatch. The same commands must be regenerated from the eventual frozen,
-runtime-matched checkout.
+The default policy gate accepted the read/context/proposal hold. Public
+`commit_memory_delta`, default write, default expansion, provider use by the
+policy gate, and readiness claims remained false.
+
+Validation records:
+
+```text
+test:all: 5091/5091 + 94/94 + 6/6, exit zero
+gate:ci -- --json: PASS, fixtureOnly=true, noNetwork=true, noProvider=true
+```
+
+The Phase 9 machine contract derives:
+
+```text
+phase9MachineObservationArtifactPassed=true
+completionEligible=true
+replayRequired=false
+```
 
 ## Canonical Review Bundle
 
-Artifacts:
+```text
+canonicalPayloadSha256=2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2
+```
 
-- `external_review_handoff_bundle_v2.json`
-- `external_review_handoff_bundle_canonical.md`
+Evidence hashes:
 
-The v2 bundle binds the Phase 2 manifest, Windows/WSL receipt, Phase 9
-artifact, and fail-closed conflict resolution by SHA-256. Its payload is
-recursively key-sorted, rendered verbatim into Markdown, and carries its own
-SHA-256. All four independent decisions remain false.
+```text
+phase2_machine_execution_evidence_manifest.json=9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03
+windows_wsl_machine_smoke_receipt.json=60b38d4025d567aa8ac7b839b00aa3539884d67450647157cbe22b9c2363718d
+phase9_machine_observation_artifact.json=138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d
+external_review_conflict_resolution_report.md=0e6c6f285c0f8f6caec80c46588ce78ae51829d5bdaa2498882b0fae42a96014
+```
 
-## Required Frozen Replay
+## Effective Decisions
 
-Before Phase 2 or Phase 9 can be accepted again:
+```yaml
+externalReviewPassed: false
+externalReviewEvidenceBundleAppliedToCompletionAudit: false
+tagApprovalPacketPassed: false
+phase8NativeWriteAuthorizationGranted: false
+```
 
-1. Freeze the intended evidence checkout in a clean local commit.
-2. Ensure the loaded runtime HEAD equals that commit.
-3. Re-run the three native read calls and Windows/WSL smoke.
-4. Re-run `test:all` and `gate:ci` from the same clean checkout.
-5. Regenerate the machine artifacts and canonical review bundle.
-6. Obtain a new non-conflicting external review decision.
-
-The application sequence is now non-circular: external review evidence is
-applied to the Completion Audit first; a Tag Approval Packet is reviewed only
-afterward and remains required for Phase 10/tag action.
-
-No Phase 8 write, tag, release, push, deploy, cutover, or readiness action is
-authorized or performed by this rebaseline.
+The replay repairs the lineage, clean-checkout, runtime-head, Windows/WSL, and
+actual-observation findings. It does not self-accept external review, apply the
+Completion Audit patch, approve a Tag Approval Packet, authorize Phase 8, push,
+tag, release, deploy, cut over, or establish readiness.

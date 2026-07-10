@@ -4,19 +4,20 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2078 machine-verifiable review evidence rebaseline and canonical bundle`.
-Current validation: `CMV-2179`.
-Current handoff: CM-2077/2078 replace asserted Phase 2/9 acceptance with machine-derived evidence and a canonical readable bundle. Evidence shape verifies, but dirty checkout and loaded-runtime HEAD drift force replay and keep Phase 2/9 false. External review, review-bundle application, tag approval, and Phase 8 write authorization are independently false. No primary/native memory write, remote action, or readiness claim occurred.
+Current task: `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication`.
+Current validation: `CMV-2180`.
+Current handoff: CM-2079 completed the clean, runtime-matched Phase 2/9 machine replay on source commit `1822d7e8…`; both machine artifacts and the canonical bundle pass. The proof is fixture-backed, not production-provider proof. External review, review-bundle application, tag approval, and Phase 8 write authorization remain independently false. No primary/native memory write, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
 Goal: complete the imported near-model-memory plan pack. Current local source,
-contract, fixture, and machine-evidence preparation is substantial, but Phase 2
-and Phase 9 acceptance were withdrawn after external review found lineage and
-replayability gaps. A clean/frozen, runtime-matched replay remains required.
-The four explicit external/exact-authority decisions are all false.
+contract, fixture, and machine-evidence preparation is substantial. CM-2079 has
+closed the clean-checkout, runtime-head, replayable Phase 2 receipt, Windows/WSL,
+actual tools/list, and validation-record findings. A new unambiguous external
+review is now required. The four explicit external/exact-authority decisions
+are all false.
 
 Current status: `COMPLETED_VALIDATED_EVIDENCE_MATERIAL_REVIEWED_DECISION_PACKET_REFERENCE_REVIEW_BOUNDARY_NO_PACKET_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM`; production/release/cutover ready no; full plan-pack completion not claimed; complete V8 not claimed. Public MCP default surface remains read-only plus proposal-only and includes `prepare_memory_context` and `propose_memory_delta`; `commit_memory_delta` remains not default/public and is only represented by local operator preflight evidence. Direct governed native read delegation remains limited to `search_memory`, `memory_overview`, and `audit_memory`. CM-2071 consumes the CM-2070 reference intake execution result and prepares low-disclosure reviewed acceptance decision boundary checklist entries, then binds `evidenceMaterialReviewedDecisionPacketReferenceReviewBoundaryPassed` into the acceptance chain as local_contract evidence only. It does not receive actual reviewed decision packet body/value; does not accept an actual reviewed decision packet; does not accept an acceptance decision packet, submit or make an acceptance decision, accept exact authorization, approval, receipts, review evidence, tag approval, or evidence material; does not apply evidence or completion-audit patches; does not disclose endpoint/locator/request/response/raw/review/private-memory values; does not call VCPToolBox/runtime/provider surfaces; does not execute native read/write; does not mutate durable state; does not expand public MCP or default runtime; does not create/push tags, publish releases, deploy/cut over, complete phases, or claim readiness. The full plan pack still lacks actual low-disclosure Phase 2 native read proof, fallback distinction, low-disclosure proof, audit/scope visibility, WSL/Linux proof, Windows/WSL smoke receipts, receipt application, and patch evidence; actual Phase 8 exact-authorized native side-effect, durable write, verify, rollback, failure, output, audit, exact approval enforcement, receipt application, and patch evidence; Phase 9 observation/external review evidence for completion; and Phase 10 external review/tag approval packet evidence for completion. VCPToolBox native memory remains final memory intelligence owner. Native runtime calls, native write production, durable mutation, default expansion, external review completion, actual release/tag/deploy/cutover/push, M15/RC unlock, and readiness claims remain forbidden without separate evidence and approval.
 

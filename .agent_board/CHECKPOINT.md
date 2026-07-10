@@ -4,11 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2078 machine-verifiable review evidence rebaseline and canonical bundle`.
-Current validation: `CMV-2179`.
+Current checkpoint: `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication`.
+Current validation: `CMV-2180`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2079 Clean Frozen Runtime-Matched Replay
+
+Status: `CLEAN_FROZEN_REPLAY_PASSED_EXTERNAL_REVIEW_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM`
+
+Recorded:
+
+- Replayed Phase 2 and Phase 9 from clean source/runtime commit `1822d7e8…`.
+- Passed three native reads, Windows/WSL smoke, actual stdio tools/list,
+  `test:all`, and fixture-only `gate:ci`.
+- Regenerated the canonical bundle with payload SHA-256 `2215bb33…622f2`.
+- Kept external review, Completion Audit application, tag approval, and Phase 8
+  native-write authorization false.
+- Performed zero primary/native memory writes, remote actions, or readiness
+  claims.
+
+Validation: `CMV-2180`.
 
 ## CM-2078 Machine Evidence Rebaseline And Canonical Bundle
 

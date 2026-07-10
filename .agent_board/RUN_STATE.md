@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2078 machine-verifiable review evidence rebaseline and canonical bundle`.
-Current validation: `CMV-2179`.
-Current status: Conflicting review decisions resolve fail-closed. Machine Phase 2/9 evidence and a canonical readable bundle exist and their hashes verify. Dirty checkout and loaded-runtime HEAD drift keep Phase 2/9 completion false. External review, review-bundle application, tag approval, and Phase 8 write authorization are all false.
+Current task: `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication`.
+Current validation: `CMV-2180`.
+Current status: Machine Phase 2/9 evidence and the canonical bundle pass on clean matching source/runtime commit `1822d7e8…`. The proof is fixture-backed. External review, review-bundle application, tag approval, and Phase 8 write authorization are all false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->

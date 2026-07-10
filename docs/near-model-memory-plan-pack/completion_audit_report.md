@@ -900,7 +900,7 @@ all decisions retained as false. It reduces the remaining external work to
 explicit decisions without self-accepting review or authority and performs no
 runtime, write, remote, tag, release, deploy, cutover, or readiness action.
 
-## CM-2077 / CM-2078 Update
+## CM-2077 / CM-2078 / CM-2079 Update
 
 `CM-2077` replaces caller-asserted Phase 2 completion with a machine-generated
 manifest containing three safe call references, per-call receipt projection
@@ -909,12 +909,15 @@ machine Windows/WSL receipt. `CM-2078` similarly binds the actual tools/list,
 default-runtime policy gate summary, bounded dogfood workflow, and concrete
 validation execution-record slots. Both contracts derive completion only when
 the checkout is clean, loaded runtime HEAD equals the source commit, and frozen
-replay evidence passes. Current artifacts are valid evidence shapes but fail
-completion because the checkout is dirty and runtime HEADs do not match. The
-earlier CM-2074 Phase 2 and CM-2075 Phase 9 completion statements are withdrawn
-pending replay.
+replay evidence passes. CM-2079 executed that replay from clean source commit
+`1822d7e8492424cd4b8849d544df087cf9c8edad`; current Phase 2 and Phase 9
+machine artifacts now derive eligible=true. The replay is fixture-backed and
+does not constitute production-provider or Phase 8 native-write proof.
 
 CM-2078 also resolves the prior application-order cycle. The application gate
 and exact patch application contract now require tag approval to remain false
 while external review evidence is applied. `tagApprovalPacketPassed` remains a
 separate Phase 10 requirement evaluated only after Completion Audit application.
+The prior external review decision remains `changes_required`, so
+`externalReviewPassed`, review-bundle application, tag approval, and Phase 8
+write authorization remain false. Full plan-pack completion remains false.

@@ -1,20 +1,24 @@
 {
   "schemaVersion": 1,
   "taskId": "CM-2077",
-  "generatedAt": "2026-07-10T17:31:29.215Z",
+  "replayTaskId": "CM-2079",
+  "generatedAt": "2026-07-10T19:08:47.634Z",
   "generationMethod": "sanitized_mcp_projection_captured_by_tool_orchestration",
-  "sourceCommit": "ddfc67d2f227d3e726ce5f1829751c783eccddc8",
-  "worktreeClean": false,
-  "loadedRuntimeHead": "2537f31e178e5a61059cca2505bb5d4f01e498ec",
-  "loadedRuntimeHeadEvidenceSource": "external_review_decision",
-  "runtimeHeadMatchesSourceCommit": false,
-  "runtimeDriftDisposition": "evidence_only_write_prohibited_replay_required_after_freeze",
+  "sourceCommit": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+  "sourceTree": "bac696fac692509572ecd1ab889a5b3aedc4b9a6",
+  "worktreeClean": true,
+  "loadedRuntimeHead": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+  "loadedRuntimeHeadEvidenceSource": "local_process_executed_from_clean_frozen_checkout",
+  "runtimeHeadMatchesSourceCommit": true,
+  "runtimeDriftDisposition": "none_clean_frozen_runtime_matched_replay",
+  "acceptanceArtifactSha256": "94226ccf0ae5f14a52a826346600a3ca8dd519b3931af07cf768419ed3b71b1e",
+  "validationFixtureUsed": true,
+  "productionProviderProofClaimed": false,
   "calls": [
     {
       "safeCallRef": "CM-2077-P2-1-search_memory",
-      "receiptSummarySha256": "1b6993a24c288aab705ea1f397b4f74cb7eaf63f4b977d9dc7688c9f9c0d0750",
       "toolName": "search_memory",
-      "observedAt": "2026-07-10T17:31:29.215Z",
+      "observedAt": "2026-07-10T19:08:45.845Z",
       "accepted": true,
       "statusCategory": "GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED",
       "targetReferenceName": "operator-vcp-toolbox-service-ref",
@@ -23,7 +27,7 @@
       "nativeInvocationAttempted": true,
       "nativeInvocationSucceeded": true,
       "responseShapeCategory": "object_top_level_kind_only_no_field_names",
-      "itemCountBucket": "one",
+      "itemCountBucket": "zero_or_one",
       "invocationBindingMatched": true,
       "scopeBoundaryBound": true,
       "visibilityBound": true,
@@ -54,13 +58,13 @@
       "filesystemPathsReturned": false,
       "tokenMaterialReturned": false,
       "providerPayloadReturned": false,
-      "readinessClaimed": false
+      "readinessClaimed": false,
+      "receiptSummarySha256": "e55f9443d58ef107ea40dee93f2dee04793e0db107f4764d03227fceadd09c7e"
     },
     {
       "safeCallRef": "CM-2077-P2-2-memory_overview",
-      "receiptSummarySha256": "2ed345def376cd052a7a372f31903837886e74a424522ad52bbd878ef5d729d1",
       "toolName": "memory_overview",
-      "observedAt": "2026-07-10T17:31:29.215Z",
+      "observedAt": "2026-07-10T19:08:45.845Z",
       "accepted": true,
       "statusCategory": "GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED",
       "targetReferenceName": "operator-vcp-toolbox-service-ref",
@@ -100,13 +104,13 @@
       "filesystemPathsReturned": false,
       "tokenMaterialReturned": false,
       "providerPayloadReturned": false,
-      "readinessClaimed": false
+      "readinessClaimed": false,
+      "receiptSummarySha256": "6253c30b1795989147fb76183251456fdf726d762678c1fdbf211cb121569fd1"
     },
     {
       "safeCallRef": "CM-2077-P2-3-audit_memory",
-      "receiptSummarySha256": "8d9e77ee18ff92285059dae0d9ee8957c8509a96c326f0717802a227cb4bc3f3",
       "toolName": "audit_memory",
-      "observedAt": "2026-07-10T17:31:29.215Z",
+      "observedAt": "2026-07-10T19:08:45.845Z",
       "accepted": true,
       "statusCategory": "GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED",
       "targetReferenceName": "operator-vcp-toolbox-service-ref",
@@ -146,7 +150,8 @@
       "filesystemPathsReturned": false,
       "tokenMaterialReturned": false,
       "providerPayloadReturned": false,
-      "readinessClaimed": false
+      "readinessClaimed": false,
+      "receiptSummarySha256": "1491c3fa8f0a6ffe81c3f7a34eaa9e56bc86c3d14384d790db62ad220886b8f6"
     }
   ],
   "aggregate": {
@@ -164,8 +169,8 @@
     "readinessClaims": 0
   },
   "phase2CompletionDerivation": {
-    "eligible": false,
-    "reason": "runtime_head_mismatch_and_worktree_not_clean_require_frozen_replay",
-    "phase2AcceptedFromThisManifest": false
+    "eligible": true,
+    "reason": "clean_frozen_runtime_matched_machine_replay_passed",
+    "phase2AcceptedFromThisManifest": true
   }
 }

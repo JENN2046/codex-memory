@@ -22,12 +22,12 @@ function allEvidence() {
   return evidence;
 }
 
-test('CM2077 accepts current machine evidence shape but requires frozen replay', () => {
+test('CM2079 accepts current clean frozen runtime-matched Phase 2 replay', () => {
   const result = evaluatePhase2MachineExecutionEvidenceManifestContract(manifest, windowsReceipt);
   assert.equal(result.accepted, true, result.blockers.join(', '));
-  assert.equal(result.phase2MachineExecutionEvidenceManifestPassed, false);
-  assert.equal(result.completionEligible, false);
-  assert.equal(result.replayRequired, true);
+  assert.equal(result.phase2MachineExecutionEvidenceManifestPassed, true);
+  assert.equal(result.completionEligible, true);
+  assert.equal(result.replayRequired, false);
   assert.equal(result.callReceiptHashesVerified, 3);
   assert.equal(result.windowsSmokeVerified, true);
   assert.equal(result.primaryMemoryStoreWritten, false);
@@ -51,14 +51,13 @@ test('CM2077 derives Phase 2 completion eligibility only from clean matching hea
   assert.equal(result.replayRequired, false);
 });
 
-test('CM2077 completion audit keeps Phase 2 incomplete for current manifest', () => {
+test('CM2079 completion audit accepts current machine Phase 2 evidence without completing the full plan', () => {
   const evidence = allEvidence();
   const result = evaluatePhase2MachineExecutionEvidenceManifestContract(manifest, windowsReceipt);
   evidence.phase2MachineExecutionEvidenceManifestPassed = result.phase2MachineExecutionEvidenceManifestPassed;
   const audit = evaluateNearModelMemoryPlanPackCompletionAudit({ evidence });
-  assert.ok(audit.incompletePhaseIds.includes('phase2_readonly_realtime_native_memory'));
-  assert.ok(audit.blockers.includes('missing_phase2_readonly_realtime_native_memory_phase2MachineExecutionEvidenceManifestPassed'));
-  assert.equal(audit.fullPlanPackCompleted, false);
+  assert.equal(audit.incompletePhaseIds.includes('phase2_readonly_realtime_native_memory'), false);
+  assert.equal(audit.blockers.includes('missing_phase2_readonly_realtime_native_memory_phase2MachineExecutionEvidenceManifestPassed'), false);
 });
 
 test('CM2077 rejects receipt summary hash drift', () => {
