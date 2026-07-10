@@ -401,9 +401,6 @@ async function main() {
   if (phase2Result.phase2MachineExecutionEvidenceManifestPassed !== true) {
     throw new Error(`phase2_manifest_contract_rejected:${phase2Result.blockers.join(',')}`);
   }
-  await writeJson(PHASE2_PATH, phase2Manifest);
-  await writeJson(WINDOWS_PATH, windowsReceipt);
-
   const actualToolsList = await observeActualDefaultTools();
   const gate = evaluateDefaultRuntimePolicyObservationGate({
     publicToolNames: actualToolsList.tools,
@@ -496,8 +493,6 @@ async function main() {
   if (phase9Result.phase9MachineObservationArtifactPassed !== true) {
     throw new Error(`phase9_artifact_contract_rejected:${phase9Result.blockers.join(',')}`);
   }
-  await writeJson(PHASE9_PATH, phase9Artifact);
-
   const conflictReportBody = await fsp.readFile(CONFLICT_REPORT_PATH, 'utf8');
   const evidenceBodies = {
     [EXPECTED_EVIDENCE_REFS[0]]: phase2Raw,
@@ -575,6 +570,9 @@ async function main() {
   if (bundleResult.canonicalReviewBundlePassed !== true) {
     throw new Error(`canonical_bundle_contract_rejected:${bundleResult.blockers.join(',')}`);
   }
+  await writeJson(PHASE2_PATH, phase2Manifest);
+  await writeJson(WINDOWS_PATH, windowsReceipt);
+  await writeJson(PHASE9_PATH, phase9Artifact);
   await writeJson(BUNDLE_PATH, bundle);
   await fsp.writeFile(CANONICAL_PATH, renderCanonicalReviewBundleMarkdown(bundle), 'utf8');
 
