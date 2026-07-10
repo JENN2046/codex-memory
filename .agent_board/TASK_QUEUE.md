@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest active task: `CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication`.
-Latest validation: `CMV-2181`.
+Latest active task: `CM-2081 CM-2080 final external-review decision intake and Completion Audit application request`.
+Latest validation: `CMV-2182`.
 Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -44,6 +44,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2081 | 2081 | done | P9-codex-claude-client-scope / P6-docs-drift | Green decision intake/request; no application/runtime/write/remote/readiness | decision JSON/Markdown; application request; focused contract/test; status/board | Record exact CM-2080 PASS and request only Completion Audit application | exact binding contract; frozen canonical regression; docs/current-facts/ledger/diff | revert CM-2081 commit; frozen evidence remains unchanged | separate application decision required; other three slots false | EXTERNAL_REVIEW_PASSED_APPLICATION_REQUESTED_NOT_EXECUTED_THREE_DECISIONS_FALSE_NO_READY_CLAIM |
 | CM-2080 | 2080 | done | P9-codex-claude-client-scope / P6-docs-drift | Green Git-object evidence binding; no runtime/write/remote/readiness | decision record; object manifest; second application; focused test; status/board | Make frozen evidence independently retrievable from the registered repository | object reachability; blob OID/bytes/SHA-256; canonical hash; docs/current-facts/ledger/diff | revert CM-2080 docs/tests/status commit; evidence commit remains local and unchanged | second external review required; all four decisions false | GIT_OBJECT_EVIDENCE_SURFACE_VERIFIED_SECOND_EXTERNAL_REVIEW_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM |
 | CM-2079 | 2079 | done | P9-codex-claude-client-scope / P8-memory-governance / P6-docs-drift | Amber clean frozen native-read replay with fixture provider; no primary/native write, tag, remote, or readiness | generator; Phase 2/Windows/Phase 9 artifacts; canonical bundle; external review reapplication; tests/status/board | Close external-review lineage and replayability findings without self-accepting any decision | machine generator; focused contracts; test:all; gate:ci; plan-pack/default/docs/governance/diff | revert CM-2079 evidence/status commit; isolated derived-index/audit effects were temporary | new external review required; all four decisions false | CLEAN_FROZEN_REPLAY_PASSED_EXTERNAL_REVIEW_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM |
 | CM-2078 | 2078 | done | P9-codex-claude-client-scope / P8-memory-governance / P6-docs-drift | Green/Amber machine observation and canonical review bundle; dirty/runtime-drift replay blocked; no write/tag/remote/readiness | Phase 9 artifact contract/test/JSON; canonical bundle contract/test/JSON/Markdown; conflict report; completion/trace/matrices/status/board | Replace asserted Phase 9/review claims with replayable low-disclosure artifacts and a readable self-hashed bundle | syntax; focused contracts; `test:all`; `gate:ci`; near-plan-pack/default/docs/governance/diff | revert CM-2078 scoped files; observed runtime reads/derived-index/audit side effects are evidence only and not reverted | clean/frozen runtime-matched replay and new unambiguous external review required; four independent decisions false | MACHINE_EVIDENCE_REBASELINE_VALID_REPLAY_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM |

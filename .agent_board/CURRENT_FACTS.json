@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2080",
-  "validationId": "CMV-2181",
+  "taskId": "CM-2081",
+  "validationId": "CMV-2182",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -39,9 +39,9 @@
     "evidenceCommit": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1",
     "evidenceTree": "bf5bbdaf47a7f05988d8e8d1b8ab4479e1a65ae4",
     "gitObjectEvidenceSurfaceVerified": true,
-    "externalReviewDecisionReference": "CM-2079-ER-20260711-FAIL-CLOSED-EVIDENCE-SURFACE-MISMATCH",
+    "externalReviewDecisionReference": "CM-2080-ER-20260711-PASS-F440C1BD-2215BB33",
     "completionAuditBeforeTagApprovalOrderEnforced": true,
-    "externalReviewPassed": false,
+    "externalReviewPassed": true,
     "externalReviewEvidenceBundleAppliedToCompletionAudit": false,
     "tagApprovalPacketPassed": false,
     "phase8NativeWriteAuthorizationGranted": false
@@ -49,7 +49,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_git_object_evidence_surface_verified_second_external_review_required_all_decisions_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_external_review_passed_completion_audit_application_requested_not_executed_three_decisions_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -57,6 +57,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2182",
+      "scope": "CM-2081 CM-2080 final external-review decision intake and Completion Audit application request",
+      "status": "COMPLETED_EXTERNAL_REVIEW_DECISION_ACCEPTED_APPLICATION_REQUESTED_NOT_EXECUTED_THREE_DECISIONS_FALSE_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2181",
       "scope": "CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication",
@@ -3384,9 +3389,6 @@
     }
   ],
   "notValidated": [
-    "clean frozen runtime-matched Phase 2 machine evidence replay",
-    "clean frozen runtime-matched Phase 9 dogfood observation replay",
-    "unambiguous external review over canonical v2 bundle",
     "external review completion-audit application receipt",
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",

@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication`.
-Current validation: `CMV-2181`.
+Current checkpoint: `CM-2081 CM-2080 final external-review decision intake and Completion Audit application request`.
+Current validation: `CMV-2182`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2081 Final External Review Decision Intake
+
+Status: `EXTERNAL_REVIEW_PASSED_APPLICATION_REQUESTED_NOT_EXECUTED_THREE_DECISIONS_FALSE_NO_READY_CLAIM`
+
+- Recorded exact decision `CM-2080-ER-20260711-PASS-F440C1BD-2215BB33`.
+- Validated the bound commits, trees, canonical payload, and six evidence objects.
+- Set only `externalReviewPassed=true`.
+- Prepared a separate Completion Audit application request without executing it.
+- Kept Tag Approval and Phase 8 native-write authorization false.
+
+Validation: `CMV-2182`.
 
 ## CM-2080 Independently Retrievable Evidence Surface
 

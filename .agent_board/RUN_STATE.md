@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication`.
-Current validation: `CMV-2181`.
-Current status: Runtime source `1822d7e8…` and evidence commit `c0b8c24e…` are separately bound. Six evidence Git objects verify from the registered repository. External review, review-bundle application, tag approval, and Phase 8 write authorization are all false.
+Current task: `CM-2081 CM-2080 final external-review decision intake and Completion Audit application request`.
+Current validation: `CMV-2182`.
+Current status: Exact frozen evidence passed external review. Completion Audit application is requested but not executed; Tag Approval and Phase 8 write authorization remain false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,10 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is to freeze the intended evidence checkout, load the same
-runtime HEAD, and replay the bounded Phase 2/9 machine evidence. A new
-unambiguous external review may then assess the canonical bundle. Do not
-self-accept any of the four independent decisions.
+Next safe action is to obtain a separate decision on the CM-2081 Completion
+Audit application request. Do not self-apply the bundle, accept Tag Approval,
+authorize Phase 8 write, or infer readiness/completion.
 
 ## Historical Run Notes
 
