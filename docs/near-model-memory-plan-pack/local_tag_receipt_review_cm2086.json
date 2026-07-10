@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "reviewReference": "CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE",
+  "result": "PASS",
+  "localTag": {
+    "name": "v0.2.0-readonly-context-rc",
+    "exists": true,
+    "type": "annotated",
+    "signed": false,
+    "objectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
+    "peeledCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+    "targetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33",
+    "annotation": "codex-memory readonly-context RC candidate; not RC_READY; no release authorization"
+  },
+  "receipt": {
+    "commit": "ccf61fb531933517262a5f06482343a24f9120de",
+    "payloadSha256": "b6c2a597f109ca4a17f10dde88d505f81caf892ee607eb35b562693e77e7d3d0",
+    "accepted": true
+  },
+  "authorization": {
+    "decisionReference": "CM-2084-ER-20260711-LOCAL-ANNOTATED-TAG-CREATE-C06836B4",
+    "useCount": 1,
+    "consumed": true,
+    "replayAllowed": false
+  },
+  "remoteActions": {
+    "tagPushAuthorized": false,
+    "tagPushed": false,
+    "branchPushAuthorized": false,
+    "releaseAuthorized": false,
+    "deployAuthorized": false,
+    "cutoverAuthorized": false
+  },
+  "phase8NativeWriteAuthorizationGranted": false
+}

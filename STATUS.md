@@ -4,13 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2085 exact one-use local unsigned annotated tag creation and receipt`.
-Current validation: `CMV-2186`.
-Current project status: Local unsigned annotated tag `v0.2.0-readonly-context-rc` was created exactly at `170ee339…221b` under one-use authorization, which is now consumed. Tag push, branch push, release, publication, deploy, cutover, Phase 8, and readiness remain unauthorized and unperformed.
-Current route: `CM2085_LOCAL_ANNOTATED_TAG_CREATED_AUTHORIZATION_CONSUMED_NO_PUSH_NO_RELEASE_NO_READY_CLAIM`.
+Current task: `CM-2086 local tag receipt review intake and exact tag push authorization request`.
+Current validation: `CMV-2187`.
+Current project status: Independent review confirms the exact local tag and CM-2085 receipt. A one-use exact tag push request is prepared, but `tagPushAuthorized=false`; no remote query or push occurred. Branch push, release, publication, deploy, cutover, Phase 8, and readiness remain unauthorized.
+Current route: `CM2086_LOCAL_TAG_RECEIPT_REVIEW_PASSED_TAG_PUSH_REQUESTED_NOT_AUTHORIZED_NO_REMOTE_ACTION_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2086 local tag receipt review: records review
+`CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE` and prepares a separate
+exact tag push request bound to `origin`, the full tag refspec, tag object OID,
+peeled commit, tree, and receipt hash. No network query or push occurred; force,
+all-tags, branch push, release, deploy, Phase 8, and readiness remain forbidden.
 
 CM-2085 local annotated tag creation: consumed exact authorization
 `CM-2084-ER-20260711-LOCAL-ANNOTATED-TAG-CREATE-C06836B4` once and created an

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest receipt: `CM-2085 exact one-use local unsigned annotated tag creation and receipt`.
-Latest validation: `CMV-2186`.
+Latest receipt: `CM-2086 local tag receipt review intake and exact tag push authorization request`.
+Latest validation: `CMV-2187`.
 Active receipt summaries should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -31,6 +31,7 @@ Governance kernel anchor retained for validation: `CM-0684`.
 
 | ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |
 |---|---|---|---|---|---|---|---|---:|---|---|
+| CM-2086 | complete imported near-model-memory plan pack | Green review intake and request | `local_tag_receipt_review_no_remote_action` | Recorded local tag receipt review and prepared exact tag push authorization request | `task_id=CM-2086; review_reference=CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE; local_tag_review=true; tag_oid=baf7ecce; receipt_sha256=b6c2a597; tag_push_requested=true; tag_push_authorized=false; network_calls=0; remote_actions=0; phase8_authorization=false; readiness_claims=0` | `CMV-2187` | 0 | tag push, branch push, release/deploy/Phase 8/readiness remain gated | completed_local_tag_receipt_review_passed_tag_push_requested_not_authorized_no_remote_action_no_ready_claim | 2026-07-11 |
 | CM-2085 | complete imported near-model-memory plan pack | Red exact local tag create authorized once | `local_unsigned_annotated_tag_create_no_push` | Created exact local unsigned annotated tag and consumed one-use authorization | `task_id=CM-2085; decision_reference=CM-2084-ER-20260711-LOCAL-ANNOTATED-TAG-CREATE-C06836B4; tag=v0.2.0-readonly-context-rc; target=170ee339; tag_oid=baf7ecce; authorization_uses=1; authorization_consumed=true; tag_create=1; tag_push=0; remote_actions=0; phase8_authorization=false; readiness_claims=0` | `CMV-2186` | 0 | tag push, delete/rebuild, release/deploy/Phase 8/readiness remain gated | completed_local_annotated_tag_created_authorization_consumed_no_push_no_release_no_ready_claim | 2026-07-11 |
 | CM-2084 | complete imported near-model-memory plan pack | Green decision intake and request | `tag_approval_pass_no_tag_action` | Recorded exact Tag Approval decision and prepared local tag creation authorization request | `task_id=CM-2084; decision_reference=CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4; tag_approval=true; tag_creation_authorized=false; tag_push_authorized=false; tag_create=0; tag_push=0; phase8_authorization=false; remote_actions=0; readiness_claims=0` | `CMV-2185` | 0 | tag creation/push, Phase 8, release/deploy/readiness remain gated | completed_tag_approval_packet_passed_tag_creation_requested_not_authorized_no_tag_no_push_no_ready_claim | 2026-07-11 |
 | CM-2083 | complete imported near-model-memory plan pack | Green packet preparation | `real_tag_approval_packet_no_tag_action` | Prepared real hash-bound Tag Approval Packet and independent review request | `task_id=CM-2083; candidate=v0.2.0-readonly-context-rc; target_commit=170ee339; packet_sha256=c06836b4; release_notes_sha256=e429fe2a; local_policy_shape=true; tag_approval=false; tag_create=0; tag_push=0; phase8_authorization=false; remote_actions=0; readiness_claims=0` | `CMV-2184` | 0 | independent Tag Approval, tag create/push, Phase 8, release/deploy/readiness remain gated | completed_tag_approval_packet_prepared_for_independent_review_tag_approval_false_no_tag_no_push_no_ready_claim | 2026-07-11 |

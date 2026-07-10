@@ -8,15 +8,22 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2085 local unsigned annotated tag created; push remains unauthorized |
-| Current task | `CM-2085 exact one-use local unsigned annotated tag creation and receipt` |
-| Current validation | `CMV-2186` |
-| Current route | `v0.2.0-readonly-context-rc` exists locally at `170ee339…`; authorization consumed, no push/release/readiness authority |
+| Status | CM-2085 local tag receipt review passed; exact tag push authorization requested |
+| Current task | `CM-2086 local tag receipt review intake and exact tag push authorization request` |
+| Current validation | `CMV-2187` |
+| Current route | Local tag is verified; tag push remains false and no remote action has occurred |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2086` records receipt review
+`CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE`. It confirms the local
+tag and one-use authorization consumption without granting any remote action.
+A separate request now asks only for one exact non-force tag ref push to
+verified `origin`; branch push, release, deploy, Phase 8, and readiness remain
+false. No remote query or push has been executed.
 
 `CM-2085` consumed the one-use exact authorization and created the local,
 unsigned annotated tag `v0.2.0-readonly-context-rc` pointing exactly to

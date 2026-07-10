@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2085",
-  "validationId": "CMV-2186",
+  "taskId": "CM-2086",
+  "validationId": "CMV-2187",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -57,6 +57,9 @@
     "tagCreated": true,
     "tagObjectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
     "tagCreationReceiptPayloadSha256": "b6c2a597f109ca4a17f10dde88d505f81caf892ee607eb35b562693e77e7d3d0",
+    "localTagReceiptReviewReference": "CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE",
+    "localTagReceiptReviewPassed": true,
+    "tagPushAuthorizationRequested": true,
     "tagPushAuthorized": false,
     "tagPushed": false,
     "completionAuditBeforeTagApprovalOrderEnforced": true,
@@ -68,7 +71,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_local_annotated_tag_created_authorization_consumed_no_push_phase8_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_local_tag_receipt_review_passed_exact_tag_push_authorization_requested_no_remote_action_phase8_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -76,6 +79,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2187",
+      "scope": "CM-2086 local tag receipt review intake and exact tag push authorization request",
+      "status": "COMPLETED_LOCAL_TAG_RECEIPT_REVIEW_PASSED_TAG_PUSH_REQUESTED_NOT_AUTHORIZED_NO_REMOTE_ACTION_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2186",
       "scope": "CM-2085 exact one-use local unsigned annotated tag creation and receipt",

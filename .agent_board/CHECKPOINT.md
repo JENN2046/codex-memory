@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2085 exact one-use local unsigned annotated tag creation and receipt`.
-Current validation: `CMV-2186`.
+Current checkpoint: `CM-2086 local tag receipt review intake and exact tag push authorization request`.
+Current validation: `CMV-2187`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2086 Local Tag Receipt Review
+
+Status: `LOCAL_TAG_RECEIPT_REVIEW_PASSED_TAG_PUSH_REQUESTED_NOT_AUTHORIZED_NO_REMOTE_ACTION_NO_READY_CLAIM`
+
+- Recorded review `CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE`.
+- Confirmed local tag object, target, receipt hash, and consumed authorization.
+- Prepared exact one-use tag push request bound to `origin` and full refspec.
+- Kept tag push unauthorized and performed no network or remote action.
+- Branch push, release, deploy, Phase 8, and readiness remain false.
+
+Validation: `CMV-2187`.
 
 ## CM-2085 Local Annotated Tag Creation
 
