@@ -113,7 +113,7 @@ test('P66.42 keeps governance loop local proof complete while runtime gap remain
 });
 
 test('P66.42 preserves public MCP freeze and internal validate_memory status', () => {
-  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.equal(fixture.publicToolsFrozen, true);
   assert.deepEqual(fixture.internalOnlyTools, ['validate_memory']);
 });

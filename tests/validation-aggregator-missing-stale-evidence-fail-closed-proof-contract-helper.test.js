@@ -249,7 +249,7 @@ test('P66.21 helper redacts or rejects sensitive normalized output and evidence 
 });
 
 test('P66.21 helper exports required constants exactly', () => {
-  assert.deepEqual(PUBLIC_MCP_TOOLS, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(PUBLIC_MCP_TOOLS, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.deepEqual(REQUIRED_EVIDENCE_GROUPS, [
     'source_registry_exact_set_proof',
     'evidence_freshness_proof',

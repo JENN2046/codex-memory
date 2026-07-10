@@ -115,7 +115,7 @@ test('P62 completion audit includes post-P62-T5 local audit and authorization it
 test('P62 prompt-to-artifact audit keeps public MCP frozen and A5 hard stops visible', () => {
   const fixture = loadFixture();
 
-  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
   for (const action of [
     'push',

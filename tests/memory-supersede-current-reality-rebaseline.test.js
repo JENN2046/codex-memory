@@ -31,7 +31,7 @@ function buildInput(overrides = {}) {
       'supersede_runtime_prep_not_implemented',
       'public_mcp_governance_expansion_not_approved'
     ],
-    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
+    publicTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
     deniedActions: [
       'public_mcp_expansion',
       'true_record_memory',
@@ -111,6 +111,7 @@ test('CM-0964 fails closed on public MCP drift', () => {
       'search_memory',
       'memory_overview',
       'audit_memory',
+  'prepare_memory_context',
       'memory_supersede'
     ]
   }));

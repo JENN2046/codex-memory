@@ -4,7 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p52-runtime-schema-version-enforcement-boundary
 const EXPECTED_POLICY_VERSION = 'p52-runtime-schema-version-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p52-runtime-enforcement-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const REQUIRED_VERSION_FIELDS = Object.freeze([
   'schemaVersion',

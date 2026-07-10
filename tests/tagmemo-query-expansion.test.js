@@ -98,7 +98,7 @@ test('CM1571 query expansion fixture preserves public MCP surface', () => {
   const fixture = loadFixture();
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
-  assert.equal(TOOL_DEFINITIONS.length, 7);
+  assert.equal(TOOL_DEFINITIONS.length, 9);
 });
 
 test('CM1572 query expansion output is deterministic and bounded', () => {

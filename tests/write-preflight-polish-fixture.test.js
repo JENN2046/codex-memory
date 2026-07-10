@@ -140,5 +140,5 @@ test('CM1519 write preflight rejection output remains low-disclosure', () => {
 
 test('CM1519 write preflight fixture preserves the seven-tool public MCP surface', () => {
   assert.deepEqual(sorted(publicToolNames()), sorted(fixture.expectedPublicTools));
-  assert.equal(publicToolNames().length, 7);
+  assert.equal(publicToolNames().length, fixture.expectedPublicTools.length);
 });

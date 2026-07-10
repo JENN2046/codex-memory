@@ -85,7 +85,7 @@ test('CM1604 command skeleton preserves seven-tool public MCP surface', () => {
   const fixture = loadFixture();
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
-  assert.equal(TOOL_DEFINITIONS.length, 7);
+  assert.equal(TOOL_DEFINITIONS.length, 9);
 });
 
 test('CM1604 command skeleton produces deterministic redacted plans for fixture cases', () => {

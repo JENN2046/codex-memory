@@ -206,7 +206,7 @@ test('fails closed when caller attempts apply, real-store mode, public MCP expan
 
 test('public MCP tool schemas remain frozen for proof retention/tombstone design helper', () => {
   const names = TOOL_DEFINITIONS.map(tool => tool.name).sort();
-  assert.deepEqual(names, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+  assert.deepEqual(names, ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
 
   const recordSchema = TOOL_DEFINITIONS.find(tool => tool.name === 'record_memory');
   const searchSchema = TOOL_DEFINITIONS.find(tool => tool.name === 'search_memory');

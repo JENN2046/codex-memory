@@ -39,9 +39,16 @@ Current protected source realities:
 
 * MCP service identity is `vcp_codex_memory`.
 * Current `TOOL_DEFINITIONS` public MCP surface is exactly:
-  `audit_memory`, `memory_overview`, `record_memory`, `search_memory`,
+  `audit_memory`, `memory_overview`, `prepare_memory_context`,
+  `propose_memory_delta`, `record_memory`, `search_memory`,
   `supersede_memory`, `tombstone_memory`, `validate_memory`.
 * `audit_memory` is readonly and low-disclosure.
+* `prepare_memory_context` is default-exposed, readonly, low-disclosure, and
+  must not perform durable mutation or production write.
+* `propose_memory_delta` is default-exposed, proposal-only, low-disclosure, and
+  must not perform durable mutation, production write, provider/runtime call,
+  native write, or commit execution. Its `commit_memory_delta` output is a
+  draft/operator-only contract and is not public registered by default.
 * `validate_memory`, `tombstone_memory`, and `supersede_memory` are public
   controlled-mutation preflight tools; durable confirmed mutation requires a
   separate exact approval and must not be inferred from registration.
@@ -56,8 +63,9 @@ Current protected source realities:
   authorization; if it writes only approved low-disclosure project/governance
   memory through the secure channel, it may proceed under the autonomous memory
   rules.
-* Public MCP tool/schema expansion remains blocked unless Jenn explicitly
-  authorizes the exact phase and boundary.
+* Further public MCP tool/schema expansion beyond the plan-pack
+  `prepare_memory_context` / `propose_memory_delta` surface remains blocked
+  unless Jenn explicitly authorizes the exact phase and boundary.
 * Docs-only, fixture-only, no-mutation, and read-only evidence must not be
   described as live runtime readiness, cutover readiness, production readiness,
   release readiness, or `RC_READY`.
@@ -146,6 +154,17 @@ Default repository posture:
   asks otherwise. Keep code, commands, paths, identifiers, logs, and errors in
   their original language.
 
+Default task-start memory posture for project work:
+
+* Before meaningful project task execution, use the `prepare_memory_context`
+  flow when available to obtain a bounded task-start context package.
+* If the flow is unavailable or fails, explicitly mark `memory_unavailable` and
+  continue with current repository evidence; do not pretend to remember.
+* `prepare_memory_context` is a local governed context package flow, not a
+  direct native write or production readiness proof.
+* This rule does not authorize operator-only full surface, durable mutation,
+  native write production, release, deploy, tag, cutover, or readiness claims.
+
 ---
 
 ## 3. Repository Map
@@ -157,7 +176,7 @@ Key paths:
 | `src/core/` | Memory domain services, contracts, constants, governance helpers | Editable inside scope; add targeted tests for behavior or boundary changes |
 | `src/storage/` | Diary, SQLite, vector index, chat index, audit, cache | High risk; prefer fixture/temp stores; do not inspect raw runtime stores by default |
 | `src/recall/` | Candidate generation, TagMemo, EPA, ResidualPyramid, rerank, recall audit | Validate with targeted tests and active-memory compare/rollback when touched |
-| `src/adapters/codex-mcp/` | HTTP/stdio MCP adapter surface | Public contract sensitive; preserve seven-tool surface unless exact expansion is approved |
+| `src/adapters/codex-mcp/` | HTTP/stdio MCP adapter surface | Public contract sensitive; preserve current nine-tool surface unless exact expansion is approved |
 | `src/adapters/vcp-*` | VCP active/passive/light memory compatibility adapters | Compatibility sensitive; validate with focused tests and compare/rollback where relevant |
 | `src/cli/` | CLI entrypoints and validation/runtime utilities | Inspect before running; dry-run by default for migration/profile/cleanup commands |
 | `src/config/` | Local configuration helpers | Do not edit secrets or live env values |
@@ -572,7 +591,7 @@ Task-specific validation expectations:
 | Docs/status/board-only change | Diff review, no contradiction with source/README, `git diff --check`, `bash scripts/validate-local.sh docs`, current-facts drift check when relevant, ledger consistency when relevant |
 | Unit-level JavaScript change | `node --check <changed-js-file>` and targeted `node --test tests/<target>.test.js` |
 | Shared source or governance helper | Targeted tests, negative-path tests where practical, `npm test -- --summary`, docs/status validation when status changes |
-| MCP tool or public contract change | Targeted contract tests, public surface assertion against the seven-tool list, `npm run gate:mainline:strict`; public MCP expansion requires exact approval |
+| MCP tool or public contract change | Targeted contract tests, public surface assertion against the current nine-tool list, `npm run gate:mainline:strict`; public MCP expansion requires exact approval |
 | HTTP runtime behavior change | Targeted tests, `npm run start:http:ensure`, `npm run observe:http -- --json`, and relevant gate only when runtime work is authorized |
 | Active memory / DeepMemo / TopicMemo change | Targeted tests plus compare/rollback standard suite |
 | Recall main chain / TagMemo / EPA / ResidualPyramid / rerank change | Targeted tests, default tests, compare/rollback suite, and mainline gate as needed |
@@ -721,8 +740,8 @@ Filled for `codex-memory` on 2026-07-05 using repository evidence:
 * editable source/test/docs paths: `src/`, `tests/`, `docs/`,
   `.agent_board/`, `scripts/`, `schemas/`, `examples/`, `benchmarks/`;
 * current public MCP tools: `audit_memory`, `memory_overview`,
-  `record_memory`, `search_memory`, `supersede_memory`, `tombstone_memory`,
-  `validate_memory`;
+  `prepare_memory_context`, `propose_memory_delta`, `record_memory`,
+  `search_memory`, `supersede_memory`, `tombstone_memory`, `validate_memory`;
 * validation commands: targeted `node --check`, targeted `node --test`,
   `npm test -- --summary`, `bash scripts/validate-local.sh docs`, current-facts
   drift, ledger consistency, and mainline gates as needed;

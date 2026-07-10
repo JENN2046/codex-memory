@@ -309,7 +309,7 @@ test('HTTP MCP should expose health and tools/list', async () => {
       })
     });
     const payload = await tools.json();
-    assert.equal(payload.result.tools.length, 7);
+    assert.equal(payload.result.tools.length, 5);
     const searchMemory = payload.result.tools.find(tool => tool.name === 'search_memory');
     const recordMemory = payload.result.tools.find(tool => tool.name === 'record_memory');
     const auditMemory = payload.result.tools.find(tool => tool.name === 'audit_memory');
@@ -713,7 +713,9 @@ test('HTTP MCP tools/list covers current product-goal native bridge tool surface
       'search_memory',
       'memory_overview',
       'audit_memory',
-      'record_memory',
+  'prepare_memory_context',
+'propose_memory_delta',
+'record_memory',
       'tombstone_memory',
       'supersede_memory'
     ]);

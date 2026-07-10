@@ -1,0 +1,165 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const test = require('node:test');
+
+const {
+  MemoryDeltaProposalService,
+  buildCommitContractDraft,
+  collectForbiddenKeys
+} = require('../src/core/MemoryDeltaProposalService');
+
+function validProposalArgs(overrides = {}) {
+  return {
+    task_id: 'CM-2011',
+    task: {
+      title: 'Phase 6 proposal-only memory delta',
+      project_id: 'codex-memory',
+      client_id: 'codex',
+      visibility: 'project'
+    },
+    evidence_refs: [
+      'docs/near-model-memory-plan-pack/04_PHASE_PLAN.md#phase-6',
+      'tests/memory-delta-proposal-service.test.js'
+    ],
+    candidates: [
+      {
+        target: 'process',
+        intent: 'Phase 6 adds propose_memory_delta as proposal-only task-end memory delta staging.',
+        evidence_refs: ['CM-2011 local fixture'],
+        tags: ['phase-6', 'proposal-only'],
+        reusable: true,
+        sensitivity: 'low_disclosure_project_fact'
+      }
+    ],
+    ...overrides
+  };
+}
+
+test('CM2011 propose_memory_delta returns proposal-only staging with no durable write', () => {
+  const service = new MemoryDeltaProposalService();
+  const result = service.propose(validProposalArgs());
+
+  assert.equal(result.status, 'PROPOSE_MEMORY_DELTA_ACCEPTED');
+  assert.equal(result.accepted, true);
+  assert.equal(result.proposal_only, true);
+  assert.match(result.proposal_id, /^memory-delta-[a-f0-9]{16}$/);
+  assert.equal(result.staging.staged, true);
+  assert.equal(result.staging.durable, false);
+  assert.equal(result.staging.production_write, false);
+  assert.equal(result.staging.operator_commit_required, true);
+  assert.equal(result.audit_receipt.low_disclosure, true);
+  assert.equal(result.audit_receipt.raw_payload_included, false);
+  assert.equal(result.audit_receipt.memory_written, false);
+  assert.equal(result.audit_receipt.durable_memory_written, false);
+  assert.equal(result.rollback_posture.current_step, 'proposal_only_no_runtime_state_to_rollback');
+  assert.equal(result.rollback_posture.future_commit_requires_rollback_plan, true);
+  assert.equal(result.commit_contract.tool, 'commit_memory_delta');
+  assert.equal(result.commit_contract.operator_only, true);
+  assert.equal(result.commit_contract.exposed_by_default, false);
+  assert.equal(result.commit_contract.public_mcp_registered, false);
+  assert.equal(result.commit_contract.exact_approval_required, true);
+  assert.equal(result.access.memoryWritten, false);
+  assert.equal(result.access.durableMemoryWritten, false);
+  assert.equal(result.access.productionWritePerformed, false);
+  assert.equal(result.access.mcpMemoryWriteCalled, false);
+  assert.equal(result.access.providerApiCalled, false);
+  assert.equal(result.access.vcpToolBoxRuntimeCalled, false);
+  assert.equal(result.access.publicMcpExpanded, false);
+  assert.equal(result.access.readinessClaimed, false);
+  assert.equal(result.governance_contract.decision, 'proposal_mode_accept');
+  assert.equal(result.governance_contract.memoryWritten, false);
+  assert.equal(result.governance_contract.durableMemoryWritten, false);
+});
+
+test('CM2011 propose_memory_delta rejects missing evidence or candidates without writes', () => {
+  const service = new MemoryDeltaProposalService();
+  const result = service.propose(validProposalArgs({
+    evidence_refs: [],
+    candidates: []
+  }));
+
+  assert.equal(result.status, 'PROPOSE_MEMORY_DELTA_REJECTED');
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'evidence_refs_and_candidate_memories_required');
+  assert.equal(result.staging.staged, false);
+  assert.equal(result.access.memoryWritten, false);
+  assert.equal(result.access.providerApiCalled, false);
+  assert.equal(result.commit_contract.operator_only, true);
+});
+
+test('CM2011 propose_memory_delta rejects raw secret write and readiness fields without echoing values', () => {
+  const service = new MemoryDeltaProposalService();
+  const result = service.propose({
+    ...validProposalArgs(),
+    rawPayload: 'SYNTHETIC_RAW_VALUE_SHOULD_NOT_ECHO',
+    candidates: [
+      {
+        target: 'process',
+        intent: 'safe shape',
+        memory_id: 'SYNTHETIC_MEMORY_ID_SHOULD_NOT_ECHO',
+        endpoint: 'SYNTHETIC_ENDPOINT_SHOULD_NOT_ECHO'
+      }
+    ],
+    token: 'SYNTHETIC_TOKEN_SHOULD_NOT_ECHO',
+    productionReady: true
+  });
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'forbidden_raw_secret_write_or_overclaim_fields');
+  assert.ok(result.forbiddenFields.includes('rawPayload'));
+  assert.ok(result.forbiddenFields.includes('candidates[0].memory_id'));
+  assert.ok(result.forbiddenFields.includes('candidates[0].endpoint'));
+  assert.ok(result.forbiddenFields.includes('token'));
+  assert.ok(result.forbiddenFields.includes('productionReady'));
+  assert.equal(serialized.includes('SYNTHETIC_RAW_VALUE_SHOULD_NOT_ECHO'), false);
+  assert.equal(serialized.includes('SYNTHETIC_MEMORY_ID_SHOULD_NOT_ECHO'), false);
+  assert.equal(serialized.includes('SYNTHETIC_ENDPOINT_SHOULD_NOT_ECHO'), false);
+  assert.equal(serialized.includes('SYNTHETIC_TOKEN_SHOULD_NOT_ECHO'), false);
+});
+
+test('CM2011 propose_memory_delta rejects write commit or production intent', () => {
+  const service = new MemoryDeltaProposalService();
+  const result = service.propose(validProposalArgs({
+    options: {
+      commit: true
+    }
+  }));
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'forbidden_raw_secret_write_or_overclaim_fields');
+  assert.equal(result.access.memoryWritten, false);
+  assert.equal(result.access.durableMemoryWritten, false);
+});
+
+test('CM2035 commit_memory_delta contract points to operator preflight and stays unregistered by default', () => {
+  const draft = buildCommitContractDraft();
+
+  assert.deepEqual(draft, {
+    tool: 'commit_memory_delta',
+    status: 'operator_preflight_available_no_write',
+    preflight_service: 'MemoryDeltaCommitPreflightService',
+    exposed_by_default: false,
+    public_mcp_registered: false,
+    operator_only: true,
+    exact_approval_required: true,
+    requires_reviewed_proposal_id: true,
+    requires_governance_receipt: true,
+    requires_rollback_posture: true,
+    durable_write_default: false,
+    production_write_default: false,
+    provider_call_allowed: false,
+    readiness_claim_allowed: false
+  });
+});
+
+test('CM2011 forbidden key collector reports paths only', () => {
+  assert.deepEqual(
+    collectForbiddenKeys({
+      nested: [{ rawPayload: 'SYNTHETIC_RAW_VALUE_SHOULD_NOT_ECHO' }],
+      safe: true
+    }),
+    ['nested[0].rawPayload']
+  );
+});

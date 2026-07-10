@@ -11,6 +11,8 @@
     "search_memory",
     "memory_overview",
     "audit_memory",
+    "prepare_memory_context",
+    "propose_memory_delta",
     "validate_memory",
     "tombstone_memory",
     "supersede_memory"
@@ -63,6 +65,20 @@
       "expansionAllowed": false,
       "schemaChangeAllowed": false,
       "requiredBoundary": "exact_readonly_bounded_audit_explanation_only_no_raw_or_mutation"
+    },
+    {
+      "name": "prepare_memory_context",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "task_start_readonly_context_package_no_raw_or_mutation"
+    },
+    {
+      "name": "propose_memory_delta",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "task_end_proposal_only_delta_package_no_durable_write_or_commit"
     },
     {
       "name": "validate_memory",

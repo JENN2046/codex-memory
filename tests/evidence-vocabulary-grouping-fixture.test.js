@@ -198,7 +198,7 @@ test('CM1513 deferred RC proof evidence is not marked completed and blockers rem
 
 test('CM1513 evidence vocabulary fixture preserves the seven-tool public MCP surface', () => {
   assert.deepEqual(sorted(publicToolNames()), sorted(fixture.expectedPublicTools));
-  assert.equal(publicToolNames().length, 7);
+  assert.equal(publicToolNames().length, fixture.expectedPublicTools.length);
 });
 
 test('CM1513 grouping projection strips adversarial private and sensitive fields', () => {

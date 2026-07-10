@@ -5,7 +5,7 @@ const test = require('node:test');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'p56-governance-executable-loop-boundary-v1.json');
 
-const expectedPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
+const expectedPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 const expectedSourceEvidenceIds = [
   'p31_lifecycle_contract_helper',

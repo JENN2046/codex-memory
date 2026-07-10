@@ -7,23 +7,63 @@
 | `audit_memory` | 已有 | 是 | 否 | 否 | 部分 |
 | default read-only MCP surface | 已有，需修 blocker 后重证 | 是 | 否 | 否 | 部分 |
 | hidden tools hard reject | 已有 | 是 | 否 | 否 | 部分 |
-| governed native realtime read | 部分已有 | 是 | 否 | 需要 repeatable proof | 否 |
-| native response shape compatibility | 部分 | 是 | 否 | 是 | 否 |
-| `prepare_memory_context` | 缺失 | 应默认开放 | 否 | 是 | 否 |
-| memory context package | 缺失 | 应默认开放 | 否 | 是 | 否 |
-| task-start automatic recall | 缺失 | 应默认启用 | 否 | 是 | 否 |
-| recall quality gate | 部分 | 是 | 否 | 是 | 否 |
-| `propose_memory_delta` | 缺失 | 可默认 proposal-only | 否 | 是 | 否 |
-| `commit_memory_delta` | 缺失 | 否 | 是 | 是 | 否 |
-| `record_memory` | 已有/部分 | 否 | 是 | 需要 write proof | 否 |
-| `validate_memory` | 已有/部分 | 否 | 是 | 需要 operator proof | 否 |
-| `tombstone_memory` | 已有/部分 | 否 | 是 | 需要 destructive mutation proof | 否 |
-| `supersede_memory` | 已有/部分 | 否 | 是 | 需要 destructive mutation proof | 否 |
-| native write delegation | 部分 | 否 | 是 | 是 | 否 |
-| audit receipt | 部分 | 是 | 否 | 强化 write receipt | 否 |
-| rollback posture | 部分 | 是 | 否 | 强化 write rollback | 否 |
-| output disclosure budget | 部分 | 是 | 否 | 强化 end-to-end proof | 否 |
-| Codex default full capability | 不应开放 | 否 | 否 | 需长期观察 | 否 |
+| governed native realtime read | 三工具低披露 native read 已再次真实执行，但 machine manifest 检出 dirty checkout 与 loaded runtime HEAD 不一致；Phase 2 completion 已撤回 | 是 | 否 | 需要 clean commit + matching loaded runtime 的 frozen replay | 否 |
+| Phase 2 governed native read observation | 已生成三次调用的 machine receipt projections、safe refs、per-call SHA-256 与 Windows/WSL machine receipt；当前只接受证据形状，不接受 Phase 2 completion | 是 | 否 | 需要冻结 checkout 后重放；派生索引写入仍不是 Phase 8 write proof | 否 |
+| native response shape compatibility | 本地 category-only 合同已实现；live/native proof 仍缺 | 是 | 否 | 需要 exact-authorized native read receipt / live proof | 否 |
+| native read receipt schema compatibility | 本地 schema-only 合同已实现；只覆盖 future native read attempt/success/low-disclosure receipt 候选形状 | 是 | 否 | 需要 native target binding、audit、fallback、WSL/Linux、Windows/WSL smoke 的 separate exact-authorized receipts | 否 |
+| native target binding receipt review | 本地 safe-reference-only review 合同已实现；不绑定 native target | 是 | 否 | 需要 exact-authorized native target binding receipt | 否 |
+| native read proof receipt review | 本地 category-only/no-response-body review 合同已实现；不执行 native read | 是 | 否 | 需要 exact-authorized native read proof receipt | 否 |
+| fallback distinction receipt review | 本地 category-only fallback/native distinction review 合同已实现；不执行 fallback/native comparison | 是 | 否 | 需要 exact-authorized fallback distinction receipt | 否 |
+| low-disclosure proof receipt review | 本地 category-only disclosure-budget/redaction/projection review 合同已实现；不读取 raw output / raw audit | 是 | 否 | 需要 exact-authorized low-disclosure proof receipt | 否 |
+| audit/scope receipt review | 本地 category-only audit-projection/scope-visibility/isolation review 合同已实现；不读取 raw audit rows 或 scope identifiers | 是 | 否 | 需要 exact-authorized audit receipt 和 scope visibility/isolation receipt | 否 |
+| platform proof receipt review | 本地 category-only WSL/Linux 与 Windows/WSL smoke review 合同已实现；不执行命令、不读路径/日志/env/输出 | 是 | 否 | 需要 exact-authorized WSL/Linux proof 和 Windows/WSL smoke receipt | 否 |
+| Phase 2 receipt bundle review-chain hardening | 本地 bundle contract 已要求 CM-2036 到 CM-2043 review chain；不收集或应用 receipt | 是 | 否 | 需要 exact-authorized receipts 和 receipt-bundle application evidence | 否 |
+| Phase 2 receipt intake / patch hardened bundle binding | 本地 intake 与 patch preflight 已要求 hardened bundle prerequisite summary；不收集或应用 receipt | 是 | 否 | 需要 exact-authorized receipts 和 receipt-bundle application evidence | 否 |
+| `prepare_memory_context` | 已实现本地/default read-only MVP | 是 | 否 | 需要 live/production 质量证明 | 否 |
+| memory context package | 已实现本地 bounded package | 是 | 否 | 需要 live/production 质量证明 | 否 |
+| task-start automatic recall | 已实现本地 wrapper / AGENTS 规则 | 是，本地规则 | 否 | 需要 runtime 观察 | 否 |
+| recall quality gate | 已实现 fixture/local baseline | 是 | 否 | 需要 live/production quality proof | 否 |
+| `propose_memory_delta` | 已实现 proposal-only | 是，proposal-only | 否 | 需要 commit/native write 后续 proof | 否 |
+| `commit_memory_delta` | 本地 operator-only preflight；不默认公开；不执行写入 | 否 | 是 | 需要 exact approval、governance receipt、rollback posture、exact-authorized commit receipt 和后续 write proof | 否 |
+| `record_memory` | 已有/部分；Phase 7 local proof gate 覆盖 operator surface；Phase 8 P8-T1 contract preflight 与 real-root readiness gate 已定义 | 否 | 是 | 需要 exact-approved real-root native write execution proof | 否 |
+| `validate_memory` | 已有/部分；Phase 7 local proof gate 覆盖 operator surface | 否 | 是 | 需要 exact mutation proof | 否 |
+| `tombstone_memory` | 已有/部分；Phase 7 local proof gate 覆盖 operator surface | 否 | 是 | 需要 destructive mutation proof | 否 |
+| `supersede_memory` | 已有/部分；Phase 7 local proof gate 覆盖 operator surface | 否 | 是 | 需要 destructive mutation proof | 否 |
+| native write delegation | P8-T1 contract preflight 与 approval-request readiness gate 已定义；未执行 real-root write | 否 | 是 | 需要 exact-approved real-root proof | 否 |
+| Phase 8 receipt patch hardened bundle binding | 本地 patch preflight 已要求 hardened receipt-bundle prerequisite summary；不收集或应用 receipt | 否 | 是 | 需要 exact-authorized Phase 8 receipts 和 receipt-bundle application evidence | 否 |
+| Phase 8 exact receipt request boundary | 本地 request-boundary contract 已实现；只从 CM-2053 route 准备未来 exact-authorized native-write proof receipt 字段清单，不收集/接收/应用 receipt、不执行 native write、不完成 Phase 8 | 否 | 是 | 需要 Jenn separate exact authorization 后的低披露 exact approval enforcement、native side effect、real-root durable write、verify、rollback、failure recovery、output disclosure、audit、receipt-application evidence | 否 |
+| audit receipt | 部分；Phase 2 audit/scope review 已定义，write audit receipt contract/readiness 已定义 | 是 | 否 | 需要 exact-authorized Phase 2 audit receipt 和 live/native write receipt | 否 |
+| rollback posture | 部分；rollback_or_compensate contract 与 rollback drill readiness 已定义 | 是 | 否 | 需要 rollback drill execution | 否 |
+| output disclosure budget | 部分；native write low-disclosure preflight 已定义 | 是 | 否 | 需要 end-to-end live proof | 否 |
+| Codex default runtime policy | 实际五工具面和 policy gate 已机器哈希绑定，真实 test:all/gate:ci records 已通过；Phase 9 artifact 仍因 dirty checkout 与 runtime HEAD drift 而 fail closed | 是，仅 read/context/proposal | 否 | clean/matching replay、重新外审 | 否 |
+| external review patch hardened bundle binding | 本地 patch preflight 已要求 hardened review-bundle prerequisite summary；不接收 review、不应用 bundle、不执行 tag/release | 否 | 是 | 需要 observation/external review/tag approval 和 review-bundle application evidence | 否 |
+| external review bundle application gate | 本地 gate 已实现并消除 tag 循环依赖：要求 observation/external review 通过且 tagApprovalPacketPassed=false；先应用 Completion Audit，后独立审 Tag Approval Packet | 否 | 是 | 需要 review-bundle application evidence 和 completion-audit patch evidence；tag approval 留给后续 Phase 10 gate | 否 |
+| external review bundle application receipt | 本地 receipt contract 已实现；只接收 CM-2049 gate result 的低披露形状，不应用 bundle、不执行 completion-audit patch | 否 | 是 | 需要 exact completion-audit patch application evidence | 否 |
+| external review completion-audit patch boundary | 本地 patch-boundary contract 已实现；只接收 CM-2050 receipt result 的低披露形状，不应用 bundle、不执行 completion-audit patch | 否 | 是 | 需要 exact completion-audit patch application evidence | 否 |
+| external review completion-audit patch application | 本地 patch application contract 已实现；要求真实 external review/observation 且显式拒绝提前 tag approval，只应用低披露 completion-audit 字段、不完成 Phase 9/10 | 否 | 是 | application 后再通过独立流程审 Tag Approval Packet；Phase 10 仍要求 tag approval | 否 |
+| remaining evidence route | 本地 route contract 已实现；只分类 completion-audit / trace-matrix 缺口，不创建 evidence、不完成阶段 | 否 | 否 | 需要按 route 收集 exact receipts / external review / command gates / local source evidence | 否 |
+| Phase 2 exact receipt request boundary | 本地 request-boundary contract 已实现；只从 CM-2053 route 准备未来 exact-authorized receipt 字段清单，不收集/接收/应用 receipt、不执行 native read、不完成 Phase 2 | 否 | 否 | 需要 Jenn separate exact authorization 后的低披露 native target binding、native read、fallback、low-disclosure、audit/scope、WSL/Linux、Windows/WSL、receipt-application evidence | 否 |
+| external review request boundary | 本地 request-boundary contract 已实现；只从 CM-2053 route 准备未来 observation/external-review/tag-approval/review-bundle application request entries，不接收 review/tag approval、不 apply patch、不完成 Phase 9/10 | 否 | 否 | 需要 observation/dogfood review、external review、tag approval packet、review-bundle application evidence | 否 |
+| external review hash-bound handoff | v1 已被 changes-required 外审结论取代；v2 绑定 Phase 2/Windows/Phase 9/冲突处理四份 machine evidence，提供递归排序 canonical JSON、payload SHA-256 和 Markdown 可读面；四个 decision slots 均为 false | 否 | 否 | clean/matching replay 后重新生成 bundle，并取得无冲突的新外审决定；application/tag/Phase 8 仍独立 | 否 |
+| evidence request packet rollup | 本地 rollup contract 已实现；只把 Phase 2 exact receipt、Phase 8 exact receipt、Phase 9/10 review request boundaries 合并为 future-only packet，不接受或应用 evidence | 否 | 否 | 需要 separate authorization/review/receipt 后才能进入 application 或 completion audit | 否 |
+| evidence application router | 本地 router contract 已实现；只从 CM-2057 packet 准备未来 application 顺序，不接收 evidence、不应用 completion-audit patch、不完成阶段 | 否 | 否 | 需要 separate evidence material 和 exact authorization 后才能进入 application/patch | 否 |
+| evidence material metadata gate | 本地 metadata gate 已实现；只从 CM-2058 router 准备低披露 metadata slots，不接收 material body/value、不接受 evidence、不完成阶段 | 否 | 否 | 需要 separate low-disclosure evidence material metadata 和 exact authorization 后才能进入 acceptance/application | 否 |
+| evidence material metadata packet | 本地 packet contract 已实现；只验证 CM-2059 slots 的低披露/category-only/body-free/value-free packet 形状，不接收 material body/value、不接受 evidence、不应用 evidence | 否 | 否 | 需要 separate exact authorization 和 low-disclosure evidence material 后才能进入 acceptance/application | 否 |
+| evidence material acceptance preflight | 本地 preflight contract 已实现；只从 CM-2060 packet 准备 exact authorization 与 low-disclosure material 要求，不接受授权、不接收 material body/value、不接受或应用 evidence | 否 | 否 | 需要 separate exact authorization packet 和 low-disclosure evidence material 后才能进入 acceptance | 否 |
+| evidence material intake boundary | 本地 intake boundary contract 已实现；只从 CM-2061 preflight 准备 separate exact authorization packet 与 low-disclosure material intake 要求，不接收授权、不接收 material body/value、不接受或应用 evidence | 否 | 否 | 需要 actual exact authorization packet 和 low-disclosure material 进入 manual review 后才能考虑 acceptance | 否 |
+| evidence material manual review gate | 本地 manual review gate contract 已实现；只从 CM-2062 intake 准备 operator manual review checklist，不完成 review、不接收授权、不接收 material body/value、不接受或应用 evidence | 否 | 否 | 需要 actual reviewed exact authorization 和 low-disclosure material 后才能考虑 acceptance | 否 |
+| evidence material acceptance eligibility gate | 本地 eligibility gate contract 已实现；只从 CM-2063 manual review gate 准备 future acceptance eligibility checklist，不完成 review、不作 acceptance decision、不接收授权、不接收 material body/value、不接受或应用 evidence | 否 | 否 | 需要 actual acceptance decision after reviewed authorization and low-disclosure material 后才能考虑 evidence acceptance/application | 否 |
+| evidence material acceptance decision request boundary | 本地 request boundary contract 已实现；只从 CM-2064 eligibility gate 准备 future reviewed acceptance decision packet request entries，不完成 review、不提交或作 acceptance decision、不接收授权/材料、不接受或应用 evidence | 否 | 否 | 需要 actual reviewed acceptance decision packet 后才能考虑 evidence acceptance/application | 否 |
+| evidence material acceptance decision packet metadata gate | 本地 metadata gate contract 已实现；只从 CM-2065 request boundary 准备 future reviewed acceptance decision packet metadata slots，不接收 decision packet、不提交或作 acceptance decision、不接受或应用 evidence | 否 | 否 | 需要 actual low-disclosure reviewed acceptance decision packet 后才能考虑 acceptance | 否 |
+| evidence material acceptance chain completion-audit binding | 本地 completion-audit / trace matrix 绑定已实现；要求 CM-2053 到 CM-2066 本地 gate 链作为 local_contract evidence 存在，但不把它当成 exact receipt、external review、material acceptance 或 application evidence | 否 | 否 | 需要 actual low-disclosure reviewed acceptance decision packet、exact receipts、external review/tag approval 和 patch evidence 后才能考虑 completion | 否 |
+| evidence material reviewed decision packet readiness gate | 本地 readiness/absence gate 已实现；只从 CM-2066 metadata gate 准备 actual low-disclosure reviewed decision packet readiness checklist，不接收 packet body/value、不接受 packet、不提交或作 decision、不接受或应用 evidence | 否 | 否 | 需要 actual low-disclosure reviewed acceptance decision packet 后才能考虑 packet/material acceptance/application | 否 |
+| evidence material reviewed decision packet intake preflight | 本地 intake preflight 已实现；只从 CM-2068 readiness gate 准备 future actual low-disclosure reviewed decision packet reference intake requirements，不接收 actual packet/body/value、不接受 packet、不提交或作 decision、不接受或应用 evidence | 否 | 否 | 需要 actual low-disclosure reviewed acceptance decision packet reference 后才能考虑 intake execution；acceptance/application 仍需后续 gate | 否 |
+| evidence material reviewed decision packet reference intake execution | 本地 reference-only intake execution 已实现；只从 CM-2069 preflight 接收 low-disclosure reviewed acceptance decision packet references，不接收 actual packet body/value、不接受 packet、不提交或作 decision、不接受或应用 evidence | 否 | 否 | 需要 reviewed decision packet reference review boundary 后才能考虑 acceptance decision 或 material acceptance；exact receipts、external review/tag approval 和 patch evidence 仍独立缺失 | 否 |
+| evidence material reviewed decision packet reference review boundary | 本地 reference review boundary 已实现；只从 CM-2070 reference intake 准备 reviewed acceptance decision boundary checklist，不接收 actual packet body/value、不接受 packet、不提交或作 decision、不接受或应用 evidence | 否 | 否 | 需要 acceptance decision boundary 后才能考虑 packet/material acceptance；exact receipts、external review/tag approval 和 patch evidence 仍独立缺失 | 否 |
+| evidence material reviewed acceptance decision boundary | 本地 reviewed acceptance decision boundary 已实现；只从 CM-2071 reference review 结果准备低披露、reference-only boundary checklist，不接收 actual decision packet/body/value、不接受 packet、不提交或作 decision、不接受或应用 evidence | 否 | 否 | 需要 actual low-disclosure reviewed acceptance decision packet under separate exact boundary 后才能考虑 packet/material acceptance；exact receipts、external review/tag approval 和 patch evidence 仍独立缺失 | 否 |
+| Codex default full capability | 不应开放；Phase 9 gate 对默认写/破坏/commit 扩权 fail closed | 否 | 否 | 需长期观察、外部审查、单独 proof | 否 |
+| release/tag external review chain binding | 本地 release/tag gate 已要求 hardened external-review intake/bundle/patch chain；不接收 review、不接受 tag approval、不执行 tag/release | 否 | 是 | 需要 external review、真实 tag approval 和 review-bundle application evidence | 否 |
+| release/tag readiness policy | Phase 10 本地 tag 命名/non-claims/tag approval packet gate 已实现，且已绑定 hardened external-review chain | 否，评估-only | 是，实际 tag/release 需另批 | 需要外部审查和真实 tag approval | 否 |
 
 ## 能力解释
 

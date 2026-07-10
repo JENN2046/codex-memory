@@ -4,7 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p59-http-runtime-observability-operation-harden
 const EXPECTED_POLICY_VERSION = 'p59-http-observability-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p59-http-observability-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_fixture',

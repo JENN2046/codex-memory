@@ -49,7 +49,7 @@ test('controlled write dry-run reports all operations without mutation', () => {
   assert.equal(report.noDurableMemoryWrite, true);
   assert.equal(report.noMcpPublicToolExpansion, true);
   assert.equal(report.publicToolsFrozen, true);
-  assert.deepEqual(report.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(report.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.equal(report.operationCount, 7);
   assert.deepEqual(report.operations.map(operation => operation.toolName).sort(), [
     'audit_memory',

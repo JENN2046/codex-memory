@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2078",
+  "generatedAt": "2026-07-10T17:35:21.895Z",
+  "sourceCommit": "ddfc67d2f227d3e726ce5f1829751c783eccddc8",
+  "worktreeClean": false,
+  "loadedRuntimeHead": "2537f31e178e5a61059cca2505bb5d4f01e498ec",
+  "runtimeHeadEvidenceSource": "external_review_decision",
+  "runtimeHeadMatchesSourceCommit": false,
+  "actualToolsList": {
+    "source": "getPublicToolDefinitions(createConfig())",
+    "tools": [
+      "audit_memory",
+      "memory_overview",
+      "prepare_memory_context",
+      "propose_memory_delta",
+      "search_memory"
+    ],
+    "sha256": "ce81d5cacf22a7ee60a53179639f9c18a72dfb147a8379c4bfad6c2394a91b9d"
+  },
+  "defaultRuntimePolicyGateSummary": {
+    "accepted": true,
+    "status": "default_runtime_policy_hold_read_context_proposal_accepted",
+    "toolNames": [
+      "audit_memory",
+      "memory_overview",
+      "prepare_memory_context",
+      "propose_memory_delta",
+      "search_memory"
+    ],
+    "missingDefaultTools": [],
+    "forbiddenDefaultTools": [],
+    "commitMemoryDeltaPublicRegistered": false,
+    "observationComplete": true,
+    "equivalentDogfoodReviewAccepted": true,
+    "externalReviewAccepted": false,
+    "defaultExpansionAllowed": false,
+    "productionWriteDefaultAllowed": false,
+    "durableMutationPerformed": false,
+    "providerApiCalled": false,
+    "readinessClaimed": false,
+    "sha256": "e390de04972790893100dd9b14200f58e60eaa81e8bb068b3dd748d7176e6133"
+  },
+  "boundedDogfoodWorkflow": {
+    "workflowClass": "governed_native_read_three_tool_bounded_workflow",
+    "phase2ManifestRef": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+    "phase2ManifestSha256": "e9d87b41dfbea3ed80506729429f69d6784ac8e0722df809fc3c165a7a9bc662",
+    "safeCallRefs": [
+      "CM-2077-P2-1-search_memory",
+      "CM-2077-P2-2-memory_overview",
+      "CM-2077-P2-3-audit_memory"
+    ],
+    "actualRuntimeCallsObserved": true,
+    "lowDisclosureOnly": true,
+    "memoryWrites": 0,
+    "primaryMemoryStoreWrites": 0,
+    "defaultRuntimeExpansions": 0
+  },
+  "validationExecutionRecords": {
+    "testAll": {
+      "commandCategory": "npm_test_all",
+      "executedAt": "2026-07-10T17:47:40.073Z",
+      "exitStatusCategory": "zero",
+      "passed": true,
+      "recordRef": "CM-2078-TEST-ALL-20260710T174740Z"
+    },
+    "gateCi": {
+      "commandCategory": "npm_gate_ci_json",
+      "executedAt": "2026-07-10T17:48:21.238Z",
+      "exitStatusCategory": "zero",
+      "passed": true,
+      "recordRef": "CM-2078-GATE-CI-20260710T174821Z"
+    }
+  },
+  "observationCompletionDerivation": {
+    "eligible": false,
+    "reason": "runtime_head_mismatch_and_worktree_not_clean_require_frozen_runtime_matched_replay",
+    "phase9ObservationAcceptedFromThisArtifact": false
+  },
+  "rawOutputCaptured": false,
+  "privateMemoryCaptured": false,
+  "readinessClaimed": false
+}

@@ -35,7 +35,7 @@ test('phase f readiness boundary wording guard keeps docs-only boundary', () => 
   assert.equal(fixture.providerCalled, false);
   assert.equal(fixture.realMemoryStoreRead, false);
   assert.equal(fixture.durableStateMutated, false);
-  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('phase f readiness boundary wording guard watches existing phase f docs', () => {

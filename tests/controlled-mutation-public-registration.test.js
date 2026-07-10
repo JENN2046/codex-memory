@@ -12,6 +12,8 @@ const { TOOL_DEFINITIONS } = require('../src/core/constants');
 const APPROVED_PUBLIC_TOOLS = [
   'audit_memory',
   'memory_overview',
+  'prepare_memory_context',
+  'propose_memory_delta',
   'record_memory',
   'search_memory',
   'supersede_memory',
@@ -21,6 +23,8 @@ const APPROVED_PUBLIC_TOOLS = [
 const DEFAULT_MCP_PUBLIC_TOOLS = [
   'audit_memory',
   'memory_overview',
+  'prepare_memory_context',
+  'propose_memory_delta',
   'search_memory'
 ];
 

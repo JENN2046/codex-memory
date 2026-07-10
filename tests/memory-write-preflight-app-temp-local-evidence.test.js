@@ -113,7 +113,7 @@ test('CM-0893 app-path temp-local evidence suppresses same-scope duplicate befor
 
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
   });
 });
@@ -158,7 +158,7 @@ test('CM-0893 app-path temp-local evidence preserves out-of-scope same-content a
 
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
   });
 });

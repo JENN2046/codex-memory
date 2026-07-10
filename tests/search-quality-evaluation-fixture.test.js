@@ -161,5 +161,5 @@ test('CM1516 client boundary mismatch is handled as low-disclosure filtered outp
 
 test('CM1516 search quality fixture preserves the seven-tool public MCP surface', () => {
   assert.deepEqual(sorted(publicToolNames()), sorted(fixture.expectedPublicTools));
-  assert.equal(publicToolNames().length, 7);
+  assert.equal(publicToolNames().length, fixture.expectedPublicTools.length);
 });

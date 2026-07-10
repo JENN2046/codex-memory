@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2076",
+  "mode": "external-review-handoff-bundle",
+  "supersededBy": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_v2.json",
+  "evidenceEntries": [
+    {
+      "sourceRef": "docs/near-model-memory-plan-pack/phase2_governed_native_read_observation_report.md",
+      "sha256": "fba72d91ab33897e579a4d2378405382868aa65d335e13a363a7b3864eb60664",
+      "evidenceClass": "governed_native_read_observation",
+      "lowDisclosureOnly": true
+    },
+    {
+      "sourceRef": "docs/near-model-memory-plan-pack/phase2_governed_native_read_evidence_application_report.md",
+      "sha256": "bedadb401214a949171a078484bcb5533b2e7af8cca7846d9b7e81136d6d2a7e",
+      "evidenceClass": "phase2_exact_receipt_application",
+      "lowDisclosureOnly": true
+    },
+    {
+      "sourceRef": "docs/near-model-memory-plan-pack/phase9_equivalent_dogfood_observation_evidence_report.md",
+      "sha256": "f18fe2de18714be67968ba86c391f379e8f10df2bf621437229f6712f5d85a25",
+      "evidenceClass": "phase9_equivalent_dogfood_observation",
+      "lowDisclosureOnly": true
+    }
+  ],
+  "currentFacts": {
+    "phase2Accepted": false,
+    "phase9DogfoodObservationApplied": false,
+    "machineReplayRequired": true,
+    "defaultRuntimeHeld": true,
+    "vcpToolBoxFinalOwnerPreserved": true,
+    "externalReviewPassed": false,
+    "externalReviewBundleApplied": false,
+    "tagApprovalPacketPassed": false,
+    "phase8NativeWriteProofPassed": false,
+    "fullPlanPackCompleted": false
+  },
+  "decisionSlots": [
+    { "field": "externalReviewPassed", "status": "pending_external_or_exact_authority", "accepted": false },
+    { "field": "externalReviewEvidenceBundleAppliedToCompletionAudit", "status": "pending_external_or_exact_authority", "accepted": false },
+    { "field": "tagApprovalPacketPassed", "status": "pending_external_or_exact_authority", "accepted": false },
+    { "field": "phase8NativeWriteAuthorizationGranted", "status": "pending_external_or_exact_authority", "accepted": false }
+  ],
+  "outputPolicy": {
+    "categoryOnly": true,
+    "hashBound": true,
+    "rawValuesAbsent": true,
+    "reviewerDecisionRequired": true,
+    "externalReviewAcceptedByBundle": false,
+    "tagApprovalAcceptedByBundle": false,
+    "phase8WriteAuthorizedByBundle": false,
+    "readinessClaimed": false
+  },
+  "expectedDecision": "external_review_handoff_bundle_prepared",
+  "counters": {
+    "externalReviewsAccepted": 0,
+    "tagApprovalsAccepted": 0,
+    "phase8WriteAuthorizationsAccepted": 0,
+    "memoryWrites": 0,
+    "nativeWriteAttempts": 0,
+    "remoteActions": 0,
+    "readinessClaims": 0
+  }
+}

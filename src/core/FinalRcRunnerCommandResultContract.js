@@ -4,7 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p54-final-rc-runner-safe-command-inventory-v1';
 const EXPECTED_MODE = 'fixture-only-command-inventory';
 const EXPECTED_OUTPUT_SCHEMA_VERSION = 'p54-final-rc-runner-output-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const SAFE_COMMAND_CLASSES = Object.freeze([
   'syntax_check',

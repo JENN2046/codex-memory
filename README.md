@@ -28,10 +28,59 @@ Long-term goal and boundary documents:
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current primary work goal: complete the imported near-model-memory plan pack.
-The immediate next milestone is Phase 3 `prepare_memory_context`, implemented
-by reusing the existing recall/write support pipelines rather than rebuilding
-recall from zero. VCPToolBox native memory remains the final memory
-intelligence owner.
+The Phase 3 `prepare_memory_context` MVP is implemented as a default read-only
+context package tool by reusing the existing recall/write support pipelines
+rather than rebuilding recall from zero. VCPToolBox native memory remains the
+final memory intelligence owner.
+The Phase 4 local task-start wrapper is also present: it derives task context,
+calls `prepare_memory_context`, injects a bounded summary when available, and
+marks `memory_unavailable` when memory context cannot be prepared.
+The Phase 5 fixture/local recall quality gate is present for
+`prepare_memory_context`; it covers project facts, decisions, blockers, user
+preference, stale/conflict risks, private/workspace isolation, and fallback
+distinction without claiming live or production recall quality.
+The Phase 6 proposal-only memory delta tool is also present:
+`propose_memory_delta` stages low-disclosure task-end memory proposals with
+validation, audit receipt, rollback posture, and an operator-only draft
+`commit_memory_delta` contract. It does not commit memory, perform durable
+mutation, call providers, call VCPToolBox runtime, or enable native write.
+The Phase 7 local proof gate is present for operator-only full surface:
+explicit env/operator configuration can expose `record_memory`,
+`validate_memory`, `tombstone_memory`, and `supersede_memory` for local proof,
+while hardened mode and the default surface remain read-only plus proposal-only.
+This is not native write production proof.
+The Phase 8 P8-T1 local native-write contract preflight is also present: it
+defines `prepare_write`, `commit_write`, `verify_write`, and
+`rollback_or_compensate` proof gates with exact approval, native side-effect
+receipt, real-root durable write, audit, rollback, failure recovery, and
+low-disclosure requirements. It does not execute native write, prove real-root
+durable write, call VCPToolBox runtime, or claim production write readiness.
+The Phase 8 real-root write readiness gate is present after P8-T1: it can mark
+category-only approval request material as ready for future review when
+real-root target evidence, rollback drill planning, failure recovery planning,
+and low-disclosure audit planning are present. It does not submit approval
+requests, accept approval, run `record_memory`, execute rollback or recovery,
+or prove native write production.
+The Phase 9 default runtime policy observation gate is present: it accepts only
+the current read/context/proposal default as a policy hold, blocks default
+runtime expansion without observation and external review, and stops L4 for any
+attempt to make write, destructive, commit, provider/API, release/deploy/cutover,
+or readiness behavior part of the default runtime. It does not expand the
+default surface or prove 30-day observation/external review.
+The Phase 10 release tag readiness policy gate is present: it evaluates
+candidate milestone tag names, release note non-claims, and tag approval packet
+evidence for read-only/context, operator-full-surface, and native-write-proof
+milestones. It rejects full/production/complete-memory naming and performs no
+actual tag, release, deploy, cutover, push, or readiness action.
+The full plan-pack completion audit is now present: it maps Phase 0 through
+Phase 10 plus the objective invariants into explicit evidence checks and
+currently evaluates the plan pack as incomplete. The Phase 1 command gates have
+current evidence via `npm run test:all` and `npm run gate:ci -- --json`.
+Remaining missing evidence includes native-read, native-write, observation,
+external-review, and tag-approval categories. This audit performs no runtime
+write, native write, durable mutation, public MCP expansion, provider/API call,
+real/private memory read, tag, release, deploy, cutover, push, or readiness
+action.
 
 Current active path:
 
@@ -54,15 +103,18 @@ called:
 - `memory_overview`
 - `audit_memory`
 
-Those tools are currently exposed as read-only. The legacy `7605` service is
-kept as rollback while `7625` is observed in real use.
+Those tools are currently exposed as read-only. `prepare_memory_context` is
+also exposed as a default read-only context package tool, and
+`propose_memory_delta` is exposed as a default proposal-only tool. The legacy
+`7605` service is kept as rollback while `7625` is observed in real use.
 
-The default server MCP surface is also read-only: `tools/list` exposes only
-`search_memory`, `memory_overview`, and `audit_memory`, and `tools/call`
-adapter-blocks hidden tools. Controlled mutation or write tools require an
-explicit operator surface configuration before they are exposed. Native writes
-still require exact operator approval, bounded rollback posture, and a separate
-real-root write proof.
+The default server MCP surface is read-only plus proposal-only: `tools/list`
+exposes only `search_memory`, `memory_overview`, `audit_memory`,
+`prepare_memory_context`, and `propose_memory_delta`, and `tools/call`
+adapter-blocks hidden tools. Controlled mutation, commit, or write tools require
+an explicit operator surface configuration before they are exposed. Native
+writes still require exact operator approval, bounded rollback posture, and a
+separate real-root write proof.
 
 ## Quick Start
 
@@ -91,6 +143,28 @@ Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public
 response shapes. The included shim exposes `knowledge_base.search`,
 `memory_overview`, and `audit_memory` for the read suite by default.
+`prepare_memory_context` packages governed local read results and receipts; it
+is not a direct native-bridge delegation tool.
+Task-start workflow wiring remains local and read-only; it does not perform
+durable mutation or production write.
+`propose_memory_delta` packages proposal-only staging and governance receipts;
+`commit_memory_delta` is draft/operator-only and not public registered by
+default.
+Operator-only full surface proof is local and gated; it does not change Codex
+default runtime policy.
+Native write contract preflight is local and fail-closed; it defines the proof
+shape for Phase 8 but does not execute real-root write or satisfy production
+write proof.
+Real-root write readiness gate is also local and fail-closed; it prepares the
+approval-request readiness shape for future exact authorization, but it does
+not submit approval material, execute write, run rollback/recovery drills, or
+claim production proof.
+Default runtime policy observation gate is local and fail-closed; it preserves
+the read/context/proposal default and records that observation/review evidence
+does not auto-expand the Codex default runtime.
+Release tag readiness policy gate is local and fail-closed; it can evaluate a
+candidate such as `v0.2.0-readonly-context-rc`, but it does not create or push a
+tag, publish a release, deploy, cut over, or claim readiness.
 Write proof requires explicit `--enable-write`; accepted evidence must include
 `accepted=true`, `native memory performed`, `governanceEvidenceMatrix`,
 `localMemoryAuxiliaryEvidence`, and `writeRollbackEvidence`. Evidence can be
@@ -116,7 +190,7 @@ tool_timeout_sec = 90
 required = true
 enabled = true
 bearer_token_env_var = "CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN"
-enabled_tools = ["search_memory", "memory_overview", "audit_memory"]
+enabled_tools = ["search_memory", "memory_overview", "audit_memory", "prepare_memory_context", "propose_memory_delta"]
 default_tools_approval_mode = "prompt"
 
 [mcp_servers.vcp_codex_memory.tools.search_memory]
@@ -126,6 +200,12 @@ approval_mode = "approve"
 approval_mode = "approve"
 
 [mcp_servers.vcp_codex_memory.tools.audit_memory]
+approval_mode = "approve"
+
+[mcp_servers.vcp_codex_memory.tools.prepare_memory_context]
+approval_mode = "approve"
+
+[mcp_servers.vcp_codex_memory.tools.propose_memory_delta]
 approval_mode = "approve"
 ```
 
@@ -161,8 +241,8 @@ Local `codex-memory` storage is auxiliary only:
   must not be disclosed through MCP results.
 - Fixture provider proof is not production-provider proof.
 - Read proof is not write proof.
-- Default `tools/list` is read-only; core handlers for write/controlled
-  mutation are not the default server contract.
+- Default `tools/list` is read-only plus proposal-only; core handlers for
+  commit/write/controlled mutation are not the default server contract.
 - Dogfood on `7625` is not yet formal replacement of legacy `7605`.
 
 ## Development

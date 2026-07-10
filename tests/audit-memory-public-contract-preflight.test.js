@@ -22,7 +22,7 @@ function sorted(values) {
   return [...values].sort();
 }
 
-const PUBLIC_TOOL_COUNT = 7;
+const PUBLIC_TOOL_COUNT = 9;
 
 async function withApp(handler) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-audit-public-preflight-'));

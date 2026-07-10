@@ -125,7 +125,7 @@ test('CM-1036 internal reconcile worker is app-mounted idle without public MCP e
     assert.ok(app.services.memoryWriteReconcileWorker);
     assert.equal(typeof app.services.memoryWriteReconcileWorker.runOnce, 'function');
     assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
-    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
     await assert.rejects(
       () => app.callTool('memory_write_reconcile_worker', {}),
       /Unknown tool: memory_write_reconcile_worker/

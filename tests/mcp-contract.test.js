@@ -102,7 +102,7 @@ test('codex-memory MCP should initialize a session and expose expected server in
     assert.ok(result.sessionId);
     assert.equal(result.response.result.protocolVersion, '2025-06-18');
     assert.equal(result.response.result.serverInfo.name, 'vcp_codex_memory');
-    assert.match(result.response.result.instructions, /read-only by default/);
+    assert.match(result.response.result.instructions, /read-only plus proposal-only by default/);
     assert.match(result.response.result.instructions, /params\._meta\.codexMemoryGovernance/);
     assert.equal(
       result.response.result._meta.codexMemoryGovernedBridge.productGoal.primaryRuntime,
@@ -613,7 +613,7 @@ test('governed native bridge tool metadata sanitizes unsafe runtime target confi
   assert.equal(serialized.includes('SECRET_SOURCE_SHOULD_NOT_ECHO'), false);
 });
 
-test('codex-memory MCP defaults to read-only public surface', async () => {
+test('codex-memory MCP defaults to read-only plus proposal-only public surface', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
     const list = await server.handleJsonRpc({
@@ -624,7 +624,78 @@ test('codex-memory MCP defaults to read-only public surface', async () => {
     });
     assert.deepEqual(
       list.response.result.tools.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'search_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'search_memory']
+    );
+
+    const contextPackage = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'prepare_memory_context',
+        arguments: {
+          task: {
+            title: 'Default read-only context smoke',
+            user_request: 'Build a task-start memory package without mutation.',
+            project_id: 'codex-memory',
+            client_id: 'codex',
+            visibility: 'project'
+          },
+          options: {
+            max_items: 2,
+            max_bytes: 6000
+          }
+        }
+      }
+    });
+
+    assert.equal(contextPackage.response.result.isError, false);
+    assert.equal(
+      contextPackage.response.result.structuredContent.access.mode,
+      'prepare_memory_context_readonly'
+    );
+    assert.equal(
+      contextPackage.response.result.structuredContent.access.durableMutationPerformed,
+      false
+    );
+
+    const proposal = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'tools/call',
+      params: {
+        name: 'propose_memory_delta',
+        arguments: {
+          task_id: 'CM-2011',
+          task: {
+            title: 'Default proposal-only delta smoke',
+            project_id: 'codex-memory',
+            client_id: 'codex',
+            visibility: 'project'
+          },
+          evidence_refs: ['tests/mcp-contract.test.js'],
+          candidates: [{
+            target: 'process',
+            intent: 'propose_memory_delta is exposed as proposal-only by default.',
+            evidence_refs: ['default MCP surface contract test'],
+            tags: ['proposal-only']
+          }]
+        }
+      }
+    });
+
+    assert.equal(proposal.response.result.isError, false);
+    assert.equal(
+      proposal.response.result.structuredContent.status,
+      'PROPOSE_MEMORY_DELTA_ACCEPTED'
+    );
+    assert.equal(
+      proposal.response.result.structuredContent.access.memoryWritten,
+      false
+    );
+    assert.equal(
+      proposal.response.result.structuredContent.commit_contract.public_mcp_registered,
+      false
     );
 
     const hiddenWrite = await server.handleJsonRpc({
@@ -659,7 +730,7 @@ test('hardened MCP surface ignores explicit public tool names defensively', asyn
   };
   assert.deepEqual(
     getPublicToolDefinitions(config).map(tool => tool.name).sort(),
-    ['audit_memory', 'memory_overview', 'search_memory']
+    ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'search_memory']
   );
 
   const server = new CodexMemoryMcpServer({
@@ -709,7 +780,7 @@ test('codex-memory MCP full surface can execute record/search/overview', async (
       method: 'tools/list',
       params: {}
     }, requestContext);
-    assert.equal(list.response.result.tools.length, 7);
+    assert.equal(list.response.result.tools.length, 9);
 
     const recordProcess = await server.handleJsonRpc({
       jsonrpc: '2.0',
@@ -801,7 +872,7 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
       jsonrpc: '2.0', id: 1, method: 'tools/list', params: {}
     });
     const tools = list.response.result.tools;
-    assert.deepEqual(tools.map(tool => tool.name).sort(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+    assert.deepEqual(tools.map(tool => tool.name).sort(), ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
     const recordMemory = tools.find(t => t.name === 'record_memory');
     assert.ok(recordMemory);
     const schema = recordMemory.inputSchema;

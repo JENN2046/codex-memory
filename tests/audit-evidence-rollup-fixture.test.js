@@ -218,6 +218,6 @@ test('CM1510 audit evidence rollup fixture records no raw scan write mutation or
 test('CM1510 audit evidence rollup fixture preserves seven-tool public MCP surface', () => {
   const toolNames = sorted(TOOL_DEFINITIONS.map(tool => tool.name));
 
-  assert.equal(toolNames.length, 7);
+  assert.equal(toolNames.length, fixture.expectedPublicTools.length);
   assert.deepEqual(toolNames, sorted(fixture.expectedPublicTools));
 });

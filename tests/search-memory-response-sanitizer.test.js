@@ -332,7 +332,9 @@ test('bounded search projection regression keeps public MCP surface unchanged', 
     'search_memory',
     'memory_overview',
     'audit_memory',
-    'validate_memory',
+  'prepare_memory_context',
+'propose_memory_delta',
+'validate_memory',
     'tombstone_memory',
     'supersede_memory'
   ]);

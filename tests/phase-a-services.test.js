@@ -257,7 +257,7 @@ test('app should expose internal tombstone service without expanding public MCP 
     assert.match(result.reason, /memory not found/i);
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
   });
 });
@@ -281,7 +281,7 @@ test('app should expose internal supersede service without expanding public MCP 
     assert.match(result.reason, /both old and new memory records must exist/i);
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
   });
 });
@@ -315,7 +315,7 @@ test('app should wire write preflight candidate provider while keeping default p
     assert.equal(candidates[0].taskId, 'CM-0892');
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
   });
 });
@@ -339,7 +339,7 @@ test('app should allow opt-in write preflight and suppress same-scope duplicate 
     assert.equal(second.writePreflight.matchedCandidateCount, 1);
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
   }, {
     enableWritePreflight: true

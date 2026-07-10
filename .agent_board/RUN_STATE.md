@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2007 near-model-memory plan pack primary goal selection`.
-Current validation: `CMV-2108`.
-Current status: CM-2007 records complete implementation of `docs/near-model-memory-plan-pack/` as the recent primary work goal. The active next milestone is Phase 3 `prepare_memory_context` MVP, implemented by reusing existing local memory, SQLite shadow, vector index, `KnowledgeBaseRecallPipeline`, `CandidateGenerator`, `TagMemoEngine`, scope/lifecycle filters, `AuditLogStore`, `MemoryOverviewService`, and write governance. VCPToolBox native memory remains final memory intelligence owner; EPA / Residual Pyramid / advanced TagMemo narratives are experimental recall heuristics.
+Current task: `CM-2078 machine-verifiable review evidence rebaseline and canonical bundle`.
+Current validation: `CMV-2179`.
+Current status: Conflicting review decisions resolve fail-closed. Machine Phase 2/9 evidence and a canonical readable bundle exist and their hashes verify. Dirty checkout and loaded-runtime HEAD drift keep Phase 2/9 completion false. External review, review-bundle application, tag approval, and Phase 8 write authorization are all false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,10 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is implementing Phase 3 `prepare_memory_context` MVP through local source/tests/docs: define the tool contract and response schema, reuse `KnowledgeBaseRecallPipeline` and support services, convert bounded search results into task-oriented context package sections, add read-only MCP exposure after validation, enforce disclosure budgets, and add a context quality baseline. Do not enable operator-only full surface, native write production, release/deploy/cutover, or readiness claims without separate evidence and approval.
+Next safe action is to freeze the intended evidence checkout, load the same
+runtime HEAD, and replay the bounded Phase 2/9 machine evidence. A new
+unambiguous external review may then assess the canonical bundle. Do not
+self-accept any of the four independent decisions.
 
 ## Historical Run Notes
 

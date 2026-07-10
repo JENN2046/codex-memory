@@ -53,7 +53,7 @@ test('P66.3 runtime gap plan parses as planning-only and blocked', () => {
 });
 
 test('P66.3 preserves public MCP freeze and internal validate_memory status', () => {
-  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.equal(fixture.publicToolsFrozen, true);
   assert.deepEqual(fixture.internalOnlyTools, ['validate_memory']);
 });

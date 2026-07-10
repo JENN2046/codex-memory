@@ -100,7 +100,7 @@ test('CM1582 recall composition fixture preserves public MCP surface', () => {
   const fixture = loadFixture();
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
-  assert.equal(TOOL_DEFINITIONS.length, 7);
+  assert.equal(TOOL_DEFINITIONS.length, 9);
 });
 
 test('CM1583 recall composition output is deterministic and bounded', () => {

@@ -69,7 +69,7 @@ test('admin review surface fixture parses and locks top-level shape', () => {
   assert.equal(fixture.providerCalls, 0);
   assert.equal(fixture.durableMemoryTouched, false);
   assert.equal(fixture.realMemoryPreview, false);
-  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('admin review sources represent existing read-only review surfaces', () => {

@@ -15,6 +15,9 @@ const { DeferredGovernanceRuntimeEntryAdapter } = require('./core/DeferredGovern
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
+const { MemoryContextPackageService } = require('./core/MemoryContextPackageService');
+const { TaskStartMemoryContextWorkflow } = require('./core/TaskStartMemoryContextWorkflow');
+const { MemoryDeltaProposalService } = require('./core/MemoryDeltaProposalService');
 const {
   ACCESS_MODE: AUDIT_MEMORY_ACCESS_MODE,
   AuditMemoryReadonlyService,
@@ -2498,6 +2501,18 @@ function createCodexMemoryApplication(overrides = {}) {
     return { results: policyFiltered };
   }
 
+  const memoryContextPackageService = new MemoryContextPackageService({
+    searchMemory: (searchArgs, searchRequestContext) =>
+      executeSearchMemory(searchArgs, searchRequestContext),
+    overviewService,
+    auditMemoryReadonlyService
+  });
+  const taskStartMemoryContextWorkflow = new TaskStartMemoryContextWorkflow({
+    prepareMemoryContext: (prepareArgs, prepareRequestContext) =>
+      memoryContextPackageService.prepare(prepareArgs, prepareRequestContext)
+  });
+  const memoryDeltaProposalService = new MemoryDeltaProposalService();
+
   return {
     config,
     stores: {
@@ -2520,6 +2535,9 @@ function createCodexMemoryApplication(overrides = {}) {
       passiveRecallService,
       activeRecallService,
       overviewService,
+      memoryContextPackageService,
+      taskStartMemoryContextWorkflow,
+      memoryDeltaProposalService,
       auditMemoryReadonlyService,
       governedNativeBridgeObservationStore
     },
@@ -2782,6 +2800,14 @@ function createCodexMemoryApplication(overrides = {}) {
             localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
           }
         );
+      }
+
+      if (toolName === 'prepare_memory_context') {
+        return memoryContextPackageService.prepare(args, requestContext);
+      }
+
+      if (toolName === 'propose_memory_delta') {
+        return memoryDeltaProposalService.propose(args, requestContext);
       }
 
       if (toolName === 'memory_overview') {

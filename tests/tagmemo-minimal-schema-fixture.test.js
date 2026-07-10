@@ -171,7 +171,7 @@ test('CM1549 fixture declares no-side-effect safety boundaries and seven public 
   assert.equal(fixture.safety.completeV8Claimed, false);
   assert.equal(fixture.safety.runtimeRankingChanged, false);
   assert.deepEqual(sorted(publicToolNames()), sorted(fixture.safety.publicMcpTools));
-  assert.equal(publicToolNames().length, 7);
+  assert.equal(publicToolNames().length, fixture.safety.publicMcpTools.length);
 });
 
 test('CM1549 valid TagMemo minimal records contain controlled required fields', () => {

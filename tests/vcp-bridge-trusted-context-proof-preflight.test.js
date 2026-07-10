@@ -231,7 +231,9 @@ test('CM1647 public MCP surface remains seven tools', () => {
   assert.deepEqual(TOOL_DEFINITIONS.map(tool => tool.name).sort(), [
     'audit_memory',
     'memory_overview',
-    'record_memory',
+  'prepare_memory_context',
+'propose_memory_delta',
+'record_memory',
     'search_memory',
     'supersede_memory',
     'tombstone_memory',

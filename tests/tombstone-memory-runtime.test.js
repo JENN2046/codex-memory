@@ -506,5 +506,5 @@ test('memory_tombstone requires tombstone_reason lifecycle projection support', 
 test('tombstone_memory is registered as an approved public MCP tool', () => {
   const toolNames = TOOL_DEFINITIONS.map(tool => tool.name).sort();
 
-  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
 });

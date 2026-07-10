@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 2,
+  "taskId": "CM-2078",
+  "mode": "canonical-external-review-bundle-v2",
+  "payload": {
+    "generatedAt": "2026-07-10T17:48:21.238Z",
+    "sourceCommit": "ddfc67d2f227d3e726ce5f1829751c783eccddc8",
+    "worktreeClean": false,
+    "loadedRuntimeHead": "2537f31e178e5a61059cca2505bb5d4f01e498ec",
+    "runtimeHeadMatchesSourceCommit": false,
+    "reviewDisposition": "changes_required_fail_closed",
+    "reviewReferences": [
+      "CM-2076-ER-20260710-H3-fba72d91-bedadb40-f18fe2de",
+      "CM-ER-20260710-ddfc67d2-fba72d91-bedadb40-f18fe2de"
+    ],
+    "evidenceEntries": [
+      {
+        "sourceRef": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+        "sha256": "e9d87b41dfbea3ed80506729429f69d6784ac8e0722df809fc3c165a7a9bc662",
+        "evidenceClass": "machine_generated_phase2_execution_manifest",
+        "lowDisclosureOnly": true
+      },
+      {
+        "sourceRef": "docs/near-model-memory-plan-pack/windows_wsl_machine_smoke_receipt.json",
+        "sha256": "eed480499cb1d820e2506c06f8e2e0ac8d4dc71c3413f9004ec25b6ad71d9121",
+        "evidenceClass": "machine_generated_windows_wsl_smoke_receipt",
+        "lowDisclosureOnly": true
+      },
+      {
+        "sourceRef": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+        "sha256": "c97f302e91ee9b202e3b0eaba6442d97d557e36d3fcad7fb680f92196e0fb005",
+        "evidenceClass": "machine_generated_phase9_observation",
+        "lowDisclosureOnly": true
+      },
+      {
+        "sourceRef": "docs/near-model-memory-plan-pack/external_review_conflict_resolution_report.md",
+        "sha256": "0e6c6f285c0f8f6caec80c46588ce78ae51829d5bdaa2498882b0fae42a96014",
+        "evidenceClass": "fail_closed_external_review_conflict_resolution",
+        "lowDisclosureOnly": true
+      }
+    ],
+    "effectiveDecisions": {
+      "externalReviewPassed": false,
+      "externalReviewEvidenceBundleAppliedToCompletionAudit": false,
+      "tagApprovalPacketPassed": false,
+      "phase8NativeWriteAuthorizationGranted": false
+    },
+    "canonicalRenderedBundleRef": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_canonical.md",
+    "canonicalRenderedBundleAvailable": true,
+    "completionDerivation": {
+      "eligible": false,
+      "fullPlanPackCompleted": false,
+      "reason": "dirty_checkout_runtime_head_mismatch_and_four_independent_decisions_false"
+    },
+    "rawPrivateMemoryAccessed": false,
+    "defaultMcpExpanded": false,
+    "readinessClaimed": false
+  },
+  "canonicalPayloadSha256": "bbd3eeeabf6cfb02f43af5da944804aed6aa3192cca0b7d604be6bb9bccaaca3"
+}

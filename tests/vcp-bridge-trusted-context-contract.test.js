@@ -152,10 +152,12 @@ test('CM1646 adapter does not call record_memory or provider/API', () => {
   assert.equal(result.publicMcpExpanded, false);
 });
 
-test('CM1646 public MCP surface remains seven tools', () => {
+test('CM1646 public MCP surface includes proposal-only delta tool', () => {
   assert.deepEqual(TOOL_DEFINITIONS.map(tool => tool.name).sort(), [
     'audit_memory',
     'memory_overview',
+    'prepare_memory_context',
+    'propose_memory_delta',
     'record_memory',
     'search_memory',
     'supersede_memory',

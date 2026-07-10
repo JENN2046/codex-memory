@@ -138,7 +138,9 @@ const GOVERNED_NATIVE_WRITE_TOOLS = new Set([
 const DEFAULT_PUBLIC_MCP_READ_TOOLS = Object.freeze([
   'search_memory',
   'memory_overview',
-  'audit_memory'
+  'audit_memory',
+  'prepare_memory_context',
+  'propose_memory_delta'
 ]);
 const CONTROLLED_MUTATION_MCP_TOOLS = Object.freeze([
   'validate_memory',
@@ -665,7 +667,7 @@ function buildInstructions(config = {}) {
   const exposedTools = getPublicToolDefinitions(config).map(tool => tool.name);
   const exposesOnlyReadTools = exposedTools.every(toolName => DEFAULT_PUBLIC_MCP_READ_TOOLS.includes(toolName));
   if (exposesOnlyReadTools) {
-    return 'Current MCP surface is read-only by default. Use search_memory for Codex diary recall, memory_overview for bridge observability, and audit_memory for readonly bounded audit explanations. Governed native-memory calls carry trusted execution context and disclosure budget through params._meta.codexMemoryGovernance, never through tool arguments. Controlled mutation or write tools are hidden and adapter-blocked unless an operator profile explicitly exposes them.';
+    return 'Current MCP surface is read-only plus proposal-only by default. Use prepare_memory_context at task start, propose_memory_delta for proposal-only task-end memory deltas, search_memory for bounded recall, memory_overview for bridge observability, and audit_memory for readonly bounded audit explanations. Governed native-memory calls carry trusted execution context and disclosure budget through params._meta.codexMemoryGovernance, never through tool arguments. Controlled mutation or write tools are hidden and adapter-blocked unless an operator profile explicitly exposes them.';
   }
   return 'Use exposed tools according to the configured MCP surface. Governed native-memory calls carry exact approval, rollback posture, audit receipt, and trusted execution context through params._meta.codexMemoryGovernance, never through tool arguments. Hidden tools are adapter-blocked even if the core application still supports them internally.';
 }

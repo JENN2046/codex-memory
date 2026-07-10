@@ -23,6 +23,8 @@ test('Phase F1 runner public tools expectation matches current seven-tool surfac
   assert.deepEqual(REQUIRED_PUBLIC_TOOLS, [
     'audit_memory',
     'memory_overview',
+    'prepare_memory_context',
+    'propose_memory_delta',
     'record_memory',
     'search_memory',
     'supersede_memory',
@@ -258,6 +260,8 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
               tools: [
                 { name: 'audit_memory' },
                 { name: 'memory_overview' },
+                { name: 'prepare_memory_context' },
+                { name: 'propose_memory_delta' },
                 { name: 'record_memory' },
                 { name: 'search_memory' },
                 { name: 'supersede_memory' },
@@ -335,7 +339,7 @@ test('Phase F1 injected execution captures sanitized no-write evidence', async (
   assert.equal(report.tokenMaterialPersisted, false);
   assert.equal(JSON.stringify(report).includes('secret-token-that-must-not-appear'), false);
   assert.equal(report.evidence.toolsList.publicToolsFrozen, true);
-  assert.equal(report.evidence.toolsList.publicToolCount, 7);
+  assert.equal(report.evidence.toolsList.publicToolCount, REQUIRED_PUBLIC_TOOLS.length);
   assert.deepEqual(report.evidence.toolsList.publicTools, REQUIRED_PUBLIC_TOOLS);
   assert.equal(report.evidence.noTokenOverview.ok, true);
   assert.equal(report.evidence.noTokenRecordMemory.rejected, true);

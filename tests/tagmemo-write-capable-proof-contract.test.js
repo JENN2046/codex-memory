@@ -136,7 +136,7 @@ test('CM1615 contract preserves seven-tool public MCP surface', () => {
   const fixture = loadFixture();
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
-  assert.equal(TOOL_DEFINITIONS.length, 7);
+  assert.equal(TOOL_DEFINITIONS.length, 9);
 });
 
 test('CM1615 future write-capable cases are bounded and low disclosure', () => {

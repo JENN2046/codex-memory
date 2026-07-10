@@ -254,7 +254,9 @@ test('CM1978 public MCP surface remains unchanged', () => {
   assert.deepEqual(toolNames, [
     'audit_memory',
     'memory_overview',
-    'record_memory',
+  'prepare_memory_context',
+'propose_memory_delta',
+'record_memory',
     'search_memory',
     'supersede_memory',
     'tombstone_memory',

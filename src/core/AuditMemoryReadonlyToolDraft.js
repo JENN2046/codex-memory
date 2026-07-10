@@ -13,6 +13,8 @@ const CORE_TOOL_DEFINITION_NAMES = Object.freeze([
   'search_memory',
   'memory_overview',
   'audit_memory',
+  'prepare_memory_context',
+  'propose_memory_delta',
   'validate_memory',
   'tombstone_memory',
   'supersede_memory'
@@ -21,7 +23,9 @@ const CORE_TOOL_DEFINITION_NAMES = Object.freeze([
 const PUBLIC_MCP_TOOL_NAMES = Object.freeze([
   'search_memory',
   'memory_overview',
-  'audit_memory'
+  'audit_memory',
+  'prepare_memory_context',
+  'propose_memory_delta'
 ]);
 
 const ALLOWED_AUDIT_FAMILIES = Object.freeze([

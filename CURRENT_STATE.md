@@ -8,17 +8,982 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2007 near-model-memory plan pack primary goal selection |
-| Current task | `CM-2007 near-model-memory plan pack primary goal selection` |
-| Current validation | `CMV-2108` |
-| Current route | The recent primary work goal is complete implementation of the imported near-model-memory plan pack. Immediate next milestone is Phase 3 `prepare_memory_context` MVP, reusing existing local memory, SQLite shadow, vector index, `KnowledgeBaseRecallPipeline`, `CandidateGenerator`, `TagMemoEngine`, scope/lifecycle filters, `AuditLogStore`, `MemoryOverviewService`, and write governance; VCPToolBox native memory remains the final memory intelligence owner |
+| Status | CM-2078 machine evidence rebaseline; frozen runtime-matched replay required |
+| Current task | `CM-2078 machine-verifiable review evidence rebaseline and canonical bundle` |
+| Current validation | `CMV-2179` |
+| Current route | Conflicting review decisions resolve fail-closed; Phase 2/9 machine artifacts and canonical bundle verify, but dirty checkout and loaded-runtime HEAD drift keep completion ineligible and all four independent decisions false |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
-`CM-2007` records `docs/near-model-memory-plan-pack/` as the recent primary implementation plan source. The actual goal is complete implementation of the plan pack. The immediate active route is Phase 3 `prepare_memory_context` MVP: reuse the existing recall pipeline and support services, convert bounded search results into task-oriented memory context sections, keep default read-only/no durable mutation, and keep VCPToolBox native memory as final memory intelligence owner. Later `propose_memory_delta` / staging / audit work should reuse local write governance without becoming default production write.
+`CM-2078` replaces asserted Phase 9 booleans with an actual tools-list hash,
+policy-gate summary hash, bounded workflow reference, and real `test:all` /
+`gate:ci` execution references. It also publishes a canonical readable bundle
+whose stable payload SHA-256 is independently verifiable. The artifact remains
+ineligible until replayed from a clean/frozen checkout with matching loaded
+runtime HEAD.
+
+`CM-2077` replaces asserted Phase 2 receipt booleans with three per-call summary
+hashes, aggregate counters, and a machine Windows/WSL smoke receipt. The current
+manifest verifies its evidence shape but derives `Phase 2 accepted=false`
+because the checkout was dirty and runtime HEAD differed from source.
+
+The supplied external review text contains both `externalReviewPassed=true`
+and a later `changes_required` / `externalReviewPassed=false` decision. The
+effective value is false until a new unambiguous external review accepts a
+clean, runtime-matched canonical bundle. Review-bundle application, tag
+approval, and Phase 8 native-write authorization remain independently false.
+
+The application-order cycle is resolved in source: external review and
+observation evidence gate Completion Audit application while
+`tagApprovalPacketPassed` must still be false. Tag Approval Packet review comes
+after the application and remains mandatory for Phase 10 or tag action.
+
+`CM-2076` prepared the first hash-bound handoff over CM-2073/2074/2075. The
+later changes-required review superseded its Phase 2/Phase 9 acceptance claims;
+the v1 bundle now points to the CM-2078 canonical v2 bundle.
+
+`CM-2075` recorded an asserted equivalent dogfood observation while keeping
+actual external review false. CM-2078 supersedes its acceptance claim with a
+machine artifact; the default runtime remains exactly read/context/proposal and
+`commit_memory_delta` remains non-public.
+
+`CM-2074` recorded category-only native-read receipts and dual Windows
+host-bridge smoke. CM-2077 supersedes its Phase 2 acceptance claim: machine
+evidence exists, but current completion eligibility is false pending a clean,
+runtime-matched replay. Nothing here authorizes or proves Phase 8 native writes.
+
+`CM-2073` records exactly three governed native read observations across
+`search_memory`, `memory_overview`, and `audit_memory`. The retained evidence is
+category-only: native target/read/audit/scope/low-disclosure and WSL/Linux are
+observed, while primary memory-store writes, native writes, raw/private returns,
+fallback uses, and readiness claims remain zero. CM-2074 later supplied and
+applied the remaining exact category-only route/platform/bundle evidence.
+
+`CM-2072` adds a local reviewed acceptance decision boundary and binds
+`evidenceMaterialReviewedAcceptanceDecisionBoundaryPassed` as `local_contract`
+evidence only. It preserves all packet/material acceptance, decision, runtime,
+write, release, and readiness boundaries. Full plan-pack completion remains
+incomplete.
+
+`CM-2071` adds a local evidence material reviewed decision packet reference
+review boundary contract. It consumes the CM-2070 reference intake execution
+result and prepares only low-disclosure reviewed acceptance decision boundary
+checklist entries from reference metadata across Phase 2 exact receipts, Phase
+8 exact native-write receipts, and Phase 9 / Phase 10 external review or
+tag-approval material. Focused tests prove stale CM-2070 source metadata is
+rejected, rejected or stale reference intake results are blocked, reference
+intake entry drift is blocked, actual packet/body/value/acceptability drift
+stops L4, acceptance/application/runtime/tag/readiness drift stops L4,
+forbidden raw reference review fields are rejected by path only, and the
+reference review boundary does not complete the full completion audit.
+CM-2071 also binds
+`evidenceMaterialReviewedDecisionPacketReferenceReviewBoundaryPassed` into the
+`evidence_material_acceptance_chain_local_gates_bound` invariant as
+local-contract-only evidence. CM-2071 does not receive or accept an actual
+reviewed decision packet body/value, accept an acceptance decision packet,
+submit or make an acceptance decision, accept exact authorization, accept
+material, accept/apply receipts, accept review evidence, accept tag approval,
+accept evidence material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2071 is reference review
+boundary only, not exact receipt evidence, not external review evidence, not
+tag approval, not material acceptance, not application evidence, not release
+readiness, and not full plan-pack completion.
+
+`CM-2070` adds a local evidence material reviewed decision packet reference
+intake execution contract. It consumes the CM-2069 intake preflight result and
+intakes only low-disclosure reviewed acceptance decision packet references
+across Phase 2 exact receipts, Phase 8 exact native-write receipts, and Phase
+9 / Phase 10 external review or tag-approval material. Focused tests prove
+stale CM-2069 source metadata is rejected, rejected or stale preflight results
+are blocked, preflight requirement drift is blocked, reference envelope drift
+before acceptance boundaries stops L4, acceptance/application/runtime/tag/
+readiness drift stops L4, forbidden raw reviewed decision packet reference
+fields are rejected by path only, and the reference intake execution does not
+complete the full completion audit. CM-2070 also binds
+`evidenceMaterialReviewedDecisionPacketReferenceIntakeExecutionPassed` into the
+`evidence_material_acceptance_chain_local_gates_bound` invariant as
+local-contract-only evidence. CM-2070 does not receive or accept an actual
+reviewed decision packet body/value, accept an acceptance decision packet,
+submit or make an acceptance decision, accept exact authorization, accept
+material, accept/apply receipts, accept review evidence, accept tag approval,
+accept evidence material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2070 is reference-only intake
+execution, not exact receipt evidence, not external review evidence, not tag
+approval, not material acceptance, not application evidence, not release
+readiness, and not full plan-pack completion.
+
+`CM-2069` adds a local evidence material reviewed decision packet intake
+preflight contract. It consumes the CM-2068 readiness gate result and prepares
+future actual low-disclosure reviewed acceptance decision packet reference
+intake requirements across Phase 2 exact receipts, Phase 8 exact native-write
+receipts, and Phase 9 / Phase 10 external review or tag-approval material.
+Focused tests prove stale CM-2068 source metadata is rejected, rejected or
+stale readiness gate results are blocked, readiness checklist drift is blocked,
+packet receipt/acceptance/application/runtime/tag/readiness drift stops L4,
+forbidden raw reviewed decision packet fields are rejected by path only, and
+the intake preflight does not complete the full completion audit. CM-2069 also
+binds `evidenceMaterialReviewedDecisionPacketIntakePreflightPassed` into the
+`evidence_material_acceptance_chain_local_gates_bound` invariant as
+local-contract-only evidence. CM-2069 does not receive or accept an actual
+reviewed decision packet, execute packet intake, accept an acceptance decision
+packet, submit or make an acceptance decision, accept exact authorization,
+accept material, accept/apply receipts, accept review evidence, accept tag
+approval, accept evidence material, apply evidence or completion-audit patches,
+call VCPToolBox/runtime/provider surfaces, execute native reads or writes,
+mutate durable state, expand public MCP or default runtime, tag, release,
+deploy, cut over, complete any phase, or claim readiness. CM-2069 is intake
+preflight only, not exact receipt evidence, not external review evidence, not
+tag approval, not material acceptance, not application evidence, not release
+readiness, and not full plan-pack completion.
+
+`CM-2068` adds a local evidence material reviewed decision packet readiness
+gate contract. It consumes the CM-2066 acceptance decision packet metadata gate
+result and prepares future actual low-disclosure reviewed acceptance decision
+packet readiness checklist entries across Phase 2 exact receipts, Phase 8
+exact native-write receipts, and Phase 9 / Phase 10 external review or
+tag-approval material. Focused tests prove stale CM-2066 source metadata is
+rejected, rejected or stale metadata gate results are blocked, metadata slot
+drift is blocked, packet acceptance/application/runtime/tag/readiness drift
+stops L4, forbidden raw reviewed decision packet fields are rejected by path
+only, and the readiness gate does not complete the full completion audit.
+CM-2068 also binds
+`evidenceMaterialReviewedDecisionPacketReadinessGatePassed` into the
+`evidence_material_acceptance_chain_local_gates_bound` invariant as
+local-contract-only evidence. CM-2068 does not receive or accept an actual
+reviewed decision packet, accept an acceptance decision packet, submit or make
+an acceptance decision, accept exact authorization, accept material,
+accept/apply receipts, accept review evidence, accept tag approval, accept
+evidence material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2068 is readiness/absence
+gate only, not exact receipt evidence, not external review evidence, not tag
+approval, not material acceptance, not application evidence, not release
+readiness, and not full plan-pack completion.
+
+`CM-2067` binds the existing evidence material acceptance/application local
+gate chain into the executable completion audit and evidence trace matrix as
+`evidence_material_acceptance_chain_local_gates_bound`. Focused tests prove the
+full plan pack remains incomplete when
+`evidenceMaterialAcceptanceDecisionPacketMetadataGatePassed` is missing, and
+that the trace matrix maps the chain as `local_contract` evidence only rather
+than exact-authorized receipt or external-review evidence. CM-2067 does not
+accept an acceptance decision packet, submit or make an acceptance decision,
+accept exact authorization, accept material, accept/apply receipts, accept
+review evidence, accept tag approval, accept evidence material, apply evidence
+or completion-audit patches, call VCPToolBox/runtime/provider surfaces,
+execute native reads or writes, mutate durable state, expand public MCP or
+default runtime, tag, release, deploy, cut over, complete any phase, or claim
+readiness. CM-2067 is audit/trace binding only, not exact receipt evidence,
+not external review evidence, not material acceptance, not application
+evidence, not release readiness, and not full plan-pack completion.
+
+`CM-2066` adds a local evidence material acceptance decision packet metadata
+gate contract. It consumes the CM-2065 acceptance decision request boundary
+result and prepares future low-disclosure reviewed acceptance decision packet
+metadata slots across Phase 2 exact receipts, Phase 8 exact native-write
+receipts, and Phase 9 / Phase 10 external review or tag-approval material.
+Focused tests prove stale CM-2065 source metadata is rejected, rejected or
+stale decision request boundary results are blocked, decision request drift is
+blocked, decision packet acceptance/decision submission/exact authorization/
+material acceptance/application/runtime/tag/readiness drift stops L4, forbidden
+raw decision packet metadata fields are rejected by path only, and the metadata
+gate does not complete the full completion audit. CM-2066 does not complete
+manual review, accept an acceptance decision packet, submit or make an
+acceptance decision, accept exact authorization, accept approval, accept/apply
+receipts, accept review evidence, accept tag approval, accept evidence
+material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2066 is future acceptance
+decision packet metadata gate only, not exact authorization, not evidence, not
+completion-audit evidence, not release readiness, and not full plan-pack
+completion.
+
+`CM-2065` adds a local evidence material acceptance decision request boundary
+contract. It consumes the CM-2064 acceptance eligibility gate result and
+prepares future reviewed acceptance decision packet request entries across
+Phase 2 exact receipts, Phase 8 exact native-write receipts, and Phase 9 /
+Phase 10 external review or tag-approval material. Focused tests prove stale
+CM-2064 source metadata is rejected, rejected or stale acceptance eligibility
+results are blocked, acceptance eligibility checklist drift is blocked,
+decision submission/acceptance decision/exact authorization/material
+acceptance/application/runtime/tag/readiness drift stops L4, forbidden raw
+acceptance decision/reviewed decision/decision receipt fields are rejected by
+path only, and the acceptance decision request boundary does not complete the
+full completion audit. CM-2065 does not complete manual review, submit or make
+an acceptance decision, accept exact authorization, accept approval,
+accept/apply receipts, accept review evidence, accept tag approval, accept
+evidence material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2065 is future acceptance
+decision request boundary only, not exact authorization, not evidence, not
+completion-audit evidence, not release readiness, and not full plan-pack
+completion.
+
+`CM-2064` adds a local evidence material acceptance eligibility gate contract.
+It consumes the CM-2063 manual review gate result and prepares a future
+acceptance-eligibility checklist for actual reviewed exact authorization plus
+low-disclosure material across Phase 2 exact receipts, Phase 8 exact
+native-write receipts, and Phase 9 / Phase 10 external review or tag-approval
+material. Focused tests prove stale CM-2063 source metadata is rejected,
+rejected or stale manual review gate results are blocked, manual review
+checklist drift is blocked, manual review completion/acceptance decision/exact
+authorization/material acceptance/application/runtime/tag/readiness drift stops
+L4, forbidden raw reviewed authorization/material/acceptance fields are
+rejected by path only, and the acceptance eligibility gate does not complete
+the full completion audit. CM-2064 does not complete manual review, make an
+acceptance decision, accept exact authorization, accept approval, accept/apply
+receipts, accept review evidence, accept tag approval, accept evidence
+material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2064 is future acceptance
+eligibility gate only, not exact authorization, not evidence, not
+completion-audit evidence, not release readiness, and not full plan-pack
+completion.
+
+`CM-2063` adds a local evidence material manual review gate contract. It
+consumes the CM-2062 intake boundary result and prepares an operator
+manual-review checklist for future exact-authorization packet plus
+low-disclosure-material review across Phase 2 exact receipts, Phase 8 exact
+native-write receipts, and Phase 9 / Phase 10 external review or tag-approval
+material. Focused tests prove stale CM-2062 source metadata is rejected,
+rejected or stale intake results are blocked, intake requirement drift is
+blocked, manual review completion/exact authorization/material
+acceptance/application/runtime/tag/readiness drift stops L4, forbidden raw
+review/authorization/material fields are rejected by path only, and the manual
+review gate does not complete the full completion audit. CM-2063 does not
+complete manual review, accept exact authorization, accept approval,
+accept/apply receipts, accept review evidence, accept tag approval, accept
+evidence material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2063 is future manual-review
+gate only, not exact authorization, not evidence, not completion-audit evidence,
+not release readiness, and not full plan-pack completion.
+
+`CM-2062` adds a local evidence material intake boundary contract. It consumes
+the CM-2061 acceptance preflight result and prepares separate exact-
+authorization packet plus low-disclosure-material intake requirements for
+future Phase 2 exact receipts, Phase 8 exact native-write receipts, and Phase 9
+/ Phase 10 external review or tag-approval material. Focused tests prove stale
+CM-2061 source metadata is rejected, rejected or stale preflight results are
+blocked, acceptance requirement drift is blocked, exact authorization/material
+acceptance/application/runtime/tag/readiness drift stops L4, forbidden raw
+authorization/material intake fields are rejected by path only, and the intake
+boundary does not complete the full completion audit. CM-2062 does not accept
+exact authorization, accept approval, accept/apply receipts, accept review
+evidence, accept tag approval, accept evidence material, apply evidence or
+completion-audit patches, call VCPToolBox/runtime/provider surfaces, execute
+native reads or writes, mutate durable state, expand public MCP or default
+runtime, tag, release, deploy, cut over, complete any phase, or claim
+readiness. CM-2062 is future intake boundary only, not exact authorization, not
+evidence, not completion-audit evidence, not release readiness, and not full
+plan-pack completion.
+
+`CM-2061` adds a local evidence material acceptance preflight contract. It
+consumes the CM-2060 metadata packet result and prepares exact-authorization
+plus low-disclosure-material requirements for future Phase 2 exact receipts,
+Phase 8 exact native-write receipts, and Phase 9 / Phase 10 external review or
+tag-approval material. Focused tests prove stale CM-2060 source metadata is
+rejected, rejected or stale metadata packet results are blocked, metadata entry
+drift is blocked, exact authorization/material acceptance/application/runtime/
+tag/readiness drift stops L4, forbidden raw authorization/material fields are
+rejected by path only, and acceptance preflight does not complete the full
+completion audit. CM-2061 does not accept exact authorization, accept approval,
+accept/apply receipts, accept review evidence, accept tag approval, accept
+evidence material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2061 is future acceptance
+preflight only, not exact authorization, not evidence, not completion-audit
+evidence, not release readiness, and not full plan-pack completion.
+
+`CM-2060` adds a local evidence material metadata packet contract. It consumes
+the CM-2059 metadata gate result and validates low-disclosure, category-only,
+body-free, value-free metadata packet entries for future Phase 2 exact
+receipts, Phase 8 exact native-write receipts, and Phase 9 / Phase 10 external
+review or tag-approval material. Focused tests prove stale CM-2059 source
+metadata is rejected, rejected or stale metadata gate results are blocked, slot
+and packet entry drift is blocked, material acceptance/application/runtime/tag/
+readiness drift stops L4, forbidden raw material fields are rejected by path
+only, and metadata packets do not complete the full completion audit. CM-2060
+does not accept approval, accept/apply receipts, accept review evidence, accept
+tag approval, accept evidence material, apply evidence or completion-audit
+patches, call VCPToolBox/runtime/provider surfaces, execute native reads or
+writes, mutate durable state, expand public MCP or default runtime, tag,
+release, deploy, cut over, complete any phase, or claim readiness. CM-2060 is
+future metadata packet validation only, not evidence, not completion-audit
+evidence, not release readiness, and not full plan-pack completion.
+
+`CM-2059` adds a local evidence material metadata gate contract. It consumes
+the CM-2058 router and prepares low-disclosure, body-free, value-free metadata
+slots for future Phase 2 exact receipts, Phase 8 exact native-write receipts,
+and Phase 9 / Phase 10 external review or tag-approval material. Focused tests
+prove stale CM-2058 source metadata is rejected, rejected or stale router
+results are blocked, route drift and current application attempts are blocked,
+material acceptance/application/runtime/tag/readiness drift stops L4,
+forbidden raw evidence material fields are rejected by path only, and metadata
+slots do not complete the full completion audit. CM-2059 does not accept
+approval, accept/apply receipts, accept review evidence, accept tag approval,
+accept evidence material, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2059 is future metadata slot
+preparation only, not evidence, not completion-audit evidence, not release
+readiness, and not full plan-pack completion.
+
+`CM-2058` adds a local evidence application router contract. It consumes the
+CM-2057 evidence request packet and prepares the future application order for
+Phase 2 exact receipts, Phase 8 exact native-write receipts, and Phase 9 /
+Phase 10 external review or tag-approval evidence. Focused tests prove stale
+CM-2057 source metadata is rejected, rejected or stale packet results are
+blocked, packet count drift is blocked, evidence application/runtime/tag/
+readiness drift stops L4, forbidden raw evidence material fields are rejected
+by path only, and the router does not complete the full completion audit.
+CM-2058 does not accept approval, accept/apply receipts, accept review evidence,
+accept tag approval, apply evidence or completion-audit patches, call
+VCPToolBox/runtime/provider surfaces, execute native reads or writes, mutate
+durable state, expand public MCP or default runtime, tag, release, deploy, cut
+over, complete any phase, or claim readiness. CM-2058 is future application
+routing only, not evidence, not completion-audit evidence, not release
+readiness, and not full plan-pack completion.
+
+`CM-2057` adds a local evidence request packet rollup contract. It consumes the
+CM-2054 Phase 2 exact receipt request boundary, CM-2055 Phase 8 exact receipt
+request boundary, and CM-2056 Phase 9 / Phase 10 external review request
+boundary, then prepares one category-only future evidence request packet.
+Focused tests prove stale source metadata is rejected, rejected source
+request-boundary results are blocked, evidence acceptance/patch/tag/runtime/
+readiness drift stops L4, forbidden raw/secret/receipt/review/tag-approval
+fields are rejected by path only, and the packet does not complete the full
+completion audit. CM-2057 does not accept approval, accept/apply receipts,
+accept review evidence, accept tag approval, apply evidence or completion-audit
+patches, call VCPToolBox/runtime/provider surfaces, execute native reads or
+writes, mutate durable state, expand public MCP or default runtime, tag,
+release, deploy, cut over, complete any phase, or claim readiness. CM-2057 is
+not exact receipt evidence, not external review evidence, not tag approval, not
+completion-audit evidence, not release readiness, and not full plan-pack
+completion.
+
+`CM-2056` adds a local Phase 9 / Phase 10 external review request boundary
+contract that consumes the CM-2053 route output. It prepares category-only
+future request entries for Phase 9 observation/dogfood review, Phase 9 external
+review, Phase 9 review-bundle application, Phase 10 external review, Phase 10
+tag approval packet, and Phase 10 review-bundle application evidence. Focused
+tests prove stale route evidence is rejected, routes with no external review
+gaps are blocked, review acceptance/tag/default-runtime/readiness drift stops
+L4, forbidden raw/secret/review/tag-approval fields are rejected by path only,
+and the request boundary does not complete Phase 9 or Phase 10 in the
+completion audit. CM-2056 does not accept review evidence, accept tag approval,
+apply review bundles or completion-audit patches, expand default runtime,
+create/push tags, publish releases, deploy, cut over, call
+VCPToolBox/runtime/provider surfaces, read real/private memory, mutate durable
+state, complete Phase 9/10, or claim readiness. CM-2056 is not external review
+evidence, not tag approval, not Phase 9/10 completion, not release readiness,
+and not full plan-pack completion.
+
+`CM-2055` adds a local Phase 8 exact receipt request boundary contract that
+consumes the CM-2053 route output. It prepares the category-only future exact
+receipt request field list for Phase 8 native-write proof: exact approval
+enforcement, native side-effect receipt, real-root durable write proof,
+`verify_write`, rollback drill, failure recovery, output disclosure, audit
+receipt, and receipt-bundle application evidence. Focused tests prove stale
+route evidence is rejected, routes with no exact receipt gaps are blocked,
+receipt/native-write/durable-write/readiness drift stops L4, forbidden
+raw/secret/rollback/receipt fields are rejected by path only, and the request
+boundary does not complete Phase 8 in the completion audit. CM-2055 does not
+accept approval, collect/read/accept/apply receipts, apply a completion-audit
+patch, execute native write, prove production write, run verify/rollback/failure
+recovery, call VCPToolBox/runtime/provider surfaces, read real/private memory,
+mutate durable state, complete Phase 8, or claim readiness. CM-2055 is not
+exact receipt evidence, not Phase 8 completion, not native-write production
+proof, not release readiness, and not full plan-pack completion.
+
+`CM-2054` adds a local Phase 2 exact receipt request boundary contract that
+consumes the CM-2053 route output. It prepares the category-only future exact
+receipt request field list for Phase 2: native target binding, native read
+proof, fallback distinction, low-disclosure proof, audit/scope visibility,
+WSL/Linux proof, Windows/WSL smoke proof, and receipt-bundle application
+evidence. Focused tests prove stale route evidence is rejected, routes with no
+exact receipt gaps are blocked, receipt/native-read/command/readiness drift
+stops L4, forbidden raw/secret/receipt fields are rejected by path only, and
+the request boundary does not complete Phase 2 in the completion audit. CM-2054
+does not accept approval, collect/read/accept/apply receipts, apply a
+completion-audit patch, execute native/fallback reads, execute platform
+commands, call VCPToolBox/runtime/provider surfaces, read real/private memory,
+mutate durable state, complete Phase 2, or claim readiness. CM-2054 is not
+exact receipt evidence, not Phase 2 completion, not release readiness, and not
+full plan-pack completion.
+
+`CM-2053` adds a local remaining-evidence route contract that consumes the
+real completion audit and trace matrix outputs. It classifies missing evidence
+into exact-authorized receipt, external review, local command gate, local
+contract/source evidence, and objective invariant buckets, then selects the
+next safe evidence route without reducing any completion requirement. Focused
+tests prove exact receipt gaps are prioritized before external review gaps,
+external review gaps stay separate from local contracts, and completion /
+readiness / runtime side-effect claims stop L4. CM-2053 does not accept
+evidence, collect or apply receipts, accept external review, accept tag
+approval, run command gates, expand default runtime, call VCPToolBox/runtime
+surfaces, read real/private memory, execute native reads or writes, mutate
+durable state, complete phases, or claim readiness. CM-2053 is not evidence,
+not Phase completion, not release readiness, and not full plan-pack completion.
+
+`CM-2052` adds a Phase 9 / Phase 10 external review completion-audit patch
+application contract for `externalReviewEvidenceBundleAppliedToCompletionAudit`.
+It requires the CM-2051 boundary plus category-only, low-disclosure
+observation/dogfood review, external review, and tag approval packet evidence
+from separate processes before the applied field can be represented. Focused
+tests prove Phase 9 and Phase 10 remain incomplete when the applied field is
+present but external review / tag evidence is missing, and trace matrix tests
+reject local-contract evidence for this external-review field. CM-2052 does
+not accept review evidence, accept tag approval, expand default runtime,
+create/push tags, publish releases, deploy, cut over, call VCPToolBox/runtime
+surfaces, read real/private memory, execute native reads or writes, mutate
+durable state, complete Phase 9/10, or claim readiness. CM-2052 is not external
+review evidence acceptance, not tag approval acceptance, not default runtime
+expansion, not Phase 9/10 completion, not release readiness, and not full
+plan-pack completion.
+
+`CM-2051` adds a Phase 9 / Phase 10 external review completion-audit patch
+boundary contract and integrates
+`externalReviewEvidenceCompletionAuditPatchBoundaryPassed` into the full
+completion audit before `externalReviewEvidenceBundleAppliedToCompletionAudit`.
+Focused tests prove Phase 9 and Phase 10 remain incomplete when the CM-2050
+application receipt exists but this local patch boundary evidence is missing.
+CM-2051 does not accept review evidence, accept tag approval, apply review
+bundles, apply a completion-audit patch, expand the default runtime,
+create/push tags, publish releases, deploy, cut over, call VCPToolBox/runtime
+surfaces, read real/private memory, execute native reads or writes, mutate
+durable state, or claim readiness. CM-2051 is not external review evidence, not
+tag approval evidence, not review-bundle application, not completion-audit
+patch application, not Phase 9/10 completion, not release readiness, and not
+full plan-pack completion.
+
+`CM-2050` adds a Phase 9 / Phase 10 external review bundle application receipt
+contract and integrates `externalReviewEvidenceBundleApplicationReceiptPassed`
+into the full completion audit before
+`externalReviewEvidenceBundleAppliedToCompletionAudit`. Focused tests prove
+Phase 9 and Phase 10 remain incomplete when the CM-2049 application gate
+exists but this local application receipt evidence is missing. CM-2050 does
+not accept review evidence, accept tag approval, apply review bundles, apply a
+completion-audit patch, expand the default runtime, create/push tags, publish
+releases, deploy, cut over, call VCPToolBox/runtime surfaces, read
+real/private memory, execute native reads or writes, mutate durable state, or
+claim readiness. CM-2050 is not external review evidence, not tag approval
+evidence, not review-bundle application, not completion-audit patch
+application, not Phase 9/10 completion, not release readiness, and not full
+plan-pack completion.
+
+`CM-2049` adds a Phase 9 / Phase 10 external review bundle application gate
+and integrates `externalReviewEvidenceBundleApplicationGatePassed` into the
+full completion audit before
+`externalReviewEvidenceBundleAppliedToCompletionAudit`. Focused tests prove
+Phase 9 and Phase 10 remain incomplete when review/tag evidence exists but this
+application gate evidence is missing. CM-2049 does not accept review evidence,
+accept tag approval, apply review bundles, apply a completion-audit patch,
+expand the default runtime, create/push tags, publish releases, deploy, cut
+over, call VCPToolBox/runtime surfaces, read real/private memory, execute
+native reads or writes, mutate durable state, or claim readiness. CM-2049 is
+not external review evidence, not tag approval evidence, not review-bundle
+application, not completion-audit patch application, not Phase 9/10 completion,
+not release readiness, and not full plan-pack completion.
+
+`CM-2048` hardens the Phase 10 release/tag readiness policy gate so tag
+approval packet acceptance requires the hardened external-review intake,
+review-bundle contract, patch hardened bundle binding, and application patch
+preflight chain. It integrates
+`releaseTagExternalReviewChainBindingPassed` into the full completion audit.
+Focused tests prove missing hardened external-review chain evidence blocks tag
+approval packet acceptance, and Phase 10 remains incomplete when this
+release/tag gate binding evidence is missing. CM-2048 does not accept review
+evidence, accept tag approval, apply review bundles, apply a completion-audit
+patch, expand the default runtime, create/push tags, publish releases, deploy,
+cut over, call VCPToolBox/runtime surfaces, read real/private memory, execute
+native reads or writes, mutate durable state, or claim readiness. CM-2048 is
+not external review evidence, not tag approval evidence, not review-bundle
+application, not completion-audit patch application, not Phase 10 completion,
+not release readiness, and not full plan-pack completion.
+
+`CM-2047` hardens the Phase 9 / Phase 10 external review evidence bundle and
+application patch preflight contracts so patch preflight requires the CM-2033
+hardened review-bundle `prerequisiteChecksRequired` summary before local ready
+decisions. It integrates
+`externalReviewEvidencePatchHardenedBundleBindingPassed` into the full
+completion audit. Focused tests prove Phase 9 and Phase 10 remain incomplete
+when this downstream hardened-bundle binding evidence is missing, and stale
+bundle summaries are blocked in patch preflight. CM-2047 does not accept review
+evidence, accept tag approval, apply review bundles, apply a completion-audit
+patch, expand the default runtime, create/push tags, publish releases, deploy,
+cut over, call VCPToolBox/runtime surfaces, read real/private memory, execute
+native reads or writes, mutate durable state, or claim readiness. CM-2047 is
+not external review evidence, not tag approval evidence, not review-bundle
+application, not completion-audit patch application, not Phase 9/10 completion,
+not release readiness, and not full plan-pack completion.
+
+`CM-2046` hardens the Phase 8 native-write proof receipt bundle and receipt
+application patch preflight contracts so patch preflight requires the CM-2029
+hardened receipt-bundle `prerequisiteChecksRequired` summary before local ready
+decisions. It integrates `phase8ReceiptPatchHardenedBundleBindingPassed` into
+the full completion audit. Focused tests prove Phase 8 remains incomplete when
+this downstream hardened-bundle binding evidence is missing, and stale bundle
+summaries are blocked in patch preflight. CM-2046 does not collect or apply
+receipts, apply a completion-audit patch, accept approval, generate approval
+lines, execute commands, inspect processes, start or stop services, disclose
+endpoints/locators/target values, query text, request/response bodies, command
+text/output, paths, logs, environment variables, process details, memory
+content, raw output, raw audit, or approval lines, call VCPToolBox/runtime
+surfaces, read real/private memory, execute native write, mutate durable state,
+or claim readiness. CM-2046 is not exact receipt evidence, not receipt
+application, not completion-audit patch application, not Phase 8 completion,
+not release readiness, and not full plan-pack completion.
+
+`CM-2045` hardens the Phase 2 receipt audit intake and receipt application
+patch preflight contracts so they require the CM-2044 hardened receipt-bundle
+`prerequisiteChecksRequired` summary before local ready decisions. It
+integrates `phase2ReceiptIntakePatchHardenedBundleBindingPassed` into the full
+completion audit. Focused tests prove Phase 2 remains incomplete when this
+downstream hardened-bundle binding evidence is missing, and stale bundle
+summaries are blocked in both audit intake and patch preflight. CM-2045 does
+not collect or apply receipts, apply a completion-audit patch, accept approval,
+generate approval lines, execute commands, inspect processes, start or stop
+services, disclose endpoints/locators/target values, query text,
+request/response bodies, command text/output, paths, logs, environment
+variables, process details, memory content, raw output, raw audit, or approval
+lines, call VCPToolBox/runtime surfaces, bind a native target, read
+real/private memory, execute native reads, execute fallback reads, compare
+fallback/native results, mutate durable state, or claim readiness. CM-2045 is
+not exact receipt evidence, not receipt application, not completion-audit patch
+application, not Phase 2 completion, not release readiness, and not full
+plan-pack completion.
+
+`CM-2044` hardens the Phase 2 native read proof receipt bundle contract and
+integrates `phase2ReceiptBundleReviewChainHardeningPassed` into the full
+completion audit. The hardened bundle contract requires the CM-2036 through
+CM-2043 local review chain before future receipt-bundle readiness: native read
+response shape compatibility, native read receipt schema compatibility, native
+target binding receipt review, native read proof receipt review, fallback
+distinction receipt review, low-disclosure proof receipt review, audit/scope
+receipt review, and platform proof receipt review. Focused tests prove Phase 2
+remains incomplete when receipt bundle review-chain hardening evidence is
+missing. CM-2044 does not collect or apply receipts, accept approval, generate
+approval lines, execute commands, inspect processes, start or stop services,
+disclose endpoints/locators/target values, query text, request/response
+bodies, command text/output, paths, logs, environment variables, process
+details, memory content, raw output, raw audit, or approval lines, call
+VCPToolBox/runtime surfaces, bind a native target, read real/private memory,
+execute native reads, execute fallback reads, compare fallback/native results,
+mutate durable state, or claim readiness. CM-2044 is not exact receipt
+evidence, not receipt application, not Phase 2 completion, not release
+readiness, and not full plan-pack completion.
+
+`CM-2043` adds a local Phase 2 platform proof receipt review contract and
+integrates `phase2PlatformProofReceiptReviewPassed` into the full completion
+audit. The contract accepts only a safe reference name, category-only platform
+class, category-only WSL/Linux proof shape, category-only Windows/WSL smoke
+shape, and category-only smoke command facts, keeps platform proof observations
+as `requires_future_exact_authorized_receipt`, and keeps
+`wslLinuxProofPassed` and `windowsWslSmokePassed` as separate exact-authorized
+receipt evidence. Focused tests prove Phase 2 remains incomplete when platform
+proof receipt review evidence is missing. CM-2043 does not collect or apply
+receipts, accept approval, generate approval lines, execute commands, inspect
+processes, start or stop services, disclose endpoints/locators/target values,
+query text, request/response bodies, command text/output, paths, logs,
+environment variables, process details, memory content, raw output, raw audit,
+or approval lines, call VCPToolBox/runtime surfaces, bind a native target, read
+real/private memory, execute native reads, execute fallback reads, compare
+fallback/native results, mutate durable state, or claim readiness. CM-2043 is
+not `wslLinuxProofPassed`, not `windowsWslSmokePassed`, not Phase 2 completion,
+not release readiness, and not full plan-pack completion.
+
+`CM-2042` adds a local Phase 2 audit/scope receipt review contract and
+integrates `phase2AuditScopeReceiptReviewPassed` into the full completion
+audit. The contract accepts only a safe reference name, category-only audit
+projection, category-only scope visibility, and category-only isolation
+boundary facts, keeps audit and scope visibility/isolation observations as
+`requires_future_exact_authorized_receipt`, and keeps `auditReceiptPassed` and
+`scopeVisibilityIsolationPassed` as separate exact-authorized receipt evidence.
+Focused tests prove Phase 2 remains incomplete when audit/scope receipt review
+evidence is missing. CM-2042 does not collect or apply receipts, accept
+approval, generate approval lines, disclose endpoints/locators/target values,
+query text, request/response bodies, field names, memory ids, memory content,
+audit rows, scope identifiers, raw output, raw audit, or approval lines, call
+VCPToolBox/runtime surfaces, bind a native target, read real/private memory,
+execute native reads, execute fallback reads, compare fallback/native results,
+mutate durable state, or claim readiness. CM-2042 is not `auditReceiptPassed`,
+not `scopeVisibilityIsolationPassed`, not Phase 2 completion, not release
+readiness, and not full plan-pack completion.
+
+`CM-2041` adds a local Phase 2 low-disclosure proof receipt review contract and
+integrates `phase2LowDisclosureProofReceiptReviewPassed` into the full
+completion audit. The contract accepts only a safe reference name,
+category-only disclosure budget, category-only redaction policy, and
+category-only output projection facts, keeps low-disclosure proof observation
+as `requires_future_exact_authorized_receipt`, and keeps
+`lowDisclosureProofPassed` as separate exact-authorized receipt evidence.
+Focused tests prove Phase 2 remains incomplete when low-disclosure proof
+receipt review evidence is missing. CM-2041 does not collect or apply receipts,
+accept approval, generate approval lines, disclose endpoints/locators/target
+values, query text, request/response bodies, field names, memory ids, memory
+content, raw output, raw audit, or approval lines, call VCPToolBox/runtime
+surfaces, bind a native target, read real/private memory, execute native reads,
+execute fallback reads, compare fallback/native results, mutate durable state,
+or claim readiness. CM-2041 is not `lowDisclosureProofPassed`, not Phase 2
+completion, not release readiness, and not full plan-pack completion.
+
+`CM-2040` adds a local Phase 2 fallback distinction receipt review contract and
+integrates `phase2FallbackDistinctionReceiptReviewPassed` into the full
+completion audit. The contract accepts only a safe reference name,
+category-only native/fallback route distinction, and category-only fallback
+policy facts, keeps fallback distinction observation as
+`requires_future_exact_authorized_receipt`, and keeps
+`fallbackDistinctionPassed` as separate exact-authorized receipt evidence.
+Focused tests prove Phase 2 remains incomplete when fallback distinction
+receipt review evidence is missing. CM-2040 does not collect or apply receipts,
+accept approval, generate approval lines, disclose endpoints/locators/target
+values, query text, request/response bodies, field names, memory ids, memory
+content, fallback result values, native result values, or approval lines, call
+VCPToolBox/runtime surfaces, bind a native target, read real/private memory,
+execute native reads, execute fallback reads, compare fallback/native results,
+mutate durable state, or claim readiness. CM-2040 is not
+`fallbackDistinctionPassed`, not Phase 2 completion, not release readiness, and
+not full plan-pack completion.
+
+`CM-2039` adds a local Phase 2 native read proof receipt review contract and
+integrates `phase2NativeReadProofReceiptReviewPassed` into the full completion
+audit. The contract accepts only a safe reference name, category-only bounded
+query boundary, and category-only no-field-name result shape, keeps actual
+native read observation as `requires_future_exact_authorized_receipt`, and
+keeps `nativeReadProofPassed` as separate exact-authorized receipt evidence.
+Focused tests prove Phase 2 remains incomplete when native read proof receipt
+review evidence is missing. CM-2039 does not collect or apply receipts, accept
+approval, generate approval lines, disclose endpoints/locators/target values,
+query text, request/response bodies, field names, memory ids, or memory
+content, call VCPToolBox/runtime surfaces, bind a native target, read
+real/private memory, execute native reads, inspect response shape, mutate
+durable state, or claim readiness. CM-2039 is not `nativeReadProofPassed`, not
+Phase 2 completion, not release readiness, and not full plan-pack completion.
+
+`CM-2038` adds a local Phase 2 native target binding receipt review contract
+and integrates `phase2NativeTargetBindingReceiptReviewPassed` into the full
+completion audit. The contract accepts only a safe reference name and
+category-only low-disclosure review facts, keeps actual target binding
+observation as `requires_future_exact_authorized_receipt`, and keeps
+`nativeTargetBindingPassed` as separate exact-authorized receipt evidence.
+Focused tests prove Phase 2 remains incomplete when target binding receipt
+review evidence is missing. CM-2038 does not collect or apply receipts, accept
+approval, generate approval lines, disclose endpoints/locators/target values,
+call VCPToolBox/runtime surfaces, bind a native target, read real/private
+memory, execute native reads, mutate durable state, or claim readiness. CM-2038
+is not `nativeTargetBindingPassed`, not native read proof, not Phase 2
+completion, not release readiness, and not full plan-pack completion.
+
+`CM-2037` adds a local Phase 2 native read receipt schema compatibility
+contract and integrates `nativeReadReceiptSchemaCompatibilityPassed` into the
+full completion audit. The contract maps the existing low-disclosure readonly
+execution receipt schema to candidate native read attempt, native read success,
+and low-disclosure receipt categories while keeping native target binding,
+audit, fallback distinction, WSL/Linux, and Windows/WSL smoke as separate
+exact-authorized receipt requirements. Focused tests prove Phase 2 remains
+incomplete when receipt schema compatibility evidence is missing. CM-2037 does
+not collect or apply receipts, accept approval, generate approval lines, call
+VCPToolBox/runtime surfaces, read real/private memory, execute native reads,
+mutate durable state, or claim readiness. CM-2037 is not native target binding,
+not native read proof, not Phase 2 completion, not release readiness, and not
+full plan-pack completion.
+
+`CM-2036` adds a local category-only native read response shape compatibility
+contract and integrates `nativeReadResponseShapeCompatibilityPassed` into the
+full completion audit. The contract covers `search_memory`, `memory_overview`,
+and `audit_memory` response shape projections without consuming native response
+bodies, inspecting field names, binding endpoints or locators, calling
+VCPToolBox/runtime surfaces, reading real/private memory, executing native
+reads, mutating durable state, or claiming readiness. Focused tests prove Phase
+2 remains incomplete when shape compatibility evidence is missing. CM-2036 is
+not native target binding, not native read proof, not Phase 2 completion, not
+release readiness, and not full plan-pack completion.
+
+`CM-2035` adds a local operator-only `commit_memory_delta` preflight and
+integrates `commitMemoryDeltaOperatorPreflightPassed` into the full completion
+audit. The preflight consumes an accepted low-disclosure `propose_memory_delta`
+result and prepares future markers for exact operator approval, governance
+receipt, rollback posture, and exact-authorized commit receipt. Focused tests
+prove Phase 6 remains incomplete when proposal-only evidence exists but
+operator commit preflight evidence is missing. CM-2035 does not register
+`commit_memory_delta` as a default MCP tool, accept approval, generate approval
+lines, execute commit, write memory, mutate durable state, call providers or
+VCPToolBox, expand public MCP, tag/release, deploy/cut over, or claim
+readiness.
+
+`CM-2034` adds a local Phase 9 / Phase 10 external review evidence application
+patch preflight contract and integrates
+`externalReviewEvidenceApplicationPatchPreflightPassed` plus
+`externalReviewEvidenceBundleAppliedToCompletionAudit` into the full completion
+audit. The preflight consumes the CM-2033 bundle contract result only as local
+preflight input and prepares future markers for applying observation/dogfood
+review, external review, and tag approval packet evidence to the completion
+audit. Focused tests prove Phase 9 and Phase 10 remain incomplete when review
+evidence exists but review-bundle application / completion-audit patch evidence
+is missing. CM-2034 does not accept review evidence, accept tag approval, apply
+review evidence to the completion audit, apply a completion-audit patch, expand
+the default runtime, create tags, publish releases, deploy/cut over, or claim
+readiness.
+
+`CM-2033` adds a local Phase 9 / Phase 10 external review evidence bundle
+contract and integrates `externalReviewEvidenceBundleContractPassed` into the
+full completion audit. The contract accepts only future low-disclosure
+review-evidence bundle shape categories for observation/dogfood review,
+external review, and tag approval packet evidence. Focused tests prove Phase 9
+and Phase 10 remain incomplete when the bundle contract exists but actual
+review/tag evidence is missing. CM-2033 does not accept review evidence, accept
+tag approval, apply review evidence to the completion audit, expand the default
+runtime, create tags, publish releases, deploy/cut over, or claim readiness.
+
+`CM-2032` integrates the CM-2026 external review evidence intake into the full
+completion audit. Phase 9 and Phase 10 now require
+`externalReviewEvidenceIntakePassed` as local contract evidence, while
+observation/dogfood review, external review, and tag approval packet evidence
+remain external-review-backed fields. Focused tests prove Phase 9 and Phase 10
+remain incomplete when the intake exists but actual review/tag evidence is
+missing. CM-2032 does not accept review evidence, accept tag approval, expand
+the default runtime, apply a completion-audit patch, create tags, publish
+releases, deploy/cut over, or claim readiness.
+
+`CM-2031` adds a local Phase 2 native-read proof receipt application patch
+preflight contract and integrates `phase2ReceiptApplicationPatchPreflightPassed`
+into the full completion audit. The preflight consumes the CM-2022
+receipt-bundle contract result only as local preflight input and prepares
+future exact-authorized markers for the Phase 2 proof fields plus
+receipt-bundle application. Focused tests prove Phase 2 remains incomplete when
+exact receipt fields exist but receipt-bundle application / patch evidence is
+missing. CM-2031 does not accept approval, submit approval material, generate
+approval lines, collect/read/apply receipts, call VCPToolBox, execute live
+native read proof, apply a completion-audit patch, mutate durable state, expand
+public MCP, tag/release, deploy/cut over, or claim readiness.
+
+`CM-2030` adds a local Phase 8 native-write proof receipt application patch
+preflight contract and integrates `phase8ReceiptApplicationPatchPreflightPassed`
+plus `phase8ReceiptBundleAppliedToCompletionAudit` into the full completion
+audit. The preflight consumes the CM-2029 receipt-bundle contract result only as
+local preflight input and prepares future exact-authorized markers for the Phase
+8 proof fields plus receipt-bundle application. Focused tests prove Phase 8
+remains incomplete when exact receipt fields exist but receipt-bundle
+application / patch evidence is missing. CM-2030 does not accept approval,
+submit approval material, generate approval lines, collect/read/apply receipts,
+call VCPToolBox, execute native write, apply a completion-audit patch, mutate
+durable state, expand public MCP, tag/release, deploy/cut over, or claim
+readiness.
+
+`CM-2029` adds a local Phase 8 native-write proof receipt-bundle contract and
+integrates `phase8ReceiptBundleContractPassed` into the full completion audit.
+The contract defines future low-disclosure receipt categories and sequence
+checks for fresh exact approval, exact approval enforcement, native side
+effect, real-root durable write proof, `verify_write`, rollback drill, failure
+recovery, output disclosure budget, and audit receipt. Focused tests prove
+Phase 8 remains incomplete when the bundle contract exists but exact
+native-write receipts are missing. CM-2029 does not accept approval, submit
+approval material, generate approval lines, collect receipts, apply receipts,
+call VCPToolBox, execute native write, apply a completion-audit patch, mutate
+durable state, expand public MCP, tag/release, deploy/cut over, or claim
+readiness.
+
+`CM-2028` integrates the CM-2027 Phase 8 native-write proof receipt audit intake
+into the full completion audit. Phase 8 now requires
+`phase8ReceiptAuditIntakePassed` before the phase can be accepted. Focused
+tests prove Phase 8 remains incomplete when the intake exists but exact
+native-write receipts are missing. CM-2028 does not accept approval, submit
+approval material, generate approval lines, call VCPToolBox, execute native
+write, apply a completion-audit patch, mutate durable state, expand public MCP,
+tag/release, deploy/cut over, or claim readiness.
+
+`CM-2027` adds a local Phase 8 native-write proof receipt audit intake
+preflight contract. It connects the CM-2013 native write contract preflight and
+CM-2014 real-root write readiness gate to the CM-2017 completion-audit Phase 8
+proof requirements without accepting approval, executing native write, proving
+production write, applying a completion-audit patch, or claiming readiness. It
+accepts only `requires_future_exact_authorized_receipt` markers for exact
+approval enforcement, native side-effect receipt, real-root durable write
+proof, `verify_write`, rollback drill, failure recovery, output disclosure
+budget, and audit receipt. It also refines the CM-2024 trace matrix so exact
+receipt requirements are evaluated by phase requirement plus evidence field.
+CM-2027 does not accept approval, submit approval material, generate approval
+lines, call VCPToolBox, read real/private memory, read raw private state, call
+providers, mutate durable state, expand public MCP, tag/release, deploy/cut
+over, or claim readiness.
+
+`CM-2026` adds a local Phase 9 / Phase 10 external review evidence intake
+preflight contract. It connects the CM-2015 default runtime policy gate and
+CM-2016 release tag readiness policy gate to the CM-2017 completion-audit review
+evidence requirements without accepting review evidence, expanding the default
+runtime, accepting a tag approval packet, creating tags, publishing releases,
+deploying, cutting over, or claiming readiness. It accepts only future
+observation/dogfood review, external-review, and tag-approval markers, and
+rejects local policy gates or booleans masquerading as review evidence. CM-2026
+does not apply a completion-audit patch, accept review, accept tag approval,
+generate approval lines, call VCPToolBox, read real/private memory, read raw
+private state, call providers, mutate durable state, expand public MCP,
+tag/release, deploy/cut over, or claim readiness.
+
+`CM-2025` adds a local Phase 2 receipt audit intake preflight contract. It
+connects the CM-2022 receipt-bundle shape contract to the CM-2023
+completion-audit receipt-application requirement without applying receipts or
+marking Phase 2 complete. It accepts only
+`requires_future_exact_authorized_receipt` markers for the Phase 2 audit fields
+that still require separate exact-authorized low-disclosure receipts, and
+rejects proposed evidence that tries to mark those fields complete now. CM-2025
+does not collect or apply receipts, apply a completion-audit patch, accept
+approval, generate approval lines, run live native read proof, start services,
+call VCPToolBox, inspect process state, read real/private memory, read raw
+private state, call providers, mutate durable state, expand public MCP,
+tag/release, deploy/cut over, or claim readiness.
+
+`CM-2024` adds a local evidence trace matrix for the full completion audit. It
+binds every phase requirement and objective invariant evidence field to a
+low-disclosure trace entry, distinguishes local source/test, command-gate,
+contract, docs/status, exact-authorized receipt, external review, future exact
+receipt, and future external review evidence, and rejects missing, duplicate,
+or insufficient evidence-kind entries. Exact receipt fields cannot be satisfied
+by local contract evidence. The current trace can cover every requirement while
+remaining incomplete because actual receipts and external reviews remain future
+required. CM-2024 does not collect or apply receipts, accept approval, generate
+approval lines, run live native read proof, start services, call VCPToolBox,
+inspect process state, read real/private memory, read raw private state, call
+providers, mutate durable state, expand public MCP, tag/release, deploy/cut
+over, or claim readiness.
+
+`CM-2023` integrates the Phase 2 gate chain into the full plan-pack completion
+audit. Phase 2 completion now requires `phase2EvidenceGatePassed`,
+`phase2ReadinessGatePassed`, `phase2ApprovalPacketContractPassed`,
+`phase2ReceiptBundleContractPassed`, the actual low-disclosure native-read
+receipt evidence, and `phase2ReceiptBundleAppliedToCompletionAudit`. Focused
+tests prove local gate contracts alone do not complete Phase 2. CM-2023 does
+not collect or apply receipts, accept approval, generate approval lines, run
+live native read proof, start services, call VCPToolBox, inspect process state,
+read real/private memory, read raw private state, call providers, mutate
+durable state, expand public MCP, tag/release, deploy/cut over, or claim
+readiness. Phase 2 remains incomplete until separate exact-authorized
+low-disclosure native-read receipt evidence exists and is separately reviewed.
+
+`CM-2022` implements a local Phase 2 native read proof receipt bundle contract
+for future low-disclosure evidence. It consumes the CM-2019 evidence gate,
+CM-2020 readiness gate, and CM-2021 approval-packet prerequisites; requires
+category-only receipt entries for fresh exact approval, native target binding,
+native read attempt, native read success, audit, fallback distinction,
+WSL/Linux, Windows/WSL smoke, and low disclosure; and requires sequence checks
+for approval before native read, target binding before native read, attempt
+before success, audit after native read, fallback separation, and WSL/Linux
+versus Windows/WSL smoke separation. It stops L4 on receipt-bundle application,
+Phase 2 completion claims, approval/runtime/native-read/memory-read counters,
+raw output, approval-line material, memory content, public-MCP/release/deploy
+/cutover drift, or readiness. It does not collect or apply receipt evidence,
+accept approval, generate approval lines, run live native read proof, start
+services, call VCPToolBox, inspect process state, read real/private memory,
+read raw private state, call providers, mutate durable state, expand public MCP,
+tag/release, deploy/cut over, or claim readiness. Phase 2 remains incomplete
+until separate exact-authorized low-disclosure native-read receipt evidence
+exists and is separately reviewed.
+
+`CM-2021` implements a local Phase 2 native read proof approval packet contract
+for a future exact-authorized proof boundary. It consumes the CM-2019
+evidence-gate and CM-2020 readiness-gate prerequisites, keeps target binding to
+a safe reference name/category only, requires fresh current single-use exact
+approval later, bounds future read-only proof budgets, and forbids
+endpoint/locator/raw runtime/provider payload/raw response/memory
+content/approval-line material. It stops L4 on packet submission, accepted
+approval, approval-line generation/disclosure, runtime/native-read/memory-read
+counters, service/process/provider/write/public-MCP expansion,
+tag/release/deploy/cutover, or readiness drift. It does not display or submit
+approval material, generate approval lines, run live native read proof, start
+services, call VCPToolBox, inspect process state, read real/private memory,
+read raw private state, call providers, mutate durable state, expand public MCP,
+tag/release, deploy/cut over, or claim readiness. Phase 2 remains incomplete
+until separate exact-authorized low-disclosure native-read receipt evidence
+exists.
+
+`CM-2020` implements a local Phase 2 native read proof readiness gate for a
+future exact-authorized proof request. It consumes the CM-2019 evidence-gate
+boundary as prerequisite, requires a task-scoped/operator-intent-scoped
+category-only approval request, requires native target binding by safe reference
+category, plans governed read-only probes through `search_memory`,
+`memory_overview`, and `audit_memory`, and requires fallback distinction plus
+low-disclosure audit planning. It stops L4 if input claims exact approval,
+approval submission, service action, runtime call, native target binding
+receipt, native read attempt, native read success, raw output, provider/API,
+write, durable mutation, public MCP expansion, tag/release/deploy/cutover, or
+readiness. It does not run live native read proof, start services, call
+VCPToolBox, inspect process state, read real/private memory, read raw private
+state, call providers, mutate durable state, expand public MCP, tag/release,
+deploy/cut over, or claim readiness. Phase 2 remains incomplete until separate
+exact-authorized low-disclosure native-read receipt evidence exists.
+
+`CM-2019` implements a local Phase 2 native read proof evidence gate. It accepts
+only receipt-only low-disclosure evidence for default read-only surface, hidden
+tools hard reject, native target binding, native read proof, fallback
+distinction, low disclosure, audit receipt, scope/visibility isolation,
+WSL/Linux proof, and Windows/WSL smoke. It requires `search_memory`,
+`memory_overview`, and `audit_memory` as the read-only bridge tools; allows
+`prepare_memory_context` and `propose_memory_delta` as later safe default tools;
+and stops L4 if mutation, destructive, or commit tools appear in default surface
+evidence. It does not run live native read proof, start services, call
+VCPToolBox, inspect process state, read real/private memory, read raw private
+state, call providers, mutate durable state, expand public MCP, tag/release,
+deploy/cut over, or claim readiness. Phase 2 remains incomplete until separate
+exact-authorized low-disclosure native-read receipt evidence exists.
+
+`CM-2018` supplies current Phase 1 command-gate evidence for the imported
+near-model-memory plan pack. `npm run test:all` passed, and `npm run gate:ci --
+--json` passed with fixture-only/no-network/no-daemon/no-provider posture,
+compare/rollback/query checks, CI-safe tests, and docs script target checks.
+This closes the current `testAllPassed` and `gateCiPassed` completion-audit gap.
+It is not full plan-pack completion, not production readiness, not release
+readiness, not native read proof, not native write proof, and not tag/release
+approval. It performs no provider/API call, no VCPToolBox runtime call, no
+native write, no durable mutation, no real/private memory read, no raw
+private-state read, no public MCP expansion, no tag/release/deploy/cutover/push,
+and no readiness claim.
+
+`CM-2017` implements a local completion audit for the full imported
+near-model-memory plan pack. It maps Phase 0 through Phase 10 plus Jenn's
+objective invariants into explicit evidence checks and records the current
+result as incomplete rather than complete. After CM-2020, Phase 1 command-gate
+evidence plus Phase 2 evidence/readiness gates are current, while the plan still
+needs Phase 2 live native-read receipt evidence, Phase 8 native
+side-effect/rollback/failure proof, Phase 9 observation/external review, and
+Phase 10 external review/tag approval packet evidence before any full plan-pack
+completion claim. It performs no runtime or
+native write, no durable mutation, no provider/API call, no public MCP
+expansion, no real/private memory read, no raw private-state read, no
+tag/release/deploy/cutover/push, and no readiness claim.
+
+`CM-2016` implements a local Phase 10 release tag readiness policy gate. It evaluates milestone tag naming, release note non-claims, and tag approval packet evidence for read-only/context, operator-full-surface, and native-write-proof milestones. It allows only scoped candidate families such as `v0.2.0-readonly-context-rc`; rejects full/production/complete-memory naming; rejects release note full-capability or production-write claims; requires release note non-claims review; and stops L4 if input claims actual tag creation, tag push, release publication, deploy, cutover, provider/API call, durable mutation, native write, public MCP expansion, or readiness. This advances Phase 10 local policy gating, but it is not external review completion, not tag approval, not an actual tag/release, not release readiness, not production readiness, and not full plan-pack completion.
+
+`CM-2015` implements a local Phase 9 default runtime policy observation gate. It accepts only the current read/context/proposal default posture as a policy hold; rejects default runtime expansion requests without 30-day observation or equivalent dogfood review plus external review; and still does not auto-expand the default runtime after observation/review evidence. It stops L4 if input tries to place `record_memory`, `validate_memory`, `tombstone_memory`, `supersede_memory`, or `commit_memory_delta` into the default runtime, or claims runtime/native write execution, durable mutation, provider/API call, public MCP expansion, release/deploy/cutover, approval-line operations, or readiness. This advances Phase 9 policy gating, but it is not observation completion, not external review, not default expansion, not native write proof, not production write, and not full plan-pack completion.
+
+`CM-2014` implements a local Phase 8 real-root write proof readiness gate after P8-T1. It consumes native-write contract preflight evidence; requires category-only approval request preparation, real-root target evidence by safe reference category, rollback drill planning, failure recovery planning, and low-disclosure audit planning; blocks missing prerequisites; and stops L4 if input claims approval acceptance, approval-line operations, runtime/native write execution, durable write, rollback execution, failure recovery execution, provider/API call, public MCP expansion, release/deploy/cutover, or readiness. This advances P8-T2/P8-T3/P8-T4 execution readiness, but it is not approval, not approval submission, not real-root write proof, not native side-effect execution, not durable mutation, not rollback drill proof, not failure recovery proof, and not full plan-pack completion.
+
+`CM-2013` implements the Phase 8 P8-T1 local native-write contract preflight. It defines `prepare_write`, `commit_write`, `verify_write`, and `rollback_or_compensate` gates; requires operator full-surface proof, exact approval enforcement, native side-effect receipt requirement, real-root durable write proof requirement, audit receipt, rollback posture, failure recovery, and output disclosure budget; rejects out-of-order contract material; and rejects raw/secret/runtime/readiness fields without echo. This advances native write proof preparation, but it is not exact-approved real-root write proof, not native side-effect execution, not durable mutation, not production write, not rollback drill proof, not failure recovery proof, and not full plan-pack completion.
+
+`CM-2012` implements a Phase 7 local operator-only full-surface proof gate. It verifies explicit env/operator full-surface evidence for `record_memory`, `validate_memory`, `tombstone_memory`, and `supersede_memory`; rejects default-surface and hardened-surface attempts; requires exact approval, audit receipt, rollback posture, and no-approval durable mutation blocking evidence; and keeps `commit_memory_delta` out of public registration. This advances operator-only surface proof, but it is not native write production proof, not durable mutation, not production write, and not full plan-pack completion.
+
+`CM-2011` implements the Phase 6 proposal-only `propose_memory_delta` MCP tool. It stages task-end memory delta proposals using bounded task/evidence/candidates, reuses the governed mutation proposal-mode contract, and returns low-disclosure proposal staging, validation, audit receipt, rollback posture, and a draft `commit_memory_delta` contract. `commit_memory_delta` is not public registered and is not exposed by default. This advances proposal-only memory capture, but it is not durable mutation, not production write, not native write proof, not commit execution, and not full plan-pack completion.
+
+`CM-2010` implements the Phase 5 fixture/local recall quality gate for `prepare_memory_context`. It adds a synthetic query suite and generated report files under `docs/near-model-memory-plan-pack/recall_quality_report.{json,md}`. Coverage includes project fact recall, historical decision recall, current blocker recall, user preference recall, stale fact filtering, conflict fact surfacing, private isolation, workspace isolation, and fallback distinction. This advances the context package quality baseline, but it is not live recall proof, not production recall quality proof, not native read/write proof, and not full plan-pack completion.
+
+`CM-2009` implements the Phase 4 local task-start memory context workflow wrapper. It derives bounded task fields, calls `prepare_memory_context`, injects a summary when context is safe, and returns `memory_unavailable` without raw error echo when the package cannot be prepared or is unsafe. This advances automatic recall wiring locally, but it is not production runtime expansion, not a write proof, and not full plan-pack completion.
+
+`CM-2008` implements the Phase 3 `prepare_memory_context` MVP as a default read-only MCP tool. It reuses existing search/overview/audit and local recall support surfaces, returns bounded task-oriented context sections, marks fallback/native ownership clearly, keeps controlled mutation/write tools hidden by default, and leaves direct native bridge read delegation limited to `search_memory`, `memory_overview`, and `audit_memory`. The full plan pack remains active; later `propose_memory_delta` / staging / audit, operator-only full surface proof, and native write production proof are not completed by this route.
+
+`CM-2007` records `docs/near-model-memory-plan-pack/` as the recent primary implementation plan source. The actual goal is complete implementation of the plan pack. Its immediate active route was Phase 3 `prepare_memory_context` MVP: reuse the existing recall pipeline and support services, convert bounded search results into task-oriented memory context sections, keep default read-only/no durable mutation, and keep VCPToolBox native memory as final memory intelligence owner. Later `propose_memory_delta` / staging / audit work should reuse local write governance without becoming default production write.
 
 `CM-2006` adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md` and closes out the CM-2005 bounded trusted-full-read attempt. It records only the allowed low-disclosure projection: `execution_status_category=bounded_attempt_completed`, `route_status_category=action_success_response_shape_projected`, `response_shape_category=array_item_count_bucket_only`, `top_level_kind_category=array`, `item_count_bucket=zero`, `duration_bucket=lt_100ms`, `read_shape_unlocked_boolean=true`, `raw_output_persisted_boolean=false`, zero write/mutation counters, and `readiness_claimed_boolean=false`. CM-2006 performs no retry, no new trusted-full-read attempt, no request-body generation, no endpoint/locator disclosure, no runtime/network/VCPToolBox call, no response consumption, no memory read/write, no public MCP expansion, no M15/RC unlock, and no readiness claim. CM-2005 single-use execution authority is consumed; any additional attempt requires a new exact boundary.
 

@@ -220,7 +220,7 @@ test('internal validate runtime entry derives actor_client_id from execution con
     assert.equal(result.auditEventPreview.actor_client_id, 'codex');
     assert.deepEqual(
       TOOL_DEFINITIONS.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']
     );
     const publicResult = await app.callTool('validate_memory', runtimeEntryPayload({ dry_run: false, confirm: true }), approvedRequestContext());
     assert.equal(publicResult.decision, 'rejected');

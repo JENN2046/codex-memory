@@ -4,7 +4,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const workspaceRoot = path.join(__dirname, '..');
-const frozenPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
+const frozenPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 const noTouchTargets = [
   {

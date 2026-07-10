@@ -6,7 +6,7 @@ const test = require('node:test');
 const fixturePath = path.join(__dirname, 'fixtures', 'phase-f-query-quality-dry-run-refresh-v1.json');
 const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 
-const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
+const REQUIRED_PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 const REQUIRED_AREAS = ['lifecycle-proposal-state', 'forget-flow-boundary', 'admin-review-schema'];
 const FORBIDDEN_READY_CLAIMS = ['RC_READY', 'runtimeReady=true', 'finalRcMatrixReady=true', 'rcReady=true'];
 

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2077",
+  "observedAt": "2026-07-10T17:31:57Z",
+  "sourceCommit": "ddfc67d2f227d3e726ce5f1829751c783eccddc8",
+  "worktreeClean": false,
+  "loadedRuntimeHead": "2537f31e178e5a61059cca2505bb5d4f01e498ec",
+  "runtimeHeadMatchesSourceCommit": false,
+  "platformCategory": "linux_wsl",
+  "cmdBridge": {
+    "present": true,
+    "passed": true,
+    "exitStatusCategory": "zero"
+  },
+  "powershellBridge": {
+    "present": true,
+    "passed": true,
+    "exitStatusCategory": "zero"
+  },
+  "rawOutputCaptured": false,
+  "absolutePathCaptured": false,
+  "environmentValuesCaptured": false,
+  "completionEligible": false,
+  "completionBlocker": "runtime_head_mismatch_and_worktree_not_clean_require_frozen_replay"
+}
