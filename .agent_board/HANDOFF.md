@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
-Current validation: `CMV-2185`.
-Current handoff: Packet `c06836b4…aa43` passed independent Tag Approval. Tag creation is requested separately but not authorized; tag push and Phase 8 remain false, with no tag or readiness claim.
+Current task: `CM-2085 exact one-use local unsigned annotated tag creation and receipt`.
+Current validation: `CMV-2186`.
+Current handoff: Local unsigned annotated tag `v0.2.0-readonly-context-rc` exists at `170ee339…221b`; authorization is consumed. Tag push, release, Phase 8, and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -18,7 +18,7 @@ closed the clean-checkout, runtime-head, replayable Phase 2 receipt, Windows/WSL
 actual tools/list, and validation-record findings. CM-2080 external review now
 passes for the exact frozen binding. CM-2082 applied that evidence to Completion
 Audit. The remaining independent false slots are Tag Approval and Phase 8; the
-next gate is independent authorization of exact local annotated-tag creation.
+no further tag action is authorized; tag push remains a separate Red boundary.
 
 The long legacy status paragraph below is retained as historical context and
 does not override the CM-2081 active block above. Its older statements about

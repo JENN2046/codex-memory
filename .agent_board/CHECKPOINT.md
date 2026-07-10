@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
-Current validation: `CMV-2185`.
+Current checkpoint: `CM-2085 exact one-use local unsigned annotated tag creation and receipt`.
+Current validation: `CMV-2186`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2085 Local Annotated Tag Creation
+
+Status: `LOCAL_ANNOTATED_TAG_CREATED_AUTHORIZATION_CONSUMED_NO_PUSH_NO_RELEASE_NO_READY_CLAIM`
+
+- Created local unsigned annotated tag `v0.2.0-readonly-context-rc`.
+- Tag object OID: `baf7ecce…5e3c`.
+- Peeled commit: `170ee339…221b`; target tree: `c3e12feb…3b33`.
+- Exact annotation and unsigned status verified.
+- One-use authorization consumed; replay is forbidden.
+- No push, release, deploy, cutover, Phase 8 action, or readiness claim.
+
+Validation: `CMV-2186`.
 
 ## CM-2084 Tag Approval Decision Intake
 

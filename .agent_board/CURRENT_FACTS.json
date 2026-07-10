@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2084",
-  "validationId": "CMV-2185",
+  "taskId": "CM-2085",
+  "validationId": "CMV-2186",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -50,8 +50,15 @@
     "tagCandidateReleaseNotesSha256": "e429fe2a5cc537b2e168c531b79666b1cb5b1ec5bd5aaef26ec4cbab3ec5d90e",
     "tagApprovalPacketPreparedForIndependentReview": true,
     "tagApprovalDecisionReference": "CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4",
-    "tagCreationAuthorized": false,
+    "tagCreationAuthorizationDecisionReference": "CM-2084-ER-20260711-LOCAL-ANNOTATED-TAG-CREATE-C06836B4",
+    "tagCreationAuthorized": true,
+    "tagCreationAuthorizationConsumed": true,
+    "tagCreationAuthorizationReplayAllowed": false,
+    "tagCreated": true,
+    "tagObjectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
+    "tagCreationReceiptPayloadSha256": "b6c2a597f109ca4a17f10dde88d505f81caf892ee607eb35b562693e77e7d3d0",
     "tagPushAuthorized": false,
+    "tagPushed": false,
     "completionAuditBeforeTagApprovalOrderEnforced": true,
     "externalReviewPassed": true,
     "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
@@ -61,7 +68,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_tag_approval_packet_passed_local_tag_creation_authorization_requested_no_tag_no_push_phase8_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_local_annotated_tag_created_authorization_consumed_no_push_phase8_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -69,6 +76,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2186",
+      "scope": "CM-2085 exact one-use local unsigned annotated tag creation and receipt",
+      "status": "COMPLETED_LOCAL_ANNOTATED_TAG_CREATED_AUTHORIZATION_CONSUMED_NO_PUSH_NO_RELEASE_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2185",
       "scope": "CM-2084 exact Tag Approval decision intake and local tag creation authorization request",
@@ -3416,7 +3428,7 @@
     }
   ],
   "notValidated": [
-    "independent local tag creation authorization",
+    "independent tag push authorization",
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
     "live provider/API calls",

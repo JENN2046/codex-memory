@@ -4,19 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
-Current validation: `CMV-2185`.
-Current project status: Exact packet `c06836b4…aa43` passed independent Tag Approval. The first three decision slots are true and Phase 8 remains false. Tag creation and tag push are still separately unauthorized; no tag exists. A request for local annotated-tag creation only is prepared.
-Current route: `CM2084_TAG_APPROVAL_PASSED_TAG_CREATION_REQUESTED_NOT_AUTHORIZED_NO_TAG_NO_PUSH_NO_READY_CLAIM`.
+Current task: `CM-2085 exact one-use local unsigned annotated tag creation and receipt`.
+Current validation: `CMV-2186`.
+Current project status: Local unsigned annotated tag `v0.2.0-readonly-context-rc` was created exactly at `170ee339…221b` under one-use authorization, which is now consumed. Tag push, branch push, release, publication, deploy, cutover, Phase 8, and readiness remain unauthorized and unperformed.
+Current route: `CM2085_LOCAL_ANNOTATED_TAG_CREATED_AUTHORIZATION_CONSUMED_NO_PUSH_NO_RELEASE_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+CM-2085 local annotated tag creation: consumed exact authorization
+`CM-2084-ER-20260711-LOCAL-ANNOTATED-TAG-CREATE-C06836B4` once and created an
+unsigned annotated tag at the immutable approved target. Read-only verification
+confirmed tag object type, peeled commit, target tree, exact annotation, and no
+signature. No remote action occurred. Push/release/deploy/cutover/Phase 8 and
+readiness remain false.
+
 CM-2084 Tag Approval decision intake: records exact decision
 `CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4` and sets only
 `tagApprovalPacketPassed=true`. It also prepares a separate request for local
-annotated tag creation at the immutable CM-2083 target. No tag was created;
-tag push, release, deploy, cutover, Phase 8, and readiness remain unauthorized.
+annotated tag creation at the immutable CM-2083 target. CM-2085 later executed
+that separately authorized creation only; tag push and all other actions remain
+unauthorized.
 
 CM-2083 real Tag Approval Packet: binds candidate name, target commit/tree,
 CM-2080/2081 decisions, CM-2082 application receipt, release-note non-claims,

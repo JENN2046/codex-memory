@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
-Current validation: `CMV-2185`.
-Current status: Exact Tag Approval Packet passed. Local tag creation is requested but not authorized; tag push and Phase 8 remain false, and no tag exists.
+Current task: `CM-2085 exact one-use local unsigned annotated tag creation and receipt`.
+Current validation: `CMV-2186`.
+Current status: Local annotated tag exists at the exact approved target; one-use authorization consumed. Tag push, release, Phase 8, and readiness remain false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,8 +37,8 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the exact local tag creation request.
-Do not create/push a tag, authorize Phase 8 write, or infer readiness/completion.
+No further tag action is authorized. Do not push the tag, create a release,
+authorize Phase 8 write, or infer readiness/completion.
 
 ## Historical Run Notes
 

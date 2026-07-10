@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest validation: `CMV-2185`.
-Latest task: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
+Latest validation: `CMV-2186`.
+Latest task: `CM-2085 exact one-use local unsigned annotated tag creation and receipt`.
 Validation facts should be summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts are collected by fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -17,6 +17,7 @@ Active validation ledger. Long historical validation rows are archived by refere
 
 | ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |
 |---|---|---|---|---|---|---|---|
+| CMV-2186 | immediate absence/target/tree/packet/decision preflight; exact `--no-sign` annotated tag creation; object type/OID/peeled commit/tree/annotation/signature checks; receipt hash; focused/default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2085 one-use local tag creation | COMPLETED_LOCAL_ANNOTATED_TAG_CREATED_AUTHORIZATION_CONSUMED_NO_PUSH_NO_RELEASE_NO_READY_CLAIM | Local tag `v0.2.0-readonly-context-rc` created exactly at `170ee339…221b`, OID `baf7ecce…5e3c`, unsigned with exact annotation. Authorization consumed once. No remote action or readiness claim. | Stop; tag push, deletion/rebuild, release, and Phase 8 require separate authorization. | 2026-07-11 |
 | CMV-2185 | exact decision binding; packet/release-note/target checks; tag absence; action-authorization fail-closed tests; default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2084 Tag Approval decision intake and local tag creation request | COMPLETED_TAG_APPROVAL_PACKET_PASSED_TAG_CREATION_REQUESTED_NOT_AUTHORIZED_NO_TAG_NO_PUSH_NO_READY_CLAIM | Independent decision accepts only packet `c06836b4…aa43`; third slot is true. All tag/release/deploy actions remain false and no tag exists. | Submit local annotated-tag creation request for independent exact authorization; tag push remains separate. | 2026-07-11 |
 | CMV-2184 | target commit/tree check; release-note SHA-256/bytes; policy gate; generated/persisted packet hash; fail-closed boundary tests; default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2083 real Tag Approval Packet | COMPLETED_TAG_APPROVAL_PACKET_PREPARED_FOR_INDEPENDENT_REVIEW_TAG_APPROVAL_FALSE_NO_TAG_NO_PUSH_NO_READY_CLAIM | Packet `c06836b4…aa43` binds candidate `v0.2.0-readonly-context-rc`, target `170ee339…221b`, exact decision chain, CM-2082 receipt, and release-note non-claims. Local policy shape passes; Tag Approval remains false. | Submit exact packet commit through ColaMeta read-only review; no tag creation or push. | 2026-07-11 |
 | CMV-2183 | four-contract exact application chain; persisted receipt/hash check; fail-closed authorization tests; completion-audit/trace/application regressions; docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2082 authorized Completion Audit evidence application | COMPLETED_EXTERNAL_REVIEW_BUNDLE_APPLIED_TO_COMPLETION_AUDIT_TAG_APPROVAL_AND_PHASE8_FALSE_NO_READY_CLAIM | All four application contracts accepted in order and receipt payload SHA-256 is `b74dd9ad…6cfeb`. Only the second slot was promoted. No phase completion, Tag Approval, Phase 8 authority, runtime/memory/remote action, or readiness claim occurred. | Prepare a real Tag Approval Packet for separate review; do not create or push a tag. | 2026-07-11 |

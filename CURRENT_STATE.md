@@ -8,21 +8,28 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2083 Tag Approval Packet passed; local tag creation authorization requested |
-| Current task | `CM-2084 exact Tag Approval decision intake and local tag creation authorization request` |
-| Current validation | `CMV-2185` |
-| Current route | First three decision slots are true; tag creation/push and Phase 8 remain unauthorized, and no tag exists |
+| Status | CM-2085 local unsigned annotated tag created; push remains unauthorized |
+| Current task | `CM-2085 exact one-use local unsigned annotated tag creation and receipt` |
+| Current validation | `CMV-2186` |
+| Current route | `v0.2.0-readonly-context-rc` exists locally at `170ee339…`; authorization consumed, no push/release/readiness authority |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
+`CM-2085` consumed the one-use exact authorization and created the local,
+unsigned annotated tag `v0.2.0-readonly-context-rc` pointing exactly to
+`170ee339…221b`. Object type, peeled commit, target tree, annotation, and
+unsigned status verify. Tag push and all release/deploy/readiness actions remain
+unauthorized and unperformed; the creation authorization cannot be replayed.
+
 `CM-2084` records independent decision
 `CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4`, making only
 `tagApprovalPacketPassed=true` for the exact candidate/target/packet binding.
-All tag/release/deploy actions remain unauthorized and no tag exists. A separate
-request now asks only for local annotated-tag creation; tag push remains false.
+All tag/release/deploy actions were unauthorized at intake time. CM-2085 later
+used a separate exact one-use authorization for local tag creation only; tag
+push remains false.
 
 `CM-2083` prepares a real Tag Approval Packet for
 `v0.2.0-readonly-context-rc`, targeting `170ee339…221b`. It binds the exact
