@@ -1,7 +1,9 @@
 # codex-memory 外部审查重新申请书
 
-申请日期：2026-07-11  
-申请范围：`docs/near-model-memory-plan-pack/`  
+申请日期：2026-07-11
+
+申请范围：`docs/near-model-memory-plan-pack/`
+
 申请事项：仅重新审查 `externalReviewPassed`
 
 ## 一、申请结论
