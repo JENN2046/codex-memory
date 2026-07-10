@@ -4,11 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2086 local tag receipt review intake and exact tag push authorization request`.
-Current validation: `CMV-2187`.
+Current checkpoint: `CM-2087 exact one-use tag push and low-disclosure receipt`.
+Current validation: `CMV-2188`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2087 Exact Tag Push
+
+Status: `EXACT_TAG_PUSH_COMPLETED_AUTHORIZATION_CONSUMED_NO_BRANCH_NO_RELEASE_NO_PHASE8_NO_READY_CLAIM`
+
+- Consumed decision `CM-2086-ER-20260711-EXACT-TAG-PUSH-BAF7ECCE` once.
+- Pushed only the exact approved tag ref to `origin` without force.
+- Verified remote tag object `baf7ecce…5e3c` and peeled commit `170ee339…221b`.
+- Branch push, other tag push, Release, deploy, Phase 8, and readiness remain false.
+
+Validation: `CMV-2188`.
 
 ## CM-2086 Local Tag Receipt Review
 

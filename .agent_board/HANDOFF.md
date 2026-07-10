@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2086 local tag receipt review intake and exact tag push authorization request`.
-Current validation: `CMV-2187`.
-Current handoff: Independent review passed for the local tag receipt. Exact tag push to `origin` is requested but not authorized; no remote action occurred and release/Phase 8/readiness remain false.
+Current task: `CM-2087 exact one-use tag push and low-disclosure receipt`.
+Current validation: `CMV-2188`.
+Current handoff: Exact approved tag ref was pushed to `origin` and verified; one-use authorization is consumed. Branch push, Release, deploy, Phase 8, and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -18,8 +18,8 @@ closed the clean-checkout, runtime-head, replayable Phase 2 receipt, Windows/WSL
 actual tools/list, and validation-record findings. CM-2080 external review now
 passes for the exact frozen binding. CM-2082 applied that evidence to Completion
 Audit, and CM-2083 accepted the exact Tag Approval Packet. The first three
-decision slots are true and Phase 8 remains false; tag push is a separate Red
-boundary pending exact independent authorization.
+decision slots are true and Phase 8 remains false. CM-2087 completed the exact
+single tag push; Release and all later remote actions remain separate Red boundaries.
 
 The long legacy status paragraph below is retained as historical context and
 does not override the CM-2081 active block above. Its older statements about

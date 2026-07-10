@@ -1,0 +1,44 @@
+{
+  "receiptPayload": {
+    "schemaVersion": 1,
+    "taskId": "CM-2087",
+    "authorizationDecisionReference": "CM-2086-ER-20260711-EXACT-TAG-PUSH-BAF7ECCE",
+    "authorizationUseCount": 1,
+    "authorizationConsumed": true,
+    "authorizationReplayAllowed": false,
+    "pushResultCategory": "pushed_new_tag",
+    "remote": {
+      "name": "origin",
+      "url": "git@github.com:JENN2046/codex-memory.git",
+      "precheckRefAbsent": true
+    },
+    "refspec": "refs/tags/v0.2.0-readonly-context-rc:refs/tags/v0.2.0-readonly-context-rc",
+    "tag": {
+      "name": "v0.2.0-readonly-context-rc",
+      "localObjectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
+      "remoteObjectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
+      "peeledCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+      "targetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33",
+      "signed": false,
+      "annotation": "codex-memory readonly-context RC candidate; not RC_READY; no release authorization"
+    },
+    "boundaries": {
+      "branchRefPushed": false,
+      "otherTagPushed": false,
+      "forceUpdatePerformed": false,
+      "releaseCreated": false,
+      "releasePublished": false,
+      "packagePublished": false,
+      "deploymentTriggered": false,
+      "cutoverPerformed": false,
+      "phase8NativeWriteAuthorized": false,
+      "nativeMemoryWritePerformed": false,
+      "realMemoryReadOrModified": false,
+      "defaultMcpExpanded": false,
+      "commitMemoryDeltaPublic": false,
+      "readinessClaimed": false,
+      "fullPlanPackCompletedClaimed": false
+    }
+  },
+  "receiptPayloadSha256": "df1e41dd0d6915b9b978c51a7d41614ed91a2f1873f22eb34131bb45035f626b"
+}

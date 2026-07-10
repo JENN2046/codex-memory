@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2086 local tag receipt review intake and exact tag push authorization request`.
-Current validation: `CMV-2187`.
-Current status: Local tag receipt review passed. Exact tag push is requested but not authorized; no remote action, release, Phase 8, or readiness claim.
+Current task: `CM-2087 exact one-use tag push and low-disclosure receipt`.
+Current validation: `CMV-2188`.
+Current status: Exact tag push completed and verified; authorization consumed. No branch push, Release, deploy, Phase 8, or readiness claim.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,8 +37,8 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the exact tag push request. Do not
-query or mutate the remote, create a release, or infer readiness/completion.
+Next safe action is independent review of the CM-2087 push receipt. Do not
+perform another remote action, create a Release, or infer readiness/completion.
 
 ## Historical Run Notes
 

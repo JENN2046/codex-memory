@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2086",
-  "validationId": "CMV-2187",
+  "taskId": "CM-2087",
+  "validationId": "CMV-2188",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -60,8 +60,11 @@
     "localTagReceiptReviewReference": "CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE",
     "localTagReceiptReviewPassed": true,
     "tagPushAuthorizationRequested": true,
-    "tagPushAuthorized": false,
-    "tagPushed": false,
+    "tagPushAuthorizationDecisionReference": "CM-2086-ER-20260711-EXACT-TAG-PUSH-BAF7ECCE",
+    "tagPushAuthorizationConsumed": true,
+    "tagPushReceiptPayloadSha256": "df1e41dd0d6915b9b978c51a7d41614ed91a2f1873f22eb34131bb45035f626b",
+    "tagPushAuthorized": true,
+    "tagPushed": true,
     "completionAuditBeforeTagApprovalOrderEnforced": true,
     "externalReviewPassed": true,
     "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
@@ -71,7 +74,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_local_tag_receipt_review_passed_exact_tag_push_authorization_requested_no_remote_action_phase8_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_exact_tag_push_completed_authorization_consumed_no_release_phase8_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -79,6 +82,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2188",
+      "scope": "CM-2087 exact one-use tag push and low-disclosure receipt",
+      "status": "COMPLETED_EXACT_TAG_PUSH_AUTHORIZATION_CONSUMED_NO_BRANCH_NO_RELEASE_NO_PHASE8_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2187",
       "scope": "CM-2086 local tag receipt review intake and exact tag push authorization request",

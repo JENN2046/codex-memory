@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "decisionReference": "CM-2086-ER-20260711-EXACT-TAG-PUSH-BAF7ECCE",
+  "authorizationRequestCommit": "2668e150ca084a0bb418a30cee117a23fba6c7a0",
+  "authorization": {
+    "tagPushAuthorized": true,
+    "branchPushAuthorized": false,
+    "releaseCreationAuthorized": false,
+    "releasePublicationAuthorized": false,
+    "packagePublicationAuthorized": false,
+    "deployAuthorized": false,
+    "cutoverAuthorized": false,
+    "phase8NativeWriteAuthorized": false,
+    "forceAllowed": false,
+    "pushAllTagsAllowed": false,
+    "followTagsAllowed": false,
+    "deleteRemoteRefAllowed": false,
+    "retargetAllowed": false,
+    "authorizationUseCount": 1
+  },
+  "binding": {
+    "remoteName": "origin",
+    "remoteUrl": "git@github.com:JENN2046/codex-memory.git",
+    "sourceRef": "refs/tags/v0.2.0-readonly-context-rc",
+    "destinationRef": "refs/tags/v0.2.0-readonly-context-rc",
+    "exactRefspec": "refs/tags/v0.2.0-readonly-context-rc:refs/tags/v0.2.0-readonly-context-rc",
+    "tagObjectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
+    "tagSigned": false,
+    "tagAnnotation": "codex-memory readonly-context RC candidate; not RC_READY; no release authorization",
+    "peeledCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+    "targetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33",
+    "packetPayloadSha256": "c06836b4c9de74f8031cf665f050b9e1c668edfd2a1584a26713c28263c6aa43",
+    "tagApprovalDecisionReference": "CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4",
+    "tagCreationAuthorizationReference": "CM-2084-ER-20260711-LOCAL-ANNOTATED-TAG-CREATE-C06836B4",
+    "localTagReceiptPayloadSha256": "b6c2a597f109ca4a17f10dde88d505f81caf892ee607eb35b562693e77e7d3d0",
+    "receiptReviewReference": "CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE"
+  },
+  "executionStatus": {
+    "authorizationConsumed": true,
+    "authorizationReplayAllowed": false,
+    "tagPushed": true,
+    "ambiguousResult": false
+  }
+}
