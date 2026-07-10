@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2083 real hash-bound Tag Approval Packet and independent review request`.
-Current validation: `CMV-2184`.
-Current status: Real Tag Approval Packet prepared for `v0.2.0-readonly-context-rc`; Tag Approval remains false, no tag/push authority, Phase 8 remains false.
+Current task: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
+Current validation: `CMV-2185`.
+Current status: Exact Tag Approval Packet passed. Local tag creation is requested but not authorized; tag push and Phase 8 remain false, and no tag exists.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,8 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the exact CM-2083 packet. Do not
-self-accept Tag Approval, authorize Phase 8 write, create/push a tag, or infer
-readiness/completion.
+Next safe action is independent review of the exact local tag creation request.
+Do not create/push a tag, authorize Phase 8 write, or infer readiness/completion.
 
 ## Historical Run Notes
 

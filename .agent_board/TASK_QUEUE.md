@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest active task: `CM-2083 real hash-bound Tag Approval Packet and independent review request`.
-Latest validation: `CMV-2184`.
+Latest active task: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
+Latest validation: `CMV-2185`.
 Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -44,6 +44,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2084 | 2084 | done | P9-codex-claude-client-scope / P6-docs-drift | Green decision intake/request; no tag action | decision JSON/Markdown; tag creation request; contract/test; status/board | Record exact Tag Approval and request only local annotated-tag creation | exact binding contract; tag absence; focused/default/docs/current-facts/ledger/diff | revert CM-2084 commit; no tag state changed | separate tag creation authorization required; tag push remains false | TAG_APPROVAL_PACKET_PASSED_TAG_CREATION_REQUESTED_NOT_AUTHORIZED_NO_TAG_NO_PUSH_NO_READY_CLAIM |
 | CM-2083 | 2083 | done | P9-codex-claude-client-scope / P6-docs-drift | Green packet preparation; no tag/push/release/readiness | packet JSON; release notes; review request; contract/test; status/board | Prepare real hash-bound Tag Approval Packet and submit for independent review | policy gate; packet/release-note hashes; focused/default/docs/current-facts/ledger/diff | revert CM-2083 commit; target commit remains unchanged | independent packet decision required; tag create/push remain separately unauthorized | TAG_APPROVAL_PACKET_PREPARED_FOR_INDEPENDENT_REVIEW_TAG_APPROVAL_FALSE_NO_TAG_NO_PUSH_NO_READY_CLAIM |
 | CM-2082 | 2082 | done | P9-codex-claude-client-scope / P6-docs-drift | Amber exact Completion Audit evidence application; no runtime/memory/remote/readiness | four-contract orchestrator; low-disclosure receipt; completion/trace/status/board | Execute the independently authorized second decision slot application exactly once | four-contract chain; receipt hash; focused/adjacent tests; docs/current-facts/ledger/diff | revert CM-2082 commit; second decision slot returns false | Tag Approval and Phase 8 remain separate false slots | EXTERNAL_REVIEW_BUNDLE_APPLIED_TO_COMPLETION_AUDIT_TAG_APPROVAL_AND_PHASE8_FALSE_NO_READY_CLAIM |
 | CM-2081 | 2081 | done | P9-codex-claude-client-scope / P6-docs-drift | Green decision intake/request; no application/runtime/write/remote/readiness | decision JSON/Markdown; application request; focused contract/test; status/board | Record exact CM-2080 PASS and request only Completion Audit application | exact binding contract; frozen canonical regression; docs/current-facts/ledger/diff | revert CM-2081 commit; frozen evidence remains unchanged | separate application decision required; other three slots false | EXTERNAL_REVIEW_PASSED_APPLICATION_REQUESTED_NOT_EXECUTED_THREE_DECISIONS_FALSE_NO_READY_CLAIM |

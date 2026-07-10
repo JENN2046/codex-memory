@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2083 real hash-bound Tag Approval Packet and independent review request`.
-Current validation: `CMV-2184`.
+Current checkpoint: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
+Current validation: `CMV-2185`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2084 Tag Approval Decision Intake
+
+Status: `TAG_APPROVAL_PACKET_PASSED_TAG_CREATION_REQUESTED_NOT_AUTHORIZED_NO_TAG_NO_PUSH_NO_READY_CLAIM`
+
+- Accepted exact decision `CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4`.
+- Set only `tagApprovalPacketPassed=true`; Phase 8 remains false.
+- Kept tag creation, tag push, release, deploy, and cutover unauthorized.
+- Prepared a separate request for one local annotated tag at `170ee339…221b`.
+- Confirmed no tag exists and made no readiness/completion claim.
+
+Validation: `CMV-2185`.
 
 ## CM-2083 Real Tag Approval Packet
 

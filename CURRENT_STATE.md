@@ -8,22 +8,28 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2083 real Tag Approval Packet prepared; independent review required |
-| Current task | `CM-2083 real hash-bound Tag Approval Packet and independent review request` |
-| Current validation | `CMV-2184` |
-| Current route | Packet targets `v0.2.0-readonly-context-rc` at `170ee339…`; Tag Approval remains false and no tag/push is authorized |
+| Status | CM-2083 Tag Approval Packet passed; local tag creation authorization requested |
+| Current task | `CM-2084 exact Tag Approval decision intake and local tag creation authorization request` |
+| Current validation | `CMV-2185` |
+| Current route | First three decision slots are true; tag creation/push and Phase 8 remain unauthorized, and no tag exists |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
+`CM-2084` records independent decision
+`CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4`, making only
+`tagApprovalPacketPassed=true` for the exact candidate/target/packet binding.
+All tag/release/deploy actions remain unauthorized and no tag exists. A separate
+request now asks only for local annotated-tag creation; tag push remains false.
+
 `CM-2083` prepares a real Tag Approval Packet for
 `v0.2.0-readonly-context-rc`, targeting `170ee339…221b`. It binds the exact
 external-review/application chain, release-note non-claims, target tree, and
 packet payload SHA-256 `c06836b4…aa43`. Local policy shape passes, but
-`tagApprovalPacketPassed=false` until an independent decision accepts this exact
-packet. No tag exists and no tag creation/push authority is inferred.
+the exact packet. The later CM-2084 decision accepts it, without authorizing tag
+creation or push.
 
 `CM-2082` executed the four-contract application chain under decision
 `CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33`. All four contracts

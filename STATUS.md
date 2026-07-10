@@ -4,20 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2083 real hash-bound Tag Approval Packet and independent review request`.
-Current validation: `CMV-2184`.
-Current project status: A real Tag Approval Packet is frozen for `v0.2.0-readonly-context-rc` at target commit `170ee339…221b`, with release-note and packet hashes. Local policy shape passes, but `tagApprovalPacketPassed=false`; no tag was created or pushed. Phase 8 and all release/readiness actions remain unauthorized.
-Current route: `CM2083_TAG_APPROVAL_PACKET_PREPARED_INDEPENDENT_REVIEW_REQUIRED_NO_TAG_NO_PUSH_NO_READY_CLAIM`.
+Current task: `CM-2084 exact Tag Approval decision intake and local tag creation authorization request`.
+Current validation: `CMV-2185`.
+Current project status: Exact packet `c06836b4…aa43` passed independent Tag Approval. The first three decision slots are true and Phase 8 remains false. Tag creation and tag push are still separately unauthorized; no tag exists. A request for local annotated-tag creation only is prepared.
+Current route: `CM2084_TAG_APPROVAL_PASSED_TAG_CREATION_REQUESTED_NOT_AUTHORIZED_NO_TAG_NO_PUSH_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+CM-2084 Tag Approval decision intake: records exact decision
+`CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4` and sets only
+`tagApprovalPacketPassed=true`. It also prepares a separate request for local
+annotated tag creation at the immutable CM-2083 target. No tag was created;
+tag push, release, deploy, cutover, Phase 8, and readiness remain unauthorized.
+
 CM-2083 real Tag Approval Packet: binds candidate name, target commit/tree,
 CM-2080/2081 decisions, CM-2082 application receipt, release-note non-claims,
 and stable packet payload hash `c06836b4…aa43`. Local policy validation passes,
-but the packet is only submitted for independent review. Tag Approval remains
-false; tag creation, tag push, release, deploy, cutover, Phase 8, and readiness
-remain separate unauthorized actions.
+and was accepted by the later CM-2084 independent decision. Tag creation, tag
+push, release, deploy, cutover, Phase 8, and readiness remain separate
+unauthorized actions.
 
 CM-2082 authorized Completion Audit evidence application: validates the exact
 CM-2081 decision, CM-2080 external-review reference, application commit, and

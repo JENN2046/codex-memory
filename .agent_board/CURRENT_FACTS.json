@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2083",
-  "validationId": "CMV-2184",
+  "taskId": "CM-2084",
+  "validationId": "CMV-2185",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -49,16 +49,19 @@
     "tagApprovalPacketPayloadSha256": "c06836b4c9de74f8031cf665f050b9e1c668edfd2a1584a26713c28263c6aa43",
     "tagCandidateReleaseNotesSha256": "e429fe2a5cc537b2e168c531b79666b1cb5b1ec5bd5aaef26ec4cbab3ec5d90e",
     "tagApprovalPacketPreparedForIndependentReview": true,
+    "tagApprovalDecisionReference": "CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4",
+    "tagCreationAuthorized": false,
+    "tagPushAuthorized": false,
     "completionAuditBeforeTagApprovalOrderEnforced": true,
     "externalReviewPassed": true,
     "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
-    "tagApprovalPacketPassed": false,
+    "tagApprovalPacketPassed": true,
     "phase8NativeWriteAuthorizationGranted": false
   },
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_real_tag_approval_packet_prepared_for_independent_review_no_tag_no_push_phase8_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_tag_approval_packet_passed_local_tag_creation_authorization_requested_no_tag_no_push_phase8_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -66,6 +69,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2185",
+      "scope": "CM-2084 exact Tag Approval decision intake and local tag creation authorization request",
+      "status": "COMPLETED_TAG_APPROVAL_PACKET_PASSED_TAG_CREATION_REQUESTED_NOT_AUTHORIZED_NO_TAG_NO_PUSH_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2184",
       "scope": "CM-2083 real hash-bound Tag Approval Packet and independent review request",
@@ -3408,7 +3416,7 @@
     }
   ],
   "notValidated": [
-    "independent Tag Approval Packet decision",
+    "independent local tag creation authorization",
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
     "live provider/API calls",
