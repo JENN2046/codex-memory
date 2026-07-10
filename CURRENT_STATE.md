@@ -8,15 +8,21 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2079 clean frozen runtime-matched replay passed; new external review required |
-| Current task | `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication` |
-| Current validation | `CMV-2180` |
-| Current route | Phase 2/9 machine replay is eligible on source commit `1822d7e8…`; prior review remains changes-required, so all four independent decisions stay false |
+| Status | CM-2080 Git-object evidence surface verified; second external review required |
+| Current task | `CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication` |
+| Current validation | `CMV-2181` |
+| Current route | Runtime source `1822d7e8…` and evidence commit `c0b8c24e…` are separately bound; all six evidence objects are retrievable from the registered repository; four decisions remain false |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2080` records the CM-2079 fail-closed decision and fixes its evidence-surface
+mistake. The second application binds runtime code to `1822d7e8…`, generated
+artifacts to `c0b8c24e…`, and supplies Git object refs, blob OIDs, byte lengths,
+and SHA-256 values for independent retrieval and recalculation. External review
+is still false until the reviewer issues a new decision.
 
 `CM-2079` completed the clean/frozen, runtime-matched replay from source commit
 `1822d7e8492424cd4b8849d544df087cf9c8edad`. Phase 2 and Phase 9 machine

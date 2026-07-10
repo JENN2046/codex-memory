@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2080",
+  "purpose": "independently_retrievable_external_review_evidence_surface",
+  "runtimeSourceCommit": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+  "runtimeSourceTree": "bac696fac692509572ecd1ab889a5b3aedc4b9a6",
+  "evidenceCommit": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1",
+  "evidenceTree": "bf5bbdaf47a7f05988d8e8d1b8ab4479e1a65ae4",
+  "evidenceCommitReachableFromRegisteredRepository": true,
+  "retrievalMethod": "git_object_read_from_registered_repository",
+  "canonicalPayloadSha256": "2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2",
+  "objects": [
+    {
+      "role": "phase2_machine_execution_evidence",
+      "path": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+      "gitObjectRef": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1:docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+      "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+      "byteLength": 6937,
+      "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03"
+    },
+    {
+      "role": "windows_wsl_machine_smoke_receipt",
+      "path": "docs/near-model-memory-plan-pack/windows_wsl_machine_smoke_receipt.json",
+      "gitObjectRef": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1:docs/near-model-memory-plan-pack/windows_wsl_machine_smoke_receipt.json",
+      "blobOid": "83bca87e0c06a08046eb88d1fac55418c0ad37fd",
+      "byteLength": 795,
+      "sha256": "60b38d4025d567aa8ac7b839b00aa3539884d67450647157cbe22b9c2363718d"
+    },
+    {
+      "role": "phase9_machine_observation",
+      "path": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+      "gitObjectRef": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1:docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+      "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+      "byteLength": 3793,
+      "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d"
+    },
+    {
+      "role": "external_review_conflict_resolution",
+      "path": "docs/near-model-memory-plan-pack/external_review_conflict_resolution_report.md",
+      "gitObjectRef": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1:docs/near-model-memory-plan-pack/external_review_conflict_resolution_report.md",
+      "blobOid": "4bef2d345276e7e027f73c9f4d80cafbab751613",
+      "byteLength": 1382,
+      "sha256": "0e6c6f285c0f8f6caec80c46588ce78ae51829d5bdaa2498882b0fae42a96014"
+    },
+    {
+      "role": "canonical_markdown",
+      "path": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_canonical.md",
+      "gitObjectRef": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1:docs/near-model-memory-plan-pack/external_review_handoff_bundle_canonical.md",
+      "blobOid": "0206c750af2b5bac0a64d2e9e1d5a3da6ccf06d4",
+      "byteLength": 2767,
+      "sha256": "e6d7baf4bf3329a2b78645877a1fdedd841513c9a117f1e8a64c62df4019e8fe"
+    },
+    {
+      "role": "canonical_bundle_json",
+      "path": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_v2.json",
+      "gitObjectRef": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1:docs/near-model-memory-plan-pack/external_review_handoff_bundle_v2.json",
+      "blobOid": "f6edf04b9a5b4fcc37799248343fba60c6b4801b",
+      "byteLength": 2856,
+      "sha256": "45fb4ecdd88ba2984072d2340333f7af0d05bb8fbd3ad72e0e8646a79dbc3a47"
+    }
+  ],
+  "effectiveDecisions": {
+    "externalReviewPassed": false,
+    "externalReviewEvidenceBundleAppliedToCompletionAudit": false,
+    "tagApprovalPacketPassed": false,
+    "phase8NativeWriteAuthorizationGranted": false
+  },
+  "rawPrivateMemoryAccessed": false,
+  "nativeMemoryWritePerformed": false,
+  "remoteActionPerformed": false,
+  "readinessClaimed": false
+}

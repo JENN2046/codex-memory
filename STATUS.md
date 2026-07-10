@@ -4,13 +4,20 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication`.
-Current validation: `CMV-2180`.
-Current project status: The clean frozen checkout at source commit `1822d7e8…` completed a machine-orchestrated Phase 2/9 replay. The Phase 2 manifest, Windows/WSL receipt, actual stdio tools/list, default-policy gate, `test:all`, `gate:ci`, and canonical review bundle all verify. This is fixture-backed validation, not production-provider proof. The earlier conflicting review still resolves fail-closed, so external review, Completion Audit application, Tag Approval Packet, and Phase 8 native-write authorization all remain false. No primary/native memory write, remote action, or readiness claim occurred.
-Current route: `CM2079_CLEAN_FROZEN_REPLAY_PASSED_EXTERNAL_REVIEW_REAPPLICATION_REQUIRED_ALL_FOUR_DECISIONS_FALSE`.
+Current task: `CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication`.
+Current validation: `CMV-2181`.
+Current project status: CM-2079 external review failed closed because the application bound runtime source commit `1822d7e8…` but did not identify the later commit containing generated evidence. CM-2080 now binds `runtimeSourceCommit=1822d7e8…` separately from `evidenceCommit=c0b8c24e…`, and provides six Git object refs with blob OID, byte length, and SHA-256. All objects and the canonical payload hash verify from the currently registered repository object database. External review and the other three decisions remain false. No primary/native memory write, remote action, or readiness claim occurred.
+Current route: `CM2080_GIT_OBJECT_EVIDENCE_SURFACE_VERIFIED_SECOND_EXTERNAL_REVIEW_REQUIRED_ALL_FOUR_DECISIONS_FALSE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2080 independently retrievable evidence surface: records the fail-closed
+CM-2079 review decision, separates runtime source and evidence commits, and
+adds a machine manifest over six Git objects. The focused verifier passed `4/4`
+both from the feature worktree and from the registered repository cwd. The
+second reapplication requests only `externalReviewPassed`; Completion Audit
+application, Tag Approval, and Phase 8 authorization remain false.
 
 CM-2079 clean frozen runtime-matched replay: executed the reusable evidence
 generator from clean source commit `1822d7e8492424cd4b8849d544df087cf9c8edad`.

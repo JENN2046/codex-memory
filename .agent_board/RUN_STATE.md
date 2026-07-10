@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication`.
-Current validation: `CMV-2180`.
-Current status: Machine Phase 2/9 evidence and the canonical bundle pass on clean matching source/runtime commit `1822d7e8…`. The proof is fixture-backed. External review, review-bundle application, tag approval, and Phase 8 write authorization are all false.
+Current task: `CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication`.
+Current validation: `CMV-2181`.
+Current status: Runtime source `1822d7e8…` and evidence commit `c0b8c24e…` are separately bound. Six evidence Git objects verify from the registered repository. External review, review-bundle application, tag approval, and Phase 8 write authorization are all false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication`.
-Current validation: `CMV-2180`.
-Current handoff: CM-2079 completed the clean, runtime-matched Phase 2/9 machine replay on source commit `1822d7e8…`; both machine artifacts and the canonical bundle pass. The proof is fixture-backed, not production-provider proof. External review, review-bundle application, tag approval, and Phase 8 write authorization remain independently false. No primary/native memory write, remote action, or readiness claim occurred.
+Current task: `CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication`.
+Current validation: `CMV-2181`.
+Current handoff: CM-2079 review failed closed because generated artifacts were not bound to their later evidence commit. CM-2080 now separates `runtimeSourceCommit=1822d7e8…` and `evidenceCommit=c0b8c24e…`; six evidence objects independently verify from the registered repository. External review and all other decisions remain false. No primary/native memory write, remote action, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

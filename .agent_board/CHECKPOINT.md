@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication`.
-Current validation: `CMV-2180`.
+Current checkpoint: `CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication`.
+Current validation: `CMV-2181`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2080 Independently Retrievable Evidence Surface
+
+Status: `GIT_OBJECT_EVIDENCE_SURFACE_VERIFIED_SECOND_EXTERNAL_REVIEW_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM`
+
+- Recorded the CM-2079 fail-closed decision.
+- Separated runtime source commit from evidence artifact commit.
+- Bound six Git objects by ref, blob OID, byte length, and SHA-256.
+- Verified all objects and canonical payload from the registered repository.
+- Kept all four independent decisions false.
+
+Validation: `CMV-2181`.
 
 ## CM-2079 Clean Frozen Runtime-Matched Replay
 
