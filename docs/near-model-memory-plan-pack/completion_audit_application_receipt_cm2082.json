@@ -1,0 +1,45 @@
+{
+  "receiptPayload": {
+    "schemaVersion": 1,
+    "taskId": "CM-2082",
+    "authorization": {
+      "decisionReference": "CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33",
+      "appliedExternalReviewDecisionReference": "CM-2080-ER-20260711-PASS-F440C1BD-2215BB33",
+      "applicationRequestCommit": "88d11e94dc238145ba9317589cebda52f73910e1",
+      "canonicalPayloadSha256": "2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2"
+    },
+    "decisions": {
+      "externalReviewPassed": true,
+      "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
+      "tagApprovalPacketPassed": false,
+      "phase8NativeWriteAuthorizationGranted": false
+    },
+    "contractResults": {
+      "applicationGate": "external_review_bundle_application_gate_ready_for_future_completion_audit_patch",
+      "applicationReceipt": "external_review_bundle_application_receipt_ready_for_future_completion_audit_patch",
+      "patchBoundary": "external_review_completion_audit_patch_boundary_ready_for_future_exact_application",
+      "patchApplication": "external_review_completion_audit_patch_application_ready_for_completion_audit_evidence"
+    },
+    "completionAuditEvidence": {
+      "field": "externalReviewEvidenceBundleAppliedToCompletionAudit",
+      "evidenceKind": "external_review",
+      "applied": true,
+      "controlledApplicationCount": 1
+    },
+    "boundaries": {
+      "currentPhase9Completed": false,
+      "currentPhase10Completed": false,
+      "fullPlanPackCompleted": false,
+      "tagApprovalPacketAccepted": false,
+      "phase8NativeWriteAuthorized": false,
+      "defaultRuntimeExpanded": false,
+      "commitMemoryDeltaPublic": false,
+      "nativeMemoryWritePerformed": false,
+      "realMemoryReadOrModified": false,
+      "tagOrPushPerformed": false,
+      "releaseDeployOrCutoverPerformed": false,
+      "readinessClaimed": false
+    }
+  },
+  "receiptPayloadSha256": "b74dd9ad7077754e98aaff266d62bd1a25223eb392d35108e5926a9eca16cfeb"
+}

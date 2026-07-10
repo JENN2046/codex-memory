@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2081 CM-2080 final external-review decision intake and Completion Audit application request`.
-Current validation: `CMV-2182`.
-Current status: Exact frozen evidence passed external review. Completion Audit application is requested but not executed; Tag Approval and Phase 8 write authorization remain false.
+Current task: `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt`.
+Current validation: `CMV-2183`.
+Current status: External review and Completion Audit application are true. Tag Approval and Phase 8 write authorization remain false; no completion/readiness claim.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is to obtain a separate decision on the CM-2081 Completion
-Audit application request. Do not self-apply the bundle, accept Tag Approval,
-authorize Phase 8 write, or infer readiness/completion.
+Next safe action is to prepare and separately review a real Tag Approval Packet.
+Do not self-accept Tag Approval, authorize Phase 8 write, create/push a tag, or
+infer readiness/completion.
 
 ## Historical Run Notes
 

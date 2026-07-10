@@ -8,22 +8,30 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2080 external review passed; Completion Audit application requested but not executed |
-| Current task | `CM-2081 CM-2080 final external-review decision intake and Completion Audit application request` |
-| Current validation | `CMV-2182` |
-| Current route | `externalReviewPassed=true`; Completion Audit application, Tag Approval, and Phase 8 native-write authorization remain independently false |
+| Status | CM-2082 Completion Audit evidence application passed; Tag Approval remains separate |
+| Current task | `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt` |
+| Current validation | `CMV-2183` |
+| Current route | First two decision slots are true; Tag Approval and Phase 8 native-write authorization remain independently false |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
+`CM-2082` executed the four-contract application chain under decision
+`CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33`. All four contracts
+accepted, the low-disclosure receipt payload hash is `b74dd9ad…6cfeb`, and
+`externalReviewEvidenceBundleAppliedToCompletionAudit=true`. Tag Approval and
+Phase 8 native-write authorization remain false; no phase/full-plan/readiness
+claim or runtime, memory, remote, tag, release, deploy, or cutover action occurred.
+
 `CM-2081` records final decision
 `CM-2080-ER-20260711-PASS-F440C1BD-2215BB33`. It accepts only the exact bound
 commits, trees, canonical payload, and six evidence objects. The first decision
 slot is now true; Completion Audit application, Tag Approval, and Phase 8
 native-write authorization remain false. A separate Completion Audit application
-request has been prepared, but no application or patch has been executed.
+request was prepared without application; CM-2082 subsequently executed the
+separately authorized exact application.
 
 `CM-2080` fixed the earlier evidence-surface mismatch by separately binding
 runtime code at `1822d7e8…` and generated artifacts at `c0b8c24e…`, then

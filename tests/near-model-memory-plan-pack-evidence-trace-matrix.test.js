@@ -518,6 +518,27 @@ test('CM2052 rejects external review bundle application satisfied by local contr
   assertNoSideEffects(result);
 });
 
+test('CM2082 traces applied Completion Audit evidence to the external-review receipt', () => {
+  const entries = fullAcceptedEntries().map(entry => {
+    if (entry.evidenceField === 'externalReviewEvidenceBundleAppliedToCompletionAudit') {
+      return {
+        ...entry,
+        evidenceKind: 'external_review',
+        sourceRef: 'docs/near-model-memory-plan-pack/completion_audit_application_receipt_cm2082.json'
+      };
+    }
+    return entry;
+  });
+  const result = evaluateNearModelMemoryPlanPackEvidenceTraceMatrix({
+    schemaVersion: 1,
+    entries
+  });
+
+  assert.equal(result.accepted, true, result.blockers.join(', '));
+  assert.equal(result.receiptAppliedByThisContract, false);
+  assertNoSideEffects(result);
+});
+
 test('CM2067 traces evidence material acceptance chain binding as local contracts only', () => {
   const entries = fullAcceptedEntries();
   const chainEntries = entries.filter(entry =>

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2081 CM-2080 final external-review decision intake and Completion Audit application request`.
-Current validation: `CMV-2182`.
-Current handoff: Decision `CM-2080-ER-20260711-PASS-F440C1BD-2215BB33` sets only `externalReviewPassed=true` for the exact frozen objects. Completion Audit application is requested but not executed; Tag Approval and Phase 8 authorization remain false. No primary/native memory write, remote action, or readiness claim occurred.
+Current task: `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt`.
+Current validation: `CMV-2183`.
+Current handoff: The CM-2081 exact application decision passed all four contracts and set only the first two decision slots true. Tag Approval and Phase 8 authorization remain false. No primary/native memory write, remote action, phase completion, or readiness claim occurred.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -16,8 +16,9 @@ Goal: complete the imported near-model-memory plan pack. Current local source,
 contract, fixture, and machine-evidence preparation is substantial. CM-2079
 closed the clean-checkout, runtime-head, replayable Phase 2 receipt, Windows/WSL,
 actual tools/list, and validation-record findings. CM-2080 external review now
-passes for the exact frozen binding. The other three explicit decisions remain
-false; the next gate is the separately requested Completion Audit application.
+passes for the exact frozen binding. CM-2082 applied that evidence to Completion
+Audit. The remaining independent false slots are Tag Approval and Phase 8; the
+next gate is a separately reviewed real Tag Approval Packet.
 
 The long legacy status paragraph below is retained as historical context and
 does not override the CM-2081 active block above. Its older statements about

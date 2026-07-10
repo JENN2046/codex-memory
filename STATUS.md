@@ -4,20 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2081 CM-2080 final external-review decision intake and Completion Audit application request`.
-Current validation: `CMV-2182`.
-Current project status: Final external-review decision `CM-2080-ER-20260711-PASS-F440C1BD-2215BB33` accepts the exact frozen commit/tree/payload/evidence binding, so `externalReviewPassed=true`. Completion Audit application has only been requested and remains false; Tag Approval and Phase 8 native-write authorization also remain false. No application patch, primary/native memory write, remote action, or readiness claim occurred.
-Current route: `CM2081_EXTERNAL_REVIEW_PASSED_COMPLETION_AUDIT_APPLICATION_REQUESTED_NOT_EXECUTED_THREE_DECISIONS_FALSE`.
+Current task: `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt`.
+Current validation: `CMV-2183`.
+Current project status: The CM-2081 exact application decision was executed through all four required contracts. `externalReviewPassed=true` and `externalReviewEvidenceBundleAppliedToCompletionAudit=true`; Tag Approval and Phase 8 native-write authorization remain false. No phase/full-plan completion, native memory write, real-memory access, default expansion, remote action, or readiness claim occurred.
+Current route: `CM2082_COMPLETION_AUDIT_APPLICATION_PASSED_TAG_APPROVAL_AND_PHASE8_FALSE_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2082 authorized Completion Audit evidence application: validates the exact
+CM-2081 decision, CM-2080 external-review reference, application commit, and
+canonical payload, then executes gate → receipt → patch boundary → patch
+application. All four accepted. A low-disclosure receipt with payload SHA-256
+`b74dd9ad…6cfeb` records exactly one controlled application. Tag Approval and
+Phase 8 remain false; no phase completion, runtime/write/remote/readiness action
+or claim occurred.
 
 CM-2081 final external-review decision intake: records the exact CM-2080 PASS
 decision in machine-readable and human-readable form, validates all commit,
 tree, payload, byte, blob, and SHA-256 bindings, and prepares a separate
 Completion Audit application request. Only `externalReviewPassed` is true.
-The request does not execute the application, accept Tag Approval, authorize a
-Phase 8 write, perform a remote action, or make a readiness/completion claim.
+That request itself did not execute the application; CM-2082 later applied it
+under a separate exact decision without accepting Tag Approval or Phase 8.
 
 CM-2080 independently retrievable evidence surface: records the fail-closed
 CM-2079 review decision, separates runtime source and evidence commits, and

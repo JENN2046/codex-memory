@@ -33,6 +33,8 @@
 | governed native read low-disclosure observation local contract | Phase 2 | 是 | 是 |
 | governed native read exact receipt application | Phase 2 | 是 | 是 |
 | machine-generated native-read execution manifest on clean matching runtime | Phase 2 | 是 | 是 |
+| CM-2080 exact external review decision | Phase 9/10 external-review prerequisite | 是 | 是 |
+| CM-2082 Completion Audit application receipt | Phase 9/10 review-bundle application field only | 是 | 是 |
 | native read proof | Phase 2 | 是 | 是 |
 | fallback distinction | Phase 2 | 是 | 是 |
 | low-disclosure proof | Phase 2 | 是 | 是 |

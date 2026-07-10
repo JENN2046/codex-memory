@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2081",
-  "validationId": "CMV-2182",
+  "taskId": "CM-2082",
+  "validationId": "CMV-2183",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -40,16 +40,19 @@
     "evidenceTree": "bf5bbdaf47a7f05988d8e8d1b8ab4479e1a65ae4",
     "gitObjectEvidenceSurfaceVerified": true,
     "externalReviewDecisionReference": "CM-2080-ER-20260711-PASS-F440C1BD-2215BB33",
+    "completionAuditApplicationDecisionReference": "CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33",
+    "completionAuditApplicationRequestCommit": "88d11e94dc238145ba9317589cebda52f73910e1",
+    "completionAuditApplicationReceiptPayloadSha256": "b74dd9ad7077754e98aaff266d62bd1a25223eb392d35108e5926a9eca16cfeb",
     "completionAuditBeforeTagApprovalOrderEnforced": true,
     "externalReviewPassed": true,
-    "externalReviewEvidenceBundleAppliedToCompletionAudit": false,
+    "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
     "tagApprovalPacketPassed": false,
     "phase8NativeWriteAuthorizationGranted": false
   },
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_external_review_passed_completion_audit_application_requested_not_executed_three_decisions_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_external_review_and_completion_audit_application_passed_tag_approval_and_phase8_authorization_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -57,6 +60,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2183",
+      "scope": "CM-2082 authorized Completion Audit evidence application and low-disclosure receipt",
+      "status": "COMPLETED_EXTERNAL_REVIEW_BUNDLE_APPLIED_TO_COMPLETION_AUDIT_TAG_APPROVAL_AND_PHASE8_FALSE_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2182",
       "scope": "CM-2081 CM-2080 final external-review decision intake and Completion Audit application request",
@@ -3389,7 +3397,6 @@
     }
   ],
   "notValidated": [
-    "external review completion-audit application receipt",
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
     "live provider/API calls",

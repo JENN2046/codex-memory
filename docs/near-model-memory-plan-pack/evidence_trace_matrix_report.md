@@ -4,6 +4,19 @@ Task id: `CM-2024`
 Validation id: `CMV-2125`
 Date: `2026-07-10`
 
+## CM-2082 Application Trace Update
+
+`externalReviewPassed` traces to the exact CM-2080 external-review decision.
+`externalReviewEvidenceBundleAppliedToCompletionAudit` now traces as accepted
+`external_review` evidence to
+`docs/near-model-memory-plan-pack/completion_audit_application_receipt_cm2082.json`.
+Its receipt payload SHA-256 is
+`b74dd9ad7077754e98aaff266d62bd1a25223eb392d35108e5926a9eca16cfeb`.
+
+`tagApprovalPacketPassed` remains future external-review evidence and false.
+Phase 8 exact native-write evidence remains separate and unsatisfied. This trace
+update does not expand the default runtime, complete a phase, or claim readiness.
+
 ## Result
 
 `CM-2024` adds a local evidence trace matrix for the full

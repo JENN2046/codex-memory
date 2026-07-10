@@ -4,11 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2081 CM-2080 final external-review decision intake and Completion Audit application request`.
-Current validation: `CMV-2182`.
+Current checkpoint: `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt`.
+Current validation: `CMV-2183`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2082 Authorized Completion Audit Application
+
+Status: `EXTERNAL_REVIEW_BUNDLE_APPLIED_TO_COMPLETION_AUDIT_TAG_APPROVAL_AND_PHASE8_FALSE_NO_READY_CLAIM`
+
+- Bound exact CM-2081 authorization, CM-2080 external-review decision, request
+  commit, and canonical payload hash.
+- Executed gate, application receipt, patch boundary, and patch application;
+  all four returned accepted.
+- Persisted low-disclosure receipt payload SHA-256 `b74dd9ad…6cfeb`.
+- Set only the first two independent decision slots true.
+- Kept Tag Approval and Phase 8 authorization false with no runtime, memory,
+  remote, phase-completion, or readiness action.
+
+Validation: `CMV-2183`.
 
 ## CM-2081 Final External Review Decision Intake
 

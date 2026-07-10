@@ -4,6 +4,29 @@ Task: `CM-2017 near-model-memory plan pack completion audit`
 Validation: `CMV-2118`
 Date: 2026-07-10
 
+## CM-2082 Authorized Application Update
+
+Decision `CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33`
+authorized exactly one application of the CM-2080 external-review evidence.
+The application gate, application receipt, patch boundary, and patch application
+contracts all returned accepted in order. The low-disclosure receipt is
+`completion_audit_application_receipt_cm2082.json`, with payload SHA-256
+`b74dd9ad7077754e98aaff266d62bd1a25223eb392d35108e5926a9eca16cfeb`.
+
+The Completion Audit evidence field is now:
+
+```yaml
+externalReviewPassed: true
+externalReviewEvidenceBundleAppliedToCompletionAudit: true
+tagApprovalPacketPassed: false
+phase8NativeWriteAuthorizationGranted: false
+```
+
+This application does not claim Phase 9, Phase 10, or full-plan completion.
+Tag Approval Packet review and Phase 8 native-write authorization remain
+independent. No native memory write, real-memory read/modification, default MCP
+expansion, tag, push, release, deploy, cutover, or readiness claim occurred.
+
 ## Result
 
 `PARTIAL`: CM-2017 adds a local, source-tested completion audit for the full
