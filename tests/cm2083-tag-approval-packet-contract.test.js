@@ -61,6 +61,25 @@ test('CM2083 persisted packet matches the generated payload and hash', () => {
   assert.equal(persisted.packetPayloadSha256, sha256Canonical(persisted.packetPayload));
 });
 
+test('CM2083 canonical Markdown exposes the exact recursively sorted payload', () => {
+  const result = buildCm2083TagApprovalPacket();
+  const rendered = fs.readFileSync(path.join(
+    __dirname,
+    '..',
+    'docs',
+    'near-model-memory-plan-pack',
+    'tag_approval_packet_cm2083_canonical.md'
+  ), 'utf8');
+  const match = rendered.match(/```json\n([^\n]+)\n```/);
+
+  assert.ok(match, 'canonical JSON block missing');
+  assert.deepEqual(JSON.parse(match[1]), result.packetPayload);
+  assert.equal(
+    crypto.createHash('sha256').update(match[1], 'utf8').digest('hex'),
+    result.packetPayloadSha256
+  );
+});
+
 test('CM2083 packet keeps tag execution and readiness behind separate boundaries', () => {
   const result = buildCm2083TagApprovalPacket();
   const boundaries = result.packetPayload.executionBoundaries;

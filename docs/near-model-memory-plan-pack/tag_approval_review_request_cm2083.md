@@ -30,6 +30,7 @@ canonical_payload_sha256: "2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d739664
 审查对象：
 
 - `tag_approval_packet_cm2083.json`
+- `tag_approval_packet_cm2083_canonical.md`
 - `tag_candidate_release_notes_cm2083.md`
 
 ## 审查请求
