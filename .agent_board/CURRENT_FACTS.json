@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2082",
-  "validationId": "CMV-2183",
+  "taskId": "CM-2083",
+  "validationId": "CMV-2184",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -43,6 +43,12 @@
     "completionAuditApplicationDecisionReference": "CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33",
     "completionAuditApplicationRequestCommit": "88d11e94dc238145ba9317589cebda52f73910e1",
     "completionAuditApplicationReceiptPayloadSha256": "b74dd9ad7077754e98aaff266d62bd1a25223eb392d35108e5926a9eca16cfeb",
+    "candidateTag": "v0.2.0-readonly-context-rc",
+    "candidateTagTargetCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+    "candidateTagTargetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33",
+    "tagApprovalPacketPayloadSha256": "c06836b4c9de74f8031cf665f050b9e1c668edfd2a1584a26713c28263c6aa43",
+    "tagCandidateReleaseNotesSha256": "e429fe2a5cc537b2e168c531b79666b1cb5b1ec5bd5aaef26ec4cbab3ec5d90e",
+    "tagApprovalPacketPreparedForIndependentReview": true,
     "completionAuditBeforeTagApprovalOrderEnforced": true,
     "externalReviewPassed": true,
     "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
@@ -52,7 +58,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_external_review_and_completion_audit_application_passed_tag_approval_and_phase8_authorization_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_real_tag_approval_packet_prepared_for_independent_review_no_tag_no_push_phase8_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -60,6 +66,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2184",
+      "scope": "CM-2083 real hash-bound Tag Approval Packet and independent review request",
+      "status": "COMPLETED_TAG_APPROVAL_PACKET_PREPARED_FOR_INDEPENDENT_REVIEW_TAG_APPROVAL_FALSE_NO_TAG_NO_PUSH_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2183",
       "scope": "CM-2082 authorized Completion Audit evidence application and low-disclosure receipt",
@@ -3397,6 +3408,7 @@
     }
   ],
   "notValidated": [
+    "independent Tag Approval Packet decision",
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
     "live provider/API calls",

@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt`.
-Current validation: `CMV-2183`.
+Current checkpoint: `CM-2083 real hash-bound Tag Approval Packet and independent review request`.
+Current validation: `CMV-2184`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2083 Real Tag Approval Packet
+
+Status: `TAG_APPROVAL_PACKET_PREPARED_FOR_INDEPENDENT_REVIEW_TAG_APPROVAL_FALSE_NO_TAG_NO_PUSH_NO_READY_CLAIM`
+
+- Candidate: `v0.2.0-readonly-context-rc`.
+- Target: commit `170ee339…221b`, tree `c3e12feb…3b33`.
+- Packet payload SHA-256: `c06836b4…aa43`.
+- Release-note non-claims SHA-256: `e429fe2a…5d90e`.
+- Local policy shape accepted; external Tag Approval remains false.
+- No tag creation, tag push, release, deploy, cutover, Phase 8 authorization,
+  or readiness claim.
+
+Validation: `CMV-2184`.
 
 ## CM-2082 Authorized Completion Audit Application
 

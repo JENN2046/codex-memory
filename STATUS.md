@@ -4,13 +4,20 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt`.
-Current validation: `CMV-2183`.
-Current project status: The CM-2081 exact application decision was executed through all four required contracts. `externalReviewPassed=true` and `externalReviewEvidenceBundleAppliedToCompletionAudit=true`; Tag Approval and Phase 8 native-write authorization remain false. No phase/full-plan completion, native memory write, real-memory access, default expansion, remote action, or readiness claim occurred.
-Current route: `CM2082_COMPLETION_AUDIT_APPLICATION_PASSED_TAG_APPROVAL_AND_PHASE8_FALSE_NO_READY_CLAIM`.
+Current task: `CM-2083 real hash-bound Tag Approval Packet and independent review request`.
+Current validation: `CMV-2184`.
+Current project status: A real Tag Approval Packet is frozen for `v0.2.0-readonly-context-rc` at target commit `170ee339…221b`, with release-note and packet hashes. Local policy shape passes, but `tagApprovalPacketPassed=false`; no tag was created or pushed. Phase 8 and all release/readiness actions remain unauthorized.
+Current route: `CM2083_TAG_APPROVAL_PACKET_PREPARED_INDEPENDENT_REVIEW_REQUIRED_NO_TAG_NO_PUSH_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2083 real Tag Approval Packet: binds candidate name, target commit/tree,
+CM-2080/2081 decisions, CM-2082 application receipt, release-note non-claims,
+and stable packet payload hash `c06836b4…aa43`. Local policy validation passes,
+but the packet is only submitted for independent review. Tag Approval remains
+false; tag creation, tag push, release, deploy, cutover, Phase 8, and readiness
+remain separate unauthorized actions.
 
 CM-2082 authorized Completion Audit evidence application: validates the exact
 CM-2081 decision, CM-2080 external-review reference, application commit, and

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt`.
-Current validation: `CMV-2183`.
-Current status: External review and Completion Audit application are true. Tag Approval and Phase 8 write authorization remain false; no completion/readiness claim.
+Current task: `CM-2083 real hash-bound Tag Approval Packet and independent review request`.
+Current validation: `CMV-2184`.
+Current status: Real Tag Approval Packet prepared for `v0.2.0-readonly-context-rc`; Tag Approval remains false, no tag/push authority, Phase 8 remains false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is to prepare and separately review a real Tag Approval Packet.
-Do not self-accept Tag Approval, authorize Phase 8 write, create/push a tag, or
-infer readiness/completion.
+Next safe action is independent review of the exact CM-2083 packet. Do not
+self-accept Tag Approval, authorize Phase 8 write, create/push a tag, or infer
+readiness/completion.
 
 ## Historical Run Notes
 

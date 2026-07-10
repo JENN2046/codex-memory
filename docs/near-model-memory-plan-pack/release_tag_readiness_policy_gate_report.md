@@ -4,6 +4,18 @@ Task id: `CM-2016`
 Validation id: `CMV-2117`
 Date: `2026-07-10`
 
+## CM-2083 Real Packet Update
+
+CM-2083 prepares a real, frozen Tag Approval Packet for candidate
+`v0.2.0-readonly-context-rc`, targeting commit `170ee339…221b` and tree
+`c3e12feb…3b33`. The recursively canonicalized packet payload SHA-256 is
+`c06836b4c9de74f8031cf665f050b9e1c668edfd2a1584a26713c28263c6aa43`.
+Release-note non-claims SHA-256 is `e429fe2a…5d90e`.
+
+The local policy shape passes, but `tagApprovalPacketPassed` remains false until
+an independent decision accepts the exact packet. Packet approval still would
+not authorize `git tag`, tag push, release, deploy, cutover, or readiness claims.
+
 ## Result
 
 `CM-2016` adds a local Phase 10 release tag readiness policy gate.

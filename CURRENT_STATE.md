@@ -8,15 +8,22 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2082 Completion Audit evidence application passed; Tag Approval remains separate |
-| Current task | `CM-2082 authorized Completion Audit evidence application and low-disclosure receipt` |
-| Current validation | `CMV-2183` |
-| Current route | First two decision slots are true; Tag Approval and Phase 8 native-write authorization remain independently false |
+| Status | CM-2083 real Tag Approval Packet prepared; independent review required |
+| Current task | `CM-2083 real hash-bound Tag Approval Packet and independent review request` |
+| Current validation | `CMV-2184` |
+| Current route | Packet targets `v0.2.0-readonly-context-rc` at `170ee339…`; Tag Approval remains false and no tag/push is authorized |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2083` prepares a real Tag Approval Packet for
+`v0.2.0-readonly-context-rc`, targeting `170ee339…221b`. It binds the exact
+external-review/application chain, release-note non-claims, target tree, and
+packet payload SHA-256 `c06836b4…aa43`. Local policy shape passes, but
+`tagApprovalPacketPassed=false` until an independent decision accepts this exact
+packet. No tag exists and no tag creation/push authority is inferred.
 
 `CM-2082` executed the four-contract application chain under decision
 `CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33`. All four contracts
