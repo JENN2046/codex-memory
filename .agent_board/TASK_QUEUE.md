@@ -5,7 +5,7 @@
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Latest active task: `CM-2093 Phase 8 content approval and registry-root request`.
-Latest validation: `CMV-2193`.
+Latest validation: `CMV-2194`.
 Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -44,6 +44,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2093-bootstrap | 2093 | done | P8-native-write-proof / P6-docs-drift | Exact local governance bootstrap; no native runtime | frozen content decision; Git-common-dir root identity; bootstrap receipt/contract/status | Consume CM-2093 root-bootstrap authorization once | decision commit/blob/hash; `wx`; identity bytes/hash; zero nonce/receipt/claim/write; receipt/default/docs gates | deletion/replacement not authorized; stop on mismatch | independent bootstrap receipt review required before execution manifest | REGISTRY_ROOT_INITIALIZED_AUTHORIZATION_CONSUMED_PHASE8_FALSE_NO_NATIVE_EXECUTION |
 | CM-2093 | 2093 | done | P8-native-write-proof / P6-docs-drift | Green non-executable content/root request; Red native execution blocked | Git-common-dir root identity gate; final-release intake; request/context/allowlist/root objects; tests/status | Resolve CM-2092 root replay and final release findings without granting native write | cross-dataDir replay; root missing/replacement; content-only rejection; release packet/manifest/expiry/copy drift; default/strict/docs gates | revert CM-2093 commits; real root remains uninitialized; execution counters zero | content/root bootstrap decision required; final release remains later separate gate | PHASE8_CONTENT_AND_ROOT_BOOTSTRAP_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM |
 | CM-2092 | 2092 | done | P8-native-write-proof / P6-docs-drift | Green decision-content request; Red execution blocked | hardened one-shot implementation commit; issuance request/context/allowlist; contract/test/status | Resolve CM-2091 findings and request machine-bindable external decision content | assertion replay/concurrency; exact receipt correlation; frozen executor; registry identity; decision intake; default/docs/diff gates | revert CM-2092 request commit; implementation commit remains local; execution counters remain zero | independent content decision, Git intake, and final execution-release review all required | PHASE8_DECISION_CONTENT_ISSUANCE_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM |
 | CM-2091 | 2091 | done | P8-native-write-proof / P6-docs-drift | Green implementation/reapplication; Red execution blocked | one-shot gate/app hook; binding evidence; reapplication; tests/status | Resolve CM-2089 findings and resubmit exact Phase 8 request | claim/replay/app-hook/blob/context/allowlist/verify/durable-byte/default/docs gates | revert CM-2091 commits; execution counters remain zero | independent exact authorization required | PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM |

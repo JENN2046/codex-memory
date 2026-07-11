@@ -11,7 +11,7 @@
   },
   "updatedAt": "2026-07-11",
   "taskId": "CM-2093",
-  "validationId": "CMV-2193",
+  "validationId": "CMV-2194",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -83,11 +83,19 @@
     "phase8FinalExecutionReleaseReviewRequired": true,
     "phase8FinalExecutionReleaseMachineEnforced": true,
     "phase8RegistryRootUsesGitCommonDir": true,
-    "phase8RegistryRootInitialized": false,
+    "phase8RegistryRootInitialized": true,
     "phase8RegistryRootIdentityCanonicalSha256": "240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0",
     "phase8ContentApprovalRequested": true,
     "phase8RegistryRootBootstrapAuthorizationRequested": true,
     "phase8ContentDecisionExecutable": false,
+    "phase8ContentDecisionReference": "CM-2093-ER-20260711-CONTENT-ROOT-BOOTSTRAP-PASS-240FD4F7",
+    "phase8ContentDecisionSourceCommit": "aecc431de4533e1c3a0e9f42948b217f835b4c7e",
+    "phase8ContentDecisionBlobOid": "bc251e7a34152b41724f3c098fee12baefe0f787",
+    "phase8ContentDecisionPayloadSha256": "9fb37b29e18ee65225e8e2fcb9628260ba93afb5ced6c195388e390570daa5dc",
+    "phase8RegistryRootBootstrapAuthorizationConsumed": true,
+    "phase8RegistryRootBootstrapReplayAllowed": false,
+    "phase8NonceClaimed": false,
+    "phase8NativeExecutionReceiptCreated": false,
     "phase8LatestRuntimeSourceCommit": "10b1ea49257c0aa2c26e50a2291142093589d938",
     "phase8LatestRuntimeSourceTree": "f4273910483c096ff03d3c33f01c59187a2f6e2b",
     "phase8RequestedContextCanonicalSha256": "75832f193a1a414ccabcd508fa8dc7d3f8d5afb3f7360184734c21d2647229fc",
@@ -100,7 +108,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_phase8_content_and_root_bootstrap_requested_fourth_slot_false_no_execution_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_registry_root_initialized_authorization_consumed_phase8_false_no_native_execution",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -108,6 +116,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2194",
+      "scope": "CM-2093 exact registry root bootstrap and low-disclosure receipt",
+      "status": "COMPLETED_REGISTRY_ROOT_INITIALIZED_AUTHORIZATION_CONSUMED_PHASE8_FALSE_NO_NATIVE_EXECUTION"
+    },
     {
       "id": "CMV-2193",
       "scope": "CM-2093 Phase 8 content approval and registry-root request",

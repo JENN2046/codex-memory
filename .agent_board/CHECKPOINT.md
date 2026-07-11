@@ -5,10 +5,21 @@
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current checkpoint: `CM-2093 Phase 8 content approval and registry-root request`.
-Current validation: `CMV-2193`.
+Current validation: `CMV-2194`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2093 Registry Root Bootstrap
+
+Status: `REGISTRY_ROOT_INITIALIZED_AUTHORIZATION_CONSUMED_PHASE8_FALSE_NO_NATIVE_EXECUTION`
+
+- Content decision frozen at `aecc431d…`, blob `bc251e7a…`.
+- Root identity created once with `wx`; 216 bytes and SHA `240fd4f7…` verified.
+- Bootstrap authorization consumed; replay and replacement forbidden.
+- Nonce, execution receipt, claim, write, verify, compensation, and real reads remain zero.
+
+Validation: `CMV-2194`.
 
 ## CM-2093 Phase 8 Content and Registry Root Request
 

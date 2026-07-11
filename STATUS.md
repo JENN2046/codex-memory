@@ -5,12 +5,16 @@
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2093 Phase 8 content approval and registry-root request`.
-Current validation: `CMV-2193`.
-Current project status: CM-2092 root replay and missing final-release findings are resolved in `10b1ea49…`. Only non-executable content and exact root bootstrap are requested; real root is uninitialized, fourth slot false, nothing executed.
-Current route: `CM2093_PHASE8_CONTENT_AND_ROOT_BOOTSTRAP_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM`.
+Current validation: `CMV-2194`.
+Current project status: CM-2093 content decision is frozen and exact Git-common-dir root identity is initialized once. Bootstrap authorization is consumed; fourth slot remains false and no native action occurred.
+Current route: `CM2093_REGISTRY_ROOT_INITIALIZED_AUTHORIZATION_CONSUMED_PHASE8_FALSE_NO_NATIVE_EXECUTION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2093 bootstrap receipt: decision commit `aecc431d…`, decision blob
+`bc251e7a…`, decision SHA `9fb37b29…`; root identity is exactly 216 bytes with
+SHA `240fd4f7…`. No nonce, native execution receipt, claim, write or verify exists.
 
 CM-2093 binds the authorization registry to a stable Git-common-dir governance
 root with immutable identity hash `240fd4f7…`, independent of `dataDir`. Content

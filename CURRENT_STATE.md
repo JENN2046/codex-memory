@@ -8,20 +8,24 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2093 non-executable content/root-bootstrap review requested; fourth slot false |
+| Status | CM-2093 root initialized once; bootstrap authorization consumed; fourth slot false |
 | Current task | `CM-2093 Phase 8 content approval and registry-root request` |
-| Current validation | `CMV-2193` |
-| Current route | Review content/root bootstrap, freeze decision, initialize exact root, then build separately reviewed final release |
+| Current validation | `CMV-2194` |
+| Current route | Independent bootstrap receipt review; execution manifest and final release remain blocked |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
+CM-2093 content decision is frozen at `aecc431d…`. The exact 216-byte root
+identity was initialized once and its authorization consumed. The next gate is
+bootstrap receipt review; native execution remains unauthorized and unperformed.
+
 `CM-2093` moves the replay registry to one Git-common-dir governance root and
 binds an immutable root identity. It also requires a separate machine-bound final
-release decision over the exact execution manifest. Current request is limited to
-non-executable content plus root bootstrap; real root remains uninitialized.
+release decision over the exact execution manifest. The root bootstrap is now
+complete; execution-manifest preparation remains blocked pending receipt review.
 
 `CM-2092` fixes the remaining CM-2091 findings in implementation `e1785994…`
 and requests only a non-executable authorization decision content object. The

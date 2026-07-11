@@ -5,8 +5,8 @@
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2093 Phase 8 content approval and registry-root request`.
-Current validation: `CMV-2193`.
-Current status: Git-common-dir root and mandatory final release implemented; content/root bootstrap requested; fourth slot false and no execution.
+Current validation: `CMV-2194`.
+Current status: Exact root identity initialized once; bootstrap authorization consumed; fourth slot false and no native execution.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,8 +37,8 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of CM-2093 content/root-bootstrap request.
-Freeze returned bytes before root initialization. Final execution release remains
+Next safe action is independent review of the CM-2093 bootstrap receipt. Do not
+generate the execution manifest until receipt acceptance. Final release remains
 separate; do not claim nonce or execute write/verify/rollback/compensation.
 
 ## Historical Run Notes
