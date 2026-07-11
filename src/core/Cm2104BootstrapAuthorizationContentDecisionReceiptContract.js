@@ -7,7 +7,13 @@ const {
 const RECEIPT_PATH =
   'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_authorization_content_decision_receipt_cm2104.json';
 
-const EXPECTED_RECEIPT_PAYLOAD = Object.freeze({
+function deepFreeze(value) {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  for (const nested of Object.values(value)) deepFreeze(nested);
+  return Object.freeze(value);
+}
+
+const EXPECTED_RECEIPT_PAYLOAD = deepFreeze({
   decision: {
     reference: 'CM-2104-ER-IDENTITY-BOUND-STORE-BOOTSTRAP-CONTENT-0A7CEB6C-017307C9',
     sourceCommit: 'a70870a090d739f79eb31c7d1be3b7ac979fb32a',
