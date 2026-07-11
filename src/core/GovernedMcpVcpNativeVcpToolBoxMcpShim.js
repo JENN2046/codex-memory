@@ -542,6 +542,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       ? path.resolve(process.env.KNOWLEDGEBASE_STORE_PATH)
       : '';
   const isolatedRuntimeStoreUsed = Boolean(knowledgeBaseStorePath);
+  const primaryWriteOnly = options.primaryWriteOnly === true;
   const writeSubdir = safeFilenamePart(options.writeSubdir || 'codex-memory-governed');
   let knowledgeBaseManager = null;
   let embeddingUtils = null;
@@ -563,6 +564,17 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     loadRuntime();
     if (knowledgeBaseManager && typeof knowledgeBaseManager.initialize === 'function') {
       await knowledgeBaseManager.initialize();
+    }
+  }
+
+  async function ensurePrimaryWriteReady() {
+    if (!primaryWriteOnly) {
+      await ensureReady();
+      return;
+    }
+    const rootStat = await fs.lstat(knowledgeBaseRootPath);
+    if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) {
+      throw new Error('primary_write_root_invalid');
     }
   }
 
@@ -639,7 +651,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   }
 
   async function record(args = {}) {
-    await ensureReady();
+    await ensurePrimaryWriteReady();
     const title = boundedString(args.title, 200) || 'codex-memory governed native record';
     const markdown = createRecordMarkdown(args);
     const digest = crypto
@@ -673,7 +685,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   }
 
   async function mutationMarker(toolName, args = {}) {
-    await ensureReady();
+    await ensurePrimaryWriteReady();
     const markdown = createMutationMarkdown(toolName, args);
     const digest = crypto
       .createHash('sha256')
@@ -712,7 +724,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     audit,
     record,
     tombstone: args => mutationMarker('tombstone_memory', args),
-    supersede: args => mutationMarker('supersede_memory', args)
+    supersede: args => mutationMarker('supersede_memory', args),
+    async shutdown() {
+      if (knowledgeBaseManager && typeof knowledgeBaseManager.shutdown === 'function') {
+        await knowledgeBaseManager.shutdown();
+      }
+      knowledgeBaseManager = null;
+      embeddingUtils = null;
+    }
   };
 }
 
