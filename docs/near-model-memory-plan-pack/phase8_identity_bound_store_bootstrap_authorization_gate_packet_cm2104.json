@@ -30,8 +30,8 @@
   "bootstrapRequestCommit": "0c80561ae6ce2145becf438624ffdd21d1a62726",
   "bootstrapRequestBlobOid": "a75b15ae7519b608338160b8ba52ede3e9ff832c",
   "bootstrapRequestSha256": "2318692aec334acd75b54d9bdac71ada9a2c2d3d3255b76cf97a5095421927ad",
-  "gateImplementationCommit": "53e5524937c030cab1ecf48a3d9d5006af34dca6",
-  "gateImplementationTree": "94cbbb695e3e2a4e75367ec0165bba5285a4a502",
+  "gateImplementationCommit": "2fdf97f1854964c88d244b731cc0b45f3102de92",
+  "gateImplementationTree": "a4e74f74871b663683bd6e26cbba9a21e3443dc4",
   "gateImplementationArtifacts": {
     "authorizationContentDecisionIntake": {
       "path": "src/core/Cm2104IdentityBoundStoreBootstrapAuthorizationContentDecisionIntake.js",
@@ -47,7 +47,7 @@
     },
     "frozenExecutor": {
       "path": "src/cli/cm2103-identity-bound-store-bootstrap.js",
-      "blobOid": "16097f784dd435fcbe0ef15ac3bdc21ead60b2e7"
+      "blobOid": "d0d29f3e2f97dfe77c550c653bc4fc8e52b7ca66"
     },
     "authorizationIntakeTests": {
       "path": "tests/cm2104-bootstrap-two-stage-authorization-intake.test.js",
@@ -55,7 +55,7 @@
     },
     "executorHardStopTests": {
       "path": "tests/cm2103-bootstrap-executor-hard-stop.test.js",
-      "blobOid": "4934d7b54ff6f2ee5eb667af051549ea13cf978d"
+      "blobOid": "ebfd4addf975719b737ab36d2300e83c902db68e"
     }
   },
   "expectedAuthorizationContentDecisionReference": "CM-2104-ER-IDENTITY-BOUND-STORE-BOOTSTRAP-CONTENT-0A7CEB6C-017307C9",
@@ -138,5 +138,5 @@
     "store_directory_creation_not_authorized",
     "store_identity_creation_not_authorized"
   ],
-  "packetPayloadSha256": "e57a98e9151583029843ff3ce93ca60ad45ebbfcd91e9c7fce7e0362969359da"
+  "packetPayloadSha256": "2f699b5db2d2b651ec2a541fbe55dd2d988c515b8b95170ea06cdc78900b7684"
 }

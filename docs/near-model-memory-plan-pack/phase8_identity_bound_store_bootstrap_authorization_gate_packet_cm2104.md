@@ -1,5 +1,11 @@
 # CM-2104-PRE Two-stage Bootstrap Authorization Gate
 
+## R1 implementation repair
+
+首次执行在 claim 前因 final-release SHA 局部变量名错误停止，未创建 claim、store 或
+identity。Packet 现重新绑定修复后的 implementation commit
+`2fdf97f1854964c88d244b731cc0b45f3102de92`；旧 packet/decisions 不得重试。
+
 本包解决 CM-2103-R2 实现通过后出现的执行语义缺口：授权内容决定与最终执行释放决定必须
 由不同 Git 对象承载，并分别通过机器 intake。
 
