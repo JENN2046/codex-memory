@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2104-A",
+  "requestType": "independent_exact_bootstrap_authorization_content_application_review",
+  "requestReference": "CM-2104-A-IR-20260712-CONTENT-ONLY-07B8CE5D",
+  "repositoryRealityControls": true,
+  "externalReviewReferenceClassification": "reference_only",
+  "requestedDecision": {
+    "authorizationContentApplicationAccepted": true,
+    "authorizationContentApproved": true,
+    "bootstrapExecutionAuthorized": false,
+    "storeDirectoryCreationAuthorized": false,
+    "storeIdentityCreationAuthorized": false,
+    "identityReadbackVerificationAuthorized": false,
+    "finalExecutionReleaseReviewRequired": true
+  },
+  "applicationContract": {
+    "commit": "a5654894993a160366e2da4bbf3325dd8cedc10e",
+    "tree": "ea6a2cb4e8084df50c720c114c999047247e100e",
+    "contractBlobOid": "5f70e72369b3c540658931c5d4888f0b855998f7",
+    "testBlobOid": "878368c1c929ce581ffee5c56f0ade9130b1a9cb"
+  },
+  "application": {
+    "commit": "3477c567642e47e12bfed30711b182f18d49b074",
+    "tree": "7764f067b0b61cfee54c00329c9f91db1495f8b1",
+    "blobOid": "5753fa4483b936c64ae4f752032a5d543bf93969",
+    "bytes": 8546,
+    "sha256": "015b1a0c049d7f841399e9874faafd681a573259f005f64a7854de51b535fa9b",
+    "payloadSha256": "07b8ce5d2c7d4d21eca4980cd701148e40f4e00aeb3b3fffb3001df525c9e21d",
+    "staticContentFieldsSha256": "46c9e2466959501747ee4cf7707ddaa7a6499981d7ba9a466f0c4c1cd08c6823",
+    "artifactTestBlobOid": "dee2050538a247357d98740101cb111c2fd12d21"
+  },
+  "gateBinding": {
+    "packetCommit": "67eaab147cb856180a7ddd0491c5e5cc2f01324f",
+    "packetBlobOid": "c5a2c6e4eb6c0911895c44b41c07244fe96d61e9",
+    "packetSha256": "0ad7e1cb4ff30cc993c9625fcefe0328d9c78d9a4227ffb6c9409b5faa4c0f8e",
+    "packetPayloadSha256": "e57a98e9151583029843ff3ce93ca60ad45ebbfcd91e9c7fce7e0362969359da",
+    "implementationCommit": "53e5524937c030cab1ecf48a3d9d5006af34dca6",
+    "implementationTree": "94cbbb695e3e2a4e75367ec0165bba5285a4a502"
+  },
+  "requestedContentDecision": {
+    "reference": "CM-2104-ER-IDENTITY-BOUND-STORE-BOOTSTRAP-CONTENT-0A7CEB6C-017307C9",
+    "staticFieldsSha256": "46c9e2466959501747ee4cf7707ddaa7a6499981d7ba9a466f0c4c1cd08c6823",
+    "expiresAt": "2026-07-15T18:00:00+08:00",
+    "approvedAtAssignedByIndependentReviewer": true,
+    "rawBytesFrozenByApplication": false
+  },
+  "futureFinalRelease": {
+    "expectedReference": "CM-2104-ER-IDENTITY-BOUND-STORE-BOOTSTRAP-FINAL-RELEASE-0A7CEB6C-017307C9",
+    "decisionPresent": false,
+    "applicationPrepared": false,
+    "reviewReady": false,
+    "executionReleased": false
+  },
+  "validation": {
+    "focusedCommand": "node --test tests/cm2103-bootstrap-*.test.js tests/cm2104-bootstrap-*.test.js",
+    "focusedTests": 48,
+    "focusedPassed": 48,
+    "focusedFailed": 0,
+    "defaultSafeCommand": "npm test -- --summary",
+    "defaultSafeExitCode": 0,
+    "providerTestsRun": false,
+    "runtimeStarted": false
+  },
+  "currentState": {
+    "contentDecisionFilePresent": false,
+    "finalExecutionReleaseDecisionFilePresent": false,
+    "authorizationContentApproved": false,
+    "bootstrapExecutionAuthorized": false,
+    "claimEnvelopeCreated": false,
+    "storeDirectoryCreated": false,
+    "storeIdentityCreated": false,
+    "nativeReads": 0,
+    "nativeWrites": 0,
+    "rollbackOrCompensationOperations": 0,
+    "rollbackDrillPassed": false,
+    "failureRecoveryProofPassed": false,
+    "phase8Completed": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "explicitNonAuthorizations": [
+    "content_decision_execution",
+    "final_execution_release",
+    "executor_run",
+    "nonce_claim",
+    "store_directory_creation",
+    "identity_write_or_readback",
+    "empty_store_preflight",
+    "record_memory",
+    "tombstone_memory",
+    "verify",
+    "native_memory_read_or_write",
+    "retry_cleanup_or_compensation",
+    "push_tag_release_deploy_cutover",
+    "readiness_or_completion_claim"
+  ],
+  "requestPayloadSha256": "0d5fa0f384ce1e0d9371f9f6d5b23efe605062e877e2c257b19703b04357a8ab"
+}
