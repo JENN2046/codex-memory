@@ -39,29 +39,30 @@ function transitionCm2103BootstrapState(state, event) {
 function summarizeCm2103BootstrapState(state) {
   const authorizationConsumed = state !== 'UNCLAIMED';
   const directoryCreateAttempted = !['UNCLAIMED', 'CLAIMED'].includes(state);
-  const directoryCreated = [
+  const directoryCreatedKnown = [
     'STORE_DIRECTORY_CREATED',
     'IDENTITY_WRITE_CONSUMED',
     'IDENTITY_CREATED',
     'CONSUMED_SUCCESS',
     'CONSUMED_PARTIAL_BOOTSTRAP'
   ].includes(state);
-  const identityWriteAttempted = [
+  const identityWriteAttemptedKnown = [
     'IDENTITY_WRITE_CONSUMED',
     'IDENTITY_CREATED',
     'CONSUMED_SUCCESS',
     'CONSUMED_PARTIAL_BOOTSTRAP'
   ].includes(state);
-  const identityCreated = ['IDENTITY_CREATED', 'CONSUMED_SUCCESS'].includes(state);
+  const identityCreatedKnown = ['IDENTITY_CREATED', 'CONSUMED_SUCCESS'].includes(state);
+  const ambiguous = state === 'CONSUMED_AMBIGUOUS';
   return {
     state,
     terminal: TERMINAL_STATES.includes(state),
     authorizationConsumed,
     authorizationReplayAllowed: false,
     directoryCreateAttempted,
-    directoryCreated,
-    identityWriteAttempted,
-    identityCreated,
+    directoryCreated: ambiguous ? null : directoryCreatedKnown,
+    identityWriteAttempted: ambiguous ? null : identityWriteAttemptedKnown,
+    identityCreated: ambiguous ? null : identityCreatedKnown,
     identityReadbackVerified: state === 'CONSUMED_SUCCESS',
     automaticRetryAllowed: false,
     automaticCleanupAllowed: false,

@@ -48,6 +48,11 @@ test('CM-2103 state machine preserves partial and ambiguous outcomes without ret
     assert.equal(summary.automaticRetryAllowed, false);
     assert.equal(summary.automaticCleanupAllowed, false);
     assert.equal(summary.reconciliationRequired, true);
+    if (state === 'CONSUMED_AMBIGUOUS') {
+      assert.equal(summary.directoryCreated, null);
+      assert.equal(summary.identityWriteAttempted, null);
+      assert.equal(summary.identityCreated, null);
+    }
   }
 });
 
