@@ -9,6 +9,9 @@ const {
 } = require('../src/core/Cm2096TombstonePayloadSerializer');
 const {
   expectedCm2096LifecycleBinding,
+  projectCm2096MarkerAwareLifecycle,
+  filterCm2096EffectiveCandidateRefs,
+  buildCm2096MarkerAwareVerifyObservation,
   evaluateCm2096MarkerAwareProjectionShape
 } = require('../src/core/Cm2096MarkerAwareLifecycleProjection');
 
@@ -77,4 +80,46 @@ test('CM-2096 marker-aware projection shape requires exact suppression evidence 
     { retryPerformed: true },
     { markerReceiptBindingMatched: false }
   ]) assert.equal(evaluateCm2096MarkerAwareProjectionShape({ ...observation, ...drift }).shapeAccepted, false);
+});
+
+test('CM-2096 lifecycle layer derives tombstoned status from exact selected-field record and marker projections', () => {
+  const expected = expectedCm2096LifecycleBinding();
+  const targetRecordProjection = {
+    memoryIdRef: expected.targetMemoryIdRef,
+    durableBytes: expected.targetRecordBytes,
+    durableSha256: expected.targetRecordSha256,
+    rawContentIncluded: false
+  };
+  const tombstoneMarkerProjection = {
+    toolName: 'tombstone_memory',
+    targetMemoryIdRef: expected.targetMemoryIdRef,
+    markerMemoryIdRef: expected.markerMemoryIdRef,
+    durableBytes: expected.durableMarkerBytes,
+    durableSha256: expected.durableMarkerSha256,
+    receiptBindingMatched: true,
+    mutationMarkerOnly: true,
+    rawContentIncluded: false
+  };
+  const lifecycle = projectCm2096MarkerAwareLifecycle({ targetRecordProjection, tombstoneMarkerProjection });
+  assert.equal(lifecycle.accepted, true, lifecycle.blockers.join(', '));
+  assert.equal(lifecycle.effectiveLifecycleStatus, 'tombstoned');
+  assert.equal(lifecycle.effectiveMemoryEligible, false);
+  assert.deepEqual(filterCm2096EffectiveCandidateRefs([expected.targetMemoryIdRef, 'vcp-kb-aaaaaaaaaaaaaaaa'], lifecycle), ['vcp-kb-aaaaaaaaaaaaaaaa']);
+  const built = buildCm2096MarkerAwareVerifyObservation({
+    targetRecordProjection,
+    tombstoneMarkerProjection,
+    candidateMemoryIdRefs: [expected.targetMemoryIdRef, 'vcp-kb-aaaaaaaaaaaaaaaa']
+  });
+  assert.equal(built.accepted, true);
+  assert.equal(evaluateCm2096MarkerAwareProjectionShape(built.observation).shapeAccepted, true);
+});
+
+test('CM-2096 lifecycle layer rejects unrelated markers and unverified filtering', () => {
+  const expected = expectedCm2096LifecycleBinding();
+  const target = { memoryIdRef: expected.targetMemoryIdRef, durableBytes: 269, durableSha256: expected.targetRecordSha256, rawContentIncluded: false };
+  const marker = { toolName: 'tombstone_memory', targetMemoryIdRef: 'vcp-kb-bbbbbbbbbbbbbbbb', markerMemoryIdRef: expected.markerMemoryIdRef, durableBytes: 507, durableSha256: expected.durableMarkerSha256, receiptBindingMatched: true, mutationMarkerOnly: true, rawContentIncluded: false };
+  const lifecycle = projectCm2096MarkerAwareLifecycle({ targetRecordProjection: target, tombstoneMarkerProjection: marker });
+  assert.equal(lifecycle.accepted, false);
+  assert.throws(() => filterCm2096EffectiveCandidateRefs([expected.targetMemoryIdRef], lifecycle), /not_verified/);
+  assert.throws(() => filterCm2096EffectiveCandidateRefs(['raw candidate content'], { ...lifecycle, accepted: true, effectiveLifecycleStatus: 'tombstoned', effectiveMemoryEligible: false }), /invalid_selected_field/);
 });
