@@ -4,18 +4,20 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2098 CM-2096 frozen rollback execution packet v2`.
-Current validation: `CMV-2202`.
-Current project status: CM-2096 semantic design passed. Exact safe target reference, real 507-byte shim marker, marker-aware lifecycle projection, and non-executing v2 packet are prepared; tombstone execution and Phase 8 completion remain false.
-Current route: `CM2096_V2_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE`.
+Current task: `CM-2099 CM-2096 rollback execution packet v3`.
+Current validation: `CMV-2203`.
+Current project status: CM-2096 v2 independent review passed for implementation only. The v3 stack now binds target-store identity, real-store projection, atomic one-shot tombstone assertion, exact receipt correlation, and a two-commit frozen executor; no target-store bootstrap receipt or execution decision exists, so tombstone execution and Phase 8 completion remain false.
+Current route: `CM2096_V3_NON_EXECUTING_STACK_PREPARED_REVIEW_REQUIRED_NO_TOMBSTONE_PHASE8_INCOMPLETE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-2096 semantic decision `...51F21F60-NO-EXECUTION` is frozen and machine
-bound. V2 derives target `vcp-kb-4f863f52455147c6`, uses the actual shim
-serializer for a 507-byte marker (`27a5e586…6263a`), and implements selected-field
-lifecycle suppression. The frozen executor still hard-stops execution.
+CM-2096 v2 review `...V2-PACKET-PASS-NO-EXECUTION-47E81469` is frozen. V3
+implementation `6f4f7867…` and packet `1ba07b0c…` add an immutable synthetic
+store identity, exact real-store collector, atomic assertion consumption,
+receipt/claim/target correlation, and an executor that accepts only packet and
+future-decision commits. The packet records missing bootstrap/preflight/decision
+evidence and grants no tombstone, verify, nonce-claim, or completion authority.
 
 CM-2095 binds review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 and requests a separate application gate for exact approval, side effect, durable

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2098 CM-2096 frozen rollback execution packet v2`.
-Current validation: `CMV-2202`.
-Current status: Exact target, 507-byte marker, lifecycle projection, and non-executing packet prepared; no tombstone/verify authority; Phase 8 incomplete.
+Current task: `CM-2099 CM-2096 rollback execution packet v3`.
+Current validation: `CMV-2203`.
+Current status: V3 target-store identity/collector, one-shot tombstone gate, exact verifier, two-commit executor, and packet prepared; bootstrap/preflight/decision absent; no tombstone/verify authority; Phase 8 incomplete.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,10 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of CM-2096 v2 packet. Do not call
-`tombstone_memory`, run verify, claim nonce/registry, create an execution receipt,
-or alter rollback/Phase 8 evidence fields.
+Next safe action is independent review of CM-2096 v3 implementation and packet.
+Do not initialize the target-store identity, call `tombstone_memory`, run verify,
+claim nonce/registry, create an execution receipt, or alter rollback/Phase 8
+evidence fields without the next exact independent decisions.
 
 ## Historical Run Notes
 

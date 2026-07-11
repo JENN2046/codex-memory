@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2098 CM-2096 frozen rollback execution packet v2`.
-Current validation: `CMV-2202`.
+Current checkpoint: `CM-2099 CM-2096 rollback execution packet v3`.
+Current validation: `CMV-2203`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2096 Frozen Rollback Packet v3
+
+Status: `V3_NON_EXECUTING_STACK_PREPARED_REVIEW_REQUIRED_NO_TOMBSTONE_PHASE8_INCOMPLETE`
+
+- V2 independent review decision is frozen at `79b7aeb4…`.
+- V3 implementation `6f4f7867…` binds immutable target-store identity, exact pre/post projections, and native-read-off verify preflight.
+- One internal assertion is atomically consumable once; exact audit receipt, claim, target, scope, marker, and unchanged target are correlated.
+- Frozen executor accepts only packet and future decision Git commits; caller callbacks, store paths, projections, candidates, targets, and actions are not accepted.
+- Packet `1ba07b0c…` records missing store-bootstrap receipt, preflight, runtime route, and exact execution decision; tombstone/verify/claim counters remain zero.
+
+Validation: `CMV-2203`.
 
 ## CM-2096 Frozen Rollback Packet v2
 

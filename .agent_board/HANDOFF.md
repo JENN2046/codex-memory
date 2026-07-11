@@ -4,18 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2098 CM-2096 frozen rollback execution packet v2`.
-Current validation: `CMV-2202`.
-Current handoff: Submit CM-2096 v2 packet for independent review. It binds the safe target, actual shim marker, lifecycle projection, nonce/receipt/registry, but authorizes no tombstone or verify.
+Current task: `CM-2099 CM-2096 rollback execution packet v3`.
+Current validation: `CMV-2203`.
+Current handoff: Submit CM-2096 v3 implementation and packet for independent review. They bind the target-store identity, real collector, atomic one-shot gate, exact verifier, and two-commit executor, but authorize no bootstrap, nonce claim, tombstone, or verify.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2096 v2 closes the target-ID, durable-marker, and lifecycle-layer gaps. The
-safe target ref is derived from the exact CM-2094 SHA; marker bytes come from the
-actual shim serializer; candidate filtering uses selected-field references only.
-Execution is hard-stopped and rollback/Phase 8 evidence remains false.
+CM-2096 v3 closes the v2 implementation gaps in a non-executing stack. A fixed
+store identity and internally resolved runtime authority feed exact pre/post
+store projections. The assertion is atomically consumed, the audit receipt is
+correlated to the exact decision/claim/target/scope, and effective visibility is
+derived only afterward. Packet `1ba07b0c…` and readable review surface
+`b113a5e6…` still record bootstrap, preflight, runtime route, and future exact
+decision as missing. Rollback/Phase 8 evidence remains false.
 
 CM-2095 is the active gate. Review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 accepts the one-shot proof but ends the authorization lifecycle. Application is

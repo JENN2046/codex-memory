@@ -8,20 +8,23 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2096 v2 packet prepared with exact target/marker/lifecycle binding; no execution authority; Phase 8 incomplete |
-| Current task | `CM-2098 CM-2096 frozen rollback execution packet v2` |
-| Current validation | `CMV-2202` |
-| Current route | Independent CM-2096 v2 packet review; no tombstone execution |
+| Status | CM-2096 v3 non-executing stack and packet prepared; bootstrap/preflight/decision still absent; Phase 8 incomplete |
+| Current task | `CM-2099 CM-2096 rollback execution packet v3` |
+| Current validation | `CMV-2203` |
+| Current route | Independent v3 implementation review; no tombstone/verify/nonce claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
-CM-2096 semantic design passed. V2 packet binds the CM-2094 target reference
-derived from its durable SHA, exact tombstone payload, actual 507-byte shim
-Markdown, and a marker-aware selected-field lifecycle layer. Executor execution
-is hard-disabled; rollback evidence and Phase 8 remain false. CM-2097 remains separate.
+CM-2096 v2 implementation review passed without execution authority. V3 binds
+an immutable synthetic-store identity, collects exact target/marker hashes from
+the real selected store, atomically consumes one tombstone assertion, correlates
+the exact audit receipt, and freezes a two-Git-commit executor. The target-store
+bootstrap receipt, live preflight, and future exact decision are absent, so
+execution authorization, rollback evidence, and Phase 8 remain false. CM-2097
+remains separate.
 
 CM-2095 requests a separate application decision for the six receipt-backed
 fields supported by the accepted CM-2094 proof. Rollback and failure-recovery
