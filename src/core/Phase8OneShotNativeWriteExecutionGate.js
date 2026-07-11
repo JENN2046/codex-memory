@@ -3,6 +3,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { isMachineBoundPhase8AuthorizationDecision } = require('./Phase8ExternalAuthorizationDecisionIntake');
 
 const INTERNAL_ASSERTION = Symbol('phase8-one-shot-native-write-assertion');
 const FINAL_STATES = new Set([
@@ -30,12 +31,37 @@ function safeKey(value) {
 }
 
 class Phase8OneShotAuthorizationRegistry {
-  constructor({ directory }) {
-    this.directory = directory;
+  constructor({ governanceRoot, identity }) {
+    if (typeof governanceRoot !== 'string' || governanceRoot.trim() === '') {
+      throw new Error('authorization_registry_governance_root_required');
+    }
+    if (!identity?.authorizationRegistryReference) {
+      throw new Error('authorization_registry_reference_required');
+    }
+    this.governanceRoot = governanceRoot;
+    this.directory = path.join(governanceRoot, safeKey(identity.authorizationRegistryReference));
+    this.identity = identity;
+  }
+
+  async ensureIdentity() {
+    if (!this.identity || this.identity.registryReinitializationAllowed !== false || this.identity.registryDeletionAllowed !== false) {
+      throw new Error('authorization_registry_identity_required');
+    }
+    await fs.mkdir(this.directory, { recursive: true });
+    const identityPath = path.join(this.directory, '.registry-identity.json');
+    const serialized = JSON.stringify(canonicalize(this.identity));
+    try {
+      await fs.writeFile(identityPath, serialized, { flag: 'wx' });
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+      const existing = await fs.readFile(identityPath, 'utf8');
+      if (existing !== serialized) throw new Error('authorization_registry_identity_mismatch');
+    }
+    return { reference: this.identity.authorizationRegistryReference, identityHash: sha256(serialized) };
   }
 
   async claim({ nonce, receiptId, bindingHash }) {
-    await fs.mkdir(this.directory, { recursive: true });
+    await this.ensureIdentity();
     const lock = path.join(this.directory, '.claim.lock');
     let lockHandle;
     try {
@@ -78,12 +104,34 @@ class Phase8OneShotAuthorizationRegistry {
   async finalize(claimId, state) {
     if (!FINAL_STATES.has(state)) throw new Error('invalid_final_state');
     const current = await this.readClaim(claimId);
-    if (current.state !== 'CLAIMED') throw new Error('authorization_not_claimed');
+    const validTransition = current.state === 'WRITE_INVOCATION_CONSUMED' ||
+      (current.state === 'CLAIMED' && state === 'CONSUMED_FAILED_PRE_COMMIT');
+    if (!validTransition) throw new Error('write_invocation_not_consumed');
     const statePath = path.join(this.directory, `claim-${claimId}.json`);
     const tempPath = `${statePath}.tmp`;
     await fs.writeFile(tempPath, JSON.stringify({ ...current, state }), { flag: 'wx' });
     await fs.rename(tempPath, statePath);
     return { ...current, state };
+  }
+
+  async consumeWriteInvocation(claimId, bindingHash) {
+    const markerPath = path.join(this.directory, `write-invocation-${claimId}.json`);
+    try {
+      await fs.writeFile(markerPath, JSON.stringify({ claimId, invocationCount: 1 }), { flag: 'wx' });
+    } catch (error) {
+      if (error.code === 'EEXIST') throw new Error('write_invocation_already_consumed');
+      throw error;
+    }
+    const current = await this.readClaim(claimId);
+    if (current.state !== 'CLAIMED' || current.bindingHash !== bindingHash) {
+      throw new Error('authorization_claim_not_consumable');
+    }
+    const statePath = path.join(this.directory, `claim-${claimId}.json`);
+    const tempPath = `${statePath}.write-consumed.tmp`;
+    const next = { ...current, state: 'WRITE_INVOCATION_CONSUMED', writeInvocationCount: 1 };
+    await fs.writeFile(tempPath, JSON.stringify(next), { flag: 'wx' });
+    await fs.rename(tempPath, statePath);
+    return next;
   }
 }
 
@@ -92,8 +140,11 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
 
   async function verifyAssertion(assertion) {
     if (!assertion || assertion[INTERNAL_ASSERTION] !== true) return { accepted: false };
-    const claim = await registry.readClaim(assertion.claimId).catch(() => null);
-    if (!claim || claim.state !== 'CLAIMED' || claim.bindingHash !== assertion.bindingHash) {
+    const claim = await registry.consumeWriteInvocation(
+      assertion.claimId,
+      assertion.bindingHash
+    ).catch(() => null);
+    if (!claim || claim.state !== 'WRITE_INVOCATION_CONSUMED') {
       return { accepted: false };
     }
     return { accepted: true, exactApprovalResult: assertion.exactApprovalResult };
@@ -110,6 +161,7 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
     const contextHash = sha256Canonical(context);
     const allowlistHash = sha256Canonical(allowlist);
     const blockers = [];
+    if (!isMachineBoundPhase8AuthorizationDecision(decision)) blockers.push('decision.machineBoundIntake');
     if (decision?.phase8NativeWriteAuthorized !== true) blockers.push('decision.authorization');
     if (decision?.token !== 'APPROVE_VCP_BRIDGE_LIVE_RECORD_MEMORY_PROOF_EXACT') blockers.push('decision.token');
     if (decision?.allowedAction !== 'live_bridge_record_memory_proof') blockers.push('decision.allowedAction');
@@ -131,13 +183,29 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
       allowedScope: expectedBinding.allowedScope,
       runtimeTarget: expectedBinding.runtimeTarget,
       rollbackPlanRef: expectedBinding.rollbackPlanReference,
-      approvalId: decision.decisionReference,
+      approvalDecisionReference: decision.decisionReference,
+      claimBindingHash: bindingHash,
       approvedAt: decision.approvedAt
     };
     const assertion = { [INTERNAL_ASSERTION]: true, claimId: claim.claimId, bindingHash, exactApprovalResult };
     try {
       const result = await executeNativeWrite({ payload, assertion });
-      const nativeSuccess = result?.nativeWritePerformed === true && result?.durableWritePerformed === true;
+      const postCallbackClaim = await registry.readClaim(claim.claimId);
+      if (postCallbackClaim.state !== 'WRITE_INVOCATION_CONSUMED') {
+        const state = 'CONSUMED_FAILED_PRE_COMMIT';
+        await registry.finalize(claim.claimId, state);
+        return { accepted: false, blockers: ['write_invocation_not_consumed'], nativeWriteCalls: 0, verifyOperations: 0, state };
+      }
+      const nativeSuccess = (
+        result?.nativeWritePerformed === true && result?.durableWritePerformed === true
+      ) || (
+        result?.status === 'GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATED' &&
+        result?.access?.memoryWritePerformed === true &&
+        result?.access?.localMemoryFallbackUsed === false &&
+        result?.receipt?.nativeInvocationReceipt?.invocationBindingMatched === true &&
+        result?.receipt?.nativeInvocationReceipt?.statusClass === 'success' &&
+        result?.receipt?.localAuditReceipt?.status === 'appended'
+      );
       const verifyResult = nativeSuccess
         ? await verifyWrite({ claimId: claim.claimId, receiptId: decision.receiptId, nativeResult: result })
         : { accepted: false };
@@ -146,7 +214,8 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
       await registry.finalize(claim.claimId, state);
       return { accepted: success, blockers: success ? [] : ['native_write_or_verify_result_ambiguous'], nativeWriteCalls: 1, verifyOperations: nativeSuccess ? 1 : 0, state, result, verifyResult };
     } catch (error) {
-      const state = error?.commitState === 'pre_commit'
+      const currentClaim = await registry.readClaim(claim.claimId).catch(() => null);
+      const state = currentClaim?.state === 'CLAIMED' || error?.commitState === 'pre_commit'
         ? 'CONSUMED_FAILED_PRE_COMMIT'
         : 'CONSUMED_AMBIGUOUS_POST_COMMIT';
       await registry.finalize(claim.claimId, state);
@@ -157,15 +226,15 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
   return { execute, verifyAssertion };
 }
 
-async function verifyPhase8NativeWriteAuditProjection({ callAuditMemory, scope, registry, claimId, receiptId }) {
+async function verifyPhase8NativeWriteAuditProjection({ callAuditMemory, scope, registry, claimId, receiptId, approvalDecisionReference, claimBindingHash, targetReferenceName, expectedScopeFingerprint }) {
   if (typeof callAuditMemory !== 'function' || !registry) return { accepted: false, reasonCode: 'verify_configuration_missing' };
   const claim = await registry.readClaim(claimId).catch(() => null);
-  if (!claim || claim.state !== 'CLAIMED' || claim.receiptIdHash !== safeKey(receiptId)) {
+  if (!claim || claim.state !== 'WRITE_INVOCATION_CONSUMED' || claim.receiptIdHash !== safeKey(receiptId)) {
     return { accepted: false, reasonCode: 'verify_claim_binding_invalid' };
   }
   const report = await callAuditMemory({
     audit_family: 'governance',
-    window: 1,
+    window: 10,
     scope: {
       project_id: scope.project_id,
       scope_id: scope.scope_id,
@@ -177,7 +246,21 @@ async function verifyPhase8NativeWriteAuditProjection({ callAuditMemory, scope, 
     },
     include_raw: false
   });
-  const receipt = report?.findings?.[0]?.governedNativeBridgeReceipt;
+  const candidates = Array.isArray(report?.findings)
+    ? report.findings.map(item => item?.governedNativeBridgeReceipt).filter(Boolean)
+    : [];
+  const receipt = candidates.length
+    ? candidates
+      .find(item => item?.toolName === 'record_memory' &&
+        item?.auditReceiptReferenceName === receiptId &&
+        item?.exactApprovalDecisionReference === approvalDecisionReference &&
+        item?.exactApprovalClaimBindingHash === claimBindingHash &&
+        item?.targetReferenceName === targetReferenceName &&
+        item?.scopeFingerprintPresent === true &&
+        item?.scopeFingerprintMatched === true &&
+        typeof expectedScopeFingerprint === 'string' &&
+        /^[a-f0-9]{64}$/.test(expectedScopeFingerprint))
+    : null;
   const accepted = report?.accepted === true &&
     report?.access?.rawMemoryReturned === false &&
     report?.access?.rawAuditReturned === false &&
@@ -187,6 +270,7 @@ async function verifyPhase8NativeWriteAuditProjection({ callAuditMemory, scope, 
     receipt?.exactApprovalAction === 'live_bridge_record_memory_proof' &&
     receipt?.exactApprovalActionMatched === true &&
     receipt?.nativeInvocationAttempted === true &&
+    receipt?.nativeInvocationReceiptBindingMatched === true &&
     receipt?.memoryWritePerformed === true &&
     receipt?.rawRequestBodyPersisted === false &&
     receipt?.rawResponseBodyPersisted === false;
@@ -196,7 +280,17 @@ async function verifyPhase8NativeWriteAuditProjection({ callAuditMemory, scope, 
     selectedFieldsOnly: true,
     rawMemoryReturned: false,
     rawAuditReturned: false,
-    maxOperations: 1
+    maxOperations: 1,
+    observedCandidateCount: candidates.length,
+    observedSelectedBinding: receipt ? {
+      auditReceiptReferenceName: receipt.auditReceiptReferenceName || null,
+      exactApprovalDecisionReference: receipt.exactApprovalDecisionReference || null,
+      exactApprovalClaimBindingHash: receipt.exactApprovalClaimBindingHash || null,
+      targetReferenceName: receipt.targetReferenceName || null,
+      scopeFingerprintPresent: receipt.scopeFingerprintPresent === true,
+      scopeFingerprintMatched: receipt.scopeFingerprintMatched === true,
+      nativeInvocationReceiptBindingMatched: receipt.nativeInvocationReceiptBindingMatched === true
+    } : null
   };
 }
 
