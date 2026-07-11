@@ -11,7 +11,7 @@
   },
   "updatedAt": "2026-07-11",
   "taskId": "CM-2095",
-  "validationId": "CMV-2197",
+  "validationId": "CMV-2198",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -125,8 +125,21 @@
     "phase8ExecutionReceiptReviewPassed": true,
     "phase8NativeWriteProofAccepted": true,
     "phase8CompletionEvidenceApplicationRequested": true,
-    "phase8CompletionEvidenceAlreadyApplied": false,
-    "phase8CompletionAuditPatchAlreadyApplied": false,
+    "phase8CompletionEvidenceAlreadyApplied": true,
+    "phase8CompletionAuditPatchAlreadyApplied": true,
+    "phase8CompletionEvidenceApplicationDecisionReference": "CM-2095-ER-20260711-COMPLETION-EVIDENCE-APPLICATION-PASS-2E98CE0C",
+    "phase8CompletionEvidenceApplicationDecisionCommit": "83ac6f8d45a92d04453e9f280d5dbd054a663132",
+    "phase8CompletionEvidenceApplicationRuntimeCommit": "e2bb3e9b4bf1f1e7dd8d4a74295360c3b8c7a513",
+    "phase8CompletionEvidenceApplicationAuthorizationConsumed": true,
+    "phase8CompletionEvidenceApplicationReplayAllowed": false,
+    "phase8ReceiptBundleAppliedToCompletionAudit": true,
+    "phase8ExactApprovalEnforcementPassed": true,
+    "phase8NativeSideEffectReceiptPassed": true,
+    "phase8RealRootDurableWriteProofPassed": true,
+    "phase8VerifyWritePassed": true,
+    "phase8OutputDisclosureBudgetPassed": true,
+    "phase8AuditReceiptPassed": true,
+    "phase8CompletionEvidenceApplicationReceiptPayloadSha256": "8c8a22f89863214ccbe2d0e64b75a0526cc32f1e21d83d7159e109e6fa200939",
     "phase8RollbackDrillPassed": false,
     "phase8FailureRecoveryProofPassed": false,
     "phase8DerivedIndexProofAccepted": false,
@@ -143,7 +156,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_completion_evidence_application_requested_phase8_incomplete_no_new_native_authority",
+    "scope": "near_model_memory_plan_pack_evidence_applied_rollback_failure_missing_phase8_incomplete_receipt_review_required",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -151,6 +164,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2198",
+      "scope": "CM-2095 exact Phase 8 completion evidence application",
+      "status": "COMPLETED_EVIDENCE_APPLIED_ROLLBACK_FAILURE_MISSING_PHASE8_INCOMPLETE_RECEIPT_REVIEW_REQUIRED"
+    },
     {
       "id": "CMV-2197",
       "scope": "CM-2095 Phase 8 completion evidence application request",

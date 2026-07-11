@@ -8,6 +8,9 @@ const { buildInput } = require('../src/cli/cm2095-phase8-completion-evidence-app
 test('CM-2095 application gate, patch boundary, and patch application accept only six supported fields', () => {
   const input = buildInput();
   input.runtimeFacts.clean = true;
+  input.baseline.completionAuditWorktreeMatchesHead = true;
+  input.baseline.traceMatrixWorktreeMatchesHead = true;
+  input.baseline.applicationReceiptAbsent = true;
   const result = executeCm2095Phase8CompletionEvidenceApplication(input);
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.applicationGateAccepted, true);
@@ -23,6 +26,9 @@ test('CM-2095 application gate, patch boundary, and patch application accept onl
 test('CM-2095 application fails before patch on binding, baseline, replay, or authority drift', () => {
   const input = buildInput();
   input.runtimeFacts.clean = true;
+  input.baseline.completionAuditWorktreeMatchesHead = true;
+  input.baseline.traceMatrixWorktreeMatchesHead = true;
+  input.baseline.applicationReceiptAbsent = true;
   for (const drift of [
     { bindings: { ...input.bindings, decisionSha256: '0'.repeat(64) } },
     { runtimeFacts: { ...input.runtimeFacts, clean: false } },

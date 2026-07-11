@@ -4,6 +4,18 @@ Task id: `CM-2024`
 Validation id: `CMV-2125`
 Date: `2026-07-10`
 
+## CM-2095 Phase 8 Application Trace Update
+
+The exact approval, native side effect, primary durable Markdown, verify,
+output-disclosure, and audit fields now trace to accepted exact-authorized
+receipt evidence in `phase8_completion_evidence_application_receipt_cm2095.json`.
+`phase8ReceiptBundleAppliedToCompletionAudit` is applied by the separately
+authorized CM-2095 patch. Receipt payload SHA-256 is `8c8a22f8…0939`.
+
+`rollbackDrillPassed` and `failureRecoveryProofPassed` remain future exact
+evidence and false. Derived-index/provider proof remains unaccepted. Therefore
+Phase 8 and the full plan pack remain incomplete, with no readiness claim.
+
 ## CM-2082 Application Trace Update
 
 `externalReviewPassed` traces to the exact CM-2080 external-review decision.

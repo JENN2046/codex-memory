@@ -4,6 +4,32 @@ Task: `CM-2017 near-model-memory plan pack completion audit`
 Validation: `CMV-2118`
 Date: 2026-07-10
 
+## CM-2095 Authorized Phase 8 Evidence Application
+
+Decision `CM-2095-ER-20260711-COMPLETION-EVIDENCE-APPLICATION-PASS-2E98CE0C`
+authorized one application of the independently accepted CM-2094 execution
+receipt. Application gate, patch boundary, and patch application all accepted.
+
+```yaml
+exactApprovalEnforcementPassed: true
+nativeSideEffectReceiptPassed: true
+realRootDurableWriteProofPassed: true
+verifyWritePassed: true
+outputDisclosureBudgetPassed: true
+auditReceiptPassed: true
+phase8ReceiptBundleAppliedToCompletionAudit: true
+
+rollbackDrillPassed: false
+failureRecoveryProofPassed: false
+phase8Completed: false
+fullPlanPackCompleted: false
+readinessClaimed: false
+```
+
+Receipt payload SHA-256 is `8c8a22f8…0939`. This patch does not accept
+derived-index/provider evidence, execute a new native action, or claim Phase 8,
+production, release, RC, V8, or full-plan completion.
+
 ## CM-2082 Authorized Application Update
 
 Decision `CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33`

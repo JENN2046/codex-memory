@@ -4,13 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2095 Phase 8 completion evidence application request`.
-Current validation: `CMV-2197`.
-Current handoff: CM-2094 receipt review passed. CM-2095 requests application of six supported evidence fields only; rollback/failure and Phase 8 completion remain false. No new native action.
+Current task: `CM-2095 Phase 8 completion evidence application receipt`.
+Current validation: `CMV-2198`.
+Current handoff: CM-2095 application consumed once and applied six supported fields plus bundle application. Rollback/failure remain false; Phase 8 incomplete. Submit receipt review; no new native action.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2095 application is applied and non-replayable. Receipt payload SHA is
+`8c8a22f8…0939`. Completion Audit and trace report now bind the six accepted
+fields and bundle application. Rollback/failure gaps, provider/derived-index
+non-proof, Phase 8 incomplete, and all readiness non-claims remain preserved.
 
 CM-2095 is the active gate. Review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 accepts the one-shot proof but ends the authorization lifecycle. Application is

@@ -4,11 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2095 Phase 8 completion evidence application request`.
-Current validation: `CMV-2197`.
+Current checkpoint: `CM-2095 Phase 8 completion evidence application receipt`.
+Current validation: `CMV-2198`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2095 Completion Evidence Application
+
+Status: `EVIDENCE_APPLIED_ROLLBACK_FAILURE_MISSING_PHASE8_INCOMPLETE_RECEIPT_REVIEW_REQUIRED`
+
+- Decision `...PASS-2E98CE0C` frozen at `83ac6f8d…` and consumed once.
+- Application gate, patch boundary, and patch application accepted.
+- Six receipt-backed fields and bundle application are true.
+- Rollback/failure/provider/derived-index evidence and Phase 8 completion remain false.
+
+Validation: `CMV-2198`.
 
 ## CM-2095 Completion Evidence Application Request
 

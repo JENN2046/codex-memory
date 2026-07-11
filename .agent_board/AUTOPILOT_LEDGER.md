@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest receipt: `CM-2095 Phase 8 completion evidence application request`.
-Latest validation: `CMV-2197`.
+Latest receipt: `CM-2095 Phase 8 completion evidence application receipt`.
+Latest validation: `CMV-2198`.
 Active receipt summaries should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -31,6 +31,7 @@ Governance kernel anchor retained for validation: `CM-0684`.
 
 | ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |
 |---|---|---|---|---|---|---|---|---:|---|---|
+| CM-2095-application | complete imported near-model-memory plan pack | Exact one-use evidence application | `phase8_six_field_receipt_application_no_completion` | Applied six accepted receipt fields plus bundle marker through gate/boundary/application | `decision=83ac6f8d; runtime=e2bb3e9b; receipt_sha=8c8a22f8; applications=1; native_actions=0; rollback=false; failure=false; phase8=false` | `CMV-2198` | 1 | no replay, new native action, rollback/failure fabrication, provider proof, completion, or readiness | completed_evidence_applied_rollback_failure_missing_phase8_incomplete_receipt_review_required | 2026-07-11 |
 | CM-2095 | complete imported near-model-memory plan pack | Green review intake/application request | `phase8_receipt_review_and_completion_evidence_application_request_no_patch` | Recorded CM-2094 PASS and requested application of six supported evidence fields | `review=...PASS-FD22CEC6; receipt_sha=fd22cec6; supported_fields=6; rollback=false; failure=false; phase8_complete=false; new_native_authority=false` | `CMV-2197` | 0 | no patch, replay, new write/verify, rollback/compensation, provider proof, or readiness claim | completed_completion_evidence_application_requested_phase8_incomplete_no_new_native_authority | 2026-07-11 |
 | CM-2094 | complete imported near-model-memory plan pack | Exact consumed Red native proof | `phase8_one_shot_record_memory_and_verify` | Froze decision, passed preflight/intake, executed one synthetic native write and one verify | `decision=f1e2a830; state=CONSUMED_SUCCESS; writes=1; verify=1; durable_sha=4f863f52; fallback=false; retry=0; compensation=0; replay=false` | `CMV-2196` | 1 | no replay, marker deletion, additional verify, rollback/compensation, raw-memory access, or readiness claim | completed_consumed_success_one_write_one_verify_receipt_review_required_no_ready_claim | 2026-07-11 |
 | CM2094-request | complete imported near-model-memory plan pack | Green manifest/request; Red native execution blocked | `phase8_final_execution_release_request_no_execution` | Froze exact execution manifest and prepared separate CM-2094 final release request | `packet=66cfae23; manifest_blob=549f157e; manifest_sha256=0786167b; payload_sha256=11bbbc72; fourth_slot=false; nonce=0; writes=0; verify=0` | `CMV-2195` | 0 | no positive release intake, nonce, runtime write, verify, compensation, or real-memory read before independent PASS | completed_final_execution_release_requested_phase8_false_unclaimed_no_native_execution | 2026-07-11 |

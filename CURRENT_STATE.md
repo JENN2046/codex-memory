@@ -8,15 +8,20 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2094 receipt review passed; CM-2095 evidence application requested; Phase 8 incomplete |
-| Current task | `CM-2095 Phase 8 completion evidence application request` |
-| Current validation | `CMV-2197` |
-| Current route | Independent application review; no patch or new native action before approval |
+| Status | CM-2095 six-field evidence applied; rollback/failure missing; Phase 8 incomplete |
+| Current task | `CM-2095 Phase 8 completion evidence application receipt` |
+| Current validation | `CMV-2198` |
+| Current route | Independent application receipt review; no new native action |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+CM-2095 application gate, patch boundary, and patch application accepted once.
+Six receipt-backed fields plus `phase8ReceiptBundleAppliedToCompletionAudit` are
+now applied. Rollback/failure requirements remain false, preventing Phase 8 and
+full-plan completion. The application receipt requires independent review.
 
 CM-2095 requests a separate application decision for the six receipt-backed
 fields supported by the accepted CM-2094 proof. Rollback and failure-recovery
