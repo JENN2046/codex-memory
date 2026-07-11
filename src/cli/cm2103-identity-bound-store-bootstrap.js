@@ -146,6 +146,44 @@ function expectedFinalExecutionReleaseDecisionBinding({
   };
 }
 
+function buildCm2103BootstrapBindingHash({
+  authorizationContentDecisionSourceCommit,
+  authorizationContentDecisionBlobOid,
+  authorizationContentDecisionSha256,
+  finalExecutionReleaseDecisionSourceCommit,
+  finalExecutionReleaseDecisionBlobOid,
+  finalExecutionReleaseDecisionSha256,
+  executionPacketCommit,
+  executionPacketBlobOid,
+  executionPacketSha256,
+  implementationCommit,
+  implementationTree,
+  storeRootBindingSha256,
+  governanceRootIdentitySha256,
+  identitySha256,
+  nonce,
+  receiptId
+}) {
+  return sha256Canonical({
+    authorizationContentDecisionSourceCommit,
+    authorizationContentDecisionBlobOid,
+    authorizationContentDecisionSha256,
+    finalExecutionReleaseDecisionSourceCommit,
+    finalExecutionReleaseDecisionBlobOid,
+    finalExecutionReleaseDecisionSha256,
+    executionPacketCommit,
+    executionPacketBlobOid,
+    executionPacketSha256,
+    implementationCommit,
+    implementationTree,
+    storeRootBindingSha256,
+    governanceRootIdentitySha256,
+    identitySha256,
+    nonce,
+    receiptId
+  });
+}
+
 function buildCm2103BootstrapReceipt({
   packet,
   observedContentDecision,
@@ -422,13 +460,13 @@ async function runFrozenCm2103Bootstrap(
     throw new Error('cm2103_governance_binding_mismatch');
   }
 
-  const bindingHash = sha256Canonical({
+  const bindingHash = buildCm2103BootstrapBindingHash({
     authorizationContentDecisionSourceCommit: authorizationContentDecisionCommit,
     authorizationContentDecisionBlobOid: contentDecisionBlobOid,
     authorizationContentDecisionSha256: contentDecisionSha256,
     finalExecutionReleaseDecisionSourceCommit: finalExecutionReleaseDecisionCommit,
     finalExecutionReleaseDecisionBlobOid: finalReleaseDecisionBlobOid,
-    finalExecutionReleaseDecisionSha256,
+    finalExecutionReleaseDecisionSha256: finalReleaseDecisionSha256,
     executionPacketCommit: authorizationGatePacketCommit,
     executionPacketBlobOid: packetBlobOid,
     executionPacketSha256: sha256(packetBytes),
@@ -513,6 +551,7 @@ module.exports = {
   AUTHORIZATION_CONTENT_DECISION_PATH,
   AUTHORIZATION_GATE_PACKET_PATH,
   FINAL_EXECUTION_RELEASE_DECISION_PATH,
+  buildCm2103BootstrapBindingHash,
   buildCm2103BootstrapReceipt,
   expectedAuthorizationContentDecisionBinding,
   expectedFinalExecutionReleaseDecisionBinding,

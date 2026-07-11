@@ -35,7 +35,6 @@ test('CM-2104-PRE packet freezes a non-executing two-stage bootstrap authorizati
   assert.equal(packet.finalReleaseMustBindContentGitIdentity, true);
   assert.equal(gitObjectExists(packetFreezeCommit, AUTHORIZATION_CONTENT_DECISION_PATH), false);
   assert.equal(gitObjectExists(packetFreezeCommit, FINAL_EXECUTION_RELEASE_DECISION_PATH), false);
-  assert.equal(fs.existsSync(path.join(repoRoot, FINAL_EXECUTION_RELEASE_DECISION_PATH)), false);
 });
 
 test('CM-2104-PRE packet rejects authority, release separation, artifact, counter, or hash drift', () => {

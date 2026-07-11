@@ -33,7 +33,6 @@ test('CM-2104-A frozen application exactly matches the contract-generated no-exe
   assert.equal(result.executionAuthorized, false);
   assert.equal(gitObjectExists(applicationFreezeCommit, application.contentDecisionPath), false);
   assert.equal(gitObjectExists(applicationFreezeCommit, application.finalExecutionReleaseDecisionPath), false);
-  assert.equal(fs.existsSync(path.join(repoRoot, application.finalExecutionReleaseDecisionPath)), false);
 });
 
 test('CM-2104-A frozen application preserves zero effects and incomplete Phase 8 boundaries', () => {

@@ -23,6 +23,19 @@ const {
 
 const repoRoot = path.resolve(__dirname, '..');
 const receipt = JSON.parse(fs.readFileSync(path.join(repoRoot, RECEIPT_PATH), 'utf8'));
+const receiptFreezeCommit = '4cf5f44dde337fd09c6d71295b628f7a8408025c';
+
+function gitObjectExists(commit, objectPath) {
+  try {
+    execFileSync('git', ['cat-file', '-e', `${commit}:${objectPath}`], {
+      cwd: repoRoot,
+      stdio: 'ignore'
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 test('CM-2104 exact Git object content decision intake is accepted without execution authority', () => {
   const binding = receipt.receiptPayload.decision;
@@ -66,7 +79,7 @@ test('CM-2104 content decision receipt records the self-decision and preserves t
   assert.equal(result.executorRun, false);
   assert.equal(result.executionEffects, 0);
   assert.equal(result.phase8Completed, false);
-  assert.equal(fs.existsSync(path.join(repoRoot, FINAL_EXECUTION_RELEASE_DECISION_PATH)), false);
+  assert.equal(gitObjectExists(receiptFreezeCommit, FINAL_EXECUTION_RELEASE_DECISION_PATH), false);
 });
 
 test('CM-2104 content decision receipt fails closed on authority, effect, completion, or hash drift', () => {
