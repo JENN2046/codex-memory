@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2111",
+  "decisionType": "self_governed_exact_phase8_completion_audit_application",
+  "decisionReference": "CM-2111-SELF-PHASE8-COMPLETION-AUDIT-77D162ED",
+  "decisionBasis": "repository_reality_and_user_delegated_prohibited_first_authority",
+  "phase8CompletionAuditApplicationAuthorized": true,
+  "decisionRequiresGitFreezeBeforeApplication": true,
+  "evidenceBundle": {
+    "bytes": 3465,
+    "rawSha256": "d629f341710fcd4d95a5107a5913bf172b58cd19c77eb08a972f36b3df57eba8",
+    "payloadSha256": "77d162edba2dc7c6911653c1f251cc0ea5b1a96a1db5c1748fd4ba2b2f84fe9d"
+  },
+  "baseline": {
+    "completionAuditBlobOid": "e6b310f920356eb9689b3eff0f2c1ddfc14e0f59",
+    "traceMatrixBlobOid": "e7ff98e96b811b66390d900d7e7dc890e4f0d4f0",
+    "rollbackDrillPassed": true,
+    "failureRecoveryProofPassed": true,
+    "phase8Completed": false
+  },
+  "allowedPatch": {
+    "rollbackDrillPassed": true,
+    "failureRecoveryProofPassed": true,
+    "phase8Completed": true,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "applicationAuthorization": {
+    "useCount": 1,
+    "replayAllowed": false
+  },
+  "applicationSideEffectLimits": {
+    "completionAuditPatchApplications": 1,
+    "nativeReads": 0,
+    "nativeWrites": 0,
+    "verifyOperations": 0,
+    "rollbackOrCompensationOperations": 0,
+    "remoteActions": 0,
+    "readinessClaims": 0
+  },
+  "unsupportedClaims": {
+    "productionReady": false,
+    "releaseReady": false,
+    "rcReady": false,
+    "completeV8": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  }
+}
