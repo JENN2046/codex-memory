@@ -105,7 +105,15 @@ function exactObject(value, expected) {
 
 function evaluateCm2103BootstrapExecutionPacket(packet) {
   const blockers = [];
-  if (!exactKeys(packet, PACKET_KEYS)) return { accepted: false, blockers: ['packet.keys'], executionAuthorized: false };
+  if (!exactKeys(packet, PACKET_KEYS)) return {
+    accepted: false,
+    blockers: ['packet.keys'],
+    packetPrepared: false,
+    executionAuthorized: false,
+    nativeActionsAuthorized: 0,
+    storeDirectoryCreated: false,
+    storeIdentityCreated: false
+  };
   const { packetPayloadSha256, ...payload } = packet;
   if (sha256Canonical(payload) !== packetPayloadSha256) blockers.push('packet.packetPayloadSha256');
   const exact = {
