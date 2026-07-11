@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2095",
+  "requestType": "phase8_completion_evidence_application_review",
+  "receiptReviewReference": "CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6",
+  "receiptReviewAccepted": true,
+  "executionReceiptCommit": "91c20ce4c9b85966ef2da6b7c37563ebbce0f365",
+  "executionReceiptJsonSha256": "fd22cec67c8d95eab2f95c10a52207529847d83942354331ba372f5edc41f277",
+  "completionEvidenceApplicationRequested": true,
+  "completionEvidenceAlreadyApplied": false,
+  "completionAuditPatchAlreadyApplied": false,
+  "proposedEvidence": {
+    "exactApprovalEnforcementPassed": true,
+    "nativeSideEffectReceiptPassed": true,
+    "realRootDurableWriteProofPassed": true,
+    "verifyWritePassed": true,
+    "rollbackDrillPassed": false,
+    "failureRecoveryProofPassed": false,
+    "outputDisclosureBudgetPassed": true,
+    "auditReceiptPassed": true,
+    "phase8ReceiptBundleAppliedToCompletionAudit": false
+  },
+  "unsupportedEvidence": {
+    "derivedIndexProofAccepted": false,
+    "providerExecutionProofAccepted": false,
+    "productionProviderProofAccepted": false
+  },
+  "resultingStateRequested": {
+    "phase8NativeWriteAuthorizationGranted": true,
+    "authorizationConsumed": true,
+    "authorizationReplayAllowed": false,
+    "additionalNativeWriteAuthorized": false,
+    "phase8Completed": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "applicationCounters": {
+    "nativeWriteCalls": 0,
+    "verifyOperations": 0,
+    "rollbackOrCompensationOperations": 0,
+    "realMemoryReads": 0,
+    "remoteActions": 0,
+    "readinessClaims": 0
+  }
+}

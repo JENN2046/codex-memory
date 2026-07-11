@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2094 Phase 8 one-shot native execution receipt`.
-Current validation: `CMV-2196`.
-Current status: CONSUMED_SUCCESS; one synthetic native write and one verify; authorization consumed; receipt review required.
+Current task: `CM-2095 Phase 8 completion evidence application request`.
+Current validation: `CMV-2197`.
+Current status: CM-2094 receipt review passed; six-field evidence application requested; Phase 8 incomplete and no new native authority.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the frozen CM-2094 execution receipt.
-Do not replay the authorization, delete markers, or execute any additional write,
-verify, rollback, compensation, or real-memory action.
+Next safe action is independent review of the CM-2095 completion-evidence
+application request. Do not apply a patch or alter Phase 8 completion fields before
+approval; never replay or perform an additional native action.
 
 ## Historical Run Notes
 

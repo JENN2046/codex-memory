@@ -4,11 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2094 Phase 8 one-shot native execution receipt`.
-Current validation: `CMV-2196`.
+Current checkpoint: `CM-2095 Phase 8 completion evidence application request`.
+Current validation: `CMV-2197`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2095 Completion Evidence Application Request
+
+Status: `COMPLETION_EVIDENCE_APPLICATION_REQUESTED_PHASE8_INCOMPLETE_NO_NEW_NATIVE_AUTHORITY`
+
+- CM-2094 receipt review `...PASS-FD22CEC6` accepted the single write/verify proof.
+- Application requests six supported evidence fields only.
+- Rollback drill, failure recovery, derived-index/provider proof, receipt-bundle application, and Phase 8 completion remain false.
+- Authorization lifecycle ended; no additional native write is permitted.
+
+Validation: `CMV-2197`.
 
 ## CM-2094 One-Shot Native Execution
 

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest active task: `CM-2094 Phase 8 one-shot native execution receipt`.
-Latest validation: `CMV-2196`.
+Latest active task: `CM-2095 Phase 8 completion evidence application request`.
+Latest validation: `CMV-2197`.
 Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -44,6 +44,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2095 | 2095 | done | P8-native-write-proof / P6-docs-drift | Green application request; no execution | receipt review; application request; contracts/tests/status | Request application of only independently accepted CM-2094 receipt evidence | exact review/receipt hash; six supported fields; rollback/failure/provider gaps false; zero counters; default/docs gates | revert CM-2095 request commit; no runtime or governance marker changes | independent application authorization required before patch | COMPLETION_EVIDENCE_APPLICATION_REQUESTED_PHASE8_INCOMPLETE_NO_NEW_NATIVE_AUTHORITY |
 | CM-2094 | 2094 | done | P8-native-write-proof / P6-docs-drift | Consumed exact Red authorization; no replay | final decision; registry state; durable proof; execution receipt/contract/status | Execute exact one-shot synthetic record and freeze receipt | decision Git intake; runtime/packet/context/allowlist preflight; one write/verify; durable hash; no fallback/retry/compensation/raw return | rollback not authorized; preserve markers and record; no replay | independent execution receipt review required; Phase 8 completion remains unclaimed | CONSUMED_SUCCESS_ONE_WRITE_ONE_VERIFY_RECEIPT_REVIEW_REQUIRED_NO_READY_CLAIM |
 | CM2094-request | 2094 | done | P8-native-write-proof / P6-docs-drift | Green frozen request; Red execution remains blocked | frozen manifest; final release request; contracts/tests/status | Bind exact execution packet and request independent final release | manifest Git object/raw/canonical hashes; context/allowlist/root/scope; fail-closed authority/effect tests; default/strict/docs gates | revert CM-2094 request commits; registry root remains; nonce and native effects remain zero | exact independent CM-2094 PASS decision required before any execution | FINAL_EXECUTION_RELEASE_REQUESTED_PHASE8_FALSE_UNCLAIMED_NO_NATIVE_EXECUTION |
 | CM-2093-bootstrap | 2093 | done | P8-native-write-proof / P6-docs-drift | Exact local governance bootstrap; no native runtime | frozen content decision; Git-common-dir root identity; bootstrap receipt/contract/status | Consume CM-2093 root-bootstrap authorization once | decision commit/blob/hash; `wx`; identity bytes/hash; zero nonce/receipt/claim/write; receipt/default/docs gates | deletion/replacement not authorized; stop on mismatch | independent bootstrap receipt review required before execution manifest | REGISTRY_ROOT_INITIALIZED_AUTHORIZATION_CONSUMED_PHASE8_FALSE_NO_NATIVE_EXECUTION |

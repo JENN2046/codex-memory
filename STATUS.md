@@ -4,13 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2094 Phase 8 one-shot native execution receipt`.
-Current validation: `CMV-2196`.
-Current project status: CM-2094 exact release was frozen and consumed once. One synthetic native write and one low-disclosure verify succeeded; receipt review remains required and Phase 8 completion is not claimed.
-Current route: `CM2094_CONSUMED_SUCCESS_ONE_WRITE_ONE_VERIFY_RECEIPT_REVIEW_REQUIRED_NO_READY_CLAIM`.
+Current task: `CM-2095 Phase 8 completion evidence application request`.
+Current validation: `CMV-2197`.
+Current project status: CM-2094 execution receipt review passed. CM-2095 requests application of six supported receipt-backed fields while rollback/failure evidence and Phase 8 completion remain false.
+Current route: `CM2095_COMPLETION_EVIDENCE_APPLICATION_REQUESTED_PHASE8_INCOMPLETE_NO_NEW_NATIVE_AUTHORITY`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2095 binds review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
+and requests a separate application gate for exact approval, side effect, durable
+write, verify, disclosure, and audit evidence only. Rollback/failure recovery,
+derived-index/provider proof, Phase 8 completion, and readiness remain false.
 
 CM-2094 execution result is `CONSUMED_SUCCESS`: one native write, one verify,
 zero retry, zero rollback/compensation, and no local fallback. The single durable

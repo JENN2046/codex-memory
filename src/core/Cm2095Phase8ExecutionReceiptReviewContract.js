@@ -1,0 +1,55 @@
+'use strict';
+
+function evaluateCm2095Phase8ExecutionReceiptReview(review = {}) {
+  const blockers = [];
+  const exact = {
+    schemaVersion: 1,
+    taskId: 'CM-2095',
+    result: 'PASS',
+    reviewReference: 'CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6',
+    executionReceiptAccepted: true,
+    nativeWriteProofAccepted: true,
+    receiptCommit: '91c20ce4c9b85966ef2da6b7c37563ebbce0f365',
+    receiptTree: '6b9b6fae23ae534661a226b27aad01f33f17380d',
+    receiptJsonBlobOid: 'b310146b5219cb4db0e463275f10e8aae4d2f94a',
+    receiptJsonBytes: 3078,
+    receiptJsonSha256: 'fd22cec67c8d95eab2f95c10a52207529847d83942354331ba372f5edc41f277',
+    receiptMarkdownBlobOid: 'ab11479072580bdd76b0a5257cf392946bfffd56',
+    receiptMarkdownBytes: 3266,
+    receiptMarkdownSha256: '3b8e15f64312b52663b8c9e33997fbfc962fc011a7c7b26206dd9445d5a3eb4a',
+    authorizationWasGranted: true,
+    authorizationConsumed: true,
+    authorizationActive: false,
+    authorizationReplayAllowed: false,
+    additionalNativeWriteAuthorized: false,
+    finalState: 'CONSUMED_SUCCESS',
+    nativeWriteCalls: 1,
+    verifyOperations: 1,
+    verifyAccepted: true,
+    durableRecordCount: 1,
+    durableRecordBytes: 269,
+    durableRecordSha256: '4f863f52455147c691c873cc5821f82e9904b6df554d6aeaf2ac960a1baa3828',
+    localFallbackUsed: false,
+    automaticRetryPerformed: false,
+    rollbackOrCompensationPerformed: false,
+    existingMemoryModified: false,
+    rawMemoryReturned: false,
+    rawAuditReturned: false,
+    rawMemoryReadPerformed: false,
+    derivedIndexProofAccepted: false,
+    providerExecutionProofAccepted: false,
+    phase8Completed: false,
+    readinessClaimAuthorized: false
+  };
+  for (const [field, expected] of Object.entries(exact)) if (review[field] !== expected) blockers.push(`review.${field}`);
+  return {
+    accepted: blockers.length === 0,
+    blockers,
+    completionEvidenceApplicationReviewMayBegin: blockers.length === 0,
+    phase8Completed: false,
+    additionalNativeWriteAuthorized: false,
+    readinessClaimAuthorized: false
+  };
+}
+
+module.exports = { evaluateCm2095Phase8ExecutionReceiptReview };

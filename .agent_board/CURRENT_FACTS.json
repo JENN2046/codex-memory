@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2094",
-  "validationId": "CMV-2196",
+  "taskId": "CM-2095",
+  "validationId": "CMV-2197",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -121,6 +121,16 @@
     "phase8RetryPerformed": false,
     "phase8RollbackOrCompensationPerformed": false,
     "phase8CompletionClaimed": false,
+    "phase8ExecutionReceiptReviewReference": "CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6",
+    "phase8ExecutionReceiptReviewPassed": true,
+    "phase8NativeWriteProofAccepted": true,
+    "phase8CompletionEvidenceApplicationRequested": true,
+    "phase8CompletionEvidenceAlreadyApplied": false,
+    "phase8CompletionAuditPatchAlreadyApplied": false,
+    "phase8RollbackDrillPassed": false,
+    "phase8FailureRecoveryProofPassed": false,
+    "phase8DerivedIndexProofAccepted": false,
+    "phase8ProviderExecutionProofAccepted": false,
     "phase8LatestRuntimeSourceCommit": "10b1ea49257c0aa2c26e50a2291142093589d938",
     "phase8LatestRuntimeSourceTree": "f4273910483c096ff03d3c33f01c59187a2f6e2b",
     "phase8RequestedContextCanonicalSha256": "f1cf912c1609dbf70ac07794c7b691e85f92e4c6daceda168e444d175dc49283",
@@ -133,7 +143,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_consumed_success_one_write_one_verify_receipt_review_required_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_completion_evidence_application_requested_phase8_incomplete_no_new_native_authority",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -141,6 +151,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2197",
+      "scope": "CM-2095 Phase 8 completion evidence application request",
+      "status": "COMPLETED_COMPLETION_EVIDENCE_APPLICATION_REQUESTED_PHASE8_INCOMPLETE_NO_NEW_NATIVE_AUTHORITY"
+    },
     {
       "id": "CMV-2196",
       "scope": "CM-2094 exact one-shot native execution and low-disclosure receipt",

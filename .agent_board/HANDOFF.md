@@ -4,13 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2094 Phase 8 one-shot native execution receipt`.
-Current validation: `CMV-2196`.
-Current handoff: CM-2094 was frozen, intaken and consumed once. Result is CONSUMED_SUCCESS with one write/verify. Do not replay; submit low-disclosure receipt for independent review.
+Current task: `CM-2095 Phase 8 completion evidence application request`.
+Current validation: `CMV-2197`.
+Current handoff: CM-2094 receipt review passed. CM-2095 requests application of six supported evidence fields only; rollback/failure and Phase 8 completion remain false. No new native action.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2095 is the active gate. Review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
+accepts the one-shot proof but ends the authorization lifecycle. Application is
+requested, not performed. Any application must preserve rollback/failure gaps,
+derived-index/provider non-proof, Phase 8 incomplete, and no readiness claim.
 
 CM-2094 execution is complete and non-replayable. Decision commit `f1e2a830…`
 binds the exact 1325-byte decision. Registry state is `CONSUMED_SUCCESS`; native

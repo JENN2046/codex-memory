@@ -8,15 +8,20 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2094 consumed success; one write/verify; receipt review required |
-| Current task | `CM-2094 Phase 8 one-shot native execution receipt` |
-| Current validation | `CMV-2196` |
-| Current route | Independent execution receipt review; no replay or additional native action |
+| Status | CM-2094 receipt review passed; CM-2095 evidence application requested; Phase 8 incomplete |
+| Current task | `CM-2095 Phase 8 completion evidence application request` |
+| Current validation | `CMV-2197` |
+| Current route | Independent application review; no patch or new native action before approval |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+CM-2095 requests a separate application decision for the six receipt-backed
+fields supported by the accepted CM-2094 proof. Rollback and failure-recovery
+fields remain false, so this request cannot complete Phase 8. It creates no new
+native-write, provider, remote, or readiness authority.
 
 CM-2094 final release was frozen and machine-intaken. The one-shot execution
 finished `CONSUMED_SUCCESS` with one synthetic primary-memory write and one
