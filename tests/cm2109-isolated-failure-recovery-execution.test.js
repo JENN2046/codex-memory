@@ -50,6 +50,22 @@ test('CM-2109 executes all three isolated cases with exact terminal states', asy
   assert.equal((await fs.readFile(path.join(root, '.cm2109-harness-identity.json'))).equals(HARNESS_IDENTITY_BYTES), true);
 });
 
+test('CM-2109 frozen receipt passes exact binding review but does not apply evidence', async () => {
+  const source = await fs.readFile(path.join(
+    __dirname,
+    '../docs/near-model-memory-plan-pack/phase8_failure_recovery_execution_receipt_cm2109.json'
+  ), 'utf8');
+  const receipt = JSON.parse(source);
+  const result = evaluateFailureRecoveryReceipt(receipt, executionBinding());
+  assert.equal(result.accepted, false, 'fixture binding intentionally differs from frozen binding');
+  const exactBinding = receipt.receiptPayload.executionBinding;
+  const exact = evaluateFailureRecoveryReceipt(receipt, exactBinding);
+  assert.equal(exact.accepted, true, exact.blockers.join(', '));
+  assert.equal(exact.acceptedAsFailureRecoveryEvidence, true);
+  assert.equal(exact.failureRecoveryProofPassed, false);
+  assert.equal(exact.phase8Completed, false);
+});
+
 test('CM-2109 ambiguous case persists one exact synthetic fixture and no acknowledgement', async t => {
   const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2109-ambiguous-'));
   t.after(() => fs.rm(parent, { recursive: true, force: true }));
