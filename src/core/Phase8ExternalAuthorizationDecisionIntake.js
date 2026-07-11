@@ -31,6 +31,8 @@ function evaluatePhase8ExternalAuthorizationDecisionIntake({ decisionBytes, obse
       phase8NativeWriteAuthorized: false,
       nativeWriteMayExecute: false,
       finalExecutionReleaseReviewRequired: true,
+      registryRootBootstrapAuthorized: true,
+      registryRootIdentitySha256: expectedBinding.registryRootIdentitySha256,
       allowedAction: 'live_bridge_record_memory_proof',
       expectedContextHash: expectedBinding.expectedContextHash,
       expectedAllowlistHash: expectedBinding.expectedAllowlistHash,

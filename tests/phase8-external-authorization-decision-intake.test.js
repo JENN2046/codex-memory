@@ -12,6 +12,8 @@ function fixture() {
     phase8NativeWriteAuthorized: false,
     nativeWriteMayExecute: false,
     finalExecutionReleaseReviewRequired: true,
+    registryRootBootstrapAuthorized: true,
+    registryRootIdentitySha256: '9'.repeat(64),
     allowedAction: 'live_bridge_record_memory_proof',
     expectedContextHash: 'a'.repeat(64),
     expectedAllowlistHash: 'b'.repeat(64),
@@ -33,6 +35,7 @@ function fixture() {
     payloadCanonicalSha256: decision.payloadCanonicalSha256,
     nonce: decision.nonce,
     receiptId: decision.receiptId,
+    registryRootIdentitySha256: decision.registryRootIdentitySha256,
     expectedFinalReleaseDecisionReference: decision.expectedFinalReleaseDecisionReference
   };
   return { decisionBytes, expectedBinding };

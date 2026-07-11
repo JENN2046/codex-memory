@@ -65,6 +65,8 @@ function decision(expected, overrides = {}) {
     phase8NativeWriteAuthorized: false,
     nativeWriteMayExecute: false,
     finalExecutionReleaseReviewRequired: true,
+    registryRootBootstrapAuthorized: true,
+    registryRootIdentitySha256: sha256Canonical(registryRootIdentity),
     decisionReference: 'TEST-ONLY-PHASE8-APPROVAL',
     allowedAction: 'live_bridge_record_memory_proof',
     expiresAt: '2030-01-01T00:00:00.000Z',
@@ -89,6 +91,7 @@ function decision(expected, overrides = {}) {
     payloadCanonicalSha256: value.payloadCanonicalSha256,
     nonce: value.nonce,
     receiptId: value.receiptId,
+    registryRootIdentitySha256: value.registryRootIdentitySha256,
     expectedFinalReleaseDecisionReference: value.expectedFinalReleaseDecisionReference
   };
   const intake = evaluatePhase8ExternalAuthorizationDecisionIntake({
