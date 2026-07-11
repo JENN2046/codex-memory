@@ -4,6 +4,23 @@ Task id: `CM-2024`
 Validation id: `CMV-2125`
 Date: `2026-07-10`
 
+## CM-2111 Phase 8 Completion Trace Update
+
+All fifteen Phase 8 requirements now trace to accepted local-contract and exact
+receipt/application evidence. The Phase 8-only completion audit reports:
+
+```yaml
+phase_id: "phase8_native_write_production_proof"
+accepted: true
+missing_evidence: []
+phase8Completed: true
+```
+
+The application receipt payload SHA-256 is `d2617505…faec`. The trace does not
+set `fullPlanPackCompleted` or any readiness field and does not infer provider,
+derived-index, default-product retrieval, production, release, deploy, cutover,
+`RC_READY`, or complete-V8 status.
+
 ## CM-2110 Failure-Recovery Application Trace Update
 
 `failureRecoveryProofPassed` now traces to the exact CM-2109 isolated
@@ -13,9 +30,8 @@ ambiguous post-commit stop behavior with zero retry, rollback, or compensation.
 
 Application receipt payload SHA-256 is `9d96290a…ecd6`. Together with CM-2108,
 both remaining Phase 8 execution-proof fields are now accepted and applied.
-`phase8Completed` remains false until the separate completion-audit gate runs.
-No production failure-recovery, provider, release, or readiness inference is
-permitted.
+CM-2111 subsequently runs that separate completion-audit gate. No production
+failure-recovery, provider, release, or readiness inference is permitted.
 
 ## CM-2108 Rollback Application Trace Update
 

@@ -49,6 +49,18 @@ test('CM-2111 exact decision applies Phase 8 completion without full-plan or rea
   assert.equal(evaluateApplicationReceipt({ receiptPayload: result.receiptPayload, receiptPayloadSha256: result.receiptPayloadSha256 }).accepted, true);
 });
 
+test('CM-2111 frozen application receipt records Phase 8 completion only', () => {
+  const receipt = JSON.parse(fs.readFileSync(path.join(
+    DOCS,
+    'phase8_completion_audit_application_receipt_cm2111.json'
+  ), 'utf8'));
+  const result = evaluateApplicationReceipt(receipt);
+  assert.equal(result.accepted, true, result.blockers.join(', '));
+  assert.equal(result.phase8Completed, true);
+  assert.equal(result.fullPlanPackCompleted, false);
+  assert.equal(result.readinessClaimed, false);
+});
+
 test('CM-2111 fails closed on any missing Phase 8 field or boundary drift', () => {
   for (const mutate of [
     value => { value.bundle.evidence.failureRecoveryProofPassed = false; },

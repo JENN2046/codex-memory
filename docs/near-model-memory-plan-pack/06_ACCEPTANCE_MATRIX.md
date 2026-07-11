@@ -36,6 +36,7 @@
 | CM-2095 Phase 8 completion-evidence application receipt | Phase 8 六项 receipt-backed evidence 与 bundle application；rollback/failure 仍 false | 是 | 是 |
 | CM-2108 identity-bound rollback application receipt | Phase 8 rollback drill evidence；failure recovery 与 Phase 8 completion 仍 false | 否，read-only tag 可不等 | 是 |
 | CM-2110 isolated failure-recovery application receipt | Phase 8 three-case recovery evidence；Phase 8 completion 仍为单独 gate | 否，read-only tag 可不等 | 是 |
+| CM-2111 Phase 8 completion-audit application receipt | Phase 8 全部 15 项 evidence；不代表 full plan 或 readiness | 否，read-only tag 可不等 | 是 |
 | CM-2080 exact external review decision | Phase 9/10 external-review prerequisite | 是 | 是 |
 | CM-2082 Completion Audit application receipt | Phase 9/10 review-bundle application field only | 是 | 是 |
 | native read proof | Phase 2 | 是 | 是 |

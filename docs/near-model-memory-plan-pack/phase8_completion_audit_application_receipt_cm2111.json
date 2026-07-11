@@ -1,0 +1,70 @@
+{
+  "receiptPayload": {
+    "schemaVersion": 1,
+    "taskId": "CM-2111",
+    "receiptType": "phase8_completion_audit_application_receipt",
+    "decision": {
+      "reference": "CM-2111-SELF-PHASE8-COMPLETION-AUDIT-77D162ED",
+      "commit": "1de196fb4e986d715570335dc2bd7b551968ac5f",
+      "blobOid": "47190af4ac3326e4fe8031871d93e3e35285e052",
+      "bytes": 1601,
+      "sha256": "04bd1a964743c17f7693f4903ee2722805b6acffbfec6974169f0c883bdf068f"
+    },
+    "evidenceBundle": {
+      "commit": "1de196fb4e986d715570335dc2bd7b551968ac5f",
+      "blobOid": "4535ebac2d58ac48a3c388ed917004df5b0cba9e",
+      "bytes": 3465,
+      "sha256": "d629f341710fcd4d95a5107a5913bf172b58cd19c77eb08a972f36b3df57eba8",
+      "payloadSha256": "77d162edba2dc7c6911653c1f251cc0ea5b1a96a1db5c1748fd4ba2b2f84fe9d",
+      "requiredEvidenceCount": 15
+    },
+    "phaseAudit": {
+      "phaseId": "phase8_native_write_production_proof",
+      "accepted": true,
+      "missingEvidence": [],
+      "fullPlanPackCompleted": false
+    },
+    "applicationRuntime": {
+      "commit": "29c2a597bc458afc789e8d866e39a493d8b327a9",
+      "tree": "f1395aa4196f56c173b46074f6e08d6cc77c6f9f",
+      "cleanBeforeApplication": true,
+      "completionAuditBaselineBlobOid": "e6b310f920356eb9689b3eff0f2c1ddfc14e0f59",
+      "traceMatrixBaselineBlobOid": "e7ff98e96b811b66390d900d7e7dc890e4f0d4f0"
+    },
+    "contractResults": {
+      "completionAuditGate": "cm2111_phase8_completion_audit_gate_accepted",
+      "patchBoundary": "cm2111_phase8_completion_patch_boundary_accepted",
+      "patchApplication": "cm2111_phase8_completion_patch_application_accepted"
+    },
+    "appliedState": {
+      "rollbackDrillPassed": true,
+      "failureRecoveryProofPassed": true,
+      "phase8Completed": true,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    },
+    "authorization": {
+      "useCount": 1,
+      "consumed": true,
+      "replayAllowed": false
+    },
+    "applicationCounters": {
+      "completionAuditPatchApplications": 1,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "verifyOperations": 0,
+      "rollbackOrCompensationOperations": 0,
+      "remoteActions": 0,
+      "readinessClaims": 0
+    },
+    "nonClaims": {
+      "productionReady": false,
+      "releaseReady": false,
+      "rcReady": false,
+      "completeV8": false,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    }
+  },
+  "receiptPayloadSha256": "d261750552c5eb275d7d934a0c94c272468393ae7aff4de1801eec4cbdabfaec"
+}
