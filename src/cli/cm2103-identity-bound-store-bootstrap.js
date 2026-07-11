@@ -2,12 +2,8 @@
 'use strict';
 
 const { execFileSync } = require('node:child_process');
-const fs = require('node:fs/promises');
 const {
-  IDENTITY_CANONICAL_BYTES,
-  IDENTITY_CANONICAL_SHA256,
   IDENTITY_FILENAME,
-  STORE_IDENTITY,
   STORE_ROOT_BINDING_CANONICAL_SHA256,
   expectedIdentityBytes,
   sha256,
@@ -22,6 +18,9 @@ const {
   REGISTRY_IDENTITY
 } = require('../core/Cm2103IdentityBoundStoreBootstrapRegistry');
 const {
+  executeCm2103BootstrapFilesystem
+} = require('../core/Cm2103IdentityBoundStoreBootstrapEngine');
+const {
   EXECUTION_PACKET_PATH,
   FUTURE_DECISION_PATH,
   evaluateCm2103BootstrapExecutionPacket
@@ -29,7 +28,6 @@ const {
 const {
   GOVERNANCE_ROOT_IDENTITY,
   GOVERNANCE_ROOT_IDENTITY_SHA256,
-  observeCm2103StoreDirectoryAbsent,
   verifyCm2103GovernanceRoot
 } = require('../core/Cm2103IdentityBoundStoreGovernance');
 
@@ -96,20 +94,15 @@ function expectedDecisionBinding({ packet, executionPacketCommit, executionPacke
   };
 }
 
-function buildCm2103BootstrapReceipt({ packet, observedDecision, executionPacketCommit, executionPacketBlobOid, executionPacketBytes, bindingHash, claim }) {
+function buildCm2103BootstrapReceipt({ packet, observedDecision, executionPacketCommit, executionPacketBlobOid, executionPacketBytes, bindingHash, claim, outcomeStage }) {
   const success = claim.state === 'CONSUMED_SUCCESS';
-  const outcomeCategory = success
-    ? 'identity_bound_store_bootstrap_completed'
-    : claim.state === 'CONSUMED_PARTIAL_BOOTSTRAP'
-      ? 'partial_bootstrap_requires_independent_reconciliation'
-      : 'ambiguous_bootstrap_requires_independent_reconciliation';
   return {
-    schemaVersion: 1,
-    taskId: 'CM-2103',
-    receiptType: 'identity_bound_synthetic_store_bootstrap_receipt',
+    schemaVersion: 2,
+    taskId: 'CM-2103-R1',
+    receiptType: 'identity_bound_synthetic_store_bootstrap_receipt_union',
     result: success ? 'PASS' : 'STOPPED',
     finalState: claim.state,
-    outcomeCategory,
+    outcomeStage,
     decisionReference: observedDecision.decision.decisionReference,
     decisionSourceCommit: observedDecision.sourceCommit,
     decisionBlobOid: observedDecision.blobOid,
@@ -143,15 +136,26 @@ function buildCm2103BootstrapReceipt({ packet, observedDecision, executionPacket
     existingStoreDirectoryRead: false,
     storeDirectoryCreateAttempts: claim.directoryCreateAttempts,
     storeDirectoryCreates: claim.directoryCreates,
-    storeDirectoryCreated: claim.directoryCreates === 1,
+    storeDirectoryCreated: claim.storeDirectoryCreated,
     identityFilename: IDENTITY_FILENAME,
     identityWriteAttempts: claim.identityWriteAttempts,
     identityWrites: claim.identityWrites,
-    identityCreated: claim.identityWrites === 1,
-    identityBytes: claim.identityWrites === 1 ? IDENTITY_CANONICAL_BYTES : 0,
-    identitySha256: claim.identityWrites === 1 ? IDENTITY_CANONICAL_SHA256 : null,
+    identityWriteAttempted: claim.identityWriteAttempted,
+    identityCreated: claim.identityCreated,
+    identityBytes: claim.identityBytes,
+    identitySha256: claim.identitySha256,
+    identityReadbackAttempts: claim.identityReadbackAttempts,
     identityReadbackVerifications: claim.identityReadbackVerifications,
-    identityReadbackMatched: success,
+    identityReadbackMatched: claim.identityReadbackMatched,
+    governanceRegistryDirectoryCreates: claim.governanceRegistryDirectoryCreates,
+    governanceRegistryIdentityWrites: claim.governanceRegistryIdentityWrites,
+    authorizationMarkerWrites: claim.authorizationMarkerWrites,
+    claimEnvelopeCreateAttempts: claim.claimEnvelopeCreateAttempts,
+    claimEnvelopeCreates: claim.claimEnvelopeCreates,
+    claimStateWriteAttempts: claim.claimStateWriteAttempts,
+    claimStateWrites: claim.claimStateWrites,
+    terminalStateDurablyRecorded: claim.terminalStateDurablyRecorded,
+    governanceFilesystemEffectsPresent: claim.claimEnvelopeCreateAttempts > 0,
     authorizationUseCount: 1,
     authorizationConsumed: true,
     authorizationReplayAllowed: false,
@@ -183,27 +187,6 @@ function buildCm2103BootstrapReceipt({ packet, observedDecision, executionPacket
   };
 }
 
-async function finalizeAmbiguousOrPartial(registry, claimId, preferredEvent) {
-  const current = await registry.readClaim(claimId).catch(() => null);
-  if (!current) throw new Error('cm2103_bootstrap_claim_state_unreadable');
-  if (current.state === 'STORE_DIRECTORY_CREATE_CONSUMED') {
-    return registry.transition(claimId, 'DIRECTORY_CREATE_AMBIGUOUS');
-  }
-  if (current.state === 'STORE_DIRECTORY_CREATED') {
-    return registry.transition(claimId, 'PARTIAL');
-  }
-  if (current.state === 'IDENTITY_WRITE_CONSUMED') {
-    return registry.transition(claimId, preferredEvent === 'PARTIAL' ? 'PARTIAL' : 'AMBIGUOUS');
-  }
-  if (current.state === 'IDENTITY_CREATED') {
-    return registry.transition(claimId, preferredEvent === 'PARTIAL' ? 'PARTIAL' : 'AMBIGUOUS', {
-      identityReadbackVerifications: preferredEvent === 'PARTIAL' ? 1 : current.identityReadbackVerifications
-    });
-  }
-  if (['CONSUMED_PARTIAL_BOOTSTRAP', 'CONSUMED_AMBIGUOUS', 'CONSUMED_SUCCESS'].includes(current.state)) return current;
-  throw new Error('cm2103_bootstrap_state_cannot_be_safely_finalized');
-}
-
 async function runFrozenCm2103Bootstrap(executionPacketCommit, futureDecisionCommit) {
   if (!hash40(executionPacketCommit)) throw new Error('cm2103_execution_packet_commit_required');
   if (!hash40(futureDecisionCommit)) throw new Error('cm2103_future_bootstrap_decision_commit_required');
@@ -215,6 +198,13 @@ async function runFrozenCm2103Bootstrap(executionPacketCommit, futureDecisionCom
   const packetResult = evaluateCm2103BootstrapExecutionPacket(packet);
   if (!packetResult.accepted) throw new Error(`cm2103_execution_packet_rejected:${packetResult.blockers.join(',')}`);
 
+  verifyFrozenGitObject({
+    commit: packet.r1ReviewDecisionSourceCommit,
+    file: packet.r1ReviewDecisionPath,
+    blobOid: packet.r1ReviewDecisionBlobOid,
+    bytes: packet.r1ReviewDecisionBytes,
+    sha256: packet.r1ReviewDecisionSha256
+  });
   verifyFrozenGitObject({
     commit: packet.foundationDecisionSourceCommit,
     file: packet.foundationDecisionPath,
@@ -276,20 +266,6 @@ async function runFrozenCm2103Bootstrap(executionPacketCommit, futureDecisionCom
     throw new Error('cm2103_governance_binding_mismatch');
   }
 
-  const storeObservation = await observeCm2103StoreDirectoryAbsent(governance.internalPaths.storeRoot);
-  if (!storeObservation.absent) {
-    return {
-      accepted: false,
-      state: 'UNCLAIMED',
-      outcomeCategory: storeObservation.outcome,
-      authorizationConsumed: false,
-      storeDirectoryRead: false,
-      identityRead: false,
-      receipt: null,
-      rawPathDisclosed: false
-    };
-  }
-
   const bindingHash = sha256Canonical({
     decisionSourceCommit: futureDecisionCommit,
     decisionBlobOid,
@@ -308,10 +284,6 @@ async function runFrozenCm2103Bootstrap(executionPacketCommit, futureDecisionCom
   const registry = new Cm2103IdentityBoundStoreBootstrapRegistry({
     authorizationRegistryRoot: governance.internalPaths.authorizationRegistryRoot
   });
-  const unused = await registry.preflightUnused({ nonce: packet.nonce, receiptId: packet.receiptId, bindingHash });
-  if (!unused.accepted) throw new Error('cm2103_bootstrap_authorization_already_claimed');
-  let claim = await registry.claim({ nonce: packet.nonce, receiptId: packet.receiptId, bindingHash });
-
   const observedDecision = {
     decision: decisionIntake.decision,
     sourceCommit: futureDecisionCommit,
@@ -326,47 +298,25 @@ async function runFrozenCm2103Bootstrap(executionPacketCommit, futureDecisionCom
     executionPacketBytes: packetBytes,
     bindingHash
   };
-
-  claim = await registry.transition(claim.claimId, 'CONSUME_DIRECTORY_CREATE', { directoryCreateAttempts: 1 });
-  try {
-    await fs.mkdir(governance.internalPaths.storeRoot);
-  } catch {
-    claim = await finalizeAmbiguousOrPartial(registry, claim.claimId, 'AMBIGUOUS');
-    return { accepted: false, state: claim.state, receipt: buildCm2103BootstrapReceipt({ ...receiptArgs, claim }) };
-  }
-
-  try {
-    claim = await registry.transition(claim.claimId, 'DIRECTORY_CREATED', { directoryCreates: 1 });
-    claim = await registry.transition(claim.claimId, 'CONSUME_IDENTITY_WRITE', { identityWriteAttempts: 1 });
-    await fs.writeFile(
-      `${governance.internalPaths.storeRoot}/${IDENTITY_FILENAME}`,
-      expectedIdentityBytes(),
-      { flag: 'wx' }
-    );
-    claim = await registry.transition(claim.claimId, 'IDENTITY_CREATED', { identityWrites: 1 });
-  } catch {
-    claim = await finalizeAmbiguousOrPartial(registry, claim.claimId, 'PARTIAL');
-    return { accepted: false, state: claim.state, receipt: buildCm2103BootstrapReceipt({ ...receiptArgs, claim }) };
-  }
-
-  let readback;
-  try {
-    readback = await fs.readFile(`${governance.internalPaths.storeRoot}/${IDENTITY_FILENAME}`);
-  } catch {
-    claim = await finalizeAmbiguousOrPartial(registry, claim.claimId, 'AMBIGUOUS');
-    return { accepted: false, state: claim.state, receipt: buildCm2103BootstrapReceipt({ ...receiptArgs, claim }) };
-  }
-  if (readback.length !== IDENTITY_CANONICAL_BYTES ||
-      sha256(readback) !== IDENTITY_CANONICAL_SHA256 ||
-      !readback.equals(expectedIdentityBytes())) {
-    claim = await registry.transition(claim.claimId, 'PARTIAL', { identityReadbackVerifications: 1 });
-    return { accepted: false, state: claim.state, receipt: buildCm2103BootstrapReceipt({ ...receiptArgs, claim }) };
-  }
-  claim = await registry.transition(claim.claimId, 'READBACK_VERIFIED', { identityReadbackVerifications: 1 });
+  const execution = await executeCm2103BootstrapFilesystem({
+    registry,
+    storeRoot: governance.internalPaths.storeRoot,
+    nonce: packet.nonce,
+    receiptId: packet.receiptId,
+    bindingHash,
+    identityFilename: IDENTITY_FILENAME,
+    identityBytes: expectedIdentityBytes()
+  });
+  const receipt = execution.receiptRequired && execution.claim
+    ? buildCm2103BootstrapReceipt({
+      ...receiptArgs,
+      claim: execution.claim,
+      outcomeStage: execution.outcomeStage
+    })
+    : null;
   return {
-    accepted: true,
-    state: claim.state,
-    receipt: buildCm2103BootstrapReceipt({ ...receiptArgs, claim }),
+    ...execution,
+    receipt,
     emptyStorePreflightExecuted: false,
     nativeActions: 0,
     rawPathDisclosed: false

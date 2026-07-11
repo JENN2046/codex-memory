@@ -2,12 +2,8 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const {
-  buildCm2103BootstrapReceipt
-} = require('../src/cli/cm2103-identity-bound-store-bootstrap');
-const {
-  evaluateCm2103BootstrapReceipt
-} = require('../src/core/Cm2103IdentityBoundStoreBootstrapReceiptContract');
+const { buildCm2103BootstrapReceipt } = require('../src/cli/cm2103-identity-bound-store-bootstrap');
+const { evaluateCm2103BootstrapReceipt } = require('../src/core/Cm2103IdentityBoundStoreBootstrapReceiptContract');
 
 const packet = Object.freeze({
   foundationDecisionReference: 'CM-2102-TEST',
@@ -43,7 +39,34 @@ const observedDecision = Object.freeze({
   sha256: 'e'.repeat(64)
 });
 
-function buildReceipt() {
+function baseClaim(overrides = {}) {
+  return {
+    state: 'CONSUMED_SUCCESS',
+    directoryCreateAttempts: 1,
+    directoryCreates: 1,
+    storeDirectoryCreated: true,
+    identityWriteAttempts: 1,
+    identityWrites: 1,
+    identityWriteAttempted: true,
+    identityCreated: true,
+    identityBytes: 633,
+    identitySha256: '017307c9a1cb3e216895934b9c2aae8fa5773b909afebe87d3f91bc0a5736f57',
+    identityReadbackAttempts: 1,
+    identityReadbackVerifications: 1,
+    identityReadbackMatched: true,
+    governanceRegistryDirectoryCreates: 0,
+    governanceRegistryIdentityWrites: 0,
+    authorizationMarkerWrites: 0,
+    claimEnvelopeCreateAttempts: 1,
+    claimEnvelopeCreates: 1,
+    claimStateWriteAttempts: 7,
+    claimStateWrites: 7,
+    terminalStateDurablyRecorded: true,
+    ...overrides
+  };
+}
+
+function buildReceipt(outcomeStage, overrides = {}) {
   return buildCm2103BootstrapReceipt({
     packet,
     observedDecision,
@@ -51,14 +74,8 @@ function buildReceipt() {
     executionPacketBlobOid,
     executionPacketBytes,
     bindingHash,
-    claim: {
-      state: 'CONSUMED_SUCCESS',
-      directoryCreateAttempts: 1,
-      directoryCreates: 1,
-      identityWriteAttempts: 1,
-      identityWrites: 1,
-      identityReadbackVerifications: 1
-    }
+    outcomeStage,
+    claim: baseClaim(overrides)
   });
 }
 
@@ -86,34 +103,72 @@ function expectedBinding(receipt) {
   };
 }
 
-test('CM-2103 receipt contract accepts only the exact low-disclosure success receipt', () => {
-  const receipt = buildReceipt();
-  const result = evaluateCm2103BootstrapReceipt({ receipt, expectedBinding: expectedBinding(receipt) });
+function evaluate(receipt) {
+  return evaluateCm2103BootstrapReceipt({ receipt, expectedBinding: expectedBinding(receipt) });
+}
+
+test('CM-2103 R1 contract accepts the exact success receipt only as bootstrap evidence', () => {
+  const result = evaluate(buildReceipt('identity_bound_store_bootstrap_completed'));
   assert.equal(result.shapeAccepted, true, result.blockers.join(', '));
   assert.equal(result.acceptedAsBootstrapEvidence, true);
+  assert.equal(result.acceptedAsReconciliationEvidence, false);
+  assert.equal(result.receiptVariant, 'CONSUMED_SUCCESS');
   assert.equal(result.bootstrapExecutedByThisContract, false);
-  assert.equal(result.emptyStorePreflightAuthorizedByThisContract, false);
-  assert.equal(result.nativeActionsPerformedByThisContract, 0);
 });
 
-test('CM-2103 receipt contract rejects counter, replay, read, native, cleanup, path, or completion drift', () => {
-  const base = buildReceipt();
+test('CM-2103 R1 contract accepts partial and ambiguous receipts only as reconciliation evidence', () => {
+  const receipts = [
+    buildReceipt('claim_envelope_persisted_but_acknowledgement_ambiguous', {
+      state: 'CLAIM_REGISTRY_AMBIGUOUS',
+      directoryCreateAttempts: 0, directoryCreates: 0, storeDirectoryCreated: false,
+      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
+      identityCreated: false, identityBytes: 0, identitySha256: null,
+      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
+      identityReadbackMatched: false, claimStateWriteAttempts: 2, claimStateWrites: 2
+    }),
+    buildReceipt('identity_write_acknowledgement_ambiguous', {
+      state: 'CONSUMED_PARTIAL_BOOTSTRAP',
+      identityWrites: null, identityCreated: null, identityBytes: null, identitySha256: null,
+      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
+      identityReadbackMatched: false, claimStateWriteAttempts: 5, claimStateWrites: 5
+    }),
+    buildReceipt('directory_create_acknowledgement_ambiguous', {
+      state: 'CONSUMED_AMBIGUOUS', directoryCreates: null, storeDirectoryCreated: null,
+      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
+      identityCreated: false, identityBytes: 0, identitySha256: null,
+      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
+      identityReadbackMatched: false, claimStateWriteAttempts: 3, claimStateWrites: 3
+    })
+  ];
+  for (const receipt of receipts) {
+    const result = evaluate(receipt);
+    assert.equal(result.shapeAccepted, true, `${receipt.outcomeStage}: ${result.blockers.join(', ')}`);
+    assert.equal(result.acceptedAsBootstrapEvidence, false);
+    assert.equal(result.acceptedAsReconciliationEvidence, true);
+  }
+  assert.equal(receipts[1].identityCreated, null);
+  assert.equal(receipts[2].storeDirectoryCreated, null);
+});
+
+test('CM-2103 R1 union rejects unknown-to-false collapse, counter drift, retry, cleanup, native effects, or overclaims', () => {
+  const base = buildReceipt('identity_write_acknowledgement_ambiguous', {
+    state: 'CONSUMED_PARTIAL_BOOTSTRAP', identityWrites: null, identityCreated: null,
+    identityBytes: null, identitySha256: null, identityReadbackAttempts: 0,
+    identityReadbackVerifications: 0, identityReadbackMatched: false,
+    claimStateWriteAttempts: 5, claimStateWrites: 5
+  });
   const drifts = [
-    { extra: true },
-    { storeDirectoryCreateAttempts: 2 },
-    { identityWrites: 0 },
+    { unexpected: true },
+    { identityCreated: false },
+    { identityBytes: 0 },
+    { claimEnvelopeCreates: 2 },
+    { governanceRegistryDirectoryCreates: 1 },
+    { authorizationMarkerWrites: 1 },
     { authorizationReplayAllowed: true },
     { automaticRetryPerformed: true },
     { automaticCleanupPerformed: true },
-    { directoryEnumerations: 1 },
-    { recordContentReads: 1 },
-    { nativeReads: 1 },
     { nativeWrites: 1 },
     { recordMemoryCalls: 1 },
-    { tombstoneMemoryCalls: 1 },
-    { verifyOperations: 1 },
-    { realMemoryRead: true },
-    { providerCalled: true },
     { rawPathDisclosed: true },
     { emptyStorePreflightExecuted: true },
     { rollbackDrillPassed: true },
@@ -121,9 +176,9 @@ test('CM-2103 receipt contract rejects counter, replay, read, native, cleanup, p
     { readinessClaimed: true }
   ];
   for (const drift of drifts) {
-    const receipt = { ...base, ...drift };
-    const result = evaluateCm2103BootstrapReceipt({ receipt, expectedBinding: expectedBinding(base) });
-    assert.equal(result.acceptedAsBootstrapEvidence, false, JSON.stringify(drift));
-    assert.equal(result.bootstrapExecutedByThisContract, false);
+    const result = evaluate({ ...base, ...drift });
+    assert.equal(result.shapeAccepted, false, JSON.stringify(drift));
+    assert.equal(result.acceptedAsBootstrapEvidence, false);
+    assert.equal(result.acceptedAsReconciliationEvidence, false);
   }
 });

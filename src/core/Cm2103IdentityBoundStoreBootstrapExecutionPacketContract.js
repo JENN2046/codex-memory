@@ -17,6 +17,17 @@ const {
 } = require('./Cm2103IdentityBoundStoreGovernance');
 const { REGISTRY_IDENTITY } = require('./Cm2103IdentityBoundStoreBootstrapRegistry');
 
+const R1_REVIEW_DECISION = Object.freeze({
+  reference: 'CM-2103-ER-20260711-CHANGES-REQUIRED-CLAIM-AMBIGUITY-RECEIPT-INCOMPLETE-D9D896AC',
+  sourceCommit: '237e7b9b3ff0ac6ca1dd970a856c346c98086d5f',
+  sourceTree: 'f06553a3c01d1522a91643aad6c061a1077b5c17',
+  path: 'docs/near-model-memory-plan-pack/phase8_bootstrap_executor_review_decision_cm2103_r1.json',
+  blobOid: '94b5a4b8373b4094e1ec354e174cd1825a069166',
+  bytes: 3270,
+  sha256: '31135cef23dd1b52678fcb8a7689326c00e29df1a74ecdb34f92129f3e051e52',
+  payloadSha256: 'be4e2f54b6892ade8aba39006ab1869d21d88e884a734964302ef7786c4723c2'
+});
+
 const FOUNDATION_DECISION = Object.freeze({
   reference: 'CM-2102-ER-20260711-FOUNDATION-PASS-NO-EXECUTION-D6CE7C74',
   sourceCommit: '9f73db8c6d1b7cba1a24d262880c7d37b953d2a0',
@@ -48,14 +59,56 @@ const BOOTSTRAP_REQUEST = Object.freeze({
 });
 
 const EXPECTED_FUTURE_DECISION_REFERENCE =
-  'CM-2103-ER-20260711-IDENTITY-BOUND-STORE-BOOTSTRAP-0A7CEB6C-017307C9';
+  'CM-2103-R1-ER-20260711-IDENTITY-BOUND-STORE-BOOTSTRAP-0A7CEB6C-017307C9';
 const FUTURE_DECISION_PATH =
-  'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_decision_cm2103.json';
+  'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_decision_cm2103_r1.json';
 const EXECUTION_PACKET_PATH =
-  'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_execution_packet_cm2103.json';
+  'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_execution_packet_cm2103_r1.json';
+
+const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze({
+  decisionIntake: 'src/core/Cm2103IdentityBoundStoreBootstrapDecisionIntake.js',
+  stateMachine: 'src/core/Cm2103IdentityBoundStoreBootstrapState.js',
+  governanceVerifier: 'src/core/Cm2103IdentityBoundStoreGovernance.js',
+  authorizationRegistry: 'src/core/Cm2103IdentityBoundStoreBootstrapRegistry.js',
+  bootstrapEngine: 'src/core/Cm2103IdentityBoundStoreBootstrapEngine.js',
+  executionPacketContract: 'src/core/Cm2103IdentityBoundStoreBootstrapExecutionPacketContract.js',
+  receiptContract: 'src/core/Cm2103IdentityBoundStoreBootstrapReceiptContract.js',
+  frozenExecutor: 'src/cli/cm2103-identity-bound-store-bootstrap.js'
+});
+
+const STATE_SEQUENCE = Object.freeze([
+  'UNCLAIMED', 'CLAIMED', 'CLAIM_REGISTRY_AMBIGUOUS',
+  'STORE_DIRECTORY_CREATE_CONSUMED', 'STORE_DIRECTORY_CREATED',
+  'IDENTITY_WRITE_CONSUMED', 'IDENTITY_CREATED', 'IDENTITY_READBACK_CONSUMED',
+  'CONSUMED_SUCCESS', 'CONSUMED_PARTIAL_BOOTSTRAP', 'CONSUMED_AMBIGUOUS'
+]);
+
+const RECEIPT_VARIANTS = Object.freeze([
+  'CLAIM_REGISTRY_AMBIGUOUS',
+  'CONSUMED_SUCCESS',
+  'CONSUMED_PARTIAL_BOOTSTRAP',
+  'CONSUMED_AMBIGUOUS'
+]);
+
+const FAULT_INJECTION_CASES = Object.freeze([
+  'existing_store_unclaimed_stop',
+  'claim_write_before_create',
+  'claim_write_acknowledgement_lost',
+  'claim_terminal_state_persistence_failure',
+  'mkdir_acknowledgement_lost',
+  'identity_write_acknowledgement_lost',
+  'identity_readback_failure',
+  'directory_state_persistence_failure',
+  'identity_state_persistence_failure',
+  'success_state_persistence_failure',
+  'terminal_state_replay_rejected'
+]);
 
 const PACKET_KEYS = Object.freeze([
   'schemaVersion', 'taskId', 'packetType', 'packetPurpose',
+  'r1ReviewDecisionReference', 'r1ReviewDecisionSourceCommit', 'r1ReviewDecisionSourceTree',
+  'r1ReviewDecisionPath', 'r1ReviewDecisionBlobOid', 'r1ReviewDecisionBytes',
+  'r1ReviewDecisionSha256', 'r1ReviewDecisionPayloadSha256',
   'foundationDecisionReference', 'foundationDecisionSourceCommit', 'foundationDecisionSourceTree',
   'foundationDecisionPath', 'foundationDecisionBlobOid', 'foundationDecisionBytes',
   'foundationDecisionSha256', 'foundationDecisionPayloadSha256',
@@ -72,18 +125,25 @@ const PACKET_KEYS = Object.freeze([
   'identityFilename', 'identityBytes', 'identitySha256', 'storeRootDerivation', 'storeRootBinding',
   'storeRootBindingCanonicalBytes', 'storeRootBindingSha256', 'governanceRootIdentity',
   'governanceRootIdentitySha256', 'authorizationRegistryIdentity', 'authorizationRegistryIdentitySha256',
-  'nonce', 'receiptId', 'requestedExpiresAt', 'authorizationUseCount', 'authorizationReplayAllowed', 'stateSequence',
-  'maxStoreDirectoryCreates', 'maxIdentityWrites', 'maxIdentityReadbackVerifications',
+  'claimStorageModel', 'singleClaimEnvelopeAtomicCreateRequired',
+  'actionRegistryDirectoryCreatedByClaim', 'actionRegistryIdentityWrittenByClaim',
+  'nonceMarkerWrites', 'receiptMarkerWrites', 'separateClaimRecordWrites',
+  'successPartialAmbiguousReceiptUnionImplemented', 'receiptVariants', 'tristateEffectFields',
+  'filesystemFaultInjectionTestPath', 'filesystemFaultInjectionCases',
+  'nonce', 'receiptId', 'requestedExpiresAt', 'authorizationUseCount', 'authorizationReplayAllowed',
+  'stateSequence', 'maxStoreDirectoryCreates', 'maxIdentityWrites', 'maxIdentityReadbackVerifications',
   'maxDirectoryEnumerations', 'maxRecordContentReads', 'maxNativeReads', 'maxNativeWrites',
   'maxRecordMemoryCalls', 'maxTombstoneMemoryCalls', 'maxVerifyOperations', 'maxRetries',
-  'parentDirectoryCreationAllowed', 'identityOverwriteAllowed', 'identityReplacementAllowed',
-  'identityReinitializationAllowed', 'identityDeletionAllowed', 'automaticRetryAllowed',
-  'automaticCleanupAllowed', 'existingStoreDirectoryOutcome', 'partialBootstrapOutcome',
-  'ambiguousBootstrapOutcome', 'futureDecisionPresentAtFreeze', 'bootstrapExecutionAuthorizedAtFreeze',
-  'storeDirectoryCreatedAtFreeze', 'storeIdentityCreatedAtFreeze', 'emptyStorePreflightAuthorizedAtFreeze',
-  'emptyStorePreflightExecutedAtFreeze', 'recordMemoryAuthorizedAtFreeze', 'tombstoneMemoryAuthorizedAtFreeze',
-  'verifyAuthorizedAtFreeze', 'nonceClaimedAtFreeze', 'receiptCreatedAtFreeze',
-  'nativeReadsAtFreeze', 'nativeWritesAtFreeze', 'rollbackOrCompensationOperationsAtFreeze',
+  'maxClaimEnvelopeCreates', 'governanceRegistryDirectoryCreates', 'governanceRegistryIdentityWrites',
+  'authorizationMarkerWrites', 'parentDirectoryCreationAllowed', 'identityOverwriteAllowed',
+  'identityReplacementAllowed', 'identityReinitializationAllowed', 'identityDeletionAllowed',
+  'automaticRetryAllowed', 'automaticCleanupAllowed', 'existingStoreDirectoryOutcome',
+  'partialBootstrapOutcome', 'ambiguousBootstrapOutcome', 'futureDecisionPresentAtFreeze',
+  'bootstrapExecutionAuthorizedAtFreeze', 'storeDirectoryCreatedAtFreeze', 'storeIdentityCreatedAtFreeze',
+  'emptyStorePreflightAuthorizedAtFreeze', 'emptyStorePreflightExecutedAtFreeze',
+  'recordMemoryAuthorizedAtFreeze', 'tombstoneMemoryAuthorizedAtFreeze', 'verifyAuthorizedAtFreeze',
+  'nonceClaimedAtFreeze', 'receiptCreatedAtFreeze', 'nativeReadsAtFreeze', 'nativeWritesAtFreeze',
+  'governanceFilesystemEffectsAtFreeze', 'rollbackOrCompensationOperationsAtFreeze',
   'rollbackDrillPassed', 'failureRecoveryProofPassed', 'phase8Completed', 'fullPlanPackCompleted',
   'readinessClaimed', 'readyForImplementationReview', 'readyForBootstrapAuthorizationReview',
   'executionBlockersAtFreeze', 'packetPayloadSha256'
@@ -106,21 +166,24 @@ function exactObject(value, expected) {
 function evaluateCm2103BootstrapExecutionPacket(packet) {
   const blockers = [];
   if (!exactKeys(packet, PACKET_KEYS)) return {
-    accepted: false,
-    blockers: ['packet.keys'],
-    packetPrepared: false,
-    executionAuthorized: false,
-    nativeActionsAuthorized: 0,
-    storeDirectoryCreated: false,
-    storeIdentityCreated: false
+    accepted: false, blockers: ['packet.keys'], packetPrepared: false, executionAuthorized: false,
+    nativeActionsAuthorized: 0, storeDirectoryCreated: false, storeIdentityCreated: false
   };
   const { packetPayloadSha256, ...payload } = packet;
   if (sha256Canonical(payload) !== packetPayloadSha256) blockers.push('packet.packetPayloadSha256');
   const exact = {
-    schemaVersion: 1,
-    taskId: 'CM-2103',
-    packetType: 'identity_bound_synthetic_store_bootstrap_execution_packet_non_executing',
-    packetPurpose: 'independent_review_of_exact_one_shot_bootstrap_executor_without_execution',
+    schemaVersion: 2,
+    taskId: 'CM-2103-R1',
+    packetType: 'identity_bound_synthetic_store_bootstrap_execution_packet_r1_non_executing',
+    packetPurpose: 'independent_review_of_claim_atomicity_and_ambiguous_receipt_repair_without_execution',
+    r1ReviewDecisionReference: R1_REVIEW_DECISION.reference,
+    r1ReviewDecisionSourceCommit: R1_REVIEW_DECISION.sourceCommit,
+    r1ReviewDecisionSourceTree: R1_REVIEW_DECISION.sourceTree,
+    r1ReviewDecisionPath: R1_REVIEW_DECISION.path,
+    r1ReviewDecisionBlobOid: R1_REVIEW_DECISION.blobOid,
+    r1ReviewDecisionBytes: R1_REVIEW_DECISION.bytes,
+    r1ReviewDecisionSha256: R1_REVIEW_DECISION.sha256,
+    r1ReviewDecisionPayloadSha256: R1_REVIEW_DECISION.payloadSha256,
     foundationDecisionReference: FOUNDATION_DECISION.reference,
     foundationDecisionSourceCommit: FOUNDATION_DECISION.sourceCommit,
     foundationDecisionSourceTree: FOUNDATION_DECISION.sourceTree,
@@ -164,6 +227,15 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
     storeRootBindingSha256: STORE_ROOT_BINDING_CANONICAL_SHA256,
     governanceRootIdentitySha256: GOVERNANCE_ROOT_IDENTITY_SHA256,
     authorizationRegistryIdentitySha256: sha256Canonical(REGISTRY_IDENTITY),
+    claimStorageModel: 'single_atomic_claim_envelope_in_existing_governance_root',
+    singleClaimEnvelopeAtomicCreateRequired: true,
+    actionRegistryDirectoryCreatedByClaim: false,
+    actionRegistryIdentityWrittenByClaim: false,
+    nonceMarkerWrites: 0,
+    receiptMarkerWrites: 0,
+    separateClaimRecordWrites: 0,
+    successPartialAmbiguousReceiptUnionImplemented: true,
+    filesystemFaultInjectionTestPath: 'tests/cm2103-bootstrap-filesystem-fault-injection.test.js',
     nonce: 'cm2102-identity-bound-store-bootstrap-001',
     receiptId: 'cm2102-identity-bound-store-bootstrap-receipt-001',
     requestedExpiresAt: '2026-07-15T18:00:00+08:00',
@@ -180,6 +252,10 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
     maxTombstoneMemoryCalls: 0,
     maxVerifyOperations: 0,
     maxRetries: 0,
+    maxClaimEnvelopeCreates: 1,
+    governanceRegistryDirectoryCreates: 0,
+    governanceRegistryIdentityWrites: 0,
+    authorizationMarkerWrites: 0,
     parentDirectoryCreationAllowed: false,
     identityOverwriteAllowed: false,
     identityReplacementAllowed: false,
@@ -188,8 +264,8 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
     automaticRetryAllowed: false,
     automaticCleanupAllowed: false,
     existingStoreDirectoryOutcome: 'stop_without_read_delete_replace_or_reconcile',
-    partialBootstrapOutcome: 'stop_without_retry_cleanup_or_reconciliation',
-    ambiguousBootstrapOutcome: 'stop_without_retry_cleanup_or_reconciliation',
+    partialBootstrapOutcome: 'stop_without_retry_cleanup_and_require_independent_reconciliation',
+    ambiguousBootstrapOutcome: 'stop_without_retry_cleanup_and_require_independent_reconciliation',
     futureDecisionPresentAtFreeze: false,
     bootstrapExecutionAuthorizedAtFreeze: false,
     storeDirectoryCreatedAtFreeze: false,
@@ -203,6 +279,7 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
     receiptCreatedAtFreeze: false,
     nativeReadsAtFreeze: 0,
     nativeWritesAtFreeze: 0,
+    governanceFilesystemEffectsAtFreeze: 0,
     rollbackOrCompensationOperationsAtFreeze: 0,
     rollbackDrillPassed: false,
     failureRecoveryProofPassed: false,
@@ -214,12 +291,10 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
   };
   for (const [field, expected] of Object.entries(exact)) if (packet[field] !== expected) blockers.push(`packet.${field}`);
   if (!hash(packet.implementationCommit, 40) || !hash(packet.implementationTree, 40)) blockers.push('packet.implementationBinding');
-  if (!exactKeys(packet.implementationArtifacts, [
-    'decisionIntake', 'stateMachine', 'governanceVerifier', 'authorizationRegistry',
-    'executionPacketContract', 'receiptContract', 'frozenExecutor'
-  ])) blockers.push('packet.implementationArtifacts.keys');
-  for (const [name, artifact] of Object.entries(packet.implementationArtifacts || {})) {
-    if (!exactKeys(artifact, ['path', 'blobOid']) || typeof artifact.path !== 'string' || !hash(artifact.blobOid, 40)) {
+  if (!exactKeys(packet.implementationArtifacts, Object.keys(IMPLEMENTATION_ARTIFACT_PATHS))) blockers.push('packet.implementationArtifacts.keys');
+  for (const [name, expectedPath] of Object.entries(IMPLEMENTATION_ARTIFACT_PATHS)) {
+    const artifact = packet.implementationArtifacts?.[name];
+    if (!exactKeys(artifact, ['path', 'blobOid']) || artifact.path !== expectedPath || !hash(artifact.blobOid, 40)) {
       blockers.push(`packet.implementationArtifacts.${name}`);
     }
   }
@@ -228,16 +303,16 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
   if (!exactObject(packet.storeRootBinding, STORE_ROOT_BINDING)) blockers.push('packet.storeRootBinding');
   if (!exactObject(packet.governanceRootIdentity, GOVERNANCE_ROOT_IDENTITY)) blockers.push('packet.governanceRootIdentity');
   if (!exactObject(packet.authorizationRegistryIdentity, REGISTRY_IDENTITY)) blockers.push('packet.authorizationRegistryIdentity');
-  if (JSON.stringify(packet.stateSequence) !== JSON.stringify([
-    'UNCLAIMED', 'CLAIMED', 'STORE_DIRECTORY_CREATE_CONSUMED', 'STORE_DIRECTORY_CREATED',
-    'IDENTITY_WRITE_CONSUMED', 'IDENTITY_CREATED', 'CONSUMED_SUCCESS',
-    'CONSUMED_PARTIAL_BOOTSTRAP', 'CONSUMED_AMBIGUOUS'
-  ])) blockers.push('packet.stateSequence');
+  if (JSON.stringify(packet.stateSequence) !== JSON.stringify(STATE_SEQUENCE)) blockers.push('packet.stateSequence');
+  if (JSON.stringify(packet.receiptVariants) !== JSON.stringify(RECEIPT_VARIANTS)) blockers.push('packet.receiptVariants');
+  if (JSON.stringify(packet.tristateEffectFields) !== JSON.stringify([
+    'storeDirectoryCreated', 'identityWriteAttempted', 'identityCreated',
+    'identityBytes', 'identitySha256', 'identityReadbackMatched'
+  ])) blockers.push('packet.tristateEffectFields');
+  if (JSON.stringify(packet.filesystemFaultInjectionCases) !== JSON.stringify(FAULT_INJECTION_CASES)) blockers.push('packet.filesystemFaultInjectionCases');
   if (JSON.stringify(packet.executionBlockersAtFreeze) !== JSON.stringify([
-    'future_exact_bootstrap_decision_absent',
-    'bootstrap_execution_not_authorized',
-    'store_directory_creation_not_authorized',
-    'store_identity_creation_not_authorized'
+    'future_exact_bootstrap_decision_absent', 'bootstrap_execution_not_authorized',
+    'store_directory_creation_not_authorized', 'store_identity_creation_not_authorized'
   ])) blockers.push('packet.executionBlockersAtFreeze');
   return {
     accepted: blockers.length === 0,
@@ -254,9 +329,14 @@ module.exports = {
   BOOTSTRAP_REQUEST,
   EXECUTION_PACKET_PATH,
   EXPECTED_FUTURE_DECISION_REFERENCE,
+  FAULT_INJECTION_CASES,
   FOUNDATION_DECISION,
   FOUNDATION_PACKET,
   FUTURE_DECISION_PATH,
+  IMPLEMENTATION_ARTIFACT_PATHS,
   PACKET_KEYS,
+  R1_REVIEW_DECISION,
+  RECEIPT_VARIANTS,
+  STATE_SEQUENCE,
   evaluateCm2103BootstrapExecutionPacket
 };

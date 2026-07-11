@@ -26,13 +26,16 @@ test('CM-2103 state machine consumes directory and identity attempts before side
   state = transitionCm2103BootstrapState(state, 'CONSUME_IDENTITY_WRITE');
   assert.equal(state, 'IDENTITY_WRITE_CONSUMED');
   state = transitionCm2103BootstrapState(state, 'IDENTITY_CREATED');
+  state = transitionCm2103BootstrapState(state, 'CONSUME_READBACK');
+  assert.equal(state, 'IDENTITY_READBACK_CONSUMED');
   state = transitionCm2103BootstrapState(state, 'READBACK_VERIFIED');
   assert.equal(state, 'CONSUMED_SUCCESS');
   assert.equal(summarizeCm2103BootstrapState(state).authorizationReplayAllowed, false);
   assert.throws(() => transitionCm2103BootstrapState(state, 'CLAIM'), /terminal_state/);
 });
 
-test('CM-2103 state machine preserves partial and ambiguous outcomes without retry or cleanup', () => {
+test('CM-2103 state machine preserves claim, partial, and ambiguous outcomes without retry or cleanup', () => {
+  assert.equal(transitionCm2103BootstrapState('CLAIMED', 'CLAIM_AMBIGUOUS'), 'CLAIM_REGISTRY_AMBIGUOUS');
   assert.equal(
     transitionCm2103BootstrapState('STORE_DIRECTORY_CREATE_CONSUMED', 'DIRECTORY_CREATE_AMBIGUOUS'),
     'CONSUMED_AMBIGUOUS'
@@ -41,7 +44,7 @@ test('CM-2103 state machine preserves partial and ambiguous outcomes without ret
     transitionCm2103BootstrapState('IDENTITY_WRITE_CONSUMED', 'PARTIAL'),
     'CONSUMED_PARTIAL_BOOTSTRAP'
   );
-  for (const state of ['CONSUMED_AMBIGUOUS', 'CONSUMED_PARTIAL_BOOTSTRAP']) {
+  for (const state of ['CLAIM_REGISTRY_AMBIGUOUS', 'CONSUMED_AMBIGUOUS', 'CONSUMED_PARTIAL_BOOTSTRAP']) {
     const summary = summarizeCm2103BootstrapState(state);
     assert.equal(summary.terminal, true);
     assert.equal(summary.authorizationReplayAllowed, false);
@@ -53,6 +56,7 @@ test('CM-2103 state machine preserves partial and ambiguous outcomes without ret
       assert.equal(summary.identityWriteAttempted, null);
       assert.equal(summary.identityCreated, null);
     }
+    if (state === 'CLAIM_REGISTRY_AMBIGUOUS') assert.equal(summary.directoryCreated, false);
   }
 });
 

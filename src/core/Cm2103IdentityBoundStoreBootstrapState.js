@@ -1,21 +1,26 @@
 'use strict';
 
 const TERMINAL_STATES = Object.freeze([
+  'CLAIM_REGISTRY_AMBIGUOUS',
   'CONSUMED_SUCCESS',
   'CONSUMED_PARTIAL_BOOTSTRAP',
   'CONSUMED_AMBIGUOUS'
 ]);
 
 const TRANSITIONS = Object.freeze({
-  UNCLAIMED: Object.freeze({ CLAIM: 'CLAIMED' }),
-  CLAIMED: Object.freeze({ CONSUME_DIRECTORY_CREATE: 'STORE_DIRECTORY_CREATE_CONSUMED' }),
+  UNCLAIMED: Object.freeze({ CLAIM: 'CLAIMED', CLAIM_AMBIGUOUS: 'CLAIM_REGISTRY_AMBIGUOUS' }),
+  CLAIMED: Object.freeze({
+    CLAIM_AMBIGUOUS: 'CLAIM_REGISTRY_AMBIGUOUS',
+    CONSUME_DIRECTORY_CREATE: 'STORE_DIRECTORY_CREATE_CONSUMED'
+  }),
   STORE_DIRECTORY_CREATE_CONSUMED: Object.freeze({
     DIRECTORY_CREATED: 'STORE_DIRECTORY_CREATED',
     DIRECTORY_CREATE_AMBIGUOUS: 'CONSUMED_AMBIGUOUS'
   }),
   STORE_DIRECTORY_CREATED: Object.freeze({
     CONSUME_IDENTITY_WRITE: 'IDENTITY_WRITE_CONSUMED',
-    PARTIAL: 'CONSUMED_PARTIAL_BOOTSTRAP'
+    PARTIAL: 'CONSUMED_PARTIAL_BOOTSTRAP',
+    AMBIGUOUS: 'CONSUMED_AMBIGUOUS'
   }),
   IDENTITY_WRITE_CONSUMED: Object.freeze({
     IDENTITY_CREATED: 'IDENTITY_CREATED',
@@ -23,6 +28,11 @@ const TRANSITIONS = Object.freeze({
     AMBIGUOUS: 'CONSUMED_AMBIGUOUS'
   }),
   IDENTITY_CREATED: Object.freeze({
+    CONSUME_READBACK: 'IDENTITY_READBACK_CONSUMED',
+    PARTIAL: 'CONSUMED_PARTIAL_BOOTSTRAP',
+    AMBIGUOUS: 'CONSUMED_AMBIGUOUS'
+  }),
+  IDENTITY_READBACK_CONSUMED: Object.freeze({
     READBACK_VERIFIED: 'CONSUMED_SUCCESS',
     PARTIAL: 'CONSUMED_PARTIAL_BOOTSTRAP',
     AMBIGUOUS: 'CONSUMED_AMBIGUOUS'
@@ -37,36 +47,58 @@ function transitionCm2103BootstrapState(state, event) {
 }
 
 function summarizeCm2103BootstrapState(state) {
-  const authorizationConsumed = state !== 'UNCLAIMED';
-  const directoryCreateAttempted = !['UNCLAIMED', 'CLAIMED'].includes(state);
-  const directoryCreatedKnown = [
-    'STORE_DIRECTORY_CREATED',
-    'IDENTITY_WRITE_CONSUMED',
-    'IDENTITY_CREATED',
-    'CONSUMED_SUCCESS',
-    'CONSUMED_PARTIAL_BOOTSTRAP'
-  ].includes(state);
-  const identityWriteAttemptedKnown = [
-    'IDENTITY_WRITE_CONSUMED',
-    'IDENTITY_CREATED',
-    'CONSUMED_SUCCESS',
-    'CONSUMED_PARTIAL_BOOTSTRAP'
-  ].includes(state);
-  const identityCreatedKnown = ['IDENTITY_CREATED', 'CONSUMED_SUCCESS'].includes(state);
-  const ambiguous = state === 'CONSUMED_AMBIGUOUS';
+  if (state === 'UNCLAIMED') return {
+    state,
+    terminal: false,
+    authorizationConsumed: false,
+    authorizationReplayAllowed: false,
+    directoryCreateAttempted: false,
+    directoryCreated: false,
+    identityWriteAttempted: false,
+    identityCreated: false,
+    identityReadbackAttempted: false,
+    identityReadbackVerified: false,
+    automaticRetryAllowed: false,
+    automaticCleanupAllowed: false,
+    reconciliationRequired: false
+  };
+  if (state === 'CLAIM_REGISTRY_AMBIGUOUS') return {
+    state,
+    terminal: true,
+    authorizationConsumed: true,
+    authorizationReplayAllowed: false,
+    directoryCreateAttempted: false,
+    directoryCreated: false,
+    identityWriteAttempted: false,
+    identityCreated: false,
+    identityReadbackAttempted: false,
+    identityReadbackVerified: false,
+    automaticRetryAllowed: false,
+    automaticCleanupAllowed: false,
+    reconciliationRequired: true
+  };
+  const genericAmbiguous = state === 'CONSUMED_AMBIGUOUS';
+  const partial = state === 'CONSUMED_PARTIAL_BOOTSTRAP';
   return {
     state,
     terminal: TERMINAL_STATES.includes(state),
-    authorizationConsumed,
+    authorizationConsumed: true,
     authorizationReplayAllowed: false,
-    directoryCreateAttempted,
-    directoryCreated: ambiguous ? null : directoryCreatedKnown,
-    identityWriteAttempted: ambiguous ? null : identityWriteAttemptedKnown,
-    identityCreated: ambiguous ? null : identityCreatedKnown,
+    directoryCreateAttempted: !['CLAIMED'].includes(state),
+    directoryCreated: genericAmbiguous ? null : !['CLAIMED', 'STORE_DIRECTORY_CREATE_CONSUMED'].includes(state),
+    identityWriteAttempted: genericAmbiguous || partial
+      ? null
+      : ['IDENTITY_WRITE_CONSUMED', 'IDENTITY_CREATED', 'IDENTITY_READBACK_CONSUMED', 'CONSUMED_SUCCESS'].includes(state),
+    identityCreated: genericAmbiguous || partial
+      ? null
+      : ['IDENTITY_CREATED', 'IDENTITY_READBACK_CONSUMED', 'CONSUMED_SUCCESS'].includes(state),
+    identityReadbackAttempted: genericAmbiguous || partial
+      ? null
+      : ['IDENTITY_READBACK_CONSUMED', 'CONSUMED_SUCCESS'].includes(state),
     identityReadbackVerified: state === 'CONSUMED_SUCCESS',
     automaticRetryAllowed: false,
     automaticCleanupAllowed: false,
-    reconciliationRequired: state === 'CONSUMED_PARTIAL_BOOTSTRAP' || state === 'CONSUMED_AMBIGUOUS'
+    reconciliationRequired: partial || genericAmbiguous
   };
 }
 
