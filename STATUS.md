@@ -4,13 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2088 exact tag push receipt review intake`.
-Current validation: `CMV-2189`.
-Current project status: Independent review accepted the exact tag push receipt. Delivery is recorded; authorization is consumed and cannot replay. No new remote, Release, publication, deploy, cutover, Phase 8, or readiness authority exists.
-Current route: `CM2088_TAG_PUSH_RECEIPT_REVIEW_PASSED_NO_NEW_REMOTE_AUTHORITY_NO_PHASE8_NO_READY_CLAIM`.
+Current task: `CM-2089 exact Phase 8 native write authorization request`.
+Current validation: `CMV-2190`.
+Current project status: A hash-bound request for one synthetic Phase 8 native record_memory proof is prepared. Authorization remains false; no runtime, write, verify, rollback, compensation, real-memory read, or readiness action occurred.
+Current route: `CM2089_EXACT_PHASE8_NATIVE_WRITE_AUTHORIZATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2089 Phase 8 exact native write request: binds source/runtime, exact action,
+scope, payload hashes, expiry, nonce, receipt and allowlist. It requests one
+native write and one low-disclosure verify only. Rollback/compensation is not
+authorized and counts as a separate native write. This is an application, not
+authorization or execution evidence.
 
 CM-2088 tag push receipt review: records PASS decision
 `CM-2087-ER-20260711-TAG-PUSH-RECEIPT-PASS-DF1E41DD`. It accepts only the

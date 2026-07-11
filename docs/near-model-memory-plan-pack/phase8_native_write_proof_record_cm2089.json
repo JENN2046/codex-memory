@@ -1,0 +1,21 @@
+{
+  "target": "process",
+  "title": "CM-2089 Phase 8 governed native write proof",
+  "content": "Synthetic governance proof record. No user memory. Non-production. Not RC_READY.",
+  "evidence": "CM-2089 exact-authorized Phase 8 native write proof",
+  "validated": true,
+  "reusable": false,
+  "tags": [
+    "cm2089",
+    "phase8",
+    "native-write-proof"
+  ],
+  "sensitivity": "none",
+  "scope_id": "cm2089-phase8-native-write-proof-001",
+  "project_id": "codex-memory",
+  "workspace_id": "codex-memory-phase8-proof",
+  "client_id": "codex",
+  "visibility": "project",
+  "task_id": "CM-2089",
+  "retention_policy": "proof-record-only"
+}

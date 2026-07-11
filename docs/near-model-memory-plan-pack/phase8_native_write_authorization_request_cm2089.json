@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2089",
+  "requestType": "exact_phase8_native_write_authorization",
+  "phase8NativeWriteAuthorizationGranted": false,
+  "decisionChain": {
+    "externalReviewPassed": true,
+    "completionAuditApplicationPassed": true,
+    "tagApprovalPacketPassed": true,
+    "tagPushReceiptReviewReference": "CM-2087-ER-20260711-TAG-PUSH-RECEIPT-PASS-DF1E41DD"
+  },
+  "executionBinding": {
+    "runtimeSourceCommit": "66e6974cfc1f0225ac315f16bdd0aa4fa954fb51",
+    "runtimeSourceTree": "e60d90e6b9bc0ca52e4d841b4b50130b6ea2b53d",
+    "cleanDetachedCheckoutRequired": true,
+    "runtimeHeadMustEqualSourceCommit": true,
+    "staleLoadedRuntimeAllowed": false,
+    "transport": "isolated_stdio_mcp",
+    "persistentServiceMutationAllowed": false,
+    "runtimeTarget": {
+      "primaryRuntime": "VCPToolBox native memory",
+      "targetReferenceName": "cm2089-vcptoolbox-native-memory-target",
+      "targetKind": "mcp_server",
+      "sourceAuthority": "bridge_runtime_or_static_config"
+    }
+  },
+  "writeAction": {
+    "toolName": "record_memory",
+    "exactApprovalAction": "live_bridge_record_memory_proof",
+    "maxNativeWrites": 1,
+    "proofRecordOnly": true,
+    "existingMemoryModificationAllowed": false,
+    "localFallbackWriteAllowed": false,
+    "payloadFile": "docs/near-model-memory-plan-pack/phase8_native_write_proof_record_cm2089.json",
+    "payloadFileSha256": "3773ac46474890e033b6113d81fb2c0c191cbcbaf78225d2746eefb4c67fc245",
+    "canonicalPayloadSha256": "91d3b2ed314641bb372237aa9490a2803da6ea060b4457c5e7694c738a6b9aee"
+  },
+  "approvalScope": {
+    "scopeId": "cm2089-phase8-native-write-proof-001",
+    "projectId": "codex-memory",
+    "workspaceId": "codex-memory-phase8-proof",
+    "clientId": "Codex",
+    "visibility": "project"
+  },
+  "approvalPacketRequest": {
+    "token": "APPROVE_VCP_BRIDGE_LIVE_RECORD_MEMORY_PROOF_EXACT",
+    "operatorIntentScope": "one synthetic Phase 8 proof record only",
+    "allowedAction": "live_bridge_record_memory_proof",
+    "expiresAt": "2026-07-12T06:00:00+08:00",
+    "nonce": "cm2089-phase8-record-memory-proof-001",
+    "receiptId": "cm2089-phase8-native-write-receipt-001",
+    "expectedContextHash": "29668cd36b14b2d7e36e35463dcd7af0a1a1c1d01ba3b6aa94a32f6349ecc20a",
+    "expectedAllowlistHash": "fd08575141c2ffdb501f24d4a8f525f660cc5919c1baeb1817697da164da956e",
+    "authorizationUseCount": 1
+  },
+  "verification": {
+    "maxVerifyOperations": 1,
+    "verifyOperation": "audit_memory_low_disclosure_receipt_correlation",
+    "rawMemoryReadAllowed": false,
+    "rawAuditReadAllowed": false,
+    "receiptOnly": true
+  },
+  "rollbackOrCompensation": {
+    "maxOperations": 0,
+    "authorizedByThisRequest": false,
+    "separateActionSpecificApprovalRequired": true,
+    "compensationCountsAsNativeWrite": true,
+    "postCommitFailureDisposition": "rollback_required_not_applied",
+    "rollbackPlanReference": "cm2089-phase8-rollback-plan"
+  },
+  "receiptRequirements": {
+    "lowDisclosureOnly": true,
+    "exactApprovalEnforcement": true,
+    "nativeSideEffect": true,
+    "realRootDurableWriteProof": true,
+    "verifyWrite": true,
+    "outputDisclosureBudget": true,
+    "auditReceipt": true,
+    "rollbackDrill": false,
+    "failureRecovery": false
+  },
+  "forbidden": {
+    "rawPrivateMemoryAccess": false,
+    "defaultMcpExpansion": false,
+    "commitMemoryDeltaPublic": false,
+    "branchOrTagPush": false,
+    "releaseOrPublication": false,
+    "deployOrCutover": false,
+    "readinessClaim": false,
+    "fullPlanPackCompletionClaim": false
+  },
+  "currentExecutionCounters": {
+    "nativeWrites": 0,
+    "verifyOperations": 0,
+    "rollbackOrCompensationOperations": 0,
+    "realMemoryReads": 0,
+    "remoteGitActions": 0
+  }
+}

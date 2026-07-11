@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2088 exact tag push receipt review intake`.
-Current validation: `CMV-2189`.
+Current checkpoint: `CM-2089 exact Phase 8 native write authorization request`.
+Current validation: `CMV-2190`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2089 Phase 8 Native Write Authorization Request
+
+Status: `EXACT_PHASE8_NATIVE_WRITE_AUTHORIZATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM`
+
+- Prepared one exact `record_memory` proof request bound to source commit/tree,
+  runtime target, scope, payload hash, expiry, nonce, receipt, and allowlist.
+- Requested at most one native write and one low-disclosure verify.
+- Rollback/compensation count is zero and requires separate action-specific approval.
+- No runtime, native write, verify, memory read, or remote action occurred.
+
+Validation: `CMV-2190`.
 
 ## CM-2088 Tag Push Receipt Review
 

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2088 exact tag push receipt review intake`.
-Current validation: `CMV-2189`.
-Current handoff: Independent review accepted the exact tag push receipt. Authorization is consumed and cannot replay; no new remote, Release, deploy, Phase 8, or readiness authority exists.
+Current task: `CM-2089 exact Phase 8 native write authorization request`.
+Current validation: `CMV-2190`.
+Current handoff: A single-use, hash-bound Phase 8 record_memory proof request is prepared but not authorized. No runtime/write/verify/rollback/compensation occurred; readiness remains false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

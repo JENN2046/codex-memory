@@ -8,15 +8,21 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2088 exact tag push receipt review passed; no new remote authority |
-| Current task | `CM-2088 exact tag push receipt review intake` |
-| Current validation | `CMV-2189` |
-| Current route | Remote delivery recorded; authorization consumed; Release and Phase 8 remain false |
+| Status | CM-2089 exact Phase 8 native write authorization requested; not granted |
+| Current task | `CM-2089 exact Phase 8 native write authorization request` |
+| Current validation | `CMV-2190` |
+| Current route | Independent request review; no runtime/write/verify/rollback execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2089` prepares a separate single-use `record_memory` proof authorization
+request. It binds a clean source commit/tree, matching runtime, exact scope,
+synthetic payload hash, expiry, nonce, receipt and allowlist. The request permits
+at most one write and one low-disclosure verify; rollback/compensation remains
+zero and separately gated. Authorization remains false and nothing executed.
 
 `CM-2088` records independent review
 `CM-2087-ER-20260711-TAG-PUSH-RECEIPT-PASS-DF1E41DD`. The exact tag delivery
