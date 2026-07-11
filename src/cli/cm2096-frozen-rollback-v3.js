@@ -55,6 +55,8 @@ function exactCm2096Allowlist() {
     nativeWriteTools: ['tombstone_memory'],
     nativeWriteActions: ['live_bridge_tombstone_memory_proof'],
     maxTombstoneWrites: 1,
+    nativeReadTools: [],
+    nativeReadAllowed: false,
     verifySurface: 'verifyCm2096TombstoneExecution',
     verifyTool: 'audit_memory',
     verifyAuditFamily: 'governance',
@@ -118,6 +120,7 @@ function buildRuntimeContext({ packet, head, tree, config, storeIdentityProjecti
     innerNativeTransport: 'local_http_mcp',
     primaryRuntime: 'VCPToolBox native memory',
     nativeWriteDelegationMode: config.governedMcpVcpNativeWriteDelegationMode,
+    nativeReadDelegationMode: config.governedMcpVcpNativeReadDelegationMode,
     innerHttpTargetAccepted: httpTarget.accepted,
     innerHttpTargetConfigured: httpTarget.configured,
     innerHttpAuthConfigured: httpTarget.bearerTokenConfigured,
@@ -175,6 +178,20 @@ function exactDecisionExpectedBinding({ packet, packetCommit, packetBlobOid, pac
   };
 }
 
+function cm2096RuntimeRouteAccepted(config, expectedRuntimeTarget) {
+  const target = config?.governedMcpVcpNativeRuntimeTarget || {};
+  const httpTarget = config?.governedMcpVcpNativeHttpMcpTarget || {};
+  return config?.governedMcpVcpNativeWriteDelegationMode === 'primary' &&
+    config?.governedMcpVcpNativeReadDelegationMode === 'off' &&
+    target.accepted === true &&
+    target.targetReferenceName === expectedRuntimeTarget?.targetReferenceName &&
+    target.targetKind === expectedRuntimeTarget?.targetKind &&
+    httpTarget.accepted === true &&
+    httpTarget.configured === true &&
+    httpTarget.bearerTokenConfigured === true &&
+    httpTarget.mcpToolNameByAction?.tombstone_memory === 'knowledge_base.tombstone';
+}
+
 async function runFrozenCm2096RollbackV3(executionPacketCommit, futureDecisionCommit) {
   if (!/^[a-f0-9]{40}$/.test(executionPacketCommit || '')) throw new Error('cm2096_execution_packet_commit_required');
   if (!/^[a-f0-9]{40}$/.test(futureDecisionCommit || '')) throw new Error('cm2096_future_tombstone_decision_commit_required');
@@ -210,16 +227,7 @@ async function runFrozenCm2096RollbackV3(executionPacketCommit, futureDecisionCo
   if (decisionIntake.accepted !== true) throw new Error('cm2096_tombstone_decision_intake_rejected');
 
   const config = createConfig();
-  const target = config.governedMcpVcpNativeRuntimeTarget || {};
-  const httpTarget = config.governedMcpVcpNativeHttpMcpTarget || {};
-  if (config.governedMcpVcpNativeWriteDelegationMode !== 'primary' ||
-      target.accepted !== true ||
-      target.targetReferenceName !== packet.runtimeTarget.targetReferenceName ||
-      target.targetKind !== packet.runtimeTarget.targetKind ||
-      httpTarget.accepted !== true ||
-      httpTarget.configured !== true ||
-      httpTarget.bearerTokenConfigured !== true ||
-      httpTarget.mcpToolNameByAction?.tombstone_memory !== 'knowledge_base.tombstone') {
+  if (!cm2096RuntimeRouteAccepted(config, packet.runtimeTarget)) {
     throw new Error('cm2096_runtime_native_tombstone_route_binding_mismatch');
   }
 
@@ -357,6 +365,7 @@ if (require.main === module) {
 module.exports = {
   DECISION_PATH,
   PACKET_PATH,
+  cm2096RuntimeRouteAccepted,
   exactCm2096Allowlist,
   resolveCm2096RegistryGovernanceRoot,
   runFrozenCm2096RollbackV3
