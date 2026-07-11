@@ -8,15 +8,20 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2094 exact execution manifest frozen; final release requested; fourth slot false |
-| Current task | `CM-2094 Phase 8 final execution release request` |
-| Current validation | `CMV-2195` |
-| Current route | Independent CM-2094 final release review; no execution before PASS |
+| Status | CM-2094 consumed success; one write/verify; receipt review required |
+| Current task | `CM-2094 Phase 8 one-shot native execution receipt` |
+| Current validation | `CMV-2196` |
+| Current route | Independent execution receipt review; no replay or additional native action |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+CM-2094 final release was frozen and machine-intaken. The one-shot execution
+finished `CONSUMED_SUCCESS` with one synthetic primary-memory write and one
+selected-field verify. Authorization is consumed and cannot be replayed. Receipt
+review is required before any Phase 8 completion evidence may be considered.
 
 CM-2094 freezes the exact execution packet at `66cfae23…` and requests only a
 separate final execution-release decision. The manifest, request, and their tests

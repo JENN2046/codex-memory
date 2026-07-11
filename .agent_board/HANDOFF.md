@@ -4,13 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2094 Phase 8 final execution release request`.
-Current validation: `CMV-2195`.
-Current handoff: Bootstrap receipt review passed. Execution packet `66cfae23…` is frozen and CM-2094 final release review is requested. Fourth slot false; nonce and all native actions remain zero.
+Current task: `CM-2094 Phase 8 one-shot native execution receipt`.
+Current validation: `CMV-2196`.
+Current handoff: CM-2094 was frozen, intaken and consumed once. Result is CONSUMED_SUCCESS with one write/verify. Do not replay; submit low-disclosure receipt for independent review.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2094 execution is complete and non-replayable. Decision commit `f1e2a830…`
+binds the exact 1325-byte decision. Registry state is `CONSUMED_SUCCESS`; native
+write calls `1`, verify operations `1`, durable record SHA `4f863f52…`, fallback
+`false`, retry/rollback/compensation `0`. Phase 8 completion is not yet accepted.
 
 CM-2094 is the active gate. The frozen manifest binds packet `66cfae23…`, blob
 `549f157e…`, raw SHA `0786167b…`, context `f1cf912c…`, allowlist `b69cc85d…`,

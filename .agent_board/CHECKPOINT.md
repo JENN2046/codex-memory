@@ -4,11 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2094 Phase 8 final execution release request`.
-Current validation: `CMV-2195`.
+Current checkpoint: `CM-2094 Phase 8 one-shot native execution receipt`.
+Current validation: `CMV-2196`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2094 One-Shot Native Execution
+
+Status: `CONSUMED_SUCCESS_ONE_WRITE_ONE_VERIFY_RECEIPT_REVIEW_REQUIRED_NO_READY_CLAIM`
+
+- Exact final release decision frozen at `f1e2a830…`, 1325 bytes, SHA `db9dd1cc…`.
+- Registry state `CONSUMED_SUCCESS`; authorization use count 1 and replay false.
+- Native write calls 1; verify operations 1; durable record 269 bytes/SHA `4f863f52…`.
+- Fallback, retry, rollback, compensation, raw-memory return, and readiness claim are zero/false.
+
+Validation: `CMV-2196`.
 
 ## CM-2094 Final Execution Release Request
 

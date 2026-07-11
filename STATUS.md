@@ -4,13 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2094 Phase 8 final execution release request`.
-Current validation: `CMV-2195`.
-Current project status: Bootstrap receipt review passed; exact execution manifest is frozen and CM-2094 final release review is requested. Fourth slot remains false and no native action occurred.
-Current route: `CM2094_FINAL_EXECUTION_RELEASE_REQUESTED_PHASE8_FALSE_UNCLAIMED_NO_NATIVE_EXECUTION`.
+Current task: `CM-2094 Phase 8 one-shot native execution receipt`.
+Current validation: `CMV-2196`.
+Current project status: CM-2094 exact release was frozen and consumed once. One synthetic native write and one low-disclosure verify succeeded; receipt review remains required and Phase 8 completion is not claimed.
+Current route: `CM2094_CONSUMED_SUCCESS_ONE_WRITE_ONE_VERIFY_RECEIPT_REVIEW_REQUIRED_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2094 execution result is `CONSUMED_SUCCESS`: one native write, one verify,
+zero retry, zero rollback/compensation, and no local fallback. The single durable
+synthetic Markdown is 269 bytes with SHA `4f863f52…`. Authorization replay is
+forbidden; the execution receipt now requires independent review.
 
 CM-2094 execution packet is frozen at `66cfae23…`, with manifest blob
 `549f157e…`, raw SHA `0786167b…`, and canonical payload SHA `11bbbc72…`.

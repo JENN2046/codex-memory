@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2094 Phase 8 final execution release request`.
-Current validation: `CMV-2195`.
-Current status: Exact execution manifest frozen; final release review requested; fourth slot false, UNCLAIMED, and no native execution.
+Current task: `CM-2094 Phase 8 one-shot native execution receipt`.
+Current validation: `CMV-2196`.
+Current status: CONSUMED_SUCCESS; one synthetic native write and one verify; authorization consumed; receipt review required.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the exact CM-2094 final execution
-release request. Do not freeze or run a positive release decision unless returned
-by review; do not claim nonce or execute write/verify/rollback/compensation.
+Next safe action is independent review of the frozen CM-2094 execution receipt.
+Do not replay the authorization, delete markers, or execute any additional write,
+verify, rollback, compensation, or real-memory action.
 
 ## Historical Run Notes
 
