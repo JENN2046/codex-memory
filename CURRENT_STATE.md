@@ -8,15 +8,20 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2089 exact Phase 8 native write authorization requested; not granted |
-| Current task | `CM-2089 exact Phase 8 native write authorization request` |
-| Current validation | `CMV-2190` |
-| Current route | Independent request review; no runtime/write/verify/rollback execution |
+| Status | CM-2091 machine-enforced Phase 8 reapplication prepared; not granted |
+| Current task | `CM-2091 machine-enforced Phase 8 native write reapplication` |
+| Current validation | `CMV-2191` |
+| Current route | Independent reapplication review; no runtime/write/verify/rollback execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2091` resolves the CM-2089 fail-closed findings with atomic one-shot claim
+state, app-path enforcement, same-commit payload binding, canonical context and
+allowlist evidence, executable low-disclosure verify, two-stage transport, and
+exact durable Markdown bytes. Authorization remains false and nothing executed.
 
 `CM-2089` prepares a separate single-use `record_memory` proof authorization
 request. It binds a clean source commit/tree, matching runtime, exact scope,

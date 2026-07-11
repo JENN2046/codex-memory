@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2089",
-  "validationId": "CMV-2190",
+  "taskId": "CM-2091",
+  "validationId": "CMV-2191",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -73,6 +73,9 @@
     "tagApprovalPacketPassed": true,
     "phase8NativeWriteAuthorizationRequested": true,
     "phase8NativeWriteAuthorizationGranted": false,
+    "phase8PriorDecisionReference": "CM-2089-ER-20260711-FAIL-CLOSED-EXECUTION-BINDING-INCOMPLETE",
+    "phase8ReapplicationPrepared": true,
+    "phase8OneShotMachineEnforced": true,
     "phase8RequestedCanonicalPayloadSha256": "91d3b2ed314641bb372237aa9490a2803da6ea060b4457c5e7694c738a6b9aee",
     "phase8RequestedMaxNativeWrites": 1,
     "phase8RequestedMaxVerifyOperations": 1,
@@ -81,7 +84,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_exact_phase8_native_write_authorization_requested_not_granted_no_execution_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_phase8_machine_enforced_reapplication_requested_not_granted_no_execution_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -89,6 +92,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2191",
+      "scope": "CM-2091 machine-enforced Phase 8 native write reapplication",
+      "status": "COMPLETED_PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2190",
       "scope": "CM-2089 exact Phase 8 native write authorization request",

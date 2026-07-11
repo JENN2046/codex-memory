@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2089 exact Phase 8 native write authorization request`.
-Current validation: `CMV-2190`.
-Current handoff: A single-use, hash-bound Phase 8 record_memory proof request is prepared but not authorized. No runtime/write/verify/rollback/compensation occurred; readiness remains false.
+Current task: `CM-2091 machine-enforced Phase 8 native write reapplication`.
+Current validation: `CMV-2191`.
+Current handoff: One-shot native write enforcement and exact evidence bindings are implemented; reapplication is prepared but authorization remains false. Nothing executed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

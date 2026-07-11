@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest validation: `CMV-2190`.
-Latest task: `CM-2089 exact Phase 8 native write authorization request`.
+Latest validation: `CMV-2191`.
+Latest task: `CM-2091 machine-enforced Phase 8 native write reapplication`.
 Validation facts should be summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts are collected by fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -17,6 +17,7 @@ Active validation ledger. Long historical validation rows are archived by refere
 
 | ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |
 |---|---|---|---|---|---|---|---|
+| CMV-2191 | atomic nonce/receipt claim; caller accepted=true rejection; replay/ambiguous states; same-commit payload blob; canonical context/allowlist; exact audit verify; durable Markdown; MCP/default/docs/current-facts/ledger/diff gates | P8-native-write-proof / P6-docs-drift | CM-2091 reapplication | COMPLETED_PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM | Six CM-2089 blockers resolved. One-shot enforcement is in the real app path; reapplication remains non-executing and authorization false. | Submit exact reapplication for independent review; no execution before PASS. | 2026-07-11 |
 | CMV-2190 | source commit/tree; canonical payload/file hashes; runtime/scope/action/expiry/nonce/receipt/allowlist binding; compensation separation; fail-closed/default/docs/current-facts/ledger/diff gates | P8-native-write-proof / P6-docs-drift | CM-2089 exact native write request | COMPLETED_EXACT_PHASE8_NATIVE_WRITE_AUTHORIZATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM | One synthetic proof record request prepared; native write max 1, verify max 1, rollback/compensation 0. Authorization false and all execution counters zero. | Submit request for independent exact authorization; no execution before accepted decision. | 2026-07-11 |
 | CMV-2189 | exact review/receipt/authorization/refspec/tag binding; fail-closed authority tests; default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2088 tag push receipt review | COMPLETED_TAG_PUSH_RECEIPT_REVIEW_PASSED_NO_NEW_REMOTE_AUTHORITY_NO_PHASE8_NO_READY_CLAIM | Review accepts receipt `df1e41dd…626b`; authorization consumed and replay forbidden. No new remote action, Release, deploy, Phase 8, or readiness authority. | Stop remote actions; Phase 8 remains a separate exact gate. | 2026-07-11 |
 | CMV-2188 | clean/tag/remote binding preflight; exact remote absence check; single full-refspec push; remote object/peeled verification; receipt hash; fail-closed/default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2087 exact tag push | COMPLETED_EXACT_TAG_PUSH_AUTHORIZATION_CONSUMED_NO_BRANCH_NO_RELEASE_NO_PHASE8_NO_READY_CLAIM | Exact tag object `baf7ecce…5e3c` pushed once to `origin` and verified at `170ee339…221b`; authorization consumed. No branch/other-tag/force/Release/deploy/Phase 8 action. | Submit low-disclosure push receipt for independent review; no further remote action. | 2026-07-11 |

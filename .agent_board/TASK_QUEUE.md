@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest active task: `CM-2089 exact Phase 8 native write authorization request`.
-Latest validation: `CMV-2190`.
+Latest active task: `CM-2091 machine-enforced Phase 8 native write reapplication`.
+Latest validation: `CMV-2191`.
 Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -44,6 +44,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2091 | 2091 | done | P8-native-write-proof / P6-docs-drift | Green implementation/reapplication; Red execution blocked | one-shot gate/app hook; binding evidence; reapplication; tests/status | Resolve CM-2089 findings and resubmit exact Phase 8 request | claim/replay/app-hook/blob/context/allowlist/verify/durable-byte/default/docs gates | revert CM-2091 commits; execution counters remain zero | independent exact authorization required | PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM |
 | CM-2089 | 2089 | done | P8-native-write-proof / P6-docs-drift | Green request preparation; Red execution remains blocked | exact request JSON/Markdown; synthetic payload; contract/test; status/board | Prepare separate exact Phase 8 native write authorization request | source/runtime/scope/payload/expiry/nonce/receipt/allowlist binding; fail-closed/default/docs gates | revert request commit; execution counters remain zero | independent exact Phase 8 authorization required | EXACT_PHASE8_NATIVE_WRITE_AUTHORIZATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM |
 | CM-2088 | 2088 | done | P9-codex-claude-client-scope / P6-docs-drift | Green review intake; no remote action | review JSON/Markdown; contract/test; status/board | Record exact tag push receipt PASS decision | exact review/receipt/OID/refspec/consumption binding; fail-closed/default/docs gates | revert CM-2088 commit; no remote state changed | any later remote action or Phase 8 requires separate authorization | TAG_PUSH_RECEIPT_REVIEW_PASSED_NO_NEW_REMOTE_AUTHORITY_NO_PHASE8_NO_READY_CLAIM |
 | CM-2087 | 2087 | done | P9-codex-claude-client-scope / P6-docs-drift | Red exact one-use tag push | authorization decision; push receipt; contract/test; status/board | Push only exact approved tag ref and consume authorization | clean/local binding; remote absence; exact refspec push; remote OID/peeled verification; receipt/default/docs gates | remote deletion/repair not authorized | independent receipt review required; Release/Phase 8 remain false | EXACT_TAG_PUSH_COMPLETED_AUTHORIZATION_CONSUMED_NO_BRANCH_NO_RELEASE_NO_PHASE8_NO_READY_CLAIM |

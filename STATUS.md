@@ -4,13 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2089 exact Phase 8 native write authorization request`.
-Current validation: `CMV-2190`.
-Current project status: A hash-bound request for one synthetic Phase 8 native record_memory proof is prepared. Authorization remains false; no runtime, write, verify, rollback, compensation, real-memory read, or readiness action occurred.
-Current route: `CM2089_EXACT_PHASE8_NATIVE_WRITE_AUTHORIZATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM`.
+Current task: `CM-2091 machine-enforced Phase 8 native write reapplication`.
+Current validation: `CMV-2191`.
+Current project status: CM-2089 execution-binding findings are resolved in code and frozen evidence. Reapplication is prepared, but authorization remains false; no runtime, write, verify, rollback, compensation, real-memory read, or readiness action occurred.
+Current route: `CM2091_PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2091 Phase 8 reapplication: adds atomic one-shot authorization claim,
+real-app-path rejection of caller-supplied accepted=true, exact Git/blob and
+canonical hash bindings, executable selected-field verify, two-stage transport,
+and durable Markdown byte proof. It remains an application, not authorization.
 
 CM-2089 Phase 8 exact native write request: binds source/runtime, exact action,
 scope, payload hashes, expiry, nonce, receipt and allowlist. It requests one

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2089 exact Phase 8 native write authorization request`.
-Current validation: `CMV-2190`.
-Current status: Exact one-write Phase 8 request prepared; authorization remains false and no execution occurred.
+Current task: `CM-2091 machine-enforced Phase 8 native write reapplication`.
+Current validation: `CMV-2191`.
+Current status: Fail-closed findings resolved in code/evidence; reapplication requested, authorization false, no execution.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the CM-2089 request. Do not start the
+Next safe action is independent review of the CM-2091 reapplication. Do not start the
 runtime or execute write/verify/rollback/compensation before exact authorization.
 
 ## Historical Run Notes

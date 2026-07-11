@@ -4,11 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2089 exact Phase 8 native write authorization request`.
-Current validation: `CMV-2190`.
+Current checkpoint: `CM-2091 machine-enforced Phase 8 native write reapplication`.
+Current validation: `CMV-2191`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2091 Phase 8 Reapplication
+
+Status: `PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM`
+
+- Resolved CM-2089 fail-closed execution-binding findings.
+- Added atomic nonce/receipt claim states and rejected caller-supplied accepted=true.
+- Bound same-commit runtime/payload, two-stage transport, executable verify, and durable bytes.
+- No authorization, runtime, write, verify, compensation, or real-memory read occurred.
+
+Validation: `CMV-2191`.
 
 ## CM-2089 Phase 8 Native Write Authorization Request
 
