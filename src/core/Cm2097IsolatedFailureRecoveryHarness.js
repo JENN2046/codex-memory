@@ -112,4 +112,11 @@ function summarizeCm2097HarnessDesign(manifests = []) {
   };
 }
 
-module.exports = { CASE_IDS, buildCm2097CaseManifest, validateCm2097CaseManifest, summarizeCm2097HarnessDesign };
+module.exports = {
+  CASE_IDS,
+  CASE_SPECIFIC,
+  ROUTE_DECISION,
+  buildCm2097CaseManifest,
+  validateCm2097CaseManifest,
+  summarizeCm2097HarnessDesign
+};
