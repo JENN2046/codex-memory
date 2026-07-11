@@ -14,8 +14,8 @@
   "v2PacketBlobOid": "d791bc3367eb9b8e0343afc84b9fa22db9ce7f20",
   "v2PacketBytes": 4089,
   "v2PacketSha256": "47e81469da9dcec14f7285f09f8e43394adb5d8ba8d5323d4fcaf8aa95ecc506",
-  "implementationCommit": "49c1809bce8f016625994cfbd98c9994b67220f7",
-  "implementationTree": "26c71420bd06fd55ab431d5334ae851a6491b3fa",
+  "implementationCommit": "6f4f7867e8260fc79113239de4ff8d73b1425de9",
+  "implementationTree": "c9247b19a9d84e170f62ced27a190051bbeb7a3a",
   "implementationArtifacts": {
     "app": {
       "path": "src/app.js",
@@ -43,7 +43,7 @@
     },
     "frozenExecutor": {
       "path": "src/cli/cm2096-frozen-rollback-v3.js",
-      "blobOid": "9d1ede0f60ee6f6d92be11fa41b99b2a3e5bcede"
+      "blobOid": "324a9cc3455d45d1a1725fdb708546d9f9318591"
     }
   },
   "expectedFutureDecisionReference": "CM-2096-ER-PHASE8-TOMBSTONE-EXECUTION-RELEASE-E28D9B2F-27A5E586",
@@ -135,8 +135,8 @@
     "targetKind": "mcp_server"
   },
   "rollbackPlanReference": "cm2096-append-only-logical-tombstone-rollback-drill",
-  "contextCanonicalSha256": "94e3d896b9b3114bb7500b4fef99722bb44037b704aa806b34f2256924a20eaf",
-  "allowlistCanonicalSha256": "63cd3c977d3e5e4346b960b93426f3f25bf23af538316e8ab6e80bdec924af71",
+  "contextCanonicalSha256": "e9c0fb8c31c5c9ee22187380c15f6ec99524b66521f40133ae45159da8c3cc87",
+  "allowlistCanonicalSha256": "7977c68c77a7debe8d38bb28a95d1bc346c03a2fc550f81c8405d19518112734",
   "maxTombstoneWrites": 1,
   "maxVerifyOperations": 1,
   "maxRetries": 0,
@@ -161,5 +161,5 @@
   "phase8Completed": false,
   "fullPlanPackCompleted": false,
   "readinessClaimed": false,
-  "packetPayloadSha256": "3c2ab23bad744a0e9bd06a4b110589db7bbeb1042ba82af7729b7b2d51bca3be"
+  "packetPayloadSha256": "0b925a72d24deb004112b0f847c8b70cc533f0d84a91f11eda78e435aefa097d"
 }

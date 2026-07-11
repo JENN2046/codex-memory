@@ -36,6 +36,7 @@ function expectedRuntimeContext() {
     innerNativeTransport: 'local_http_mcp',
     primaryRuntime: 'VCPToolBox native memory',
     nativeWriteDelegationMode: 'primary',
+    nativeReadDelegationMode: 'off',
     innerHttpTargetAccepted: true,
     innerHttpTargetConfigured: true,
     innerHttpAuthConfigured: true,
