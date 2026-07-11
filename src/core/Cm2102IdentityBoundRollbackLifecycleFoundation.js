@@ -57,6 +57,21 @@ const STORE_ROOT_DERIVATION = Object.freeze({
   identityCreateMode: 'exclusive_create_only'
 });
 
+const STORE_ROOT_BINDING = Object.freeze({
+  authority: 'git_common_dir_governance_state',
+  governanceRootIdentityReference: 'codex-memory-phase8-governance-root',
+  governanceRootIdentitySha256: '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0',
+  lifecycleReference: 'phase8-identity-bound-rollback-lifecycle-001',
+  schemaVersion: 1,
+  storeDirectoryName: 'phase8-identity-bound-synthetic-rollback-store-001',
+  storeIdentitySha256: IDENTITY_CANONICAL_SHA256,
+  storeInstanceId: 'phase8-identity-bound-synthetic-rollback-store-instance-001',
+  storeReference: 'phase8-identity-bound-synthetic-rollback-store-001'
+});
+
+const STORE_ROOT_BINDING_CANONICAL_BYTES = 616;
+const STORE_ROOT_BINDING_CANONICAL_SHA256 = '0a7ceb6cf658d517de2a3eb30ee09195dbeb9d46800f42ac87edf7f7cb11dd94';
+
 const GATE_SEQUENCE = Object.freeze([
   'identity_bootstrap',
   'bootstrap_receipt_review',
@@ -128,6 +143,8 @@ function evaluateCm2102LifecycleFoundation({ packet, identityTemplateBytes } = {
     storeIdentityCanonicalBytes: IDENTITY_CANONICAL_BYTES,
     storeIdentityCanonicalSha256: IDENTITY_CANONICAL_SHA256,
     storeIdentityRuntimeFilename: IDENTITY_FILENAME,
+    storeRootBindingCanonicalBytes: STORE_ROOT_BINDING_CANONICAL_BYTES,
+    storeRootBindingCanonicalSha256: STORE_ROOT_BINDING_CANONICAL_SHA256,
     routeBSelected: true,
     syntheticOnly: true,
     identityPresentBeforeFirstNativeWriteRequired: true,
@@ -168,6 +185,7 @@ function evaluateCm2102LifecycleFoundation({ packet, identityTemplateBytes } = {
     'implementationTree',
     'storeIdentityTemplateBlobOid',
     'storeRootDerivation',
+    'storeRootBinding',
     'gateSequence',
     'cm2094ReuseBoundary'
   ].sort();
@@ -176,6 +194,9 @@ function evaluateCm2102LifecycleFoundation({ packet, identityTemplateBytes } = {
   if (!/^[a-f0-9]{40}$/.test(packet.implementationTree || '')) blockers.push('packet.implementationTree');
   if (!/^[a-f0-9]{40}$/.test(packet.storeIdentityTemplateBlobOid || '')) blockers.push('packet.storeIdentityTemplateBlobOid');
   if (!exactObject(packet.storeRootDerivation, STORE_ROOT_DERIVATION)) blockers.push('packet.storeRootDerivation');
+  if (!exactObject(packet.storeRootBinding, STORE_ROOT_BINDING) ||
+      Buffer.byteLength(JSON.stringify(canonicalize(STORE_ROOT_BINDING)), 'utf8') !== STORE_ROOT_BINDING_CANONICAL_BYTES ||
+      sha256Canonical(STORE_ROOT_BINDING) !== STORE_ROOT_BINDING_CANONICAL_SHA256) blockers.push('packet.storeRootBinding');
   if (JSON.stringify(packet.gateSequence) !== JSON.stringify(GATE_SEQUENCE)) blockers.push('packet.gateSequence');
   if (packet.cm2094ReuseBoundary?.authorizationDecision !== false ||
       packet.cm2094ReuseBoundary?.nonce !== false ||
@@ -214,6 +235,9 @@ module.exports = {
   IDENTITY_TEMPLATE_PATH,
   ROUTE_DECISION,
   STORE_IDENTITY,
+  STORE_ROOT_BINDING,
+  STORE_ROOT_BINDING_CANONICAL_BYTES,
+  STORE_ROOT_BINDING_CANONICAL_SHA256,
   STORE_ROOT_DERIVATION,
   canonicalize,
   evaluateCm2102LifecycleFoundation,

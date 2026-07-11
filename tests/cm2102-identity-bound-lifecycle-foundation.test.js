@@ -14,6 +14,9 @@ const {
   IDENTITY_TEMPLATE_PATH,
   ROUTE_DECISION,
   STORE_IDENTITY,
+  STORE_ROOT_BINDING,
+  STORE_ROOT_BINDING_CANONICAL_BYTES,
+  STORE_ROOT_BINDING_CANONICAL_SHA256,
   STORE_ROOT_DERIVATION,
   evaluateCm2102LifecycleFoundation,
   sha256Canonical
@@ -51,6 +54,9 @@ function buildPacket() {
     storeIdentityCanonicalSha256: IDENTITY_CANONICAL_SHA256,
     storeIdentityRuntimeFilename: IDENTITY_FILENAME,
     storeRootDerivation: STORE_ROOT_DERIVATION,
+    storeRootBinding: STORE_ROOT_BINDING,
+    storeRootBindingCanonicalBytes: STORE_ROOT_BINDING_CANONICAL_BYTES,
+    storeRootBindingCanonicalSha256: STORE_ROOT_BINDING_CANONICAL_SHA256,
     gateSequence: GATE_SEQUENCE,
     cm2094ReuseBoundary: {
       authorizationDecision: false,
@@ -114,6 +120,7 @@ test('CM-2102 foundation fails closed on identity, order, reuse, authority, acti
     packet => ({ ...packet, gateSequence: [...packet.gateSequence].reverse() }),
     packet => ({ ...packet, cm2094ReuseBoundary: { ...packet.cm2094ReuseBoundary, nonce: true } }),
     packet => ({ ...packet, storeRootDerivation: { ...packet.storeRootDerivation, environmentPathOverrideAllowed: true } }),
+    packet => ({ ...packet, storeRootBinding: { ...packet.storeRootBinding, storeReference: 'clone-store' } }),
     packet => ({ ...packet, foundationPayloadSha256: '0'.repeat(64) })
   ];
   for (const mutate of cases) {
