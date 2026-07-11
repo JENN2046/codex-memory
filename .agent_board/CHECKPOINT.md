@@ -4,11 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2097 Phase 8 remaining evidence request preparation`.
-Current validation: `CMV-2200`.
+Current checkpoint: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
+Current validation: `CMV-2201`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2096 Semantic Packet / CM-2097 Isolated Harness
+
+Status: `PACKET_AND_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE`
+
+- Rollback route selects append-only logical tombstone; marker-only is not proof.
+- Marker-aware effective-visibility verify remains explicitly unfrozen.
+- Failure harness has three immutable manifests and no execution API.
+- All native, verify, retry, rollback, compensation, and recovery counters are zero.
+
+Validation: `CMV-2201`.
 
 ## CM-2096 / CM-2097 Remaining Evidence Requests
 

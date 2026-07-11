@@ -8,20 +8,20 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2095 receipt review passed; rollback/failure requests separate and non-executing; Phase 8 incomplete |
-| Current task | `CM-2097 Phase 8 remaining evidence request preparation` |
-| Current validation | `CMV-2200` |
-| Current route | Independent rollback and failure-recovery review requests; no execution authority |
+| Status | CM-2096 semantic packet and CM-2097 isolated harness prepared; no execution authority; Phase 8 incomplete |
+| Current task | `CM-2097 isolated failure harness and CM-2096 rollback semantic packet` |
+| Current validation | `CMV-2201` |
+| Current route | Independent non-executing packet/harness review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
-CM-2095 application receipt review passed. Six receipt-backed fields plus
-`phase8ReceiptBundleAppliedToCompletionAudit` remain applied. CM-2096 rollback
-and CM-2097 failure-recovery requests are separate preparation artifacts with
-zero execution authority; both evidence fields and Phase 8 remain false.
+CM-2096 and CM-2097 route reviews passed for preparation only. CM-2096 freezes
+append-only tombstone semantics but leaves marker-aware verify implementation
+unfrozen. CM-2097 freezes three isolated case manifests and a compile/validate
+harness with no execution entrypoint. Both evidence fields and Phase 8 remain false.
 
 CM-2095 requests a separate application decision for the six receipt-backed
 fields supported by the accepted CM-2094 proof. Rollback and failure-recovery

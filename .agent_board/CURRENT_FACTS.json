@@ -11,7 +11,7 @@
   },
   "updatedAt": "2026-07-11",
   "taskId": "CM-2097",
-  "validationId": "CMV-2200",
+  "validationId": "CMV-2201",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -145,6 +145,14 @@
     "phase8RollbackDrillEvidenceRequestPrepared": true,
     "phase8FailureRecoveryEvidenceRequestPrepared": true,
     "phase8RemainingEvidenceExecutionAuthorized": false,
+    "phase8RollbackRouteDecisionReference": "CM-2096-ER-20260711-ROLLBACK-ROUTE-PASS-NO-EXECUTION-BB6EBB76",
+    "phase8FailureRecoveryRouteDecisionReference": "CM-2097-ER-20260711-FAILURE-RECOVERY-ROUTE-PASS-NO-EXECUTION-C8DBFB58",
+    "phase8RollbackSemanticPacketPrepared": true,
+    "phase8RollbackMarkerCanonicalSha256": "0407cbcfffce19c8b015f1d18c10735ebe3c45b348e62ec8b1e6e76de509e467",
+    "phase8RollbackMarkerAwareVerifyImplementationFrozen": false,
+    "phase8FailureRecoveryHarnessPrepared": true,
+    "phase8FailureRecoveryManifestCount": 3,
+    "phase8FailureRecoveryExecutionApiPresent": false,
     "phase8RollbackDrillPassed": false,
     "phase8FailureRecoveryProofPassed": false,
     "phase8DerivedIndexProofAccepted": false,
@@ -161,7 +169,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_remaining_evidence_requests_prepared_no_execution_phase8_incomplete",
+    "scope": "near_model_memory_plan_pack_packet_and_harness_prepared_no_execution_phase8_incomplete",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -169,6 +177,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2201",
+      "scope": "CM-2096 rollback semantic packet and CM-2097 isolated failure harness",
+      "status": "COMPLETED_PACKET_AND_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE"
+    },
     {
       "id": "CMV-2200",
       "scope": "CM-2096 rollback and CM-2097 failure-recovery independent request preparation",

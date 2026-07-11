@@ -4,18 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2097 Phase 8 remaining evidence request preparation`.
-Current validation: `CMV-2200`.
-Current handoff: CM-2095 receipt review passed. Submit CM-2096 rollback and CM-2097 failure-recovery requests separately; neither authorizes execution and Phase 8 remains incomplete.
+Current task: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
+Current validation: `CMV-2201`.
+Current handoff: Submit the non-executing CM-2096 semantic packet and CM-2097 three-case harness for independent review. No tombstone, fault injection, write, verify, retry, or compensation is authorized.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2095 application is applied, independently accepted, and non-replayable.
-CM-2096 and CM-2097 separately prepare the remaining evidence review routes.
-No exact rollback/failure executor is frozen, so no action is authorized;
-rollback/failure fields, Phase 8 completion, and readiness remain false.
+CM-2096 route selects append-only tombstone but marker-aware effective-visibility
+verify remains design-only. CM-2097 harness compiles and validates three fixed,
+isolated manifests and exports no executor. No action is authorized; rollback,
+failure recovery, Phase 8 completion, and readiness remain false.
 
 CM-2095 is the active gate. Review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 accepts the one-shot proof but ends the authorization lifecycle. Application is

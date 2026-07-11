@@ -4,17 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2097 Phase 8 remaining evidence request preparation`.
-Current validation: `CMV-2200`.
-Current project status: CM-2095 application receipt review passed. CM-2096 rollback and CM-2097 failure-recovery requests are prepared separately with zero execution authority; Phase 8 remains incomplete.
-Current route: `CM2096_2097_REMAINING_EVIDENCE_REQUESTS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE`.
+Current task: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
+Current validation: `CMV-2201`.
+Current project status: CM-2096 rollback route and CM-2097 failure-recovery route passed for preparation only. Non-executing semantic packet, isolated harness, and three case manifests are prepared; all execution authority and Phase 8 completion remain false.
+Current route: `CM2096_PACKET_CM2097_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-2095 application receipt review `...PASS-8C8A22F8` accepted the applied
-bundle. CM-2096 and CM-2097 now prepare independent future evidence routes only;
-they authorize zero native, verify, rollback, compensation, or recovery actions.
+CM-2096 route `...NO-EXECUTION-BB6EBB76` selects append-only logical tombstone.
+CM-2097 route `...NO-EXECUTION-C8DBFB58` permits an isolated synthetic harness.
+The packet and manifests are non-executing; native, verify, rollback,
+compensation, and recovery action counts remain zero.
 
 CM-2095 binds review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 and requests a separate application gate for exact approval, side effect, durable

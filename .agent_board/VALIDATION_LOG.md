@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest validation: `CMV-2200`.
-Latest task: `CM-2097 Phase 8 remaining evidence request preparation`.
+Latest validation: `CMV-2201`.
+Latest task: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
 Validation facts should be summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts are collected by fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -17,6 +17,7 @@ Active validation ledger. Long historical validation rows are archived by refere
 
 | ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |
 |---|---|---|---|---|---|---|---|
+| CMV-2201 | route decision binding; marker canonical bytes/hash; target/semantic/verify fail-closed; three fixed case manifests; unique nonce/receipt/registry; no execute API; focused `6/6`; default `5200/5200`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2096 semantic packet and CM-2097 isolated harness | COMPLETED_PACKET_AND_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE | Marker-only is not rollback proof; harness compiles/validates manifests only; all execution and evidence fields false. | Submit frozen packet/harness for independent review; no case or tombstone execution. | 2026-07-11 |
 | CMV-2200 | receipt review binding; independent rollback/failure request contracts; zero authority/effects; focused `3/3`; default `5194/5194`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2097 failure recovery and CM-2096 separation | COMPLETED_REMAINING_EVIDENCE_REQUESTS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE | Separate request artifacts preserve both evidence fields false and authorize no execution. | Submit CM-2096 and CM-2097 independently; implement/freeze exact executor only after review direction. | 2026-07-11 |
 | CMV-2199 | CM-2095 receipt PASS intake; rollback target/mechanism non-inference; compensation-as-write; zero authority/effects; focused contract | P8-native-write-proof / P6-docs-drift | CM-2096 rollback drill request | COMPLETED_ROLLBACK_DRILL_EVIDENCE_REQUEST_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE | Rollback request is preparation only; no mechanism selected and no action authorized. | Obtain independent request review before any executor or action-specific authorization work. | 2026-07-11 |
 | CMV-2198 | exact decision commit/blob/SHA; request/receipt Git binding; clean audit/trace baseline; application gate/boundary/application; six-field allowlist; rollback/failure false; canonical receipt hash; no runtime counters; focused `62/62`; default `5191/5191`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2095 evidence application | COMPLETED_EVIDENCE_APPLIED_ROLLBACK_FAILURE_MISSING_PHASE8_INCOMPLETE_RECEIPT_REVIEW_REQUIRED | Application consumed once; receipt SHA `8c8a22f8…0939`; six fields and bundle marker applied; Phase 8 incomplete. | Submit application receipt for independent review; never replay. | 2026-07-11 |

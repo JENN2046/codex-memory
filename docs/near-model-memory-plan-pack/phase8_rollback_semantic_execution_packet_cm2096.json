@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2096",
+  "routeDecisionReference": "CM-2096-ER-20260711-ROLLBACK-ROUTE-PASS-NO-EXECUTION-BB6EBB76",
+  "packetType": "rollback_semantic_and_execution_packet_non_executing",
+  "action": "tombstone_memory",
+  "exactApprovalAction": "live_bridge_tombstone_memory_proof",
+  "targetKind": "cm2094_synthetic_proof_record_only",
+  "targetBinding": {
+    "executionReceiptCommit": "91c20ce4c9b85966ef2da6b7c37563ebbce0f365",
+    "durableRecordBytes": 269,
+    "durableRecordSha256": "4f863f52455147c691c873cc5821f82e9904b6df554d6aeaf2ac960a1baa3828",
+    "rawPathDisclosed": false
+  },
+  "markerCanonicalObject": {
+    "action": "tombstone_memory",
+    "appendOnly": true,
+    "mutationMarkerOnly": true,
+    "reasonCode": "cm2096_rollback_drill_synthetic_proof_record",
+    "target": {
+      "durableRecordSha256": "4f863f52455147c691c873cc5821f82e9904b6df554d6aeaf2ac960a1baa3828",
+      "executionReceiptCommit": "91c20ce4c9b85966ef2da6b7c37563ebbce0f365"
+    }
+  },
+  "markerCanonicalBytes": 301,
+  "markerCanonicalSha256": "0407cbcfffce19c8b015f1d18c10735ebe3c45b348e62ec8b1e6e76de509e467",
+  "rollbackSemantics": {
+    "model": "append_only_logical_tombstone",
+    "appendOnly": true,
+    "originalRecordPreserved": true,
+    "tombstoneMarkerRequired": true,
+    "effectiveVisibilitySuppressionRequired": true,
+    "physicalDeleteForbidden": true,
+    "inPlaceOverwriteForbidden": true,
+    "supersedeSelected": false
+  },
+  "markerAwareVerifyDesign": {
+    "surface": "cm2096_marker_aware_effective_visibility_projection",
+    "implementationFrozen": false,
+    "selectedFieldsOnly": true,
+    "rawMemoryReturned": false,
+    "rawAuditReturned": false,
+    "requiredOutcomes": {
+      "markerPersistedExactHash": true,
+      "originalRecordBytesUnchanged": true,
+      "effectiveLifecycleStatus": "tombstoned",
+      "governedRetrievalReturnsTargetAsEffectiveMemory": false,
+      "otherRealMemoryRead": false,
+      "otherRealMemoryModified": false
+    }
+  },
+  "futureExecutionRequirements": {
+    "frozenExecutorRequired": true,
+    "exactTargetRequired": true,
+    "uniqueNonceRequired": true,
+    "uniqueReceiptRequired": true,
+    "isolatedRegistryRequired": true,
+    "independentActionSpecificAuthorizationRequired": true,
+    "independentReceiptReviewRequired": true
+  },
+  "executionAuthorized": false,
+  "tombstoneExecutionAuthorized": false,
+  "verifyAuthorized": false,
+  "rollbackDrillPassed": false,
+  "failureRecoveryProofPassed": false,
+  "phase8Completed": false,
+  "nativeActionCount": 0,
+  "verifyOperationCount": 0,
+  "realMemoryReadCount": 0,
+  "existingRealMemoryModificationCount": 0
+}
