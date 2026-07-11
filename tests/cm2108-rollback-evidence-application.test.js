@@ -71,6 +71,18 @@ test('CM-2108 applies only rollbackDrillPassed and keeps Phase 8 incomplete', ()
   assert.equal(evaluateApplicationReceipt(receipt).accepted, true);
 });
 
+test('CM-2108 frozen application receipt matches the accepted one-shot result', () => {
+  const receipt = JSON.parse(fs.readFileSync(path.join(
+    DOCS,
+    'phase8_rollback_evidence_application_receipt_cm2108.json'
+  ), 'utf8'));
+  const result = evaluateApplicationReceipt(receipt);
+  assert.equal(result.accepted, true, result.blockers.join(', '));
+  assert.equal(result.rollbackDrillPassed, true);
+  assert.equal(result.failureRecoveryProofPassed, false);
+  assert.equal(result.phase8Completed, false);
+});
+
 test('CM-2108 fails closed on decision, receipt, baseline, replay, or overclaim drift', () => {
   const cases = [
     value => { value.decision.allowedPatch.phase8Completed = true; },

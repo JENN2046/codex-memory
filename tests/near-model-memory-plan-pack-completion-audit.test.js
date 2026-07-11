@@ -584,6 +584,26 @@ test('CM2029 keeps Phase 8 incomplete when receipt bundle contract exists but ex
   assert.equal(result.nonClaims.productionReadyClaimed, false);
 });
 
+test('CM2108 accepts rollback evidence but keeps Phase 8 incomplete on failure recovery alone', () => {
+  const evidence = fullEvidence();
+  evidence.rollbackDrillPassed = true;
+  evidence.failureRecoveryProofPassed = false;
+
+  const result = evaluateNearModelMemoryPlanPackCompletionAudit({ evidence });
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.fullPlanPackCompleted, false);
+  assert.ok(result.incompletePhaseIds.includes('phase8_native_write_production_proof'));
+  assert.ok(!result.blockers.includes(
+    'missing_phase8_native_write_production_proof_rollbackDrillPassed'
+  ));
+  assert.ok(result.blockers.includes(
+    'missing_phase8_native_write_production_proof_failureRecoveryProofPassed'
+  ));
+  assert.equal(result.sideEffects.nativeWriteExecuted, false);
+  assert.equal(result.nonClaims.productionReadyClaimed, false);
+});
+
 test('CM2032 keeps Phase 9 and Phase 10 incomplete when review intake exists but review evidence is missing', () => {
   const evidence = fullEvidence();
   evidence.observationOrDogfoodReviewPassed = false;

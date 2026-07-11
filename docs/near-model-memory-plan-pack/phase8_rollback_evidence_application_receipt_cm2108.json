@@ -1,0 +1,67 @@
+{
+  "receiptPayload": {
+    "schemaVersion": 1,
+    "taskId": "CM-2108",
+    "receiptType": "rollback_evidence_completion_audit_application_receipt",
+    "decision": {
+      "reference": "CM-2108-SELF-ROLLBACK-EVIDENCE-APPLICATION-928DA067",
+      "commit": "8bd6ac205d093975f77e817e3ea0f945f6962985",
+      "blobOid": "3926d8d58f3cc868a7cba662a8e1a58305db4376",
+      "bytes": 1895,
+      "sha256": "bec1e447a207ee16bf90f85b251ea02588da702a05e39652d982091c862e32b9"
+    },
+    "sourceRollbackReceipt": {
+      "commit": "32eb63b891647d1794d51e025883bbc12b521db1",
+      "tree": "62c90e7d0dfa717554bd12d0417a26d38d00839f",
+      "blobOid": "8b6720bf04d7d9c2d7e1bbee7194dcae72b010a5",
+      "bytes": 3234,
+      "sha256": "86701dd223ef054406df846faffb958708795465205b8ba84ee2cbde8abec609",
+      "payloadSha256": "928da067bed3fc6e840fd903e8012c248753a82b9fdb9a4b6d259a68b4fbe95d",
+      "acceptedAsRollbackEvidence": true
+    },
+    "applicationRuntime": {
+      "commit": "48bb5259cb3af83fc9f27152d4b5755ae31d44f0",
+      "tree": "1ed1bb913de668a0ca3a5c07cdef6a1999a19b6b",
+      "cleanBeforeApplication": true,
+      "completionAuditBaselineBlobOid": "194a9ddea400fe835a3191f015db20ba3e47ac03",
+      "traceMatrixBaselineBlobOid": "746da6c456160b764ab71e151fc01b89b7551d6f"
+    },
+    "contractResults": {
+      "applicationGate": "cm2108_rollback_evidence_application_gate_accepted",
+      "patchBoundary": "cm2108_rollback_evidence_patch_boundary_accepted",
+      "patchApplication": "cm2108_rollback_evidence_patch_application_accepted"
+    },
+    "appliedEvidence": {
+      "rollbackDrillPassed": true,
+      "failureRecoveryProofPassed": false,
+      "phase8Completed": false,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    },
+    "authorization": {
+      "useCount": 1,
+      "consumed": true,
+      "replayAllowed": false
+    },
+    "applicationCounters": {
+      "completionAuditPatchApplications": 1,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "recordMemoryCalls": 0,
+      "tombstoneMemoryCalls": 0,
+      "verifyOperations": 0,
+      "retryOperations": 0,
+      "rollbackOrCompensationOperations": 0,
+      "remoteActions": 0,
+      "readinessClaims": 0
+    },
+    "boundaries": {
+      "defaultProductRetrievalTombstoneAwarenessProven": false,
+      "failureRecoveryProofPassed": false,
+      "phase8Completed": false,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    }
+  },
+  "receiptPayloadSha256": "8517b8e930f4d78d203fc6d8f1a7256f4c7b4ab303183cdf56db8aa70c320a0b"
+}

@@ -4,6 +4,20 @@ Task id: `CM-2024`
 Validation id: `CMV-2125`
 Date: `2026-07-10`
 
+## CM-2108 Rollback Application Trace Update
+
+`rollbackDrillPassed` now traces to the exact CM-2107 identity-bound tombstone
+execution receipt and the one-shot CM-2108 application receipt. The chain
+binds the original synthetic record hash, exact marker hash, one tombstone
+write, one correlated verify, original-record preservation, and a zero-target
+effective lifecycle projection.
+
+The application receipt payload SHA-256 is `8517b8e9…0a0b`.
+`failureRecoveryProofPassed` remains false, so Phase 8 and the full plan pack
+remain incomplete. Default product retrieval tombstone awareness, provider
+execution, readiness, release, and production claims remain outside this
+evidence.
+
 ## CM-2095 Phase 8 Application Trace Update
 
 The exact approval, native side effect, primary durable Markdown, verify,
@@ -12,9 +26,11 @@ receipt evidence in `phase8_completion_evidence_application_receipt_cm2095.json`
 `phase8ReceiptBundleAppliedToCompletionAudit` is applied by the separately
 authorized CM-2095 patch. Receipt payload SHA-256 is `8c8a22f8…0939`.
 
-`rollbackDrillPassed` and `failureRecoveryProofPassed` remain future exact
-evidence and false. Derived-index/provider proof remains unaccepted. Therefore
-Phase 8 and the full plan pack remain incomplete, with no readiness claim.
+At the CM-2095 application point, `rollbackDrillPassed` and
+`failureRecoveryProofPassed` were future exact evidence and false. CM-2108 now
+applies the rollback field separately; failure recovery remains false.
+Derived-index/provider proof remains unaccepted. Therefore Phase 8 and the full
+plan pack remain incomplete, with no readiness claim.
 
 ## CM-2082 Application Trace Update
 

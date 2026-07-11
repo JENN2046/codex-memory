@@ -4,6 +4,27 @@ Task: `CM-2017 near-model-memory plan pack completion audit`
 Validation: `CMV-2118`
 Date: 2026-07-10
 
+## CM-2108 Rollback Evidence Application
+
+The self-governed exact application decision
+`CM-2108-SELF-ROLLBACK-EVIDENCE-APPLICATION-928DA067` bound the accepted
+CM-2107 rollback receipt and authorized one Completion Audit patch.
+
+```yaml
+rollbackDrillPassed: true
+failureRecoveryProofPassed: false
+phase8Completed: false
+fullPlanPackCompleted: false
+readinessClaimed: false
+```
+
+Application gate, patch boundary, patch application, and receipt validation all
+accepted. Receipt payload SHA-256 is `8517b8e9…0a0b`. The source evidence proves
+one append-only tombstone and one marker-aware lifecycle verify against the
+identity-bound synthetic store. It does not claim default product retrieval
+tombstone awareness and did not execute another native action. Phase 8 remains
+incomplete only because failure-recovery proof has not yet been applied.
+
 ## CM-2095 Authorized Phase 8 Evidence Application
 
 Decision `CM-2095-ER-20260711-COMPLETION-EVIDENCE-APPLICATION-PASS-2E98CE0C`
