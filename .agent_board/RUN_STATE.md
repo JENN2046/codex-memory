@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
-Current validation: `CMV-2201`.
-Current status: Route preparation passed; non-executing semantic packet/harness prepared; no action authority; Phase 8 incomplete.
+Current task: `CM-2098 CM-2096 frozen rollback execution packet v2`.
+Current validation: `CMV-2202`.
+Current status: Exact target, 507-byte marker, lifecycle projection, and non-executing packet prepared; no tombstone/verify authority; Phase 8 incomplete.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the CM-2096 semantic packet and
-CM-2097 isolated case manifests. Do not execute tombstone or fault injection,
-claim a registry, create receipts, or alter Phase 8 evidence fields.
+Next safe action is independent review of CM-2096 v2 packet. Do not call
+`tombstone_memory`, run verify, claim nonce/registry, create an execution receipt,
+or alter rollback/Phase 8 evidence fields.
 
 ## Historical Run Notes
 

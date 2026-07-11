@@ -4,18 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
-Current validation: `CMV-2201`.
-Current project status: CM-2096 rollback route and CM-2097 failure-recovery route passed for preparation only. Non-executing semantic packet, isolated harness, and three case manifests are prepared; all execution authority and Phase 8 completion remain false.
-Current route: `CM2096_PACKET_CM2097_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE`.
+Current task: `CM-2098 CM-2096 frozen rollback execution packet v2`.
+Current validation: `CMV-2202`.
+Current project status: CM-2096 semantic design passed. Exact safe target reference, real 507-byte shim marker, marker-aware lifecycle projection, and non-executing v2 packet are prepared; tombstone execution and Phase 8 completion remain false.
+Current route: `CM2096_V2_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-2096 route `...NO-EXECUTION-BB6EBB76` selects append-only logical tombstone.
-CM-2097 route `...NO-EXECUTION-C8DBFB58` permits an isolated synthetic harness.
-The packet and manifests are non-executing; native, verify, rollback,
-compensation, and recovery action counts remain zero.
+CM-2096 semantic decision `...51F21F60-NO-EXECUTION` is frozen and machine
+bound. V2 derives target `vcp-kb-4f863f52455147c6`, uses the actual shim
+serializer for a 507-byte marker (`27a5e586…6263a`), and implements selected-field
+lifecycle suppression. The frozen executor still hard-stops execution.
 
 CM-2095 binds review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 and requests a separate application gate for exact approval, side effect, durable

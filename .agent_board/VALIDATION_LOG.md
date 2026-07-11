@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest validation: `CMV-2201`.
-Latest task: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
+Latest validation: `CMV-2202`.
+Latest task: `CM-2098 CM-2096 frozen rollback execution packet v2`.
 Validation facts should be summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts are collected by fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -17,6 +17,7 @@ Active validation ledger. Long historical validation rows are archived by refere
 
 | ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |
 |---|---|---|---|---|---|---|---|
+| CMV-2202 | semantic decision Git/blob/SHA; target ref derivation; actual shim serializer; payload/507-byte marker hashes; marker-aware selected-field filtering; frozen executor hard-stop; focused `11/11`; default `5209/5209`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2098 CM-2096 rollback packet v2 | COMPLETED_V2_ROLLBACK_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE | Closes target ID, durable marker, and lifecycle-layer gaps while all execution/evidence counters remain zero/false. | Submit v2 packet for independent review; no tombstone or verify before new exact decision. | 2026-07-11 |
 | CMV-2201 | route decision binding; marker canonical bytes/hash; target/semantic/verify fail-closed; three fixed case manifests; unique nonce/receipt/registry; no execute API; focused `6/6`; default `5200/5200`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2096 semantic packet and CM-2097 isolated harness | COMPLETED_PACKET_AND_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE | Marker-only is not rollback proof; harness compiles/validates manifests only; all execution and evidence fields false. | Submit frozen packet/harness for independent review; no case or tombstone execution. | 2026-07-11 |
 | CMV-2200 | receipt review binding; independent rollback/failure request contracts; zero authority/effects; focused `3/3`; default `5194/5194`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2097 failure recovery and CM-2096 separation | COMPLETED_REMAINING_EVIDENCE_REQUESTS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE | Separate request artifacts preserve both evidence fields false and authorize no execution. | Submit CM-2096 and CM-2097 independently; implement/freeze exact executor only after review direction. | 2026-07-11 |
 | CMV-2199 | CM-2095 receipt PASS intake; rollback target/mechanism non-inference; compensation-as-write; zero authority/effects; focused contract | P8-native-write-proof / P6-docs-drift | CM-2096 rollback drill request | COMPLETED_ROLLBACK_DRILL_EVIDENCE_REQUEST_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE | Rollback request is preparation only; no mechanism selected and no action authorized. | Obtain independent request review before any executor or action-specific authorization work. | 2026-07-11 |

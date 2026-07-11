@@ -8,20 +8,20 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2096 semantic packet and CM-2097 isolated harness prepared; no execution authority; Phase 8 incomplete |
-| Current task | `CM-2097 isolated failure harness and CM-2096 rollback semantic packet` |
-| Current validation | `CMV-2201` |
-| Current route | Independent non-executing packet/harness review |
+| Status | CM-2096 v2 packet prepared with exact target/marker/lifecycle binding; no execution authority; Phase 8 incomplete |
+| Current task | `CM-2098 CM-2096 frozen rollback execution packet v2` |
+| Current validation | `CMV-2202` |
+| Current route | Independent CM-2096 v2 packet review; no tombstone execution |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
-CM-2096 and CM-2097 route reviews passed for preparation only. CM-2096 freezes
-append-only tombstone semantics but leaves marker-aware verify implementation
-unfrozen. CM-2097 freezes three isolated case manifests and a compile/validate
-harness with no execution entrypoint. Both evidence fields and Phase 8 remain false.
+CM-2096 semantic design passed. V2 packet binds the CM-2094 target reference
+derived from its durable SHA, exact tombstone payload, actual 507-byte shim
+Markdown, and a marker-aware selected-field lifecycle layer. Executor execution
+is hard-disabled; rollback evidence and Phase 8 remain false. CM-2097 remains separate.
 
 CM-2095 requests a separate application decision for the six receipt-backed
 fields supported by the accepted CM-2094 proof. Rollback and failure-recovery

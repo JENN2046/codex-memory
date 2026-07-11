@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2097",
-  "validationId": "CMV-2201",
+  "taskId": "CM-2098",
+  "validationId": "CMV-2202",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -149,7 +149,15 @@
     "phase8FailureRecoveryRouteDecisionReference": "CM-2097-ER-20260711-FAILURE-RECOVERY-ROUTE-PASS-NO-EXECUTION-C8DBFB58",
     "phase8RollbackSemanticPacketPrepared": true,
     "phase8RollbackMarkerCanonicalSha256": "0407cbcfffce19c8b015f1d18c10735ebe3c45b348e62ec8b1e6e76de509e467",
-    "phase8RollbackMarkerAwareVerifyImplementationFrozen": false,
+    "phase8RollbackMarkerAwareVerifyImplementationFrozen": true,
+    "phase8RollbackSemanticDecisionReference": "CM-2096-ER-20260711-SEMANTIC-PACKET-PASS-51F21F60-NO-EXECUTION",
+    "phase8RollbackSemanticDecisionCommit": "ac465bd659d430821127db92c2b1cc327758421d",
+    "phase8RollbackTargetMemoryIdRef": "vcp-kb-4f863f52455147c6",
+    "phase8RollbackPayloadCanonicalSha256": "661e7eaf21cee1d31ebbaf81188fb65d4a1a0f5116ebd114aa37ca15a1251166",
+    "phase8RollbackDurableMarkerBytes": 507,
+    "phase8RollbackDurableMarkerSha256": "27a5e58649908bbc4f835d891149d028e71dcc5042dcb13daaa597bd4286263a",
+    "phase8RollbackExecutionPacketV2Prepared": true,
+    "phase8RollbackExecutionAuthorized": false,
     "phase8FailureRecoveryHarnessPrepared": true,
     "phase8FailureRecoveryManifestCount": 3,
     "phase8FailureRecoveryExecutionApiPresent": false,
@@ -169,7 +177,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_packet_and_harness_prepared_no_execution_phase8_incomplete",
+    "scope": "near_model_memory_plan_pack_cm2096_v2_packet_prepared_no_execution_phase8_incomplete",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -177,6 +185,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2202",
+      "scope": "CM-2098 CM-2096 frozen rollback execution packet v2",
+      "status": "COMPLETED_V2_ROLLBACK_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE"
+    },
     {
       "id": "CMV-2201",
       "scope": "CM-2096 rollback semantic packet and CM-2097 isolated failure harness",

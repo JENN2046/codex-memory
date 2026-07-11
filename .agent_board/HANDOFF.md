@@ -4,18 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
-Current validation: `CMV-2201`.
-Current handoff: Submit the non-executing CM-2096 semantic packet and CM-2097 three-case harness for independent review. No tombstone, fault injection, write, verify, retry, or compensation is authorized.
+Current task: `CM-2098 CM-2096 frozen rollback execution packet v2`.
+Current validation: `CMV-2202`.
+Current handoff: Submit CM-2096 v2 packet for independent review. It binds the safe target, actual shim marker, lifecycle projection, nonce/receipt/registry, but authorizes no tombstone or verify.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2096 route selects append-only tombstone but marker-aware effective-visibility
-verify remains design-only. CM-2097 harness compiles and validates three fixed,
-isolated manifests and exports no executor. No action is authorized; rollback,
-failure recovery, Phase 8 completion, and readiness remain false.
+CM-2096 v2 closes the target-ID, durable-marker, and lifecycle-layer gaps. The
+safe target ref is derived from the exact CM-2094 SHA; marker bytes come from the
+actual shim serializer; candidate filtering uses selected-field references only.
+Execution is hard-stopped and rollback/Phase 8 evidence remains false.
 
 CM-2095 is the active gate. Review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 accepts the one-shot proof but ends the authorization lifecycle. Application is

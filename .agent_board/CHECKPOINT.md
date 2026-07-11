@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2097 isolated failure harness and CM-2096 rollback semantic packet`.
-Current validation: `CMV-2201`.
+Current checkpoint: `CM-2098 CM-2096 frozen rollback execution packet v2`.
+Current validation: `CMV-2202`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2096 Frozen Rollback Packet v2
+
+Status: `V2_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE`
+
+- Semantic decision is frozen with exact Git/blob/SHA binding.
+- Target ref `vcp-kb-4f863f52455147c6` is derived from CM-2094 durable SHA.
+- Actual shim serializer freezes a 507-byte marker with SHA `27a5e586…6263a`.
+- Marker-aware lifecycle filters only safe candidate refs and returns no raw content.
+- Executor execution hard-stops; action and verify counters remain zero.
+
+Validation: `CMV-2202`.
 
 ## CM-2096 Semantic Packet / CM-2097 Isolated Harness
 
