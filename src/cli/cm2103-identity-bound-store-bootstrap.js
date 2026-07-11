@@ -97,8 +97,8 @@ function expectedDecisionBinding({ packet, executionPacketCommit, executionPacke
 function buildCm2103BootstrapReceipt({ packet, observedDecision, executionPacketCommit, executionPacketBlobOid, executionPacketBytes, bindingHash, claim, outcomeStage }) {
   const success = claim.state === 'CONSUMED_SUCCESS';
   return {
-    schemaVersion: 2,
-    taskId: 'CM-2103-R1',
+    schemaVersion: 3,
+    taskId: 'CM-2103-R2',
     receiptType: 'identity_bound_synthetic_store_bootstrap_receipt_union',
     result: success ? 'PASS' : 'STOPPED',
     finalState: claim.state,
@@ -131,9 +131,15 @@ function buildCm2103BootstrapReceipt({ packet, observedDecision, executionPacket
     bindingHash,
     nonce: packet.nonce,
     receiptId: packet.receiptId,
-    storeDirectoryExistenceCheckedBeforeClaim: true,
-    storeDirectoryAbsentBeforeClaim: true,
-    existingStoreDirectoryRead: false,
+    claimEnvelopePresent: claim.claimEnvelopePresent,
+    claimEnvelopeBindingVerified: claim.claimEnvelopeBindingVerified,
+    receiptReconstructedFromExistingEnvelope: claim.reentryProjection === true,
+    reentrySourceState: claim.reentrySourceState,
+    storeFilesystemAccessesDuringReentry: 0,
+    storeFilesystemWritesDuringReentry: 0,
+    storeDirectoryExistenceCheckedBeforeClaim: claim.storeDirectoryExistenceCheckedBeforeClaim,
+    storeDirectoryAbsentBeforeClaim: claim.storeDirectoryAbsentBeforeClaim,
+    existingStoreDirectoryRead: claim.existingStoreDirectoryRead,
     storeDirectoryCreateAttempts: claim.directoryCreateAttempts,
     storeDirectoryCreates: claim.directoryCreates,
     storeDirectoryCreated: claim.storeDirectoryCreated,
@@ -150,12 +156,13 @@ function buildCm2103BootstrapReceipt({ packet, observedDecision, executionPacket
     governanceRegistryDirectoryCreates: claim.governanceRegistryDirectoryCreates,
     governanceRegistryIdentityWrites: claim.governanceRegistryIdentityWrites,
     authorizationMarkerWrites: claim.authorizationMarkerWrites,
+    governanceFilesystemEffectAttempted: claim.governanceFilesystemEffectAttempted,
     claimEnvelopeCreateAttempts: claim.claimEnvelopeCreateAttempts,
     claimEnvelopeCreates: claim.claimEnvelopeCreates,
     claimStateWriteAttempts: claim.claimStateWriteAttempts,
     claimStateWrites: claim.claimStateWrites,
     terminalStateDurablyRecorded: claim.terminalStateDurablyRecorded,
-    governanceFilesystemEffectsPresent: claim.claimEnvelopeCreateAttempts > 0,
+    governanceFilesystemEffectsPresent: claim.governanceFilesystemEffectsPresent,
     authorizationUseCount: 1,
     authorizationConsumed: true,
     authorizationReplayAllowed: false,
@@ -199,11 +206,11 @@ async function runFrozenCm2103Bootstrap(executionPacketCommit, futureDecisionCom
   if (!packetResult.accepted) throw new Error(`cm2103_execution_packet_rejected:${packetResult.blockers.join(',')}`);
 
   verifyFrozenGitObject({
-    commit: packet.r1ReviewDecisionSourceCommit,
-    file: packet.r1ReviewDecisionPath,
-    blobOid: packet.r1ReviewDecisionBlobOid,
-    bytes: packet.r1ReviewDecisionBytes,
-    sha256: packet.r1ReviewDecisionSha256
+    commit: packet.r2ReviewDecisionSourceCommit,
+    file: packet.r2ReviewDecisionPath,
+    blobOid: packet.r2ReviewDecisionBlobOid,
+    bytes: packet.r2ReviewDecisionBytes,
+    sha256: packet.r2ReviewDecisionSha256
   });
   verifyFrozenGitObject({
     commit: packet.foundationDecisionSourceCommit,

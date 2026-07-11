@@ -42,6 +42,13 @@ const observedDecision = Object.freeze({
 function baseClaim(overrides = {}) {
   return {
     state: 'CONSUMED_SUCCESS',
+    claimEnvelopePresent: true,
+    claimEnvelopeBindingVerified: true,
+    reentryProjection: false,
+    reentrySourceState: null,
+    storeDirectoryExistenceCheckedBeforeClaim: true,
+    storeDirectoryAbsentBeforeClaim: true,
+    existingStoreDirectoryRead: false,
     directoryCreateAttempts: 1,
     directoryCreates: 1,
     storeDirectoryCreated: true,
@@ -57,6 +64,8 @@ function baseClaim(overrides = {}) {
     governanceRegistryDirectoryCreates: 0,
     governanceRegistryIdentityWrites: 0,
     authorizationMarkerWrites: 0,
+    governanceFilesystemEffectAttempted: true,
+    governanceFilesystemEffectsPresent: true,
     claimEnvelopeCreateAttempts: 1,
     claimEnvelopeCreates: 1,
     claimStateWriteAttempts: 7,

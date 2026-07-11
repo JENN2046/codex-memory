@@ -16,16 +16,20 @@ const {
   GOVERNANCE_ROOT_IDENTITY_SHA256
 } = require('./Cm2103IdentityBoundStoreGovernance');
 const { REGISTRY_IDENTITY } = require('./Cm2103IdentityBoundStoreBootstrapRegistry');
+const {
+  NONTERMINAL_REENTRY,
+  TERMINAL_REENTRY_OUTCOMES
+} = require('./Cm2103IdentityBoundStoreBootstrapState');
 
-const R1_REVIEW_DECISION = Object.freeze({
-  reference: 'CM-2103-ER-20260711-CHANGES-REQUIRED-CLAIM-AMBIGUITY-RECEIPT-INCOMPLETE-D9D896AC',
-  sourceCommit: '237e7b9b3ff0ac6ca1dd970a856c346c98086d5f',
-  sourceTree: 'f06553a3c01d1522a91643aad6c061a1077b5c17',
-  path: 'docs/near-model-memory-plan-pack/phase8_bootstrap_executor_review_decision_cm2103_r1.json',
-  blobOid: '94b5a4b8373b4094e1ec354e174cd1825a069166',
-  bytes: 3270,
-  sha256: '31135cef23dd1b52678fcb8a7689326c00e29df1a74ecdb34f92129f3e051e52',
-  payloadSha256: 'be4e2f54b6892ade8aba39006ab1869d21d88e884a734964302ef7786c4723c2'
+const R2_REVIEW_DECISION = Object.freeze({
+  reference: 'CM-2103-R1-ER-20260711-CHANGES-REQUIRED-DURABLE-REENTRY-INCOMPLETE-175ECE43',
+  sourceCommit: 'a0191b2be4eb7ef44e5919e9af89d3d31c373c93',
+  sourceTree: '01016e0fe7eb332056657200ce44ed8047c941a1',
+  path: 'docs/near-model-memory-plan-pack/phase8_bootstrap_executor_review_decision_cm2103_r2.json',
+  blobOid: 'df4fc6d519be7208c68752f71eb67fc376e114f8',
+  bytes: 4393,
+  sha256: '4dfe57dcee82c8a1ac34c7717590cf5e1ef57aabf6804f316ef6871a15daddce',
+  payloadSha256: 'dd8c65de44e38f5245e1cfe9b575baa208f6d077c7c9bca5a5f79e3ae2bf6d4d'
 });
 
 const FOUNDATION_DECISION = Object.freeze({
@@ -59,11 +63,11 @@ const BOOTSTRAP_REQUEST = Object.freeze({
 });
 
 const EXPECTED_FUTURE_DECISION_REFERENCE =
-  'CM-2103-R1-ER-20260711-IDENTITY-BOUND-STORE-BOOTSTRAP-0A7CEB6C-017307C9';
+  'CM-2103-R2-ER-20260711-IDENTITY-BOUND-STORE-BOOTSTRAP-0A7CEB6C-017307C9';
 const FUTURE_DECISION_PATH =
-  'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_decision_cm2103_r1.json';
+  'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_decision_cm2103_r2.json';
 const EXECUTION_PACKET_PATH =
-  'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_execution_packet_cm2103_r1.json';
+  'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_execution_packet_cm2103_r2.json';
 
 const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze({
   decisionIntake: 'src/core/Cm2103IdentityBoundStoreBootstrapDecisionIntake.js',
@@ -90,6 +94,12 @@ const RECEIPT_VARIANTS = Object.freeze([
   'CONSUMED_AMBIGUOUS'
 ]);
 
+const REENTRY_OUTCOME_STAGES = Object.freeze([
+  ...Object.values(NONTERMINAL_REENTRY).map(value => value.outcomeStage),
+  ...Object.values(TERMINAL_REENTRY_OUTCOMES),
+  'reentry_existing_claim_unreadable_or_corrupt'
+]);
+
 const FAULT_INJECTION_CASES = Object.freeze([
   'existing_store_unclaimed_stop',
   'claim_write_before_create',
@@ -101,14 +111,26 @@ const FAULT_INJECTION_CASES = Object.freeze([
   'directory_state_persistence_failure',
   'identity_state_persistence_failure',
   'success_state_persistence_failure',
-  'terminal_state_replay_rejected'
+  'terminal_state_replay_reconstructed'
+]);
+
+const DURABLE_REENTRY_CASES = Object.freeze([
+  'claim_envelope_persistence_unknown',
+  'new_process_reentry_after_claimed',
+  'all_nonterminal_claim_receipt_projections',
+  'corrupt_claim_low_disclosure_ambiguous_receipt',
+  'unreadable_claim_low_disclosure_ambiguous_receipt',
+  'persisted_claim_registry_ambiguous_receipt_reconstruction',
+  'persisted_success_receipt_reconstruction',
+  'reentry_zero_target_store_effects',
+  'governance_filesystem_effect_presence_tristate'
 ]);
 
 const PACKET_KEYS = Object.freeze([
   'schemaVersion', 'taskId', 'packetType', 'packetPurpose',
-  'r1ReviewDecisionReference', 'r1ReviewDecisionSourceCommit', 'r1ReviewDecisionSourceTree',
-  'r1ReviewDecisionPath', 'r1ReviewDecisionBlobOid', 'r1ReviewDecisionBytes',
-  'r1ReviewDecisionSha256', 'r1ReviewDecisionPayloadSha256',
+  'r2ReviewDecisionReference', 'r2ReviewDecisionSourceCommit', 'r2ReviewDecisionSourceTree',
+  'r2ReviewDecisionPath', 'r2ReviewDecisionBlobOid', 'r2ReviewDecisionBytes',
+  'r2ReviewDecisionSha256', 'r2ReviewDecisionPayloadSha256',
   'foundationDecisionReference', 'foundationDecisionSourceCommit', 'foundationDecisionSourceTree',
   'foundationDecisionPath', 'foundationDecisionBlobOid', 'foundationDecisionBytes',
   'foundationDecisionSha256', 'foundationDecisionPayloadSha256',
@@ -129,9 +151,16 @@ const PACKET_KEYS = Object.freeze([
   'actionRegistryDirectoryCreatedByClaim', 'actionRegistryIdentityWrittenByClaim',
   'nonceMarkerWrites', 'receiptMarkerWrites', 'separateClaimRecordWrites',
   'successPartialAmbiguousReceiptUnionImplemented', 'receiptVariants', 'tristateEffectFields',
+  'durableClaimReentryImplemented', 'terminalReceiptReconstructionImplemented',
+  'nonterminalClaimProjectionImplemented', 'corruptEnvelopeLowDisclosureProjectionImplemented',
+  'governanceFilesystemEffectsTristateImplemented', 'governanceFilesystemEffectFields',
+  'reentryTerminalStatePersistenceAllowed', 'reentryMayReplayBootstrap',
+  'reentryMayCreateStoreEffects', 'reentryOutcomeStages',
+  'maxStoreFilesystemAccessesDuringReentry', 'maxStoreFilesystemWritesDuringReentry',
   'filesystemFaultInjectionTestPath', 'filesystemFaultInjectionTestBlobOid',
   'filesystemFaultInjectionTestBytes', 'filesystemFaultInjectionTestSha256',
-  'filesystemFaultInjectionCases',
+  'filesystemFaultInjectionCases', 'durableReentryTestPath', 'durableReentryTestBlobOid',
+  'durableReentryTestBytes', 'durableReentryTestSha256', 'durableReentryCases',
   'nonce', 'receiptId', 'requestedExpiresAt', 'authorizationUseCount', 'authorizationReplayAllowed',
   'stateSequence', 'maxStoreDirectoryCreates', 'maxIdentityWrites', 'maxIdentityReadbackVerifications',
   'maxDirectoryEnumerations', 'maxRecordContentReads', 'maxNativeReads', 'maxNativeWrites',
@@ -174,18 +203,18 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
   const { packetPayloadSha256, ...payload } = packet;
   if (sha256Canonical(payload) !== packetPayloadSha256) blockers.push('packet.packetPayloadSha256');
   const exact = {
-    schemaVersion: 2,
-    taskId: 'CM-2103-R1',
-    packetType: 'identity_bound_synthetic_store_bootstrap_execution_packet_r1_non_executing',
-    packetPurpose: 'independent_review_of_claim_atomicity_and_ambiguous_receipt_repair_without_execution',
-    r1ReviewDecisionReference: R1_REVIEW_DECISION.reference,
-    r1ReviewDecisionSourceCommit: R1_REVIEW_DECISION.sourceCommit,
-    r1ReviewDecisionSourceTree: R1_REVIEW_DECISION.sourceTree,
-    r1ReviewDecisionPath: R1_REVIEW_DECISION.path,
-    r1ReviewDecisionBlobOid: R1_REVIEW_DECISION.blobOid,
-    r1ReviewDecisionBytes: R1_REVIEW_DECISION.bytes,
-    r1ReviewDecisionSha256: R1_REVIEW_DECISION.sha256,
-    r1ReviewDecisionPayloadSha256: R1_REVIEW_DECISION.payloadSha256,
+    schemaVersion: 3,
+    taskId: 'CM-2103-R2',
+    packetType: 'identity_bound_synthetic_store_bootstrap_execution_packet_r2_non_executing',
+    packetPurpose: 'independent_review_of_durable_claim_reentry_and_persistence_unknown_receipt_repair_without_execution',
+    r2ReviewDecisionReference: R2_REVIEW_DECISION.reference,
+    r2ReviewDecisionSourceCommit: R2_REVIEW_DECISION.sourceCommit,
+    r2ReviewDecisionSourceTree: R2_REVIEW_DECISION.sourceTree,
+    r2ReviewDecisionPath: R2_REVIEW_DECISION.path,
+    r2ReviewDecisionBlobOid: R2_REVIEW_DECISION.blobOid,
+    r2ReviewDecisionBytes: R2_REVIEW_DECISION.bytes,
+    r2ReviewDecisionSha256: R2_REVIEW_DECISION.sha256,
+    r2ReviewDecisionPayloadSha256: R2_REVIEW_DECISION.payloadSha256,
     foundationDecisionReference: FOUNDATION_DECISION.reference,
     foundationDecisionSourceCommit: FOUNDATION_DECISION.sourceCommit,
     foundationDecisionSourceTree: FOUNDATION_DECISION.sourceTree,
@@ -237,10 +266,24 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
     receiptMarkerWrites: 0,
     separateClaimRecordWrites: 0,
     successPartialAmbiguousReceiptUnionImplemented: true,
+    durableClaimReentryImplemented: true,
+    terminalReceiptReconstructionImplemented: true,
+    nonterminalClaimProjectionImplemented: true,
+    corruptEnvelopeLowDisclosureProjectionImplemented: true,
+    governanceFilesystemEffectsTristateImplemented: true,
+    reentryTerminalStatePersistenceAllowed: false,
+    reentryMayReplayBootstrap: false,
+    reentryMayCreateStoreEffects: false,
+    maxStoreFilesystemAccessesDuringReentry: 0,
+    maxStoreFilesystemWritesDuringReentry: 0,
     filesystemFaultInjectionTestPath: 'tests/cm2103-bootstrap-filesystem-fault-injection.test.js',
-    filesystemFaultInjectionTestBlobOid: 'e8003ec0d3174eebfcfd8faec44dafa89f3244fb',
-    filesystemFaultInjectionTestBytes: 16544,
-    filesystemFaultInjectionTestSha256: 'c0980d311b5484da2911f81af3d7e0abce2633a9f5815050bf3d24d52075b8dd',
+    filesystemFaultInjectionTestBlobOid: '2ba16a716ea48ee2d0482529930c09505dc200ce',
+    filesystemFaultInjectionTestBytes: 16897,
+    filesystemFaultInjectionTestSha256: '21057926a93056137619e9d47ccb29c7a5eec1e28e5c2d7342ec36292c941e91',
+    durableReentryTestPath: 'tests/cm2103-bootstrap-durable-reentry.test.js',
+    durableReentryTestBlobOid: '46d00af10bdca40f26f236e690945001edd39707',
+    durableReentryTestBytes: 18998,
+    durableReentryTestSha256: 'a08cbac7a040c2155271cea3327995e4e54c60fcf7b4880f96e553e7b7f8776d',
     nonce: 'cm2102-identity-bound-store-bootstrap-001',
     receiptId: 'cm2102-identity-bound-store-bootstrap-receipt-001',
     requestedExpiresAt: '2026-07-15T18:00:00+08:00',
@@ -294,27 +337,53 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
     readyForImplementationReview: true,
     readyForBootstrapAuthorizationReview: false
   };
-  for (const [field, expected] of Object.entries(exact)) if (packet[field] !== expected) blockers.push(`packet.${field}`);
-  if (!hash(packet.implementationCommit, 40) || !hash(packet.implementationTree, 40)) blockers.push('packet.implementationBinding');
-  if (!exactKeys(packet.implementationArtifacts, Object.keys(IMPLEMENTATION_ARTIFACT_PATHS))) blockers.push('packet.implementationArtifacts.keys');
+  for (const [field, expected] of Object.entries(exact)) {
+    if (packet[field] !== expected) blockers.push(`packet.${field}`);
+  }
+  if (!hash(packet.implementationCommit, 40) || !hash(packet.implementationTree, 40)) {
+    blockers.push('packet.implementationBinding');
+  }
+  if (!exactKeys(packet.implementationArtifacts, Object.keys(IMPLEMENTATION_ARTIFACT_PATHS))) {
+    blockers.push('packet.implementationArtifacts.keys');
+  }
   for (const [name, expectedPath] of Object.entries(IMPLEMENTATION_ARTIFACT_PATHS)) {
     const artifact = packet.implementationArtifacts?.[name];
     if (!exactKeys(artifact, ['path', 'blobOid']) || artifact.path !== expectedPath || !hash(artifact.blobOid, 40)) {
       blockers.push(`packet.implementationArtifacts.${name}`);
     }
   }
-  if (JSON.stringify(packet.frozenExecutorInputs) !== JSON.stringify(['execution_packet_commit', 'future_exact_bootstrap_decision_commit'])) blockers.push('packet.frozenExecutorInputs');
+  if (JSON.stringify(packet.frozenExecutorInputs) !==
+      JSON.stringify(['execution_packet_commit', 'future_exact_bootstrap_decision_commit'])) {
+    blockers.push('packet.frozenExecutorInputs');
+  }
   if (!exactObject(packet.storeRootDerivation, STORE_ROOT_DERIVATION)) blockers.push('packet.storeRootDerivation');
   if (!exactObject(packet.storeRootBinding, STORE_ROOT_BINDING)) blockers.push('packet.storeRootBinding');
-  if (!exactObject(packet.governanceRootIdentity, GOVERNANCE_ROOT_IDENTITY)) blockers.push('packet.governanceRootIdentity');
-  if (!exactObject(packet.authorizationRegistryIdentity, REGISTRY_IDENTITY)) blockers.push('packet.authorizationRegistryIdentity');
+  if (!exactObject(packet.governanceRootIdentity, GOVERNANCE_ROOT_IDENTITY)) {
+    blockers.push('packet.governanceRootIdentity');
+  }
+  if (!exactObject(packet.authorizationRegistryIdentity, REGISTRY_IDENTITY)) {
+    blockers.push('packet.authorizationRegistryIdentity');
+  }
   if (JSON.stringify(packet.stateSequence) !== JSON.stringify(STATE_SEQUENCE)) blockers.push('packet.stateSequence');
-  if (JSON.stringify(packet.receiptVariants) !== JSON.stringify(RECEIPT_VARIANTS)) blockers.push('packet.receiptVariants');
+  if (JSON.stringify(packet.receiptVariants) !== JSON.stringify(RECEIPT_VARIANTS)) {
+    blockers.push('packet.receiptVariants');
+  }
   if (JSON.stringify(packet.tristateEffectFields) !== JSON.stringify([
     'storeDirectoryCreated', 'identityWriteAttempted', 'identityCreated',
     'identityBytes', 'identitySha256', 'identityReadbackMatched'
   ])) blockers.push('packet.tristateEffectFields');
-  if (JSON.stringify(packet.filesystemFaultInjectionCases) !== JSON.stringify(FAULT_INJECTION_CASES)) blockers.push('packet.filesystemFaultInjectionCases');
+  if (JSON.stringify(packet.governanceFilesystemEffectFields) !== JSON.stringify([
+    'governanceFilesystemEffectAttempted', 'governanceFilesystemEffectsPresent'
+  ])) blockers.push('packet.governanceFilesystemEffectFields');
+  if (JSON.stringify(packet.reentryOutcomeStages) !== JSON.stringify(REENTRY_OUTCOME_STAGES)) {
+    blockers.push('packet.reentryOutcomeStages');
+  }
+  if (JSON.stringify(packet.filesystemFaultInjectionCases) !== JSON.stringify(FAULT_INJECTION_CASES)) {
+    blockers.push('packet.filesystemFaultInjectionCases');
+  }
+  if (JSON.stringify(packet.durableReentryCases) !== JSON.stringify(DURABLE_REENTRY_CASES)) {
+    blockers.push('packet.durableReentryCases');
+  }
   if (JSON.stringify(packet.executionBlockersAtFreeze) !== JSON.stringify([
     'future_exact_bootstrap_decision_absent', 'bootstrap_execution_not_authorized',
     'store_directory_creation_not_authorized', 'store_identity_creation_not_authorized'
@@ -332,6 +401,7 @@ function evaluateCm2103BootstrapExecutionPacket(packet) {
 
 module.exports = {
   BOOTSTRAP_REQUEST,
+  DURABLE_REENTRY_CASES,
   EXECUTION_PACKET_PATH,
   EXPECTED_FUTURE_DECISION_REFERENCE,
   FAULT_INJECTION_CASES,
@@ -340,8 +410,9 @@ module.exports = {
   FUTURE_DECISION_PATH,
   IMPLEMENTATION_ARTIFACT_PATHS,
   PACKET_KEYS,
-  R1_REVIEW_DECISION,
+  R2_REVIEW_DECISION,
   RECEIPT_VARIANTS,
+  REENTRY_OUTCOME_STAGES,
   STATE_SEQUENCE,
   evaluateCm2103BootstrapExecutionPacket
 };

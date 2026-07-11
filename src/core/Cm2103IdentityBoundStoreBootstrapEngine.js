@@ -97,18 +97,19 @@ async function executeCm2103BootstrapFilesystem({
     throw new Error('cm2103_bootstrap_engine_identity_binding_mismatch');
   }
 
-  const storeAbsent = await observeStoreAbsent(filesystem, storeRoot);
   const unused = await registry.preflightUnused({ nonce, receiptId });
   if (!unused.accepted) {
-    const existing = await registry.readClaim(unused.claimId).catch(() => null);
+    const existing = await registry.inspectExistingClaimForReconciliation({ nonce, receiptId, bindingHash });
     return result({
-      state: existing?.state || 'CLAIM_REGISTRY_AMBIGUOUS',
-      outcomeStage: 'authorization_already_claimed_stop',
-      claim: existing,
+      accepted: existing.accepted === true,
+      state: existing.state,
+      outcomeStage: existing.outcomeStage || existing.claim?.outcomeStage || 'reentry_existing_claim_unreadable_or_corrupt',
+      claim: existing.claim,
       authorizationConsumed: true,
-      receiptRequired: false
+      receiptRequired: true
     });
   }
+  const storeAbsent = await observeStoreAbsent(filesystem, storeRoot);
   if (!storeAbsent) return result({
     state: 'UNCLAIMED',
     outcomeStage: 'existing_store_directory_stop',

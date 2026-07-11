@@ -1,8 +1,6 @@
 'use strict';
 
 const {
-  IDENTITY_CANONICAL_BYTES,
-  IDENTITY_CANONICAL_SHA256,
   IDENTITY_FILENAME,
   STORE_IDENTITY,
   STORE_ROOT_BINDING_CANONICAL_SHA256
@@ -12,6 +10,14 @@ const {
   GOVERNANCE_ROOT_IDENTITY_SHA256
 } = require('./Cm2103IdentityBoundStoreGovernance');
 const { REGISTRY_IDENTITY } = require('./Cm2103IdentityBoundStoreBootstrapRegistry');
+const {
+  CLAIM_EFFECT_FIELDS,
+  NONTERMINAL_REENTRY,
+  ORIGINAL_OUTCOME_EFFECTS,
+  ORIGINAL_OUTCOME_STATES,
+  TERMINAL_REENTRY_OUTCOMES,
+  validOriginalTerminalEffects
+} = require('./Cm2103IdentityBoundStoreBootstrapState');
 
 const EXPECTED_BINDING_KEYS = Object.freeze([
   'decisionReference', 'decisionSourceCommit', 'decisionBlobOid', 'decisionSha256',
@@ -32,18 +38,22 @@ const RECEIPT_KEYS = Object.freeze([
   'lifecycleReference', 'storeReference', 'storeInstanceId', 'storeRole',
   'storeRootBindingSha256', 'governanceRootIdentityReference', 'governanceRootIdentitySha256',
   'authorizationRegistryReference', 'bindingHash', 'nonce', 'receiptId',
+  'claimEnvelopePresent', 'claimEnvelopeBindingVerified',
+  'receiptReconstructedFromExistingEnvelope', 'reentrySourceState',
+  'storeFilesystemAccessesDuringReentry', 'storeFilesystemWritesDuringReentry',
   'storeDirectoryExistenceCheckedBeforeClaim', 'storeDirectoryAbsentBeforeClaim',
   'existingStoreDirectoryRead', 'storeDirectoryCreateAttempts', 'storeDirectoryCreates',
   'storeDirectoryCreated', 'identityFilename', 'identityWriteAttempts', 'identityWrites',
   'identityWriteAttempted', 'identityCreated', 'identityBytes', 'identitySha256',
   'identityReadbackAttempts', 'identityReadbackVerifications', 'identityReadbackMatched',
   'governanceRegistryDirectoryCreates', 'governanceRegistryIdentityWrites',
-  'authorizationMarkerWrites', 'claimEnvelopeCreateAttempts', 'claimEnvelopeCreates',
-  'claimStateWriteAttempts', 'claimStateWrites', 'terminalStateDurablyRecorded',
-  'governanceFilesystemEffectsPresent', 'authorizationUseCount', 'authorizationConsumed',
-  'authorizationReplayAllowed', 'automaticRetryPerformed', 'automaticCleanupPerformed',
-  'reconciliationRequired', 'directoryEnumerations', 'recordContentReads', 'nativeReads',
-  'nativeWrites', 'recordMemoryCalls', 'tombstoneMemoryCalls', 'verifyOperations',
+  'authorizationMarkerWrites', 'governanceFilesystemEffectAttempted',
+  'claimEnvelopeCreateAttempts', 'claimEnvelopeCreates', 'claimStateWriteAttempts',
+  'claimStateWrites', 'terminalStateDurablyRecorded', 'governanceFilesystemEffectsPresent',
+  'authorizationUseCount', 'authorizationConsumed', 'authorizationReplayAllowed',
+  'automaticRetryPerformed', 'automaticCleanupPerformed', 'reconciliationRequired',
+  'directoryEnumerations', 'recordContentReads', 'nativeReads', 'nativeWrites',
+  'recordMemoryCalls', 'tombstoneMemoryCalls', 'verifyOperations',
   'rollbackOrCompensationOperations', 'realMemoryRead', 'realMemoryModified',
   'providerCalled', 'embeddingProviderCalled', 'remoteActionPerformed', 'rawMemoryReturned',
   'rawAuditReturned', 'rawPathDisclosed', 'emptyStorePreflightExecuted',
@@ -51,21 +61,31 @@ const RECEIPT_KEYS = Object.freeze([
   'fullPlanPackCompleted', 'readinessClaimed'
 ]);
 
+const NONTERMINAL_REENTRY_BY_STAGE = Object.freeze(Object.fromEntries(
+  Object.entries(NONTERMINAL_REENTRY).map(([sourceState, value]) => [
+    value.outcomeStage,
+    Object.freeze({ sourceState, effectiveState: value.effectiveState, effects: value.effects })
+  ])
+));
+
+const TERMINAL_REENTRY_BY_STAGE = Object.freeze(Object.fromEntries(
+  Object.entries(TERMINAL_REENTRY_OUTCOMES).map(([state, stage]) => [
+    stage,
+    Object.freeze({ sourceState: state, effectiveState: state })
+  ])
+));
+
+const CORRUPT_REENTRY_STAGE = 'reentry_existing_claim_unreadable_or_corrupt';
+
 const VARIANT_STATES = Object.freeze({
-  identity_bound_store_bootstrap_completed: 'CONSUMED_SUCCESS',
-  claim_envelope_persisted_but_acknowledgement_ambiguous: 'CLAIM_REGISTRY_AMBIGUOUS',
-  claim_envelope_terminal_state_persistence_failed: 'CLAIM_REGISTRY_AMBIGUOUS',
-  claim_envelope_persistence_unknown: 'CLAIM_REGISTRY_AMBIGUOUS',
-  directory_attempt_state_persistence_failed: 'CLAIM_REGISTRY_AMBIGUOUS',
-  directory_create_acknowledgement_ambiguous: 'CONSUMED_AMBIGUOUS',
-  directory_state_persistence_failed: 'CONSUMED_AMBIGUOUS',
-  identity_attempt_state_persistence_failed: 'CONSUMED_PARTIAL_BOOTSTRAP',
-  identity_write_acknowledgement_ambiguous: 'CONSUMED_PARTIAL_BOOTSTRAP',
-  identity_state_persistence_failed: 'CONSUMED_AMBIGUOUS',
-  readback_attempt_state_persistence_failed: 'CONSUMED_AMBIGUOUS',
-  identity_readback_failed: 'CONSUMED_AMBIGUOUS',
-  identity_readback_mismatch: 'CONSUMED_PARTIAL_BOOTSTRAP',
-  success_state_persistence_failed: 'CONSUMED_AMBIGUOUS'
+  ...ORIGINAL_OUTCOME_STATES,
+  ...Object.fromEntries(Object.entries(NONTERMINAL_REENTRY_BY_STAGE).map(([stage, value]) => [
+    stage, value.effectiveState
+  ])),
+  ...Object.fromEntries(Object.entries(TERMINAL_REENTRY_BY_STAGE).map(([stage, value]) => [
+    stage, value.effectiveState
+  ])),
+  [CORRUPT_REENTRY_STAGE]: 'CLAIM_REGISTRY_AMBIGUOUS'
 });
 
 function exactKeys(value, expected) {
@@ -85,6 +105,74 @@ function exactField(receipt, blockers, field, expected) {
   if (receipt[field] !== expected) blockers.push(`receipt.${field}`);
 }
 
+function exactEffects(receipt, blockers, expected) {
+  for (const field of CLAIM_EFFECT_FIELDS) {
+    const receiptField = field === 'directoryCreateAttempts'
+      ? 'storeDirectoryCreateAttempts'
+      : field === 'directoryCreates'
+        ? 'storeDirectoryCreates'
+        : field;
+    exactField(receipt, blockers, receiptField, expected[field]);
+  }
+}
+
+function claimEffectsFromReceipt(receipt) {
+  return Object.fromEntries(CLAIM_EFFECT_FIELDS.map(field => [
+    field,
+    field === 'directoryCreateAttempts'
+      ? receipt.storeDirectoryCreateAttempts
+      : field === 'directoryCreates'
+        ? receipt.storeDirectoryCreates
+        : receipt[field]
+  ]));
+}
+
+function validateEnvelopeProjection(receipt, blockers) {
+  const reentry = receipt.outcomeStage.startsWith('reentry_');
+  exactField(receipt, blockers, 'receiptReconstructedFromExistingEnvelope', reentry);
+  exactField(receipt, blockers, 'storeFilesystemAccessesDuringReentry', 0);
+  exactField(receipt, blockers, 'storeFilesystemWritesDuringReentry', 0);
+  exactField(receipt, blockers, 'governanceFilesystemEffectAttempted', true);
+
+  if (![true, null].includes(receipt.claimEnvelopePresent)) blockers.push('receipt.claimEnvelopePresent');
+  if (typeof receipt.claimEnvelopeBindingVerified !== 'boolean') blockers.push('receipt.claimEnvelopeBindingVerified');
+  if (![true, null].includes(receipt.governanceFilesystemEffectsPresent)) {
+    blockers.push('receipt.governanceFilesystemEffectsPresent');
+  }
+  if (receipt.governanceFilesystemEffectsPresent !== receipt.claimEnvelopePresent) {
+    blockers.push('receipt.governanceFilesystemEffectPresenceCorrelation');
+  }
+  if (receipt.claimEnvelopeBindingVerified && receipt.claimEnvelopePresent !== true) {
+    blockers.push('receipt.claimEnvelopeBindingVerified');
+  }
+
+  if (reentry) {
+    if (receipt.outcomeStage === CORRUPT_REENTRY_STAGE) {
+      exactField(receipt, blockers, 'claimEnvelopeBindingVerified', false);
+      exactField(receipt, blockers, 'reentrySourceState', null);
+      if (![true, null].includes(receipt.claimEnvelopePresent)) blockers.push('receipt.claimEnvelopePresent');
+      exactField(receipt, blockers, 'storeDirectoryExistenceCheckedBeforeClaim', null);
+      exactField(receipt, blockers, 'storeDirectoryAbsentBeforeClaim', null);
+    } else {
+      exactField(receipt, blockers, 'claimEnvelopePresent', true);
+      exactField(receipt, blockers, 'claimEnvelopeBindingVerified', true);
+      exactField(receipt, blockers, 'storeDirectoryExistenceCheckedBeforeClaim', true);
+      exactField(receipt, blockers, 'storeDirectoryAbsentBeforeClaim', true);
+    }
+  } else {
+    exactField(receipt, blockers, 'reentrySourceState', null);
+    exactField(receipt, blockers, 'storeDirectoryExistenceCheckedBeforeClaim', true);
+    exactField(receipt, blockers, 'storeDirectoryAbsentBeforeClaim', true);
+    if (receipt.outcomeStage === 'claim_envelope_persistence_unknown') {
+      exactField(receipt, blockers, 'claimEnvelopeBindingVerified', false);
+    } else {
+      exactField(receipt, blockers, 'claimEnvelopePresent', true);
+      exactField(receipt, blockers, 'claimEnvelopeBindingVerified', true);
+    }
+  }
+  exactField(receipt, blockers, 'existingStoreDirectoryRead', false);
+}
+
 function validateVariant(receipt, blockers) {
   const expectedState = VARIANT_STATES[receipt.outcomeStage];
   if (!expectedState) {
@@ -96,117 +184,43 @@ function validateVariant(receipt, blockers) {
   exactField(receipt, blockers, 'result', success ? 'PASS' : 'STOPPED');
   exactField(receipt, blockers, 'reconciliationRequired', !success);
 
-  const exactEffectsByStage = {
-    identity_bound_store_bootstrap_completed: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 1, identityWrites: 1, identityWriteAttempted: true,
-      identityCreated: true, identityBytes: IDENTITY_CANONICAL_BYTES,
-      identitySha256: IDENTITY_CANONICAL_SHA256, identityReadbackAttempts: 1,
-      identityReadbackVerifications: 1, identityReadbackMatched: true,
-      terminalStateDurablyRecorded: true
-    },
-    claim_envelope_persisted_but_acknowledgement_ambiguous: {
-      storeDirectoryCreateAttempts: 0, storeDirectoryCreates: 0, storeDirectoryCreated: false,
-      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
-      identityCreated: false, identityBytes: 0, identitySha256: null,
-      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
-      identityReadbackMatched: false, claimEnvelopeCreates: 1, terminalStateDurablyRecorded: true
-    },
-    claim_envelope_persistence_unknown: {
-      storeDirectoryCreateAttempts: 0, storeDirectoryCreates: 0, storeDirectoryCreated: false,
-      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
-      identityCreated: false, identityBytes: 0, identitySha256: null,
-      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
-      identityReadbackMatched: false, claimEnvelopeCreates: null, terminalStateDurablyRecorded: false
-    },
-    claim_envelope_terminal_state_persistence_failed: {
-      storeDirectoryCreateAttempts: 0, storeDirectoryCreates: 0, storeDirectoryCreated: false,
-      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
-      identityCreated: false, identityBytes: 0, identitySha256: null,
-      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
-      identityReadbackMatched: false, claimEnvelopeCreates: 1, terminalStateDurablyRecorded: false
-    },
-    directory_attempt_state_persistence_failed: {
-      storeDirectoryCreateAttempts: 0, storeDirectoryCreates: 0, storeDirectoryCreated: false,
-      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
-      identityCreated: false, identityBytes: 0, identitySha256: null,
-      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
-      identityReadbackMatched: false
-    },
-    directory_create_acknowledgement_ambiguous: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: null, storeDirectoryCreated: null,
-      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
-      identityCreated: false, identityBytes: 0, identitySha256: null,
-      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
-      identityReadbackMatched: false
-    },
-    directory_state_persistence_failed: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
-      identityCreated: false, identityBytes: 0, identitySha256: null,
-      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
-      identityReadbackMatched: false
-    },
-    identity_attempt_state_persistence_failed: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
-      identityCreated: false, identityBytes: 0, identitySha256: null,
-      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
-      identityReadbackMatched: false
-    },
-    identity_write_acknowledgement_ambiguous: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 1, identityWrites: null, identityWriteAttempted: true,
-      identityCreated: null, identityBytes: null, identitySha256: null,
-      identityReadbackAttempts: 0, identityReadbackVerifications: 0,
-      identityReadbackMatched: false
-    },
-    identity_state_persistence_failed: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 1, identityWrites: 1, identityWriteAttempted: true,
-      identityCreated: true, identityBytes: IDENTITY_CANONICAL_BYTES,
-      identitySha256: IDENTITY_CANONICAL_SHA256, identityReadbackAttempts: 0,
-      identityReadbackVerifications: 0, identityReadbackMatched: false
-    },
-    readback_attempt_state_persistence_failed: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 1, identityWrites: 1, identityWriteAttempted: true,
-      identityCreated: true, identityBytes: IDENTITY_CANONICAL_BYTES,
-      identitySha256: IDENTITY_CANONICAL_SHA256, identityReadbackAttempts: 0,
-      identityReadbackVerifications: 0, identityReadbackMatched: false
-    },
-    identity_readback_failed: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 1, identityWrites: 1, identityWriteAttempted: true,
-      identityCreated: true, identityBytes: IDENTITY_CANONICAL_BYTES,
-      identitySha256: IDENTITY_CANONICAL_SHA256, identityReadbackAttempts: 1,
-      identityReadbackVerifications: 0, identityReadbackMatched: null
-    },
-    identity_readback_mismatch: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 1, identityWrites: 1, identityWriteAttempted: true,
-      identityCreated: true, identityBytes: null, identitySha256: null,
-      identityReadbackAttempts: 1, identityReadbackVerifications: 1,
-      identityReadbackMatched: false
-    },
-    success_state_persistence_failed: {
-      storeDirectoryCreateAttempts: 1, storeDirectoryCreates: 1, storeDirectoryCreated: true,
-      identityWriteAttempts: 1, identityWrites: 1, identityWriteAttempted: true,
-      identityCreated: true, identityBytes: IDENTITY_CANONICAL_BYTES,
-      identitySha256: IDENTITY_CANONICAL_SHA256, identityReadbackAttempts: 1,
-      identityReadbackVerifications: 1, identityReadbackMatched: true
-    }
-  };
-  for (const [field, expected] of Object.entries(exactEffectsByStage[receipt.outcomeStage])) {
-    exactField(receipt, blockers, field, expected);
+  if (ORIGINAL_OUTCOME_EFFECTS[receipt.outcomeStage]) {
+    exactEffects(receipt, blockers, ORIGINAL_OUTCOME_EFFECTS[receipt.outcomeStage]);
+  } else if (NONTERMINAL_REENTRY_BY_STAGE[receipt.outcomeStage]) {
+    const expected = NONTERMINAL_REENTRY_BY_STAGE[receipt.outcomeStage];
+    exactField(receipt, blockers, 'reentrySourceState', expected.sourceState);
+    exactEffects(receipt, blockers, expected.effects);
+    exactField(receipt, blockers, 'terminalStateDurablyRecorded', false);
+  } else if (TERMINAL_REENTRY_BY_STAGE[receipt.outcomeStage]) {
+    const expected = TERMINAL_REENTRY_BY_STAGE[receipt.outcomeStage];
+    exactField(receipt, blockers, 'reentrySourceState', expected.sourceState);
+    exactField(receipt, blockers, 'terminalStateDurablyRecorded', true);
+    if (!validOriginalTerminalEffects({
+      state: receipt.finalState,
+      ...claimEffectsFromReceipt(receipt)
+    })) blockers.push('receipt.reentryTerminalEffects');
+  } else if (receipt.outcomeStage === CORRUPT_REENTRY_STAGE) {
+    exactEffects(receipt, blockers, Object.fromEntries(CLAIM_EFFECT_FIELDS.map(field => [field, null])));
+    exactField(receipt, blockers, 'terminalStateDurablyRecorded', false);
   }
-  if (receipt.outcomeStage !== 'claim_envelope_persistence_unknown' && receipt.claimEnvelopeCreates !== 1) {
+
+  const allowedTerminalDurability = new Set([
+    'success_state_persistence_failed',
+    'claim_envelope_persistence_unknown',
+    'claim_envelope_terminal_state_persistence_failed'
+  ]);
+  if (ORIGINAL_OUTCOME_EFFECTS[receipt.outcomeStage] &&
+      !allowedTerminalDurability.has(receipt.outcomeStage) &&
+      receipt.terminalStateDurablyRecorded !== true) {
+    blockers.push('receipt.terminalStateDurablyRecorded');
+  }
+
+  if (receipt.outcomeStage === 'claim_envelope_persistence_unknown' ||
+      receipt.outcomeStage === CORRUPT_REENTRY_STAGE) {
+    if (receipt.claimEnvelopeCreates !== null) blockers.push('receipt.claimEnvelopeCreates');
+  } else if (receipt.claimEnvelopeCreates !== 1) {
     blockers.push('receipt.claimEnvelopeCreates');
   }
-  if (receipt.outcomeStage !== 'success_state_persistence_failed' &&
-      receipt.outcomeStage !== 'claim_envelope_persistence_unknown' &&
-      receipt.outcomeStage !== 'claim_envelope_terminal_state_persistence_failed' &&
-      receipt.terminalStateDurablyRecorded !== true) blockers.push('receipt.terminalStateDurablyRecorded');
 }
 
 function evaluateCm2103BootstrapReceipt({ receipt, expectedBinding } = {}) {
@@ -236,8 +250,8 @@ function evaluateCm2103BootstrapReceipt({ receipt, expectedBinding } = {}) {
   ]) if (!hash(expectedBinding[field], 64)) blockers.push(`expectedBinding.${field}`);
 
   const exact = {
-    schemaVersion: 2,
-    taskId: 'CM-2103-R1',
+    schemaVersion: 3,
+    taskId: 'CM-2103-R2',
     receiptType: 'identity_bound_synthetic_store_bootstrap_receipt_union',
     decisionReference: expectedBinding.decisionReference,
     decisionSourceCommit: expectedBinding.decisionSourceCommit,
@@ -267,15 +281,12 @@ function evaluateCm2103BootstrapReceipt({ receipt, expectedBinding } = {}) {
     bindingHash: expectedBinding.bindingHash,
     nonce: expectedBinding.nonce,
     receiptId: expectedBinding.receiptId,
-    storeDirectoryExistenceCheckedBeforeClaim: true,
-    storeDirectoryAbsentBeforeClaim: true,
-    existingStoreDirectoryRead: false,
     identityFilename: IDENTITY_FILENAME,
     governanceRegistryDirectoryCreates: 0,
     governanceRegistryIdentityWrites: 0,
     authorizationMarkerWrites: 0,
     claimEnvelopeCreateAttempts: 1,
-    governanceFilesystemEffectsPresent: true,
+    governanceFilesystemEffectAttempted: true,
     authorizationUseCount: 1,
     authorizationConsumed: true,
     authorizationReplayAllowed: false,
@@ -305,21 +316,31 @@ function evaluateCm2103BootstrapReceipt({ receipt, expectedBinding } = {}) {
     readinessClaimed: false
   };
   for (const [field, expected] of Object.entries(exact)) exactField(receipt, blockers, field, expected);
-  if (!Number.isInteger(receipt.claimStateWriteAttempts) || receipt.claimStateWriteAttempts < 1 || receipt.claimStateWriteAttempts > 8) {
+
+  if (!(receipt.claimStateWriteAttempts === null ||
+      (Number.isInteger(receipt.claimStateWriteAttempts) && receipt.claimStateWriteAttempts >= 1 &&
+       receipt.claimStateWriteAttempts <= 10))) {
     blockers.push('receipt.claimStateWriteAttempts');
   }
-  if (!(receipt.claimStateWrites === null && receipt.outcomeStage === 'claim_envelope_persistence_unknown') &&
-      (!Number.isInteger(receipt.claimStateWrites) || receipt.claimStateWrites < 1 || receipt.claimStateWrites > 8)) {
+  if (!(receipt.claimStateWrites === null ||
+      (Number.isInteger(receipt.claimStateWrites) && receipt.claimStateWrites >= 1 &&
+       receipt.claimStateWrites <= 10))) {
     blockers.push('receipt.claimStateWrites');
   }
   if (Number.isInteger(receipt.claimStateWrites) && Number.isInteger(receipt.claimStateWriteAttempts) &&
       receipt.claimStateWrites > receipt.claimStateWriteAttempts) blockers.push('receipt.claimStateWriteCounts');
-  if (typeof receipt.terminalStateDurablyRecorded !== 'boolean') blockers.push('receipt.terminalStateDurablyRecorded');
+  if (typeof receipt.terminalStateDurablyRecorded !== 'boolean') {
+    blockers.push('receipt.terminalStateDurablyRecorded');
+  }
+
+  validateEnvelopeProjection(receipt, blockers);
   validateVariant(receipt, blockers);
+
   const success = receipt.finalState === 'CONSUMED_SUCCESS';
   return {
     shapeAccepted: blockers.length === 0,
-    acceptedAsBootstrapEvidence: blockers.length === 0 && success,
+    acceptedAsBootstrapEvidence: blockers.length === 0 && success &&
+      receipt.claimEnvelopeBindingVerified === true,
     acceptedAsReconciliationEvidence: blockers.length === 0 && !success,
     receiptVariant: blockers.length === 0 ? receipt.finalState : null,
     blockers: [...new Set(blockers)],
@@ -332,8 +353,11 @@ function evaluateCm2103BootstrapReceipt({ receipt, expectedBinding } = {}) {
 }
 
 module.exports = {
+  CORRUPT_REENTRY_STAGE,
   EXPECTED_BINDING_KEYS,
+  NONTERMINAL_REENTRY_BY_STAGE,
   RECEIPT_KEYS,
+  TERMINAL_REENTRY_BY_STAGE,
   VARIANT_STATES,
   evaluateCm2103BootstrapReceipt
 };

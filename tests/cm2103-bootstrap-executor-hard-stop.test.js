@@ -11,11 +11,11 @@ const {
 test('CM-2103 frozen executor exposes only packet and future decision Git inputs', () => {
   assert.equal(
     EXECUTION_PACKET_PATH,
-    'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_execution_packet_cm2103_r1.json'
+    'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_execution_packet_cm2103_r2.json'
   );
   assert.equal(
     FUTURE_DECISION_PATH,
-    'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_decision_cm2103_r1.json'
+    'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_decision_cm2103_r2.json'
   );
   assert.equal(runFrozenCm2103Bootstrap.length, 2);
 });

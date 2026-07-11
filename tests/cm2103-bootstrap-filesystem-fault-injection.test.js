@@ -351,8 +351,13 @@ test('CM-2103 R1 fault receipts preserve true false null effects and prohibit re
       const replay = await executeFixture(fixture, suffix);
       assert.equal(replay.accepted, false);
       assert.equal(replay.authorizationConsumed, true);
-      assert.equal(replay.outcomeStage, 'authorization_already_claimed_stop');
+      assert.equal(replay.receiptRequired, true);
+      assert.equal(replay.claim.reentryProjection, true);
+      assert.match(replay.outcomeStage, /^reentry_existing_/);
       assert.equal(replay.state, result.state);
+      const replayEvaluated = evaluateExecutionReceipt(replay);
+      assert.equal(replayEvaluated.contract.shapeAccepted, true, replayEvaluated.contract.blockers.join(', '));
+      assert.equal(replayEvaluated.contract.acceptedAsReconciliationEvidence, true);
     });
   }
 });

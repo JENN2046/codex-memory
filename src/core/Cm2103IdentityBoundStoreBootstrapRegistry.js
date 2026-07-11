@@ -8,9 +8,13 @@ const {
   GOVERNANCE_ROOT_IDENTITY_SHA256
 } = require('./Cm2103IdentityBoundStoreGovernance');
 const {
+  NONTERMINAL_REENTRY,
+  TERMINAL_REENTRY_OUTCOMES,
   TERMINAL_STATES,
+  effectsMatch,
   summarizeCm2103BootstrapState,
-  transitionCm2103BootstrapState
+  transitionCm2103BootstrapState,
+  validOriginalTerminalEffects
 } = require('./Cm2103IdentityBoundStoreBootstrapState');
 const { canonicalize } = require('./Cm2102IdentityBoundRollbackLifecycleFoundation');
 
@@ -21,7 +25,7 @@ const REGISTRY_IDENTITY = Object.freeze({
   registryDirectoryCreatedByClaim: false,
   registryIdentityWrittenByClaim: false,
   registryStorageRole: 'durable-local-governance-state',
-  schemaVersion: 2,
+  schemaVersion: 3,
   storeRootBindingSha256: '0a7ceb6cf658d517de2a3eb30ee09195dbeb9d46800f42ac87edf7f7cb11dd94'
 });
 
@@ -45,13 +49,20 @@ function claimIdentity({ nonce, receiptId }) {
 function baseClaimEnvelope({ nonce, receiptId, bindingHash }) {
   const identity = claimIdentity({ nonce, receiptId });
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     claimId: identity.claimId,
     authorizationRegistryReference: REGISTRY_IDENTITY.authorizationRegistryReference,
     nonceHash: identity.nonceHash,
     receiptIdHash: identity.receiptIdHash,
     bindingHash,
     state: 'CLAIMED',
+    claimEnvelopePresent: true,
+    claimEnvelopeBindingVerified: true,
+    reentryProjection: false,
+    reentrySourceState: null,
+    storeDirectoryExistenceCheckedBeforeClaim: true,
+    storeDirectoryAbsentBeforeClaim: true,
+    existingStoreDirectoryRead: false,
     directoryCreateAttempts: 0,
     directoryCreates: 0,
     storeDirectoryCreated: false,
@@ -67,6 +78,8 @@ function baseClaimEnvelope({ nonce, receiptId, bindingHash }) {
     governanceRegistryDirectoryCreates: 0,
     governanceRegistryIdentityWrites: 0,
     authorizationMarkerWrites: 0,
+    governanceFilesystemEffectAttempted: true,
+    governanceFilesystemEffectsPresent: true,
     claimEnvelopeCreateAttempts: 1,
     claimEnvelopeCreates: 1,
     claimStateWriteAttempts: 1,
@@ -81,26 +94,138 @@ function baseClaimEnvelope({ nonce, receiptId, bindingHash }) {
 }
 
 function exactEnvelopeBinding(value, expected) {
-  return value?.schemaVersion === 2 &&
+  return value?.schemaVersion === 3 &&
     value?.claimId === expected.claimId &&
     value?.authorizationRegistryReference === REGISTRY_IDENTITY.authorizationRegistryReference &&
     value?.nonceHash === expected.nonceHash &&
     value?.receiptIdHash === expected.receiptIdHash &&
     value?.bindingHash === expected.bindingHash &&
+    value?.claimEnvelopePresent === true &&
+    value?.claimEnvelopeBindingVerified === true &&
+    value?.reentryProjection === false &&
+    value?.reentrySourceState === null &&
+    value?.storeDirectoryExistenceCheckedBeforeClaim === true &&
+    value?.storeDirectoryAbsentBeforeClaim === true &&
+    value?.existingStoreDirectoryRead === false &&
+    value?.governanceFilesystemEffectAttempted === true &&
+    value?.governanceFilesystemEffectsPresent === true &&
     value?.authorizationUseCount === 1 &&
     value?.authorizationReplayAllowed === false &&
     value?.automaticRetryAllowed === false &&
     value?.automaticCleanupAllowed === false;
 }
 
-function syntheticClaimRegistryAmbiguous(expected, overrides = {}) {
+function syntheticClaimRegistryAmbiguous(expected, {
+  claimEnvelopePresent = null,
+  claimEnvelopeBindingVerified = false,
+  storeEffectsUnknown = false,
+  ...overrides
+} = {}) {
   return {
     ...expected,
     state: 'CLAIM_REGISTRY_AMBIGUOUS',
+    claimEnvelopePresent,
+    claimEnvelopeBindingVerified,
+    reentryProjection: false,
+    reentrySourceState: null,
+    ...(storeEffectsUnknown ? {
+      directoryCreateAttempts: null,
+      directoryCreates: null,
+      storeDirectoryCreated: null,
+      identityWriteAttempts: null,
+      identityWrites: null,
+      identityWriteAttempted: null,
+      identityCreated: null,
+      identityBytes: null,
+      identitySha256: null,
+      identityReadbackAttempts: null,
+      identityReadbackVerifications: null,
+      identityReadbackMatched: null
+    } : {}),
+    governanceFilesystemEffectAttempted: true,
+    governanceFilesystemEffectsPresent: claimEnvelopePresent,
     claimEnvelopeCreates: null,
     claimStateWrites: null,
     terminalStateDurablyRecorded: false,
     ...overrides
+  };
+}
+
+function exactKeys(value, expectedKeys) {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value)) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expectedKeys].sort());
+}
+
+function boundedCount(value) {
+  return Number.isInteger(value) && value >= 0 && value <= 1;
+}
+
+function validPersistedClaimEnvelope(observed, expected) {
+  if (!exactKeys(observed, Object.keys(expected)) || !exactEnvelopeBinding(observed, expected)) return false;
+  if (![...Object.keys(NONTERMINAL_REENTRY), ...TERMINAL_STATES].includes(observed.state)) return false;
+  if (observed.governanceRegistryDirectoryCreates !== 0 ||
+      observed.governanceRegistryIdentityWrites !== 0 || observed.authorizationMarkerWrites !== 0 ||
+      observed.claimEnvelopeCreateAttempts !== 1 || observed.claimEnvelopeCreates !== 1 ||
+      !Number.isInteger(observed.claimStateWriteAttempts) || observed.claimStateWriteAttempts < 1 ||
+      !Number.isInteger(observed.claimStateWrites) || observed.claimStateWrites < 1 ||
+      observed.claimStateWrites > observed.claimStateWriteAttempts ||
+      observed.terminalStateDurablyRecorded !== TERMINAL_STATES.includes(observed.state)) return false;
+  for (const field of [
+    'directoryCreateAttempts', 'directoryCreates', 'identityWriteAttempts', 'identityWrites',
+    'identityReadbackAttempts', 'identityReadbackVerifications'
+  ]) if (observed[field] !== null && !boundedCount(observed[field])) return false;
+  for (const field of ['storeDirectoryCreated', 'identityWriteAttempted', 'identityCreated', 'identityReadbackMatched']) {
+    if (![true, false, null].includes(observed[field])) return false;
+  }
+  if (![0, 633, null].includes(observed.identityBytes)) return false;
+  if (!(observed.identitySha256 === null || /^[a-f0-9]{64}$/.test(observed.identitySha256))) return false;
+  if (TERMINAL_STATES.includes(observed.state)) return validOriginalTerminalEffects(observed);
+  return effectsMatch(observed, NONTERMINAL_REENTRY[observed.state].effects);
+}
+
+function reentryProjectionFromObserved(observed) {
+  const sourceState = observed.state;
+  if (TERMINAL_STATES.includes(sourceState)) return {
+    ...observed,
+    claimEnvelopePresent: true,
+    claimEnvelopeBindingVerified: true,
+    reentryProjection: true,
+    reentrySourceState: sourceState,
+    governanceFilesystemEffectAttempted: true,
+    governanceFilesystemEffectsPresent: true,
+    terminalStateDurablyRecorded: true,
+    outcomeStage: TERMINAL_REENTRY_OUTCOMES[sourceState]
+  };
+  const projection = NONTERMINAL_REENTRY[sourceState];
+  return {
+    ...observed,
+    ...projection.effects,
+    state: projection.effectiveState,
+    claimEnvelopePresent: true,
+    claimEnvelopeBindingVerified: true,
+    reentryProjection: true,
+    reentrySourceState: sourceState,
+    governanceFilesystemEffectAttempted: true,
+    governanceFilesystemEffectsPresent: true,
+    terminalStateDurablyRecorded: false,
+    outcomeStage: projection.outcomeStage
+  };
+}
+
+function corruptExistingClaimProjection(expected, { claimEnvelopePresent = true } = {}) {
+  return {
+    ...syntheticClaimRegistryAmbiguous(expected, {
+      claimEnvelopePresent,
+      claimEnvelopeBindingVerified: false,
+      storeEffectsUnknown: true
+    }),
+    reentryProjection: true,
+    reentrySourceState: null,
+    storeDirectoryExistenceCheckedBeforeClaim: null,
+    storeDirectoryAbsentBeforeClaim: null,
+    existingStoreDirectoryRead: false,
+    governanceFilesystemEffectsPresent: claimEnvelopePresent,
+    outcomeStage: 'reentry_existing_claim_unreadable_or_corrupt'
   };
 }
 
@@ -141,12 +266,99 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
     await this.verifyGovernanceRootIdentity();
     const target = this.envelopePath({ nonce, receiptId });
     try {
-      await this.fs.access(target.claimPath);
+      await this.fs.lstat(target.claimPath);
       return { accepted: false, unused: false, claimId: target.claimId };
     } catch (error) {
       if (error.code === 'ENOENT') return { accepted: true, unused: true, claimId: target.claimId };
       throw error;
     }
+  }
+
+  async inspectExistingClaimForReconciliation({ nonce, receiptId, bindingHash }) {
+    await this.verifyGovernanceRootIdentity();
+    const target = this.envelopePath({ nonce, receiptId });
+    const expected = baseClaimEnvelope({ nonce, receiptId, bindingHash });
+    let stat;
+    try {
+      stat = await this.fs.lstat(target.claimPath);
+    } catch (error) {
+      return {
+        accepted: false,
+        existing: true,
+        state: 'CLAIM_REGISTRY_AMBIGUOUS',
+        authorizationConsumed: true,
+        authorizationReplayAllowed: false,
+        receiptRequired: true,
+        reasonCode: 'cm2103_existing_claim_presence_became_unknown',
+        claim: corruptExistingClaimProjection(expected, { claimEnvelopePresent: null })
+      };
+    }
+    if (!stat.isFile() || stat.isSymbolicLink()) return {
+      accepted: false,
+      existing: true,
+      state: 'CLAIM_REGISTRY_AMBIGUOUS',
+      authorizationConsumed: true,
+      authorizationReplayAllowed: false,
+      receiptRequired: true,
+      reasonCode: 'cm2103_existing_claim_unsafe_file_type',
+      claim: corruptExistingClaimProjection(expected)
+    };
+    let raw;
+    try {
+      raw = await this.fs.readFile(target.claimPath, 'utf8');
+    } catch (error) {
+      return {
+        accepted: false,
+        existing: true,
+        state: 'CLAIM_REGISTRY_AMBIGUOUS',
+        authorizationConsumed: true,
+        authorizationReplayAllowed: false,
+        receiptRequired: true,
+        reasonCode: error.code === 'ENOENT'
+          ? 'cm2103_existing_claim_presence_became_unknown'
+          : 'cm2103_existing_claim_unreadable',
+        claim: corruptExistingClaimProjection(expected, {
+          claimEnvelopePresent: error.code === 'ENOENT' ? null : true
+        })
+      };
+    }
+    let observed;
+    try {
+      observed = JSON.parse(raw);
+    } catch {
+      return {
+        accepted: false,
+        existing: true,
+        state: 'CLAIM_REGISTRY_AMBIGUOUS',
+        authorizationConsumed: true,
+        authorizationReplayAllowed: false,
+        receiptRequired: true,
+        reasonCode: 'cm2103_existing_claim_corrupt',
+        claim: corruptExistingClaimProjection(expected)
+      };
+    }
+    if (!validPersistedClaimEnvelope(observed, expected)) return {
+      accepted: false,
+      existing: true,
+      state: 'CLAIM_REGISTRY_AMBIGUOUS',
+      authorizationConsumed: true,
+      authorizationReplayAllowed: false,
+      receiptRequired: true,
+      reasonCode: 'cm2103_existing_claim_binding_or_shape_invalid',
+      claim: corruptExistingClaimProjection(expected)
+    };
+    const claim = reentryProjectionFromObserved(observed);
+    return {
+      accepted: false,
+      existing: true,
+      state: claim.state,
+      authorizationConsumed: true,
+      authorizationReplayAllowed: false,
+      receiptRequired: true,
+      reasonCode: 'cm2103_existing_claim_projected_for_reconciliation',
+      outcomeStage: claim.outcomeStage,
+      claim
+    };
   }
 
   async recoverClaimCreateError({ expected, claimPath }) {
@@ -176,15 +388,24 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
       state: 'CLAIM_REGISTRY_AMBIGUOUS',
       authorizationConsumed: true,
       reasonCode: 'cm2103_claim_envelope_binding_ambiguous',
-      claim: syntheticClaimRegistryAmbiguous(expected)
+      claim: syntheticClaimRegistryAmbiguous(expected, {
+        claimEnvelopePresent: true,
+        claimEnvelopeBindingVerified: false
+      })
     };
-    if (TERMINAL_STATES.includes(observed.state)) return {
-      accepted: false,
-      state: observed.state,
-      authorizationConsumed: true,
-      reasonCode: 'cm2103_claim_envelope_already_terminal',
-      claim: observed
-    };
+    if (TERMINAL_STATES.includes(observed.state)) {
+      const projection = validPersistedClaimEnvelope(observed, expected)
+        ? reentryProjectionFromObserved(observed)
+        : corruptExistingClaimProjection(expected);
+      return {
+        accepted: projection.state === 'CONSUMED_SUCCESS',
+        state: projection.state,
+        authorizationConsumed: true,
+        reasonCode: 'cm2103_claim_envelope_already_terminal',
+        claim: projection,
+        outcomeStage: projection.outcomeStage
+      };
+    }
     try {
       const terminal = await this.transition(observed.claimId, 'CLAIM_AMBIGUOUS');
       return {
@@ -201,6 +422,8 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
         authorizationConsumed: true,
         reasonCode: 'cm2103_claim_envelope_terminal_persistence_ambiguous',
         claim: syntheticClaimRegistryAmbiguous(observed, {
+          claimEnvelopePresent: true,
+          claimEnvelopeBindingVerified: true,
           claimEnvelopeCreates: 1,
           claimStateWriteAttempts: observed.claimStateWriteAttempts + 1,
           claimStateWrites: observed.claimStateWrites,
@@ -219,14 +442,7 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
       return { accepted: true, state: 'CLAIMED', authorizationConsumed: true, claim: expected };
     } catch (error) {
       if (error.code === 'EEXIST') {
-        const existing = await this.readClaim(target.claimId).catch(() => null);
-        return {
-          accepted: false,
-          state: existing?.state || 'CLAIM_REGISTRY_AMBIGUOUS',
-          authorizationConsumed: true,
-          reasonCode: 'cm2103_bootstrap_authorization_already_claimed',
-          claim: existing || syntheticClaimRegistryAmbiguous(expected)
-        };
+        return this.inspectExistingClaimForReconciliation({ nonce, receiptId, bindingHash });
       }
       return this.recoverClaimCreateError({ expected, claimPath: target.claimPath });
     }
