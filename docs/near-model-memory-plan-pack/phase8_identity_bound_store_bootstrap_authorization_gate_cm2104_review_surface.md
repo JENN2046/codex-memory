@@ -9,10 +9,15 @@ requested:
   twoStageBootstrapAuthorizationGateImplementationPassed: true
   readyForExactBootstrapAuthorizationContentApplication: true
 
-not_requested:
-  bootstrapExecutionAuthorized: true
-  storeDirectoryCreationAuthorized: true
-  storeIdentityCreationAuthorized: true
+current_authority:
+  bootstrapExecutionAuthorized: false
+  storeDirectoryCreationAuthorized: false
+  storeIdentityCreationAuthorized: false
+
+not_requested_actions:
+  - "bootstrap execution"
+  - "store directory creation"
+  - "store identity creation"
 ```
 
 ## 为什么没有直接提交可执行的 CM-2104 决定
