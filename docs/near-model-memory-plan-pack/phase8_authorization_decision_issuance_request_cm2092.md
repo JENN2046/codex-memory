@@ -93,9 +93,9 @@ runtime proof，也不是 production-provider proof。
 
 默认测试：`5157/5157` 通过。聚焦 MCP/Phase 8 回归：`117/117` 通过。
 
-`gate:mainline:strict` 的 health、默认测试、compare 和 rollback 通过，但旧 HTTP
-contract 仍期待写工具出现在默认公开工具面，产生 `15/106` 失败。本申请不通过
-扩大默认 MCP 工具面来消除该冲突；该门禁结果如实保留为未通过。
+`gate:mainline:strict` 全部通过：contract `106/106`、默认测试 `5157/5157`、
+compare `43/43`、rollback `43/43`。HTTP 写路径测试通过显式 `full` fixture
+surface 运行；产品默认五工具面未扩大。
 
 ## 当前效力
 
