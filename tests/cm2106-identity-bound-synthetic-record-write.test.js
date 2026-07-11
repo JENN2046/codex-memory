@@ -25,6 +25,7 @@ const {
   PAYLOAD_PATH,
   collectPostWriteProjection,
   collectPreWriteProjection,
+  evaluateRecordWriteReceipt,
   expectedAllowlist,
   expectedRuntimeContext,
   verifyPayloadBytes
@@ -260,4 +261,41 @@ test('CM-2106 frozen executor rejects missing Git decisions before runtime or st
   await assert.rejects(runFrozenCm2106RecordWrite(null, null, null), /cm2106_execution_packet_commit_required/);
   await assert.rejects(runFrozenCm2106RecordWrite('a'.repeat(40), null, null), /cm2106_content_decision_commit_required/);
   await assert.rejects(runFrozenCm2106RecordWrite('a'.repeat(40), 'b'.repeat(40), null), /cm2106_final_release_decision_commit_required/);
+});
+
+test('CM-2106 R1 frozen receipt proves one exact write and one verify without follow-on authority', async () => {
+  const receipt = JSON.parse(await fs.readFile(path.join(
+    __dirname,
+    '../docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_execution_receipt_cm2106_r1.json'
+  ), 'utf8'));
+  const result = evaluateRecordWriteReceipt(receipt);
+  assert.equal(result.accepted, true, result.blockers.join(', '));
+  assert.equal(result.acceptedAsIdentityBoundRecordEvidence, true);
+  assert.equal(result.nativeWriteCalls, 1);
+  assert.equal(result.verifyOperations, 1);
+  assert.equal(result.additionalWriteAuthorized, false);
+  assert.equal(result.tombstoneAuthorized, false);
+  assert.equal(result.phase8Completed, false);
+});
+
+test('CM-2106 R1 receipt fails closed on count, hash, provider, replay, or completion drift', async () => {
+  const source = JSON.parse(await fs.readFile(path.join(
+    __dirname,
+    '../docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_execution_receipt_cm2106_r1.json'
+  ), 'utf8'));
+  for (const drift of [
+    { nativeWriteCalls: 2 },
+    { verifyOperations: 2 },
+    { durableRecordSha256: 'f'.repeat(64) },
+    { providerCalled: true },
+    { derivedIndexWritePerformed: true },
+    { authorizationReplayAllowed: true },
+    { rollbackDrillPassed: true },
+    { phase8Completed: true }
+  ]) {
+    const receipt = { ...source, ...drift };
+    const { receiptPayloadSha256, ...payload } = receipt;
+    receipt.receiptPayloadSha256 = sha256Canonical(payload);
+    assert.equal(evaluateRecordWriteReceipt(receipt).accepted, false, JSON.stringify(drift));
+  }
 });

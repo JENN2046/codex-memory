@@ -160,6 +160,101 @@ function verifyPayloadBytes(payloadBytes) {
   return { payload, durable };
 }
 
+function evaluateRecordWriteReceipt(receipt) {
+  const blockers = [];
+  if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt)) {
+    return { accepted: false, blockers: ['receipt.missing'] };
+  }
+  const { receiptPayloadSha256, ...payload } = receipt;
+  if (!/^[a-f0-9]{64}$/.test(receiptPayloadSha256 || '') ||
+      sha256Canonical(payload) !== receiptPayloadSha256) {
+    blockers.push('receipt.payloadHash');
+  }
+  const exact = {
+    schemaVersion: 1,
+    taskId: 'CM-2106',
+    receiptType: 'identity_bound_synthetic_record_one_shot_execution_receipt',
+    result: 'PASS',
+    finalState: 'CONSUMED_SUCCESS',
+    executionAccepted: true,
+    implementationCommit: '40068a70fe4a04f54a2e24b04c70e11a7099f6fa',
+    implementationTree: '1b032845712433c3f6235527f535e689b0470c24',
+    executionPacketCommit: 'f65e903c9a21f2b6aba9b1bda5e9ee8d01c7c7a5',
+    executionPacketBlobOid: '993ece4ed4b0dacb38fa8fc3718041f7975a4f05',
+    executionPacketSha256: 'f9bae002a970c58e2bdeb746d5dcbcb67ce903cdc09f0b9c7cedf528abb7a669',
+    contentDecisionReference: EXPECTED.contentDecisionReference,
+    contentDecisionCommit: '88b504cd514acda93a37deee6a32b46607e6addf',
+    contentDecisionBlobOid: 'b32c6b180d84f8ba24d1f76bcbf95bfcdeace0ca',
+    contentDecisionSha256: '00d37b1671193df44b0795783f27c2963b354efae9ae06ad9a74271317afa28c',
+    finalReleaseDecisionReference: EXPECTED.finalReleaseDecisionReference,
+    finalReleaseDecisionCommit: 'f9df8cc23508d2a3215171ab9eb66bd14806ba80',
+    finalReleaseDecisionBlobOid: '0710007a68bb253b9d51483a91d9b2c915018b90',
+    finalReleaseDecisionSha256: '02acc1f83debfd4d79b799bf658f4942e710df316d7cd48e609664454d8a3a25',
+    preflightReceiptCommit: '12090c995ee15818d0583567001248637e24e103',
+    preflightReceiptBlobOid: '2b401bf0fd4e9601fd58ad8902744b8aed6cc700',
+    preflightReceiptSha256: '2682943390cedb875527a57ec0c7766c33368367fbaf1a9a0513a382e522ef96',
+    preflightReceiptAccepted: true,
+    storeRootBindingSha256: STORE_ROOT_BINDING_CANONICAL_SHA256,
+    storeIdentityMatched: true,
+    storeIdentitySha256: IDENTITY_CANONICAL_SHA256,
+    payloadBlobOid: 'de20e372df724bc6668a308ff0bad1091475d300',
+    payloadBytes: EXPECTED.payloadBytes,
+    payloadFileSha256: EXPECTED.payloadFileSha256,
+    payloadCanonicalSha256: EXPECTED.payloadCanonicalSha256,
+    durableRecordCount: 1,
+    durableRecordBytes: EXPECTED.durableRecordBytes,
+    durableRecordSha256: EXPECTED.durableRecordSha256,
+    memoryIdRef: EXPECTED.memoryIdRef,
+    authorizationUseCount: 1,
+    authorizationConsumed: true,
+    authorizationReplayAllowed: false,
+    nonceMarkerCount: 1,
+    authorizationReceiptMarkerCount: 1,
+    writeInvocationMarkerCount: 1,
+    writeInvocationCount: 1,
+    nativeWriteCalls: 1,
+    verifyOperations: 1,
+    verifyAccepted: true,
+    auditReceiptSelectedFieldsOnly: true,
+    nativeInvocationReceiptBindingMatched: true,
+    primaryMemoryStoreWritePerformed: true,
+    durableWritePerformed: true,
+    primaryWriteOnly: true,
+    providerCalled: false,
+    derivedIndexWritePerformed: false,
+    derivedRuntimeStoreCreated: false,
+    localFallbackUsed: false,
+    automaticRetryPerformed: false,
+    rollbackOrCompensationPerformed: false,
+    existingMemoryModified: false,
+    otherRealMemoryRead: false,
+    otherRealMemoryModified: false,
+    rawMemoryReturned: false,
+    rawAuditReturned: false,
+    rawPathDisclosed: false,
+    readinessClaimed: false,
+    rollbackDrillPassed: false,
+    failureRecoveryProofPassed: false,
+    phase8Completed: false
+  };
+  for (const [field, expected] of Object.entries(exact)) {
+    if (receipt[field] !== expected) blockers.push(`receipt.${field}`);
+  }
+  for (const field of ['claimId', 'claimBindingHash']) {
+    if (!/^[a-f0-9]{64}$/.test(receipt[field] || '')) blockers.push(`receipt.${field}`);
+  }
+  return {
+    accepted: blockers.length === 0,
+    blockers: [...new Set(blockers)],
+    acceptedAsIdentityBoundRecordEvidence: blockers.length === 0,
+    nativeWriteCalls: blockers.length === 0 ? 1 : 0,
+    verifyOperations: blockers.length === 0 ? 1 : 0,
+    additionalWriteAuthorized: false,
+    tombstoneAuthorized: false,
+    phase8Completed: false
+  };
+}
+
 async function verifyIdentity(storeRoot, filesystem = fs) {
   const root = await filesystem.lstat(storeRoot);
   if (!root.isDirectory() || root.isSymbolicLink()) {
@@ -252,6 +347,7 @@ module.exports = {
   REGISTRY_ROOT_IDENTITY,
   collectPostWriteProjection,
   collectPreWriteProjection,
+  evaluateRecordWriteReceipt,
   expectedAllowlist,
   expectedRuntimeContext,
   sha256,
