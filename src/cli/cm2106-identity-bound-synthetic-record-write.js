@@ -376,11 +376,11 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
     payloadCanonicalSha256: packet.payloadCanonicalSha256,
     allowedScope: ALLOWED_SCOPE,
     runtimeTarget: {
-      primaryRuntime: 'VCPToolBox native memory shim',
+      primaryRuntime: 'VCPToolBox native memory',
       targetReferenceName: EXPECTED.runtimeTargetReference,
       targetKind: 'mcp_server'
     },
-    rollbackPlanReference: 'cm2106-identity-bound-append-only-tombstone-plan',
+    rollbackPlanReference: 'cm2106-r1-identity-bound-append-only-tombstone-plan',
     buildContext: () => runtimeContext,
     buildAllowlist: expectedAllowlist
   };
@@ -436,7 +436,7 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
           phase8OneShotAuthorizationAssertion: assertion,
           auditReceipt: { receiptId: packet.receiptId },
           rollbackPosture: {
-            mode: 'append_only_logical_tombstone',
+            mode: 'bounded_rollback_plan',
             rollbackPlanRef: expectedBinding.rollbackPlanReference
           },
           outputDisclosureBudget: {

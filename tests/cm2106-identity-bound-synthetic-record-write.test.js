@@ -12,8 +12,10 @@ const {
   expectedIdentityBytes
 } = require('../src/core/Cm2102IdentityBoundRollbackLifecycleFoundation');
 const {
+  createGovernedMcpVcpNativeVcpToolBoxMcpShimServer,
   createVcpToolBoxNativeMemoryAdapter
 } = require('../src/core/GovernedMcpVcpNativeVcpToolBoxMcpShim');
+const { createCodexMemoryApplication } = require('../src/app');
 const {
   sha256Canonical
 } = require('../src/core/Phase8OneShotNativeWriteExecutionGate');
@@ -180,6 +182,78 @@ test('CM-2106 app route is local, primary-write-only, and provider disabled', ()
   assert.equal(config.governedMcpVcpNativeRuntimeTarget.accepted, true);
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.endpointDisclosed, false);
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.tokenMaterialDisclosed, false);
+});
+
+test('CM-2106 strict bridge delegates one primary-write-only record with bounded rollback controls', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2106-strict-e2e-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const store = path.join(root, 'store');
+  await fs.mkdir(store);
+  await fs.writeFile(path.join(store, IDENTITY_FILENAME), expectedIdentityBytes(), { flag: 'wx' });
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseRootPath: store,
+    knowledgeBaseStorePath: path.join(root, 'derived'),
+    writeSubdir: STORE_IDENTITY.writeSubdir,
+    primaryWriteOnly: true
+  });
+  const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({ adapter, enableWrite: true });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(async () => {
+    await new Promise(resolve => server.close(resolve));
+    await adapter.shutdown();
+  });
+  const address = server.address();
+  const endpoint = ['http:', '', `127.0.0.1:${address.port}`, 'mcp', 'vcp-native'].join('/');
+  const rollbackPlanRef = 'cm2106-r1-identity-bound-append-only-tombstone-plan';
+  const app = createCodexMemoryApplication({
+    ...appOverrides({ endpoint, bearerToken: 'synthetic-fixture-only', appStateRoot: path.join(root, 'app') }),
+    phase8OneShotNativeWriteEnforcementEnabled: true,
+    phase8OneShotAuthorizationAssertionVerifier: async () => ({
+      accepted: true,
+      exactApprovalResult: {
+        accepted: true,
+        allowedAction: 'live_bridge_record_memory_proof',
+        allowedScope: ALLOWED_SCOPE,
+        runtimeTarget: {
+          primaryRuntime: 'VCPToolBox native memory',
+          targetReferenceName: EXPECTED.runtimeTargetReference,
+          targetKind: 'mcp_server'
+        },
+        rollbackPlanRef,
+        approvalDecisionReference: EXPECTED.finalReleaseDecisionReference,
+        claimBindingHash: 'a'.repeat(64),
+        approvedAt: '2026-07-12T03:40:00+08:00'
+      }
+    })
+  });
+  t.after(() => app.close());
+  await app.initialize();
+  const payload = JSON.parse(await fs.readFile(path.join(__dirname, '..', PAYLOAD_PATH), 'utf8'));
+  const result = await app.callTool('record_memory', payload, {
+    executionContext: {
+      agentAlias: 'Codex', agentId: 'cm2106-r1-fixture', clientId: 'codex',
+      projectId: ALLOWED_SCOPE.project_id, workspaceId: ALLOWED_SCOPE.workspace_id,
+      scopeId: ALLOWED_SCOPE.scope_id, visibility: ALLOWED_SCOPE.visibility,
+      requestSource: 'cm2106-r1-strict-fixture'
+    },
+    phase8OneShotAuthorizationAssertion: { fixtureOnly: true },
+    auditReceipt: { receiptId: EXPECTED.receiptId },
+    rollbackPosture: { mode: 'bounded_rollback_plan', rollbackPlanRef },
+    outputDisclosureBudget: {
+      level: 'summary', lowDisclosure: true, rawOutput: false, maxItems: 5, maxBytes: 4096
+    }
+  });
+  assert.equal(result.status, 'GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATED', JSON.stringify({
+    decision: result.decision,
+    reasonCode: result.reasonCode,
+    gate: result.gate
+  }));
+  assert.equal(result.access.memoryWritePerformed, true);
+  assert.equal(result.access.localMemoryFallbackUsed, false);
+  assert.equal(result.receipt.nativeInvocationReceipt.statusClass, 'success');
+  const post = await collectPostWriteProjection(store);
+  assert.equal(post.accepted, true);
+  assert.equal(post.durableRecordSha256, EXPECTED.durableRecordSha256);
 });
 
 test('CM-2106 frozen executor rejects missing Git decisions before runtime or store access', async () => {

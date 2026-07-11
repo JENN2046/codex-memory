@@ -21,11 +21,11 @@ const {
 const PAYLOAD_PATH =
   'docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_payload_cm2106.json';
 const PACKET_PATH =
-  'docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_execution_packet_cm2106.json';
+  'docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_execution_packet_cm2106_r1.json';
 const CONTENT_DECISION_PATH =
-  'docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_authorization_content_cm2106.json';
+  'docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_authorization_content_cm2106_r1.json';
 const FINAL_RELEASE_DECISION_PATH =
-  'docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_final_release_cm2106.json';
+  'docs/near-model-memory-plan-pack/phase8_identity_bound_synthetic_record_final_release_cm2106_r1.json';
 
 const EXPECTED = Object.freeze({
   payloadBytes: 731,
@@ -34,14 +34,14 @@ const EXPECTED = Object.freeze({
   durableRecordBytes: 327,
   durableRecordSha256: '5b140bdb1f30f1b0d08ad3f066bde9a07b56940eecef20a9a196ef278970a5c3',
   memoryIdRef: 'vcp-kb-5b140bdb1f30f1b0',
-  contentDecisionReference: 'CM-2106-SELF-IDENTITY-BOUND-RECORD-CONTENT-5B140BDB',
-  finalReleaseDecisionReference: 'CM-2106-SELF-IDENTITY-BOUND-RECORD-FINAL-5B140BDB',
-  nonce: 'cm2106-identity-bound-record-write-001',
-  receiptId: 'cm2106-identity-bound-record-write-receipt-001',
-  registryReference: 'cm2106-identity-bound-record-write-registry-001',
-  runtimeTargetReference: 'cm2106-identity-bound-vcptoolbox-native-target',
-  appStateReference: 'cm2106-identity-bound-record-write-app-state-001',
-  derivedRuntimeStoreReference: 'cm2106-identity-bound-record-write-derived-store-001',
+  contentDecisionReference: 'CM-2106-R1-SELF-IDENTITY-BOUND-RECORD-CONTENT-5B140BDB',
+  finalReleaseDecisionReference: 'CM-2106-R1-SELF-IDENTITY-BOUND-RECORD-FINAL-5B140BDB',
+  nonce: 'cm2106-r1-identity-bound-record-write-001',
+  receiptId: 'cm2106-r1-identity-bound-record-write-receipt-001',
+  registryReference: 'cm2106-r1-identity-bound-record-write-registry-001',
+  runtimeTargetReference: 'cm2106-r1-identity-bound-vcptoolbox-native-target',
+  appStateReference: 'cm2106-r1-identity-bound-record-write-app-state-001',
+  derivedRuntimeStoreReference: 'cm2106-r1-identity-bound-record-write-derived-store-001',
   scopeFingerprint: 'ff5cacbe8b6723514c127b35e0ddb6f14e45f3d0afdb1e88f3780978421984ad'
 });
 
@@ -106,7 +106,7 @@ function expectedRuntimeContext({ implementationCommit, implementationTree, payl
     cleanDetachedCheckoutRequired: true,
     outerTransport: 'frozen_local_executor',
     innerNativeTransport: 'local_http_mcp',
-    primaryRuntime: 'VCPToolBox native memory shim',
+    primaryRuntime: 'VCPToolBox native memory',
     primaryWriteOnly: true,
     providerCallsAllowed: false,
     derivedIndexWritesAllowed: false,
