@@ -8,15 +8,21 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2091 machine-enforced Phase 8 reapplication prepared; not granted |
-| Current task | `CM-2091 machine-enforced Phase 8 native write reapplication` |
-| Current validation | `CMV-2191` |
-| Current route | Independent reapplication review; no runtime/write/verify/rollback execution |
+| Status | CM-2092 non-executable Phase 8 decision-content issuance requested; fourth slot false |
+| Current task | `CM-2092 Phase 8 authorization decision content issuance request` |
+| Current validation | `CMV-2192` |
+| Current route | Obtain content decision, freeze its Git identity, then seek separate final execution release |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2092` fixes the remaining CM-2091 findings in implementation `e1785994…`
+and requests only a non-executable authorization decision content object. The
+returned bytes must be frozen into Git and bound to a final execution manifest;
+a separate review must then authorize execution and the fourth decision slot.
+No claim, write, verify, rollback, compensation, or real-memory read occurred.
 
 `CM-2091` resolves the CM-2089 fail-closed findings with atomic one-shot claim
 state, app-path enforcement, same-commit payload binding, canonical context and

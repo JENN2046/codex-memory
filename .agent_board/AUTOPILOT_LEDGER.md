@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest receipt: `CM-2091 machine-enforced Phase 8 native write reapplication`.
-Latest validation: `CMV-2191`.
+Latest receipt: `CM-2092 Phase 8 authorization decision content issuance request`.
+Latest validation: `CMV-2192`.
 Active receipt summaries should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -31,6 +31,7 @@ Governance kernel anchor retained for validation: `CM-0684`.
 
 | ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |
 |---|---|---|---|---|---|---|---|---:|---|---|
+| CM-2092 | complete imported near-model-memory plan pack | Green decision-content request; no runtime | `phase8_decision_content_issuance_no_execution` | Hardened one-shot execution and prepared two-gate machine-bindable decision issuance request | `task_id=CM-2092; implementation=e1785994; context_sha256=75832f19; allowlist_sha256=b69cc85d; content_issuance_requested=true; fourth_slot=false; claims=0; native_writes=0; verify=0; compensation=0; readiness=0` | `CMV-2192` | 0 | content decision is non-executable; Git decision intake and final execution-release review required | completed_phase8_decision_content_issuance_requested_fourth_slot_false_no_execution_no_ready_claim | 2026-07-11 |
 | CM-2091 | complete imported near-model-memory plan pack | Green reapplication; no runtime | `phase8_machine_enforced_reapplication_no_execution` | Implemented one-shot claim enforcement and prepared exact reapplication | `task_id=CM-2091; prior_decision=CM-2089-ER-FAIL-CLOSED; runtime_commit=3ce0cc0f; payload_blob=cde8e314; context_sha256=fc9deec9; allowlist_sha256=4a36b22c; durable_sha256=4f863f52; authorization=false; native_writes=0; verify=0; compensation=0; readiness=0` | `CMV-2191` | 0 | independent authorization still required; no runtime/write/verify/compensation | completed_phase8_machine_enforced_reapplication_requested_not_granted_no_execution_no_ready_claim | 2026-07-11 |
 | CM-2089 | complete imported near-model-memory plan pack | Green exact authorization request; no runtime | `phase8_exact_native_write_request_no_execution` | Prepared hash-bound one-write authorization request and synthetic proof payload | `task_id=CM-2089; action=live_bridge_record_memory_proof; payload_sha256=91d3b2ed; max_native_writes=1; max_verify=1; max_rollback_or_compensation=0; authorization=false; runtime_calls=0; native_writes=0; real_memory_reads=0; remote_actions=0; readiness_claims=0` | `CMV-2190` | 0 | native write/verify/rollback/compensation/readiness remain gated until exact decision | completed_exact_phase8_native_write_authorization_requested_not_granted_no_execution_no_ready_claim | 2026-07-11 |
 | CM-2088 | complete imported near-model-memory plan pack | Green review intake | `tag_push_receipt_review_no_new_remote_authority` | Recorded independent PASS for exact tag push receipt | `task_id=CM-2088; review_reference=CM-2087-ER-20260711-TAG-PUSH-RECEIPT-PASS-DF1E41DD; receipt_review=true; authorization_consumed=true; replay_allowed=false; new_remote_authority=false; release=0; deploy=0; phase8_authorization=false; readiness_claims=0` | `CMV-2189` | 0 | all new remote actions, Release/deploy/Phase 8/readiness remain gated | completed_tag_push_receipt_review_passed_no_new_remote_authority_no_phase8_no_ready_claim | 2026-07-11 |

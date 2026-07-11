@@ -4,13 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2091 machine-enforced Phase 8 native write reapplication`.
-Current validation: `CMV-2191`.
-Current handoff: One-shot native write enforcement and exact evidence bindings are implemented; reapplication is prepared but authorization remains false. Nothing executed.
+Current task: `CM-2092 Phase 8 authorization decision content issuance request`.
+Current validation: `CMV-2192`.
+Current handoff: CM-2091 findings are fixed in `e1785994…`. A non-executable content decision is requested; fourth slot remains false. Next: freeze returned decision bytes, then request final execution release. Nothing executed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2092 is the active gate. It requests only a machine-bindable external decision
+content object. Even a positive content decision cannot execute a write: its exact
+bytes must first be committed, independently hashed, bound into a frozen manifest,
+and approved by a separate final execution-release review. Phase 8 remains false;
+nonce claims, write, verify, rollback, compensation, and real-memory reads are zero.
 
 Goal: complete the imported near-model-memory plan pack. Current local source,
 contract, fixture, and machine-evidence preparation is substantial. CM-2079

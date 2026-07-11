@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2091 machine-enforced Phase 8 native write reapplication`.
-Current validation: `CMV-2191`.
+Current checkpoint: `CM-2092 Phase 8 authorization decision content issuance request`.
+Current validation: `CMV-2192`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2092 Phase 8 Decision Content Issuance
+
+Status: `PHASE8_DECISION_CONTENT_ISSUANCE_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM`
+
+- Frozen hardened execution implementation at `e1785994…`.
+- Assertion consumption, exact audit correlation, stable registry identity, frozen
+  executor, and Git decision intake are fail-closed and covered by negative tests.
+- Split authorization into non-executable content issuance, Git object intake, and
+  a later independent final execution-release review.
+- No authorization claim, runtime write, verify, compensation, or real-memory read occurred.
+
+Validation: `CMV-2192`.
 
 ## CM-2091 Phase 8 Reapplication
 

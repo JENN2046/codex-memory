@@ -4,13 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2091 machine-enforced Phase 8 native write reapplication`.
-Current validation: `CMV-2191`.
-Current project status: CM-2089 execution-binding findings are resolved in code and frozen evidence. Reapplication is prepared, but authorization remains false; no runtime, write, verify, rollback, compensation, real-memory read, or readiness action occurred.
-Current route: `CM2091_PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM`.
+Current task: `CM-2092 Phase 8 authorization decision content issuance request`.
+Current validation: `CMV-2192`.
+Current project status: CM-2091 one-shot, exact-correlation, frozen-executor, registry-identity, and decision-intake findings are resolved in `e1785994…`. Only non-executable decision content is requested; the fourth slot remains false and nothing executed.
+Current route: `CM2092_PHASE8_DECISION_CONTENT_ISSUANCE_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2092 Phase 8 decision-content issuance request: binds implementation
+`e1785994…`, context `75832f19…`, allowlist `b69cc85d…`, the unchanged synthetic
+payload, durable Markdown bytes, a stable registry identity, and a new nonce/receipt.
+It deliberately separates content issuance from Git decision intake and final
+execution release. No positive content decision may be used directly for execution.
 
 CM-2091 Phase 8 reapplication: adds atomic one-shot authorization claim,
 real-app-path rejection of caller-supplied accepted=true, exact Git/blob and
