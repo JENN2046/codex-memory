@@ -41,6 +41,11 @@ const STORE_IDENTITY = Object.freeze({
 const STORE_ROOT_DERIVATION = Object.freeze({
   schemaVersion: 1,
   authority: 'git_common_dir_governance_state',
+  governanceRootIdentityReference: 'codex-memory-phase8-governance-root',
+  governanceRootIdentitySha256: '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0',
+  governanceRootIdentityVerificationRequired: true,
+  governanceRootReinitializationAllowed: false,
+  governanceRootReplacementAllowed: false,
   governanceParentSubdir: 'codex-memory-governance',
   storeDirectoryName: 'phase8-identity-bound-synthetic-rollback-store-001',
   callerPathAllowed: false,
