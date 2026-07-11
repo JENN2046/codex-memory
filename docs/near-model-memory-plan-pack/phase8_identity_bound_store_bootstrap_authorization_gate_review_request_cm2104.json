@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2104-PRE",
+  "requestType": "non_executing_two_stage_bootstrap_authorization_gate_implementation_review",
+  "requestReference": "CM-2104-PRE-IR-20260712-TWO-STAGE-BOOTSTRAP-GATE",
+  "requestedDecision": {
+    "twoStageBootstrapAuthorizationGateImplementationPassed": true,
+    "readyForExactBootstrapAuthorizationContentApplication": true,
+    "bootstrapExecutionAuthorized": false
+  },
+  "realityFinding": {
+    "r2ExecutorAcceptedSingleExecutableDecision": true,
+    "r2ExecutorMachineRequiredFinalExecutionRelease": false,
+    "directCm2104ExecutableDecisionWouldViolateReviewBoundary": true,
+    "selectedRepair": "machine_bound_content_decision_plus_independent_final_execution_release"
+  },
+  "r2PassReview": {
+    "decisionReference": "CM-2103-R2-ER-20260712-IMPLEMENTATION-PASS-NO-EXECUTION-F4BA5627",
+    "freezeCommit": "29d6afea40dd7dbb13e8e237967fda80d5d0020d",
+    "freezeTree": "9626f3bb1cbbf560aa63e8cb203ee37c7d4b3ae7",
+    "freezeBlobOid": "03efdbfdb1d8844ff488136a0b79e886d6d0396c",
+    "freezeBytes": 3398,
+    "freezeSha256": "3df35ee2eaa41fad83530624a2d6f7dff7f10e67669231f88ff0a1d06c93fbc5",
+    "freezePayloadSha256": "51bddc45b56c23ecae9a4fdde8bcf7cdab6c8b4da5aa7fe0785f6ce1394a24ee"
+  },
+  "acceptedR2Base": {
+    "implementationCommit": "808fac45c0b21b1ba6cc97513b2692cced403d54",
+    "implementationTree": "32f336c3c4776c964de227ac8911a233b01407a0",
+    "executionPacketCommit": "c0286d7341ee46ee94198c761462bf27336cdec0",
+    "executionPacketTree": "794438793c4c5000e87e35a611fbb29fbae6fb85",
+    "executionPacketBlobOid": "3231b4b037793a05547e7f0a19c428fe5f0c284e",
+    "executionPacketBytes": 14476,
+    "executionPacketSha256": "f4ba5627e8ef651685f11ec6be5a4e81bca15e8844fa9c600e9868c84b4c8ebc",
+    "executionPacketPayloadSha256": "5da91016365599346dad93cac7ed16a2012730dcf613d3349e728188ce72d0b1"
+  },
+  "twoStageGateImplementation": {
+    "commit": "53e5524937c030cab1ecf48a3d9d5006af34dca6",
+    "tree": "94cbbb695e3e2a4e75367ec0165bba5285a4a502",
+    "contentDecisionIntakeBlobOid": "20848bf4a15c057cf746343f7fe3a5447069f76d",
+    "finalReleaseDecisionIntakeBlobOid": "6402880049ef89c13de601b353f6e7e8a69f88bf",
+    "gatePacketContractBlobOid": "b9a112c08de326f948dc41e7f0c3b91a0bb89b26",
+    "frozenExecutorBlobOid": "16097f784dd435fcbe0ef15ac3bdc21ead60b2e7"
+  },
+  "authorizationGatePacket": {
+    "commit": "67eaab147cb856180a7ddd0491c5e5cc2f01324f",
+    "tree": "5ad4fb736034172bfb96ce8c34a492e509b9acfa",
+    "blobOid": "c5a2c6e4eb6c0911895c44b41c07244fe96d61e9",
+    "bytes": 7843,
+    "sha256": "0ad7e1cb4ff30cc993c9625fcefe0328d9c78d9a4227ffb6c9409b5faa4c0f8e",
+    "payloadSha256": "e57a98e9151583029843ff3ce93ca60ad45ebbfcd91e9c7fce7e0362969359da"
+  },
+  "machineEnforcedSequence": [
+    "authorization_gate_packet_git_intake",
+    "authorization_content_decision_git_intake_with_execution_false",
+    "final_execution_release_git_intake_binding_content_commit_blob_sha",
+    "runtime_tree_and_artifact_binding",
+    "governance_root_verification",
+    "one_shot_claim_and_bootstrap"
+  ],
+  "hardStops": {
+    "contentDecisionAloneExecutable": false,
+    "missingFinalReleaseStopsBeforeGitPacketRead": true,
+    "finalReleaseMustBindContentDecisionGitIdentity": true,
+    "callerStorePathAllowed": false,
+    "environmentStorePathOverrideAllowed": false,
+    "callerIdentityBytesAllowed": false,
+    "automaticRetryAllowed": false,
+    "automaticCleanupAllowed": false
+  },
+  "validation": {
+    "focusedCommand": "node --test tests/cm2103-bootstrap-*.test.js tests/cm2104-bootstrap-*.test.js",
+    "focusedTests": 44,
+    "focusedPassed": 44,
+    "focusedFailed": 0,
+    "defaultSafeCommand": "npm test -- --summary",
+    "defaultSafeExitCode": 0,
+    "providerTestsRun": false,
+    "runtimeStarted": false
+  },
+  "stateAtRequest": {
+    "authorizationContentDecisionPresent": false,
+    "finalExecutionReleaseDecisionPresent": false,
+    "bootstrapExecutionAuthorized": false,
+    "claimCreatedInRealGovernanceRoot": false,
+    "storeDirectoryCreated": false,
+    "storeIdentityCreated": false,
+    "bootstrapReceiptCreated": false,
+    "emptyStorePreflightAuthorized": false,
+    "recordMemoryAuthorized": false,
+    "tombstoneMemoryAuthorized": false,
+    "verifyAuthorized": false,
+    "nativeReads": 0,
+    "nativeWrites": 0,
+    "rollbackOrCompensationOperations": 0,
+    "rollbackDrillPassed": false,
+    "failureRecoveryProofPassed": false,
+    "phase8Completed": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "explicitNonAuthorizations": [
+    "bootstrap_execution",
+    "store_directory_creation",
+    "store_identity_creation",
+    "empty_store_preflight",
+    "record_memory",
+    "tombstone_memory",
+    "verify",
+    "native_memory_read_or_write",
+    "retry_or_cleanup",
+    "git_push_tag_release_deploy_cutover",
+    "readiness_or_completion_claim"
+  ],
+  "requestedNextStateIfPassed": {
+    "twoStageBootstrapAuthorizationGateImplementationPassed": true,
+    "exactAuthorizationContentApplicationMayBePrepared": true,
+    "authorizationContentDecisionMayBeFrozenWithoutExecution": true,
+    "finalExecutionReleaseStillRequiresSeparateReview": true,
+    "bootstrapExecutionAuthorized": false
+  },
+  "requestPayloadSha256": "2ebe1152f9a31e27c3018d79418c3fbaf06f2ce08bab2a09f4b93533d7590715"
+}
