@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2099 CM-2096 rollback execution packet v3`.
-Current validation: `CMV-2203`.
+Current checkpoint: `CM-2111 Phase 8 completion evidence audit`.
+Current validation: `CMV-2204`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2111 Phase 8 Completion Evidence Audit
+
+Status: `PHASE8_EVIDENCE_GATE_COMPLETED_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM`
+
+- CM-2107 completed one identity-bound append-only tombstone and correlated lifecycle verify.
+- CM-2109 completed the isolated pre-claim, pre-commit, and ambiguous post-commit cases with zero retry/compensation.
+- CM-2108 and CM-2110 separately applied rollback and failure-recovery evidence.
+- CM-2111 evaluated all 15 Phase 8 requirements as accepted and set only `phase8Completed=true`.
+- Full plan-pack, production, release, deploy, cutover, `RC_READY`, complete V8, and readiness remain false.
+
+Validation: `CMV-2204`.
 
 ## CM-2096 Frozen Rollback Packet v3
 

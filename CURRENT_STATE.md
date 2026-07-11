@@ -8,15 +8,24 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2096 v3 non-executing stack and packet prepared; bootstrap/preflight/decision still absent; Phase 8 incomplete |
-| Current task | `CM-2099 CM-2096 rollback execution packet v3` |
-| Current validation | `CMV-2203` |
-| Current route | Independent v3 implementation review; no tombstone/verify/nonce claim |
+| Status | Phase 8 evidence gate accepted; full plan pack and readiness remain incomplete/unclaimed |
+| Current task | `CM-2111 Phase 8 completion evidence audit` |
+| Current validation | `CMV-2204` |
+| Current route | Preserve consumed one-shot state; no additional native or remote action |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## Future Candidate Routes
+## Current Completed Route
+
+CM-2111 accepted all 15 Phase 8 requirements after three independent evidence
+applications: CM-2095 native write/verify, CM-2108 rollback drill, and CM-2110
+isolated failure recovery. `phase8Completed=true`; `fullPlanPackCompleted=false`
+and every production/release/deploy/cutover/RC/V8 readiness claim remains false.
+The record/tombstone/failure-harness authorizations are consumed and cannot be
+replayed. No additional native action is authorized.
+
+## Historical / Future Candidate Routes
 
 CM-2096 v2 implementation review passed without execution authority. V3 binds
 an immutable synthetic-store identity, collects exact target/marker hashes from

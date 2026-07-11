@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest receipt: `CM-2099 CM-2096 rollback execution packet v3`.
-Latest validation: `CMV-2203`.
+Latest receipt: `CM-2111 Phase 8 completion evidence audit`.
+Latest validation: `CMV-2204`.
 Active receipt summaries should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -31,6 +31,7 @@ Governance kernel anchor retained for validation: `CM-0684`.
 
 | ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |
 |---|---|---|---|---|---|---|---|---:|---|---|
+| CM-2111 | complete Phase 8 of imported near-model-memory plan pack | Exact evidence applications plus Phase 8-only completion audit | `phase8_identity_bound_rollback_failure_recovery_completion` | Applied exact rollback and failure-recovery receipts, then accepted all 15 Phase 8 evidence fields | `rollback_receipt=928da067; rollback_application=8517b8e9; failure_receipt=07c1cf3b; failure_application=9d96290a; completion_bundle=77d162ed; completion_receipt=d2617505; phase8=true; full_plan=false; readiness=false` | `CMV-2204` | 3 | no replay, cleanup, additional native action, provider/real-memory access, remote action, full-plan or readiness claim | completed_phase8_evidence_gate_accepted_full_plan_incomplete_no_ready_claim | 2026-07-12 |
 | CM-2099 | complete imported near-model-memory plan pack | Green CM-2096 v3 non-executing stack | `phase8_cm2096_rollback_v3_stack_no_execution` | Froze store identity/collector, one-shot assertion gate, exact verifier, two-commit executor, and v3 packet/review surface | `v2_review=79b7aeb4; implementation=6f4f7867; packet=1ba07b0c; packet_sha=75fafecd; store_identity=e28d9b2f; focused=57/57; default=5236/5236; strict=106/106; compare_rollback=43/43; real_actions=0` | `CMV-2203` | 0 | no target-store bootstrap, nonce/receipt claim, tombstone/verify, retry, supersede/compensation, real-memory access, completion, or readiness | completed_cm2096_v3_non_executing_stack_prepared_review_required_no_tombstone_phase8_incomplete | 2026-07-11 |
 | CM-2098 | complete imported near-model-memory plan pack | Green CM-2096 v2 frozen packet; no execution | `phase8_cm2096_rollback_v2_packet_no_execution` | Froze decision intake, exact target/payload/507-byte marker, lifecycle projection, and hard-stop executor | `decision=ac465bd6; implementation=a02df061; target_ref=vcp-kb-4f863f52455147c6; marker_sha=27a5e586; writes=0; verify=0; rollback_proof=false` | `CMV-2202` | 0 | no tombstone/verify, claim, receipt, retry, supersede/compensation, real-memory access, completion, or readiness | completed_cm2096_v2_rollback_packet_prepared_no_tombstone_execution_phase8_incomplete | 2026-07-11 |
 | CM-2096 | complete imported near-model-memory plan pack | Green v2 frozen packet; no execution | `phase8_rollback_v2_packet_no_execution` | Froze decision intake, exact target/payload/507-byte marker, lifecycle projection, and hard-stop executor | `decision=ac465bd6; implementation=a02df061; target_ref=vcp-kb-4f863f52455147c6; marker_sha=27a5e586; writes=0; verify=0; rollback_proof=false` | `CMV-2202` | 0 | no tombstone/verify, claim, receipt, retry, supersede/compensation, real-memory access, completion, or readiness | completed_v2_rollback_packet_prepared_no_tombstone_execution_phase8_incomplete | 2026-07-11 |

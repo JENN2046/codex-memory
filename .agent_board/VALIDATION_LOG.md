@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest validation: `CMV-2203`.
-Latest task: `CM-2099 CM-2096 rollback execution packet v3`.
+Latest validation: `CMV-2204`.
+Latest task: `CM-2111 Phase 8 completion evidence audit`.
 Validation facts should be summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts are collected by fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -17,6 +17,7 @@ Active validation ledger. Long historical validation rows are archived by refere
 
 | ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |
 |---|---|---|---|---|---|---|---|
+| CMV-2204 | exact CM-2107/2109 execution receipts; CM-2108/2110 application contracts; CM-2111 15-field bundle and Phase 8 audit; focused `68/68`; default `5345/5345`; strict contract/test/compare/rollback `106/106 + 5345/5345 + 43/43 + 43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2111 Phase 8 completion evidence audit | COMPLETED_PHASE8_EVIDENCE_GATE_ACCEPTED_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM | Phase 8 audit accepted all 15 fields. Record, rollback, and failure-recovery authorizations are consumed/non-replayable. No additional native, provider, remote, or readiness action occurred. | Preserve governance markers and receipts; do not infer full-plan, production, release, deploy, RC, or V8 readiness. | 2026-07-12 |
 | CMV-2203 | v2 decision Git freeze; implementation/packet/blob/SHA binding; immutable store identity; exact real-store collector; assertion replay/concurrency; exact receipt/claim/target correlation; native-read-off preflight; synthetic app→HTTP MCP→shim→507-byte marker→collector→local-audit verify E2E; focused `57/57`; default `5236/5236`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2099 CM-2096 rollback packet v3 | COMPLETED_V3_NON_EXECUTING_STACK_PREPARED_REVIEW_REQUIRED_NO_TOMBSTONE_PHASE8_INCOMPLETE | V3 packet `1ba07b0c…` binds implementation `6f4f7867…`; target-store bootstrap/preflight and future execution decision are absent; all real execution counters remain zero. | Submit v3 implementation/packet for independent review; no target-store bootstrap, nonce claim, tombstone, or verify before separate decisions. | 2026-07-11 |
 | CMV-2202 | semantic decision Git/blob/SHA; target ref derivation; actual shim serializer; payload/507-byte marker hashes; marker-aware selected-field filtering; frozen executor hard-stop; focused `11/11`; default `5209/5209`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2098 CM-2096 rollback packet v2 | COMPLETED_V2_ROLLBACK_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE | Closes target ID, durable marker, and lifecycle-layer gaps while all execution/evidence counters remain zero/false. | Submit v2 packet for independent review; no tombstone or verify before new exact decision. | 2026-07-11 |
 | CMV-2201 | route decision binding; marker canonical bytes/hash; target/semantic/verify fail-closed; three fixed case manifests; unique nonce/receipt/registry; no execute API; focused `6/6`; default `5200/5200`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2096 semantic packet and CM-2097 isolated harness | COMPLETED_PACKET_AND_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE | Marker-only is not rollback proof; harness compiles/validates manifests only; all execution and evidence fields false. | Submit frozen packet/harness for independent review; no case or tombstone execution. | 2026-07-11 |

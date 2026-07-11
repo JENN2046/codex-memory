@@ -4,13 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2099 CM-2096 rollback execution packet v3`.
-Current validation: `CMV-2203`.
-Current handoff: Submit CM-2096 v3 implementation and packet for independent review. They bind the target-store identity, real collector, atomic one-shot gate, exact verifier, and two-commit executor, but authorize no bootstrap, nonce claim, tombstone, or verify.
+Current task: `CM-2111 Phase 8 completion evidence audit`.
+Current validation: `CMV-2204`.
+Current handoff: Phase 8 is complete under its 15-field Completion Audit. Preserve all consumed one-shot markers and receipts. Do not replay native/tombstone/failure actions or infer full-plan, production, release, deploy, RC, or V8 readiness.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2111 is complete. The exact identity-bound record/rollback lifecycle and the
+isolated three-case failure-recovery harness produced frozen receipts; CM-2108
+and CM-2110 applied the remaining evidence separately. CM-2111 then accepted
+all 15 Phase 8 requirements and set only `phase8Completed=true`. Completion
+receipt payload SHA-256 is `d2617505…faec`. All action authorizations are
+consumed or inactive. `fullPlanPackCompleted`, production/release/deploy/cutover
+readiness, `RC_READY`, and complete V8 remain false.
 
 CM-2096 v3 closes the v2 implementation gaps in a non-executing stack. A fixed
 store identity and internally resolved runtime authority feed exact pre/post
