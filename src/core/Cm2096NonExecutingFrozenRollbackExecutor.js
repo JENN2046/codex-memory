@@ -23,6 +23,7 @@ function prepareCm2096FrozenRollbackExecution(packet = {}, runtimeFacts = {}) {
   if (packet.packetType !== 'frozen_rollback_execution_packet_non_executing') blockers.push('packet.packetType');
   if (packet.routeDecisionReference !== 'CM-2096-ER-20260711-ROLLBACK-ROUTE-PASS-NO-EXECUTION-BB6EBB76') blockers.push('packet.routeDecisionReference');
   if (packet.semanticDecisionReference !== 'CM-2096-ER-20260711-SEMANTIC-PACKET-PASS-51F21F60-NO-EXECUTION') blockers.push('packet.semanticDecisionReference');
+  if (packet.semanticDecisionSourceCommit !== 'ac465bd659d430821127db92c2b1cc327758421d' || packet.semanticDecisionBlobOid !== 'abd1dc4f65d6967795ccd6e46174dc960cbfaa70' || packet.semanticDecisionBytes !== 1007 || packet.semanticDecisionSha256 !== 'fe83fbd9b0f83cabcf45936ca2fe396f1a083200868b59d92206b1938ea8bb03') blockers.push('packet.semanticDecisionGitBinding');
   if (packet.reviewedSemanticPacketCommit !== 'ffc07c504b388c06b816f021752e145c3a753a4f' || packet.reviewedSemanticPacketSha256 !== '51f21f60a1d0b2b9f6dc5cd759b1776f5d42f32266f37504047db1ad06860fdb') blockers.push('packet.reviewedSemanticPacket');
   if (packet.action !== 'tombstone_memory' || packet.exactApprovalAction !== 'live_bridge_tombstone_memory_proof') blockers.push('packet.action');
   if (packet.targetMemoryIdRef !== marker.targetMemoryIdRef || packet.targetRecordSha256 !== marker.targetRecordSha256) blockers.push('packet.target');
