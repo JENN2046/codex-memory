@@ -3,8 +3,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
+  FINAL_RELEASE_DECISION_PATH,
   MANIFEST_PATH,
   exactAllowlist,
+  resolvePhase8RegistryGovernanceRoot,
   runFrozenExecutor
 } = require('../src/cli/phase8-frozen-one-shot-executor');
 
@@ -19,6 +21,18 @@ test('frozen executor accepts only an exact packet commit, not injected callback
     /execution_packet_commit_required/
   );
   assert.equal(MANIFEST_PATH, 'docs/near-model-memory-plan-pack/phase8_frozen_execution_manifest.json');
+  assert.equal(FINAL_RELEASE_DECISION_PATH, 'docs/near-model-memory-plan-pack/phase8_final_execution_release_decision.json');
+});
+
+test('frozen executor requires a separate final release commit before any Git or runtime action', async () => {
+  await assert.rejects(runFrozenExecutor('a'.repeat(40)), /final_release_decision_commit_required/);
+});
+
+test('registry governance root is derived from Git common-dir and ignores switchable dataDir values', () => {
+  const first = resolvePhase8RegistryGovernanceRoot('/repo/.git');
+  const second = resolvePhase8RegistryGovernanceRoot('/repo/.git');
+  assert.equal(first, second);
+  assert.doesNotMatch(first, /data-A|data-B/);
 });
 
 test('frozen executor allowlist keeps exactly one write, one verify, and zero compensation operations', () => {

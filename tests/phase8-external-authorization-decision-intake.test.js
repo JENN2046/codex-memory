@@ -8,8 +8,10 @@ const { evaluatePhase8ExternalAuthorizationDecisionIntake } = require('../src/co
 function fixture() {
   const decision = {
     decisionReference: 'CM-TEST-PHASE8-PASS',
-    phase8NativeWriteAuthorized: true,
-    token: 'APPROVE_VCP_BRIDGE_LIVE_RECORD_MEMORY_PROOF_EXACT',
+    authorizationContentApproved: true,
+    phase8NativeWriteAuthorized: false,
+    nativeWriteMayExecute: false,
+    finalExecutionReleaseReviewRequired: true,
     allowedAction: 'live_bridge_record_memory_proof',
     expectedContextHash: 'a'.repeat(64),
     expectedAllowlistHash: 'b'.repeat(64),
@@ -17,6 +19,7 @@ function fixture() {
     nonce: 'test-nonce',
     receiptId: 'test-receipt',
     authorizationUseCount: 1,
+    expectedFinalReleaseDecisionReference: 'CM-TEST-PHASE8-FINAL-RELEASE',
     expiresAt: '2030-01-01T00:00:00.000Z'
   };
   const decisionBytes = Buffer.from(JSON.stringify(decision));
@@ -29,12 +32,13 @@ function fixture() {
     expectedAllowlistHash: decision.expectedAllowlistHash,
     payloadCanonicalSha256: decision.payloadCanonicalSha256,
     nonce: decision.nonce,
-    receiptId: decision.receiptId
+    receiptId: decision.receiptId,
+    expectedFinalReleaseDecisionReference: decision.expectedFinalReleaseDecisionReference
   };
   return { decisionBytes, expectedBinding };
 }
 
-test('external Phase 8 decision intake binds exact Git identity and payload bytes', () => {
+test('external Phase 8 content decision intake binds Git identity and remains non-executable', () => {
   const value = fixture();
   const result = evaluatePhase8ExternalAuthorizationDecisionIntake({
     decisionBytes: value.decisionBytes,
@@ -44,6 +48,7 @@ test('external Phase 8 decision intake binds exact Git identity and payload byte
   });
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.decisionIdentityMachineBound, true);
+  assert.equal(result.executionAuthorized, false);
 });
 
 test('decision intake rejects forged reference blob hash or public-token-only packet', () => {
@@ -51,6 +56,8 @@ test('decision intake rejects forged reference blob hash or public-token-only pa
   const observed = { ...value.expectedBinding, decisionReference: 'CM-FORGED', decisionBlobOid: '0'.repeat(40) };
   const forged = JSON.parse(value.decisionBytes);
   forged.decisionReference = 'CM-FORGED';
+  forged.phase8NativeWriteAuthorized = true;
+  forged.token = 'APPROVE_VCP_BRIDGE_LIVE_RECORD_MEMORY_PROOF_EXACT';
   const result = evaluatePhase8ExternalAuthorizationDecisionIntake({
     decisionBytes: Buffer.from(JSON.stringify(forged)),
     observedBinding: observed,
@@ -62,6 +69,7 @@ test('decision intake rejects forged reference blob hash or public-token-only pa
   assert.ok(result.blockers.includes('binding.decisionBlobOid'));
   assert.ok(result.blockers.includes('binding.decisionPayloadSha256'));
   assert.ok(result.blockers.includes('decision.decisionReference'));
+  assert.ok(result.blockers.includes('decision.phase8NativeWriteAuthorized'));
 });
 
 test('registry rejects missing or drifting durable identity', async () => {
@@ -72,8 +80,28 @@ test('registry rejects missing or drifting durable identity', async () => {
   const governanceRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-registry-identity-'));
   assert.throws(() => new Phase8OneShotAuthorizationRegistry({ directory: governanceRoot }), /governance_root_required/);
   const identity = { authorizationRegistryReference: 'stable-registry', registryStorageRole: 'durable-local-governance-state', registryReinitializationAllowed: false, registryDeletionAllowed: false };
-  const first = new Phase8OneShotAuthorizationRegistry({ governanceRoot, identity });
+  const rootIdentity = { registryRootInstanceId: 'root-001', registryRootReference: 'stable-root', registryRootReinitializationAllowed: false, registryRootReplacementAllowed: false };
+  const first = new Phase8OneShotAuthorizationRegistry({ governanceRoot, rootIdentity, identity });
+  await assert.rejects(first.ensureIdentity(), /root_identity_missing/);
+  await fs.writeFile(path.join(governanceRoot, '.phase8-registry-root-identity.json'), JSON.stringify(rootIdentity));
   await first.ensureIdentity();
-  const drifted = new Phase8OneShotAuthorizationRegistry({ governanceRoot, identity: { ...identity, registryStorageRole: 'other-role' } });
+  const drifted = new Phase8OneShotAuthorizationRegistry({ governanceRoot, rootIdentity, identity: { ...identity, registryStorageRole: 'other-role' } });
   await assert.rejects(drifted.ensureIdentity(), /identity_mismatch/);
+  const replacedRoot = new Phase8OneShotAuthorizationRegistry({ governanceRoot, rootIdentity: { ...rootIdentity, registryRootInstanceId: 'root-002' }, identity });
+  await assert.rejects(replacedRoot.ensureIdentity(), /root_identity_mismatch/);
+});
+
+test('switching application dataDir cannot reset nonce state under one Git governance root', async () => {
+  const { Phase8OneShotAuthorizationRegistry } = require('../src/core/Phase8OneShotNativeWriteExecutionGate');
+  const fs = require('node:fs/promises');
+  const os = require('node:os');
+  const path = require('node:path');
+  const gitGovernanceRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-git-common-root-'));
+  const rootIdentity = { registryRootInstanceId: 'shared-root-001', registryRootReference: 'stable-root', registryRootReinitializationAllowed: false, registryRootReplacementAllowed: false };
+  const identity = { authorizationRegistryReference: 'stable-registry', registryStorageRole: 'durable-local-governance-state', registryReinitializationAllowed: false, registryDeletionAllowed: false };
+  await fs.writeFile(path.join(gitGovernanceRoot, '.phase8-registry-root-identity.json'), JSON.stringify(rootIdentity));
+  const fromDataA = new Phase8OneShotAuthorizationRegistry({ governanceRoot: gitGovernanceRoot, rootIdentity, identity });
+  await fromDataA.claim({ nonce: 'same-nonce', receiptId: 'same-receipt', bindingHash: 'a'.repeat(64) });
+  const fromDataB = new Phase8OneShotAuthorizationRegistry({ governanceRoot: gitGovernanceRoot, rootIdentity, identity });
+  await assert.rejects(fromDataB.claim({ nonce: 'same-nonce', receiptId: 'same-receipt', bindingHash: 'a'.repeat(64) }), /authorization_already_claimed/);
 });

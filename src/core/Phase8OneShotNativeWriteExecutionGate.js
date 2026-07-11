@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { isMachineBoundPhase8AuthorizationDecision } = require('./Phase8ExternalAuthorizationDecisionIntake');
+const { isMachineBoundPhase8FinalExecutionReleaseDecision } = require('./Phase8FinalExecutionReleaseDecisionIntake');
 
 const INTERNAL_ASSERTION = Symbol('phase8-one-shot-native-write-assertion');
 const FINAL_STATES = new Set([
@@ -31,7 +32,7 @@ function safeKey(value) {
 }
 
 class Phase8OneShotAuthorizationRegistry {
-  constructor({ governanceRoot, identity }) {
+  constructor({ governanceRoot, rootIdentity, identity }) {
     if (typeof governanceRoot !== 'string' || governanceRoot.trim() === '') {
       throw new Error('authorization_registry_governance_root_required');
     }
@@ -40,10 +41,31 @@ class Phase8OneShotAuthorizationRegistry {
     }
     this.governanceRoot = governanceRoot;
     this.directory = path.join(governanceRoot, safeKey(identity.authorizationRegistryReference));
+    this.rootIdentity = rootIdentity;
     this.identity = identity;
   }
 
+  async ensureRootIdentity() {
+    if (!this.rootIdentity ||
+        this.rootIdentity.registryRootReinitializationAllowed !== false ||
+        this.rootIdentity.registryRootReplacementAllowed !== false) {
+      throw new Error('authorization_registry_root_identity_required');
+    }
+    const identityPath = path.join(this.governanceRoot, '.phase8-registry-root-identity.json');
+    const serialized = JSON.stringify(canonicalize(this.rootIdentity));
+    let existing;
+    try {
+      existing = await fs.readFile(identityPath, 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') throw new Error('authorization_registry_root_identity_missing');
+      throw error;
+    }
+    if (existing !== serialized) throw new Error('authorization_registry_root_identity_mismatch');
+    return { reference: this.rootIdentity.registryRootReference, identityHash: sha256(serialized) };
+  }
+
   async ensureIdentity() {
+    await this.ensureRootIdentity();
     if (!this.identity || this.identity.registryReinitializationAllowed !== false || this.identity.registryDeletionAllowed !== false) {
       throw new Error('authorization_registry_identity_required');
     }
@@ -150,7 +172,7 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
     return { accepted: true, exactApprovalResult: assertion.exactApprovalResult };
   }
 
-  async function execute({ decision, runtimeFacts, payloadBytes, payloadBlobOid, executeNativeWrite, verifyWrite }) {
+  async function execute({ authorizationContentDecision, executionReleaseDecision, runtimeFacts, payloadBytes, payloadBlobOid, executeNativeWrite, verifyWrite }) {
     if (typeof executeNativeWrite !== 'function') throw new Error('missing_native_write_executor');
     if (typeof verifyWrite !== 'function') throw new Error('missing_verify_executor');
     const payloadFileSha256 = sha256(payloadBytes);
@@ -161,14 +183,19 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
     const contextHash = sha256Canonical(context);
     const allowlistHash = sha256Canonical(allowlist);
     const blockers = [];
-    if (!isMachineBoundPhase8AuthorizationDecision(decision)) blockers.push('decision.machineBoundIntake');
-    if (decision?.phase8NativeWriteAuthorized !== true) blockers.push('decision.authorization');
-    if (decision?.token !== 'APPROVE_VCP_BRIDGE_LIVE_RECORD_MEMORY_PROOF_EXACT') blockers.push('decision.token');
-    if (decision?.allowedAction !== 'live_bridge_record_memory_proof') blockers.push('decision.allowedAction');
-    if (!decision?.expiresAt || Date.parse(decision.expiresAt) <= now().getTime()) blockers.push('decision.expired');
-    if (decision?.authorizationUseCount !== 1) blockers.push('decision.authorizationUseCount');
-    if (decision?.expectedContextHash !== contextHash) blockers.push('decision.expectedContextHash');
-    if (decision?.expectedAllowlistHash !== allowlistHash) blockers.push('decision.expectedAllowlistHash');
+    if (!isMachineBoundPhase8AuthorizationDecision(authorizationContentDecision)) blockers.push('contentDecision.machineBoundIntake');
+    if (authorizationContentDecision?.authorizationContentApproved !== true ||
+        authorizationContentDecision?.phase8NativeWriteAuthorized !== false ||
+        authorizationContentDecision?.nativeWriteMayExecute !== false) blockers.push('contentDecision.nonExecutable');
+    if (!isMachineBoundPhase8FinalExecutionReleaseDecision(executionReleaseDecision)) blockers.push('releaseDecision.machineBoundIntake');
+    if (executionReleaseDecision?.executionReleaseAuthorized !== true || executionReleaseDecision?.phase8NativeWriteAuthorized !== true) blockers.push('releaseDecision.authorization');
+    if (executionReleaseDecision?.token !== 'APPROVE_VCP_BRIDGE_LIVE_RECORD_MEMORY_PROOF_EXACT') blockers.push('releaseDecision.token');
+    if (executionReleaseDecision?.allowedAction !== 'live_bridge_record_memory_proof') blockers.push('releaseDecision.allowedAction');
+    if (!executionReleaseDecision?.expiresAt || Date.parse(executionReleaseDecision.expiresAt) <= now().getTime()) blockers.push('releaseDecision.expired');
+    if (executionReleaseDecision?.authorizationUseCount !== 1) blockers.push('releaseDecision.authorizationUseCount');
+    if (executionReleaseDecision?.expectedContextHash !== contextHash) blockers.push('releaseDecision.expectedContextHash');
+    if (executionReleaseDecision?.expectedAllowlistHash !== allowlistHash) blockers.push('releaseDecision.expectedAllowlistHash');
+    if (executionReleaseDecision?.authorizationContentDecisionReference !== authorizationContentDecision?.decisionReference) blockers.push('releaseDecision.contentReference');
     if (payloadFileSha256 !== expectedBinding.payloadFileSha256) blockers.push('payload.fileSha256');
     if (payloadCanonicalSha256 !== expectedBinding.payloadCanonicalSha256) blockers.push('payload.canonicalSha256');
     if (runtimeFacts?.clean !== true || runtimeFacts?.commit !== expectedBinding.runtimeSourceCommit || runtimeFacts?.tree !== expectedBinding.runtimeSourceTree) blockers.push('runtime.binding');
@@ -176,16 +203,16 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
     if (blockers.length) return { accepted: false, blockers, nativeWriteCalls: 0, state: 'UNCLAIMED' };
 
     const bindingHash = sha256Canonical({ context, allowlist, payloadBlobOid });
-    const claim = await registry.claim({ nonce: decision.nonce, receiptId: decision.receiptId, bindingHash });
+    const claim = await registry.claim({ nonce: executionReleaseDecision.nonce, receiptId: executionReleaseDecision.receiptId, bindingHash });
     const exactApprovalResult = {
       accepted: true,
       allowedAction: 'live_bridge_record_memory_proof',
       allowedScope: expectedBinding.allowedScope,
       runtimeTarget: expectedBinding.runtimeTarget,
       rollbackPlanRef: expectedBinding.rollbackPlanReference,
-      approvalDecisionReference: decision.decisionReference,
+      approvalDecisionReference: executionReleaseDecision.decisionReference,
       claimBindingHash: bindingHash,
-      approvedAt: decision.approvedAt
+      approvedAt: executionReleaseDecision.approvedAt
     };
     const assertion = { [INTERNAL_ASSERTION]: true, claimId: claim.claimId, bindingHash, exactApprovalResult };
     try {
@@ -207,7 +234,7 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
         result?.receipt?.localAuditReceipt?.status === 'appended'
       );
       const verifyResult = nativeSuccess
-        ? await verifyWrite({ claimId: claim.claimId, receiptId: decision.receiptId, nativeResult: result })
+        ? await verifyWrite({ claimId: claim.claimId, receiptId: executionReleaseDecision.receiptId, nativeResult: result })
         : { accepted: false };
       const success = nativeSuccess && verifyResult?.accepted === true;
       const state = success ? 'CONSUMED_SUCCESS' : 'CONSUMED_AMBIGUOUS_POST_COMMIT';

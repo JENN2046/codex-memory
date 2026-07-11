@@ -7,6 +7,7 @@ const { createConfig } = require('../config/createConfig');
 const { createCodexMemoryApplication } = require('../app');
 const { createRecordMarkdown } = require('../core/GovernedMcpVcpNativeVcpToolBoxMcpShim');
 const { evaluatePhase8ExternalAuthorizationDecisionIntake } = require('../core/Phase8ExternalAuthorizationDecisionIntake');
+const { evaluatePhase8FinalExecutionReleaseDecisionIntake } = require('../core/Phase8FinalExecutionReleaseDecisionIntake');
 const {
   Phase8OneShotAuthorizationRegistry,
   createPhase8OneShotNativeWriteExecutionGate,
@@ -16,6 +17,7 @@ const {
 } = require('../core/Phase8OneShotNativeWriteExecutionGate');
 
 const MANIFEST_PATH = 'docs/near-model-memory-plan-pack/phase8_frozen_execution_manifest.json';
+const FINAL_RELEASE_DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_final_execution_release_decision.json';
 
 function git(args, options = {}) {
   return execFileSync('git', args, { encoding: options.encoding || 'utf8', maxBuffer: 1024 * 1024 });
@@ -23,6 +25,11 @@ function git(args, options = {}) {
 
 function readGitBytes(commit, file) {
   return Buffer.from(execFileSync('git', ['show', `${commit}:${file}`], { maxBuffer: 1024 * 1024 }));
+}
+
+function resolvePhase8RegistryGovernanceRoot(gitCommonDir) {
+  if (typeof gitCommonDir !== 'string' || gitCommonDir.trim() === '') throw new Error('git_common_dir_required');
+  return path.resolve(gitCommonDir, 'codex-memory-governance', 'phase8-one-shot-authorization-registries');
 }
 
 function exactAllowlist() {
@@ -50,9 +57,11 @@ function exactAllowlist() {
   };
 }
 
-async function runFrozenExecutor(executionPacketCommit) {
+async function runFrozenExecutor(executionPacketCommit, finalReleaseDecisionCommit) {
   if (!/^[a-f0-9]{40}$/.test(executionPacketCommit || '')) throw new Error('execution_packet_commit_required');
+  if (!/^[a-f0-9]{40}$/.test(finalReleaseDecisionCommit || '')) throw new Error('final_release_decision_commit_required');
   const manifestBytes = readGitBytes(executionPacketCommit, MANIFEST_PATH);
+  const manifestBlobOid = git(['rev-parse', `${executionPacketCommit}:${MANIFEST_PATH}`]).trim();
   const manifest = JSON.parse(manifestBytes.toString('utf8'));
   const { manifestPayloadSha256, ...manifestPayload } = manifest;
   if (sha256Canonical(manifestPayload) !== manifestPayloadSha256) throw new Error('manifest_hash_mismatch');
@@ -66,7 +75,7 @@ async function runFrozenExecutor(executionPacketCommit) {
 
   const decisionBytes = readGitBytes(manifest.decisionSourceCommit, manifest.decisionPath);
   const decisionBlobOid = git(['rev-parse', `${manifest.decisionSourceCommit}:${manifest.decisionPath}`]).trim();
-  const intake = evaluatePhase8ExternalAuthorizationDecisionIntake({
+  const contentIntake = evaluatePhase8ExternalAuthorizationDecisionIntake({
     decisionBytes,
     observedBinding: {
       decisionReference: manifest.decisionReference,
@@ -77,7 +86,35 @@ async function runFrozenExecutor(executionPacketCommit) {
     expectedBinding: manifest.decisionBinding,
     now: new Date()
   });
-  if (intake.accepted !== true) throw new Error('external_decision_intake_rejected');
+  if (contentIntake.accepted !== true) throw new Error('authorization_content_decision_intake_rejected');
+
+  const releaseDecisionBytes = readGitBytes(finalReleaseDecisionCommit, FINAL_RELEASE_DECISION_PATH);
+  const releaseDecisionBlobOid = git(['rev-parse', `${finalReleaseDecisionCommit}:${FINAL_RELEASE_DECISION_PATH}`]).trim();
+  const releaseIntake = evaluatePhase8FinalExecutionReleaseDecisionIntake({
+    decisionBytes: releaseDecisionBytes,
+    observedBinding: {
+      decisionSourceCommit: finalReleaseDecisionCommit,
+      decisionBlobOid: releaseDecisionBlobOid,
+      decisionPayloadSha256: sha256(releaseDecisionBytes)
+    },
+    expectedBinding: {
+      expectedFinalReleaseDecisionReference: contentIntake.decision.expectedFinalReleaseDecisionReference,
+      authorizationContentDecisionReference: contentIntake.decision.decisionReference,
+      authorizationContentSourceCommit: manifest.decisionSourceCommit,
+      authorizationContentBlobOid: decisionBlobOid,
+      authorizationContentPayloadSha256: sha256(decisionBytes),
+      executionPacketCommit,
+      executionManifestBlobOid: manifestBlobOid,
+      executionManifestSha256: sha256(manifestBytes),
+      expectedContextHash: manifest.contextCanonicalSha256,
+      expectedAllowlistHash: manifest.allowlistCanonicalSha256,
+      payloadCanonicalSha256: manifest.payloadCanonicalSha256,
+      nonce: contentIntake.decision.nonce,
+      receiptId: contentIntake.decision.receiptId
+    },
+    now: new Date()
+  });
+  if (releaseIntake.accepted !== true) throw new Error('final_execution_release_decision_intake_rejected');
 
   const payloadBytes = readGitBytes(manifest.payloadSourceCommit, manifest.payloadPath);
   const payloadBlobOid = git(['rev-parse', `${manifest.payloadSourceCommit}:${manifest.payloadPath}`]).trim();
@@ -99,6 +136,10 @@ async function runFrozenExecutor(executionPacketCommit) {
     throw new Error('runtime_native_write_route_binding_mismatch');
   }
   const registryIdentity = manifest.registryIdentity;
+  const registryRootIdentity = manifest.registryRootIdentity;
+  if (sha256Canonical(registryRootIdentity) !== manifest.registryRootIdentitySha256) {
+    throw new Error('authorization_registry_root_identity_hash_mismatch');
+  }
   const actualContext = {
     ...manifest.contextStatic,
     runtimeSourceCommit: head,
@@ -124,7 +165,11 @@ async function runFrozenExecutor(executionPacketCommit) {
     authorizationRegistryStorageRole: registryIdentity.registryStorageRole,
     authorizationRegistryReinitializationAllowed: registryIdentity.registryReinitializationAllowed,
     authorizationRegistryDeletionAllowed: registryIdentity.registryDeletionAllowed,
-    authorizationRegistryRootRole: 'configured_data_dir_governance_state'
+    authorizationRegistryRootReference: registryRootIdentity.registryRootReference,
+    authorizationRegistryRootIdentitySha256: manifest.registryRootIdentitySha256,
+    authorizationRegistryRootReinitializationAllowed: registryRootIdentity.registryRootReinitializationAllowed,
+    authorizationRegistryRootReplacementAllowed: registryRootIdentity.registryRootReplacementAllowed,
+    authorizationRegistryRootRole: 'git_common_dir_governance_state'
   };
   const allowlist = exactAllowlist();
   if (sha256Canonical(actualContext) !== manifest.contextCanonicalSha256 ||
@@ -132,8 +177,10 @@ async function runFrozenExecutor(executionPacketCommit) {
     throw new Error('runtime_context_or_allowlist_mismatch');
   }
 
+  const gitCommonDir = git(['rev-parse', '--git-common-dir']).trim();
   const registry = new Phase8OneShotAuthorizationRegistry({
-    governanceRoot: path.join(config.dataDir, 'governance', 'phase8-one-shot-authorization-registries'),
+    governanceRoot: resolvePhase8RegistryGovernanceRoot(gitCommonDir),
+    rootIdentity: registryRootIdentity,
     identity: registryIdentity
   });
   const expectedBinding = {
@@ -164,7 +211,8 @@ async function runFrozenExecutor(executionPacketCommit) {
   };
   try {
     return await gate.execute({
-      decision: intake.decision,
+      authorizationContentDecision: contentIntake.decision,
+      executionReleaseDecision: releaseIntake.decision,
       runtimeFacts: { clean, commit: head, tree },
       payloadBytes,
       payloadBlobOid,
@@ -173,14 +221,14 @@ async function runFrozenExecutor(executionPacketCommit) {
         return app.callTool('record_memory', payload, {
           executionContext,
           phase8OneShotAuthorizationAssertion: assertion,
-          auditReceipt: { receiptId: intake.decision.receiptId },
+          auditReceipt: { receiptId: releaseIntake.decision.receiptId },
           rollbackPosture: { mode: 'bounded_rollback_plan', rollbackPlanRef: manifest.rollbackPlanReference },
           outputDisclosureBudget: { level: 'summary', lowDisclosure: true, rawOutput: false, maxItems: 5, maxBytes: 4096 }
         });
       },
       verifyWrite: async ({ claimId }) => verifyPhase8NativeWriteAuditProjection({
-        registry, claimId, receiptId: intake.decision.receiptId,
-        approvalDecisionReference: intake.decision.decisionReference,
+        registry, claimId, receiptId: releaseIntake.decision.receiptId,
+        approvalDecisionReference: releaseIntake.decision.decisionReference,
         claimBindingHash: (await registry.readClaim(claimId)).bindingHash,
         targetReferenceName: manifest.runtimeTarget.targetReferenceName,
         expectedScopeFingerprint: manifest.expectedScopeFingerprint,
@@ -195,9 +243,10 @@ async function runFrozenExecutor(executionPacketCommit) {
 
 if (require.main === module) {
   const index = process.argv.indexOf('--execution-packet-commit');
-  runFrozenExecutor(index >= 0 ? process.argv[index + 1] : null)
+  const releaseIndex = process.argv.indexOf('--final-release-decision-commit');
+  runFrozenExecutor(index >= 0 ? process.argv[index + 1] : null, releaseIndex >= 0 ? process.argv[releaseIndex + 1] : null)
     .then(result => process.stdout.write(`${JSON.stringify({ accepted: result.accepted, state: result.state, blockers: result.blockers, nativeWriteCalls: result.nativeWriteCalls, verifyOperations: result.verifyOperations })}\n`))
     .catch(error => { process.stderr.write(`${error.message}\n`); process.exitCode = 1; });
 }
 
-module.exports = { MANIFEST_PATH, exactAllowlist, runFrozenExecutor };
+module.exports = { FINAL_RELEASE_DECISION_PATH, MANIFEST_PATH, exactAllowlist, resolvePhase8RegistryGovernanceRoot, runFrozenExecutor };
