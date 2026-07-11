@@ -20,7 +20,10 @@ const {
 } = require('./Cm2103IdentityBoundStoreBootstrapState');
 
 const EXPECTED_BINDING_KEYS = Object.freeze([
-  'decisionReference', 'decisionSourceCommit', 'decisionBlobOid', 'decisionSha256',
+  'authorizationContentDecisionReference', 'authorizationContentDecisionSourceCommit',
+  'authorizationContentDecisionBlobOid', 'authorizationContentDecisionSha256',
+  'finalExecutionReleaseDecisionReference', 'finalExecutionReleaseDecisionSourceCommit',
+  'finalExecutionReleaseDecisionBlobOid', 'finalExecutionReleaseDecisionSha256',
   'executionPacketCommit', 'executionPacketBlobOid', 'executionPacketSha256',
   'foundationDecisionReference', 'foundationDecisionSourceCommit', 'foundationDecisionBlobOid',
   'foundationDecisionSha256', 'bootstrapRequestCommit', 'bootstrapRequestBlobOid',
@@ -30,7 +33,10 @@ const EXPECTED_BINDING_KEYS = Object.freeze([
 
 const RECEIPT_KEYS = Object.freeze([
   'schemaVersion', 'taskId', 'receiptType', 'result', 'finalState', 'outcomeStage',
-  'decisionReference', 'decisionSourceCommit', 'decisionBlobOid', 'decisionSha256',
+  'authorizationContentDecisionReference', 'authorizationContentDecisionSourceCommit',
+  'authorizationContentDecisionBlobOid', 'authorizationContentDecisionSha256',
+  'finalExecutionReleaseDecisionReference', 'finalExecutionReleaseDecisionSourceCommit',
+  'finalExecutionReleaseDecisionBlobOid', 'finalExecutionReleaseDecisionSha256',
   'executionPacketCommit', 'executionPacketBlobOid', 'executionPacketSha256',
   'foundationDecisionReference', 'foundationDecisionSourceCommit', 'foundationDecisionBlobOid',
   'foundationDecisionSha256', 'bootstrapRequestCommit', 'bootstrapRequestBlobOid',
@@ -236,27 +242,37 @@ function evaluateCm2103BootstrapReceipt({ receipt, expectedBinding } = {}) {
     bootstrapExecutedByThisContract: false
   };
 
-  for (const field of ['decisionReference', 'foundationDecisionReference', 'nonce', 'receiptId']) {
+  for (const field of [
+    'authorizationContentDecisionReference', 'finalExecutionReleaseDecisionReference',
+    'foundationDecisionReference', 'nonce', 'receiptId'
+  ]) {
     if (!nonempty(expectedBinding[field])) blockers.push(`expectedBinding.${field}`);
   }
   for (const field of [
-    'decisionSourceCommit', 'decisionBlobOid', 'executionPacketCommit', 'executionPacketBlobOid',
+    'authorizationContentDecisionSourceCommit', 'authorizationContentDecisionBlobOid',
+    'finalExecutionReleaseDecisionSourceCommit', 'finalExecutionReleaseDecisionBlobOid',
+    'executionPacketCommit', 'executionPacketBlobOid',
     'foundationDecisionSourceCommit', 'foundationDecisionBlobOid', 'bootstrapRequestCommit',
     'bootstrapRequestBlobOid', 'implementationCommit', 'implementationTree'
   ]) if (!hash(expectedBinding[field], 40)) blockers.push(`expectedBinding.${field}`);
   for (const field of [
-    'decisionSha256', 'executionPacketSha256', 'foundationDecisionSha256',
+    'authorizationContentDecisionSha256', 'finalExecutionReleaseDecisionSha256',
+    'executionPacketSha256', 'foundationDecisionSha256',
     'bootstrapRequestSha256', 'bindingHash'
   ]) if (!hash(expectedBinding[field], 64)) blockers.push(`expectedBinding.${field}`);
 
   const exact = {
-    schemaVersion: 3,
-    taskId: 'CM-2103-R2',
-    receiptType: 'identity_bound_synthetic_store_bootstrap_receipt_union',
-    decisionReference: expectedBinding.decisionReference,
-    decisionSourceCommit: expectedBinding.decisionSourceCommit,
-    decisionBlobOid: expectedBinding.decisionBlobOid,
-    decisionSha256: expectedBinding.decisionSha256,
+    schemaVersion: 4,
+    taskId: 'CM-2104',
+    receiptType: 'identity_bound_synthetic_store_bootstrap_two_stage_authorized_receipt_union',
+    authorizationContentDecisionReference: expectedBinding.authorizationContentDecisionReference,
+    authorizationContentDecisionSourceCommit: expectedBinding.authorizationContentDecisionSourceCommit,
+    authorizationContentDecisionBlobOid: expectedBinding.authorizationContentDecisionBlobOid,
+    authorizationContentDecisionSha256: expectedBinding.authorizationContentDecisionSha256,
+    finalExecutionReleaseDecisionReference: expectedBinding.finalExecutionReleaseDecisionReference,
+    finalExecutionReleaseDecisionSourceCommit: expectedBinding.finalExecutionReleaseDecisionSourceCommit,
+    finalExecutionReleaseDecisionBlobOid: expectedBinding.finalExecutionReleaseDecisionBlobOid,
+    finalExecutionReleaseDecisionSha256: expectedBinding.finalExecutionReleaseDecisionSha256,
     executionPacketCommit: expectedBinding.executionPacketCommit,
     executionPacketBlobOid: expectedBinding.executionPacketBlobOid,
     executionPacketSha256: expectedBinding.executionPacketSha256,

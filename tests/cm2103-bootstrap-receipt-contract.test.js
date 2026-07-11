@@ -10,20 +10,20 @@ const packet = Object.freeze({
   foundationDecisionSourceCommit: '1'.repeat(40),
   foundationDecisionBlobOid: '2'.repeat(40),
   foundationDecisionSha256: '3'.repeat(64),
-  bootstrapRequestSourceCommit: '4'.repeat(40),
+  bootstrapRequestCommit: '4'.repeat(40),
   bootstrapRequestBlobOid: '5'.repeat(40),
   bootstrapRequestSha256: '6'.repeat(64),
-  implementationCommit: '7'.repeat(40),
-  implementationTree: '8'.repeat(40),
+  gateImplementationCommit: '7'.repeat(40),
+  gateImplementationTree: '8'.repeat(40),
   action: 'initialize_identity_bound_synthetic_store',
   lifecycleReference: 'phase8-identity-bound-rollback-lifecycle-001',
   storeReference: 'phase8-identity-bound-synthetic-rollback-store-001',
   storeInstanceId: 'phase8-identity-bound-synthetic-rollback-store-instance-001',
   storeRole: 'phase8_identity_bound_synthetic_rollback_store',
   storeRootBindingSha256: '0a7ceb6cf658d517de2a3eb30ee09195dbeb9d46800f42ac87edf7f7cb11dd94',
-  governanceRootIdentity: { registryRootReference: 'codex-memory-phase8-governance-root' },
+  governanceRootIdentityReference: 'codex-memory-phase8-governance-root',
   governanceRootIdentitySha256: '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0',
-  authorizationRegistryIdentity: { authorizationRegistryReference: 'cm2103-identity-bound-store-bootstrap-registry-001' },
+  authorizationRegistryReference: 'cm2103-identity-bound-store-bootstrap-registry-001',
   nonce: 'cm2102-identity-bound-store-bootstrap-001',
   receiptId: 'cm2102-identity-bound-store-bootstrap-receipt-001'
 });
@@ -32,11 +32,17 @@ const executionPacketCommit = '9'.repeat(40);
 const executionPacketBlobOid = 'a'.repeat(40);
 const executionPacketBytes = Buffer.from('packet');
 const bindingHash = 'b'.repeat(64);
-const observedDecision = Object.freeze({
-  decision: { decisionReference: 'CM-2103-TEST-BOOTSTRAP' },
+const observedContentDecision = Object.freeze({
+  decision: { decisionReference: 'CM-2104-TEST-CONTENT' },
   sourceCommit: 'c'.repeat(40),
   blobOid: 'd'.repeat(40),
   sha256: 'e'.repeat(64)
+});
+const observedFinalReleaseDecision = Object.freeze({
+  decision: { decisionReference: 'CM-2104-TEST-FINAL-RELEASE' },
+  sourceCommit: 'f'.repeat(40),
+  blobOid: '0'.repeat(40),
+  sha256: '1'.repeat(64)
 });
 
 function baseClaim(overrides = {}) {
@@ -78,7 +84,8 @@ function baseClaim(overrides = {}) {
 function buildReceipt(outcomeStage, overrides = {}) {
   return buildCm2103BootstrapReceipt({
     packet,
-    observedDecision,
+    observedContentDecision,
+    observedFinalReleaseDecision,
     executionPacketCommit,
     executionPacketBlobOid,
     executionPacketBytes,
@@ -90,10 +97,14 @@ function buildReceipt(outcomeStage, overrides = {}) {
 
 function expectedBinding(receipt) {
   return {
-    decisionReference: receipt.decisionReference,
-    decisionSourceCommit: receipt.decisionSourceCommit,
-    decisionBlobOid: receipt.decisionBlobOid,
-    decisionSha256: receipt.decisionSha256,
+    authorizationContentDecisionReference: receipt.authorizationContentDecisionReference,
+    authorizationContentDecisionSourceCommit: receipt.authorizationContentDecisionSourceCommit,
+    authorizationContentDecisionBlobOid: receipt.authorizationContentDecisionBlobOid,
+    authorizationContentDecisionSha256: receipt.authorizationContentDecisionSha256,
+    finalExecutionReleaseDecisionReference: receipt.finalExecutionReleaseDecisionReference,
+    finalExecutionReleaseDecisionSourceCommit: receipt.finalExecutionReleaseDecisionSourceCommit,
+    finalExecutionReleaseDecisionBlobOid: receipt.finalExecutionReleaseDecisionBlobOid,
+    finalExecutionReleaseDecisionSha256: receipt.finalExecutionReleaseDecisionSha256,
     executionPacketCommit: receipt.executionPacketCommit,
     executionPacketBlobOid: receipt.executionPacketBlobOid,
     executionPacketSha256: receipt.executionPacketSha256,
