@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
@@ -14,7 +15,9 @@ const {
 } = require('../src/core/Cm2104BootstrapFinalExecutionReleaseApplicationContract');
 
 const repoRoot = path.resolve(__dirname, '..');
-const packet = JSON.parse(fs.readFileSync(path.join(repoRoot, AUTHORIZATION_GATE_PACKET_PATH), 'utf8'));
+const packet = JSON.parse(execFileSync('git', [
+  'show', `67eaab147cb856180a7ddd0491c5e5cc2f01324f:${AUTHORIZATION_GATE_PACKET_PATH}`
+], { cwd: repoRoot, encoding: 'utf8' }));
 const application = JSON.parse(fs.readFileSync(path.join(repoRoot, APPLICATION_PATH), 'utf8'));
 
 test('CM-2104-B prepares the exact final release decision without issuing or executing it', () => {

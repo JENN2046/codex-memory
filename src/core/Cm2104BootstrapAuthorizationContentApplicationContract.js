@@ -1,7 +1,6 @@
 'use strict';
 
-const fs = require('node:fs');
-const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 const {
   sha256Canonical
 } = require('./Cm2102IdentityBoundRollbackLifecycleFoundation');
@@ -218,8 +217,14 @@ function evaluateCm2104BootstrapAuthorizationContentApplication({ application, g
   };
 }
 
-function loadFrozenGatePacket(repoRoot = path.resolve(__dirname, '..', '..')) {
-  return JSON.parse(fs.readFileSync(path.join(repoRoot, AUTHORIZATION_GATE_PACKET_PATH), 'utf8'));
+function loadFrozenGatePacket(repoRoot = process.cwd()) {
+  return JSON.parse(execFileSync('git', [
+    'show', `${GATE_PACKET_GIT_IDENTITY.commit}:${AUTHORIZATION_GATE_PACKET_PATH}`
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024
+  }));
 }
 
 module.exports = {
