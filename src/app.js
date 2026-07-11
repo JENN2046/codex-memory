@@ -2243,6 +2243,12 @@ function createCodexMemoryApplication(overrides = {}) {
     typeof overrides.phase8OneShotAuthorizationAssertionVerifier === 'function'
       ? overrides.phase8OneShotAuthorizationAssertionVerifier
       : null;
+  const cm2096TombstoneOneShotEnforcementEnabled =
+    overrides.cm2096TombstoneOneShotEnforcementEnabled === true;
+  const cm2096TombstoneAuthorizationAssertionVerifier =
+    typeof overrides.cm2096TombstoneAuthorizationAssertionVerifier === 'function'
+      ? overrides.cm2096TombstoneAuthorizationAssertionVerifier
+      : null;
   const recordMemoryPrincipalScopeAuthorizationRuntime =
     buildRecordMemoryPrincipalScopeAuthorizationRuntime(
       config.recordMemoryPrincipalScopeAuthorization
@@ -2621,6 +2627,40 @@ function createCodexMemoryApplication(overrides = {}) {
           exactApprovalResult: assertionResult.exactApprovalResult
         };
         delete effectiveRequestContext.phase8OneShotAuthorizationAssertion;
+      }
+      if (toolName === 'tombstone_memory' && cm2096TombstoneOneShotEnforcementEnabled) {
+        if (
+          requestContext.exactApprovalResult !== undefined ||
+          !cm2096TombstoneAuthorizationAssertionVerifier ||
+          config.governedMcpVcpNativeWriteDelegationMode !== 'primary'
+        ) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'cm2096_tombstone_one_shot_authorization_required',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        const assertionResult = await cm2096TombstoneAuthorizationAssertionVerifier(
+          requestContext.cm2096TombstoneAuthorizationAssertion
+        );
+        if (assertionResult?.accepted !== true || !assertionResult.exactApprovalResult) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'cm2096_tombstone_one_shot_authorization_claim_invalid',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        effectiveRequestContext = {
+          ...requestContext,
+          exactApprovalResult: assertionResult.exactApprovalResult
+        };
+        delete effectiveRequestContext.cm2096TombstoneAuthorizationAssertion;
       }
       let governedNativeReadFallbackContext = null;
       let governedNativeReadFallbackAuditReceipt = null;
@@ -3004,6 +3044,16 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'tombstone_memory') {
+        if (cm2096TombstoneOneShotEnforcementEnabled) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'cm2096_tombstone_local_fallback_forbidden',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
         return executePublicControlledMutationTool(
           toolName,
           args,
