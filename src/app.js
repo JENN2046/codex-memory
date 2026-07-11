@@ -2237,6 +2237,12 @@ async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
 
 function createCodexMemoryApplication(overrides = {}) {
   const config = createConfig(overrides);
+  const phase8OneShotNativeWriteEnforcementEnabled =
+    overrides.phase8OneShotNativeWriteEnforcementEnabled === true;
+  const phase8OneShotAuthorizationAssertionVerifier =
+    typeof overrides.phase8OneShotAuthorizationAssertionVerifier === 'function'
+      ? overrides.phase8OneShotAuthorizationAssertionVerifier
+      : null;
   const recordMemoryPrincipalScopeAuthorizationRuntime =
     buildRecordMemoryPrincipalScopeAuthorizationRuntime(
       config.recordMemoryPrincipalScopeAuthorization
@@ -2581,6 +2587,41 @@ function createCodexMemoryApplication(overrides = {}) {
       }
     },
     async callTool(toolName, args = {}, requestContext = {}) {
+      let effectiveRequestContext = requestContext;
+      if (toolName === 'record_memory' && phase8OneShotNativeWriteEnforcementEnabled) {
+        if (
+          requestContext.exactApprovalResult !== undefined ||
+          !phase8OneShotAuthorizationAssertionVerifier ||
+          config.governedMcpVcpNativeWriteDelegationMode !== 'primary'
+        ) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'phase8_one_shot_authorization_required',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        const assertionResult = await phase8OneShotAuthorizationAssertionVerifier(
+          requestContext.phase8OneShotAuthorizationAssertion
+        );
+        if (assertionResult?.accepted !== true || !assertionResult.exactApprovalResult) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'phase8_one_shot_authorization_claim_invalid',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        effectiveRequestContext = {
+          ...requestContext,
+          exactApprovalResult: assertionResult.exactApprovalResult
+        };
+        delete effectiveRequestContext.phase8OneShotAuthorizationAssertion;
+      }
       let governedNativeReadFallbackContext = null;
       let governedNativeReadFallbackAuditReceipt = null;
       let governedNativeReadFallbackArgs = null;
@@ -2606,7 +2647,7 @@ function createCodexMemoryApplication(overrides = {}) {
           buildGovernedMcpVcpNativeBridgeGateInput({
             toolName,
             args,
-            requestContext,
+            requestContext: effectiveRequestContext,
             config
           })
         );
@@ -2770,7 +2811,17 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'record_memory') {
-        return writeService.record(args, requestContext);
+        if (phase8OneShotNativeWriteEnforcementEnabled) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'phase8_one_shot_local_fallback_forbidden',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        return writeService.record(args, effectiveRequestContext);
       }
 
       if (toolName === 'search_memory') {
