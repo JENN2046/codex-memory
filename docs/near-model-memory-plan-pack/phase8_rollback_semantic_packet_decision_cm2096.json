@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2096",
+  "result": "PASS_SEMANTIC_DESIGN_ONLY",
+  "decisionReference": "CM-2096-ER-20260711-SEMANTIC-PACKET-PASS-51F21F60-NO-EXECUTION",
+  "reviewedPacketCommit": "ffc07c504b388c06b816f021752e145c3a753a4f",
+  "reviewedPacketTree": "226482425cf2d5ae0cfb44274e3e0d09fdc5b815",
+  "packetBlobOid": "2995e642026ed56f499b420508a8e847f0ec31d9",
+  "packetBytes": 2648,
+  "packetSha256": "51f21f60a1d0b2b9f6dc5cd759b1776f5d42f32266f37504047db1ad06860fdb",
+  "rollbackSemanticDesignAccepted": true,
+  "rollbackExecutionPacketComplete": false,
+  "actualTombstonePayloadSerializerMayBeImplemented": true,
+  "exactDurableMarkerMarkdownMayBeFrozen": true,
+  "markerAwareLifecycleProjectionMayBeImplemented": true,
+  "markerAwareVerifyMayBeImplemented": true,
+  "nonExecutingFrozenExecutorMayBePrepared": true,
+  "rollbackExecutionAuthorized": false,
+  "tombstoneExecutionAuthorized": false,
+  "verifyAuthorized": false,
+  "rollbackDrillPassed": false,
+  "phase8Completed": false
+}
