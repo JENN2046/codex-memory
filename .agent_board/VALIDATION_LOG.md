@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest validation: `CMV-2192`.
-Latest task: `CM-2092 Phase 8 authorization decision content issuance request`.
+Latest validation: `CMV-2193`.
+Latest task: `CM-2093 Phase 8 content approval and registry-root request`.
 Validation facts should be summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts are collected by fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -17,6 +17,7 @@ Active validation ledger. Long historical validation rows are archived by refere
 
 | ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |
 |---|---|---|---|---|---|---|---|
+| CMV-2193 | Git-common-dir root derivation; cross-dataDir replay denial; root missing/replacement rejection; content-only no-claim; final release packet/manifest/expiry/copy drift; synthetic E2E; focused `124/124`; default `5166/5166`; strict contract `106/106`; compare/rollback `43/43`; docs/current-facts/ledger/diff | P8-native-write-proof / P6-docs-drift | CM-2093 content/root request | COMPLETED_PHASE8_CONTENT_AND_ROOT_BOOTSTRAP_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM | CM-2092 findings resolved in runtime source `10b1ea49…`. Request permits review of non-executable content and exact root bootstrap only; real root remains uninitialized and native authority false. | Obtain independent content/root-bootstrap decision; freeze bytes before any root initialization. Final release remains separate. | 2026-07-11 |
 | CMV-2192 | assertion sequential/concurrent replay; exact receipt/approval/claim/target/scope correlation; frozen executor no-injection; stable registry identity; Git decision intake; focused `117/117`; default `5157/5157`; strict contract `106/106`; compare/rollback `43/43`; docs/diff gates | P8-native-write-proof / P6-docs-drift | CM-2092 decision-content issuance request | COMPLETED_PHASE8_DECISION_CONTENT_ISSUANCE_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM | CM-2091 findings resolved in `e1785994…`; request separates content issuance from final executable release. HTTP write tests now explicitly use a full fixture surface; the product default five-tool surface did not expand. | Obtain exact non-executable content decision, freeze its bytes in Git, then prepare a separately reviewed final execution manifest. | 2026-07-11 |
 | CMV-2191 | atomic nonce/receipt claim; caller accepted=true rejection; replay/ambiguous states; same-commit payload blob; canonical context/allowlist; exact audit verify; durable Markdown; MCP/default/docs/current-facts/ledger/diff gates | P8-native-write-proof / P6-docs-drift | CM-2091 reapplication | COMPLETED_PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM | Six CM-2089 blockers resolved. One-shot enforcement is in the real app path; reapplication remains non-executing and authorization false. | Submit exact reapplication for independent review; no execution before PASS. | 2026-07-11 |
 | CMV-2190 | source commit/tree; canonical payload/file hashes; runtime/scope/action/expiry/nonce/receipt/allowlist binding; compensation separation; fail-closed/default/docs/current-facts/ledger/diff gates | P8-native-write-proof / P6-docs-drift | CM-2089 exact native write request | COMPLETED_EXACT_PHASE8_NATIVE_WRITE_AUTHORIZATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM | One synthetic proof record request prepared; native write max 1, verify max 1, rollback/compensation 0. Authorization false and all execution counters zero. | Submit request for independent exact authorization; no execution before accepted decision. | 2026-07-11 |

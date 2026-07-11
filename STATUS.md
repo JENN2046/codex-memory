@@ -4,13 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2092 Phase 8 authorization decision content issuance request`.
-Current validation: `CMV-2192`.
-Current project status: CM-2091 one-shot, exact-correlation, frozen-executor, registry-identity, and decision-intake findings are resolved in `e1785994…`. Only non-executable decision content is requested; the fourth slot remains false and nothing executed.
-Current route: `CM2092_PHASE8_DECISION_CONTENT_ISSUANCE_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM`.
+Current task: `CM-2093 Phase 8 content approval and registry-root request`.
+Current validation: `CMV-2193`.
+Current project status: CM-2092 root replay and missing final-release findings are resolved in `10b1ea49…`. Only non-executable content and exact root bootstrap are requested; real root is uninitialized, fourth slot false, nothing executed.
+Current route: `CM2093_PHASE8_CONTENT_AND_ROOT_BOOTSTRAP_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2093 binds the authorization registry to a stable Git-common-dir governance
+root with immutable identity hash `240fd4f7…`, independent of `dataDir`. Content
+approval stays non-executable. A separate Git-intake final release must bind the
+exact execution packet and manifest before any nonce claim.
 
 CM-2092 Phase 8 decision-content issuance request: binds implementation
 `e1785994…`, context `75832f19…`, allowlist `b69cc85d…`, the unchanged synthetic

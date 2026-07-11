@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2092",
-  "validationId": "CMV-2192",
+  "taskId": "CM-2093",
+  "validationId": "CMV-2193",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -73,7 +73,7 @@
     "tagApprovalPacketPassed": true,
     "phase8NativeWriteAuthorizationRequested": true,
     "phase8NativeWriteAuthorizationGranted": false,
-    "phase8PriorDecisionReference": "CM-2091-ER-20260711-FAIL-CLOSED-ONE-SHOT-AND-VERIFY-CORRELATION-INCOMPLETE",
+    "phase8PriorDecisionReference": "CM-2092-ER-20260711-FAIL-CLOSED-FINAL-RELEASE-AND-REGISTRY-ROOT-INCOMPLETE",
     "phase8ReapplicationPrepared": true,
     "phase8OneShotMachineEnforced": true,
     "phase8HardenedRuntimeSourceCommit": "e1785994f599f2ef4c4bcf891bbf1e2b34f0630c",
@@ -81,6 +81,15 @@
     "phase8DecisionContentIssuanceRequested": true,
     "phase8DecisionContentExecutable": false,
     "phase8FinalExecutionReleaseReviewRequired": true,
+    "phase8FinalExecutionReleaseMachineEnforced": true,
+    "phase8RegistryRootUsesGitCommonDir": true,
+    "phase8RegistryRootInitialized": false,
+    "phase8RegistryRootIdentityCanonicalSha256": "240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0",
+    "phase8ContentApprovalRequested": true,
+    "phase8RegistryRootBootstrapAuthorizationRequested": true,
+    "phase8ContentDecisionExecutable": false,
+    "phase8LatestRuntimeSourceCommit": "10b1ea49257c0aa2c26e50a2291142093589d938",
+    "phase8LatestRuntimeSourceTree": "f4273910483c096ff03d3c33f01c59187a2f6e2b",
     "phase8RequestedContextCanonicalSha256": "75832f193a1a414ccabcd508fa8dc7d3f8d5afb3f7360184734c21d2647229fc",
     "phase8RequestedAllowlistCanonicalSha256": "b69cc85dc7b9387425342ffbec7c299317dcf1eaa6948d4042503399a6b33e20",
     "phase8RequestedCanonicalPayloadSha256": "91d3b2ed314641bb372237aa9490a2803da6ea060b4457c5e7694c738a6b9aee",
@@ -91,7 +100,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_phase8_decision_content_issuance_requested_fourth_slot_false_no_execution_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_phase8_content_and_root_bootstrap_requested_fourth_slot_false_no_execution_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -99,6 +108,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2193",
+      "scope": "CM-2093 Phase 8 content approval and registry-root request",
+      "status": "COMPLETED_PHASE8_CONTENT_AND_ROOT_BOOTSTRAP_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2192",
       "scope": "CM-2092 Phase 8 authorization decision content issuance request",

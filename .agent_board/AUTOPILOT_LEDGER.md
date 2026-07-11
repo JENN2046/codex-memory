@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest receipt: `CM-2092 Phase 8 authorization decision content issuance request`.
-Latest validation: `CMV-2192`.
+Latest receipt: `CM-2093 Phase 8 content approval and registry-root request`.
+Latest validation: `CMV-2193`.
 Active receipt summaries should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -31,6 +31,7 @@ Governance kernel anchor retained for validation: `CM-0684`.
 
 | ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |
 |---|---|---|---|---|---|---|---|---:|---|---|
+| CM-2093 | complete imported near-model-memory plan pack | Green content/root request; no runtime | `phase8_content_and_registry_root_request_no_execution` | Bound Git-common-dir root identity and mandatory separate final release, then prepared non-executable request | `task_id=CM-2093; runtime=10b1ea49; context=f1cf912c; root_identity=240fd4f7; root_initialized=false; content_approval_requested=true; fourth_slot=false; claims=0; writes=0; verify=0; compensation=0` | `CMV-2193` | 0 | root bootstrap cannot overwrite; native execution requires later final release | completed_phase8_content_and_root_bootstrap_requested_fourth_slot_false_no_execution_no_ready_claim | 2026-07-11 |
 | CM-2092 | complete imported near-model-memory plan pack | Green decision-content request; no runtime | `phase8_decision_content_issuance_no_execution` | Hardened one-shot execution and prepared two-gate machine-bindable decision issuance request | `task_id=CM-2092; implementation=e1785994; context_sha256=75832f19; allowlist_sha256=b69cc85d; content_issuance_requested=true; fourth_slot=false; claims=0; native_writes=0; verify=0; compensation=0; readiness=0` | `CMV-2192` | 0 | content decision is non-executable; Git decision intake and final execution-release review required | completed_phase8_decision_content_issuance_requested_fourth_slot_false_no_execution_no_ready_claim | 2026-07-11 |
 | CM-2091 | complete imported near-model-memory plan pack | Green reapplication; no runtime | `phase8_machine_enforced_reapplication_no_execution` | Implemented one-shot claim enforcement and prepared exact reapplication | `task_id=CM-2091; prior_decision=CM-2089-ER-FAIL-CLOSED; runtime_commit=3ce0cc0f; payload_blob=cde8e314; context_sha256=fc9deec9; allowlist_sha256=4a36b22c; durable_sha256=4f863f52; authorization=false; native_writes=0; verify=0; compensation=0; readiness=0` | `CMV-2191` | 0 | independent authorization still required; no runtime/write/verify/compensation | completed_phase8_machine_enforced_reapplication_requested_not_granted_no_execution_no_ready_claim | 2026-07-11 |
 | CM-2089 | complete imported near-model-memory plan pack | Green exact authorization request; no runtime | `phase8_exact_native_write_request_no_execution` | Prepared hash-bound one-write authorization request and synthetic proof payload | `task_id=CM-2089; action=live_bridge_record_memory_proof; payload_sha256=91d3b2ed; max_native_writes=1; max_verify=1; max_rollback_or_compensation=0; authorization=false; runtime_calls=0; native_writes=0; real_memory_reads=0; remote_actions=0; readiness_claims=0` | `CMV-2190` | 0 | native write/verify/rollback/compensation/readiness remain gated until exact decision | completed_exact_phase8_native_write_authorization_requested_not_granted_no_execution_no_ready_claim | 2026-07-11 |

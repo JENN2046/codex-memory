@@ -4,11 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2092 Phase 8 authorization decision content issuance request`.
-Current validation: `CMV-2192`.
+Current checkpoint: `CM-2093 Phase 8 content approval and registry-root request`.
+Current validation: `CMV-2193`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2093 Phase 8 Content and Registry Root Request
+
+Status: `PHASE8_CONTENT_AND_ROOT_BOOTSTRAP_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM`
+
+- Registry state now uses one Git-common-dir root, independent of `dataDir`.
+- Missing, replaced, or reinitialized root identity fails before claim.
+- Content approval is non-executable; a separately Git-bound final release is mandatory.
+- Real root is not initialized; claims, writes, verify, compensation, and real reads are zero.
+
+Validation: `CMV-2193`.
 
 ## CM-2092 Phase 8 Decision Content Issuance
 

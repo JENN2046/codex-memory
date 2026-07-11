@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2092 Phase 8 authorization decision content issuance request`.
-Current validation: `CMV-2192`.
-Current status: Hardened implementation frozen; non-executable decision content requested; fourth slot false and no execution.
+Current task: `CM-2093 Phase 8 content approval and registry-root request`.
+Current validation: `CMV-2193`.
+Current status: Git-common-dir root and mandatory final release implemented; content/root bootstrap requested; fourth slot false and no execution.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review and issuance of CM-2092 non-executable
-decision content. Freeze returned bytes before a separate final execution-release
-review. Do not claim nonce or execute write/verify/rollback/compensation.
+Next safe action is independent review of CM-2093 content/root-bootstrap request.
+Freeze returned bytes before root initialization. Final execution release remains
+separate; do not claim nonce or execute write/verify/rollback/compensation.
 
 ## Historical Run Notes
 

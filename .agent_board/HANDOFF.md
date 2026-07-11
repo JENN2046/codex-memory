@@ -4,13 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2092 Phase 8 authorization decision content issuance request`.
-Current validation: `CMV-2192`.
-Current handoff: CM-2091 findings are fixed in `e1785994…`. A non-executable content decision is requested; fourth slot remains false. Next: freeze returned decision bytes, then request final execution release. Nothing executed.
+Current task: `CM-2093 Phase 8 content approval and registry-root request`.
+Current validation: `CMV-2193`.
+Current handoff: CM-2092 findings are fixed in `10b1ea49…`. Request only non-executable content plus exact root bootstrap. Real root is uninitialized; fourth slot false. Final release remains separate. Nothing executed.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2093 is the active gate. It binds a stable root identity under Git common-dir,
+not switchable `dataDir`, and requires a second Git-intake final release decision.
+The current request may approve content and one root bootstrap only. It cannot claim
+nonce or call `record_memory`; the real root has not been initialized.
 
 CM-2092 is the active gate. It requests only a machine-bindable external decision
 content object. Even a positive content decision cannot execute a write: its exact
