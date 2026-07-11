@@ -38,6 +38,17 @@ test('CM-2110 exact decision and source receipt authorize only failure-recovery 
   assert.equal(evaluateApplicationReceipt({ receiptPayload: result.receiptPayload, receiptPayloadSha256: result.receiptPayloadSha256 }).accepted, true);
 });
 
+test('CM-2110 frozen application receipt matches the accepted one-shot result', () => {
+  const receipt = JSON.parse(fs.readFileSync(path.join(
+    DOCS,
+    'phase8_failure_recovery_evidence_application_receipt_cm2110.json'
+  ), 'utf8'));
+  const result = evaluateApplicationReceipt(receipt);
+  assert.equal(result.accepted, true, result.blockers.join(', '));
+  assert.equal(result.failureRecoveryProofPassed, true);
+  assert.equal(result.phase8Completed, false);
+});
+
 test('CM-2110 fails closed on receipt, rollback baseline, replay, side effect, or phase overclaim drift', () => {
   for (const mutate of [
     value => { value.sourceReceipt.receiptPayload.caseResults[2].retryCount = 1; value.sourceReceipt.receiptPayloadSha256 = '0'.repeat(64); },

@@ -4,6 +4,19 @@ Task id: `CM-2024`
 Validation id: `CMV-2125`
 Date: `2026-07-10`
 
+## CM-2110 Failure-Recovery Application Trace Update
+
+`failureRecoveryProofPassed` now traces to the exact CM-2109 isolated
+three-case execution receipt and its one-shot CM-2110 application receipt. The
+evidence separately proves pre-claim failure, consumed pre-commit failure, and
+ambiguous post-commit stop behavior with zero retry, rollback, or compensation.
+
+Application receipt payload SHA-256 is `9d96290a…ecd6`. Together with CM-2108,
+both remaining Phase 8 execution-proof fields are now accepted and applied.
+`phase8Completed` remains false until the separate completion-audit gate runs.
+No production failure-recovery, provider, release, or readiness inference is
+permitted.
+
 ## CM-2108 Rollback Application Trace Update
 
 `rollbackDrillPassed` now traces to the exact CM-2107 identity-bound tombstone

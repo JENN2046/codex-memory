@@ -4,6 +4,26 @@ Task: `CM-2017 near-model-memory plan pack completion audit`
 Validation: `CMV-2118`
 Date: 2026-07-10
 
+## CM-2110 Failure-Recovery Evidence Application
+
+The exact CM-2109 isolated three-case failure-recovery receipt was accepted and
+applied once under decision
+`CM-2110-SELF-FAILURE-RECOVERY-EVIDENCE-APPLICATION-07C1CF3B`.
+
+```yaml
+rollbackDrillPassed: true
+failureRecoveryProofPassed: true
+phase8Completed: false
+fullPlanPackCompleted: false
+readinessClaimed: false
+```
+
+Application receipt payload SHA-256 is `9d96290a…ecd6`. This patch records
+synthetic failure-recovery evidence only. It did not rerun any failure case or
+perform native memory, provider, retry, rollback, compensation, remote, or
+readiness actions. Both remaining Phase 8 execution-proof fields are now
+applied; Phase 8 completion still requires a separate completion-audit gate.
+
 ## CM-2108 Rollback Evidence Application
 
 The self-governed exact application decision

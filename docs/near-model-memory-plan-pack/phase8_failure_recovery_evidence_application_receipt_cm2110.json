@@ -1,0 +1,66 @@
+{
+  "receiptPayload": {
+    "schemaVersion": 1,
+    "taskId": "CM-2110",
+    "receiptType": "failure_recovery_evidence_completion_audit_application_receipt",
+    "decision": {
+      "reference": "CM-2110-SELF-FAILURE-RECOVERY-EVIDENCE-APPLICATION-07C1CF3B",
+      "commit": "e82afd98e5f2a0d2723d3b8a2b40d97729c80964",
+      "blobOid": "38857977bc0b8d1e9989b6044bf216480d57c658",
+      "bytes": 1837,
+      "sha256": "c99fdf7e3e5b6a3293494f12d51715b54d660029825e4249a657b520b23e20c2"
+    },
+    "sourceFailureRecoveryReceipt": {
+      "commit": "f72229254a5dc302f2b544fe17388f151019d6d2",
+      "tree": "50754fbc07aedb1f5a2fdfd3d5ce55aa6492551d",
+      "blobOid": "b697878825bf7c58df9a794764ecf382d39002ad",
+      "bytes": 6524,
+      "sha256": "ff75c4d0ad6a1ce2f63ffbb71dcbf81f7e35a05af274841398c0bb4b7a2d38b8",
+      "payloadSha256": "07c1cf3ba9b609bd3249d195b2ba7a86c6e9d948e77de6b44751af975c99a882",
+      "acceptedAsFailureRecoveryEvidence": true
+    },
+    "applicationRuntime": {
+      "commit": "8073e4775f87a91496bc89fdb35d3eca17ad9d18",
+      "tree": "24c98e4bddaac4707661bb9afeb15615fbd125cb",
+      "cleanBeforeApplication": true,
+      "completionAuditBaselineBlobOid": "477730cf3af4457a5c3696fbcf4fadf6bd5eb788",
+      "traceMatrixBaselineBlobOid": "e1e846d85a415929e18ae90c791184a5e110c6a6"
+    },
+    "contractResults": {
+      "applicationGate": "cm2110_failure_recovery_evidence_application_gate_accepted",
+      "patchBoundary": "cm2110_failure_recovery_evidence_patch_boundary_accepted",
+      "patchApplication": "cm2110_failure_recovery_evidence_patch_application_accepted"
+    },
+    "appliedEvidence": {
+      "rollbackDrillPassed": true,
+      "failureRecoveryProofPassed": true,
+      "phase8Completed": false,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    },
+    "authorization": {
+      "useCount": 1,
+      "consumed": true,
+      "replayAllowed": false
+    },
+    "applicationCounters": {
+      "completionAuditPatchApplications": 1,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "failureInjectionExecutions": 0,
+      "verifyOperations": 0,
+      "retryOperations": 0,
+      "rollbackOrCompensationOperations": 0,
+      "remoteActions": 0,
+      "readinessClaims": 0
+    },
+    "boundaries": {
+      "syntheticFailureRecoveryOnly": true,
+      "productionFailureRecoveryProven": false,
+      "phase8Completed": false,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    }
+  },
+  "receiptPayloadSha256": "9d96290a35a42886ec8afe127520da9926f054d1b772b44d7ca3877ce1b0ecd6"
+}
