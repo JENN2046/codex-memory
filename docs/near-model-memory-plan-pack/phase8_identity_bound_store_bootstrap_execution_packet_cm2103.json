@@ -24,8 +24,8 @@
   "bootstrapRequestBytes": 7096,
   "bootstrapRequestSha256": "2318692aec334acd75b54d9bdac71ada9a2c2d3d3255b76cf97a5095421927ad",
   "bootstrapRequestPayloadSha256": "60d153e913cf1b9f1873c6e5ac98e9dfa1cb35e142eebc701dfca13ac23784da",
-  "implementationCommit": "255150db14ba8c00e7415db3cae586616842a646",
-  "implementationTree": "247a01284fa51d1acee348ccee7bd95af700274b",
+  "implementationCommit": "809ec09b1909efe5602c5a46a5a2b6e3e367dc16",
+  "implementationTree": "a9f6b7ef58828951a39e2d5502e8e703500d23ff",
   "implementationArtifacts": {
     "decisionIntake": {
       "path": "src/core/Cm2103IdentityBoundStoreBootstrapDecisionIntake.js",
@@ -33,7 +33,7 @@
     },
     "stateMachine": {
       "path": "src/core/Cm2103IdentityBoundStoreBootstrapState.js",
-      "blobOid": "502886199cc8c37d40a827d1faa9b4e637d9537c"
+      "blobOid": "0a1f2fb3fd45ad068a25cd876614707880d4f2f6"
     },
     "governanceVerifier": {
       "path": "src/core/Cm2103IdentityBoundStoreGovernance.js",
@@ -190,5 +190,5 @@
     "store_directory_creation_not_authorized",
     "store_identity_creation_not_authorized"
   ],
-  "packetPayloadSha256": "a1179c8423b7fd4d81640fd44529d4e178a54b9b6f00f40be030ccbece01224e"
+  "packetPayloadSha256": "a8f2fa968c1149fec956b408cbb518773f7296a7be6733fdf47c0f1d8ff1b968"
 }
