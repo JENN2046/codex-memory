@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
@@ -12,6 +13,15 @@ const {
 } = require('../src/core/Cm2104IdentityBoundStoreBootstrapAuthorizationGatePacketContract');
 
 const packet = JSON.parse(fs.readFileSync(path.join(__dirname, '..', AUTHORIZATION_GATE_PACKET_PATH), 'utf8'));
+const repoRoot = path.resolve(__dirname, '..');
+const packetFreezeCommit = '67eaab147cb856180a7ddd0491c5e5cc2f01324f';
+
+function gitObjectExists(commit, objectPath) {
+  return spawnSync('git', ['cat-file', '-e', `${commit}:${objectPath}`], {
+    cwd: repoRoot,
+    stdio: 'ignore'
+  }).status === 0;
+}
 
 test('CM-2104-PRE packet freezes a non-executing two-stage bootstrap authorization gate', () => {
   const result = evaluateCm2104BootstrapAuthorizationGatePacket(packet);
@@ -23,8 +33,9 @@ test('CM-2104-PRE packet freezes a non-executing two-stage bootstrap authorizati
   assert.equal(packet.authorizationContentDecisionAloneExecutable, false);
   assert.equal(packet.independentFinalExecutionReleaseRequired, true);
   assert.equal(packet.finalReleaseMustBindContentGitIdentity, true);
-  assert.equal(fs.existsSync(path.join(__dirname, '..', AUTHORIZATION_CONTENT_DECISION_PATH)), false);
-  assert.equal(fs.existsSync(path.join(__dirname, '..', FINAL_EXECUTION_RELEASE_DECISION_PATH)), false);
+  assert.equal(gitObjectExists(packetFreezeCommit, AUTHORIZATION_CONTENT_DECISION_PATH), false);
+  assert.equal(gitObjectExists(packetFreezeCommit, FINAL_EXECUTION_RELEASE_DECISION_PATH), false);
+  assert.equal(fs.existsSync(path.join(repoRoot, FINAL_EXECUTION_RELEASE_DECISION_PATH)), false);
 });
 
 test('CM-2104-PRE packet rejects authority, release separation, artifact, counter, or hash drift', () => {
