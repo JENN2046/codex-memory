@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2093",
-  "validationId": "CMV-2194",
+  "taskId": "CM-2094",
+  "validationId": "CMV-2195",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -94,11 +94,20 @@
     "phase8ContentDecisionPayloadSha256": "9fb37b29e18ee65225e8e2fcb9628260ba93afb5ced6c195388e390570daa5dc",
     "phase8RegistryRootBootstrapAuthorizationConsumed": true,
     "phase8RegistryRootBootstrapReplayAllowed": false,
+    "phase8RegistryRootBootstrapReceiptReviewReference": "CM-2093-ER-20260711-REGISTRY-ROOT-BOOTSTRAP-RECEIPT-PASS-BDD96776",
+    "phase8RegistryRootBootstrapReceiptReviewPassed": true,
+    "phase8ExecutionPacketCommit": "66cfae232b6609bbede9debc6f897f74ed8551c0",
+    "phase8ExecutionPacketTree": "88a4a6f92a9d380f568963604a8dbae3b9fe07c4",
+    "phase8ExecutionManifestBlobOid": "549f157ed65d0675fccfb2c8b68698a31c4666f2",
+    "phase8ExecutionManifestSha256": "0786167ba860d869873fdc32dad167a411d7d85617e2c08b01c1d4604ba3131d",
+    "phase8ExecutionManifestPayloadSha256": "11bbbc72e4586654c0996d63090b586ec0da7bb4f2cccfc90b63af07cf31d0ee",
+    "phase8FinalExecutionReleaseAuthorizationRequested": true,
+    "phase8FinalExecutionReleaseAuthorized": false,
     "phase8NonceClaimed": false,
     "phase8NativeExecutionReceiptCreated": false,
     "phase8LatestRuntimeSourceCommit": "10b1ea49257c0aa2c26e50a2291142093589d938",
     "phase8LatestRuntimeSourceTree": "f4273910483c096ff03d3c33f01c59187a2f6e2b",
-    "phase8RequestedContextCanonicalSha256": "75832f193a1a414ccabcd508fa8dc7d3f8d5afb3f7360184734c21d2647229fc",
+    "phase8RequestedContextCanonicalSha256": "f1cf912c1609dbf70ac07794c7b691e85f92e4c6daceda168e444d175dc49283",
     "phase8RequestedAllowlistCanonicalSha256": "b69cc85dc7b9387425342ffbec7c299317dcf1eaa6948d4042503399a6b33e20",
     "phase8RequestedCanonicalPayloadSha256": "91d3b2ed314641bb372237aa9490a2803da6ea060b4457c5e7694c738a6b9aee",
     "phase8RequestedMaxNativeWrites": 1,
@@ -108,7 +117,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_registry_root_initialized_authorization_consumed_phase8_false_no_native_execution",
+    "scope": "near_model_memory_plan_pack_final_execution_release_requested_phase8_false_unclaimed_no_native_execution",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -116,6 +125,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2195",
+      "scope": "CM-2094 exact frozen execution manifest and final release request",
+      "status": "COMPLETED_FINAL_EXECUTION_RELEASE_REQUESTED_PHASE8_FALSE_UNCLAIMED_NO_NATIVE_EXECUTION"
+    },
     {
       "id": "CMV-2194",
       "scope": "CM-2093 exact registry root bootstrap and low-disclosure receipt",

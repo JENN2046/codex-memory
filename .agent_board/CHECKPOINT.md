@@ -4,11 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2093 Phase 8 content approval and registry-root request`.
-Current validation: `CMV-2194`.
+Current checkpoint: `CM-2094 Phase 8 final execution release request`.
+Current validation: `CMV-2195`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2094 Final Execution Release Request
+
+Status: `FINAL_EXECUTION_RELEASE_REQUESTED_PHASE8_FALSE_UNCLAIMED_NO_NATIVE_EXECUTION`
+
+- Bootstrap receipt review `CM-2093-ER-20260711-REGISTRY-ROOT-BOOTSTRAP-RECEIPT-PASS-BDD96776` passed.
+- Execution packet `66cfae23…`, manifest blob `549f157e…`, and SHA `0786167b…` are frozen.
+- Request remains non-executable; fourth slot false and nonce/receipt/claim/write/verify counters are zero.
+
+Validation: `CMV-2195`.
 
 ## CM-2093 Registry Root Bootstrap
 

@@ -8,24 +8,30 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2093 root initialized once; bootstrap authorization consumed; fourth slot false |
-| Current task | `CM-2093 Phase 8 content approval and registry-root request` |
-| Current validation | `CMV-2194` |
-| Current route | Independent bootstrap receipt review; execution manifest and final release remain blocked |
+| Status | CM-2094 exact execution manifest frozen; final release requested; fourth slot false |
+| Current task | `CM-2094 Phase 8 final execution release request` |
+| Current validation | `CMV-2195` |
+| Current route | Independent CM-2094 final release review; no execution before PASS |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
+CM-2094 freezes the exact execution packet at `66cfae23…` and requests only a
+separate final execution-release decision. The manifest, request, and their tests
+remain non-executing: no nonce, native execution receipt, runtime write, verify,
+rollback, compensation, or real-memory read occurred.
+
 CM-2093 content decision is frozen at `aecc431d…`. The exact 216-byte root
-identity was initialized once and its authorization consumed. The next gate is
-bootstrap receipt review; native execution remains unauthorized and unperformed.
+identity was initialized once and its authorization consumed. Its bootstrap
+receipt review passed; native execution remains unauthorized and unperformed.
 
 `CM-2093` moves the replay registry to one Git-common-dir governance root and
 binds an immutable root identity. It also requires a separate machine-bound final
 release decision over the exact execution manifest. The root bootstrap is now
-complete; execution-manifest preparation remains blocked pending receipt review.
+complete and its receipt review passed; the execution manifest is now frozen and
+awaiting the separate CM-2094 final release review.
 
 `CM-2092` fixes the remaining CM-2091 findings in implementation `e1785994…`
 and requests only a non-executable authorization decision content object. The

@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest receipt: `CM-2093 Phase 8 content approval and registry-root request`.
-Latest validation: `CMV-2194`.
+Latest receipt: `CM-2094 Phase 8 final execution release request`.
+Latest validation: `CMV-2195`.
 Active receipt summaries should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -31,6 +31,7 @@ Governance kernel anchor retained for validation: `CM-0684`.
 
 | ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |
 |---|---|---|---|---|---|---|---|---:|---|---|
+| CM-2094 | complete imported near-model-memory plan pack | Green manifest/request; Red native execution blocked | `phase8_final_execution_release_request_no_execution` | Froze exact execution manifest and prepared separate CM-2094 final release request | `packet=66cfae23; manifest_blob=549f157e; manifest_sha256=0786167b; payload_sha256=11bbbc72; fourth_slot=false; nonce=0; writes=0; verify=0` | `CMV-2195` | 0 | no positive release intake, nonce, runtime write, verify, compensation, or real-memory read before independent PASS | completed_final_execution_release_requested_phase8_false_unclaimed_no_native_execution | 2026-07-11 |
 | CM-2093-bootstrap | complete imported near-model-memory plan pack | Exact local governance bootstrap | `phase8_registry_root_bootstrap_no_native_execution` | Froze CM-2093 decision, initialized exact root identity once, consumed bootstrap authorization | `decision_commit=aecc431d; decision_blob=bc251e7a; root_sha256=240fd4f7; root_bytes=216; authorization_consumed=true; nonce=0; execution_receipt=0; claims=0; native_writes=0` | `CMV-2194` | 0 | no overwrite/delete/reinitialize; execution manifest awaits receipt review; final release absent | completed_registry_root_initialized_authorization_consumed_phase8_false_no_native_execution | 2026-07-11 |
 | CM-2093 | complete imported near-model-memory plan pack | Green content/root request; no runtime | `phase8_content_and_registry_root_request_no_execution` | Bound Git-common-dir root identity and mandatory separate final release, then prepared non-executable request | `task_id=CM-2093; runtime=10b1ea49; context=f1cf912c; root_identity=240fd4f7; root_initialized=false; content_approval_requested=true; fourth_slot=false; claims=0; writes=0; verify=0; compensation=0` | `CMV-2193` | 0 | root bootstrap cannot overwrite; native execution requires later final release | completed_phase8_content_and_root_bootstrap_requested_fourth_slot_false_no_execution_no_ready_claim | 2026-07-11 |
 | CM-2092 | complete imported near-model-memory plan pack | Green decision-content request; no runtime | `phase8_decision_content_issuance_no_execution` | Hardened one-shot execution and prepared two-gate machine-bindable decision issuance request | `task_id=CM-2092; implementation=e1785994; context_sha256=75832f19; allowlist_sha256=b69cc85d; content_issuance_requested=true; fourth_slot=false; claims=0; native_writes=0; verify=0; compensation=0; readiness=0` | `CMV-2192` | 0 | content decision is non-executable; Git decision intake and final execution-release review required | completed_phase8_decision_content_issuance_requested_fourth_slot_false_no_execution_no_ready_claim | 2026-07-11 |

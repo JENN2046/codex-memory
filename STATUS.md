@@ -4,13 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2093 Phase 8 content approval and registry-root request`.
-Current validation: `CMV-2194`.
-Current project status: CM-2093 content decision is frozen and exact Git-common-dir root identity is initialized once. Bootstrap authorization is consumed; fourth slot remains false and no native action occurred.
-Current route: `CM2093_REGISTRY_ROOT_INITIALIZED_AUTHORIZATION_CONSUMED_PHASE8_FALSE_NO_NATIVE_EXECUTION`.
+Current task: `CM-2094 Phase 8 final execution release request`.
+Current validation: `CMV-2195`.
+Current project status: Bootstrap receipt review passed; exact execution manifest is frozen and CM-2094 final release review is requested. Fourth slot remains false and no native action occurred.
+Current route: `CM2094_FINAL_EXECUTION_RELEASE_REQUESTED_PHASE8_FALSE_UNCLAIMED_NO_NATIVE_EXECUTION`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2094 execution packet is frozen at `66cfae23…`, with manifest blob
+`549f157e…`, raw SHA `0786167b…`, and canonical payload SHA `11bbbc72…`.
+The packet is non-executable without the separately frozen and machine-intaken
+CM-2094 final release decision. Nonce, execution receipt, claim, write and verify
+remain zero.
 
 CM-2093 bootstrap receipt: decision commit `aecc431d…`, decision blob
 `bc251e7a…`, decision SHA `9fb37b29…`; root identity is exactly 216 bytes with

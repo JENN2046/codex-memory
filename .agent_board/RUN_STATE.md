@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2093 Phase 8 content approval and registry-root request`.
-Current validation: `CMV-2194`.
-Current status: Exact root identity initialized once; bootstrap authorization consumed; fourth slot false and no native execution.
+Current task: `CM-2094 Phase 8 final execution release request`.
+Current validation: `CMV-2195`.
+Current status: Exact execution manifest frozen; final release review requested; fourth slot false, UNCLAIMED, and no native execution.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the CM-2093 bootstrap receipt. Do not
-generate the execution manifest until receipt acceptance. Final release remains
-separate; do not claim nonce or execute write/verify/rollback/compensation.
+Next safe action is independent review of the exact CM-2094 final execution
+release request. Do not freeze or run a positive release decision unless returned
+by review; do not claim nonce or execute write/verify/rollback/compensation.
 
 ## Historical Run Notes
 

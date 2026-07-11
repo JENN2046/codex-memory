@@ -4,21 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2093 Phase 8 content approval and registry-root request`.
-Current validation: `CMV-2194`.
-Current handoff: CM-2093 content frozen and exact root initialized once. Bootstrap authorization consumed; fourth slot false. Submit bootstrap receipt review before execution manifest. No native action executed.
+Current task: `CM-2094 Phase 8 final execution release request`.
+Current validation: `CMV-2195`.
+Current handoff: Bootstrap receipt review passed. Execution packet `66cfae23…` is frozen and CM-2094 final release review is requested. Fourth slot false; nonce and all native actions remain zero.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2093 is the active gate. It binds a stable root identity under Git common-dir,
+CM-2094 is the active gate. The frozen manifest binds packet `66cfae23…`, blob
+`549f157e…`, raw SHA `0786167b…`, context `f1cf912c…`, allowlist `b69cc85d…`,
+and the exact CM-2093 decision/bootstrap chain. Only an independently frozen,
+machine-intaken final release decision can permit one execution.
+
+CM-2093 remains the completed upstream gate. It binds a stable root identity under Git common-dir,
 not switchable `dataDir`, and requires a second Git-intake final release decision.
 The approved content covered one root bootstrap only. It cannot claim nonce or
 call `record_memory`; the root initialization is governance state, not native execution.
 
-The root is now initialized under the separately approved bootstrap step. This
-does not change Phase 8 authorization. Bootstrap receipt review is the only next gate.
+The root is initialized under the separately approved bootstrap step and its
+receipt review passed. This does not change Phase 8 authorization.
 
 Historical CM-2092 requested only a machine-bindable external decision
 content object. Even a positive content decision cannot execute a write: its exact
