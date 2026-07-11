@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2110",
+  "decisionType": "self_governed_exact_failure_recovery_evidence_application",
+  "decisionReference": "CM-2110-SELF-FAILURE-RECOVERY-EVIDENCE-APPLICATION-07C1CF3B",
+  "decisionBasis": "repository_reality_and_user_delegated_prohibited_first_authority",
+  "failureRecoveryEvidenceApplicationAuthorized": true,
+  "decisionRequiresGitFreezeBeforeApplication": true,
+  "sourceReceipt": {
+    "commit": "f72229254a5dc302f2b544fe17388f151019d6d2",
+    "tree": "50754fbc07aedb1f5a2fdfd3d5ce55aa6492551d",
+    "jsonBlobOid": "b697878825bf7c58df9a794764ecf382d39002ad",
+    "jsonBytes": 6524,
+    "jsonSha256": "ff75c4d0ad6a1ce2f63ffbb71dcbf81f7e35a05af274841398c0bb4b7a2d38b8",
+    "payloadSha256": "07c1cf3ba9b609bd3249d195b2ba7a86c6e9d948e77de6b44751af975c99a882"
+  },
+  "baseline": {
+    "completionAuditBlobOid": "477730cf3af4457a5c3696fbcf4fadf6bd5eb788",
+    "traceMatrixBlobOid": "e1e846d85a415929e18ae90c791184a5e110c6a6",
+    "rollbackDrillPassed": true,
+    "failureRecoveryProofPassed": false,
+    "phase8Completed": false
+  },
+  "allowedPatch": {
+    "rollbackDrillPassed": true,
+    "failureRecoveryProofPassed": true,
+    "phase8Completed": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "applicationAuthorization": {
+    "useCount": 1,
+    "replayAllowed": false
+  },
+  "applicationSideEffectLimits": {
+    "completionAuditPatchApplications": 1,
+    "nativeReads": 0,
+    "nativeWrites": 0,
+    "failureInjectionExecutions": 0,
+    "verifyOperations": 0,
+    "retryOperations": 0,
+    "rollbackOrCompensationOperations": 0,
+    "remoteActions": 0,
+    "readinessClaims": 0
+  },
+  "unsupportedClaims": {
+    "productionFailureRecoveryProven": false,
+    "phase8Completed": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  }
+}
