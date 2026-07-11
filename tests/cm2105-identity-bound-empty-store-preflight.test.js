@@ -11,6 +11,9 @@ const {
   expectedIdentityBytes
 } = require('../src/core/Cm2102IdentityBoundRollbackLifecycleFoundation');
 const {
+  evaluateCm2102EmptyStorePreflightReceiptShape
+} = require('../src/core/Cm2102IdentityBoundEmptyStorePreflightContract');
+const {
   evaluateCm2105PreflightDecisionIntake,
   expectedCm2105PreflightDecision,
   isMachineBoundCm2105PreflightDecision
@@ -24,6 +27,21 @@ const expectedBinding = Object.freeze({
   implementationCommit: '1'.repeat(40),
   implementationTree: '2'.repeat(40),
   expectedExpiresAt: '2026-07-15T18:00:00+08:00'
+});
+
+const frozenReceiptBinding = Object.freeze({
+  preflightDecisionReference: 'CM-2105-SELF-EMPTY-STORE-PREFLIGHT-017307C9-0622A6E4',
+  preflightDecisionCommit: '30035c6cd9654b93f3ded0261fdf42543419d5ea',
+  preflightDecisionBlobOid: '63a0c2a7ff0a2a493efb38ecde171b041dd47c2e',
+  preflightDecisionSha256: 'e49d2949da35a2e4b2c9ac715c5262041f0d1b851f424e6018e9d594b3394db0',
+  bootstrapDecisionReference: 'CM-2104-ER-IDENTITY-BOUND-STORE-BOOTSTRAP-FINAL-RELEASE-0A7CEB6C-017307C9',
+  bootstrapDecisionCommit: 'd691fe25cc14cb42f778c0d993a6d7f2582a9068',
+  bootstrapDecisionBlobOid: 'ed92d720b34124853d8329580a1d1102ea56be19',
+  bootstrapDecisionSha256: '6121eb25d34954cd15137788ab3e1775824c2695dd3e91a0a59e6d9c9a0b5ad2',
+  bootstrapReceiptReviewReference: 'CM-2105-SELF-BOOTSTRAP-RECEIPT-PASS-0622A6E4',
+  bootstrapReceiptCommit: '030d777fb90845c1c448c5f8e0c99c9681ab7b4f',
+  bootstrapReceiptSha256: '0622a6e45262f5c127bc2a22394ed9567cbecec317c793daa2f4b3378e8930b8',
+  storeRootBindingSha256: '0a7ceb6cf658d517de2a3eb30ee09195dbeb9d46800f42ac87edf7f7cb11dd94'
 });
 
 function decision(overrides = {}) {
@@ -117,4 +135,20 @@ test('CM-2105 collector fails closed on any unexpected store entry', async t => 
 
 test('CM-2105 frozen preflight stops before Git or store access without an exact decision commit', async () => {
   await assert.rejects(runFrozenCm2105Preflight(null), /cm2105_preflight_decision_commit_required/);
+});
+
+test('CM-2105 frozen execution receipt matches the low-disclosure preflight contract', async () => {
+  const receipt = JSON.parse(await fs.readFile(path.join(
+    __dirname,
+    '../docs/near-model-memory-plan-pack/phase8_identity_bound_empty_store_preflight_execution_receipt_cm2105.json'
+  ), 'utf8'));
+  const result = evaluateCm2102EmptyStorePreflightReceiptShape({
+    receipt,
+    expectedBinding: frozenReceiptBinding
+  });
+  assert.equal(result.shapeAccepted, true, result.blockers.join(', '));
+  assert.equal(receipt.syntheticStoreEmpty, true);
+  assert.equal(receipt.recordContentReadOperations, 0);
+  assert.equal(receipt.nativeReadCalls, 0);
+  assert.equal(receipt.nativeWritePerformed, false);
 });
