@@ -343,6 +343,100 @@ function evaluateRecordReceiptBytes(bytes) {
   return evaluateRecordWriteReceipt(JSON.parse(bytes.toString('utf8')));
 }
 
+function evaluateRollbackReceipt(receipt) {
+  const blockers = [];
+  if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt)) {
+    return { accepted: false, blockers: ['receipt.missing'] };
+  }
+  const { receiptPayloadSha256, ...payload } = receipt;
+  if (!/^[a-f0-9]{64}$/.test(receiptPayloadSha256 || '') ||
+      sha256Canonical(payload) !== receiptPayloadSha256) {
+    blockers.push('receipt.payloadHash');
+  }
+  const exact = {
+    schemaVersion: 1,
+    taskId: 'CM-2107',
+    receiptType: 'identity_bound_append_only_tombstone_execution_receipt',
+    result: 'PASS',
+    finalState: 'CONSUMED_SUCCESS',
+    executionAccepted: true,
+    implementationCommit: '840b0700721f0c389d6cd9fea40a53cc86524cbc',
+    implementationTree: '522e60ae3e4305898797fd1fcf68d33b6a5d1c80',
+    executionPacketCommit: '2a89b666e082b029da566655c7eee60680218d8c',
+    executionPacketBlobOid: '20c097e0cf6a2833e94f4af604fadfe3ec157876',
+    executionPacketSha256: '3b623f7b43d7edb89fb51a2ffe8f7f05c21b46f8353fe1a4d9c98d0035d2666c',
+    decisionReference: EXPECTED.decisionReference,
+    decisionCommit: '6f0b38d0dfc7298910c9b0d7bc6145feac332c5b',
+    decisionBlobOid: '92aa5b81e06956a8d01deac523fe9e7c7e4766c4',
+    decisionSha256: '529e6831e95077e5c4cc24825bfb2bdcff95fb18d1fe6669e162285ddb80f74f',
+    recordReceiptCommit: RECORD_RECEIPT_BINDING.commit,
+    recordReceiptBlobOid: RECORD_RECEIPT_BINDING.blobOid,
+    recordReceiptSha256: RECORD_RECEIPT_BINDING.sha256,
+    recordReceiptAccepted: true,
+    storeIdentityMatched: true,
+    storeIdentitySha256: IDENTITY_CANONICAL_SHA256,
+    targetMemoryIdRef: RECORD_EXPECTED.memoryIdRef,
+    targetRecordBytes: RECORD_EXPECTED.durableRecordBytes,
+    targetRecordSha256: RECORD_EXPECTED.durableRecordSha256,
+    originalRecordUnchanged: true,
+    tombstonePayloadCanonicalBytes: EXPECTED.payloadCanonicalBytes,
+    tombstonePayloadCanonicalSha256: EXPECTED.payloadCanonicalSha256,
+    durableMarkerBytes: EXPECTED.durableMarkerBytes,
+    durableMarkerSha256: EXPECTED.durableMarkerSha256,
+    markerMemoryIdRef: EXPECTED.markerMemoryIdRef,
+    authorizationUseCount: 1,
+    authorizationConsumed: true,
+    authorizationReplayAllowed: false,
+    nonceMarkerCount: 1,
+    authorizationReceiptMarkerCount: 1,
+    writeInvocationMarkerCount: 1,
+    writeInvocationCount: 1,
+    tombstoneWriteCalls: 1,
+    verifyOperations: 1,
+    verifyAccepted: true,
+    effectiveLifecycleStatus: 'tombstoned',
+    rollbackLifecycleProjectionTargetCount: 0,
+    rollbackDrillLifecycleProjectionProven: true,
+    defaultProductRetrievalTombstoneAwarenessProven: false,
+    nativeInvocationReceiptBindingMatched: true,
+    primaryWriteOnly: true,
+    providerCalled: false,
+    derivedIndexWritePerformed: false,
+    derivedRuntimeStoreCreated: false,
+    localFallbackUsed: false,
+    automaticRetryPerformed: false,
+    supersedePerformed: false,
+    compensationPerformed: false,
+    physicalDeletePerformed: false,
+    inPlaceOverwritePerformed: false,
+    otherRealMemoryRead: false,
+    otherRealMemoryModified: false,
+    rawMemoryReturned: false,
+    rawAuditReturned: false,
+    rawPathDisclosed: false,
+    rollbackDrillPassed: false,
+    failureRecoveryProofPassed: false,
+    phase8Completed: false,
+    readinessClaimed: false
+  };
+  for (const [field, expected] of Object.entries(exact)) {
+    if (receipt[field] !== expected) blockers.push(`receipt.${field}`);
+  }
+  for (const field of ['claimId', 'claimBindingHash']) {
+    if (!/^[a-f0-9]{64}$/.test(receipt[field] || '')) blockers.push(`receipt.${field}`);
+  }
+  return {
+    accepted: blockers.length === 0,
+    blockers: [...new Set(blockers)],
+    acceptedAsRollbackEvidence: blockers.length === 0,
+    rollbackDrillApplicationMayBePrepared: blockers.length === 0,
+    rollbackDrillPassed: false,
+    failureRecoveryProofPassed: false,
+    phase8Completed: false,
+    additionalNativeActionAuthorized: false
+  };
+}
+
 async function verifyTombstoneExecution({ registry, claimId, receiptId, decisionReference,
   claimBindingHash, runtimeTargetReferenceName, postStoreProjection, callAuditMemory } = {}) {
   if (!registry || typeof callAuditMemory !== 'function' ||
@@ -456,6 +550,7 @@ module.exports = {
   collectPostRollbackProjection,
   collectPreRollbackProjection,
   evaluateRecordReceiptBytes,
+  evaluateRollbackReceipt,
   expectedAllowlist,
   expectedRuntimeContext,
   filterEffectiveCandidateRefs,

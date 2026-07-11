@@ -27,6 +27,7 @@ const {
   collectPostRollbackProjection,
   collectPreRollbackProjection,
   evaluateRecordReceiptBytes,
+  evaluateRollbackReceipt,
   expectedAllowlist,
   expectedRuntimeContext,
   filterEffectiveCandidateRefs,
@@ -311,4 +312,43 @@ test('CM-2107 verify requires exact audit correlation and yields zero effective 
 test('CM-2107 frozen executor requires packet and decision commits before store access', async () => {
   await assert.rejects(runFrozenCm2107Tombstone(null, null), /cm2107_execution_packet_commit_required/);
   await assert.rejects(runFrozenCm2107Tombstone('a'.repeat(40), null), /cm2107_final_release_decision_commit_required/);
+});
+
+test('CM-2107 frozen rollback receipt proves exact append-only lifecycle rollback', async () => {
+  const receipt = JSON.parse(await fs.readFile(path.join(
+    __dirname,
+    '../docs/near-model-memory-plan-pack/phase8_identity_bound_tombstone_execution_receipt_cm2107.json'
+  ), 'utf8'));
+  const result = evaluateRollbackReceipt(receipt);
+  assert.equal(result.accepted, true, result.blockers.join(', '));
+  assert.equal(result.acceptedAsRollbackEvidence, true);
+  assert.equal(result.rollbackDrillApplicationMayBePrepared, true);
+  assert.equal(result.rollbackDrillPassed, false);
+  assert.equal(result.failureRecoveryProofPassed, false);
+  assert.equal(result.phase8Completed, false);
+  assert.equal(result.additionalNativeActionAuthorized, false);
+});
+
+test('CM-2107 rollback receipt fails closed on lifecycle, count, replay, or overclaim drift', async () => {
+  const source = JSON.parse(await fs.readFile(path.join(
+    __dirname,
+    '../docs/near-model-memory-plan-pack/phase8_identity_bound_tombstone_execution_receipt_cm2107.json'
+  ), 'utf8'));
+  for (const drift of [
+    { tombstoneWriteCalls: 2 },
+    { verifyOperations: 2 },
+    { originalRecordUnchanged: false },
+    { durableMarkerSha256: 'f'.repeat(64) },
+    { rollbackLifecycleProjectionTargetCount: 1 },
+    { authorizationReplayAllowed: true },
+    { providerCalled: true },
+    { compensationPerformed: true },
+    { rollbackDrillPassed: true },
+    { phase8Completed: true }
+  ]) {
+    const receipt = { ...source, ...drift };
+    const { receiptPayloadSha256, ...payload } = receipt;
+    receipt.receiptPayloadSha256 = sha256Canonical(payload);
+    assert.equal(evaluateRollbackReceipt(receipt).accepted, false, JSON.stringify(drift));
+  }
 });
