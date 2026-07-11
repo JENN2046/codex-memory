@@ -112,6 +112,20 @@ test('CM-2102 accepts the non-executing identity-bound lifecycle foundation', ()
   assert.equal(result.phase8Completed, false);
 });
 
+test('CM-2102 frozen foundation packet matches the implementation and identity template', () => {
+  const packet = JSON.parse(fs.readFileSync(path.join(
+    __dirname,
+    '..',
+    'docs',
+    'near-model-memory-plan-pack',
+    'phase8_identity_bound_rollback_lifecycle_foundation_cm2102.json'
+  ), 'utf8'));
+  const result = evaluateCm2102LifecycleFoundation({ packet, identityTemplateBytes: identityBytes });
+  assert.equal(result.accepted, true, result.blockers.join(', '));
+  assert.equal(result.executionAuthorized, false);
+  assert.equal(result.nativeActions, 0);
+});
+
 test('CM-2102 foundation fails closed on identity, order, reuse, authority, action, or schema drift', () => {
   const cases = [
     packet => ({ ...packet, unexpectedCapability: true }),
