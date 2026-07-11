@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2087 exact one-use tag push and low-disclosure receipt`.
-Current validation: `CMV-2188`.
-Current handoff: Exact approved tag ref was pushed to `origin` and verified; one-use authorization is consumed. Branch push, Release, deploy, Phase 8, and readiness remain false.
+Current task: `CM-2088 exact tag push receipt review intake`.
+Current validation: `CMV-2189`.
+Current handoff: Independent review accepted the exact tag push receipt. Authorization is consumed and cannot replay; no new remote, Release, deploy, Phase 8, or readiness authority exists.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 

@@ -8,15 +8,20 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2087 exact tag push completed and one-use authorization consumed |
-| Current task | `CM-2087 exact one-use tag push and low-disclosure receipt` |
-| Current validation | `CMV-2188` |
-| Current route | Remote tag object and peeled commit verified; Release and Phase 8 remain false |
+| Status | CM-2088 exact tag push receipt review passed; no new remote authority |
+| Current task | `CM-2088 exact tag push receipt review intake` |
+| Current validation | `CMV-2189` |
+| Current route | Remote delivery recorded; authorization consumed; Release and Phase 8 remain false |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
+
+`CM-2088` records independent review
+`CM-2087-ER-20260711-TAG-PUSH-RECEIPT-PASS-DF1E41DD`. The exact tag delivery
+record is accepted, its authorization is consumed, and replay is forbidden.
+No new remote, Release, deploy, Phase 8, or readiness authority is created.
 
 `CM-2087` consumed exact decision
 `CM-2086-ER-20260711-EXACT-TAG-PUSH-BAF7ECCE` once and pushed only the approved

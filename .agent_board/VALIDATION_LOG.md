@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest validation: `CMV-2188`.
-Latest task: `CM-2087 exact one-use tag push and low-disclosure receipt`.
+Latest validation: `CMV-2189`.
+Latest task: `CM-2088 exact tag push receipt review intake`.
 Validation facts should be summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts are collected by fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -17,6 +17,7 @@ Active validation ledger. Long historical validation rows are archived by refere
 
 | ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |
 |---|---|---|---|---|---|---|---|
+| CMV-2189 | exact review/receipt/authorization/refspec/tag binding; fail-closed authority tests; default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2088 tag push receipt review | COMPLETED_TAG_PUSH_RECEIPT_REVIEW_PASSED_NO_NEW_REMOTE_AUTHORITY_NO_PHASE8_NO_READY_CLAIM | Review accepts receipt `df1e41dd…626b`; authorization consumed and replay forbidden. No new remote action, Release, deploy, Phase 8, or readiness authority. | Stop remote actions; Phase 8 remains a separate exact gate. | 2026-07-11 |
 | CMV-2188 | clean/tag/remote binding preflight; exact remote absence check; single full-refspec push; remote object/peeled verification; receipt hash; fail-closed/default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2087 exact tag push | COMPLETED_EXACT_TAG_PUSH_AUTHORIZATION_CONSUMED_NO_BRANCH_NO_RELEASE_NO_PHASE8_NO_READY_CLAIM | Exact tag object `baf7ecce…5e3c` pushed once to `origin` and verified at `170ee339…221b`; authorization consumed. No branch/other-tag/force/Release/deploy/Phase 8 action. | Submit low-disclosure push receipt for independent review; no further remote action. | 2026-07-11 |
 | CMV-2187 | exact review/tag/receipt/authorization binding; remote URL local config check; fail-closed remote-action tests; default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2086 local tag receipt review and exact tag push request | COMPLETED_LOCAL_TAG_RECEIPT_REVIEW_PASSED_TAG_PUSH_REQUESTED_NOT_AUTHORIZED_NO_REMOTE_ACTION_NO_READY_CLAIM | Review confirms tag `baf7ecce…5e3c` and receipt `b6c2a597…d3d0`; exact non-force single-ref tag push request prepared. No network query or push occurred. | Submit exact tag push request for independent authorization; no remote action until accepted. | 2026-07-11 |
 | CMV-2186 | immediate absence/target/tree/packet/decision preflight; exact `--no-sign` annotated tag creation; object type/OID/peeled commit/tree/annotation/signature checks; receipt hash; focused/default/docs/current-facts/ledger/diff gates | P9-codex-claude-client-scope / P6-docs-drift | CM-2085 one-use local tag creation | COMPLETED_LOCAL_ANNOTATED_TAG_CREATED_AUTHORIZATION_CONSUMED_NO_PUSH_NO_RELEASE_NO_READY_CLAIM | Local tag `v0.2.0-readonly-context-rc` created exactly at `170ee339…221b`, OID `baf7ecce…5e3c`, unsigned with exact annotation. Authorization consumed once. No remote action or readiness claim. | Stop; tag push, deletion/rebuild, release, and Phase 8 require separate authorization. | 2026-07-11 |

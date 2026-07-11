@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "result": "PASS",
+  "reviewReference": "CM-2087-ER-20260711-TAG-PUSH-RECEIPT-PASS-DF1E41DD",
+  "receiptCommit": "fc252418e068ac69bf87ea76458696f5fbfcc470",
+  "authorization": {
+    "decisionReference": "CM-2086-ER-20260711-EXACT-TAG-PUSH-BAF7ECCE",
+    "useCount": 1,
+    "consumed": true,
+    "replayAllowed": false
+  },
+  "push": {
+    "resultCategory": "pushed_new_tag",
+    "remote": "origin",
+    "refspec": "refs/tags/v0.2.0-readonly-context-rc:refs/tags/v0.2.0-readonly-context-rc",
+    "forceUsed": false,
+    "pushAllTagsUsed": false,
+    "branchRefPushed": false,
+    "otherTagPushed": false
+  },
+  "tag": {
+    "name": "v0.2.0-readonly-context-rc",
+    "objectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
+    "signed": false,
+    "annotation": "codex-memory readonly-context RC candidate; not RC_READY; no release authorization",
+    "peeledCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+    "targetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33"
+  },
+  "receipt": {
+    "payloadSha256": "df1e41dd0d6915b9b978c51a7d41614ed91a2f1873f22eb34131bb45035f626b",
+    "accepted": true
+  },
+  "remainingAuthorizations": {
+    "branchPushAuthorized": false,
+    "releaseCreationAuthorized": false,
+    "releasePublicationAuthorized": false,
+    "packagePublicationAuthorized": false,
+    "deployAuthorized": false,
+    "cutoverAuthorized": false,
+    "phase8NativeWriteAuthorized": false,
+    "readinessClaimAuthorized": false
+  },
+  "newRemoteActionAuthorized": false
+}

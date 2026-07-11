@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2087",
-  "validationId": "CMV-2188",
+  "taskId": "CM-2088",
+  "validationId": "CMV-2189",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -63,6 +63,8 @@
     "tagPushAuthorizationDecisionReference": "CM-2086-ER-20260711-EXACT-TAG-PUSH-BAF7ECCE",
     "tagPushAuthorizationConsumed": true,
     "tagPushReceiptPayloadSha256": "df1e41dd0d6915b9b978c51a7d41614ed91a2f1873f22eb34131bb45035f626b",
+    "tagPushReceiptReviewReference": "CM-2087-ER-20260711-TAG-PUSH-RECEIPT-PASS-DF1E41DD",
+    "tagPushReceiptReviewPassed": true,
     "tagPushAuthorized": true,
     "tagPushed": true,
     "completionAuditBeforeTagApprovalOrderEnforced": true,
@@ -74,7 +76,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_exact_tag_push_completed_authorization_consumed_no_release_phase8_false_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_tag_push_receipt_review_passed_no_new_remote_authority_phase8_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -82,6 +84,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2189",
+      "scope": "CM-2088 exact tag push receipt review intake",
+      "status": "COMPLETED_TAG_PUSH_RECEIPT_REVIEW_PASSED_NO_NEW_REMOTE_AUTHORITY_NO_PHASE8_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2188",
       "scope": "CM-2087 exact one-use tag push and low-disclosure receipt",
