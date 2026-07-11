@@ -4,17 +4,17 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2095 Phase 8 completion evidence application receipt`.
-Current validation: `CMV-2198`.
-Current project status: CM-2095 applied six supported receipt-backed fields and the Phase 8 receipt bundle to Completion Audit. Rollback/failure evidence remains false, so Phase 8 remains incomplete.
-Current route: `CM2095_EVIDENCE_APPLIED_ROLLBACK_FAILURE_MISSING_PHASE8_INCOMPLETE_RECEIPT_REVIEW_REQUIRED`.
+Current task: `CM-2097 Phase 8 remaining evidence request preparation`.
+Current validation: `CMV-2200`.
+Current project status: CM-2095 application receipt review passed. CM-2096 rollback and CM-2097 failure-recovery requests are prepared separately with zero execution authority; Phase 8 remains incomplete.
+Current route: `CM2096_2097_REMAINING_EVIDENCE_REQUESTS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-2095 application authorization was consumed once. Gate, patch boundary, and
-patch application accepted; receipt payload SHA is `8c8a22f8…0939`. No new
-native/runtime action occurred. Application receipt review is the next gate.
+CM-2095 application receipt review `...PASS-8C8A22F8` accepted the applied
+bundle. CM-2096 and CM-2097 now prepare independent future evidence routes only;
+they authorize zero native, verify, rollback, compensation, or recovery actions.
 
 CM-2095 binds review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 and requests a separate application gate for exact approval, side effect, durable

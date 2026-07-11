@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2095",
-  "validationId": "CMV-2198",
+  "taskId": "CM-2097",
+  "validationId": "CMV-2200",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -140,6 +140,11 @@
     "phase8OutputDisclosureBudgetPassed": true,
     "phase8AuditReceiptPassed": true,
     "phase8CompletionEvidenceApplicationReceiptPayloadSha256": "8c8a22f89863214ccbe2d0e64b75a0526cc32f1e21d83d7159e109e6fa200939",
+    "phase8CompletionEvidenceApplicationReceiptReviewReference": "CM-2095-ER-20260711-APPLICATION-RECEIPT-PASS-8C8A22F8",
+    "phase8CompletionEvidenceApplicationReceiptReviewPassed": true,
+    "phase8RollbackDrillEvidenceRequestPrepared": true,
+    "phase8FailureRecoveryEvidenceRequestPrepared": true,
+    "phase8RemainingEvidenceExecutionAuthorized": false,
     "phase8RollbackDrillPassed": false,
     "phase8FailureRecoveryProofPassed": false,
     "phase8DerivedIndexProofAccepted": false,
@@ -156,7 +161,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_evidence_applied_rollback_failure_missing_phase8_incomplete_receipt_review_required",
+    "scope": "near_model_memory_plan_pack_remaining_evidence_requests_prepared_no_execution_phase8_incomplete",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -164,6 +169,16 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2200",
+      "scope": "CM-2096 rollback and CM-2097 failure-recovery independent request preparation",
+      "status": "COMPLETED_REMAINING_EVIDENCE_REQUESTS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE"
+    },
+    {
+      "id": "CMV-2199",
+      "scope": "CM-2096 rollback drill evidence request preparation",
+      "status": "COMPLETED_ROLLBACK_DRILL_EVIDENCE_REQUEST_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE"
+    },
     {
       "id": "CMV-2198",
       "scope": "CM-2095 exact Phase 8 completion evidence application",

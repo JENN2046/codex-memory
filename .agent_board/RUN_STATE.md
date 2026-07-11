@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2095 Phase 8 completion evidence application receipt`.
-Current validation: `CMV-2198`.
-Current status: Six supported fields and bundle application applied once; rollback/failure missing; Phase 8 incomplete; receipt review required.
+Current task: `CM-2097 Phase 8 remaining evidence request preparation`.
+Current validation: `CMV-2200`.
+Current status: CM-2095 receipt review passed; independent rollback/failure requests prepared without execution authority; Phase 8 incomplete.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,9 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of the CM-2095 application receipt. Do
-not replay the application or alter rollback/failure/Phase 8 completion fields;
-never perform an additional native action.
+Next safe action is separate independent review of CM-2096 rollback and CM-2097
+failure-recovery request boundaries. Do not execute either action, replay prior
+authorizations, or alter rollback/failure/Phase 8 completion fields.
 
 ## Historical Run Notes
 

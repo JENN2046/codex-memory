@@ -4,11 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2095 Phase 8 completion evidence application receipt`.
-Current validation: `CMV-2198`.
+Current checkpoint: `CM-2097 Phase 8 remaining evidence request preparation`.
+Current validation: `CMV-2200`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2096 / CM-2097 Remaining Evidence Requests
+
+Status: `REMAINING_EVIDENCE_REQUESTS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE`
+
+- CM-2095 application receipt review `...PASS-8C8A22F8` is recorded.
+- Rollback drill and failure recovery are submitted as independent request boundaries.
+- No mechanism is selected or executed; native/recovery/rollback counters remain zero.
+- Both evidence fields, Phase 8 completion, and readiness remain false.
+
+Validation: `CMV-2200`.
 
 ## CM-2095 Completion Evidence Application
 
