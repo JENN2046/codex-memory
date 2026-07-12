@@ -21,7 +21,9 @@ const AUTHORITY_PATH = 'docs/near-model-memory-plan-pack/phase2_completion_audit
 const DECISION_REFERENCE = 'CM-2115-R2-DIRECT-PHASE2-EXACT-PATCH-APPLICATION-2215BB33';
 const DECISION_PATH = 'docs/near-model-memory-plan-pack/phase2_completion_audit_application_decision_cm2115_r2.json';
 const EXECUTION_RECEIPT_PATH = 'docs/near-model-memory-plan-pack/phase2_completion_audit_application_execution_receipt_cm2115_r2.json';
+const EXECUTION_RECEIPT_MARKDOWN_PATH = EXECUTION_RECEIPT_PATH.replace(/\.json$/, '.md');
 const BINDING_RECEIPT_PATH = 'docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2.json';
+const BINDING_RECEIPT_V2_PATH = 'docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json';
 const APPLICATION_STATE_PATH = 'docs/near-model-memory-plan-pack/phase2_completion_audit_application_state_cm2115_r2.json';
 const REGISTRY_REFERENCE = 'cm2115-r2-phase2-completion-audit-application-registry-001';
 const NONCE = 'cm2115-r2-phase2-completion-audit-application-001';
@@ -265,7 +267,7 @@ function buildDecision({ authorityGitIdentity, baselineCommit, baselineTree, tar
     baselineTree,
     targets,
     allowedPaths: [...PATCH_PATHS],
-    executionReceiptPaths: [EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_PATH.replace(/\.json$/, '.md')],
+    executionReceiptPaths: [EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_MARKDOWN_PATH],
     applicationCommitBindingRequired: true
   };
   patchPlan.patchPayloadSha256 = sha256Canonical(patchPlan);
@@ -616,6 +618,25 @@ function wrapPayload(payload, receiptType) {
   };
 }
 
+function renderExecutionReceiptMarkdown(receipt) {
+  const receiptBytes = Buffer.from(serializeArtifact(receipt));
+  return Buffer.from([
+    '# CM-2115-R2 Phase 2 Exact Patch Execution Receipt',
+    '',
+    `Canonical payload SHA-256: \`${receipt.canonicalPayloadSha256}\``,
+    '',
+    'This execution receipt requires a separate Git application binding receipt.',
+    'It does not by itself set phase2ReceiptBundleAppliedToCompletionAudit.',
+    '',
+    '## Exact JSON mirror',
+    '',
+    '```json',
+    receiptBytes.toString('utf8').trimEnd(),
+    '```',
+    ''
+  ].join('\n'));
+}
+
 function evaluateExecutionReceipt(receipt = {}, { resolveGitFile } = {}) {
   const blockers = [];
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
@@ -734,23 +755,9 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
     const evaluation = evaluateExecutionReceipt(receipt, { resolveGitFile });
     if (!evaluation.accepted) throw new Error(`cm2115_r2_execution_receipt_rejected:${evaluation.blockers.join(',')}`);
     const receiptBytes = Buffer.from(serializeArtifact(receipt));
-    const markdownBytes = Buffer.from([
-      '# CM-2115-R2 Phase 2 Exact Patch Execution Receipt',
-      '',
-      `Canonical payload SHA-256: \`${receipt.canonicalPayloadSha256}\``,
-      '',
-      'This execution receipt requires a separate Git application binding receipt.',
-      'It does not by itself set phase2ReceiptBundleAppliedToCompletionAudit.',
-      '',
-      '## Exact JSON mirror',
-      '',
-      '```json',
-      receiptBytes.toString('utf8').trimEnd(),
-      '```',
-      ''
-    ].join('\n'));
+    const markdownBytes = renderExecutionReceiptMarkdown(receipt);
     await fsPromises.writeFile(path.join(repoRoot, EXECUTION_RECEIPT_PATH), receiptBytes, { flag: 'wx' });
-    await fsPromises.writeFile(path.join(repoRoot, EXECUTION_RECEIPT_PATH.replace(/\.json$/, '.md')), markdownBytes, { flag: 'wx' });
+    await fsPromises.writeFile(path.join(repoRoot, EXECUTION_RECEIPT_MARKDOWN_PATH), markdownBytes, { flag: 'wx' });
     await registry.transition(bindingHash, 'PATCH_INVOCATION_CONSUMED', 'CONSUMED_SUCCESS', 1);
     return { accepted: true, blockers: [], state: 'CONSUMED_SUCCESS', receipt, bindingHash, observedTargets };
   } catch (error) {
@@ -803,18 +810,56 @@ function buildBindingReceiptPayload({ applicationCommit, applicationTree, applic
   };
 }
 
-function expectedApplicationDiffPaths() {
-  return [...PATCH_PATHS, EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_PATH.replace(/\.json$/, '.md')].sort();
+function buildBindingReceiptV2Payload({
+  applicationCommit,
+  applicationTree,
+  applicationParentCommit,
+  applicationParentTree,
+  decisionIdentity,
+  executionReceiptIdentity,
+  executionReceiptMarkdownIdentity,
+  decision,
+  diffPathsSha256
+}) {
+  const payload = buildBindingReceiptPayload({
+    applicationCommit,
+    applicationTree,
+    applicationParentCommit,
+    applicationParentTree,
+    decisionIdentity,
+    executionReceiptIdentity,
+    decision,
+    diffPathsSha256
+  });
+  return {
+    ...payload,
+    receiptType: 'phase2_exact_patch_application_git_binding_receipt_v2',
+    executionReceiptMarkdown: identityWithoutContent(executionReceiptMarkdownIdentity)
+  };
 }
 
-function evaluateBindingReceipt(receipt = {}, { resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths } = {}) {
+function expectedApplicationDiffPaths() {
+  return [...PATCH_PATHS, EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_MARKDOWN_PATH].sort();
+}
+
+function evaluateBindingReceipt(receipt = {}, {
+  resolveGitFile,
+  resolveCommitTree,
+  resolveParentCommit,
+  resolveDiffPaths,
+  resolveGitPathState
+} = {}) {
   const blockers = [];
+  const receiptType = receipt.receiptType;
+  const v2 = receiptType === 'phase2_exact_patch_application_git_binding_receipt_v2';
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
-      receipt.receiptType !== 'phase2_exact_patch_application_git_binding_receipt_v1' ||
+      !['phase2_exact_patch_application_git_binding_receipt_v1', 'phase2_exact_patch_application_git_binding_receipt_v2'].includes(receiptType) ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('bindingReceipt.identityOrHash');
   const payload = receipt.payload || {};
   const app = payload.application || {};
-  if (![resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths].every(item => typeof item === 'function')) {
+  const requiredResolvers = [resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths];
+  if (v2) requiredResolvers.push(resolveGitPathState);
+  if (!requiredResolvers.every(item => typeof item === 'function')) {
     blockers.push('bindingReceipt.gitResolversRequired');
     return { accepted: false, blockers };
   }
@@ -822,6 +867,7 @@ function evaluateBindingReceipt(receipt = {}, { resolveGitFile, resolveCommitTre
   let executionReceipt;
   let decisionActual;
   let executionActual;
+  let executionMarkdownActual;
   let observedDiffPaths = null;
   try {
     if (resolveCommitTree(app.commit) !== app.tree || resolveParentCommit(app.commit) !== app.parentCommit ||
@@ -843,6 +889,18 @@ function evaluateBindingReceipt(receipt = {}, { resolveGitFile, resolveCommitTre
     executionReceipt = JSON.parse(executionActual.content.toString('utf8'));
     const executionEvaluation = evaluateExecutionReceipt(executionReceipt, { resolveGitFile });
     if (!executionEvaluation.accepted) blockers.push(...executionEvaluation.blockers.map(item => `bindingReceipt.${item}`));
+    if (v2) {
+      executionMarkdownActual = resolveGitFile(app.commit, EXECUTION_RECEIPT_MARKDOWN_PATH);
+      verifyResolvedIdentity(
+        executionMarkdownActual,
+        payload.executionReceiptMarkdown,
+        blockers,
+        'bindingReceipt.executionReceiptMarkdownGitObject'
+      );
+      if (!executionMarkdownActual.content.equals(renderExecutionReceiptMarkdown(executionReceipt))) {
+        blockers.push('bindingReceipt.executionReceiptMarkdownContent');
+      }
+    }
     for (const target of decision.payload.patchPlan.targets) {
       const after = resolveGitFile(app.commit, target.sourcePath);
       if (after.blobOid !== target.after.blobOid || after.bytes !== target.after.bytes || after.sha256 !== target.after.sha256 ||
@@ -852,16 +910,25 @@ function evaluateBindingReceipt(receipt = {}, { resolveGitFile, resolveCommitTre
         if (before.blobOid !== target.before.blobOid || before.bytes !== target.before.bytes || before.sha256 !== target.before.sha256 ||
             before.gitMode !== target.before.gitMode) blockers.push(`bindingReceipt.beforeTarget.${target.sourcePath}`);
       } else {
-        try { resolveGitFile(app.parentCommit, target.sourcePath); blockers.push(`bindingReceipt.addTargetAlreadyExisted.${target.sourcePath}`); } catch {}
+        if (v2) {
+          const pathState = resolveGitPathState(app.parentCommit, target.sourcePath);
+          if (!pathState || pathState.exists !== false) {
+            blockers.push(`bindingReceipt.addTargetAlreadyExisted.${target.sourcePath}`);
+          }
+        } else {
+          try { resolveGitFile(app.parentCommit, target.sourcePath); blockers.push(`bindingReceipt.addTargetAlreadyExisted.${target.sourcePath}`); } catch {}
+        }
       }
     }
-    const expectedPayload = buildBindingReceiptPayload({
+    const buildExpected = v2 ? buildBindingReceiptV2Payload : buildBindingReceiptPayload;
+    const expectedPayload = buildExpected({
       applicationCommit: app.commit,
       applicationTree: app.tree,
       applicationParentCommit: app.parentCommit,
       applicationParentTree: app.parentTree,
       decisionIdentity: decisionActual,
       executionReceiptIdentity: executionActual,
+      executionReceiptMarkdownIdentity: executionMarkdownActual,
       decision,
       diffPathsSha256: sha256Canonical(observedDiffPaths)
     });
@@ -891,10 +958,12 @@ module.exports = {
   AUTHORITY_PATH,
   AUTHORITY_REFERENCE,
   BINDING_RECEIPT_PATH,
+  BINDING_RECEIPT_V2_PATH,
   Cm2115R2ApplicationClaimRegistry,
   DECISION_PATH,
   DECISION_REFERENCE,
   EXECUTION_RECEIPT_PATH,
+  EXECUTION_RECEIPT_MARKDOWN_PATH,
   EXISTING_PATCH_PATHS,
   GOVERNANCE_ROOT_IDENTITY,
   GOVERNANCE_ROOT_IDENTITY_SHA256,
@@ -908,6 +977,7 @@ module.exports = {
   buildApplicationState,
   buildAuthorityIntake,
   buildBindingReceiptPayload,
+  buildBindingReceiptV2Payload,
   buildClaimBindingHash,
   buildDecision,
   buildExpectedAfterBytes,
@@ -926,6 +996,7 @@ module.exports = {
   gitBlobOid,
   identityWithoutContent,
   revalidateUpstream,
+  renderExecutionReceiptMarkdown,
   serializeArtifact,
   sha256,
   sha256Canonical,

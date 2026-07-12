@@ -10,13 +10,15 @@ const {
   APPLICATION_STATE_PATH,
   AUTHORITY_PATH,
   BINDING_RECEIPT_PATH,
+  BINDING_RECEIPT_V2_PATH,
   Cm2115R2ApplicationClaimRegistry,
   DECISION_PATH,
   EXECUTION_RECEIPT_PATH,
+  EXECUTION_RECEIPT_MARKDOWN_PATH,
   GOVERNANCE_ROOT_IDENTITY,
   PATCH_PATHS,
   buildAuthorityIntake,
-  buildBindingReceiptPayload,
+  buildBindingReceiptV2Payload,
   buildClaimBindingHash,
   buildDecision,
   buildPatchTargets,
@@ -29,6 +31,7 @@ const {
   expectedApplicationDiffPaths,
   fileProjection,
   identityWithoutContent,
+  renderExecutionReceiptMarkdown,
   serializeArtifact,
   sha256Canonical,
   wrapPayload
@@ -41,6 +44,7 @@ const {
 const { resolveGitFile: resolveRealGitFile } = require('../scripts/cm2115-r2-git');
 const { parseArgs: parseApplyArgs } = require('../scripts/apply-cm2115-r2-phase2-completion-audit');
 const { parseArgs: parseBindingArgs } = require('../scripts/generate-cm2115-r2-application-binding-receipt');
+const { parseArgs: parseStrengthenedBindingArgs } = require('../scripts/generate-cm2115-r2-strengthened-binding-receipt');
 
 const ROOT = path.join(__dirname, '..');
 const BASELINE_COMMIT = '1'.repeat(40);
@@ -102,7 +106,14 @@ function decisionFixture() {
   return { authority, targets, decision, identity };
 }
 
-function resolverFor({ decision, decisionIdentity, authority, applicationFiles = new Map(), executionReceiptIdentity = null } = {}) {
+function resolverFor({
+  decision,
+  decisionIdentity,
+  authority,
+  applicationFiles = new Map(),
+  executionReceiptIdentity = null,
+  executionReceiptMarkdownIdentity = null
+} = {}) {
   return (commit, sourcePath) => {
     if (commit === DECISION_COMMIT && sourcePath === DECISION_PATH) return { ...decisionIdentity, content: Buffer.from(decisionIdentity.content) };
     if (commit === BASELINE_COMMIT && sourcePath === AUTHORITY_PATH) return { ...authority, content: Buffer.from(authority.content) };
@@ -110,6 +121,9 @@ function resolverFor({ decision, decisionIdentity, authority, applicationFiles =
     if (commit === PHASE2_MANIFEST.sourceCommit && sourcePath === PHASE2_MANIFEST.sourcePath) return resolveRealGitFile(commit, sourcePath);
     if (commit === WINDOWS_WSL_RECEIPT.sourceCommit && sourcePath === WINDOWS_WSL_RECEIPT.sourcePath) return resolveRealGitFile(commit, sourcePath);
     if (commit === APPLICATION_COMMIT && sourcePath === EXECUTION_RECEIPT_PATH && executionReceiptIdentity) return { ...executionReceiptIdentity, content: Buffer.from(executionReceiptIdentity.content) };
+    if (commit === APPLICATION_COMMIT && sourcePath === EXECUTION_RECEIPT_MARKDOWN_PATH && executionReceiptMarkdownIdentity) {
+      return { ...executionReceiptMarkdownIdentity, content: Buffer.from(executionReceiptMarkdownIdentity.content) };
+    }
     const key = `${commit}:${sourcePath}`;
     if (applicationFiles.has(key)) return applicationFiles.get(key);
     if ((commit === BASELINE_COMMIT || commit === DECISION_COMMIT) && PATCH_PATHS.includes(sourcePath) && sourcePath !== APPLICATION_STATE_PATH) {
@@ -289,6 +303,12 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     sourcePath: EXECUTION_RECEIPT_PATH,
     content: executionBytes
   });
+  const executionMarkdownIdentity = gitIdentity({
+    sourceCommit: APPLICATION_COMMIT,
+    sourceTree: APPLICATION_TREE,
+    sourcePath: EXECUTION_RECEIPT_MARKDOWN_PATH,
+    content: renderExecutionReceiptMarkdown(execution.receipt)
+  });
   const files = new Map();
   for (const target of fixture.targets) {
     const bytes = await fsp.readFile(path.join(fixture.root, target.sourcePath));
@@ -299,25 +319,33 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     decisionIdentity: fixture.identity,
     authority: fixture.authority,
     applicationFiles: files,
-    executionReceiptIdentity: executionIdentity
+    executionReceiptIdentity: executionIdentity,
+    executionReceiptMarkdownIdentity: executionMarkdownIdentity
   });
   const diffPaths = expectedApplicationDiffPaths();
-  const payload = buildBindingReceiptPayload({
+  const payload = buildBindingReceiptV2Payload({
     applicationCommit: APPLICATION_COMMIT,
     applicationTree: APPLICATION_TREE,
     applicationParentCommit: DECISION_COMMIT,
     applicationParentTree: DECISION_TREE,
     decisionIdentity: fixture.identity,
     executionReceiptIdentity: executionIdentity,
+    executionReceiptMarkdownIdentity: executionMarkdownIdentity,
     decision: fixture.decision,
     diffPathsSha256: sha256Canonical(diffPaths)
   });
-  const receipt = wrapPayload(payload, 'phase2_exact_patch_application_git_binding_receipt_v1');
+  const receipt = wrapPayload(payload, 'phase2_exact_patch_application_git_binding_receipt_v2');
   const options = {
     resolveGitFile: resolver,
     resolveCommitTree: commit => ({[APPLICATION_COMMIT]:APPLICATION_TREE,[DECISION_COMMIT]:DECISION_TREE}[commit]),
     resolveParentCommit: commit => commit === APPLICATION_COMMIT ? DECISION_COMMIT : BASELINE_COMMIT,
-    resolveDiffPaths: () => [...diffPaths]
+    resolveDiffPaths: () => [...diffPaths],
+    resolveGitPathState: (commit, sourcePath) => {
+      if (commit === DECISION_COMMIT && sourcePath === APPLICATION_STATE_PATH) {
+        return { sourceCommit: commit, sourceTree: DECISION_TREE, sourcePath, exists: false };
+      }
+      return { sourceCommit: commit, sourceTree: DECISION_TREE, sourcePath, exists: true };
+    }
   };
   assert.equal(evaluateBindingReceipt(receipt, options).accepted, true);
   const drift = structuredClone(receipt);
@@ -332,6 +360,19 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     ...options,
     resolveParentCommit: () => BASELINE_COMMIT
   }).accepted, false);
+  assert.equal(evaluateBindingReceipt(receipt, {
+    ...options,
+    resolveGitFile: (commit, sourcePath) => {
+      const actual = resolver(commit, sourcePath);
+      if (sourcePath !== EXECUTION_RECEIPT_MARKDOWN_PATH) return actual;
+      const content = Buffer.from('drifted markdown\n');
+      return gitIdentity({ sourceCommit: commit, sourceTree: APPLICATION_TREE, sourcePath, content });
+    }
+  }).accepted, false);
+  assert.equal(evaluateBindingReceipt(receipt, {
+    ...options,
+    resolveGitPathState: () => { throw new Error('io_failure'); }
+  }).accepted, false);
   assert.equal(receipt.payload.currentState.phase2ReceiptBundleAppliedToCompletionAudit, true);
   assert.equal(receipt.payload.currentState.fullPlanPackCompleted, false);
   assert.equal(receipt.payload.currentState.readinessClaimed, false);
@@ -342,5 +383,8 @@ test('CM-2115-R2 production CLIs reject alternate output paths and extra argumen
   assert.throws(() => parseApplyArgs(['--decision-commit', DECISION_COMMIT, '--output-json', '/tmp/x']), /no_other_arguments/);
   assert.deepEqual(parseBindingArgs(['--application-commit', APPLICATION_COMMIT]), { applicationCommit: APPLICATION_COMMIT });
   assert.throws(() => parseBindingArgs(['--application-commit', APPLICATION_COMMIT, '--output-json', '/tmp/x']), /no_other_arguments/);
+  assert.deepEqual(parseStrengthenedBindingArgs([]), {});
+  assert.throws(() => parseStrengthenedBindingArgs(['--output-json', '/tmp/x']), /no_arguments_allowed/);
   assert.equal(BINDING_RECEIPT_PATH.endsWith('.json'), true);
+  assert.equal(BINDING_RECEIPT_V2_PATH.endsWith('_v2.json'), true);
 });
