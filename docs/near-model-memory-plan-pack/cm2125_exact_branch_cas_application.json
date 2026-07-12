@@ -1,0 +1,247 @@
+{
+  "artifactType": "cm2125_exact_branch_cas_application_v1",
+  "canonicalPayloadSha256": "ea3dce0ce6e6921c579eb5e2002d0e496a506a3bac3ff69b2784387b051b50fe",
+  "payload": {
+    "applicationReference": "CM-2125-EXACT-BRANCH-CAS-APPLICATION-869D9D6E-EB016872-FF3AAD1C",
+    "applicationType": "exact_local_branch_compare_and_swap_application_only",
+    "currentAuthority": {
+      "applicationExecuted": false,
+      "applicationPrepared": true,
+      "branchCasExecutionAuthorized": false,
+      "branchRefUpdateAuthorized": false,
+      "contentDecisionPresent": false,
+      "executionPacketPresent": false,
+      "finalExecutionReleasePresent": false
+    },
+    "currentSideEffects": {
+      "branchRefUpdates": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "otherRefUpdates": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "targetWorktreeFileSynchronizations": 0,
+      "targetWorktreeIndexSynchronizations": 0
+    },
+    "currentState": {
+      "branchRefUpdated": false,
+      "currentBranchStatusSynchronized": false,
+      "detachedCommitBound": true,
+      "readinessClaimed": false,
+      "receiptReviewPassed": true,
+      "statusSyncPerformed": false,
+      "targetBranchObservedOid": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f"
+    },
+    "futureSideEffectLimits": {
+      "branchRefUpdates": 1,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "otherRefUpdates": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "targetWorktreeFileSynchronizations": 9,
+      "targetWorktreeIndexSynchronizations": 1
+    },
+    "implementation": {
+      "artifacts": [
+        {
+          "blobOid": "3abeaadb1d4501fc618fdb3bc1a62de976f89a28",
+          "bytes": 6004,
+          "path": "scripts/generate-cm2125-exact-branch-cas-application.js",
+          "sha256": "1d49e25dca36eca276b697b6094da9586b35409098a712d135dda476655a52e9"
+        },
+        {
+          "blobOid": "0b0c1194e048b58b701e53257076eb8b5e4b9652",
+          "bytes": 20778,
+          "path": "src/core/Cm2125ExactBranchCasApplication.js",
+          "sha256": "36d7b4ae4c0e21e3af2189dd89c40bc16d7c78eb16d0dbc8d3b17a506b2d7791"
+        },
+        {
+          "blobOid": "9152f9f13c4bcdfc3e3ae3c4883b06f5323b1b60",
+          "bytes": 15462,
+          "path": "tests/cm2125-exact-branch-cas-application.test.js",
+          "sha256": "d29c9d97f64ce07e2c3bc19881f8e7140c234a956deb26bffb81a2826e686182"
+        }
+      ],
+      "commit": "31c86b805ec382c5bd6cd2370def7c8fafda7a9d",
+      "diffEntries": [
+        {
+          "path": "scripts/generate-cm2125-exact-branch-cas-application.js",
+          "status": "A"
+        },
+        {
+          "path": "src/core/Cm2125ExactBranchCasApplication.js",
+          "status": "A"
+        },
+        {
+          "path": "tests/cm2125-exact-branch-cas-application.test.js",
+          "status": "A"
+        }
+      ],
+      "diffEntriesSha256": "35a47e17efaa882fbc20af1ac49d7dc8d96337fe4589a94fb8387ceb8e6f9359",
+      "diffPaths": [
+        "scripts/generate-cm2125-exact-branch-cas-application.js",
+        "src/core/Cm2125ExactBranchCasApplication.js",
+        "tests/cm2125-exact-branch-cas-application.test.js"
+      ],
+      "diffPathsSha256": "2ded9ee7c8ccfc058dc6c06c5dc7835b215189f6a483986a72be297e6eda8907",
+      "parentCommit": "4c820c284681692cb0354e9e9fd1a49aaa346d37",
+      "parentTree": "fbbbd57053263844bc7ac7d366883ef87e23700e",
+      "tree": "21f0d3805f3b5b6089b334f4d788cadfc94070c5"
+    },
+    "nonClaims": {
+      "completeRealtimeMemory": false,
+      "completeRealtimeMemoryClaimed": false,
+      "completeV8": false,
+      "completeV8Claimed": false,
+      "cutoverReady": false,
+      "cutoverReadyClaimed": false,
+      "deployReady": false,
+      "deployReadyClaimed": false,
+      "fullBridgeCompletion": false,
+      "fullBridgeCompletionClaimed": false,
+      "fullPlanPackCompletedClaimed": false,
+      "fullRealtimeMemory": false,
+      "fullRealtimeMemoryClaimed": false,
+      "modelMemoryComplete": false,
+      "modelMemoryCompleteClaimed": false,
+      "productionReady": false,
+      "productionReadyClaimed": false,
+      "rcReady": false,
+      "rcReadyClaimed": false,
+      "readinessClaimed": false,
+      "releaseReady": false,
+      "releaseReadyClaimed": false
+    },
+    "prohibitedAuthority": {
+      "branchPushAuthorized": false,
+      "cutoverAuthorized": false,
+      "deployAuthorized": false,
+      "forceUpdateAuthorized": false,
+      "nativeMemoryActionAuthorized": false,
+      "providerActionAuthorized": false,
+      "realMemoryReadAuthorized": false,
+      "refDeletionAuthorized": false,
+      "releaseAuthorized": false,
+      "tagCreationAuthorized": false,
+      "tagPushAuthorized": false
+    },
+    "receiptEvidence": {
+      "bindingReceipt": {
+        "blobOid": "bb3d764f0d072271128e2174d82361e68d509221",
+        "bytes": 12174,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "5ce9d65ab6e2c6d3a957c30ce65c7195dce0619cb88312fb18bb52ecd982f28f",
+        "sourceCommit": "86fc18bcfe9173af3cab3afca0522290f6f1f87c",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2124_status_sync_binding_receipt.json",
+        "sourceTree": "10bd4586209d5d3c3fe8d85082fb25f33a6595b1"
+      },
+      "bindingReceiptPayloadSha256": "f03cb5d8a78d17c5f9b90005edc7a45d32b2113c39a29b0f403ffe268e01d023",
+      "claim": {
+        "authorizationConsumed": true,
+        "authorizationReplayAllowed": false,
+        "authorizationUseCount": 1,
+        "bindingHash": "cf8d8ab85b3284968ede2c75b868493fdb66a086638f9123e89a1a819e956edf",
+        "branchRefUpdateCount": 0,
+        "claimId": "02d4d06cf469d6a238041a98f54fade7c23978bf94d888ecaca3f165b4825fe3",
+        "detachedCommitInvocationCount": 1,
+        "finalState": "CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION"
+      },
+      "executionReceipt": {
+        "blobOid": "cb9bb00944b992ed75a0665156d3785b40548d91",
+        "bytes": 12435,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "8d3aefd3a335f4b850dfc07369d23c411bd0bd49028c597455c28d5d8f518120",
+        "sourceCommit": "86fc18bcfe9173af3cab3afca0522290f6f1f87c",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2124_status_sync_execution_receipt.json",
+        "sourceTree": "10bd4586209d5d3c3fe8d85082fb25f33a6595b1"
+      },
+      "executionReceiptPayloadSha256": "a040c6e948fe1ac740fa5bf22a7f29d95e901b1a64102599384221204ddf5e2d",
+      "freezeCommit": "86fc18bcfe9173af3cab3afca0522290f6f1f87c",
+      "freezeManifest": {
+        "blobOid": "b454be44406a267c6bdf880b7adc08d086410fe4",
+        "bytes": 3458,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "d6ab82b0401f15d70d267a2682080518ccc5c1c38b3622581b90b41e97876e36",
+        "sourceCommit": "86fc18bcfe9173af3cab3afca0522290f6f1f87c",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2124_status_sync_receipt_freeze_manifest.json",
+        "sourceTree": "10bd4586209d5d3c3fe8d85082fb25f33a6595b1"
+      },
+      "freezePayloadSha256": "ec51dbfd4e485115a295877bc03110776985900e3285b9a35b570a5cbe092062",
+      "freezeTree": "10bd4586209d5d3c3fe8d85082fb25f33a6595b1",
+      "reviewCommit": "4c820c284681692cb0354e9e9fd1a49aaa346d37",
+      "reviewJson": {
+        "blobOid": "2d6c53122d354a936540ba327cd8848f7363b9d4",
+        "bytes": 4071,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "2746e87acd532f81d62c16f20fe4ef055dbb285f939e5d9f873f3169d057644c",
+        "sourceCommit": "4c820c284681692cb0354e9e9fd1a49aaa346d37",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2124_status_sync_receipt_review.json",
+        "sourceTree": "fbbbd57053263844bc7ac7d366883ef87e23700e"
+      },
+      "reviewMarkdown": {
+        "blobOid": "f9db2ec5d6c528ff2dfca71d06b3d6dd53384274",
+        "bytes": 4561,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "c235ac40635a3b880ad4a39422e97d72ef9abcfb188febdf70b37afb844d5bbc",
+        "sourceCommit": "4c820c284681692cb0354e9e9fd1a49aaa346d37",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2124_status_sync_receipt_review.md",
+        "sourceTree": "fbbbd57053263844bc7ac7d366883ef87e23700e"
+      },
+      "reviewPayloadSha256": "ff3aad1c4007e54e3afcab8497fb65f3472f1270ee5124627a4370c89587924c",
+      "reviewTree": "fbbbd57053263844bc7ac7d366883ef87e23700e"
+    },
+    "requestedAuthorization": {
+      "authorizationReplayAllowed": false,
+      "authorizationUseCount": 1,
+      "automaticRetryAllowed": false,
+      "automaticRollbackAllowed": false,
+      "branchCasMayExecuteFromThisApplication": false,
+      "branchRefUpdateAuthorized": false,
+      "exactAction": "update_exact_local_status_branch_ref_cas",
+      "exactContentDecisionRequired": true,
+      "exactExecutionReceiptRequired": true,
+      "nonExecutingPacketRequired": true,
+      "remoteActionAuthorized": false,
+      "separateFinalExecutionReleaseRequired": true
+    },
+    "target": {
+      "deleteAllowed": false,
+      "expectedOld": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f",
+      "expectedOldTree": "9e8185956ba4229a3238e162a4e9a092e1d4915c",
+      "forceAllowed": false,
+      "newCommit": "eb016872c834a8a8b36ed8edd8ce1aeb0db599c8",
+      "newCommitParent": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f",
+      "newTree": "c129ecfaa134a47f30ed98f17d74151989c1a547",
+      "otherRefUpdateAllowed": false,
+      "remoteName": null,
+      "remoteRefUpdateAllowed": false,
+      "retargetAllowed": false,
+      "targetRef": "refs/heads/codex/near-model-memory-frozen-replay-v2",
+      "updateMethod": "git_update_ref_exact_expected_old_compare_and_swap"
+    },
+    "targetWorktreeBoundary": {
+      "callerSuppliedWorktreePathAllowed": false,
+      "destructiveCheckoutAllowed": false,
+      "exactPostCasIndexSynchronizationRequired": true,
+      "exactPostCasNinePathWorktreeSynchronizationRequired": true,
+      "executorImplementationAndFinalReleaseStillRequired": true,
+      "refOnlyCasIsSufficient": false,
+      "resetHardAllowed": false,
+      "targetBranchCheckedOutInLinkedWorktreeAtApplication": true,
+      "targetWorktreeCleanAtApplication": true,
+      "targetWorktreeIdentityMustBeMachineDerived": true
+    }
+  },
+  "schemaVersion": 1,
+  "taskId": "CM-2125"
+}
