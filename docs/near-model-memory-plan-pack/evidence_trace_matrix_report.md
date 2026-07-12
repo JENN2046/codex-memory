@@ -687,3 +687,10 @@ Windows/WSL receipt from their exact Git objects and verify the application
 commit direct-parent relation plus the allowlisted pre/post blob set.
 
 R1 remains historical and is not current application authority.
+
+## CM-2117 Exact Full-plan Application Trace
+
+The full-plan transition is bound to the CM-2116-R1 gate, the CM-2115-R2
+internal self-review intake, five exact before/after target projections,
+one durable authorization claim, and a separate application-commit binding
+receipt. Decision preparation alone is not completion evidence.

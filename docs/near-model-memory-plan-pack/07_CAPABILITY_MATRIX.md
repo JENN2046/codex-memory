@@ -106,3 +106,9 @@ Codex default expanded write authority
 - Phase 2 application evidence requires the R2 binding receipt, not the R1 receipt alone.
 - The application changes repository evidence only; it performs no runtime, native memory, provider, real-memory, or remote action.
 - Full-plan completion and every readiness state remain false.
+
+## CM-2117 Full-plan Completion Boundary
+
+- Only the exact bound application may transition `fullPlanPackCompleted` from false to true.
+- The transition grants no production, release, deploy, cutover, RC, complete-V8, provider, native-memory, or remote capability.
+- Status synchronization is forbidden until the application-commit binding receipt passes.
