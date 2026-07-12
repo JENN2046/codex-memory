@@ -4,23 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R1 Phase 2 application repair and canonical snapshot rebuild`.
-Current validation: `CMV-2208`.
-Current handoff: submit review request commit `20ef03ef…` for independent review of snapshot commit `56d3e04c…`. Do not prepare or execute the full-plan application until an exact independent PASS is frozen. Full plan-pack and readiness remain false.
+Current task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
+Current validation: `CMV-2209`.
+Current handoff: submit review request commit `01c65db8…` for independent review of snapshot commit `8d252985…`. Do not prepare or execute the full-plan application until an exact independent PASS is frozen. Full plan-pack and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2115-R1 repairs the one invalid Phase 2 trace. Decision `29f1f47e…` binds
-CM-2080 and both machine evidence objects; receipt `623cbaf9…` applies the nine
-exact fields once and has payload SHA `8b3d1952…39fa`. The authorization is
-consumed and cannot be replayed.
+CM-2115-R2 closes the R1 one-shot and patch-binding gaps. The durable claim is
+consumed exactly once; application commit `49979a55…` binds decision
+`c8dbbcd8…`, the direct parent/tree, exact seven-path diff, five pre/post patch
+objects, and both execution-receipt artifacts. Strengthened receipt
+`d3cdc894…` has payload SHA `95945eeb…6b89` and revalidates the three upstream
+Git objects at receipt time.
 
 The rebuilt snapshot binds 164 entries to 105 exact Git blobs at source baseline
-`bfcb57ac…`; JSON raw SHA is `4bff4c15…9c09` and payload SHA is
-`5d4a380d…46ac`. Review request `20ef03ef…` has payload SHA
-`f4e3eb23…010c` and is submission-only. The next legal state transition is an
+`933d29e4…`; JSON raw SHA is `607fa483…8feb` and payload SHA is
+`afc1f726…cbb6`. Review request `01c65db8…` has payload SHA
+`9b9c158a…bdf0` and is submission-only. The next legal state transition is an
 independent review decision. Until an exact PASS is frozen, full-plan
 application authority, full-plan completion, and all readiness states are false.
 

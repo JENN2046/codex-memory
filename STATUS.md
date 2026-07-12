@@ -4,26 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R1 Phase 2 application repair and canonical snapshot rebuild`.
-Current validation: `CMV-2208`.
-Current project status: CM-2080-reviewed Phase 2 machine evidence has one exact, consumed Completion Audit application receipt. The rebuilt 164-entry R1 snapshot directly validates that receipt and is pending independent review. `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and every readiness claim remains false.
-Current route: `CM2115_R1_PHASE2_APPLICATION_APPLIED_SNAPSHOT_REBUILT_INDEPENDENT_REVIEW_PENDING_NO_READY_CLAIM`.
+Current task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
+Current validation: `CMV-2209`.
+Current project status: the CM-2080 Phase 2 application now has one durable consumed claim, an exact application commit/tree/diff binding, receipt-time revalidation of all three upstream Git objects, and a strengthened v2 binding receipt. The rebuilt 164-entry R2 snapshot is pending independent review. `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and every readiness claim remains false.
+Current route: `CM2115_R2_DURABLE_EXACT_PATCH_BOUND_SNAPSHOT_REBUILT_INDEPENDENT_REVIEW_PENDING_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-2115-R1 freezes application decision `29f1f47e…`, consumes it once in receipt
-commit `623cbaf9…`, and rejects the superseded CM-2074 report as current
-authority. Receipt payload SHA-256 is `8b3d1952…39fa`; its nine-field patch
-includes `phase2ReceiptBundleAppliedToCompletionAudit=true` while keeping
-independent review, full-plan completion, and readiness false.
+CM-2115-R2 freezes authority intake `f458277d…`, exact decision `c8dbbcd8…`,
+and application commit `49979a55…`. Its Git-common-dir claim is
+`CONSUMED_SUCCESS`, use count is one, replay is forbidden, and patch invocation
+count is one. Strengthened binding receipt commit `d3cdc894…` binds all seven
+changed paths, including the execution-receipt JSON and exact Markdown mirror;
+payload SHA-256 is `95945eeb…6b89`. The old R1 receipt remains historical and
+is not current application authority.
 
-The new source baseline is `bfcb57ac…`; snapshot commit `56d3e04c…` binds
-164/164 entries to 105 real Git blobs, including the exact Phase 2 receipt.
-Snapshot payload SHA-256 is `5d4a380d…46ac`. Review request commit `20ef03ef…`
-has payload SHA-256 `f4e3eb23…010c` and requests explicit Phase 2 receipt
-semantic review. The former CM-2115 internal recheck is historical
-Git-object-integrity evidence only and cannot approve R1.
+The R2 source baseline is `933d29e4…`; snapshot commit `8d252985…` binds
+164/164 entries to 105 real Git blobs with zero placeholders. Snapshot payload
+SHA-256 is `afc1f726…cbb6`. Review request commit `01c65db8…` has payload
+SHA-256 `9b9c158a…bdf0` and is submission-only. Neither the snapshot nor the
+request approves independent review, full-plan application, completion, or
+readiness.
 
 CM-2114 applies receipt payload SHA-256 `2097572e…c045` and revalidates all 18
 Phase 8 evidence fields. CM-2113 used the official VCPToolBox DailyNote runtime,
