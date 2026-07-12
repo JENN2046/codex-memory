@@ -25,6 +25,10 @@ function sha256Canonical(value) {
   return sha256(JSON.stringify(canonicalize(value)));
 }
 
+function exactObject(actual, expected) {
+  return JSON.stringify(canonicalize(actual)) === JSON.stringify(canonicalize(expected));
+}
+
 async function readExactRegularFile(filePath, expectedSha256) {
   const stat = await fs.lstat(filePath);
   if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('owner_runtime_binding_not_regular_file');
@@ -72,6 +76,47 @@ function createExpectedDailyNoteMarkdown(args = {}, fixed = {}) {
     input.Content,
     `Tag: ${fixed.tag}`
   ].join('\n');
+}
+
+function projectBusinessRecordArguments(args = {}) {
+  return {
+    target: args.target,
+    title: args.title,
+    content: args.content,
+    evidence: args.evidence,
+    validated: args.validated,
+    reusable: args.reusable,
+    sensitivity: args.sensitivity
+  };
+}
+
+function governedTransportEnvelopeAccepted(args, expected) {
+  const bridge = args?.governed_bridge;
+  return exactObject(args?.scope, expected.allowedScope) &&
+    bridge?.primary_runtime === 'VCPToolBox native memory' &&
+    bridge?.access_path === 'governed MCP tools' &&
+    bridge?.client_id === 'Codex' &&
+    exactObject(bridge?.scope, expected.allowedScope) &&
+    bridge?.visibility === expected.allowedScope.visibility &&
+    bridge?.runtime_target?.primary_runtime === 'VCPToolBox native memory' &&
+    bridge?.runtime_target?.target_reference_name === expected.targetReferenceName &&
+    bridge?.runtime_target?.target_kind === 'mcp_server' &&
+    bridge?.runtime_target?.bound === true &&
+    bridge?.runtime_target?.endpoint_included === false &&
+    bridge?.runtime_target?.token_material_included === false &&
+    bridge?.invocation_tool_name === 'record_memory' &&
+    bridge?.native_tool_name === 'knowledge_base.record' &&
+    bridge?.read_allowed === false &&
+    bridge?.write_allowed === true &&
+    bridge?.raw_output_allowed === false &&
+    bridge?.tool_arguments_may_override_governance === false &&
+    bridge?.governance_metadata_may_override_transport_context === false &&
+    bridge?.raw_request_body_disclosed === false &&
+    bridge?.raw_response_body_disclosed === false &&
+    bridge?.endpoint_disclosed === false &&
+    bridge?.token_material_disclosed === false &&
+    bridge?.low_disclosure === true &&
+    bridge?.readiness_claimed === false;
 }
 
 function runOwnerRuntime({ nodeExecutable, pluginPath, pluginDirectory, input, env, timeoutMs }) {
@@ -218,6 +263,10 @@ function createVcpToolBoxDailyNoteOwnerRuntimeAdapter(options = {}) {
     for (const value of [expected.storeReference, expected.storeInstanceId, expected.lifecycleReference]) {
       if (!/^[A-Za-z0-9._:-]{1,200}$/.test(value || '')) throw new Error('owner_runtime_expected_store_binding_incomplete');
     }
+    for (const value of [expected.targetReferenceName, expected.allowedScope?.project_id, expected.allowedScope?.workspace_id, expected.allowedScope?.scope_id, expected.allowedScope?.client_id]) {
+      if (!/^[A-Za-z0-9._:-]{1,200}$/.test(value || '')) throw new Error('owner_runtime_expected_transport_binding_incomplete');
+    }
+    if (expected.allowedScope?.visibility !== 'project') throw new Error('owner_runtime_expected_transport_binding_incomplete');
     for (const value of [fixed.folder, fixed.maid, fixed.date, fixed.fileName, fixed.localTime, fixed.tag]) {
       if (!normalizeString(value)) throw new Error('owner_runtime_fixed_record_binding_incomplete');
     }
@@ -299,15 +348,19 @@ function createVcpToolBoxDailyNoteOwnerRuntimeAdapter(options = {}) {
 
   async function record(args = {}) {
     if (!preflightResult?.accepted) await preflight();
-    if (sha256Canonical(args) !== expected.recordArgumentsCanonicalSha256) {
+    const businessArgs = projectBusinessRecordArguments(args);
+    if (sha256Canonical(businessArgs) !== expected.recordArgumentsCanonicalSha256) {
       throw new Error('owner_runtime_record_arguments_binding_mismatch');
+    }
+    if (!governedTransportEnvelopeAccepted(args, expected)) {
+      throw new Error('owner_runtime_transport_envelope_binding_mismatch');
     }
     await readExactRegularFile(pluginPath, expected.pluginSha256);
     await readExactRegularFile(manifestPath, expected.manifestSha256);
     await readExactRegularFile(preloadPath, expected.preloadSha256);
     await readExactRegularFile(storeIdentityPath, expected.storeIdentitySha256);
-    const dailyNoteInput = createDailyNoteInput(args, fixed);
-    const expectedMarkdown = createExpectedDailyNoteMarkdown(args, fixed);
+    const dailyNoteInput = createDailyNoteInput(businessArgs, fixed);
+    const expectedMarkdown = createExpectedDailyNoteMarkdown(businessArgs, fixed);
     const expectedMarkdownBytes = Buffer.from(expectedMarkdown, 'utf8');
     if (sha256(expectedMarkdownBytes) !== expected.durableMarkdownSha256) {
       throw new Error('owner_runtime_expected_markdown_binding_mismatch');
@@ -404,6 +457,8 @@ module.exports = {
   createExpectedDailyNoteMarkdown,
   createVcpToolBoxDailyNoteOwnerRuntimeAdapter,
   inspectStore,
+  governedTransportEnvelopeAccepted,
+  projectBusinessRecordArguments,
   sha256,
   sha256Canonical
 };

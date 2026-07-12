@@ -125,10 +125,53 @@ async function setup() {
     storeReference: storeIdentity.storeReference,
     storeInstanceId: storeIdentity.storeInstanceId,
     lifecycleReference: storeIdentity.lifecycleReference,
+    allowedScope: {
+      project_id: 'codex-memory',
+      workspace_id: 'cm2113-owner-proof',
+      scope_id: 'cm2113-vcptoolbox-owner-native-proof',
+      client_id: 'Codex',
+      visibility: 'project'
+    },
+    targetReferenceName: 'cm2113-vcptoolbox-dailynote-owner-runtime',
     recordArgumentsCanonicalSha256: sha256Canonical(args),
     durableMarkdownSha256: sha256(Buffer.from(durableMarkdown))
   };
   return { root, runtimeRoot, storeRoot, dependencyRoot, fixedRecord, args, expected, durableMarkdown };
+}
+
+function projectedArgs(fixture, businessArgs = fixture.args) {
+  return {
+    ...businessArgs,
+    scope: fixture.expected.allowedScope,
+    governed_bridge: {
+      primary_runtime: 'VCPToolBox native memory',
+      access_path: 'governed MCP tools',
+      client_id: 'Codex',
+      scope: fixture.expected.allowedScope,
+      visibility: 'project',
+      runtime_target: {
+        primary_runtime: 'VCPToolBox native memory',
+        target_reference_name: fixture.expected.targetReferenceName,
+        target_kind: 'mcp_server',
+        bound: true,
+        endpoint_included: false,
+        token_material_included: false
+      },
+      invocation_tool_name: 'record_memory',
+      native_tool_name: 'knowledge_base.record',
+      read_allowed: false,
+      write_allowed: true,
+      raw_output_allowed: false,
+      tool_arguments_may_override_governance: false,
+      governance_metadata_may_override_transport_context: false,
+      raw_request_body_disclosed: false,
+      raw_response_body_disclosed: false,
+      endpoint_disclosed: false,
+      token_material_disclosed: false,
+      low_disclosure: true,
+      readiness_claimed: false
+    }
+  };
 }
 
 test('CM-2113 adapter binds an exact VCPToolBox DailyNote stdio runtime and stable store identity', async t => {
@@ -154,7 +197,7 @@ test('CM-2113 adapter binds an exact VCPToolBox DailyNote stdio runtime and stab
     if (previousPrivateInput === undefined) delete process.env.CM2113_PRIVATE_INPUT;
     else process.env.CM2113_PRIVATE_INPUT = previousPrivateInput;
   });
-  const result = await adapter.record(fixture.args);
+  const result = await adapter.record(projectedArgs(fixture));
   assert.equal(result.recorded, true);
   assert.equal(result.write_shape, 'vcptoolbox_daily_note_markdown');
   assert.equal(result.durable_bytes, Buffer.byteLength(fixture.durableMarkdown));
@@ -200,5 +243,8 @@ test('CM-2113 adapter fails closed on runtime, store, payload, or empty-store dr
     expected: fixture.expected
   });
   await adapter.preflight();
-  await assert.rejects(adapter.record({ ...fixture.args, title: 'drift' }), /record_arguments_binding_mismatch/);
+  await assert.rejects(adapter.record(projectedArgs(fixture, { ...fixture.args, title: 'drift' })), /record_arguments_binding_mismatch/);
+  const transportDrift = projectedArgs(fixture);
+  transportDrift.governed_bridge.runtime_target.target_reference_name = 'clone-target';
+  await assert.rejects(adapter.record(transportDrift), /transport_envelope_binding_mismatch/);
 });

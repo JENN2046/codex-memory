@@ -18,7 +18,7 @@ const {
   resolveGovernancePaths
 } = require('./cm2113-vcptoolbox-owner-native-proof-runtime');
 
-const TRANSPORT_RECEIPT_FILENAME = 'cm2113-vcptoolbox-owner-native-proof-transport-receipt.json';
+const TRANSPORT_RECEIPT_FILENAME = 'cm2113-vcptoolbox-owner-native-proof-transport-receipt-002.json';
 
 function git(args, options = {}) {
   return execFileSync('git', args, {

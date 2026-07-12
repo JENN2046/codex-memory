@@ -30,7 +30,7 @@ const PACKET_PATH = 'docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_na
 const CONTENT_DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_content_decision_cm2113.json';
 const FINAL_DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_final_release_cm2113.json';
 const BOOTSTRAP_RECEIPT_PATH = 'docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_runtime_bootstrap_receipt_cm2113.json';
-const EXECUTION_RECEIPT_FILENAME = 'cm2113-vcptoolbox-owner-native-proof-execution-receipt.json';
+const EXECUTION_RECEIPT_FILENAME = 'cm2113-vcptoolbox-owner-native-proof-execution-receipt-002.json';
 
 function git(args, options = {}) {
   return execFileSync('git', args, {
@@ -292,7 +292,9 @@ async function runCm2113Runtime(packetCommit, contentCommit, finalCommit) {
     storeInstanceId: packet.storeInstanceId,
     lifecycleReference: packet.lifecycleReference,
     recordArgumentsCanonicalSha256: packet.payloadCanonicalSha256,
-    durableMarkdownSha256: packet.durableSha256
+    durableMarkdownSha256: packet.durableSha256,
+    allowedScope: packet.allowedScope,
+    targetReferenceName: packet.runtimeTarget.targetReferenceName
   };
   const adapter = createVcpToolBoxDailyNoteOwnerRuntimeAdapter({
     runtimeRoot: paths.runtimeRoot,
