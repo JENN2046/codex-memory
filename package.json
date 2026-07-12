@@ -100,7 +100,8 @@
     "cm2117:full-plan-decision": "node ./scripts/generate-cm2117-exact-full-plan-application-decision.js",
     "cm2118:execution-packet": "node ./scripts/generate-cm2118-full-plan-application-execution-packet.js",
     "cm2119:final-execution-release": "node ./scripts/generate-cm2119-full-plan-final-execution-release.js",
-    "cm2120:freeze-receipts": "node ./scripts/freeze-cm2120-full-plan-application-receipts.js"
+    "cm2120:freeze-receipts": "node ./scripts/freeze-cm2120-full-plan-application-receipts.js",
+    "cm2120:review-receipts": "node ./scripts/generate-cm2120-full-plan-application-receipt-review.js"
   },
   "engines": {
     "node": ">=22.0.0"
