@@ -10,12 +10,15 @@ const {
   EXACT_RECEIPT_REQUIREMENTS,
   EXTERNAL_REVIEW_FIELDS
 } = require('./NearModelMemoryPlanPackEvidenceTraceMatrix');
+const {
+  evaluateApplicationReceipt: evaluateCm2115R1Phase2ApplicationReceipt
+} = require('./Cm2115R1Phase2CompletionAuditApplication');
 
-const TASK_ID = 'CM-2115';
-const SNAPSHOT_TYPE = 'canonical_full_plan_evidence_snapshot_v1';
+const TASK_ID = 'CM-2115-R1';
+const SNAPSHOT_TYPE = 'canonical_full_plan_evidence_snapshot_v2';
 const BASELINE = Object.freeze({
-  sourceCommit: '7a72206b11da5b09d37ee7d65ac16b58f924ed3d',
-  sourceTree: '82930c5027423f5cccbacbde7542091b497e00db'
+  sourceCommit: 'bfcb57acce1e09b4cef5f817ffd2489cfa32e046',
+  sourceTree: 'efa5133fb0de0d14582933bf771986d81b04cf9b'
 });
 const DOCS = 'docs/near-model-memory-plan-pack/';
 
@@ -23,7 +26,8 @@ function doc(name) {
   return `${DOCS}${name}`;
 }
 
-const LOCAL_VALIDATION_RECEIPT_PATH = doc('cm2115_local_validation_receipt.json');
+const LOCAL_VALIDATION_RECEIPT_PATH = doc('cm2115_r1_local_validation_receipt.json');
+const PHASE2_APPLICATION_RECEIPT_PATH = doc('phase2_completion_audit_application_receipt_cm2115_r1.json');
 
 const PHASE_DEFAULT_SOURCES = Object.freeze({
   phase0_goal_contract_non_claims: Object.freeze([
@@ -119,9 +123,9 @@ const PHASE_FIELD_SOURCES = Object.freeze({
     doc('phase2_machine_execution_evidence_manifest.json')
   ]),
   'phase:phase2_readonly_realtime_native_memory:phase2GovernedNativeReadEvidenceApplicationPassed': Object.freeze([
-    'src/core/Phase2GovernedNativeReadEvidenceApplicationContract.js',
-    'tests/phase2-governed-native-read-evidence-application-contract.test.js',
-    doc('machine_evidence_rebaseline_report.md')
+    'src/core/Cm2115R1Phase2CompletionAuditApplication.js',
+    'tests/cm2115-r1-phase2-completion-audit-application.test.js',
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:phase2MachineExecutionEvidenceManifestPassed': Object.freeze([
     doc('phase2_machine_execution_evidence_manifest.json'),
@@ -160,33 +164,39 @@ const PHASE_FIELD_SOURCES = Object.freeze({
     doc('phase2_platform_proof_receipt_review_report.md')
   ]),
   'phase:phase2_readonly_realtime_native_memory:nativeTargetBindingPassed': Object.freeze([
-    doc('phase2_machine_execution_evidence_manifest.json')
+    doc('phase2_machine_execution_evidence_manifest.json'),
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:nativeReadProofPassed': Object.freeze([
-    doc('phase2_machine_execution_evidence_manifest.json')
+    doc('phase2_machine_execution_evidence_manifest.json'),
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:fallbackDistinctionPassed': Object.freeze([
-    doc('phase2_machine_execution_evidence_manifest.json')
+    doc('phase2_machine_execution_evidence_manifest.json'),
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:lowDisclosureProofPassed': Object.freeze([
-    doc('phase2_machine_execution_evidence_manifest.json')
+    doc('phase2_machine_execution_evidence_manifest.json'),
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:auditReceiptPassed': Object.freeze([
-    doc('phase2_machine_execution_evidence_manifest.json')
+    doc('phase2_machine_execution_evidence_manifest.json'),
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:scopeVisibilityIsolationPassed': Object.freeze([
-    doc('phase2_machine_execution_evidence_manifest.json')
+    doc('phase2_machine_execution_evidence_manifest.json'),
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:wslLinuxProofPassed': Object.freeze([
     doc('windows_wsl_machine_smoke_receipt.json'),
-    doc('machine_evidence_rebaseline_report.md')
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:windowsWslSmokePassed': Object.freeze([
-    doc('windows_wsl_machine_smoke_receipt.json')
+    doc('windows_wsl_machine_smoke_receipt.json'),
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:phase2ReceiptBundleAppliedToCompletionAudit': Object.freeze([
-    doc('machine_evidence_rebaseline_report.md'),
-    'tests/phase2-machine-execution-evidence-manifest-contract.test.js'
+    PHASE2_APPLICATION_RECEIPT_PATH
   ]),
   'phase:phase3_memory_context_package_mvp:prepareMemoryContextDefaultExposed': Object.freeze([
     'src/adapters/codex-mcp/server.js',
@@ -556,6 +566,19 @@ function normalizeResolvedSource(sourcePath, identity) {
 
 function buildSnapshot(resolveSourceObject) {
   if (typeof resolveSourceObject !== 'function') throw new TypeError('cm2115_source_resolver_required');
+  let phase2ApplicationReceiptEvaluation = null;
+  try {
+    const identity = resolveSourceObject(PHASE2_APPLICATION_RECEIPT_PATH);
+    const content = Buffer.isBuffer(identity?.content)
+      ? identity.content.toString('utf8')
+      : identity?.content;
+    phase2ApplicationReceiptEvaluation = evaluateCm2115R1Phase2ApplicationReceipt(JSON.parse(content));
+  } catch {
+    throw new Error('cm2115_r1_phase2_application_receipt_unreadable');
+  }
+  if (!phase2ApplicationReceiptEvaluation.accepted) {
+    throw new Error(`cm2115_r1_phase2_application_receipt_rejected:${phase2ApplicationReceiptEvaluation.blockers.join(',')}`);
+  }
   const specs = buildEntrySpecs();
   const cache = new Map();
   const resolve = sourcePath => {
@@ -599,6 +622,12 @@ function buildSnapshot(resolveSourceObject) {
     },
     entries,
     candidateAudit: buildCandidateAuditSummary(),
+    semanticEvidenceChecks: {
+      phase2ApplicationReceiptContractAccepted: true,
+      phase2ExactEvidenceApplied: true,
+      phase2DecisionGitIdentityBound: true,
+      supersededCm2074UsedAsCurrentAuthority: false
+    },
     reviewBoundary: {
       independentReviewRequired: true,
       independentReviewPassed: false,
@@ -631,7 +660,7 @@ function buildSnapshot(resolveSourceObject) {
     }
   };
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     taskId: TASK_ID,
     snapshotType: SNAPSHOT_TYPE,
     canonicalPayloadSha256: sha256Canonical(payload),
@@ -645,6 +674,7 @@ module.exports = {
   EXTERNAL_LOCAL_SOURCE_BY_FIELD,
   INVARIANT_DEFAULT_SOURCES,
   LOCAL_VALIDATION_RECEIPT_PATH,
+  PHASE2_APPLICATION_RECEIPT_PATH,
   PHASE_DEFAULT_SOURCES,
   PHASE_FIELD_SOURCES,
   SNAPSHOT_TYPE,

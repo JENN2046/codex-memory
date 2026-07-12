@@ -19,12 +19,12 @@ const {
 const DEFAULT_JSON_PATH = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_canonical_full_plan_evidence_snapshot.json'
+  'cm2115_r1_canonical_full_plan_evidence_snapshot.json'
 );
 const DEFAULT_MARKDOWN_PATH = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_canonical_full_plan_evidence_snapshot.md'
+  'cm2115_r1_canonical_full_plan_evidence_snapshot.md'
 );
 
 function gitText(args) {
@@ -74,16 +74,18 @@ function parseArgs(argv) {
   return options;
 }
 
-function resolveGitSourceObject(sourcePath) {
-  const treeLine = gitBuffer(['ls-tree', '-z', BASELINE.sourceCommit, '--', sourcePath]).toString('utf8');
+function resolveGitFile(sourceCommit, sourcePath) {
+  const treeLine = gitBuffer(['ls-tree', '-z', sourceCommit, '--', sourcePath]).toString('utf8');
   const match = treeLine.match(/^(\d{6}) (\w+) ([a-f0-9]{40})\t([^\0]+)\0$/);
   if (!match || match[4] !== sourcePath) throw new Error(`cm2115_git_source_missing:${sourcePath}`);
   const [, gitMode, gitObjectType, listedOid] = match;
   if (gitObjectType !== 'blob') throw new Error(`cm2115_git_source_not_blob:${sourcePath}:${gitObjectType}`);
-  const blobOid = gitText(['rev-parse', `${BASELINE.sourceCommit}:${sourcePath}`]);
+  const blobOid = gitText(['rev-parse', `${sourceCommit}:${sourcePath}`]);
   if (blobOid !== listedOid) throw new Error(`cm2115_git_source_oid_mismatch:${sourcePath}`);
   const content = gitBuffer(['cat-file', 'blob', blobOid]);
   return {
+    sourceCommit,
+    sourceTree: gitText(['rev-parse', `${sourceCommit}^{tree}`]),
     gitObjectType,
     gitMode,
     blobOid,
@@ -91,6 +93,10 @@ function resolveGitSourceObject(sourcePath) {
     sha256: crypto.createHash('sha256').update(content).digest('hex'),
     content
   };
+}
+
+function resolveGitSourceObject(sourcePath) {
+  return resolveGitFile(BASELINE.sourceCommit, sourcePath);
 }
 
 function assertFrozenBaseline() {
@@ -118,7 +124,7 @@ function assertCleanWorktree() {
 function renderCanonicalMarkdown(snapshot, jsonText) {
   const counts = snapshot.payload.counts;
   return [
-    '# CM-2115 Canonical Full-plan Evidence Snapshot',
+    '# CM-2115-R1 Canonical Full-plan Evidence Snapshot',
     '',
     'This is a content-equivalent review surface for the canonical JSON snapshot.',
     'It is prepared for independent Git-object and semantic-route review only.',
@@ -149,6 +155,7 @@ function verifySnapshot(snapshot) {
   const evaluation = evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
     resolveSourceObject: resolveGitSourceObject,
     resolveCommitTree: commit => gitText(['rev-parse', `${commit}^{tree}`]),
+    resolveGitFile,
     isCommitAncestor: (ancestor, descendant) => {
       try {
         execFileSync('git', ['merge-base', '--is-ancestor', ancestor, descendant], {
@@ -251,6 +258,7 @@ module.exports = {
   generate,
   parseArgs,
   renderCanonicalMarkdown,
+  resolveGitFile,
   resolveGitSourceObject,
   verifyExisting,
   verifySnapshot
