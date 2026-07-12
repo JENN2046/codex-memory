@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-12",
-  "taskId": "CM-2115",
-  "validationId": "CMV-2210",
+  "taskId": "CM-2116",
+  "validationId": "CMV-2211",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -21,10 +21,10 @@
     "url": null
   },
   "reviewedObject": {
-    "commit": null,
-    "parent": null,
-    "source": "none",
-    "presentInLocalCheckout": null
+    "commit": "f6b7f9a584946058ac8606e36efb7492dbf4da74",
+    "parent": "629ca75fe2141049d11e41ce13551a0fde8cbc4e",
+    "source": "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.json",
+    "presentInLocalCheckout": true
   },
   "evidenceBaseline": {
     "sourceCommit": "1822d7e8492424cd4b8849d544df087cf9c8edad",
@@ -333,9 +333,35 @@
     "cm2115InternalIndependentRecheckPassed": true,
     "cm2115IndependentReviewRequested": true,
     "cm2115IndependentReviewPassed": true,
-    "cm2115FullPlanApplicationPrepared": false,
+    "cm2115FullPlanApplicationPrepared": true,
     "cm2115FullPlanApplicationAuthorized": false,
-    "cm2115FullPlanApplicationApplied": false
+    "cm2115FullPlanApplicationApplied": false,
+    "cm2116R1GateReference": "CM-2116-R1-EXACT-FULL-PLAN-APPLICATION-GATE-FFB0A0CF-7187E520-629CA75F",
+    "cm2116R1ImplementationCommit": "629ca75fe2141049d11e41ce13551a0fde8cbc4e",
+    "cm2116R1ImplementationTree": "6ad868b1a41539b80d0214a567b8589f9b0e3376",
+    "cm2116R1GateCommit": "f6b7f9a584946058ac8606e36efb7492dbf4da74",
+    "cm2116R1GateTree": "6004160d460c0498de756d8b740a9fb90bfc19f4",
+    "cm2116R1GateParentCommit": "629ca75fe2141049d11e41ce13551a0fde8cbc4e",
+    "cm2116R1GateParentTree": "6ad868b1a41539b80d0214a567b8589f9b0e3376",
+    "cm2116R1GateDiffPathCount": 2,
+    "cm2116R1GateDiffPathsSha256": "75e8066e114bcda3ec26b689009dfb1cdcf723a03307a8c1bdb507e4b2ef224f",
+    "cm2116R1GateDiffEntriesSha256": "80a4e54519f681e4c62c084216b18a1e7a3de4cf2396df04c37828a0b1edb57b",
+    "cm2116R1GateJsonBlobOid": "5741cabeaf48680288bc48358716376754ce8177",
+    "cm2116R1GateJsonBytes": 11204,
+    "cm2116R1GateJsonRawSha256": "db625f6218b2b2249953c4c66f4c8a2b99011cf8dad310aaa0e63a017f804442",
+    "cm2116R1GateMarkdownBlobOid": "66d95391a77341143a76581de063fa5709c5d3e1",
+    "cm2116R1GateMarkdownBytes": 11735,
+    "cm2116R1GateMarkdownRawSha256": "2f1e5bb974ceaa8934fac4dd7be9c7af08f727fa904a5fc250ac4153c38c10f5",
+    "cm2116R1GatePayloadSha256": "7591efb0ff598666bd764b99155fd05f7b7fb97c3229a4bfea855a5eb552430c",
+    "cm2116R1BoundComplete7187IntakeIdentity": true,
+    "cm2116R1FutureApplicationTargetCount": 5,
+    "cm2116R1FullPlanApplicationGatePrepared": true,
+    "cm2116R1FullPlanApplicationDecisionPresent": false,
+    "cm2116R1FullPlanApplicationAuthorized": false,
+    "cm2116R1FullPlanApplicationExecuted": false,
+    "cm2116R1FullPlanApplicationCommitBound": false,
+    "cm2116R1SupersededGateCommit": "c3f3457b369e86b16dee1251f3914f343040f536",
+    "cm2116R1SupersededGateUsedAsCurrentAuthority": false
   },
   "planPackCompletion": {
     "phase8Completed": true,
@@ -345,15 +371,19 @@
     "independentReviewMode": "repository_internal_separate_pass",
     "independentExternalReviewPassed": false,
     "snapshotIndependentReviewPassed": true,
+    "fullPlanApplicationGatePrepared": true,
+    "fullPlanApplicationDecisionPresent": false,
     "fullPlanApplicationAuthorized": false,
     "fullPlanApplicationApplied": false,
+    "fullPlanApplicationExecuted": false,
+    "fullPlanApplicationCommitBound": false,
     "fullPlanPackCompleted": false,
     "readinessClaimed": false
   },
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_cm2115_r2_internal_self_review_intake_passed_separate_full_plan_application_pending_no_ready_claim",
+    "scope": "near_model_memory_plan_pack_cm2116_r1_exact_gate_prepared_decision_and_execution_separate_full_plan_false_no_ready_claim",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -361,6 +391,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2211",
+      "scope": "CM-2116-R1 exact full-plan application gate preparation",
+      "status": "COMPLETED_EXACT_GATE_PREPARED_DECISION_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM"
+    },
     {
       "id": "CMV-2210",
       "scope": "CM-2115-R2 internal canonical snapshot self-review and post-freeze decision intake",

@@ -4,13 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R2 internal canonical snapshot self-review`.
-Current validation: `CMV-2210`.
-Current handoff: internal self-review decision `116d74b3…` and intake receipt `7187e520…` passed. The next separate task may prepare an exact full-plan application bound to the receipt's complete Git identity; no application is authorized or applied yet. Full plan-pack and readiness remain false.
+Current task: `CM-2116-R1 exact full-plan application gate preparation`.
+Current validation: `CMV-2211`.
+Current handoff: hardened gate `f6b7f9a5…` passed exact replay and red-team review. The next separate task may prepare an exact application decision bound to the full gate Git identity; no application is authorized or executed. Full plan-pack and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2116-R1 freezes a non-executing exact gate at `f6b7f9a5…`, with payload
+`7591efb0…2430c`, JSON blob `5741cabe…17d7` / 11204 bytes / raw SHA
+`db625f62…04442`, and Markdown blob `66d95391…d3e1` / 11735 bytes / raw SHA
+`2f1e5bb9…10f5`. It replays the complete `7187e520…` identity, including its
+parent and A-A diff, and fixes the future application to five paths. Old gate
+`c3f3457b…` is superseded and not authority. The next step is a separate exact
+decision; gate reference alone is insufficient, and no executor may run yet.
 
 Jenn selected repository self-review as the governing review mode. The internal
 second pass found zero actionable findings over 164 traces, 411 source bindings,

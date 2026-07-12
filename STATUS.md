@@ -4,13 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R2 internal canonical snapshot self-review`.
-Current validation: `CMV-2210`.
-Current project status: the repository-internal independent second pass has revalidated all 164 trace entries, 411 source bindings, and 105 unique Git objects with zero mismatch. The self-review decision and its post-freeze Git intake receipt are frozen. `independentReviewPassed=true` only in mode `repository_internal_separate_pass`; no new external review is claimed, the historical CM-2080 external-review slot remains true, `fullPlanPackCompleted=false`, and every readiness claim remains false.
-Current route: `CM2115_R2_INTERNAL_SELF_REVIEW_INTAKE_PASSED_SEPARATE_FULL_PLAN_APPLICATION_PENDING_NO_READY_CLAIM`.
+Current task: `CM-2116-R1 exact full-plan application gate preparation`.
+Current validation: `CMV-2211`.
+Current project status: the hardened non-executing gate binds the complete `7187e520…` intake commit/tree/parent/A-A diff and both receipt objects by blob/bytes/raw SHA/payload SHA. R1 rejects hidden implementation authority and all readiness aliases. Gate preparation passed, but no application decision, authorization, claim, patch, or application commit exists; `fullPlanPackCompleted=false` and every readiness claim remains false.
+Current route: `CM2116_R1_EXACT_FULL_PLAN_APPLICATION_GATE_PREPARED_DECISION_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2116-R1 implementation `629ca75f…` hardens the gate with exact-key schemas
+and the complete readiness alias set. Gate commit `f6b7f9a5…` has payload SHA
+`7591efb0…2430c`; its JSON is blob `5741cabe…17d7`, 11204 bytes, raw SHA
+`db625f62…04442`, and its exact Markdown mirror is blob `66d95391…d3e1`,
+11735 bytes, raw SHA `2f1e5bb9…10f5`. The gate replays the full
+`7187e520…` identity and fixes a five-path future patch allowlist. The earlier
+`c3f3457b…` gate is immutable superseded history and is not current authority.
+No full-plan application decision is present; authorization, execution,
+commit binding, completion, and readiness all remain false.
 
 CM-2115-R2 internal self-review implementation is frozen at `68c8088a…`.
 Decision commit `116d74b3…` has payload SHA-256 `03242787…a1d4` and records

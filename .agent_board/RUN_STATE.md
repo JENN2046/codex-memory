@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R2 internal canonical snapshot self-review`.
-Current validation: `CMV-2210`.
-Current status: repository-internal independent second-pass review and post-freeze decision intake passed over the exact 164-entry R2 snapshot. `independentReviewPassed=true` only in `repository_internal_separate_pass` mode; no new external review is claimed, historical CM-2080 external review remains true, `fullPlanPackCompleted=false`, and every readiness claim remains false.
+Current task: `CM-2116-R1 exact full-plan application gate preparation`.
+Current validation: `CMV-2211`.
+Current status: hardened gate `f6b7f9a5…` binds the full `7187e520…` intake Git identity and passed internal red-team review. Gate preparation is true; application decision/authorization/execution/commit binding are false, `fullPlanPackCompleted=false`, and every readiness claim remains false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,11 +37,12 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is a separate exact full-plan application design bound to
-intake receipt commit `7187e520…`, tree `6a5eed26…`, both receipt blobs, bytes,
-raw SHA-256 values, payload SHA `ffb0a0cf…eaba`, and its exact two-path commit.
-The application must change only the intended completion state and force all
-readiness fields to remain false. Do not replay native actions or infer
+Next safe action is a separate exact full-plan application decision bound to
+gate commit `f6b7f9a5…`, tree `6004160d…`, parent `629ca75f…`, exact A-A diff,
+both gate blobs/bytes/raw SHA-256 values, and payload SHA `7591efb0…2430c`.
+That decision must still precede any durable claim or patch execution. The
+application may change only the intended completion state and must force every
+readiness field to remain false. Do not replay native actions or infer
 production, release, deploy, cutover, RC, complete-V8, or readiness.
 
 ## Historical Run Notes

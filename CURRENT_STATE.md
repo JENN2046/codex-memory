@@ -8,13 +8,28 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2115-R2 repository-internal independent second pass accepted and Git-intaken; full-plan application not authorized or applied; readiness remains false |
-| Current task | `CM-2115-R2 internal canonical snapshot self-review` |
-| Current validation | `CMV-2210` |
-| Current route | Prepare a separate exact full-plan application gate; do not infer completion or readiness from self-review |
+| Status | CM-2116-R1 exact full-plan application gate prepared; decision, authorization, execution, completion, and readiness remain false |
+| Current task | `CM-2116-R1 exact full-plan application gate preparation` |
+| Current validation | `CMV-2211` |
+| Current route | Prepare a separate exact application decision bound to the frozen R1 gate; do not execute or infer readiness from gate preparation |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## Current Exact Full-plan Application Gate
+
+CM-2116-R1 implementation `629ca75f…` and gate commit `f6b7f9a5…` passed exact
+Git-object replay and repository-internal red-team review. The gate binds the
+complete `7187e520…` commit/tree/parent/A-A diff, JSON and Markdown blob OIDs,
+byte counts, raw SHA-256 values, and canonical payload SHA-256. Gate payload
+SHA-256 is `7591efb0…2430c`; the JSON and Markdown raw SHA-256 values are
+`db625f62…04442` and `2f1e5bb9…10f5`.
+
+This is preparation only. The prior `c3f3457b…` gate is superseded and cannot
+serve as current authority. No application decision, durable claim, patch,
+application commit, or binding receipt exists. `fullPlanPackCompleted=false`
+and all production/release/deploy/cutover/RC/complete-V8/readiness fields remain
+false.
 
 ## Current Internal Self-review Result
 
@@ -52,8 +67,9 @@ review-request tests are `19/19`. Snapshot commit is `8d252985…`; review reque
 commit is `01c65db8…`.
 
 The candidate audit is now internally reviewed and Git-intaken, but remains
-non-applying. No full-plan application is prepared, authorized, or executed;
-`fullPlanPackCompleted=false`, and all readiness fields remain false.
+non-applying. The separate R1 gate is prepared, while no full-plan application
+decision, authorization, claim, or execution exists; `fullPlanPackCompleted=false`,
+and all readiness fields remain false.
 
 ## Historical Phase 8 Revalidation Result
 

@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2115-R2 internal canonical snapshot self-review`.
-Current validation: `CMV-2210`.
+Current checkpoint: `CM-2116-R1 exact full-plan application gate preparation`.
+Current validation: `CMV-2211`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2116-R1 Exact Full-plan Application Gate
+
+Status: `EXACT_GATE_PREPARED_DECISION_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM`
+
+- R1 implementation `629ca75f…` rejects hidden implementation/artifact authority and covers all frozen readiness aliases.
+- Gate commit `f6b7f9a5…`, payload `7591efb0…2430c`, replays the full `7187e520…` commit/tree/parent/A-A diff/blob/bytes/raw-SHA/payload-SHA chain.
+- JSON blob `5741cabe…17d7` is 11204 bytes; Markdown blob `66d95391…d3e1` is 11735 bytes and is an exact JSON mirror.
+- The old `c3f3457b…` gate is superseded history with `usedAsCurrentAuthority=false`.
+- Gate preparation does not create an application decision, authorization, claim, patch, application commit, or binding receipt.
+- `fullPlanPackCompleted=false` and `readinessClaimed=false`.
+
+Validation: `CMV-2211`.
 
 ## CM-2115-R2 Internal Canonical Snapshot Self-review
 

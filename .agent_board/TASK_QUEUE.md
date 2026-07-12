@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest active task: `CM-2115-R2 internal canonical snapshot self-review`.
-Latest validation: `CMV-2210`.
+Latest active task: `CM-2116-R1 exact full-plan application gate preparation`.
+Latest validation: `CMV-2211`.
 Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -44,6 +44,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2116-R1 | 2116 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Green non-executing exact gate; decision/application/readiness remain separate | CM-2116-R1 gate source/generator/tests, exact JSON/Markdown gate, status surfaces | Bind the complete `7187e520…` intake Git identity and freeze a fail-closed five-path full-plan application gate | gate `6/6`; combined `44/44`; default `5419/5419`; exact Git replay; red-team; docs/current-facts/ledger/diff | zero claim/patch/application/runtime/native/provider/real-memory/remote effect; old gate not authority | future exact decision must bind full `f6b7f9a5…` identity; gate reference alone is insufficient | COMPLETED_EXACT_GATE_PREPARED_DECISION_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM |
 | CM-2115 | 2115 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Green repository-internal self-review; full-plan application remains separately gated | R2 snapshot/request; internal decision; post-freeze intake receipt/contracts/tests/status | Independently revalidate all frozen R2 routes and machine-bind the internal decision without claiming external review or completion | 164 traces / 411 bindings / 105 objects / 0 mismatch; self-review `5/5`; intake `6/6`; prior R2/snapshot `27/27`; exact Git intake; docs/current-facts/ledger/diff | no native/provider/real-memory/runtime/remote effect; historical external-review slot preserved; no application performed | future application must bind receipt commit/tree/parent/diff/blob/bytes/raw SHA/payload SHA and keep readiness false | COMPLETED_INTERNAL_SELF_REVIEW_INTAKE_PASSED_SEPARATE_FULL_PLAN_APPLICATION_PENDING_NO_READY_CLAIM |
 | CM-2114 | 2114 | done | P8-native-write-proof / P6-docs-drift | Consumed synthetic proof; no active native authority | CM-2113 receipts; CM-2114 bundle/decision/application; completion audit/trace/status | Revalidate Phase 8 from exact VCPToolBox owner runtime, transport, and stable store proof | exact Git/hash/receipt; 18/18 audit; focused/default/docs/current-facts/ledger/diff | preserve attempt markers, store identity, and record; no replay/deletion/cleanup | Phase 8 only; full plan/readiness remain false | COMPLETED_PHASE8_REVALIDATED_EXACT_OWNER_RUNTIME_TRANSPORT_STORE_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM |
 | CM-2113 | 2113 | done | P8-native-write-proof | Exact owner write authorization consumed; attempt 001 preserved | owner adapter; stdio/HTTP transport; stable store; execution/transport receipts | Produce exact VCPToolBox-owned runtime proof | official Git objects; one owner write/verify; stable identity; no provider/fallback/retry/rollback | attempt 001 ambiguous/no durable; attempt 002 success; both non-replayable | separate CM-2114 application required | COMPLETED_EXACT_VCPTOOLBOX_OWNER_PROOF_RECEIPT_PHASE8_APPLICATION_PENDING |
