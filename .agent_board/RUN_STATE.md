@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115 canonical full-plan evidence snapshot`.
-Current validation: `CMV-2207`.
-Current status: the 164-entry canonical Git-object snapshot and its non-authorizing independent review request are frozen. Candidate completion is eligible, but independent review has not passed and no application authority exists. `fullPlanPackCompleted=false`; every readiness claim remains false.
+Current task: `CM-2115-R1 Phase 2 application repair and canonical snapshot rebuild`.
+Current validation: `CMV-2208`.
+Current status: the missing post-replay Phase 2 application is now exact, consumed, and receipt-bound. The rebuilt 164-entry snapshot is frozen and pending independent review. `independentReviewPassed=false`, `fullPlanPackCompleted=false`; every readiness claim remains false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,8 +37,8 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of CM-2115 snapshot commit `3798ecc1…`
-and review-request commit `3313edb8…`. Only after an exact PASS is frozen may a
+Next safe action is independent review of CM-2115-R1 snapshot commit `56d3e04c…`
+and review-request commit `20ef03ef…`. Only after an exact PASS is frozen may a
 separate one-field `fullPlanPackCompleted` application be requested. Do not
 replay native actions, prepare application authority early, or infer production,
 release, deploy, cutover, RC, complete-V8, or readiness from candidate eligibility.

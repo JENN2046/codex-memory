@@ -8,9 +8,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2115 canonical 164-trace snapshot frozen; independent review pending; full plan and readiness remain false |
-| Current task | `CM-2115 canonical full-plan evidence snapshot` |
-| Current validation | `CMV-2207` |
+| Status | CM-2115-R1 Phase 2 application repaired; rebuilt 164-trace snapshot pending independent review; full plan and readiness remain false |
+| Current task | `CM-2115-R1 Phase 2 application repair and snapshot rebuild` |
+| Current validation | `CMV-2208` |
 | Current route | Obtain an independent decision over the exact snapshot; only afterward prepare a separate one-field completion application |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
@@ -18,19 +18,24 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 ## Current Snapshot Result
 
-CM-2115 maps all 164 Completion Audit trace slots to exact Git source objects at
-baseline `7a72206b…`: each entry directly records source path, commit/tree, blob
-OID, byte length, and SHA-256. The set contains 105 unique blobs and zero
-placeholder refs. Fresh local evidence records focused `14/14`, `test:all`
-`5383/5383 + 94/94 + 6/6`, and fixture-only/no-network/no-provider `gate:ci`
-success. Snapshot commit is `3798ecc1…`; review request commit is `3313edb8…`.
-The candidate audit is eligible, but it is not authoritative: independent review
-is pending, no application authority exists, `fullPlanPackCompleted=false`, and
-all readiness fields remain false.
+CM-2115-R1 applies the exact CM-2080-reviewed Phase 2 manifest and Windows/WSL
+receipt through one consumed, non-replayable repository application. Decision
+commit is `29f1f47e…`; application receipt commit is `623cbaf9…`, with payload
+SHA-256 `8b3d1952…39fa`. The old CM-2074 application is explicitly not current
+authority.
 
-An internal independent recheck passed all 164 routes and 405 direct bindings
-with zero Git-object mismatch. It is deliberately recorded separately from the
-still-pending external independent decision and cannot unlock application.
+At baseline `bfcb57ac…`, the v2 snapshot maps all 164 Completion Audit trace
+slots to exact Git objects. It contains 105 unique blobs and zero placeholders;
+all nine Phase 2 exact entries bind the new application receipt, and the
+snapshot contract parses that receipt plus its decision Git object. Fresh
+baseline validation records `6/6`, `test:all` `5393/5393 + 94/94 + 6/6`, and
+fixture-only/no-network/no-provider `gate:ci` success. Final focused tests are
+`25/25` and default tests are `5394/5394`. Snapshot commit is `56d3e04c…`;
+review request commit is `20ef03ef…`.
+
+The candidate audit is eligible but non-authoritative. Independent review has
+not passed, no full-plan application is prepared or authorized,
+`fullPlanPackCompleted=false`, and all readiness fields remain false.
 
 ## Historical Phase 8 Revalidation Result
 

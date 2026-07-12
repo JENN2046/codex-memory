@@ -4,22 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115 canonical full-plan evidence snapshot`.
-Current validation: `CMV-2207`.
-Current handoff: submit review request commit `3313edb8…` for independent review of snapshot commit `3798ecc1…`. Do not prepare or execute the full-plan application until an exact independent PASS is frozen. Full plan-pack and readiness remain false.
+Current task: `CM-2115-R1 Phase 2 application repair and canonical snapshot rebuild`.
+Current validation: `CMV-2208`.
+Current handoff: submit review request commit `20ef03ef…` for independent review of snapshot commit `56d3e04c…`. Do not prepare or execute the full-plan application until an exact independent PASS is frozen. Full plan-pack and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2115 replaces the old placeholder trace fixture as evidence authority. The
-snapshot binds 164 entries to 105 exact Git blobs at source baseline
-`7a72206b…`; JSON raw SHA is `564aeaa2…5e33` and payload SHA is
-`f9b4fd17…85b7`. Review request `3313edb8…` has payload SHA
-`739df21d…3b6a` and is submission-only. The next legal state transition is an
-external independent review decision. The internal frozen-object recheck passed
-but carries no decision authority. Until an external PASS is frozen, application
-authority, full-plan completion, and all readiness states are false.
+CM-2115-R1 repairs the one invalid Phase 2 trace. Decision `29f1f47e…` binds
+CM-2080 and both machine evidence objects; receipt `623cbaf9…` applies the nine
+exact fields once and has payload SHA `8b3d1952…39fa`. The authorization is
+consumed and cannot be replayed.
+
+The rebuilt snapshot binds 164 entries to 105 exact Git blobs at source baseline
+`bfcb57ac…`; JSON raw SHA is `4bff4c15…9c09` and payload SHA is
+`5d4a380d…46ac`. Review request `20ef03ef…` has payload SHA
+`f4e3eb23…010c` and is submission-only. The next legal state transition is an
+independent review decision. Until an exact PASS is frozen, full-plan
+application authority, full-plan completion, and all readiness states are false.
 
 CM-2114 applied the 18-field bundle and receipt payload SHA `2097572e…c045`.
 The three CM-2112 gaps now trace to CM-2113 exact evidence: VCPToolBox-owned

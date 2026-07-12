@@ -1,4 +1,9 @@
-# CM-2115 Internal Independent Recheck
+# Historical CM-2115 Internal Independent Recheck
+
+> Superseded for current completion authority by CM-2115-R1. This document
+> preserves the original frozen-object integrity review only. It did not test
+> the later-discovered missing exact Phase 2 Completion Audit application and
+> must not be used as the current independent semantic decision.
 
 Result: `PASS_INTERNAL_RECHECK_ONLY`
 
@@ -39,7 +44,8 @@ review evidence.
 ## Boundary
 
 ```yaml
-internalIndependentRecheckPassed: true
+internalIndependentRecheckPassedForHistoricalFrozenObjectsOnly: true
+currentR1IndependentReviewPassed: false
 externalIndependentReviewPassed: false
 applicationPrepared: false
 applicationAuthorized: false
@@ -48,6 +54,7 @@ fullPlanPackCompleted: false
 readinessClaimed: false
 ```
 
-The next gate remains an exact external/independent decision over the frozen
-snapshot and review request. Only after that decision passes may a separate
-single-field completion application request be prepared.
+The current gate is an exact independent decision over CM-2115-R1 snapshot
+`56d3e04ccf342d47cec687ba42557a4ead76e804` and review request
+`20ef03efd933dcf9c2ac3d1721353474464f1c82`. Only after that decision passes may
+a separate single-field completion application request be prepared.
