@@ -1,0 +1,373 @@
+# CM-2118 Full-plan Application Execution Packet
+
+Packet reference: `CM-2118-FULL-PLAN-APPLICATION-EXECUTION-PACKET-50AE5DA8-45C53BF5`
+Canonical payload SHA-256: `2e5299ee08dee5f3e07386f58508cf14921d047c2688a7f570273149f2c05454`
+
+Result: PASS_NON_EXECUTING_PACKET_PREPARED_ONLY.
+
+This packet freezes a one-shot executor, fixed governance registry,
+external execution receipts, and exact application-commit binding.
+It carries no execution release and creates no claim, patch, or commit.
+A separate machine-bound CM-2119 final execution release is required.
+Full-plan completion and every readiness state remain false.
+
+## Exact JSON mirror
+
+```json
+{
+  "artifactType": "cm2118_non_executing_full_plan_application_packet_v1",
+  "canonicalPayloadSha256": "2e5299ee08dee5f3e07386f58508cf14921d047c2688a7f570273149f2c05454",
+  "payload": {
+    "applicationBoundary": {
+      "applicationCommitParent": "b1245149e2b94248a39213737ea05adae4d53f5e",
+      "applicationCommitParentMustBeFrozenContentDecisionCommit": true,
+      "applicationCommitParentTree": "f59b578a039e1fc615e6c8e3bbb83a826b833792",
+      "bindingReceiptIncludedInApplicationCommit": false,
+      "exactDiffEntries": [
+        {
+          "path": "docs/near-model-memory-plan-pack/06_ACCEPTANCE_MATRIX.md",
+          "status": "M"
+        },
+        {
+          "path": "docs/near-model-memory-plan-pack/07_CAPABILITY_MATRIX.md",
+          "status": "M"
+        },
+        {
+          "path": "docs/near-model-memory-plan-pack/cm2116_full_plan_application_state.json",
+          "status": "A"
+        },
+        {
+          "path": "docs/near-model-memory-plan-pack/completion_audit_report.md",
+          "status": "M"
+        },
+        {
+          "path": "docs/near-model-memory-plan-pack/evidence_trace_matrix_report.md",
+          "status": "M"
+        }
+      ],
+      "exactDiffEntriesSha256": "5a68599a89465709bb9c011111324331c2a5f46ed5b41ff2fb60746e1b9d3bb2",
+      "exactDiffPaths": [
+        "docs/near-model-memory-plan-pack/06_ACCEPTANCE_MATRIX.md",
+        "docs/near-model-memory-plan-pack/07_CAPABILITY_MATRIX.md",
+        "docs/near-model-memory-plan-pack/cm2116_full_plan_application_state.json",
+        "docs/near-model-memory-plan-pack/completion_audit_report.md",
+        "docs/near-model-memory-plan-pack/evidence_trace_matrix_report.md"
+      ],
+      "exactDiffPathsSha256": "29aa59cf94c380f9d8d0f110c099117a9604a5e713c0a85292d7748bab9d892a",
+      "exactFivePathDiffOnly": true,
+      "executionReceiptIncludedInApplicationCommit": false,
+      "patchPayloadSha256": "988386ae254f401e7e682ba4b09f26a0dc5ba96bee3c7a68200cbe4218cc49bd",
+      "sourceBaselineCommit": "249c9ba173b1849ef59bef2410e3d874e1750f31",
+      "sourceBaselineTree": "f993c3a2abf0cd17bddb90c418cb06cf95e6cdfe",
+      "targets": [
+        {
+          "after": {
+            "blobOid": "634dc19caef779dca01d49f8af9f2a4b08797f6d",
+            "bytes": 61272,
+            "gitMode": "100644",
+            "sha256": "dfa2028e5d63e7ec73329adceee52caaf4f742ab7c9c777ca238e837878089b6"
+          },
+          "before": {
+            "blobOid": "49dd3a39ef4796cdf587b3d5394ef6add78172b1",
+            "bytes": 60686,
+            "gitMode": "100644",
+            "sha256": "c791409aca283f546ab013f058c4ae98fa1b74e9574c1c6040e1ab516b624091"
+          },
+          "operation": "modify",
+          "sourcePath": "docs/near-model-memory-plan-pack/completion_audit_report.md"
+        },
+        {
+          "after": {
+            "blobOid": "7aeb3ce1c9b9af2d3c71797590fba1ab28b31420",
+            "bytes": 34457,
+            "gitMode": "100644",
+            "sha256": "66afc8f2c0eefe595ccd9ee1616968c7afe023c8da2cd7e4bac98d37b7c1422c"
+          },
+          "before": {
+            "blobOid": "4cd86ef5efada6c3f927da923fe7d4dad73d26b4",
+            "bytes": 34125,
+            "gitMode": "100644",
+            "sha256": "339bd48cba47ae02ac7dc60227bec8565880912d817b1da20161458fec71ccd0"
+          },
+          "operation": "modify",
+          "sourcePath": "docs/near-model-memory-plan-pack/evidence_trace_matrix_report.md"
+        },
+        {
+          "after": {
+            "blobOid": "21fdc9610602582fbcbef5c4c00b274695ca2782",
+            "bytes": 9204,
+            "gitMode": "100644",
+            "sha256": "28a8bd8581efc2415bfe444d1eff472c1181d92e239c94e77d446659d09abb01"
+          },
+          "before": {
+            "blobOid": "00426318115ca3b531b139437820b2150ee4d931",
+            "bytes": 8810,
+            "gitMode": "100644",
+            "sha256": "52a8953f6030fc5d69fa2b3a8f4dbc9c547f94ce53d1fce488717a2f29e954df"
+          },
+          "operation": "modify",
+          "sourcePath": "docs/near-model-memory-plan-pack/06_ACCEPTANCE_MATRIX.md"
+        },
+        {
+          "after": {
+            "blobOid": "f9131fde89684182e182f952bedf75b60adbcab5",
+            "bytes": 19496,
+            "gitMode": "100644",
+            "sha256": "d487b391c7c0a95d98415714f4e6fb4773d0d66e0c3099a1286860573fd0a6c1"
+          },
+          "before": {
+            "blobOid": "28d9962c13c6e80bf90bdb8b88f32eed3126d58a",
+            "bytes": 19139,
+            "gitMode": "100644",
+            "sha256": "eea322dceed7e38dfaf3380fca194edd47fac2bb6ad4cc0564b076681a612e7d"
+          },
+          "operation": "modify",
+          "sourcePath": "docs/near-model-memory-plan-pack/07_CAPABILITY_MATRIX.md"
+        },
+        {
+          "after": {
+            "blobOid": "def3705a3e36a44bdf42ecf2974c26ae937259ed",
+            "bytes": 1808,
+            "gitMode": "100644",
+            "sha256": "d431ea83f848b949b9da1e8fa2b7e9f8cff804890da1b6dce35d522a7352d2c8"
+          },
+          "before": null,
+          "operation": "add",
+          "sourcePath": "docs/near-model-memory-plan-pack/cm2116_full_plan_application_state.json"
+        }
+      ]
+    },
+    "contentDecision": {
+      "canonicalPayloadSha256": "50ae5da8e81885abf2f45af87d41bef19ea0cb355999cd76449f52ed53c22a5a",
+      "commit": "b1245149e2b94248a39213737ea05adae4d53f5e",
+      "diffEntriesSha256": "73ffa5f64f8bbe38f6faebe12d5671a2818039f4b240d70d5b43fdb9fac60fda",
+      "diffPathsSha256": "bc443d2ad9ce5e89d4cb1a95056fdfe6f307fb01b902adcc28f4a7936ff0c08a",
+      "json": {
+        "blobOid": "8427d80c60cf49b96a0b84a24300cba41b5049b3",
+        "bytes": 18810,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "1d4feb41e67e5439a84122ec149d7b35c7495b803c1af2d1e6b2842b660f6a27",
+        "sourceCommit": "b1245149e2b94248a39213737ea05adae4d53f5e",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2117_exact_full_plan_application_decision.json",
+        "sourceTree": "f59b578a039e1fc615e6c8e3bbb83a826b833792"
+      },
+      "markdown": {
+        "blobOid": "51d5d3df69fca4e647cf8d866d27436e61c51c57",
+        "bytes": 19419,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "18e959fb39acd9f5ee518cb9e6cc8fce49bfe3ceb5f5b3469a2da2d1ae50341c",
+        "sourceCommit": "b1245149e2b94248a39213737ea05adae4d53f5e",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2117_exact_full_plan_application_decision.md",
+        "sourceTree": "f59b578a039e1fc615e6c8e3bbb83a826b833792"
+      },
+      "parentCommit": "249c9ba173b1849ef59bef2410e3d874e1750f31",
+      "parentTree": "f993c3a2abf0cd17bddb90c418cb06cf95e6cdfe",
+      "patchPayloadSha256": "988386ae254f401e7e682ba4b09f26a0dc5ba96bee3c7a68200cbe4218cc49bd",
+      "reference": "CM-2117-EXACT-FULL-PLAN-APPLICATION-CONTENT-DECISION-7591EFB0-F6B7F9A5-249C9BA1",
+      "tree": "f59b578a039e1fc615e6c8e3bbb83a826b833792"
+    },
+    "currentAuthority": {
+      "applicationCommitCreationAuthorized": false,
+      "applicationExecutionAuthorized": false,
+      "authorizationContentApproved": true,
+      "executionReleaseAuthorized": false,
+      "statusSyncAuthorized": false
+    },
+    "currentSideEffects": {
+      "applicationCommits": 0,
+      "claimCreates": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "repositoryPatches": 0
+    },
+    "currentState": {
+      "applicationCommitBound": false,
+      "applicationCommitCreated": false,
+      "applicationExecuted": false,
+      "claimCreated": false,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    },
+    "finalReleaseRequirements": {
+      "finalReleaseCommitMustBeDirectChildOfPacketCommit": true,
+      "finalReleaseExactDiffEntries": [
+        {
+          "path": "docs/near-model-memory-plan-pack/cm2119_full_plan_final_execution_release.json",
+          "status": "A"
+        },
+        {
+          "path": "docs/near-model-memory-plan-pack/cm2119_full_plan_final_execution_release.md",
+          "status": "A"
+        }
+      ],
+      "finalReleaseExactDiffPaths": [
+        "docs/near-model-memory-plan-pack/cm2119_full_plan_final_execution_release.json",
+        "docs/near-model-memory-plan-pack/cm2119_full_plan_final_execution_release.md"
+      ],
+      "finalReleaseMayAuthorizeOneClaimAndOneApplicationCommit": true,
+      "finalReleaseMayAuthorizeStatusSync": false,
+      "finalReleaseMustBindContentDecisionGitIdentity": true,
+      "finalReleaseMustBindImplementationGitIdentity": true,
+      "finalReleaseMustBindPacketGitIdentity": true,
+      "separateFinalExecutionReleaseRequired": true
+    },
+    "implementation": {
+      "artifacts": [
+        {
+          "blobOid": "e034010c6d30361c4620fe2322591370d8a1722f",
+          "path": "package.json"
+        },
+        {
+          "blobOid": "23e909e79699845f535a44ba999df1bca1c1636b",
+          "path": "scripts/generate-cm2118-full-plan-application-execution-packet.js"
+        },
+        {
+          "blobOid": "f7a630c6459245e7acbe44d5a9f12684168ae54c",
+          "path": "scripts/generate-cm2119-full-plan-final-execution-release.js"
+        },
+        {
+          "blobOid": "1b178601c82f9c7a2309237adf2d2a4fd4f7e1fc",
+          "path": "src/cli/cm2118-full-plan-application.js"
+        },
+        {
+          "blobOid": "be61d3e53122ec235be89cfdccedf569ba4beec0",
+          "path": "src/core/Cm2118FullPlanApplicationExecution.js"
+        },
+        {
+          "blobOid": "e1e17d06f4116aee9cd3a7c45570906d53a162f1",
+          "path": "tests/cm2118-full-plan-application-execution.test.js"
+        },
+        {
+          "blobOid": "bf0f8c4c321c8e34a3a7c8452db77371592b08ee",
+          "path": "scripts/cm2115-r2-git.js"
+        },
+        {
+          "blobOid": "f740d7200e4a3aac7e7a103fe651d60ad317d2a8",
+          "path": "scripts/generate-cm2116-exact-full-plan-application-gate.js"
+        },
+        {
+          "blobOid": "95c3c7412570966510a9e7b818a450f2be0b9924",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js"
+        },
+        {
+          "blobOid": "c6a469d588ce1d7e4e8e1c905d1df553bc6d75d0",
+          "path": "src/core/Cm2116ExactFullPlanApplicationGate.js"
+        },
+        {
+          "blobOid": "8e802faa46b2fc2dd0319a94808b13f3681edddb",
+          "path": "src/core/Cm2117ExactFullPlanApplicationDecision.js"
+        }
+      ],
+      "commit": "45c53bf5379e18ade7952baf767228dabf693a84",
+      "diffEntries": [
+        {
+          "path": "package.json",
+          "status": "M"
+        },
+        {
+          "path": "scripts/generate-cm2118-full-plan-application-execution-packet.js",
+          "status": "A"
+        },
+        {
+          "path": "scripts/generate-cm2119-full-plan-final-execution-release.js",
+          "status": "A"
+        },
+        {
+          "path": "src/cli/cm2118-full-plan-application.js",
+          "status": "A"
+        },
+        {
+          "path": "src/core/Cm2118FullPlanApplicationExecution.js",
+          "status": "A"
+        },
+        {
+          "path": "tests/cm2118-full-plan-application-execution.test.js",
+          "status": "A"
+        }
+      ],
+      "diffEntriesSha256": "022ae36b380a27dfe5252e0f093d68389441c469e47a447e36db559c758ab8fc",
+      "diffPaths": [
+        "package.json",
+        "scripts/generate-cm2118-full-plan-application-execution-packet.js",
+        "scripts/generate-cm2119-full-plan-final-execution-release.js",
+        "src/cli/cm2118-full-plan-application.js",
+        "src/core/Cm2118FullPlanApplicationExecution.js",
+        "tests/cm2118-full-plan-application-execution.test.js"
+      ],
+      "diffPathsSha256": "aeff9983ba46f30e73e6976204491b7885e6d9c9a5051edd48bcebb20f05df71",
+      "parentCommit": "d04ee13f854eb4396da17bfee0d46adf588b0832",
+      "parentTree": "50b1baf196d199f13691f2a9d153a51799cece59",
+      "tree": "b4ea04726e385d8e54ab755264678b4030d456c0"
+    },
+    "nonClaims": {
+      "completeRealtimeMemory": false,
+      "completeRealtimeMemoryClaimed": false,
+      "completeV8": false,
+      "completeV8Claimed": false,
+      "cutoverReady": false,
+      "cutoverReadyClaimed": false,
+      "deployReady": false,
+      "deployReadyClaimed": false,
+      "fullBridgeCompletion": false,
+      "fullBridgeCompletionClaimed": false,
+      "fullPlanPackCompletedClaimed": false,
+      "fullRealtimeMemory": false,
+      "fullRealtimeMemoryClaimed": false,
+      "modelMemoryComplete": false,
+      "modelMemoryCompleteClaimed": false,
+      "productionReady": false,
+      "productionReadyClaimed": false,
+      "rcReady": false,
+      "rcReadyClaimed": false,
+      "readinessClaimed": false,
+      "releaseReady": false,
+      "releaseReadyClaimed": false
+    },
+    "oneShotRegistry": {
+      "alternateRootAllowed": false,
+      "atomicExclusiveCreateRequired": true,
+      "authorizationReplayAllowed": false,
+      "authorizationUseCount": 1,
+      "automaticCleanupAllowed": false,
+      "automaticRetryAllowed": false,
+      "claimIdDerivationExcludesBindingHash": true,
+      "exactReadbackRequired": true,
+      "governanceRootAuthority": "git_common_dir_fixed_governance_root",
+      "governanceRootIdentitySha256": "240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0",
+      "nonce": "cm2116-full-plan-application-001",
+      "receiptId": "cm2116-full-plan-application-receipt-001",
+      "registryReference": "cm2116-full-plan-application-registry-001"
+    },
+    "packetReference": "CM-2118-FULL-PLAN-APPLICATION-EXECUTION-PACKET-50AE5DA8-45C53BF5",
+    "packetType": "non_executing_one_shot_full_plan_application_packet",
+    "receiptBoundary": {
+      "applicationBindingReceiptFilename": "cm2118-full-plan-application-commit-binding-receipt-001.json",
+      "executionReceiptFilename": "cm2118-full-plan-application-execution-receipt-001.json",
+      "receiptRootAuthority": "git_common_dir_fixed_governance_root",
+      "receiptTimeContentDecisionRevalidationRequired": true,
+      "receiptTimeExecutionPacketRevalidationRequired": true,
+      "receiptTimeFinalReleaseRevalidationRequired": true,
+      "receiptsStoredOutsideApplicationCommit": true
+    },
+    "sideEffectLimits": {
+      "applicationCommits": 1,
+      "claimCreates": 1,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "repositoryPatches": 1
+    }
+  },
+  "schemaVersion": 1,
+  "taskId": "CM-2118"
+}
+```
