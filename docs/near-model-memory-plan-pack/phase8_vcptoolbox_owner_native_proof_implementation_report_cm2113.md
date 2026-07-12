@@ -4,8 +4,8 @@ CM-2113 implements the replacement evidence path selected by CM-2112. The
 frozen implementation baseline is:
 
 ```yaml
-implementation_commit: "26bba1605ca700ed0a2c7eba16bab83295d313d5"
-implementation_tree: "ce4669f16d0d1dc0361705e7c669f354b8849065"
+implementation_commit: "b9010cef38d81b82c299bcf8d054e44e0875c00e"
+implementation_tree: "d2bd721aa44c18ae63f70b698b61f1243243b466"
 implementation_review_result: "PASS_IMPLEMENTATION_ONLY"
 native_execution_performed_by_this_report: false
 ```
@@ -49,6 +49,7 @@ action, rollback, compensation, or readiness claim occurred.
 
 The store/runtime bootstrap itself was executed from the earlier clean
 implementation commit `ed6ffcd0…`, then independently frozen as receipt commit
-`ce3cd322…`. The later `26bba160…` executor change only adds mandatory Git-object
-intake of that bootstrap receipt; it does not alter the materialized owner
-runtime, frozen clock, store identity, payload, or transport implementation.
+`ce3cd322…`. The later executor changes add mandatory Git-object intake of that
+bootstrap receipt, exact preload binding, and fail-closed child-transport exit
+handling; they do not alter the materialized owner runtime, frozen clock, store
+identity, payload, or allowed transport chain.
