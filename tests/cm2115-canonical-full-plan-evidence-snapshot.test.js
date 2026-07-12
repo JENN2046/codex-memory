@@ -71,8 +71,8 @@ function validValidationReceipt() {
     targetTree: VALIDATION_TARGET_TREE,
     commandResults: [
       commandResult(
-        'cm2115_snapshot_focused',
-        'node --test tests/cm2115-canonical-full-plan-evidence-snapshot.test.js',
+        'cm2115_r1_phase2_application_focused',
+        'node --test tests/cm2115-r1-phase2-completion-audit-application.test.js',
         [tap(18)]
       ),
       commandResult('test_all', 'npm run test:all', [tap(5370), tap(94), tap(6)]),

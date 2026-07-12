@@ -17,7 +17,8 @@ const PAYLOAD_KEYS = Object.freeze([
   'sideEffects',
   'nonClaims'
 ]);
-const TARGET_KEYS = Object.freeze(['commit', 'tree', 'worktreeCleanAtStart']);
+const TARGET_KEYS_V1 = Object.freeze(['commit', 'tree', 'worktreeCleanAtStart']);
+const TARGET_KEYS = Object.freeze(['commit', 'tree', 'worktreeCleanAtStart', 'worktreeCleanAfterCommands']);
 const COMMAND_RESULT_KEYS = Object.freeze([
   'commandId',
   'command',
@@ -46,11 +47,17 @@ const SAFE_SUMMARY_KEYS = Object.freeze([
   'failedCheckCount',
   'checkStatusesSha256'
 ]);
-const EVIDENCE_KEYS = Object.freeze([
+const EVIDENCE_KEYS_V1 = Object.freeze([
   'phase1RegressionTestsPassed',
   'testAllPassed',
   'gateCiPassed',
   'snapshotContractTestsPassed'
+]);
+const EVIDENCE_KEYS = Object.freeze([
+  'phase1RegressionTestsPassed',
+  'testAllPassed',
+  'gateCiPassed',
+  'phase2ApplicationTestsPassed'
 ]);
 const CURRENT_STATE_KEYS = Object.freeze([
   'phase8Completed',
@@ -76,10 +83,24 @@ const NON_CLAIM_KEYS = Object.freeze([
   'fullPlanPackCompleted'
 ]);
 
-const EXPECTED_COMMANDS = Object.freeze([
+const EXPECTED_COMMANDS_V1 = Object.freeze([
   Object.freeze({
     commandId: 'cm2115_snapshot_focused',
     command: 'node --test tests/cm2115-canonical-full-plan-evidence-snapshot.test.js'
+  }),
+  Object.freeze({
+    commandId: 'test_all',
+    command: 'npm run test:all'
+  }),
+  Object.freeze({
+    commandId: 'gate_ci',
+    command: 'npm run gate:ci -- --json'
+  })
+]);
+const EXPECTED_COMMANDS = Object.freeze([
+  Object.freeze({
+    commandId: 'cm2115_r1_phase2_application_focused',
+    command: 'node --test tests/cm2115-r1-phase2-completion-audit-application.test.js'
   }),
   Object.freeze({
     commandId: 'test_all',
@@ -102,9 +123,15 @@ function hex(value, length) {
 
 function evaluateCm2115LocalValidationReceipt(receipt) {
   const blockers = [];
+  const legacyV1 = receipt?.taskId === 'CM-2115' &&
+    receipt?.receiptType === 'canonical_full_plan_local_validation_receipt_v1';
+  const currentV2 = receipt?.taskId === 'CM-2115-R1' &&
+    receipt?.receiptType === 'canonical_full_plan_local_validation_receipt_v2';
+  const expectedCommands = legacyV1 ? EXPECTED_COMMANDS_V1 : EXPECTED_COMMANDS;
+  const targetKeys = legacyV1 ? TARGET_KEYS_V1 : TARGET_KEYS;
+  const evidenceKeys = legacyV1 ? EVIDENCE_KEYS_V1 : EVIDENCE_KEYS;
   if (!sameKeys(receipt, RECEIPT_KEYS)) blockers.push('receipt.fields');
-  if (receipt?.schemaVersion !== 1 || receipt?.taskId !== 'CM-2115' ||
-      receipt?.receiptType !== 'canonical_full_plan_local_validation_receipt_v1') {
+  if (receipt?.schemaVersion !== 1 || (!legacyV1 && !currentV2)) {
     blockers.push('receipt.identity');
   }
   if (!hex(receipt?.canonicalPayloadSha256, 64) ||
@@ -113,18 +140,19 @@ function evaluateCm2115LocalValidationReceipt(receipt) {
   }
   const payload = receipt?.payload;
   if (!sameKeys(payload, PAYLOAD_KEYS)) blockers.push('payload.fields');
-  if (!sameKeys(payload?.validationTarget, TARGET_KEYS) ||
+  if (!sameKeys(payload?.validationTarget, targetKeys) ||
       !hex(payload?.validationTarget?.commit, 40) ||
       !hex(payload?.validationTarget?.tree, 40) ||
-      payload?.validationTarget?.worktreeCleanAtStart !== true) {
+      payload?.validationTarget?.worktreeCleanAtStart !== true ||
+      (currentV2 && payload?.validationTarget?.worktreeCleanAfterCommands !== true)) {
     blockers.push('payload.validationTarget');
   }
 
   const results = Array.isArray(payload?.commandResults) ? payload.commandResults : [];
-  if (!Array.isArray(payload?.commandResults) || results.length !== EXPECTED_COMMANDS.length) {
+  if (!Array.isArray(payload?.commandResults) || results.length !== expectedCommands.length) {
     blockers.push('payload.commandResults.count');
   }
-  EXPECTED_COMMANDS.forEach((expected, index) => {
+  expectedCommands.forEach((expected, index) => {
     const result = results[index];
     if (!sameKeys(result, COMMAND_RESULT_KEYS)) blockers.push(`command.fields.${expected.commandId}`);
     if (result?.commandId !== expected.commandId || result?.command !== expected.command ||
@@ -161,8 +189,8 @@ function evaluateCm2115LocalValidationReceipt(receipt) {
     }
   });
 
-  if (!sameKeys(payload?.evidenceSemantics, EVIDENCE_KEYS) ||
-      EVIDENCE_KEYS.some(field => payload?.evidenceSemantics?.[field] !== true)) {
+  if (!sameKeys(payload?.evidenceSemantics, evidenceKeys) ||
+      evidenceKeys.some(field => payload?.evidenceSemantics?.[field] !== true)) {
     blockers.push('payload.evidenceSemantics');
   }
   if (!sameKeys(payload?.currentState, CURRENT_STATE_KEYS) ||
@@ -199,7 +227,9 @@ module.exports = {
   COMMAND_RESULT_KEYS,
   CURRENT_STATE_KEYS,
   EVIDENCE_KEYS,
+  EVIDENCE_KEYS_V1,
   EXPECTED_COMMANDS,
+  EXPECTED_COMMANDS_V1,
   NON_CLAIM_KEYS,
   PAYLOAD_KEYS,
   RECEIPT_KEYS,
@@ -207,5 +237,6 @@ module.exports = {
   SIDE_EFFECT_KEYS,
   TAP_KEYS,
   TARGET_KEYS,
+  TARGET_KEYS_V1,
   evaluateCm2115LocalValidationReceipt
 };
