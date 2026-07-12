@@ -13,12 +13,19 @@ const {
   sha256
 } = require('./Cm2115R2CanonicalSnapshotSelfReviewDecisionContract');
 
-const TASK_ID = 'CM-2116';
-const GATE_PATH = 'docs/near-model-memory-plan-pack/cm2116_exact_full_plan_application_gate.json';
+const TASK_ID = 'CM-2116-R1';
+const GATE_PATH = 'docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.json';
 const GATE_MARKDOWN_PATH = GATE_PATH.replace(/\.json$/, '.md');
 const IMPLEMENTATION_PARENT_FREEZE = Object.freeze({
-  commit: 'd0956f80cbc3652f46d2225b26d2822fb8adabba',
-  tree: '1c758a146d6adf2541c243d786d4ef7e863c7b69'
+  commit: 'c3f3457b369e86b16dee1251f3914f343040f536',
+  tree: 'f56b97dc52935d34db9135da2562387f05b30e27'
+});
+const SUPERSEDED_GATE_FREEZE = Object.freeze({
+  commit: 'c3f3457b369e86b16dee1251f3914f343040f536',
+  tree: 'f56b97dc52935d34db9135da2562387f05b30e27',
+  canonicalPayloadSha256: '0fd0f9823261ada29e898eeb946e3b4b21b0e561f0100e9e28297d8c7288b2f8',
+  jsonPath: 'docs/near-model-memory-plan-pack/cm2116_exact_full_plan_application_gate.json',
+  markdownPath: 'docs/near-model-memory-plan-pack/cm2116_exact_full_plan_application_gate.md'
 });
 const SELF_REVIEW_INTAKE_FREEZE = Object.freeze({
   commit: '7187e5205806a7038a5cfaff8de46ac89ff953f3',
@@ -76,7 +83,9 @@ const HISTORICAL_IMMUTABLE_PATHS = Object.freeze([
   'docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.json',
   'docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.md',
   SELF_REVIEW_INTAKE_FREEZE.json.path,
-  SELF_REVIEW_INTAKE_FREEZE.markdown.path
+  SELF_REVIEW_INTAKE_FREEZE.markdown.path,
+  SUPERSEDED_GATE_FREEZE.jsonPath,
+  SUPERSEDED_GATE_FREEZE.markdownPath
 ]);
 
 const READINESS_FIELDS = Object.freeze([
@@ -89,8 +98,27 @@ const READINESS_FIELDS = Object.freeze([
   'modelMemoryComplete',
   'fullRealtimeMemory',
   'fullBridgeCompletion',
-  'readinessClaimed'
+  'readinessClaimed',
+  'productionReadyClaimed',
+  'releaseReadyClaimed',
+  'deployReadyClaimed',
+  'cutoverReadyClaimed',
+  'rcReadyClaimed',
+  'completeV8Claimed',
+  'fullPlanPackCompletedClaimed',
+  'modelMemoryCompleteClaimed',
+  'completeRealtimeMemoryClaimed',
+  'fullRealtimeMemoryClaimed',
+  'fullBridgeCompletionClaimed'
 ]);
+
+const IMPLEMENTATION_KEYS = Object.freeze(['commit', 'tree', 'artifacts']);
+const ARTIFACT_KEYS = Object.freeze(['path', 'blobOid']);
+
+function sameKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
 
 function sameJson(left, right) {
   return JSON.stringify(canonicalize(left)) === JSON.stringify(canonicalize(right));
@@ -201,7 +229,7 @@ function buildGateReference(gateImplementation) {
     throw new Error('cm2116_gate_implementation_commit_required');
   }
   return [
-    'CM-2116-EXACT-FULL-PLAN-APPLICATION-GATE',
+    'CM-2116-R1-EXACT-FULL-PLAN-APPLICATION-GATE',
     SELF_REVIEW_INTAKE_FREEZE.canonicalPayloadSha256.slice(0, 8),
     SELF_REVIEW_INTAKE_FREEZE.commit.slice(0, 8),
     gateImplementation.commit.slice(0, 8)
@@ -213,7 +241,14 @@ function buildGatePayload({ gateImplementation, intakeEvidence }) {
   const receipt = intakeEvidence.receipt;
   return {
     gateReference: buildGateReference(gateImplementation),
-    gateType: 'exact_full_plan_application_preparation_gate_v1',
+    gateType: 'exact_full_plan_application_preparation_gate_r1_v1',
+    supersededGate: {
+      commit: SUPERSEDED_GATE_FREEZE.commit,
+      tree: SUPERSEDED_GATE_FREEZE.tree,
+      canonicalPayloadSha256: SUPERSEDED_GATE_FREEZE.canonicalPayloadSha256,
+      usedAsCurrentAuthority: false,
+      reason: 'superseded_by_exact_schema_and_complete_readiness_alias_hardening'
+    },
     upstreamSelfReviewIntake: {
       receiptReference: receipt.payload.receiptReference,
       canonicalPayloadSha256: receipt.canonicalPayloadSha256,
@@ -242,6 +277,7 @@ function buildGatePayload({ gateImplementation, intakeEvidence }) {
       independentReviewPassed: true,
       independentReviewMode: 'repository_internal_separate_pass',
       independentExternalReviewPassed: false,
+      supersededGateUsedAsAuthority: false,
       fullPlanApplicationGatePrepared: true,
       fullPlanApplicationDecisionPresent: false,
       fullPlanApplicationAuthorized: false,
@@ -313,7 +349,7 @@ function buildGate(args) {
   return {
     schemaVersion: 1,
     taskId: TASK_ID,
-    gateType: 'exact_full_plan_application_preparation_gate_v1',
+    gateType: 'exact_full_plan_application_preparation_gate_r1_v1',
     canonicalPayloadSha256: sha256Canonical(payload),
     payload
   };
@@ -322,7 +358,7 @@ function buildGate(args) {
 function evaluateGate(gate = {}, options = {}) {
   const blockers = [];
   if (gate.schemaVersion !== 1 || gate.taskId !== TASK_ID ||
-      gate.gateType !== 'exact_full_plan_application_preparation_gate_v1' ||
+      gate.gateType !== 'exact_full_plan_application_preparation_gate_r1_v1' ||
       gate.canonicalPayloadSha256 !== sha256Canonical(gate.payload || {})) {
     blockers.push('gate.identityOrHash');
   }
@@ -330,10 +366,13 @@ function evaluateGate(gate = {}, options = {}) {
   if (!intakeEvidence.accepted) blockers.push(...intakeEvidence.blockers);
 
   const implementation = gate.payload?.gateImplementation;
-  if (!implementation || !/^[a-f0-9]{40}$/.test(implementation.commit || '') ||
+  if (!sameKeys(implementation, IMPLEMENTATION_KEYS) ||
+      !/^[a-f0-9]{40}$/.test(implementation.commit || '') ||
       !/^[a-f0-9]{40}$/.test(implementation.tree || '') ||
       !Array.isArray(implementation.artifacts) ||
-      !sameJson(implementation.artifacts.map(item => item?.path), GATE_IMPLEMENTATION_ARTIFACT_PATHS)) {
+      !sameJson(implementation.artifacts.map(item => item?.path), GATE_IMPLEMENTATION_ARTIFACT_PATHS) ||
+      implementation.artifacts.some(item => !sameKeys(item, ARTIFACT_KEYS) ||
+        !/^[a-f0-9]{40}$/.test(item.blobOid || ''))) {
     blockers.push('gate.implementation');
   } else {
     try {
@@ -370,7 +409,8 @@ function evaluateGate(gate = {}, options = {}) {
   if (current?.phase8Completed !== true || current?.historicalCm2080ExternalReviewPassed !== true ||
       current?.independentReviewPassed !== true ||
       current?.independentReviewMode !== 'repository_internal_separate_pass' ||
-      current?.independentExternalReviewPassed !== false || current?.fullPlanApplicationGatePrepared !== true ||
+      current?.independentExternalReviewPassed !== false || current?.supersededGateUsedAsAuthority !== false ||
+      current?.fullPlanApplicationGatePrepared !== true ||
       current?.fullPlanApplicationDecisionPresent !== false || current?.fullPlanApplicationAuthorized !== false ||
       current?.fullPlanApplicationExecuted !== false || current?.fullPlanApplicationCommitBound !== false ||
       current?.fullPlanPackCompleted !== false || current?.readinessClaimed !== false) {
@@ -409,6 +449,7 @@ function evaluateGate(gate = {}, options = {}) {
 }
 
 module.exports = {
+  ARTIFACT_KEYS,
   FUTURE_APPLICATION_TARGETS,
   GATE_IMPLEMENTATION_ARTIFACT_PATHS,
   GATE_IMPLEMENTATION_DIFF_PATHS,
@@ -416,8 +457,10 @@ module.exports = {
   GATE_PATH,
   HISTORICAL_IMMUTABLE_PATHS,
   IMPLEMENTATION_PARENT_FREEZE,
+  IMPLEMENTATION_KEYS,
   READINESS_FIELDS,
   SELF_REVIEW_INTAKE_FREEZE,
+  SUPERSEDED_GATE_FREEZE,
   TASK_ID,
   buildGate,
   buildGatePayload,

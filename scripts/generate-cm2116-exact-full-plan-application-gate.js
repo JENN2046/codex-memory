@@ -67,7 +67,7 @@ function buildGateImplementation() {
 
 function renderMarkdown(gate, jsonText) {
   return [
-    '# CM-2116 Exact Full-plan Application Gate',
+    '# CM-2116-R1 Exact Full-plan Application Gate',
     '',
     `Gate reference: \`${gate.payload.gateReference}\``,
     `Canonical payload SHA-256: \`${gate.canonicalPayloadSha256}\``,

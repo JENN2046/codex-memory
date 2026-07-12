@@ -170,6 +170,14 @@ test('gate rejects missing resolvers, implementation drift, extra patch paths, a
     copy.payload.gateImplementation.artifacts[0].blobOid = 'a'.repeat(40);
   });
   assert.equal(evaluateGate(artifactDrift, resolvers()).accepted, false);
+  const hiddenImplementationAuthority = mutate(gate, copy => {
+    copy.payload.gateImplementation.applicationAuthorized = true;
+  });
+  assert.equal(evaluateGate(hiddenImplementationAuthority, resolvers()).accepted, false);
+  const hiddenArtifactAuthority = mutate(gate, copy => {
+    copy.payload.gateImplementation.artifacts[0].unexpectedBareBoolean = true;
+  });
+  assert.equal(evaluateGate(hiddenArtifactAuthority, resolvers()).accepted, false);
   const extraTarget = mutate(gate, copy => {
     copy.payload.exactFutureApplicationScope.allowedTargets.push({ path: 'STATUS.md', operation: 'modify' });
   });
@@ -178,6 +186,10 @@ test('gate rejects missing resolvers, implementation drift, extra patch paths, a
     copy.payload.exactFutureApplicationScope.readinessFieldsMustRemainFalse.pop();
   });
   assert.equal(evaluateGate(readinessDrift, resolvers()).accepted, false);
+  const claimedReadiness = mutate(gate, copy => {
+    copy.payload.nonClaims.releaseReadyClaimed = true;
+  });
+  assert.equal(evaluateGate(claimedReadiness, resolvers()).accepted, false);
 });
 
 test('gate generator fixes output paths and Markdown is an exact JSON mirror', () => {
@@ -189,5 +201,5 @@ test('gate generator fixes output paths and Markdown is an exact JSON mirror', (
   const markdown = renderMarkdown(gate, jsonText);
   assert.ok(markdown.includes('PASS_GATE_PREPARED_ONLY'));
   assert.ok(markdown.includes(jsonText.trimEnd()));
-  assert.ok(GATE_PATH.endsWith('cm2116_exact_full_plan_application_gate.json'));
+  assert.ok(GATE_PATH.endsWith('cm2116_r1_exact_full_plan_application_gate.json'));
 });

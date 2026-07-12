@@ -96,7 +96,7 @@
     "cm2115-r2:strengthened-binding-receipt": "node ./scripts/generate-cm2115-r2-strengthened-binding-receipt.js",
     "cm2115-r2:self-review": "node ./scripts/generate-cm2115-r2-self-review-decision.js",
     "cm2115-r2:self-review-intake": "node ./scripts/generate-cm2115-r2-self-review-intake-receipt.js",
-    "cm2116:full-plan-gate": "node ./scripts/generate-cm2116-exact-full-plan-application-gate.js"
+    "cm2116-r1:full-plan-gate": "node ./scripts/generate-cm2116-exact-full-plan-application-gate.js"
   },
   "engines": {
     "node": ">=22.0.0"
