@@ -41,7 +41,7 @@ function ensureRepositoryRoot() {
 
 function renderMarkdown(decision, jsonText) {
   return [
-    '# CM-2123-R1 Full-plan Status-sync Final Execution Release',
+    '# CM-2123-R2 Full-plan Status-sync Final Execution Release',
     '',
     `Decision reference: \`${decision.payload.decisionReference}\``,
     `Canonical payload SHA-256: \`${decision.canonicalPayloadSha256}\``,

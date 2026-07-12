@@ -30,24 +30,24 @@ const {
   sha256
 } = require('./Cm2117ExactFullPlanApplicationDecision');
 
-const TASK_ID = 'CM-2122-R1';
-const FINAL_RELEASE_TASK_ID = 'CM-2123-R1';
+const TASK_ID = 'CM-2122-R2';
+const FINAL_RELEASE_TASK_ID = 'CM-2123-R2';
 const ACTION = 'apply_exact_full_plan_status_sync_detached_commit';
-const PACKET_PATH = 'docs/near-model-memory-plan-pack/cm2122_r1_full_plan_status_sync_execution_packet.json';
+const PACKET_PATH = 'docs/near-model-memory-plan-pack/cm2122_r2_full_plan_status_sync_execution_packet.json';
 const PACKET_MARKDOWN_PATH = PACKET_PATH.replace(/\.json$/, '.md');
-const FINAL_RELEASE_PATH = 'docs/near-model-memory-plan-pack/cm2123_r1_full_plan_status_sync_final_release.json';
+const FINAL_RELEASE_PATH = 'docs/near-model-memory-plan-pack/cm2123_r2_full_plan_status_sync_final_release.json';
 const FINAL_RELEASE_MARKDOWN_PATH = FINAL_RELEASE_PATH.replace(/\.json$/, '.md');
-const EXECUTION_RECEIPT_FILENAME = 'cm2122-r1-full-plan-status-sync-execution-receipt-001.json';
-const BINDING_RECEIPT_FILENAME = 'cm2122-r1-full-plan-status-sync-binding-receipt-001.json';
-const REGISTRY_REFERENCE = 'cm2122-r1-full-plan-status-sync-registry-001';
-const NONCE = 'cm2122-r1-full-plan-status-sync-001';
-const RECEIPT_ID = 'cm2122-r1-full-plan-status-sync-receipt-001';
+const EXECUTION_RECEIPT_FILENAME = 'cm2122-r2-full-plan-status-sync-execution-receipt-001.json';
+const BINDING_RECEIPT_FILENAME = 'cm2122-r2-full-plan-status-sync-binding-receipt-001.json';
+const REGISTRY_REFERENCE = 'cm2122-r2-full-plan-status-sync-registry-001';
+const NONCE = 'cm2122-r2-full-plan-status-sync-001';
+const RECEIPT_ID = 'cm2122-r2-full-plan-status-sync-receipt-001';
 const SUPERSEDED_FREEZE = Object.freeze({
-  implementationCommit: 'd3d230c41d924acdbd79a5975e057c4800b4e576',
-  executionPacketCommit: 'e071ed4fcb089b5896e0f25048aa1938b36f2edc',
-  finalReleaseCommit: 'fd435dc8c4f916e70a00d5a3c0a701e3e060411e',
-  finalReleaseTree: 'd9b72b92b46040cab074da9280032e3cc8a6cd25',
-  reason: 'superseded_before_execution_due_to_git_environment_isolation_repair',
+  implementationCommit: '60761ff5b9fc81554f80b16d4597174f212c82b7',
+  executionPacketCommit: 'f3db578742ce15599b86674a2476532c802eaa74',
+  finalReleaseCommit: 'ef6f8ecd2ea7989ea701ae43bd60d0ae1cba7c3d',
+  finalReleaseTree: 'b76214a388d9458e9ccadc0e0619ae2bf95881f5',
+  reason: 'superseded_before_execution_due_to_durable_review_git_environment_repair',
   authorizationClaimed: false,
   executorRun: false
 });
@@ -90,7 +90,6 @@ const IMPLEMENTATION_PARENT_FREEZE = Object.freeze({
 const IMPLEMENTATION_DIFF_PATHS = Object.freeze([
   'scripts/generate-cm2122-full-plan-status-sync-execution-packet.js',
   'scripts/generate-cm2123-full-plan-status-sync-final-release.js',
-  'src/cli/cm2122-full-plan-status-sync.js',
   'src/core/Cm2122FullPlanStatusSyncExecution.js',
   'tests/cm2122-full-plan-status-sync-execution.test.js'
 ].sort());
@@ -101,6 +100,7 @@ const IMPLEMENTATION_DIFF_ENTRIES = Object.freeze(IMPLEMENTATION_DIFF_PATHS.map(
 const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
   ...IMPLEMENTATION_DIFF_PATHS,
   'package.json',
+  'src/cli/cm2122-full-plan-status-sync.js',
   'scripts/freeze-cm2120-full-plan-application-receipts.js',
   'scripts/generate-cm2116-exact-full-plan-application-gate.js',
   'src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js',
@@ -289,7 +289,7 @@ function buildExecutionPacket({ implementation, contentEvidence }) {
   }
   const decision = contentEvidence.decision;
   const payload = {
-    packetReference: `CM-2122-R1-STATUS-SYNC-EXECUTION-PACKET-${decision.canonicalPayloadSha256.slice(0, 8)}-${implementation.commit.slice(0, 8)}`.toUpperCase(),
+    packetReference: `CM-2122-R2-STATUS-SYNC-EXECUTION-PACKET-${decision.canonicalPayloadSha256.slice(0, 8)}-${implementation.commit.slice(0, 8)}`.toUpperCase(),
     packetType: 'non_executing_exact_status_sync_execution_packet',
     implementation,
     contentDecision: {
@@ -430,7 +430,7 @@ function buildExecutionPacket({ implementation, contentEvidence }) {
     },
     nonClaims: Object.fromEntries(READINESS_FIELDS.map(field => [field, false]))
   };
-  return wrapPayload(payload, 'cm2122_r1_non_executing_full_plan_status_sync_packet_v1');
+  return wrapPayload(payload, 'cm2122_r2_non_executing_full_plan_status_sync_packet_v1');
 }
 
 function verifyImplementation(implementation, options, blockers) {
@@ -464,7 +464,7 @@ function verifyImplementation(implementation, options, blockers) {
 function evaluateExecutionPacket(packet = {}, options = {}) {
   const blockers = [];
   if (packet.schemaVersion !== 1 || packet.taskId !== TASK_ID ||
-      packet.artifactType !== 'cm2122_r1_non_executing_full_plan_status_sync_packet_v1' ||
+      packet.artifactType !== 'cm2122_r2_non_executing_full_plan_status_sync_packet_v1' ||
       packet.canonicalPayloadSha256 !== sha256Canonical(packet.payload || {})) blockers.push('packet.identityOrHash');
   const contentEvidence = intakeContentDecision(options);
   if (!contentEvidence.accepted) blockers.push(...contentEvidence.blockers.map(item => `packet.${item}`));
@@ -561,7 +561,7 @@ function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
   }
   const packet = packetEvidence.packet;
   const payload = {
-    decisionReference: `CM-2123-R1-STATUS-SYNC-FINAL-RELEASE-${packet.canonicalPayloadSha256.slice(0, 8)}-${packetEvidence.packetCommit.slice(0, 8)}`.toUpperCase(),
+    decisionReference: `CM-2123-R2-STATUS-SYNC-FINAL-RELEASE-${packet.canonicalPayloadSha256.slice(0, 8)}-${packetEvidence.packetCommit.slice(0, 8)}`.toUpperCase(),
     decisionType: 'exact_one_shot_detached_status_commit_final_execution_release',
     contentDecision: packet.payload.contentDecision,
     executionPacket: {
@@ -607,13 +607,13 @@ function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
     currentSideEffects: packet.payload.currentSideEffects,
     nonClaims: packet.payload.nonClaims
   };
-  return wrapPayload(payload, 'cm2123_r1_full_plan_status_sync_final_execution_release_v1', FINAL_RELEASE_TASK_ID);
+  return wrapPayload(payload, 'cm2123_r2_full_plan_status_sync_final_execution_release_v1', FINAL_RELEASE_TASK_ID);
 }
 
 function evaluateFinalReleaseDecision(decision = {}, { packetEvidence, now = new Date() } = {}) {
   const blockers = [];
   if (decision.schemaVersion !== 1 || decision.taskId !== FINAL_RELEASE_TASK_ID ||
-      decision.artifactType !== 'cm2123_r1_full_plan_status_sync_final_execution_release_v1' ||
+      decision.artifactType !== 'cm2123_r2_full_plan_status_sync_final_execution_release_v1' ||
       decision.canonicalPayloadSha256 !== sha256Canonical(decision.payload || {})) blockers.push('finalRelease.identityOrHash');
   if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet)) blockers.push('finalRelease.machineBoundPacketRequired');
   else {
@@ -713,7 +713,7 @@ function claimId() {
 }
 
 function claimFileName() {
-  return `.cm2122-r1-status-sync-claim-${claimId()}.json`;
+  return `.cm2122-r2-status-sync-claim-${claimId()}.json`;
 }
 
 class Cm2122StatusSyncClaimRegistry {
@@ -988,13 +988,13 @@ function buildReentryReceipt(existing, bindingHash, finalReleaseCommit) {
     realMemoryReads: 0,
     remoteActions: 0,
     readinessClaims: 0
-  }, 'cm2122_r1_status_sync_claim_readonly_reentry_projection_v1');
+  }, 'cm2122_r2_status_sync_claim_readonly_reentry_projection_v1');
 }
 
 function evaluateReentryReceipt(receipt = {}, { existing, bindingHash, finalReleaseCommit } = {}) {
   const blockers = [];
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
-      receipt.artifactType !== 'cm2122_r1_status_sync_claim_readonly_reentry_projection_v1' ||
+      receipt.artifactType !== 'cm2122_r2_status_sync_claim_readonly_reentry_projection_v1' ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('reentryReceipt.identityOrHash');
   try {
     if (!sameJson(receipt, buildReentryReceipt(existing, bindingHash, finalReleaseCommit))) {
@@ -1324,13 +1324,13 @@ function buildExecutionReceipt({ packetEvidence, finalReleaseEvidence, bindingHa
       readinessClaims: 0
     }
   };
-  return wrapPayload(payload, 'cm2122_r1_detached_status_sync_execution_receipt_v1');
+  return wrapPayload(payload, 'cm2122_r2_detached_status_sync_execution_receipt_v1');
 }
 
 function evaluateExecutionReceipt(receipt = {}, { packetEvidence, finalReleaseEvidence } = {}) {
   const blockers = [];
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
-      receipt.artifactType !== 'cm2122_r1_detached_status_sync_execution_receipt_v1' ||
+      receipt.artifactType !== 'cm2122_r2_detached_status_sync_execution_receipt_v1' ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('executionReceipt.identityOrHash');
   if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet) ||
       !finalReleaseEvidence?.accepted || !isMachineBoundFinalReleaseDecision(finalReleaseEvidence.decision)) {
@@ -1448,14 +1448,14 @@ function buildBindingReceipt({ detachedBinding, executionReceipt, claimEnvelope,
     },
     sideEffects: executionReceipt.payload.sideEffects
   };
-  return wrapPayload(payload, 'cm2122_r1_detached_status_sync_binding_receipt_v1');
+  return wrapPayload(payload, 'cm2122_r2_detached_status_sync_binding_receipt_v1');
 }
 
 function evaluateBindingReceipt(receipt = {}, { detachedBinding, executionReceipt, claimEnvelope,
   packetEvidence, finalReleaseEvidence } = {}) {
   const blockers = [];
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
-      receipt.artifactType !== 'cm2122_r1_detached_status_sync_binding_receipt_v1' ||
+      receipt.artifactType !== 'cm2122_r2_detached_status_sync_binding_receipt_v1' ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('bindingReceipt.identityOrHash');
   try {
     const expected = buildBindingReceipt({ detachedBinding, executionReceipt, claimEnvelope, packetEvidence, finalReleaseEvidence });
@@ -1509,6 +1509,7 @@ async function readExternalReceipt(root, filename) {
 }
 
 async function evaluateDurableDetachedBinding({ contentDecisionCommit, packetCommit, finalReleaseCommit }) {
+  assertSafeGitEnvironment();
   const blockers = [];
   if (contentDecisionCommit !== CONTENT_DECISION_FREEZE.commit) {
     return { accepted: false, blockers: ['durableBinding.exactContentDecisionRequired'] };

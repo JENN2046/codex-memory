@@ -80,7 +80,7 @@ function resolveImplementation() {
 
 function renderMarkdown(packet, jsonText) {
   return [
-    '# CM-2122-R1 Full-plan Status-sync Execution Packet',
+    '# CM-2122-R2 Full-plan Status-sync Execution Packet',
     '',
     `Packet reference: \`${packet.payload.packetReference}\``,
     `Canonical payload SHA-256: \`${packet.canonicalPayloadSha256}\``,
@@ -91,8 +91,8 @@ function renderMarkdown(packet, jsonText) {
     'registry, external execution/binding receipts, and exact nine-path patch.',
     'It carries no final execution release and creates no claim, patch, commit,',
     'receipt, branch update, remote action, or readiness claim.',
-    'The earlier CM-2123 freeze is superseded before execution by this Git',
-    'environment-isolation repair and never created a claim or receipt.',
+    'The earlier CM-2123-R1 freeze is superseded before execution by this',
+    'durable-review Git-environment repair and never created a claim or receipt.',
     'A separate CM-2123 final execution release is required. Branch CAS remains',
     'a later independent gate after detached-commit binding review.',
     '',

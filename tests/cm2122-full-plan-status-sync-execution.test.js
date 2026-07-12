@@ -277,6 +277,23 @@ test('Git repository, object, and index environment overrides fail before any go
   )), false);
 });
 
+test('durable binding review rejects Git environment overrides before reading review evidence', async () => {
+  for (const key of ['GIT_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES']) {
+    const previous = process.env[key];
+    process.env[key] = '/tmp/cm2122-forbidden';
+    try {
+      await assert.rejects(fixture.frozenModule.evaluateDurableDetachedBinding({
+        contentDecisionCommit: implementation.CONTENT_DECISION_FREEZE.commit,
+        packetCommit: fixture.packetCommit,
+        finalReleaseCommit: fixture.finalReleaseCommit
+      }), /unsafe_git_environment/);
+    } finally {
+      if (previous === undefined) delete process.env[key];
+      else process.env[key] = previous;
+    }
+  }
+});
+
 test('frozen packet remains non-executing and final release authorizes no branch ref update', () => {
   const packet = fixture.packetEvidence.packet;
   const release = fixture.finalReleaseEvidence.decision;
@@ -305,6 +322,9 @@ test('frozen packet remains non-executing and final release authorizes no branch
   assert.equal(packet.payload.currentAuthority.detachedStatusCommitCreationAuthorized, false);
   assert.equal(packet.payload.currentAuthority.branchRefUpdateAuthorized, false);
   assert.ok(Object.values(packet.payload.currentSideEffects).every(value => value === 0));
+  assert.deepEqual(packet.payload.supersedes, fixture.frozenModule.SUPERSEDED_FREEZE);
+  assert.equal(packet.payload.supersedes.authorizationClaimed, false);
+  assert.equal(packet.payload.supersedes.executorRun, false);
 
   assert.equal(release.payload.authorization.executionReleaseAuthorized, true);
   assert.equal(release.payload.authorization.detachedStatusCommitCreationAuthorized, true);
