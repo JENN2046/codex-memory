@@ -116,10 +116,12 @@ async function buildFreezeArtifacts() {
   assertSafeGitEnvironment();
   if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2124_clean_worktree_required');
   if (gitText(['branch', '--show-current']) !== '') throw new Error('cm2124_detached_worktree_required');
-  if (gitText(['rev-parse', 'HEAD^{commit}']) !== DETACHED_STATUS_COMMIT ||
-      gitText(['rev-parse', 'HEAD^{tree}']) !== DETACHED_STATUS_TREE ||
+  const freezeImplementationCommit = gitText(['rev-parse', 'HEAD^{commit}']);
+  const freezeImplementationTree = gitText(['rev-parse', 'HEAD^{tree}']);
+  if (gitText(['rev-parse', 'HEAD^']) !== DETACHED_STATUS_COMMIT ||
+      gitText(['rev-parse', 'HEAD^^{tree}']) !== DETACHED_STATUS_TREE ||
       gitText(['show-ref', '--hash', '--verify', FUTURE_BRANCH_REF]) !== FINAL_RELEASE_COMMIT) {
-    throw new Error('cm2124_exact_status_commit_and_target_branch_required');
+    throw new Error('cm2124_exact_implementation_status_parent_and_target_branch_required');
   }
   for (const output of Object.values(OUTPUTS)) {
     if (fs.existsSync(output)) throw new Error(`cm2124_output_already_exists:${output}`);
@@ -179,6 +181,9 @@ async function buildFreezeArtifacts() {
   }
   const payload = {
     freezeReference: 'CM-2124-STATUS-SYNC-RECEIPT-FREEZE-EB016872-8D3AEFD3-5CE9D65A',
+    freezeImplementationCommit,
+    freezeImplementationTree,
+    freezeImplementationParent: DETACHED_STATUS_COMMIT,
     contentDecisionCommit: CONTENT_DECISION_FREEZE.commit,
     executionPacketCommit: PACKET_COMMIT,
     finalReleaseCommit: FINAL_RELEASE_COMMIT,
