@@ -1,0 +1,176 @@
+# CM-2115-R2 Internal Self-review Decision Intake Receipt
+
+Receipt reference: `CM-2115-R2-SELF-REVIEW-INTAKE-PASS-03242787-116D74B3-DF0444BD`
+Canonical payload SHA-256: `ffb0a0cf5db9fff8f04c70d0eb50af4a7adda6db9b0c7f44d3a081675e58eaba`
+
+Result: PASS_INTERNAL_SELF_REVIEW_DECISION_INTAKE_ONLY.
+
+This receipt machine-binds and replays the frozen repository-internal self-review decision.
+It does not claim external review and does not authorize or execute the full-plan application.
+Full-plan completion and every readiness state remain false.
+
+## Exact JSON mirror
+
+```json
+{
+  "canonicalPayloadSha256": "ffb0a0cf5db9fff8f04c70d0eb50af4a7adda6db9b0c7f44d3a081675e58eaba",
+  "payload": {
+    "authorityBoundary": {
+      "externalReviewPerformedByThisIntake": false,
+      "fullPlanApplicationAuthorizedByThisReceipt": false,
+      "fullPlanApplicationExecuted": false,
+      "fullPlanPackCompleted": false,
+      "historicalCm2080ExternalReviewPassedPreserved": true,
+      "independentExternalReviewPassed": false,
+      "independentReviewMode": "repository_internal_separate_pass",
+      "independentReviewPassed": true,
+      "internalSelfReviewDecisionIntakeAccepted": true,
+      "readinessClaimed": false,
+      "scopedSelfReviewDoesNotModifyHistoricalExternalReviewSlot": true,
+      "selfReviewSatisfiesIndependentExternalReview": false,
+      "separateFullPlanApplicationMayBePrepared": true
+    },
+    "intake": {
+      "actionableFindingCount": 0,
+      "commitTreeAndParentMatched": true,
+      "decisionContractReplayed": true,
+      "exactSchemaAccepted": true,
+      "exactTwoPathDiffMatched": true,
+      "frozenSnapshotReplayed": true,
+      "gitBlobMatched": true,
+      "markdownMirrorMatched": true,
+      "rawBytesMatched": true,
+      "resolvedTraceEntryCount": 164,
+      "sourceObjectMismatchCount": 0,
+      "traceEntryCount": 164,
+      "uniqueSourceObjectCount": 105
+    },
+    "intakeImplementation": {
+      "artifacts": [
+        {
+          "blobOid": "692df9df815f0cf7e47ee9fcbd054fdcb3f9dc39",
+          "path": "src/core/Cm2115R2SelfReviewDecisionIntakeReceiptContract.js"
+        },
+        {
+          "blobOid": "3159795ebd1b400227b992fdd15d3d900924eb54",
+          "path": "scripts/generate-cm2115-r2-self-review-intake-receipt.js"
+        },
+        {
+          "blobOid": "ba9af745a1a37c8b9e2891582b4646392ae97152",
+          "path": "tests/cm2115-r2-self-review-intake-receipt.test.js"
+        },
+        {
+          "blobOid": "eb0db13f374c6b84e7df33cb050617ee2c643012",
+          "path": "package.json"
+        },
+        {
+          "blobOid": "cac52c26899ef3b206d9c264df6685da060426c4",
+          "path": "src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js"
+        },
+        {
+          "blobOid": "95c3c7412570966510a9e7b818a450f2be0b9924",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js"
+        },
+        {
+          "blobOid": "f38429ddefbecf97a966ede9bab1724f09ded7a6",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js"
+        },
+        {
+          "blobOid": "bf0f8c4c321c8e34a3a7c8452db77371592b08ee",
+          "path": "scripts/cm2115-r2-git.js"
+        },
+        {
+          "blobOid": "45e70706fca7dcb19314ea8ad80adbcbd740b2b7",
+          "path": "scripts/generate-cm2115-r2-self-review-decision.js"
+        }
+      ],
+      "commit": "df0444bdd46322d52f1dd65eaf78c135f09c556b",
+      "tree": "8f979aec895f3c96c5b8aa4f5f15fe9d40f453eb"
+    },
+    "nonClaims": {
+      "completeV8": false,
+      "cutoverReady": false,
+      "deployReady": false,
+      "externalIndependentReview": false,
+      "fullPlanPackCompleted": false,
+      "productionReady": false,
+      "rcReady": false,
+      "releaseReady": false
+    },
+    "receiptReference": "CM-2115-R2-SELF-REVIEW-INTAKE-PASS-03242787-116D74B3-DF0444BD",
+    "receiptType": "repository_internal_self_review_decision_post_freeze_intake_receipt_v1",
+    "reviewedRequest": {
+      "commit": "01c65db824e77400ef144ef8118deaa28b06abcc",
+      "json": {
+        "blobOid": "3c99fb6829d10f250eff1b0b873eb8e0d075f59f",
+        "bytes": 5973,
+        "canonicalPayloadSha256": "9b9c158a6652a36256b663e16fdbed9656485143df37c8c9ee13a96fc215bdf0",
+        "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json",
+        "sha256": "4b62b41753c66443b7e7f2a315729c9317172399b06fc8d618a2dd7625501cba"
+      },
+      "markdown": {
+        "blobOid": "df309bac7afdf891081c52b8397d47762d3a1f49",
+        "bytes": 6983,
+        "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md",
+        "sha256": "3ba20d045b3f085a9aa0eb1b7e1763272e44655443b4b7f120c68e7e7a5f51fb"
+      },
+      "tree": "e6f3c28f0df1d10744ead4f132d064b2dcc3fb41"
+    },
+    "reviewedSnapshot": {
+      "commit": "8d25298563e512456c614eb6fec6af6bdc02bf8f",
+      "json": {
+        "blobOid": "eab7cc71bd00642542fc1ef89e7a9bb075268002",
+        "bytes": 296723,
+        "canonicalPayloadSha256": "afc1f7263215dfc89a75118fd8f580c572b729162363021c9f806317ca55cbb6",
+        "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.json",
+        "sha256": "607fa483d192b6a70f1a0534a34c5660fd913b50197501cf85e48e5402e58feb"
+      },
+      "markdown": {
+        "blobOid": "8bffe6f814f5705bada01ac26244121cbeff2243",
+        "bytes": 297521,
+        "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.md",
+        "sha256": "8d0d9fcb5ba6755eb634e6dc81f14523027c7f1625b8f34a9961af5236d06f46"
+      },
+      "tree": "8649b063591c7063b726ef48b3a99ccf45fe7f23"
+    },
+    "selfReviewDecision": {
+      "canonicalPayloadSha256": "032427870f5bbbf1035edc7291302a1e480b93040cd9f088873b45d58546a1d4",
+      "json": {
+        "blobOid": "6b4b751d23a46e27c4502a0b2a27e0efc4f6eff4",
+        "bytes": 5011,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "f5dd9c58e6a296cb857f85a3a4fde5ee3ae33ed9cf8ce793ddc6482be63d8e41",
+        "sourceCommit": "116d74b3c69069fc377a861c01ed8105ee3fda11",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.json",
+        "sourceTree": "c10a9e75ba99113c9c3c6d6bc2991bcf58ecd804"
+      },
+      "markdown": {
+        "blobOid": "2ea6d6e73cd82604d950b6bc6dbcc875b8034752",
+        "bytes": 5606,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "f945a9beb8d40d6ca270455ba081c9ecc0fd08cdaaaee7c39fbd33d77ce63fc2",
+        "sourceCommit": "116d74b3c69069fc377a861c01ed8105ee3fda11",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.md",
+        "sourceTree": "c10a9e75ba99113c9c3c6d6bc2991bcf58ecd804"
+      },
+      "parentCommit": "68c8088a56511b6d6b598e293a6a39130c254a49",
+      "parentTree": "92f15d54d50ccc62443d9a37e10f3338e010c831",
+      "reference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-9B9C158A-68C8088A"
+    },
+    "sideEffects": {
+      "durableMutations": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0
+    }
+  },
+  "receiptType": "repository_internal_self_review_decision_post_freeze_intake_receipt_v1",
+  "schemaVersion": 1,
+  "taskId": "CM-2115-R2"
+}
+```
