@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2114 Phase 8 completion revalidation application`.
-Current validation: `CMV-2206`.
-Current status: `phase8Completed=true` and `phase8CompletionStatus=revalidated_complete` from exact CM-2113/2114 evidence. Both proof authorizations are consumed; no additional native action is allowed. Full plan-pack and every readiness claim remain false.
+Current task: `CM-2115 canonical full-plan evidence snapshot`.
+Current validation: `CMV-2207`.
+Current status: the 164-entry canonical Git-object snapshot and its non-authorizing independent review request are frozen. Candidate completion is eligible, but independent review has not passed and no application authority exists. `fullPlanPackCompleted=false`; every readiness claim remains false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,11 +37,11 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is evidence-preserving review or work on a separately scoped
-plan-pack gap. Do not replay `record_memory`, tombstone, verify, failure
-injection, or authorization claims; do not delete/rebuild governance markers;
-and do not infer production, release, deploy, cutover, RC, complete-V8, or
-full-plan readiness from Phase 8 completion.
+Next safe action is independent review of CM-2115 snapshot commit `3798ecc1…`
+and review-request commit `3313edb8…`. Only after an exact PASS is frozen may a
+separate one-field `fullPlanPackCompleted` application be requested. Do not
+replay native actions, prepare application authority early, or infer production,
+release, deploy, cutover, RC, complete-V8, or readiness from candidate eligibility.
 
 ## Historical Run Notes
 

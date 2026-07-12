@@ -4,11 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2114 Phase 8 completion revalidation application`.
-Current validation: `CMV-2206`.
+Current checkpoint: `CM-2115 canonical full-plan evidence snapshot`.
+Current validation: `CMV-2207`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2115 Canonical Full-plan Evidence Snapshot
+
+Status: `CANONICAL_164_TRACE_SNAPSHOT_FROZEN_INDEPENDENT_REVIEW_PENDING_NO_APPLICATION_NO_READY_CLAIM`
+
+- Source baseline `7a72206b…` includes a fresh low-disclosure command receipt.
+- Snapshot commit `3798ecc1…` binds 164/164 trace entries to 105 real Git blobs with exact source commit/tree/blob/bytes/SHA.
+- The frozen route table contains 21 exact-receipt entries, six external-review entries, and zero placeholders.
+- Candidate Completion Audit evaluation is eligible, but authoritative `fullPlanPackCompleted` remains false.
+- Review request commit `3313edb8…` requests independent Git-object and semantic review only.
+- Internal independent recheck passed 164 routes/405 bindings/105 blobs; it is not the external decision.
+- Application preparation/execution and every readiness claim remain false.
+
+Validation: `CMV-2207`.
 
 ## CM-2114 Phase 8 Completion Revalidation Application
 

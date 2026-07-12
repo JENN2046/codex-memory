@@ -4,13 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2114 Phase 8 completion revalidation application`.
-Current validation: `CMV-2206`.
-Current project status: CM-2113 produced exact VCPToolBox-owned runtime, actual transport, and stable synthetic store evidence; CM-2114 applied all 18 Phase 8 fields. `phase8Completed=true` and `phase8CompletionStatus=revalidated_complete`. Full plan-pack and every readiness claim remain false.
-Current route: `PHASE8_REVALIDATED_COMPLETE_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM`.
+Current task: `CM-2115 canonical full-plan evidence snapshot`.
+Current validation: `CMV-2207`.
+Current project status: the canonical snapshot binds all 164 plan-pack trace entries to frozen Git blobs with exact source commit/tree, byte length, and SHA-256. The candidate audit is mechanically completion-eligible, but independent review is still pending. `fullPlanPackCompleted=false` and every readiness claim remains false.
+Current route: `CANONICAL_164_TRACE_SNAPSHOT_FROZEN_INDEPENDENT_REVIEW_PENDING_NO_APPLICATION_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2115 freezes source baseline `7a72206b…`, canonical snapshot commit
+`3798ecc1…`, and independent review request commit `3313edb8…`. The snapshot
+contains 164/164 resolved trace entries, 105 unique Git blobs, 21 exact-receipt
+entries, six external-review entries, and zero placeholder refs. The snapshot
+payload SHA-256 is `f9b4fd17…85b7`; the review-request payload SHA-256 is
+`739df21d…3b6a`. This is review evidence only: independent review has not yet
+been accepted, no completion application is prepared or authorized, and
+`fullPlanPackCompleted` plus all readiness states remain false.
+
+A separate internal read-only reviewer independently recomputed 164 routes, 405
+direct bindings, and 105 unique blobs with zero mismatches (`18/18` focused
+tests). That internal recheck is recorded as PASS but is not treated as the
+external independent decision required by the application gate.
 
 CM-2114 applies receipt payload SHA-256 `2097572e…c045` and revalidates all 18
 Phase 8 evidence fields. CM-2113 used the official VCPToolBox DailyNote runtime,

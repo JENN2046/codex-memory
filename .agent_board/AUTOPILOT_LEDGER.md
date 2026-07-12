@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest receipt: `CM-2114 Phase 8 completion revalidation application receipt`.
-Latest validation: `CMV-2206`.
+Latest receipt: `CM-2115 canonical snapshot and independent review request`.
+Latest validation: `CMV-2207`.
 Active receipt summaries should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -31,6 +31,7 @@ Governance kernel anchor retained for validation: `CM-0684`.
 
 | ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |
 |---|---|---|---|---|---|---|---|---:|---|---|
+| CM-2115 | prepare canonical full-plan evidence for independent review | Green Git-object snapshot and non-authorizing review request | `canonical_164_trace_snapshot_no_application` | Replaced placeholder trace refs with exact semantic routes, bound 164 entries to 105 Git blobs, ran fresh command gates, and froze a separate review request | `baseline=7a72206b; snapshot=3798ecc1; snapshot_payload=f9b4fd17; review_request=3313edb8; request_payload=739df21d; traces=164; placeholders=0; full_plan=false; readiness=false` | `CMV-2207` | 0 | no independent decision fabrication, application, full-plan mutation, readiness, native/provider/real-memory, or remote action | completed_canonical_snapshot_independent_review_pending_no_application_no_ready_claim | 2026-07-12 |
 | CM-2114 | revalidate Phase 8 using repository reality | Exact synthetic owner proof + docs-only application | `phase8_vcptoolbox_owner_transport_store_revalidation` | Bound official DailyNote Git objects, real stdio/HTTP/stdio transport, stable store, one synthetic write/verify, then applied 18/18 evidence | `owner_receipt=1996cdd6; application_receipt=2097572e; record_sha=f8f84537; phase8=true; full_plan=false; readiness=false` | `CMV-2206` | 2 exact authorizations, 1 durable owner write | no replay, additional native action, provider/real-memory access, rollback/compensation, remote, full-plan, or readiness claim | completed_phase8_revalidated_exact_owner_runtime_transport_store_full_plan_incomplete_no_ready_claim | 2026-07-12 |
 | CM-2112 | revalidate Phase 8 using repository reality | Green audit/status correction; future exact synthetic native proof separate | `phase8_completion_revalidation` | Preserved CM-2111 as history, added three exact runtime/transport/store evidence requirements, and set current Phase 8 to needs_revalidation | `historical_receipt=d2617505; current_phase8=false; status=needs_revalidation; new_required_fields=3; native_actions=0` | `CMV-2205` | 0 | no consumed-action replay, private/real memory, provider, remote, release, deploy, or readiness action | completed_phase8_reopened_exact_vcp_runtime_transport_store_proof_required | 2026-07-12 |
 | CM-2111 | complete Phase 8 of imported near-model-memory plan pack | Exact evidence applications plus Phase 8-only completion audit | `phase8_identity_bound_rollback_failure_recovery_completion` | Applied exact rollback and failure-recovery receipts, then accepted all 15 Phase 8 evidence fields | `rollback_receipt=928da067; rollback_application=8517b8e9; failure_receipt=07c1cf3b; failure_application=9d96290a; completion_bundle=77d162ed; completion_receipt=d2617505; phase8=true; full_plan=false; readiness=false` | `CMV-2204` | 3 | no replay, cleanup, additional native action, provider/real-memory access, remote action, full-plan or readiness claim | completed_phase8_evidence_gate_accepted_full_plan_incomplete_no_ready_claim | 2026-07-12 |

@@ -8,15 +8,31 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Phase 8 revalidated complete; full plan pack and readiness remain incomplete/unclaimed |
-| Current task | `CM-2114 Phase 8 completion revalidation application` |
-| Current validation | `CMV-2206` |
-| Current route | Preserve consumed CM-2113 evidence and continue only with a separately selected remaining plan-pack gap |
+| Status | CM-2115 canonical 164-trace snapshot frozen; independent review pending; full plan and readiness remain false |
+| Current task | `CM-2115 canonical full-plan evidence snapshot` |
+| Current validation | `CMV-2207` |
+| Current route | Obtain an independent decision over the exact snapshot; only afterward prepare a separate one-field completion application |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## Current Revalidation Result
+## Current Snapshot Result
+
+CM-2115 maps all 164 Completion Audit trace slots to exact Git source objects at
+baseline `7a72206b…`: each entry directly records source path, commit/tree, blob
+OID, byte length, and SHA-256. The set contains 105 unique blobs and zero
+placeholder refs. Fresh local evidence records focused `14/14`, `test:all`
+`5383/5383 + 94/94 + 6/6`, and fixture-only/no-network/no-provider `gate:ci`
+success. Snapshot commit is `3798ecc1…`; review request commit is `3313edb8…`.
+The candidate audit is eligible, but it is not authoritative: independent review
+is pending, no application authority exists, `fullPlanPackCompleted=false`, and
+all readiness fields remain false.
+
+An internal independent recheck passed all 164 routes and 405 direct bindings
+with zero Git-object mismatch. It is deliberately recorded separately from the
+still-pending external independent decision and cannot unlock application.
+
+## Historical Phase 8 Revalidation Result
 
 CM-2111 remains historical, including its consumed record/tombstone/failure
 authorizations and receipt SHA `d2617505…faec`. CM-2113 added an exact official
