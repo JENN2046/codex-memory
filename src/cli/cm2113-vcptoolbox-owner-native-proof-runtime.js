@@ -29,6 +29,7 @@ const { BOOTSTRAP_DIRECTORY_NAME } = require('../core/Cm2113VcpToolBoxOwnerRunti
 const PACKET_PATH = 'docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_execution_packet_cm2113.json';
 const CONTENT_DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_content_decision_cm2113.json';
 const FINAL_DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_final_release_cm2113.json';
+const BOOTSTRAP_RECEIPT_PATH = 'docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_runtime_bootstrap_receipt_cm2113.json';
 const EXECUTION_RECEIPT_FILENAME = 'cm2113-vcptoolbox-owner-native-proof-execution-receipt.json';
 
 function git(args, options = {}) {
@@ -181,6 +182,29 @@ async function runCm2113Runtime(packetCommit, contentCommit, finalCommit) {
     bytes: packetIdentity.bytes,
     sha256: packetIdentity.sha256
   };
+  const bootstrapIdentity = gitIdentity(
+    packet.bootstrapReceiptGitIdentity.sourceCommit,
+    BOOTSTRAP_RECEIPT_PATH
+  );
+  const observedBootstrapIdentity = {
+    sourceCommit: bootstrapIdentity.sourceCommit,
+    blobOid: bootstrapIdentity.blobOid,
+    bytes: bootstrapIdentity.bytes,
+    sha256: bootstrapIdentity.sha256
+  };
+  if (JSON.stringify(observedBootstrapIdentity) !== JSON.stringify(packet.bootstrapReceiptGitIdentity)) {
+    throw new Error('cm2113_bootstrap_receipt_git_identity_mismatch');
+  }
+  const bootstrapReceipt = JSON.parse(bootstrapIdentity.rawBytes.toString('utf8'));
+  if (
+    bootstrapReceipt.result !== 'PASS' || bootstrapReceipt.finalState !== 'CONSUMED_SUCCESS' ||
+    bootstrapReceipt.memoryIntelligenceOwner !== 'VCPToolBox' ||
+    bootstrapReceipt.runtimeIdentitySha256 !== packet.runtimeIdentitySha256 ||
+    bootstrapReceipt.storeIdentitySha256 !== packet.storeIdentitySha256 ||
+    bootstrapReceipt.markdownCount !== 0 || bootstrapReceipt.nativeWrites !== 0 ||
+    bootstrapReceipt.recordMemoryCalls !== 0 || bootstrapReceipt.authorizationConsumed !== true ||
+    bootstrapReceipt.authorizationReplayAllowed !== false
+  ) throw new Error('cm2113_bootstrap_receipt_rejected');
 
   const head = git(['rev-parse', 'HEAD']).trim();
   const tree = git(['show', '-s', '--format=%T', 'HEAD']).trim();
@@ -409,4 +433,12 @@ if (require.main === module) {
     });
 }
 
-module.exports = { EXECUTION_RECEIPT_FILENAME, PACKET_PATH, CONTENT_DECISION_PATH, FINAL_DECISION_PATH, resolveGovernancePaths, runCm2113Runtime };
+module.exports = {
+  BOOTSTRAP_RECEIPT_PATH,
+  EXECUTION_RECEIPT_FILENAME,
+  PACKET_PATH,
+  CONTENT_DECISION_PATH,
+  FINAL_DECISION_PATH,
+  resolveGovernancePaths,
+  runCm2113Runtime
+};
