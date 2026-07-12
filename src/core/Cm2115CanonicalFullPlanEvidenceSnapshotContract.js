@@ -7,6 +7,7 @@ const {
   buildCandidateAuditSummary,
   buildEntrySpecs,
   buildRouteDefinition,
+  canonicalize,
   sha256Canonical
 } = require('./Cm2115CanonicalFullPlanEvidenceSnapshot');
 const {
@@ -149,7 +150,7 @@ function safeSourcePath(value) {
 }
 
 function equalJson(left, right) {
-  return JSON.stringify(left) === JSON.stringify(right);
+  return JSON.stringify(canonicalize(left)) === JSON.stringify(canonicalize(right));
 }
 
 function unique(values) {

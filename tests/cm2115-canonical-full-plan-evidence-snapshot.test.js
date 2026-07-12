@@ -156,6 +156,17 @@ test('CM-2115 snapshot contract accepts exact semantic routes and resolved sourc
   assert.equal(result.readinessClaimed, false);
 });
 
+test('canonical JSON round-trip preserves acceptance while retaining strict array order', () => {
+  const snapshot = buildSnapshot(fakeResolverFactory());
+  const roundTripped = JSON.parse(JSON.stringify(canonicalize(snapshot)));
+  const result = evaluate(roundTripped);
+  assert.equal(result.accepted, true, result.blockers.join(','));
+  const reordered = mutate(roundTripped, copy => {
+    [copy.payload.entries[0], copy.payload.entries[1]] = [copy.payload.entries[1], copy.payload.entries[0]];
+  });
+  assert.equal(evaluate(reordered).accepted, false);
+});
+
 test('CM-2115 snapshot resolves all 164 routes against the frozen real Git baseline', () => {
   const snapshot = buildSnapshot(resolveGitSourceObject);
   const result = evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
