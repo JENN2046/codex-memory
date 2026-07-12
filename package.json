@@ -88,7 +88,11 @@
     "cm2115:snapshot": "node ./src/cli/cm2115-canonical-full-plan-evidence-snapshot.js",
     "cm2115:review-request": "node ./scripts/generate-cm2115-independent-review-request.js",
     "cm2115-r1:phase2-decision": "node ./scripts/generate-cm2115-r1-phase2-application-decision.js",
-    "cm2115-r1:phase2-apply": "node ./scripts/apply-cm2115-r1-phase2-completion-audit.js"
+    "cm2115-r1:phase2-apply": "node ./scripts/apply-cm2115-r1-phase2-completion-audit.js",
+    "cm2115-r2:authority-intake": "node ./scripts/generate-cm2115-r2-authority-intake.js",
+    "cm2115-r2:phase2-decision": "node ./scripts/generate-cm2115-r2-application-decision.js",
+    "cm2115-r2:phase2-apply": "node ./scripts/apply-cm2115-r2-phase2-completion-audit.js",
+    "cm2115-r2:binding-receipt": "node ./scripts/generate-cm2115-r2-application-binding-receipt.js"
   },
   "engines": {
     "node": ">=22.0.0"
