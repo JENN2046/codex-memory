@@ -112,9 +112,9 @@ function validValidationReceipt() {
     targetTree: VALIDATION_TARGET_TREE,
     commandResults: [
       commandResult(
-        'cm2115_r1_phase2_application_focused',
-        'node --test tests/cm2115-r1-phase2-completion-audit-application.test.js',
-        [tap(6)]
+        'cm2115_r2_durable_exact_patch_focused',
+        'node --test tests/cm2115-r2-durable-exact-patch-application.test.js',
+        [tap(8)]
       ),
       commandResult('test_all', 'npm run test:all', [tap(5370), tap(94), tap(6)]),
       commandResult('gate_ci', 'npm run gate:ci -- --json', [tap(5370)], {

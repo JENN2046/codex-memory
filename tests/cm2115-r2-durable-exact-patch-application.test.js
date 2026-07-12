@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
@@ -50,6 +49,7 @@ const DECISION_COMMIT = '3'.repeat(40);
 const DECISION_TREE = '4'.repeat(40);
 const APPLICATION_COMMIT = '5'.repeat(40);
 const APPLICATION_TREE = '6'.repeat(40);
+const FROZEN_FIXTURE_BASELINE_COMMIT = 'f458277d0d929c4fcf24748ac56ee63eca186558';
 
 function gitIdentity({ sourceCommit, sourceTree, sourcePath, content, gitMode = '100644' }) {
   const projection = fileProjection(content, gitMode);
@@ -74,8 +74,14 @@ function authorityFixture() {
 }
 
 function targetBaselineResolver(sourcePath) {
-  const content = fs.readFileSync(path.join(ROOT, sourcePath));
+  const content = resolveRealGitFile(FROZEN_FIXTURE_BASELINE_COMMIT, sourcePath).content;
   return gitIdentity({ sourceCommit: BASELINE_COMMIT, sourceTree: BASELINE_TREE, sourcePath, content });
+}
+
+async function writeFrozenBaselineFile(root, sourcePath) {
+  const target = path.join(root, sourcePath);
+  await fsp.mkdir(path.dirname(target), { recursive: true });
+  await fsp.writeFile(target, targetBaselineResolver(sourcePath).content, { flag: 'wx' });
 }
 
 function decisionFixture() {
@@ -117,9 +123,7 @@ async function prepareTempExecution(t) {
   const root = await fsp.mkdtemp(path.join(os.tmpdir(), 'cm2115-r2-'));
   t.after(() => fsp.rm(root, { recursive: true, force: true }));
   for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
-    const target = path.join(root, sourcePath);
-    await fsp.mkdir(path.dirname(target), { recursive: true });
-    await fsp.copyFile(path.join(ROOT, sourcePath), target);
+    await writeFrozenBaselineFile(root, sourcePath);
   }
   const governanceRoot = path.join(root, 'governance-root');
   await fsp.mkdir(governanceRoot);
@@ -182,7 +186,7 @@ test('CM-2115-R2 executes one exact patch and a fresh registry instance cannot r
     assert.deepEqual(fileProjection(bytes, target.after.gitMode), target.after);
   }
   for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
-    await fsp.copyFile(path.join(ROOT, sourcePath), path.join(fixture.root, sourcePath));
+    await fsp.writeFile(path.join(fixture.root, sourcePath), targetBaselineResolver(sourcePath).content);
   }
   await fsp.rm(path.join(fixture.root, APPLICATION_STATE_PATH));
   await fsp.rm(path.join(fixture.root, EXECUTION_RECEIPT_PATH));
@@ -221,7 +225,7 @@ test('CM-2115-R2 corrupt or binding-drifted claim fails closed without patch', a
   await assert.rejects(() => registry.read(), /claim_corrupt/);
   await assert.rejects(() => registry.claim('a'.repeat(64), fixture.decision.payload.decisionReference), /already_claimed/);
   for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
-    assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), fs.readFileSync(path.join(ROOT, sourcePath)));
+    assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), targetBaselineResolver(sourcePath).content);
   }
 });
 

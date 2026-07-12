@@ -18,7 +18,7 @@ const {
 const DEFAULT_OUTPUT = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_r1_local_validation_receipt.json'
+  'cm2115_r2_local_validation_receipt.json'
 );
 
 function git(...args) {
@@ -162,7 +162,7 @@ function buildReceipt({ targetCommit, targetTree, commandResults }) {
       phase1RegressionTestsPassed: true,
       testAllPassed: true,
       gateCiPassed: true,
-      phase2ApplicationTestsPassed: true
+      phase2DurableExactPatchTestsPassed: true
     },
     currentState: {
       phase8Completed: true,
@@ -190,8 +190,8 @@ function buildReceipt({ targetCommit, targetTree, commandResults }) {
   };
   return {
     schemaVersion: 1,
-    taskId: 'CM-2115-R1',
-    receiptType: 'canonical_full_plan_local_validation_receipt_v2',
+    taskId: 'CM-2115-R2',
+    receiptType: 'canonical_full_plan_local_validation_receipt_v3',
     canonicalPayloadSha256: sha256Canonical(payload),
     payload
   };
@@ -204,10 +204,10 @@ function main() {
   const targetTree = git('rev-parse', 'HEAD^{tree}');
   const commandResults = [];
   commandResults.push(run(
-    'cm2115_r1_phase2_application_focused',
-    'node --test tests/cm2115-r1-phase2-completion-audit-application.test.js',
+    'cm2115_r2_durable_exact_patch_focused',
+    'node --test tests/cm2115-r2-durable-exact-patch-application.test.js',
     process.execPath,
-    ['--test', 'tests/cm2115-r1-phase2-completion-audit-application.test.js']
+    ['--test', 'tests/cm2115-r2-durable-exact-patch-application.test.js']
   ));
   commandResults.push(run('test_all', 'npm run test:all', 'npm', ['run', 'test:all']));
   const gate = run('gate_ci', 'npm run gate:ci -- --json', 'npm', ['run', 'gate:ci', '--', '--json']);
@@ -226,7 +226,7 @@ function main() {
   }
   commandResults.push(gate);
   if (git('status', '--porcelain') !== '') {
-    throw new Error('cm2115_r1_validation_receipt_worktree_drift_after_commands');
+    throw new Error('cm2115_r2_validation_receipt_worktree_drift_after_commands');
   }
   const receipt = buildReceipt({ targetCommit, targetTree, commandResults });
   const evaluation = evaluateCm2115LocalValidationReceipt(receipt);

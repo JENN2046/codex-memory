@@ -53,11 +53,17 @@ const EVIDENCE_KEYS_V1 = Object.freeze([
   'gateCiPassed',
   'snapshotContractTestsPassed'
 ]);
-const EVIDENCE_KEYS = Object.freeze([
+const EVIDENCE_KEYS_V2 = Object.freeze([
   'phase1RegressionTestsPassed',
   'testAllPassed',
   'gateCiPassed',
   'phase2ApplicationTestsPassed'
+]);
+const EVIDENCE_KEYS_V3 = Object.freeze([
+  'phase1RegressionTestsPassed',
+  'testAllPassed',
+  'gateCiPassed',
+  'phase2DurableExactPatchTestsPassed'
 ]);
 const CURRENT_STATE_KEYS = Object.freeze([
   'phase8Completed',
@@ -97,10 +103,24 @@ const EXPECTED_COMMANDS_V1 = Object.freeze([
     command: 'npm run gate:ci -- --json'
   })
 ]);
-const EXPECTED_COMMANDS = Object.freeze([
+const EXPECTED_COMMANDS_V2 = Object.freeze([
   Object.freeze({
     commandId: 'cm2115_r1_phase2_application_focused',
     command: 'node --test tests/cm2115-r1-phase2-completion-audit-application.test.js'
+  }),
+  Object.freeze({
+    commandId: 'test_all',
+    command: 'npm run test:all'
+  }),
+  Object.freeze({
+    commandId: 'gate_ci',
+    command: 'npm run gate:ci -- --json'
+  })
+]);
+const EXPECTED_COMMANDS_V3 = Object.freeze([
+  Object.freeze({
+    commandId: 'cm2115_r2_durable_exact_patch_focused',
+    command: 'node --test tests/cm2115-r2-durable-exact-patch-application.test.js'
   }),
   Object.freeze({
     commandId: 'test_all',
@@ -127,11 +147,21 @@ function evaluateCm2115LocalValidationReceipt(receipt) {
     receipt?.receiptType === 'canonical_full_plan_local_validation_receipt_v1';
   const currentV2 = receipt?.taskId === 'CM-2115-R1' &&
     receipt?.receiptType === 'canonical_full_plan_local_validation_receipt_v2';
-  const expectedCommands = legacyV1 ? EXPECTED_COMMANDS_V1 : EXPECTED_COMMANDS;
+  const currentV3 = receipt?.taskId === 'CM-2115-R2' &&
+    receipt?.receiptType === 'canonical_full_plan_local_validation_receipt_v3';
+  const expectedCommands = legacyV1
+    ? EXPECTED_COMMANDS_V1
+    : currentV2
+      ? EXPECTED_COMMANDS_V2
+      : EXPECTED_COMMANDS_V3;
   const targetKeys = legacyV1 ? TARGET_KEYS_V1 : TARGET_KEYS;
-  const evidenceKeys = legacyV1 ? EVIDENCE_KEYS_V1 : EVIDENCE_KEYS;
+  const evidenceKeys = legacyV1
+    ? EVIDENCE_KEYS_V1
+    : currentV2
+      ? EVIDENCE_KEYS_V2
+      : EVIDENCE_KEYS_V3;
   if (!sameKeys(receipt, RECEIPT_KEYS)) blockers.push('receipt.fields');
-  if (receipt?.schemaVersion !== 1 || (!legacyV1 && !currentV2)) {
+  if (receipt?.schemaVersion !== 1 || (!legacyV1 && !currentV2 && !currentV3)) {
     blockers.push('receipt.identity');
   }
   if (!hex(receipt?.canonicalPayloadSha256, 64) ||
@@ -144,7 +174,7 @@ function evaluateCm2115LocalValidationReceipt(receipt) {
       !hex(payload?.validationTarget?.commit, 40) ||
       !hex(payload?.validationTarget?.tree, 40) ||
       payload?.validationTarget?.worktreeCleanAtStart !== true ||
-      (currentV2 && payload?.validationTarget?.worktreeCleanAfterCommands !== true)) {
+      ((currentV2 || currentV3) && payload?.validationTarget?.worktreeCleanAfterCommands !== true)) {
     blockers.push('payload.validationTarget');
   }
 
@@ -226,10 +256,14 @@ function evaluateCm2115LocalValidationReceipt(receipt) {
 module.exports = {
   COMMAND_RESULT_KEYS,
   CURRENT_STATE_KEYS,
-  EVIDENCE_KEYS,
+  EVIDENCE_KEYS: EVIDENCE_KEYS_V3,
   EVIDENCE_KEYS_V1,
-  EXPECTED_COMMANDS,
+  EVIDENCE_KEYS_V2,
+  EVIDENCE_KEYS_V3,
+  EXPECTED_COMMANDS: EXPECTED_COMMANDS_V3,
   EXPECTED_COMMANDS_V1,
+  EXPECTED_COMMANDS_V2,
+  EXPECTED_COMMANDS_V3,
   NON_CLAIM_KEYS,
   PAYLOAD_KEYS,
   RECEIPT_KEYS,
