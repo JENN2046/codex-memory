@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2114",
+  "bundleType": "phase8_completion_revalidation_evidence_bundle",
+  "phaseId": "phase8_native_write_production_proof",
+  "historicalBundleGitIdentity": {
+    "sourceCommit": "1de196fb4e986d715570335dc2bd7b551968ac5f",
+    "blobOid": "4535ebac2d58ac48a3c388ed917004df5b0cba9e",
+    "bytes": 3465,
+    "sha256": "d629f341710fcd4d95a5107a5913bf172b58cd19c77eb08a972f36b3df57eba8",
+    "payloadSha256": "77d162edba2dc7c6911653c1f251cc0ea5b1a96a1db5c1748fd4ba2b2f84fe9d"
+  },
+  "newProofReceiptGitIdentity": {
+    "sourceCommit": "cd0b986420a0be33d197c00c7bc3906d3ebfe887",
+    "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+    "bytes": 4089,
+    "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162"
+  },
+  "evidence": {
+    "nativeWriteContractPreflightPassed": true,
+    "realRootWriteReadinessGatePassed": true,
+    "phase8ReceiptAuditIntakePassed": true,
+    "phase8ReceiptBundleContractPassed": true,
+    "phase8ReceiptPatchHardenedBundleBindingPassed": true,
+    "phase8ReceiptApplicationPatchPreflightPassed": true,
+    "exactApprovalEnforcementPassed": true,
+    "nativeSideEffectReceiptPassed": true,
+    "realRootDurableWriteProofPassed": true,
+    "verifyWritePassed": true,
+    "rollbackDrillPassed": true,
+    "failureRecoveryProofPassed": true,
+    "outputDisclosureBudgetPassed": true,
+    "auditReceiptPassed": true,
+    "phase8ReceiptBundleAppliedToCompletionAudit": true,
+    "vcpToolBoxOwnedRuntimeWritePassed": true,
+    "actualTransportBindingPassed": true,
+    "stableTargetStoreIdentityPassed": true
+  },
+  "currentState": {
+    "phase8Completed": false,
+    "phase8CompletionStatus": "needs_revalidation",
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "allowedCompletionResult": {
+    "phase8Completed": true,
+    "phase8CompletionStatus": "revalidated_complete",
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "proofSideEffects": {
+    "ownerRuntimeNativeWrites": 1,
+    "verifyOperations": 1,
+    "durableRecordCount": 1,
+    "automaticRetries": 0,
+    "rollbackOrCompensationOperations": 0,
+    "realMemoryReads": 0,
+    "remoteActions": 0
+  },
+  "applicationSideEffectCounters": {
+    "completionAuditPatchApplications": 0,
+    "nativeReads": 0,
+    "nativeWrites": 0,
+    "verifyOperations": 0,
+    "rollbackOrCompensationOperations": 0,
+    "remoteActions": 0,
+    "readinessClaims": 0
+  },
+  "nonClaims": {
+    "derivedIndexProofAccepted": false,
+    "productionProviderProofAccepted": false,
+    "productionReady": false,
+    "releaseReady": false,
+    "rcReady": false,
+    "completeV8": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "bundlePayloadSha256": "01d72d5b8fec7725f6f437bcc20eda17d15afc6ee16a43be26e2773c9512345d"
+}
