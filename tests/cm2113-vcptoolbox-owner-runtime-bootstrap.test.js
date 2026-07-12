@@ -16,9 +16,11 @@ const { sha256 } = require('../src/core/VcpToolBoxDailyNoteOwnerRuntimeAdapter')
 async function setup() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2113-bootstrap-'));
   const governanceRoot = path.join(root, 'governance');
+  const authorizationRegistryRoot = path.join(governanceRoot, 'phase8-one-shot-authorization-registries');
   await fs.mkdir(governanceRoot);
+  await fs.mkdir(authorizationRegistryRoot);
   const governanceIdentityBytes = Buffer.from('{"registryRootReference":"cm2113-test"}');
-  await fs.writeFile(path.join(governanceRoot, '.phase8-registry-root-identity.json'), governanceIdentityBytes);
+  await fs.writeFile(path.join(authorizationRegistryRoot, '.phase8-registry-root-identity.json'), governanceIdentityBytes);
   const pluginBytes = Buffer.from('plugin-source');
   const manifestBytes = Buffer.from('{"name":"DailyNote"}');
   const preloadBytes = Buffer.from('preload-source');
@@ -44,7 +46,7 @@ async function setup() {
     runtimeIdentitySha256: sha256(canonicalBytes(buildRuntimeIdentity(binding))),
     storeIdentitySha256: sha256(canonicalBytes(buildStoreIdentity(binding)))
   };
-  return { root, governanceRoot, governanceIdentityBytes, pluginBytes, manifestBytes, preloadBytes, binding, expected };
+  return { root, governanceRoot, authorizationRegistryRoot, governanceIdentityBytes, pluginBytes, manifestBytes, preloadBytes, binding, expected };
 }
 
 test('CM-2113 bootstrap materializes exact owner runtime and stable empty store before native write', async t => {
@@ -52,6 +54,7 @@ test('CM-2113 bootstrap materializes exact owner runtime and stable empty store 
   t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
   const receipt = await executeCm2113OwnerRuntimeBootstrap({
     governanceRoot: fixture.governanceRoot,
+    authorizationRegistryRoot: fixture.authorizationRegistryRoot,
     governanceRootIdentityBytes: fixture.governanceIdentityBytes,
     ownerSource: { pluginBytes: fixture.pluginBytes, manifestBytes: fixture.manifestBytes },
     preloadBytes: fixture.preloadBytes,
@@ -75,6 +78,7 @@ test('CM-2113 bootstrap is exclusive and fails before effects on authority or so
   t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
   const base = {
     governanceRoot: fixture.governanceRoot,
+    authorizationRegistryRoot: fixture.authorizationRegistryRoot,
     governanceRootIdentityBytes: fixture.governanceIdentityBytes,
     ownerSource: { pluginBytes: fixture.pluginBytes, manifestBytes: fixture.manifestBytes },
     preloadBytes: fixture.preloadBytes,

@@ -77,7 +77,8 @@ async function runCm2113OwnerRuntimeBootstrap(decisionCommit) {
   }
   const common = path.resolve(git(['rev-parse', '--git-common-dir']).trim());
   const governanceRoot = path.join(common, 'codex-memory-governance');
-  const governanceIdentityPath = path.join(governanceRoot, '.phase8-registry-root-identity.json');
+  const authorizationRegistryRoot = path.join(governanceRoot, 'phase8-one-shot-authorization-registries');
+  const governanceIdentityPath = path.join(authorizationRegistryRoot, '.phase8-registry-root-identity.json');
   const governanceIdentityStat = await fs.lstat(governanceIdentityPath);
   if (!governanceIdentityStat.isFile() || governanceIdentityStat.isSymbolicLink()) {
     throw new Error('cm2113_bootstrap_governance_identity_invalid');
@@ -125,6 +126,7 @@ async function runCm2113OwnerRuntimeBootstrap(decisionCommit) {
   ) throw new Error('cm2113_bootstrap_identity_binding_mismatch');
   const receipt = await executeCm2113OwnerRuntimeBootstrap({
     governanceRoot,
+    authorizationRegistryRoot,
     governanceRootIdentityBytes,
     ownerSource: { pluginBytes, manifestBytes },
     preloadBytes,

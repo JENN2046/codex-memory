@@ -74,6 +74,7 @@ function buildStoreIdentity(binding = {}) {
 
 async function executeCm2113OwnerRuntimeBootstrap(input = {}) {
   const governanceRoot = path.resolve(input.governanceRoot || '');
+  const authorizationRegistryRoot = path.resolve(input.authorizationRegistryRoot || '');
   const bootstrapRoot = path.join(governanceRoot, BOOTSTRAP_DIRECTORY_NAME);
   const runtimeRoot = path.join(bootstrapRoot, 'owner-runtime');
   const pluginDirectory = path.join(runtimeRoot, 'Plugin', 'DailyNote');
@@ -91,8 +92,13 @@ async function executeCm2113OwnerRuntimeBootstrap(input = {}) {
   }
   if (!await lstatAbsent(bootstrapRoot)) throw new Error('cm2113_bootstrap_root_already_exists');
   const governanceStat = await fs.lstat(governanceRoot);
+  const registryStat = await fs.lstat(authorizationRegistryRoot);
   if (!governanceStat.isDirectory() || governanceStat.isSymbolicLink()) throw new Error('cm2113_governance_root_invalid');
-  const governanceIdentityPath = path.join(governanceRoot, '.phase8-registry-root-identity.json');
+  if (!registryStat.isDirectory() || registryStat.isSymbolicLink()) throw new Error('cm2113_authorization_registry_root_invalid');
+  if (authorizationRegistryRoot !== path.join(governanceRoot, 'phase8-one-shot-authorization-registries')) {
+    throw new Error('cm2113_authorization_registry_root_binding_mismatch');
+  }
+  const governanceIdentityPath = path.join(authorizationRegistryRoot, '.phase8-registry-root-identity.json');
   const observedGovernanceIdentity = await fs.readFile(governanceIdentityPath);
   if (
     !observedGovernanceIdentity.equals(expectedGovernanceIdentityBytes) ||
