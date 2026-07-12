@@ -30,33 +30,42 @@ function input() {
   };
 }
 
-test('CM-2111 evidence bundle independently satisfies all Phase 8 requirements only', () => {
+test('CM-2111 historical bundle no longer satisfies the reopened Phase 8 requirements', () => {
   const result = evaluateBundle(bundle);
-  assert.equal(result.accepted, true, result.blockers.join(', '));
-  assert.equal(result.phaseAudit.accepted, true);
-  assert.equal(result.phaseAudit.missingEvidence.length, 0);
+  assert.equal(result.accepted, false);
+  assert.equal(result.phaseAudit.accepted, false);
+  assert.deepEqual(result.phaseAudit.missingEvidence, [
+    'vcpToolBoxOwnedRuntimeWritePassed',
+    'actualTransportBindingPassed',
+    'stableTargetStoreIdentityPassed'
+  ]);
   assert.equal(result.fullAudit.fullPlanPackCompleted, false);
-  assert.equal(REQUIRED_FIELDS.length, 15);
+  assert.equal(REQUIRED_FIELDS.length, 18);
 });
 
-test('CM-2111 exact decision applies Phase 8 completion without full-plan or readiness claims', () => {
+test('CM-2111 historical decision cannot be replayed after Phase 8 revalidation', () => {
   assert.equal(evaluateDecision(decision).accepted, true);
   const result = executePhase8CompletionAuditApplication(input());
-  assert.equal(result.accepted, true, result.blockers.join(', '));
-  assert.deepEqual(result.appliedState, { rollbackDrillPassed: true, failureRecoveryProofPassed: true, phase8Completed: true, fullPlanPackCompleted: false, readinessClaimed: false });
-  assert.equal(result.receiptPayload.applicationCounters.nativeWrites, 0);
+  assert.equal(result.accepted, false);
+  assert.equal(result.phase8Completed, false);
+  assert.ok(result.blockers.includes('bundle.evidence.fields'));
+  for (const field of [
+    'vcpToolBoxOwnedRuntimeWritePassed',
+    'actualTransportBindingPassed',
+    'stableTargetStoreIdentityPassed'
+  ]) assert.ok(result.blockers.includes(`bundle.evidence.${field}`));
   assert.equal(result.additionalNativeActionAuthorized, false);
-  assert.equal(evaluateApplicationReceipt({ receiptPayload: result.receiptPayload, receiptPayloadSha256: result.receiptPayloadSha256 }).accepted, true);
 });
 
-test('CM-2111 frozen application receipt records Phase 8 completion only', () => {
+test('CM-2111 frozen application receipt is historical and not current completion authority', () => {
   const receipt = JSON.parse(fs.readFileSync(path.join(
     DOCS,
     'phase8_completion_audit_application_receipt_cm2111.json'
   ), 'utf8'));
   const result = evaluateApplicationReceipt(receipt);
-  assert.equal(result.accepted, true, result.blockers.join(', '));
-  assert.equal(result.phase8Completed, true);
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('receipt.evidenceBundle'));
+  assert.equal(result.phase8Completed, false);
   assert.equal(result.fullPlanPackCompleted, false);
   assert.equal(result.readinessClaimed, false);
 });
@@ -73,12 +82,15 @@ test('CM-2111 fails closed on any missing Phase 8 field or boundary drift', () =
 });
 
 test('CM-2111 receipt rejects replay, side effects, full-plan, readiness, or V8 overclaim', () => {
-  const result = executePhase8CompletionAuditApplication(input());
+  const receipt = JSON.parse(fs.readFileSync(path.join(
+    DOCS,
+    'phase8_completion_audit_application_receipt_cm2111.json'
+  ), 'utf8'));
   for (const mutate of [
     payload => { payload.authorization.replayAllowed = true; },
     payload => { payload.applicationCounters.remoteActions = 1; },
     payload => { payload.appliedState.fullPlanPackCompleted = true; },
     payload => { payload.appliedState.readinessClaimed = true; },
     payload => { payload.nonClaims.completeV8 = true; }
-  ]) { const payload = structuredClone(result.receiptPayload); mutate(payload); assert.equal(evaluateApplicationReceipt({ receiptPayload: payload, receiptPayloadSha256: sha256Canonical(payload) }).accepted, false); }
+  ]) { const payload = structuredClone(receipt.receiptPayload); mutate(payload); assert.equal(evaluateApplicationReceipt({ receiptPayload: payload, receiptPayloadSha256: sha256Canonical(payload) }).accepted, false); }
 });

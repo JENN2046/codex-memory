@@ -4,16 +4,30 @@ Task id: `CM-2024`
 Validation id: `CMV-2125`
 Date: `2026-07-10`
 
+## CM-2112 Phase 8 Revalidation Trace Update
+
+The CM-2111 trace remains historical. The current Phase 8 trace adds three
+future exact-authorized receipt requirements:
+
+- `vcpToolBoxOwnedRuntimeWritePassed`;
+- `actualTransportBindingPassed`;
+- `stableTargetStoreIdentityPassed`.
+
+All three are currently missing. Consequently the trace reports
+`phase8Completed=false` and `phase8CompletionStatus=needs_revalidation`.
+Local contracts, old receipt booleans, direct app calls, and synthetic local
+filesystem writes cannot satisfy these entries.
+
 ## CM-2111 Phase 8 Completion Trace Update
 
-All fifteen Phase 8 requirements now trace to accepted local-contract and exact
+Historically, all fifteen then-required Phase 8 requirements traced to accepted local-contract and exact
 receipt/application evidence. The Phase 8-only completion audit reports:
 
 ```yaml
 phase_id: "phase8_native_write_production_proof"
 accepted: true
 missing_evidence: []
-phase8Completed: true
+phase8Completed: true # historical CM-2111 result; superseded for current status by CM-2112
 ```
 
 The application receipt payload SHA-256 is `d2617505…faec`. The trace does not
@@ -129,6 +143,9 @@ Receipt-backed Phase 8 fields include:
 - `exactApprovalEnforcementPassed`;
 - `nativeSideEffectReceiptPassed`;
 - `realRootDurableWriteProofPassed`;
+- `vcpToolBoxOwnedRuntimeWritePassed`;
+- `actualTransportBindingPassed`;
+- `stableTargetStoreIdentityPassed`;
 - `verifyWritePassed`;
 - `rollbackDrillPassed`;
 - `failureRecoveryProofPassed`;

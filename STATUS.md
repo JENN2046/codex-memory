@@ -4,21 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2111 Phase 8 completion evidence audit`.
-Current validation: `CMV-2204`.
-Current project status: Phase 8's 15 required evidence fields are accepted. Identity-bound synthetic record, append-only tombstone rollback, and isolated three-case failure recovery all have frozen one-shot receipts. `phase8Completed=true`; full plan-pack and every readiness claim remain false.
-Current route: `PHASE8_EVIDENCE_GATE_COMPLETED_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM`.
+Current task: `CM-2112 Phase 8 completion revalidation`.
+Current validation: `CMV-2205`.
+Current project status: CM-2111 is preserved as historical evidence, but current Phase 8 completion is reopened. `phase8Completed=false` and `phase8CompletionStatus=needs_revalidation` pending exact VCPToolBox-owned runtime, actual transport, and stable target/store identity proof. Full plan-pack and every readiness claim remain false.
+Current route: `PHASE8_NEEDS_REVALIDATION_EXACT_VCP_RUNTIME_TRANSPORT_STORE_PROOF_REQUIRED`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-2111 applies the Phase 8-only completion audit after CM-2095, CM-2108, and
-CM-2110 separately applied native-write, rollback, and failure-recovery
-evidence. The audit accepted all 15 Phase 8 requirements with no missing field.
-Receipt payload SHA-256 is `d2617505…faec`. This is not a production, release,
-deploy, cutover, `RC_READY`, complete-V8, or full-plan completion claim. All
-execution authorizations are consumed or inactive; no additional native action
-is authorized.
+CM-2112 reopens the current Phase 8 result without rewriting CM-2111 history.
+The old receipt payload SHA-256 `d2617505…faec` remains an immutable record of
+the prior 15-field application, but it is not current completion authority.
+The Completion Audit now requires three additional exact-receipt fields:
+`vcpToolBoxOwnedRuntimeWritePassed`, `actualTransportBindingPassed`, and
+`stableTargetStoreIdentityPassed`. All three are false; no native action is
+authorized by the revalidation decision.
 
 CM-2096 v2 review `...V2-PACKET-PASS-NO-EXECUTION-47E81469` is frozen. V3
 implementation `6f4f7867…` and packet `1ba07b0c…` add an immutable synthetic

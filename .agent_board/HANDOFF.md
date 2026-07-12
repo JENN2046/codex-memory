@@ -4,21 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2111 Phase 8 completion evidence audit`.
-Current validation: `CMV-2204`.
-Current handoff: Phase 8 is complete under its 15-field Completion Audit. Preserve all consumed one-shot markers and receipts. Do not replay native/tombstone/failure actions or infer full-plan, production, release, deploy, RC, or V8 readiness.
+Current task: `CM-2112 Phase 8 completion revalidation`.
+Current validation: `CMV-2205`.
+Current handoff: Treat CM-2111 as historical and current Phase 8 as `needs_revalidation`. Do not replay any consumed action. Build a new exact synthetic proof bound to VCPToolBox-owned runtime, actual stdio→local-HTTP transport, and stable target/store identity before a separate Completion Audit reapplication.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2111 is complete. The exact identity-bound record/rollback lifecycle and the
+CM-2112 supersedes CM-2111 only for current completion status. CM-2111's exact identity-bound record/rollback lifecycle and the
 isolated three-case failure-recovery harness produced frozen receipts; CM-2108
-and CM-2110 applied the remaining evidence separately. CM-2111 then accepted
-all 15 Phase 8 requirements and set only `phase8Completed=true`. Completion
-receipt payload SHA-256 is `d2617505…faec`. All action authorizations are
-consumed or inactive. `fullPlanPackCompleted`, production/release/deploy/cutover
-readiness, `RC_READY`, and complete V8 remain false.
+and CM-2110 applied the remaining evidence separately. Its completion receipt
+payload SHA-256 `d2617505…faec` remains historical. The current audit now has
+18 requirements and is missing three exact runtime/transport/store fields, so
+`phase8Completed=false` and `phase8CompletionStatus=needs_revalidation`. All
+old action authorizations are consumed or inactive.
 
 CM-2096 v3 closes the v2 implementation gaps in a non-executing stack. A fixed
 store identity and internally resolved runtime authority feed exact pre/post

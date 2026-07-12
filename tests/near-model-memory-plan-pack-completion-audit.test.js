@@ -88,6 +88,9 @@ function fullEvidence() {
     phase8ReceiptApplicationPatchPreflightPassed: true,
     nativeSideEffectReceiptPassed: true,
     realRootDurableWriteProofPassed: true,
+    vcpToolBoxOwnedRuntimeWritePassed: true,
+    actualTransportBindingPassed: true,
+    stableTargetStoreIdentityPassed: true,
     verifyWritePassed: true,
     rollbackDrillPassed: true,
     failureRecoveryProofPassed: true,
@@ -165,6 +168,9 @@ function currentPostPhase1GateEvidence() {
   evidence.phase2ReceiptBundleAppliedToCompletionAudit = false;
   evidence.nativeSideEffectReceiptPassed = false;
   evidence.realRootDurableWriteProofPassed = false;
+  evidence.vcpToolBoxOwnedRuntimeWritePassed = false;
+  evidence.actualTransportBindingPassed = false;
+  evidence.stableTargetStoreIdentityPassed = false;
   evidence.verifyWritePassed = false;
   evidence.rollbackDrillPassed = false;
   evidence.failureRecoveryProofPassed = false;

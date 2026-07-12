@@ -4,13 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2111 Phase 8 completion evidence audit`.
-Current validation: `CMV-2204`.
+Current checkpoint: `CM-2112 Phase 8 completion revalidation`.
+Current validation: `CMV-2205`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-2111 Phase 8 Completion Evidence Audit
+## CM-2112 Phase 8 Completion Revalidation
+
+Status: `PHASE8_NEEDS_REVALIDATION_EXACT_VCP_RUNTIME_TRANSPORT_STORE_PROOF_REQUIRED`
+
+- CM-2111 and its receipt remain immutable historical records.
+- Current `phase8Completed=false`; `phase8CompletionStatus=needs_revalidation`.
+- The audit now requires VCPToolBox-owned runtime write, actual transport binding, and stable target/store identity proof.
+- The old 15-field bundle fails closed with exactly those three fields missing.
+- Revalidation grants no native write, verify, rollback, private-memory, remote, or readiness authority.
+
+Validation: `CMV-2205`.
+
+## Historical CM-2111 Phase 8 Completion Evidence Audit
 
 Status: `PHASE8_EVIDENCE_GATE_COMPLETED_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM`
 

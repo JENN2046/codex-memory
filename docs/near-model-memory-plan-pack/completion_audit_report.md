@@ -4,9 +4,32 @@ Task: `CM-2017 near-model-memory plan pack completion audit`
 Validation: `CMV-2118`
 Date: 2026-07-10
 
+## CM-2112 Phase 8 Completion Revalidation
+
+CM-2111 remains a historical, hash-bound application record. It is no longer
+current completion authority. Repository reality showed that its 15-field
+bundle did not independently bind the claimed native side effect to a
+VCPToolBox-owned runtime, the actual stdio→local-HTTP transport chain, and a
+stable target/store identity.
+
+The current audit therefore requires three additional exact-receipt fields:
+
+```yaml
+vcpToolBoxOwnedRuntimeWritePassed: false
+actualTransportBindingPassed: false
+stableTargetStoreIdentityPassed: false
+phase8Completed: false
+phase8CompletionStatus: needs_revalidation
+```
+
+The historical CM-2111 bundle now fails closed with exactly those three fields
+missing. A new bounded synthetic proof and separate Completion Audit
+application are required. CM-2112 itself authorizes no native or remote action.
+
 ## CM-2111 Phase 8 Completion Audit Application
 
-The exact Phase 8 evidence bundle contains all 15 required fields. The existing
+At the time of its application, the exact Phase 8 evidence bundle contained all
+15 then-required fields. The historical
 Completion Audit independently evaluated
 `phase8_native_write_production_proof` as accepted with no missing evidence,
 and the one-shot CM-2111 patch application succeeded.
@@ -21,7 +44,8 @@ readinessClaimed: false
 
 Application receipt payload SHA-256 is `d2617505…faec`. No native, provider,
 remote, release, deploy, cutover, or readiness action occurred during this
-application. Phase 8 completion is an evidence-gate result only; it is not
+application. After CM-2112 this historical result is not current completion
+authority. It was an evidence-gate result only; it is not
 production readiness, release readiness, `RC_READY`, complete V8, or full
 plan-pack completion.
 

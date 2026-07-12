@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest active task: `CM-2111 Phase 8 completion evidence audit`.
-Latest validation: `CMV-2204`.
+Latest active task: `CM-2112 Phase 8 completion revalidation`.
+Latest validation: `CMV-2205`.
 Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -44,6 +44,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2112 | 2112 | done | P8-native-write-proof / P6-docs-drift | Exact synthetic native proof route; no current write authority | completion audit/trace; CM-2112 decision/contract/tests/status; future exact VCP runtime/transport/store proof | Reopen Phase 8 and replace insufficient runtime claims with exact owner-runtime/transport/store proof | old CM-2111 bundle rejected; three missing fields; focused/default/strict/docs gates; later exact receipt | preserve historical receipts and consumed markers; no replay or private-store access | new exact synthetic proof plus separate Completion Audit application required | COMPLETED_PHASE8_NEEDS_REVALIDATION_EXACT_VCP_RUNTIME_TRANSPORT_STORE_PROOF_REQUIRED |
 | CM-2111 | 2111 | done | P8-native-write-proof / P6-docs-drift | Consumed synthetic one-shot actions; no active native authority | CM-2107 rollback receipt; CM-2109 failure harness receipt; CM-2108/2110 applications; CM-2111 evidence bundle/audit/receipt/status | Complete Phase 8 evidence gate without full-plan or readiness overclaim | exact Git/hash binding; 15/15 Phase 8 fields; focused tests; default `5345/5345`; strict `106/106 + 5345/5345 + 43/43 + 43/43`; docs/current-facts/ledger/diff | no authorization replay, marker deletion, cleanup, additional native action, or remote action | Phase 8-only completion audit; full plan/readiness remain separate | PHASE8_EVIDENCE_GATE_COMPLETED_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM |
 | CM-2099 | 2099 | done | P8-native-write-proof / P6-docs-drift | Green v3 non-executing implementation; tombstone/verify/claim blocked | target-store identity/collector; one-shot gate; exact verifier; frozen executor; packet/review surface/tests/status | Implement CM-2096 v3 reviewable stack without touching the target store | exact Git/hash binding; replay/concurrency; exact receipt correlation; synthetic E2E; default/strict/compare/rollback/docs gates | revert v3 commits; real target, registry, and authorization state unchanged | independent v3 implementation review; bootstrap/preflight and action-specific decision remain separate | CM2096_V3_NON_EXECUTING_STACK_PREPARED_REVIEW_REQUIRED_NO_TOMBSTONE_PHASE8_INCOMPLETE |
 | CM-2098 | 2098 | done | P8-native-write-proof / P6-docs-drift | Green CM-2096 v2 packet implementation; tombstone/verify execution blocked | semantic decision intake; target derivation; actual serializer; lifecycle projection; frozen preflight; packet/tests/status | Close CM-2096 semantic review gaps without executing tombstone | exact decision Git binding; 507-byte marker; marker-aware ref filtering; executor hard-stop; full gates | revert source/packet/docs; no marker/registry/runtime state changed | independent v2 packet review then new action-specific authorization | CM2096_V2_ROLLBACK_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE |

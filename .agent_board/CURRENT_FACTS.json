@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-12",
-  "taskId": "CM-2111",
-  "validationId": "CMV-2204",
+  "taskId": "CM-2112",
+  "validationId": "CMV-2205",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -120,7 +120,7 @@
     "phase8LocalFallbackUsed": false,
     "phase8RetryPerformed": false,
     "phase8RollbackOrCompensationPerformed": false,
-    "phase8CompletionClaimed": true,
+    "phase8CompletionClaimed": false,
     "phase8ExecutionReceiptReviewReference": "CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6",
     "phase8ExecutionReceiptReviewPassed": true,
     "phase8NativeWriteProofAccepted": true,
@@ -198,7 +198,13 @@
     "phase8CompletionAuditDecisionReference": "CM-2111-SELF-PHASE8-COMPLETION-AUDIT-77D162ED",
     "phase8CompletionAuditEvidenceBundlePayloadSha256": "77d162edba2dc7c6911653c1f251cc0ea5b1a96a1db5c1748fd4ba2b2f84fe9d",
     "phase8CompletionAuditReceiptPayloadSha256": "d261750552c5eb275d7d934a0c94c272468393ae7aff4de1801eec4cbdabfaec",
-    "phase8Completed": true,
+    "phase8Completed": false,
+    "phase8CompletionStatus": "needs_revalidation",
+    "phase8HistoricalCm2111ReceiptPreserved": true,
+    "phase8HistoricalCm2111CurrentCompletionAuthority": false,
+    "phase8VcpToolBoxOwnedRuntimeWritePassed": false,
+    "phase8ActualTransportBindingPassed": false,
+    "phase8StableTargetStoreIdentityPassed": false,
     "phase8AdditionalNativeActionAuthorized": false,
     "phase8DerivedIndexProofAccepted": false,
     "phase8ProviderExecutionProofAccepted": false,
@@ -214,7 +220,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_phase8_evidence_gate_completed_full_plan_and_readiness_unclaimed",
+    "scope": "near_model_memory_plan_pack_phase8_needs_revalidation_exact_vcp_runtime_transport_store_proof_required",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -222,6 +228,11 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2205",
+      "scope": "CM-2112 Phase 8 completion revalidation",
+      "status": "COMPLETED_PHASE8_NEEDS_REVALIDATION_EXACT_VCP_RUNTIME_TRANSPORT_STORE_PROOF_REQUIRED"
+    },
     {
       "id": "CMV-2204",
       "scope": "CM-2111 Phase 8 completion evidence audit",

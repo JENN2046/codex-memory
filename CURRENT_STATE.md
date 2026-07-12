@@ -8,22 +8,23 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Phase 8 evidence gate accepted; full plan pack and readiness remain incomplete/unclaimed |
-| Current task | `CM-2111 Phase 8 completion evidence audit` |
-| Current validation | `CMV-2204` |
-| Current route | Preserve consumed one-shot state; no additional native or remote action |
+| Status | Phase 8 reopened as `needs_revalidation`; full plan pack and readiness remain incomplete/unclaimed |
+| Current task | `CM-2112 Phase 8 completion revalidation` |
+| Current validation | `CMV-2205` |
+| Current route | Prove VCPToolBox-owned runtime, actual transport, and stable synthetic store identity, then reapply Completion Audit |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## Current Completed Route
+## Current Revalidation Route
 
-CM-2111 accepted all 15 Phase 8 requirements after three independent evidence
-applications: CM-2095 native write/verify, CM-2108 rollback drill, and CM-2110
-isolated failure recovery. `phase8Completed=true`; `fullPlanPackCompleted=false`
-and every production/release/deploy/cutover/RC/V8 readiness claim remains false.
-The record/tombstone/failure-harness authorizations are consumed and cannot be
-replayed. No additional native action is authorized.
+CM-2111 remains historical, including its consumed record/tombstone/failure
+authorizations and receipt SHA `d2617505…faec`. CM-2112 makes the current status
+`phase8Completed=false` and `phase8CompletionStatus=needs_revalidation`. The old
+15-field bundle now fails closed because it lacks exact VCPToolBox-owned runtime,
+actual stdio→local-HTTP transport, and stable target/store identity evidence.
+Those facts require a new synthetic exact proof and separate audit application;
+the revalidation decision itself grants no native action.
 
 ## Historical / Future Candidate Routes
 

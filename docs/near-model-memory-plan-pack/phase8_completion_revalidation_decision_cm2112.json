@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2112",
+  "decisionReference": "CM-2112-SELF-PHASE8-NEEDS-REVALIDATION",
+  "decisionType": "phase8_completion_revalidation",
+  "historicalCm2111": {
+    "decisionReference": "CM-2111-SELF-PHASE8-COMPLETION-AUDIT-77D162ED",
+    "receiptPayloadSha256": "d261750552c5eb275d7d934a0c94c272468393ae7aff4de1801eec4cbdabfaec",
+    "historicalReceiptAcceptedAtApplicationTime": true,
+    "historicalReceiptCurrentCompletionAuthority": false
+  },
+  "currentState": {
+    "phase8Completed": false,
+    "phase8CompletionStatus": "needs_revalidation",
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "requiredRevalidationEvidence": {
+    "vcpToolBoxOwnedRuntimeWritePassed": false,
+    "actualTransportBindingPassed": false,
+    "stableTargetStoreIdentityPassed": false
+  },
+  "selectedRoute": {
+    "memoryIntelligenceOwner": "VCPToolBox",
+    "outerTransport": "isolated_stdio_mcp",
+    "innerTransport": "local_http_mcp",
+    "stableTargetStoreIdentityRequired": true,
+    "exactNativeProofRequired": true,
+    "completionAuditReapplicationRequired": true
+  },
+  "currentAuthority": {
+    "nativeWriteAuthorized": false,
+    "verifyAuthorized": false,
+    "rollbackOrCompensationAuthorized": false,
+    "realMemoryReadAuthorized": false,
+    "remoteActionAuthorized": false,
+    "readinessClaimAuthorized": false
+  }
+}
