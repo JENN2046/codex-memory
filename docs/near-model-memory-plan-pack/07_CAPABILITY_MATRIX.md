@@ -100,3 +100,9 @@ Codex default expanded write authority
 ```
 
 这些必须最后做。
+
+## CM-2115-R2 Evidence Application Boundary
+
+- Phase 2 application evidence requires the R2 binding receipt, not the R1 receipt alone.
+- The application changes repository evidence only; it performs no runtime, native memory, provider, real-memory, or remote action.
+- Full-plan completion and every readiness state remain false.

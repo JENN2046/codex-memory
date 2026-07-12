@@ -677,3 +677,13 @@ objects by exact Git identity, applies all nine exact Phase 2 fields once, and
 keeps `independentReviewPassed`, `fullPlanPackCompleted`, and
 `readinessClaimed` false. CM-2115-R1 performs no runtime, native memory,
 provider, real-memory, remote, or readiness action.
+
+## CM-2115-R2 Exact Patch Binding Trace
+
+The nine Phase 2 exact fields may use CM-2115-R2 only through the final
+application binding receipt. The execution receipt alone is insufficient.
+The binding receipt must re-read CM-2080, the Phase 2 manifest, and the
+Windows/WSL receipt from their exact Git objects and verify the application
+commit direct-parent relation plus the allowlisted pre/post blob set.
+
+R1 remains historical and is not current application authority.

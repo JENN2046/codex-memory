@@ -1,0 +1,36 @@
+{
+  "canonicalPayloadSha256": "a8632a716ae9d6ab4fe9c175a1ba0fb29c57ba5ae1b35b5e3bd9da4292b9e318",
+  "payload": {
+    "acceptedExternalReviewDecisionReference": "CM-2080-ER-20260711-PASS-F440C1BD-2215BB33",
+    "applicationBindingReceiptFrozen": false,
+    "applicationBindingReceiptRequired": true,
+    "appliedEvidence": {
+      "auditReceiptPassed": true,
+      "fallbackDistinctionPassed": true,
+      "lowDisclosureProofPassed": true,
+      "nativeReadProofPassed": true,
+      "nativeTargetBindingPassed": true,
+      "phase2ReceiptBundleAppliedToCompletionAudit": true,
+      "scopeVisibilityIsolationPassed": true,
+      "windowsWslSmokePassed": true,
+      "wslLinuxProofPassed": true
+    },
+    "fullPlanPackCompleted": false,
+    "independentReviewPassed": false,
+    "phase2ReceiptBundleAppliedToCompletionAudit": false,
+    "readinessClaimed": false,
+    "sideEffects": {
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0
+    },
+    "stateType": "phase2_completion_audit_application_state",
+    "supersedesApplicationTask": "CM-2115-R1"
+  },
+  "schemaVersion": 1,
+  "stateType": "phase2_completion_audit_application_state_v1",
+  "taskId": "CM-2115-R2"
+}

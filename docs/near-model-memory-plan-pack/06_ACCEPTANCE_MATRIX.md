@@ -140,3 +140,11 @@ complete-realtime-memory
 production-write-ready
 model-memory-complete
 ```
+
+## CM-2115-R2 Exact Application Boundary
+
+| Evidence | Acceptance boundary | Independent review | Current status |
+|---|---|---|---|
+| CM-2115-R2 Phase 2 binding receipt | Durable one-shot claim + exact application commit/tree/diff/pre-post blobs + receipt-time upstream Git revalidation | Required | Pending until binding receipt is frozen |
+
+R1 receipt shape alone is not accepted as current patch evidence.

@@ -1118,3 +1118,16 @@ reads, remote actions, or readiness claims.
 This repair does not accept the CM-2115 snapshot independent review, does not
 complete the full plan pack, and does not establish production, release,
 deploy, cutover, `RC_READY`, complete-V8, or any other readiness state.
+
+## CM-2115-R2 Exact Phase 2 Application Binding
+
+CM-2115-R2 supersedes the R1 application claim. Its execution receipt is
+created only after a durable one-shot claim and exact readback of the
+allowlisted Completion Audit patch. A separate Git binding receipt must
+then bind the application commit/tree, direct parent, exact diff, and every
+pre/post blob before this application may serve as current evidence.
+
+Machine state: `docs/near-model-memory-plan-pack/phase2_completion_audit_application_state_cm2115_r2.json`.
+
+`independentReviewPassed=false`, `fullPlanPackCompleted=false`, and
+`readinessClaimed=false` remain authoritative.
