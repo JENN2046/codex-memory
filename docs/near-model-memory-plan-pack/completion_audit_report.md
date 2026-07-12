@@ -4,7 +4,33 @@ Task: `CM-2017 near-model-memory plan pack completion audit`
 Validation: `CMV-2118`
 Date: 2026-07-10
 
-## CM-2112 Phase 8 Completion Revalidation
+## CM-2114 Phase 8 Completion Revalidation Application
+
+CM-2114 applies the exact CM-2113 VCPToolBox owner proof receipt to the reopened
+18-field Phase 8 audit. The new receipt proves the three fields CM-2112 left
+missing:
+
+```yaml
+vcpToolBoxOwnedRuntimeWritePassed: true
+actualTransportBindingPassed: true
+stableTargetStoreIdentityPassed: true
+phase8Completed: true
+phase8CompletionStatus: revalidated_complete
+fullPlanPackCompleted: false
+readinessClaimed: false
+```
+
+The proof used one synthetic VCPToolBox `DailyNote` write through a real
+child-process Content-Length stdio MCP boundary, authenticated local HTTP MCP,
+and the official DailyNote stdio runtime. The stable synthetic store identity
+matched before and after the exact 357-byte durable Markdown write. Application
+receipt payload SHA-256 is `2097572e…c045`. The proof authorization and the
+application authorization are consumed and not replayable. No additional
+native action, provider call, real-memory read, rollback, compensation, remote
+action, full-plan completion, production/release readiness, or `RC_READY` claim
+is authorized or implied.
+
+## CM-2112 Phase 8 Completion Revalidation (resolved by CM-2114)
 
 CM-2111 remains a historical, hash-bound application record. It is no longer
 current completion authority. Repository reality showed that its 15-field
@@ -12,7 +38,8 @@ bundle did not independently bind the claimed native side effect to a
 VCPToolBox-owned runtime, the actual stdio→local-HTTP transport chain, and a
 stable target/store identity.
 
-The current audit therefore requires three additional exact-receipt fields:
+At the CM-2112 checkpoint, the audit required three additional exact-receipt
+fields:
 
 ```yaml
 vcpToolBoxOwnedRuntimeWritePassed: false
@@ -22,9 +49,9 @@ phase8Completed: false
 phase8CompletionStatus: needs_revalidation
 ```
 
-The historical CM-2111 bundle now fails closed with exactly those three fields
-missing. A new bounded synthetic proof and separate Completion Audit
-application are required. CM-2112 itself authorizes no native or remote action.
+The historical CM-2111 bundle still fails closed when replayed by itself. The
+separate CM-2113 proof and CM-2114 application now satisfy those fields without
+rewriting CM-2111 history. CM-2112 itself authorized no native or remote action.
 
 ## CM-2111 Phase 8 Completion Audit Application
 

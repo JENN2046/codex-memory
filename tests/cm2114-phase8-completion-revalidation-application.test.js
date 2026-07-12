@@ -14,6 +14,7 @@ const DOCS = path.join(__dirname, '../docs/near-model-memory-plan-pack');
 const bundle = JSON.parse(fs.readFileSync(path.join(DOCS, 'phase8_completion_revalidation_evidence_bundle_cm2114.json')));
 const decision = JSON.parse(fs.readFileSync(path.join(DOCS, 'phase8_completion_revalidation_application_decision_cm2114.json')));
 const proofReceipt = JSON.parse(fs.readFileSync(path.join(DOCS, 'phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json')));
+const applicationReceipt = JSON.parse(fs.readFileSync(path.join(DOCS, 'phase8_completion_revalidation_application_receipt_cm2114.json')));
 
 function input() {
   return {
@@ -79,4 +80,14 @@ test('CM-2114 application receipt rejects replay, new runtime action, or readine
     const receipt = { receiptPayload: payload, receiptPayloadSha256: require('../src/core/Cm2114Phase8CompletionRevalidationApplication').sha256Canonical(payload) };
     assert.equal(evaluateApplicationReceipt(receipt).accepted, false);
   }
+});
+
+test('CM-2114 frozen application receipt passes the exact receipt contract', () => {
+  const result = evaluateApplicationReceipt(applicationReceipt);
+  assert.equal(result.accepted, true, result.blockers.join(', '));
+  assert.equal(result.phase8Completed, true);
+  assert.equal(result.phase8CompletionStatus, 'revalidated_complete');
+  assert.equal(result.fullPlanPackCompleted, false);
+  assert.equal(result.readinessClaimed, false);
+  assert.equal(result.additionalNativeWriteAuthorized, false);
 });

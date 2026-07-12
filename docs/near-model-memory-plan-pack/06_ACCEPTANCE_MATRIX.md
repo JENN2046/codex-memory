@@ -37,7 +37,9 @@
 | CM-2108 identity-bound rollback application receipt | Phase 8 rollback drill evidence；failure recovery 与 Phase 8 completion 仍 false | 否，read-only tag 可不等 | 是 |
 | CM-2110 isolated failure-recovery application receipt | Phase 8 three-case recovery evidence；Phase 8 completion 仍为单独 gate | 否，read-only tag 可不等 | 是 |
 | CM-2111 Phase 8 completion-audit application receipt | 历史 15 项 evidence application；CM-2112 后不再是当前 Phase 8 completion authority | 否，read-only tag 可不等 | 历史证据保留，当前需重验证 |
-| CM-2112 Phase 8 completion revalidation decision | 当前 `phase8Completed=false`；要求 VCPToolBox-owned runtime、真实 transport、稳定 target/store identity 三项 exact proof | 否 | 是，`needs_revalidation` |
+| CM-2112 Phase 8 completion revalidation decision | 历史检查点 `phase8Completed=false`；要求 VCPToolBox-owned runtime、真实 transport、稳定 target/store identity 三项 exact proof | 否 | 历史状态：`needs_revalidation` |
+| CM-2113 VCPToolBox owner native proof receipt | 官方 DailyNote owner runtime、真实 stdio→authenticated local HTTP→stdio transport、稳定 synthetic store identity | 否，read-only tag 可不等 | 是，exact receipt |
+| CM-2114 Phase 8 revalidation application receipt | 18/18 Phase 8 evidence；只完成 Phase 8，不完成完整计划包、不声明 readiness | 否，read-only tag 可不等 | 是，`revalidated_complete` |
 | CM-2080 exact external review decision | Phase 9/10 external-review prerequisite | 是 | 是 |
 | CM-2082 Completion Audit application receipt | Phase 9/10 review-bundle application field only | 是 | 是 |
 | native read proof | Phase 2 | 是 | 是 |

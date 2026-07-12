@@ -4,41 +4,42 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2112 Phase 8 completion revalidation`.
-Current validation: `CMV-2205`.
-Current handoff: Treat CM-2111 as historical and current Phase 8 as `needs_revalidation`. Do not replay any consumed action. Build a new exact synthetic proof bound to VCPToolBox-owned runtime, actual stdio→local-HTTP transport, and stable target/store identity before a separate Completion Audit reapplication.
+Current task: `CM-2114 Phase 8 completion revalidation application`.
+Current validation: `CMV-2206`.
+Current handoff: Phase 8 is revalidated complete from the exact CM-2113 owner-runtime/transport/store receipt. Preserve both consumed attempt markers and the synthetic record; no native authorization is active. Full plan-pack and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2112 supersedes CM-2111 only for current completion status. CM-2111's exact identity-bound record/rollback lifecycle and the
-isolated three-case failure-recovery harness produced frozen receipts; CM-2108
-and CM-2110 applied the remaining evidence separately. Its completion receipt
-payload SHA-256 `d2617505…faec` remains historical. The current audit now has
-18 requirements and is missing three exact runtime/transport/store fields, so
-`phase8Completed=false` and `phase8CompletionStatus=needs_revalidation`. All
-old action authorizations are consumed or inactive.
+CM-2114 applied the 18-field bundle and receipt payload SHA `2097572e…c045`.
+The three CM-2112 gaps now trace to CM-2113 exact evidence: VCPToolBox-owned
+DailyNote, real process stdio MCP plus authenticated local HTTP MCP, and stable
+store identity SHA `0294fc5c…cfaab`. Current Phase 8 status is
+`revalidated_complete`. Attempt 001 and 002 authorizations are consumed; no
+write, verify, rollback, compensation, or retry authority remains.
 
-CM-2096 v3 closes the v2 implementation gaps in a non-executing stack. A fixed
+Historical CM-2096 v3 closed the v2 implementation gaps in a non-executing stack. A fixed
 store identity and internally resolved runtime authority feed exact pre/post
 store projections. The assertion is atomically consumed, the audit receipt is
 correlated to the exact decision/claim/target/scope, and effective visibility is
 derived only afterward. Packet `1ba07b0c…` and readable review surface
 `b113a5e6…` still record bootstrap, preflight, runtime route, and future exact
-decision as missing. Rollback/Phase 8 evidence remains false.
+decision as missing at that checkpoint. Later CM-2107 through CM-2114 evidence
+supersedes that historical incomplete status.
 
-CM-2095 is the active gate. Review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
+Historical CM-2095 gate review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
 accepts the one-shot proof but ends the authorization lifecycle. Application is
-requested, not performed. Any application must preserve rollback/failure gaps,
-derived-index/provider non-proof, Phase 8 incomplete, and no readiness claim.
+described at its original checkpoint. Its rollback/failure gaps were later
+closed by separate evidence; derived-index/provider non-proof remains preserved.
 
 CM-2094 execution is complete and non-replayable. Decision commit `f1e2a830…`
 binds the exact 1325-byte decision. Registry state is `CONSUMED_SUCCESS`; native
 write calls `1`, verify operations `1`, durable record SHA `4f863f52…`, fallback
-`false`, retry/rollback/compensation `0`. Phase 8 completion is not yet accepted.
+`false`, retry/rollback/compensation `0`. At that checkpoint, Phase 8 completion
+was not yet accepted; CM-2114 now supersedes that historical status.
 
-CM-2094 is the active gate. The frozen manifest binds packet `66cfae23…`, blob
+Historical CM-2094 final-release gate bound packet `66cfae23…`, blob
 `549f157e…`, raw SHA `0786167b…`, context `f1cf912c…`, allowlist `b69cc85d…`,
 and the exact CM-2093 decision/bootstrap chain. Only an independently frozen,
 machine-intaken final release decision can permit one execution.
@@ -62,9 +63,11 @@ contract, fixture, and machine-evidence preparation is substantial. CM-2079
 closed the clean-checkout, runtime-head, replayable Phase 2 receipt, Windows/WSL,
 actual tools/list, and validation-record findings. CM-2080 external review now
 passes for the exact frozen binding. CM-2082 applied that evidence to Completion
-Audit, and CM-2083 accepted the exact Tag Approval Packet. The first three
-decision slots are true and Phase 8 remains false. CM-2087 completed the exact
-single tag push; Release and all later remote actions remain separate Red boundaries.
+Audit, and CM-2083 accepted the exact Tag Approval Packet. At the historical
+CM-2087 checkpoint, the first three decision slots were true and Phase 8
+remained false. CM-2087 completed the exact single tag push; CM-2114 now
+supersedes the Phase 8 status, while Release and all later remote actions remain
+separate Red boundaries.
 
 The long legacy status paragraph below is retained as historical context and
 does not override the CM-2081 active block above. Its older statements about

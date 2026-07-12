@@ -4,21 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2112 Phase 8 completion revalidation`.
-Current validation: `CMV-2205`.
-Current project status: CM-2111 is preserved as historical evidence, but current Phase 8 completion is reopened. `phase8Completed=false` and `phase8CompletionStatus=needs_revalidation` pending exact VCPToolBox-owned runtime, actual transport, and stable target/store identity proof. Full plan-pack and every readiness claim remain false.
-Current route: `PHASE8_NEEDS_REVALIDATION_EXACT_VCP_RUNTIME_TRANSPORT_STORE_PROOF_REQUIRED`.
+Current task: `CM-2114 Phase 8 completion revalidation application`.
+Current validation: `CMV-2206`.
+Current project status: CM-2113 produced exact VCPToolBox-owned runtime, actual transport, and stable synthetic store evidence; CM-2114 applied all 18 Phase 8 fields. `phase8Completed=true` and `phase8CompletionStatus=revalidated_complete`. Full plan-pack and every readiness claim remain false.
+Current route: `PHASE8_REVALIDATED_COMPLETE_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-2112 reopens the current Phase 8 result without rewriting CM-2111 history.
+CM-2114 applies receipt payload SHA-256 `2097572e…c045` and revalidates all 18
+Phase 8 evidence fields. CM-2113 used the official VCPToolBox DailyNote runtime,
+a real child stdio MCP boundary, authenticated local HTTP MCP, and stable store
+identity SHA `0294fc5c…cfaab`; its durable synthetic record is 357 bytes with SHA
+`f8f84537…93e50`. Both native authorization attempts and the application
+authorization are consumed/non-replayable; no additional native action is
+authorized. Full plan-pack, production/release/deploy/cutover, `RC_READY`, and
+complete-V8 claims remain false.
+
+CM-2112 reopened the Phase 8 result without rewriting CM-2111 history.
 The old receipt payload SHA-256 `d2617505…faec` remains an immutable record of
 the prior 15-field application, but it is not current completion authority.
 The Completion Audit now requires three additional exact-receipt fields:
 `vcpToolBoxOwnedRuntimeWritePassed`, `actualTransportBindingPassed`, and
-`stableTargetStoreIdentityPassed`. All three are false; no native action is
-authorized by the revalidation decision.
+`stableTargetStoreIdentityPassed`. Those fields were false at CM-2112 and are
+now satisfied only through the separate CM-2113/2114 chain.
 
 CM-2096 v2 review `...V2-PACKET-PASS-NO-EXECUTION-47E81469` is frozen. V3
 implementation `6f4f7867…` and packet `1ba07b0c…` add an immutable synthetic

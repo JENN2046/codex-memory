@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2112 Phase 8 completion revalidation`.
-Current validation: `CMV-2205`.
-Current status: CM-2111 is historical only. `phase8Completed=false` and `phase8CompletionStatus=needs_revalidation` until exact VCPToolBox-owned runtime, actual transport, and stable target/store identity evidence is produced and reapplied. Full plan-pack and every readiness claim remain false.
+Current task: `CM-2114 Phase 8 completion revalidation application`.
+Current validation: `CMV-2206`.
+Current status: `phase8Completed=true` and `phase8CompletionStatus=revalidated_complete` from exact CM-2113/2114 evidence. Both proof authorizations are consumed; no additional native action is allowed. Full plan-pack and every readiness claim remain false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->

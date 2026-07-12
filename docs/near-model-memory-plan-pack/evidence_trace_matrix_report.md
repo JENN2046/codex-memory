@@ -4,7 +4,25 @@ Task id: `CM-2024`
 Validation id: `CMV-2125`
 Date: `2026-07-10`
 
-## CM-2112 Phase 8 Revalidation Trace Update
+## CM-2114 Phase 8 Revalidation Trace Application
+
+The three reopened exact-receipt entries now trace to the frozen CM-2113 owner
+proof receipt (`cd0b9864…`, raw SHA-256 `1996cdd6…8162`) and the CM-2114
+application receipt (`2097572e…c045`):
+
+- `vcpToolBoxOwnedRuntimeWritePassed=true` traces to the exact VCPToolBox
+  `DailyNote` Git objects and one exact 357-byte owner-runtime write;
+- `actualTransportBindingPassed=true` traces to 3/3 Content-Length stdio MCP
+  frames, a real child process boundary, authenticated local HTTP MCP, and
+  DailyNote stdio;
+- `stableTargetStoreIdentityPassed=true` traces to identity SHA-256
+  `0294fc5c…cfaab`, matched before and after the write.
+
+The Phase 8 trace now has 18/18 accepted evidence fields and no missing entry.
+`phase8Completed=true` and `phase8CompletionStatus=revalidated_complete` apply
+only to Phase 8. Full-plan completion and every readiness claim remain false.
+
+## CM-2112 Phase 8 Revalidation Trace Update (historical checkpoint)
 
 The CM-2111 trace remains historical. The current Phase 8 trace adds three
 future exact-authorized receipt requirements:
@@ -13,7 +31,7 @@ future exact-authorized receipt requirements:
 - `actualTransportBindingPassed`;
 - `stableTargetStoreIdentityPassed`.
 
-All three are currently missing. Consequently the trace reports
+All three were missing at that checkpoint. Consequently CM-2112 reported
 `phase8Completed=false` and `phase8CompletionStatus=needs_revalidation`.
 Local contracts, old receipt booleans, direct app calls, and synthetic local
 filesystem writes cannot satisfy these entries.
