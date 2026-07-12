@@ -93,7 +93,8 @@
     "cm2115-r2:phase2-decision": "node ./scripts/generate-cm2115-r2-application-decision.js",
     "cm2115-r2:phase2-apply": "node ./scripts/apply-cm2115-r2-phase2-completion-audit.js",
     "cm2115-r2:binding-receipt": "node ./scripts/generate-cm2115-r2-application-binding-receipt.js",
-    "cm2115-r2:strengthened-binding-receipt": "node ./scripts/generate-cm2115-r2-strengthened-binding-receipt.js"
+    "cm2115-r2:strengthened-binding-receipt": "node ./scripts/generate-cm2115-r2-strengthened-binding-receipt.js",
+    "cm2115-r2:self-review": "node ./scripts/generate-cm2115-r2-self-review-decision.js"
   },
   "engines": {
     "node": ">=22.0.0"
