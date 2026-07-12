@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2113",
+  "packetType": "vcptoolbox_owner_native_proof_execution_packet",
+  "implementation": {
+    "commit": "26bba1605ca700ed0a2c7eba16bab83295d313d5",
+    "tree": "ce4669f16d0d1dc0361705e7c669f354b8849065"
+  },
+  "ownerRuntime": {
+    "owner": "VCPToolBox",
+    "component": "DailyNote",
+    "communication": "stdio",
+    "runtimeSourceCommit": "555b3b538f6eb736e530c2912de678c5941f9985",
+    "runtimeSourceTree": "fd82d403e79f36f749eb7f555b4736eae3eacdff",
+    "pluginBlobOid": "2e3ff4ae08fd0746d5d53b74d34486ac9f623448",
+    "manifestBlobOid": "7a9fc4812c4a0cf03415c165fa1a64e9c36748ed",
+    "dependencyLockBlobOid": "3c695ea1d0608a463fe2bf0b3484a3c38759e534",
+    "pluginSha256": "4eee260c13965283001ed305af1b86aeddbaf0b7502fad784546397f0c8b4614",
+    "manifestSha256": "a3d73021cc4b3c1e9e4af310c0d18a182ac7e77dd21ca8e5527b879dfefb77b9",
+    "dependencyLockSha256": "d8d61f42b61b04b7005c7f7788c5d58e2f3e284442fc4beba08c8e476feb8e0c",
+    "dotenvVersion": "16.6.1",
+    "dotenvPackageSha256": "922be338d27d6b0b3a238f8da99daeb1f42ef972e71b4568d5104bbef661f5f5",
+    "dotenvMainSha256": "3381601545980775b6ecd2bf078ce369a3b24316e10a3182ab78811f01dc83b5"
+  },
+  "transport": {
+    "outer": "stdio_mcp_process",
+    "inner": "local_http_mcp",
+    "ownerRuntime": "stdio",
+    "contentLengthFramingRequired": true,
+    "processBoundaryRequired": true,
+    "innerAuthorizationRequired": true
+  },
+  "storeReference": "phase8-vcptoolbox-owner-native-proof-store-001",
+  "storeInstanceId": "phase8-vcptoolbox-owner-native-proof-store-instance-001",
+  "lifecycleReference": "phase8-vcptoolbox-owner-native-proof-lifecycle-001",
+  "runtimeIdentitySha256": "602c66f9f30e71c68725dc823362f821f9bd5fa0a43cc82a14fb7eee04f7e1a5",
+  "storeIdentitySha256": "0294fc5c92dbcfc535057cf8c8e77901e5223c83b906b26dba8e29bf659cfaab",
+  "fixedRecord": {
+    "folder": "cm2113-proof",
+    "maid": "codex-memory-phase8-proof",
+    "date": "2026-07-12",
+    "fileName": "cm2113-vcptoolbox-owner-runtime-proof",
+    "localTime": "08:00",
+    "tag": "codex-memory, phase8, synthetic-proof, vcptoolbox-owner-runtime"
+  },
+  "recordArguments": {
+    "target": "knowledge",
+    "title": "CM-2113 VCPToolBox owner runtime proof",
+    "content": "Synthetic governance proof record.\nNo user memory.\nNon-production.\nNot RC_READY.",
+    "evidence": "CM-2113 exact owner runtime, actual transport, and stable store identity proof.",
+    "validated": true,
+    "reusable": false,
+    "sensitivity": "internal"
+  },
+  "payloadCanonicalSha256": "3ed7989e975e2e750aabd77f320e7ba065631d1e2374cedebdc53df055f8bf4a",
+  "durableBytes": 357,
+  "durableSha256": "f8f845371e1eebf2dbce80e6bc0b86ed656f95712b409ac8fabc24a4cf393e50",
+  "authorization": {
+    "action": "live_bridge_record_memory_proof",
+    "nonce": "cm2113-vcptoolbox-owner-native-proof-nonce-001",
+    "receiptId": "cm2113-vcptoolbox-owner-native-proof-receipt-001",
+    "useCount": 1,
+    "replayAllowed": false,
+    "approvedAt": "2026-07-12T10:40:05+08:00",
+    "expiresAt": "2026-07-15T18:00:00+08:00"
+  },
+  "limits": {
+    "nativeWrites": 1,
+    "verifyOperations": 1,
+    "retries": 0,
+    "rollbackOrCompensation": 0
+  },
+  "nonClaims": {
+    "productionReady": false,
+    "releaseReady": false,
+    "rcReady": false,
+    "fullPlanPackCompleted": false
+  },
+  "contentDecisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-CONTENT-0294FC5C",
+  "finalReleaseDecisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-FINAL-0294FC5C",
+  "allowedScope": {
+    "project_id": "codex-memory",
+    "workspace_id": "cm2113-owner-proof",
+    "scope_id": "cm2113-vcptoolbox-owner-native-proof",
+    "client_id": "Codex",
+    "visibility": "project"
+  },
+  "executionContext": {
+    "agentAlias": "Codex",
+    "clientId": "Codex",
+    "projectId": "codex-memory",
+    "workspaceId": "cm2113-owner-proof",
+    "scopeId": "cm2113-vcptoolbox-owner-native-proof",
+    "visibility": "project"
+  },
+  "runtimeTarget": {
+    "primaryRuntime": "VCPToolBox native memory",
+    "targetKind": "mcp_server",
+    "targetReferenceName": "cm2113-vcptoolbox-dailynote-owner-runtime",
+    "storeReference": "phase8-vcptoolbox-owner-native-proof-store-001",
+    "storeInstanceId": "phase8-vcptoolbox-owner-native-proof-store-instance-001",
+    "storeIdentitySha256": "0294fc5c92dbcfc535057cf8c8e77901e5223c83b906b26dba8e29bf659cfaab"
+  },
+  "rollbackPlanReference": "cm2113-no-automatic-rollback-or-compensation",
+  "authorizationRegistryIdentity": {
+    "authorizationRegistryReference": "cm2113-vcptoolbox-owner-native-proof-registry-001",
+    "registryReinitializationAllowed": false,
+    "registryDeletionAllowed": false
+  },
+  "governanceRootIdentitySha256": "240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0",
+  "bootstrapReceiptGitIdentity": {
+    "sourceCommit": "ce3cd322c85571e70940c8a539dd6e169c496184",
+    "blobOid": "fae14d9c08cadea862d896dfc4815a56726d8ebb",
+    "bytes": 2139,
+    "sha256": "14cc7a42004049b19ebefdcd8fa34778deb87e4190800e8c63469bf5f897eba1"
+  },
+  "packetPayloadSha256": "60f898f4c724f880a9be73a5a002d332f7c8a9fd36f30fed42a25d6c48b003f5"
+}

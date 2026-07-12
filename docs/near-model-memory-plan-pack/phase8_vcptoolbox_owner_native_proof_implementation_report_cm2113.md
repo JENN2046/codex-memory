@@ -4,8 +4,8 @@ CM-2113 implements the replacement evidence path selected by CM-2112. The
 frozen implementation baseline is:
 
 ```yaml
-implementation_commit: "ed6ffcd0d67e1d9c8f98208708e3d5998b046750"
-implementation_tree: "a9faf3aeb889ff82c28709d1f8c59362825ed243"
+implementation_commit: "26bba1605ca700ed0a2c7eba16bab83295d313d5"
+implementation_tree: "ce4669f16d0d1dc0361705e7c669f354b8849065"
 implementation_review_result: "PASS_IMPLEMENTATION_ONLY"
 native_execution_performed_by_this_report: false
 ```
@@ -46,3 +46,9 @@ Focused tests passed `86/86`; the default suite passed `5362/5362`. The
 bootstrap directory and identity were absent when this baseline was prepared.
 No VCPToolBox process, native write, verify, provider, real-memory read, remote
 action, rollback, compensation, or readiness claim occurred.
+
+The store/runtime bootstrap itself was executed from the earlier clean
+implementation commit `ed6ffcd0…`, then independently frozen as receipt commit
+`ce3cd322…`. The later `26bba160…` executor change only adds mandatory Git-object
+intake of that bootstrap receipt; it does not alter the materialized owner
+runtime, frozen clock, store identity, payload, or transport implementation.
