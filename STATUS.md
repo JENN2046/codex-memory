@@ -4,13 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
-Current validation: `CMV-2209`.
-Current project status: the CM-2080 Phase 2 application now has one durable consumed claim, an exact application commit/tree/diff binding, receipt-time revalidation of all three upstream Git objects, and a strengthened v2 binding receipt. The rebuilt 164-entry R2 snapshot is pending independent review. `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and every readiness claim remains false.
-Current route: `CM2115_R2_DURABLE_EXACT_PATCH_BOUND_SNAPSHOT_REBUILT_INDEPENDENT_REVIEW_PENDING_NO_READY_CLAIM`.
+Current task: `CM-2115-R2 internal canonical snapshot self-review`.
+Current validation: `CMV-2210`.
+Current project status: the repository-internal independent second pass has revalidated all 164 trace entries, 411 source bindings, and 105 unique Git objects with zero mismatch. The self-review decision and its post-freeze Git intake receipt are frozen. `independentReviewPassed=true` only in mode `repository_internal_separate_pass`; no new external review is claimed, the historical CM-2080 external-review slot remains true, `fullPlanPackCompleted=false`, and every readiness claim remains false.
+Current route: `CM2115_R2_INTERNAL_SELF_REVIEW_INTAKE_PASSED_SEPARATE_FULL_PLAN_APPLICATION_PENDING_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2115-R2 internal self-review implementation is frozen at `68c8088a…`.
+Decision commit `116d74b3…` has payload SHA-256 `03242787…a1d4` and records
+zero actionable findings over snapshot `8d252985…` and request `01c65db8…`.
+Post-freeze intake receipt `7187e520…` has payload SHA-256
+`ffb0a0cf…eaba`; it re-reads the exact decision commit/tree/parent/two-path
+diff, JSON/Markdown blobs, bytes, raw SHA-256 values, implementation artifacts,
+and all frozen snapshot routes. This is repository-internal review under Jenn's
+self-review policy. It neither impersonates a new external review nor changes
+the historical CM-2080 external-review decision. It permits preparation of a
+separate exact full-plan application only; it does not authorize or apply it.
 
 CM-2115-R2 freezes authority intake `f458277d…`, exact decision `c8dbbcd8…`,
 and application commit `49979a55…`. Its Git-common-dir claim is

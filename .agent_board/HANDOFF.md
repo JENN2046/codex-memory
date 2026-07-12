@@ -4,13 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
-Current validation: `CMV-2209`.
-Current handoff: submit review request commit `01c65db8…` for independent review of snapshot commit `8d252985…`. Do not prepare or execute the full-plan application until an exact independent PASS is frozen. Full plan-pack and readiness remain false.
+Current task: `CM-2115-R2 internal canonical snapshot self-review`.
+Current validation: `CMV-2210`.
+Current handoff: internal self-review decision `116d74b3…` and intake receipt `7187e520…` passed. The next separate task may prepare an exact full-plan application bound to the receipt's complete Git identity; no application is authorized or applied yet. Full plan-pack and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+Jenn selected repository self-review as the governing review mode. The internal
+second pass found zero actionable findings over 164 traces, 411 source bindings,
+and 105 unique Git objects. Decision `116d74b3…` is machine-bound by intake
+receipt `7187e520…`; payloads are `03242787…a1d4` and `ffb0a0cf…eaba`.
+Consumers must require mode `repository_internal_separate_pass` and the exact
+receipt commit/tree/parent/diff/blob/bytes/raw-SHA/payload-SHA chain. The bare
+reference and bare `independentReviewPassed` boolean are insufficient.
+
+This self-review performed no new external review. Historical CM-2080
+`externalReviewPassed=true` is preserved, while
+`independentExternalReviewPassed=false` for this snapshot pass. The next legal
+transition is preparation of a separate exact full-plan application. It must
+keep every readiness field false and cannot be inferred from this handoff.
 
 CM-2115-R2 closes the R1 one-shot and patch-binding gaps. The durable claim is
 consumed exactly once; application commit `49979a55…` binds decision
@@ -22,9 +36,9 @@ Git objects at receipt time.
 The rebuilt snapshot binds 164 entries to 105 exact Git blobs at source baseline
 `933d29e4…`; JSON raw SHA is `607fa483…8feb` and payload SHA is
 `afc1f726…cbb6`. Review request `01c65db8…` has payload SHA
-`9b9c158a…bdf0` and is submission-only. The next legal state transition is an
-independent review decision. Until an exact PASS is frozen, full-plan
-application authority, full-plan completion, and all readiness states are false.
+`9b9c158a…bdf0` and is submission-only. Its repository-internal independent
+decision is now frozen and intaken. Full-plan application authority, full-plan
+completion, and all readiness states remain false.
 
 CM-2114 applied the 18-field bundle and receipt payload SHA `2097572e…c045`.
 The three CM-2112 gaps now trace to CM-2113 exact evidence: VCPToolBox-owned

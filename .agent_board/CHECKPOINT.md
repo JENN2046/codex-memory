@@ -4,25 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2115-R2 durable one-shot and exact patch binding repair`.
-Current validation: `CMV-2209`.
+Current checkpoint: `CM-2115-R2 internal canonical snapshot self-review`.
+Current validation: `CMV-2210`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-2115-R2 Durable One-shot and Exact Patch Binding Repair
+## CM-2115-R2 Internal Canonical Snapshot Self-review
 
-Status: `DURABLE_EXACT_PATCH_BOUND_R2_SNAPSHOT_FROZEN_INDEPENDENT_REVIEW_PENDING_FULL_PLAN_FALSE_NO_READY_CLAIM`
+Status: `INTERNAL_SELF_REVIEW_INTAKE_PASSED_SEPARATE_FULL_PLAN_APPLICATION_PENDING_NO_READY_CLAIM`
 
-- Durable claim state is `CONSUMED_SUCCESS`, use count and patch invocation count are one, and replay is forbidden.
-- Application commit `49979a55…` is bound to decision `c8dbbcd8…`, its direct parent/tree, exact seven-path diff, and every pre/post patch object.
-- Strengthened receipt `d3cdc894…` additionally binds the execution-receipt Markdown and typed absence check; payload SHA is `95945eeb…6b89`.
-- Receipt-time validation re-resolves CM-2080, the Phase 2 manifest, and Windows/WSL smoke from exact Git objects.
-- Source baseline `933d29e4…` records R2 `8/8`, full `test:all`, and fixture-only `gate:ci`; snapshot `8d252985…` binds 164/164 entries to 105 blobs with zero placeholders.
-- Review request `01c65db8…` is submission-only; R1 and CM-2074 are historical, not current authority.
-- `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and `readinessClaimed=false`.
+- Internal self-review decision `116d74b3…` has payload SHA `03242787…a1d4`; its implementation is `68c8088a…`.
+- Post-freeze intake receipt `7187e520…` has payload SHA `ffb0a0cf…eaba` and binds the exact decision commit/tree/parent/two-path diff, JSON/Markdown blobs/bytes/raw SHA, and replay implementation.
+- Independent second-pass recomputation verified 164/164 traces, 411 source bindings, and 105 unique Git objects with zero mismatch or actionable finding.
+- `independentReviewPassed=true` is scoped to `repository_internal_separate_pass`; `independentExternalReviewPassed=false` and this self-review does not impersonate external review.
+- Historical CM-2080 `externalReviewPassed=true` remains unchanged.
+- Full-plan application preparation is the next separate gate; it is not authorized or applied here.
+- `fullPlanPackCompleted=false` and `readinessClaimed=false`.
 
-Validation: `CMV-2209`.
+Validation: `CMV-2210`.
 
 ## Historical CM-2115 Canonical Full-plan Evidence Snapshot (Superseded)
 

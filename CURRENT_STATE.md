@@ -8,15 +8,32 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2115-R2 durable one-shot and exact patch binding repaired; rebuilt 164-trace snapshot pending independent review; full plan and readiness remain false |
-| Current task | `CM-2115-R2 durable one-shot and exact patch binding repair` |
-| Current validation | `CMV-2209` |
-| Current route | Obtain an independent decision over the exact snapshot; only afterward prepare a separate one-field completion application |
+| Status | CM-2115-R2 repository-internal independent second pass accepted and Git-intaken; full-plan application not authorized or applied; readiness remains false |
+| Current task | `CM-2115-R2 internal canonical snapshot self-review` |
+| Current validation | `CMV-2210` |
+| Current route | Prepare a separate exact full-plan application gate; do not infer completion or readiness from self-review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## Current Snapshot Result
+## Current Internal Self-review Result
+
+The repository-internal second pass re-resolved 164/164 trace entries, 411
+source bindings, and 105 unique Git objects with zero mismatch, placeholder,
+private/circular route, or actionable finding. Decision `116d74b3…` has payload
+SHA-256 `03242787…a1d4`. Intake receipt `7187e520…` has payload SHA-256
+`ffb0a0cf…eaba` and replays the exact decision Git identity, parent, two-path
+diff, JSON/Markdown bytes and hashes, implementation lineage, snapshot, and
+review request.
+
+`independentReviewPassed=true` is scoped to
+`repository_internal_separate_pass`. It is not a new external review and does
+not satisfy an external-review requirement. The historical CM-2080
+`externalReviewPassed=true` fact remains unchanged. No full-plan application is
+authorized or applied, `fullPlanPackCompleted=false`, and all readiness fields
+remain false.
+
+## Frozen R2 Snapshot Result
 
 CM-2115-R2 applies the exact CM-2080-reviewed Phase 2 manifest and Windows/WSL
 receipt through one durable consumed Git-common-dir claim. Decision commit is
@@ -34,8 +51,8 @@ and fixture-only/no-network/no-provider `gate:ci` success. Snapshot contract and
 review-request tests are `19/19`. Snapshot commit is `8d252985…`; review request
 commit is `01c65db8…`.
 
-The candidate audit is eligible but non-authoritative. Independent review has
-not passed, no full-plan application is prepared or authorized,
+The candidate audit is now internally reviewed and Git-intaken, but remains
+non-applying. No full-plan application is prepared, authorized, or executed;
 `fullPlanPackCompleted=false`, and all readiness fields remain false.
 
 ## Historical Phase 8 Revalidation Result
