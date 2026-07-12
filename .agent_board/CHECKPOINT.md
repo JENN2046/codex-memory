@@ -4,13 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2118/CM-2119 one-shot executor and final release`.
-Current validation: `CMV-2213`.
-Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
+Current task: `CM-2121 exact full-plan status synchronization`.
+Current validation: `CMV-2214`.
+Current fact: the exact application commit is ancestry-anchored, both low-disclosure receipts are frozen and internally reviewed, the one-shot authorization is consumed/non-replayable, and the nine-path status synchronization records `fullPlanPackCompleted=true`.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-2118/CM-2119 Executor Packet and Final Release
+## CM-2121 Bound Full-plan Completion Status Sync
+
+Status: `FULL_PLAN_APPLICATION_BOUND_STATUS_SYNCED_READINESS_FALSE`
+
+- Application `41097b0f…` / tree `fecb13c4…` is anchored in branch ancestry with the exact `4M+1A` target set.
+- Receipt freeze `727e8128…` preserves the exact 7986-byte execution and 7546-byte binding receipts; review `521348cf…` passed.
+- Authorization final state is `CONSUMED_SUCCESS`, use count and patch count are one, and replay is forbidden.
+- The status application changes only nine governance/status paths and records `fullPlanPackCompleted=true`.
+- Every readiness alias remains false; no native/provider/real-memory/remote action occurs.
+
+Validation: `CMV-2214`.
+
+## Historical CM-2118/CM-2119 Executor Packet and Final Release
 
 Status: `FINAL_RELEASE_FROZEN_ONE_SHOT_APPLICATION_AUTHORIZED_UNCLAIMED_FULL_PLAN_FALSE_NO_READY_CLAIM`
 

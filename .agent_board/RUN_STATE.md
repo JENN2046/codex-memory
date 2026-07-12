@@ -4,12 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2118/CM-2119 one-shot full-plan executor and final execution release`.
-Current validation: `CMV-2213`.
-Current status: implementation `45c53bf5…`, packet `02a78ef8…`, and final release `dd78a679…` are frozen. Exact one-shot application authority is present, but it is unclaimed and unexecuted; status sync, `fullPlanPackCompleted`, and every readiness claim remain false.
-Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
+Current task: `CM-2121 exact full-plan status synchronization`.
+Current validation: `CMV-2214`.
+Current fact: the exact application commit is ancestry-anchored, both low-disclosure receipts are frozen and internally reviewed, the one-shot authorization is consumed/non-replayable, and the nine-path status synchronization records `fullPlanPackCompleted=true`.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## Current Run State
+
+- Full-plan application evidence: bound and synchronized.
+- Application authorization: consumed, non-replayable, inactive.
+- Readiness: all aliases false.
+- Native/provider/real-memory/remote authority from this task: none.
 
 ## Historical Run State Archive
 
@@ -37,11 +44,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is a separate decision whether to run the exact three-commit
-CM-2118 CLI from a clean detached checkout at implementation `45c53bf5…`.
-If run, only one fixed claim and one exact `4M+1A` Git-plumbing application
-commit may occur. Do not infer status sync, production, release, deploy,
-cutover, RC, complete-V8, or readiness from the prepared release.
+Any readiness, release, deploy, cutover, tag, push, native-memory, provider, or real-memory action requires a new exact boundary. Do not replay the consumed full-plan application authorization.
 
 ## Historical Run Notes
 

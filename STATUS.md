@@ -4,14 +4,20 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2118/CM-2119 one-shot full-plan executor and final execution release`.
-Current validation: `CMV-2213`.
-Current project status: implementation `45c53bf5…`, non-executing packet `02a78ef8…`, and exact final release `dd78a679…` are frozen and machine-intaken. The release authorizes one exact local claim, five-path Git-plumbing application commit, and durable binding only; it does not authorize status sync, readiness, native/provider/real-memory, or remote actions. The executor has not run: claim, patch, application commit, and binding receipt counts remain zero; `fullPlanPackCompleted=false` and every readiness field remains false.
-Current route: `CM2119_FINAL_RELEASE_FROZEN_ONE_SHOT_APPLICATION_AUTHORIZED_UNCLAIMED_FULL_PLAN_FALSE_NO_READY_CLAIM`.
-Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
+Current task: `CM-2121 exact full-plan status synchronization`.
+Current validation: `CMV-2214`.
+Current fact: the exact application commit is ancestry-anchored, both low-disclosure receipts are frozen and internally reviewed, the one-shot authorization is consumed/non-replayable, and the nine-path status synchronization records `fullPlanPackCompleted=true`.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## CM-2121 Bound Full-plan Application Status
+
+Application `41097b0f…` is ancestry-anchored with exact tree `fecb13c4…`. Receipt freeze `727e8128…` preserves both byte-exact low-disclosure receipts, and internal review `521348cf…` passes. Authorization is consumed/non-replayable; the nine-path status synchronization records `fullPlanPackCompleted=true`.
+
+This completion is limited to the imported plan-pack evidence state. Production, release, deploy, cutover, `RC_READY`, complete V8, and all other readiness fields remain false. No native/provider/real-memory/remote action is authorized or performed by the status synchronization.
+
+## Historical CM-2118/CM-2119 Release State
 CM-2118 implementation `45c53bf5…` freezes the fixed-root claim registry,
 three-commit secure executor, low-disclosure external receipts, and exact
 application-commit binding contract. Packet `02a78ef8…` has payload SHA

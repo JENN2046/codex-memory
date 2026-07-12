@@ -8,15 +8,21 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2118 executor/packet and CM-2119 final release frozen; one-shot application authorized but unclaimed/unexecuted |
-| Current task | `CM-2118/CM-2119 one-shot full-plan executor and final execution release` |
-| Current validation | `CMV-2213` |
-| Current route | Stop after final-release preparation; execute only as a separate next action using the exact three-commit CLI |
+| Status | Exact full-plan application bound and status synchronized; readiness remains false |
+| Current task | `CM-2121 exact full-plan status synchronization` |
+| Current validation | `CMV-2214` |
+| Current route | Full plan-pack evidence is complete; any readiness or external action remains separately gated |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## Current Final Execution Release
+## Current Bound Full-plan Application
+
+Application `41097b0f…` / tree `fecb13c4…` is ancestry-anchored with its exact `4M+1A` target set. Freeze commit `727e8128…` preserves the byte-exact execution and binding receipts; internal review `521348cf…` passed. The one-shot authorization is `CONSUMED_SUCCESS`, use count one, and non-replayable.
+
+`fullPlanPackCompleted=true` now describes the bounded plan-pack evidence state. This is not production, release, deploy, cutover, `RC_READY`, complete V8, or another readiness claim; every readiness field remains false.
+
+## Historical Final Execution Release
 
 CM-2118 implementation `45c53bf5…` and packet `02a78ef8…` freeze a secure
 three-commit entrypoint, fixed Git-common-dir governance root, atomic one-shot

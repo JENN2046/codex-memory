@@ -4,9 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest active task: `CM-2118/CM-2119 one-shot executor and final release`.
-Latest validation: `CMV-2213`.
-Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
+Current task: `CM-2121 exact full-plan status synchronization`.
+Current validation: `CMV-2214`.
+Current fact: the exact application commit is ancestry-anchored, both low-disclosure receipts are frozen and internally reviewed, the one-shot authorization is consumed/non-replayable, and the nine-path status synchronization records `fullPlanPackCompleted=true`.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -44,6 +45,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2121 | 2121 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Exact local status sync only | nine status/governance paths | Bind the reviewed one-shot application result into current status while keeping every readiness field false | exact receipt review; nine before/after blobs; current-facts drift; ledger consistency; docs/diff checks | authorization consumed/non-replayable; no native/provider/real-memory/remote effect | separate exact status-sync decision/release required; no readiness authority | COMPLETED_FULL_PLAN_APPLICATION_BOUND_STATUS_SYNCED_READINESS_FALSE |
 | CM-2119 | 2119 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Exact local one-shot application authority; no execution yet | CM-2118 source/CLI/generators/tests; packet; CM-2119 decision; status surfaces | Freeze the secure one-shot stack, then separately freeze exact final release without running it | focused `10/10`; combined `60/60`; default `5435/5435`; exact packet/release Git intake; concurrency/reentry/drift red-team; docs gates | claim/patch/application/receipt counts remain zero; release is non-replayable if later consumed | future execution requires the exact three commits and clean detached implementation runtime; status sync/readiness remain forbidden | FINAL_RELEASE_FROZEN_ONE_SHOT_APPLICATION_AUTHORIZED_UNCLAIMED_FULL_PLAN_FALSE_NO_READY_CLAIM |
 | CM-2117 | 2117 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Green content-only decision; final release/application remain separately gated | CM-2117 decision source/generator/tests, exact JSON/Markdown decision, status surfaces | Freeze the complete gate-bound five-target decision content without opening execution | decision `6/6`; combined `50/50`; default `5425/5425`; exact real-resolver replay; red-team; docs/current-facts/ledger/diff | zero claim/patch/application/runtime/native/provider/real-memory/remote effect | frozen executor and separate final release must bind full `b1245149…` identity before execution | COMPLETED_EXACT_CONTENT_DECISION_FROZEN_FINAL_RELEASE_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM |
 | CM-2116-R1 | 2116 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Green non-executing exact gate; decision/application/readiness remain separate | CM-2116-R1 gate source/generator/tests, exact JSON/Markdown gate, status surfaces | Bind the complete `7187e520…` intake Git identity and freeze a fail-closed five-path full-plan application gate | gate `6/6`; combined `44/44`; default `5419/5419`; exact Git replay; red-team; docs/current-facts/ledger/diff | zero claim/patch/application/runtime/native/provider/real-memory/remote effect; old gate not authority | future exact decision must bind full `f6b7f9a5…` identity; gate reference alone is insufficient | COMPLETED_EXACT_GATE_PREPARED_DECISION_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM |
