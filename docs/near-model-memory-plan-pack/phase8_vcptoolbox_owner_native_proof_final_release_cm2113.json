@@ -1,29 +1,29 @@
 {
   "schemaVersion": 1,
   "taskId": "CM-2113",
-  "decisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-FINAL-0294FC5C",
+  "decisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-FINAL-002-0294FC5C",
   "executionReleaseAuthorized": true,
   "nativeWriteAuthorized": true,
   "authorizationUseCount": 1,
   "automaticRetryAllowed": false,
   "rollbackOrCompensationAllowed": false,
   "expiresAt": "2026-07-15T18:00:00+08:00",
-  "approvedAt": "2026-07-12T10:40:05+08:00",
+  "approvedAt": "2026-07-12T10:51:48+08:00",
   "contentDecisionGitIdentity": {
-    "sourceCommit": "c88f4ae64a1c864476f120caf0605356d72948e4",
-    "blobOid": "cdd42a4ffe14c0f4cd2b0168894d107567025131",
-    "bytes": 3261,
-    "sha256": "ed86d7eff66acc83e9c50c0a4cbb14ba99af6e8f2ff74e0fa383caa1b2f18bd1"
+    "sourceCommit": "0f10573581bf752d0c41ee3c8e8ca53dda04a094",
+    "blobOid": "bc90fac2b46b87a70b117f6707b3e7b07f1cab3c",
+    "bytes": 3265,
+    "sha256": "cead009dc0d97dfc8dd44765e980ab0ebd0e288db70abdc42342cc6959119fc6"
   },
   "executionPacketGitIdentity": {
-    "sourceCommit": "be6d615a0624b2bd5cd2715579bb7843c0d0c95c",
-    "blobOid": "066d8752804543116251c46e630c798498d15178",
-    "bytes": 5231,
-    "sha256": "6d41dee5c2c99f3e5295129f831e9b9e96a978af7a0a344f5c6b05396a681844"
+    "sourceCommit": "59a2c87b44f93f2c15e5785e9c3c501df60f1eaf",
+    "blobOid": "a08bd4e2033e3af8854452a08d79d3031bf32103",
+    "bytes": 5239,
+    "sha256": "a77662caf6c28c5df0457541eb28bd83c94af975ee37f22d8e2b2db6a1331d82"
   },
   "implementation": {
-    "commit": "b9010cef38d81b82c299bcf8d054e44e0875c00e",
-    "tree": "d2bd721aa44c18ae63f70b698b61f1243243b466"
+    "commit": "388e62b55e62dcae472ed0da69319d916edb97a8",
+    "tree": "99bb3ed9c1ea5f549b8f9e3d215e72147823f670"
   },
   "ownerRuntime": {
     "owner": "VCPToolBox",
@@ -67,11 +67,11 @@
   },
   "authorization": {
     "action": "live_bridge_record_memory_proof",
-    "nonce": "cm2113-vcptoolbox-owner-native-proof-nonce-001",
-    "receiptId": "cm2113-vcptoolbox-owner-native-proof-receipt-001",
+    "nonce": "cm2113-vcptoolbox-owner-native-proof-nonce-002",
+    "receiptId": "cm2113-vcptoolbox-owner-native-proof-receipt-002",
     "useCount": 1,
     "replayAllowed": false,
-    "approvedAt": "2026-07-12T10:40:05+08:00",
+    "approvedAt": "2026-07-12T10:51:48+08:00",
     "expiresAt": "2026-07-15T18:00:00+08:00"
   },
   "limits": {
