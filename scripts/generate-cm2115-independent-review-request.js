@@ -22,12 +22,12 @@ const {
 const DEFAULT_JSON_PATH = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_canonical_full_plan_evidence_snapshot_review_request.json'
+  'cm2115_r1_canonical_full_plan_evidence_snapshot_review_request.json'
 );
 const DEFAULT_MARKDOWN_PATH = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_canonical_full_plan_evidence_snapshot_review_request.md'
+  'cm2115_r1_canonical_full_plan_evidence_snapshot_review_request.md'
 );
 
 function gitText(args) {
@@ -49,6 +49,9 @@ function resolveGitFile(commit, sourcePath) {
   const [, gitMode, gitObjectType, blobOid] = match;
   const content = gitBuffer(['cat-file', 'blob', blobOid]);
   return {
+    sourceCommit: commit,
+    sourceTree: gitText(['rev-parse', `${commit}^{tree}`]),
+    sourcePath,
     gitMode,
     gitObjectType,
     blobOid,
@@ -144,6 +147,7 @@ function buildRequest() {
       allTraceGitObjectBindingsReviewRequested: true,
       allTraceSemanticRoutesReviewRequested: true,
       validationReceiptAndLineageReviewRequested: true,
+      phase2ApplicationReceiptSemanticReviewRequested: true,
       candidateCompletionAuditReviewRequested: true,
       nonClaimAndZeroSideEffectReviewRequested: true
     },
@@ -183,9 +187,9 @@ function buildRequest() {
     }
   };
   return {
-    schemaVersion: 1,
-    taskId: 'CM-2115',
-    requestType: 'canonical_full_plan_evidence_snapshot_independent_review_request_v1',
+    schemaVersion: 2,
+    taskId: 'CM-2115-R1',
+    requestType: 'canonical_full_plan_evidence_snapshot_independent_review_request_v2',
     canonicalPayloadSha256: sha256Canonical(payload),
     payload
   };
@@ -193,7 +197,7 @@ function buildRequest() {
 
 function renderMarkdown(request, jsonText) {
   return [
-    '# CM-2115 Canonical Full-plan Evidence Snapshot Independent Review Request',
+    '# CM-2115-R1 Canonical Full-plan Evidence Snapshot Independent Review Request',
     '',
     'Review only the frozen snapshot and its 164 exact Git-object/semantic-route bindings.',
     'This request does not authorize a completion application and does not change repository state.',
