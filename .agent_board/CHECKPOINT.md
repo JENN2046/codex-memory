@@ -4,11 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2117 exact full-plan application content decision`.
-Current validation: `CMV-2212`.
+Current checkpoint: `CM-2118/CM-2119 one-shot executor and final release`.
+Current validation: `CMV-2213`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2118/CM-2119 Executor Packet and Final Release
+
+Status: `FINAL_RELEASE_FROZEN_ONE_SHOT_APPLICATION_AUTHORIZED_UNCLAIMED_FULL_PLAN_FALSE_NO_READY_CLAIM`
+
+- Implementation `45c53bf5…`; packet `02a78ef8…`; final release `dd78a679…`.
+- Packet payload `2e5299ee…5454`; release payload `33caf9c6…e579`.
+- Secure entry accepts only the exact content, packet, and release commits; it derives the fixed governance root internally and does not expose raw plumbing/resolver authority.
+- Isolated two-process E2E proves one claimant only, new-process replay denial, direct parent `b1245149…`, exact `4M+1A`, external receipts, and readiness-drift rejection.
+- Final release Git intake passed, but the executor was not run: claim, patch, application commit, binding receipt, native/provider/real-memory/remote effects are zero.
+- `fullPlanPackCompleted=false`, `statusSyncAuthorized=false`, and every readiness field remains false.
+
+Validation: `CMV-2213`.
 
 ## CM-2117 Exact Full-plan Application Content Decision
 

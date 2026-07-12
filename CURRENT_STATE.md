@@ -8,13 +8,28 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2117 exact application content decision frozen; final release, execution, completion, and readiness remain false |
-| Current task | `CM-2117 exact full-plan application content decision` |
-| Current validation | `CMV-2212` |
-| Current route | Freeze a non-executing exact executor, then issue a separate final execution release bound to decision `b1245149…` |
+| Status | CM-2118 executor/packet and CM-2119 final release frozen; one-shot application authorized but unclaimed/unexecuted |
+| Current task | `CM-2118/CM-2119 one-shot full-plan executor and final execution release` |
+| Current validation | `CMV-2213` |
+| Current route | Stop after final-release preparation; execute only as a separate next action using the exact three-commit CLI |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## Current Final Execution Release
+
+CM-2118 implementation `45c53bf5…` and packet `02a78ef8…` freeze a secure
+three-commit entrypoint, fixed Git-common-dir governance root, atomic one-shot
+claim, durable re-entry state, external execution/binding receipts, and an exact
+`4M+1A` application-commit contract. Packet payload SHA-256 is
+`2e5299ee…5454`.
+
+CM-2119 decision `dd78a679…` is an exact two-file child of that packet and
+passed machine Git intake. Decision payload SHA-256 is `33caf9c6…e579`.
+It authorizes one local claim/application only. It does not authorize status
+sync, remote actions, native/provider/real-memory access, or readiness claims.
+The executor has not run, so claim/application/commit/receipt counters remain
+zero. `fullPlanPackCompleted=false` and all 22 readiness fields remain false.
 
 ## Current Exact Full-plan Application Decision
 
@@ -40,10 +55,11 @@ SHA-256 is `7591efb0…2430c`; the JSON and Markdown raw SHA-256 values are
 `db625f62…04442` and `2f1e5bb9…10f5`.
 
 This is preparation only. The prior `c3f3457b…` gate is superseded and cannot
-serve as current authority. No application decision, durable claim, patch,
-application commit, or binding receipt exists. `fullPlanPackCompleted=false`
-and all production/release/deploy/cutover/RC/complete-V8/readiness fields remain
-false.
+serve as current authority. The gate alone created no application decision,
+claim, patch, commit, or binding receipt. CM-2117 through CM-2119 now provide
+the separate active decision/release route described above, but it remains
+unclaimed and unexecuted. `fullPlanPackCompleted=false` and all
+production/release/deploy/cutover/RC/complete-V8/readiness fields remain false.
 
 ## Current Internal Self-review Result
 
@@ -80,10 +96,10 @@ and fixture-only/no-network/no-provider `gate:ci` success. Snapshot contract and
 review-request tests are `19/19`. Snapshot commit is `8d252985…`; review request
 commit is `01c65db8…`.
 
-The candidate audit is now internally reviewed and Git-intaken, but remains
-non-applying. The separate R1 gate is prepared, while no full-plan application
-decision, authorization, claim, or execution exists; `fullPlanPackCompleted=false`,
-and all readiness fields remain false.
+The candidate audit is internally reviewed and Git-intaken. At that snapshot
+checkpoint it remained non-applying and had no full-plan decision or authority.
+CM-2117 through CM-2119 now provide the separate unclaimed application route;
+`fullPlanPackCompleted=false` and all readiness fields remain false.
 
 ## Historical Phase 8 Revalidation Result
 

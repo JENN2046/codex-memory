@@ -4,22 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2117 exact full-plan application content decision`.
-Current validation: `CMV-2212`.
-Current handoff: decision `b1245149…` freezes the five-target content and passed exact replay. Content approval is true, but execution authorization and final release remain false. No claim or patch may run; full plan-pack and readiness remain false.
+Current task: `CM-2118/CM-2119 one-shot full-plan executor and final execution release`.
+Current validation: `CMV-2213`.
+Current handoff: implementation `45c53bf5…`, packet `02a78ef8…`, and final release `dd78a679…` passed exact local intake. One exact application is authorized but not claimed or executed. Status sync, full-plan completion, and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
+CM-2118 uses a single secure entry that accepts only content commit
+`b1245149…`, packet `02a78ef8…`, and release `dd78a679…`. It revalidates all
+three Git objects at claim time, derives the fixed Git-common-dir registry,
+records real `claimedAt`, creates an application commit directly on
+`b1245149…`, and requires exact external execution/binding receipts. CM-2119
+opens exactly one use and no retry, cleanup, status sync, native/provider,
+real-memory, remote, or readiness authority. It has not been consumed.
+
+
 CM-2117 decision `b1245149…` binds implementation `249c9ba1…`, gate
 `f6b7f9a5…`, payload `50ae5da8…2a5a`, and patch payload
 `988386ae…49bd`. It freezes five target before/after projections, excludes any
 execution-receipt path exception, and expands the immutable set to the current
-gate and decision artifacts. The next implementation must remain non-executing
-until frozen; only a later final release may bind that executor and this full
-decision Git identity. Bare decision reference or content approval is not
-execution authority.
+gate and decision artifacts. CM-2118/CM-2119 now satisfy its separate
+implementation/release requirement without executing it. Bare decision
+reference or content approval remains insufficient execution authority.
 
 CM-2116-R1 freezes a non-executing exact gate at `f6b7f9a5…`, with payload
 `7591efb0…2430c`, JSON blob `5741cabe…17d7` / 11204 bytes / raw SHA

@@ -4,13 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2117 exact full-plan application content decision`.
-Current validation: `CMV-2212`.
-Current project status: the exact five-target application decision content is frozen at `b1245149…` and passed repository-internal red-team replay. It binds the complete CM-2116-R1 gate and nested `7187e520…` chain plus every before/after object. Content approval is true, but execution authorization, final release, claim, patch, application commit binding, `fullPlanPackCompleted`, and all readiness claims remain false.
-Current route: `CM2117_EXACT_CONTENT_DECISION_FROZEN_FINAL_RELEASE_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM`.
+Current task: `CM-2118/CM-2119 one-shot full-plan executor and final execution release`.
+Current validation: `CMV-2213`.
+Current project status: implementation `45c53bf5…`, non-executing packet `02a78ef8…`, and exact final release `dd78a679…` are frozen and machine-intaken. The release authorizes one exact local claim, five-path Git-plumbing application commit, and durable binding only; it does not authorize status sync, readiness, native/provider/real-memory, or remote actions. The executor has not run: claim, patch, application commit, and binding receipt counts remain zero; `fullPlanPackCompleted=false` and every readiness field remains false.
+Current route: `CM2119_FINAL_RELEASE_FROZEN_ONE_SHOT_APPLICATION_AUTHORIZED_UNCLAIMED_FULL_PLAN_FALSE_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2118 implementation `45c53bf5…` freezes the fixed-root claim registry,
+three-commit secure executor, low-disclosure external receipts, and exact
+application-commit binding contract. Packet `02a78ef8…` has payload SHA
+`2e5299ee…5454`; its JSON/Markdown raw SHA values are `debe3cfd…dad0` and
+`3ea8297b…d80f`. CM-2119 release `dd78a679…` has payload SHA
+`33caf9c6…e579`; JSON/Markdown raw SHA values are `d570e56a…db42` and
+`e189a083…58a4`. Exact Git intake passed. Authorization use count is one and
+replay is false, but no claim or application occurred. The future application
+commit must be a direct child of CM-2117 decision `b1245149…` and contain
+exactly four modified targets plus one added state file. Status sync and all
+readiness claims remain unauthorized.
 
 CM-2117 implementation `249c9ba1…` freezes a content-only decision contract.
 Decision commit `b1245149…` has payload SHA `50ae5da8…2a5a` and patch payload
@@ -29,8 +41,9 @@ and the complete readiness alias set. Gate commit `f6b7f9a5…` has payload SHA
 11735 bytes, raw SHA `2f1e5bb9…10f5`. The gate replays the full
 `7187e520…` identity and fixes a five-path future patch allowlist. The earlier
 `c3f3457b…` gate is immutable superseded history and is not current authority.
-No full-plan application decision is present; authorization, execution,
-commit binding, completion, and readiness all remain false.
+At the CM-2116 gate checkpoint no full-plan application decision was present.
+CM-2117 through CM-2119 now supersede that checkpoint as the active route;
+execution remains unclaimed, while completion and readiness remain false.
 
 CM-2115-R2 internal self-review implementation is frozen at `68c8088a…`.
 Decision commit `116d74b3…` has payload SHA-256 `03242787…a1d4` and records
