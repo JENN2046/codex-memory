@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2114",
+  "decisionReference": "CM-2114-SELF-PHASE8-REVALIDATION-APPLICATION-01D72D5B",
+  "completionAuditReapplicationAuthorized": true,
+  "evidenceBundleGitIdentity": {
+    "sourceCommit": "8f33fd03e8055d57f8a65c5a7f00254c3232afe4",
+    "blobOid": "1b36f23e4a649c44c9882cbb33348e884dd2c55d",
+    "bytes": 2821,
+    "sha256": "6fc1b8374b33327681ad3ff410c85061b8b0a19c56e5eca9c6b3ce58cce34bba",
+    "payloadSha256": "01d72d5b8fec7725f6f437bcc20eda17d15afc6ee16a43be26e2773c9512345d"
+  },
+  "newProofReceiptGitIdentity": {
+    "sourceCommit": "cd0b986420a0be33d197c00c7bc3906d3ebfe887",
+    "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+    "bytes": 4089,
+    "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162"
+  },
+  "requiredEvidencePatch": {
+    "vcpToolBoxOwnedRuntimeWritePassed": true,
+    "actualTransportBindingPassed": true,
+    "stableTargetStoreIdentityPassed": true
+  },
+  "allowedCompletionResult": {
+    "phase8Completed": true,
+    "phase8CompletionStatus": "revalidated_complete",
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "applicationAuthorization": {
+    "useCount": 1,
+    "replayAllowed": false
+  },
+  "applicationSideEffectLimits": {
+    "completionAuditPatchApplications": 1,
+    "nativeReads": 0,
+    "nativeWrites": 0,
+    "verifyOperations": 0,
+    "rollbackOrCompensationOperations": 0,
+    "remoteActions": 0,
+    "readinessClaims": 0
+  },
+  "nonClaims": {
+    "additionalNativeWriteAuthorized": false,
+    "derivedIndexProofAccepted": false,
+    "productionProviderProofAccepted": false,
+    "productionReady": false,
+    "releaseReady": false,
+    "rcReady": false,
+    "completeV8": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  }
+}
