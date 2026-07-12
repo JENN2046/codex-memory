@@ -85,7 +85,8 @@
     "test:provider": "node ./src/cli/run-provider-tests.js",
     "test:all": "npm test && npm run test:hardening",
     "cm2115:validation-receipt": "node ./scripts/generate-cm2115-local-validation-receipt.js",
-    "cm2115:snapshot": "node ./src/cli/cm2115-canonical-full-plan-evidence-snapshot.js"
+    "cm2115:snapshot": "node ./src/cli/cm2115-canonical-full-plan-evidence-snapshot.js",
+    "cm2115:review-request": "node ./scripts/generate-cm2115-independent-review-request.js"
   },
   "engines": {
     "node": ">=22.0.0"
