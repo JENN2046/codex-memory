@@ -73,6 +73,14 @@ function buildSnapshot(resolveSourceObject) {
   return buildSnapshotCore(resolveSourceObject, bindingReceiptResolvers());
 }
 
+function reviewRequestResolvers() {
+  return {
+    ...bindingReceiptResolvers(),
+    resolveGitFile: resolveReviewGitFile,
+    isCommitAncestor: isReviewCommitAncestor
+  };
+}
+
 function tap(tests) {
   return { tests, pass: tests, fail: 0, cancelled: 0, skipped: 0, todo: 0 };
 }
@@ -438,13 +446,7 @@ test('canonical Markdown is a complete content-equivalent JSON mirror', () => {
 
 test('independent review request binds the frozen snapshot and stays non-authoritative', () => {
   const request = buildReviewRequest();
-  const result = evaluateCm2115SnapshotReviewRequest(request, {
-    resolveGitFile: resolveReviewGitFile,
-    resolveCommitTree: commit => execFileSync('git', ['rev-parse', `${commit}^{tree}`], {
-      cwd: process.cwd(), encoding: 'utf8'
-    }).trim(),
-    isCommitAncestor: isReviewCommitAncestor
-  });
+  const result = evaluateCm2115SnapshotReviewRequest(request, reviewRequestResolvers());
   assert.equal(result.accepted, true, result.blockers.join(','));
   assert.equal(result.snapshotContractAccepted, true);
   assert.equal(result.readyToSubmitForIndependentReview, true);
@@ -469,13 +471,7 @@ test('review request cannot self-approve review, application, completion, or rea
     const candidate = structuredClone(original);
     change(candidate);
     candidate.canonicalPayloadSha256 = sha256Canonical(candidate.payload);
-    const result = evaluateCm2115SnapshotReviewRequest(candidate, {
-      resolveGitFile: resolveReviewGitFile,
-      resolveCommitTree: commit => execFileSync('git', ['rev-parse', `${commit}^{tree}`], {
-        cwd: process.cwd(), encoding: 'utf8'
-      }).trim(),
-      isCommitAncestor: isReviewCommitAncestor
-    });
+    const result = evaluateCm2115SnapshotReviewRequest(candidate, reviewRequestResolvers());
     assert.equal(result.accepted, false);
   }
 });

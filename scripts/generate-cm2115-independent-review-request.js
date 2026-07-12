@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 'use strict';
 
-const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const {
+  resolveCommitTree,
+  resolveDiffPaths,
+  resolveGitFile: resolveR2GitFile,
+  resolveGitPathState,
+  resolveParentCommit
+} = require('./cm2115-r2-git');
 
 const {
   BASELINE,
@@ -22,12 +28,12 @@ const {
 const DEFAULT_JSON_PATH = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_r1_canonical_full_plan_evidence_snapshot_review_request.json'
+  'cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json'
 );
 const DEFAULT_MARKDOWN_PATH = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_r1_canonical_full_plan_evidence_snapshot_review_request.md'
+  'cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md'
 );
 
 function gitText(args) {
@@ -36,29 +42,8 @@ function gitText(args) {
   }).trim();
 }
 
-function gitBuffer(args) {
-  return execFileSync('git', args, {
-    cwd: process.cwd(), encoding: null, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024
-  });
-}
-
 function resolveGitFile(commit, sourcePath) {
-  const line = gitBuffer(['ls-tree', '-z', commit, '--', sourcePath]).toString('utf8');
-  const match = line.match(/^(\d{6}) (\w+) ([a-f0-9]{40})\t([^\0]+)\0$/);
-  if (!match || match[4] !== sourcePath) throw new Error(`cm2115_review_git_file_missing:${commit}:${sourcePath}`);
-  const [, gitMode, gitObjectType, blobOid] = match;
-  const content = gitBuffer(['cat-file', 'blob', blobOid]);
-  return {
-    sourceCommit: commit,
-    sourceTree: gitText(['rev-parse', `${commit}^{tree}`]),
-    sourcePath,
-    gitMode,
-    gitObjectType,
-    blobOid,
-    bytes: content.length,
-    sha256: crypto.createHash('sha256').update(content).digest('hex'),
-    content
-  };
+  return resolveR2GitFile(commit, sourcePath);
 }
 
 function fileBinding(commit, sourcePath) {
@@ -147,7 +132,7 @@ function buildRequest() {
       allTraceGitObjectBindingsReviewRequested: true,
       allTraceSemanticRoutesReviewRequested: true,
       validationReceiptAndLineageReviewRequested: true,
-      phase2ApplicationReceiptSemanticReviewRequested: true,
+      phase2ApplicationBindingReceiptSemanticReviewRequested: true,
       candidateCompletionAuditReviewRequested: true,
       nonClaimAndZeroSideEffectReviewRequested: true
     },
@@ -187,9 +172,9 @@ function buildRequest() {
     }
   };
   return {
-    schemaVersion: 2,
-    taskId: 'CM-2115-R1',
-    requestType: 'canonical_full_plan_evidence_snapshot_independent_review_request_v2',
+    schemaVersion: 3,
+    taskId: 'CM-2115-R2',
+    requestType: 'canonical_full_plan_evidence_snapshot_independent_review_request_v3',
     canonicalPayloadSha256: sha256Canonical(payload),
     payload
   };
@@ -197,7 +182,7 @@ function buildRequest() {
 
 function renderMarkdown(request, jsonText) {
   return [
-    '# CM-2115-R1 Canonical Full-plan Evidence Snapshot Independent Review Request',
+    '# CM-2115-R2 Canonical Full-plan Evidence Snapshot Independent Review Request',
     '',
     'Review only the frozen snapshot and its 164 exact Git-object/semantic-route bindings.',
     'This request does not authorize a completion application and does not change repository state.',
@@ -233,8 +218,11 @@ function main() {
   const request = buildRequest();
   const evaluation = evaluateCm2115SnapshotReviewRequest(request, {
     resolveGitFile,
-    resolveCommitTree: commit => gitText(['rev-parse', `${commit}^{tree}`]),
-    isCommitAncestor
+    resolveCommitTree,
+    isCommitAncestor,
+    resolveParentCommit,
+    resolveDiffPaths,
+    resolveGitPathState
   });
   if (!evaluation.accepted) throw new Error(`cm2115_review_request_rejected:${evaluation.blockers.join(',')}`);
   const jsonText = `${JSON.stringify(canonicalize(request), null, 2)}\n`;

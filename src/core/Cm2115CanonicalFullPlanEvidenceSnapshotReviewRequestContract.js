@@ -14,20 +14,20 @@ const {
 } = require('./Cm2115LocalValidationReceiptContract');
 
 const SNAPSHOT_FREEZE = Object.freeze({
-  commit: '56d3e04ccf342d47cec687ba42557a4ead76e804',
-  tree: '312827b5ed08e750fba6ed880d401a45dd684b3f',
+  commit: '8d25298563e512456c614eb6fec6af6bdc02bf8f',
+  tree: '8649b063591c7063b726ef48b3a99ccf45fe7f23',
   json: Object.freeze({
-    path: 'docs/near-model-memory-plan-pack/cm2115_r1_canonical_full_plan_evidence_snapshot.json',
-    blobOid: '14f7a4eacd5234df453eac21b54d46ece83d9e15',
-    bytes: 296444,
-    sha256: '4bff4c1573ea74d2e6808bf0ea86ad8e7a1fdc756c83bc558bb57794954d9c09',
-    canonicalPayloadSha256: '5d4a380d2a2dae4383f83f367bdea2ad137bc14211828e14f4faf521a77546ac'
+    path: 'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.json',
+    blobOid: 'eab7cc71bd00642542fc1ef89e7a9bb075268002',
+    bytes: 296723,
+    sha256: '607fa483d192b6a70f1a0534a34c5660fd913b50197501cf85e48e5402e58feb',
+    canonicalPayloadSha256: 'afc1f7263215dfc89a75118fd8f580c572b729162363021c9f806317ca55cbb6'
   }),
   markdown: Object.freeze({
-    path: 'docs/near-model-memory-plan-pack/cm2115_r1_canonical_full_plan_evidence_snapshot.md',
-    blobOid: '608ef4e2fe78f55d1f8eae3d9be45188d6549cfa',
-    bytes: 297242,
-    sha256: '56a4f09bac1f7f961f7c4acb746c30bef498d1ed53dfc9f8531b6b831f06d59a'
+    path: 'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.md',
+    blobOid: '8bffe6f814f5705bada01ac26244121cbeff2243',
+    bytes: 297521,
+    sha256: '8d0d9fcb5ba6755eb634e6dc81f14523027c7f1625b8f34a9961af5236d06f46'
   })
 });
 
@@ -39,10 +39,10 @@ const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
   'src/cli/cm2115-canonical-full-plan-evidence-snapshot.js',
   'scripts/generate-cm2115-local-validation-receipt.js',
   'scripts/generate-cm2115-independent-review-request.js',
-  'src/core/Cm2115R1Phase2CompletionAuditApplication.js',
-  'scripts/generate-cm2115-r1-phase2-application-decision.js',
-  'scripts/apply-cm2115-r1-phase2-completion-audit.js',
-  'tests/cm2115-r1-phase2-completion-audit-application.test.js',
+  'src/core/Cm2115R2Phase2CompletionAuditApplication.js',
+  'scripts/cm2115-r2-git.js',
+  'scripts/generate-cm2115-r2-strengthened-binding-receipt.js',
+  'tests/cm2115-r2-durable-exact-patch-application.test.js',
   'tests/cm2115-canonical-full-plan-evidence-snapshot.test.js'
 ]);
 
@@ -100,7 +100,7 @@ const REVIEW_CHECK_KEYS = Object.freeze([
   'allTraceGitObjectBindingsReviewRequested',
   'allTraceSemanticRoutesReviewRequested',
   'validationReceiptAndLineageReviewRequested',
-  'phase2ApplicationReceiptSemanticReviewRequested',
+  'phase2ApplicationBindingReceiptSemanticReviewRequested',
   'candidateCompletionAuditReviewRequested',
   'nonClaimAndZeroSideEffectReviewRequested'
 ]);
@@ -169,12 +169,15 @@ function verifyFileBinding(binding, commit, resolveGitFile, blockers, label) {
 function evaluateCm2115SnapshotReviewRequest(request, {
   resolveGitFile,
   resolveCommitTree,
-  isCommitAncestor
+  isCommitAncestor,
+  resolveParentCommit,
+  resolveDiffPaths,
+  resolveGitPathState
 } = {}) {
   const blockers = [];
   if (!sameKeys(request, REQUEST_KEYS)) blockers.push('request.fields');
-  if (request?.schemaVersion !== 2 || request?.taskId !== 'CM-2115-R1' ||
-      request?.requestType !== 'canonical_full_plan_evidence_snapshot_independent_review_request_v2') {
+  if (request?.schemaVersion !== 3 || request?.taskId !== 'CM-2115-R2' ||
+      request?.requestType !== 'canonical_full_plan_evidence_snapshot_independent_review_request_v3') {
     blockers.push('request.identity');
   }
   if (!hex(request?.canonicalPayloadSha256, 64) ||
@@ -225,7 +228,10 @@ function evaluateCm2115SnapshotReviewRequest(request, {
         resolveSourceObject: sourcePath => resolveGitFile(BASELINE.sourceCommit, sourcePath),
         resolveCommitTree,
         isCommitAncestor,
-        resolveGitFile
+        resolveGitFile,
+        resolveParentCommit,
+        resolveDiffPaths,
+        resolveGitPathState
       });
       if (!snapshotEvaluation.accepted) blockers.push('snapshot.contract');
     } catch {
