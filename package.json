@@ -103,7 +103,9 @@
     "cm2120:freeze-receipts": "node ./scripts/freeze-cm2120-full-plan-application-receipts.js",
     "cm2120:review-receipts": "node ./scripts/generate-cm2120-full-plan-application-receipt-review.js",
     "cm2121:status-sync-application": "node ./scripts/generate-cm2121-full-plan-status-sync-application.js",
-    "cm2121:status-sync-content-decision": "node ./scripts/generate-cm2121-full-plan-status-sync-content-decision.js"
+    "cm2121:status-sync-content-decision": "node ./scripts/generate-cm2121-full-plan-status-sync-content-decision.js",
+    "cm2122:status-sync-execution-packet": "node ./scripts/generate-cm2122-full-plan-status-sync-execution-packet.js",
+    "cm2123:status-sync-final-release": "node ./scripts/generate-cm2123-full-plan-status-sync-final-release.js"
   },
   "engines": {
     "node": ">=22.0.0"
