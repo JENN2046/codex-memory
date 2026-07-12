@@ -1,0 +1,6034 @@
+# CM-2115-R2 Canonical Full-plan Evidence Snapshot
+
+This is a content-equivalent review surface for the canonical JSON snapshot.
+It is prepared for independent Git-object and semantic-route review only.
+
+- Source commit: `933d29e41a6489adc1d411f217b4cebf0f5e060d`
+- Source tree: `7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2`
+- Canonical payload SHA-256: `afc1f7263215dfc89a75118fd8f580c572b729162363021c9f806317ca55cbb6`
+- Trace entries: `164`
+- Resolved trace entries: `164`
+- Placeholder refs: `0`
+- Unique source objects: `105`
+- Candidate completion eligible: `true`
+- Authoritative fullPlanPackCompleted: `false`
+- Readiness claimed: `false`
+
+The candidate audit result is not an application. Independent review and a separate application gate remain required.
+
+## Exact JSON mirror
+
+```json
+{
+  "canonicalPayloadSha256": "afc1f7263215dfc89a75118fd8f580c572b729162363021c9f806317ca55cbb6",
+  "payload": {
+    "baseline": {
+      "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+      "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+    },
+    "candidateAudit": {
+      "authoritativeFullPlanPackCompleted": false,
+      "authoritativeReadinessClaimed": false,
+      "blockerCount": 0,
+      "completedPhaseIds": [
+        "phase0_goal_contract_non_claims",
+        "phase1_blocker_repairs",
+        "phase2_readonly_realtime_native_memory",
+        "phase3_memory_context_package_mvp",
+        "phase4_codex_workflow_integration",
+        "phase5_recall_quality_gate",
+        "phase6_memory_delta_pipeline",
+        "phase7_operator_full_surface",
+        "phase8_native_write_production_proof",
+        "phase9_default_runtime_policy",
+        "phase10_tag_release_readiness"
+      ],
+      "completionEligibleForIndependentReview": true,
+      "evaluatorAccepted": true,
+      "evaluatorSchemaVersion": "near_model_memory_plan_pack_completion_audit_v1",
+      "evaluatorWouldReturnFullPlanPackCompleted": true,
+      "incompletePhaseIds": [],
+      "missingObjectiveInvariantIds": [],
+      "stopReasonCount": 0
+    },
+    "counts": {
+      "exactAuthorizedReceiptEntryCount": 21,
+      "externalReviewEntryCount": 6,
+      "fakePlaceholderRefCount": 0,
+      "invariantTraceEntryCount": 41,
+      "objectiveInvariantCount": 13,
+      "phaseRequirementCount": 11,
+      "phaseTraceEntryCount": 123,
+      "resolvedTraceEntryCount": 164,
+      "totalTraceEntryCount": 164,
+      "uniqueEvidenceFieldCount": 146,
+      "uniqueSourceObjectCount": 105
+    },
+    "currentState": {
+      "fullPlanPackCompleted": false,
+      "phase8Completed": true,
+      "readinessClaimed": false
+    },
+    "entries": [
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "epaResidualPyramidAdvancedTagMemoExperimentalOnly",
+        "evidenceKind": "local_source_test",
+        "requirementId": "advanced_recall_heuristics_experimental_only",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "9af6805e260220a9a6996c94478faec9bb2ca289",
+            "bytes": 3031,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e260ebe7f078554990bc17fd5aa8cf183fc8958124c9afe3299a73d707ef62c9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/02_FINAL_GOAL_AND_NON_CLAIMS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5cb490f9d2bb15d9f19d2d19d661021ed1464e69",
+            "bytes": 5053,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "79f2acccc52cfa16fc460bad8c924479e35d33365fe256d1545e6f540857b417",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/recall/EPAModule.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "1ca291c1a13612f767844e8eb8c1fac75ff7a492",
+            "bytes": 1981,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6710328d9ddcdc72ba5fadca6dd25dfdf8bc2ac6a1d39774c8849563d0ee2efe",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/recall/ResidualPyramid.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "e4751667ec961c86437db1b4f0a9373f9f63d483",
+            "bytes": 7245,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "7e443ef63553f555883dc15d80a503e298b5198bdfa4be03e10a28b51b3ed719",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/recall/TagMemoEngine.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:advanced_recall_heuristics_experimental_only:epaResidualPyramidAdvancedTagMemoExperimentalOnly"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "auditContinuityRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "eda5243a928ba83dbcd124b11e89cd1cd6fcc126",
+            "bytes": 4295,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d1fa56ff9002ad1693a007a31e30e64811ec318c03df098a22bbae8bb992d866",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/03_ARCHITECTURE_PLAN.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5e46e979d14d1d681092f1d120b6c5feaef38acf",
+            "bytes": 42472,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6ba4e7241b1053b5c54d5ea7a45211f8c69238b037301e2f473f1b66680833f6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/GovernedMcpVcpNativeBridgeGate.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5abe0ca2fb4e935cda135905ce2525633e630362",
+            "bytes": 12099,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "87454a6fcb77278922c83214260d4277f48e092adaeeb3110b2f601cf8d938dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/AuditLogStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline:auditContinuityRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "codexMemoryGovernedMcpBridge",
+        "evidenceKind": "local_source_test",
+        "requirementId": "codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "eda5243a928ba83dbcd124b11e89cd1cd6fcc126",
+            "bytes": 4295,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d1fa56ff9002ad1693a007a31e30e64811ec318c03df098a22bbae8bb992d866",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/03_ARCHITECTURE_PLAN.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5e46e979d14d1d681092f1d120b6c5feaef38acf",
+            "bytes": 42472,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6ba4e7241b1053b5c54d5ea7a45211f8c69238b037301e2f473f1b66680833f6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/GovernedMcpVcpNativeBridgeGate.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5abe0ca2fb4e935cda135905ce2525633e630362",
+            "bytes": 12099,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "87454a6fcb77278922c83214260d4277f48e092adaeeb3110b2f601cf8d938dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/AuditLogStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline:codexMemoryGovernedMcpBridge"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "compatibilityContinuityRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "eda5243a928ba83dbcd124b11e89cd1cd6fcc126",
+            "bytes": 4295,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d1fa56ff9002ad1693a007a31e30e64811ec318c03df098a22bbae8bb992d866",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/03_ARCHITECTURE_PLAN.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5e46e979d14d1d681092f1d120b6c5feaef38acf",
+            "bytes": 42472,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6ba4e7241b1053b5c54d5ea7a45211f8c69238b037301e2f473f1b66680833f6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/GovernedMcpVcpNativeBridgeGate.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5abe0ca2fb4e935cda135905ce2525633e630362",
+            "bytes": 12099,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "87454a6fcb77278922c83214260d4277f48e092adaeeb3110b2f601cf8d938dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/AuditLogStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline:compatibilityContinuityRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "localFallbackRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "eda5243a928ba83dbcd124b11e89cd1cd6fcc126",
+            "bytes": 4295,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d1fa56ff9002ad1693a007a31e30e64811ec318c03df098a22bbae8bb992d866",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/03_ARCHITECTURE_PLAN.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5e46e979d14d1d681092f1d120b6c5feaef38acf",
+            "bytes": 42472,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6ba4e7241b1053b5c54d5ea7a45211f8c69238b037301e2f473f1b66680833f6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/GovernedMcpVcpNativeBridgeGate.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5abe0ca2fb4e935cda135905ce2525633e630362",
+            "bytes": 12099,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "87454a6fcb77278922c83214260d4277f48e092adaeeb3110b2f601cf8d938dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/AuditLogStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline:localFallbackRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "offlineContinuityRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "eda5243a928ba83dbcd124b11e89cd1cd6fcc126",
+            "bytes": 4295,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d1fa56ff9002ad1693a007a31e30e64811ec318c03df098a22bbae8bb992d866",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/03_ARCHITECTURE_PLAN.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5e46e979d14d1d681092f1d120b6c5feaef38acf",
+            "bytes": 42472,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6ba4e7241b1053b5c54d5ea7a45211f8c69238b037301e2f473f1b66680833f6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/GovernedMcpVcpNativeBridgeGate.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5abe0ca2fb4e935cda135905ce2525633e630362",
+            "bytes": 12099,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "87454a6fcb77278922c83214260d4277f48e092adaeeb3110b2f601cf8d938dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/AuditLogStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline:offlineContinuityRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "validationFixturesRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "eda5243a928ba83dbcd124b11e89cd1cd6fcc126",
+            "bytes": 4295,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d1fa56ff9002ad1693a007a31e30e64811ec318c03df098a22bbae8bb992d866",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/03_ARCHITECTURE_PLAN.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5e46e979d14d1d681092f1d120b6c5feaef38acf",
+            "bytes": 42472,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6ba4e7241b1053b5c54d5ea7a45211f8c69238b037301e2f473f1b66680833f6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/GovernedMcpVcpNativeBridgeGate.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5abe0ca2fb4e935cda135905ce2525633e630362",
+            "bytes": 12099,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "87454a6fcb77278922c83214260d4277f48e092adaeeb3110b2f601cf8d938dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/AuditLogStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:codex_memory_governed_bridge_with_fallback_audit_fixtures_compat_offline:validationFixturesRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultRuntimeReadContextProposalHeld",
+        "evidenceKind": "local_source_test",
+        "requirementId": "default_runtime_read_context_proposal_only",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:default_runtime_read_context_proposal_only:defaultRuntimeReadContextProposalHeld"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceApplicationRouterPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "32fdf824c83be268cd7e54551cdd0d1aeac3656c",
+            "bytes": 3121,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "00ede2383d700fb8dd0e779967bd0cf876ce613777ca15676dd86c8f481aa156",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_application_router_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceApplicationRouterPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialAcceptanceDecisionPacketMetadataGatePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "489046efdfbe0fcdf20e017117e785d1e8d3a22d",
+            "bytes": 3405,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "69e2b90f2d2187d0cff732c5dd589a6de8fd02f6b165b26f70c73c6fe5610dfc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_acceptance_decision_packet_metadata_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialAcceptanceDecisionPacketMetadataGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialAcceptanceDecisionRequestBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "21a00d501f216ef84107f82458e9ee09451664eb",
+            "bytes": 3616,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9e4b945e454594967170f051159a4d62a4e840c0ba429f0c7112bfcfc3ee0296",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_acceptance_decision_request_boundary_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialAcceptanceDecisionRequestBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialAcceptanceEligibilityGatePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "308cbf57bd7841587c7fe78a68712e8a98a06373",
+            "bytes": 3365,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9ff2489e40002212001ebd60f2cb52e1894f9310ebb81b24dada45c2bde631e4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_acceptance_eligibility_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialAcceptanceEligibilityGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialAcceptancePreflightPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c49006829cbc8d850cc5f58dd2d65a8e6ab65fcd",
+            "bytes": 2850,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "37f8e139037996ceee8457d5dc8df9c2b3ab4b31b7b7a13902c73bf7a2f04aa6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_acceptance_preflight_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialAcceptancePreflightPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialIntakeBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a5773b6ce3289f7ca0b06059e0383d9da241111d",
+            "bytes": 2993,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "466db75c944f529c0fce03b69b0fabb65693f77f03ab7fad44564b4655589582",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_intake_boundary_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialIntakeBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialManualReviewGatePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "e51e32e270218953661ee3c39610b70ceee374ec",
+            "bytes": 3162,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3c66425232d07421434a71145e9a4bbb2dcf5fe5bf6b1144313e52599b11f9c0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_manual_review_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialManualReviewGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialMetadataGatePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "1d9275a755458a6363f4b2f204a85a14be826f0f",
+            "bytes": 3301,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "ef67c8b6d03b58df295e039f8e4c566c416647c611f1eaf1fa6455844dd8b448",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_metadata_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialMetadataGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialMetadataPacketPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "165ac83a9e6776d4f3e561b574a75ba5044ba067",
+            "bytes": 2617,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "4ab2200a26be27f08d9f6bf827766c5b4694057a943fb9280f0d5645d5673b43",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_metadata_packet_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialMetadataPacketPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialReviewedAcceptanceDecisionBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "715bb9d63296dd316dabe73c812ed736216101ca",
+            "bytes": 2991,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "84a380629605cd90747c37add682d7dbcb282a534aba8861a9b3c1851b1a144e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_reviewed_acceptance_decision_boundary_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialReviewedAcceptanceDecisionBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialReviewedDecisionPacketIntakePreflightPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "1fa39748009697fb7a56b359a8c8730d8a683370",
+            "bytes": 3711,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "8795ee159037f4f3378c229c3d5c2aabc3d5b629a3f8f2a5c5c1b87325814bf6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_reviewed_decision_packet_intake_preflight_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialReviewedDecisionPacketIntakePreflightPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialReviewedDecisionPacketReadinessGatePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "634c0dea76a2fe55fa5d4f5f99c21ad3890d7aad",
+            "bytes": 3800,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1e7fc3bba397fa9a6c1b6900bf6dbe8ad629a52e414c18f2bbe8259c074e095f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_reviewed_decision_packet_readiness_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialReviewedDecisionPacketReadinessGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialReviewedDecisionPacketReferenceIntakeExecutionPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "50ec3380d16a6f43b6e6f8d711d515000f9f2d8f",
+            "bytes": 3688,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d86a838e30423b83e4acca98601986a38c68baa7ce46230670124533dcafe68d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_reviewed_decision_packet_reference_intake_execution_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialReviewedDecisionPacketReferenceIntakeExecutionPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceMaterialReviewedDecisionPacketReferenceReviewBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "b1ffd57b7f9a3c69a45165b4a08da16def535de8",
+            "bytes": 3692,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3ac25a1a35c0a29267a52155c71603d95b12aa5cb0c6976a7ed30221e8785131",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_material_reviewed_decision_packet_reference_review_boundary_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceMaterialReviewedDecisionPacketReferenceReviewBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "evidenceRequestPacketRollupPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "85dc3bce8cc1ee69ae50ac185d81edee01bb0663",
+            "bytes": 2665,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "97263aefefceb0f04501fbf86b47ee91dec0386584482f043d53b751bd01c5d2",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/evidence_request_packet_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:evidenceRequestPacketRollupPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewRequestBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "e8a45258a3c8b1fc8eb527260b81a3ef43a90c96",
+            "bytes": 2363,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "805c3f455905445d8e9ab45115ba40f0d81e9790241b7a8ac5a002515877a98e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_request_boundary_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:externalReviewRequestBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "phase2ExactReceiptRequestBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a10c518d164c717e6024c81dc20e9a44e7307686",
+            "bytes": 2561,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6f029c727f6586c3a0b6059f76ed2428d392dc9d7425dc547c64d898eb4692dd",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_exact_receipt_request_boundary_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:phase2ExactReceiptRequestBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "phase8ExactReceiptRequestBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "1ec7049f0ec11ebb8f4dee6e704cb57aee8c1901",
+            "bytes": 2803,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "55336616025e6c871770deb04988fa6e35d66e58f29eba6f6fc54a511588894a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_exact_receipt_request_boundary_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:phase8ExactReceiptRequestBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "remainingEvidenceRouteContractPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "evidence_material_acceptance_chain_local_gates_bound",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5880b50a635d673eb9f8cb2c63f0cacf622b8f22",
+            "bytes": 2696,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "c2e8202fa6e96349ac87f4d6ecbb199fcb82e3ff13f43e6d558aef9be1ad5f38",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/remaining_evidence_route_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:evidence_material_acceptance_chain_local_gates_bound:remainingEvidenceRouteContractPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "localMemoryRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "local_memory_retained",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fa4f3b60c907728d367990994a4d8c8054a0c2f3",
+            "bytes": 10392,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fb8e64207a0374d68a6fb0e79aa70b3c4918a7e1830abb41ca447de07ce702a8",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/DiaryStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:local_memory_retained:localMemoryRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultProductionWriteBlocked",
+        "evidenceKind": "local_source_test",
+        "requirementId": "memory_delta_not_default_production_write",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:memory_delta_not_default_production_write:defaultProductionWriteBlocked"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "proposeMemoryDeltaProposalOnlyPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "memory_delta_not_default_production_write",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:memory_delta_not_default_production_write:proposeMemoryDeltaProposalOnlyPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "nativeWriteProductionGated",
+        "evidenceKind": "local_source_test",
+        "requirementId": "operator_native_release_boundaries_gated",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "47031fe18e0939fc3226fb3911a07616f25882bf",
+            "bytes": 2260,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d77adf456e5982dc5a94df5c275e8b95af5db2a019a41880506e0a200de10ccc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/native_write_contract_preflight_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4970320f9ff21024449dfa3a1988e29f353830d6",
+            "bytes": 4075,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9d1949e968f0eb5bea72573396edb91c032948001165d4c82577f1511560758f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/release_tag_readiness_policy_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:operator_native_release_boundaries_gated:nativeWriteProductionGated"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "operatorOnlyFullSurfaceGated",
+        "evidenceKind": "local_source_test",
+        "requirementId": "operator_native_release_boundaries_gated",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "47031fe18e0939fc3226fb3911a07616f25882bf",
+            "bytes": 2260,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d77adf456e5982dc5a94df5c275e8b95af5db2a019a41880506e0a200de10ccc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/native_write_contract_preflight_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4970320f9ff21024449dfa3a1988e29f353830d6",
+            "bytes": 4075,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9d1949e968f0eb5bea72573396edb91c032948001165d4c82577f1511560758f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/release_tag_readiness_policy_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:operator_native_release_boundaries_gated:operatorOnlyFullSurfaceGated"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "releaseTagDeployCutoverGated",
+        "evidenceKind": "local_source_test",
+        "requirementId": "operator_native_release_boundaries_gated",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "47031fe18e0939fc3226fb3911a07616f25882bf",
+            "bytes": 2260,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d77adf456e5982dc5a94df5c275e8b95af5db2a019a41880506e0a200de10ccc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/native_write_contract_preflight_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4970320f9ff21024449dfa3a1988e29f353830d6",
+            "bytes": 4075,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9d1949e968f0eb5bea72573396edb91c032948001165d4c82577f1511560758f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/release_tag_readiness_policy_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:operator_native_release_boundaries_gated:releaseTagDeployCutoverGated"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "prepareMemoryContextNotFullGoal",
+        "evidenceKind": "local_source_test",
+        "requirementId": "prepare_context_milestone_not_full_goal",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "9af6805e260220a9a6996c94478faec9bb2ca289",
+            "bytes": 3031,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e260ebe7f078554990bc17fd5aa8cf183fc8958124c9afe3299a73d707ef62c9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/02_FINAL_GOAL_AND_NON_CLAIMS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:prepare_context_milestone_not_full_goal:prepareMemoryContextNotFullGoal"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "prepareMemoryContextReusesExistingRecallStack",
+        "evidenceKind": "local_source_test",
+        "requirementId": "recall_pipeline_retained_and_reused",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bb32b6b35b8bcdfa346907f6d0aedc6b5e3010e4",
+            "bytes": 17773,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "267b22a47a155ae5d71f9f51223cf941ac74f41faa88f7968fc78c916b71f257",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryContextPackageService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4434d69ff0ead033f49bc56f1ace5a6fde96a2c9",
+            "bytes": 17225,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "c1f4cc627ba536c3fa61fa6422b64637f1e5be67b71b67e24a03cbeaf8800f0d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/recall/KnowledgeBaseRecallPipeline.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:recall_pipeline_retained_and_reused:prepareMemoryContextReusesExistingRecallStack"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "recallPipelineRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "recall_pipeline_retained_and_reused",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bb32b6b35b8bcdfa346907f6d0aedc6b5e3010e4",
+            "bytes": 17773,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "267b22a47a155ae5d71f9f51223cf941ac74f41faa88f7968fc78c916b71f257",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryContextPackageService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4434d69ff0ead033f49bc56f1ace5a6fde96a2c9",
+            "bytes": 17225,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "c1f4cc627ba536c3fa61fa6422b64637f1e5be67b71b67e24a03cbeaf8800f0d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/recall/KnowledgeBaseRecallPipeline.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:recall_pipeline_retained_and_reused:recallPipelineRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "sqliteShadowRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "sqlite_shadow_retained",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "7dcf9c4d217deb7a0039c76f06f27b6e92fe9948",
+            "bytes": 63217,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9c069f04c67da0c20d4f53f062d8fb1eb6040bb7194d1b47ff9a5bcff720a147",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/SqliteShadowStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:sqlite_shadow_retained:sqliteShadowRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "vcpToolBoxFinalMemoryIntelligenceOwner",
+        "evidenceKind": "local_source_test",
+        "requirementId": "vcptoolbox_final_memory_intelligence_owner",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "9af6805e260220a9a6996c94478faec9bb2ca289",
+            "bytes": 3031,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e260ebe7f078554990bc17fd5aa8cf183fc8958124c9afe3299a73d707ef62c9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/02_FINAL_GOAL_AND_NON_CLAIMS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "6153a60c8dd16da5a4108b4dc5a2506bd6d7bc8f",
+            "bytes": 107083,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "2218c3c22f43513acc259c1b585cca22c6b31fc7c9dad736c5e0de5a2b1162dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/CurrentProductGoalContract.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:vcptoolbox_final_memory_intelligence_owner:vcpToolBoxFinalMemoryIntelligenceOwner"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "vectorIndexRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "vector_index_retained",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "1bac66b0b0bed5572fc5436363fcbc948eb104d5",
+            "bytes": 16150,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "29fa1bd83cbb855ea9fe23b3011548d779d6016d304c113c11c9053ab8ece52e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/VectorIndexStore.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:vector_index_retained:vectorIndexRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "proposeMemoryDeltaReusesLocalWriteGovernance",
+        "evidenceKind": "local_source_test",
+        "requirementId": "write_governance_retained_and_reused",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f7314b5f31a1c787f2daed87018d2a01e3a7fd73",
+            "bytes": 50530,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "0462765465049529a4ce94a3af32512a90ce74f9dcf233ad7ef9052fd2a45924",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryWriteService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:write_governance_retained_and_reused:proposeMemoryDeltaReusesLocalWriteGovernance"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "writeGovernanceRetained",
+        "evidenceKind": "local_source_test",
+        "requirementId": "write_governance_retained_and_reused",
+        "scope": "invariant",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f7314b5f31a1c787f2daed87018d2a01e3a7fd73",
+            "bytes": 50530,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "0462765465049529a4ce94a3af32512a90ce74f9dcf233ad7ef9052fd2a45924",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryWriteService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "invariant:write_governance_retained_and_reused:writeGovernanceRetained"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "capabilityLayerModelFrozen",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase0_goal_contract_non_claims",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9af6805e260220a9a6996c94478faec9bb2ca289",
+            "bytes": 3031,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e260ebe7f078554990bc17fd5aa8cf183fc8958124c9afe3299a73d707ef62c9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/02_FINAL_GOAL_AND_NON_CLAIMS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "6153a60c8dd16da5a4108b4dc5a2506bd6d7bc8f",
+            "bytes": 107083,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "2218c3c22f43513acc259c1b585cca22c6b31fc7c9dad736c5e0de5a2b1162dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/CurrentProductGoalContract.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d97b84ad18aed5c3a824ce3449397b04e460d8cb",
+            "bytes": 21694,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d6b1c14d2ba876c33a76c82a9a0f6ed9a7ccc3c2d0b9cbb0a02bef3507182189",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/current-product-goal-contract.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase0_goal_contract_non_claims:capabilityLayerModelFrozen"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "goalContractFrozen",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase0_goal_contract_non_claims",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9af6805e260220a9a6996c94478faec9bb2ca289",
+            "bytes": 3031,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e260ebe7f078554990bc17fd5aa8cf183fc8958124c9afe3299a73d707ef62c9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/02_FINAL_GOAL_AND_NON_CLAIMS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "6153a60c8dd16da5a4108b4dc5a2506bd6d7bc8f",
+            "bytes": 107083,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "2218c3c22f43513acc259c1b585cca22c6b31fc7c9dad736c5e0de5a2b1162dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/CurrentProductGoalContract.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d97b84ad18aed5c3a824ce3449397b04e460d8cb",
+            "bytes": 21694,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d6b1c14d2ba876c33a76c82a9a0f6ed9a7ccc3c2d0b9cbb0a02bef3507182189",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/current-product-goal-contract.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase0_goal_contract_non_claims:goalContractFrozen"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "nonClaimsFrozen",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase0_goal_contract_non_claims",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9af6805e260220a9a6996c94478faec9bb2ca289",
+            "bytes": 3031,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e260ebe7f078554990bc17fd5aa8cf183fc8958124c9afe3299a73d707ef62c9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/02_FINAL_GOAL_AND_NON_CLAIMS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "6153a60c8dd16da5a4108b4dc5a2506bd6d7bc8f",
+            "bytes": 107083,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "2218c3c22f43513acc259c1b585cca22c6b31fc7c9dad736c5e0de5a2b1162dc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/CurrentProductGoalContract.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d97b84ad18aed5c3a824ce3449397b04e460d8cb",
+            "bytes": 21694,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d6b1c14d2ba876c33a76c82a9a0f6ed9a7ccc3c2d0b9cbb0a02bef3507182189",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/current-product-goal-contract.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase0_goal_contract_non_claims:nonClaimsFrozen"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "readmeNonClaimsPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase0_goal_contract_non_claims",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "3f9567eded7c28a61daf3f479827704863196b7d",
+            "bytes": 11893,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3a46ca7d91f462d46b590b19b14d370d52616bdb0b4a0dc8c55d19a42f8f1f6b",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "README.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d97b84ad18aed5c3a824ce3449397b04e460d8cb",
+            "bytes": 21694,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d6b1c14d2ba876c33a76c82a9a0f6ed9a7ccc3c2d0b9cbb0a02bef3507182189",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/current-product-goal-contract.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase0_goal_contract_non_claims:readmeNonClaimsPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "atomicFileWriterStaleLockToctouFixed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase1_blocker_repairs",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "593bb8ce5911e6e663e62ccf7e5055e515e73a85",
+            "bytes": 7450,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "347074442fe6d6df6e19696eef797e513e590ecfc0a2ef3cab11ac5bb51031c8",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/storage/AtomicFileWriter.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "b8203458c3d3b7dad79eb9abfde4326ceaa00d74",
+            "bytes": 3176,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "72bad53d261297d37c344332958dc5a615394297cdcf176a3769da56e12fd5a9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/atomic-file-writer-lock.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase1_blocker_repairs:atomicFileWriterStaleLockToctouFixed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "current_validation_receipt",
+        "evidenceField": "gateCiPassed",
+        "evidenceKind": "local_command_gate",
+        "requirementId": "phase1_blocker_repairs",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase1_blocker_repairs:gateCiPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "hardenedExplicitToolsBypassFixed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase1_blocker_repairs",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c38a04bbe552a7709f3de8c6fa32e49390cd0132",
+            "bytes": 131400,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "a111ddde9081258aad29c274ddf6dd917af9343b000b74020ec12e108fa7b7a4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/mcp-contract.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase1_blocker_repairs:hardenedExplicitToolsBypassFixed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase1RegressionTestsPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase1_blocker_repairs",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "425f0a7551764a4e81ed3b4b06237f2579807383",
+            "bytes": 2732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "de02c826df51490e00f1383a74c9fc1ab73e7bb326e0981f52a1211a120181c6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase1_acceptance_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase1_blocker_repairs:phase1RegressionTestsPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "current_validation_receipt",
+        "evidenceField": "testAllPassed",
+        "evidenceKind": "local_command_gate",
+        "requirementId": "phase1_blocker_repairs",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase1_blocker_repairs:testAllPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "actualTagReleaseDeployCutoverSeparateApprovalRequired",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "38a6df89d065fcbf02c8bb40f10daad9fd7d6d8c",
+            "bytes": 1673,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fee129c5474bbff951188473145224405e53a4acd33d33c3c95c0e5c5a2ec652",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/tag_approval_final_decision_cm2084.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:actualTagReleaseDeployCutoverSeparateApprovalRequired"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "canonicalReviewBundlePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "0206c750af2b5bac0a64d2e9e1d5a3da6ccf06d4",
+            "bytes": 2767,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e6d7baf4bf3329a2b78645877a1fdedd841513c9a117f1e8a64c62df4019e8fe",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_canonical.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:canonicalReviewBundlePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceApplicationPatchPreflightPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "836f58ed26ba1744f08a1e1b05ca0042cb3b655a",
+            "bytes": 5091,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "83cd0d6a68307dba69b7590a07e54e39e83bd821f2761ab77b2999a0c5f1259f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_evidence_application_patch_preflight_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewEvidenceApplicationPatchPreflightPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceBundleApplicationGatePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "063f7b477e01e8904d66a67643310af571dd526e",
+            "bytes": 2850,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "320c3b2bc8df3da87735f32433754521262d70d1234097708b50941df93f8630",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_bundle_application_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewEvidenceBundleApplicationGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceBundleApplicationReceiptPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "33937e57edc5a933ad067e93b1738b590550df66",
+            "bytes": 2530,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "01ac65ee2882bb6f928284c9c0a2ef199db20275f6a6a51b799f5c0d3a221ac0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_bundle_application_receipt_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewEvidenceBundleApplicationReceiptPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_independent_review_decision",
+        "evidenceField": "externalReviewEvidenceBundleAppliedToCompletionAudit",
+        "evidenceKind": "external_review",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "15d9d708faa161fa45e28a214eca1d549dafa6db",
+            "bytes": 1979,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "09080b2681a8d57869e363064a6af2103c719b5fb244608f81a95afcd5ce3e6d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/completion_audit_application_receipt_cm2082.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewEvidenceBundleAppliedToCompletionAudit"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceBundleContractPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "11612bc21323c8d9ba6469fea0a1746a134ddb18",
+            "bytes": 4891,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "4a5c4a509d912fb1312268e8265fbcc09377b2f5c9eba6b309a02ceec0ed8cc9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_evidence_bundle_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewEvidenceBundleContractPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceCompletionAuditPatchBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "7216e709b8053afcb415a89581e861af165b9b44",
+            "bytes": 2669,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "7d276ef5d540c6c2e6bd655d426569fbd046161a917342ef1282ddf051f78fa0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_completion_audit_patch_boundary_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewEvidenceCompletionAuditPatchBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceIntakePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "99182cc1c0c8e0c21d20bec9d31f04fe38e78b46",
+            "bytes": 3557,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "30036d8b3b7aae37c56e13d2db58bae0623a54c4146e45d3e3d65f2713bef650",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_evidence_intake_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewEvidenceIntakePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidencePatchHardenedBundleBindingPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f3054846c87a680784161ef20142fe7ce099adfb",
+            "bytes": 3497,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "2465e1bf092a85270588bbff5d60d6c9f0104730741e9ea5cbae9b4f7bc0b86d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_patch_hardened_bundle_binding_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewEvidencePatchHardenedBundleBindingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewHandoffBundlePreparedPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "089f2caa2e546efa8f0cafd42c2ebad5268f3ff5",
+            "bytes": 2622,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "abbb374899baede5fe53039f9c387c5f15ed0c4453ae3bb25fb10bff9cdd71d1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewHandoffBundlePreparedPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_independent_review_decision",
+        "evidenceField": "externalReviewPassed",
+        "evidenceKind": "external_review",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "cee6321853e531b465458bc0286a613245054b5b",
+            "bytes": 3563,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f022a5e88b22b824b35d9cccd0627ad00b2923b1dbae8e4463b41c3c27f5dc4e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_final_decision_cm2080.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:externalReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "releaseNamingNonClaimsPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4970320f9ff21024449dfa3a1988e29f353830d6",
+            "bytes": 4075,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9d1949e968f0eb5bea72573396edb91c032948001165d4c82577f1511560758f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/release_tag_readiness_policy_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "07378df68cea32aebbaeedca57939d65b6d5c5aa",
+            "bytes": 3633,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "eaf42f45a8cc2b05b6bebab27ba7fb2aff36826ac2bf2f950d78bc062c498bec",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/tag_approval_packet_cm2083.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:releaseNamingNonClaimsPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "releaseTagExternalReviewChainBindingPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "19c52b233586df45f38605c87f5d47cedb885177",
+            "bytes": 2104,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "08a5f6bd9b2acaa8ef5a1fef6c911babd283616cd5b828d5b7c990174e85a612",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/release_tag_external_review_chain_binding_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "07378df68cea32aebbaeedca57939d65b6d5c5aa",
+            "bytes": 3633,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "eaf42f45a8cc2b05b6bebab27ba7fb2aff36826ac2bf2f950d78bc062c498bec",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/tag_approval_packet_cm2083.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:releaseTagExternalReviewChainBindingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "releaseTagReadinessPolicyGatePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4970320f9ff21024449dfa3a1988e29f353830d6",
+            "bytes": 4075,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9d1949e968f0eb5bea72573396edb91c032948001165d4c82577f1511560758f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/release_tag_readiness_policy_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "07378df68cea32aebbaeedca57939d65b6d5c5aa",
+            "bytes": 3633,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "eaf42f45a8cc2b05b6bebab27ba7fb2aff36826ac2bf2f950d78bc062c498bec",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/tag_approval_packet_cm2083.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:releaseTagReadinessPolicyGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_independent_review_decision",
+        "evidenceField": "tagApprovalPacketPassed",
+        "evidenceKind": "external_review",
+        "requirementId": "phase10_tag_release_readiness",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "38a6df89d065fcbf02c8bb40f10daad9fd7d6d8c",
+            "bytes": 1673,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fee129c5474bbff951188473145224405e53a4acd33d33c3c95c0e5c5a2ec652",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/tag_approval_final_decision_cm2084.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase10_tag_release_readiness:tagApprovalPacketPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "auditReceiptPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+            "bytes": 6937,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:auditReceiptPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultReadOnlySurfacePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:defaultReadOnlySurfacePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "fallbackDistinctionPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+            "bytes": 6937,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:fallbackDistinctionPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "hiddenToolsHardRejectPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:hiddenToolsHardRejectPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "lowDisclosureProofPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+            "bytes": 6937,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:lowDisclosureProofPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "nativeReadProofPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+            "bytes": 6937,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:nativeReadProofPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "nativeReadReceiptSchemaCompatibilityPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "63712cf2f5540515a8c94b085855e0f87fd7e09a",
+            "bytes": 4212,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d195c81140ac3f55d1ed34da1bbea49200e8c2be5fb00247f2797c4fd4888e56",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/native_read_receipt_schema_compatibility_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:nativeReadReceiptSchemaCompatibilityPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "nativeReadResponseShapeCompatibilityPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "6ec74791821a62bad07b5d390ae1e54abfc188e3",
+            "bytes": 2997,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "c42dec6e2384d8f8a8e75c4ab458bc20c78b5b6dcdd229f16c9130d59f3b18e5",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/native_read_response_shape_compatibility_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:nativeReadResponseShapeCompatibilityPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "nativeTargetBindingPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+            "bytes": 6937,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:nativeTargetBindingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2ApprovalPacketContractPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "8c4cc20fab2a26bdfb0c662f387237e51db21000",
+            "bytes": 3503,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "2edec450f790fa3659235492eee4206507133c704c08e74801471b181647b66a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_native_read_proof_approval_packet_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2ApprovalPacketContractPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2AuditScopeReceiptReviewPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "3b7ad877586d7eae33651e5f4e808c8a0fefc4dc",
+            "bytes": 3159,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcabcbaee800e0e5c6f1916a82acaff20fda3f3bb450b81120ead8c2aef5e452",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_audit_scope_receipt_review_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2AuditScopeReceiptReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2EvidenceGatePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "e86b321146dc0c6d574519dda1f34e38368ad13c",
+            "bytes": 3574,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5268418e2df48968e6fe285bfac0a8e3d7689f36f34dfcc393bf579951419b8f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_native_read_proof_evidence_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2EvidenceGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2FallbackDistinctionReceiptReviewPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "1d882f651f93e85f7e8425532c34b4690af3d319",
+            "bytes": 4027,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "29a47842568b95d45865357ac91ee47cc676200d14c7cd78c77282cc3530fc9f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_fallback_distinction_receipt_review_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2FallbackDistinctionReceiptReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "phase2GovernedNativeReadEvidenceApplicationPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "6682c6cf30fd4d60db8ff774af1e6a713100bd0f",
+            "bytes": 44341,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "7202c7312f1c30fee6c8fddde6faac4b6bcebdacb8d861dd12c071989b779d8c",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/Cm2115R2Phase2CompletionAuditApplication.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c2095f1c8f880857eff942637a6704916d1d4ab0",
+            "bytes": 18676,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "35c778e491101954b2cc150765524f3c9bd92ef1417c715a81dcb44065cf7e47",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/cm2115-r2-durable-exact-patch-application.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2GovernedNativeReadEvidenceApplicationPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "phase2GovernedNativeReadObservationPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "363f259275eb28a25812e20d682f76e45270fcbb",
+            "bytes": 3181,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fba72d91ab33897e579a4d2378405382868aa65d335e13a363a7b3864eb60664",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_governed_native_read_observation_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+            "bytes": 6937,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2GovernedNativeReadObservationPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2LowDisclosureProofReceiptReviewPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "6df3b661d37303894bbbb413b4a695c0ab85791e",
+            "bytes": 4047,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fab6c96e3c14073ff1abf2f541e44edb1cd1aa1f38df24282cf1863ba7fecf35",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_low_disclosure_proof_receipt_review_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2LowDisclosureProofReceiptReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2MachineExecutionEvidenceManifestPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+            "bytes": 6937,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "e72c21a7188172be0a014eab39d9256cdcbd8ee5",
+            "bytes": 5001,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "aa276e22fed548b44b727f62782cda5c73e960705ae71e5bad61aca6af93906b",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/phase2-machine-execution-evidence-manifest-contract.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2MachineExecutionEvidenceManifestPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2NativeReadProofReceiptReviewPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb6165135f922b32ec3a86329a6594aa0d23f72e",
+            "bytes": 4172,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "39076414be213063b0d300d0ac20b942b1205339b360f5d3e15f40c6ef4a150d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_native_read_proof_receipt_review_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2NativeReadProofReceiptReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2NativeTargetBindingReceiptReviewPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bb87735fc89d7785c40a9dd6e58cd71a05f6cb64",
+            "bytes": 3918,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "763e1b1c80eea29ef5291178f19fa06bd9df9b895f510fa34db94578b68d8796",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_native_target_binding_receipt_review_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2NativeTargetBindingReceiptReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2PlatformProofReceiptReviewPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "b6e7c0e9fd13bb9808b6580af6b31702c5835106",
+            "bytes": 4041,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "43ff6a39cfb4fd571551f5d758bc3ed96976c7a6bea32770eaf372cdf5af945a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_platform_proof_receipt_review_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2PlatformProofReceiptReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2ReadinessGatePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "e767cec035bc646f24240338a7871e5ca8b56e34",
+            "bytes": 3252,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "b4e625f2a29fcf9feeb7f6faccf021a9b95c75c7eb6d216b3e87821c75b1f649",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_native_read_proof_readiness_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2ReadinessGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2ReceiptApplicationPatchPreflightPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "09c92be4c503350d6ef8633cff2d7e52ba97a9ec",
+            "bytes": 4081,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "b24b55206338ba22e83711fe09af3c2aa7208f27907c96438aed2c49247773f3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_receipt_application_patch_preflight_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2ReceiptApplicationPatchPreflightPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "phase2ReceiptBundleAppliedToCompletionAudit",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2ReceiptBundleAppliedToCompletionAudit"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2ReceiptBundleContractPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "9a7bb3543e95710e89911a53fea5484881e479b4",
+            "bytes": 3899,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5c5ca5289e13d70c81d098a1e3d543b2221edb6741662c81f6aad988d7907a57",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_native_read_proof_receipt_bundle_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2ReceiptBundleContractPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2ReceiptBundleReviewChainHardeningPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "81767492a960f813071ddb42609a1f40a1888775",
+            "bytes": 4276,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e1359af379f03dd80b7c284640f46b46e9e94b708e90719ace503a1ed313c64f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_receipt_bundle_review_chain_hardening_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2ReceiptBundleReviewChainHardeningPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase2ReceiptIntakePatchHardenedBundleBindingPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "b2b70cd6daa58fedbc13397f0dcbfaff2b757c69",
+            "bytes": 4691,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "355e7faad90c3e0913d4cc617abb73417bfd3fb1db8fff84914e44aec214e109",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_receipt_intake_patch_hardened_bundle_binding_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:phase2ReceiptIntakePatchHardenedBundleBindingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "scopeVisibilityIsolationPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "4ccc78ad3cdd2489d10ab0d6a680bbca9ce4e592",
+            "bytes": 6937,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:scopeVisibilityIsolationPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "windowsWslSmokePassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "83bca87e0c06a08046eb88d1fac55418c0ad37fd",
+            "bytes": 795,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "60b38d4025d567aa8ac7b839b00aa3539884d67450647157cbe22b9c2363718d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/windows_wsl_machine_smoke_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:windowsWslSmokePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "wslLinuxProofPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase2_readonly_realtime_native_memory",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "6e07d38e7d0602d511ee1ba86eceaf6df6473280",
+            "bytes": 6730,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5a27ad0b981203489f21f97d1562cf88d91dbdd36b6119a07af9d48c7bdebb5a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "83bca87e0c06a08046eb88d1fac55418c0ad37fd",
+            "bytes": 795,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "60b38d4025d567aa8ac7b839b00aa3539884d67450647157cbe22b9c2363718d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/windows_wsl_machine_smoke_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase2_readonly_realtime_native_memory:wslLinuxProofPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "prepareMemoryContextDefaultExposed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase3_memory_context_package_mvp",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c38a04bbe552a7709f3de8c6fa32e49390cd0132",
+            "bytes": 131400,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "a111ddde9081258aad29c274ddf6dd917af9343b000b74020ec12e108fa7b7a4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/mcp-contract.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase3_memory_context_package_mvp:prepareMemoryContextDefaultExposed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "prepareMemoryContextMvpPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase3_memory_context_package_mvp",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bb32b6b35b8bcdfa346907f6d0aedc6b5e3010e4",
+            "bytes": 17773,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "267b22a47a155ae5d71f9f51223cf941ac74f41faa88f7968fc78c916b71f257",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryContextPackageService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "25ccf96d5dad2bdd6564b76f398f8d4e5dbfe63a",
+            "bytes": 7576,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "b6d749c3dca83128f01548d3ae6f58e42c9f89846dba8d9f6a64a57640a7a9af",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-package-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase3_memory_context_package_mvp:prepareMemoryContextMvpPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "prepareMemoryContextNoDurableMutation",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase3_memory_context_package_mvp",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bb32b6b35b8bcdfa346907f6d0aedc6b5e3010e4",
+            "bytes": 17773,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "267b22a47a155ae5d71f9f51223cf941ac74f41faa88f7968fc78c916b71f257",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryContextPackageService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "25ccf96d5dad2bdd6564b76f398f8d4e5dbfe63a",
+            "bytes": 7576,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "b6d749c3dca83128f01548d3ae6f58e42c9f89846dba8d9f6a64a57640a7a9af",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-package-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase3_memory_context_package_mvp:prepareMemoryContextNoDurableMutation"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "prepareMemoryContextReadOnly",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase3_memory_context_package_mvp",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bb32b6b35b8bcdfa346907f6d0aedc6b5e3010e4",
+            "bytes": 17773,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "267b22a47a155ae5d71f9f51223cf941ac74f41faa88f7968fc78c916b71f257",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryContextPackageService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "25ccf96d5dad2bdd6564b76f398f8d4e5dbfe63a",
+            "bytes": 7576,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "b6d749c3dca83128f01548d3ae6f58e42c9f89846dba8d9f6a64a57640a7a9af",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-package-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase3_memory_context_package_mvp:prepareMemoryContextReadOnly"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "prepareMemoryContextReusesExistingRecallStack",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase3_memory_context_package_mvp",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bb32b6b35b8bcdfa346907f6d0aedc6b5e3010e4",
+            "bytes": 17773,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "267b22a47a155ae5d71f9f51223cf941ac74f41faa88f7968fc78c916b71f257",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryContextPackageService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "25ccf96d5dad2bdd6564b76f398f8d4e5dbfe63a",
+            "bytes": 7576,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "b6d749c3dca83128f01548d3ae6f58e42c9f89846dba8d9f6a64a57640a7a9af",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-package-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase3_memory_context_package_mvp:prepareMemoryContextReusesExistingRecallStack"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "agentsTaskStartRulePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase4_codex_workflow_integration",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "90e82f31c825769efd60a4b20f2082fc97f7cdb0",
+            "bytes": 33718,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "c7fe7429cf4e6f07938c6a2db0c6a1053cf80890070c04f10f457829edac4a25",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "AGENTS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "b2fd5eb968a433a21603b3eaf9252cd4bbc81620",
+            "bytes": 6921,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f65ad266c0d74eed05dafabe9f907c9da81269a04badb3bf5e2cd51c1e676ec7",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/task-start-memory-context-workflow.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase4_codex_workflow_integration:agentsTaskStartRulePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "taskbookPreflightRulePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase4_codex_workflow_integration",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "d303368dfbda08e72bc3959236898ffedbefdabc",
+            "bytes": 4745,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e7b7b78d549436f82b22c5acde10931d5c530023eedb95ce026d3d36650cf2b6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/05_TASKBOOKS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "b2fd5eb968a433a21603b3eaf9252cd4bbc81620",
+            "bytes": 6921,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f65ad266c0d74eed05dafabe9f907c9da81269a04badb3bf5e2cd51c1e676ec7",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/task-start-memory-context-workflow.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase4_codex_workflow_integration:taskbookPreflightRulePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "taskStartWorkflowPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase4_codex_workflow_integration",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "90e82f31c825769efd60a4b20f2082fc97f7cdb0",
+            "bytes": 33718,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "c7fe7429cf4e6f07938c6a2db0c6a1053cf80890070c04f10f457829edac4a25",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "AGENTS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d303368dfbda08e72bc3959236898ffedbefdabc",
+            "bytes": 4745,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e7b7b78d549436f82b22c5acde10931d5c530023eedb95ce026d3d36650cf2b6",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/05_TASKBOOKS.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "99b4d701e02fd05e751ebe9bd1a44236fbc4dc69",
+            "bytes": 7697,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "911420aaf0e63db35c2be9cdd4fda9a17309a04c6acf65eb577b7c65fe41c764",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/TaskStartMemoryContextWorkflow.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "b2fd5eb968a433a21603b3eaf9252cd4bbc81620",
+            "bytes": 6921,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f65ad266c0d74eed05dafabe9f907c9da81269a04badb3bf5e2cd51c1e676ec7",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/task-start-memory-context-workflow.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase4_codex_workflow_integration:taskStartWorkflowPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "blockerRecallPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:blockerRecallPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "conflictSurfacingPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:conflictSurfacingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "decisionRecallPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:decisionRecallPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "fallbackDistinctionPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:fallbackDistinctionPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "privateIsolationPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:privateIsolationPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "projectFactRecallPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:projectFactRecallPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "recallQualityBaselinePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:recallQualityBaselinePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "staleFilteringPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:staleFilteringPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "userPreferenceRecallPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase5_recall_quality_gate",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "bd79bf97e9798f19442503685b9706ec4dd88d46",
+            "bytes": 5732,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "fcb4294d2972152097f9e0c1f05196c284aea69ff567aef0eb91cb2777f11e08",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/recall_quality_report.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d21b83213e736c8df235efe0a763b4d1ef5ddfd1",
+            "bytes": 5326,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "41943e3fb0a4e75477f05bee7fe3b756c1758370a7c042d512c8f8878b8576f4",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-context-recall-quality-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase5_recall_quality_gate:userPreferenceRecallPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "commitMemoryDeltaNotPublic",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f54b726636b1db0155f42a59d6271aa1c97795fe",
+            "bytes": 6584,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f0a17d37d5e54394438cf432d5dc106cee78f0c911fcf3708ea6e657841416d0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-delta-proposal-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:commitMemoryDeltaNotPublic"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "commitMemoryDeltaOperatorOnlyDrafted",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f54b726636b1db0155f42a59d6271aa1c97795fe",
+            "bytes": 6584,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f0a17d37d5e54394438cf432d5dc106cee78f0c911fcf3708ea6e657841416d0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-delta-proposal-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:commitMemoryDeltaOperatorOnlyDrafted"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "commitMemoryDeltaOperatorPreflightPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "56d1191135a21366b45908343fc6056bd8f628cf",
+            "bytes": 3461,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "b832d89f99296f0bc215e942787c1df3b5678fd03c73d0b3e1b734fb9a8a3c52",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/memory_delta_commit_preflight_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "3f3436a1b44523aae2e1d0ee9c765cf4eda581e2",
+            "bytes": 7629,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "90820d40edb054abe58c8d507484e2f58b58dde6e1135f2636b3721a6d898e6d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-delta-commit-preflight-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:commitMemoryDeltaOperatorPreflightPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultProductionWriteBlocked",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "fb5d5704491a1b84c14ea5e80809bdefa584eaba",
+            "bytes": 61132,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f672aef633a957fbb1ff774620568e547741a02577f89d56529a759ad784c77e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/adapters/codex-mcp/server.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:defaultProductionWriteBlocked"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "memoryDeltaAuditReceiptPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f54b726636b1db0155f42a59d6271aa1c97795fe",
+            "bytes": 6584,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f0a17d37d5e54394438cf432d5dc106cee78f0c911fcf3708ea6e657841416d0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-delta-proposal-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:memoryDeltaAuditReceiptPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "memoryDeltaRollbackPosturePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f54b726636b1db0155f42a59d6271aa1c97795fe",
+            "bytes": 6584,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f0a17d37d5e54394438cf432d5dc106cee78f0c911fcf3708ea6e657841416d0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-delta-proposal-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:memoryDeltaRollbackPosturePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "memoryDeltaStagingPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f54b726636b1db0155f42a59d6271aa1c97795fe",
+            "bytes": 6584,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f0a17d37d5e54394438cf432d5dc106cee78f0c911fcf3708ea6e657841416d0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-delta-proposal-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:memoryDeltaStagingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "memoryDeltaValidationPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f54b726636b1db0155f42a59d6271aa1c97795fe",
+            "bytes": 6584,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f0a17d37d5e54394438cf432d5dc106cee78f0c911fcf3708ea6e657841416d0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-delta-proposal-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:memoryDeltaValidationPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "proposeMemoryDeltaProposalOnlyPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase6_memory_delta_pipeline",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "158859e2ec6bcd73b603ae4504e411d89d47fbbb",
+            "bytes": 12599,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "9442cc94554a743246ea39c5ac14ab3dc7f017bd0fc6e71b1df4779111ad04e3",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "src/core/MemoryDeltaProposalService.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f54b726636b1db0155f42a59d6271aa1c97795fe",
+            "bytes": 6584,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f0a17d37d5e54394438cf432d5dc106cee78f0c911fcf3708ea6e657841416d0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/memory-delta-proposal-service.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase6_memory_delta_pipeline:proposeMemoryDeltaProposalOnlyPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultSurfacePreserved",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase7_operator_full_surface",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a2c519e2b4b54fdcc0e7868e083f25a02fa9be37",
+            "bytes": 6103,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "638e72cec8c6520bd6c9378f6034e57dbfd4c6e80da7ba30dc04f1dea728e9b1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/operator-full-surface-proof-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase7_operator_full_surface:defaultSurfacePreserved"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "exactApprovalEnforcementPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase7_operator_full_surface",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a2c519e2b4b54fdcc0e7868e083f25a02fa9be37",
+            "bytes": 6103,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "638e72cec8c6520bd6c9378f6034e57dbfd4c6e80da7ba30dc04f1dea728e9b1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/operator-full-surface-proof-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase7_operator_full_surface:exactApprovalEnforcementPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "operatorAuditReceiptPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase7_operator_full_surface",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a2c519e2b4b54fdcc0e7868e083f25a02fa9be37",
+            "bytes": 6103,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "638e72cec8c6520bd6c9378f6034e57dbfd4c6e80da7ba30dc04f1dea728e9b1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/operator-full-surface-proof-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase7_operator_full_surface:operatorAuditReceiptPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "operatorExplicitEnvPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase7_operator_full_surface",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a2c519e2b4b54fdcc0e7868e083f25a02fa9be37",
+            "bytes": 6103,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "638e72cec8c6520bd6c9378f6034e57dbfd4c6e80da7ba30dc04f1dea728e9b1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/operator-full-surface-proof-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase7_operator_full_surface:operatorExplicitEnvPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "operatorLocalOnlyPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase7_operator_full_surface",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a2c519e2b4b54fdcc0e7868e083f25a02fa9be37",
+            "bytes": 6103,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "638e72cec8c6520bd6c9378f6034e57dbfd4c6e80da7ba30dc04f1dea728e9b1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/operator-full-surface-proof-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase7_operator_full_surface:operatorLocalOnlyPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "operatorOnlyFullSurfaceProofPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase7_operator_full_surface",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a2c519e2b4b54fdcc0e7868e083f25a02fa9be37",
+            "bytes": 6103,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "638e72cec8c6520bd6c9378f6034e57dbfd4c6e80da7ba30dc04f1dea728e9b1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/operator-full-surface-proof-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase7_operator_full_surface:operatorOnlyFullSurfaceProofPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "operatorRollbackPosturePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase7_operator_full_surface",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "c9d05fcad639709e6df3d3f709d4653c4ec1d807",
+            "bytes": 1816,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "3b538d4f22b698c82c044937619322c229c8771029a90b4adfc535cc49412642",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "a2c519e2b4b54fdcc0e7868e083f25a02fa9be37",
+            "bytes": 6103,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "638e72cec8c6520bd6c9378f6034e57dbfd4c6e80da7ba30dc04f1dea728e9b1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "tests/operator-full-surface-proof-gate.test.js",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase7_operator_full_surface:operatorRollbackPosturePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "actualTransportBindingPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:actualTransportBindingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "auditReceiptPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:auditReceiptPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "exactApprovalEnforcementPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:exactApprovalEnforcementPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "failureRecoveryProofPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "1b36f23e4a649c44c9882cbb33348e884dd2c55d",
+            "bytes": 2821,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6fc1b8374b33327681ad3ff410c85061b8b0a19c56e5eca9c6b3ce58cce34bba",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_evidence_bundle_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "979d8758327472a25b6dc727d30fda5a40e15efd",
+            "bytes": 2561,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f4cded56f7d663d355ed840eac2f07551b1450bec7a6c58be2b24f3eb8ff579d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_failure_recovery_evidence_application_receipt_cm2110.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:failureRecoveryProofPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "nativeSideEffectReceiptPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:nativeSideEffectReceiptPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "nativeWriteContractPreflightPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "47031fe18e0939fc3226fb3911a07616f25882bf",
+            "bytes": 2260,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d77adf456e5982dc5a94df5c275e8b95af5db2a019a41880506e0a200de10ccc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/native_write_contract_preflight_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:nativeWriteContractPreflightPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "outputDisclosureBudgetPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:outputDisclosureBudgetPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase8ReceiptApplicationPatchPreflightPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f116219926265b49983863cdfd6fda7e22868b64",
+            "bytes": 5571,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e786d186e173d9d5975b992c5e6cd4a9c14aeaa9c848adac5f2e94643a28ffd9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_native_write_receipt_application_patch_preflight_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:phase8ReceiptApplicationPatchPreflightPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase8ReceiptAuditIntakePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "7570803d0baf9ba87383a49130764950885318c0",
+            "bytes": 4037,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "5c7a949abe519a2240f9964880e10196f884464146aaffe43c55cc22944c0846",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_native_write_receipt_audit_intake_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:phase8ReceiptAuditIntakePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "phase8ReceiptBundleAppliedToCompletionAudit",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "1b36f23e4a649c44c9882cbb33348e884dd2c55d",
+            "bytes": 2821,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6fc1b8374b33327681ad3ff410c85061b8b0a19c56e5eca9c6b3ce58cce34bba",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_evidence_bundle_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:phase8ReceiptBundleAppliedToCompletionAudit"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase8ReceiptBundleContractPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "ee199e446031efcfc23d63f8ec687e611da0f29e",
+            "bytes": 4978,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "66c1d88f562fd25d1667dc3c3cdc541f9ce4a47e61ad5d2ee83b9866bf70be3b",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_native_write_receipt_bundle_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:phase8ReceiptBundleContractPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase8ReceiptPatchHardenedBundleBindingPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "5ef8c71c16ea421e010638c19bce1e475d649e5d",
+            "bytes": 3968,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1d17a5a73c3d04738e11f8ffe6ebece273fece522f68f111578e7bd0b72b64d9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_receipt_patch_hardened_bundle_binding_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:phase8ReceiptPatchHardenedBundleBindingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "realRootDurableWriteProofPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:realRootDurableWriteProofPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "realRootWriteReadinessGatePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "199dcaa064796e185b1b5cec208acf5925e3e416",
+            "bytes": 2997,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1f9c35edc51fa82d0bd188327302410e020ef87c1e193bb9fd48bcace60dbf21",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/real_root_write_readiness_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:realRootWriteReadinessGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "rollbackDrillPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "1b36f23e4a649c44c9882cbb33348e884dd2c55d",
+            "bytes": 2821,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "6fc1b8374b33327681ad3ff410c85061b8b0a19c56e5eca9c6b3ce58cce34bba",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_evidence_bundle_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "3129e9531074d26919667eabc646cf58a28a63ad",
+            "bytes": 2547,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d645b3308ef683f7932d81375cd58f19b1198440d33069d694d7cc3cd4f8d83c",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_rollback_evidence_application_receipt_cm2108.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:rollbackDrillPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "stableTargetStoreIdentityPassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:stableTargetStoreIdentityPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "vcpToolBoxOwnedRuntimeWritePassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:vcpToolBoxOwnedRuntimeWritePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_exact_authorized_receipt",
+        "evidenceField": "verifyWritePassed",
+        "evidenceKind": "exact_authorized_receipt",
+        "requirementId": "phase8_native_write_production_proof",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "9e407701765d377b49fd46ae38a7c274d405d6b7",
+            "bytes": 2495,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "d627d5cbc56e0f3d5b7e56e37401c7192a511b7bbbc802da13b580c72f8f7476",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_completion_revalidation_application_receipt_cm2114.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92",
+            "bytes": 4089,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_native_proof_receipt_cm2113.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase8_native_write_production_proof:verifyWritePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "canonicalReviewBundlePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "0206c750af2b5bac0a64d2e9e1d5a3da6ccf06d4",
+            "bytes": 2767,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "e6d7baf4bf3329a2b78645877a1fdedd841513c9a117f1e8a64c62df4019e8fe",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_canonical.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:canonicalReviewBundlePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultForbiddenWriteToolsBlocked",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "91870868b90752554dd318fd418d9e15ac05af90",
+            "bytes": 2649,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1bc75b24cac7f71e328bdff8b89469a20a9bb9bc8878867665531496c14c773c",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/default_runtime_policy_observation_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:defaultForbiddenWriteToolsBlocked"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultRuntimeExpansionNotAutomatic",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "91870868b90752554dd318fd418d9e15ac05af90",
+            "bytes": 2649,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1bc75b24cac7f71e328bdff8b89469a20a9bb9bc8878867665531496c14c773c",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/default_runtime_policy_observation_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:defaultRuntimeExpansionNotAutomatic"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultRuntimePolicyGatePassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "91870868b90752554dd318fd418d9e15ac05af90",
+            "bytes": 2649,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1bc75b24cac7f71e328bdff8b89469a20a9bb9bc8878867665531496c14c773c",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/default_runtime_policy_observation_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:defaultRuntimePolicyGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "defaultRuntimeReadContextProposalHeld",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "91870868b90752554dd318fd418d9e15ac05af90",
+            "bytes": 2649,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "1bc75b24cac7f71e328bdff8b89469a20a9bb9bc8878867665531496c14c773c",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/default_runtime_policy_observation_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:defaultRuntimeReadContextProposalHeld"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceApplicationPatchPreflightPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "836f58ed26ba1744f08a1e1b05ca0042cb3b655a",
+            "bytes": 5091,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "83cd0d6a68307dba69b7590a07e54e39e83bd821f2761ab77b2999a0c5f1259f",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_evidence_application_patch_preflight_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewEvidenceApplicationPatchPreflightPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceBundleApplicationGatePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "063f7b477e01e8904d66a67643310af571dd526e",
+            "bytes": 2850,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "320c3b2bc8df3da87735f32433754521262d70d1234097708b50941df93f8630",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_bundle_application_gate_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewEvidenceBundleApplicationGatePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceBundleApplicationReceiptPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "33937e57edc5a933ad067e93b1738b590550df66",
+            "bytes": 2530,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "01ac65ee2882bb6f928284c9c0a2ef199db20275f6a6a51b799f5c0d3a221ac0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_bundle_application_receipt_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewEvidenceBundleApplicationReceiptPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_independent_review_decision",
+        "evidenceField": "externalReviewEvidenceBundleAppliedToCompletionAudit",
+        "evidenceKind": "external_review",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "15d9d708faa161fa45e28a214eca1d549dafa6db",
+            "bytes": 1979,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "09080b2681a8d57869e363064a6af2103c719b5fb244608f81a95afcd5ce3e6d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/completion_audit_application_receipt_cm2082.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewEvidenceBundleAppliedToCompletionAudit"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceBundleContractPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "11612bc21323c8d9ba6469fea0a1746a134ddb18",
+            "bytes": 4891,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "4a5c4a509d912fb1312268e8265fbcc09377b2f5c9eba6b309a02ceec0ed8cc9",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_evidence_bundle_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewEvidenceBundleContractPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceCompletionAuditPatchBoundaryPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "7216e709b8053afcb415a89581e861af165b9b44",
+            "bytes": 2669,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "7d276ef5d540c6c2e6bd655d426569fbd046161a917342ef1282ddf051f78fa0",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_completion_audit_patch_boundary_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewEvidenceCompletionAuditPatchBoundaryPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidenceIntakePassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "99182cc1c0c8e0c21d20bec9d31f04fe38e78b46",
+            "bytes": 3557,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "30036d8b3b7aae37c56e13d2db58bae0623a54c4146e45d3e3d65f2713bef650",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_evidence_intake_contract_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewEvidenceIntakePassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewEvidencePatchHardenedBundleBindingPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "f3054846c87a680784161ef20142fe7ce099adfb",
+            "bytes": 3497,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "2465e1bf092a85270588bbff5d60d6c9f0104730741e9ea5cbae9b4f7bc0b86d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_patch_hardened_bundle_binding_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewEvidencePatchHardenedBundleBindingPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "externalReviewHandoffBundlePreparedPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "089f2caa2e546efa8f0cafd42c2ebad5268f3ff5",
+            "bytes": 2622,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "abbb374899baede5fe53039f9c387c5f15ed0c4453ae3bb25fb10bff9cdd71d1",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_handoff_bundle_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewHandoffBundlePreparedPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_independent_review_decision",
+        "evidenceField": "externalReviewPassed",
+        "evidenceKind": "external_review",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "cee6321853e531b465458bc0286a613245054b5b",
+            "bytes": 3563,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f022a5e88b22b824b35d9cccd0627ad00b2923b1dbae8e4463b41c3c27f5dc4e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_final_decision_cm2080.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:externalReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_independent_review_decision",
+        "evidenceField": "observationOrDogfoodReviewPassed",
+        "evidenceKind": "external_review",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "cee6321853e531b465458bc0286a613245054b5b",
+            "bytes": 3563,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "f022a5e88b22b824b35d9cccd0627ad00b2923b1dbae8e4463b41c3c27f5dc4e",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/external_review_final_decision_cm2080.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:observationOrDogfoodReviewPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_contract_plus_current_validation",
+        "evidenceField": "phase9EquivalentDogfoodObservationApplicationPassed",
+        "evidenceKind": "local_contract",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "01b2976300fb113b821a8d0de9f48683f60475c6",
+            "bytes": 2420,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "4bc960c98c16a0636ab70af9fe6a507a41899a47ef573f58b9996c99c7b9fd2a",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_equivalent_dogfood_observation_evidence_report.md",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:phase9EquivalentDogfoodObservationApplicationPassed"
+      },
+      {
+        "bindingStatus": "bound_for_independent_review",
+        "derivationClass": "git_object_local_source_test_plus_current_validation",
+        "evidenceField": "phase9MachineObservationArtifactPassed",
+        "evidenceKind": "local_source_test",
+        "requirementId": "phase9_default_runtime_policy",
+        "scope": "phase",
+        "sourceBindings": [
+          {
+            "blobOid": "690fca80a1741b5ee0b7e6370820a37224f12a1e",
+            "bytes": 3698,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "534ff98f58978d7c9a0241dfe0bdf1c2d068a31a003f1e85001be1921569a9bc",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_local_validation_receipt.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          },
+          {
+            "blobOid": "d1dd18c797a76a208977dac4827bbc6b1007114e",
+            "bytes": 3793,
+            "gitMode": "100644",
+            "gitObjectType": "blob",
+            "sha256": "138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d",
+            "sourceCommit": "933d29e41a6489adc1d411f217b4cebf0f5e060d",
+            "sourcePath": "docs/near-model-memory-plan-pack/phase9_machine_observation_artifact.json",
+            "sourceTree": "7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2"
+          }
+        ],
+        "traceKey": "phase:phase9_default_runtime_policy:phase9MachineObservationArtifactPassed"
+      }
+    ],
+    "nonClaims": {
+      "completeV8": false,
+      "cutoverReady": false,
+      "deployReady": false,
+      "fullBridgeCompletion": false,
+      "fullRealtimeMemory": false,
+      "modelMemoryComplete": false,
+      "productionReady": false,
+      "rcReady": false,
+      "releaseReady": false
+    },
+    "reviewBoundary": {
+      "applicationAuthorized": false,
+      "applicationPrepared": false,
+      "applicationReviewIsSeparate": true,
+      "gitObjectReviewPassed": false,
+      "independentReviewPassed": false,
+      "independentReviewRequired": true,
+      "semanticRouteReviewPassed": false,
+      "snapshotApplied": false
+    },
+    "routeDefinitionSha256": "e161cff6ec4024e06f4169ffdbb7c02563ce96c14452c83a4669c25325d406f7",
+    "semanticEvidenceChecks": {
+      "phase2ApplicationBindingReceiptContractAccepted": true,
+      "phase2ApplicationCommitBound": true,
+      "phase2DurableClaimReceiptStateAccepted": true,
+      "phase2ExactEvidenceApplied": true,
+      "phase2ReceiptTimeUpstreamGitRevalidationPassed": true,
+      "supersededCm2074UsedAsCurrentAuthority": false,
+      "supersededR1UsedAsCurrentAuthority": false
+    },
+    "sideEffects": {
+      "durableMutations": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0
+    },
+    "snapshotStatus": "prepared_for_independent_review"
+  },
+  "schemaVersion": 3,
+  "snapshotType": "canonical_full_plan_evidence_snapshot_v3",
+  "taskId": "CM-2115-R2"
+}
+```
