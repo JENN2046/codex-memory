@@ -70,3 +70,14 @@ test('CM-2113 stdio sequence fails closed when isolated tool surface expands', a
     /tool_surface_mismatch/
   );
 });
+
+test('CM-2113 stdio client rejects pending request when child transport closes', async t => {
+  const input = new PassThrough();
+  const output = new PassThrough();
+  t.after(() => { input.destroy(); output.destroy(); });
+  const client = createCm2113StdioMcpFrameClient({ input, output, timeoutMs: 60_000 });
+  t.after(() => client.close());
+  const pending = client.request({ jsonrpc: '2.0', id: 99, method: 'initialize', params: {} });
+  output.end();
+  await assert.rejects(pending, /transport_closed/);
+});

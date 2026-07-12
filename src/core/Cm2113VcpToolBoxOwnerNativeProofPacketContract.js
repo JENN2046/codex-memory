@@ -47,6 +47,7 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
     !hex(owner.runtimeSourceCommit, 40) || !hex(owner.runtimeSourceTree, 40) ||
     !hex(owner.pluginBlobOid, 40) || !hex(owner.manifestBlobOid, 40) || !hex(owner.dependencyLockBlobOid, 40) ||
     !hex(owner.pluginSha256, 64) || !hex(owner.manifestSha256, 64) || !hex(owner.dependencyLockSha256, 64) ||
+    !hex(owner.preloadSha256, 64) ||
     owner.dotenvVersion !== '16.6.1' || !hex(owner.dotenvPackageSha256, 64) || !hex(owner.dotenvMainSha256, 64)
   ) blockers.push('ownerRuntime.binding');
   if (!hex(packet.runtimeIdentitySha256, 64) || !hex(packet.storeIdentitySha256, 64)) blockers.push('identity.sha256');

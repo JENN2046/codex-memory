@@ -54,7 +54,13 @@ function createCm2113StdioMcpFrameClient({ input, output, processBoundary = fals
       failAll(new Error('cm2113_stdio_response_framing_failed'));
     }
   }
+  function onTransportClosed() {
+    if (pending.size > 0) failAll(new Error('cm2113_stdio_transport_closed'));
+  }
   output.on('data', onData);
+  output.on('end', onTransportClosed);
+  output.on('close', onTransportClosed);
+  output.on('error', onTransportClosed);
 
   async function request(message) {
     if (!Number.isInteger(message?.id)) throw new Error('cm2113_stdio_request_id_required');
@@ -81,6 +87,9 @@ function createCm2113StdioMcpFrameClient({ input, output, processBoundary = fals
 
   function close() {
     output.off('data', onData);
+    output.off('end', onTransportClosed);
+    output.off('close', onTransportClosed);
+    output.off('error', onTransportClosed);
     failAll(new Error('cm2113_stdio_client_closed'));
   }
 

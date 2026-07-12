@@ -19,6 +19,7 @@ function packetFixture() {
       runtimeSourceCommit: '3'.repeat(40), runtimeSourceTree: '4'.repeat(40),
       pluginBlobOid: '5'.repeat(40), manifestBlobOid: '6'.repeat(40), dependencyLockBlobOid: '7'.repeat(40),
       pluginSha256: '8'.repeat(64), manifestSha256: '9'.repeat(64), dependencyLockSha256: 'a'.repeat(64),
+      preloadSha256: '1'.repeat(64),
       dotenvVersion: '16.6.1', dotenvPackageSha256: 'b'.repeat(64), dotenvMainSha256: 'c'.repeat(64)
     },
     transport: {

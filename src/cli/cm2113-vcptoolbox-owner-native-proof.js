@@ -93,7 +93,12 @@ async function runCm2113ProofController(packetCommit, contentCommit, finalCommit
     stdio: ['pipe', 'pipe', 'pipe']
   });
   let stderrBytes = 0;
-  child.stderr.on('data', chunk => { stderrBytes += chunk.length; });
+  let safeStderr = '';
+  child.stderr.setEncoding('utf8');
+  child.stderr.on('data', chunk => {
+    stderrBytes += Buffer.byteLength(chunk, 'utf8');
+    if (Buffer.byteLength(safeStderr, 'utf8') <= 1024) safeStderr += chunk;
+  });
   const exitPromise = waitForExit(child);
   const client = createCm2113StdioMcpFrameClient({ input: child.stdin, output: child.stdout, processBoundary: true, timeoutMs: 60_000 });
   let transportResult;
@@ -103,6 +108,8 @@ async function runCm2113ProofController(packetCommit, contentCommit, finalCommit
     child.kill('SIGKILL');
     await exitPromise.catch(() => {});
     client.close();
+    const safeReason = safeStderr.trim();
+    if (/^cm2113_[a-z0-9_]+$/.test(safeReason)) throw new Error(safeReason);
     throw error;
   } finally {
     child.stdin.end();
