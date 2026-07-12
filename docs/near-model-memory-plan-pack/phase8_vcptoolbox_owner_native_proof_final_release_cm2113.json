@@ -10,20 +10,20 @@
   "expiresAt": "2026-07-15T18:00:00+08:00",
   "approvedAt": "2026-07-12T10:40:05+08:00",
   "contentDecisionGitIdentity": {
-    "sourceCommit": "1f3f16aabe990066fd1b3e221a6ad1a4905db4ea",
-    "blobOid": "09ac9dfeb2997cabb68efcee93530e5a450ffeee",
-    "bytes": 3172,
-    "sha256": "d5cd7b7c3333af0cb84aa1464e4fbf68243dfe6c9d37069cbf16fccc0ead863f"
+    "sourceCommit": "c88f4ae64a1c864476f120caf0605356d72948e4",
+    "blobOid": "cdd42a4ffe14c0f4cd2b0168894d107567025131",
+    "bytes": 3261,
+    "sha256": "ed86d7eff66acc83e9c50c0a4cbb14ba99af6e8f2ff74e0fa383caa1b2f18bd1"
   },
   "executionPacketGitIdentity": {
-    "sourceCommit": "e25f555b6a580163f415294933cbd80414c10bf6",
-    "blobOid": "5d551edeb49057ec5e54b00dad17ae269bc236c4",
-    "bytes": 5142,
-    "sha256": "627606dbd5abc2c4c247c8791f840a6c9e976acbcfdc1269bf8d9e8d6b01b65d"
+    "sourceCommit": "be6d615a0624b2bd5cd2715579bb7843c0d0c95c",
+    "blobOid": "066d8752804543116251c46e630c798498d15178",
+    "bytes": 5231,
+    "sha256": "6d41dee5c2c99f3e5295129f831e9b9e96a978af7a0a344f5c6b05396a681844"
   },
   "implementation": {
-    "commit": "26bba1605ca700ed0a2c7eba16bab83295d313d5",
-    "tree": "ce4669f16d0d1dc0361705e7c669f354b8849065"
+    "commit": "b9010cef38d81b82c299bcf8d054e44e0875c00e",
+    "tree": "d2bd721aa44c18ae63f70b698b61f1243243b466"
   },
   "ownerRuntime": {
     "owner": "VCPToolBox",
@@ -37,6 +37,7 @@
     "pluginSha256": "4eee260c13965283001ed305af1b86aeddbaf0b7502fad784546397f0c8b4614",
     "manifestSha256": "a3d73021cc4b3c1e9e4af310c0d18a182ac7e77dd21ca8e5527b879dfefb77b9",
     "dependencyLockSha256": "d8d61f42b61b04b7005c7f7788c5d58e2f3e284442fc4beba08c8e476feb8e0c",
+    "preloadSha256": "5587f26d208167368cec4da3e7da6c2c80ff020f4b6a3263d9c34c034621551f",
     "dotenvVersion": "16.6.1",
     "dotenvPackageSha256": "922be338d27d6b0b3a238f8da99daeb1f42ef972e71b4568d5104bbef661f5f5",
     "dotenvMainSha256": "3381601545980775b6ecd2bf078ce369a3b24316e10a3182ab78811f01dc83b5"
