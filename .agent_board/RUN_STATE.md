@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2116-R1 exact full-plan application gate preparation`.
-Current validation: `CMV-2211`.
-Current status: hardened gate `f6b7f9a5…` binds the full `7187e520…` intake Git identity and passed internal red-team review. Gate preparation is true; application decision/authorization/execution/commit binding are false, `fullPlanPackCompleted=false`, and every readiness claim remains false.
+Current task: `CM-2117 exact full-plan application content decision`.
+Current validation: `CMV-2212`.
+Current status: decision content `b1245149…` freezes five exact targets and passed internal red-team replay. Content approval is true; final release, execution authorization, claim, patch, commit binding, `fullPlanPackCompleted`, and every readiness claim remain false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,13 +37,14 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is a separate exact full-plan application decision bound to
-gate commit `f6b7f9a5…`, tree `6004160d…`, parent `629ca75f…`, exact A-A diff,
-both gate blobs/bytes/raw SHA-256 values, and payload SHA `7591efb0…2430c`.
-That decision must still precede any durable claim or patch execution. The
-application may change only the intended completion state and must force every
-readiness field to remain false. Do not replay native actions or infer
-production, release, deploy, cutover, RC, complete-V8, or readiness.
+Next safe action is to implement and freeze the non-executing one-shot executor,
+claim registry, low-disclosure execution receipt, and application-commit
+binding contract. Only afterward may a separate final release bind that
+implementation plus decision commit `b1245149…`, tree `f59b578a…`, parent,
+exact A-A diff, both blobs/bytes/raw SHA-256 values, payload SHA
+`50ae5da8…2a5a`, and patch payload `988386ae…49bd`. Before final release, do
+not claim or patch. Never infer production, release, deploy, cutover, RC,
+complete-V8, or readiness.
 
 ## Historical Run Notes
 

@@ -4,13 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2116-R1 exact full-plan application gate preparation`.
-Current validation: `CMV-2211`.
-Current project status: the hardened non-executing gate binds the complete `7187e520…` intake commit/tree/parent/A-A diff and both receipt objects by blob/bytes/raw SHA/payload SHA. R1 rejects hidden implementation authority and all readiness aliases. Gate preparation passed, but no application decision, authorization, claim, patch, or application commit exists; `fullPlanPackCompleted=false` and every readiness claim remains false.
-Current route: `CM2116_R1_EXACT_FULL_PLAN_APPLICATION_GATE_PREPARED_DECISION_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM`.
+Current task: `CM-2117 exact full-plan application content decision`.
+Current validation: `CMV-2212`.
+Current project status: the exact five-target application decision content is frozen at `b1245149…` and passed repository-internal red-team replay. It binds the complete CM-2116-R1 gate and nested `7187e520…` chain plus every before/after object. Content approval is true, but execution authorization, final release, claim, patch, application commit binding, `fullPlanPackCompleted`, and all readiness claims remain false.
+Current route: `CM2117_EXACT_CONTENT_DECISION_FROZEN_FINAL_RELEASE_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2117 implementation `249c9ba1…` freezes a content-only decision contract.
+Decision commit `b1245149…` has payload SHA `50ae5da8…2a5a` and patch payload
+SHA `988386ae…49bd`. Its JSON is blob `8427d80c…49b3`, 18810 bytes, raw SHA
+`1d4feb41…6a27`; the exact Markdown mirror is blob `51d5d3df…1c57`, 19419
+bytes, raw SHA `18e959fb…341c`. Five exact targets, 14 immutable paths, and 22
+false readiness/non-claim fields are frozen. `authorizationContentApproved=true`
+does not open execution: a separate final release must first bind this complete
+decision Git identity and a frozen executor. No claim, patch, completion, or
+readiness state changed.
 
 CM-2116-R1 implementation `629ca75f…` hardens the gate with exact-key schemas
 and the complete readiness alias set. Gate commit `f6b7f9a5…` has payload SHA

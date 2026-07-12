@@ -4,11 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2116-R1 exact full-plan application gate preparation`.
-Current validation: `CMV-2211`.
+Current checkpoint: `CM-2117 exact full-plan application content decision`.
+Current validation: `CMV-2212`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2117 Exact Full-plan Application Content Decision
+
+Status: `EXACT_CONTENT_DECISION_FROZEN_FINAL_RELEASE_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM`
+
+- Implementation `249c9ba1…`; decision commit `b1245149…`; payload `50ae5da8…2a5a`; patch payload `988386ae…49bd`.
+- The decision binds the complete CM-2116-R1 gate, nested `7187e520…` intake, five exact before/after targets, 14 immutable paths, and 22 false readiness fields.
+- `authorizationContentApproved=true`, but `applicationExecutionAuthorized=false` and a separate final release is required.
+- No claim, patch, application commit, binding receipt, completion transition, runtime/native/provider/real-memory/remote action, or readiness claim occurred.
+- `fullPlanPackCompleted=false` and `readinessClaimed=false`.
+
+Validation: `CMV-2212`.
 
 ## CM-2116-R1 Exact Full-plan Application Gate
 

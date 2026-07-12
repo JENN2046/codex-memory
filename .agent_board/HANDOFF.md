@@ -4,13 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2116-R1 exact full-plan application gate preparation`.
-Current validation: `CMV-2211`.
-Current handoff: hardened gate `f6b7f9a5…` passed exact replay and red-team review. The next separate task may prepare an exact application decision bound to the full gate Git identity; no application is authorized or executed. Full plan-pack and readiness remain false.
+Current task: `CM-2117 exact full-plan application content decision`.
+Current validation: `CMV-2212`.
+Current handoff: decision `b1245149…` freezes the five-target content and passed exact replay. Content approval is true, but execution authorization and final release remain false. No claim or patch may run; full plan-pack and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2117 decision `b1245149…` binds implementation `249c9ba1…`, gate
+`f6b7f9a5…`, payload `50ae5da8…2a5a`, and patch payload
+`988386ae…49bd`. It freezes five target before/after projections, excludes any
+execution-receipt path exception, and expands the immutable set to the current
+gate and decision artifacts. The next implementation must remain non-executing
+until frozen; only a later final release may bind that executor and this full
+decision Git identity. Bare decision reference or content approval is not
+execution authority.
 
 CM-2116-R1 freezes a non-executing exact gate at `f6b7f9a5…`, with payload
 `7591efb0…2430c`, JSON blob `5741cabe…17d7` / 11204 bytes / raw SHA

@@ -8,13 +8,27 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2116-R1 exact full-plan application gate prepared; decision, authorization, execution, completion, and readiness remain false |
-| Current task | `CM-2116-R1 exact full-plan application gate preparation` |
-| Current validation | `CMV-2211` |
-| Current route | Prepare a separate exact application decision bound to the frozen R1 gate; do not execute or infer readiness from gate preparation |
+| Status | CM-2117 exact application content decision frozen; final release, execution, completion, and readiness remain false |
+| Current task | `CM-2117 exact full-plan application content decision` |
+| Current validation | `CMV-2212` |
+| Current route | Freeze a non-executing exact executor, then issue a separate final execution release bound to decision `b1245149…` |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## Current Exact Full-plan Application Decision
+
+CM-2117 implementation `249c9ba1…` and decision `b1245149…` passed exact
+Git-object replay and repository-internal red-team review. The decision payload
+SHA-256 is `50ae5da8…2a5a`; its five-target patch payload is
+`988386ae…49bd`. JSON and Markdown raw SHA-256 values are
+`1d4feb41…6a27` and `18e959fb…341c`.
+
+The decision is deliberately content-only: `authorizationContentApproved=true`,
+while `applicationExecutionAuthorized=false`. A separate final release must
+bind the full decision Git identity and a frozen executor before any claim or
+patch. Current `fullPlanPackCompleted=false`; all 22 readiness/non-claim fields
+remain false. No native/provider/real-memory/remote action occurred.
 
 ## Current Exact Full-plan Application Gate
 
