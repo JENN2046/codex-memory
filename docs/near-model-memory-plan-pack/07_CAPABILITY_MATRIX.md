@@ -7,8 +7,8 @@
 | `audit_memory` | 已有 | 是 | 否 | 否 | 部分 |
 | default read-only MCP surface | 已有，需修 blocker 后重证 | 是 | 否 | 否 | 部分 |
 | hidden tools hard reject | 已有 | 是 | 否 | 否 | 部分 |
-| governed native realtime read | 三工具低披露 native read 已在 clean commit `1822d7e8…` 的 matching runtime 上机器重放并通过；使用 fixture provider 与隔离派生存储，不构成 production provider proof | 是 | 否 | 需要新外审接受；派生索引副作用仍不是 Phase 8 write proof | 否 |
-| Phase 2 governed native read observation | 三次调用的 machine receipt projections、safe refs、per-call SHA-256 与 Windows/WSL machine receipt 已从 clean matching replay 自动验证，Phase 2 machine evidence eligible=true | 是 | 否 | 需要新外审/Completion Audit 受控应用；不授权写入 | 否 |
+| governed native realtime read | 三工具低披露 native read 已在 clean commit `1822d7e8…` 的 matching runtime 上机器重放并通过；CM-2080 已接受精确机器对象，CM-2115-R1 已受控应用；使用 fixture provider 与隔离派生存储，不构成 production provider proof | 是 | 否 | 派生索引副作用仍不是 Phase 8 write proof；不构成 production provider proof | 否 |
+| Phase 2 governed native read observation | 三次调用的 machine receipt projections、safe refs、per-call SHA-256 与 Windows/WSL machine receipt 已从 clean matching replay 自动验证；CM-2115-R1 已将九项 exact evidence 一次性应用到 Completion Audit | 是 | 否 | 不授权写入、full-plan completion 或 readiness | 否 |
 | native response shape compatibility | 本地 category-only 合同已实现；live/native proof 仍缺 | 是 | 否 | 需要 exact-authorized native read receipt / live proof | 否 |
 | native read receipt schema compatibility | 本地 schema-only 合同已实现；只覆盖 future native read attempt/success/low-disclosure receipt 候选形状 | 是 | 否 | 需要 native target binding、audit、fallback、WSL/Linux、Windows/WSL smoke 的 separate exact-authorized receipts | 否 |
 | native target binding receipt review | 本地 safe-reference-only review 合同已实现；不绑定 native target | 是 | 否 | 需要 exact-authorized native target binding receipt | 否 |

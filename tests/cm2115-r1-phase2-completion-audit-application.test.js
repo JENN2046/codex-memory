@@ -165,3 +165,17 @@ test('CM-2115-R1 decision and receipt serializers are canonical and low disclosu
     assert.equal(text.includes(forbidden), false, forbidden);
   }
 });
+
+test('CM-2115-R1 frozen application receipt passes the exact receipt contract', () => {
+  const receiptPath = path.join(
+    ROOT,
+    'docs/near-model-memory-plan-pack/phase2_completion_audit_application_receipt_cm2115_r1.json'
+  );
+  const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+  const evaluation = evaluateApplicationReceipt(receipt);
+  assert.equal(evaluation.accepted, true, evaluation.blockers.join(', '));
+  assert.equal(evaluation.phase2ReceiptBundleAppliedToCompletionAudit, true);
+  assert.equal(evaluation.independentReviewPassed, false);
+  assert.equal(evaluation.fullPlanPackCompleted, false);
+  assert.equal(evaluation.readinessClaimed, false);
+});
