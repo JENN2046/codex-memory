@@ -3,8 +3,8 @@
   "taskId": "CM-2113",
   "packetType": "vcptoolbox_owner_native_proof_execution_packet",
   "implementation": {
-    "commit": "b9010cef38d81b82c299bcf8d054e44e0875c00e",
-    "tree": "d2bd721aa44c18ae63f70b698b61f1243243b466"
+    "commit": "388e62b55e62dcae472ed0da69319d916edb97a8",
+    "tree": "99bb3ed9c1ea5f549b8f9e3d215e72147823f670"
   },
   "ownerRuntime": {
     "owner": "VCPToolBox",
@@ -58,11 +58,11 @@
   "durableSha256": "f8f845371e1eebf2dbce80e6bc0b86ed656f95712b409ac8fabc24a4cf393e50",
   "authorization": {
     "action": "live_bridge_record_memory_proof",
-    "nonce": "cm2113-vcptoolbox-owner-native-proof-nonce-001",
-    "receiptId": "cm2113-vcptoolbox-owner-native-proof-receipt-001",
+    "nonce": "cm2113-vcptoolbox-owner-native-proof-nonce-002",
+    "receiptId": "cm2113-vcptoolbox-owner-native-proof-receipt-002",
     "useCount": 1,
     "replayAllowed": false,
-    "approvedAt": "2026-07-12T10:40:05+08:00",
+    "approvedAt": "2026-07-12T10:51:48+08:00",
     "expiresAt": "2026-07-15T18:00:00+08:00"
   },
   "limits": {
@@ -77,8 +77,8 @@
     "rcReady": false,
     "fullPlanPackCompleted": false
   },
-  "contentDecisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-CONTENT-0294FC5C",
-  "finalReleaseDecisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-FINAL-0294FC5C",
+  "contentDecisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-CONTENT-002-0294FC5C",
+  "finalReleaseDecisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-FINAL-002-0294FC5C",
   "allowedScope": {
     "project_id": "codex-memory",
     "workspace_id": "cm2113-owner-proof",
@@ -115,5 +115,5 @@
     "bytes": 2139,
     "sha256": "14cc7a42004049b19ebefdcd8fa34778deb87e4190800e8c63469bf5f897eba1"
   },
-  "packetPayloadSha256": "9da55d6f2f5cbff0e5aafcbd9070c4975ae8dcdf41b875a5fd1f04b32fd58eb0"
+  "packetPayloadSha256": "87a7571158b6bca6f0b4c03a865ea2e6bbcf5e0f2a2e5b2de9d7bd14526317bc"
 }

@@ -4,8 +4,8 @@ CM-2113 implements the replacement evidence path selected by CM-2112. The
 frozen implementation baseline is:
 
 ```yaml
-implementation_commit: "b9010cef38d81b82c299bcf8d054e44e0875c00e"
-implementation_tree: "d2bd721aa44c18ae63f70b698b61f1243243b466"
+implementation_commit: "388e62b55e62dcae472ed0da69319d916edb97a8"
+implementation_tree: "99bb3ed9c1ea5f549b8f9e3d215e72147823f670"
 implementation_review_result: "PASS_IMPLEMENTATION_ONLY"
 native_execution_performed_by_this_report: false
 ```
@@ -53,3 +53,13 @@ implementation commit `ed6ffcd0…`, then independently frozen as receipt commit
 bootstrap receipt, exact preload binding, and fail-closed child-transport exit
 handling; they do not alter the materialized owner runtime, frozen clock, store
 identity, payload, or allowed transport chain.
+
+Attempt `001` consumed its exact authorization without a durable write. The
+authenticated HTTP gateway was reached, but the owner adapter correctly
+rejected the projected envelope before DailyNote because the first
+implementation compared business-payload SHA against the combined
+business-plus-governance transport object. Its durable record count is zero and
+its ambiguous marker is preserved. The current implementation separately
+validates the exact business payload and the canonical governed transport
+envelope; any later execution uses a new nonce and receipt and does not replay
+attempt `001`.
