@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 'use strict';
 
-const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const {
+  resolveCommitTree,
+  resolveDiffPaths,
+  resolveGitFile: resolveR2GitFile,
+  resolveGitPathState,
+  resolveParentCommit
+} = require('../../scripts/cm2115-r2-git');
 
 const {
   BASELINE,
@@ -19,12 +25,12 @@ const {
 const DEFAULT_JSON_PATH = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_r1_canonical_full_plan_evidence_snapshot.json'
+  'cm2115_r2_canonical_full_plan_evidence_snapshot.json'
 );
 const DEFAULT_MARKDOWN_PATH = path.join(
   'docs',
   'near-model-memory-plan-pack',
-  'cm2115_r1_canonical_full_plan_evidence_snapshot.md'
+  'cm2115_r2_canonical_full_plan_evidence_snapshot.md'
 );
 
 function gitText(args) {
@@ -33,15 +39,6 @@ function gitText(args) {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   }).trim();
-}
-
-function gitBuffer(args) {
-  return execFileSync('git', args, {
-    cwd: process.cwd(),
-    encoding: null,
-    stdio: ['ignore', 'pipe', 'pipe'],
-    maxBuffer: 64 * 1024 * 1024
-  });
 }
 
 function parseArgs(argv) {
@@ -75,24 +72,7 @@ function parseArgs(argv) {
 }
 
 function resolveGitFile(sourceCommit, sourcePath) {
-  const treeLine = gitBuffer(['ls-tree', '-z', sourceCommit, '--', sourcePath]).toString('utf8');
-  const match = treeLine.match(/^(\d{6}) (\w+) ([a-f0-9]{40})\t([^\0]+)\0$/);
-  if (!match || match[4] !== sourcePath) throw new Error(`cm2115_git_source_missing:${sourcePath}`);
-  const [, gitMode, gitObjectType, listedOid] = match;
-  if (gitObjectType !== 'blob') throw new Error(`cm2115_git_source_not_blob:${sourcePath}:${gitObjectType}`);
-  const blobOid = gitText(['rev-parse', `${sourceCommit}:${sourcePath}`]);
-  if (blobOid !== listedOid) throw new Error(`cm2115_git_source_oid_mismatch:${sourcePath}`);
-  const content = gitBuffer(['cat-file', 'blob', blobOid]);
-  return {
-    sourceCommit,
-    sourceTree: gitText(['rev-parse', `${sourceCommit}^{tree}`]),
-    gitObjectType,
-    gitMode,
-    blobOid,
-    bytes: content.length,
-    sha256: crypto.createHash('sha256').update(content).digest('hex'),
-    content
-  };
+  return resolveR2GitFile(sourceCommit, sourcePath);
 }
 
 function resolveGitSourceObject(sourcePath) {
@@ -124,7 +104,7 @@ function assertCleanWorktree() {
 function renderCanonicalMarkdown(snapshot, jsonText) {
   const counts = snapshot.payload.counts;
   return [
-    '# CM-2115-R1 Canonical Full-plan Evidence Snapshot',
+    '# CM-2115-R2 Canonical Full-plan Evidence Snapshot',
     '',
     'This is a content-equivalent review surface for the canonical JSON snapshot.',
     'It is prepared for independent Git-object and semantic-route review only.',
@@ -154,8 +134,11 @@ function renderCanonicalMarkdown(snapshot, jsonText) {
 function verifySnapshot(snapshot) {
   const evaluation = evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
     resolveSourceObject: resolveGitSourceObject,
-    resolveCommitTree: commit => gitText(['rev-parse', `${commit}^{tree}`]),
+    resolveCommitTree,
     resolveGitFile,
+    resolveParentCommit,
+    resolveDiffPaths,
+    resolveGitPathState,
     isCommitAncestor: (ancestor, descendant) => {
       try {
         execFileSync('git', ['merge-base', '--is-ancestor', ancestor, descendant], {
@@ -180,7 +163,13 @@ function generate(options) {
   if (fs.existsSync(options.jsonPath) || fs.existsSync(options.markdownPath)) {
     throw new Error('cm2115_snapshot_output_already_exists');
   }
-  const snapshot = buildSnapshot(resolveGitSourceObject);
+  const snapshot = buildSnapshot(resolveGitSourceObject, {
+    resolveGitFile,
+    resolveCommitTree,
+    resolveParentCommit,
+    resolveDiffPaths,
+    resolveGitPathState
+  });
   const evaluation = verifySnapshot(snapshot);
   const jsonText = `${JSON.stringify(canonicalize(snapshot), null, 2)}\n`;
   const markdownText = renderCanonicalMarkdown(snapshot, jsonText);
@@ -259,7 +248,11 @@ module.exports = {
   parseArgs,
   renderCanonicalMarkdown,
   resolveGitFile,
+  resolveCommitTree,
+  resolveDiffPaths,
+  resolveGitPathState,
   resolveGitSourceObject,
+  resolveParentCommit,
   verifyExisting,
   verifySnapshot
 };

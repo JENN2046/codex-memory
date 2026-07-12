@@ -11,14 +11,14 @@ const {
   EXTERNAL_REVIEW_FIELDS
 } = require('./NearModelMemoryPlanPackEvidenceTraceMatrix');
 const {
-  evaluateApplicationReceipt: evaluateCm2115R1Phase2ApplicationReceipt
-} = require('./Cm2115R1Phase2CompletionAuditApplication');
+  evaluateBindingReceipt: evaluateCm2115R2Phase2ApplicationBindingReceipt
+} = require('./Cm2115R2Phase2CompletionAuditApplication');
 
-const TASK_ID = 'CM-2115-R1';
-const SNAPSHOT_TYPE = 'canonical_full_plan_evidence_snapshot_v2';
+const TASK_ID = 'CM-2115-R2';
+const SNAPSHOT_TYPE = 'canonical_full_plan_evidence_snapshot_v3';
 const BASELINE = Object.freeze({
-  sourceCommit: 'bfcb57acce1e09b4cef5f817ffd2489cfa32e046',
-  sourceTree: 'efa5133fb0de0d14582933bf771986d81b04cf9b'
+  sourceCommit: '933d29e41a6489adc1d411f217b4cebf0f5e060d',
+  sourceTree: '7d2b196fd83c9a4d5c95fb1641fced34fc6b65b2'
 });
 const DOCS = 'docs/near-model-memory-plan-pack/';
 
@@ -26,8 +26,8 @@ function doc(name) {
   return `${DOCS}${name}`;
 }
 
-const LOCAL_VALIDATION_RECEIPT_PATH = doc('cm2115_r1_local_validation_receipt.json');
-const PHASE2_APPLICATION_RECEIPT_PATH = doc('phase2_completion_audit_application_receipt_cm2115_r1.json');
+const LOCAL_VALIDATION_RECEIPT_PATH = doc('cm2115_r2_local_validation_receipt.json');
+const PHASE2_APPLICATION_RECEIPT_PATH = doc('phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json');
 
 const PHASE_DEFAULT_SOURCES = Object.freeze({
   phase0_goal_contract_non_claims: Object.freeze([
@@ -123,9 +123,10 @@ const PHASE_FIELD_SOURCES = Object.freeze({
     doc('phase2_machine_execution_evidence_manifest.json')
   ]),
   'phase:phase2_readonly_realtime_native_memory:phase2GovernedNativeReadEvidenceApplicationPassed': Object.freeze([
-    'src/core/Cm2115R1Phase2CompletionAuditApplication.js',
-    'tests/cm2115-r1-phase2-completion-audit-application.test.js',
-    PHASE2_APPLICATION_RECEIPT_PATH
+    'src/core/Cm2115R2Phase2CompletionAuditApplication.js',
+    'tests/cm2115-r2-durable-exact-patch-application.test.js',
+    PHASE2_APPLICATION_RECEIPT_PATH,
+    LOCAL_VALIDATION_RECEIPT_PATH
   ]),
   'phase:phase2_readonly_realtime_native_memory:phase2MachineExecutionEvidenceManifestPassed': Object.freeze([
     doc('phase2_machine_execution_evidence_manifest.json'),
@@ -564,7 +565,7 @@ function normalizeResolvedSource(sourcePath, identity) {
   };
 }
 
-function buildSnapshot(resolveSourceObject) {
+function buildSnapshot(resolveSourceObject, bindingReceiptResolvers = {}) {
   if (typeof resolveSourceObject !== 'function') throw new TypeError('cm2115_source_resolver_required');
   let phase2ApplicationReceiptEvaluation = null;
   try {
@@ -572,12 +573,15 @@ function buildSnapshot(resolveSourceObject) {
     const content = Buffer.isBuffer(identity?.content)
       ? identity.content.toString('utf8')
       : identity?.content;
-    phase2ApplicationReceiptEvaluation = evaluateCm2115R1Phase2ApplicationReceipt(JSON.parse(content));
+    phase2ApplicationReceiptEvaluation = evaluateCm2115R2Phase2ApplicationBindingReceipt(
+      JSON.parse(content),
+      bindingReceiptResolvers
+    );
   } catch {
-    throw new Error('cm2115_r1_phase2_application_receipt_unreadable');
+    throw new Error('cm2115_r2_phase2_application_binding_receipt_unreadable');
   }
   if (!phase2ApplicationReceiptEvaluation.accepted) {
-    throw new Error(`cm2115_r1_phase2_application_receipt_rejected:${phase2ApplicationReceiptEvaluation.blockers.join(',')}`);
+    throw new Error(`cm2115_r2_phase2_application_binding_receipt_rejected:${phase2ApplicationReceiptEvaluation.blockers.join(',')}`);
   }
   const specs = buildEntrySpecs();
   const cache = new Map();
@@ -623,10 +627,13 @@ function buildSnapshot(resolveSourceObject) {
     entries,
     candidateAudit: buildCandidateAuditSummary(),
     semanticEvidenceChecks: {
-      phase2ApplicationReceiptContractAccepted: true,
+      phase2ApplicationBindingReceiptContractAccepted: true,
       phase2ExactEvidenceApplied: true,
-      phase2DecisionGitIdentityBound: true,
-      supersededCm2074UsedAsCurrentAuthority: false
+      phase2ApplicationCommitBound: true,
+      phase2ReceiptTimeUpstreamGitRevalidationPassed: true,
+      phase2DurableClaimReceiptStateAccepted: true,
+      supersededCm2074UsedAsCurrentAuthority: false,
+      supersededR1UsedAsCurrentAuthority: false
     },
     reviewBoundary: {
       independentReviewRequired: true,
@@ -660,7 +667,7 @@ function buildSnapshot(resolveSourceObject) {
     }
   };
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     taskId: TASK_ID,
     snapshotType: SNAPSHOT_TYPE,
     canonicalPayloadSha256: sha256Canonical(payload),

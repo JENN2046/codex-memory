@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const fs = require('node:fs');
 const { execFileSync } = require('node:child_process');
 const { test } = require('node:test');
 
@@ -10,7 +11,7 @@ const {
   PHASE2_APPLICATION_RECEIPT_PATH,
   buildEntrySpecs,
   buildRouteDefinition,
-  buildSnapshot,
+  buildSnapshot: buildSnapshotCore,
   canonicalize,
   sha256,
   sha256Canonical
@@ -23,13 +24,9 @@ const {
   evaluateCm2115LocalValidationReceipt
 } = require('../src/core/Cm2115LocalValidationReceiptContract');
 const {
-  DECISION_PATH: PHASE2_DECISION_PATH,
-  buildDecision: buildPhase2Decision,
-  buildReceiptPayload: buildPhase2ReceiptPayload,
-  gitBlobOid,
-  serializeArtifact: serializePhase2Decision,
-  sha256Canonical: sha256Phase2Canonical
-} = require('../src/core/Cm2115R1Phase2CompletionAuditApplication');
+  DECISION_PATH: PHASE2_DECISION_PATH
+} = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
+const snapshotGit = require('../scripts/cm2115-r2-git');
 const {
   evaluateCm2115SnapshotReviewRequest
 } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
@@ -58,35 +55,22 @@ const {
 const VALIDATION_TARGET_COMMIT = '1'.repeat(40);
 const VALIDATION_TARGET_TREE = '2'.repeat(40);
 
-function fakePhase2DecisionIdentity() {
-  const content = Buffer.from(serializePhase2Decision(buildPhase2Decision()));
-  return {
-    sourceCommit: '3'.repeat(40),
-    sourceTree: '4'.repeat(40),
-    sourcePath: PHASE2_DECISION_PATH,
-    blobOid: gitBlobOid(content),
-    bytes: content.length,
-    sha256: sha256(content)
-  };
-}
-
 function validPhase2ApplicationReceipt() {
-  const receiptPayload = buildPhase2ReceiptPayload(fakePhase2DecisionIdentity());
+  return JSON.parse(fs.readFileSync(PHASE2_APPLICATION_RECEIPT_PATH, 'utf8'));
+}
+
+function bindingReceiptResolvers() {
   return {
-    receiptPayload,
-    receiptPayloadSha256: sha256Phase2Canonical(receiptPayload)
+    resolveGitFile: snapshotGit.resolveGitFile,
+    resolveCommitTree: snapshotGit.resolveCommitTree,
+    resolveParentCommit: snapshotGit.resolveParentCommit,
+    resolveDiffPaths: snapshotGit.resolveDiffPaths,
+    resolveGitPathState: snapshotGit.resolveGitPathState
   };
 }
 
-function fakePhase2DecisionResolver(commit, sourcePath) {
-  const identity = fakePhase2DecisionIdentity();
-  if (commit !== identity.sourceCommit || sourcePath !== identity.sourcePath) {
-    throw new Error('fake_phase2_decision_missing');
-  }
-  return {
-    ...identity,
-    content: Buffer.from(serializePhase2Decision(buildPhase2Decision()))
-  };
+function buildSnapshot(resolveSourceObject) {
+  return buildSnapshotCore(resolveSourceObject, bindingReceiptResolvers());
 }
 
 function tap(tests) {
@@ -138,7 +122,7 @@ function fakeResolverFactory({ receipt = validValidationReceipt(), overrides = {
       ? Buffer.from(`${JSON.stringify(canonicalize(receipt), null, 2)}\n`)
       : sourcePath === PHASE2_APPLICATION_RECEIPT_PATH
         ? Buffer.from(`${JSON.stringify(canonicalize(validPhase2ApplicationReceipt()), null, 2)}\n`)
-        : Buffer.from(`CM-2115-R1 evidence source: ${sourcePath}\n`);
+        : Buffer.from(`CM-2115-R2 evidence source: ${sourcePath}\n`);
     return {
       gitObjectType: 'blob',
       gitMode: '100644',
@@ -151,12 +135,15 @@ function fakeResolverFactory({ receipt = validValidationReceipt(), overrides = {
 }
 
 function evaluate(snapshot, resolver = fakeResolverFactory(), extras = {}) {
+  const binding = bindingReceiptResolvers();
   return evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
     resolveSourceObject: resolver,
-    resolveCommitTree: commit => commit === VALIDATION_TARGET_COMMIT ? VALIDATION_TARGET_TREE : null,
+    ...binding,
+    resolveCommitTree: commit => commit === VALIDATION_TARGET_COMMIT
+      ? VALIDATION_TARGET_TREE
+      : binding.resolveCommitTree(commit),
     isCommitAncestor: (ancestor, descendant) =>
       ancestor === VALIDATION_TARGET_COMMIT && typeof descendant === 'string' && descendant.length === 40,
-    resolveGitFile: fakePhase2DecisionResolver,
     ...extras
   });
 }
@@ -238,10 +225,7 @@ test('CM-2115 snapshot resolves all 164 routes against the frozen real Git basel
   const snapshot = buildSnapshot(resolveGitSourceObject);
   const result = evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
     resolveSourceObject: resolveGitSourceObject,
-    resolveCommitTree: commit => execFileSync('git', ['rev-parse', `${commit}^{tree}`], {
-      cwd: process.cwd(), encoding: 'utf8'
-    }).trim(),
-    resolveGitFile: resolveSnapshotGitFile,
+    ...bindingReceiptResolvers(),
     isCommitAncestor: (ancestor, descendant) => {
       const result = execFileSync('git', ['merge-base', '--is-ancestor', ancestor, descendant], {
         cwd: process.cwd(), encoding: 'utf8'
@@ -252,7 +236,7 @@ test('CM-2115 snapshot resolves all 164 routes against the frozen real Git basel
   assert.equal(result.accepted, true, result.blockers.join(','));
   assert.equal(result.traceEntryCount, 164);
   assert.equal(result.uniqueSourceObjectCount, snapshot.payload.counts.uniqueSourceObjectCount);
-  assert.equal(result.validationReceiptTargetCommit, '3e7edf9da62347afa15595bca5ec8fbdad19f415');
+  assert.equal(result.validationReceiptTargetCommit, 'd3cdc894772171c8c98dbbf6c2d19adf4fcd99e2');
 });
 
 test('candidate Completion Audit eligibility is kept separate from authoritative state', () => {
@@ -301,8 +285,8 @@ test('snapshot construction and contract reject invalid Phase 2 application sema
   const validResolver = fakeResolverFactory();
   const actual = validResolver(PHASE2_APPLICATION_RECEIPT_PATH);
   const receipt = JSON.parse(actual.content.toString('utf8'));
-  receipt.receiptPayload.currentState.fullPlanPackCompleted = true;
-  receipt.receiptPayloadSha256 = sha256Phase2Canonical(receipt.receiptPayload);
+  receipt.payload.currentState.fullPlanPackCompleted = true;
+  receipt.canonicalPayloadSha256 = sha256Canonical(receipt.payload);
   const content = Buffer.from(`${JSON.stringify(canonicalize(receipt), null, 2)}\n`);
   const invalidIdentity = {
     ...actual,
@@ -314,14 +298,15 @@ test('snapshot construction and contract reject invalid Phase 2 application sema
   const invalidResolver = fakeResolverFactory({
     overrides: { [PHASE2_APPLICATION_RECEIPT_PATH]: invalidIdentity }
   });
-  assert.throws(() => buildSnapshot(invalidResolver), /phase2_application_receipt_rejected/);
+  assert.throws(() => buildSnapshot(invalidResolver), /phase2_application_binding_receipt_rejected/);
 
   const snapshot = buildSnapshot(validResolver);
+  const binding = bindingReceiptResolvers();
   const result = evaluate(snapshot, validResolver, {
-    resolveGitFile: () => ({
-      ...fakePhase2DecisionResolver('3'.repeat(40), PHASE2_DECISION_PATH),
-      sha256: 'f'.repeat(64)
-    })
+    resolveGitFile: (commit, sourcePath) => {
+      const identity = binding.resolveGitFile(commit, sourcePath);
+      return sourcePath === PHASE2_DECISION_PATH ? { ...identity, sha256: 'f'.repeat(64) } : identity;
+    }
   });
   assert.equal(result.accepted, false);
   assert.ok(result.blockers.includes('phase2ApplicationReceipt.contract'));
@@ -344,6 +329,7 @@ test('snapshot contract rejects circular, private, symlink, or non-blob sources'
   assert.equal(safeSourcePath('docs/near-model-memory-plan-pack/completion_audit_report.md'), false);
   assert.equal(safeSourcePath('docs/near-model-memory-plan-pack/evidence_trace_matrix_report.md'), false);
   assert.equal(safeSourcePath('docs/near-model-memory-plan-pack/cm2115_canonical_full_plan_evidence_snapshot.json'), false);
+  assert.equal(safeSourcePath('docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.json'), false);
   assert.equal(safeSourcePath('.env'), false);
   assert.equal(safeSourcePath('data/private.json'), false);
   const resolver = fakeResolverFactory();
@@ -409,6 +395,7 @@ test('snapshot review boundary cannot be promoted inside snapshot preparation', 
     copy => { copy.payload.reviewBoundary.independentReviewPassed = true; },
     copy => { copy.payload.reviewBoundary.applicationAuthorized = true; },
     copy => { copy.payload.semanticEvidenceChecks.supersededCm2074UsedAsCurrentAuthority = true; },
+    copy => { copy.payload.semanticEvidenceChecks.supersededR1UsedAsCurrentAuthority = true; },
     copy => { copy.payload.currentState.fullPlanPackCompleted = true; },
     copy => { copy.payload.currentState.readinessClaimed = true; },
     copy => { copy.payload.nonClaims.productionReady = true; },

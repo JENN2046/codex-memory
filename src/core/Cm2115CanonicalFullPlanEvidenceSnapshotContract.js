@@ -16,8 +16,8 @@ const {
   evaluateCm2115LocalValidationReceipt
 } = require('./Cm2115LocalValidationReceiptContract');
 const {
-  evaluateApplicationReceipt: evaluateCm2115R1Phase2ApplicationReceipt
-} = require('./Cm2115R1Phase2CompletionAuditApplication');
+  evaluateBindingReceipt: evaluateCm2115R2Phase2ApplicationBindingReceipt
+} = require('./Cm2115R2Phase2CompletionAuditApplication');
 
 const SNAPSHOT_KEYS = Object.freeze([
   'schemaVersion',
@@ -92,10 +92,13 @@ const CANDIDATE_AUDIT_KEYS = Object.freeze([
   'authoritativeReadinessClaimed'
 ]);
 const SEMANTIC_EVIDENCE_CHECK_KEYS = Object.freeze([
-  'phase2ApplicationReceiptContractAccepted',
+  'phase2ApplicationBindingReceiptContractAccepted',
   'phase2ExactEvidenceApplied',
-  'phase2DecisionGitIdentityBound',
-  'supersededCm2074UsedAsCurrentAuthority'
+  'phase2ApplicationCommitBound',
+  'phase2ReceiptTimeUpstreamGitRevalidationPassed',
+  'phase2DurableClaimReceiptStateAccepted',
+  'supersededCm2074UsedAsCurrentAuthority',
+  'supersededR1UsedAsCurrentAuthority'
 ]);
 const REVIEW_BOUNDARY_KEYS = Object.freeze([
   'independentReviewRequired',
@@ -134,7 +137,9 @@ const FORBIDDEN_CIRCULAR_SOURCE_PATHS = Object.freeze([
   'docs/near-model-memory-plan-pack/cm2115_canonical_full_plan_evidence_snapshot.json',
   'docs/near-model-memory-plan-pack/cm2115_canonical_full_plan_evidence_snapshot.md',
   'docs/near-model-memory-plan-pack/cm2115_r1_canonical_full_plan_evidence_snapshot.json',
-  'docs/near-model-memory-plan-pack/cm2115_r1_canonical_full_plan_evidence_snapshot.md'
+  'docs/near-model-memory-plan-pack/cm2115_r1_canonical_full_plan_evidence_snapshot.md',
+  'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.json',
+  'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.md'
 ]);
 
 function sameKeys(value, expected) {
@@ -175,7 +180,10 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
   resolveSourceObject,
   resolveCommitTree,
   isCommitAncestor,
-  resolveGitFile
+  resolveGitFile,
+  resolveParentCommit,
+  resolveDiffPaths,
+  resolveGitPathState
 } = {}) {
   const blockers = [];
   const resolvedByPath = new Map();
@@ -184,7 +192,7 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
     return resolvedByPath.get(sourcePath);
   };
   if (!sameKeys(snapshot, SNAPSHOT_KEYS)) blockers.push('snapshot.fields');
-  if (snapshot?.schemaVersion !== 2 || snapshot?.taskId !== TASK_ID || snapshot?.snapshotType !== SNAPSHOT_TYPE) {
+  if (snapshot?.schemaVersion !== 3 || snapshot?.taskId !== TASK_ID || snapshot?.snapshotType !== SNAPSHOT_TYPE) {
     blockers.push('snapshot.identity');
   }
   if (!hex(snapshot?.canonicalPayloadSha256, 64) ||
@@ -296,9 +304,9 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
       const content = Buffer.isBuffer(receiptIdentity?.content)
         ? receiptIdentity.content.toString('utf8')
         : receiptIdentity?.content;
-      phase2ApplicationReceiptEvaluation = evaluateCm2115R1Phase2ApplicationReceipt(
+      phase2ApplicationReceiptEvaluation = evaluateCm2115R2Phase2ApplicationBindingReceipt(
         JSON.parse(content),
-        { resolveGitFile }
+        { resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths, resolveGitPathState }
       );
       if (!phase2ApplicationReceiptEvaluation.accepted) blockers.push('phase2ApplicationReceipt.contract');
     } catch {
@@ -306,10 +314,13 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
     }
   }
   const expectedSemanticEvidenceChecks = {
-    phase2ApplicationReceiptContractAccepted: true,
+    phase2ApplicationBindingReceiptContractAccepted: true,
     phase2ExactEvidenceApplied: true,
-    phase2DecisionGitIdentityBound: true,
-    supersededCm2074UsedAsCurrentAuthority: false
+    phase2ApplicationCommitBound: true,
+    phase2ReceiptTimeUpstreamGitRevalidationPassed: true,
+    phase2DurableClaimReceiptStateAccepted: true,
+    supersededCm2074UsedAsCurrentAuthority: false,
+    supersededR1UsedAsCurrentAuthority: false
   };
   if (!sameKeys(payload?.semanticEvidenceChecks, SEMANTIC_EVIDENCE_CHECK_KEYS) ||
       !equalJson(payload?.semanticEvidenceChecks, expectedSemanticEvidenceChecks) ||
@@ -398,7 +409,7 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
     readinessClaimed: false,
     sourceObjectsVerifiedAgainstGit: accepted && typeof resolveSourceObject === 'function',
     validationReceiptAccepted: accepted && validationReceiptEvaluation?.accepted === true,
-    phase2ApplicationReceiptAccepted: accepted && phase2ApplicationReceiptEvaluation?.accepted === true,
+    phase2ApplicationBindingReceiptAccepted: accepted && phase2ApplicationReceiptEvaluation?.accepted === true,
     validationReceiptTargetCommit: validationTarget?.commit || null,
     traceEntryCount: entries.length,
     uniqueSourceObjectCount: unique(observedPaths).length,
