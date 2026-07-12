@@ -22,14 +22,27 @@ const {
   evaluateCm2115LocalValidationReceipt
 } = require('../src/core/Cm2115LocalValidationReceiptContract');
 const {
+  evaluateCm2115SnapshotReviewRequest
+} = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
+const {
   buildReceipt,
   extractTapSummaries,
   renderCanonicalMarkdown,
-  resolveGitSourceObject
+  resolveGitSourceObject,
+  buildReviewRequest,
+  resolveReviewGitFile,
+  isReviewCommitAncestor
 } = (() => {
   const receiptGenerator = require('../scripts/generate-cm2115-local-validation-receipt');
   const snapshotGenerator = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
-  return { ...receiptGenerator, ...snapshotGenerator };
+  const reviewGenerator = require('../scripts/generate-cm2115-independent-review-request');
+  return {
+    ...receiptGenerator,
+    ...snapshotGenerator,
+    buildReviewRequest: reviewGenerator.buildRequest,
+    resolveReviewGitFile: reviewGenerator.resolveGitFile,
+    isReviewCommitAncestor: reviewGenerator.isCommitAncestor
+  };
 })();
 
 const VALIDATION_TARGET_COMMIT = '1'.repeat(40);
@@ -344,4 +357,48 @@ test('canonical Markdown is a complete content-equivalent JSON mirror', () => {
   assert.ok(markdown.includes(jsonText.trimEnd()));
   assert.ok(markdown.includes('Authoritative fullPlanPackCompleted: `false`'));
   assert.ok(markdown.includes('Readiness claimed: `false`'));
+});
+
+test('independent review request binds the frozen snapshot and stays non-authoritative', () => {
+  const request = buildReviewRequest();
+  const result = evaluateCm2115SnapshotReviewRequest(request, {
+    resolveGitFile: resolveReviewGitFile,
+    resolveCommitTree: commit => execFileSync('git', ['rev-parse', `${commit}^{tree}`], {
+      cwd: process.cwd(), encoding: 'utf8'
+    }).trim(),
+    isCommitAncestor: isReviewCommitAncestor
+  });
+  assert.equal(result.accepted, true, result.blockers.join(','));
+  assert.equal(result.snapshotContractAccepted, true);
+  assert.equal(result.readyToSubmitForIndependentReview, true);
+  assert.equal(result.independentReviewPassed, false);
+  assert.equal(result.applicationAuthorized, false);
+  assert.equal(result.fullPlanPackCompleted, false);
+  assert.equal(result.readinessClaimed, false);
+});
+
+test('review request cannot self-approve review, application, completion, or readiness', () => {
+  const original = buildReviewRequest();
+  const mutations = [
+    copy => { copy.payload.requestedDecisionBoundary.independentSnapshotReviewPassed = true; },
+    copy => { copy.payload.requestedDecisionBoundary.applicationPreparationAuthorizedByReviewRequest = true; },
+    copy => { copy.payload.requestedDecisionBoundary.applicationExecutionAuthorizedByReviewRequest = true; },
+    copy => { copy.payload.currentState.fullPlanPackCompleted = true; },
+    copy => { copy.payload.currentState.readinessClaimed = true; },
+    copy => { copy.payload.snapshot.json.blobOid = 'a'.repeat(40); },
+    copy => { copy.payload.reviewImplementation.artifacts.pop(); }
+  ];
+  for (const change of mutations) {
+    const candidate = structuredClone(original);
+    change(candidate);
+    candidate.canonicalPayloadSha256 = sha256Canonical(candidate.payload);
+    const result = evaluateCm2115SnapshotReviewRequest(candidate, {
+      resolveGitFile: resolveReviewGitFile,
+      resolveCommitTree: commit => execFileSync('git', ['rev-parse', `${commit}^{tree}`], {
+        cwd: process.cwd(), encoding: 'utf8'
+      }).trim(),
+      isCommitAncestor: isReviewCommitAncestor
+    });
+    assert.equal(result.accepted, false);
+  }
 });
