@@ -869,11 +869,35 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
 
 function createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options = {}) {
   const handler = createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options);
+  const expectedBearerToken = typeof options.expectedBearerToken === 'string'
+    ? options.expectedBearerToken
+    : '';
+  let authorizedRequestCount = 0;
+  let rejectedAuthorizationCount = 0;
   const server = http.createServer(async (req, res) => {
     if (req.method !== 'POST') {
       res.writeHead(405, { 'content-type': 'application/json' });
       res.end(JSON.stringify(jsonRpcError(null, -32601, 'Method not found')));
       return;
+    }
+    if (expectedBearerToken) {
+      const actualHeader = typeof req.headers.authorization === 'string'
+        ? req.headers.authorization
+        : '';
+      const actualBytes = Buffer.from(actualHeader, 'utf8');
+      const expectedBytes = Buffer.from(`Bearer ${expectedBearerToken}`, 'utf8');
+      const matched = actualBytes.length === expectedBytes.length &&
+        crypto.timingSafeEqual(actualBytes, expectedBytes);
+      if (!matched) {
+        rejectedAuthorizationCount += 1;
+        res.writeHead(401, { 'content-type': 'application/json' });
+        res.end(JSON.stringify(jsonRpcError(null, -32001, 'Unauthorized', {
+          reasonCode: 'transport_authorization_rejected',
+          lowDisclosure: true
+        })));
+        return;
+      }
+      authorizedRequestCount += 1;
     }
     try {
       const rawBody = await readRequestBody(req, options.maxRequestBytes || 1024 * 1024);
@@ -885,6 +909,12 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options = {}) {
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify(jsonRpcError(null, -32700, 'Parse error')));
     }
+  });
+  server.getLowDisclosureAuthorizationProjection = () => ({
+    authorizationRequired: Boolean(expectedBearerToken),
+    authorizedRequestCount,
+    rejectedAuthorizationCount,
+    tokenMaterialDisclosed: false
   });
   return server;
 }

@@ -194,6 +194,16 @@ function lowDisclosureNativeRuntimeReceipt(receipt = null) {
       rawMemoryContentDisclosed: false,
       runtimeLocatorDisclosed: false,
       tokenMaterialDisclosed: false,
+      memoryIntelligenceOwner: null,
+      ownerRuntimeComponent: null,
+      ownerRuntimeCommunication: null,
+      ownerRuntimeSourceCommitMatched: false,
+      ownerRuntimeSourceTreeMatched: false,
+      ownerRuntimePluginBlobMatched: false,
+      ownerRuntimeManifestBlobMatched: false,
+      stableStoreIdentityMatched: false,
+      durableBytes: null,
+      durableSha256: null,
       readinessClaimed: false
     };
   }
@@ -220,6 +230,26 @@ function lowDisclosureNativeRuntimeReceipt(receipt = null) {
     rawMemoryContentDisclosed: receipt.rawMemoryContentDisclosed === true,
     runtimeLocatorDisclosed: receipt.runtimeLocatorDisclosed === true,
     tokenMaterialDisclosed: receipt.tokenMaterialDisclosed === true,
+    memoryIntelligenceOwner: receipt.memoryIntelligenceOwner === 'VCPToolBox'
+      ? 'VCPToolBox'
+      : null,
+    ownerRuntimeComponent: receipt.ownerRuntimeComponent === 'DailyNote'
+      ? 'DailyNote'
+      : null,
+    ownerRuntimeCommunication: receipt.ownerRuntimeCommunication === 'stdio'
+      ? 'stdio'
+      : null,
+    ownerRuntimeSourceCommitMatched: receipt.ownerRuntimeSourceCommitMatched === true,
+    ownerRuntimeSourceTreeMatched: receipt.ownerRuntimeSourceTreeMatched === true,
+    ownerRuntimePluginBlobMatched: receipt.ownerRuntimePluginBlobMatched === true,
+    ownerRuntimeManifestBlobMatched: receipt.ownerRuntimeManifestBlobMatched === true,
+    stableStoreIdentityMatched: receipt.stableStoreIdentityMatched === true,
+    durableBytes: Number.isInteger(receipt.durableBytes) && receipt.durableBytes > 0
+      ? receipt.durableBytes
+      : null,
+    durableSha256: /^[a-f0-9]{64}$/.test(receipt.durableSha256 || '')
+      ? receipt.durableSha256
+      : null,
     readinessClaimed: receipt.readinessClaimed === true
   };
 }

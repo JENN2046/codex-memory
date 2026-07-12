@@ -94,11 +94,40 @@ async function withShimServer(options = {}) {
   return {
     calls,
     url: `http://127.0.0.1:${address.port}/mcp/vcp-native`,
+    authorizationProjection: () => server.getLowDisclosureAuthorizationProjection(),
     close: () => new Promise((resolve, reject) => {
       server.close(error => (error ? reject(error) : resolve()));
     })
   };
 }
+
+test('VCPToolBox native MCP shim can require an exact in-process bearer without disclosing it', async t => {
+  const shim = await withShimServer({ expectedBearerToken: 'cm2113-synthetic-transport-token' });
+  t.after(() => shim.close());
+  const body = { jsonrpc: '2.0', id: 1, method: 'initialize', params: {} };
+  const rejected = await fetch(shim.url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  assert.equal(rejected.status, 401);
+  const accepted = await fetch(shim.url, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: 'Bearer cm2113-synthetic-transport-token'
+    },
+    body: JSON.stringify(body)
+  });
+  assert.equal(accepted.status, 200);
+  assert.equal((await accepted.json()).result.serverInfo.name, 'codex-memory-governed-vcp-toolbox-native-shim');
+  assert.deepEqual(shim.authorizationProjection(), {
+    authorizationRequired: true,
+    authorizedRequestCount: 1,
+    rejectedAuthorizationCount: 1,
+    tokenMaterialDisclosed: false
+  });
+});
 
 test('VCPToolBox native MCP shim CLI accepts isolated knowledge-base store path without disclosing it', () => {
   const options = parseArgs([

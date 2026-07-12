@@ -1,0 +1,42 @@
+'use strict';
+
+const fs = require('node:fs');
+const path = require('node:path');
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const { runCm2113Runtime } = require('../src/cli/cm2113-vcptoolbox-owner-native-proof-runtime');
+const { runCm2113ProofController } = require('../src/cli/cm2113-vcptoolbox-owner-native-proof');
+const { runCm2113OwnerRuntimeBootstrap } = require('../src/cli/cm2113-vcptoolbox-owner-runtime-bootstrap');
+
+test('CM-2113 runtime and controller require all three frozen Git commits before effects', async () => {
+  await assert.rejects(runCm2113Runtime(null, null, null), /git_commit_argument_required/);
+  await assert.rejects(runCm2113ProofController(null, null, null), /git_commit_argument_required/);
+  await assert.rejects(runCm2113OwnerRuntimeBootstrap(null), /decision_commit_required/);
+});
+
+test('CM-2113 frozen runtime uses process stdio plus local HTTP owner gateway and never primaryWriteOnly shim mode', () => {
+  const runtimeSource = fs.readFileSync(path.join(__dirname, '../src/cli/cm2113-vcptoolbox-owner-native-proof-runtime.js'), 'utf8');
+  const controllerSource = fs.readFileSync(path.join(__dirname, '../src/cli/cm2113-vcptoolbox-owner-native-proof.js'), 'utf8');
+  assert.match(runtimeSource, /createStdioServer/);
+  assert.match(runtimeSource, /input:\s*process\.stdin/);
+  assert.match(runtimeSource, /output:\s*process\.stdout/);
+  assert.match(runtimeSource, /createVcpToolBoxDailyNoteOwnerRuntimeAdapter/);
+  assert.match(runtimeSource, /createGovernedMcpVcpNativeVcpToolBoxMcpShimServer/);
+  assert.match(runtimeSource, /expectedBearerToken/);
+  assert.match(runtimeSource, /validateCm2113VcpToolBoxOwnerNativeProofPacket/);
+  assert.doesNotMatch(runtimeSource, /primaryWriteOnly:\s*true/);
+  assert.match(controllerSource, /processBoundary:\s*true/);
+  assert.match(controllerSource, /executeCm2113RecordMemoryStdioSequence/);
+  assert.doesNotMatch(controllerSource, /app\.callTool/);
+  assert.doesNotMatch(controllerSource, /env:\s*\{\s*\.\.\.process\.env/);
+});
+
+test('CM-2113 isolated runtime exposes only record_memory and preserves zero provider/retry/rollback boundaries', () => {
+  const runtimeSource = fs.readFileSync(path.join(__dirname, '../src/cli/cm2113-vcptoolbox-owner-native-proof-runtime.js'), 'utf8');
+  assert.match(runtimeSource, /mcpPublicToolNames:\s*\['record_memory'\]/);
+  assert.match(runtimeSource, /allowExternalProvider:\s*false/);
+  assert.match(runtimeSource, /governedMcpVcpNativeReadDelegationMode:\s*'off'/);
+  assert.match(runtimeSource, /rollbackOrCompensationPerformed:\s*false/);
+  assert.match(runtimeSource, /phase8Completed:\s*false/);
+  assert.match(runtimeSource, /readinessClaimed:\s*false/);
+});
