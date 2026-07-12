@@ -30,18 +30,27 @@ const {
   sha256
 } = require('./Cm2117ExactFullPlanApplicationDecision');
 
-const TASK_ID = 'CM-2122';
-const FINAL_RELEASE_TASK_ID = 'CM-2123';
+const TASK_ID = 'CM-2122-R1';
+const FINAL_RELEASE_TASK_ID = 'CM-2123-R1';
 const ACTION = 'apply_exact_full_plan_status_sync_detached_commit';
-const PACKET_PATH = 'docs/near-model-memory-plan-pack/cm2122_full_plan_status_sync_execution_packet.json';
+const PACKET_PATH = 'docs/near-model-memory-plan-pack/cm2122_r1_full_plan_status_sync_execution_packet.json';
 const PACKET_MARKDOWN_PATH = PACKET_PATH.replace(/\.json$/, '.md');
-const FINAL_RELEASE_PATH = 'docs/near-model-memory-plan-pack/cm2123_full_plan_status_sync_final_release.json';
+const FINAL_RELEASE_PATH = 'docs/near-model-memory-plan-pack/cm2123_r1_full_plan_status_sync_final_release.json';
 const FINAL_RELEASE_MARKDOWN_PATH = FINAL_RELEASE_PATH.replace(/\.json$/, '.md');
-const EXECUTION_RECEIPT_FILENAME = 'cm2122-full-plan-status-sync-execution-receipt-001.json';
-const BINDING_RECEIPT_FILENAME = 'cm2122-full-plan-status-sync-binding-receipt-001.json';
-const REGISTRY_REFERENCE = 'cm2121-full-plan-status-sync-registry-001';
-const NONCE = 'cm2121-full-plan-status-sync-001';
-const RECEIPT_ID = 'cm2121-full-plan-status-sync-receipt-001';
+const EXECUTION_RECEIPT_FILENAME = 'cm2122-r1-full-plan-status-sync-execution-receipt-001.json';
+const BINDING_RECEIPT_FILENAME = 'cm2122-r1-full-plan-status-sync-binding-receipt-001.json';
+const REGISTRY_REFERENCE = 'cm2122-r1-full-plan-status-sync-registry-001';
+const NONCE = 'cm2122-r1-full-plan-status-sync-001';
+const RECEIPT_ID = 'cm2122-r1-full-plan-status-sync-receipt-001';
+const SUPERSEDED_FREEZE = Object.freeze({
+  implementationCommit: 'd3d230c41d924acdbd79a5975e057c4800b4e576',
+  executionPacketCommit: 'e071ed4fcb089b5896e0f25048aa1938b36f2edc',
+  finalReleaseCommit: 'fd435dc8c4f916e70a00d5a3c0a701e3e060411e',
+  finalReleaseTree: 'd9b72b92b46040cab074da9280032e3cc8a6cd25',
+  reason: 'superseded_before_execution_due_to_git_environment_isolation_repair',
+  authorizationClaimed: false,
+  executorRun: false
+});
 
 const GOVERNANCE_ROOT_IDENTITY = Object.freeze({
   registryRootInstanceId: 'cm2093-phase8-governance-root-instance-001',
@@ -74,12 +83,11 @@ const CONTENT_DECISION_FREEZE = Object.freeze({
 });
 
 const IMPLEMENTATION_PARENT_FREEZE = Object.freeze({
-  commit: CONTENT_DECISION_FREEZE.commit,
-  tree: CONTENT_DECISION_FREEZE.tree
+  commit: SUPERSEDED_FREEZE.finalReleaseCommit,
+  tree: SUPERSEDED_FREEZE.finalReleaseTree
 });
 
 const IMPLEMENTATION_DIFF_PATHS = Object.freeze([
-  'package.json',
   'scripts/generate-cm2122-full-plan-status-sync-execution-packet.js',
   'scripts/generate-cm2123-full-plan-status-sync-final-release.js',
   'src/cli/cm2122-full-plan-status-sync.js',
@@ -87,11 +95,12 @@ const IMPLEMENTATION_DIFF_PATHS = Object.freeze([
   'tests/cm2122-full-plan-status-sync-execution.test.js'
 ].sort());
 const IMPLEMENTATION_DIFF_ENTRIES = Object.freeze(IMPLEMENTATION_DIFF_PATHS.map(sourcePath => ({
-  status: sourcePath === 'package.json' ? 'M' : 'A',
+  status: 'M',
   path: sourcePath
 })));
 const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
   ...IMPLEMENTATION_DIFF_PATHS,
+  'package.json',
   'scripts/freeze-cm2120-full-plan-application-receipts.js',
   'scripts/generate-cm2116-exact-full-plan-application-gate.js',
   'src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js',
@@ -117,6 +126,30 @@ const CLAIM_ENVELOPE_KEYS = Object.freeze([
 const machineBoundContentDecisions = new WeakSet();
 const machineBoundPackets = new WeakSet();
 const machineBoundFinalReleases = new WeakSet();
+const UNSAFE_GIT_ENV_KEYS = Object.freeze(new Set([
+  'GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY',
+  'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_REPLACE_REF_BASE', 'GIT_SHALLOW_FILE',
+  'GIT_QUARANTINE_PATH', 'GIT_CONFIG', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM',
+  'GIT_CONFIG_NOSYSTEM', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_COUNT', 'GIT_CEILING_DIRECTORIES',
+  'GIT_DISCOVERY_ACROSS_FILESYSTEM', 'GIT_EXEC_PATH'
+]));
+
+function unsafeGitEnvironmentKeys(env = process.env) {
+  return Object.keys(env).filter(key => UNSAFE_GIT_ENV_KEYS.has(key) ||
+    /^GIT_CONFIG_(?:KEY|VALUE)_\d+$/.test(key));
+}
+
+function assertSafeGitEnvironment(env = process.env) {
+  const keys = unsafeGitEnvironmentKeys(env);
+  if (keys.length) throw new Error(`cm2122_unsafe_git_environment:${keys.sort().join(',')}`);
+  return true;
+}
+
+function sanitizedGitEnvironment(env = process.env) {
+  const result = { ...env };
+  for (const key of unsafeGitEnvironmentKeys(result)) delete result[key];
+  return result;
+}
 
 function wrapPayload(payload, artifactType, taskId = TASK_ID) {
   return {
@@ -256,7 +289,7 @@ function buildExecutionPacket({ implementation, contentEvidence }) {
   }
   const decision = contentEvidence.decision;
   const payload = {
-    packetReference: `CM-2122-STATUS-SYNC-EXECUTION-PACKET-${decision.canonicalPayloadSha256.slice(0, 8)}-${implementation.commit.slice(0, 8)}`.toUpperCase(),
+    packetReference: `CM-2122-R1-STATUS-SYNC-EXECUTION-PACKET-${decision.canonicalPayloadSha256.slice(0, 8)}-${implementation.commit.slice(0, 8)}`.toUpperCase(),
     packetType: 'non_executing_exact_status_sync_execution_packet',
     implementation,
     contentDecision: {
@@ -278,6 +311,7 @@ function buildExecutionPacket({ implementation, contentEvidence }) {
       evidenceApplicationCommit: '41097b0fb1118a47f3d16873a12a5e0fcc75a94b',
       evidenceApplicationAnchored: true
     },
+    supersedes: SUPERSEDED_FREEZE,
     detachedCommitBoundary: {
       targetBranchRef: FUTURE_BRANCH_REF,
       parentMustBeFinalReleaseSourceCommit: true,
@@ -307,7 +341,11 @@ function buildExecutionPacket({ implementation, contentEvidence }) {
       callerOutputPathAllowed: false,
       callerRegistryRootAllowed: false,
       callerCallbackAllowed: false,
-      callerResolverAllowed: false
+      callerResolverAllowed: false,
+      gitRepositoryEnvironmentOverridesAllowed: false,
+      gitObjectEnvironmentOverridesAllowed: false,
+      gitIndexEnvironmentOverridesAllowed: false,
+      sanitizedGitChildEnvironmentRequired: true
     },
     oneShotRegistry: {
       governanceRootAuthority: 'git_common_dir_fixed_governance_root',
@@ -392,7 +430,7 @@ function buildExecutionPacket({ implementation, contentEvidence }) {
     },
     nonClaims: Object.fromEntries(READINESS_FIELDS.map(field => [field, false]))
   };
-  return wrapPayload(payload, 'cm2122_non_executing_full_plan_status_sync_packet_v1');
+  return wrapPayload(payload, 'cm2122_r1_non_executing_full_plan_status_sync_packet_v1');
 }
 
 function verifyImplementation(implementation, options, blockers) {
@@ -426,7 +464,7 @@ function verifyImplementation(implementation, options, blockers) {
 function evaluateExecutionPacket(packet = {}, options = {}) {
   const blockers = [];
   if (packet.schemaVersion !== 1 || packet.taskId !== TASK_ID ||
-      packet.artifactType !== 'cm2122_non_executing_full_plan_status_sync_packet_v1' ||
+      packet.artifactType !== 'cm2122_r1_non_executing_full_plan_status_sync_packet_v1' ||
       packet.canonicalPayloadSha256 !== sha256Canonical(packet.payload || {})) blockers.push('packet.identityOrHash');
   const contentEvidence = intakeContentDecision(options);
   if (!contentEvidence.accepted) blockers.push(...contentEvidence.blockers.map(item => `packet.${item}`));
@@ -523,7 +561,7 @@ function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
   }
   const packet = packetEvidence.packet;
   const payload = {
-    decisionReference: `CM-2123-STATUS-SYNC-FINAL-RELEASE-${packet.canonicalPayloadSha256.slice(0, 8)}-${packetEvidence.packetCommit.slice(0, 8)}`.toUpperCase(),
+    decisionReference: `CM-2123-R1-STATUS-SYNC-FINAL-RELEASE-${packet.canonicalPayloadSha256.slice(0, 8)}-${packetEvidence.packetCommit.slice(0, 8)}`.toUpperCase(),
     decisionType: 'exact_one_shot_detached_status_commit_final_execution_release',
     contentDecision: packet.payload.contentDecision,
     executionPacket: {
@@ -535,6 +573,7 @@ function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
       markdown: identityWithoutContent(packetEvidence.markdownIdentity)
     },
     implementation: packet.payload.implementation,
+    supersedes: packet.payload.supersedes,
     detachedCommitBoundary: packet.payload.detachedCommitBoundary,
     oneShotRegistry: packet.payload.oneShotRegistry,
     receiptBoundary: packet.payload.receiptBoundary,
@@ -568,13 +607,13 @@ function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
     currentSideEffects: packet.payload.currentSideEffects,
     nonClaims: packet.payload.nonClaims
   };
-  return wrapPayload(payload, 'cm2123_full_plan_status_sync_final_execution_release_v1', FINAL_RELEASE_TASK_ID);
+  return wrapPayload(payload, 'cm2123_r1_full_plan_status_sync_final_execution_release_v1', FINAL_RELEASE_TASK_ID);
 }
 
 function evaluateFinalReleaseDecision(decision = {}, { packetEvidence, now = new Date() } = {}) {
   const blockers = [];
   if (decision.schemaVersion !== 1 || decision.taskId !== FINAL_RELEASE_TASK_ID ||
-      decision.artifactType !== 'cm2123_full_plan_status_sync_final_execution_release_v1' ||
+      decision.artifactType !== 'cm2123_r1_full_plan_status_sync_final_execution_release_v1' ||
       decision.canonicalPayloadSha256 !== sha256Canonical(decision.payload || {})) blockers.push('finalRelease.identityOrHash');
   if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet)) blockers.push('finalRelease.machineBoundPacketRequired');
   else {
@@ -674,7 +713,7 @@ function claimId() {
 }
 
 function claimFileName() {
-  return `.cm2122-status-sync-claim-${claimId()}.json`;
+  return `.cm2122-r1-status-sync-claim-${claimId()}.json`;
 }
 
 class Cm2122StatusSyncClaimRegistry {
@@ -782,8 +821,12 @@ class Cm2122StatusSyncClaimRegistry {
     return envelope;
   }
 
-  async inspectExisting(bindingHash) {
+  async inspectExisting(bindingHash, finalReleaseEvidence) {
     await this.verifyRoot();
+    if (!finalReleaseEvidence?.accepted || !isMachineBoundFinalReleaseDecision(finalReleaseEvidence.decision)) {
+      return { claimEnvelopePresent: true, state: 'CLAIM_REGISTRY_AMBIGUOUS', authorizationConsumed: true,
+        replayAllowed: false, reconciliationRequired: true, claimEnvelopeBindingVerified: false, envelope: null };
+    }
     try {
       const stat = await this.fs.lstat(this.claimPath);
       if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('invalid');
@@ -793,7 +836,7 @@ class Cm2122StatusSyncClaimRegistry {
         replayAllowed: false, reconciliationRequired: true, claimEnvelopeBindingVerified: false, envelope: null };
     }
     try {
-      const envelope = await this.read(bindingHash);
+      const envelope = await this.read(bindingHash, finalReleaseEvidence);
       return { claimEnvelopePresent: true, state: envelope.state, authorizationConsumed: true,
         replayAllowed: false, reconciliationRequired: envelope.reconciliationRequired,
         claimEnvelopeBindingVerified: true, envelope };
@@ -945,13 +988,13 @@ function buildReentryReceipt(existing, bindingHash, finalReleaseCommit) {
     realMemoryReads: 0,
     remoteActions: 0,
     readinessClaims: 0
-  }, 'cm2122_status_sync_claim_readonly_reentry_projection_v1');
+  }, 'cm2122_r1_status_sync_claim_readonly_reentry_projection_v1');
 }
 
 function evaluateReentryReceipt(receipt = {}, { existing, bindingHash, finalReleaseCommit } = {}) {
   const blockers = [];
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
-      receipt.artifactType !== 'cm2122_status_sync_claim_readonly_reentry_projection_v1' ||
+      receipt.artifactType !== 'cm2122_r1_status_sync_claim_readonly_reentry_projection_v1' ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('reentryReceipt.identityOrHash');
   try {
     if (!sameJson(receipt, buildReentryReceipt(existing, bindingHash, finalReleaseCommit))) {
@@ -986,11 +1029,11 @@ function buildClaimBindingHash({ packetEvidence, finalReleaseEvidence }) {
   });
 }
 
-function gitText(args, { cwd = process.cwd(), input = undefined, env = undefined } = {}) {
+function gitText(args, { cwd = process.cwd(), input = undefined } = {}) {
   return execFileSync('git', args, {
     cwd,
     input,
-    env: env ? { ...process.env, ...env } : process.env,
+    env: sanitizedGitEnvironment(),
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
     maxBuffer: 64 * 1024 * 1024
@@ -1035,6 +1078,7 @@ function detachedHeadRequired(repoRoot) {
 function listTreeEntries(treeish, repoRoot) {
   const raw = execFileSync('git', ['ls-tree', '-z', treeish], {
     cwd: repoRoot,
+    env: sanitizedGitEnvironment(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -1280,13 +1324,13 @@ function buildExecutionReceipt({ packetEvidence, finalReleaseEvidence, bindingHa
       readinessClaims: 0
     }
   };
-  return wrapPayload(payload, 'cm2122_detached_status_sync_execution_receipt_v1');
+  return wrapPayload(payload, 'cm2122_r1_detached_status_sync_execution_receipt_v1');
 }
 
 function evaluateExecutionReceipt(receipt = {}, { packetEvidence, finalReleaseEvidence } = {}) {
   const blockers = [];
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
-      receipt.artifactType !== 'cm2122_detached_status_sync_execution_receipt_v1' ||
+      receipt.artifactType !== 'cm2122_r1_detached_status_sync_execution_receipt_v1' ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('executionReceipt.identityOrHash');
   if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet) ||
       !finalReleaseEvidence?.accepted || !isMachineBoundFinalReleaseDecision(finalReleaseEvidence.decision)) {
@@ -1404,14 +1448,14 @@ function buildBindingReceipt({ detachedBinding, executionReceipt, claimEnvelope,
     },
     sideEffects: executionReceipt.payload.sideEffects
   };
-  return wrapPayload(payload, 'cm2122_detached_status_sync_binding_receipt_v1');
+  return wrapPayload(payload, 'cm2122_r1_detached_status_sync_binding_receipt_v1');
 }
 
 function evaluateBindingReceipt(receipt = {}, { detachedBinding, executionReceipt, claimEnvelope,
   packetEvidence, finalReleaseEvidence } = {}) {
   const blockers = [];
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
-      receipt.artifactType !== 'cm2122_detached_status_sync_binding_receipt_v1' ||
+      receipt.artifactType !== 'cm2122_r1_detached_status_sync_binding_receipt_v1' ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('bindingReceipt.identityOrHash');
   try {
     const expected = buildBindingReceipt({ detachedBinding, executionReceipt, claimEnvelope, packetEvidence, finalReleaseEvidence });
@@ -1537,6 +1581,7 @@ async function evaluateDurableDetachedBinding({ contentDecisionCommit, packetCom
 }
 
 async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommit, finalReleaseCommit }) {
+  assertSafeGitEnvironment();
   if (contentDecisionCommit !== CONTENT_DECISION_FREEZE.commit || !/^[a-f0-9]{40}$/.test(packetCommit || '') ||
       !/^[a-f0-9]{40}$/.test(finalReleaseCommit || '')) throw new Error('cm2122_exact_three_commit_inputs_required');
   const options = realResolverOptions();
@@ -1560,7 +1605,7 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
   const root = resolveFixedGovernanceRoot(repoRoot);
   const registry = new Cm2122StatusSyncClaimRegistry({ governanceRoot: root });
   let bindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
-  const existing = await registry.inspectExisting(bindingHash);
+  const existing = await registry.inspectExisting(bindingHash, finalReleaseEvidence);
   if (existing.claimEnvelopePresent) {
     const reconciliationReceipt = buildReentryReceipt(existing, bindingHash, finalReleaseCommit);
     const reconciliationEvaluation = evaluateReentryReceipt(reconciliationReceipt, {
@@ -1722,6 +1767,7 @@ module.exports = {
   PACKET_PATH,
   RECEIPT_ID,
   REGISTRY_REFERENCE,
+  SUPERSEDED_FREEZE,
   TASK_ID,
   Cm2122StatusSyncClaimRegistry,
   buildBindingReceipt,
@@ -1730,6 +1776,7 @@ module.exports = {
   buildExecutionReceipt,
   buildFinalReleaseDecision,
   buildReentryReceipt,
+  assertSafeGitEnvironment,
   claimFileName,
   claimId,
   evaluateDurableDetachedBinding,
@@ -1748,6 +1795,8 @@ module.exports = {
   isMachineBoundExecutionPacket,
   isMachineBoundFinalReleaseDecision,
   resolveFixedGovernanceRoot,
+  sanitizedGitEnvironment,
+  unsafeGitEnvironmentKeys,
   verifyDetachedCommitBinding,
   wrapPayload
 };

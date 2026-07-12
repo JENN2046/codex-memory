@@ -9,6 +9,7 @@ const {
   IMPLEMENTATION_PARENT_FREEZE,
   PACKET_MARKDOWN_PATH,
   PACKET_PATH,
+  assertSafeGitEnvironment,
   buildExecutionPacket,
   evaluateExecutionPacket,
   intakeContentDecision
@@ -79,7 +80,7 @@ function resolveImplementation() {
 
 function renderMarkdown(packet, jsonText) {
   return [
-    '# CM-2122 Full-plan Status-sync Execution Packet',
+    '# CM-2122-R1 Full-plan Status-sync Execution Packet',
     '',
     `Packet reference: \`${packet.payload.packetReference}\``,
     `Canonical payload SHA-256: \`${packet.canonicalPayloadSha256}\``,
@@ -90,6 +91,8 @@ function renderMarkdown(packet, jsonText) {
     'registry, external execution/binding receipts, and exact nine-path patch.',
     'It carries no final execution release and creates no claim, patch, commit,',
     'receipt, branch update, remote action, or readiness claim.',
+    'The earlier CM-2123 freeze is superseded before execution by this Git',
+    'environment-isolation repair and never created a claim or receipt.',
     'A separate CM-2123 final execution release is required. Branch CAS remains',
     'a later independent gate after detached-commit binding review.',
     '',
@@ -104,6 +107,7 @@ function renderMarkdown(packet, jsonText) {
 
 function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
+  assertSafeGitEnvironment();
   ensureRepositoryRoot();
   ensureCleanWorktree();
   if (fs.existsSync(PACKET_PATH) || fs.existsSync(PACKET_MARKDOWN_PATH)) {
@@ -135,6 +139,8 @@ function main(argv = process.argv.slice(2)) {
     markdownBytes: Buffer.byteLength(markdownText),
     markdownSha256: sha256(markdownText),
     packetPrepared: true,
+    supersededFinalReleaseCommit: packet.payload.supersedes.finalReleaseCommit,
+    supersededAuthorizationClaimed: false,
     finalExecutionReleasePresent: false,
     statusSyncExecutionAuthorized: false,
     detachedStatusCommitCreationAuthorized: false,

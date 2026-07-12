@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const {
   CONTENT_DECISION_FREEZE,
+  assertSafeGitEnvironment,
   executeStatusSyncFromCommits
 } = require('../core/Cm2122FullPlanStatusSyncExecution');
 const {
@@ -39,6 +40,7 @@ function parseArgs(argv) {
 
 async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
+  assertSafeGitEnvironment();
   if (path.resolve(gitText(['rev-parse', '--show-toplevel'])) !== path.resolve(process.cwd())) {
     throw new Error('cm2122_repository_root_required');
   }

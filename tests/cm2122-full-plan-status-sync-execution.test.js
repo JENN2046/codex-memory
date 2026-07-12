@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { execFileSync, spawn } = require('node:child_process');
+const { execFileSync, spawn, spawnSync } = require('node:child_process');
 const test = require('node:test');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -247,6 +247,34 @@ test('packet and final-release generators are preparation-only and reject execut
     assert.throws(() => packetGenerator.parseArgs(argv));
     assert.throws(() => releaseGenerator.parseArgs(argv));
   }
+});
+
+test('Git repository, object, and index environment overrides fail before any governance or Git effect', () => {
+  for (const key of ['GIT_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE']) {
+    assert.throws(() => implementation.assertSafeGitEnvironment({ [key]: '/tmp/cm2122-forbidden' }),
+      /unsafe_git_environment/);
+    const before = text(['rev-parse', 'HEAD^{commit}'], fixture.repo);
+    const rejected = spawnSync(process.execPath, [
+      'src/cli/cm2122-full-plan-status-sync.js',
+      '--content-decision-commit', implementation.CONTENT_DECISION_FREEZE.commit,
+      '--execution-packet-commit', fixture.packetCommit,
+      '--final-execution-release-commit', fixture.finalReleaseCommit
+    ], {
+      cwd: fixture.repo,
+      env: { ...process.env, [key]: '/tmp/cm2122-forbidden' },
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    assert.notEqual(rejected.status, 0);
+    assert.match(rejected.stderr, /unsafe_git_environment/);
+    assert.equal(text(['rev-parse', 'HEAD^{commit}'], fixture.repo), before);
+  }
+  assert.equal(fs.existsSync(path.join(
+    fixture.repo,
+    '.git',
+    'codex-memory-governance',
+    'phase8-one-shot-authorization-registries'
+  )), false);
 });
 
 test('frozen packet remains non-executing and final release authorizes no branch ref update', () => {
@@ -496,7 +524,7 @@ test('a new process cannot replay the consumed authorization or move the branch 
     packetEvidence: fixture.packetEvidence,
     finalReleaseEvidence: fixture.finalReleaseEvidence
   });
-  const existing = await registry.inspectExisting(bindingHash);
+  const existing = await registry.inspectExisting(bindingHash, fixture.finalReleaseEvidence);
   const reentryReceipt = fixture.frozenModule.buildReentryReceipt(
     existing,
     bindingHash,

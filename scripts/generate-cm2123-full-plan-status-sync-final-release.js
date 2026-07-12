@@ -7,6 +7,7 @@ const path = require('node:path');
 const {
   FINAL_RELEASE_MARKDOWN_PATH,
   FINAL_RELEASE_PATH,
+  assertSafeGitEnvironment,
   buildFinalReleaseDecision,
   evaluateFinalReleaseDecision,
   intakeExecutionPacket
@@ -40,7 +41,7 @@ function ensureRepositoryRoot() {
 
 function renderMarkdown(decision, jsonText) {
   return [
-    '# CM-2123 Full-plan Status-sync Final Execution Release',
+    '# CM-2123-R1 Full-plan Status-sync Final Execution Release',
     '',
     `Decision reference: \`${decision.payload.decisionReference}\``,
     `Canonical payload SHA-256: \`${decision.canonicalPayloadSha256}\``,
@@ -66,6 +67,7 @@ function renderMarkdown(decision, jsonText) {
 
 function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
+  assertSafeGitEnvironment();
   ensureRepositoryRoot();
   ensureCleanWorktree();
   if (fs.existsSync(FINAL_RELEASE_PATH) || fs.existsSync(FINAL_RELEASE_MARKDOWN_PATH)) {
@@ -99,6 +101,8 @@ function main(argv = process.argv.slice(2)) {
     executionPacketTree: packetEvidence.packetTree,
     executionPacketPayloadSha256: packetEvidence.packet.canonicalPayloadSha256,
     implementationCommit: decision.payload.implementation.commit,
+    supersededFinalReleaseCommit: decision.payload.supersedes.finalReleaseCommit,
+    supersededAuthorizationClaimed: false,
     jsonBytes: Buffer.byteLength(jsonText),
     jsonSha256: sha256(jsonText),
     markdownBytes: Buffer.byteLength(markdownText),
