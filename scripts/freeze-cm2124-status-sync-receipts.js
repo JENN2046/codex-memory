@@ -118,8 +118,15 @@ async function buildFreezeArtifacts() {
   if (gitText(['branch', '--show-current']) !== '') throw new Error('cm2124_detached_worktree_required');
   const freezeImplementationCommit = gitText(['rev-parse', 'HEAD^{commit}']);
   const freezeImplementationTree = gitText(['rev-parse', 'HEAD^{tree}']);
-  if (gitText(['rev-parse', 'HEAD^']) !== DETACHED_STATUS_COMMIT ||
-      gitText(['rev-parse', 'HEAD^^{tree}']) !== DETACHED_STATUS_TREE ||
+  const freezeImplementationBase = gitText(['merge-base', DETACHED_STATUS_COMMIT, freezeImplementationCommit]);
+  const freezeImplementationDiffPaths = gitText([
+    'diff', '--name-only', DETACHED_STATUS_COMMIT, freezeImplementationCommit
+  ]).split('\n').filter(Boolean).sort();
+  if (freezeImplementationBase !== DETACHED_STATUS_COMMIT ||
+      JSON.stringify(freezeImplementationDiffPaths) !== JSON.stringify([
+        'scripts/freeze-cm2124-status-sync-receipts.js',
+        'scripts/review-cm2124-status-sync-receipts.js'
+      ]) ||
       gitText(['show-ref', '--hash', '--verify', FUTURE_BRANCH_REF]) !== FINAL_RELEASE_COMMIT) {
     throw new Error('cm2124_exact_implementation_status_parent_and_target_branch_required');
   }
@@ -183,7 +190,8 @@ async function buildFreezeArtifacts() {
     freezeReference: 'CM-2124-STATUS-SYNC-RECEIPT-FREEZE-EB016872-8D3AEFD3-5CE9D65A',
     freezeImplementationCommit,
     freezeImplementationTree,
-    freezeImplementationParent: DETACHED_STATUS_COMMIT,
+    freezeImplementationBase: DETACHED_STATUS_COMMIT,
+    freezeImplementationDiffPaths,
     contentDecisionCommit: CONTENT_DECISION_FREEZE.commit,
     executionPacketCommit: PACKET_COMMIT,
     finalReleaseCommit: FINAL_RELEASE_COMMIT,
