@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const { execFileSync } = require('node:child_process');
 const { test } = require('node:test');
 
 const {
@@ -23,7 +24,8 @@ const {
 const {
   buildReceipt,
   extractTapSummaries,
-  renderCanonicalMarkdown
+  renderCanonicalMarkdown,
+  resolveGitSourceObject
 } = (() => {
   const receiptGenerator = require('../scripts/generate-cm2115-local-validation-receipt');
   const snapshotGenerator = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
@@ -152,6 +154,26 @@ test('CM-2115 snapshot contract accepts exact semantic routes and resolved sourc
   assert.equal(result.applicationAuthorized, false);
   assert.equal(result.fullPlanPackCompleted, false);
   assert.equal(result.readinessClaimed, false);
+});
+
+test('CM-2115 snapshot resolves all 164 routes against the frozen real Git baseline', () => {
+  const snapshot = buildSnapshot(resolveGitSourceObject);
+  const result = evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
+    resolveSourceObject: resolveGitSourceObject,
+    resolveCommitTree: commit => execFileSync('git', ['rev-parse', `${commit}^{tree}`], {
+      cwd: process.cwd(), encoding: 'utf8'
+    }).trim(),
+    isCommitAncestor: (ancestor, descendant) => {
+      const result = execFileSync('git', ['merge-base', '--is-ancestor', ancestor, descendant], {
+        cwd: process.cwd(), encoding: 'utf8'
+      });
+      return result !== null;
+    }
+  });
+  assert.equal(result.accepted, true, result.blockers.join(','));
+  assert.equal(result.traceEntryCount, 164);
+  assert.equal(result.uniqueSourceObjectCount, snapshot.payload.counts.uniqueSourceObjectCount);
+  assert.equal(result.validationReceiptTargetCommit, '20df1440ffdab8e1fda6a0786be36ff6523ef5c9');
 });
 
 test('candidate Completion Audit eligibility is kept separate from authoritative state', () => {

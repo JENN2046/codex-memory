@@ -14,8 +14,8 @@ const {
 const TASK_ID = 'CM-2115';
 const SNAPSHOT_TYPE = 'canonical_full_plan_evidence_snapshot_v1';
 const BASELINE = Object.freeze({
-  sourceCommit: 'fcb9844e595689d402ceaec6cb73b816f6ada804',
-  sourceTree: 'c8ae21d7673596358937e8072a8ce5bff4337052'
+  sourceCommit: '7a72206b11da5b09d37ee7d65ac16b58f924ed3d',
+  sourceTree: '82930c5027423f5cccbacbde7542091b497e00db'
 });
 const DOCS = 'docs/near-model-memory-plan-pack/';
 
