@@ -70,6 +70,7 @@ function resolvers(overrides = {}) {
       ? [...IMPLEMENTATION_ARTIFACT_PATHS]
       : git.resolveDiffPaths(parent, commit),
     resolveGitPathState: git.resolveGitPathState,
+    resolveDurableClaim: git.resolveDurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === REVIEW_REQUEST_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
       return realIsCommitAncestor(ancestor, descendant);

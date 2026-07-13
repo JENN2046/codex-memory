@@ -69,11 +69,12 @@ function evaluateFrozenSelfReviewDecision({
   resolveParentCommit,
   resolveDiffPaths,
   resolveGitPathState,
+  resolveDurableClaim,
   isCommitAncestor
 } = {}) {
   const blockers = [];
   if (![resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths,
-    resolveGitPathState, isCommitAncestor].every(value => typeof value === 'function')) {
+    resolveGitPathState, resolveDurableClaim, isCommitAncestor].every(value => typeof value === 'function')) {
     return { accepted: false, blockers: ['intake.gitResolversRequired'] };
   }
   let jsonIdentity = null;
@@ -117,6 +118,7 @@ function evaluateFrozenSelfReviewDecision({
       resolveParentCommit,
       resolveDiffPaths,
       resolveGitPathState,
+      resolveDurableClaim,
       isCommitAncestor
     });
     if (!decisionEvaluation.accepted) {
