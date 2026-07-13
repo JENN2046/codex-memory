@@ -128,7 +128,9 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters.completionAuditPatchApplications');
   for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
-  for (const field of ['productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed']) if (payload.nonClaims?.[field] !== false) blockers.push(`receipt.nonClaims.${field}`);
+  const nonClaimFields = ['productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed'];
+  if (JSON.stringify(Object.keys(payload.nonClaims || {}).sort()) !== JSON.stringify([...nonClaimFields].sort())) blockers.push('receipt.nonClaims.fields');
+  for (const field of nonClaimFields) if (payload.nonClaims?.[field] !== false) blockers.push(`receipt.nonClaims.${field}`);
   return { accepted: blockers.length === 0, blockers: [...new Set(blockers)], applicationReceiptAccepted: blockers.length === 0, phase8Completed: blockers.length === 0, fullPlanPackCompleted: false, readinessClaimed: false, additionalNativeActionAuthorized: false };
 }
 

@@ -7,6 +7,23 @@ function sha256(value) {
   return crypto.createHash('sha256').update(String(value || '')).digest('hex');
 }
 
+function canonicalize(value) {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonicalize(value[key])]));
+}
+
+function scopeFingerprint(scope = {}) {
+  const allowedFields = ['client_id', 'project_id', 'scope_id', 'visibility', 'workspace_id'];
+  const source = Object.fromEntries(
+    Object.keys(scope)
+      .filter(field => allowedFields.includes(field))
+      .sort()
+      .map(field => [field, scope[field]])
+  );
+  return Object.keys(source).length > 0 ? sha256(JSON.stringify(canonicalize(source))) : null;
+}
+
 async function verifyCm2096TombstoneExecution({ registry, claimId, receiptId, decisionReference, claimBindingHash, runtimeTargetReferenceName, scope, expectedScopeFingerprint, postStoreProjection, callAuditMemory } = {}) {
   if (!registry || typeof callAuditMemory !== 'function' || postStoreProjection?.accepted !== true || postStoreProjection?.stage !== 'post_rollback') {
     return { accepted: false, reasonCode: 'cm2096_verify_configuration_or_store_projection_missing' };
@@ -17,6 +34,9 @@ async function verifyCm2096TombstoneExecution({ registry, claimId, receiptId, de
       claim.bindingHash !== claimBindingHash ||
       claim.receiptIdHash !== sha256(receiptId)) {
     return { accepted: false, reasonCode: 'cm2096_verify_claim_binding_invalid' };
+  }
+  if (expectedScopeFingerprint !== scopeFingerprint(scope)) {
+    return { accepted: false, reasonCode: 'cm2096_verify_scope_fingerprint_invalid' };
   }
   const report = await callAuditMemory({
     audit_family: 'governance',
@@ -88,4 +108,4 @@ async function verifyCm2096TombstoneExecution({ registry, claimId, receiptId, de
   };
 }
 
-module.exports = { verifyCm2096TombstoneExecution };
+module.exports = { scopeFingerprint, verifyCm2096TombstoneExecution };

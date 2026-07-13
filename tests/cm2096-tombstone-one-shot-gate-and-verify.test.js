@@ -297,7 +297,7 @@ test('CM-2096 verify accepts only the exact write receipt and then derives tombs
     claimBindingHash: claimed.bindingHash,
     runtimeTargetReferenceName: binding.runtimeTarget.targetReferenceName,
     scope: binding.allowedScope,
-    expectedScopeFingerprint: '8'.repeat(64),
+    expectedScopeFingerprint: sha256Canonical(binding.allowedScope),
     postStoreProjection: postStoreProjection(binding),
     callAuditMemory: async input => {
       calls += 1;
@@ -340,7 +340,7 @@ test('CM-2096 verify rejects receipt, decision, claim, target, or raw-output dri
         claimBindingHash: claimed.bindingHash,
         runtimeTargetReferenceName: binding.runtimeTarget.targetReferenceName,
         scope: binding.allowedScope,
-        expectedScopeFingerprint: '8'.repeat(64),
+        expectedScopeFingerprint: sha256Canonical(binding.allowedScope),
         postStoreProjection: postStoreProjection(binding),
         callAuditMemory: async () => report
       });
@@ -365,11 +365,35 @@ test('CM-2096 verify rejects a receipt argument not bound to the registry claim 
     claimBindingHash: claimed.bindingHash,
     runtimeTargetReferenceName: binding.runtimeTarget.targetReferenceName,
     scope: binding.allowedScope,
-    expectedScopeFingerprint: '8'.repeat(64),
+    expectedScopeFingerprint: sha256Canonical(binding.allowedScope),
     postStoreProjection: postStoreProjection(binding),
     callAuditMemory: async () => { called = true; return {}; }
   });
   assert.equal(result.reasonCode, 'cm2096_verify_claim_binding_invalid');
+  assert.equal(called, false);
+});
+
+test('CM-2096 verify rejects a valid-looking fingerprint not derived from the exact scope', async () => {
+  const binding = expectedBinding();
+  const decision = intakeDecision(binding);
+  const registry = await newRegistry();
+  const gate = createCm2096TombstoneOneShotGate({ registry, expectedBinding: binding, now: () => new Date('2026-07-11T00:00:00.000Z') });
+  const claimed = await gate.claim({ decision, preStoreProjection: preStoreProjection(binding) });
+  assert.equal((await gate.verifyAssertion(claimed.assertion)).accepted, true);
+  let called = false;
+  const result = await verifyCm2096TombstoneExecution({
+    registry,
+    claimId: claimed.claimId,
+    receiptId: binding.receiptId,
+    decisionReference: decision.decisionReference,
+    claimBindingHash: claimed.bindingHash,
+    runtimeTargetReferenceName: binding.runtimeTarget.targetReferenceName,
+    scope: binding.allowedScope,
+    expectedScopeFingerprint: '8'.repeat(64),
+    postStoreProjection: postStoreProjection(binding),
+    callAuditMemory: async () => { called = true; return {}; }
+  });
+  assert.equal(result.reasonCode, 'cm2096_verify_scope_fingerprint_invalid');
   assert.equal(called, false);
 });
 
