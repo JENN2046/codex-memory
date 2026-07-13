@@ -140,6 +140,42 @@ test('no-token HTTP search_memory response must not include snippet/text/content
   });
 });
 
+test('no-token HTTP prepare_memory_context returns 403 when bearer authentication is configured', async () => {
+  const bearerToken = 'test-token-12345';
+  await withHttpServer(async ({ app, address }) => {
+    let searchCalled = false;
+    app.services.passiveRecallService.search = async () => {
+      searchCalled = true;
+      return [];
+    };
+
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 12,
+        method: 'tools/call',
+        params: {
+          name: 'prepare_memory_context',
+          arguments: {
+            task: {
+              title: 'No-token context request',
+              user_request: 'This request must not reach recall.'
+            }
+          }
+        }
+      })
+    });
+    const payload = await response.json();
+
+    assert.equal(response.status, 403);
+    assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+    assert.equal(searchCalled, false);
+    assert.doesNotMatch(JSON.stringify(payload), /bearer|token|raw|lifecycle|mutation|provider|api|client/i);
+  }, { bearerToken });
+});
+
 test('no-token HTTP record_memory returns 403 Forbidden', async () => {
   await withHttpServer(async ({ address }) => {
     const response = await fetch(address.url, {
