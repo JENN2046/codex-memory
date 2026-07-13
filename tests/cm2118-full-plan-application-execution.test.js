@@ -320,7 +320,8 @@ test('final release is inactive before approvedAt and after expiry', () => {
   }).accepted, false);
 });
 
-test('one-shot registry uses fixed root identity, atomic claim, and rejects serial replay/binding drift', async () => {
+test('one-shot registry uses fixed root identity, atomic claim, and rejects serial replay/binding drift', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: decisionTime(fixture.finalReleaseEvidence.decision) });
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-registry-'));
   fs.writeFileSync(
     path.join(root, '.phase8-registry-root-identity.json'),
