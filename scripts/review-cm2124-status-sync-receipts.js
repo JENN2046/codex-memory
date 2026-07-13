@@ -4,7 +4,9 @@
 const fs = require('node:fs');
 
 const {
+  BINDING_RECEIPT_FILENAME,
   CONTENT_DECISION_FREEZE,
+  EXECUTION_RECEIPT_FILENAME,
   FUTURE_BRANCH_REF,
   Cm2122StatusSyncClaimRegistry,
   assertSafeGitEnvironment,
@@ -30,7 +32,9 @@ const {
   FINAL_RELEASE_COMMIT,
   OUTPUTS,
   PACKET_COMMIT,
-  claimBoundReviewTime
+  claimBoundReviewTime,
+  receiptIdentity,
+  renderMarkdown: renderFreezeMarkdown
 } = require('./freeze-cm2124-status-sync-receipts');
 const {
   gitText
@@ -76,6 +80,81 @@ function renderMarkdown(review, jsonText) {
   ].join('\n');
 }
 
+function buildExpectedFreezePayload({
+  implementationCommit,
+  implementationTree,
+  executionIdentity,
+  executionReceipt,
+  bindingIdentity,
+  bindingReceipt,
+  claim
+}) {
+  return {
+    freezeReference: 'CM-2124-STATUS-SYNC-RECEIPT-FREEZE-EB016872-8D3AEFD3-5CE9D65A',
+    freezeImplementationCommit: implementationCommit,
+    freezeImplementationTree: implementationTree,
+    freezeImplementationBase: DETACHED_STATUS_COMMIT,
+    freezeImplementationDiffPaths: [
+      'scripts/freeze-cm2124-status-sync-receipts.js',
+      'scripts/review-cm2124-status-sync-receipts.js'
+    ],
+    contentDecisionCommit: CONTENT_DECISION_FREEZE.commit,
+    executionPacketCommit: PACKET_COMMIT,
+    finalReleaseCommit: FINAL_RELEASE_COMMIT,
+    detachedStatusCommit: DETACHED_STATUS_COMMIT,
+    detachedStatusTree: DETACHED_STATUS_TREE,
+    detachedStatusParent: FINAL_RELEASE_COMMIT,
+    targetBranchRef: FUTURE_BRANCH_REF,
+    targetBranchObservedOid: FINAL_RELEASE_COMMIT,
+    executionReceipt: receiptIdentity(OUTPUTS.execution, EXECUTION_RECEIPT_FILENAME, {
+      bytes: executionIdentity.content,
+      receipt: executionReceipt
+    }),
+    bindingReceipt: receiptIdentity(OUTPUTS.binding, BINDING_RECEIPT_FILENAME, {
+      bytes: bindingIdentity.content,
+      receipt: bindingReceipt
+    }),
+    claim: {
+      claimId: claim.claimId,
+      bindingHash: claim.bindingHash,
+      finalState: claim.state,
+      authorizationUseCount: claim.authorizationUseCount,
+      authorizationConsumed: claim.authorizationConsumed,
+      authorizationReplayAllowed: claim.authorizationReplayAllowed,
+      detachedCommitInvocationCount: claim.detachedCommitInvocationCount,
+      branchRefUpdateCount: claim.branchRefUpdateCount
+    },
+    verification: {
+      executionReceiptAccepted: true,
+      bindingReceiptAccepted: true,
+      durableDetachedBindingAccepted: true,
+      exactNineModifiedPaths: true
+    },
+    currentState: {
+      detachedStatusCommitBound: true,
+      branchRefUpdated: false,
+      statusSyncPerformed: false,
+      currentBranchStatusSynchronized: false,
+      readinessClaimed: false,
+      remoteActions: 0,
+      nativeReads: 0,
+      nativeWrites: 0,
+      providerCalls: 0,
+      realMemoryReads: 0
+    }
+  };
+}
+
+function assertExactFreezeManifest(manifest, expectedPayload, markdownIdentity) {
+  if (!sameJson(manifest.payload, expectedPayload)) throw new Error('cm2124_manifest_projection_rejected');
+  const expectedMarkdown = Buffer.from(renderFreezeMarkdown(manifest, serializeArtifact(manifest)), 'utf8');
+  if (!markdownIdentity || markdownIdentity.gitObjectType !== 'blob' ||
+      markdownIdentity.gitMode !== '100644' || !Buffer.isBuffer(markdownIdentity.content) ||
+      !markdownIdentity.content.equals(expectedMarkdown)) {
+    throw new Error('cm2124_freeze_markdown_mirror_rejected');
+  }
+}
+
 async function buildReview() {
   assertSafeGitEnvironment();
   assertCm2124ReviewCleanWorktree();
@@ -85,6 +164,7 @@ async function buildReview() {
   const freezeCommit = gitText(['rev-parse', 'HEAD^{commit}']);
   const freezeTree = options.resolveCommitTree(freezeCommit);
   const implementationCommit = options.resolveParentCommit(freezeCommit);
+  const implementationTree = options.resolveCommitTree(implementationCommit);
   const paths = options.resolveDiffPaths(implementationCommit, freezeCommit).sort();
   const entries = options.resolveDiffEntries(implementationCommit, freezeCommit)
     .sort((left, right) => left.path.localeCompare(right.path));
@@ -103,6 +183,7 @@ async function buildReview() {
   }
   const executionIdentity = options.resolveGitFile(freezeCommit, OUTPUTS.execution);
   const bindingIdentity = options.resolveGitFile(freezeCommit, OUTPUTS.binding);
+  const markdownIdentity = options.resolveGitFile(freezeCommit, OUTPUTS.markdown);
   for (const [identity, expected] of [
     [executionIdentity, manifest.payload.executionReceipt],
     [bindingIdentity, manifest.payload.bindingReceipt]
@@ -155,6 +236,24 @@ async function buildReview() {
       gitText(['show-ref', '--hash', '--verify', FUTURE_BRANCH_REF]) !== FINAL_RELEASE_COMMIT) {
     throw new Error('cm2124_independent_replay_rejected');
   }
+  const implementationBase = gitText(['merge-base', DETACHED_STATUS_COMMIT, implementationCommit]);
+  const implementationDiffPaths = gitText([
+    'diff', '--name-only', DETACHED_STATUS_COMMIT, implementationCommit
+  ]).split('\n').filter(Boolean).sort();
+  const expectedPayload = buildExpectedFreezePayload({
+    implementationCommit,
+    implementationTree,
+    executionIdentity,
+    executionReceipt,
+    bindingIdentity,
+    bindingReceipt,
+    claim
+  });
+  if (implementationBase !== DETACHED_STATUS_COMMIT ||
+      !sameJson(implementationDiffPaths, expectedPayload.freezeImplementationDiffPaths)) {
+    throw new Error('cm2124_freeze_implementation_lineage_rejected');
+  }
+  assertExactFreezeManifest(manifest, expectedPayload, markdownIdentity);
   const payload = {
     reviewReference: `CM-2124-RECEIPT-REVIEW-PASS-${executionIdentity.sha256.slice(0, 8)}-${bindingIdentity.sha256.slice(0, 8)}`.toUpperCase(),
     freezeCommit,
@@ -242,6 +341,8 @@ module.exports = {
   REVIEW_MARKDOWN_PATH,
   REVIEW_PATH,
   assertCm2124ReviewCleanWorktree,
+  assertExactFreezeManifest,
+  buildExpectedFreezePayload,
   buildReview,
   main,
   parseArgs,
