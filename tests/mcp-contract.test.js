@@ -720,6 +720,43 @@ test('codex-memory MCP defaults to read-only plus proposal-only public surface',
   });
 });
 
+test('prepare_memory_context uses metadata-only recall and excludes raw candidate fields', async () => {
+  await withApp(async ({ app }) => {
+    let searchOptions = null;
+    app.services.passiveRecallService.search = async options => {
+      searchOptions = options;
+      return [{
+        target: 'process',
+        score: 0.9,
+        title: 'private raw title must not escape',
+        snippet: 'private raw snippet must not escape',
+        text: 'private raw text must not escape',
+        content: 'private raw content must not escape',
+        sourceFile: 'private/source.md',
+        memoryId: 'private-memory-id'
+      }];
+    };
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Metadata-only context package',
+        user_request: 'Use bounded recall without raw memory fields.'
+      },
+      options: {
+        max_items: 2,
+        max_bytes: 6000
+      }
+    });
+    const serialized = JSON.stringify(result);
+
+    assert.equal(searchOptions.readOnly, true);
+    assert.equal(searchOptions.noRawContentRead, true);
+    assert.equal(searchOptions.includeContent, false);
+    assert.equal(result.access.rawMemoryReturned, false);
+    assert.doesNotMatch(serialized, /private raw title|private raw snippet|private raw text|private raw content|private\/source|private-memory-id/);
+  });
+});
+
 test('hardened MCP surface ignores explicit public tool names defensively', async () => {
   const config = {
     securityProfile: 'hardened',

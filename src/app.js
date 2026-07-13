@@ -317,7 +317,10 @@ function normalizeInternalPrecisionPolicyContext(requestContext = {}) {
 
 function normalizeInternalNoRawContentRead(requestContext = {}) {
   const executionContext = requestContext.executionContext || {};
-  if (requestContext.authenticatedBoundedSearch === true) {
+  if (
+    requestContext.authenticatedBoundedSearch === true
+    || requestContext.memoryContextPackageReadOnly === true
+  ) {
     return true;
   }
   if (!Object.prototype.hasOwnProperty.call(executionContext, 'noRawContentRead')) {
@@ -2440,10 +2443,12 @@ function createCodexMemoryApplication(overrides = {}) {
   async function executeSearchMemory(args = {}, requestContext = {}, { signal = null } = {}) {
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const authenticatedBoundedSearch = isAuthenticatedBoundedSearchRequest(requestContext);
-    if (authenticatedBoundedSearch && args.include_content === true) {
-      return buildAuthenticatedBoundedSearchRejected('authenticated bounded search does not allow include_content=true.');
+    const metadataOnlyBoundedSearch = authenticatedBoundedSearch
+      || requestContext.memoryContextPackageReadOnly === true;
+    if (metadataOnlyBoundedSearch && args.include_content === true) {
+      return buildAuthenticatedBoundedSearchRejected('metadata-only bounded search does not allow include_content=true.');
     }
-    const readOnly = requestContext.noTokenReadOnly === true || authenticatedBoundedSearch;
+    const readOnly = requestContext.noTokenReadOnly === true || metadataOnlyBoundedSearch;
     const precisionPolicyContext = normalizeInternalPrecisionPolicyContext(requestContext)
       || buildAuthenticatedBoundedSearchPrecisionPolicyContext(args, requestContext);
     const noRawContentRead = normalizeInternalNoRawContentRead(requestContext);
@@ -2507,7 +2512,7 @@ function createCodexMemoryApplication(overrides = {}) {
         policyAudit
       });
     }
-    if (authenticatedBoundedSearch) {
+    if (metadataOnlyBoundedSearch) {
       return projectAuthenticatedBoundedSearchResponse(policyFiltered);
     }
     return { results: policyFiltered };
