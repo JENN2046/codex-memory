@@ -44,7 +44,7 @@ function exactKeys(value, keys) {
     JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...keys].sort());
 }
 
-function decisionAccepted(decision) {
+function decisionAccepted(decision, now = new Date()) {
   const keys = [
     'action', 'approvedAt', 'authorizationReplayAllowed', 'authorizationUseCount',
     'bootstrapAuthorized', 'decisionReference', 'expiresAt', 'governanceRootIdentitySha256',
@@ -55,13 +55,17 @@ function decisionAccepted(decision) {
   const nonClaimKeys = [
     'nativeWritePerformed', 'phase8Completed', 'readinessClaimed', 'recordMemoryCalled'
   ];
+  const nowMs = new Date(now).getTime();
+  const approvedAt = Date.parse(decision?.approvedAt || '');
+  const expiresAt = Date.parse(decision?.expiresAt || '');
   return exactKeys(decision, keys) &&
     exactKeys(decision.nonClaims, nonClaimKeys) &&
     decision.schemaVersion === 1 && decision.taskId === 'CM-2113' &&
     decision.action === 'initialize_vcptoolbox_owner_runtime_and_synthetic_store' &&
     decision.bootstrapAuthorized === true && decision.nativeMemoryAuthorized === false &&
     decision.authorizationUseCount === 1 && decision.authorizationReplayAllowed === false &&
-    Date.parse(decision.expiresAt) > Date.now() &&
+    Number.isFinite(nowMs) && Number.isFinite(approvedAt) && Number.isFinite(expiresAt) &&
+    approvedAt <= nowMs && nowMs < expiresAt && approvedAt < expiresAt &&
     decision.nonClaims?.nativeWritePerformed === false &&
     decision.nonClaims?.recordMemoryCalled === false &&
     decision.nonClaims?.phase8Completed === false &&

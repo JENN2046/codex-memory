@@ -197,7 +197,12 @@ function createCm2113VcpToolBoxOwnerNativeProofGate({ registry, expected, now = 
     if (!releaseGitIdentity) blockers.push('releaseDecision.machineIntake');
     if (!exactObject(releaseDecision?.contentDecisionGitIdentity, contentGitIdentity)) blockers.push('releaseDecision.contentBinding');
     if (!exactObject(releaseDecision?.executionPacketGitIdentity, expected.executionPacketGitIdentity)) blockers.push('releaseDecision.packetBinding');
-    if (!releaseDecision?.expiresAt || Date.parse(releaseDecision.expiresAt) <= now().getTime()) blockers.push('releaseDecision.expired');
+    const nowMs = now().getTime();
+    const approvedAt = Date.parse(releaseDecision?.approvedAt || '');
+    const expiresAt = Date.parse(releaseDecision?.expiresAt || '');
+    if (!Number.isFinite(approvedAt) || approvedAt > nowMs) blockers.push('releaseDecision.notYetApproved');
+    if (!Number.isFinite(expiresAt) || expiresAt <= nowMs) blockers.push('releaseDecision.expired');
+    if (Number.isFinite(approvedAt) && Number.isFinite(expiresAt) && expiresAt <= approvedAt) blockers.push('releaseDecision.approvalWindow');
     if (blockers.length) return failure('UNCLAIMED', blockers, 0, 0);
 
     const bindingHash = sha256Canonical({
