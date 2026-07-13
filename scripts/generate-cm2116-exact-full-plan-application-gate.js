@@ -22,6 +22,7 @@ const {
   resolveParentCommit
 } = require('./cm2115-r2-git');
 const { isCommitAncestor } = require('./generate-cm2115-r2-self-review-decision');
+const { assertSafeGitEnvironment } = require('../src/core/Cm2118FullPlanApplicationExecution');
 
 function parseArgs(argv) {
   if (argv.length === 0) return { jsonSummary: false };
@@ -42,6 +43,7 @@ function resolveDiffEntries(parentCommit, commit) {
 }
 
 function resolverOptions() {
+  assertSafeGitEnvironment();
   return {
     resolveGitFile,
     resolveCommitTree,
