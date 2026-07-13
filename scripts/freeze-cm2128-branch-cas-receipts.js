@@ -123,7 +123,8 @@ function assertLowDisclosure(value) {
     }
     if (typeof current !== 'string') continue;
     const normalizedPath = current.replace(/\\/g, '/');
-    if (/^(?:[A-Za-z]:\/|\/)/.test(normalizedPath) ||
+    if (/^(?:file:|~\/)/i.test(normalizedPath) ||
+        /^(?:[A-Za-z]:\/|\/)/.test(normalizedPath) ||
         /(?:^|\/)\.\.(?:\/|$)|(?:^|\/)\.git(?:\/|$)/.test(normalizedPath) ||
         /(?:^|\/)(?:\.env(?:\.[^/]*)?|data|logs|\.colameta|\.omc|\.claude|\.tmp)(?:\/|$)/.test(normalizedPath) ||
         /(?:BEGIN (?:RSA|OPENSSH|PRIVATE)|Bearer\s+[A-Za-z0-9._-]{20,}|sk-[A-Za-z0-9_-]{20,})/.test(current)) {
