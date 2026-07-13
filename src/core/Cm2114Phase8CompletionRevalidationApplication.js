@@ -37,6 +37,12 @@ const BASELINE = Object.freeze({
   completionAuditBlobOid: '75d7fa92889c09e01afd5042c1074ddda608e551',
   traceMatrixBlobOid: '6ad7ac9453039be795b4be8318818cc53f13e00c'
 });
+const DECISION_FIELDS = Object.freeze([
+  'schemaVersion', 'taskId', 'decisionReference', 'completionAuditReapplicationAuthorized',
+  'evidenceBundleGitIdentity', 'newProofReceiptGitIdentity', 'requiredEvidencePatch',
+  'allowedCompletionResult', 'applicationAuthorization', 'applicationSideEffectLimits',
+  'nonClaims'
+]);
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -90,6 +96,7 @@ function evaluateBundle(bundle = {}, proofReceipt = {}) {
 
 function evaluateDecision(decision = {}) {
   const blockers = [];
+  if (!hasExactKeys(decision, DECISION_FIELDS)) blockers.push('decision.fields');
   if (decision.schemaVersion !== 1 || decision.taskId !== 'CM-2114' || decision.decisionReference !== DECISION.reference || decision.completionAuditReapplicationAuthorized !== true) blockers.push('decision.authority');
   if (decision.evidenceBundleGitIdentity?.sourceCommit !== BUNDLE.commit || decision.evidenceBundleGitIdentity?.blobOid !== BUNDLE.blobOid || decision.evidenceBundleGitIdentity?.bytes !== BUNDLE.bytes || decision.evidenceBundleGitIdentity?.sha256 !== BUNDLE.rawSha256 || decision.evidenceBundleGitIdentity?.payloadSha256 !== BUNDLE.payloadSha256) blockers.push('decision.evidenceBundle');
   if (decision.newProofReceiptGitIdentity?.sourceCommit !== PROOF.commit || decision.newProofReceiptGitIdentity?.blobOid !== PROOF.blobOid || decision.newProofReceiptGitIdentity?.bytes !== PROOF.bytes || decision.newProofReceiptGitIdentity?.sha256 !== PROOF.rawSha256) blockers.push('decision.newProofReceipt');

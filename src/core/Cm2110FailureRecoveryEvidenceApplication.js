@@ -120,6 +120,17 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.sourceFailureRecoveryReceipt?.commit !== SOURCE_RECEIPT.commit || payload.sourceFailureRecoveryReceipt?.blobOid !== SOURCE_RECEIPT.blobOid || payload.sourceFailureRecoveryReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 || payload.sourceFailureRecoveryReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 || payload.sourceFailureRecoveryReceipt?.acceptedAsFailureRecoveryEvidence !== true) blockers.push('receipt.sourceFailureRecoveryReceipt');
+  if (!hasExactKeys(payload.applicationRuntime, [
+    'commit', 'tree', 'cleanBeforeApplication',
+    'completionAuditBaselineBlobOid', 'traceMatrixBaselineBlobOid'
+  ])) blockers.push('receipt.applicationRuntime.fields');
+  if (!/^[a-f0-9]{40}$/.test(payload.applicationRuntime?.commit || '') ||
+      !/^[a-f0-9]{40}$/.test(payload.applicationRuntime?.tree || '') ||
+      payload.applicationRuntime?.cleanBeforeApplication !== true ||
+      payload.applicationRuntime?.completionAuditBaselineBlobOid !== BASELINE.completionAuditBlobOid ||
+      payload.applicationRuntime?.traceMatrixBaselineBlobOid !== BASELINE.traceMatrixBlobOid) {
+    blockers.push('receipt.applicationRuntime');
+  }
   const appliedEvidence = expectedPatch();
   if (!hasExactKeys(payload.appliedEvidence, Object.keys(appliedEvidence))) blockers.push('receipt.appliedEvidence.fields');
   for (const [field, expected] of Object.entries(appliedEvidence)) if (payload.appliedEvidence?.[field] !== expected) blockers.push(`receipt.appliedEvidence.${field}`);
