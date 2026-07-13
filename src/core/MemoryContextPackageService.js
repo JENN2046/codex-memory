@@ -286,6 +286,47 @@ function enforceNoForbiddenOutputKeys(value, path = []) {
   }
 }
 
+function buildMinimalBoundedResponse(result) {
+  const fallbackUsed = result?.access?.localMemoryFallbackUsed === true;
+  return {
+    status: 'PREPARE_MEMORY_CONTEXT_ACCEPTED',
+    accepted: true,
+    memory_context_package: {
+      must_know: [],
+      recent_decisions: [],
+      current_state: [],
+      blockers: [],
+      risks: [],
+      forbidden_assumptions: [],
+      recommended_next_step: 'Memory context omitted to fit the response budget; inspect repository evidence.',
+      source_breakdown: {
+        search_result_count: 0,
+        fallback_used: fallbackUsed,
+        vcp_toolbox_native_memory_owner: true
+      },
+      audit_receipt: null
+    },
+    access: {
+      mode: 'prepare_memory_context_readonly',
+      selectedProjection: true,
+      readOnly: true,
+      lowDisclosure: true,
+      durableMutationPerformed: false,
+      productionWritePerformed: false,
+      rawMemoryReturned: false,
+      rawAuditReturned: false,
+      readinessClaimed: false,
+      localMemoryFallbackUsed: fallbackUsed,
+      resultCanBeMistakenForVcpNative: false
+    },
+    compression: { applied: true, mode: 'minimal_bounded_envelope' },
+    nonClaims: {
+      productionReadiness: false,
+      productionWriteReady: false
+    }
+  };
+}
+
 function enforceMaxBytes(result, maxBytes) {
   let current = JSON.stringify(result);
   if (Buffer.byteLength(current, 'utf8') <= maxBytes) return result;
@@ -349,22 +390,7 @@ function enforceMaxBytes(result, maxBytes) {
     }
   }
   if (Buffer.byteLength(JSON.stringify(result), 'utf8') > maxBytes) {
-    result.access = {
-      mode: 'prepare_memory_context_readonly',
-      selectedProjection: true,
-      readOnly: true,
-      lowDisclosure: true,
-      durableMutationPerformed: false,
-      productionWritePerformed: false,
-      rawMemoryReturned: false,
-      rawAuditReturned: false,
-      providerPayloadReturned: false,
-      memoryIdsReturned: false,
-      tokenMaterialReturned: false,
-      readinessClaimed: false,
-      localMemoryFallbackUsed: result.access.localMemoryFallbackUsed === true,
-      resultCanBeMistakenForVcpNative: false
-    };
+    return buildMinimalBoundedResponse(result);
   }
   result.compression = { applied: true, mode: 'statement_trim_and_bucket_prune' };
   return result;
