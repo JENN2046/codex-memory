@@ -840,6 +840,10 @@ class Cm2118FullPlanApplicationClaimRegistry {
         ![true, false, null].includes(value.applicationCommitCreated) ||
         ![true, false, null].includes(value.executionReceiptCreated) ||
         ![true, false, null].includes(value.bindingReceiptCreated) ||
+        !(value.applicationCommit === null || /^[a-f0-9]{40}$/.test(value.applicationCommit || '')) ||
+        !(value.applicationTree === null || /^[a-f0-9]{40}$/.test(value.applicationTree || '')) ||
+        !(value.executionReceiptSha256 === null || /^[a-f0-9]{64}$/.test(value.executionReceiptSha256 || '')) ||
+        !(value.bindingReceiptSha256 === null || /^[a-f0-9]{64}$/.test(value.bindingReceiptSha256 || '')) ||
         typeof value.reconciliationRequired !== 'boolean' ||
         (bindingHash !== null && value.bindingHash !== bindingHash) ||
         (value.state === 'APPLICATION_COMMIT_INVOCATION_CONSUMED' &&
@@ -1519,10 +1523,13 @@ async function executeFullPlanApplicationFromCommits({
 
   let currentState = 'UNCLAIMED';
   let applicationCommitKnown = false;
+  let applicationIdentity = null;
   let executionReceiptWriteAttempted = false;
   let executionReceiptKnown = false;
+  let executionReceiptIdentity = null;
   let bindingReceiptWriteAttempted = false;
   let bindingReceiptKnown = false;
+  let bindingReceiptIdentity = null;
   try {
     const claimTime = new Date();
     packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
@@ -1538,6 +1545,7 @@ async function executeFullPlanApplicationFromCommits({
     const claimedAt = claimEnvelope.claimedAt;
     currentState = 'APPLICATION_COMMIT_INVOCATION_CONSUMED';
     const application = createExactApplicationCommitWithGitPlumbing({ repositoryRoot, repoRoot: repositoryRoot, packetEvidence, governanceRoot });
+    applicationIdentity = { commit: application.commit, tree: application.tree };
     applicationCommitKnown = true;
     claimEnvelope = await registry.transition(
       bindingHash,
@@ -1567,8 +1575,9 @@ async function executeFullPlanApplicationFromCommits({
     });
     const executionEvaluation = evaluateExecutionReceipt(executionReceipt, { packetEvidence, finalReleaseEvidence });
     if (!executionEvaluation.accepted) throw new Error(`cm2118_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
+    executionReceiptIdentity = { sha256: sha256(serializeArtifact(executionReceipt)) };
     executionReceiptWriteAttempted = true;
-    const executionReceiptIdentity = await writeExternalReceipt(governanceRoot, EXECUTION_RECEIPT_FILENAME, executionReceipt);
+    executionReceiptIdentity = await writeExternalReceipt(governanceRoot, EXECUTION_RECEIPT_FILENAME, executionReceipt);
     executionReceiptKnown = true;
     claimEnvelope = await registry.transition(bindingHash, currentState, 'EXECUTION_RECEIPT_WRITTEN', {
       executionReceiptCreated: true,
@@ -1591,8 +1600,9 @@ async function executeFullPlanApplicationFromCommits({
       ...options
     });
     if (!bindingEvaluation.accepted) throw new Error(`cm2118_binding_receipt_rejected:${bindingEvaluation.blockers.join(',')}`);
+    bindingReceiptIdentity = { sha256: sha256(serializeArtifact(bindingReceipt)) };
     bindingReceiptWriteAttempted = true;
-    const bindingReceiptIdentity = await writeExternalReceipt(governanceRoot, BINDING_RECEIPT_FILENAME, bindingReceipt);
+    bindingReceiptIdentity = await writeExternalReceipt(governanceRoot, BINDING_RECEIPT_FILENAME, bindingReceipt);
     bindingReceiptKnown = true;
     claimEnvelope = await registry.transition(bindingHash, currentState, 'BINDING_RECEIPT_WRITTEN', {
       bindingReceiptCreated: true,
@@ -1626,8 +1636,12 @@ async function executeFullPlanApplicationFromCommits({
     if (currentState !== 'UNCLAIMED' && currentState !== 'CONSUMED_SUCCESS') {
       await registry.transition(bindingHash, currentState, 'CONSUMED_AMBIGUOUS', {
         applicationCommitCreated: applicationCommitKnown ? true : null,
+        applicationCommit: applicationIdentity?.commit || null,
+        applicationTree: applicationIdentity?.tree || null,
         executionReceiptCreated: executionReceiptKnown ? true : (executionReceiptWriteAttempted ? null : false),
-        bindingReceiptCreated: bindingReceiptKnown ? true : (bindingReceiptWriteAttempted ? null : false)
+        executionReceiptSha256: executionReceiptIdentity?.sha256 || null,
+        bindingReceiptCreated: bindingReceiptKnown ? true : (bindingReceiptWriteAttempted ? null : false),
+        bindingReceiptSha256: bindingReceiptIdentity?.sha256 || null
       }).catch(() => {});
     }
     throw error;
