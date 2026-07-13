@@ -114,12 +114,14 @@ function evaluateDefaultRuntimePolicyObservationGate({
   const requestedDefaultTools = sortedUnique(policy.requestedDefaultTools);
   const defaultMissingTools = DEFAULT_RUNTIME_ALLOWED_TOOLS
     .filter(toolName => !toolNames.includes(toolName));
-  const defaultForbiddenTools = DEFAULT_RUNTIME_FORBIDDEN_TOOLS
-    .filter(toolName => toolNames.includes(toolName));
+  const unexpectedDefaultTools = toolNames
+    .filter(toolName => !DEFAULT_RUNTIME_ALLOWED_TOOLS.includes(toolName));
+  const defaultForbiddenTools = [...unexpectedDefaultTools];
   const requestedForbiddenTools = DEFAULT_RUNTIME_FORBIDDEN_TOOLS
     .filter(toolName => requestedDefaultTools.includes(toolName));
   const expansionRequested = policy.expansionRequested === true ||
-    requestedDefaultTools.some(toolName => !DEFAULT_RUNTIME_ALLOWED_TOOLS.includes(toolName));
+    requestedDefaultTools.some(toolName => !DEFAULT_RUNTIME_ALLOWED_TOOLS.includes(toolName)) ||
+    unexpectedDefaultTools.length > 0;
 
   const forbiddenInputPaths = sortedUnique([
     ...collectForbiddenInputPaths(policy, ['policy']),
@@ -182,6 +184,7 @@ function evaluateDefaultRuntimePolicyObservationGate({
       defaultRuntimeAllowedTools: [...DEFAULT_RUNTIME_ALLOWED_TOOLS],
       defaultRuntimeForbiddenTools: [...DEFAULT_RUNTIME_FORBIDDEN_TOOLS],
       missingDefaultTools: defaultMissingTools,
+      unexpectedDefaultTools,
       forbiddenDefaultTools: defaultForbiddenTools,
       commitMemoryDeltaPublicRegistered: toolNames.includes(COMMIT_MEMORY_DELTA_TOOL)
     },

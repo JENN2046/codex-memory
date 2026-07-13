@@ -224,6 +224,33 @@ test('CM2035 rejects raw secret private commit fields by path without echoing va
   assert.equal(serialized.includes('SYNTHETIC_TOKEN_SHOULD_NOT_ECHO'), false);
 });
 
+test('CM2035 redacts sensitive task titles in accepted and rejected preflight output', () => {
+  const service = new MemoryDeltaCommitPreflightService();
+  const rawBearer = ['Bearer', 'SYNTHETIC_PREFLIGHT_BEARER_1234567890'].join(' ');
+  const rawPath = 'C:\\Users\\example\\private\\.env';
+  const task = {
+    title: `authorization: ${rawBearer} at ${rawPath}`,
+    client_id: 'codex',
+    visibility: 'project'
+  };
+  const accepted = service.preflight(validPreflightArgs({ task }));
+  const rejected = service.preflight(validPreflightArgs({
+    task,
+    rawPayload: 'SYNTHETIC_RAW_PREFLIGHT_VALUE'
+  }));
+
+  assert.equal(accepted.accepted, true);
+  assert.equal(rejected.accepted, false);
+  for (const result of [accepted, rejected]) {
+    const serialized = JSON.stringify(result);
+    assert.equal(serialized.includes('SYNTHETIC_PREFLIGHT_BEARER_1234567890'), false);
+    assert.equal(serialized.includes(rawPath), false);
+    assert.match(result.task.title, /<redacted>/);
+    assert.equal(result.low_disclosure, true);
+    assert.equal(result.raw_values_included, false);
+  }
+});
+
 test('CM2035 forbidden key collector reports paths only', () => {
   assert.deepEqual(collectForbiddenKeys({
     nested: [{ responseBody: 'SYNTHETIC_RESPONSE_SHOULD_NOT_ECHO' }],
