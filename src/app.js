@@ -416,6 +416,48 @@ function projectAuthenticatedBoundedSearchResponse(results = []) {
   };
 }
 
+function projectMemoryContextPackageSearchResult(item = {}) {
+  const projectTokens = values => Array.isArray(values)
+    ? [...new Set(values
+      .filter(value => typeof value === 'string')
+      .map(value => value.trim().slice(0, 80))
+      .filter(Boolean))].slice(0, 16)
+    : [];
+  const projectTimestamp = value => {
+    if (typeof value !== 'string') return null;
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? new Date(parsed).toISOString() : null;
+  };
+  return {
+    ...projectBoundedSearchResult(item),
+    matchedTags: projectTokens(item.matchedTags),
+    coreTags: projectTokens(item.coreTags),
+    createdAt: projectTimestamp(item.createdAt),
+    updatedAt: projectTimestamp(item.updatedAt)
+  };
+}
+
+function projectMemoryContextPackageSearchResponse(results = []) {
+  const safeResults = Array.isArray(results)
+    ? results.map(projectMemoryContextPackageSearchResult)
+    : [];
+  return {
+    access: {
+      mode: 'memory_context_package_metadata_search',
+      selectedProjection: true,
+      selectedProjectionVersion: 1,
+      includeContent: false,
+      rawContentReturned: false,
+      pathsReturned: false,
+      memoryIdsReturned: false,
+      titlesReturned: false,
+      snippetsReturned: false
+    },
+    resultCount: safeResults.length,
+    results: safeResults
+  };
+}
+
 function buildAuthenticatedBoundedSearchRejected(reason) {
   return {
     decision: 'rejected',
@@ -2506,7 +2548,10 @@ function createCodexMemoryApplication(overrides = {}) {
         policyAudit
       });
     }
-    if (metadataOnlyBoundedSearch) {
+    if (requestContext.memoryContextPackageReadOnly === true) {
+      return projectMemoryContextPackageSearchResponse(policyFiltered);
+    }
+    if (authenticatedBoundedSearch) {
       return projectAuthenticatedBoundedSearchResponse(policyFiltered);
     }
     return { results: policyFiltered };
