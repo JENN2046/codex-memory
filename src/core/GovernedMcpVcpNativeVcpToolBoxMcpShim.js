@@ -670,8 +670,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       write_shape: 'markdown_dailynote_file',
       raw_path_disclosed: false,
       _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: true,
-        nativeRuntimeInitialized: true,
+        nativeRuntimeCalled: !primaryWriteOnly,
+        nativeRuntimeInitialized: !primaryWriteOnly,
         providerApiCalled: false,
         memoryReadPerformed: false,
         memoryWritePerformed: true,
@@ -704,8 +704,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       mutation_tool: toolName,
       raw_path_disclosed: false,
       _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: true,
-        nativeRuntimeInitialized: true,
+        nativeRuntimeCalled: !primaryWriteOnly,
+        nativeRuntimeInitialized: !primaryWriteOnly,
         providerApiCalled: false,
         memoryReadPerformed: false,
         memoryWritePerformed: true,
