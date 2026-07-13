@@ -16,6 +16,31 @@ function createCm2096TombstoneOneShotGate({ registry, expectedBinding, now = () 
     if (decision?.nonce !== expectedBinding.nonce ||
         decision?.receiptId !== expectedBinding.receiptId ||
         decision?.registryReference !== expectedBinding.registryReference) blockers.push('decision.oneShotBinding');
+    const exactDecisionBinding = {
+      decisionReference: expectedBinding.expectedDecisionReference,
+      executionPacketCommit: expectedBinding.executionPacketCommit,
+      executionPacketBlobOid: expectedBinding.executionPacketBlobOid,
+      executionPacketSha256: expectedBinding.executionPacketSha256,
+      implementationCommit: expectedBinding.implementationCommit,
+      implementationTree: expectedBinding.implementationTree,
+      targetStoreReference: expectedBinding.targetStoreReference,
+      targetStoreIdentitySha256: expectedBinding.targetStoreIdentitySha256,
+      targetMemoryIdRef: expectedBinding.targetMemoryIdRef,
+      targetRecordBytes: expectedBinding.targetRecordBytes,
+      targetRecordSha256: expectedBinding.targetRecordSha256,
+      payloadCanonicalBytes: expectedBinding.payloadCanonicalBytes,
+      payloadCanonicalSha256: expectedBinding.payloadCanonicalSha256,
+      durableMarkerBytes: expectedBinding.durableMarkerBytes,
+      durableMarkerSha256: expectedBinding.durableMarkerSha256,
+      expectedMarkerMemoryIdRef: expectedBinding.expectedMarkerMemoryIdRef,
+      expectedContextHash: expectedBinding.expectedContextHash,
+      expectedAllowlistHash: expectedBinding.expectedAllowlistHash,
+      expectedScopeFingerprint: expectedBinding.expectedScopeFingerprint,
+      registryRootIdentitySha256: expectedBinding.registryRootIdentitySha256
+    };
+    if (Object.entries(exactDecisionBinding).some(([field, expected]) => decision?.[field] !== expected)) {
+      blockers.push('decision.executionBinding');
+    }
     if (preStoreProjection?.accepted !== true ||
         preStoreProjection?.stage !== 'pre_rollback' ||
         preStoreProjection?.markerAbsent !== true ||

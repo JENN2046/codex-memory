@@ -414,7 +414,8 @@ test('CM-2107 rollback receipt fails closed on lifecycle, count, replay, or over
     { providerCalled: true },
     { compensationPerformed: true },
     { rollbackDrillPassed: true },
-    { phase8Completed: true }
+    { phase8Completed: true },
+    { productionReady: true }
   ]) {
     const receipt = { ...source, ...drift };
     const { receiptPayloadSha256, ...payload } = receipt;

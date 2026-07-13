@@ -237,6 +237,8 @@ function evaluateRecordWriteReceipt(receipt) {
     failureRecoveryProofPassed: false,
     phase8Completed: false
   };
+  const exactReceiptFields = [...Object.keys(exact), 'claimId', 'claimBindingHash'].sort();
+  if (JSON.stringify(Object.keys(payload).sort()) !== JSON.stringify(exactReceiptFields)) blockers.push('receipt.fields');
   for (const [field, expected] of Object.entries(exact)) {
     if (receipt[field] !== expected) blockers.push(`receipt.${field}`);
   }

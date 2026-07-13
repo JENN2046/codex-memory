@@ -80,6 +80,7 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
     packet.limits?.retries !== 0 || packet.limits?.rollbackOrCompensation !== 0
   ) blockers.push('limits');
   if (
+    !exactKeys(packet.nonClaims, ['productionReady', 'releaseReady', 'rcReady', 'fullPlanPackCompleted']) ||
     packet.nonClaims?.productionReady !== false || packet.nonClaims?.releaseReady !== false ||
     packet.nonClaims?.rcReady !== false || packet.nonClaims?.fullPlanPackCompleted !== false
   ) blockers.push('nonClaims');
