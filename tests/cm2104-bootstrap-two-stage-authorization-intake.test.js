@@ -120,6 +120,8 @@ test('CM-2104 content intake rejects authority, packet, identity, or expiry drif
     { executionPacketSha256: '0'.repeat(64) },
     { identitySha256: '0'.repeat(64) },
     { maxNativeWrites: 1 },
+    { approvedAt: '2026-07-12T10:00:00.001+08:00' },
+    { approvedAt: expectedContentBinding.expectedExpiresAt },
     { expiresAt: '2026-07-12T09:30:00+08:00' },
     { unexpected: true }
   ];
@@ -161,6 +163,8 @@ test('CM-2104 final release must bind the exact content Git identity before auth
     { bootstrapExecutionAuthorized: false },
     { maxStoreDirectoryCreates: 2 },
     { maxNativeWrites: 1 },
+    { approvedAt: '2026-07-12T12:00:00.001+08:00' },
+    { approvedAt: binding.expectedExpiresAt },
     { expiresAt: '2026-07-12T11:30:00+08:00' }
   ]) {
     const driftFixture = bytesAndBinding({ ...decision, ...drift }, '1', '2');
