@@ -125,6 +125,10 @@ function parseJsonFromNpmOutput(stdout) {
 
 function buildGateCiSafeSummary(gatePayload) {
   const summary = gatePayload?.summary || {};
+  if (!Object.prototype.hasOwnProperty.call(summary, 'unsafeEnvOverrideDetected') ||
+      summary.unsafeEnvOverrideDetected !== false) {
+    throw new Error('cm2115_gate_ci_unsafe_env_override_status_required');
+  }
   const statuses = Object.fromEntries(Object.entries(gatePayload?.checks || {})
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([key, value]) => [key, value?.status || 'missing']));
@@ -134,7 +138,7 @@ function buildGateCiSafeSummary(gatePayload) {
     noNetwork: summary.noNetwork === true,
     noDaemon: summary.noDaemon === true,
     noProvider: summary.noProvider === true,
-    unsafeEnvOverrideDetected: summary.unsafeEnvOverrideDetected === true,
+    unsafeEnvOverrideDetected: false,
     failedCheckCount: Array.isArray(summary.failedChecks) ? summary.failedChecks.length : -1,
     checkStatusesSha256: sha256Canonical(statuses)
   };
