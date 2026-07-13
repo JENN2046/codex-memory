@@ -331,9 +331,9 @@ class MemoryDeltaProposalService {
     }
 
     const proposalShape = {
-      task_id: task.task_id,
-      candidate_count: candidates.length,
-      evidence_ref_count: evidenceRefs.length,
+      task,
+      evidence_refs: evidenceRefs,
+      candidates,
       reviewDecision
     };
 
