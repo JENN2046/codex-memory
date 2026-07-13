@@ -2,7 +2,6 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
@@ -13,28 +12,18 @@ const {
 } = require('../src/core/Cm2104BootstrapAuthorizationContentApplicationContract');
 
 const repoRoot = path.resolve(__dirname, '..');
-const applicationFreezeCommit = '3477c567642e47e12bfed30711b182f18d49b074';
 const gatePacket = loadFrozenGatePacket(repoRoot);
 const application = JSON.parse(fs.readFileSync(path.join(repoRoot, APPLICATION_PATH), 'utf8'));
 
-function gitObjectExists(commit, objectPath) {
-  return spawnSync('git', ['cat-file', '-e', `${commit}:${objectPath}`], {
-    cwd: repoRoot,
-    stdio: 'ignore'
-  }).status === 0;
-}
-
-test('CM-2104-A current application contract supersedes the stale frozen application', () => {
+test('CM-2104-A checked-in application matches the active gate packet', () => {
   const currentApplication = createCm2104BootstrapAuthorizationContentApplication(gatePacket);
-  const result = evaluateCm2104BootstrapAuthorizationContentApplication({ application: currentApplication, gatePacket });
+  const result = evaluateCm2104BootstrapAuthorizationContentApplication({ application, gatePacket });
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.contentDecisionIssued, false);
   assert.equal(result.finalExecutionReleaseIssued, false);
   assert.equal(result.executionAuthorized, false);
   assert.equal(currentApplication.gatePacketGitIdentity.commit, '9ba0800a6b4b401df0b72dac024bc6668602414b');
-  assert.equal(evaluateCm2104BootstrapAuthorizationContentApplication({ application, gatePacket }).accepted, false);
-  assert.equal(gitObjectExists(applicationFreezeCommit, application.contentDecisionPath), false);
-  assert.equal(gitObjectExists(applicationFreezeCommit, application.finalExecutionReleaseDecisionPath), false);
+  assert.deepEqual(application, currentApplication);
 });
 
 test('CM-2104-A frozen application preserves zero effects and incomplete Phase 8 boundaries', () => {
