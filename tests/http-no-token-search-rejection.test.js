@@ -337,6 +337,9 @@ test('bearer token HTTP search_memory returns bounded projection', async () => {
         tagMemoSurfaceScore: 0.7,
         dynamicCoreWeight: 0.8,
         sourceKinds: ['synthetic'],
+        matchedTags: ['internal-matched-tag'],
+        coreTags: ['internal-core-tag'],
+        updatedAt: '2026-07-13T00:00:00.000Z',
         sourceFile: 'synthetic/source.md',
         filePath: 'synthetic/file.md',
         path: 'synthetic/path.md',
@@ -384,7 +387,7 @@ test('bearer token HTTP search_memory returns bounded projection', async () => {
     assert.equal(structured.results.length, 1);
     assert.equal(structured.results[0].target, 'process');
     assert.equal(structured.results[0].score, 0.75);
-    assert.doesNotMatch(serialized, /synthetic\/source|synthetic\/file|synthetic title|synthetic-memory-id|synthetic snippet|synthetic text|synthetic content|synthetic raw text/);
+    assert.doesNotMatch(serialized, /synthetic\/source|synthetic\/file|synthetic title|synthetic-memory-id|synthetic snippet|synthetic text|synthetic content|synthetic raw text|internal-matched-tag|internal-core-tag|2026-07-13T00:00:00/);
     const keys = collectObjectKeys(structured);
     for (const forbiddenKey of ['sourceFile', 'filePath', 'path', 'title', 'memoryId', 'snippet', 'text', 'content', 'raw_text']) {
       assert.equal(keys.has(forbiddenKey), false, `${forbiddenKey} should be stripped`);
