@@ -17,6 +17,7 @@ const {
   gitText,
   resolveCommitTree,
   resolveDiffPaths,
+  resolveDurableClaim,
   resolveGitFile,
   resolveGitPathState,
   resolveParentCommit
@@ -38,6 +39,7 @@ function resolverOptions() {
     resolveParentCommit,
     resolveDiffPaths,
     resolveGitPathState,
+    resolveDurableClaim,
     isCommitAncestor
   };
 }

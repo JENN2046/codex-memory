@@ -80,6 +80,7 @@ function resolvers(overrides = {}) {
         ? expectedIntakeDiffEntries()
         : [],
     resolveGitPathState: git.resolveGitPathState,
+    resolveDurableClaim: git.resolveDurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === SELF_REVIEW_INTAKE_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
       return realIsCommitAncestor(ancestor, descendant);

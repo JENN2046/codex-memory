@@ -151,6 +151,7 @@ function evaluateFrozenSelfReviewIntake(options = {}) {
     options.resolveDiffPaths,
     options.resolveDiffEntries,
     options.resolveGitPathState,
+    options.resolveDurableClaim,
     options.isCommitAncestor
   ];
   if (!required.every(value => typeof value === 'function')) {

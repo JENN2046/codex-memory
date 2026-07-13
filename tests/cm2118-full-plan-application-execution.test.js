@@ -133,17 +133,14 @@ function copyImplementationFiles(destination) {
 
 function commitAll(cwd, message) {
   git(['add', '-A'], cwd);
-  git(['commit', '-m', message], cwd);
+  git(['-c', 'user.name=CM2118 Test', '-c', 'user.email=cm2118@example.invalid', 'commit', '-m', message], cwd);
   return text(['rev-parse', 'HEAD^{commit}'], cwd);
 }
 
 function prepareFrozenFixture() {
   const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-e2e-'));
   const repo = path.join(parent, 'repo');
-  git(['clone', '--quiet', '--no-hardlinks', ROOT, repo], parent);
-  git(['config', 'user.name', 'CM2118 Test'], repo);
-  git(['config', 'user.email', 'cm2118@example.invalid'], repo);
-  git(['checkout', '--detach', implementation.IMPLEMENTATION_PARENT_FREEZE.commit], repo);
+  git(['worktree', 'add', '--quiet', '--detach', repo, implementation.IMPLEMENTATION_PARENT_FREEZE.commit], ROOT);
   copyImplementationFiles(repo);
   const implementationCommit = commitAll(repo, 'test: freeze cm2118 implementation');
   execFileSync(process.execPath, ['scripts/generate-cm2118-full-plan-application-execution-packet.js'], {
@@ -188,6 +185,11 @@ test.before(() => {
 
 test.after(() => {
   if (fixture?.parent && process.env.CM2118_KEEP_FIXTURE !== '1') {
+    if (fixture.repo && fs.existsSync(fixture.repo)) {
+      try {
+        git(['worktree', 'remove', '--force', fixture.repo], ROOT);
+      } catch {}
+    }
     fs.rmSync(fixture.parent, { recursive: true, force: true });
   }
 });

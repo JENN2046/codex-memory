@@ -10,7 +10,8 @@ const {
   PACKET_PATH,
   buildExecutionPacket,
   evaluateExecutionPacket,
-  intakeContentDecision
+  intakeContentDecision,
+  realResolverOptions: resolverOptions
 } = require('../src/core/Cm2118FullPlanApplicationExecution');
 const {
   serializeArtifact,
@@ -26,7 +27,6 @@ const {
   resolveGitPathState,
   resolveParentCommit
 } = require('./cm2115-r2-git');
-const { resolverOptions } = require('./generate-cm2116-exact-full-plan-application-gate');
 
 const REPOSITORY_ROOT = path.resolve(__dirname, '..');
 
