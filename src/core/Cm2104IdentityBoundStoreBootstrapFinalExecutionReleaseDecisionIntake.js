@@ -136,8 +136,11 @@ function evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake({
     if (decision.expiresAt !== expectedBinding.expectedExpiresAt) blockers.push('decision.expiresAt.binding');
     const approvedAt = Date.parse(decision.approvedAt || '');
     const expiresAt = Date.parse(decision.expiresAt || '');
-    if (!Number.isFinite(approvedAt)) blockers.push('decision.approvedAt');
-    if (!Number.isFinite(expiresAt) || expiresAt <= new Date(now).getTime() || expiresAt <= approvedAt) {
+    const nowMs = new Date(now).getTime();
+    if (!Number.isFinite(approvedAt) || !Number.isFinite(nowMs) || approvedAt > nowMs) {
+      blockers.push('decision.approvedAt');
+    }
+    if (!Number.isFinite(expiresAt) || !Number.isFinite(nowMs) || nowMs >= expiresAt || approvedAt >= expiresAt) {
       blockers.push('decision.expiresAt');
     }
   }

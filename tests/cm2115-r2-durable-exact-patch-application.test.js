@@ -290,6 +290,37 @@ test('CM-2115-R2 rejects occupied receipt output paths before patch or claim', a
   }
 });
 
+test('CM-2115-R2 rejects stale transition temp paths before patch or claim', async t => {
+  for (const nextState of ['PATCH_INVOCATION_CONSUMED', 'CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS']) {
+    await t.test(nextState, async t => {
+      const fixture = await prepareTempExecution(t);
+      const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
+      const stalePath = `${registry.claimPath}.${nextState}.tmp`;
+      const staleBytes = Buffer.from('synthetic unknown governance state\n');
+      await fsp.writeFile(stalePath, staleBytes, { flag: 'wx' });
+
+      const result = await executeExactPatch({
+        repoRoot: fixture.root,
+        decision: fixture.decision,
+        decisionIdentity: fixture.identity,
+        authorityIdentity: fixture.authority,
+        resolveGitFile: fixture.resolver,
+        registry
+      });
+
+      assert.equal(result.accepted, false);
+      assert.equal(result.state, 'UNCLAIMED');
+      assert.ok(result.blockers.includes('registry.transitionTempPaths'));
+      assert.deepEqual(await fsp.readFile(stalePath), staleBytes);
+      await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
+      for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
+        assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), targetBaselineResolver(sourcePath).content);
+      }
+      await assert.rejects(() => fsp.lstat(path.join(fixture.root, APPLICATION_STATE_PATH)), { code: 'ENOENT' });
+    });
+  }
+});
+
 test('CM-2115-R2 authority Git entry mode and object type must match the resolved entry', async t => {
   const fixture = await prepareTempExecution(t);
   for (const [field, value] of [['gitMode', '100755'], ['gitObjectType', 'tree']]) {
