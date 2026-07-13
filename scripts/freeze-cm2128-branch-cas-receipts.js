@@ -124,7 +124,7 @@ function assertLowDisclosure(value) {
       continue;
     }
     if (typeof current !== 'string') continue;
-    if (/^(?:[A-Za-z]:[\\/]|\/home\/|\/Users\/|\/var\/|\/tmp\/)/.test(current) ||
+    if (/^(?:[A-Za-z]:[\\/]|\/)/.test(current) ||
         /(?:^|\/)\.\.(?:\/|$)|(?:^|\/)\.git(?:\/|$)/.test(current) ||
         /(?:^|\/)(?:\.env(?:\.[^/]*)?|data|logs|\.colameta|\.omc|\.claude|\.tmp)(?:\/|$)/.test(current) ||
         /(?:BEGIN (?:RSA|OPENSSH|PRIVATE)|Bearer\s+[A-Za-z0-9._-]{20,}|sk-[A-Za-z0-9_-]{20,})/.test(current)) {
@@ -132,6 +132,13 @@ function assertLowDisclosure(value) {
     }
   }
   return true;
+}
+
+function assertCleanDetachedWorktree(gitRunner = gitText) {
+  if (gitRunner(['status', '--porcelain', '--untracked-files=all']) !== '' ||
+      gitRunner(['branch', '--show-current']) !== '') {
+    throw new Error('cm2128_clean_detached_worktree_required');
+  }
 }
 
 function readExactJson(sourcePath, expected, label) {
@@ -231,9 +238,7 @@ function renderMarkdown(manifest, jsonText) {
 
 async function buildFreezeArtifacts() {
   assertSafeGitEnvironment();
-  if (gitText(['status', '--porcelain']) !== '' || gitText(['branch', '--show-current']) !== '') {
-    throw new Error('cm2128_clean_detached_worktree_required');
-  }
+  assertCleanDetachedWorktree();
   const options = resolverOptions();
   const implementationCommit = gitText(['rev-parse', 'HEAD^{commit}']);
   const implementationTree = resolveCommitTree(implementationCommit);
@@ -413,6 +418,7 @@ module.exports = {
   IMPLEMENTATION_DIFF_PATHS,
   OUTPUTS,
   PACKET_COMMIT,
+  assertCleanDetachedWorktree,
   assertLowDisclosure,
   buildFreezeArtifacts,
   gitIdentityWithoutContent,

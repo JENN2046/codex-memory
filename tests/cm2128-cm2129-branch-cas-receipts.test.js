@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 const test = require('node:test');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -72,6 +73,9 @@ test('CM-2128 low-disclosure scanner accepts bounded metadata and rejects nested
 
   for (const unsafe of [
     { nested: [{ path: path.join('/home', 'jenn', 'private') }] },
+    { nested: [{ path: '/workspace/codex-memory/private' }] },
+    { nested: [{ path: '/root/private' }] },
+    { nested: [{ path: '/opt/private' }] },
     { nested: { path: 'C:\\Users\\Example\\private' } },
     { nested: { path: '../private/receipt.json' } },
     { nested: { path: '.git/worktrees/private/index' } },
@@ -86,6 +90,34 @@ test('CM-2128 low-disclosure scanner accepts bounded metadata and rejects nested
       /cm2128_low_disclosure_string_boundary_failed/
     );
   }
+});
+
+test('CM-2128 clean-detached check forces untracked-file reporting despite Git config', () => {
+  withTempDirectory(directory => {
+    const git = args => execFileSync('git', args, {
+      cwd: directory,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    }).trim();
+    execFileSync('git', ['init', '--quiet'], { cwd: directory, stdio: 'ignore' });
+    git(['config', 'user.email', 'cm2128@example.invalid']);
+    git(['config', 'user.name', 'CM-2128 Test']);
+    fs.writeFileSync(path.join(directory, 'tracked.txt'), 'tracked\n');
+    git(['add', 'tracked.txt']);
+    git(['commit', '--quiet', '-m', 'fixture']);
+    git(['checkout', '--quiet', '--detach']);
+    git(['config', 'status.showUntrackedFiles', 'no']);
+    fs.writeFileSync(path.join(directory, 'untracked-sentinel.txt'), 'untracked\n');
+
+    assert.equal(git(['status', '--porcelain']), '');
+    assert.throws(
+      () => freeze.assertCleanDetachedWorktree(git),
+      /cm2128_clean_detached_worktree_required/
+    );
+
+    fs.rmSync(path.join(directory, 'untracked-sentinel.txt'));
+    assert.doesNotThrow(() => freeze.assertCleanDetachedWorktree(git));
+  });
 });
 
 test('CM-2128 exact JSON reader binds file shape, raw bytes, and SHA-256 and fails closed on drift', () => {
