@@ -24,6 +24,36 @@ const REUSED_SURFACES = Object.freeze([
   'AuditLogStore',
   'MemoryOverviewService'
 ]);
+const CONTEXT_CLASSIFICATIONS = Object.freeze([
+  'must_know',
+  'recent_decisions',
+  'current_state',
+  'blockers',
+  'risks',
+  'forbidden_assumptions'
+]);
+const CONTEXT_FRESHNESS_BUCKETS = Object.freeze([
+  'recent',
+  'established',
+  'stale_candidate',
+  'unknown'
+]);
+const CONTEXT_REASON_CODES = Object.freeze([
+  'title_match',
+  'tag_match',
+  'content_match',
+  'evidence_match',
+  'stale_candidate',
+  'semantic_match'
+]);
+const LOW_DISCLOSURE_STATEMENT_LABELS = Object.freeze({
+  must_know: 'bounded recall match',
+  recent_decisions: 'bounded recall decision signal',
+  current_state: 'bounded recall current-state signal',
+  blockers: 'bounded recall blocker signal',
+  risks: 'bounded recall risk signal',
+  forbidden_assumptions: 'bounded recall forbidden-assumption signal'
+});
 const FORBIDDEN_OUTPUT_KEYS = Object.freeze([
   'memoryId',
   'memory_id',
@@ -80,7 +110,34 @@ function sourceKinds(item = {}) {
   ).slice(0, 5);
 }
 
-function freshnessBucket(item = {}, now = Date.now()) {
+function normalizeMemoryContextProjection(item = {}) {
+  const projection = item.memoryContextProjection;
+  if (!isPlainObject(projection) ||
+    projection.projectionVersion !== 1 ||
+    projection.lowDisclosure !== true ||
+    !CONTEXT_CLASSIFICATIONS.includes(projection.classification) ||
+    !CONTEXT_FRESHNESS_BUCKETS.includes(projection.freshness)) {
+    return null;
+  }
+  const statement = safeString(projection.statement, 420);
+  const projectedReasonCodes = uniqueTokens(
+    Array.isArray(projection.reasonCodes)
+      ? projection.reasonCodes.filter(code => CONTEXT_REASON_CODES.includes(code))
+      : []
+  );
+  if (!statement || projectedReasonCodes.length === 0 || typeof projection.conflict !== 'boolean') {
+    return null;
+  }
+  return {
+    statement,
+    classification: projection.classification,
+    freshness: projection.freshness,
+    reasonCodes: projectedReasonCodes,
+    conflict: projection.conflict
+  };
+}
+
+function freshnessBucketFromTimestamps(item = {}, now = Date.now()) {
   const updatedAt = Date.parse(item.updatedAt || item.createdAt || '');
   if (!Number.isFinite(updatedAt)) return 'unknown';
   const ageDays = Math.max(0, (now - updatedAt) / 86400000);
@@ -89,7 +146,14 @@ function freshnessBucket(item = {}, now = Date.now()) {
   return 'stale_candidate';
 }
 
+function freshnessBucket(item = {}, now = Date.now()) {
+  return normalizeMemoryContextProjection(item)?.freshness ||
+    freshnessBucketFromTimestamps(item, now);
+}
+
 function deriveStatement(item = {}, index) {
+  const projected = normalizeMemoryContextProjection(item);
+  if (projected) return projected.statement;
   const source = safeString(item.title || item.snippet || item.text || '', 420);
   if (source) return source;
   const tags = uniqueTokens([...(item.matchedTags || []), ...(item.coreTags || [])])
@@ -110,8 +174,7 @@ function lowerSearchText(item = {}) {
   ].map(value => String(value || '').toLowerCase()).join(' ');
 }
 
-function classifyResult(item = {}) {
-  const text = lowerSearchText(item);
+function classifySearchText(text = '') {
   if (/(blocker|blocked|blocking|hard stop|cannot proceed|阻塞|卡点)/.test(text)) {
     return 'blockers';
   }
@@ -130,7 +193,15 @@ function classifyResult(item = {}) {
   return 'must_know';
 }
 
-function reasonCodes(item = {}, freshness) {
+function classifyRawResult(item = {}) {
+  return classifySearchText(lowerSearchText(item));
+}
+
+function classifyResult(item = {}) {
+  return normalizeMemoryContextProjection(item)?.classification || classifyRawResult(item);
+}
+
+function reasonCodesFromMetrics(item = {}, freshness) {
   const reasons = [];
   if (Number(item.titleHitCount || 0) > 0) reasons.push('title_match');
   if (Number(item.tagHitCount || 0) > 0 || Number(item.exactCoreTagCount || 0) > 0) reasons.push('tag_match');
@@ -139,6 +210,41 @@ function reasonCodes(item = {}, freshness) {
   if (freshness === 'stale_candidate') reasons.push('stale_candidate');
   if (reasons.length === 0) reasons.push('semantic_match');
   return reasons;
+}
+
+function reasonCodes(item = {}, freshness) {
+  return normalizeMemoryContextProjection(item)?.reasonCodes ||
+    reasonCodesFromMetrics(item, freshness);
+}
+
+function buildMemoryContextLowDisclosureProjection(item = {}, index = 0, now = Date.now()) {
+  const classification = classifyRawResult(item);
+  const freshness = freshnessBucketFromTimestamps(item, now);
+  const tags = uniqueTokens([...(item.matchedTags || []), ...(item.coreTags || [])])
+    .map(tag => safeString(tag, 80))
+    .filter(Boolean)
+    .slice(0, 4);
+  const label = LOW_DISCLOSURE_STATEMENT_LABELS[classification] ||
+    LOW_DISCLOSURE_STATEMENT_LABELS.must_know;
+  const statement = tags.length > 0
+    ? `Memory signal ${index + 1}: ${label}: ${tags.join(', ')}`
+    : `Memory signal ${index + 1}: ${label}.`;
+  return Object.freeze({
+    projectionVersion: 1,
+    lowDisclosure: true,
+    statement: safeString(statement, 420),
+    classification,
+    freshness,
+    reasonCodes: reasonCodesFromMetrics(item, freshness),
+    conflict: /(conflict|contradict|superseded|冲突|矛盾)/.test(lowerSearchText(item))
+  });
+}
+
+function isConflictResult(item = {}) {
+  const projected = normalizeMemoryContextProjection(item);
+  return projected
+    ? projected.conflict
+    : /(conflict|contradict|superseded|冲突|矛盾)/.test(lowerSearchText(item));
 }
 
 function projectContextItem(item = {}, index, now = Date.now()) {
@@ -461,7 +567,7 @@ class MemoryContextPackageService {
           reason_codes: uniqueTokens([...projected.reason_codes, 'stale_memory'])
         });
       }
-      if (/(conflict|contradict|superseded|冲突|矛盾)/.test(lowerSearchText(item))) {
+      if (isConflictResult(item)) {
         pkg.risks.push({
           ...projected,
           statement: `Conflict candidate: ${projected.statement}`,
@@ -528,6 +634,7 @@ class MemoryContextPackageService {
 }
 
 module.exports = {
+  buildMemoryContextLowDisclosureProjection,
   EXPERIMENTAL_HEURISTICS,
   FORBIDDEN_OUTPUT_KEYS,
   MemoryContextPackageService,
