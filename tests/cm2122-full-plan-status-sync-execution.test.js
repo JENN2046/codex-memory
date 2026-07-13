@@ -401,6 +401,15 @@ test('receipt writes pin the verified governance directory and never follow its 
   assert.doesNotMatch(source, /fsPromises\.writeFile\(receiptPath, bytes/);
 });
 
+test('claim create, read, and transition stay inside the verified governance descriptor', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2122FullPlanStatusSyncExecution.js'), 'utf8');
+  assert.match(source, /governanceDescriptorPath\(rootHandle, claimFileName\(\)\)/);
+  assert.match(source, /governanceDescriptorPath\(rootHandle, temporaryName\)/);
+  assert.match(source, /governanceDescriptorPath\(rootHandle, filename\)/);
+  assert.doesNotMatch(source, /this\.fs\.writeFile\(this\.claimPath/);
+  assert.doesNotMatch(source, /this\.fs\.readFile\(this\.claimPath/);
+});
+
 function initializeGovernanceRoot() {
   const root = path.join(
     fixture.repo,

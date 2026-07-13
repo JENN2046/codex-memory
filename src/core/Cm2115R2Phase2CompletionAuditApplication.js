@@ -771,6 +771,21 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
   const beforeBytesByPath = new Map();
   const blockers = [];
   try {
+    if (!validIdentity(decisionIdentity, DECISION_PATH) ||
+        decisionIdentity.gitObjectType !== 'blob' || decisionIdentity.gitMode !== '100644') {
+      blockers.push('decisionIdentity.gitObject');
+    } else {
+      const decisionActual = resolveGitFile(decisionIdentity.sourceCommit, DECISION_PATH);
+      verifyResolvedIdentity(decisionActual, decisionIdentity, blockers, 'decisionIdentity.gitObject');
+      if (!Buffer.isBuffer(decisionActual.content) ||
+          !decisionActual.content.equals(Buffer.from(serializeArtifact(decision)))) {
+        blockers.push('decisionIdentity.gitObject');
+      }
+    }
+  } catch {
+    blockers.push('decisionIdentity.gitObject');
+  }
+  try {
     const authorityActual = resolveGitFile(decision.payload.authority.sourceCommit, AUTHORITY_PATH);
     verifyResolvedIdentity(authorityActual, authorityIdentity, blockers, 'authorityIdentity.gitObject');
   } catch {

@@ -9,6 +9,7 @@ const {
   evaluateApplicationReceipt, evaluateBundle, evaluateDecision,
   executeCm2114Phase8CompletionRevalidationApplication
 } = require('../src/core/Cm2114Phase8CompletionRevalidationApplication');
+const { evaluateCm2113VcpToolBoxOwnerNativeProofReceipt } = require('../src/core/Cm2113VcpToolBoxOwnerNativeProofReceiptContract');
 
 const DOCS = path.join(__dirname, '../docs/near-model-memory-plan-pack');
 const bundle = JSON.parse(fs.readFileSync(path.join(DOCS, 'phase8_completion_revalidation_evidence_bundle_cm2114.json')));
@@ -68,6 +69,15 @@ test('CM-2114 fails closed on proof, bundle, replay, baseline, side effect, or r
     assert.equal(result.phase8Completed, false);
     assert.equal(result.additionalNativeWriteAuthorized, false);
   }
+});
+
+test('CM-2114 binds the supplied proof receipt content to the frozen PROOF object', () => {
+  const value = input();
+  value.proofReceipt.ownerRuntime.sourceCommit = 'f'.repeat(40);
+  assert.equal(evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value.proofReceipt).accepted, true);
+  const result = executeCm2114Phase8CompletionRevalidationApplication(value);
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('proof.receiptCanonicalSha256'));
 });
 
 test('CM-2114 application receipt rejects replay, new runtime action, or readiness overclaim', () => {
