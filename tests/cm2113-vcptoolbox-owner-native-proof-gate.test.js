@@ -9,7 +9,8 @@ const { Phase8OneShotAuthorizationRegistry } = require('../src/core/Phase8OneSho
 const {
   createCm2113VcpToolBoxOwnerNativeProofGate,
   intakeCm2113AuthorizationContentDecision,
-  intakeCm2113FinalExecutionReleaseDecision
+  intakeCm2113FinalExecutionReleaseDecision,
+  ownerRuntimeReceiptAccepted
 } = require('../src/core/Cm2113VcpToolBoxOwnerNativeProofGate');
 
 function fixture() {
@@ -106,6 +107,8 @@ function nativeResult(expected) {
           providerApiCalled: false,
           primaryMemoryStoreWritePerformed: true,
           derivedIndexWritePerformed: false,
+          memoryReadPerformed: false,
+          rawRuntimeOutputDisclosed: false,
           rawMemoryContentDisclosed: false,
           runtimeLocatorDisclosed: false,
           tokenMaterialDisclosed: false,
@@ -115,6 +118,16 @@ function nativeResult(expected) {
     }
   };
 }
+
+test('CM-2113 owner-runtime receipt rejects memory reads and raw runtime output disclosure', () => {
+  const { expected } = fixture();
+  assert.equal(ownerRuntimeReceiptAccepted(nativeResult(expected), expected), true);
+  for (const field of ['memoryReadPerformed', 'rawRuntimeOutputDisclosed']) {
+    const drift = nativeResult(expected);
+    drift.receipt.nativeInvocationReceipt.nativeRuntimeReceipt[field] = true;
+    assert.equal(ownerRuntimeReceiptAccepted(drift, expected), false, field);
+  }
+});
 
 async function registryFixture(root) {
   const rootIdentity = {
