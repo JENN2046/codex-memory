@@ -8,6 +8,7 @@ const {
   cm2096RuntimeRouteAccepted,
   exactCm2096Allowlist,
   resolveCm2096RegistryGovernanceRoot,
+  runCm2096VerifyForPostStoreProjection,
   runFrozenCm2096RollbackV3
 } = require('../src/cli/cm2096-frozen-rollback-v3');
 
@@ -64,4 +65,24 @@ test('CM-2096 route preflight requires tombstone write primary and native reads 
   assert.equal(cm2096RuntimeRouteAccepted(config, expectedTarget), true);
   assert.equal(cm2096RuntimeRouteAccepted({ ...config, governedMcpVcpNativeReadDelegationMode: 'primary' }, expectedTarget), false);
   assert.equal(cm2096RuntimeRouteAccepted({ ...config, governedMcpVcpNativeWriteDelegationMode: 'off' }, expectedTarget), false);
+});
+
+test('CM-2096 post-store projection failure does not count or invoke audit verify', async () => {
+  let verifyCalls = 0;
+  const projectionFailure = await runCm2096VerifyForPostStoreProjection(
+    { accepted: false, reasonCode: 'cm2096_post_store_projection_rejected' },
+    async () => { verifyCalls += 1; return { accepted: true }; }
+  );
+  assert.equal(verifyCalls, 0);
+  assert.equal(projectionFailure.verifyOperations, 0);
+  assert.equal(projectionFailure.verifyResult.accepted, false);
+  assert.equal(projectionFailure.verifyResult.reasonCode, 'cm2096_post_store_projection_rejected');
+
+  const projectionAccepted = await runCm2096VerifyForPostStoreProjection(
+    { accepted: true },
+    async () => { verifyCalls += 1; return { accepted: true }; }
+  );
+  assert.equal(verifyCalls, 1);
+  assert.equal(projectionAccepted.verifyOperations, 1);
+  assert.equal(projectionAccepted.verifyResult.accepted, true);
 });
