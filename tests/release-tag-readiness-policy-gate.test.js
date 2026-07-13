@@ -144,7 +144,7 @@ test('CM2016 normalizes case and hyphen variants before capability claim checks'
     milestone: 'readonly_context',
     evidence: readonlyContextEvidence(),
     releaseNotes: releaseNotes({
-      capabilityClaims: ['Full-Capability', 'PRODUCTION-WRITE']
+      capabilityClaims: ['Full Capability', 'PRODUCTION-WRITE', 'production_write']
     })
   });
 

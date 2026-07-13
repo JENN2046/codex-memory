@@ -139,7 +139,7 @@ function normalizeMilestone(value) {
 
 function normalizeCapabilityClaims(values) {
   return sortedUnique((Array.isArray(values) ? values : [])
-    .map(value => normalizeString(value).toLowerCase().replace(/-/g, '_')));
+    .map(value => normalizeString(value).toLowerCase().replace(/[\s_-]+/g, '_')));
 }
 
 function buildAllowedTagPattern(suffix) {
