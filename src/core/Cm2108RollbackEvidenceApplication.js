@@ -39,6 +39,11 @@ function sha256Canonical(value) {
   return sha256(JSON.stringify(canonicalize(value)));
 }
 
+function hasExactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
+
 function expectedPatch() {
   return {
     rollbackDrillPassed: true,
@@ -182,6 +187,12 @@ function executeRollbackEvidenceApplication(input = {}) {
 function evaluateApplicationReceipt(receipt = {}) {
   const blockers = [];
   const payload = receipt.receiptPayload || {};
+  if (!hasExactKeys(receipt, ['receiptPayload', 'receiptPayloadSha256'])) blockers.push('receipt.fields');
+  if (!hasExactKeys(payload, [
+    'schemaVersion', 'taskId', 'receiptType', 'decision', 'sourceRollbackReceipt',
+    'applicationRuntime', 'contractResults', 'appliedEvidence', 'authorization',
+    'applicationCounters', 'boundaries'
+  ])) blockers.push('receipt.payload.fields');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.sourceRollbackReceipt?.commit !== SOURCE_RECEIPT.commit || payload.sourceRollbackReceipt?.blobOid !== SOURCE_RECEIPT.blobOid || payload.sourceRollbackReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 || payload.sourceRollbackReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 || payload.sourceRollbackReceipt?.acceptedAsRollbackEvidence !== true) blockers.push('receipt.sourceRollbackReceipt');

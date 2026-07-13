@@ -1,7 +1,19 @@
 'use strict';
 
+function hasExactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
+
 function evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(receipt = {}) {
   const blockers = [];
+  if (!hasExactKeys(receipt, [
+    'schemaVersion', 'taskId', 'receiptType', 'result', 'implementation',
+    'executionPacketGitIdentity', 'contentDecisionGitIdentity', 'finalReleaseDecisionGitIdentity',
+    'bootstrapReceiptGitIdentity', 'executionReceipt', 'transportReceipt', 'ownerRuntime',
+    'transport', 'store', 'authorization', 'priorAttempt', 'completionEvidence', 'nonClaims',
+    'phase8Completed', 'completionAuditReapplicationRequired'
+  ])) blockers.push('receipt.fields');
   if (receipt.schemaVersion !== 1 || receipt.taskId !== 'CM-2113' || receipt.receiptType !== 'vcptoolbox_owner_native_proof_receipt' || receipt.result !== 'PASS') blockers.push('receipt.identity');
   if (!/^[a-f0-9]{40}$/.test(receipt.implementation?.commit || '') || !/^[a-f0-9]{40}$/.test(receipt.implementation?.tree || '')) blockers.push('receipt.implementation');
   for (const field of ['executionPacketGitIdentity', 'contentDecisionGitIdentity', 'finalReleaseDecisionGitIdentity', 'bootstrapReceiptGitIdentity']) {
