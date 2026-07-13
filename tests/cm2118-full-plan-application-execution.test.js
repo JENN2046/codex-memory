@@ -16,6 +16,7 @@ const packetGenerator = require('../scripts/generate-cm2118-full-plan-applicatio
 const releaseGenerator = require('../scripts/generate-cm2119-full-plan-final-execution-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
+const EXECUTOR_CHILD_TIMEOUT_MS = 60_000;
 
 function git(args, cwd, options = {}) {
   return execFileSync('git', args, {
@@ -365,9 +366,22 @@ function runApplicationProcess() {
     });
     let stdout = '';
     let stderr = '';
+    let settled = false;
+    let timedOut = false;
+    const finish = result => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve({ ...result, stdout, stderr, timedOut });
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill('SIGKILL');
+    }, EXECUTOR_CHILD_TIMEOUT_MS);
     child.stdout.on('data', chunk => { stdout += chunk; });
     child.stderr.on('data', chunk => { stderr += chunk; });
-    child.on('close', code => resolve({ code, stdout, stderr }));
+    child.on('error', error => finish({ code: null, signal: null, spawnError: error.message }));
+    child.on('close', (code, signal) => finish({ code, signal, spawnError: null }));
   });
 }
 
@@ -383,7 +397,9 @@ function evaluateDurableInFixture() {
   }));
 }
 
-test('fixed executor survives concurrent invocation with exactly one application and durable receipts', async () => {
+test('fixed executor survives concurrent invocation with exactly one application and durable receipts', {
+  timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
+}, async () => {
   const governanceRoot = path.join(
     fixture.repo,
     '.git',
@@ -398,6 +414,8 @@ test('fixed executor survives concurrent invocation with exactly one application
   );
   git(['checkout', '--detach', fixture.implementationCommit], fixture.repo);
   const [left, right] = await Promise.all([runApplicationProcess(), runApplicationProcess()]);
+  assert.equal(left.timedOut, false, JSON.stringify(left));
+  assert.equal(right.timedOut, false, JSON.stringify(right));
   const successful = [left, right].filter(item => item.code === 0 && item.stdout.includes('PASS_APPLICATION_COMMIT_BOUND'));
   assert.equal(successful.length, 1, JSON.stringify({ left, right }));
   const applicationResult = JSON.parse(successful[0].stdout);
@@ -433,9 +451,12 @@ test('fixed executor survives concurrent invocation with exactly one application
   assert.equal(durable.statusSyncAuthorized, false);
 });
 
-test('new process cannot replay consumed authorization', async () => {
+test('new process cannot replay consumed authorization', {
+  timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
+}, async () => {
   const before = text(['count-objects', '-v'], fixture.repo);
   const replay = await runApplicationProcess();
+  assert.equal(replay.timedOut, false, JSON.stringify(replay));
   assert.equal(replay.code, 0, replay.stderr);
   const result = JSON.parse(replay.stdout);
   assert.equal(result.status, 'STOPPED');
