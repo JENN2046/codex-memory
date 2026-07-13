@@ -33,6 +33,14 @@ const registryRootIdentity = {
   registryRootReinitializationAllowed: false,
   registryRootReplacementAllowed: false
 };
+const verifyScope = {
+  client_id: 'Codex',
+  project_id: 'codex-memory',
+  scope_id: 'proof-scope',
+  visibility: 'project',
+  workspace_id: 'proof-workspace'
+};
+const verifyScopeFingerprint = sha256Canonical(verifyScope);
 const newRegistry = governanceRoot => {
   fsSync.mkdirSync(governanceRoot, { recursive: true });
   const rootIdentityPath = path.join(governanceRoot, '.phase8-registry-root-identity.json');
@@ -328,8 +336,8 @@ test('exact verify calls audit_memory shape once and accepts selected receipt fi
     approvalDecisionReference: 'CM-TEST-APPROVAL',
     claimBindingHash: 'd'.repeat(64),
     targetReferenceName: 'phase8-target',
-    expectedScopeFingerprint: 'e'.repeat(64),
-    scope: { project_id: 'codex-memory', scope_id: 'proof-scope', workspace_id: 'proof-workspace', visibility: 'project' },
+    expectedScopeFingerprint: verifyScopeFingerprint,
+    scope: verifyScope,
     callAuditMemory: async input => {
       calls += 1;
       assert.equal(input.audit_family, 'governance');
@@ -348,6 +356,33 @@ test('exact verify calls audit_memory shape once and accepts selected receipt fi
   assert.equal(result.accepted, true);
   assert.equal(result.selectedFieldsOnly, true);
   assert.equal(calls, 1);
+});
+
+test('exact verify rejects a stale expected scope fingerprint before audit access', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-verify-scope-drift-'));
+  const registry = newRegistry(root);
+  const claim = await registry.claim({ nonce: 'scope-drift-nonce', receiptId: 'verify-receipt', bindingHash: 'd'.repeat(64) });
+  await registry.consumeWriteInvocation(claim.claimId, 'd'.repeat(64));
+  let calls = 0;
+  const result = await verifyPhase8NativeWriteAuditProjection({
+    registry,
+    claimId: claim.claimId,
+    receiptId: 'verify-receipt',
+    approvalDecisionReference: 'CM-TEST-APPROVAL',
+    claimBindingHash: 'd'.repeat(64),
+    targetReferenceName: 'phase8-target',
+    expectedScopeFingerprint: 'e'.repeat(64),
+    scope: verifyScope,
+    callAuditMemory: async () => {
+      calls += 1;
+      return { accepted: true, findings: [] };
+    }
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'phase8_native_write_scope_fingerprint_invalid');
+  assert.equal(result.observedCandidateCount, 0);
+  assert.equal(result.observedSelectedBinding, null);
+  assert.equal(calls, 0);
 });
 
 test('exact verify rejects receipt, approval, claim, target, or scope drift', async t => {
@@ -388,8 +423,8 @@ test('exact verify rejects receipt, approval, claim, target, or scope drift', as
         approvalDecisionReference: 'CM-TEST-APPROVAL',
         claimBindingHash: 'd'.repeat(64),
         targetReferenceName: 'phase8-target',
-        expectedScopeFingerprint: 'e'.repeat(64),
-        scope: { project_id: 'codex-memory', scope_id: 'proof-scope', workspace_id: 'proof-workspace', visibility: 'project' },
+        expectedScopeFingerprint: verifyScopeFingerprint,
+        scope: verifyScope,
         callAuditMemory: async () => ({
           accepted: true,
           access: { rawMemoryReturned: false, rawAuditReturned: false, contentReturned: false },

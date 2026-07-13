@@ -5,6 +5,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { isMachineBoundPhase8AuthorizationDecision } = require('./Phase8ExternalAuthorizationDecisionIntake');
 const { isMachineBoundPhase8FinalExecutionReleaseDecision } = require('./Phase8FinalExecutionReleaseDecisionIntake');
+const { buildRequestedScopeAuditFilter } = require('./GovernedNativeBridgeAuditMemoryProjection');
 
 const INTERNAL_ASSERTION = Symbol('phase8-one-shot-native-write-assertion');
 const FINAL_STATES = new Set([
@@ -259,16 +260,34 @@ async function verifyPhase8NativeWriteAuditProjection({ callAuditMemory, scope, 
   if (!claim || claim.state !== 'WRITE_INVOCATION_CONSUMED' || claim.receiptIdHash !== safeKey(receiptId)) {
     return { accepted: false, reasonCode: 'verify_claim_binding_invalid' };
   }
+  const auditScope = {
+    project_id: scope?.project_id,
+    scope_id: scope?.scope_id,
+    workspace_id: scope?.workspace_id,
+    client_id: scope?.client_id,
+    visibility: scope?.visibility
+  };
+  const requestedScopeFilter = buildRequestedScopeAuditFilter(auditScope);
+  if (typeof expectedScopeFingerprint !== 'string' ||
+      !/^[a-f0-9]{64}$/.test(expectedScopeFingerprint) ||
+      requestedScopeFilter?.scopeFingerprint !== expectedScopeFingerprint) {
+    return {
+      accepted: false,
+      reasonCode: 'phase8_native_write_scope_fingerprint_invalid',
+      selectedFieldsOnly: true,
+      rawMemoryReturned: false,
+      rawAuditReturned: false,
+      maxOperations: 1,
+      observedCandidateCount: 0,
+      observedSelectedBinding: null
+    };
+  }
   const report = await callAuditMemory({
     audit_family: 'governance',
     window: 10,
     scope: {
-      project_id: scope.project_id,
-      scope_id: scope.scope_id,
-      workspace_id: scope.workspace_id,
+      ...auditScope,
       workspace_id_present: true,
-      client_id: 'codex',
-      visibility: scope.visibility,
       task_id: 'CM-2091'
     },
     include_raw: false
@@ -284,9 +303,7 @@ async function verifyPhase8NativeWriteAuditProjection({ callAuditMemory, scope, 
         item?.exactApprovalClaimBindingHash === claimBindingHash &&
         item?.targetReferenceName === targetReferenceName &&
         item?.scopeFingerprintPresent === true &&
-        item?.scopeFingerprintMatched === true &&
-        typeof expectedScopeFingerprint === 'string' &&
-        /^[a-f0-9]{64}$/.test(expectedScopeFingerprint))
+        item?.scopeFingerprintMatched === true)
     : null;
   const accepted = report?.accepted === true &&
     report?.access?.rawMemoryReturned === false &&
