@@ -296,8 +296,12 @@ async function runFrozenCm2107Tombstone(packetCommit, decisionCommit) {
   try {
     shim = await startPrimaryWriteOnlyShim({
       storeRoot: governance.internalPaths.storeRoot,
-      derivedRuntimeStore: paths.derivedRuntimeStore
+      derivedRuntimeStore: paths.derivedRuntimeStore,
+      bearerToken
     });
+    if (shim.authorizationProjection().authorizationRequired !== true) {
+      throw new Error('cm2107_local_shim_bearer_not_enforced');
+    }
     const overrides = appOverrides({ endpoint: shim.endpoint, bearerToken, appStateRoot: paths.appStateRoot });
     const config = createConfig(overrides);
     if (config.governedMcpVcpNativeWriteDelegationMode !== 'primary' ||

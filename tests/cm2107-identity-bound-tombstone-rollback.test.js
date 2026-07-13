@@ -181,7 +181,12 @@ test('CM-2107 strict bridge delegates one primary-write-only tombstone marker', 
     writeSubdir: STORE_IDENTITY.writeSubdir,
     primaryWriteOnly: true
   });
-  const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({ adapter, enableWrite: true });
+  const bearerToken = 'synthetic-fixture-only';
+  const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({
+    adapter,
+    enableWrite: true,
+    expectedBearerToken: bearerToken
+  });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => {
     await new Promise(resolve => server.close(resolve));
@@ -189,10 +194,16 @@ test('CM-2107 strict bridge delegates one primary-write-only tombstone marker', 
   });
   const address = server.address();
   const endpoint = ['http:', '', `127.0.0.1:${address.port}`, 'mcp', 'vcp-native'].join('/');
+  const rejected = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: {} })
+  });
+  assert.equal(rejected.status, 401);
   const appStateRoot = path.join(path.dirname(root), `${path.basename(root)}-app`);
   t.after(() => fs.rm(appStateRoot, { recursive: true, force: true }));
   const app = createCodexMemoryApplication({
-    ...appOverrides({ endpoint, bearerToken: 'synthetic-fixture-only', appStateRoot }),
+    ...appOverrides({ endpoint, bearerToken, appStateRoot }),
     cm2096TombstoneOneShotEnforcementEnabled: true,
     cm2096TombstoneAuthorizationAssertionVerifier: async () => ({
       accepted: true,
@@ -237,6 +248,8 @@ test('CM-2107 strict bridge delegates one primary-write-only tombstone marker', 
   assert.equal(result.access.memoryWritePerformed, true);
   assert.equal(result.access.localMemoryFallbackUsed, false);
   assert.equal(result.receipt.nativeInvocationReceipt.statusClass, 'success');
+  assert.equal(server.getLowDisclosureAuthorizationProjection().authorizationRequired, true);
+  assert.equal(server.getLowDisclosureAuthorizationProjection().rejectedAuthorizationCount, 1);
   assert.equal((await collectPostRollbackProjection(root)).accepted, true);
 });
 

@@ -156,7 +156,7 @@ function runOwnerRuntime({ nodeExecutable, pluginPath, pluginDirectory, input, e
       clearTimeout(timer);
       reject(new Error(`owner_runtime_spawn_failed:${error.code || 'unknown'}`));
     });
-    child.on('exit', code => {
+    child.on('close', code => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
@@ -459,6 +459,7 @@ module.exports = {
   inspectStore,
   governedTransportEnvelopeAccepted,
   projectBusinessRecordArguments,
+  runOwnerRuntime,
   sha256,
   sha256Canonical
 };

@@ -10,6 +10,7 @@ const {
   RUNTIME_IDENTITY_FILENAME,
   createExpectedDailyNoteMarkdown,
   createVcpToolBoxDailyNoteOwnerRuntimeAdapter,
+  runOwnerRuntime,
   sha256,
   sha256Canonical
 } = require('../src/core/VcpToolBoxDailyNoteOwnerRuntimeAdapter');
@@ -173,6 +174,35 @@ function projectedArgs(fixture, businessArgs = fixture.args) {
     }
   };
 }
+
+test('owner runtime waits for stdio close before parsing output', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2113-owner-close-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const pluginPath = path.join(root, 'delayed-owner.js');
+  const plugin = String.raw`'use strict';
+const { spawn } = require('node:child_process');
+process.stdin.resume();
+process.stdin.on('end', () => {
+  const code = "setTimeout(() => process.stdout.write(JSON.stringify({ status: 'success', delayed: true })), 50)";
+  spawn(process.execPath, ['-e', code], { stdio: ['ignore', process.stdout, process.stderr] });
+  process.exit(0);
+});
+`;
+  await fs.writeFile(pluginPath, plugin);
+
+  const result = await runOwnerRuntime({
+    nodeExecutable: process.execPath,
+    pluginPath,
+    pluginDirectory: root,
+    input: { synthetic: true },
+    env: { ...process.env },
+    timeoutMs: 3000
+  });
+
+  assert.equal(result.exitCode, 0);
+  assert.equal(result.parsed.status, 'success');
+  assert.equal(result.parsed.delayed, true);
+});
 
 test('CM-2113 adapter binds an exact VCPToolBox DailyNote stdio runtime and stable store identity', async t => {
   const fixture = await setup();
