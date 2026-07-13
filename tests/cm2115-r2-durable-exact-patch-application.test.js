@@ -264,6 +264,29 @@ test('CM-2115-R2 rejects a dangling add target before consuming the claim', asyn
   await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
 });
 
+test('CM-2115-R2 rejects a stale modify temp path before consuming the claim', async t => {
+  const fixture = await prepareTempExecution(t);
+  const modifyTarget = fixture.targets.find(target => target.operation === 'modify');
+  const temporaryPath = `${path.join(fixture.root, modifyTarget.sourcePath)}.cm2115-r2.tmp`;
+  await fsp.writeFile(temporaryPath, 'synthetic stale temp', { flag: 'wx' });
+  const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
+
+  const result = await executeExactPatch({
+    repoRoot: fixture.root,
+    decision: fixture.decision,
+    decisionIdentity: fixture.identity,
+    authorityIdentity: fixture.authority,
+    resolveGitFile: fixture.resolver,
+    registry
+  });
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.state, 'UNCLAIMED');
+  assert.ok(result.blockers.includes(`patchTarget.temporaryPathExpectedAbsent.${modifyTarget.sourcePath}`));
+  assert.equal(await fsp.readFile(temporaryPath, 'utf8'), 'synthetic stale temp');
+  await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
+});
+
 test('CM-2115-R2 executes one exact patch and a fresh registry instance cannot replay it', async t => {
   const fixture = await prepareTempExecution(t);
   const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
