@@ -213,8 +213,10 @@ function evaluateCm2103BootstrapDecisionIntake({ decisionBytes, observedBinding,
     if (decision.expiresAt !== expectedBinding.expectedExpiresAt) blockers.push('decision.expiresAt.binding');
     const approvedAt = Date.parse(decision.approvedAt || '');
     const expiresAt = Date.parse(decision.expiresAt || '');
+    const nowMs = new Date(now).getTime();
     if (!Number.isFinite(approvedAt)) blockers.push('decision.approvedAt');
-    if (!Number.isFinite(expiresAt) || expiresAt <= new Date(now).getTime() || expiresAt <= approvedAt) {
+    if (Number.isFinite(approvedAt) && approvedAt > nowMs) blockers.push('decision.approvedAt.future');
+    if (!Number.isFinite(expiresAt) || expiresAt <= nowMs || expiresAt <= approvedAt) {
       blockers.push('decision.expiresAt');
     }
   }
