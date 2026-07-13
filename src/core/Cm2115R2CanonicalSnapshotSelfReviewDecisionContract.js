@@ -258,8 +258,10 @@ function evaluateDecision(decision = {}, {
   const implementation = decision.payload?.reviewImplementation;
   if (!implementation || !/^[a-f0-9]{40}$/.test(implementation.commit || '') ||
       !/^[a-f0-9]{40}$/.test(implementation.tree || '') ||
+      !sameJson(Object.keys(implementation).sort(), ['artifacts', 'commit', 'tree']) ||
       !Array.isArray(implementation.artifacts) ||
-      !sameJson(implementation.artifacts.map(item => item?.path), IMPLEMENTATION_ARTIFACT_PATHS)) {
+      !sameJson(implementation.artifacts.map(item => item?.path), IMPLEMENTATION_ARTIFACT_PATHS) ||
+      implementation.artifacts.some(item => !sameJson(Object.keys(item || {}).sort(), ['blobOid', 'path']))) {
     blockers.push('decision.reviewImplementation');
   } else {
     try {

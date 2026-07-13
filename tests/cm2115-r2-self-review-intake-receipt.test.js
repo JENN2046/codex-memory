@@ -150,6 +150,12 @@ test('intake receipt rejects missing resolvers, frozen decision drift, and imple
     copy.payload.intakeImplementation.artifacts[0].blobOid = 'a'.repeat(40);
   });
   assert.equal(evaluateReceipt(implementationDrift, resolvers()).accepted, false);
+  for (const change of [
+    copy => { copy.payload.intakeImplementation.unauthorizedReadinessClaim = false; },
+    copy => { copy.payload.intakeImplementation.artifacts[0].unauthorizedReadinessClaim = false; }
+  ]) {
+    assert.equal(evaluateReceipt(mutate(receipt, change), resolvers()).accepted, false);
+  }
   const referenceDrift = mutate(receipt, copy => {
     copy.payload.intakeImplementation.commit = 'a'.repeat(40);
   });

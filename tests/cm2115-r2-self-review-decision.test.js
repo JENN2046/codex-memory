@@ -151,6 +151,12 @@ test('self-review rejects frozen request, resolver, implementation, or payload d
     copy.payload.reviewImplementation.artifacts[0].blobOid = 'a'.repeat(40);
   });
   assert.equal(evaluateDecision(drift, resolvers()).accepted, false);
+  for (const change of [
+    copy => { copy.payload.reviewImplementation.unauthorizedReadinessClaim = false; },
+    copy => { copy.payload.reviewImplementation.artifacts[0].unauthorizedReadinessClaim = false; }
+  ]) {
+    assert.equal(evaluateDecision(mutate(decision, change), resolvers()).accepted, false);
+  }
   const resigned = mutate(decision, copy => {
     copy.payload.reviewImplementation.commit = 'a'.repeat(40);
   });
