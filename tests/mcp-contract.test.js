@@ -3173,6 +3173,61 @@ test('MCP search_memory timeout should abort before post-timeout read-policy aud
   });
 });
 
+test('MCP prepare_memory_context recall uses the configured search timeout and abort signal', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    let receivedSignal = false;
+    let overviewCalls = 0;
+    let auditCalls = 0;
+
+    app.services.passiveRecallService.search = async ({ signal }) => {
+      receivedSignal = !!signal;
+      return new Promise(resolve => {
+        signal.addEventListener('abort', () => {
+          setTimeout(() => resolve([]), 10);
+        }, { once: true });
+      });
+    };
+    app.services.overviewService.getAuthenticatedBoundedOverview = async () => {
+      overviewCalls += 1;
+      return {};
+    };
+    app.services.auditMemoryReadonlyService.run = async () => {
+      auditCalls += 1;
+      return {};
+    };
+
+    const startedAt = Date.now();
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 15,
+      method: 'tools/call',
+      params: {
+        name: 'prepare_memory_context',
+        arguments: {
+          task: {
+            title: 'Timeout context package',
+            user_request: 'Recall must not pin the MCP session SHOULD_NOT_LEAK_0562.'
+          }
+        }
+      }
+    });
+    const elapsedMs = Date.now() - startedAt;
+    await new Promise(resolve => setTimeout(resolve, 50));
+    const serialized = JSON.stringify(result.response);
+
+    assert.equal(receivedSignal, true);
+    assert.equal(overviewCalls, 0);
+    assert.equal(auditCalls, 0);
+    assert.equal(result.response.error.code, -32002);
+    assert.equal(result.response.error.message, 'Search memory timeout');
+    assert.equal(result.response.error.data.code, 'SEARCH_MEMORY_TIMEOUT');
+    assert.equal(result.response.error.data.timeoutMs, 5);
+    assert.ok(elapsedMs < 1000);
+    assert.doesNotMatch(serialized, /SHOULD_NOT_LEAK_0562/);
+  }, { searchMemoryTimeoutMs: 5 });
+});
+
 test('MCP schema contract should expose scope in search_memory', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
