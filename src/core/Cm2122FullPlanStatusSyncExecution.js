@@ -716,6 +716,32 @@ function claimFileName() {
   return `.cm2122-r2-status-sync-claim-${claimId()}.json`;
 }
 
+function governanceDescriptorPath(rootHandle, filename) {
+  return `/proc/self/fd/${rootHandle.fd}/${filename}`;
+}
+
+async function openVerifiedGovernanceRoot(registry) {
+  const rootIdentity = await registry.verifyRoot();
+  if (process.platform !== 'linux' || !Number.isInteger(fs.constants.O_DIRECTORY) ||
+      !Number.isInteger(fs.constants.O_NOFOLLOW)) {
+    throw new Error('cm2122_descriptor_relative_governance_access_unsupported');
+  }
+  const rootHandle = await registry.fs.open(
+    registry.governanceRoot,
+    fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+  );
+  try {
+    const descriptorStat = await rootHandle.stat();
+    if (!descriptorStat.isDirectory() || descriptorStat.dev !== rootIdentity.dev || descriptorStat.ino !== rootIdentity.ino) {
+      throw new Error('cm2122_governance_root_descriptor_identity_mismatch');
+    }
+    return rootHandle;
+  } catch (error) {
+    await rootHandle.close().catch(() => {});
+    throw error;
+  }
+}
+
 class Cm2122StatusSyncClaimRegistry {
   constructor({ governanceRoot, fsApi = fsPromises } = {}) {
     if (!governanceRoot || !path.isAbsolute(governanceRoot)) throw new Error('cm2122_fixed_governance_root_required');
@@ -816,25 +842,26 @@ class Cm2122StatusSyncClaimRegistry {
   }
 
   async read(bindingHash, finalReleaseEvidence = null) {
-    await this.verifyRoot();
-    const stat = await this.fs.lstat(this.claimPath);
-    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('cm2122_claim_invalid');
-    const envelope = JSON.parse((await this.fs.readFile(this.claimPath)).toString('utf8'));
-    this.validateEnvelope(envelope, bindingHash || envelope.bindingHash, finalReleaseEvidence);
-    return envelope;
+    const rootHandle = await openVerifiedGovernanceRoot(this);
+    let claimHandle = null;
+    try {
+      claimHandle = await this.fs.open(
+        governanceDescriptorPath(rootHandle, claimFileName()),
+        fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW
+      );
+      const stat = await claimHandle.stat();
+      if (!stat.isFile()) throw new Error('cm2122_claim_invalid');
+      const envelope = JSON.parse((await claimHandle.readFile()).toString('utf8'));
+      this.validateEnvelope(envelope, bindingHash || envelope.bindingHash, finalReleaseEvidence);
+      return envelope;
+    } finally {
+      if (claimHandle) await claimHandle.close().catch(() => {});
+      await rootHandle.close().catch(() => {});
+    }
   }
 
   async inspectExisting(bindingHash, finalReleaseEvidence) {
-    await this.verifyRoot();
     if (!finalReleaseEvidence?.accepted || !isMachineBoundFinalReleaseDecision(finalReleaseEvidence.decision)) {
-      return { claimEnvelopePresent: true, state: 'CLAIM_REGISTRY_AMBIGUOUS', authorizationConsumed: true,
-        replayAllowed: false, reconciliationRequired: true, claimEnvelopeBindingVerified: false, envelope: null };
-    }
-    try {
-      const stat = await this.fs.lstat(this.claimPath);
-      if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('invalid');
-    } catch (error) {
-      if (error.code === 'ENOENT') return { claimEnvelopePresent: false, authorizationConsumed: false, replayAllowed: false };
       return { claimEnvelopePresent: true, state: 'CLAIM_REGISTRY_AMBIGUOUS', authorizationConsumed: true,
         replayAllowed: false, reconciliationRequired: true, claimEnvelopeBindingVerified: false, envelope: null };
     }
@@ -843,7 +870,8 @@ class Cm2122StatusSyncClaimRegistry {
       return { claimEnvelopePresent: true, state: envelope.state, authorizationConsumed: true,
         replayAllowed: false, reconciliationRequired: envelope.reconciliationRequired,
         claimEnvelopeBindingVerified: true, envelope };
-    } catch {
+    } catch (error) {
+      if (error.code === 'ENOENT') return { claimEnvelopePresent: false, authorizationConsumed: false, replayAllowed: false };
       return { claimEnvelopePresent: true, state: 'CLAIM_REGISTRY_AMBIGUOUS', authorizationConsumed: true,
         replayAllowed: false, reconciliationRequired: true, claimEnvelopeBindingVerified: false, envelope: null };
     }
@@ -891,15 +919,29 @@ class Cm2122StatusSyncClaimRegistry {
       reconciliationRequired: true
     };
     this.validateEnvelope(envelope, bindingHash, finalReleaseEvidence);
+    const bytes = Buffer.from(JSON.stringify(canonicalize(envelope)));
+    const rootHandle = await openVerifiedGovernanceRoot(this);
+    let claimHandle = null;
     try {
-      await this.fs.writeFile(this.claimPath, JSON.stringify(canonicalize(envelope)), { flag: 'wx' });
+      claimHandle = await this.fs.open(
+        governanceDescriptorPath(rootHandle, claimFileName()),
+        fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+        0o600
+      );
+      await claimHandle.writeFile(bytes);
+      await claimHandle.sync();
+      const observed = Buffer.alloc(bytes.length);
+      const readback = await claimHandle.read(observed, 0, bytes.length, 0);
+      if (readback.bytesRead !== bytes.length || !observed.equals(bytes)) throw new Error('cm2122_claim_readback_mismatch');
+      await rootHandle.sync();
     } catch (error) {
       if (error.code === 'EEXIST') throw new Error('cm2122_authorization_already_claimed');
       throw error;
+    } finally {
+      if (claimHandle) await claimHandle.close().catch(() => {});
+      await rootHandle.close().catch(() => {});
     }
-    const observed = await this.read(bindingHash, finalReleaseEvidence);
-    if (!sameJson(observed, envelope)) throw new Error('cm2122_claim_readback_mismatch');
-    return observed;
+    return envelope;
   }
 
   async transition(bindingHash, expectedState, state, details = {}, finalReleaseEvidence = null) {
@@ -932,10 +974,34 @@ class Cm2122StatusSyncClaimRegistry {
       reconciliationRequired: state !== 'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION'
     };
     this.validateEnvelope(next, bindingHash, finalReleaseEvidence);
-    const temporary = `${this.claimPath}.${state}.tmp`;
-    await this.fs.writeFile(temporary, JSON.stringify(canonicalize(next)), { flag: 'wx' });
-    await this.fs.rename(temporary, this.claimPath);
-    return this.read(bindingHash, finalReleaseEvidence);
+    const bytes = Buffer.from(JSON.stringify(canonicalize(next)));
+    const rootHandle = await openVerifiedGovernanceRoot(this);
+    const temporaryName = `${claimFileName()}.${state}.tmp`;
+    const temporary = governanceDescriptorPath(rootHandle, temporaryName);
+    const destination = governanceDescriptorPath(rootHandle, claimFileName());
+    let temporaryHandle = null;
+    let observedHandle = null;
+    try {
+      temporaryHandle = await this.fs.open(
+        temporary,
+        fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+        0o600
+      );
+      await temporaryHandle.writeFile(bytes);
+      await temporaryHandle.sync();
+      await temporaryHandle.close();
+      temporaryHandle = null;
+      await this.fs.rename(temporary, destination);
+      await rootHandle.sync();
+      observedHandle = await this.fs.open(destination, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+      const observed = await observedHandle.readFile();
+      if (!observed.equals(bytes)) throw new Error('cm2122_claim_transition_readback_mismatch');
+      return next;
+    } finally {
+      if (temporaryHandle) await temporaryHandle.close().catch(() => {});
+      if (observedHandle) await observedHandle.close().catch(() => {});
+      await rootHandle.close().catch(() => {});
+    }
   }
 }
 
@@ -1488,26 +1554,14 @@ function evaluateBindingReceipt(receipt = {}, { detachedBinding, executionReceip
 }
 
 async function writeExternalReceipt(registry, filename, receipt) {
-  const rootIdentity = await registry.verifyRoot();
   const bytes = Buffer.from(serializeArtifact(receipt));
   const identity = { bytes: bytes.length, sha256: sha256(bytes), persistenceAcknowledged: false };
   let rootHandle = null;
   let receiptHandle = null;
   try {
-    if (process.platform !== 'linux' || !Number.isInteger(fs.constants.O_DIRECTORY) ||
-        !Number.isInteger(fs.constants.O_NOFOLLOW)) {
-      throw new Error('cm2122_descriptor_relative_receipt_write_unsupported');
-    }
-    rootHandle = await fsPromises.open(
-      registry.governanceRoot,
-      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
-    );
-    const descriptorStat = await rootHandle.stat();
-    if (!descriptorStat.isDirectory() || descriptorStat.dev !== rootIdentity.dev || descriptorStat.ino !== rootIdentity.ino) {
-      throw new Error('cm2122_governance_root_descriptor_identity_mismatch');
-    }
-    const descriptorReceiptPath = `/proc/self/fd/${rootHandle.fd}/${filename}`;
-    receiptHandle = await fsPromises.open(
+    rootHandle = await openVerifiedGovernanceRoot(registry);
+    const descriptorReceiptPath = governanceDescriptorPath(rootHandle, filename);
+    receiptHandle = await registry.fs.open(
       descriptorReceiptPath,
       fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
       0o600
