@@ -52,7 +52,11 @@ function decisionAccepted(decision) {
     'ownerRuntime', 'preloadSha256', 'runtimeIdentitySha256', 'schemaVersion',
     'storeIdentitySha256', 'storeInstanceId', 'storeReference', 'taskId'
   ];
+  const nonClaimKeys = [
+    'nativeWritePerformed', 'phase8Completed', 'readinessClaimed', 'recordMemoryCalled'
+  ];
   return exactKeys(decision, keys) &&
+    exactKeys(decision.nonClaims, nonClaimKeys) &&
     decision.schemaVersion === 1 && decision.taskId === 'CM-2113' &&
     decision.action === 'initialize_vcptoolbox_owner_runtime_and_synthetic_store' &&
     decision.bootstrapAuthorized === true && decision.nativeMemoryAuthorized === false &&
