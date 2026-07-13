@@ -15,6 +15,7 @@ const { parseArgs } = require('../src/cli/cm2118-full-plan-application');
 const packetGenerator = require('../scripts/generate-cm2118-full-plan-application-execution-packet');
 const releaseGenerator = require('../scripts/generate-cm2119-full-plan-final-execution-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
 
 function git(args, cwd, options = {}) {
   return execFileSync('git', args, {
@@ -33,6 +34,15 @@ function text(args, cwd, options) {
 
 function sha256(bytes) {
   return crypto.createHash('sha256').update(bytes).digest('hex');
+}
+
+function decisionTime(decision) {
+  const approved = Date.parse(decision.payload.approvedAt);
+  const expires = Date.parse(decision.payload.expiresAt);
+  assert.ok(Number.isFinite(approved));
+  assert.ok(Number.isFinite(expires));
+  assert.ok(approved < expires);
+  return new Date(approved + Math.min(1000, Math.max(0, expires - approved - 1)));
 }
 
 function resolvers(cwd) {
@@ -307,14 +317,44 @@ test('one-shot registry uses fixed root identity, atomic claim, and rejects seri
   fs.rmSync(root, { recursive: true, force: true });
 });
 
+test('CM-2118 registry rejects a governance root reached through a symlinked parent', async () => {
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-registry-parent-'));
+  try {
+    const realParent = path.join(parent, 'real-parent');
+    const linkedParent = path.join(parent, 'linked-parent');
+    const realRoot = path.join(realParent, 'registry');
+    fs.mkdirSync(realRoot, { recursive: true });
+    fs.writeFileSync(
+      path.join(realRoot, '.phase8-registry-root-identity.json'),
+      JSON.stringify(canonicalize(fixture.frozenModule.GOVERNANCE_ROOT_IDENTITY))
+    );
+    fs.symlinkSync(realParent, linkedParent, 'dir');
+    const registry = new fixture.frozenModule.Cm2118FullPlanApplicationClaimRegistry({
+      governanceRoot: path.join(linkedParent, 'registry')
+    });
+    await assert.rejects(registry.verifyRoot(), /governance_root_invalid|symlink_forbidden/);
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 function runApplicationProcess() {
   return new Promise(resolve => {
     const child = spawn(process.execPath, [
+      '--require', FIXED_DATE_PRELOAD,
       'src/cli/cm2118-full-plan-application.js',
       '--authorization-content-decision-commit', implementation.CONTENT_DECISION_FREEZE.commit,
       '--execution-packet-commit', fixture.packetCommit,
       '--final-execution-release-decision-commit', fixture.finalReleaseCommit
-    ], { cwd: fixture.repo, stdio: ['ignore', 'pipe', 'pipe'] });
+    ], {
+      cwd: fixture.repo,
+      env: {
+        ...process.env,
+        NODE_ENV: 'test',
+        CODEX_MEMORY_TEST_FIXED_NOW: decisionTime(fixture.finalReleaseEvidence.decision).toISOString()
+      },
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', chunk => { stdout += chunk; });
