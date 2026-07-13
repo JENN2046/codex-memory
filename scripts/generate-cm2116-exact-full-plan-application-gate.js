@@ -93,6 +93,7 @@ function renderMarkdown(gate, jsonText) {
 
 function main(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
+  assertSafeGitEnvironment();
   ensureCleanWorktree();
   if (fs.existsSync(GATE_PATH) || fs.existsSync(GATE_MARKDOWN_PATH)) {
     throw new Error('cm2116_gate_already_exists');
