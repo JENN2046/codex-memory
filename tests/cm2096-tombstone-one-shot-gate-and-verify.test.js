@@ -249,6 +249,16 @@ test('CM-2096 decision intake machine-binds exact bytes and rejects drift', () =
   });
   assert.equal(result.accepted, false);
   assert.ok(result.blockers.includes('decision.maxTombstoneWrites'));
+
+  const expanded = decisionBytes(binding, { compensationAuthorized: true });
+  const expandedResult = evaluateCm2096TombstoneExecutionDecisionIntake({
+    decisionBytes: expanded,
+    observedBinding: { decisionSourceCommit: '6'.repeat(40), decisionBlobOid: '7'.repeat(40), decisionPayloadSha256: sha256(expanded) },
+    expectedBinding: binding,
+    now: new Date('2026-07-11T00:00:00.000Z')
+  });
+  assert.equal(expandedResult.accepted, false);
+  assert.ok(expandedResult.blockers.includes('decision.fields'));
 });
 
 test('CM-2096 tombstone assertion is atomically consumable exactly once', async () => {

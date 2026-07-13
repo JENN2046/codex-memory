@@ -62,6 +62,8 @@ function evaluateCm2096TombstoneExecutionDecisionIntake({ decisionBytes, observe
       registryMarkerDeletionAllowed: false,
       registryRebuildAllowed: false
     };
+    const exactFields = [...Object.keys(exact), 'expiresAt', 'approvedAt'].sort();
+    if (JSON.stringify(Object.keys(decision).sort()) !== JSON.stringify(exactFields)) blockers.push('decision.fields');
     for (const [field, expected] of Object.entries(exact)) if (decision[field] !== expected) blockers.push(`decision.${field}`);
     if (!decision.expiresAt || Date.parse(decision.expiresAt) <= new Date(now).getTime()) blockers.push('decision.expiresAt');
   }
