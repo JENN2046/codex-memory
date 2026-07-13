@@ -210,6 +210,37 @@ test('packet and release generators reject output-path arguments', () => {
   assert.throws(() => releaseGenerator.parseArgs(['--output', '/tmp/x']), /no_output/);
 });
 
+test('CM-2118 rejects repository Git environment overrides before packet intake or durable effects', async () => {
+  for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE']) {
+    assert.throws(
+      () => implementation.assertSafeGitEnvironment({ [key]: '/tmp/cm2118-forbidden' }),
+      /cm2118_unsafe_git_environment/
+    );
+    const previous = process.env[key];
+    process.env[key] = '/tmp/cm2118-forbidden';
+    try {
+      await assert.rejects(
+        implementation.executeFullPlanApplicationFromCommits({
+          authorizationContentDecisionCommit: implementation.CONTENT_DECISION_FREEZE.commit,
+          packetCommit: 'a'.repeat(40),
+          finalReleaseCommit: 'b'.repeat(40)
+        }),
+        /cm2118_unsafe_git_environment/
+      );
+    } finally {
+      if (previous === undefined) delete process.env[key];
+      else process.env[key] = previous;
+    }
+  }
+});
+
+test('CM-2119 generation validates at a deterministic in-window time', () => {
+  assert.equal(releaseGenerator.VALIDATION_AT, releaseGenerator.APPROVED_AT);
+  const validation = Date.parse(releaseGenerator.VALIDATION_AT);
+  assert.equal(validation >= Date.parse(releaseGenerator.APPROVED_AT), true);
+  assert.equal(validation < Date.parse(releaseGenerator.EXPIRES_AT), true);
+});
+
 test('frozen packet and final release pass exact Git intake but ordinary clones have no authority', () => {
   assert.equal(fixture.packetEvidence.accepted, true, fixture.packetEvidence.blockers.join(','));
   assert.equal(fixture.finalReleaseEvidence.accepted, true, fixture.finalReleaseEvidence.blockers.join(','));

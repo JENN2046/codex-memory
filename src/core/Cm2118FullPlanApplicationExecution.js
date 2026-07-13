@@ -130,6 +130,30 @@ const APPLICATION_DIFF_ENTRIES = Object.freeze(APPLICATION_DIFF_PATHS.map(source
 const machineBoundContentDecisions = new WeakSet();
 const machineBoundExecutionPackets = new WeakSet();
 const machineBoundFinalReleases = new WeakSet();
+const UNSAFE_GIT_ENV_KEYS = Object.freeze(new Set([
+  'GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY',
+  'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_REPLACE_REF_BASE', 'GIT_SHALLOW_FILE',
+  'GIT_QUARANTINE_PATH', 'GIT_CONFIG', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM',
+  'GIT_CONFIG_NOSYSTEM', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_COUNT', 'GIT_CEILING_DIRECTORIES',
+  'GIT_DISCOVERY_ACROSS_FILESYSTEM', 'GIT_EXEC_PATH'
+]));
+
+function unsafeGitEnvironmentKeys(env = process.env) {
+  return Object.keys(env).filter(key => UNSAFE_GIT_ENV_KEYS.has(key) ||
+    /^GIT_CONFIG_(?:KEY|VALUE)_\d+$/.test(key));
+}
+
+function assertSafeGitEnvironment(env = process.env) {
+  const keys = unsafeGitEnvironmentKeys(env);
+  if (keys.length) throw new Error(`cm2118_unsafe_git_environment:${keys.sort().join(',')}`);
+  return true;
+}
+
+function sanitizedGitEnvironment(env = process.env) {
+  const result = { ...env };
+  for (const key of unsafeGitEnvironmentKeys(result)) delete result[key];
+  return result;
+}
 
 function deepFreeze(value) {
   if (!value || typeof value !== 'object' || Buffer.isBuffer(value) || Object.isFrozen(value)) return value;
@@ -1252,10 +1276,10 @@ function evaluateApplicationBindingReceipt(receipt = {}, {
   };
 }
 
-function gitText(args, { cwd = process.cwd(), env = process.env, input = undefined } = {}) {
+function gitText(args, { cwd = process.cwd(), env = null, input = undefined } = {}) {
   return execFileSync('git', args, {
     cwd,
-    env,
+    env: env || sanitizedGitEnvironment(),
     input,
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
@@ -1264,15 +1288,17 @@ function gitText(args, { cwd = process.cwd(), env = process.env, input = undefin
 }
 
 function resolveFixedGovernanceRoot(repoRoot = process.cwd()) {
+  assertSafeGitEnvironment();
   const commonDir = path.resolve(repoRoot, gitText(['rev-parse', '--git-common-dir'], { cwd: repoRoot }));
   return path.join(commonDir, 'codex-memory-governance', 'phase8-one-shot-authorization-registries');
 }
 
 function createExactApplicationCommitWithGitPlumbing({ repoRoot, packetEvidence, governanceRoot }) {
+  assertSafeGitEnvironment();
   const targets = packetEvidence.packet.payload.applicationBoundary.targets;
   const indexPath = path.join(governanceRoot, `.cm2118-application-index-${claimId()}`);
   if (fs.existsSync(indexPath)) throw new Error('cm2118_application_index_already_exists');
-  const env = { ...process.env, GIT_INDEX_FILE: indexPath };
+  const env = { ...sanitizedGitEnvironment(), GIT_INDEX_FILE: indexPath };
   gitText(['read-tree', CONTENT_DECISION_FREEZE.commit], { cwd: repoRoot, env });
   for (const target of targets) {
     let bytes;
@@ -1281,6 +1307,7 @@ function createExactApplicationCommitWithGitPlumbing({ repoRoot, packetEvidence,
     } else {
       const before = execFileSync('git', ['cat-file', 'blob', target.before.blobOid], {
         cwd: repoRoot,
+        env: sanitizedGitEnvironment(),
         encoding: null,
         stdio: ['ignore', 'pipe', 'pipe']
       });
@@ -1434,6 +1461,7 @@ async function executeFullPlanApplicationFromCommits({
       !/^[a-f0-9]{40}$/.test(packetCommit || '') || !/^[a-f0-9]{40}$/.test(finalReleaseCommit || '')) {
     throw new Error('cm2118_exact_three_commit_inputs_required');
   }
+  assertSafeGitEnvironment();
   const options = realResolverOptions();
   let packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
   if (!packetEvidence.accepted) throw new Error(`cm2118_execution_packet_rejected:${packetEvidence.blockers.join(',')}`);
@@ -1624,6 +1652,7 @@ module.exports = {
   STATUS_SYNC_PATHS,
   TASK_ID,
   Cm2118FullPlanApplicationClaimRegistry,
+  assertSafeGitEnvironment,
   buildExecutionPacket,
   buildFinalReleaseDecision,
   claimFileName,
@@ -1642,5 +1671,7 @@ module.exports = {
   isMachineBoundContentDecision,
   isMachineBoundExecutionPacket,
   isMachineBoundFinalReleaseDecision,
+  sanitizedGitEnvironment,
+  unsafeGitEnvironmentKeys,
   wrapPayload
 };
