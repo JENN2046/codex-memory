@@ -770,6 +770,12 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
         if (error?.code !== 'ENOENT') blockers.push(`patchTarget.expectedAbsent.${target.sourcePath}`);
       }
     } else {
+      try {
+        await fsPromises.lstat(`${absolutePath}.cm2115-r2.tmp`);
+        blockers.push(`patchTarget.temporaryPathExpectedAbsent.${target.sourcePath}`);
+      } catch (error) {
+        if (error?.code !== 'ENOENT') blockers.push(`patchTarget.temporaryPathExpectedAbsent.${target.sourcePath}`);
+      }
       beforeBytes = await fsPromises.readFile(absolutePath).catch(() => null);
       if (!beforeBytes || !sameJson(fileProjection(beforeBytes, target.before.gitMode), target.before)) {
         blockers.push(`patchTarget.beforeDrift.${target.sourcePath}`);

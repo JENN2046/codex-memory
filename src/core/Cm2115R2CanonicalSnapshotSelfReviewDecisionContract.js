@@ -265,8 +265,11 @@ function evaluateDecision(decision = {}, {
     blockers.push('decision.reviewImplementation');
   } else {
     try {
+      const implementationParent = resolveParentCommit(implementation.commit);
+      const implementationDiffPaths = resolveDiffPaths(implementationParent, implementation.commit).sort();
       if (resolveCommitTree(implementation.commit) !== implementation.tree ||
-          !isCommitAncestor(REVIEW_REQUEST_FREEZE.commit, implementation.commit)) {
+          !isCommitAncestor(REVIEW_REQUEST_FREEZE.commit, implementation.commit) ||
+          !sameJson(implementationDiffPaths, [...IMPLEMENTATION_ARTIFACT_PATHS].sort())) {
         blockers.push('decision.reviewImplementationLineage');
       }
       for (const artifact of implementation.artifacts) {
