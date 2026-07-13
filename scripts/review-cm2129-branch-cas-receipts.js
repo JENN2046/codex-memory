@@ -69,6 +69,11 @@ function assertPathAbsent(entryPath) {
   throw new Error(`cm2129_review_output_already_exists:${entryPath}`);
 }
 
+function receiptSourceFilenamesAccepted(manifest = {}) {
+  return manifest.payload?.claimReceipt?.sourceFilename === claimFileName() &&
+    manifest.payload?.executionReceipt?.sourceFilename === execution.EXECUTION_RECEIPT_FILENAME;
+}
+
 function readLiveGovernanceFile(entryPath, label) {
   let descriptor;
   try {
@@ -160,7 +165,8 @@ async function buildReview() {
       manifest.payload.executionPacketCommit !== PACKET_COMMIT ||
       manifest.payload.finalReleaseCommit !== FINAL_RELEASE_COMMIT ||
       manifest.payload.targetRef !== constants.TARGET_REF ||
-      manifest.payload.targetCommit !== constants.NEW_COMMIT || manifest.payload.targetTree !== constants.NEW_TREE) {
+      manifest.payload.targetCommit !== constants.NEW_COMMIT || manifest.payload.targetTree !== constants.NEW_TREE ||
+      !receiptSourceFilenamesAccepted(manifest)) {
     throw new Error('cm2129_manifest_rejected');
   }
   const expectedFreezeMarkdown = renderFreezeMarkdown(manifest, manifestIdentity.content.toString('utf8'));
@@ -179,11 +185,11 @@ async function buildReview() {
   }
   if (!sameJson(manifest.payload.claimReceipt, receiptIdentity(
     OUTPUTS.claim,
-    manifest.payload.claimReceipt.sourceFilename,
+    claimFileName(),
     { bytes: claimIdentity.content, value: frozenClaim }
   )) || !sameJson(manifest.payload.executionReceipt, receiptIdentity(
     OUTPUTS.execution,
-    manifest.payload.executionReceipt.sourceFilename,
+    execution.EXECUTION_RECEIPT_FILENAME,
     { bytes: executionIdentity.content, value: frozenReceipt }
   ))) {
     throw new Error('cm2129_manifest_receipt_projection_rejected');
@@ -400,5 +406,6 @@ module.exports = {
   main,
   parseArgs,
   readLiveGovernanceFile,
+  receiptSourceFilenamesAccepted,
   renderMarkdown
 };

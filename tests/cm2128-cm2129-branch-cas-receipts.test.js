@@ -11,6 +11,8 @@ const test = require('node:test');
 const ROOT = path.resolve(__dirname, '..');
 const freeze = require('../scripts/freeze-cm2128-branch-cas-receipts');
 const review = require('../scripts/review-cm2129-branch-cas-receipts');
+const execution = require('../src/core/Cm2126ExactBranchCasExecution');
+const { claimFileName } = require('../src/core/Cm2126ExactBranchCasClaimRegistry');
 
 function sha256(bytes) {
   return crypto.createHash('sha256').update(bytes).digest('hex');
@@ -240,6 +242,21 @@ test('CM-2128 receipt identity deterministically binds bytes, blob OID, raw hash
     artifactType: 'fixture_receipt_v1',
     canonicalPayloadSha256: 'a'.repeat(64)
   });
+});
+
+test('CM-2129 accepts only the fixed claim and execution receipt source filenames', () => {
+  const manifest = {
+    payload: {
+      claimReceipt: { sourceFilename: claimFileName() },
+      executionReceipt: { sourceFilename: execution.EXECUTION_RECEIPT_FILENAME }
+    }
+  };
+  assert.equal(review.receiptSourceFilenamesAccepted(manifest), true);
+  manifest.payload.claimReceipt.sourceFilename = 'forked-claim.json';
+  assert.equal(review.receiptSourceFilenamesAccepted(manifest), false);
+  manifest.payload.claimReceipt.sourceFilename = claimFileName();
+  manifest.payload.executionReceipt.sourceFilename = 'forked-execution.json';
+  assert.equal(review.receiptSourceFilenamesAccepted(manifest), false);
 });
 
 test('CM-2128 and CM-2129 Markdown renderers preserve an exact JSON mirror and non-authority boundary', () => {
