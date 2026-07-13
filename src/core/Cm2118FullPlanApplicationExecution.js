@@ -206,7 +206,7 @@ function validResolvers(options, names) {
 function intakeContentDecision(options = {}) {
   const blockers = [];
   const required = ['resolveCommitTree', 'resolveParentCommit', 'resolveDiffPaths', 'resolveDiffEntries',
-    'resolveGitFile', 'resolveGitPathState', 'isCommitAncestor'];
+    'resolveGitFile', 'resolveGitPathState', 'resolveDurableClaim', 'isCommitAncestor'];
   if (!validResolvers(options, required)) return { accepted: false, blockers: ['contentDecision.gitResolversRequired'] };
   let decision = null;
   let jsonIdentity = null;
@@ -1362,7 +1362,39 @@ async function writeExternalReceipt(governanceRoot, filename, receipt) {
 
 function realResolverOptions() {
   const { resolverOptions } = require('../../scripts/generate-cm2116-exact-full-plan-application-gate');
-  return resolverOptions();
+  const gitResolvers = require('../../scripts/cm2115-r2-git');
+  if (typeof gitResolvers.resolveDurableClaim === 'function') {
+    return { ...resolverOptions(), resolveDurableClaim: gitResolvers.resolveDurableClaim };
+  }
+  const {
+    GOVERNANCE_ROOT_IDENTITY: cm2115RootIdentity,
+    GOVERNANCE_ROOT_IDENTITY_SHA256: cm2115RootIdentitySha256,
+    canonicalize: cm2115Canonicalize,
+    claimFileName: cm2115ClaimFileName,
+    sha256: cm2115Sha256
+  } = require('./Cm2115R2Phase2CompletionAuditApplication');
+  const resolveDurableClaim = () => {
+    if (!Number.isInteger(fs.constants.O_NOFOLLOW)) throw new Error('cm2118_no_follow_unavailable');
+    const readRegular = filePath => {
+      const descriptor = fs.openSync(filePath, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+      try {
+        if (!fs.fstatSync(descriptor).isFile()) throw new Error('cm2118_governance_file_invalid');
+        return fs.readFileSync(descriptor);
+      } finally {
+        fs.closeSync(descriptor);
+      }
+    };
+    const governanceRoot = gitResolvers.resolveGovernanceRegistryRoot();
+    const rootStat = fs.lstatSync(governanceRoot);
+    if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) throw new Error('cm2118_governance_root_invalid');
+    const identityBytes = readRegular(path.join(governanceRoot, '.phase8-registry-root-identity.json'));
+    if (cm2115Sha256(identityBytes) !== cm2115RootIdentitySha256 ||
+        identityBytes.toString('utf8') !== JSON.stringify(cm2115Canonicalize(cm2115RootIdentity))) {
+      throw new Error('cm2118_governance_root_identity_mismatch');
+    }
+    return JSON.parse(readRegular(path.join(governanceRoot, cm2115ClaimFileName())).toString('utf8'));
+  };
+  return { ...resolverOptions(), resolveDurableClaim };
 }
 
 function assertFixedExecutionRuntime(packetEvidence) {
@@ -1709,6 +1741,7 @@ module.exports = {
   isMachineBoundContentDecision,
   isMachineBoundExecutionPacket,
   isMachineBoundFinalReleaseDecision,
+  realResolverOptions,
   sanitizedGitEnvironment,
   unsafeGitEnvironmentKeys,
   wrapPayload

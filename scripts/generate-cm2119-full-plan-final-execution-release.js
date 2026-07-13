@@ -9,7 +9,8 @@ const {
   assertSafeGitEnvironment,
   buildFinalReleaseDecision,
   evaluateFinalReleaseDecision,
-  intakeExecutionPacket
+  intakeExecutionPacket,
+  realResolverOptions: resolverOptions
 } = require('../src/core/Cm2118FullPlanApplicationExecution');
 const {
   serializeArtifact,
@@ -19,7 +20,6 @@ const {
   ensureCleanWorktree,
   gitText
 } = require('./cm2115-r2-git');
-const { resolverOptions } = require('./generate-cm2116-exact-full-plan-application-gate');
 
 const APPROVED_AT = '2026-07-12T18:00:00+08:00';
 const EXPIRES_AT = '2026-07-19T18:00:00+08:00';
