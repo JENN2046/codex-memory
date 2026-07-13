@@ -763,7 +763,12 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
     const absolutePath = path.join(repoRoot, target.sourcePath);
     let beforeBytes = null;
     if (target.operation === 'add') {
-      if (fs.existsSync(absolutePath)) blockers.push(`patchTarget.expectedAbsent.${target.sourcePath}`);
+      try {
+        await fsPromises.lstat(absolutePath);
+        blockers.push(`patchTarget.expectedAbsent.${target.sourcePath}`);
+      } catch (error) {
+        if (error?.code !== 'ENOENT') blockers.push(`patchTarget.expectedAbsent.${target.sourcePath}`);
+      }
     } else {
       beforeBytes = await fsPromises.readFile(absolutePath).catch(() => null);
       if (!beforeBytes || !sameJson(fileProjection(beforeBytes, target.before.gitMode), target.before)) {
