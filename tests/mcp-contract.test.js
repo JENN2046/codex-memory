@@ -626,6 +626,10 @@ test('codex-memory MCP defaults to read-only plus proposal-only public surface',
       list.response.result.tools.map(tool => tool.name).sort(),
       ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'search_memory']
     );
+    const prepareMemoryContext = list.response.result.tools.find(tool =>
+      tool.name === 'prepare_memory_context'
+    );
+    assert.ok(prepareMemoryContext.inputSchema.properties.task.properties.scope_id);
 
     const contextPackage = await server.handleJsonRpc({
       jsonrpc: '2.0',
@@ -638,6 +642,7 @@ test('codex-memory MCP defaults to read-only plus proposal-only public surface',
             title: 'Default read-only context smoke',
             user_request: 'Build a task-start memory package without mutation.',
             project_id: 'codex-memory',
+            scope_id: 'scope-default-smoke',
             client_id: 'codex',
             visibility: 'project'
           },
@@ -773,6 +778,36 @@ test('prepare_memory_context preserves useful low-disclosure metadata without ra
     assert.match(result.memory_context_package.recent_decisions[0].statement, /decision-approved/);
     assert.doesNotMatch(serialized, /"matchedTags"|"coreTags"|"createdAt"|"updatedAt"/);
     assert.doesNotMatch(serialized, /private raw title|second private title|private raw snippet|private raw text|private raw content|private\/source|private-memory-id/);
+  });
+});
+
+test('prepare_memory_context forwards scope_id into the real app recall boundary', async () => {
+  await withApp(async ({ app }) => {
+    let searchOptions = null;
+    app.services.passiveRecallService.search = async options => {
+      searchOptions = options;
+      return [];
+    };
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Scope-isolated context package',
+        project_id: 'codex-memory',
+        scope_id: 'scope-metadata-only',
+        workspace_id: 'workspace-alpha',
+        client_id: 'codex',
+        visibility: 'project'
+      },
+      options: {
+        max_items: 2,
+        max_bytes: 6000
+      }
+    });
+
+    assert.equal(result.accepted, true);
+    assert.equal(searchOptions.candidateFilters.scopeId, 'scope-metadata-only');
+    assert.equal(searchOptions.auditContext.scope.scopeIdPresent, true);
+    assert.equal(searchOptions.auditContext.scope.scopeStrict, true);
   });
 });
 

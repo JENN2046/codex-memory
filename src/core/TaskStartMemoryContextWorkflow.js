@@ -62,6 +62,7 @@ function deriveTaskFields(input = {}, requestContext = {}) {
     title: safeString(sourceTask.title || input.title || executionContext.taskTitle || 'task-start memory context', 300),
     user_request: safeString(sourceTask.user_request || input.user_request || executionContext.userRequest || '', 4000),
     project_id: safeString(sourceTask.project_id || scope.project_id || executionContext.projectId || '', 200),
+    scope_id: safeString(sourceTask.scope_id || scope.scope_id || executionContext.scopeId || '', 200),
     workspace_id: safeString(sourceTask.workspace_id || scope.workspace_id || executionContext.workspaceId || '', 200),
     client_id: safeString(sourceTask.client_id || requestContext.clientId || executionContext.clientId || 'codex', 200),
     visibility: safeString(sourceTask.visibility || scope.visibility || executionContext.visibility || 'project', 200),
