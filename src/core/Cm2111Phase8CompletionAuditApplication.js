@@ -38,6 +38,10 @@ function canonicalize(value) {
 }
 function sha256(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
 function sha256Canonical(value) { return sha256(JSON.stringify(canonicalize(value))); }
+function hasExactKeys(value, keys) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...keys].sort());
+}
 
 function expectedPatch() {
   return { rollbackDrillPassed: true, failureRecoveryProofPassed: true, phase8Completed: true, fullPlanPackCompleted: false, readinessClaimed: false };
@@ -120,6 +124,13 @@ function executePhase8CompletionAuditApplication(input = {}) {
 function evaluateApplicationReceipt(receipt = {}) {
   const blockers = [];
   const payload = receipt.receiptPayload || {};
+  if (!hasExactKeys(receipt, ['receiptPayload', 'receiptPayloadSha256'])) blockers.push('receipt.fields');
+  if (!hasExactKeys(payload, [
+    'schemaVersion', 'taskId', 'receiptType', 'decision', 'evidenceBundle', 'phaseAudit',
+    'applicationRuntime', 'contractResults', 'appliedState', 'authorization',
+    'applicationCounters', 'nonClaims'
+  ])) blockers.push('receipt.payload.fields');
+  if (payload.schemaVersion !== 1 || payload.taskId !== 'CM-2111' || payload.receiptType !== 'phase8_completion_audit_application_receipt') blockers.push('receipt.payload.identity');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 || payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 || payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.evidenceBundle');

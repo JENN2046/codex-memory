@@ -92,6 +92,23 @@ test('CM-2114 application receipt rejects replay, new runtime action, or readine
   }
 });
 
+test('CM-2114 application receipt binds the exact three applied proof flags', () => {
+  const result = executeCm2114Phase8CompletionRevalidationApplication(input());
+  for (const mutate of [
+    payload => { payload.appliedEvidence.vcpToolBoxOwnedRuntimeWritePassed = false; },
+    payload => { payload.appliedEvidence.actualTransportBindingPassed = false; },
+    payload => { payload.appliedEvidence.stableTargetStoreIdentityPassed = false; },
+    payload => { payload.appliedEvidence.unreviewedProofPassed = true; }
+  ]) {
+    const payload = structuredClone(result.receiptPayload);
+    mutate(payload);
+    assert.equal(evaluateApplicationReceipt({
+      receiptPayload: payload,
+      receiptPayloadSha256: require('../src/core/Cm2114Phase8CompletionRevalidationApplication').sha256Canonical(payload)
+    }).accepted, false);
+  }
+});
+
 test('CM-2114 application receipt rejects rehashed top-level receipt or payload overclaims', () => {
   const result = executeCm2114Phase8CompletionRevalidationApplication(input());
   assert.equal(evaluateApplicationReceipt({
