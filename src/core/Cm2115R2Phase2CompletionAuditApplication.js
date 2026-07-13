@@ -367,7 +367,9 @@ function evaluateDecision(decision = {}, { resolveGitFile } = {}) {
       payload.registry?.replayAllowed !== false) blockers.push('decision.registry');
   const plan = payload.patchPlan || {};
   if (!/^[a-f0-9]{40}$/.test(plan.baselineCommit || '') || !/^[a-f0-9]{40}$/.test(plan.baselineTree || '') ||
-      !sameJson(plan.allowedPaths, PATCH_PATHS) || !Array.isArray(plan.targets) || plan.targets.length !== PATCH_PATHS.length ||
+      !sameJson(plan.allowedPaths, PATCH_PATHS) ||
+      !sameJson(plan.executionReceiptPaths, [EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_MARKDOWN_PATH]) ||
+      !Array.isArray(plan.targets) || plan.targets.length !== PATCH_PATHS.length ||
       !sameJson(plan.targets.map(item => item.sourcePath), PATCH_PATHS) ||
       plan.applicationCommitBindingRequired !== true ||
       plan.patchPayloadSha256 !== sha256Canonical({
