@@ -2520,7 +2520,10 @@ function createCodexMemoryApplication(overrides = {}) {
 
   const memoryContextPackageService = new MemoryContextPackageService({
     searchMemory: (searchArgs, searchRequestContext) =>
-      executeSearchMemory(searchArgs, searchRequestContext),
+      runSearchMemoryWithTimeout(
+        ({ signal }) => executeSearchMemory(searchArgs, searchRequestContext, { signal }),
+        { timeoutMs: config.searchMemoryTimeoutMs }
+      ),
     overviewService,
     auditMemoryReadonlyService
   });
