@@ -63,8 +63,12 @@ function resolvers(overrides = {}) {
     resolveCommitTree: commit => commit === IMPLEMENTATION_COMMIT
       ? IMPLEMENTATION_TREE
       : git.resolveCommitTree(commit),
-    resolveParentCommit: git.resolveParentCommit,
-    resolveDiffPaths: git.resolveDiffPaths,
+    resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
+      ? '7'.repeat(40)
+      : git.resolveParentCommit(commit),
+    resolveDiffPaths: (parent, commit) => commit === IMPLEMENTATION_COMMIT
+      ? [...IMPLEMENTATION_ARTIFACT_PATHS]
+      : git.resolveDiffPaths(parent, commit),
     resolveGitPathState: git.resolveGitPathState,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === REVIEW_REQUEST_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
@@ -146,6 +150,11 @@ test('self-review rejects frozen request, resolver, implementation, or payload d
   })).accepted, false);
   assert.equal(evaluateDecision(decision, resolvers({
     resolveCommitTree: commit => commit === IMPLEMENTATION_COMMIT ? '0'.repeat(40) : git.resolveCommitTree(commit)
+  })).accepted, false);
+  assert.equal(evaluateDecision(decision, resolvers({
+    resolveDiffPaths: (parent, commit) => commit === IMPLEMENTATION_COMMIT
+      ? [...IMPLEMENTATION_ARTIFACT_PATHS, 'src/core/Unreviewed.js']
+      : git.resolveDiffPaths(parent, commit)
   })).accepted, false);
   const drift = mutate(decision, copy => {
     copy.payload.reviewImplementation.artifacts[0].blobOid = 'a'.repeat(40);
