@@ -33,6 +33,7 @@ const {
 const {
   appOverrides,
   runFrozenCm2106RecordWrite,
+  startPrimaryWriteOnlyShim,
   validatePacket
 } = require('../src/cli/cm2106-identity-bound-synthetic-record-write');
 
@@ -185,6 +186,21 @@ test('CM-2106 app route is local, primary-write-only, and provider disabled', ()
   assert.equal(config.governedMcpVcpNativeHttpMcpTarget.tokenMaterialDisclosed, false);
 });
 
+test('CM-2106 primary-write shim refuses to start without a strong bearer binding', async () => {
+  await assert.rejects(
+    startPrimaryWriteOnlyShim({ storeRoot: 'unused', derivedRuntimeStore: 'unused' }),
+    /cm2106_local_shim_bearer_token_invalid/
+  );
+  await assert.rejects(
+    startPrimaryWriteOnlyShim({
+      storeRoot: 'unused',
+      derivedRuntimeStore: 'unused',
+      bearerToken: 'too-short'
+    }),
+    /cm2106_local_shim_bearer_token_invalid/
+  );
+});
+
 test('CM-2106 strict bridge delegates one primary-write-only record with bounded rollback controls', async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2106-strict-e2e-'));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
@@ -197,7 +213,12 @@ test('CM-2106 strict bridge delegates one primary-write-only record with bounded
     writeSubdir: STORE_IDENTITY.writeSubdir,
     primaryWriteOnly: true
   });
-  const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({ adapter, enableWrite: true });
+  const bearerToken = 'synthetic-fixture-only';
+  const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({
+    adapter,
+    enableWrite: true,
+    expectedBearerToken: bearerToken
+  });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => {
     await new Promise(resolve => server.close(resolve));
@@ -205,9 +226,15 @@ test('CM-2106 strict bridge delegates one primary-write-only record with bounded
   });
   const address = server.address();
   const endpoint = ['http:', '', `127.0.0.1:${address.port}`, 'mcp', 'vcp-native'].join('/');
+  const rejected = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: {} })
+  });
+  assert.equal(rejected.status, 401);
   const rollbackPlanRef = 'cm2106-r1-identity-bound-append-only-tombstone-plan';
   const app = createCodexMemoryApplication({
-    ...appOverrides({ endpoint, bearerToken: 'synthetic-fixture-only', appStateRoot: path.join(root, 'app') }),
+    ...appOverrides({ endpoint, bearerToken, appStateRoot: path.join(root, 'app') }),
     phase8OneShotNativeWriteEnforcementEnabled: true,
     phase8OneShotAuthorizationAssertionVerifier: async () => ({
       accepted: true,
@@ -252,6 +279,8 @@ test('CM-2106 strict bridge delegates one primary-write-only record with bounded
   assert.equal(result.access.memoryWritePerformed, true);
   assert.equal(result.access.localMemoryFallbackUsed, false);
   assert.equal(result.receipt.nativeInvocationReceipt.statusClass, 'success');
+  assert.equal(server.getLowDisclosureAuthorizationProjection().authorizationRequired, true);
+  assert.equal(server.getLowDisclosureAuthorizationProjection().rejectedAuthorizationCount, 1);
   const post = await collectPostWriteProjection(store);
   assert.equal(post.accepted, true);
   assert.equal(post.durableRecordSha256, EXPECTED.durableRecordSha256);
