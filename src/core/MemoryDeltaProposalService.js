@@ -2,6 +2,7 @@
 
 const crypto = require('node:crypto');
 
+const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const {
   validateVcpMemoryGovernedMutationProposalModeContract
 } = require('./VcpMemoryGovernedMutationProposalModeContract');
@@ -54,7 +55,10 @@ function isPlainObject(value) {
 
 function safeString(value, maxLength = 300) {
   if (typeof value !== 'string') return '';
-  return value.trim().replace(/\s+/g, ' ').slice(0, maxLength);
+  return redactSensitiveFragments(value)
+    .trim()
+    .replace(/\s+/g, ' ')
+    .slice(0, maxLength);
 }
 
 function normalizeStringList(value, { maxItems = 5, maxLength = 180 } = {}) {
