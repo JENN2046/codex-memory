@@ -7,6 +7,7 @@ const { execFileSync } = require('node:child_process');
 const {
   resolveCommitTree,
   resolveDiffPaths,
+  resolveDurableClaim,
   resolveGitFile: resolveR2GitFile,
   resolveGitPathState,
   resolveParentCommit
@@ -223,7 +224,8 @@ function main() {
     isCommitAncestor,
     resolveParentCommit,
     resolveDiffPaths,
-    resolveGitPathState
+    resolveGitPathState,
+    resolveDurableClaim
   });
   if (!evaluation.accepted) throw new Error(`cm2115_review_request_rejected:${evaluation.blockers.join(',')}`);
   const jsonText = `${JSON.stringify(canonicalize(request), null, 2)}\n`;

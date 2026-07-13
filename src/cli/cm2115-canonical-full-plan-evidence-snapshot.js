@@ -7,6 +7,7 @@ const { execFileSync } = require('node:child_process');
 const {
   resolveCommitTree,
   resolveDiffPaths,
+  resolveDurableClaim,
   resolveGitFile: resolveR2GitFile,
   resolveGitPathState,
   resolveParentCommit
@@ -138,6 +139,7 @@ function verifySnapshot(snapshot) {
     resolveGitFile,
     resolveParentCommit,
     resolveDiffPaths,
+    resolveDurableClaim,
     resolveGitPathState,
     isCommitAncestor: (ancestor, descendant) => {
       try {
@@ -168,6 +170,7 @@ function generate(options) {
     resolveCommitTree,
     resolveParentCommit,
     resolveDiffPaths,
+    resolveDurableClaim,
     resolveGitPathState
   });
   const evaluation = verifySnapshot(snapshot);

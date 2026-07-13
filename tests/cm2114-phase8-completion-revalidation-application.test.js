@@ -73,6 +73,9 @@ test('CM-2114 fails closed on proof, bundle, replay, baseline, side effect, or r
 test('CM-2114 application receipt rejects replay, new runtime action, or readiness overclaim', () => {
   const result = executeCm2114Phase8CompletionRevalidationApplication(input());
   for (const mutate of [
+    payload => { payload.schemaVersion = 2; },
+    payload => { payload.taskId = 'CM-FORGED'; },
+    payload => { payload.receiptType = 'forged_receipt'; },
     payload => { payload.authorization.replayAllowed = true; },
     payload => { payload.applicationCounters.nativeWrites = 1; },
     payload => { payload.appliedState.readinessClaimed = true; },

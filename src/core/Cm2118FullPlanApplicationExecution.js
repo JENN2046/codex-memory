@@ -1590,6 +1590,7 @@ async function executeFullPlanApplicationFromCommits({
     if (!executionEvaluation.accepted) throw new Error(`cm2118_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
     executionReceiptIdentity = { sha256: sha256(serializeArtifact(executionReceipt)) };
     executionReceiptWriteAttempted = true;
+    await registry.verifyRoot();
     executionReceiptIdentity = await writeExternalReceipt(governanceRoot, EXECUTION_RECEIPT_FILENAME, executionReceipt);
     executionReceiptKnown = true;
     claimEnvelope = await registry.transition(bindingHash, currentState, 'EXECUTION_RECEIPT_WRITTEN', {
@@ -1615,6 +1616,7 @@ async function executeFullPlanApplicationFromCommits({
     if (!bindingEvaluation.accepted) throw new Error(`cm2118_binding_receipt_rejected:${bindingEvaluation.blockers.join(',')}`);
     bindingReceiptIdentity = { sha256: sha256(serializeArtifact(bindingReceipt)) };
     bindingReceiptWriteAttempted = true;
+    await registry.verifyRoot();
     bindingReceiptIdentity = await writeExternalReceipt(governanceRoot, BINDING_RECEIPT_FILENAME, bindingReceipt);
     bindingReceiptKnown = true;
     claimEnvelope = await registry.transition(bindingHash, currentState, 'BINDING_RECEIPT_WRITTEN', {

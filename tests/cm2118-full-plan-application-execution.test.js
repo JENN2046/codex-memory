@@ -530,3 +530,16 @@ test('authority exports do not expose raw Git-plumbing or caller-resolver execut
   assert.equal(implementation.APPLICATION_DIFF_ENTRIES.filter(item => item.status === 'M').length, 4);
   assert.equal(implementation.APPLICATION_DIFF_ENTRIES.filter(item => item.status === 'A').length, 1);
 });
+
+test('external receipt writes immediately re-verify the fixed governance root', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2118FullPlanApplicationExecution.js'), 'utf8');
+  for (const [identity, filename] of [
+    ['executionReceiptIdentity', 'EXECUTION_RECEIPT_FILENAME'],
+    ['bindingReceiptIdentity', 'BINDING_RECEIPT_FILENAME']
+  ]) {
+    assert.match(
+      source,
+      new RegExp(`await registry\\.verifyRoot\\(\\);\\s+${identity} = await writeExternalReceipt\\(governanceRoot, ${filename},`)
+    );
+  }
+});

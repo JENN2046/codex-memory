@@ -183,7 +183,8 @@ function evaluateCm2115SnapshotReviewRequest(request, {
   isCommitAncestor,
   resolveParentCommit,
   resolveDiffPaths,
-  resolveGitPathState
+  resolveGitPathState,
+  resolveDurableClaim
 } = {}) {
   const blockers = [];
   if (!sameKeys(request, REQUEST_KEYS)) blockers.push('request.fields');
@@ -242,7 +243,8 @@ function evaluateCm2115SnapshotReviewRequest(request, {
         resolveGitFile,
         resolveParentCommit,
         resolveDiffPaths,
-        resolveGitPathState
+        resolveGitPathState,
+        resolveDurableClaim
       });
       if (!snapshotEvaluation.accepted) blockers.push('snapshot.contract');
     } catch {

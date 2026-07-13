@@ -1,8 +1,17 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const {
+  GOVERNANCE_ROOT_IDENTITY,
+  GOVERNANCE_ROOT_IDENTITY_SHA256,
+  canonicalize,
+  claimFileName,
+  sha256,
+  validateDurableClaim
+} = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 
 function gitText(args, { cwd = process.cwd() } = {}) {
   return execFileSync('git', args, {
@@ -83,6 +92,31 @@ function resolveGovernanceRegistryRoot(options) {
   return path.join(resolveGitCommonDir(options), 'codex-memory-governance', 'phase8-one-shot-authorization-registries');
 }
 
+function readRegularFileNoFollow(filePath) {
+  if (!Number.isInteger(fs.constants.O_NOFOLLOW)) throw new Error('cm2115_r2_no_follow_unavailable');
+  const descriptor = fs.openSync(filePath, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+  try {
+    if (!fs.fstatSync(descriptor).isFile()) throw new Error('cm2115_r2_governance_file_invalid');
+    return fs.readFileSync(descriptor);
+  } finally {
+    fs.closeSync(descriptor);
+  }
+}
+
+function resolveDurableClaim(bindingHash, options) {
+  const governanceRoot = resolveGovernanceRegistryRoot(options);
+  const rootStat = fs.lstatSync(governanceRoot);
+  if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) throw new Error('cm2115_r2_governance_root_invalid');
+  const identityPath = path.join(governanceRoot, '.phase8-registry-root-identity.json');
+  const identityBytes = readRegularFileNoFollow(identityPath);
+  if (sha256(identityBytes) !== GOVERNANCE_ROOT_IDENTITY_SHA256 ||
+      identityBytes.toString('utf8') !== JSON.stringify(canonicalize(GOVERNANCE_ROOT_IDENTITY))) {
+    throw new Error('cm2115_r2_governance_root_identity_mismatch');
+  }
+  const claimPath = path.join(governanceRoot, claimFileName());
+  return validateDurableClaim(JSON.parse(readRegularFileNoFollow(claimPath).toString('utf8')), bindingHash);
+}
+
 function ensureCleanWorktree(options) {
   if (gitText(['status', '--porcelain'], options) !== '') throw new Error('cm2115_r2_clean_worktree_required');
 }
@@ -93,6 +127,7 @@ module.exports = {
   gitText,
   resolveCommitTree,
   resolveDiffPaths,
+  resolveDurableClaim,
   resolveGitCommonDir,
   resolveGitFile,
   resolveGitPathState,
