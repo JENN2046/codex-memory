@@ -199,6 +199,26 @@ test('CM2035 stops L4 on default exposure approval acceptance commit write or re
   assert.equal(result.public_mcp_expanded, false);
 });
 
+test('CM2035 blocks top-level commit and write intent aliases', () => {
+  const service = new MemoryDeltaCommitPreflightService();
+  for (const field of ['commit', 'write', 'confirm', 'durableWrite', 'production_write']) {
+    const result = service.preflight(validPreflightArgs({ [field]: true }));
+    assert.equal(result.accepted, false);
+    assert.equal(result.reasonCode, 'stop_l4');
+    assert.ok(result.blockers.includes(field));
+  }
+});
+
+test('CM2035 requires the accepted proposal task to match the preflight task', () => {
+  const service = new MemoryDeltaCommitPreflightService();
+  const result = service.preflight(validPreflightArgs({ task_id: 'CM-9999' }));
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'proposal_task_mismatch');
+  assert.deepEqual(result.blockers, ['proposal.task.task_id']);
+  assert.equal(result.task.task_id, 'CM-9999');
+});
+
 test('CM2035 rejects raw secret private commit fields by path without echoing values', () => {
   const service = new MemoryDeltaCommitPreflightService();
   const result = service.preflight(validPreflightArgs({
