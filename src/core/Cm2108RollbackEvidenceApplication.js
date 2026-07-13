@@ -197,7 +197,9 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.sourceRollbackReceipt?.commit !== SOURCE_RECEIPT.commit || payload.sourceRollbackReceipt?.blobOid !== SOURCE_RECEIPT.blobOid || payload.sourceRollbackReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 || payload.sourceRollbackReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 || payload.sourceRollbackReceipt?.acceptedAsRollbackEvidence !== true) blockers.push('receipt.sourceRollbackReceipt');
-  for (const [field, expected] of Object.entries(expectedPatch())) {
+  const appliedEvidence = expectedPatch();
+  if (!hasExactKeys(payload.appliedEvidence, Object.keys(appliedEvidence))) blockers.push('receipt.appliedEvidence.fields');
+  for (const [field, expected] of Object.entries(appliedEvidence)) {
     if (payload.appliedEvidence?.[field] !== expected) blockers.push(`receipt.appliedEvidence.${field}`);
   }
   const expectedBoundaries = expectedReceiptBoundaries();

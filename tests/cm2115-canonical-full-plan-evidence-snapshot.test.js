@@ -35,6 +35,7 @@ const {
   evaluateCm2115SnapshotReviewRequest
 } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
 const {
+  buildGateCiSafeSummary,
   buildReceipt,
   extractTapSummaries,
   renderCanonicalMarkdown,
@@ -442,6 +443,40 @@ test('local validation receipt contract rejects failed command or completion/rea
   dirtyAfter.payload.validationTarget.worktreeCleanAfterCommands = false;
   dirtyAfter.canonicalPayloadSha256 = sha256Canonical(dirtyAfter.payload);
   assert.equal(evaluateCm2115LocalValidationReceipt(dirtyAfter).accepted, false);
+});
+
+test('local validation receipt generator requires an explicit safe gate environment summary', () => {
+  const safeSummary = {
+    ok: true,
+    fixtureOnly: true,
+    noNetwork: true,
+    noDaemon: true,
+    noProvider: true,
+    unsafeEnvOverrideDetected: false,
+    failedChecks: []
+  };
+  assert.equal(buildGateCiSafeSummary({ summary: safeSummary, checks: {} }).unsafeEnvOverrideDetected, false);
+
+  const missing = { ...safeSummary };
+  delete missing.unsafeEnvOverrideDetected;
+  assert.throws(
+    () => buildGateCiSafeSummary({ summary: missing, checks: {} }),
+    /cm2115_gate_ci_unsafe_env_override_status_required/
+  );
+
+  const renamed = { ...missing, unsafeEnvironmentOverrideDetected: false };
+  assert.throws(
+    () => buildGateCiSafeSummary({ summary: renamed, checks: {} }),
+    /cm2115_gate_ci_unsafe_env_override_status_required/
+  );
+
+  assert.throws(
+    () => buildGateCiSafeSummary({
+      summary: { ...safeSummary, unsafeEnvOverrideDetected: true },
+      checks: {}
+    }),
+    /cm2115_gate_ci_unsafe_env_override_status_required/
+  );
 });
 
 test('snapshot review boundary cannot be promoted inside snapshot preparation', () => {

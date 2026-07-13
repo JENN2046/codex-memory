@@ -34,6 +34,8 @@ const REGISTRY_REFERENCE = 'cm2116-full-plan-application-registry-001';
 const NONCE = 'cm2116-full-plan-application-001';
 const RECEIPT_ID = 'cm2116-full-plan-application-receipt-001';
 const ACTION = 'apply_exact_full_plan_completion_state';
+const FINAL_RELEASE_APPROVED_AT = '2026-07-12T18:00:00+08:00';
+const FINAL_RELEASE_EXPIRES_AT = '2026-07-19T18:00:00+08:00';
 
 const GOVERNANCE_ROOT_IDENTITY = Object.freeze({
   registryRootInstanceId: 'cm2093-phase8-governance-root-instance-001',
@@ -528,6 +530,9 @@ function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
   if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet)) {
     throw new Error('cm2119_machine_bound_execution_packet_required');
   }
+  if (approvedAt !== FINAL_RELEASE_APPROVED_AT || expiresAt !== FINAL_RELEASE_EXPIRES_AT) {
+    throw new Error('cm2119_exact_authorization_window_required');
+  }
   const packet = packetEvidence.packet;
   const payload = {
     decisionReference: `CM-2119-FULL-PLAN-FINAL-EXECUTION-RELEASE-${packet.payload.contentDecision.canonicalPayloadSha256.slice(0, 8)}-${packet.canonicalPayloadSha256.slice(0, 8)}-${packet.payload.implementation.commit.slice(0, 8)}`.toUpperCase(),
@@ -607,8 +612,8 @@ function evaluateFinalReleaseDecision(decision = {}, { packetEvidence, now = new
     try {
       const expected = buildFinalReleaseDecision({
         packetEvidence,
-        approvedAt: decision.payload?.approvedAt,
-        expiresAt: decision.payload?.expiresAt
+        approvedAt: FINAL_RELEASE_APPROVED_AT,
+        expiresAt: FINAL_RELEASE_EXPIRES_AT
       });
       if (!sameJson(decision, expected)) blockers.push('finalRelease.exactContent');
     } catch {
@@ -746,6 +751,33 @@ function exactRootIdentityBytes() {
   return Buffer.from(JSON.stringify(canonicalize(GOVERNANCE_ROOT_IDENTITY)));
 }
 
+function governanceDescriptorPath(rootHandle, filename) {
+  return `/proc/self/fd/${rootHandle.fd}/${filename}`;
+}
+
+async function openVerifiedGovernanceRoot(registry) {
+  const rootIdentity = await registry.verifyRoot();
+  if (process.platform !== 'linux' || !Number.isInteger(fs.constants.O_DIRECTORY) ||
+      !Number.isInteger(fs.constants.O_NOFOLLOW)) {
+    throw new Error('cm2118_descriptor_relative_governance_access_unsupported');
+  }
+  const rootHandle = await registry.fs.open(
+    registry.governanceRoot,
+    fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+  );
+  try {
+    const descriptorStat = await rootHandle.stat();
+    if (!descriptorStat.isDirectory() || descriptorStat.dev !== rootIdentity.dev ||
+        descriptorStat.ino !== rootIdentity.ino) {
+      throw new Error('cm2118_governance_root_descriptor_identity_mismatch');
+    }
+    return rootHandle;
+  } catch (error) {
+    await rootHandle.close().catch(() => {});
+    throw error;
+  }
+}
+
 class Cm2118FullPlanApplicationClaimRegistry {
   constructor({ governanceRoot, filesystem = fsPromises }) {
     if (typeof governanceRoot !== 'string' || governanceRoot.trim() === '') {
@@ -757,11 +789,13 @@ class Cm2118FullPlanApplicationClaimRegistry {
   }
 
   async verifyRoot() {
+    let verifiedRootStat = null;
     for (const directory of [path.dirname(this.governanceRoot), this.governanceRoot]) {
       const stat = await this.fs.lstat(directory);
       if (!stat.isDirectory() || stat.isSymbolicLink()) {
         throw new Error('cm2118_governance_root_invalid');
       }
+      if (path.resolve(directory) === path.resolve(this.governanceRoot)) verifiedRootStat = stat;
     }
     const realRoot = await this.fs.realpath(this.governanceRoot);
     if (path.resolve(realRoot) !== path.resolve(this.governanceRoot)) {
@@ -774,6 +808,7 @@ class Cm2118FullPlanApplicationClaimRegistry {
     if (!bytes.equals(exactRootIdentityBytes()) || sha256(bytes) !== GOVERNANCE_ROOT_IDENTITY_SHA256) {
       throw new Error('cm2118_governance_root_identity_mismatch');
     }
+    return { dev: verifiedRootStat.dev, ino: verifiedRootStat.ino };
   }
 
   baseEnvelope(bindingHash, finalReleaseEvidence, claimedAt) {
@@ -1411,14 +1446,24 @@ function assertFixedExecutionRuntime(packetEvidence) {
   return repositoryRoot;
 }
 
-async function readExternalReceipt(governanceRoot, filename) {
-  const receiptPath = path.join(governanceRoot, filename);
-  const stat = await fsPromises.lstat(receiptPath);
-  if (!stat.isFile() || stat.isSymbolicLink()) throw new Error(`cm2118_receipt_invalid:${filename}`);
-  const bytes = await fsPromises.readFile(receiptPath);
-  let receipt;
-  try { receipt = JSON.parse(bytes.toString('utf8')); } catch { throw new Error(`cm2118_receipt_corrupt:${filename}`); }
-  return { receipt, bytes, sha256: sha256(bytes) };
+async function readExternalReceipt(registry, filename) {
+  const rootHandle = await openVerifiedGovernanceRoot(registry);
+  let receiptHandle = null;
+  try {
+    receiptHandle = await registry.fs.open(
+      governanceDescriptorPath(rootHandle, filename),
+      fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW
+    );
+    const stat = await receiptHandle.stat();
+    if (!stat.isFile()) throw new Error(`cm2118_receipt_invalid:${filename}`);
+    const bytes = await receiptHandle.readFile();
+    let receipt;
+    try { receipt = JSON.parse(bytes.toString('utf8')); } catch { throw new Error(`cm2118_receipt_corrupt:${filename}`); }
+    return { receipt, bytes, sha256: sha256(bytes) };
+  } finally {
+    if (receiptHandle) await receiptHandle.close().catch(() => {});
+    await rootHandle.close().catch(() => {});
+  }
 }
 
 async function evaluateDurableApplicationBinding({
@@ -1462,8 +1507,8 @@ async function evaluateDurableApplicationBinding({
         claimEnvelope.finalReleaseExpiresAt !== finalReleaseEvidence.decision.payload.expiresAt) {
       blockers.push('durableBinding.claimNotConsumedSuccess');
     }
-    execution = await readExternalReceipt(governanceRoot, EXECUTION_RECEIPT_FILENAME);
-    binding = await readExternalReceipt(governanceRoot, BINDING_RECEIPT_FILENAME);
+    execution = await readExternalReceipt(registry, EXECUTION_RECEIPT_FILENAME);
+    binding = await readExternalReceipt(registry, BINDING_RECEIPT_FILENAME);
     if (execution.sha256 !== claimEnvelope.executionReceiptSha256 ||
         binding.sha256 !== claimEnvelope.bindingReceiptSha256) blockers.push('durableBinding.receiptHash');
     const executionEvaluation = evaluateExecutionReceipt(execution.receipt, { packetEvidence, finalReleaseEvidence });

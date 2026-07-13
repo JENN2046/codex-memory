@@ -120,7 +120,9 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.sourceFailureRecoveryReceipt?.commit !== SOURCE_RECEIPT.commit || payload.sourceFailureRecoveryReceipt?.blobOid !== SOURCE_RECEIPT.blobOid || payload.sourceFailureRecoveryReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 || payload.sourceFailureRecoveryReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 || payload.sourceFailureRecoveryReceipt?.acceptedAsFailureRecoveryEvidence !== true) blockers.push('receipt.sourceFailureRecoveryReceipt');
-  for (const [field, expected] of Object.entries(expectedPatch())) if (payload.appliedEvidence?.[field] !== expected) blockers.push(`receipt.appliedEvidence.${field}`);
+  const appliedEvidence = expectedPatch();
+  if (!hasExactKeys(payload.appliedEvidence, Object.keys(appliedEvidence))) blockers.push('receipt.appliedEvidence.fields');
+  for (const [field, expected] of Object.entries(appliedEvidence)) if (payload.appliedEvidence?.[field] !== expected) blockers.push(`receipt.appliedEvidence.${field}`);
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters.completionAuditPatchApplications');
   for (const field of ['nativeReads', 'nativeWrites', 'failureInjectionExecutions', 'verifyOperations', 'retryOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);

@@ -359,6 +359,19 @@ test('frozen packet remains non-executing and final release authorizes no branch
   }).accepted, false);
 });
 
+test('final release cannot replace the independently frozen approval window', () => {
+  const decision = JSON.parse(JSON.stringify(fixture.finalReleaseEvidence.decision));
+  decision.payload.authorization.approvedAt = '2030-01-01T00:00:00+08:00';
+  decision.payload.authorization.expiresAt = '2030-01-02T00:00:00+08:00';
+  decision.canonicalPayloadSha256 = sha256Canonical(decision.payload);
+  const evaluation = fixture.frozenModule.evaluateFinalReleaseDecision(decision, {
+    packetEvidence: fixture.packetEvidence,
+    now: new Date('2030-01-01T12:00:00+08:00')
+  });
+  assert.equal(evaluation.accepted, false);
+  assert.ok(evaluation.blockers.includes('finalRelease.exactContent'));
+});
+
 test('registry root symlinks and claim timestamps outside the exact release window fail before claim creation', async () => {
   const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2122-registry-boundary-'));
   try {
@@ -399,6 +412,19 @@ test('receipt writes pin the verified governance directory and never follow its 
   assert.match(source, /`\/proc\/self\/fd\/\$\{rootHandle\.fd\}\/\$\{filename\}`/);
   assert.match(source, /descriptorStat\.dev !== rootIdentity\.dev \|\| descriptorStat\.ino !== rootIdentity\.ino/);
   assert.doesNotMatch(source, /fsPromises\.writeFile\(receiptPath, bytes/);
+});
+
+test('receipt reads pin the verified governance directory and read through a no-follow descriptor', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2122FullPlanStatusSyncExecution.js'), 'utf8');
+  const start = source.indexOf('async function readExternalReceipt');
+  const end = source.indexOf('\nasync function evaluateDurableDetachedBinding', start);
+  const implementationSource = source.slice(start, end);
+  assert.match(implementationSource, /openVerifiedGovernanceRoot\(registry\)/);
+  assert.match(implementationSource, /O_NOFOLLOW/);
+  assert.match(implementationSource, /receiptHandle\.stat\(\)/);
+  assert.match(implementationSource, /receiptHandle\.readFile\(\)/);
+  assert.doesNotMatch(implementationSource, /lstat\(receiptPath\)/);
+  assert.doesNotMatch(implementationSource, /readFile\(receiptPath\)/);
 });
 
 test('claim create, read, and transition stay inside the verified governance descriptor', () => {

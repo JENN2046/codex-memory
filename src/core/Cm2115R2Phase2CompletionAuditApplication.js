@@ -28,6 +28,10 @@ const APPLICATION_STATE_PATH = 'docs/near-model-memory-plan-pack/phase2_completi
 const REGISTRY_REFERENCE = 'cm2115-r2-phase2-completion-audit-application-registry-001';
 const NONCE = 'cm2115-r2-phase2-completion-audit-application-001';
 const RECEIPT_ID = 'cm2115-r2-phase2-completion-audit-application-receipt-001';
+const CLAIM_TRANSITIONS = Object.freeze({
+  CLAIMED: Object.freeze(['PATCH_INVOCATION_CONSUMED']),
+  PATCH_INVOCATION_CONSUMED: Object.freeze(['CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS'])
+});
 
 const GOVERNANCE_ROOT_IDENTITY = Object.freeze({
   registryRootInstanceId: 'cm2093-phase8-governance-root-instance-001',
@@ -568,12 +572,20 @@ class Cm2115R2ApplicationClaimRegistry {
     return validateDurableClaim(value, bindingHash);
   }
 
+  async preflightTransitionTempPathsUnused() {
+    await this.verifyRoot();
+    for (const nextState of Object.values(CLAIM_TRANSITIONS).flat()) {
+      try {
+        await this.fs.lstat(`${this.claimPath}.${nextState}.tmp`);
+        throw new Error('cm2115_r2_transition_temp_path_exists');
+      } catch (error) {
+        if (error?.code !== 'ENOENT') throw error;
+      }
+    }
+  }
+
   async transition(bindingHash, expectedState, nextState, patchInvocationCount) {
-    const allowed = {
-      CLAIMED: ['PATCH_INVOCATION_CONSUMED'],
-      PATCH_INVOCATION_CONSUMED: ['CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS']
-    };
-    if (!allowed[expectedState]?.includes(nextState)) throw new Error('cm2115_r2_claim_transition_invalid');
+    if (!CLAIM_TRANSITIONS[expectedState]?.includes(nextState)) throw new Error('cm2115_r2_claim_transition_invalid');
     const current = await this.read(bindingHash);
     if (current.state !== expectedState) throw new Error('cm2115_r2_claim_state_mismatch');
     const next = { ...current, state: nextState, patchInvocationCount };
@@ -793,6 +805,11 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
     verifyResolvedIdentity(authorityActual, authorityIdentity, blockers, 'authorityIdentity.gitObject');
   } catch {
     blockers.push('authorityIdentity.gitObject');
+  }
+  try {
+    await registry.preflightTransitionTempPathsUnused();
+  } catch {
+    blockers.push('registry.transitionTempPaths');
   }
   for (const receiptPath of [EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_MARKDOWN_PATH]) {
     try {
