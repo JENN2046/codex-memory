@@ -36,7 +36,7 @@ test('CM-2104-B current content decision identity resolves to the exact reissued
 
 test('CM-2104-B prepares the reissued final release binding without issuing or executing it', () => {
   const currentApplication = createCm2104BootstrapFinalExecutionReleaseApplication(packet);
-  const result = evaluateCm2104BootstrapFinalExecutionReleaseApplication({ application: currentApplication, gatePacket: packet });
+  const result = evaluateCm2104BootstrapFinalExecutionReleaseApplication({ application, gatePacket: packet });
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.authorizationContentApproved, true);
   assert.equal(result.finalReleaseDecisionIssued, false);
@@ -46,7 +46,7 @@ test('CM-2104-B prepares the reissued final release binding without issuing or e
   assert.equal(result.nativeActions, 0);
   assert.equal(currentApplication.gatePacketGitIdentity.commit, GATE_PACKET_GIT_IDENTITY.commit);
   assert.equal(currentApplication.authorizationContentDecisionGitIdentity.commit, CONTENT_DECISION_GIT_IDENTITY.commit);
-  assert.equal(evaluateCm2104BootstrapFinalExecutionReleaseApplication({ application, gatePacket: packet }).accepted, false);
+  assert.deepEqual(application, currentApplication);
   assert.throws(
     () => createCm2104BootstrapFinalExecutionReleaseApplication(stalePacket),
     /cm2104_final_release_application_gate_packet_rejected/

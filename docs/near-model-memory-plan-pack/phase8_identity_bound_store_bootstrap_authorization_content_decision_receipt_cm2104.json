@@ -5,13 +5,13 @@
   "receiptPayload": {
     "decision": {
       "reference": "CM-2104-ER-IDENTITY-BOUND-STORE-BOOTSTRAP-CONTENT-0A7CEB6C-017307C9",
-      "sourceCommit": "a70870a090d739f79eb31c7d1be3b7ac979fb32a",
-      "sourceTree": "241ec97972e0e16c741dd0d48baa66349716b41f",
+      "sourceCommit": "e2000e4d823cdbbf53152a27aa0122131fb34eb9",
+      "sourceTree": "e1bc6f9a799d70aeffaec29006b18dde3c0fabfc",
       "path": "docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_authorization_content_decision_cm2104.json",
-      "blobOid": "86915428a69719093d426996deb56078dc6a5a5e",
+      "blobOid": "b460ad94ed6b66c7c7e38ca2732ee907aea6c8bf",
       "bytes": 4176,
-      "sha256": "4baa0e84cf127ca99e6eec0111480a7e262ab368c9f04adc0ee5448cee384493",
-      "approvedAt": "2026-07-12T02:21:45+08:00",
+      "sha256": "2414b28a3474984f81fd50769c07da2461d5f5d9ac1801f2e601f9ff56ccfbb3",
+      "approvedAt": "2026-07-12T03:00:57+08:00",
       "expiresAt": "2026-07-15T18:00:00+08:00"
     },
     "intake": {
@@ -21,32 +21,13 @@
       "finalExecutionReleaseRequired": true,
       "executionAuthorized": false
     },
-    "application": {
-      "reference": "CM-2104-A-AR-20260712-CONTENT-ONLY-0AD7E1CB",
-      "sourceCommit": "3477c567642e47e12bfed30711b182f18d49b074",
-      "sourceTree": "7764f067b0b61cfee54c00329c9f91db1495f8b1",
-      "path": "docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_authorization_content_application_cm2104_a.json",
-      "blobOid": "5753fa4483b936c64ae4f752032a5d543bf93969",
-      "bytes": 8546,
-      "sha256": "015b1a0c049d7f841399e9874faafd681a573259f005f64a7854de51b535fa9b",
-      "payloadSha256": "07b8ce5d2c7d4d21eca4980cd701148e40f4e00aeb3b3fffb3001df525c9e21d"
-    },
-    "applicationReviewRequest": {
-      "sourceCommit": "8af4adaeccaeedfebe7d953cf625f4e1aa22fe28",
-      "sourceTree": "204aaca92c81b48be16d04a20b4f0d74f24d7b03",
-      "path": "docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_authorization_content_review_request_cm2104_a.json",
-      "blobOid": "974edce81892097aa7dead3e00019a9f87a0ef2e",
-      "bytes": 4039,
-      "sha256": "ddeec6020e95a2d0f7a38a5036ef21f7cd83a951095328ae008a0d3a7210eefa",
-      "payloadSha256": "0d5fa0f384ce1e0d9371f9f6d5b23efe605062e877e2c257b19703b04357a8ab"
-    },
     "gate": {
-      "packetCommit": "67eaab147cb856180a7ddd0491c5e5cc2f01324f",
-      "packetBlobOid": "c5a2c6e4eb6c0911895c44b41c07244fe96d61e9",
-      "packetSha256": "0ad7e1cb4ff30cc993c9625fcefe0328d9c78d9a4227ffb6c9409b5faa4c0f8e",
-      "packetPayloadSha256": "e57a98e9151583029843ff3ce93ca60ad45ebbfcd91e9c7fce7e0362969359da",
-      "implementationCommit": "53e5524937c030cab1ecf48a3d9d5006af34dca6",
-      "implementationTree": "94cbbb695e3e2a4e75367ec0165bba5285a4a502",
+      "packetCommit": "9ba0800a6b4b401df0b72dac024bc6668602414b",
+      "packetBlobOid": "b0fa9da564b2628c33ca758b1e34f5879e0c5538",
+      "packetSha256": "f15ac74db5d34e806ae5fb90f70c76edec3ec07a9e3301326803ad8bbdf9d3e4",
+      "packetPayloadSha256": "2f699b5db2d2b651ec2a541fbe55dd2d988c515b8b95170ea06cdc78900b7684",
+      "implementationCommit": "2fdf97f1854964c88d244b731cc0b45f3102de92",
+      "implementationTree": "a4e74f74871b663683bd6e26cbba9a21e3443dc4",
       "contentApprovalSeparatedFromExecutionRelease": true
     },
     "reviewBasis": {
@@ -102,5 +83,5 @@
     },
     "nextGate": "separate_exact_final_execution_release_application"
   },
-  "receiptPayloadSha256": "9be8f36e0baeb0fa4c21699c10051ff865f7e40f8aadaca77077b9635bb3ed00"
+  "receiptPayloadSha256": "ab9f0c40c2d9f4ea4539ec15a543eb0bf1c079fe0653a2fcc9581441175f240a"
 }
