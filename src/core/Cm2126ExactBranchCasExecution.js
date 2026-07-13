@@ -71,9 +71,13 @@ const machineBoundPackets = new WeakSet();
 const machineBoundFinalReleases = new WeakSet();
 const machineBoundReleaseBindings = new WeakSet();
 
+function isolatedTestFaultSelected(point) {
+  return process.env.NODE_ENV === 'test' && process.env.CM2126_ISOLATED_TEST_FIXTURE === '1' &&
+    process.cwd().includes('cm2126-cas-e2e-') && process.env.CM2126_TEST_FAULT_POINT === point;
+}
+
 function injectIsolatedTestFault(point) {
-  if (process.env.NODE_ENV === 'test' && process.env.CM2126_ISOLATED_TEST_FIXTURE === '1' &&
-      process.cwd().includes('cm2126-cas-e2e-') && process.env.CM2126_TEST_FAULT_POINT === point) {
+  if (isolatedTestFaultSelected(point)) {
     throw new Error(`cm2126_isolated_test_fault:${point}`);
   }
 }
@@ -1071,6 +1075,7 @@ function verifyPerFileEffectBoundary(repoRoot, targetPath, beforeOtherRefs) {
     optionalGitText(['rev-parse', 'HEAD^{commit}'], { cwd: targetPath }) === NEW_COMMIT &&
     optionalGitText(['symbolic-ref', '-q', 'HEAD'], { cwd: targetPath }) === TARGET_REF &&
     indexMatchesCommit(targetPath, NEW_COMMIT) && exactIndexPolicyMatched(targetPath) &&
+    targetIndexLockAbsent(targetPath) &&
     otherRefsSnapshotSha256(repoRoot) === beforeOtherRefs;
 }
 
@@ -1090,6 +1095,11 @@ function assertTargetParentChain(root, sourcePath) {
 async function syncTargetFiles(targetPath, targetBindings, options, repoRoot, beforeOtherRefs) {
   let completed = 0;
   for (const binding of targetBindings) {
+    if (completed === 0 && isolatedTestFaultSelected('index_lock_before_first_file_sync')) {
+      fs.writeFileSync(`${resolveTargetIndexPath(targetPath)}.lock`, 'synthetic concurrent index writer\n', {
+        flag: 'wx'
+      });
+    }
     const identity = binding.after;
     const source = options.resolveGitFile(NEW_COMMIT, identity.sourcePath);
     if (source.blobOid !== identity.blobOid || source.bytes !== identity.bytes || source.sha256 !== identity.sha256 ||
@@ -1102,7 +1112,9 @@ async function syncTargetFiles(targetPath, targetBindings, options, repoRoot, be
     if (!existing.isFile() || existing.isSymbolicLink()) throw new Error(`cm2126_target_file_invalid:${identity.sourcePath}`);
     if (!verifyPerFileEffectBoundary(repoRoot, targetPath, beforeOtherRefs) ||
         !fileMatchesIdentity(targetPath, binding.before)) {
-      throw new Error(`cm2126_target_file_before_drift:${identity.sourcePath}`);
+      const error = new Error(`cm2126_target_file_before_drift:${identity.sourcePath}`);
+      error.cm2126TargetFileSynchronizations = completed;
+      throw error;
     }
     const temporary = path.join(path.dirname(absolute),
       `.cm2126-${sha256(identity.sourcePath).slice(0, 16)}.sync.tmp`);

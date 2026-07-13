@@ -838,6 +838,16 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
     assert.equal(claim.executionReceiptWrites, 0);
   });
 
+  runIsolatedFault('index_lock_before_first_file_sync', ({ claim, output }) => {
+    assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
+    assert.equal(claim.targetIndexSynchronizations, 1);
+    assert.equal(claim.targetFileSyncAttempts, 1);
+    assert.equal(claim.targetFileSynchronizations, 0);
+    assert.equal(claim.targetFilesMatchedCount, 0);
+    assert.equal(claim.executionReceiptWrites, 0);
+    assert.equal(output.reconciliationReceipt.payload.targetIndexLockAbsent, false);
+  });
+
   runIsolatedFault('file_rename_acknowledgement_lost', ({ claim }) => {
     assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
     assert.equal(claim.targetIndexSynchronizations, 1);
