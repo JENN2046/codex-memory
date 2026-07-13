@@ -154,12 +154,13 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters');
   for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
-  for (const field of ['additionalNativeWriteAuthorized', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed']) if (payload.nonClaims?.[field] !== false) blockers.push(`receipt.nonClaims.${field}`);
-  for (const field of ['derivedIndexProofAccepted', 'productionProviderProofAccepted']) {
-    if (payload.nonClaims?.[field] !== undefined && payload.nonClaims[field] !== false) {
-      blockers.push(`receipt.nonClaims.${field}`);
-    }
-  }
+  const historicalNonClaimFields = ['additionalNativeWriteAuthorized', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed'];
+  const currentNonClaimFields = ['additionalNativeWriteAuthorized', 'derivedIndexProofAccepted', 'productionProviderProofAccepted', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed'];
+  const observedNonClaimFields = Object.keys(payload.nonClaims || {}).sort();
+  const allowedNonClaimShapes = [historicalNonClaimFields, currentNonClaimFields]
+    .map(fields => JSON.stringify([...fields].sort()));
+  if (!allowedNonClaimShapes.includes(JSON.stringify(observedNonClaimFields))) blockers.push('receipt.nonClaims.fields');
+  for (const field of observedNonClaimFields) if (payload.nonClaims?.[field] !== false) blockers.push(`receipt.nonClaims.${field}`);
   return { accepted: blockers.length === 0, blockers: [...new Set(blockers)], phase8Completed: blockers.length === 0, phase8CompletionStatus: blockers.length === 0 ? 'revalidated_complete' : 'needs_revalidation', fullPlanPackCompleted: false, readinessClaimed: false, additionalNativeWriteAuthorized: false };
 }
 
