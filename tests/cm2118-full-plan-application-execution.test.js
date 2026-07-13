@@ -249,6 +249,36 @@ test('CM-2118 rejects repository Git environment overrides before packet intake 
   }
 });
 
+test('CM-2118 preflights author and committer identities before the durable claim', () => {
+  const calls = [];
+  assert.equal(implementation.assertGitCommitIdentity('/fixture/repo', (args, options) => {
+    calls.push({ args, options });
+    return `${args[1]} Fixture <fixture@example.invalid> 0 +0000`;
+  }), true);
+  assert.deepEqual(calls.map(call => call.args), [
+    ['var', 'GIT_AUTHOR_IDENT'],
+    ['var', 'GIT_COMMITTER_IDENT']
+  ]);
+  assert.ok(calls.every(call => call.options.cwd === '/fixture/repo'));
+
+  assert.throws(
+    () => implementation.assertGitCommitIdentity('/fixture/repo', args => {
+      if (args[1] === 'GIT_COMMITTER_IDENT') throw new Error('Committer identity unknown');
+      return 'Author Fixture <fixture@example.invalid> 0 +0000';
+    }),
+    /cm2118_git_commit_identity_required:GIT_COMMITTER_IDENT/
+  );
+
+  const executionSource = fs.readFileSync(
+    path.join(ROOT, 'src/core/Cm2118FullPlanApplicationExecution.js'),
+    'utf8'
+  );
+  assert.ok(
+    executionSource.indexOf('assertGitCommitIdentity(repositoryRoot);') <
+      executionSource.indexOf('registry.claim(bindingHash, finalReleaseEvidence)')
+  );
+});
+
 test('CM-2119 generation validates at a deterministic in-window time', () => {
   assert.equal(releaseGenerator.VALIDATION_AT, releaseGenerator.APPROVED_AT);
   const validation = Date.parse(releaseGenerator.VALIDATION_AT);
