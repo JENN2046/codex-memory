@@ -95,10 +95,16 @@ function renderMarkdown(decision, jsonText) {
   ].join('\n');
 }
 
+function assertCm2125ContentDecisionCleanWorktree() {
+  if (gitText(['status', '--porcelain', '--untracked-files=all']) !== '') {
+    throw new Error('cm2125_content_decision_clean_worktree_required');
+  }
+}
+
 function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
   assertSafeGitEnvironment();
-  if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2125_content_decision_clean_worktree_required');
+  assertCm2125ContentDecisionCleanWorktree();
   if (gitText(['branch', '--show-current']) !== '') throw new Error('cm2125_content_decision_detached_worktree_required');
   if (gitText(['show-ref', '--hash', '--verify', TARGET_REF]) !== EXPECTED_OLD) {
     throw new Error('cm2125_content_decision_target_ref_expected_old_required');
@@ -160,6 +166,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  assertCm2125ContentDecisionCleanWorktree,
   buildImplementationIdentity,
   gitText,
   main,

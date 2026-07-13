@@ -29,7 +29,8 @@ const {
   DETACHED_STATUS_TREE,
   FINAL_RELEASE_COMMIT,
   OUTPUTS,
-  PACKET_COMMIT
+  PACKET_COMMIT,
+  claimBoundReviewTime
 } = require('./freeze-cm2124-status-sync-receipts');
 const {
   gitText
@@ -45,6 +46,12 @@ const FREEZE_DIFF_ENTRIES = Object.freeze(FREEZE_DIFF_PATHS.map(sourcePath => ({
 
 function parseArgs(argv) {
   if (argv.length !== 0) throw new Error('cm2124_review_no_arguments_allowed');
+}
+
+function assertCm2124ReviewCleanWorktree() {
+  if (gitText(['status', '--porcelain', '--untracked-files=all']) !== '') {
+    throw new Error('cm2124_review_clean_worktree_required');
+  }
 }
 
 function renderMarkdown(review, jsonText) {
@@ -71,7 +78,7 @@ function renderMarkdown(review, jsonText) {
 
 async function buildReview() {
   assertSafeGitEnvironment();
-  if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2124_review_clean_worktree_required');
+  assertCm2124ReviewCleanWorktree();
   if (gitText(['branch', '--show-current']) !== '') throw new Error('cm2124_review_detached_worktree_required');
   if (fs.existsSync(REVIEW_PATH) || fs.existsSync(REVIEW_MARKDOWN_PATH)) throw new Error('cm2124_review_already_exists');
   const options = resolverOptions();
@@ -111,7 +118,7 @@ async function buildReview() {
   const finalReleaseEvidence = intakeFinalReleaseDecision({
     finalReleaseCommit: FINAL_RELEASE_COMMIT,
     packetEvidence,
-    now: new Date(),
+    now: claimBoundReviewTime(executionReceipt),
     ...options
   });
   if (!packetEvidence.accepted || !finalReleaseEvidence.accepted) throw new Error('cm2124_upstream_intake_rejected');
@@ -234,6 +241,7 @@ module.exports = {
   FREEZE_DIFF_PATHS,
   REVIEW_MARKDOWN_PATH,
   REVIEW_PATH,
+  assertCm2124ReviewCleanWorktree,
   buildReview,
   main,
   parseArgs,

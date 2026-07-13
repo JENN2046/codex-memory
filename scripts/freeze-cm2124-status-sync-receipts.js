@@ -67,6 +67,12 @@ function parseArgs(argv) {
   if (argv.length !== 0) throw new Error('cm2124_freeze_no_arguments_allowed');
 }
 
+function assertCm2124FreezeCleanWorktree() {
+  if (gitText(['status', '--porcelain', '--untracked-files=all']) !== '') {
+    throw new Error('cm2124_clean_worktree_required');
+  }
+}
+
 function readExactReceipt(root, filename, expected) {
   const source = path.join(root, filename);
   const stat = fs.lstatSync(source);
@@ -78,6 +84,18 @@ function readExactReceipt(root, filename, expected) {
     throw new Error(`cm2124_receipt_identity_mismatch:${filename}`);
   }
   return { bytes, receipt };
+}
+
+function claimBoundReviewTime(receipt) {
+  const registry = receipt?.payload?.registry;
+  const claimedAt = Date.parse(registry?.claimedAt || '');
+  const approvedAt = Date.parse(registry?.finalReleaseApprovedAt || '');
+  const expiresAt = Date.parse(registry?.finalReleaseExpiresAt || '');
+  if (!Number.isFinite(claimedAt) || !Number.isFinite(approvedAt) ||
+      !Number.isFinite(expiresAt) || claimedAt < approvedAt || claimedAt >= expiresAt) {
+    throw new Error('cm2124_receipt_claim_time_invalid');
+  }
+  return new Date(claimedAt);
 }
 
 function receiptIdentity(outputPath, sourceFilename, value) {
@@ -114,7 +132,7 @@ function renderMarkdown(manifest, jsonText) {
 
 async function buildFreezeArtifacts() {
   assertSafeGitEnvironment();
-  if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2124_clean_worktree_required');
+  assertCm2124FreezeCleanWorktree();
   if (gitText(['branch', '--show-current']) !== '') throw new Error('cm2124_detached_worktree_required');
   const freezeImplementationCommit = gitText(['rev-parse', 'HEAD^{commit}']);
   const freezeImplementationTree = gitText(['rev-parse', 'HEAD^{tree}']);
@@ -136,15 +154,16 @@ async function buildFreezeArtifacts() {
   const options = resolverOptions();
   const packetEvidence = intakeExecutionPacket({ packetCommit: PACKET_COMMIT, ...options });
   if (!packetEvidence.accepted) throw new Error(`cm2124_packet_rejected:${packetEvidence.blockers.join(',')}`);
+  const root = resolveFixedGovernanceRoot();
+  const execution = readExactReceipt(root, EXECUTION_RECEIPT_FILENAME, EXPECTED.execution);
   const finalReleaseEvidence = intakeFinalReleaseDecision({
     finalReleaseCommit: FINAL_RELEASE_COMMIT,
     packetEvidence,
-    now: new Date(),
+    now: claimBoundReviewTime(execution.receipt),
     ...options
   });
   if (!finalReleaseEvidence.accepted) throw new Error(`cm2124_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
   const bindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
-  const root = resolveFixedGovernanceRoot();
   const registry = new Cm2122StatusSyncClaimRegistry({ governanceRoot: root });
   const claim = await registry.read(bindingHash, finalReleaseEvidence);
   if (claim.state !== 'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION' ||
@@ -152,7 +171,6 @@ async function buildFreezeArtifacts() {
       claim.branchRefUpdateCount !== 0 || claim.authorizationReplayAllowed !== false) {
     throw new Error('cm2124_claim_state_rejected');
   }
-  const execution = readExactReceipt(root, EXECUTION_RECEIPT_FILENAME, EXPECTED.execution);
   const binding = readExactReceipt(root, BINDING_RECEIPT_FILENAME, EXPECTED.binding);
   const executionEvaluation = evaluateExecutionReceipt(execution.receipt, { packetEvidence, finalReleaseEvidence });
   if (!executionEvaluation.accepted) throw new Error(`cm2124_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
@@ -277,7 +295,9 @@ module.exports = {
   FINAL_RELEASE_COMMIT,
   OUTPUTS,
   PACKET_COMMIT,
+  assertCm2124FreezeCleanWorktree,
   buildFreezeArtifacts,
+  claimBoundReviewTime,
   main,
   parseArgs,
   receiptIdentity,
