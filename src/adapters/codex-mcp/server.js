@@ -872,6 +872,26 @@ function pickSafeReferenceString(source, keys, invalidFields, fieldName) {
   return undefined;
 }
 
+function pickExactGovernedString(source, keys, invalidFields, fieldName, predicate) {
+  if (!isPlainObject(source)) return undefined;
+  const supplied = keys
+    .filter(key => Object.prototype.hasOwnProperty.call(source, key))
+    .map(key => source[key]);
+  if (supplied.length === 0) return undefined;
+  if (supplied.some(value => typeof value !== 'string')) {
+    invalidFields.push(fieldName);
+    return undefined;
+  }
+  const normalized = supplied.map(value => value.trim());
+  if (normalized.some(value => !value) ||
+      new Set(normalized).size !== 1 ||
+      !predicate(normalized[0])) {
+    invalidFields.push(fieldName);
+    return undefined;
+  }
+  return normalized[0];
+}
+
 function pickGovernedEnumString(source, keys, allowedValues, invalidFields, fieldName) {
   const value = pickReferenceCandidate(source, keys);
   if (value === undefined) return undefined;
@@ -1115,6 +1135,20 @@ function normalizeExactApprovalResult(value, invalidFields) {
     invalidFields,
     'exactApprovalResult.approvedAt'
   );
+  const approvalDecisionReference = pickExactGovernedString(
+    value,
+    ['approvalDecisionReference', 'approval_decision_reference'],
+    invalidFields,
+    'exactApprovalResult.approvalDecisionReference',
+    isSafeReferenceName
+  );
+  const claimBindingHash = pickExactGovernedString(
+    value,
+    ['claimBindingHash', 'claim_binding_hash'],
+    invalidFields,
+    'exactApprovalResult.claimBindingHash',
+    candidate => /^[a-f0-9]{64}$/.test(candidate)
+  );
 
   return {
     accepted,
@@ -1161,6 +1195,12 @@ function normalizeExactApprovalResult(value, invalidFields) {
     } : {}),
     ...(approvedAt ? {
       approvedAt
+    } : {}),
+    ...(approvalDecisionReference ? {
+      approvalDecisionReference
+    } : {}),
+    ...(claimBindingHash ? {
+      claimBindingHash
     } : {})
   };
 }

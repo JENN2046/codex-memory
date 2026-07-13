@@ -265,6 +265,14 @@ function safeVisibility(value) {
   return safeEnum(value, ALLOWED_VISIBILITIES);
 }
 
+function safeExactApprovalDecisionReference(value) {
+  return isSafeReferenceName(value) ? value : null;
+}
+
+function safeExactApprovalClaimBindingHash(value) {
+  return typeof value === 'string' && /^[a-f0-9]{64}$/.test(value) ? value : null;
+}
+
 function clampInt(value, fallback, min, max) {
   const parsed = Number.parseInt(String(value ?? ''), 10);
   if (!Number.isInteger(parsed)) return fallback;
@@ -981,6 +989,10 @@ function buildDelegatedArguments(toolName, args = {}, gateResult = {}) {
     unbounded_write_allowed: false,
     write_requires_exact_approval: true,
     exact_approval_action: exactApprovalActionForDelegatedTool(toolName, request),
+    exact_approval_decision_reference:
+      safeExactApprovalDecisionReference(request.exact_approval_decision_reference),
+    exact_approval_claim_binding_hash:
+      safeExactApprovalClaimBindingHash(request.exact_approval_claim_binding_hash),
     exact_approval_action_matched: request.exact_approval_action_matched === true,
     exact_approval_scope_matched: request.exact_approval_scope_matched === true,
     exact_approval_runtime_target_matched: request.exact_approval_runtime_target_matched === true,
@@ -1065,6 +1077,10 @@ function buildMcpGovernanceMetadata(toolName, gateResult = {}) {
   const rollbackPlanRef = isSafeReferenceName(request.rollback_plan_reference_name)
     ? request.rollback_plan_reference_name
     : null;
+  const approvalDecisionReference =
+    safeExactApprovalDecisionReference(request.exact_approval_decision_reference);
+  const claimBindingHash =
+    safeExactApprovalClaimBindingHash(request.exact_approval_claim_binding_hash);
   return {
     schemaVersion: GOVERNANCE_METADATA_SCHEMA_VERSION,
     trustedExecutionContext: {
@@ -1107,6 +1123,8 @@ function buildMcpGovernanceMetadata(toolName, gateResult = {}) {
     exactApprovalResult: {
       accepted: true,
       allowedAction: exactApprovalActionForDelegatedTool(toolName, request),
+      ...(approvalDecisionReference ? { approvalDecisionReference } : {}),
+      ...(claimBindingHash ? { claimBindingHash } : {}),
       allowedScope: canonicalScope || null,
       runtimeTarget: {
         primaryRuntime: runtimeTarget.primaryRuntime,
@@ -1265,6 +1283,10 @@ function buildReceipt({ toolName, targetReferenceName, gateResult, statusClass, 
     unboundedWriteAllowed: false,
     writeRequiresExactApproval: true,
     exactApprovalAction: request.exact_approval_action || null,
+    exactApprovalDecisionReference:
+      safeExactApprovalDecisionReference(request.exact_approval_decision_reference),
+    exactApprovalClaimBindingHash:
+      safeExactApprovalClaimBindingHash(request.exact_approval_claim_binding_hash),
     exactApprovalActionMatched: request.exact_approval_action_matched === true,
     exactApprovalScopeMatched: request.exact_approval_scope_matched === true,
     exactApprovalRuntimeTargetMatched: request.exact_approval_runtime_target_matched === true,
