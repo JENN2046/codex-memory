@@ -230,7 +230,7 @@ function evaluateReleaseTagReadinessPolicyGate({
     }
   }
 
-  if (isPlainObject(releaseNotes) && releaseNotes.nonClaimsReviewed !== true) {
+  if (!isPlainObject(releaseNotes) || releaseNotes.nonClaimsReviewed !== true) {
     blockers.push('release_note_non_claims_review_missing');
   }
 
