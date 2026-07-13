@@ -177,6 +177,37 @@ test('prepare_memory_context surfaces stale and conflict candidates as risks', a
   assert.equal(riskReasons.includes('conflict_memory'), true);
 });
 
+test('prepare_memory_context consumes approved projected statement, classification, freshness, and reasons', async () => {
+  const { service } = createService({
+    results: [
+      {
+        target: 'process',
+        score: 0.8,
+        titleHitCount: 1,
+        memoryContextProjection: {
+          projectionVersion: 1,
+          lowDisclosure: true,
+          statement: 'Memory signal 1: bounded recall blocker signal.',
+          classification: 'blockers',
+          freshness: 'recent',
+          reasonCodes: ['title_match'],
+          conflict: false
+        }
+      }
+    ]
+  });
+
+  const result = await service.prepare(baseInput());
+
+  assert.equal(result.memory_context_package.blockers.length, 1);
+  assert.equal(
+    result.memory_context_package.blockers[0].statement,
+    'Memory signal 1: bounded recall blocker signal.'
+  );
+  assert.equal(result.memory_context_package.blockers[0].freshness, 'recent');
+  assert.deepEqual(result.memory_context_package.blockers[0].reason_codes, ['title_match']);
+});
+
 test('prepare_memory_context applies scope and bounded compression', async () => {
   const { service, calls } = createService({
     results: Array.from({ length: 10 }, (_, index) => ({
