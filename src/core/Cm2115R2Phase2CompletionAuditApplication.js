@@ -702,7 +702,8 @@ function evaluateExecutionReceipt(receipt = {}, { resolveGitFile } = {}) {
 async function exactWriteTarget(repoRoot, target, beforeBytes) {
   const absolutePath = path.join(repoRoot, target.sourcePath);
   const afterBytes = buildExpectedAfterBytes(target.sourcePath, beforeBytes);
-  const projection = fileProjection(afterBytes, target.after.gitMode);
+  const expectedMode = target.operation === 'add' ? '100644' : target.before.gitMode;
+  const projection = fileProjection(afterBytes, expectedMode);
   if (!sameJson(projection, target.after)) throw new Error(`cm2115_r2_after_projection_mismatch:${target.sourcePath}`);
   if (target.operation === 'add') {
     await fsPromises.writeFile(absolutePath, afterBytes, { flag: 'wx' });
@@ -726,13 +727,29 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
   const blockers = [];
   for (const target of decision.payload.patchPlan.targets) {
     const absolutePath = path.join(repoRoot, target.sourcePath);
+    let beforeBytes = null;
     if (target.operation === 'add') {
       if (fs.existsSync(absolutePath)) blockers.push(`patchTarget.expectedAbsent.${target.sourcePath}`);
-      continue;
+    } else {
+      beforeBytes = await fsPromises.readFile(absolutePath).catch(() => null);
+      if (!beforeBytes || !sameJson(fileProjection(beforeBytes, target.before.gitMode), target.before)) {
+        blockers.push(`patchTarget.beforeDrift.${target.sourcePath}`);
+      } else {
+        beforeBytesByPath.set(target.sourcePath, beforeBytes);
+      }
     }
-    const bytes = await fsPromises.readFile(absolutePath).catch(() => null);
-    if (!bytes || !sameJson(fileProjection(bytes, target.before.gitMode), target.before)) blockers.push(`patchTarget.beforeDrift.${target.sourcePath}`);
-    else beforeBytesByPath.set(target.sourcePath, bytes);
+    try {
+      const expectedMode = target.operation === 'add' ? '100644' : target.before.gitMode;
+      const expectedAfter = fileProjection(
+        buildExpectedAfterBytes(target.sourcePath, beforeBytes),
+        expectedMode
+      );
+      if (!sameJson(expectedAfter, target.after)) {
+        blockers.push(`patchTarget.afterDrift.${target.sourcePath}`);
+      }
+    } catch {
+      blockers.push(`patchTarget.afterDrift.${target.sourcePath}`);
+    }
   }
   if (blockers.length) return { accepted: false, blockers, state: 'UNCLAIMED' };
   const bindingHash = buildClaimBindingHash(decisionIdentity, decision);
