@@ -153,6 +153,32 @@ test('CM2016 requires release note non-claims review even when evidence object s
   assert.ok(result.blockers.includes('release_note_non_claims_review_missing'));
 });
 
+test('CM2016 rejects missing or non-object release notes instead of skipping non-claims review', () => {
+  const inputs = [
+    {},
+    { releaseNotes: null },
+    { releaseNotes: [] },
+    { releaseNotes: 'non-claims reviewed' },
+    { releaseNotes: true }
+  ];
+
+  for (const input of inputs) {
+    const result = evaluateReleaseTagReadinessPolicyGate({
+      candidateTag: 'v0.2.0-readonly-context-rc',
+      milestone: 'readonly_context',
+      evidence: readonlyContextEvidence(),
+      ...input
+    });
+
+    assert.equal(result.accepted, false);
+    assert.equal(result.status, 'release_tag_readiness_policy_rejected');
+    assert.ok(result.blockers.includes('release_note_non_claims_review_missing'));
+    assert.equal(result.nonClaims.releaseNoteNonClaimsReviewed, false);
+    assert.equal(result.readiness.tagApprovalPacketAccepted, false);
+    assert.equal(result.sideEffects.tagCreated, false);
+  }
+});
+
 test('CM2016 supports operator and native proof tag naming without calling release ready', () => {
   const operatorResult = evaluateReleaseTagReadinessPolicyGate({
     candidateTag: 'v0.3.0-operator-full-surface-rc',
