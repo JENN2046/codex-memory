@@ -128,6 +128,24 @@ test('CM-2109 receipt rejects rehashed top-level receipt or payload overclaims',
   assert.equal(evaluateFailureRecoveryReceipt(drift, executionBinding()).accepted, false);
 });
 
+test('CM-2109 receipt fixes its schema version and receipt type identity', async t => {
+  const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2109-identity-drift-'));
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  const receipt = await executeIsolatedFailureRecoveryHarness({
+    harnessRoot: path.join(parent, 'harness'),
+    executionBinding: executionBinding()
+  });
+  for (const mutate of [
+    payload => { payload.schemaVersion = 2; },
+    payload => { payload.receiptType = 'forged_failure_recovery_receipt'; }
+  ]) {
+    const drift = structuredClone(receipt);
+    mutate(drift.receiptPayload);
+    drift.receiptPayloadSha256 = sha256Canonical(drift.receiptPayload);
+    assert.equal(evaluateFailureRecoveryReceipt(drift, executionBinding()).accepted, false);
+  }
+});
+
 test('CM-2109 packet and decision boundaries reject authority expansion', () => {
   const manifests = CASE_IDS.map(buildCm2097CaseManifest);
   const manifestBindings = manifests.map(() => ({ blobOid: 'a'.repeat(40), bytes: 100, sha256: 'b'.repeat(64) }));
