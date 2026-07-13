@@ -15,10 +15,14 @@ const { main: runCli, parseArgs } = require('../src/cli/cm2118-full-plan-applica
 const packetGenerator = require('../scripts/generate-cm2118-full-plan-application-execution-packet');
 const releaseGenerator = require('../scripts/generate-cm2119-full-plan-final-execution-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
-const cm2115Git = require('../scripts/cm2115-r2-git');
 const {
+  DECISION_REFERENCE: CM2115_DECISION_REFERENCE,
   GOVERNANCE_ROOT_IDENTITY: CM2115_GOVERNANCE_ROOT_IDENTITY,
-  claimFileName: cm2115ClaimFileName
+  NONCE: CM2115_NONCE,
+  RECEIPT_ID: CM2115_RECEIPT_ID,
+  REGISTRY_REFERENCE: CM2115_REGISTRY_REFERENCE,
+  claimFileName: cm2115ClaimFileName,
+  validateDurableClaim: validateCm2115DurableClaim
 } = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
 const CM2115_BINDING_HASH = '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc';
@@ -150,13 +154,26 @@ function fixtureGovernanceRoot(cwd) {
 
 function seedCm2115DurableClaim(cwd) {
   const root = fixtureGovernanceRoot(cwd);
-  const claim = cm2115Git.resolveDurableClaim(CM2115_BINDING_HASH, { cwd: ROOT });
+  const claimFile = cm2115ClaimFileName();
+  const claim = validateCm2115DurableClaim({
+    schemaVersion: 1,
+    registryReference: CM2115_REGISTRY_REFERENCE,
+    claimId: claimFile.slice('.cm2115-r2-phase2-application-claim-'.length, -'.json'.length),
+    nonceHash: sha256(CM2115_NONCE),
+    receiptIdHash: sha256(CM2115_RECEIPT_ID),
+    bindingHash: CM2115_BINDING_HASH,
+    decisionReference: CM2115_DECISION_REFERENCE,
+    authorizationUseCount: 1,
+    authorizationReplayAllowed: false,
+    patchInvocationCount: 1,
+    state: 'CONSUMED_SUCCESS'
+  }, CM2115_BINDING_HASH);
   fs.mkdirSync(root, { recursive: true });
   fs.writeFileSync(
     path.join(root, '.phase8-registry-root-identity.json'),
     JSON.stringify(canonicalize(CM2115_GOVERNANCE_ROOT_IDENTITY))
   );
-  fs.writeFileSync(path.join(root, cm2115ClaimFileName()), JSON.stringify(canonicalize(claim)));
+  fs.writeFileSync(path.join(root, claimFile), JSON.stringify(canonicalize(claim)));
 }
 
 function resolveFixtureDurableClaim(cwd) {

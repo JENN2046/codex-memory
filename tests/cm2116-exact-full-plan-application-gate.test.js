@@ -22,6 +22,7 @@ const { canonicalize } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSna
 const git = require('../scripts/cm2115-r2-git');
 const { isCommitAncestor: realIsCommitAncestor } = require('../scripts/generate-cm2115-r2-self-review-decision');
 const {
+  main,
   parseArgs,
   renderMarkdown,
   resolverOptions
@@ -216,5 +217,16 @@ test('gate resolver factory rejects Git repository and object overrides', () => 
       if (previous === undefined) delete process.env[key];
       else process.env[key] = previous;
     }
+  }
+});
+
+test('gate generator rejects an unsafe Git environment before its cleanliness check', () => {
+  const previous = process.env.GIT_DIR;
+  process.env.GIT_DIR = '/tmp/cm2116-forbidden-git-dir';
+  try {
+    assert.throws(() => main([]), /cm2118_unsafe_git_environment:GIT_DIR/);
+  } finally {
+    if (previous === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previous;
   }
 });
