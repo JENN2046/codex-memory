@@ -29,7 +29,9 @@ const PROOF = Object.freeze({
   commit: 'cd0b986420a0be33d197c00c7bc3906d3ebfe887',
   blobOid: 'd3b8cd54e70cdbb57b6c92443bc85a0eafb7ec92',
   bytes: 4089,
-  rawSha256: '1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162'
+  rawSha256: '1996cdd696d607aa319749f897b6b5a795cf08998e12c69dc3a30e8741838162',
+  canonicalBytes: 3461,
+  canonicalSha256: '247d1b79573c87a8d04b0818c46e121682107b75842fd20e1fe2d21b84822559'
 });
 const BASELINE = Object.freeze({
   completionAuditBlobOid: '75d7fa92889c09e01afd5042c1074ddda608e551',
@@ -63,6 +65,8 @@ function expectedPatch() {
 
 function evaluateBundle(bundle = {}, proofReceipt = {}) {
   const blockers = [];
+  const canonicalProofReceipt = JSON.stringify(canonicalize(proofReceipt));
+  if (Buffer.byteLength(canonicalProofReceipt) !== PROOF.canonicalBytes || sha256(canonicalProofReceipt) !== PROOF.canonicalSha256) blockers.push('proof.receiptCanonicalSha256');
   const { bundlePayloadSha256, ...payload } = bundle;
   if (bundlePayloadSha256 !== BUNDLE.payloadSha256 || sha256Canonical(payload) !== BUNDLE.payloadSha256) blockers.push('bundle.payloadSha256');
   if (bundle.schemaVersion !== 1 || bundle.taskId !== 'CM-2114' || bundle.bundleType !== 'phase8_completion_revalidation_evidence_bundle' || bundle.phaseId !== PHASE_ID) blockers.push('bundle.identity');
