@@ -302,6 +302,33 @@ test('CM-2115-R2 authority Git entry mode and object type must match the resolve
   }
 });
 
+test('CM-2115-R2 rejects decision Git identity drift before claim or patch', async t => {
+  const fixture = await prepareTempExecution(t);
+  const decisionIdentity = {
+    ...fixture.identity,
+    sourceTree: 'f'.repeat(40)
+  };
+  const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
+
+  const result = await executeExactPatch({
+    repoRoot: fixture.root,
+    decision: fixture.decision,
+    decisionIdentity,
+    authorityIdentity: fixture.authority,
+    resolveGitFile: fixture.resolver,
+    registry
+  });
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.state, 'UNCLAIMED');
+  assert.ok(result.blockers.includes('decisionIdentity.gitObject'));
+  await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
+  for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
+    assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), targetBaselineResolver(sourcePath).content);
+  }
+  await assert.rejects(() => fsp.lstat(path.join(fixture.root, APPLICATION_STATE_PATH)), { code: 'ENOENT' });
+});
+
 test('CM-2115-R2 rejects a dangling add target before consuming the claim', async t => {
   const fixture = await prepareTempExecution(t);
   const addTarget = path.join(fixture.root, APPLICATION_STATE_PATH);
