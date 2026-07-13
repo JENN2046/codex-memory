@@ -687,6 +687,18 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
     assert.equal(text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo), constants.NEW_COMMIT);
   });
 
+  runIsolatedFault('branch_ref_postcheck_failure', ({ claim }) => {
+    assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_AMBIGUOUS');
+    assert.equal(claim.branchCasInvocationCount, 1);
+    assert.equal(claim.branchRefUpdates, 1);
+    assert.equal(claim.targetRefObserved, constants.NEW_COMMIT);
+    assert.equal(claim.targetIndexTreeObserved, constants.EXPECTED_OLD_TREE);
+    assert.equal(claim.targetFilesMatchedCount, 0);
+    assert.equal(claim.targetIndexSynchronizations, 0);
+    assert.equal(claim.targetFileSynchronizations, 0);
+    assert.equal(claim.executionReceiptWrites, 0);
+  });
+
   runIsolatedFault('index_rename_acknowledgement_lost', ({ claim }) => {
     assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
     assert.equal(claim.branchRefUpdates, 1);

@@ -1545,6 +1545,7 @@ async function executeBranchCasFromCommits(inputs = {}) {
       await registry.transition(bindingHash, state, failure.state, failure.details, release).catch(() => {});
       throw error;
     }
+    injectIsolatedTestFault('branch_ref_postcheck_failure');
     const refOnlySnapshot = targetSnapshot(repoRoot, target, targetBindings, 'before');
     const refOnlyAfterMatches = targetSnapshot(repoRoot, target, targetBindings, 'after').matchedFiles;
     if (refOnlySnapshot.ref !== NEW_COMMIT || refOnlySnapshot.head !== NEW_COMMIT ||
