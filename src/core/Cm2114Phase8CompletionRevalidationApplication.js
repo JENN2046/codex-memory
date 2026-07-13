@@ -164,7 +164,9 @@ function evaluateApplicationReceipt(receipt = {}) {
   const appliedEvidenceFields = ['vcpToolBoxOwnedRuntimeWritePassed', 'actualTransportBindingPassed', 'stableTargetStoreIdentityPassed'];
   if (!hasExactKeys(payload.appliedEvidence, appliedEvidenceFields)) blockers.push('receipt.appliedEvidence.fields');
   for (const field of appliedEvidenceFields) if (payload.appliedEvidence?.[field] !== true) blockers.push(`receipt.appliedEvidence.${field}`);
-  for (const [field, expected] of Object.entries(expectedPatch())) if (payload.appliedState?.[field] !== expected) blockers.push(`receipt.appliedState.${field}`);
+  const appliedState = expectedPatch();
+  if (!hasExactKeys(payload.appliedState, Object.keys(appliedState))) blockers.push('receipt.appliedState.fields');
+  for (const [field, expected] of Object.entries(appliedState)) if (payload.appliedState?.[field] !== expected) blockers.push(`receipt.appliedState.${field}`);
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters');
   for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
