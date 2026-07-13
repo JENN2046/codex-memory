@@ -1017,32 +1017,39 @@ class Cm2118FullPlanApplicationClaimRegistry {
       BINDING_RECEIPT_WRITTEN: ['CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS']
     };
     if (!allowed[expectedState]?.includes(state)) throw new Error('cm2118_claim_transition_invalid');
-    const current = await this.read(bindingHash);
-    if (current.state !== expectedState) throw new Error('cm2118_claim_state_mismatch');
-    const next = {
-      ...current,
-      state,
-      applicationCommitCreated: Object.hasOwn(details, 'applicationCommitCreated')
-        ? details.applicationCommitCreated : current.applicationCommitCreated,
-      executionReceiptCreated: Object.hasOwn(details, 'executionReceiptCreated')
-        ? details.executionReceiptCreated : current.executionReceiptCreated,
-      bindingReceiptCreated: Object.hasOwn(details, 'bindingReceiptCreated')
-        ? details.bindingReceiptCreated : current.bindingReceiptCreated,
-      reconciliationRequired: state !== 'CONSUMED_SUCCESS',
-      applicationCommit: Object.hasOwn(details, 'applicationCommit')
-        ? details.applicationCommit : current.applicationCommit,
-      applicationTree: Object.hasOwn(details, 'applicationTree')
-        ? details.applicationTree : current.applicationTree,
-      executionReceiptSha256: Object.hasOwn(details, 'executionReceiptSha256')
-        ? details.executionReceiptSha256 : current.executionReceiptSha256,
-      bindingReceiptSha256: Object.hasOwn(details, 'bindingReceiptSha256')
-        ? details.bindingReceiptSha256 : current.bindingReceiptSha256
-    };
-    this.validateEnvelope(next, bindingHash);
-    const temporary = `${this.claimPath}.${state}.tmp`;
-    await this.fs.writeFile(temporary, JSON.stringify(canonicalize(next)), { flag: 'wx' });
-    await this.fs.rename(temporary, this.claimPath);
-    return this.read(bindingHash);
+    const rootHandle = await openVerifiedGovernanceRoot(this);
+    try {
+      const current = await readClaimFromGovernanceRootHandle(this, rootHandle, bindingHash);
+      if (current.state !== expectedState) throw new Error('cm2118_claim_state_mismatch');
+      const next = {
+        ...current,
+        state,
+        applicationCommitCreated: Object.hasOwn(details, 'applicationCommitCreated')
+          ? details.applicationCommitCreated : current.applicationCommitCreated,
+        executionReceiptCreated: Object.hasOwn(details, 'executionReceiptCreated')
+          ? details.executionReceiptCreated : current.executionReceiptCreated,
+        bindingReceiptCreated: Object.hasOwn(details, 'bindingReceiptCreated')
+          ? details.bindingReceiptCreated : current.bindingReceiptCreated,
+        reconciliationRequired: state !== 'CONSUMED_SUCCESS',
+        applicationCommit: Object.hasOwn(details, 'applicationCommit')
+          ? details.applicationCommit : current.applicationCommit,
+        applicationTree: Object.hasOwn(details, 'applicationTree')
+          ? details.applicationTree : current.applicationTree,
+        executionReceiptSha256: Object.hasOwn(details, 'executionReceiptSha256')
+          ? details.executionReceiptSha256 : current.executionReceiptSha256,
+        bindingReceiptSha256: Object.hasOwn(details, 'bindingReceiptSha256')
+          ? details.bindingReceiptSha256 : current.bindingReceiptSha256
+      };
+      this.validateEnvelope(next, bindingHash);
+      const temporaryFilename = `${claimFileName()}.${state}.tmp`;
+      const temporary = governanceDescriptorPath(rootHandle, temporaryFilename);
+      const claim = governanceDescriptorPath(rootHandle, claimFileName());
+      await this.fs.writeFile(temporary, JSON.stringify(canonicalize(next)), { flag: 'wx' });
+      await this.fs.rename(temporary, claim);
+      return await readClaimFromGovernanceRootHandle(this, rootHandle, bindingHash);
+    } finally {
+      await rootHandle.close().catch(() => {});
+    }
   }
 }
 
