@@ -64,6 +64,7 @@ const READINESS_FIELDS = Object.freeze([
   'productionReady', 'productionReadyClaimed', 'rcReady', 'rcReadyClaimed',
   'readinessClaimed', 'releaseReady', 'releaseReadyClaimed'
 ]);
+const machineBoundDurableEvidence = new WeakSet();
 
 function wrapPayload(payload, artifactType) {
   return {
@@ -211,7 +212,8 @@ function evaluateFrozenReceiptSet(options = {}) {
 }
 
 function buildReviewDecision({ frozenEvidence, durableEvidence, implementation }) {
-  if (!frozenEvidence?.accepted || durableEvidence?.accepted !== true ||
+  if (!frozenEvidence?.accepted || !machineBoundDurableEvidence.has(durableEvidence) ||
+      durableEvidence?.accepted !== true ||
       durableEvidence.applicationCommit !== APPLICATION_COMMIT || durableEvidence.applicationTree !== APPLICATION_TREE ||
       durableEvidence.fullPlanPackCompleted !== true || durableEvidence.readinessClaimed !== false ||
       durableEvidence.statusSyncAuthorized !== false) throw new Error('cm2120_exact_evidence_required');
@@ -277,6 +279,7 @@ function evaluateReviewDecision(decision = {}, { implementation, durableEvidence
   const blockers = [];
   const frozenEvidence = evaluateFrozenReceiptSet(options);
   if (!frozenEvidence.accepted) blockers.push(...frozenEvidence.blockers.map(item => `review.${item}`));
+  if (!machineBoundDurableEvidence.has(durableEvidence)) blockers.push('review.durableEvidenceMachineBinding');
   let expected = null;
   try {
     expected = buildReviewDecision({ frozenEvidence, durableEvidence, implementation });
@@ -305,11 +308,16 @@ function evaluateReviewDecision(decision = {}, { implementation, durableEvidence
 }
 
 async function evaluateCurrentDurableEvidence() {
-  return evaluateDurableApplicationBinding({
+  const evidence = await evaluateDurableApplicationBinding({
     authorizationContentDecisionCommit: CONTENT_DECISION_FREEZE.commit,
     packetCommit: PACKET_COMMIT,
     finalReleaseCommit: FINAL_RELEASE_COMMIT
   });
+  if (evidence.accepted) {
+    Object.freeze(evidence);
+    machineBoundDurableEvidence.add(evidence);
+  }
+  return evidence;
 }
 
 module.exports = {
