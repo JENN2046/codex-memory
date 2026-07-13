@@ -380,6 +380,35 @@ test('final release is inactive before approvedAt and after expiry', () => {
   }).accepted, false);
 });
 
+test('final release cannot replace the independently frozen approval window', () => {
+  const decision = JSON.parse(JSON.stringify(fixture.finalReleaseEvidence.decision));
+  decision.payload.approvedAt = '2030-01-01T00:00:00+08:00';
+  decision.payload.expiresAt = '2030-01-02T00:00:00+08:00';
+  decision.canonicalPayloadSha256 = sha256Canonical(decision.payload);
+  const evaluation = fixture.frozenModule.evaluateFinalReleaseDecision(decision, {
+    packetEvidence: fixture.packetEvidence,
+    now: new Date('2030-01-01T12:00:00+08:00')
+  });
+  assert.equal(evaluation.accepted, false);
+  assert.ok(evaluation.blockers.includes('finalRelease.exactContent'));
+});
+
+test('durable receipt reads use a verified governance descriptor, not a mutable path', () => {
+  const source = fs.readFileSync(
+    path.join(ROOT, 'src/core/Cm2118FullPlanApplicationExecution.js'),
+    'utf8'
+  );
+  const start = source.indexOf('async function readExternalReceipt');
+  const end = source.indexOf('\nasync function evaluateDurableApplicationBinding', start);
+  const implementationSource = source.slice(start, end);
+  assert.match(implementationSource, /openVerifiedGovernanceRoot\(registry\)/);
+  assert.match(implementationSource, /O_NOFOLLOW/);
+  assert.match(implementationSource, /receiptHandle\.stat\(\)/);
+  assert.match(implementationSource, /receiptHandle\.readFile\(\)/);
+  assert.doesNotMatch(implementationSource, /lstat\(receiptPath\)/);
+  assert.doesNotMatch(implementationSource, /readFile\(receiptPath\)/);
+});
+
 test('one-shot registry uses fixed root identity, atomic claim, and rejects serial replay/binding drift', async t => {
   t.mock.timers.enable({ apis: ['Date'], now: decisionTime(fixture.finalReleaseEvidence.decision) });
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-registry-'));

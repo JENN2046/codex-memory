@@ -42,6 +42,8 @@ const BINDING_RECEIPT_FILENAME = 'cm2122-r2-full-plan-status-sync-binding-receip
 const REGISTRY_REFERENCE = 'cm2122-r2-full-plan-status-sync-registry-001';
 const NONCE = 'cm2122-r2-full-plan-status-sync-001';
 const RECEIPT_ID = 'cm2122-r2-full-plan-status-sync-receipt-001';
+const FINAL_RELEASE_APPROVED_AT = '2026-07-12T00:00:00+08:00';
+const FINAL_RELEASE_EXPIRES_AT = '2026-07-19T23:59:59+08:00';
 const SUPERSEDED_FREEZE = Object.freeze({
   implementationCommit: '60761ff5b9fc81554f80b16d4597174f212c82b7',
   executionPacketCommit: 'f3db578742ce15599b86674a2476532c802eaa74',
@@ -559,6 +561,9 @@ function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
   if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet)) {
     throw new Error('cm2123_machine_bound_execution_packet_required');
   }
+  if (approvedAt !== FINAL_RELEASE_APPROVED_AT || expiresAt !== FINAL_RELEASE_EXPIRES_AT) {
+    throw new Error('cm2123_exact_authorization_window_required');
+  }
   const packet = packetEvidence.packet;
   const payload = {
     decisionReference: `CM-2123-R2-STATUS-SYNC-FINAL-RELEASE-${packet.canonicalPayloadSha256.slice(0, 8)}-${packetEvidence.packetCommit.slice(0, 8)}`.toUpperCase(),
@@ -620,8 +625,8 @@ function evaluateFinalReleaseDecision(decision = {}, { packetEvidence, now = new
     try {
       const expected = buildFinalReleaseDecision({
         packetEvidence,
-        approvedAt: decision.payload?.authorization?.approvedAt,
-        expiresAt: decision.payload?.authorization?.expiresAt
+        approvedAt: FINAL_RELEASE_APPROVED_AT,
+        expiresAt: FINAL_RELEASE_EXPIRES_AT
       });
       if (!sameJson(decision, expected)) blockers.push('finalRelease.exactContent');
     } catch {
@@ -1585,12 +1590,22 @@ async function writeExternalReceipt(registry, filename, receipt) {
   }
 }
 
-async function readExternalReceipt(root, filename) {
-  const receiptPath = path.join(root, filename);
-  const stat = await fsPromises.lstat(receiptPath);
-  if (!stat.isFile() || stat.isSymbolicLink()) throw new Error(`cm2122_receipt_invalid:${filename}`);
-  const bytes = await fsPromises.readFile(receiptPath);
-  return { receipt: JSON.parse(bytes.toString('utf8')), bytes, sha256: sha256(bytes) };
+async function readExternalReceipt(registry, filename) {
+  const rootHandle = await openVerifiedGovernanceRoot(registry);
+  let receiptHandle = null;
+  try {
+    receiptHandle = await registry.fs.open(
+      governanceDescriptorPath(rootHandle, filename),
+      fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW
+    );
+    const stat = await receiptHandle.stat();
+    if (!stat.isFile()) throw new Error(`cm2122_receipt_invalid:${filename}`);
+    const bytes = await receiptHandle.readFile();
+    return { receipt: JSON.parse(bytes.toString('utf8')), bytes, sha256: sha256(bytes) };
+  } finally {
+    if (receiptHandle) await receiptHandle.close().catch(() => {});
+    await rootHandle.close().catch(() => {});
+  }
 }
 
 async function evaluateDurableDetachedBinding({ contentDecisionCommit, packetCommit, finalReleaseCommit }) {
@@ -1610,7 +1625,7 @@ async function evaluateDurableDetachedBinding({ contentDecisionCommit, packetCom
   } catch {
     return { accepted: false, blockers: ['durableBinding.finalReleaseUnreadable'] };
   }
-  const staticReviewTime = new Date(Date.parse(frozenRelease?.payload?.authorization?.approvedAt || '') + 1);
+  const staticReviewTime = new Date(Date.parse(FINAL_RELEASE_APPROVED_AT) + 1);
   const finalReleaseEvidence = intakeFinalReleaseDecision({
     finalReleaseCommit,
     packetEvidence,
@@ -1625,8 +1640,8 @@ async function evaluateDurableDetachedBinding({ contentDecisionCommit, packetCom
     claim = await registry.read(bindingHash, finalReleaseEvidence);
     if (claim.state !== 'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION' ||
         claim.branchRefUpdateCount !== 0) blockers.push('durableBinding.claimState');
-    const execution = await readExternalReceipt(root, EXECUTION_RECEIPT_FILENAME);
-    const binding = await readExternalReceipt(root, BINDING_RECEIPT_FILENAME);
+    const execution = await readExternalReceipt(registry, EXECUTION_RECEIPT_FILENAME);
+    const binding = await readExternalReceipt(registry, BINDING_RECEIPT_FILENAME);
     if (execution.sha256 !== claim.executionReceiptSha256 || binding.sha256 !== claim.bindingReceiptSha256) {
       blockers.push('durableBinding.receiptHash');
     }
