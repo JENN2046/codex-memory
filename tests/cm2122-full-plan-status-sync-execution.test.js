@@ -16,6 +16,7 @@ const packetGenerator = require('../scripts/generate-cm2122-full-plan-status-syn
 const releaseGenerator = require('../scripts/generate-cm2123-full-plan-status-sync-final-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
+const EXECUTOR_CHILD_TIMEOUT_MS = 60_000;
 
 function git(args, cwd, options = {}) {
   return execFileSync('git', args, {
@@ -422,9 +423,22 @@ function runStatusSyncProcess() {
     });
     let stdout = '';
     let stderr = '';
+    let settled = false;
+    let timedOut = false;
+    const finish = result => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve({ ...result, stdout, stderr, timedOut });
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill('SIGKILL');
+    }, EXECUTOR_CHILD_TIMEOUT_MS);
     child.stdout.on('data', chunk => { stdout += chunk; });
     child.stderr.on('data', chunk => { stderr += chunk; });
-    child.on('close', code => resolve({ code, stdout, stderr }));
+    child.on('error', error => finish({ code: null, signal: null, spawnError: error.message }));
+    child.on('close', (code, signal) => finish({ code, signal, spawnError: null }));
   });
 }
 
@@ -440,7 +454,9 @@ function evaluateDurableInFixture() {
   }));
 }
 
-test('temp clone creates one exact detached 9M commit, binds it, and leaves the branch ref unchanged', async () => {
+test('temp clone creates one exact detached 9M commit, binds it, and leaves the branch ref unchanged', {
+  timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
+}, async () => {
   initializeGovernanceRoot();
   git(['update-ref', implementation.FUTURE_BRANCH_REF, fixture.finalReleaseCommit], fixture.repo);
   git(['checkout', '--detach', fixture.finalReleaseCommit], fixture.repo);
@@ -449,6 +465,7 @@ test('temp clone creates one exact detached 9M commit, binds it, and leaves the 
   assert.equal(text(['branch', '--show-current'], fixture.repo), '');
 
   const result = await runStatusSyncProcess();
+  assert.equal(result.timedOut, false, JSON.stringify(result));
   assert.equal(result.code, 0, result.stderr);
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.status, 'PASS_DETACHED_STATUS_COMMIT_BOUND');
@@ -534,11 +551,14 @@ test('temp clone creates one exact detached 9M commit, binds it, and leaves the 
   assert.equal(durable.readinessClaimed, false);
 });
 
-test('a new process cannot replay the consumed authorization or move the branch ref', async () => {
+test('a new process cannot replay the consumed authorization or move the branch ref', {
+  timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
+}, async () => {
   git(['checkout', '--detach', fixture.finalReleaseCommit], fixture.repo);
   const branchBefore = text(['show-ref', '--hash', '--verify', implementation.FUTURE_BRANCH_REF], fixture.repo);
   const objectsBefore = text(['count-objects', '-v'], fixture.repo);
   const replay = await runStatusSyncProcess();
+  assert.equal(replay.timedOut, false, JSON.stringify(replay));
   assert.equal(replay.code, 0, replay.stderr);
   const result = JSON.parse(replay.stdout);
   assert.equal(result.status, 'STOPPED');
