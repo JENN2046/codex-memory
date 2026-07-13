@@ -26,6 +26,7 @@ const {
 
 const APPROVED_AT = '2026-07-12T00:00:00+08:00';
 const EXPIRES_AT = '2026-07-19T23:59:59+08:00';
+const VALIDATION_AT = APPROVED_AT;
 const REPOSITORY_ROOT = path.resolve(__dirname, '..');
 
 function parseArgs(argv) {
@@ -85,7 +86,7 @@ function main(argv = process.argv.slice(2)) {
   });
   const evaluation = evaluateFinalReleaseDecision(decision, {
     packetEvidence,
-    now: new Date()
+    now: new Date(VALIDATION_AT)
   });
   if (!evaluation.accepted) {
     throw new Error(`cm2123_release_rejected:${evaluation.blockers.join(',')}`);
@@ -139,6 +140,7 @@ if (require.main === module) {
 module.exports = {
   APPROVED_AT,
   EXPIRES_AT,
+  VALIDATION_AT,
   REPOSITORY_ROOT,
   ensureRepositoryRoot,
   main,

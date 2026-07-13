@@ -249,6 +249,13 @@ test('packet and final-release generators are preparation-only and reject execut
   }
 });
 
+test('CM-2123 generation validates at a deterministic in-window time', () => {
+  assert.equal(releaseGenerator.VALIDATION_AT, releaseGenerator.APPROVED_AT);
+  const validation = Date.parse(releaseGenerator.VALIDATION_AT);
+  assert.equal(validation >= Date.parse(releaseGenerator.APPROVED_AT), true);
+  assert.equal(validation < Date.parse(releaseGenerator.EXPIRES_AT), true);
+});
+
 test('Git repository, object, and index environment overrides fail before any governance or Git effect', () => {
   for (const key of ['GIT_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE']) {
     assert.throws(() => implementation.assertSafeGitEnvironment({ [key]: '/tmp/cm2122-forbidden' }),

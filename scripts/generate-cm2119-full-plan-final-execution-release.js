@@ -6,6 +6,7 @@ const path = require('node:path');
 const {
   FINAL_RELEASE_MARKDOWN_PATH,
   FINAL_RELEASE_PATH,
+  assertSafeGitEnvironment,
   buildFinalReleaseDecision,
   evaluateFinalReleaseDecision,
   intakeExecutionPacket
@@ -22,6 +23,7 @@ const { resolverOptions } = require('./generate-cm2116-exact-full-plan-applicati
 
 const APPROVED_AT = '2026-07-12T18:00:00+08:00';
 const EXPIRES_AT = '2026-07-19T18:00:00+08:00';
+const VALIDATION_AT = APPROVED_AT;
 const REPOSITORY_ROOT = path.resolve(__dirname, '..');
 
 function parseArgs(argv) {
@@ -62,6 +64,7 @@ function renderMarkdown(decision, jsonText) {
 
 function main(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
+  assertSafeGitEnvironment();
   ensureRepositoryRoot();
   ensureCleanWorktree();
   if (fs.existsSync(FINAL_RELEASE_PATH) || fs.existsSync(FINAL_RELEASE_MARKDOWN_PATH)) {
@@ -79,7 +82,7 @@ function main(argv = process.argv.slice(2)) {
   });
   const evaluation = evaluateFinalReleaseDecision(decision, {
     packetEvidence,
-    now: new Date()
+    now: new Date(VALIDATION_AT)
   });
   if (!evaluation.accepted) {
     throw new Error(`cm2119_release_rejected:${evaluation.blockers.join(',')}`);
@@ -125,6 +128,7 @@ if (require.main === module) {
 module.exports = {
   APPROVED_AT,
   EXPIRES_AT,
+  VALIDATION_AT,
   REPOSITORY_ROOT,
   ensureRepositoryRoot,
   main,

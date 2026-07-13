@@ -543,6 +543,9 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       : '';
   const isolatedRuntimeStoreUsed = Boolean(knowledgeBaseStorePath);
   const primaryWriteOnly = options.primaryWriteOnly === true;
+  const primaryWritePreflight = typeof options.primaryWritePreflight === 'function'
+    ? options.primaryWritePreflight
+    : null;
   const writeSubdir = safeFilenamePart(options.writeSubdir || 'codex-memory-governed');
   let knowledgeBaseManager = null;
   let embeddingUtils = null;
@@ -567,7 +570,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     }
   }
 
-  async function ensurePrimaryWriteReady() {
+  async function ensurePrimaryWriteReady(toolName) {
     if (!primaryWriteOnly) {
       await ensureReady();
       return;
@@ -575,6 +578,15 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     const rootStat = await fs.lstat(knowledgeBaseRootPath);
     if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) {
       throw new Error('primary_write_root_invalid');
+    }
+    if (primaryWritePreflight) {
+      const projection = await primaryWritePreflight({
+        toolName,
+        knowledgeBaseRootPath
+      });
+      if (projection?.accepted !== true) {
+        throw new Error('primary_write_preflight_rejected');
+      }
     }
   }
 
@@ -651,7 +663,6 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   }
 
   async function record(args = {}) {
-    await ensurePrimaryWriteReady();
     const title = boundedString(args.title, 200) || 'codex-memory governed native record';
     const markdown = createRecordMarkdown(args);
     const digest = crypto
@@ -662,6 +673,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     const dir = path.join(knowledgeBaseRootPath, writeSubdir);
     const filename = `${new Date().toISOString().replace(/[:.]/g, '-')}-${safeFilenamePart(title)}-${digest}.md`;
     const filePath = path.join(dir, filename);
+    await ensurePrimaryWriteReady('record_memory');
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(filePath, markdown, { encoding: 'utf8', flag: 'wx' });
     return {
@@ -685,7 +697,6 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   }
 
   async function mutationMarker(toolName, args = {}) {
-    await ensurePrimaryWriteReady();
     const markdown = createMutationMarkdown(toolName, args);
     const digest = crypto
       .createHash('sha256')
@@ -695,6 +706,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     const dir = path.join(knowledgeBaseRootPath, writeSubdir);
     const filename = `${new Date().toISOString().replace(/[:.]/g, '-')}-${safeFilenamePart(toolName)}-${digest}.md`;
     const filePath = path.join(dir, filename);
+    await ensurePrimaryWriteReady(toolName);
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(filePath, markdown, { encoding: 'utf8', flag: 'wx' });
     return {
