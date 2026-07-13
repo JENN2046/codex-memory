@@ -31,6 +31,7 @@ const {
   evaluateExecutionReceipt,
   executeExactPatch,
   expectedApplicationDiffPaths,
+  expectedDecisionDiffPaths,
   fileProjection,
   identityWithoutContent,
   revalidateUpstream,
@@ -361,6 +362,7 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     executionReceiptMarkdownIdentity: executionMarkdownIdentity
   });
   const diffPaths = expectedApplicationDiffPaths();
+  const decisionDiffPaths = expectedDecisionDiffPaths();
   const payload = buildBindingReceiptV2Payload({
     applicationCommit: APPLICATION_COMMIT,
     applicationTree: APPLICATION_TREE,
@@ -375,9 +377,17 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
   const receipt = wrapPayload(payload, 'phase2_exact_patch_application_git_binding_receipt_v2');
   const options = {
     resolveGitFile: resolver,
-    resolveCommitTree: commit => ({[APPLICATION_COMMIT]:APPLICATION_TREE,[DECISION_COMMIT]:DECISION_TREE}[commit]),
-    resolveParentCommit: commit => commit === APPLICATION_COMMIT ? DECISION_COMMIT : BASELINE_COMMIT,
-    resolveDiffPaths: () => [...diffPaths],
+    resolveCommitTree: commit => ({
+      [APPLICATION_COMMIT]: APPLICATION_TREE,
+      [DECISION_COMMIT]: DECISION_TREE,
+      [BASELINE_COMMIT]: BASELINE_TREE
+    }[commit]),
+    resolveParentCommit: commit => commit === APPLICATION_COMMIT
+      ? DECISION_COMMIT
+      : commit === DECISION_COMMIT ? BASELINE_COMMIT : null,
+    resolveDiffPaths: (fromCommit, toCommit) => fromCommit === BASELINE_COMMIT && toCommit === DECISION_COMMIT
+      ? [...decisionDiffPaths]
+      : [...diffPaths],
     resolveGitPathState: (commit, sourcePath) => {
       if (commit === DECISION_COMMIT && sourcePath === APPLICATION_STATE_PATH) {
         return { sourceCommit: commit, sourceTree: DECISION_TREE, sourcePath, exists: false };
@@ -476,7 +486,9 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
   assert.equal(evaluateBindingReceipt(drift, options).accepted, false);
   assert.equal(evaluateBindingReceipt(receipt, {
     ...options,
-    resolveDiffPaths: () => [...diffPaths, 'unexpected.txt']
+    resolveDiffPaths: (fromCommit, toCommit) => fromCommit === BASELINE_COMMIT && toCommit === DECISION_COMMIT
+      ? [...decisionDiffPaths]
+      : [...diffPaths, 'unexpected.txt']
   }).accepted, false);
   assert.equal(evaluateBindingReceipt(receipt, {
     ...options,
@@ -495,6 +507,22 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     ...options,
     resolveGitPathState: () => { throw new Error('io_failure'); }
   }).accepted, false);
+  const unrelatedDecisionDiff = evaluateBindingReceipt(receipt, {
+    ...options,
+    resolveDiffPaths: (fromCommit, toCommit) => fromCommit === BASELINE_COMMIT && toCommit === DECISION_COMMIT
+      ? [...decisionDiffPaths, 'unrelated.txt']
+      : [...diffPaths]
+  });
+  assert.equal(unrelatedDecisionDiff.accepted, false);
+  assert.ok(unrelatedDecisionDiff.blockers.includes('bindingReceipt.decisionDiffPaths'));
+  const wrongDecisionParent = evaluateBindingReceipt(receipt, {
+    ...options,
+    resolveParentCommit: commit => commit === APPLICATION_COMMIT
+      ? DECISION_COMMIT
+      : commit === DECISION_COMMIT ? '7'.repeat(40) : null
+  });
+  assert.equal(wrongDecisionParent.accepted, false);
+  assert.ok(wrongDecisionParent.blockers.includes('bindingReceipt.decisionLineage'));
   assert.equal(receipt.payload.currentState.phase2ReceiptBundleAppliedToCompletionAudit, true);
   assert.equal(receipt.payload.currentState.fullPlanPackCompleted, false);
   assert.equal(receipt.payload.currentState.readinessClaimed, false);

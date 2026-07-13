@@ -861,6 +861,10 @@ function expectedApplicationDiffPaths() {
   return [...PATCH_PATHS, EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_MARKDOWN_PATH].sort();
 }
 
+function expectedDecisionDiffPaths() {
+  return [DECISION_PATH, DECISION_PATH.replace(/\.json$/, '.md')].sort();
+}
+
 function evaluateBindingReceipt(receipt = {}, {
   resolveGitFile,
   resolveCommitTree,
@@ -900,6 +904,16 @@ function evaluateBindingReceipt(receipt = {}, {
     decision = JSON.parse(decisionActual.content.toString('utf8'));
     const decisionEvaluation = evaluateDecision(decision, { resolveGitFile });
     if (!decisionEvaluation.accepted) blockers.push(...decisionEvaluation.blockers.map(item => `bindingReceipt.${item}`));
+    const baselineCommit = decision.payload?.patchPlan?.baselineCommit;
+    const baselineTree = decision.payload?.patchPlan?.baselineTree;
+    if (resolveParentCommit(payload.decision.sourceCommit) !== baselineCommit ||
+        resolveCommitTree(baselineCommit) !== baselineTree) {
+      blockers.push('bindingReceipt.decisionLineage');
+    }
+    const observedDecisionDiffPaths = resolveDiffPaths(baselineCommit, payload.decision.sourceCommit).sort();
+    if (!sameJson(observedDecisionDiffPaths, expectedDecisionDiffPaths())) {
+      blockers.push('bindingReceipt.decisionDiffPaths');
+    }
     if (app.parentCommit !== payload.decision.sourceCommit || app.parentTree !== payload.decision.sourceTree ||
         app.patchPayloadSha256 !== decision.payload.patchPlan.patchPayloadSha256 ||
         !sameJson(app.targets, decision.payload.patchPlan.targets)) blockers.push('bindingReceipt.applicationDecisionBinding');
@@ -1028,6 +1042,7 @@ module.exports = {
   exactEvidencePatch,
   executeExactPatch,
   expectedApplicationDiffPaths,
+  expectedDecisionDiffPaths,
   fileProjection,
   gitBlobOid,
   identityWithoutContent,
