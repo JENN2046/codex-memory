@@ -561,6 +561,26 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     diffPathsSha256: sha256Canonical(diffPaths)
   }), 'phase2_exact_patch_application_git_binding_receipt_v1');
   assert.equal(evaluateBindingReceipt(v1Receipt, options).accepted, true);
+  const { resolveDurableClaim: _v1Resolver, ...v1OptionsWithoutDurableClaim } = options;
+  const v1WithoutDurableClaimResolver = evaluateBindingReceipt(v1Receipt, v1OptionsWithoutDurableClaim);
+  assert.equal(v1WithoutDurableClaimResolver.accepted, false);
+  assert.ok(v1WithoutDurableClaimResolver.blockers.includes('bindingReceipt.durableClaimResolverRequired'));
+  const v1MissingDurableClaim = evaluateBindingReceipt(v1Receipt, {
+    ...options,
+    resolveDurableClaim: () => { throw new Error('missing'); }
+  });
+  assert.equal(v1MissingDurableClaim.accepted, false);
+  assert.ok(v1MissingDurableClaim.blockers.includes('bindingReceipt.durableClaim'));
+  const v1NonSuccessDurableClaim = evaluateBindingReceipt(v1Receipt, {
+    ...options,
+    resolveDurableClaim: () => ({
+      ...structuredClone(durableClaim),
+      state: 'CLAIMED',
+      patchInvocationCount: 0
+    })
+  });
+  assert.equal(v1NonSuccessDurableClaim.accepted, false);
+  assert.ok(v1NonSuccessDurableClaim.blockers.includes('bindingReceipt.durableClaim'));
   const v1MarkdownDrift = evaluateBindingReceipt(v1Receipt, {
     ...options,
     resolveGitFile: (commit, sourcePath) => {
