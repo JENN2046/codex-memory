@@ -192,6 +192,32 @@ test('CM2015 stops L4 if current public surface is treated as default full surfa
   });
 });
 
+test('CM2015 stops L4 when the observed public surface contains an unknown tool', () => {
+  const unexpectedTool = 'future_unreviewed_public_tool';
+  const result = evaluateDefaultRuntimePolicyObservationGate({
+    publicToolNames: [...DEFAULT_RUNTIME_ALLOWED_TOOLS, unexpectedTool],
+    policy: {
+      expansionRequested: false,
+      requestedDefaultTools: DEFAULT_RUNTIME_ALLOWED_TOOLS
+    },
+    observation: {
+      observationWindowDays: 30
+    },
+    review: {
+      externalReviewAccepted: true
+    }
+  });
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.status, 'default_runtime_policy_stop_l4');
+  assert.ok(result.stopReasons.includes(`default_runtime_tool_not_allowed_${unexpectedTool}`));
+  assert.ok(result.blockers.includes('default_runtime_expansion_request_not_accepted_by_current_policy'));
+  assert.deepEqual(result.publicSurface.unexpectedDefaultTools, [unexpectedTool]);
+  assert.deepEqual(result.publicSurface.forbiddenDefaultTools, [unexpectedTool]);
+  assert.equal(result.requestedSurface.expansionRequested, true);
+  assert.equal(result.policy.defaultExpansionAllowed, false);
+});
+
 test('CM2015 rejects raw or readiness-shaped evidence without echoing values', () => {
   const result = evaluateDefaultRuntimePolicyObservationGate({
     publicToolNames: DEFAULT_RUNTIME_ALLOWED_TOOLS,
