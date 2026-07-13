@@ -137,7 +137,15 @@ function validValidationReceipt() {
         noProvider: true,
         unsafeEnvOverrideDetected: false,
         failedCheckCount: 0,
-        checkStatusesSha256: sha256Canonical({ compare: 'ok', rollback: 'ok', tests: 'ok' })
+        checkStatusesSha256: sha256Canonical({
+          compare: 'ok',
+          docs: 'ok',
+          lifecyclePolicy: 'ok',
+          policyPreflight: 'ok',
+          queries: 'ok',
+          rollback: 'ok',
+          tests: 'ok'
+        })
       })
     ]
   });
@@ -457,6 +465,11 @@ test('local validation receipt contract rejects failed command or completion/rea
   dirtyAfter.payload.validationTarget.worktreeCleanAfterCommands = false;
   dirtyAfter.canonicalPayloadSha256 = sha256Canonical(dirtyAfter.payload);
   assert.equal(evaluateCm2115LocalValidationReceipt(dirtyAfter).accepted, false);
+  const incompleteGateCoverage = structuredClone(receipt);
+  incompleteGateCoverage.payload.commandResults[2].safeSummary.checkStatusesSha256 =
+    sha256Canonical({ tests: 'ok' });
+  incompleteGateCoverage.canonicalPayloadSha256 = sha256Canonical(incompleteGateCoverage.payload);
+  assert.equal(evaluateCm2115LocalValidationReceipt(incompleteGateCoverage).accepted, false);
 });
 
 test('local validation receipt generator requires an explicit safe gate environment summary', () => {

@@ -88,6 +88,16 @@ const NON_CLAIM_KEYS = Object.freeze([
   'completeV8',
   'fullPlanPackCompleted'
 ]);
+const EXPECTED_GATE_CI_CHECK_STATUSES = Object.freeze({
+  compare: 'ok',
+  docs: 'ok',
+  lifecyclePolicy: 'ok',
+  policyPreflight: 'ok',
+  queries: 'ok',
+  rollback: 'ok',
+  tests: 'ok'
+});
+const EXPECTED_GATE_CI_CHECK_STATUSES_SHA256 = sha256Canonical(EXPECTED_GATE_CI_CHECK_STATUSES);
 
 const EXPECTED_COMMANDS_V1 = Object.freeze([
   Object.freeze({
@@ -211,7 +221,7 @@ function evaluateCm2115LocalValidationReceipt(receipt) {
           result?.safeSummary?.noProvider !== true ||
           result?.safeSummary?.unsafeEnvOverrideDetected !== false ||
           result?.safeSummary?.failedCheckCount !== 0 ||
-          !hex(result?.safeSummary?.checkStatusesSha256, 64)) {
+          result?.safeSummary?.checkStatusesSha256 !== EXPECTED_GATE_CI_CHECK_STATUSES_SHA256) {
         blockers.push('command.safeSummary.gate_ci');
       }
     } else if (result?.safeSummary !== null) {
@@ -260,6 +270,8 @@ module.exports = {
   EVIDENCE_KEYS_V1,
   EVIDENCE_KEYS_V2,
   EVIDENCE_KEYS_V3,
+  EXPECTED_GATE_CI_CHECK_STATUSES,
+  EXPECTED_GATE_CI_CHECK_STATUSES_SHA256,
   EXPECTED_COMMANDS: EXPECTED_COMMANDS_V3,
   EXPECTED_COMMANDS_V1,
   EXPECTED_COMMANDS_V2,

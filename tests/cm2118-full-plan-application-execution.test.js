@@ -465,6 +465,42 @@ test('one-shot registry uses fixed root identity, atomic claim, and rejects seri
   fs.rmSync(root, { recursive: true, force: true });
 });
 
+test('initial claim write stays pinned to the verified governance root across a path swap', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: decisionTime(fixture.finalReleaseEvidence.decision) });
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-claim-root-swap-'));
+  const root = path.join(parent, 'registry');
+  const replacement = path.join(parent, 'replacement');
+  const pinned = path.join(parent, 'pinned');
+  const identity = JSON.stringify(canonicalize(fixture.frozenModule.GOVERNANCE_ROOT_IDENTITY));
+  fs.mkdirSync(root);
+  fs.mkdirSync(replacement);
+  fs.writeFileSync(path.join(root, '.phase8-registry-root-identity.json'), identity);
+  fs.writeFileSync(path.join(replacement, '.phase8-registry-root-identity.json'), identity);
+  let swapped = false;
+  const filesystem = Object.create(require('node:fs/promises'));
+  filesystem.writeFile = async (target, bytes, options) => {
+    if (!swapped && String(target).endsWith(fixture.frozenModule.claimFileName())) {
+      fs.renameSync(root, pinned);
+      fs.renameSync(replacement, root);
+      swapped = true;
+    }
+    return require('node:fs/promises').writeFile(target, bytes, options);
+  };
+  try {
+    const registry = new fixture.frozenModule.Cm2118FullPlanApplicationClaimRegistry({
+      governanceRoot: root,
+      filesystem
+    });
+    const claim = await registry.claim('d'.repeat(64), fixture.finalReleaseEvidence);
+    assert.equal(claim.state, 'APPLICATION_COMMIT_INVOCATION_CONSUMED');
+    assert.equal(swapped, true);
+    assert.equal(fs.existsSync(path.join(pinned, fixture.frozenModule.claimFileName())), true);
+    assert.equal(fs.existsSync(path.join(root, fixture.frozenModule.claimFileName())), false);
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 test('CM-2118 registry rejects a governance root reached through a symlinked parent', async () => {
   const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-registry-parent-'));
   try {

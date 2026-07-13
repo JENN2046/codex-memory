@@ -44,6 +44,13 @@ test('CM-2113 bootstrap decision rejects nested non-claim expansion', () => {
   assert.equal(decisionAccepted(drifted), false);
 });
 
+test('CM-2113 bootstrap decision rejects an approval that is not effective yet', () => {
+  const drifted = structuredClone(bootstrapDecision);
+  drifted.approvedAt = '2098-07-12T12:00:01+08:00';
+  drifted.expiresAt = '2099-07-12T13:00:00+08:00';
+  assert.equal(decisionAccepted(drifted, new Date('2098-07-12T12:00:00+08:00')), false);
+});
+
 test('CM-2113 frozen runtime uses process stdio plus local HTTP owner gateway and never primaryWriteOnly shim mode', () => {
   const runtimeSource = fs.readFileSync(path.join(__dirname, '../src/cli/cm2113-vcptoolbox-owner-native-proof-runtime.js'), 'utf8');
   const controllerSource = fs.readFileSync(path.join(__dirname, '../src/cli/cm2113-vcptoolbox-owner-native-proof.js'), 'utf8');
