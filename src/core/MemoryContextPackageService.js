@@ -351,17 +351,73 @@ function buildTargetCounts(results = []) {
   return counts;
 }
 
+function sha256Hex(value) {
+  return crypto.createHash('sha256').update(String(value || '')).digest('hex');
+}
+
+function buildReceiptScopeBinding(task = {}) {
+  const scope = buildScope(task) || {};
+  return {
+    project_id: safeString(scope.project_id || '', 200),
+    scope_id: safeString(scope.scope_id || '', 200),
+    workspace_id: safeString(scope.workspace_id || '', 200),
+    client_id: safeString(scope.client_id || '', 200),
+    visibility: safeString(scope.visibility || '', 200),
+    strict: scope.strict === true
+  };
+}
+
+function buildReceiptResultProjectionIdentity(item = {}, index = 0) {
+  const projected = normalizeMemoryContextProjection(item) ||
+    normalizeMemoryContextProjection({
+      memoryContextProjection: buildMemoryContextLowDisclosureProjection(item, index)
+    });
+  const projectTokens = values => uniqueTokens(
+    Array.isArray(values)
+      ? values.map(value => safeString(value, 80)).filter(Boolean)
+      : []
+  ).slice(0, 16);
+  const projectTimestamp = value => {
+    if (typeof value !== 'string') return null;
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? new Date(parsed).toISOString() : null;
+  };
+  const finiteOrNull = value => Number.isFinite(value) ? value : null;
+  const projection = {
+    target: safeString(item.target || 'unknown', 80) || 'unknown',
+    score: finiteOrNull(item.score),
+    baseScore: finiteOrNull(item.baseScore),
+    rerankScore: finiteOrNull(item.rerankScore),
+    titleHitCount: Number(item.titleHitCount || 0),
+    tagHitCount: Number(item.tagHitCount || 0),
+    contentHitCount: Number(item.contentHitCount || 0),
+    evidenceHitCount: Number(item.evidenceHitCount || 0),
+    exactCoreTagCount: Number(item.exactCoreTagCount || 0),
+    sourceKinds: sourceKinds(item),
+    matchedTags: projectTokens(item.matchedTags),
+    coreTags: projectTokens(item.coreTags),
+    createdAt: projectTimestamp(item.createdAt),
+    updatedAt: projectTimestamp(item.updatedAt),
+    context: projected
+  };
+  return sha256Hex(JSON.stringify(projection));
+}
+
 function buildAuditReceipt({ task, query, results, searchResult, overview, audit }) {
+  const scopeFingerprint = sha256Hex(JSON.stringify(buildReceiptScopeBinding(task)));
+  const resultProjectionDigest = sha256Hex(JSON.stringify(
+    results.map(buildReceiptResultProjectionIdentity)
+  ));
   const seed = JSON.stringify({
     query,
     resultCount: results.length,
-    project: task.project_id || '',
-    client: task.client_id || '',
+    scopeFingerprint,
+    resultProjectionDigest,
     fallback: hasFallback(searchResult)
   });
   return {
     schemaVersion: 'prepare_memory_context_audit_receipt_v1',
-    receipt_id: `pmc_${crypto.createHash('sha256').update(seed).digest('hex').slice(0, 16)}`,
+    receipt_id: `pmc_${sha256Hex(seed).slice(0, 16)}`,
     generated_at: new Date().toISOString(),
     read_only: true,
     durable_mutation_performed: false,
@@ -371,6 +427,8 @@ function buildAuditReceipt({ task, query, results, searchResult, overview, audit
     provider_payload_returned: false,
     fallback_used: hasFallback(searchResult),
     search_result_count: results.length,
+    scope_fingerprint: scopeFingerprint,
+    result_projection_digest: resultProjectionDigest,
     overview_status: overview?.runtimePosture?.securityProfile || overview?.access?.mode || 'unknown',
     audit_status: audit?.status || 'unknown',
     low_disclosure: true
