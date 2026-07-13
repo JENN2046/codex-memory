@@ -50,6 +50,7 @@ test('CM-2096 registry root remains under the Git common-dir governance root', (
 test('CM-2096 route preflight requires tombstone write primary and native reads off', () => {
   const expectedTarget = { targetReferenceName: 'cm2096-target', targetKind: 'mcp_server' };
   const config = {
+    governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeWriteDelegationMode: 'primary',
     governedMcpVcpNativeReadDelegationMode: 'off',
     governedMcpVcpNativeRuntimeTarget: { accepted: true, ...expectedTarget },
