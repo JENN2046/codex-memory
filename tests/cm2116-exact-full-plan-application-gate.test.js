@@ -18,7 +18,18 @@ const {
   expectedIntakeDiffPaths
 } = require('../src/core/Cm2116ExactFullPlanApplicationGate');
 const { sha256Canonical } = require('../src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract');
-const { canonicalize } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const {
+  BASELINE,
+  PHASE2_APPLICATION_RECEIPT_PATH,
+  canonicalize,
+  sha256
+} = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const {
+  DECISION_REFERENCE: PHASE2_DECISION_REFERENCE,
+  NONCE: PHASE2_NONCE,
+  RECEIPT_ID: PHASE2_RECEIPT_ID,
+  REGISTRY_REFERENCE: PHASE2_REGISTRY_REFERENCE
+} = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 const git = require('../scripts/cm2115-r2-git');
 const { isCommitAncestor: realIsCommitAncestor } = require('../scripts/generate-cm2115-r2-self-review-decision');
 const {
@@ -44,6 +55,24 @@ function gateImplementation() {
     commit: IMPLEMENTATION_COMMIT,
     tree: IMPLEMENTATION_TREE,
     artifacts: GATE_IMPLEMENTATION_ARTIFACT_PATHS.map(artifact)
+  };
+}
+
+function resolveFixtureDurableClaim(bindingHash) {
+  const receiptIdentity = git.resolveGitFile(BASELINE.sourceCommit, PHASE2_APPLICATION_RECEIPT_PATH);
+  const receipt = JSON.parse(receiptIdentity.content.toString('utf8'));
+  return {
+    schemaVersion: 1,
+    registryReference: PHASE2_REGISTRY_REFERENCE,
+    claimId: receipt.payload.registry.claimId,
+    nonceHash: sha256(PHASE2_NONCE),
+    receiptIdHash: sha256(PHASE2_RECEIPT_ID),
+    bindingHash,
+    decisionReference: PHASE2_DECISION_REFERENCE,
+    authorizationUseCount: 1,
+    authorizationReplayAllowed: false,
+    patchInvocationCount: 1,
+    state: 'CONSUMED_SUCCESS'
   };
 }
 
@@ -81,7 +110,7 @@ function resolvers(overrides = {}) {
         ? expectedIntakeDiffEntries()
         : [],
     resolveGitPathState: git.resolveGitPathState,
-    resolveDurableClaim: git.resolveDurableClaim,
+    resolveDurableClaim: resolveFixtureDurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === SELF_REVIEW_INTAKE_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
       return realIsCommitAncestor(ancestor, descendant);
