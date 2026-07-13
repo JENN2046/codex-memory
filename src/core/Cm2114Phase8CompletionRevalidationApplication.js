@@ -70,7 +70,7 @@ function evaluateBundle(bundle = {}, proofReceipt = {}) {
   for (const field of ['phase8Completed', 'phase8CompletionStatus', 'fullPlanPackCompleted', 'readinessClaimed']) if (bundle.allowedCompletionResult?.[field] !== patch[field]) blockers.push(`bundle.allowedCompletionResult.${field}`);
   if (bundle.proofSideEffects?.ownerRuntimeNativeWrites !== 1 || bundle.proofSideEffects?.verifyOperations !== 1 || bundle.proofSideEffects?.durableRecordCount !== 1 || bundle.proofSideEffects?.automaticRetries !== 0 || bundle.proofSideEffects?.rollbackOrCompensationOperations !== 0 || bundle.proofSideEffects?.realMemoryReads !== 0 || bundle.proofSideEffects?.remoteActions !== 0) blockers.push('bundle.proofSideEffects');
   for (const field of ['completionAuditPatchApplications', 'nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (bundle.applicationSideEffectCounters?.[field] !== 0) blockers.push(`bundle.applicationSideEffectCounters.${field}`);
-  for (const field of ['productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed']) if (bundle.nonClaims?.[field] !== false) blockers.push(`bundle.nonClaims.${field}`);
+  for (const field of ['derivedIndexProofAccepted', 'productionProviderProofAccepted', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed']) if (bundle.nonClaims?.[field] !== false) blockers.push(`bundle.nonClaims.${field}`);
   const proof = evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(proofReceipt);
   if (!proof.accepted) blockers.push(...proof.blockers.map(item => `proof.${item}`));
   const audit = evaluateNearModelMemoryPlanPackCompletionAudit({ evidence: bundle.evidence });
@@ -90,7 +90,7 @@ function evaluateDecision(decision = {}) {
   if (decision.applicationAuthorization?.useCount !== 1 || decision.applicationAuthorization?.replayAllowed !== false) blockers.push('decision.applicationAuthorization');
   if (decision.applicationSideEffectLimits?.completionAuditPatchApplications !== 1) blockers.push('decision.applicationSideEffectLimits.completionAuditPatchApplications');
   for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (decision.applicationSideEffectLimits?.[field] !== 0) blockers.push(`decision.applicationSideEffectLimits.${field}`);
-  for (const field of ['additionalNativeWriteAuthorized', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed']) if (decision.nonClaims?.[field] !== false) blockers.push(`decision.nonClaims.${field}`);
+  for (const field of ['additionalNativeWriteAuthorized', 'derivedIndexProofAccepted', 'productionProviderProofAccepted', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed']) if (decision.nonClaims?.[field] !== false) blockers.push(`decision.nonClaims.${field}`);
   return { accepted: blockers.length === 0, blockers: [...new Set(blockers)] };
 }
 

@@ -180,6 +180,34 @@ test('CM-2115-R2 durable claim allows exactly one serial or concurrent claimant'
   );
 });
 
+test('CM-2115-R2 rejects rehashed after-projection drift before consuming the claim', async t => {
+  const fixture = await prepareTempExecution(t);
+  const drift = structuredClone(fixture.decision);
+  drift.payload.patchPlan.targets[0].after.sha256 = 'f'.repeat(64);
+  const { patchPayloadSha256: _ignored, ...patchPlanPayload } = drift.payload.patchPlan;
+  drift.payload.patchPlan.patchPayloadSha256 = sha256Canonical(patchPlanPayload);
+  drift.canonicalPayloadSha256 = sha256Canonical(drift.payload);
+  assert.equal(evaluateDecision(drift, { resolveGitFile: fixture.resolver }).accepted, true);
+
+  const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
+  const result = await executeExactPatch({
+    repoRoot: fixture.root,
+    decision: drift,
+    decisionIdentity: fixture.identity,
+    authorityIdentity: fixture.authority,
+    resolveGitFile: fixture.resolver,
+    registry
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.state, 'UNCLAIMED');
+  assert.ok(result.blockers.some(item => item.startsWith('patchTarget.afterDrift.')));
+  await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
+  for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
+    assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), targetBaselineResolver(sourcePath).content);
+  }
+  await assert.rejects(() => fsp.lstat(path.join(fixture.root, APPLICATION_STATE_PATH)), { code: 'ENOENT' });
+});
+
 test('CM-2115-R2 executes one exact patch and a fresh registry instance cannot replay it', async t => {
   const fixture = await prepareTempExecution(t);
   const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
