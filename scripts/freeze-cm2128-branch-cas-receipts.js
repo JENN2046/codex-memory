@@ -115,12 +115,10 @@ function assertLowDisclosure(value) {
   const stack = [value];
   while (stack.length) {
     const current = stack.pop();
-    if (Array.isArray(current)) {
-      stack.push(...current);
-      continue;
-    }
     if (current && typeof current === 'object') {
-      stack.push(...Object.values(current));
+      for (const [key, nestedValue] of Object.entries(current)) {
+        stack.push(key, nestedValue);
+      }
       continue;
     }
     if (typeof current !== 'string') continue;

@@ -87,7 +87,10 @@ test('CM-2128 low-disclosure scanner accepts bounded metadata and rejects nested
     { nested: { path: 'logs/private-audit.jsonl' } },
     { nested: { credential: `sk-${'x'.repeat(20)}` } },
     { nested: { authorization: `Bearer ${'x'.repeat(20)}` } },
-    { nested: { privateKey: `BEGIN ${'PRIVATE'} KEY` } }
+    { nested: { privateKey: `BEGIN ${'PRIVATE'} KEY` } },
+    { nested: { ['/home/jenn/private/receipt.json']: 'safe-value' } },
+    { nested: { [`Bearer ${'x'.repeat(20)}`]: 'safe-value' } },
+    { nested: { [`sk-${'x'.repeat(20)}`]: 'safe-value' } }
   ]) {
     assert.throws(
       () => freeze.assertLowDisclosure(unsafe),
