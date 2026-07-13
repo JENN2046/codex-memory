@@ -32,6 +32,16 @@ function safeKey(value) {
   return sha256(String(value || ''));
 }
 
+async function pathExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch (error) {
+    if (error.code === 'ENOENT') return false;
+    throw error;
+  }
+}
+
 class Phase8OneShotAuthorizationRegistry {
   constructor({ governanceRoot, rootIdentity, identity }) {
     if (typeof governanceRoot !== 'string' || governanceRoot.trim() === '') {
@@ -99,19 +109,20 @@ class Phase8OneShotAuthorizationRegistry {
     const statePath = path.join(this.directory, `claim-${claimId}.json`);
     const record = { claimId, nonceHash: safeKey(nonce), receiptIdHash: safeKey(receiptId), bindingHash, state: 'CLAIMED' };
     try {
-      await Promise.all([fs.access(noncePath), fs.access(receiptPath)]).then(
-        () => { throw new Error('authorization_already_claimed'); },
-        async () => {
-          try {
-            await fs.writeFile(noncePath, JSON.stringify({ claimId }), { flag: 'wx' });
-            await fs.writeFile(receiptPath, JSON.stringify({ claimId }), { flag: 'wx' });
-            await fs.writeFile(statePath, JSON.stringify(record), { flag: 'wx' });
-          } catch (error) {
-            if (error.code === 'EEXIST') throw new Error('authorization_already_claimed');
-            throw error;
-          }
-        }
-      );
+      const existingReservations = await Promise.all([
+        pathExists(noncePath),
+        pathExists(receiptPath),
+        pathExists(statePath)
+      ]);
+      if (existingReservations.some(Boolean)) throw new Error('authorization_already_claimed');
+      try {
+        await fs.writeFile(noncePath, JSON.stringify({ claimId }), { flag: 'wx' });
+        await fs.writeFile(receiptPath, JSON.stringify({ claimId }), { flag: 'wx' });
+        await fs.writeFile(statePath, JSON.stringify(record), { flag: 'wx' });
+      } catch (error) {
+        if (error.code === 'EEXIST') throw new Error('authorization_already_claimed');
+        throw error;
+      }
     } finally {
       await lockHandle.close();
       await fs.unlink(lock).catch(() => {});
