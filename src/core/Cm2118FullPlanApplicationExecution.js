@@ -1394,6 +1394,7 @@ async function evaluateDurableApplicationBinding({
   packetCommit,
   finalReleaseCommit
 }) {
+  assertSafeGitEnvironment();
   const blockers = [];
   if (authorizationContentDecisionCommit !== CONTENT_DECISION_FREEZE.commit) {
     return { accepted: false, blockers: ['durableBinding.exactContentDecisionCommitRequired'] };
