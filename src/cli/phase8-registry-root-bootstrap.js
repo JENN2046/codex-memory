@@ -5,9 +5,16 @@ const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const {
+  DECISION_BLOB_OID: EXPECTED_DECISION_BLOB_OID,
+  DECISION_BYTES: EXPECTED_DECISION_BYTES,
+  DECISION_REFERENCE: EXPECTED_DECISION_REFERENCE,
+  DECISION_SHA256: EXPECTED_DECISION_SHA256,
+  DECISION_SOURCE_COMMIT: EXPECTED_DECISION_SOURCE_COMMIT,
+  evaluateCm2093Phase8RegistryRootBootstrapDecision
+} = require('../core/Cm2093Phase8RegistryRootBootstrapDecisionContract');
 
 const DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_content_decision_cm2093.json';
-const EXPECTED_DECISION_REFERENCE = 'CM-2093-ER-20260711-CONTENT-ROOT-BOOTSTRAP-PASS-240FD4F7';
 const ROOT_IDENTITY_BYTES = Buffer.from('{"registryRootInstanceId":"cm2093-phase8-governance-root-instance-001","registryRootReference":"codex-memory-phase8-governance-root","registryRootReinitializationAllowed":false,"registryRootReplacementAllowed":false}');
 const ROOT_IDENTITY_SHA256 = '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0';
 
@@ -19,14 +26,24 @@ function git(args, options = {}) {
   return execFileSync('git', args, { encoding: options.encoding || 'utf8', maxBuffer: 1024 * 1024 });
 }
 
-async function bootstrapPhase8RegistryRoot(decisionSourceCommit) {
+async function bootstrapPhase8RegistryRoot(decisionSourceCommit, { now = new Date() } = {}) {
   if (!/^[a-f0-9]{40}$/.test(decisionSourceCommit || '')) throw new Error('decision_source_commit_required');
+  if (decisionSourceCommit !== EXPECTED_DECISION_SOURCE_COMMIT) {
+    throw new Error('content_decision_git_identity_mismatch');
+  }
   const head = git(['rev-parse', 'HEAD']).trim();
   const clean = git(['status', '--porcelain']).trim() === '';
   if (head !== decisionSourceCommit || !clean) throw new Error('decision_checkout_binding_mismatch');
 
   const decisionBytes = Buffer.from(execFileSync('git', ['show', `${decisionSourceCommit}:${DECISION_PATH}`], { maxBuffer: 1024 * 1024 }));
   const decisionBlobOid = git(['rev-parse', `${decisionSourceCommit}:${DECISION_PATH}`]).trim();
+  const exactDecision = evaluateCm2093Phase8RegistryRootBootstrapDecision({
+    decisionBytes,
+    decisionSourceCommit,
+    decisionBlobOid,
+    now
+  });
+  if (exactDecision.accepted !== true) throw new Error('content_decision_exact_artifact_rejected');
   const decision = JSON.parse(decisionBytes.toString('utf8'));
   if (decision.decisionReference !== EXPECTED_DECISION_REFERENCE ||
       decision.authorizationContentApproved !== true ||
@@ -81,7 +98,11 @@ if (require.main === module) {
 
 module.exports = {
   DECISION_PATH,
+  EXPECTED_DECISION_BLOB_OID,
+  EXPECTED_DECISION_BYTES,
   EXPECTED_DECISION_REFERENCE,
+  EXPECTED_DECISION_SHA256,
+  EXPECTED_DECISION_SOURCE_COMMIT,
   ROOT_IDENTITY_BYTES,
   ROOT_IDENTITY_SHA256,
   bootstrapPhase8RegistryRoot
