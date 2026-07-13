@@ -20,7 +20,6 @@ const {
   sha256
 } = require('../src/core/Cm2117ExactFullPlanApplicationDecision');
 const {
-  ensureCleanWorktree,
   gitText
 } = require('./cm2115-r2-git');
 const {
@@ -76,7 +75,9 @@ function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
   assertSafeGitEnvironment();
   ensureRepositoryRoot();
-  ensureCleanWorktree();
+  if (gitText(['status', '--porcelain', '--untracked-files=all']) !== '') {
+    throw new Error('cm2127_release_clean_worktree_required');
+  }
   if (gitText(['branch', '--show-current']) !== '') throw new Error('cm2127_release_detached_worktree_required');
   if (fs.existsSync(FINAL_RELEASE_PATH) || fs.existsSync(FINAL_RELEASE_MARKDOWN_PATH)) {
     throw new Error('cm2127_release_already_exists');

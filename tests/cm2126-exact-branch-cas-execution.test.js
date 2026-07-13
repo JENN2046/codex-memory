@@ -18,6 +18,7 @@ const { resolverOptions: realResolverOptions } =
   require('../scripts/generate-cm2116-exact-full-plan-application-gate');
 const { canonicalize, sha256Canonical } =
   require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
 
 function git(args, cwd, options = {}) {
   return execFileSync('git', args, {
@@ -241,12 +242,24 @@ function cliArgv() {
 }
 
 function runCli(extra = {}) {
-  return spawnSync(process.execPath, ['src/cli/cm2126-exact-branch-cas.js', ...cliArgv()], {
+  return spawnSync(process.execPath, [
+    '--require', FIXED_DATE_PRELOAD,
+    'src/cli/cm2126-exact-branch-cas.js',
+    ...cliArgv()
+  ], {
     cwd: fixture.repo,
-    env: extra.env || process.env,
+    env: fixedExecutionEnv(extra.env || process.env),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
+}
+
+function fixedExecutionEnv(env = process.env) {
+  return {
+    ...env,
+    NODE_ENV: 'test',
+    CODEX_MEMORY_TEST_FIXED_NOW: fixture.now.toISOString()
+  };
 }
 
 function runTwiceInOneProcess() {
@@ -258,8 +271,9 @@ function runTwiceInOneProcess() {
     "process.stdout.write(JSON.stringify({first,second}));})()",
     ".catch(error=>{process.stderr.write(error.message+'\\n');process.exit(1);});"
   ].join('');
-  return spawnSync(process.execPath, ['-e', source], {
+  return spawnSync(process.execPath, ['--require', FIXED_DATE_PRELOAD, '-e', source], {
     cwd: fixture.repo,
+    env: fixedExecutionEnv(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -273,8 +287,9 @@ function evaluateDurableInFixture() {
     "process.stdout.write(JSON.stringify(value));})()",
     ".catch(error=>{process.stderr.write(error.message+'\\n');process.exit(1);});"
   ].join('');
-  const result = spawnSync(process.execPath, ['-e', source], {
+  const result = spawnSync(process.execPath, ['--require', FIXED_DATE_PRELOAD, '-e', source], {
     cwd: fixture.repo,
+    env: fixedExecutionEnv(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -470,6 +485,29 @@ test('detached executor clean check reports untracked files even when Git config
     assert.match(result.stderr, /clean_detached_final_release_runtime_required/);
     assert.equal(fs.existsSync(fixture.claimPath), false);
     assert.equal(text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo), refBefore);
+  } finally {
+    fs.rmSync(sentinel, { force: true });
+    git(['config', '--unset', 'status.showUntrackedFiles'], fixture.repo);
+  }
+});
+
+test('packet and final-release generators force untracked-file reporting', () => {
+  const sentinel = path.join(fixture.repo, 'cm2126-hidden-generator-sentinel');
+  git(['config', 'status.showUntrackedFiles', 'no'], fixture.repo);
+  fs.writeFileSync(sentinel, 'fixture only\n');
+  try {
+    for (const script of [
+      'scripts/generate-cm2126-exact-branch-cas-execution-packet.js',
+      'scripts/generate-cm2127-exact-branch-cas-final-release.js'
+    ]) {
+      const result = spawnSync(process.execPath, [script], {
+        cwd: fixture.repo,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
+      assert.notEqual(result.status, 0, script);
+      assert.match(result.stderr, /cm212[67]_(packet|release)_clean_worktree_required/, script);
+    }
   } finally {
     fs.rmSync(sentinel, { force: true });
     git(['config', '--unset', 'status.showUntrackedFiles'], fixture.repo);

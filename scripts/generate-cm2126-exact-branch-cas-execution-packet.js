@@ -26,7 +26,6 @@ const {
   sha256
 } = require('../src/core/Cm2117ExactFullPlanApplicationDecision');
 const {
-  ensureCleanWorktree,
   gitText,
   resolveCommitTree,
   resolveDiffPaths,
@@ -117,7 +116,9 @@ function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
   assertSafeGitEnvironment();
   ensureRepositoryRoot();
-  ensureCleanWorktree();
+  if (gitText(['status', '--porcelain', '--untracked-files=all']) !== '') {
+    throw new Error('cm2126_packet_clean_worktree_required');
+  }
   if (gitText(['branch', '--show-current']) !== '') throw new Error('cm2126_packet_detached_worktree_required');
   if (fs.existsSync(PACKET_PATH) || fs.existsSync(PACKET_MARKDOWN_PATH)) {
     throw new Error('cm2126_packet_already_exists');
