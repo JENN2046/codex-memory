@@ -846,8 +846,10 @@ function fileMatchesIdentity(root, identity) {
     const absolute = path.join(root, identity.sourcePath);
     const stat = fs.lstatSync(absolute);
     if (!stat.isFile() || stat.isSymbolicLink()) return false;
-    const expectedMode = identity.gitMode === '100755' ? 0o755 : 0o644;
-    if ((stat.mode & 0o777) !== expectedMode) return false;
+    if (identity.gitMode !== '100644' && identity.gitMode !== '100755') return false;
+    const expectedExecutable = identity.gitMode === '100755';
+    const observedExecutable = (stat.mode & 0o100) !== 0;
+    if (observedExecutable !== expectedExecutable) return false;
     const bytes = fs.readFileSync(absolute);
     return bytes.length === identity.bytes && sha256(bytes) === identity.sha256 && gitBlobOid(bytes) === identity.blobOid;
   } catch {

@@ -591,6 +591,32 @@ test('dirty target and ref drift fail before claim creation', () => {
   assert.equal(text(['status', '--porcelain'], fixture.target), '');
 });
 
+test('target identity compares only the Git executable bit', () => {
+  const sourcePath = 'STATUS.md';
+  const absolute = path.join(fixture.target, sourcePath);
+  const originalMode = fs.statSync(absolute).mode & 0o777;
+  const target = fixture.frozenModule.deriveTargetWorktree(fixture.repo);
+  const bindings = fixture.packetEvidence.packet.payload.exactCasBoundary.targetBindings;
+  try {
+    fs.chmodSync(absolute, 0o664);
+    assert.equal(text(['status', '--porcelain'], fixture.target), '');
+    assert.doesNotThrow(() => fixture.frozenModule.verifyTargetOldPreflight(
+      fixture.repo,
+      target,
+      bindings
+    ));
+
+    fs.chmodSync(absolute, 0o775);
+    assert.throws(
+      () => fixture.frozenModule.verifyTargetOldPreflight(fixture.repo, target, bindings),
+      /target_old_preflight_failed/
+    );
+  } finally {
+    fs.chmodSync(absolute, originalMode);
+  }
+  assert.equal(text(['status', '--porcelain'], fixture.target), '');
+});
+
 test('assume-unchanged and skip-worktree index flags fail closed before claim', () => {
   initializeGovernanceRoot();
   for (const [setFlag, clearFlag] of [
