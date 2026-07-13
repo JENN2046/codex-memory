@@ -4,6 +4,7 @@
 const path = require('node:path');
 
 const {
+  assertSafeGitEnvironment,
   CONTENT_DECISION_FREEZE,
   executeFullPlanApplicationFromCommits
 } = require('../core/Cm2118FullPlanApplicationExecution');
@@ -37,6 +38,7 @@ function parseArgs(argv) {
 
 async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
+  assertSafeGitEnvironment();
   if (path.resolve(gitText(['rev-parse', '--show-toplevel'])) !== path.resolve(process.cwd())) {
     throw new Error('cm2118_application_repository_root_required');
   }
