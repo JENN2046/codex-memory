@@ -176,6 +176,40 @@ test('no-token HTTP prepare_memory_context returns 403 when bearer authenticatio
   }, { bearerToken });
 });
 
+test('no-token HTTP propose_memory_delta returns 403 when bearer authentication is configured', async () => {
+  const bearerToken = 'test-token-12345';
+  await withHttpServer(async ({ app, address }) => {
+    let proposalCalled = false;
+    app.services.memoryDeltaProposalService.propose = () => {
+      proposalCalled = true;
+      return { status: 'proposal_should_not_run' };
+    };
+
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 13,
+        method: 'tools/call',
+        params: {
+          name: 'propose_memory_delta',
+          arguments: {
+            task: { task_id: 'no-token-proposal' },
+            candidates: [{ operation: 'record', evidence: ['synthetic'] }]
+          }
+        }
+      })
+    });
+    const payload = await response.json();
+
+    assert.equal(response.status, 403);
+    assert.equal(payload.error.data.code, PUBLIC_REQUEST_BLOCKED);
+    assert.equal(proposalCalled, false);
+    assert.doesNotMatch(JSON.stringify(payload), /bearer|token|raw|lifecycle|mutation|provider|api|client/i);
+  }, { bearerToken });
+});
+
 test('no-token HTTP record_memory returns 403 Forbidden', async () => {
   await withHttpServer(async ({ address }) => {
     const response = await fetch(address.url, {
