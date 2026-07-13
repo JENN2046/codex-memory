@@ -15,6 +15,7 @@ const { parseArgs } = require('../src/cli/cm2118-full-plan-application');
 const packetGenerator = require('../scripts/generate-cm2118-full-plan-application-execution-packet');
 const releaseGenerator = require('../scripts/generate-cm2119-full-plan-final-execution-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const cm2115Git = require('../scripts/cm2115-r2-git');
 const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
 // The frozen executor performs a large number of Git-object checks. A focused
 // run completes in roughly one minute, while the default suite runs many test
@@ -118,6 +119,7 @@ function resolvers(cwd) {
     resolveGitFile,
     resolveDiffPaths,
     resolveDiffEntries,
+    resolveDurableClaim: bindingHash => cm2115Git.resolveDurableClaim(bindingHash, { cwd }),
     isCommitAncestor
   };
 }
