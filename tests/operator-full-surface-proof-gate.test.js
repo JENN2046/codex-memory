@@ -179,3 +179,23 @@ test('CM2012 rejects commit_memory_delta in public operator surface', () => {
   assert.ok(result.blockers.includes('forbidden_default_tool_commit_memory_delta'));
   assert.equal(result.publicSurface.commitMemoryDeltaPublicRegistered, true);
 });
+
+test('CM2012 rejects public tools outside the exact approved full surface', () => {
+  const config = createConfig({
+    mcpPublicToolSurface: 'full',
+    exposeControlledMutationMcpTools: true,
+    exposeWriteMcpTools: true
+  });
+  const result = evaluateOperatorFullSurfaceProof({
+    config,
+    publicToolNames: [
+      ...getPublicToolDefinitions(config).map(tool => tool.name),
+      'import_memory'
+    ],
+    proof: acceptedProof()
+  });
+
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('unexpected_public_tool_import_memory'));
+  assert.deepEqual(result.publicSurface.unexpectedTools, ['import_memory']);
+});
