@@ -779,6 +779,26 @@ async function openVerifiedGovernanceRoot(registry) {
   }
 }
 
+async function readClaimFromGovernanceRootHandle(registry, rootHandle, bindingHash = null) {
+  const claimHandle = await registry.fs.open(
+    governanceDescriptorPath(rootHandle, claimFileName()),
+    fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW
+  );
+  try {
+    const stat = await claimHandle.stat();
+    if (!stat.isFile()) throw new Error('cm2118_claim_invalid');
+    let value;
+    try {
+      value = JSON.parse(await claimHandle.readFile('utf8'));
+    } catch {
+      throw new Error('cm2118_claim_corrupt_or_unreadable');
+    }
+    return registry.validateEnvelope(value, bindingHash);
+  } finally {
+    await claimHandle.close().catch(() => {});
+  }
+}
+
 class Cm2118FullPlanApplicationClaimRegistry {
   constructor({ governanceRoot, filesystem = fsPromises }) {
     if (typeof governanceRoot !== 'string' || governanceRoot.trim() === '') {
@@ -904,7 +924,6 @@ class Cm2118FullPlanApplicationClaimRegistry {
   }
 
   async claim(bindingHash, finalReleaseEvidence) {
-    await this.verifyRoot();
     const claimedAt = new Date().toISOString();
     const approvedAt = Date.parse(finalReleaseEvidence?.decision?.payload?.approvedAt || '');
     const expiresAt = Date.parse(finalReleaseEvidence?.decision?.payload?.expiresAt || '');
@@ -915,28 +934,33 @@ class Cm2118FullPlanApplicationClaimRegistry {
     }
     const envelope = this.baseEnvelope(bindingHash, finalReleaseEvidence, claimedAt);
     const bytes = Buffer.from(JSON.stringify(canonicalize(envelope)));
+    const rootHandle = await openVerifiedGovernanceRoot(this);
     try {
-      await this.fs.writeFile(this.claimPath, bytes, { flag: 'wx' });
-    } catch (error) {
-      if (error?.code === 'EEXIST') throw new Error('cm2118_authorization_already_claimed');
-      throw new Error('cm2118_claim_persistence_ambiguous');
+      try {
+        await this.fs.writeFile(
+          governanceDescriptorPath(rootHandle, claimFileName()),
+          bytes,
+          { flag: 'wx' }
+        );
+      } catch (error) {
+        if (error?.code === 'EEXIST') throw new Error('cm2118_authorization_already_claimed');
+        throw new Error('cm2118_claim_persistence_ambiguous');
+      }
+      const observed = await readClaimFromGovernanceRootHandle(this, rootHandle, bindingHash);
+      if (!sameJson(observed, envelope)) throw new Error('cm2118_claim_readback_mismatch');
+      return observed;
+    } finally {
+      await rootHandle.close().catch(() => {});
     }
-    const observed = await this.read(bindingHash);
-    if (!sameJson(observed, envelope)) throw new Error('cm2118_claim_readback_mismatch');
-    return observed;
   }
 
   async read(bindingHash = null) {
-    await this.verifyRoot();
-    const stat = await this.fs.lstat(this.claimPath);
-    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('cm2118_claim_invalid');
-    let value;
+    const rootHandle = await openVerifiedGovernanceRoot(this);
     try {
-      value = JSON.parse(await this.fs.readFile(this.claimPath, 'utf8'));
-    } catch {
-      throw new Error('cm2118_claim_corrupt_or_unreadable');
+      return await readClaimFromGovernanceRootHandle(this, rootHandle, bindingHash);
+    } finally {
+      await rootHandle.close().catch(() => {});
     }
-    return this.validateEnvelope(value, bindingHash);
   }
 
   async inspectExisting(bindingHash = null) {
