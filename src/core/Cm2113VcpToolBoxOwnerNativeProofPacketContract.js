@@ -12,6 +12,14 @@ const TOP_LEVEL_KEYS = Object.freeze([
   'runtimeIdentitySha256', 'runtimeTarget', 'schemaVersion', 'storeIdentitySha256',
   'storeInstanceId', 'storeReference', 'taskId', 'transport'
 ]);
+const FIXED_RECORD = Object.freeze({
+  folder: 'cm2113-proof',
+  maid: 'codex-memory-phase8-proof',
+  date: '2026-07-12',
+  fileName: 'cm2113-vcptoolbox-owner-runtime-proof',
+  localTime: '08:00',
+  tag: 'codex-memory, phase8, synthetic-proof, vcptoolbox-owner-runtime'
+});
 
 function exactKeys(value, keys) {
   return value && typeof value === 'object' && !Array.isArray(value) &&
@@ -78,7 +86,9 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
   if (!hex(packet.payloadCanonicalSha256, 64) || !hex(packet.durableSha256, 64) || !Number.isInteger(packet.durableBytes) || packet.durableBytes <= 0) {
     blockers.push('payload.binding');
   }
-  if (!packet.recordArguments || !packet.fixedRecord || sha256Canonical(packet.recordArguments) !== packet.payloadCanonicalSha256) {
+  if (!packet.recordArguments || !exactKeys(packet.fixedRecord, Object.keys(FIXED_RECORD)) ||
+      Object.entries(FIXED_RECORD).some(([key, value]) => packet.fixedRecord[key] !== value) ||
+      sha256Canonical(packet.recordArguments) !== packet.payloadCanonicalSha256) {
     blockers.push('payload.canonical');
   }
   if (!gitIdentityAccepted(packet.bootstrapReceiptGitIdentity)) blockers.push('bootstrapReceipt.gitIdentity');

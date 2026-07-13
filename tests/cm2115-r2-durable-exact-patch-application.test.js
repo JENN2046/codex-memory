@@ -172,6 +172,13 @@ test('CM-2115-R2 authority intake and exact patch decision fail closed on drift'
   receiptPathDrift.payload.patchPlan.patchPayloadSha256 = sha256Canonical(patchPlanPayload);
   receiptPathDrift.canonicalPayloadSha256 = sha256Canonical(receiptPathDrift.payload);
   assert.equal(evaluateDecision(receiptPathDrift, { resolveGitFile: resolver }).accepted, false);
+
+  const extraPayloadClaim = structuredClone(fixture.decision);
+  extraPayloadClaim.payload.unauthorizedReadinessClaim = { readinessClaimed: true };
+  extraPayloadClaim.canonicalPayloadSha256 = sha256Canonical(extraPayloadClaim.payload);
+  const extraEvaluation = evaluateDecision(extraPayloadClaim, { resolveGitFile: resolver });
+  assert.equal(extraEvaluation.accepted, false);
+  assert.ok(extraEvaluation.blockers.includes('decision.exactShape'));
 });
 
 test('CM-2115-R2 durable claim allows exactly one serial or concurrent claimant', async t => {

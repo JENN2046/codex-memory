@@ -432,7 +432,7 @@ function createVcpToolBoxDailyNoteOwnerRuntimeAdapter(options = {}) {
         isolatedRuntimeStoreUsed: true,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false,
-        rawRuntimeOutputDisclosed: false,
+        rawRuntimeOutputDisclosed: execution.stderrPresent === true,
         rawMemoryContentDisclosed: false,
         runtimeLocatorDisclosed: false,
         tokenMaterialDisclosed: false,

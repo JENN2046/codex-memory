@@ -354,6 +354,17 @@ function evaluateDecision(decision = {}, { resolveGitFile } = {}) {
       decision.decisionType !== 'phase2_exact_patch_application_decision_v1' ||
       payload.decisionReference !== DECISION_REFERENCE) blockers.push('decision.identity');
   if (decision.canonicalPayloadSha256 !== sha256Canonical(payload)) blockers.push('decision.payloadSha256');
+  try {
+    const expectedDecision = buildDecision({
+      authorityGitIdentity: payload.authority,
+      baselineCommit: payload.patchPlan?.baselineCommit,
+      baselineTree: payload.patchPlan?.baselineTree,
+      targets: payload.patchPlan?.targets
+    });
+    if (!sameJson(decision, expectedDecision)) blockers.push('decision.exactShape');
+  } catch {
+    blockers.push('decision.exactShape');
+  }
   if (payload.authority?.reference !== AUTHORITY_REFERENCE || payload.authority?.authorizationUseCount !== 1 ||
       payload.authority?.authorizationReplayAllowed !== false || !validIdentity(payload.authority, AUTHORITY_PATH)) {
     blockers.push('decision.authority');
