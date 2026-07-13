@@ -181,7 +181,8 @@ function exactDecisionExpectedBinding({ packet, packetCommit, packetBlobOid, pac
 function cm2096RuntimeRouteAccepted(config, expectedRuntimeTarget) {
   const target = config?.governedMcpVcpNativeRuntimeTarget || {};
   const httpTarget = config?.governedMcpVcpNativeHttpMcpTarget || {};
-  return config?.governedMcpVcpNativeWriteDelegationMode === 'primary' &&
+  return ['observe', 'strict'].includes(config?.governedMcpVcpNativeBridgeGateMode) &&
+    config?.governedMcpVcpNativeWriteDelegationMode === 'primary' &&
     config?.governedMcpVcpNativeReadDelegationMode === 'off' &&
     target.accepted === true &&
     target.targetReferenceName === expectedRuntimeTarget?.targetReferenceName &&
