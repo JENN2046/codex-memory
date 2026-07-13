@@ -468,6 +468,28 @@ test('independent review request binds the frozen snapshot and stays non-authori
   assert.equal(result.readinessClaimed, false);
 });
 
+test('independent review request requires the exact implementation parent and diff paths', () => {
+  const request = buildReviewRequest();
+  const parentDrift = evaluateCm2115SnapshotReviewRequest(request, {
+    ...reviewRequestResolvers(),
+    resolveParentCommit: commit => commit === request.payload.reviewImplementation.commit
+      ? 'f'.repeat(40)
+      : snapshotGit.resolveParentCommit(commit)
+  });
+  assert.equal(parentDrift.accepted, false);
+  assert.ok(parentDrift.blockers.includes('reviewImplementation.parent'));
+
+  const diffDrift = evaluateCm2115SnapshotReviewRequest(request, {
+    ...reviewRequestResolvers(),
+    resolveDiffPaths: (parent, commit) => parent === request.payload.snapshot.commit &&
+        commit === request.payload.reviewImplementation.commit
+      ? ['src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js']
+      : snapshotGit.resolveDiffPaths(parent, commit)
+  });
+  assert.equal(diffDrift.accepted, false);
+  assert.ok(diffDrift.blockers.includes('reviewImplementation.diffPaths'));
+});
+
 test('review request cannot self-approve review, application, completion, or readiness', () => {
   const original = buildReviewRequest();
   const mutations = [

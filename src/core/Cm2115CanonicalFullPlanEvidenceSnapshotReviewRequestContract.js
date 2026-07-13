@@ -45,6 +45,17 @@ const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
   'tests/cm2115-r2-durable-exact-patch-application.test.js',
   'tests/cm2115-canonical-full-plan-evidence-snapshot.test.js'
 ]);
+const REVIEW_IMPLEMENTATION_FREEZE = Object.freeze({
+  commit: '5a2494dd6fc6a3c72015b3f92cf2940759b77b5d',
+  tree: 'ab04eff94dc1655378a6f88e5cdbf1ddf3f82d14',
+  parentCommit: SNAPSHOT_FREEZE.commit,
+  parentTree: SNAPSHOT_FREEZE.tree,
+  diffPaths: Object.freeze([
+    'scripts/generate-cm2115-independent-review-request.js',
+    'src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js',
+    'tests/cm2115-canonical-full-plan-evidence-snapshot.test.js'
+  ])
+});
 
 const REQUEST_KEYS = Object.freeze([
   'schemaVersion',
@@ -273,7 +284,8 @@ function evaluateCm2115SnapshotReviewRequest(request, {
 
   const implementation = payload?.reviewImplementation;
   if (!sameKeys(implementation, IMPLEMENTATION_KEYS) ||
-      !hex(implementation?.commit, 40) || !hex(implementation?.tree, 40) ||
+      implementation?.commit !== REVIEW_IMPLEMENTATION_FREEZE.commit ||
+      implementation?.tree !== REVIEW_IMPLEMENTATION_FREEZE.tree ||
       !Array.isArray(implementation?.artifacts) ||
       !equalJson(implementation?.artifacts?.map(item => item?.path), IMPLEMENTATION_ARTIFACT_PATHS)) {
     blockers.push('payload.reviewImplementation');
@@ -301,9 +313,19 @@ function evaluateCm2115SnapshotReviewRequest(request, {
           resolveCommitTree(implementation.commit) !== implementation.tree) {
         blockers.push('gitLineage.tree');
       }
-      if (!isCommitAncestor(BASELINE.sourceCommit, SNAPSHOT_FREEZE.commit) ||
-          !isCommitAncestor(SNAPSHOT_FREEZE.commit, implementation.commit)) {
+      if (!isCommitAncestor(BASELINE.sourceCommit, SNAPSHOT_FREEZE.commit)) {
         blockers.push('gitLineage.ancestor');
+      }
+      if (typeof resolveParentCommit !== 'function' || typeof resolveDiffPaths !== 'function') {
+        blockers.push('reviewImplementation.gitLineageResolversRequired');
+      } else if (resolveParentCommit(implementation.commit) !== REVIEW_IMPLEMENTATION_FREEZE.parentCommit ||
+          resolveCommitTree(REVIEW_IMPLEMENTATION_FREEZE.parentCommit) !== REVIEW_IMPLEMENTATION_FREEZE.parentTree) {
+        blockers.push('reviewImplementation.parent');
+      } else if (!equalJson(
+        resolveDiffPaths(REVIEW_IMPLEMENTATION_FREEZE.parentCommit, implementation.commit).sort(),
+        [...REVIEW_IMPLEMENTATION_FREEZE.diffPaths].sort()
+      )) {
+        blockers.push('reviewImplementation.diffPaths');
       }
     } catch {
       blockers.push('gitLineage.unreadable');
@@ -385,6 +407,7 @@ module.exports = {
   PAYLOAD_KEYS,
   REQUEST_KEYS,
   REVIEW_CHECK_KEYS,
+  REVIEW_IMPLEMENTATION_FREEZE,
   REVIEW_SCOPE_KEYS,
   SIDE_EFFECT_KEYS,
   SNAPSHOT_FREEZE,

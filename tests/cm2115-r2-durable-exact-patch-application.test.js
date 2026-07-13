@@ -476,6 +476,17 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     diffPathsSha256: sha256Canonical(diffPaths)
   }), 'phase2_exact_patch_application_git_binding_receipt_v1');
   assert.equal(evaluateBindingReceipt(v1Receipt, options).accepted, true);
+  const v1MarkdownDrift = evaluateBindingReceipt(v1Receipt, {
+    ...options,
+    resolveGitFile: (commit, sourcePath) => {
+      const actual = resolver(commit, sourcePath);
+      if (sourcePath !== EXECUTION_RECEIPT_MARKDOWN_PATH) return actual;
+      const content = Buffer.from('drifted v1 markdown\n');
+      return gitIdentity({ sourceCommit: commit, sourceTree: APPLICATION_TREE, sourcePath, content });
+    }
+  });
+  assert.equal(v1MarkdownDrift.accepted, false);
+  assert.ok(v1MarkdownDrift.blockers.includes('bindingReceipt.executionReceiptMarkdownContent'));
   const v1TreeAtAddPath = evaluateBindingReceipt(v1Receipt, {
     ...options,
     resolveGitPathState: (commit, sourcePath) => commit === DECISION_COMMIT && sourcePath === APPLICATION_STATE_PATH
