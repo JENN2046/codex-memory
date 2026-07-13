@@ -820,6 +820,16 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
     assert.equal(claim.executionReceiptWrites, 0);
   });
 
+  runIsolatedFault('index_preclaim_external_sync_failure', ({ claim }) => {
+    assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
+    assert.equal(claim.branchRefUpdates, 1);
+    assert.equal(claim.targetIndexSyncAttempts, 0);
+    assert.equal(claim.targetIndexSynchronizations, 0);
+    assert.equal(claim.targetIndexTreeObserved, constants.NEW_TREE);
+    assert.equal(claim.targetFileSynchronizations, 0);
+    assert.equal(claim.executionReceiptWrites, 0);
+  });
+
   runIsolatedFault('index_rename_acknowledgement_lost', ({ claim }) => {
     assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
     assert.equal(claim.branchRefUpdates, 1);

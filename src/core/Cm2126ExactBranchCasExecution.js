@@ -1454,7 +1454,8 @@ async function terminalizeFailure({ registry, bindingHash, release, state, repoR
       (durableState === 'BRANCH_REF_CAS_CONSUMED' ?
         (knownBranchCasInvocationCount === 0 ? 0 : null) : current.branchRefUpdates)),
     targetIndexSynchronizations: indexSyncReturnedSuccess || current.targetIndexSynchronizations === 1 ? 1 :
-      (observedIndexTree === NEW_TREE ? 1 : (observedIndexTree === EXPECTED_OLD_TREE ? 0 : null)),
+      (current.targetIndexSyncAttempts === 0 ? 0 :
+        (observedIndexTree === NEW_TREE ? 1 : (observedIndexTree === EXPECTED_OLD_TREE ? 0 : null))),
     targetFileSynchronizations: completedFileSynchronizations,
     executionReceiptWrites: receiptWrites,
     executionReceiptSha256: receiptSha256,
@@ -1616,6 +1617,13 @@ async function executeBranchCasFromCommits(inputs = {}) {
       targetWorktreeCleanObserved: false
     }, release);
     state = claim.state;
+
+    if (process.env.NODE_ENV === 'test' && process.env.CM2126_ISOLATED_TEST_FIXTURE === '1' &&
+        process.cwd().includes('cm2126-cas-e2e-') &&
+        process.env.CM2126_TEST_FAULT_POINT === 'index_preclaim_external_sync_failure') {
+      await synchronizeExactIndexEntries(target.path, targetBindings, repoRoot, beforeOtherRefs);
+      injectIsolatedTestFault('index_preclaim_external_sync_failure');
+    }
 
     claim = await registry.transition(bindingHash, state, 'TARGET_INDEX_SYNC_CONSUMED', {
       targetIndexSyncAttempts: 1,
