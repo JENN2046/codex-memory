@@ -372,6 +372,8 @@ test('content decision is exact Git-intaken, frozen, and WeakSet machine-bound',
 test('packet/final generators accept no arguments and CLI accepts exactly three frozen commits', () => {
   assert.deepEqual(packetGenerator.parseArgs([]), {});
   assert.deepEqual(releaseGenerator.parseArgs([]), {});
+  assert.equal(releaseGenerator.VALIDATION_AT, releaseGenerator.APPROVED_AT);
+  assert.equal(Date.parse(releaseGenerator.VALIDATION_AT) < Date.parse(releaseGenerator.EXPIRES_AT), true);
   for (const argv of [['--execute'], ['--update-ref'], ['--worktree', '/tmp/x'], ['--output', '/tmp/x']]) {
     assert.throws(() => packetGenerator.parseArgs(argv), /no_arguments/);
     assert.throws(() => releaseGenerator.parseArgs(argv), /no_arguments/);
