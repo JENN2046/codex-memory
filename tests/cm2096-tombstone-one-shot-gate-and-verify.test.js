@@ -281,6 +281,25 @@ test('CM-2096 claim fails before registry mutation for copied decision, expiry, 
   }
 });
 
+test('CM-2096 claim rejects a machine-bound decision paired with a drifted gate binding', async () => {
+  const decisionBinding = expectedBinding();
+  const decision = intakeDecision(decisionBinding);
+  const gateBinding = {
+    ...decisionBinding,
+    targetStoreReference: 'drifted-store',
+    allowedScope: { ...decisionBinding.allowedScope, scope_id: 'drifted-scope' }
+  };
+  const registry = await newRegistry();
+  const gate = createCm2096TombstoneOneShotGate({
+    registry,
+    expectedBinding: gateBinding,
+    now: () => new Date('2026-07-11T00:00:00.000Z')
+  });
+  const result = await gate.claim({ decision, preStoreProjection: preStoreProjection(gateBinding) });
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('decision.executionBinding'));
+});
+
 test('CM-2096 verify accepts only the exact write receipt and then derives tombstoned visibility', async () => {
   const binding = expectedBinding();
   const decision = intakeDecision(binding);
