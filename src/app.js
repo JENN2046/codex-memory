@@ -15,7 +15,10 @@ const { DeferredGovernanceRuntimeEntryAdapter } = require('./core/DeferredGovern
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
-const { MemoryContextPackageService } = require('./core/MemoryContextPackageService');
+const {
+  buildMemoryContextLowDisclosureProjection,
+  MemoryContextPackageService
+} = require('./core/MemoryContextPackageService');
 const { TaskStartMemoryContextWorkflow } = require('./core/TaskStartMemoryContextWorkflow');
 const { MemoryDeltaProposalService } = require('./core/MemoryDeltaProposalService');
 const {
@@ -416,7 +419,7 @@ function projectAuthenticatedBoundedSearchResponse(results = []) {
   };
 }
 
-function projectMemoryContextPackageSearchResult(item = {}) {
+function projectMemoryContextPackageSearchResult(item = {}, index = 0) {
   const projectTokens = values => Array.isArray(values)
     ? [...new Set(values
       .filter(value => typeof value === 'string')
@@ -433,7 +436,8 @@ function projectMemoryContextPackageSearchResult(item = {}) {
     matchedTags: projectTokens(item.matchedTags),
     coreTags: projectTokens(item.coreTags),
     createdAt: projectTimestamp(item.createdAt),
-    updatedAt: projectTimestamp(item.updatedAt)
+    updatedAt: projectTimestamp(item.updatedAt),
+    memoryContextProjection: buildMemoryContextLowDisclosureProjection(item, index)
   };
 }
 
