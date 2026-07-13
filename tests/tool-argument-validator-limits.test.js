@@ -255,3 +255,15 @@ test('maxItems validation works when added to schemas', () => {
     () => validateArgumentsAgainstSchema(schema, { items: ['one', 'two'] })
   );
 });
+
+test('pattern validation rejects non-matching strings and accepts matching strings', () => {
+  const schema = { type: 'string', pattern: '^CM-[0-9]{4}$' };
+
+  assert.throws(
+    () => validateArgumentsAgainstSchema(schema, 'BAD', 'arguments.task_id'),
+    err => err instanceof ToolArgumentValidationError && err.path === 'arguments.task_id'
+  );
+  assert.doesNotThrow(
+    () => validateArgumentsAgainstSchema(schema, 'CM-2011', 'arguments.task_id')
+  );
+});

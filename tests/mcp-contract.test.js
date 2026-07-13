@@ -2133,6 +2133,30 @@ test('MCP runtime schema validation should reject invalid scope with -32602', as
   });
 });
 
+test('MCP runtime schema validation rejects invalid proposal task_id patterns before normalization', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 13,
+      method: 'tools/call',
+      params: {
+        name: 'propose_memory_delta',
+        arguments: {
+          task_id: 'BAD',
+          candidates: [{
+            target: 'process',
+            intent: 'This proposal must not be attributed to a default task.'
+          }]
+        }
+      }
+    });
+
+    assert.equal(result.response.error.code, -32602);
+    assert.match(result.response.error.data, /task_id/);
+  });
+});
+
 test('MCP governed metadata parser projects only approved request context fields', () => {
   const result = buildGovernedMcpRequestContextFromParams({
     _meta: {

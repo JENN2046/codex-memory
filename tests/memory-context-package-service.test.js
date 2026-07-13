@@ -208,6 +208,39 @@ test('prepare_memory_context consumes approved projected statement, classificati
   assert.deepEqual(result.memory_context_package.blockers[0].reason_codes, ['title_match']);
 });
 
+test('prepare_memory_context audit receipt binds full scope and stable result projections', async () => {
+  const resultTemplate = tag => ({
+    target: 'process',
+    score: 0.8,
+    tagHitCount: 1,
+    matchedTags: [tag],
+    sourceKinds: ['synthetic-metadata'],
+    updatedAt: '2026-07-13T00:00:00.000Z'
+  });
+  const first = await createService({ results: [resultTemplate('decision-alpha')] })
+    .service.prepare(baseInput({ task: { scope_id: 'scope-a' } }));
+  const same = await createService({ results: [resultTemplate('decision-alpha')] })
+    .service.prepare(baseInput({ task: { scope_id: 'scope-a' } }));
+  const differentScope = await createService({ results: [resultTemplate('decision-alpha')] })
+    .service.prepare(baseInput({ task: { scope_id: 'scope-b' } }));
+  const differentProjection = await createService({ results: [resultTemplate('decision-beta')] })
+    .service.prepare(baseInput({ task: { scope_id: 'scope-a' } }));
+  const firstReceipt = first.memory_context_package.audit_receipt;
+  const sameReceipt = same.memory_context_package.audit_receipt;
+  const scopeReceipt = differentScope.memory_context_package.audit_receipt;
+  const projectionReceipt = differentProjection.memory_context_package.audit_receipt;
+
+  assert.equal(firstReceipt.receipt_id, sameReceipt.receipt_id);
+  assert.equal(firstReceipt.scope_fingerprint, sameReceipt.scope_fingerprint);
+  assert.equal(firstReceipt.result_projection_digest, sameReceipt.result_projection_digest);
+  assert.notEqual(firstReceipt.receipt_id, scopeReceipt.receipt_id);
+  assert.notEqual(firstReceipt.scope_fingerprint, scopeReceipt.scope_fingerprint);
+  assert.equal(firstReceipt.result_projection_digest, scopeReceipt.result_projection_digest);
+  assert.notEqual(firstReceipt.receipt_id, projectionReceipt.receipt_id);
+  assert.equal(firstReceipt.scope_fingerprint, projectionReceipt.scope_fingerprint);
+  assert.notEqual(firstReceipt.result_projection_digest, projectionReceipt.result_projection_digest);
+});
+
 test('prepare_memory_context applies scope and bounded compression', async () => {
   const { service, calls } = createService({
     results: Array.from({ length: 10 }, (_, index) => ({
