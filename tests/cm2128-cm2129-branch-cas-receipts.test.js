@@ -175,6 +175,31 @@ test('CM-2128 exact JSON reader rejects symlinks and low-disclosure drift', () =
   });
 });
 
+test('CM-2128 verified reader rejects descriptor identity swaps before reading bytes', () => {
+  let readCalls = 0;
+  let closeCalls = 0;
+  const pathStat = {
+    dev: 1,
+    ino: 2,
+    isFile: () => true,
+    isSymbolicLink: () => false
+  };
+  const fileSystem = {
+    lstatSync: () => pathStat,
+    openSync: () => 17,
+    fstatSync: () => ({ ...pathStat, ino: 3, isFile: () => true }),
+    readFileSync: () => { readCalls += 1; return Buffer.from('{}'); },
+    closeSync: () => { closeCalls += 1; }
+  };
+
+  assert.throws(
+    () => freeze.readVerifiedFileSync('/fixed/receipt.json', 'fixture', fileSystem),
+    /cm2128_fixture_source_invalid/
+  );
+  assert.equal(readCalls, 0);
+  assert.equal(closeCalls, 1);
+});
+
 test('CM-2129 live governance reader rejects symlinks before reading receipt bytes', () => {
   withTempDirectory(directory => {
     const target = path.join(directory, 'target.json');

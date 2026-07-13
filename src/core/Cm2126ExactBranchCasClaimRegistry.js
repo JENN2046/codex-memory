@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('node:fs');
 const fsPromises = require('node:fs/promises');
 const path = require('node:path');
 const {
@@ -112,6 +113,26 @@ class Cm2126ExactBranchCasClaimRegistry {
     this.claimPath = path.join(governanceRoot, claimFileName());
   }
 
+  async readVerifiedFile(filePath, invalidCode) {
+    let handle = null;
+    try {
+      const pathStat = await this.fs.lstat(filePath);
+      if (!pathStat.isFile() || pathStat.isSymbolicLink()) throw new Error('invalid');
+      handle = await this.fs.open(filePath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
+      const descriptorStat = await handle.stat();
+      if (!descriptorStat.isFile() || descriptorStat.dev !== pathStat.dev || descriptorStat.ino !== pathStat.ino) {
+        throw new Error('invalid');
+      }
+      return Buffer.from(await handle.readFile());
+    } catch (error) {
+      const wrapped = new Error(invalidCode);
+      if (error?.code) wrapped.code = error.code;
+      throw wrapped;
+    } finally {
+      if (handle) await handle.close().catch(() => {});
+    }
+  }
+
   async verifyRoot() {
     for (const directory of [path.dirname(this.governanceRoot), this.governanceRoot]) {
       const stat = await this.fs.lstat(directory);
@@ -122,11 +143,7 @@ class Cm2126ExactBranchCasClaimRegistry {
       throw new Error('cm2126_governance_root_symlink_forbidden');
     }
     const identityPath = path.join(this.governanceRoot, '.phase8-registry-root-identity.json');
-    const identityStat = await this.fs.lstat(identityPath);
-    if (!identityStat.isFile() || identityStat.isSymbolicLink()) {
-      throw new Error('cm2126_governance_root_identity_invalid');
-    }
-    const identityBytes = await this.fs.readFile(identityPath);
+    const identityBytes = await this.readVerifiedFile(identityPath, 'cm2126_governance_root_identity_invalid');
     if (sha256(identityBytes) !== GOVERNANCE_ROOT_IDENTITY_SHA256 ||
         !sameJson(JSON.parse(identityBytes.toString('utf8')), GOVERNANCE_ROOT_IDENTITY)) {
       throw new Error('cm2126_governance_root_identity_mismatch');
@@ -291,9 +308,7 @@ class Cm2126ExactBranchCasClaimRegistry {
 
   async read(bindingHash, releaseBinding = null) {
     await this.verifyRoot();
-    const stat = await this.fs.lstat(this.claimPath);
-    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('cm2126_claim_invalid');
-    const envelope = JSON.parse((await this.fs.readFile(this.claimPath)).toString('utf8'));
+    const envelope = JSON.parse((await this.readVerifiedFile(this.claimPath, 'cm2126_claim_invalid')).toString('utf8'));
     this.validateEnvelope(envelope, bindingHash || envelope.bindingHash, releaseBinding);
     return envelope;
   }

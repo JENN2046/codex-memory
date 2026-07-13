@@ -759,6 +759,35 @@ test('registry enforces exact transitions and reentry receipt is readonly', asyn
   }
 });
 
+test('claim registry rejects descriptor identity swaps before reading envelope bytes', async () => {
+  const pathStat = {
+    dev: 10,
+    ino: 20,
+    isFile: () => true,
+    isSymbolicLink: () => false
+  };
+  let readCalls = 0;
+  let closeCalls = 0;
+  const registry = new fixture.frozenRegistry.Cm2126ExactBranchCasClaimRegistry({
+    governanceRoot: '/fixed/governance-root',
+    fsApi: {
+      lstat: async () => pathStat,
+      open: async () => ({
+        stat: async () => ({ ...pathStat, ino: 21, isFile: () => true }),
+        readFile: async () => { readCalls += 1; return Buffer.from('{}'); },
+        close: async () => { closeCalls += 1; }
+      })
+    }
+  });
+
+  await assert.rejects(
+    registry.readVerifiedFile('/fixed/governance-root/claim.json', 'cm2126_claim_invalid'),
+    /cm2126_claim_invalid/
+  );
+  assert.equal(readCalls, 0);
+  assert.equal(closeCalls, 1);
+});
+
 test('isolated fault injection preserves exact terminal counters and forbids replay', () => {
   runIsolatedFault('branch_cas_acknowledgement_lost', ({ claim }) => {
     assert.equal(claim.state, 'CONSUMED_AMBIGUOUS_CAS');

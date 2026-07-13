@@ -142,10 +142,29 @@ function assertCleanDetachedWorktree(gitRunner = gitText) {
   }
 }
 
+function readVerifiedFileSync(sourcePath, label, fileSystem = fs) {
+  let descriptor;
+  try {
+    const pathStat = fileSystem.lstatSync(sourcePath);
+    if (!pathStat.isFile() || pathStat.isSymbolicLink()) throw new Error('invalid');
+    descriptor = fileSystem.openSync(
+      sourcePath,
+      fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0)
+    );
+    const descriptorStat = fileSystem.fstatSync(descriptor);
+    if (!descriptorStat.isFile() || descriptorStat.dev !== pathStat.dev || descriptorStat.ino !== pathStat.ino) {
+      throw new Error('invalid');
+    }
+    return fileSystem.readFileSync(descriptor);
+  } catch {
+    throw new Error(`cm2128_${label}_source_invalid`);
+  } finally {
+    if (descriptor !== undefined) fileSystem.closeSync(descriptor);
+  }
+}
+
 function readExactJson(sourcePath, expected, label) {
-  const stat = fs.lstatSync(sourcePath);
-  if (!stat.isFile() || stat.isSymbolicLink()) throw new Error(`cm2128_${label}_source_invalid`);
-  const bytes = fs.readFileSync(sourcePath);
+  const bytes = readVerifiedFileSync(sourcePath, label);
   const value = JSON.parse(bytes.toString('utf8'));
   if (bytes.length !== expected.bytes || sha256(bytes) !== expected.sha256) {
     throw new Error(`cm2128_${label}_identity_mismatch`);
@@ -428,6 +447,7 @@ module.exports = {
   projectClaim,
   projectExecutionReceipt,
   readExactJson,
+  readVerifiedFileSync,
   receiptIdentity,
   renderMarkdown,
   sha256
