@@ -201,6 +201,22 @@ test('prepare_memory_context applies scope and bounded compression', async () =>
   enforceNoForbiddenOutputKeys(result);
 });
 
+test('prepare_memory_context enforces the minimum max_bytes budget with a minimal envelope', async () => {
+  const { service } = createService({ results: [] });
+  const result = await service.prepare(baseInput({
+    options: {
+      max_bytes: 1200
+    }
+  }));
+
+  assert.equal(Buffer.byteLength(JSON.stringify(result), 'utf8') <= 1200, true);
+  assert.equal(result.compression.applied, true);
+  assert.equal(result.compression.mode, 'minimal_bounded_envelope');
+  assert.equal(result.access.rawMemoryReturned, false);
+  assert.equal(result.access.readinessClaimed, false);
+  enforceNoForbiddenOutputKeys(result);
+});
+
 test('prepare_memory_context redacts sensitive fragments from returned statements', async () => {
   const { service } = createService({
     results: [
