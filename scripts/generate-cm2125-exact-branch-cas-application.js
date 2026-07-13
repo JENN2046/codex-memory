@@ -44,7 +44,7 @@ function verifyTargetWorktree() {
   if (matches.length !== 1 || matches[0].HEAD !== EXPECTED_OLD || typeof matches[0].worktree !== 'string') {
     throw new Error('cm2125_exact_checked_out_target_worktree_required');
   }
-  if (gitText(['-C', matches[0].worktree, 'status', '--porcelain']) !== '') {
+  if (gitText(['-C', matches[0].worktree, 'status', '--porcelain', '--untracked-files=all']) !== '') {
     throw new Error('cm2125_clean_target_worktree_required');
   }
   return true;
@@ -103,7 +103,9 @@ function renderMarkdown(application, jsonText) {
 function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
   assertSafeGitEnvironment();
-  if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2125_clean_worktree_required');
+  if (gitText(['status', '--porcelain', '--untracked-files=all']) !== '') {
+    throw new Error('cm2125_clean_worktree_required');
+  }
   if (gitText(['branch', '--show-current']) !== '') throw new Error('cm2125_detached_worktree_required');
   if (gitText(['show-ref', '--hash', '--verify', TARGET_REF]) !== EXPECTED_OLD) {
     throw new Error('cm2125_target_ref_expected_old_required');

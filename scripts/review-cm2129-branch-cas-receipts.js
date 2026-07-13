@@ -34,6 +34,7 @@ const {
   IMPLEMENTATION_DIFF_PATHS,
   OUTPUTS,
   PACKET_COMMIT,
+  assertCleanDetachedWorktree,
   assertLowDisclosure,
   gitIdentityWithoutContent,
   projectClaim,
@@ -93,8 +94,13 @@ function renderMarkdown(review, jsonText) {
 
 async function buildReview() {
   assertSafeGitEnvironment();
-  if (gitText(['status', '--porcelain']) !== '' || gitText(['branch', '--show-current']) !== '') {
-    throw new Error('cm2129_clean_detached_worktree_required');
+  try {
+    assertCleanDetachedWorktree();
+  } catch (error) {
+    if (error.message === 'cm2128_clean_detached_worktree_required') {
+      throw new Error('cm2129_clean_detached_worktree_required');
+    }
+    throw error;
   }
   assertPathAbsent(REVIEW_PATH);
   assertPathAbsent(REVIEW_MARKDOWN_PATH);

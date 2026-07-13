@@ -321,8 +321,24 @@ test('generator rejects target-ref drift and every extra or execution argument',
   fs.rmSync(path.join(fixture.repo, application.APPLICATION_MARKDOWN_PATH));
   assert.equal(text(['status', '--porcelain'], fixture.repo), '');
 
-  git(['checkout', '--quiet', '--detach', application.EXPECTED_OLD], fixture.targetRepo);
+  const evidenceSentinel = path.join(fixture.repo, 'cm2125-dirty-evidence-sentinel');
+  git(['config', 'status.showUntrackedFiles', 'no'], fixture.repo);
+  fs.writeFileSync(evidenceSentinel, 'fixture only\n');
+  assert.equal(text(['status', '--porcelain'], fixture.repo), '');
   let result = spawnSync(process.execPath, [
+    'scripts/generate-cm2125-exact-branch-cas-application.js'
+  ], {
+    cwd: fixture.repo,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /clean_worktree_required/);
+  fs.rmSync(evidenceSentinel);
+  git(['config', '--unset', 'status.showUntrackedFiles'], fixture.repo);
+
+  git(['checkout', '--quiet', '--detach', application.EXPECTED_OLD], fixture.targetRepo);
+  result = spawnSync(process.execPath, [
     'scripts/generate-cm2125-exact-branch-cas-application.js'
   ], {
     cwd: fixture.repo,
@@ -334,7 +350,9 @@ test('generator rejects target-ref drift and every extra or execution argument',
   git(['checkout', '--quiet', fixture.targetBranch], fixture.targetRepo);
 
   const dirtySentinel = path.join(fixture.targetRepo, 'cm2125-dirty-target-sentinel');
+  git(['config', 'status.showUntrackedFiles', 'no'], fixture.targetRepo);
   fs.writeFileSync(dirtySentinel, 'fixture only\n');
+  assert.equal(text(['status', '--porcelain'], fixture.targetRepo), '');
   result = spawnSync(process.execPath, [
     'scripts/generate-cm2125-exact-branch-cas-application.js'
   ], {
@@ -345,6 +363,7 @@ test('generator rejects target-ref drift and every extra or execution argument',
   assert.equal(result.status, 1);
   assert.match(result.stderr, /clean_target_worktree_required/);
   fs.rmSync(dirtySentinel);
+  git(['config', '--unset', 'status.showUntrackedFiles'], fixture.targetRepo);
 
   git(['update-ref', application.TARGET_REF, application.REVIEW_COMMIT, application.EXPECTED_OLD], fixture.repo);
   try {

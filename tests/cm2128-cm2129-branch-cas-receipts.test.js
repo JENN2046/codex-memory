@@ -229,6 +229,8 @@ test('receipt freeze and review scripts statically exclude executor, ref-update,
     assert.doesNotMatch(scriptSource, /(?:^|\s)(?:git\s+)?push(?:\s|$)/m);
     assert.doesNotMatch(scriptSource, /--output|--claim|--receipt/);
   }
+  assert.match(freezeSource, /--untracked-files=all/);
+  assert.match(reviewSource, /assertCleanDetachedWorktree\(\)/);
 
   const freezeWrites = [...freezeSource.matchAll(/fs\.writeFileSync\(([^,]+),/g)]
     .map(match => match[1].trim());
