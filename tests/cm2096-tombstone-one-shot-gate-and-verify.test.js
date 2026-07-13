@@ -261,6 +261,38 @@ test('CM-2096 decision intake machine-binds exact bytes and rejects drift', () =
   assert.ok(expandedResult.blockers.includes('decision.fields'));
 });
 
+test('CM-2096 decision intake rejects malformed, future, or inverted approval windows', () => {
+  const binding = expectedBinding();
+  for (const [name, overrides] of [
+    ['malformed approvedAt', { approvedAt: 'not-a-timestamp' }],
+    ['future approvedAt', { approvedAt: '2026-07-12T00:00:00.000Z' }],
+    ['approvedAt after expiresAt', {
+      approvedAt: '2031-01-01T00:00:00.000Z',
+      expiresAt: '2030-01-01T00:00:00.000Z'
+    }],
+    ['malformed expiresAt', { expiresAt: 'not-a-timestamp' }]
+  ]) {
+    const bytes = decisionBytes(binding, overrides);
+    const result = evaluateCm2096TombstoneExecutionDecisionIntake({
+      decisionBytes: bytes,
+      observedBinding: {
+        decisionSourceCommit: '6'.repeat(40),
+        decisionBlobOid: '7'.repeat(40),
+        decisionPayloadSha256: sha256(bytes)
+      },
+      expectedBinding: binding,
+      now: new Date('2026-07-11T00:00:00.000Z')
+    });
+
+    assert.equal(result.accepted, false, name);
+    assert.ok(
+      result.blockers.includes('decision.approvedAt') ||
+      result.blockers.includes('decision.expiresAt'),
+      name
+    );
+  }
+});
+
 test('CM-2096 tombstone assertion is atomically consumable exactly once', async () => {
   const binding = expectedBinding();
   const registry = await newRegistry();
