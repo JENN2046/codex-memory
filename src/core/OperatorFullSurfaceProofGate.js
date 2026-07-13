@@ -52,15 +52,21 @@ function buildMissingRequiredProofFields(proof = {}) {
 
 function buildToolSetBlockers(publicToolNames = []) {
   const names = sortedUnique(publicToolNames);
+  const approved = sortedUnique([
+    ...DEFAULT_PUBLIC_PROPOSAL_ONLY_TOOLS,
+    ...OPERATOR_FULL_SURFACE_TOOLS
+  ]);
   const missingDefault = DEFAULT_PUBLIC_PROPOSAL_ONLY_TOOLS.filter(toolName => !names.includes(toolName));
   const missingOperator = OPERATOR_FULL_SURFACE_TOOLS.filter(toolName => !names.includes(toolName));
   const forbiddenDefault = FORBIDDEN_DEFAULT_OPERATOR_TOOLS.filter(toolName => names.includes(toolName));
+  const unexpected = names.filter(toolName => !approved.includes(toolName));
 
   return {
     names,
     missingDefault,
     missingOperator,
-    forbiddenDefault
+    forbiddenDefault,
+    unexpected
   };
 }
 
@@ -99,6 +105,9 @@ function evaluateOperatorFullSurfaceProof({
   for (const toolName of toolSet.forbiddenDefault) {
     blockers.push(`forbidden_default_tool_${toolName}`);
   }
+  for (const toolName of toolSet.unexpected) {
+    blockers.push(`unexpected_public_tool_${toolName}`);
+  }
 
   const accepted = blockers.length === 0;
 
@@ -116,6 +125,7 @@ function evaluateOperatorFullSurfaceProof({
       missingDefaultTools: toolSet.missingDefault,
       missingOperatorTools: toolSet.missingOperator,
       forbiddenDefaultTools: toolSet.forbiddenDefault,
+      unexpectedTools: toolSet.unexpected,
       commitMemoryDeltaPublicRegistered: toolSet.names.includes('commit_memory_delta')
     },
     policy: {
