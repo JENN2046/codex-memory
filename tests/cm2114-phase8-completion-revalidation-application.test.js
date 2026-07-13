@@ -81,6 +81,15 @@ test('CM-2114 binds the supplied proof receipt content to the frozen PROOF objec
   assert.ok(result.blockers.includes('proof.receiptCanonicalSha256'));
 });
 
+test('CM-2114 rejects rehashed top-level decision overclaims', () => {
+  const value = input();
+  value.decision.productionReady = true;
+  const result = executeCm2114Phase8CompletionRevalidationApplication(value);
+  assert.equal(result.accepted, false);
+  assert.equal(result.phase8Completed, false);
+  assert.ok(result.blockers.includes('decision.fields'));
+});
+
 test('CM-2114 application receipt rejects replay, new runtime action, or readiness overclaim', () => {
   const result = executeCm2114Phase8CompletionRevalidationApplication(input());
   for (const mutate of [
