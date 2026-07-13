@@ -119,6 +119,10 @@ function evaluateApplicationReceipt(receipt = {}) {
     fullPlanPackCompleted: false,
     readinessClaimed: false
   };
+  if (JSON.stringify(Object.keys(payload.boundaries || {}).sort()) !==
+      JSON.stringify(Object.keys(expectedBoundaries).sort())) {
+    blockers.push('receipt.boundaries.fields');
+  }
   for (const [field, expected] of Object.entries(expectedBoundaries)) {
     if (payload.boundaries?.[field] !== expected) blockers.push(`receipt.boundaries.${field}`);
   }

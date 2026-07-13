@@ -71,7 +71,8 @@ test('CM-2110 application receipt rejects native actions or completion overclaim
     payload => { payload.appliedEvidence.phase8Completed = true; },
     payload => { payload.boundaries.productionFailureRecoveryProven = true; },
     payload => { payload.boundaries.fullPlanPackCompleted = true; },
-    payload => { payload.boundaries.readinessClaimed = true; }
+    payload => { payload.boundaries.readinessClaimed = true; },
+    payload => { payload.boundaries.productionReady = true; }
   ]) {
     const payload = structuredClone(result.receiptPayload); mutate(payload);
     assert.equal(evaluateApplicationReceipt({ receiptPayload: payload, receiptPayloadSha256: sha256Canonical(payload) }).accepted, false);
