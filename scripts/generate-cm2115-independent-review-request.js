@@ -21,6 +21,7 @@ const {
 } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 const {
   IMPLEMENTATION_ARTIFACT_PATHS,
+  REVIEW_IMPLEMENTATION_FREEZE,
   SNAPSHOT_FREEZE,
   evaluateCm2115SnapshotReviewRequest
 } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
@@ -80,8 +81,8 @@ function isCommitAncestor(ancestor, descendant) {
 }
 
 function buildRequest() {
-  const implementationCommit = gitText(['rev-parse', 'HEAD^{commit}']);
-  const implementationTree = gitText(['rev-parse', 'HEAD^{tree}']);
+  const implementationCommit = REVIEW_IMPLEMENTATION_FREEZE.commit;
+  const implementationTree = REVIEW_IMPLEMENTATION_FREEZE.tree;
   const validationFile = resolveGitFile(BASELINE.sourceCommit, LOCAL_VALIDATION_RECEIPT_PATH);
   const validationReceipt = JSON.parse(validationFile.content.toString('utf8'));
   const payload = {

@@ -36,6 +36,28 @@ function trustedRuntimeTargetConfig(overrides = {}) {
   };
 }
 
+function nativeRuntimeReceiptForTool(toolName) {
+  const writePerformed = ['record_memory', 'tombstone_memory', 'supersede_memory'].includes(toolName);
+  return {
+    present: true,
+    nativeRuntimeCalled: true,
+    nativeRuntimeInitialized: true,
+    providerApiCalled: writePerformed,
+    memoryReadPerformed: !writePerformed,
+    memoryWritePerformed: writePerformed,
+    durableWritePerformed: writePerformed,
+    durableWriteScope: writePerformed ? 'primary_memory_write' : null,
+    isolatedRuntimeStoreUsed: false,
+    primaryMemoryStoreWritePerformed: writePerformed,
+    derivedIndexWritePerformed: false,
+    rawRuntimeOutputDisclosed: false,
+    rawMemoryContentDisclosed: false,
+    runtimeLocatorDisclosed: false,
+    tokenMaterialDisclosed: false,
+    readinessClaimed: false
+  };
+}
+
 function nativeInvocationReceiptForPayload(payload, overrides = {}) {
   return {
     targetReferenceName: payload.targetReferenceName,
@@ -55,6 +77,7 @@ function nativeInvocationReceiptForPayload(payload, overrides = {}) {
     topLevelKindCategory: 'object',
     rawRequestBodyDisclosed: false,
     rawResponseBodyDisclosed: false,
+    nativeRuntimeReceipt: nativeRuntimeReceiptForTool(payload.toolName),
     readinessClaimed: false,
     ...overrides
   };
@@ -3820,6 +3843,9 @@ test('primary write delegation sends record_memory to governed native MCP and sk
         structuredContent: {
           memory_id: 'RAW_MEMORY_ID_SHOULD_NOT_ECHO',
           content: rawNativeValue
+        },
+        _meta: {
+          codexMemoryNativeRuntimeReceipt: nativeRuntimeReceiptForTool('record_memory')
         }
       }
     }));
@@ -4116,6 +4142,9 @@ test('primary write delegation binds every governed write tool on the real app p
           structuredContent: {
             status: 'ok',
             rawNativeValue
+          },
+          _meta: {
+            codexMemoryNativeRuntimeReceipt: nativeRuntimeReceiptForTool(writeCase.toolName)
           }
         }
       }));

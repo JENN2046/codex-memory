@@ -7,7 +7,10 @@ const { execFileSync } = require('node:child_process');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { sha256Canonical } = require('../src/core/Phase8OneShotNativeWriteExecutionGate');
-const { exactCm2096Allowlist } = require('../src/cli/cm2096-frozen-rollback-v3');
+const {
+  cm2096RuntimeRouteAccepted,
+  exactCm2096Allowlist
+} = require('../src/cli/cm2096-frozen-rollback-v3');
 
 const root = path.join(__dirname, '..');
 const packet = JSON.parse(fs.readFileSync(path.join(root, 'docs/near-model-memory-plan-pack/phase8_rollback_execution_packet_cm2096_v3.json'), 'utf8'));
@@ -111,4 +114,26 @@ test('CM-2096 v3 packet rejects any authority, target, marker, implementation, o
     { ...packet, implementationCommit: '0'.repeat(40) },
     { ...packet, maxRetries: 1 }
   ]) assert.notEqual(packetPayloadHash(candidate), packet.packetPayloadSha256);
+});
+
+test('CM-2096 runtime route rejects bridge gate off before one-shot claim', () => {
+  const config = {
+    governedMcpVcpNativeBridgeGateMode: 'off',
+    governedMcpVcpNativeWriteDelegationMode: 'primary',
+    governedMcpVcpNativeReadDelegationMode: 'off',
+    governedMcpVcpNativeRuntimeTarget: {
+      accepted: true,
+      targetReferenceName: packet.runtimeTarget.targetReferenceName,
+      targetKind: packet.runtimeTarget.targetKind
+    },
+    governedMcpVcpNativeHttpMcpTarget: {
+      accepted: true,
+      configured: true,
+      bearerTokenConfigured: true,
+      mcpToolNameByAction: { tombstone_memory: 'knowledge_base.tombstone' }
+    }
+  };
+  assert.equal(cm2096RuntimeRouteAccepted(config, packet.runtimeTarget), false);
+  assert.equal(cm2096RuntimeRouteAccepted({ ...config, governedMcpVcpNativeBridgeGateMode: 'observe' }, packet.runtimeTarget), true);
+  assert.equal(cm2096RuntimeRouteAccepted({ ...config, governedMcpVcpNativeBridgeGateMode: 'strict' }, packet.runtimeTarget), true);
 });

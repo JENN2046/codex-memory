@@ -110,6 +110,10 @@ function nativeInvocationReceiptForPayload(payload, overrides = {}) {
     httpStatusClass: 'success',
     responseShapeCategory: 'object_top_level_kind_only_no_field_names',
     topLevelKindCategory: 'object',
+    nativeRuntimeReceipt: {
+      memoryWritePerformed: true,
+      durableWritePerformed: true
+    },
     ...overrides
   };
 }
@@ -598,6 +602,36 @@ test('write delegation marks rollback required when native receipt disclosed gov
   assert.equal(serializedResult.includes('RAW_WRITE_CONTENT_SHOULD_NOT_ECHO'), false);
   assert.equal(serializedResult.includes('RAW_NATIVE_CONTENT_SHOULD_NOT_ECHO'), false);
 });
+
+for (const [fieldName, nativeRuntimeReceipt] of [
+  ['memoryWritePerformed', { memoryWritePerformed: false, durableWritePerformed: true }],
+  ['durableWritePerformed', { memoryWritePerformed: true, durableWritePerformed: false }]
+]) {
+  test(`write delegation rejects success when native runtime receipt does not confirm ${fieldName}`, async () => {
+    const result = await executeGovernedMcpVcpNativeWriteDelegation({
+      toolName: 'record_memory',
+      args: {
+        target: 'knowledge',
+        title: 'Governed write proof',
+        content: 'RAW_WRITE_CONTENT_SHOULD_NOT_ECHO',
+        evidence: 'operator approved',
+        validated: true,
+        reusable: true,
+        sensitivity: 'none'
+      },
+      gateResult: acceptedGate(),
+      callMcpTool: receiptAwareCallMcpTool(async () => ({ status: 'ok' }), {
+        nativeRuntimeReceipt
+      })
+    });
+
+    assert.equal(result.accepted, false);
+    assert.equal(result.reasonCode, 'native_write_delegation_native_invocation_receipt_unbound');
+    assert.equal(result.receipt.statusClass, 'native_invocation_receipt_unbound');
+    assert.equal(result.receipt.rollbackRequired, true);
+    assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt[fieldName], false);
+  });
+}
 
 test('write delegation rejects oversized public schema fields before native call', async () => {
   const cases = [

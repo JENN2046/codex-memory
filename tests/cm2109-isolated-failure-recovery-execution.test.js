@@ -144,14 +144,20 @@ test('CM-2109 packet and decision boundaries reject authority expansion', () => 
     realMemoryAllowed: false,
     localFallbackAllowed: false,
     defaultMcpExpansionAllowed: false,
-    readinessClaimAllowed: false
+    readinessClaimAllowed: false,
+    failureRecoveryProofPassedAtPacketFreeze: false,
+    phase8CompletedAtPacketFreeze: false
   };
   assert.equal(validatePacket(packet, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, true);
   assert.equal(validatePacket({ ...packet, maxRetryCount: 1 }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
+  assert.equal(validatePacket({ ...packet, failureRecoveryProofPassedAtPacketFreeze: true }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
+  assert.equal(validatePacket({ ...packet, phase8CompletedAtPacketFreeze: true }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
   const binding = { implementationCommit: packet.implementationCommit, implementationTree: packet.implementationTree, executionPacketCommit: 'c'.repeat(40), executionPacketBlobOid: 'd'.repeat(40), executionPacketSha256: 'e'.repeat(64) };
-  const decision = { schemaVersion: 1, taskId: 'CM-2109', decisionReference: 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION', failureRecoveryExecutionAuthorized: true, authorizationUseCount: 1, authorizationReplayAllowed: false, ...binding, expiresAt: '2099-01-01T00:00:00Z', productionProviderAuthorized: false, realMemoryAuthorized: false, cm2094AuthorizationReuseAuthorized: false, retryAuthorized: false, rollbackAuthorized: false, compensationAuthorized: false, defaultMcpExpansionAuthorized: false, readinessClaimAuthorized: false };
+  const decision = { schemaVersion: 1, taskId: 'CM-2109', decisionReference: 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION', failureRecoveryExecutionAuthorized: true, authorizationUseCount: 1, authorizationReplayAllowed: false, ...binding, expiresAt: '2099-01-01T00:00:00Z', productionProviderAuthorized: false, realMemoryAuthorized: false, cm2094AuthorizationReuseAuthorized: false, retryAuthorized: false, rollbackAuthorized: false, compensationAuthorized: false, defaultMcpExpansionAuthorized: false, readinessClaimAuthorized: false, failureRecoveryProofPassedByDecisionAlone: false, phase8CompletedByDecisionAlone: false };
   assert.equal(validateDecision(decision, binding).accepted, true);
   assert.equal(validateDecision({ ...decision, retryAuthorized: true }, binding).accepted, false);
+  assert.equal(validateDecision({ ...decision, failureRecoveryProofPassedByDecisionAlone: true }, binding).accepted, false);
+  assert.equal(validateDecision({ ...decision, phase8CompletedByDecisionAlone: true }, binding).accepted, false);
 });
 
 test('CM-2109 frozen executor requires packet and decision commits before governance access', async () => {

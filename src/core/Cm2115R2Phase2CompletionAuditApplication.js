@@ -960,17 +960,17 @@ function evaluateBindingReceipt(receipt = {}, {
     executionReceipt = JSON.parse(executionActual.content.toString('utf8'));
     const executionEvaluation = evaluateExecutionReceipt(executionReceipt, { resolveGitFile });
     if (!executionEvaluation.accepted) blockers.push(...executionEvaluation.blockers.map(item => `bindingReceipt.${item}`));
+    executionMarkdownActual = resolveGitFile(app.commit, EXECUTION_RECEIPT_MARKDOWN_PATH);
     if (v2) {
-      executionMarkdownActual = resolveGitFile(app.commit, EXECUTION_RECEIPT_MARKDOWN_PATH);
       verifyResolvedIdentity(
         executionMarkdownActual,
         payload.executionReceiptMarkdown,
         blockers,
         'bindingReceipt.executionReceiptMarkdownGitObject'
       );
-      if (!executionMarkdownActual.content.equals(renderExecutionReceiptMarkdown(executionReceipt))) {
-        blockers.push('bindingReceipt.executionReceiptMarkdownContent');
-      }
+    }
+    if (!executionMarkdownActual.content.equals(renderExecutionReceiptMarkdown(executionReceipt))) {
+      blockers.push('bindingReceipt.executionReceiptMarkdownContent');
     }
     for (const target of decision.payload.patchPlan.targets) {
       const after = resolveGitFile(app.commit, target.sourcePath);
