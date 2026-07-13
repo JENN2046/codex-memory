@@ -46,6 +46,7 @@ function fixture(overrides = {}) {
     ...overrides
   };
   const decisionBytes = Buffer.from(JSON.stringify(decision));
+  expectedBinding.decisionPayloadSha256 = sha256(decisionBytes);
   return { decisionBytes, expectedBinding, observedBinding: { decisionSourceCommit: '4'.repeat(40), decisionBlobOid: '5'.repeat(40), decisionPayloadSha256: sha256(decisionBytes) } };
 }
 
@@ -82,4 +83,23 @@ test('final release intake rejects packet, manifest, expiry, or copied decision 
     });
     assert.equal(result.accepted, false, field);
   }
+});
+
+test('final release intake rejects bytes whose caller-observed hash does not match the expected decision hash', () => {
+  const value = fixture();
+  const drifted = JSON.parse(value.decisionBytes);
+  drifted.unexpectedClaim = 'caller-controlled-but-hash-consistent';
+  const decisionBytes = Buffer.from(JSON.stringify(drifted));
+  const result = evaluatePhase8FinalExecutionReleaseDecisionIntake({
+    decisionBytes,
+    observedBinding: {
+      ...value.observedBinding,
+      decisionPayloadSha256: sha256(decisionBytes)
+    },
+    expectedBinding: value.expectedBinding,
+    now: new Date('2026-07-11T00:00:00.000Z')
+  });
+
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('binding.decisionPayloadSha256'));
 });
