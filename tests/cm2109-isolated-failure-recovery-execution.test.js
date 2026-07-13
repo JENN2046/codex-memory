@@ -100,6 +100,7 @@ test('CM-2109 receipt fails closed on retry, replay, provider, real-memory, or p
     payload => { payload.authorization.replayAllowed = true; },
     payload => { payload.boundaries.productionProviderCalled = true; },
     payload => { payload.boundaries.realMemoryRead = true; },
+    payload => { payload.boundaries.productionFailureRecoveryProven = true; },
     payload => { payload.summary.failureRecoveryProofPassed = true; },
     payload => { payload.summary.phase8Completed = true; }
   ]) {

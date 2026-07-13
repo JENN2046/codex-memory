@@ -40,6 +40,11 @@ const FORBIDDEN_INPUT_KEYS = Object.freeze([
 ]);
 
 const STOP_TRUE_PATHS = Object.freeze([
+  ['commit'],
+  ['write'],
+  ['confirm'],
+  ['durableWrite'],
+  ['production_write'],
   ['operator', 'defaultExposed'],
   ['operator', 'publicMcpRegistered'],
   ['operator', 'exactApprovalAccepted'],
@@ -234,6 +239,13 @@ class MemoryDeltaCommitPreflightService {
         task,
         reasonCode: 'accepted_low_disclosure_proposal_required',
         blockers: ['proposal']
+      });
+    }
+    if (input.proposal.task?.task_id !== task.task_id) {
+      return rejected({
+        task,
+        reasonCode: 'proposal_task_mismatch',
+        blockers: ['proposal.task.task_id']
       });
     }
 

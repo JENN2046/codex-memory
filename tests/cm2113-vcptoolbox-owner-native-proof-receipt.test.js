@@ -30,7 +30,8 @@ test('CM-2113 fails closed on owner, transport, store, replay, or completion ove
     value => { value.authorization.replayAllowed = true; },
     value => { value.priorAttempt.preserved = false; },
     value => { value.phase8Completed = true; },
-    value => { value.nonClaims.productionReady = true; }
+    value => { value.nonClaims.productionReady = true; },
+    value => { value.nonClaims.realMemoryProofAccepted = true; }
   ]) {
     const value = structuredClone(receipt);
     mutate(value);
