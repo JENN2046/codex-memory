@@ -34,7 +34,8 @@ test('CM-2096 app path rejects invalid assertion and never falls back locally', 
   const app = createCodexMemoryApplication({
     cm2096TombstoneOneShotEnforcementEnabled: true,
     cm2096TombstoneAuthorizationAssertionVerifier: async () => ({ accepted: false }),
-    governedMcpVcpNativeWriteDelegationMode: 'primary'
+    governedMcpVcpNativeWriteDelegationMode: 'primary',
+    governedMcpVcpNativeBridgeGateMode: 'observe'
   });
   const result = await app.callTool('tombstone_memory', args, {
     cm2096TombstoneAuthorizationAssertion: { invalid: true }
@@ -54,6 +55,28 @@ test('CM-2096 app path requires primary native delegation mode', async () => {
     cm2096TombstoneAuthorizationAssertion: { opaque: true }
   });
   assert.equal(result.reasonCode, 'cm2096_tombstone_one_shot_authorization_required');
+  assert.equal(result.localFallbackWritePerformed, false);
+  await app.close();
+});
+
+test('CM-2096 app path rejects a disabled bridge gate before consuming the assertion', async () => {
+  let assertionVerifierCalls = 0;
+  const app = createCodexMemoryApplication({
+    cm2096TombstoneOneShotEnforcementEnabled: true,
+    cm2096TombstoneAuthorizationAssertionVerifier: async () => {
+      assertionVerifierCalls += 1;
+      return { accepted: true, exactApprovalResult: {} };
+    },
+    governedMcpVcpNativeWriteDelegationMode: 'primary',
+    governedMcpVcpNativeBridgeGateMode: 'off'
+  });
+  const result = await app.callTool('tombstone_memory', args, {
+    cm2096TombstoneAuthorizationAssertion: { opaque: true }
+  });
+  assert.equal(result.decision, 'rejected');
+  assert.equal(assertionVerifierCalls, 0);
+  assert.equal(result.reasonCode, 'cm2096_tombstone_one_shot_authorization_required');
+  assert.equal(result.nativeWritePerformed, false);
   assert.equal(result.localFallbackWritePerformed, false);
   await app.close();
 });
