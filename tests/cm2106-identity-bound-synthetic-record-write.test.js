@@ -32,9 +32,11 @@ const {
 } = require('../src/core/Cm2106IdentityBoundSyntheticRecordWrite');
 const {
   appOverrides,
+  collectExecutionClaimEvidence,
   runFrozenCm2106RecordWrite,
   startPrimaryWriteOnlyShim,
-  validatePacket
+  validatePacket,
+  withReceiptPayloadSha256
 } = require('../src/cli/cm2106-identity-bound-synthetic-record-write');
 
 async function identityStore(t) {
@@ -201,6 +203,38 @@ test('CM-2106 primary-write shim refuses to start without a strong bearer bindin
   );
 });
 
+test('CM-2106 execution receipt evidence binds durable claim markers and payload hash', async t => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2106-claim-evidence-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const claim = {
+    claimId: 'a'.repeat(64),
+    bindingHash: 'b'.repeat(64),
+    nonceHash: 'c'.repeat(64),
+    receiptIdHash: 'd'.repeat(64),
+    state: 'CONSUMED_SUCCESS',
+    writeInvocationCount: 1
+  };
+  await Promise.all([
+    fs.writeFile(path.join(directory, `nonce-${claim.nonceHash}.json`), '{}'),
+    fs.writeFile(path.join(directory, `receipt-${claim.receiptIdHash}.json`), '{}'),
+    fs.writeFile(path.join(directory, `write-invocation-${claim.claimId}.json`), '{}')
+  ]);
+  const registry = { directory, readClaim: async () => claim };
+
+  const evidence = await collectExecutionClaimEvidence(registry, claim.claimId);
+  assert.deepEqual(evidence, {
+    claimId: claim.claimId,
+    claimBindingHash: claim.bindingHash,
+    nonceMarkerCount: 1,
+    authorizationReceiptMarkerCount: 1,
+    writeInvocationMarkerCount: 1,
+    writeInvocationCount: 1
+  });
+  const receipt = withReceiptPayloadSha256({ schemaVersion: 1, ...evidence });
+  const { receiptPayloadSha256, ...payload } = receipt;
+  assert.equal(receiptPayloadSha256, sha256Canonical(payload));
+});
+
 test('CM-2106 strict bridge delegates one primary-write-only record with bounded rollback controls', async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2106-strict-e2e-'));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
@@ -279,6 +313,9 @@ test('CM-2106 strict bridge delegates one primary-write-only record with bounded
   assert.equal(result.access.memoryWritePerformed, true);
   assert.equal(result.access.localMemoryFallbackUsed, false);
   assert.equal(result.receipt.nativeInvocationReceipt.statusClass, 'success');
+  assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.nativeRuntimeCalled, false);
+  assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.nativeRuntimeInitialized, false);
+  assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.durableWritePerformed, true);
   assert.equal(server.getLowDisclosureAuthorizationProjection().authorizationRequired, true);
   assert.equal(server.getLowDisclosureAuthorizationProjection().rejectedAuthorizationCount, 1);
   const post = await collectPostWriteProjection(store);
