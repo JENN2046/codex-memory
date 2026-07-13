@@ -27,7 +27,10 @@ function evaluatePhase8FinalExecutionReleaseDecisionIntake({ decisionBytes, obse
   if (observedBinding.decisionBlobOid !== expectedBinding.decisionBlobOid) {
     blockers.push('binding.decisionBlobOid');
   }
-  if (fileSha256 !== observedBinding.decisionPayloadSha256) blockers.push('binding.decisionPayloadSha256');
+  if (fileSha256 !== observedBinding.decisionPayloadSha256 ||
+      observedBinding.decisionPayloadSha256 !== expectedBinding.decisionPayloadSha256) {
+    blockers.push('binding.decisionPayloadSha256');
+  }
   let decision = null;
   try { decision = JSON.parse(decisionBytes.toString('utf8')); } catch { blockers.push('decision.invalidJson'); }
   if (decision) {
