@@ -43,10 +43,10 @@ function gitIdentity(commit, file) {
   };
 }
 
-async function waitForExit(child) {
+async function waitForClose(child) {
   return new Promise((resolve, reject) => {
     child.once('error', reject);
-    child.once('exit', (code, signal) => resolve({ code, signal }));
+    child.once('close', (code, signal) => resolve({ code, signal }));
   });
 }
 
@@ -99,7 +99,7 @@ async function runCm2113ProofController(packetCommit, contentCommit, finalCommit
     stderrBytes += Buffer.byteLength(chunk, 'utf8');
     if (Buffer.byteLength(safeStderr, 'utf8') <= 1024) safeStderr += chunk;
   });
-  const exitPromise = waitForExit(child);
+  const exitPromise = waitForClose(child);
   const client = createCm2113StdioMcpFrameClient({ input: child.stdin, output: child.stdout, processBoundary: true, timeoutMs: 60_000 });
   let transportResult;
   try {
@@ -206,4 +206,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { TRANSPORT_RECEIPT_FILENAME, runCm2113ProofController };
+module.exports = { TRANSPORT_RECEIPT_FILENAME, runCm2113ProofController, waitForClose };
