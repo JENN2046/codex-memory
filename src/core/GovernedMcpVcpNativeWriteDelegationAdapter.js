@@ -803,7 +803,9 @@ function nativeInvocationReceiptExecutionBound(receipt) {
     receipt.jsonRpcResponseIdMatched === true &&
     receipt.statusClass === 'success' &&
     receipt.httpStatusClass === 'success' &&
-    receipt.jsonRpcErrorPresent === false;
+    receipt.jsonRpcErrorPresent === false &&
+    receipt.nativeRuntimeReceipt?.memoryWritePerformed === true &&
+    receipt.nativeRuntimeReceipt?.durableWritePerformed === true;
 }
 
 function normalizedNativeWriteArgumentKey(key) {
