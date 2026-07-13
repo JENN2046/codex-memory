@@ -235,6 +235,7 @@ test('CM2016 stops L4 when actual tag release deploy or readiness action is clai
     request: {
       tagCreated: true,
       releasePublished: true,
+      readinessClaimed: true,
       rcReadyClaimed: true
     }
   });
@@ -243,6 +244,7 @@ test('CM2016 stops L4 when actual tag release deploy or readiness action is clai
   assert.equal(result.status, 'release_tag_readiness_stop_l4');
   assert.ok(result.stopReasons.includes('stop_l4_flag_request.tagCreated'));
   assert.ok(result.stopReasons.includes('stop_l4_flag_request.releasePublished'));
+  assert.ok(result.stopReasons.includes('stop_l4_flag_request.readinessClaimed'));
   assert.ok(result.stopReasons.includes('stop_l4_flag_request.rcReadyClaimed'));
   assert.equal(result.sideEffects.tagCreated, false);
   assert.equal(result.sideEffects.releasePublished, false);
