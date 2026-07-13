@@ -215,8 +215,12 @@ function validateVariant(receipt, blockers) {
     'claim_envelope_persistence_unknown',
     'claim_envelope_terminal_state_persistence_failed'
   ]);
+  const terminalDoubleFailure = /_state_persistence_failed$/.test(receipt.outcomeStage) &&
+    Number.isInteger(receipt.claimStateWriteAttempts) && Number.isInteger(receipt.claimStateWrites) &&
+    receipt.claimStateWriteAttempts - receipt.claimStateWrites >= 2;
   if (ORIGINAL_OUTCOME_EFFECTS[receipt.outcomeStage] &&
       !allowedTerminalDurability.has(receipt.outcomeStage) &&
+      !terminalDoubleFailure &&
       receipt.terminalStateDurablyRecorded !== true) {
     blockers.push('receipt.terminalStateDurablyRecorded');
   }
