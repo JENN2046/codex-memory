@@ -59,6 +59,7 @@ test('final release intake rejects packet, manifest, expiry, or copied decision 
     ['packet', { executionPacketCommit: '0'.repeat(40) }],
     ['blob', { executionManifestBlobOid: '0'.repeat(40) }],
     ['manifest hash', { executionManifestSha256: '0'.repeat(64) }],
+    ['invalid expiry', { expiresAt: 'not-a-timestamp' }],
     ['expired', { expiresAt: '2020-01-01T00:00:00.000Z' }]
   ]) {
     const value = fixture(overrides);

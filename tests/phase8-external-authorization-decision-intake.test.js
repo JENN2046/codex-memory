@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const { sha256 } = require('../src/core/Phase8OneShotNativeWriteExecutionGate');
 const { evaluatePhase8ExternalAuthorizationDecisionIntake } = require('../src/core/Phase8ExternalAuthorizationDecisionIntake');
 
-function fixture() {
+function fixture(overrides = {}) {
   const decision = {
     decisionReference: 'CM-TEST-PHASE8-PASS',
     authorizationContentApproved: true,
@@ -22,7 +22,8 @@ function fixture() {
     receiptId: 'test-receipt',
     authorizationUseCount: 1,
     expectedFinalReleaseDecisionReference: 'CM-TEST-PHASE8-FINAL-RELEASE',
-    expiresAt: '2030-01-01T00:00:00.000Z'
+    expiresAt: '2030-01-01T00:00:00.000Z',
+    ...overrides
   };
   const decisionBytes = Buffer.from(JSON.stringify(decision));
   const expectedBinding = {
@@ -73,6 +74,19 @@ test('decision intake rejects forged reference blob hash or public-token-only pa
   assert.ok(result.blockers.includes('binding.decisionPayloadSha256'));
   assert.ok(result.blockers.includes('decision.decisionReference'));
   assert.ok(result.blockers.includes('decision.phase8NativeWriteAuthorized'));
+});
+
+test('external Phase 8 content decision intake rejects invalid expiry timestamps', () => {
+  const value = fixture({ expiresAt: 'not-a-timestamp' });
+  const result = evaluatePhase8ExternalAuthorizationDecisionIntake({
+    decisionBytes: value.decisionBytes,
+    observedBinding: value.expectedBinding,
+    expectedBinding: value.expectedBinding,
+    now: new Date('2026-07-11T00:00:00.000Z')
+  });
+
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('decision.expiresAt'));
 });
 
 test('registry rejects missing or drifting durable identity', async () => {

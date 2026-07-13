@@ -42,7 +42,13 @@ function evaluatePhase8ExternalAuthorizationDecisionIntake({ decisionBytes, obse
       authorizationUseCount: 1,
       expectedFinalReleaseDecisionReference: expectedBinding.expectedFinalReleaseDecisionReference
     })) if (decision[field] !== expected) blockers.push(`decision.${field}`);
-    if (!decision.expiresAt || Date.parse(decision.expiresAt) <= new Date(now).getTime()) blockers.push('decision.expiresAt');
+    const expiresAtMs = typeof decision.expiresAt === 'string'
+      ? Date.parse(decision.expiresAt)
+      : Number.NaN;
+    const nowMs = new Date(now).getTime();
+    if (!Number.isFinite(expiresAtMs) || !Number.isFinite(nowMs) || expiresAtMs <= nowMs) {
+      blockers.push('decision.expiresAt');
+    }
   }
   if (blockers.length) return { accepted: false, blockers, decision: null };
   MACHINE_BOUND_CONTENT_DECISIONS.add(decision);
