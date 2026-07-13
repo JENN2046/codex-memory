@@ -170,6 +170,55 @@ async function ensureAbsent(target, code) {
   }
 }
 
+async function countExactRegularFile(filePath) {
+  try {
+    const stat = await fs.lstat(filePath);
+    return stat.isFile() && !stat.isSymbolicLink() ? 1 : 0;
+  } catch (error) {
+    if (error.code === 'ENOENT') return 0;
+    throw error;
+  }
+}
+
+async function collectExecutionClaimEvidence(registry, claimId) {
+  if (!registry || !hash64(claimId)) {
+    return {
+      claimId: null,
+      claimBindingHash: null,
+      nonceMarkerCount: 0,
+      authorizationReceiptMarkerCount: 0,
+      writeInvocationMarkerCount: 0,
+      writeInvocationCount: 0
+    };
+  }
+  const claim = await registry.readClaim(claimId);
+  if (claim.claimId !== claimId || !hash64(claim.bindingHash) ||
+      !hash64(claim.nonceHash) || !hash64(claim.receiptIdHash)) {
+    throw new Error('cm2106_execution_claim_binding_invalid');
+  }
+  const [nonceMarkerCount, authorizationReceiptMarkerCount, writeInvocationMarkerCount] =
+    await Promise.all([
+      countExactRegularFile(path.join(registry.directory, `nonce-${claim.nonceHash}.json`)),
+      countExactRegularFile(path.join(registry.directory, `receipt-${claim.receiptIdHash}.json`)),
+      countExactRegularFile(path.join(registry.directory, `write-invocation-${claimId}.json`))
+    ]);
+  return {
+    claimId,
+    claimBindingHash: claim.bindingHash,
+    nonceMarkerCount,
+    authorizationReceiptMarkerCount,
+    writeInvocationMarkerCount,
+    writeInvocationCount: Number(claim.writeInvocationCount || 0)
+  };
+}
+
+function withReceiptPayloadSha256(receiptPayload) {
+  return {
+    ...receiptPayload,
+    receiptPayloadSha256: sha256Canonical(receiptPayload)
+  };
+}
+
 function statePaths(governanceParent) {
   return {
     appStateRoot: path.join(governanceParent, EXPECTED.appStateReference),
@@ -392,6 +441,7 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
   const gate = createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding });
   let app = null;
   let shim = null;
+  let executionClaimId = null;
   const bearerToken = crypto.randomBytes(32).toString('hex');
   const executionContext = {
     agentAlias: 'Codex',
@@ -439,6 +489,7 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
       payloadBytes,
       payloadBlobOid,
       executeNativeWrite: async ({ payload, assertion }) => {
+        executionClaimId = assertion.claimId;
         await app.initialize();
         return app.callTool('record_memory', payload, {
           executionContext,
@@ -480,7 +531,8 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
     );
     const post = execution.verifyResult?.postWriteProjection || null;
     const audit = execution.verifyResult?.auditProjection || null;
-    return {
+    const claimEvidence = await collectExecutionClaimEvidence(registry, executionClaimId);
+    const receiptPayload = {
       schemaVersion: 1,
       taskId: 'CM-2106',
       receiptType: 'identity_bound_synthetic_record_one_shot_execution_receipt',
@@ -518,6 +570,7 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
       authorizationUseCount: 1,
       authorizationConsumed: execution.state !== 'UNCLAIMED',
       authorizationReplayAllowed: false,
+      ...claimEvidence,
       nativeWriteCalls: execution.nativeWriteCalls,
       verifyOperations: execution.verifyOperations || 0,
       verifyAccepted: audit?.accepted === true,
@@ -544,6 +597,7 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
       failureRecoveryProofPassed: false,
       phase8Completed: false
     };
+    return withReceiptPayloadSha256(receiptPayload);
   } finally {
     if (app) await app.close().catch(() => {});
     if (shim) await shim.close().catch(() => {});
@@ -572,9 +626,11 @@ if (require.main === module) {
 module.exports = {
   PREFLIGHT_RECEIPT_PATH,
   appOverrides,
+  collectExecutionClaimEvidence,
   preflightReceiptBinding,
   runFrozenCm2106RecordWrite,
   startPrimaryWriteOnlyShim,
   statePaths,
-  validatePacket
+  validatePacket,
+  withReceiptPayloadSha256
 };
