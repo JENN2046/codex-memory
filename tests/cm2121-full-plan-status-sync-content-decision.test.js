@@ -53,6 +53,21 @@ test('content decision rejects a caller-supplied implementation not present in G
   assert.ok(evaluation.blockers.includes('decision.implementationUnreadable'));
 });
 
+test('content decision binds the package.json changed by its implementation commit', () => {
+  const { options, implementation, artifact } = prepared();
+  const evaluation = decision.evaluateDecision(artifact, {
+    implementation,
+    ...options,
+    resolveGitFile: (commit, sourcePath) => {
+      const actual = options.resolveGitFile(commit, sourcePath);
+      if (sourcePath !== 'package.json') return actual;
+      return { ...actual, sha256: '0'.repeat(64) };
+    }
+  });
+  assert.equal(evaluation.accepted, false);
+  assert.ok(evaluation.blockers.includes('decision.implementationArtifact.package.json'));
+});
+
 test('application, patch, execution, final release, branch ref, and readiness drift fail closed', () => {
   const { options, implementation, artifact } = prepared();
   for (const mutate of [

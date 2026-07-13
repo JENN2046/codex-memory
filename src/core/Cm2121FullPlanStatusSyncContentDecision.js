@@ -62,6 +62,12 @@ const IMPLEMENTATION_DIFF_ENTRIES = Object.freeze(IMPLEMENTATION_DIFF_PATHS.map(
 const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze(
   IMPLEMENTATION_DIFF_PATHS.filter(sourcePath => sourcePath !== 'package.json')
 );
+const PACKAGE_IMPLEMENTATION_ARTIFACT = Object.freeze({
+  path: 'package.json',
+  blobOid: 'e1e867482e4a96ff2de2a1cc7e74bfe3eb0ac7ee',
+  bytes: 8223,
+  sha256: '6102f8619388a3c75f8ade69f2f04eefc8954a7961760c9ee9c436e26e1b3887'
+});
 const machineBoundApplications = new WeakSet();
 
 function deepFreeze(value) {
@@ -179,6 +185,19 @@ function verifyImplementationIdentity(implementation, options, blockers) {
           actual.blobOid !== artifact.blobOid || actual.bytes !== artifact.bytes || actual.sha256 !== artifact.sha256 ||
           !Buffer.isBuffer(actual.content) || gitBlobOid(actual.content) !== artifact.blobOid ||
           sha256(actual.content) !== artifact.sha256) blockers.push(`decision.implementationArtifact.${artifact.path}`);
+    }
+    const packageActual = options.resolveGitFile(implementation.commit, PACKAGE_IMPLEMENTATION_ARTIFACT.path);
+    if (!packageActual || packageActual.sourceCommit !== implementation.commit ||
+        packageActual.sourceTree !== implementation.tree ||
+        packageActual.sourcePath !== PACKAGE_IMPLEMENTATION_ARTIFACT.path ||
+        packageActual.gitMode !== '100644' || packageActual.gitObjectType !== 'blob' ||
+        packageActual.blobOid !== PACKAGE_IMPLEMENTATION_ARTIFACT.blobOid ||
+        packageActual.bytes !== PACKAGE_IMPLEMENTATION_ARTIFACT.bytes ||
+        packageActual.sha256 !== PACKAGE_IMPLEMENTATION_ARTIFACT.sha256 ||
+        !Buffer.isBuffer(packageActual.content) ||
+        gitBlobOid(packageActual.content) !== PACKAGE_IMPLEMENTATION_ARTIFACT.blobOid ||
+        sha256(packageActual.content) !== PACKAGE_IMPLEMENTATION_ARTIFACT.sha256) {
+      blockers.push('decision.implementationArtifact.package.json');
     }
   } catch {
     blockers.push('decision.implementationUnreadable');
