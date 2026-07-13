@@ -161,6 +161,9 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 || payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 || payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.bundle');
   if (payload.proofReceipt?.commit !== PROOF.commit || payload.proofReceipt?.blobOid !== PROOF.blobOid || payload.proofReceipt?.sha256 !== PROOF.rawSha256) blockers.push('receipt.proof');
   if (payload.phaseAudit?.accepted !== true || payload.phaseAudit?.missingEvidence?.length !== 0 || payload.phaseAudit?.fullPlanPackCompleted !== false) blockers.push('receipt.phaseAudit');
+  const appliedEvidenceFields = ['vcpToolBoxOwnedRuntimeWritePassed', 'actualTransportBindingPassed', 'stableTargetStoreIdentityPassed'];
+  if (!hasExactKeys(payload.appliedEvidence, appliedEvidenceFields)) blockers.push('receipt.appliedEvidence.fields');
+  for (const field of appliedEvidenceFields) if (payload.appliedEvidence?.[field] !== true) blockers.push(`receipt.appliedEvidence.${field}`);
   for (const [field, expected] of Object.entries(expectedPatch())) if (payload.appliedState?.[field] !== expected) blockers.push(`receipt.appliedState.${field}`);
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters');
