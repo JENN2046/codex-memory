@@ -49,7 +49,8 @@ test('CM-2112 fails closed on route, status, authority, or historical binding dr
     value => { value.decision.requiredRevalidationEvidence.actualTransportBindingPassed = true; },
     value => { value.decision.currentAuthority.nativeWriteAuthorized = true; },
     value => { value.historicalBundle.evidence.verifyWritePassed = false; },
-    value => { value.historicalReceipt.receiptPayloadSha256 = '0'.repeat(64); }
+    value => { value.historicalReceipt.receiptPayloadSha256 = '0'.repeat(64); },
+    value => { value.historicalReceipt.receiptPayload.syntheticUnboundField = true; }
   ];
   for (const mutate of mutations) {
     const value = input();
