@@ -49,6 +49,16 @@ function expectedPatch() {
   };
 }
 
+function expectedReceiptBoundaries() {
+  return {
+    defaultProductRetrievalTombstoneAwarenessProven: false,
+    failureRecoveryProofPassed: false,
+    phase8Completed: false,
+    fullPlanPackCompleted: false,
+    readinessClaimed: false
+  };
+}
+
 function evaluateDecision(decision = {}) {
   const blockers = [];
   if (sha256Canonical(decision) !== DECISION.payloadSha256) blockers.push('decision.payloadSha256');
@@ -150,13 +160,7 @@ function executeRollbackEvidenceApplication(input = {}) {
       remoteActions: 0,
       readinessClaims: 0
     },
-    boundaries: {
-      defaultProductRetrievalTombstoneAwarenessProven: false,
-      failureRecoveryProofPassed: false,
-      phase8Completed: false,
-      fullPlanPackCompleted: false,
-      readinessClaimed: false
-    }
+    boundaries: expectedReceiptBoundaries()
   };
   return {
     accepted: true,
@@ -183,6 +187,14 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (payload.sourceRollbackReceipt?.commit !== SOURCE_RECEIPT.commit || payload.sourceRollbackReceipt?.blobOid !== SOURCE_RECEIPT.blobOid || payload.sourceRollbackReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 || payload.sourceRollbackReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 || payload.sourceRollbackReceipt?.acceptedAsRollbackEvidence !== true) blockers.push('receipt.sourceRollbackReceipt');
   for (const [field, expected] of Object.entries(expectedPatch())) {
     if (payload.appliedEvidence?.[field] !== expected) blockers.push(`receipt.appliedEvidence.${field}`);
+  }
+  const expectedBoundaries = expectedReceiptBoundaries();
+  const boundaryKeys = Object.keys(payload.boundaries || {}).sort();
+  if (JSON.stringify(boundaryKeys) !== JSON.stringify(Object.keys(expectedBoundaries).sort())) {
+    blockers.push('receipt.boundaries.fields');
+  }
+  for (const [field, expected] of Object.entries(expectedBoundaries)) {
+    if (payload.boundaries?.[field] !== expected) blockers.push(`receipt.boundaries.${field}`);
   }
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters.completionAuditPatchApplications');
