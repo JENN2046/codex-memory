@@ -73,6 +73,9 @@ function evaluateCm2112Phase8CompletionRevalidation(input = {}) {
   if (historicalReceipt.receiptPayloadSha256 !== HISTORICAL_RECEIPT_PAYLOAD_SHA256) {
     blockers.push('historicalReceipt.payloadSha256');
   }
+  if (sha256Canonical(historicalReceipt.receiptPayload || {}) !== historicalReceipt.receiptPayloadSha256) {
+    blockers.push('historicalReceipt.payloadHashMismatch');
+  }
   if (historicalReceipt.receiptPayload?.evidenceBundle?.requiredEvidenceCount !== LEGACY_REQUIRED_EVIDENCE_COUNT) {
     blockers.push('historicalReceipt.legacyEvidenceCount');
   }

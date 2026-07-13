@@ -106,7 +106,9 @@ function createFaultFilesystem({ storeRoot, fault }) {
   const identityPath = path.join(storeRoot, IDENTITY_FILENAME);
   function enabled(name) {
     return fault === name ||
-      (fault === 'claim_terminal_double_failure' && ['claim_after_success', 'rename_claim_terminal'].includes(name));
+      (fault === 'claim_terminal_double_failure' && ['claim_after_success', 'rename_claim_terminal'].includes(name)) ||
+      (fault === 'directory_terminal_double_failure' &&
+        ['rename_directory_state', 'rename_directory_terminal'].includes(name));
   }
   function once(name) {
     if (!fired.has(name) && enabled(name)) {
@@ -145,9 +147,12 @@ function createFaultFilesystem({ storeRoot, fault }) {
       return fs.readFile(target, options);
     },
     async rename(source, target) {
-      if (fault?.startsWith('rename_') || fault === 'claim_terminal_double_failure') {
+      if (fault?.startsWith('rename_') || fault === 'claim_terminal_double_failure' ||
+          fault === 'directory_terminal_double_failure') {
         const attempted = JSON.parse(await fs.readFile(source, 'utf8'));
-        const targetState = fault === 'rename_directory_state'
+        const targetState = fault === 'directory_terminal_double_failure'
+          ? (attempted.state === 'STORE_DIRECTORY_CREATED' ? 'STORE_DIRECTORY_CREATED' : 'CONSUMED_AMBIGUOUS')
+          : fault === 'rename_directory_state'
           ? 'STORE_DIRECTORY_CREATED'
           : fault === 'rename_identity_state'
             ? 'IDENTITY_CREATED'
@@ -156,7 +161,11 @@ function createFaultFilesystem({ storeRoot, fault }) {
               : fault === 'claim_terminal_double_failure'
                 ? 'CLAIM_REGISTRY_AMBIGUOUS'
               : null;
-        const faultName = fault === 'claim_terminal_double_failure' ? 'rename_claim_terminal' : fault;
+        const faultName = fault === 'claim_terminal_double_failure'
+          ? 'rename_claim_terminal'
+          : fault === 'directory_terminal_double_failure'
+            ? (attempted.state === 'STORE_DIRECTORY_CREATED' ? 'rename_directory_state' : 'rename_directory_terminal')
+            : fault;
         if (attempted.state === targetState && once(faultName)) throw ioError();
       }
       return fs.rename(source, target);
@@ -370,6 +379,20 @@ test('CM-2103 R1 fault receipts preserve true false null effects and prohibit re
       assert.equal(replayEvaluated.contract.acceptedAsReconciliationEvidence, true);
     });
   }
+});
+
+test('CM-2103 R1 terminal double failure remains valid reconciliation evidence', async t => {
+  const fixture = await createFixture(t, 'directory_terminal_double_failure');
+  const result = await executeFixture(fixture, 'directory-double');
+  assert.equal(result.state, 'CONSUMED_AMBIGUOUS');
+  assert.equal(result.outcomeStage, 'directory_state_persistence_failed');
+  assert.equal(result.claim.terminalStateDurablyRecorded, false);
+  assert.equal(result.claim.claimStateWriteAttempts - result.claim.claimStateWrites, 2);
+  assert.equal(fixture.filesystem.faultCount(), 2);
+  const evaluated = evaluateExecutionReceipt(result);
+  assert.equal(evaluated.contract.shapeAccepted, true, evaluated.contract.blockers.join(', '));
+  assert.equal(evaluated.contract.acceptedAsReconciliationEvidence, true);
+  await assertClaimCannotReplay(fixture, 'directory-double');
 });
 
 test('CM-2103 R1 logical registry binding explicitly records zero registry directory identity and marker writes', () => {
