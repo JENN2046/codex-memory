@@ -220,6 +220,21 @@ test('task-start workflow rejects broader raw output, path, endpoint, and creden
   }
 });
 
+test('task-start workflow rejects packages that report provider or MCP memory write calls', async () => {
+  for (const unsafeFlag of ['providerApiCalled', 'mcpMemoryWriteCalled']) {
+    const workflow = new TaskStartMemoryContextWorkflow({
+      async prepareMemoryContext() {
+        return packageResult({ access: { [unsafeFlag]: true } });
+      }
+    });
+
+    const result = await workflow.run({ task: { title: `Unsafe ${unsafeFlag}` } });
+    assert.equal(result.status, 'memory_unavailable', unsafeFlag);
+    assert.equal(result.reasonCode, 'prepare_memory_context_unsafe_or_unusable', unsafeFlag);
+    assert.equal(result.access[unsafeFlag], false, unsafeFlag);
+  }
+});
+
 test('task-start workflow redacts sensitive fragments from echoed task fields', async () => {
   const syntheticBearer = `Bearer ${'synthetic-token-'.repeat(2)}`;
   const syntheticPath = 'C:\\Users\\example\\private\\.env';

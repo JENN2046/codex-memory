@@ -140,6 +140,7 @@ function releaseDecision(expected, content, overrides = {}) {
   const expectedBinding = {
     decisionSourceCommit: '4'.repeat(40),
     decisionBlobOid: '5'.repeat(40),
+    decisionPayloadSha256: sha256(bytes),
     expectedFinalReleaseDecisionReference: value.decisionReference,
     authorizationContentDecisionReference: value.authorizationContentDecisionReference,
     authorizationContentSourceCommit: value.authorizationContentSourceCommit,

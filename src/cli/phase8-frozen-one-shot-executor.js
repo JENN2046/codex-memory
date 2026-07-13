@@ -114,6 +114,7 @@ async function runFrozenExecutor(executionPacketCommit, finalReleaseDecisionComm
     expectedBinding: {
       decisionSourceCommit: finalReleaseDecisionCommit,
       decisionBlobOid: FINAL_RELEASE_DECISION_BLOB_OID,
+      decisionPayloadSha256: EXPECTED_FINAL_RELEASE_DECISION_SHA256,
       expectedFinalReleaseDecisionReference: contentIntake.decision.expectedFinalReleaseDecisionReference,
       authorizationContentDecisionReference: contentIntake.decision.decisionReference,
       authorizationContentSourceCommit: manifest.decisionSourceCommit,
