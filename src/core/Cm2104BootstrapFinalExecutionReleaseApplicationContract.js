@@ -17,22 +17,22 @@ const APPLICATION_PATH =
 
 const CONTENT_DECISION_GIT_IDENTITY = Object.freeze({
   reference: 'CM-2104-ER-IDENTITY-BOUND-STORE-BOOTSTRAP-CONTENT-0A7CEB6C-017307C9',
-  commit: 'a70870a090d739f79eb31c7d1be3b7ac979fb32a',
-  tree: '241ec97972e0e16c741dd0d48baa66349716b41f',
+  commit: 'e2000e4d823cdbbf53152a27aa0122131fb34eb9',
+  tree: 'e1bc6f9a799d70aeffaec29006b18dde3c0fabfc',
   path: 'docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_authorization_content_decision_cm2104.json',
-  blobOid: '86915428a69719093d426996deb56078dc6a5a5e',
+  blobOid: 'b460ad94ed6b66c7c7e38ca2732ee907aea6c8bf',
   bytes: 4176,
-  sha256: '4baa0e84cf127ca99e6eec0111480a7e262ab368c9f04adc0ee5448cee384493'
+  sha256: '2414b28a3474984f81fd50769c07da2461d5f5d9ac1801f2e601f9ff56ccfbb3'
 });
 
 const GATE_PACKET_GIT_IDENTITY = Object.freeze({
-  commit: '67eaab147cb856180a7ddd0491c5e5cc2f01324f',
-  tree: '5ad4fb736034172bfb96ce8c34a492e509b9acfa',
+  commit: '9ba0800a6b4b401df0b72dac024bc6668602414b',
+  tree: '742dd2747e4c1a5ea087b1204620c41e34762e7d',
   path: AUTHORIZATION_GATE_PACKET_PATH,
-  blobOid: 'c5a2c6e4eb6c0911895c44b41c07244fe96d61e9',
+  blobOid: 'b0fa9da564b2628c33ca758b1e34f5879e0c5538',
   bytes: 7843,
-  sha256: '0ad7e1cb4ff30cc993c9625fcefe0328d9c78d9a4227ffb6c9409b5faa4c0f8e',
-  payloadSha256: 'e57a98e9151583029843ff3ce93ca60ad45ebbfcd91e9c7fce7e0362969359da'
+  sha256: 'f15ac74db5d34e806ae5fb90f70c76edec3ec07a9e3301326803ad8bbdf9d3e4',
+  payloadSha256: '2f699b5db2d2b651ec2a541fbe55dd2d988c515b8b95170ea06cdc78900b7684'
 });
 
 const APPLICATION_KEYS = Object.freeze([
@@ -96,7 +96,8 @@ function finalReleaseDecisionBindingFromPacket(packet) {
 
 function createCm2104BootstrapFinalExecutionReleaseApplication(gatePacket) {
   const packetResult = evaluateCm2104BootstrapAuthorizationGatePacket(gatePacket);
-  if (!packetResult.accepted || packetResult.executionAuthorized !== false) {
+  if (!packetResult.accepted || packetResult.executionAuthorized !== false ||
+      gatePacket?.packetPayloadSha256 !== GATE_PACKET_GIT_IDENTITY.payloadSha256) {
     throw new Error('cm2104_final_release_application_gate_packet_rejected');
   }
   const binding = finalReleaseDecisionBindingFromPacket(gatePacket);

@@ -65,6 +65,9 @@ test('CM-2110 fails closed on receipt, rollback baseline, replay, side effect, o
 test('CM-2110 application receipt rejects native actions or completion overclaim', () => {
   const result = executeFailureRecoveryEvidenceApplication(input());
   for (const mutate of [
+    payload => { payload.schemaVersion = 2; },
+    payload => { payload.taskId = 'CM-FORGED'; },
+    payload => { payload.receiptType = 'forged_receipt'; },
     payload => { payload.applicationCounters.nativeWrites = 1; },
     payload => { payload.applicationCounters.failureInjectionExecutions = 1; },
     payload => { payload.authorization.replayAllowed = true; },
