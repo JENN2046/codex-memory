@@ -29,6 +29,7 @@ test('CM-2113 fails closed on owner, transport, store, replay, or completion ove
     value => { value.store.identitySha256 = '0'.repeat(64); },
     value => { value.authorization.replayAllowed = true; },
     value => { value.priorAttempt.preserved = false; },
+    value => { value.completionEvidence.productionReady = true; },
     value => { value.phase8Completed = true; },
     value => { value.nonClaims.productionReady = true; },
     value => { value.nonClaims.realMemoryProofAccepted = true; }

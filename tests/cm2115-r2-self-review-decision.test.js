@@ -15,6 +15,9 @@ const {
 } = require('../src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract');
 const git = require('../scripts/cm2115-r2-git');
 const {
+  resolveFrozenPhase2DurableClaim
+} = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
+const {
   isCommitAncestor: realIsCommitAncestor,
   parseArgs,
   renderMarkdown
@@ -70,7 +73,7 @@ function resolvers(overrides = {}) {
       ? [...IMPLEMENTATION_ARTIFACT_PATHS]
       : git.resolveDiffPaths(parent, commit),
     resolveGitPathState: git.resolveGitPathState,
-    resolveDurableClaim: git.resolveDurableClaim,
+    resolveDurableClaim: resolveFrozenPhase2DurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === REVIEW_REQUEST_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
       return realIsCommitAncestor(ancestor, descendant);

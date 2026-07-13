@@ -15,6 +15,9 @@ const {
 } = require('../src/core/Cm2115R2SelfReviewDecisionIntakeReceiptContract');
 const { sha256Canonical } = require('../src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract');
 const git = require('../scripts/cm2115-r2-git');
+const {
+  resolveFrozenPhase2DurableClaim
+} = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
 const { isCommitAncestor: realIsCommitAncestor } = require('../scripts/generate-cm2115-r2-self-review-decision');
 const {
   parseArgs,
@@ -72,7 +75,7 @@ function resolvers(overrides = {}) {
         ? [...INTAKE_IMPLEMENTATION_DIFF_PATHS]
         : git.resolveDiffPaths(fromCommit, toCommit),
     resolveGitPathState: git.resolveGitPathState,
-    resolveDurableClaim: git.resolveDurableClaim,
+    resolveDurableClaim: resolveFrozenPhase2DurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === SELF_REVIEW_DECISION_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
       return realIsCommitAncestor(ancestor, descendant);

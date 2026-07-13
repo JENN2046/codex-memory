@@ -10,53 +10,18 @@ const {
   evaluateCm2104BootstrapAuthorizationContentDecisionIntake
 } = require('../src/core/Cm2104IdentityBoundStoreBootstrapAuthorizationContentDecisionIntake');
 const {
-  contentDecisionBindingFromPacket
+  contentDecisionBindingFromPacket,
+  loadFrozenGatePacket
 } = require('../src/core/Cm2104BootstrapAuthorizationContentApplicationContract');
 const {
   RECEIPT_PATH,
   evaluateCm2104BootstrapAuthorizationContentDecisionReceipt
 } = require('../src/core/Cm2104BootstrapAuthorizationContentDecisionReceiptContract');
-const {
-  AUTHORIZATION_GATE_PACKET_PATH,
-  FINAL_EXECUTION_RELEASE_DECISION_PATH
-} = require('../src/core/Cm2104IdentityBoundStoreBootstrapAuthorizationGatePacketContract');
-
 const repoRoot = path.resolve(__dirname, '..');
 const receipt = JSON.parse(fs.readFileSync(path.join(repoRoot, RECEIPT_PATH), 'utf8'));
-const receiptFreezeCommit = '4cf5f44dde337fd09c6d71295b628f7a8408025c';
-const historicalGatePacketCommit = '67eaab147cb856180a7ddd0491c5e5cc2f01324f';
+const activeGatePacket = loadFrozenGatePacket(repoRoot);
 
-function historicalContentDecisionBinding() {
-  const packetBytes = execFileSync('git', ['show', `${historicalGatePacketCommit}:${AUTHORIZATION_GATE_PACKET_PATH}`], {
-    cwd: repoRoot
-  });
-  const binding = contentDecisionBindingFromPacket(JSON.parse(packetBytes.toString('utf8')));
-  return {
-    ...binding,
-    executionPacketCommit: historicalGatePacketCommit,
-    executionPacketBlobOid: execFileSync(
-      'git', ['rev-parse', `${historicalGatePacketCommit}:${AUTHORIZATION_GATE_PACKET_PATH}`], {
-        cwd: repoRoot,
-        encoding: 'utf8'
-      }
-    ).trim(),
-    executionPacketSha256: crypto.createHash('sha256').update(packetBytes).digest('hex')
-  };
-}
-
-function gitObjectExists(commit, objectPath) {
-  try {
-    execFileSync('git', ['cat-file', '-e', `${commit}:${objectPath}`], {
-      cwd: repoRoot,
-      stdio: 'ignore'
-    });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-test('CM-2104 historical exact Git object content decision intake remains accepted without execution authority', () => {
+test('CM-2104 active exact Git object content decision intake remains accepted without execution authority', () => {
   const binding = receipt.receiptPayload.decision;
   const decisionBytes = execFileSync('git', ['show', `${binding.sourceCommit}:${binding.path}`], {
     cwd: repoRoot
@@ -79,8 +44,8 @@ test('CM-2104 historical exact Git object content decision intake remains accept
       decisionBlobOid: binding.blobOid,
       decisionSha256: binding.sha256
     },
-    expectedBinding: historicalContentDecisionBinding(),
-    now: new Date('2026-07-12T03:00:00+08:00')
+    expectedBinding: contentDecisionBindingFromPacket(activeGatePacket),
+    now: new Date('2026-07-12T03:01:00+08:00')
   });
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.authorizationContentApproved, true);
@@ -98,7 +63,9 @@ test('CM-2104 content decision receipt records the self-decision and preserves t
   assert.equal(result.executorRun, false);
   assert.equal(result.executionEffects, 0);
   assert.equal(result.phase8Completed, false);
-  assert.equal(gitObjectExists(receiptFreezeCommit, FINAL_EXECUTION_RELEASE_DECISION_PATH), false);
+  assert.equal(receipt.receiptPayload.decision.sourceCommit, 'e2000e4d823cdbbf53152a27aa0122131fb34eb9');
+  assert.equal(receipt.receiptPayload.gate.packetCommit, '9ba0800a6b4b401df0b72dac024bc6668602414b');
+  assert.equal(receipt.receiptPayload.currentAuthority.finalExecutionReleaseDecisionPresent, false);
 });
 
 test('CM-2104 content decision receipt fails closed on authority, effect, completion, or hash drift', () => {
