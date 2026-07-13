@@ -10,20 +10,39 @@ const {
   evaluateCm2104BootstrapAuthorizationContentDecisionIntake
 } = require('../src/core/Cm2104IdentityBoundStoreBootstrapAuthorizationContentDecisionIntake');
 const {
-  contentDecisionBindingFromPacket,
-  loadFrozenGatePacket
+  contentDecisionBindingFromPacket
 } = require('../src/core/Cm2104BootstrapAuthorizationContentApplicationContract');
 const {
   RECEIPT_PATH,
   evaluateCm2104BootstrapAuthorizationContentDecisionReceipt
 } = require('../src/core/Cm2104BootstrapAuthorizationContentDecisionReceiptContract');
 const {
+  AUTHORIZATION_GATE_PACKET_PATH,
   FINAL_EXECUTION_RELEASE_DECISION_PATH
 } = require('../src/core/Cm2104IdentityBoundStoreBootstrapAuthorizationGatePacketContract');
 
 const repoRoot = path.resolve(__dirname, '..');
 const receipt = JSON.parse(fs.readFileSync(path.join(repoRoot, RECEIPT_PATH), 'utf8'));
 const receiptFreezeCommit = '4cf5f44dde337fd09c6d71295b628f7a8408025c';
+const historicalGatePacketCommit = '67eaab147cb856180a7ddd0491c5e5cc2f01324f';
+
+function historicalContentDecisionBinding() {
+  const packetBytes = execFileSync('git', ['show', `${historicalGatePacketCommit}:${AUTHORIZATION_GATE_PACKET_PATH}`], {
+    cwd: repoRoot
+  });
+  const binding = contentDecisionBindingFromPacket(JSON.parse(packetBytes.toString('utf8')));
+  return {
+    ...binding,
+    executionPacketCommit: historicalGatePacketCommit,
+    executionPacketBlobOid: execFileSync(
+      'git', ['rev-parse', `${historicalGatePacketCommit}:${AUTHORIZATION_GATE_PACKET_PATH}`], {
+        cwd: repoRoot,
+        encoding: 'utf8'
+      }
+    ).trim(),
+    executionPacketSha256: crypto.createHash('sha256').update(packetBytes).digest('hex')
+  };
+}
 
 function gitObjectExists(commit, objectPath) {
   try {
@@ -37,7 +56,7 @@ function gitObjectExists(commit, objectPath) {
   }
 }
 
-test('CM-2104 exact Git object content decision intake is accepted without execution authority', () => {
+test('CM-2104 historical exact Git object content decision intake remains accepted without execution authority', () => {
   const binding = receipt.receiptPayload.decision;
   const decisionBytes = execFileSync('git', ['show', `${binding.sourceCommit}:${binding.path}`], {
     cwd: repoRoot
@@ -60,7 +79,7 @@ test('CM-2104 exact Git object content decision intake is accepted without execu
       decisionBlobOid: binding.blobOid,
       decisionSha256: binding.sha256
     },
-    expectedBinding: contentDecisionBindingFromPacket(loadFrozenGatePacket(repoRoot)),
+    expectedBinding: historicalContentDecisionBinding(),
     now: new Date('2026-07-12T03:00:00+08:00')
   });
   assert.equal(result.accepted, true, result.blockers.join(', '));
