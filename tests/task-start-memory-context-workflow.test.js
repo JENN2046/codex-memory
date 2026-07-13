@@ -200,6 +200,50 @@ test('task-start workflow rejects package that can be mistaken for native or ret
   assert.equal(result.receipt.raw_memory_returned, false);
 });
 
+test('task-start workflow rejects broader raw output, path, endpoint, and credential access flags', async () => {
+  for (const unsafeFlag of [
+    'rawOutputReturned',
+    'rawPathReturned',
+    'endpointDisclosed',
+    'tokenMaterialReturned',
+    'credentialsReturned'
+  ]) {
+    const workflow = new TaskStartMemoryContextWorkflow({
+      async prepareMemoryContext() {
+        return packageResult({ access: { [unsafeFlag]: true } });
+      }
+    });
+
+    const result = await workflow.run({ task: { title: `Unsafe ${unsafeFlag}` } });
+    assert.equal(result.status, 'memory_unavailable', unsafeFlag);
+    assert.equal(result.reasonCode, 'prepare_memory_context_unsafe_or_unusable', unsafeFlag);
+  }
+});
+
+test('task-start workflow redacts sensitive fragments from echoed task fields', async () => {
+  const syntheticBearer = `Bearer ${'synthetic-token-'.repeat(2)}`;
+  const syntheticPath = 'C:\\Users\\example\\private\\.env';
+  const workflow = new TaskStartMemoryContextWorkflow({
+    async prepareMemoryContext() {
+      throw new Error('synthetic unavailable');
+    }
+  });
+
+  const result = await workflow.run({
+    task: {
+      title: `Inspect ${syntheticPath}`,
+      user_request: `Authorization: ${syntheticBearer}`
+    }
+  });
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.status, 'memory_unavailable');
+  assert.equal(serialized.includes(syntheticPath), false);
+  assert.equal(serialized.includes(syntheticBearer), false);
+  assert.match(result.task.title, /<redacted>/);
+  assert.match(result.task.user_request, /<redacted>/);
+});
+
 test('injectable summary stays bounded to package statements and next step', () => {
   const summary = buildInjectableSummary(packageResult().memory_context_package);
 
