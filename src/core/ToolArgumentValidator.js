@@ -115,6 +115,17 @@ function validateValue(value, schema, path) {
     if (typeof schema.maxLength === 'number' && value.length > schema.maxLength) {
       throw new ToolArgumentValidationError(`${path} must be at most ${schema.maxLength} characters`, path);
     }
+    if (typeof schema.pattern === 'string') {
+      let pattern;
+      try {
+        pattern = new RegExp(schema.pattern);
+      } catch (_error) {
+        throw new ToolArgumentValidationError(`${path} has an invalid schema pattern`, path);
+      }
+      if (!pattern.test(value)) {
+        throw new ToolArgumentValidationError(`${path} must match the required pattern`, path);
+      }
+    }
   }
 }
 
