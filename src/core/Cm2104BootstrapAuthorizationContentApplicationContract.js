@@ -30,13 +30,13 @@ const EXTERNAL_REVIEW_REFERENCE = Object.freeze({
 });
 
 const GATE_PACKET_GIT_IDENTITY = Object.freeze({
-  commit: '67eaab147cb856180a7ddd0491c5e5cc2f01324f',
-  tree: '5ad4fb736034172bfb96ce8c34a492e509b9acfa',
+  commit: '9ba0800a6b4b401df0b72dac024bc6668602414b',
+  tree: '742dd2747e4c1a5ea087b1204620c41e34762e7d',
   path: AUTHORIZATION_GATE_PACKET_PATH,
-  blobOid: 'c5a2c6e4eb6c0911895c44b41c07244fe96d61e9',
+  blobOid: 'b0fa9da564b2628c33ca758b1e34f5879e0c5538',
   bytes: 7843,
-  sha256: '0ad7e1cb4ff30cc993c9625fcefe0328d9c78d9a4227ffb6c9409b5faa4c0f8e',
-  payloadSha256: 'e57a98e9151583029843ff3ce93ca60ad45ebbfcd91e9c7fce7e0362969359da'
+  sha256: 'f15ac74db5d34e806ae5fb90f70c76edec3ec07a9e3301326803ad8bbdf9d3e4',
+  payloadSha256: '2f699b5db2d2b651ec2a541fbe55dd2d988c515b8b95170ea06cdc78900b7684'
 });
 
 const APPLICATION_KEYS = Object.freeze([
@@ -109,7 +109,8 @@ function contentDecisionBindingFromPacket(packet) {
 
 function createCm2104BootstrapAuthorizationContentApplication(gatePacket) {
   const packetResult = evaluateCm2104BootstrapAuthorizationGatePacket(gatePacket);
-  if (!packetResult.accepted || packetResult.executionAuthorized !== false) {
+  if (!packetResult.accepted || packetResult.executionAuthorized !== false ||
+      gatePacket?.packetPayloadSha256 !== GATE_PACKET_GIT_IDENTITY.payloadSha256) {
     throw new Error('cm2104_content_application_gate_packet_rejected');
   }
   const expectedBinding = contentDecisionBindingFromPacket(gatePacket);

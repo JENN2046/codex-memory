@@ -3,7 +3,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { sha256 } = require('../src/core/Phase8OneShotNativeWriteExecutionGate');
-const { evaluatePhase8ExternalAuthorizationDecisionIntake } = require('../src/core/Phase8ExternalAuthorizationDecisionIntake');
+const {
+  evaluatePhase8ExternalAuthorizationDecisionIntake,
+  isMachineBoundPhase8AuthorizationDecision
+} = require('../src/core/Phase8ExternalAuthorizationDecisionIntake');
 
 function fixture(overrides = {}) {
   const decision = {
@@ -53,6 +56,16 @@ test('external Phase 8 content decision intake binds Git identity and remains no
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.decisionIdentityMachineBound, true);
   assert.equal(result.executionAuthorized, false);
+  assert.equal(Object.isFrozen(result.decision), true);
+  assert.equal(isMachineBoundPhase8AuthorizationDecision(result.decision), true);
+  assert.throws(() => {
+    result.decision.decisionReference = 'CM-MUTATED-AFTER-INTAKE';
+  }, TypeError);
+  assert.equal(result.decision.decisionReference, 'CM-TEST-PHASE8-PASS');
+
+  const replayCopy = { ...result.decision };
+  assert.equal(Object.isFrozen(replayCopy), false);
+  assert.equal(isMachineBoundPhase8AuthorizationDecision(replayCopy), false);
 });
 
 test('decision intake rejects forged reference blob hash or public-token-only packet', () => {
