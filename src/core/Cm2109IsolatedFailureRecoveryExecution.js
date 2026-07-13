@@ -287,6 +287,7 @@ function evaluateFailureRecoveryReceipt(receipt = {}, expectedBinding = {}) {
   ])) blockers.push('receipt.payload.fields');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (receipt.failureRecoveryProofEligible !== true || receipt.failureRecoveryProofPassed !== false || receipt.phase8Completed !== false) blockers.push('receipt.completionBoundary');
+  if (payload.schemaVersion !== 1 || payload.receiptType !== 'isolated_three_case_failure_recovery_execution_receipt') blockers.push('receipt.identity');
   if (payload.result !== 'PASS' || payload.taskId !== 'CM-2109') blockers.push('receipt.result');
   for (const [field, expected] of Object.entries(expectedBinding)) {
     if (payload.executionBinding?.[field] !== expected) blockers.push(`receipt.executionBinding.${field}`);
