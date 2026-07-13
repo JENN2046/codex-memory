@@ -1,5 +1,7 @@
 'use strict';
 
+const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
+
 const SCHEMA_VERSION = 'commit_memory_delta_operator_preflight_v1';
 const DEFAULT_TASK_ID = 'CM-2035';
 
@@ -78,7 +80,10 @@ function isPlainObject(value) {
 
 function safeString(value, maxLength = 220) {
   if (typeof value !== 'string') return '';
-  return value.trim().replace(/\s+/g, ' ').slice(0, maxLength);
+  return redactSensitiveFragments(value)
+    .trim()
+    .replace(/\s+/g, ' ')
+    .slice(0, maxLength);
 }
 
 function pathJoin(prefix, key) {
