@@ -380,7 +380,8 @@ test('CM-2106 R1 receipt fails closed on count, hash, provider, replay, or compl
     { derivedIndexWritePerformed: true },
     { authorizationReplayAllowed: true },
     { rollbackDrillPassed: true },
-    { phase8Completed: true }
+    { phase8Completed: true },
+    { productionReady: true }
   ]) {
     const receipt = { ...source, ...drift };
     const { receiptPayloadSha256, ...payload } = receipt;
