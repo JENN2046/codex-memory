@@ -210,3 +210,33 @@ test('CM-2113 content decision is non-executable and final release or receipt dr
   assert.equal(result.state, 'CONSUMED_AMBIGUOUS_POST_COMMIT');
   assert.equal(result.authorizationReplayAllowed, false);
 });
+
+test('CM-2113 final release cannot claim or write before approvedAt', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2113-gate-future-approval-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const { expected, contentDecision, releaseDecision, contentDecisionGitIdentity, finalReleaseDecisionGitIdentity } = fixture();
+  const contentIntake = intakeCm2113AuthorizationContentDecision({ decision: contentDecision, expected, gitIdentity: contentDecisionGitIdentity });
+  const releaseIntake = intakeCm2113FinalExecutionReleaseDecision({
+    decision: releaseDecision,
+    expected: { ...expected, contentDecisionGitIdentity: contentIntake.gitIdentity },
+    gitIdentity: finalReleaseDecisionGitIdentity
+  });
+  const gate = createCm2113VcpToolBoxOwnerNativeProofGate({
+    registry: await registryFixture(root),
+    expected,
+    now: () => new Date('2026-07-12T11:59:59+08:00')
+  });
+  let nativeWriteCalls = 0;
+  const result = await gate.execute({
+    contentDecision: contentIntake.decision,
+    releaseDecision: releaseIntake.decision,
+    executeNativeWrite: async () => { nativeWriteCalls += 1; return nativeResult(expected); },
+    verifyWrite: async () => ({ accepted: true })
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.state, 'UNCLAIMED');
+  assert.equal(result.authorizationConsumed, false);
+  assert.equal(result.nativeWriteCalls, 0);
+  assert.equal(nativeWriteCalls, 0);
+  assert.ok(result.blockers.includes('releaseDecision.notYetApproved'));
+});
