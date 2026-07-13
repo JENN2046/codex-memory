@@ -102,6 +102,9 @@ test('CM-2108 fails closed on decision, receipt, baseline, replay, or overclaim 
 test('CM-2108 receipt contract rejects replay, native side effects, or completion overclaim', () => {
   const result = executeRollbackEvidenceApplication(input());
   for (const mutate of [
+    payload => { payload.schemaVersion = 2; },
+    payload => { payload.taskId = 'CM-FORGED'; },
+    payload => { payload.receiptType = 'forged_receipt'; },
     payload => { payload.authorization.replayAllowed = true; },
     payload => { payload.applicationCounters.nativeWrites = 1; },
     payload => { payload.appliedEvidence.failureRecoveryProofPassed = true; },

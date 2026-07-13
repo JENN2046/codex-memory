@@ -24,13 +24,15 @@ function gitObjectExists(commit, objectPath) {
   }).status === 0;
 }
 
-test('CM-2104-A frozen application exactly matches the contract-generated no-execution application', () => {
-  assert.deepEqual(application, createCm2104BootstrapAuthorizationContentApplication(gatePacket));
-  const result = evaluateCm2104BootstrapAuthorizationContentApplication({ application, gatePacket });
+test('CM-2104-A current application contract supersedes the stale frozen application', () => {
+  const currentApplication = createCm2104BootstrapAuthorizationContentApplication(gatePacket);
+  const result = evaluateCm2104BootstrapAuthorizationContentApplication({ application: currentApplication, gatePacket });
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.contentDecisionIssued, false);
   assert.equal(result.finalExecutionReleaseIssued, false);
   assert.equal(result.executionAuthorized, false);
+  assert.equal(currentApplication.gatePacketGitIdentity.commit, '9ba0800a6b4b401df0b72dac024bc6668602414b');
+  assert.equal(evaluateCm2104BootstrapAuthorizationContentApplication({ application, gatePacket }).accepted, false);
   assert.equal(gitObjectExists(applicationFreezeCommit, application.contentDecisionPath), false);
   assert.equal(gitObjectExists(applicationFreezeCommit, application.finalExecutionReleaseDecisionPath), false);
 });

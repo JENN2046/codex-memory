@@ -455,14 +455,16 @@ test('CM-2115-R2 execution receipt re-resolves all upstream Git objects', async 
 
 test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execution receipt', async t => {
   const fixture = await prepareTempExecution(t);
+  const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
   const execution = await executeExactPatch({
     repoRoot: fixture.root,
     decision: fixture.decision,
     decisionIdentity: fixture.identity,
     authorityIdentity: fixture.authority,
     resolveGitFile: fixture.resolver,
-    registry: new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot })
+    registry
   });
+  const durableClaim = await registry.read(execution.bindingHash);
   const executionBytes = Buffer.from(serializeArtifact(execution.receipt));
   const executionIdentity = gitIdentity({
     sourceCommit: APPLICATION_COMMIT,
@@ -521,9 +523,32 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
         return { sourceCommit: commit, sourceTree: DECISION_TREE, sourcePath, exists: false };
       }
       return { sourceCommit: commit, sourceTree: DECISION_TREE, sourcePath, exists: true };
+    },
+    resolveDurableClaim: bindingHash => {
+      assert.equal(bindingHash, execution.bindingHash);
+      return structuredClone(durableClaim);
     }
   };
   assert.equal(evaluateBindingReceipt(receipt, options).accepted, true);
+
+  const missingDurableClaim = evaluateBindingReceipt(receipt, {
+    ...options,
+    resolveDurableClaim: () => { throw new Error('missing'); }
+  });
+  assert.equal(missingDurableClaim.accepted, false);
+  assert.ok(missingDurableClaim.blockers.includes('bindingReceipt.durableClaim'));
+  for (const state of ['CLAIMED', 'CONSUMED_AMBIGUOUS']) {
+    const nonSuccessClaim = evaluateBindingReceipt(receipt, {
+      ...options,
+      resolveDurableClaim: () => ({
+        ...structuredClone(durableClaim),
+        state,
+        patchInvocationCount: state === 'CLAIMED' ? 0 : 1
+      })
+    });
+    assert.equal(nonSuccessClaim.accepted, false);
+    assert.ok(nonSuccessClaim.blockers.includes('bindingReceipt.durableClaim'));
+  }
 
   const v1Receipt = wrapPayload(buildBindingReceiptPayload({
     applicationCommit: APPLICATION_COMMIT,

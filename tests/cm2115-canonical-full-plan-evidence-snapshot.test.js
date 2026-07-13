@@ -24,7 +24,11 @@ const {
   evaluateCm2115LocalValidationReceipt
 } = require('../src/core/Cm2115LocalValidationReceiptContract');
 const {
-  DECISION_PATH: PHASE2_DECISION_PATH
+  DECISION_PATH: PHASE2_DECISION_PATH,
+  DECISION_REFERENCE: PHASE2_DECISION_REFERENCE,
+  NONCE: PHASE2_NONCE,
+  RECEIPT_ID: PHASE2_RECEIPT_ID,
+  REGISTRY_REFERENCE: PHASE2_REGISTRY_REFERENCE
 } = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 const snapshotGit = require('../scripts/cm2115-r2-git');
 const {
@@ -60,12 +64,26 @@ function validPhase2ApplicationReceipt() {
 }
 
 function bindingReceiptResolvers() {
+  const receipt = validPhase2ApplicationReceipt();
   return {
     resolveGitFile: snapshotGit.resolveGitFile,
     resolveCommitTree: snapshotGit.resolveCommitTree,
     resolveParentCommit: snapshotGit.resolveParentCommit,
     resolveDiffPaths: snapshotGit.resolveDiffPaths,
-    resolveGitPathState: snapshotGit.resolveGitPathState
+    resolveGitPathState: snapshotGit.resolveGitPathState,
+    resolveDurableClaim: bindingHash => ({
+      schemaVersion: 1,
+      registryReference: PHASE2_REGISTRY_REFERENCE,
+      claimId: receipt.payload.registry.claimId,
+      nonceHash: sha256(PHASE2_NONCE),
+      receiptIdHash: sha256(PHASE2_RECEIPT_ID),
+      bindingHash,
+      decisionReference: PHASE2_DECISION_REFERENCE,
+      authorizationUseCount: 1,
+      authorizationReplayAllowed: false,
+      patchInvocationCount: 1,
+      state: 'CONSUMED_SUCCESS'
+    })
   };
 }
 
@@ -324,6 +342,23 @@ test('snapshot construction and contract reject invalid Phase 2 application sema
   });
   assert.equal(result.accepted, false);
   assert.ok(result.blockers.includes('phase2ApplicationReceipt.contract'));
+});
+
+test('snapshot contract requires the durable Phase 2 claim to remain consumed-success', () => {
+  const snapshot = buildSnapshot(fakeResolverFactory());
+  const withoutResolver = evaluate(snapshot, fakeResolverFactory(), { resolveDurableClaim: undefined });
+  assert.equal(withoutResolver.accepted, false);
+  assert.ok(withoutResolver.blockers.includes('phase2ApplicationReceipt.contract'));
+
+  const binding = bindingReceiptResolvers();
+  const nonSuccess = evaluate(snapshot, fakeResolverFactory(), {
+    resolveDurableClaim: bindingHash => ({
+      ...binding.resolveDurableClaim(bindingHash),
+      state: 'CONSUMED_AMBIGUOUS'
+    })
+  });
+  assert.equal(nonSuccess.accepted, false);
+  assert.ok(nonSuccess.blockers.includes('phase2ApplicationReceipt.contract'));
 });
 
 test('snapshot contract rejects blob, byte, or SHA drift even after payload rehash', () => {
