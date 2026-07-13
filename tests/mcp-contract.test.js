@@ -49,7 +49,18 @@ function receiptAwareNativeToolCaller(caller) {
   Object.assign(wrapped, caller);
   wrapped.callWithReceipt = async payload => ({
     value: await caller(payload),
-    receipt: nativeInvocationReceiptForPayload(payload)
+    receipt: nativeInvocationReceiptForPayload(payload, {
+      ...(payload.toolName === 'record_memory' ||
+      payload.toolName === 'tombstone_memory' ||
+      payload.toolName === 'supersede_memory'
+        ? {
+            nativeRuntimeReceipt: {
+              memoryWritePerformed: true,
+              durableWritePerformed: true
+            }
+          }
+        : {})
+    })
   });
   return wrapped;
 }
