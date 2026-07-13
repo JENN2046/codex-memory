@@ -2,16 +2,31 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { EventEmitter } = require('node:events');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { runCm2113Runtime } = require('../src/cli/cm2113-vcptoolbox-owner-native-proof-runtime');
-const { runCm2113ProofController } = require('../src/cli/cm2113-vcptoolbox-owner-native-proof');
+const { runCm2113ProofController, waitForClose } = require('../src/cli/cm2113-vcptoolbox-owner-native-proof');
 const { runCm2113OwnerRuntimeBootstrap } = require('../src/cli/cm2113-vcptoolbox-owner-runtime-bootstrap');
 
 test('CM-2113 runtime and controller require all three frozen Git commits before effects', async () => {
   await assert.rejects(runCm2113Runtime(null, null, null), /git_commit_argument_required/);
   await assert.rejects(runCm2113ProofController(null, null, null), /git_commit_argument_required/);
   await assert.rejects(runCm2113OwnerRuntimeBootstrap(null), /decision_commit_required/);
+});
+
+test('CM-2113 controller waits for stdio close rather than process exit', async () => {
+  const child = new EventEmitter();
+  let settled = false;
+  const result = waitForClose(child).then(value => {
+    settled = true;
+    return value;
+  });
+  child.emit('exit', 0, null);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(settled, false);
+  child.emit('close', 0, null);
+  assert.deepEqual(await result, { code: 0, signal: null });
 });
 
 test('CM-2113 frozen runtime uses process stdio plus local HTTP owner gateway and never primaryWriteOnly shim mode', () => {
