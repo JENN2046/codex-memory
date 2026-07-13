@@ -937,6 +937,51 @@ test('terminal claim and execution receipt bind the exact successful runtime', (
   assert.equal(durable.readinessClaimed, false);
 });
 
+test('governance receipt reads use no-follow descriptors and reject path identity swaps', async () => {
+  const expected = Buffer.from('{"accepted":true}\n');
+  const pathStat = {
+    dev: 1,
+    ino: 2,
+    isFile: () => true,
+    isSymbolicLink: () => false
+  };
+  let openedFlags = null;
+  let readCalls = 0;
+  let closeCalls = 0;
+  const acceptedFileSystem = {
+    lstat: async () => pathStat,
+    open: async (_entryPath, flags) => {
+      openedFlags = flags;
+      return {
+        stat: async () => ({ ...pathStat, isFile: () => true }),
+        readFile: async () => { readCalls += 1; return expected; },
+        close: async () => { closeCalls += 1; }
+      };
+    }
+  };
+  const observed = await implementation.readVerifiedGovernanceFile('/fixed/receipt', acceptedFileSystem);
+  assert.ok(observed.equals(expected));
+  assert.equal(openedFlags & fs.constants.O_RDONLY, fs.constants.O_RDONLY);
+  if (fs.constants.O_NOFOLLOW !== undefined) {
+    assert.equal(openedFlags & fs.constants.O_NOFOLLOW, fs.constants.O_NOFOLLOW);
+  }
+  assert.equal(readCalls, 1);
+  assert.equal(closeCalls, 1);
+
+  const swappedFileSystem = {
+    lstat: async () => pathStat,
+    open: async () => ({
+      stat: async () => ({ ...pathStat, ino: 3, isFile: () => true }),
+      readFile: async () => { throw new Error('must_not_read_swapped_descriptor'); },
+      close: async () => { closeCalls += 1; }
+    })
+  };
+  await assert.rejects(
+    implementation.readVerifiedGovernanceFile('/fixed/receipt', swappedFileSystem),
+    /cm2126_execution_receipt_invalid/
+  );
+});
+
 test('SUCCESS claim with a missing or corrupt external receipt reenters fail closed with zero effect', () => {
   const originalReceipt = fs.readFileSync(fixture.executionReceiptPath);
   const receiptMode = fs.statSync(fixture.executionReceiptPath).mode & 0o777;

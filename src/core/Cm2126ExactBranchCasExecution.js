@@ -1200,7 +1200,7 @@ async function writeExternalReceipt(root, receipt) {
     injectIsolatedTestFault('receipt_write_acknowledgement_lost');
     const directory = await fsPromises.open(root, 'r');
     try { await directory.sync(); } finally { await directory.close(); }
-    const observed = await fsPromises.readFile(receiptPath);
+    const observed = await readVerifiedGovernanceFile(receiptPath);
     if (!observed.equals(bytes)) throw new Error('cm2126_execution_receipt_readback_mismatch');
     identity.persistenceAcknowledged = true;
     return identity;
@@ -1211,11 +1211,36 @@ async function writeExternalReceipt(root, receipt) {
   }
 }
 
+async function readVerifiedGovernanceFile(
+  receiptPath,
+  fileSystem = fsPromises,
+  invalidCode = 'cm2126_execution_receipt_invalid'
+) {
+  let handle = null;
+  try {
+    const pathStat = await fileSystem.lstat(receiptPath);
+    if (!pathStat.isFile() || pathStat.isSymbolicLink()) throw new Error('invalid');
+    handle = await fileSystem.open(
+      receiptPath,
+      fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0)
+    );
+    const descriptorStat = await handle.stat();
+    if (!descriptorStat.isFile() || descriptorStat.dev !== pathStat.dev || descriptorStat.ino !== pathStat.ino) {
+      throw new Error('invalid');
+    }
+    return Buffer.from(await handle.readFile());
+  } catch (error) {
+    const wrapped = new Error(invalidCode);
+    if (error?.code) wrapped.code = error.code;
+    throw wrapped;
+  } finally {
+    if (handle) await handle.close().catch(() => {});
+  }
+}
+
 async function readExternalReceipt(root) {
   const receiptPath = path.join(root, EXECUTION_RECEIPT_FILENAME);
-  const stat = await fsPromises.lstat(receiptPath);
-  if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('cm2126_execution_receipt_invalid');
-  const bytes = await fsPromises.readFile(receiptPath);
+  const bytes = await readVerifiedGovernanceFile(receiptPath);
   return { receipt: JSON.parse(bytes.toString('utf8')), bytes, sha256: sha256(bytes) };
 }
 
@@ -1403,9 +1428,7 @@ async function terminalizeFailure({ registry, bindingHash, release, state, repoR
   if (current.executionReceiptWriteAttempts === 1) {
     try {
       const receiptPath = path.join(governanceRoot, EXECUTION_RECEIPT_FILENAME);
-      const stat = await fsPromises.lstat(receiptPath);
-      if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('invalid');
-      const bytes = await fsPromises.readFile(receiptPath);
+      const bytes = await readVerifiedGovernanceFile(receiptPath);
       receiptWrites = 1;
       receiptSha256 = sha256(bytes);
     } catch (error) {
@@ -1878,6 +1901,7 @@ module.exports = {
   isMachineBoundReleaseBinding,
   parseWorktreeList,
   realResolverOptions,
+  readVerifiedGovernanceFile,
   releaseBinding,
   resolveFixedGovernanceRoot,
   targetSnapshot,
