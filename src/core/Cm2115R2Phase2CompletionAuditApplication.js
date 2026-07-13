@@ -1001,20 +1001,18 @@ function evaluateBindingReceipt(receipt = {}, {
     if (!executionMarkdownActual.content.equals(renderExecutionReceiptMarkdown(executionReceipt))) {
       blockers.push('bindingReceipt.executionReceiptMarkdownContent');
     }
-    if (v2) {
-      if (typeof resolveDurableClaim !== 'function') {
-        blockers.push('bindingReceipt.durableClaimResolverRequired');
-      } else {
-        try {
-          const bindingHash = buildClaimBindingHash(identityWithoutContent(decisionActual), decision);
-          const claim = validateDurableClaim(resolveDurableClaim(bindingHash), bindingHash);
-          if (claim.state !== 'CONSUMED_SUCCESS' || claim.patchInvocationCount !== 1 ||
-              payload.registry?.bindingHash !== bindingHash || payload.registry?.finalState !== claim.state) {
-            blockers.push('bindingReceipt.durableClaim');
-          }
-        } catch {
+    if (typeof resolveDurableClaim !== 'function') {
+      blockers.push('bindingReceipt.durableClaimResolverRequired');
+    } else {
+      try {
+        const bindingHash = buildClaimBindingHash(identityWithoutContent(decisionActual), decision);
+        const claim = validateDurableClaim(resolveDurableClaim(bindingHash), bindingHash);
+        if (claim.state !== 'CONSUMED_SUCCESS' || claim.patchInvocationCount !== 1 ||
+            payload.registry?.bindingHash !== bindingHash || payload.registry?.finalState !== claim.state) {
           blockers.push('bindingReceipt.durableClaim');
         }
+      } catch {
+        blockers.push('bindingReceipt.durableClaim');
       }
     }
     for (const target of decision.payload.patchPlan.targets) {

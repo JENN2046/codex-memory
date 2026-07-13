@@ -21,6 +21,7 @@ const {
   gitText,
   resolveCommitTree,
   resolveDiffPaths,
+  resolveDurableClaim,
   resolveGitFile,
   resolveGitPathState,
   resolveGovernanceRegistryRoot,
@@ -66,7 +67,8 @@ async function main(argv = process.argv.slice(2)) {
     resolveGitPathState,
     resolveCommitTree,
     resolveParentCommit,
-    resolveDiffPaths
+    resolveDiffPaths,
+    resolveDurableClaim
   });
   if (!evaluation.accepted) throw new Error(`cm2115_r2_binding_receipt_rejected:${evaluation.blockers.join(',')}`);
   const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: resolveGovernanceRegistryRoot() });

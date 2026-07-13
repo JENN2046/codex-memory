@@ -20,6 +20,23 @@ const DOCS = path.join(__dirname, '../docs/near-model-memory-plan-pack');
 const bundle = JSON.parse(fs.readFileSync(path.join(DOCS, 'phase8_completion_evidence_bundle_cm2111.json'), 'utf8'));
 const decision = JSON.parse(fs.readFileSync(path.join(DOCS, 'phase8_completion_audit_decision_cm2111.json'), 'utf8'));
 
+function otherwiseValidReceipt() {
+  const receipt = JSON.parse(fs.readFileSync(path.join(
+    DOCS,
+    'phase8_completion_audit_application_receipt_cm2111.json'
+  ), 'utf8'));
+  Object.assign(receipt.receiptPayload.evidenceBundle, {
+    commit: BUNDLE.commit,
+    blobOid: BUNDLE.blobOid,
+    bytes: BUNDLE.bytes,
+    sha256: BUNDLE.rawSha256,
+    payloadSha256: BUNDLE.payloadSha256,
+    requiredEvidenceCount: REQUIRED_FIELDS.length
+  });
+  receipt.receiptPayloadSha256 = sha256Canonical(receipt.receiptPayload);
+  return receipt;
+}
+
 function input() {
   return {
     bundle: structuredClone(bundle),
@@ -94,4 +111,20 @@ test('CM-2111 receipt rejects replay, side effects, full-plan, readiness, or V8 
     payload => { payload.nonClaims.completeV8 = true; },
     payload => { payload.nonClaims.derivedIndexProofAccepted = false; }
   ]) { const payload = structuredClone(receipt.receiptPayload); mutate(payload); assert.equal(evaluateApplicationReceipt({ receiptPayload: payload, receiptPayloadSha256: sha256Canonical(payload) }).accepted, false); }
+});
+
+test('CM-2111 receipt rejects rehashed identity drift and top-level field expansion', () => {
+  assert.equal(evaluateApplicationReceipt(otherwiseValidReceipt()).accepted, true);
+  for (const mutate of [
+    receipt => { receipt.receiptPayload.schemaVersion = 2; },
+    receipt => { receipt.receiptPayload.taskId = 'CM-FORGED'; },
+    receipt => { receipt.receiptPayload.receiptType = 'forged_receipt'; },
+    receipt => { receipt.receiptPayload.unreviewedClaim = false; },
+    receipt => { receipt.unreviewedClaim = false; }
+  ]) {
+    const receipt = otherwiseValidReceipt();
+    mutate(receipt);
+    receipt.receiptPayloadSha256 = sha256Canonical(receipt.receiptPayload);
+    assert.equal(evaluateApplicationReceipt(receipt).accepted, false);
+  }
 });
