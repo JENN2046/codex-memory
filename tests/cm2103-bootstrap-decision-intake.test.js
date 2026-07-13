@@ -178,3 +178,14 @@ test('CM-2103 intake rejects raw-byte SHA or Git identity drift', () => {
   const badCommit = evaluate(buildDecision(), { decisionSourceCommit: 'not-a-commit' });
   assert.equal(badCommit.accepted, false);
 });
+
+test('CM-2103 intake rejects an approval that is not effective yet', () => {
+  const result = evaluate({
+    ...buildDecision(),
+    approvedAt: '2026-07-11T16:00:01+08:00'
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.executionAuthorized, false);
+  assert.equal(result.decision, null);
+  assert.ok(result.blockers.includes('decision.approvedAt.future'));
+});
