@@ -720,21 +720,34 @@ test('codex-memory MCP defaults to read-only plus proposal-only public surface',
   });
 });
 
-test('prepare_memory_context uses metadata-only recall and excludes raw candidate fields', async () => {
+test('prepare_memory_context preserves useful low-disclosure metadata without raw candidate fields', async () => {
   await withApp(async ({ app }) => {
     let searchOptions = null;
     app.services.passiveRecallService.search = async options => {
       searchOptions = options;
-      return [{
-        target: 'process',
-        score: 0.9,
-        title: 'private raw title must not escape',
-        snippet: 'private raw snippet must not escape',
-        text: 'private raw text must not escape',
-        content: 'private raw content must not escape',
-        sourceFile: 'private/source.md',
-        memoryId: 'private-memory-id'
-      }];
+      return [
+        {
+          target: 'process',
+          score: 0.9,
+          matchedTags: ['blocker-policy', 'governance'],
+          sourceKinds: ['synthetic-metadata'],
+          updatedAt: new Date().toISOString(),
+          title: 'private raw title must not escape',
+          snippet: 'private raw snippet must not escape',
+          text: 'private raw text must not escape',
+          content: 'private raw content must not escape',
+          sourceFile: 'private/source.md',
+          memoryId: 'private-memory-id'
+        },
+        {
+          target: 'process',
+          score: 0.8,
+          coreTags: ['decision-approved'],
+          sourceKinds: ['synthetic-metadata'],
+          updatedAt: new Date().toISOString(),
+          title: 'second private title must not escape'
+        }
+      ];
     };
 
     const result = await app.callTool('prepare_memory_context', {
@@ -753,7 +766,13 @@ test('prepare_memory_context uses metadata-only recall and excludes raw candidat
     assert.equal(searchOptions.noRawContentRead, true);
     assert.equal(searchOptions.includeContent, false);
     assert.equal(result.access.rawMemoryReturned, false);
-    assert.doesNotMatch(serialized, /private raw title|private raw snippet|private raw text|private raw content|private\/source|private-memory-id/);
+    assert.equal(result.memory_context_package.blockers.length, 1);
+    assert.equal(result.memory_context_package.blockers[0].freshness, 'recent');
+    assert.match(result.memory_context_package.blockers[0].statement, /blocker-policy/);
+    assert.equal(result.memory_context_package.recent_decisions.length, 1);
+    assert.match(result.memory_context_package.recent_decisions[0].statement, /decision-approved/);
+    assert.doesNotMatch(serialized, /"matchedTags"|"coreTags"|"createdAt"|"updatedAt"/);
+    assert.doesNotMatch(serialized, /private raw title|second private title|private raw snippet|private raw text|private raw content|private\/source|private-memory-id/);
   });
 });
 
