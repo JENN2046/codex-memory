@@ -116,6 +116,7 @@ function evaluateApplicationReceipt(receipt = {}) {
     'applicationRuntime', 'contractResults', 'appliedEvidence', 'authorization',
     'applicationCounters', 'boundaries'
   ])) blockers.push('receipt.payload.fields');
+  if (payload.schemaVersion !== 1 || payload.taskId !== 'CM-2110' || payload.receiptType !== 'failure_recovery_evidence_completion_audit_application_receipt') blockers.push('receipt.payload.identity');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.sourceFailureRecoveryReceipt?.commit !== SOURCE_RECEIPT.commit || payload.sourceFailureRecoveryReceipt?.blobOid !== SOURCE_RECEIPT.blobOid || payload.sourceFailureRecoveryReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 || payload.sourceFailureRecoveryReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 || payload.sourceFailureRecoveryReceipt?.acceptedAsFailureRecoveryEvidence !== true) blockers.push('receipt.sourceFailureRecoveryReceipt');
