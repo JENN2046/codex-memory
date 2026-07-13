@@ -31,7 +31,11 @@ function packetFixture() {
     lifecycleReference: 'cm2113-lifecycle',
     runtimeIdentitySha256: 'd'.repeat(64),
     storeIdentitySha256: 'e'.repeat(64),
-    fixedRecord: { folder: 'cm2113', maid: 'codex', date: '2026-07-12', fileName: 'proof', localTime: '08:00', tag: 'synthetic' },
+    fixedRecord: {
+      folder: 'cm2113-proof', maid: 'codex-memory-phase8-proof', date: '2026-07-12',
+      fileName: 'cm2113-vcptoolbox-owner-runtime-proof', localTime: '08:00',
+      tag: 'codex-memory, phase8, synthetic-proof, vcptoolbox-owner-runtime'
+    },
     recordArguments: {
       target: 'knowledge', title: 'synthetic', content: 'Synthetic proof.', evidence: 'CM-2113.',
       validated: true, reusable: false, sensitivity: 'internal'
@@ -84,7 +88,9 @@ test('CM-2113 packet rejects self identity, transport drift, and store replaceme
   for (const mutate of [
     packet => { packet.executionPacket = { commit: '1'.repeat(40) }; },
     packet => { packet.transport.outer = 'direct_app_call'; },
-    packet => { packet.runtimeTarget.storeInstanceId = 'clone-store'; }
+    packet => { packet.runtimeTarget.storeInstanceId = 'clone-store'; },
+    packet => { packet.fixedRecord.folder = '../outside'; },
+    packet => { packet.fixedRecord.unbound = true; }
   ]) {
     const packet = packetFixture();
     mutate(packet);
