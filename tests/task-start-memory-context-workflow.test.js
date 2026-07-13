@@ -50,6 +50,7 @@ test('deriveTaskFields uses explicit task fields before request context defaults
       title: 'Explicit title',
       user_request: 'Explicit request',
       project_id: 'codex-memory',
+      scope_id: 'scope-explicit',
       client_id: 'codex',
       visibility: 'project',
       current_files: ['src/app.js']
@@ -64,6 +65,7 @@ test('deriveTaskFields uses explicit task fields before request context defaults
 
   assert.equal(derived.title, 'Explicit title');
   assert.equal(derived.user_request, 'Explicit request');
+  assert.equal(derived.scope_id, 'scope-explicit');
   assert.equal(derived.client_id, 'codex');
   assert.deepEqual(derived.current_files, ['src/app.js']);
   assert.equal(derived.strict_scope, true);
@@ -83,6 +85,7 @@ test('task-start workflow calls prepare_memory_context and returns injectable co
       title: 'Continue plan pack',
       user_request: 'Start with memory context.',
       project_id: 'codex-memory',
+      scope_id: 'scope-plan-pack',
       client_id: 'codex',
       visibility: 'project'
     },
@@ -102,6 +105,7 @@ test('task-start workflow calls prepare_memory_context and returns injectable co
   assert.match(result.injectedContext, /Use the plan pack as the active goal/);
   assert.equal(calls.length, 1);
   assert.equal(calls[0].args.task.title, 'Continue plan pack');
+  assert.equal(calls[0].args.task.scope_id, 'scope-plan-pack');
   assert.equal(calls[0].args.options.max_items, 4);
   assert.equal(calls[0].requestContext.noTokenReadOnly, true);
   assert.equal(calls[0].requestContext.taskStartMemoryContextWorkflow, true);

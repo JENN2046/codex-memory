@@ -193,6 +193,42 @@ test('Phase 8 gate atomically claims once, generates internal approval, and cons
   assert.equal(calls, 1);
 });
 
+test('claim conflict checks both nonce and receipt before creating either reservation', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-claim-conflict-'));
+  const registry = newRegistry(root);
+  await registry.claim({
+    nonce: 'used-nonce',
+    receiptId: 'used-receipt',
+    bindingHash: 'd'.repeat(64)
+  });
+
+  await assert.rejects(
+    registry.claim({
+      nonce: 'fresh-nonce',
+      receiptId: 'used-receipt',
+      bindingHash: 'e'.repeat(64)
+    }),
+    /authorization_already_claimed/
+  );
+  await assert.rejects(
+    fs.access(path.join(registry.directory, `nonce-${sha256('fresh-nonce')}.json`)),
+    error => error.code === 'ENOENT'
+  );
+
+  await assert.rejects(
+    registry.claim({
+      nonce: 'used-nonce',
+      receiptId: 'fresh-receipt',
+      bindingHash: 'f'.repeat(64)
+    }),
+    /authorization_already_claimed/
+  );
+  await assert.rejects(
+    fs.access(path.join(registry.directory, `receipt-${sha256('fresh-receipt')}.json`)),
+    error => error.code === 'ENOENT'
+  );
+});
+
 test('two concurrent assertion verifications permit exactly one write invocation', async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-one-shot-'));
   const expected = binding();
