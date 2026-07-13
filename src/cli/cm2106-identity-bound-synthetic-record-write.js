@@ -213,7 +213,10 @@ function appOverrides({ endpoint, bearerToken, appStateRoot }) {
   };
 }
 
-async function startPrimaryWriteOnlyShim({ storeRoot, derivedRuntimeStore }) {
+async function startPrimaryWriteOnlyShim({ storeRoot, derivedRuntimeStore, bearerToken }) {
+  if (typeof bearerToken !== 'string' || bearerToken.length < 32) {
+    throw new Error('cm2106_local_shim_bearer_token_invalid');
+  }
   const adapter = createVcpToolBoxNativeMemoryAdapter({
     vcpToolBoxRoot: path.resolve(process.cwd(), '../../runtime/VCPToolBox'),
     knowledgeBaseRootPath: storeRoot,
@@ -223,7 +226,8 @@ async function startPrimaryWriteOnlyShim({ storeRoot, derivedRuntimeStore }) {
   });
   const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({
     adapter,
-    enableWrite: true
+    enableWrite: true,
+    expectedBearerToken: bearerToken
   });
   await new Promise((resolve, reject) => {
     server.once('error', reject);
@@ -236,6 +240,7 @@ async function startPrimaryWriteOnlyShim({ storeRoot, derivedRuntimeStore }) {
   if (!address || typeof address !== 'object') throw new Error('cm2106_local_shim_address_invalid');
   return {
     endpoint: `http://127.0.0.1:${address.port}/mcp/vcp-native`,
+    authorizationProjection: () => server.getLowDisclosureAuthorizationProjection(),
     async close() {
       await new Promise(resolve => server.close(resolve));
       await adapter.shutdown();
@@ -401,8 +406,12 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
   try {
     shim = await startPrimaryWriteOnlyShim({
       storeRoot: governance.internalPaths.storeRoot,
-      derivedRuntimeStore: paths.derivedRuntimeStore
+      derivedRuntimeStore: paths.derivedRuntimeStore,
+      bearerToken
     });
+    if (shim.authorizationProjection().authorizationRequired !== true) {
+      throw new Error('cm2106_local_shim_bearer_not_enforced');
+    }
     const overrides = appOverrides({
       endpoint: shim.endpoint,
       bearerToken,
