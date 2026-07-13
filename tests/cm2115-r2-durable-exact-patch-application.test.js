@@ -21,6 +21,8 @@ const {
   buildBindingReceiptV2Payload,
   buildClaimBindingHash,
   buildDecision,
+  buildExpectedAfterBytes,
+  buildExecutionReceiptPayload,
   buildPatchTargets,
   canonicalize,
   evaluateAuthorityIntake,
@@ -31,6 +33,7 @@ const {
   expectedApplicationDiffPaths,
   fileProjection,
   identityWithoutContent,
+  revalidateUpstream,
   renderExecutionReceiptMarkdown,
   serializeArtifact,
   sha256Canonical,
@@ -376,6 +379,90 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     }
   };
   assert.equal(evaluateBindingReceipt(receipt, options).accepted, true);
+
+  const forgedDecision = structuredClone(fixture.decision);
+  const forgedBytes = Buffer.from('forged non-canonical completion evidence\n');
+  forgedDecision.payload.patchPlan.targets[0].after = fileProjection(
+    forgedBytes,
+    forgedDecision.payload.patchPlan.targets[0].before.gitMode
+  );
+  const { patchPayloadSha256: _ignoredPatchHash, ...forgedPatchPlan } = forgedDecision.payload.patchPlan;
+  forgedDecision.payload.patchPlan.patchPayloadSha256 = sha256Canonical(forgedPatchPlan);
+  forgedDecision.canonicalPayloadSha256 = sha256Canonical(forgedDecision.payload);
+  const forgedDecisionIdentity = gitIdentity({
+    sourceCommit: DECISION_COMMIT,
+    sourceTree: DECISION_TREE,
+    sourcePath: DECISION_PATH,
+    content: Buffer.from(serializeArtifact(forgedDecision))
+  });
+  const forgedBaseResolver = resolverFor({
+    decision: forgedDecision,
+    decisionIdentity: forgedDecisionIdentity,
+    authority: fixture.authority
+  });
+  assert.equal(evaluateDecision(forgedDecision, { resolveGitFile: forgedBaseResolver }).accepted, true);
+  const forgedExecutionReceipt = wrapPayload(buildExecutionReceiptPayload({
+    decisionIdentity: forgedDecisionIdentity,
+    decision: forgedDecision,
+    authorityIdentity: fixture.authority,
+    upstream: revalidateUpstream(forgedBaseResolver),
+    bindingHash: buildClaimBindingHash(identityWithoutContent(forgedDecisionIdentity), forgedDecision),
+    observedTargets: forgedDecision.payload.patchPlan.targets
+  }), 'phase2_exact_patch_application_execution_receipt_v1');
+  const forgedExecutionIdentity = gitIdentity({
+    sourceCommit: APPLICATION_COMMIT,
+    sourceTree: APPLICATION_TREE,
+    sourcePath: EXECUTION_RECEIPT_PATH,
+    content: Buffer.from(serializeArtifact(forgedExecutionReceipt))
+  });
+  const forgedExecutionMarkdownIdentity = gitIdentity({
+    sourceCommit: APPLICATION_COMMIT,
+    sourceTree: APPLICATION_TREE,
+    sourcePath: EXECUTION_RECEIPT_MARKDOWN_PATH,
+    content: renderExecutionReceiptMarkdown(forgedExecutionReceipt)
+  });
+  const forgedFiles = new Map();
+  for (const [index, target] of forgedDecision.payload.patchPlan.targets.entries()) {
+    const bytes = index === 0
+      ? forgedBytes
+      : buildExpectedAfterBytes(
+          target.sourcePath,
+          target.operation === 'add' ? null : targetBaselineResolver(target.sourcePath).content
+        );
+    forgedFiles.set(`${APPLICATION_COMMIT}:${target.sourcePath}`, gitIdentity({
+      sourceCommit: APPLICATION_COMMIT,
+      sourceTree: APPLICATION_TREE,
+      sourcePath: target.sourcePath,
+      content: bytes,
+      gitMode: target.after.gitMode
+    }));
+  }
+  const forgedResolver = resolverFor({
+    decision: forgedDecision,
+    decisionIdentity: forgedDecisionIdentity,
+    authority: fixture.authority,
+    applicationFiles: forgedFiles,
+    executionReceiptIdentity: forgedExecutionIdentity,
+    executionReceiptMarkdownIdentity: forgedExecutionMarkdownIdentity
+  });
+  const forgedBindingReceipt = wrapPayload(buildBindingReceiptV2Payload({
+    applicationCommit: APPLICATION_COMMIT,
+    applicationTree: APPLICATION_TREE,
+    applicationParentCommit: DECISION_COMMIT,
+    applicationParentTree: DECISION_TREE,
+    decisionIdentity: forgedDecisionIdentity,
+    executionReceiptIdentity: forgedExecutionIdentity,
+    executionReceiptMarkdownIdentity: forgedExecutionMarkdownIdentity,
+    decision: forgedDecision,
+    diffPathsSha256: sha256Canonical(diffPaths)
+  }), 'phase2_exact_patch_application_git_binding_receipt_v2');
+  const forgedEvaluation = evaluateBindingReceipt(forgedBindingReceipt, {
+    ...options,
+    resolveGitFile: forgedResolver
+  });
+  assert.equal(forgedEvaluation.accepted, false);
+  assert.ok(forgedEvaluation.blockers.some(item => item.startsWith('bindingReceipt.nonCanonicalAfterTarget.')));
+
   const drift = structuredClone(receipt);
   drift.payload.application.targets[0].after.sha256 = 'f'.repeat(64);
   drift.canonicalPayloadSha256 = sha256Canonical(drift.payload);
