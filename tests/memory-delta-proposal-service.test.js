@@ -72,6 +72,25 @@ test('CM2011 propose_memory_delta returns proposal-only staging with no durable 
   assert.equal(result.governance_contract.durableMemoryWritten, false);
 });
 
+test('CM2011 proposal_id binds normalized proposal content', () => {
+  const service = new MemoryDeltaProposalService();
+  const first = service.propose(validProposalArgs());
+  const second = service.propose(validProposalArgs({
+    candidates: [{
+      target: 'process',
+      intent: 'A materially different candidate with the same list sizes.',
+      evidence_refs: ['CM-2011 local fixture'],
+      tags: ['phase-6', 'proposal-only'],
+      reusable: true,
+      sensitivity: 'low_disclosure_project_fact'
+    }]
+  }));
+
+  assert.notEqual(first.proposal_id, second.proposal_id);
+  assert.match(first.proposal_id, /^memory-delta-[a-f0-9]{16}$/);
+  assert.match(second.proposal_id, /^memory-delta-[a-f0-9]{16}$/);
+});
+
 test('CM2011 propose_memory_delta rejects missing evidence or candidates without writes', () => {
   const service = new MemoryDeltaProposalService();
   const result = service.propose(validProposalArgs({

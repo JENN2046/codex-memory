@@ -139,6 +139,7 @@ function normalizeTask(input) {
 
 function isAcceptedProposal(proposal) {
   return isPlainObject(proposal) &&
+    proposal.status === 'PROPOSE_MEMORY_DELTA_ACCEPTED' &&
     proposal.accepted === true &&
     proposal.proposal_only === true &&
     typeof proposal.proposal_id === 'string' &&
