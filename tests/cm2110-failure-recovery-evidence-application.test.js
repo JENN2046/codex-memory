@@ -78,3 +78,18 @@ test('CM-2110 application receipt rejects native actions or completion overclaim
     assert.equal(evaluateApplicationReceipt({ receiptPayload: payload, receiptPayloadSha256: sha256Canonical(payload) }).accepted, false);
   }
 });
+
+test('CM-2110 application receipt rejects rehashed top-level receipt or payload overclaims', () => {
+  const result = executeFailureRecoveryEvidenceApplication(input());
+  assert.equal(evaluateApplicationReceipt({
+    receiptPayload: result.receiptPayload,
+    receiptPayloadSha256: result.receiptPayloadSha256,
+    productionReady: true
+  }).accepted, false);
+  const payload = structuredClone(result.receiptPayload);
+  payload.productionReady = true;
+  assert.equal(evaluateApplicationReceipt({
+    receiptPayload: payload,
+    receiptPayloadSha256: sha256Canonical(payload)
+  }).accepted, false);
+});

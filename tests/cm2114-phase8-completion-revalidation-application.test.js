@@ -89,6 +89,22 @@ test('CM-2114 application receipt rejects replay, new runtime action, or readine
   }
 });
 
+test('CM-2114 application receipt rejects rehashed top-level receipt or payload overclaims', () => {
+  const result = executeCm2114Phase8CompletionRevalidationApplication(input());
+  assert.equal(evaluateApplicationReceipt({
+    receiptPayload: result.receiptPayload,
+    receiptPayloadSha256: result.receiptPayloadSha256,
+    productionReady: true
+  }).accepted, false);
+  const payload = structuredClone(result.receiptPayload);
+  payload.productionReady = true;
+  const receipt = {
+    receiptPayload: payload,
+    receiptPayloadSha256: require('../src/core/Cm2114Phase8CompletionRevalidationApplication').sha256Canonical(payload)
+  };
+  assert.equal(evaluateApplicationReceipt(receipt).accepted, false);
+});
+
 test('CM-2114 frozen application receipt passes the exact receipt contract', () => {
   const result = evaluateApplicationReceipt(applicationReceipt);
   assert.equal(result.accepted, true, result.blockers.join(', '));
