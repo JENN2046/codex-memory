@@ -137,6 +137,11 @@ function normalizeMilestone(value) {
   return normalizeString(value).toLowerCase().replace(/-/g, '_');
 }
 
+function normalizeCapabilityClaims(values) {
+  return sortedUnique((Array.isArray(values) ? values : [])
+    .map(value => normalizeString(value).toLowerCase().replace(/-/g, '_')));
+}
+
 function buildAllowedTagPattern(suffix) {
   return new RegExp(`^v\\d+\\.\\d+\\.\\d+-${suffix}$`);
 }
@@ -187,7 +192,7 @@ function buildMissingEvidence(requirement, evidence = {}) {
 
 function buildCapabilityClaimBlockers(requirement, releaseNotes = {}) {
   const safeReleaseNotes = isPlainObject(releaseNotes) ? releaseNotes : {};
-  const capabilityClaims = sortedUnique(safeReleaseNotes.capabilityClaims);
+  const capabilityClaims = normalizeCapabilityClaims(safeReleaseNotes.capabilityClaims);
   return requirement.forbiddenCapabilityClaims
     .filter(claim => capabilityClaims.includes(claim));
 }
@@ -285,7 +290,7 @@ function evaluateReleaseTagReadinessPolicyGate({
     nonClaims: {
       releaseNoteNonClaimsReviewed: isPlainObject(releaseNotes) && releaseNotes.nonClaimsReviewed === true,
       forbiddenCapabilityClaims: requirement ? [...requirement.forbiddenCapabilityClaims] : [],
-      requestedCapabilityClaims: sortedUnique(isPlainObject(releaseNotes) ? releaseNotes.capabilityClaims : [])
+      requestedCapabilityClaims: normalizeCapabilityClaims(isPlainObject(releaseNotes) ? releaseNotes.capabilityClaims : [])
     },
     sideEffects: {
       tagCreated: false,
