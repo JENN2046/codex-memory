@@ -55,6 +55,10 @@ test('CM-2114 fails closed on proof, bundle, replay, baseline, side effect, or r
     value => { value.baseline.phase8CompletionStatus = 'complete'; },
     value => { value.decision.applicationSideEffectLimits.nativeWrites = 1; },
     value => { value.decision.allowedCompletionResult.fullPlanPackCompleted = true; },
+    value => { value.decision.nonClaims.derivedIndexProofAccepted = true; },
+    value => { value.decision.nonClaims.productionProviderProofAccepted = true; },
+    value => { value.bundle.nonClaims.derivedIndexProofAccepted = true; },
+    value => { value.bundle.nonClaims.productionProviderProofAccepted = true; },
     value => { value.runtimeFacts.clean = false; }
   ]) {
     const value = input();
