@@ -83,6 +83,24 @@ test('CM-2110 application receipt rejects native actions or completion overclaim
   }
 });
 
+test('CM-2110 application receipt binds clean runtime and exact audit baselines', () => {
+  const result = executeFailureRecoveryEvidenceApplication(input());
+  for (const mutate of [
+    payload => { payload.applicationRuntime.cleanBeforeApplication = false; },
+    payload => { payload.applicationRuntime.completionAuditBaselineBlobOid = '0'.repeat(40); },
+    payload => { payload.applicationRuntime.traceMatrixBaselineBlobOid = '0'.repeat(40); }
+  ]) {
+    const payload = structuredClone(result.receiptPayload);
+    mutate(payload);
+    const evaluated = evaluateApplicationReceipt({
+      receiptPayload: payload,
+      receiptPayloadSha256: sha256Canonical(payload)
+    });
+    assert.equal(evaluated.accepted, false);
+    assert.equal(evaluated.failureRecoveryProofPassed, false);
+  }
+});
+
 test('CM-2110 application receipt rejects rehashed top-level receipt or payload overclaims', () => {
   const result = executeFailureRecoveryEvidenceApplication(input());
   assert.equal(evaluateApplicationReceipt({
