@@ -170,6 +170,8 @@ class TaskStartMemoryContextWorkflow {
       access.readOnly !== true ||
       access.durableMutationPerformed !== false ||
       access.productionWritePerformed !== false ||
+      access.mcpMemoryWriteCalled === true ||
+      access.providerApiCalled === true ||
       access.readinessClaimed !== false ||
       access.resultCanBeMistakenForVcpNative === true ||
       access.rawMemoryReturned === true ||
