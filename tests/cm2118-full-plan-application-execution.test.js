@@ -242,6 +242,14 @@ test('CM-2118 rejects repository Git environment overrides before packet intake 
         }),
         /cm2118_unsafe_git_environment/
       );
+      await assert.rejects(
+        implementation.evaluateDurableApplicationBinding({
+          authorizationContentDecisionCommit: implementation.CONTENT_DECISION_FREEZE.commit,
+          packetCommit: 'a'.repeat(40),
+          finalReleaseCommit: 'b'.repeat(40)
+        }),
+        /cm2118_unsafe_git_environment/
+      );
     } finally {
       if (previous === undefined) delete process.env[key];
       else process.env[key] = previous;
