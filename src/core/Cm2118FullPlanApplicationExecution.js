@@ -757,8 +757,16 @@ class Cm2118FullPlanApplicationClaimRegistry {
   }
 
   async verifyRoot() {
-    const stat = await this.fs.lstat(this.governanceRoot);
-    if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('cm2118_governance_root_invalid');
+    for (const directory of [path.dirname(this.governanceRoot), this.governanceRoot]) {
+      const stat = await this.fs.lstat(directory);
+      if (!stat.isDirectory() || stat.isSymbolicLink()) {
+        throw new Error('cm2118_governance_root_invalid');
+      }
+    }
+    const realRoot = await this.fs.realpath(this.governanceRoot);
+    if (path.resolve(realRoot) !== path.resolve(this.governanceRoot)) {
+      throw new Error('cm2118_governance_root_symlink_forbidden');
+    }
     const identityPath = path.join(this.governanceRoot, '.phase8-registry-root-identity.json');
     const identityStat = await this.fs.lstat(identityPath);
     if (!identityStat.isFile() || identityStat.isSymbolicLink()) throw new Error('cm2118_governance_root_identity_invalid');

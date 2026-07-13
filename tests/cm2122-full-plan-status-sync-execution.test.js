@@ -15,6 +15,7 @@ const { parseArgs } = require('../src/cli/cm2122-full-plan-status-sync');
 const packetGenerator = require('../scripts/generate-cm2122-full-plan-status-sync-execution-packet');
 const releaseGenerator = require('../scripts/generate-cm2123-full-plan-status-sync-final-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
 
 function git(args, cwd, options = {}) {
   return execFileSync('git', args, {
@@ -405,11 +406,20 @@ function initializeGovernanceRoot() {
 function runStatusSyncProcess() {
   return new Promise(resolve => {
     const child = spawn(process.execPath, [
+      '--require', FIXED_DATE_PRELOAD,
       'src/cli/cm2122-full-plan-status-sync.js',
       '--content-decision-commit', implementation.CONTENT_DECISION_FREEZE.commit,
       '--execution-packet-commit', fixture.packetCommit,
       '--final-execution-release-commit', fixture.finalReleaseCommit
-    ], { cwd: fixture.repo, stdio: ['ignore', 'pipe', 'pipe'] });
+    ], {
+      cwd: fixture.repo,
+      env: {
+        ...process.env,
+        NODE_ENV: 'test',
+        CODEX_MEMORY_TEST_FIXED_NOW: fixture.now.toISOString()
+      },
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', chunk => { stdout += chunk; });
