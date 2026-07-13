@@ -137,7 +137,7 @@ function executeCm2114Phase8CompletionRevalidationApplication(input = {}) {
     appliedState,
     authorization: { useCount: 1, consumed: true, replayAllowed: false },
     applicationCounters: { completionAuditPatchApplications: 1, nativeReads: 0, nativeWrites: 0, verifyOperations: 0, rollbackOrCompensationOperations: 0, remoteActions: 0, readinessClaims: 0 },
-    nonClaims: { additionalNativeWriteAuthorized: false, productionReady: false, releaseReady: false, rcReady: false, completeV8: false, fullPlanPackCompleted: false, readinessClaimed: false }
+    nonClaims: { additionalNativeWriteAuthorized: false, derivedIndexProofAccepted: false, productionProviderProofAccepted: false, productionReady: false, releaseReady: false, rcReady: false, completeV8: false, fullPlanPackCompleted: false, readinessClaimed: false }
   };
   return { accepted: true, blockers: [], appliedState, receiptPayload, receiptPayloadSha256: sha256Canonical(receiptPayload), phase8Completed: true, phase8CompletionStatus: 'revalidated_complete', fullPlanPackCompleted: false, readinessClaimed: false, additionalNativeWriteAuthorized: false };
 }
@@ -155,6 +155,11 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters');
   for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
   for (const field of ['additionalNativeWriteAuthorized', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed']) if (payload.nonClaims?.[field] !== false) blockers.push(`receipt.nonClaims.${field}`);
+  for (const field of ['derivedIndexProofAccepted', 'productionProviderProofAccepted']) {
+    if (payload.nonClaims?.[field] !== undefined && payload.nonClaims[field] !== false) {
+      blockers.push(`receipt.nonClaims.${field}`);
+    }
+  }
   return { accepted: blockers.length === 0, blockers: [...new Set(blockers)], phase8Completed: blockers.length === 0, phase8CompletionStatus: blockers.length === 0 ? 'revalidated_complete' : 'needs_revalidation', fullPlanPackCompleted: false, readinessClaimed: false, additionalNativeWriteAuthorized: false };
 }
 

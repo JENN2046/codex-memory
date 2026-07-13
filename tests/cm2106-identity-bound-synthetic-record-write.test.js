@@ -142,6 +142,29 @@ test('CM-2106 pre/post collectors prove an identity-bound one-record lifecycle',
   await adapter.shutdown();
 });
 
+test('CM-2106 primary-write shim rechecks the exact empty store immediately before append', async t => {
+  const root = await identityStore(t);
+  assert.equal((await collectPreWriteProjection(root)).accepted, true);
+  await fs.writeFile(path.join(root, 'concurrent-entry'), 'synthetic-race-fixture');
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseRootPath: root,
+    knowledgeBaseStorePath: path.join(root, '..', 'unused-derived-store'),
+    writeSubdir: STORE_IDENTITY.writeSubdir,
+    primaryWriteOnly: true,
+    primaryWritePreflight: () => collectPreWriteProjection(root)
+  });
+  t.after(() => adapter.shutdown());
+  const payloadBytes = await fs.readFile(path.join(__dirname, '..', PAYLOAD_PATH));
+  await assert.rejects(
+    adapter.record(JSON.parse(payloadBytes.toString('utf8'))),
+    /cm2106_pre_write_store_not_empty/
+  );
+  await assert.rejects(
+    fs.lstat(path.join(root, STORE_IDENTITY.writeSubdir)),
+    error => error.code === 'ENOENT'
+  );
+});
+
 test('primary-write-only adapter does not initialize or create the derived runtime store', async t => {
   const root = await identityStore(t);
   const derived = path.join(root, '..', `cm2106-derived-${process.pid}-${Date.now()}`);
