@@ -346,6 +346,8 @@ function verifyResolvedIdentity(actual, expected, blockers, label, { allowEmpty 
   if (!actual || actual.gitObjectType !== 'blob' || actual.sourceCommit !== expected.sourceCommit ||
       actual.sourceTree !== expected.sourceTree || actual.sourcePath !== expected.sourcePath ||
       actual.blobOid !== expected.blobOid || actual.bytes !== expected.bytes || actual.sha256 !== expected.sha256 ||
+      (expected.gitObjectType !== undefined && actual.gitObjectType !== expected.gitObjectType) ||
+      (expected.gitMode !== undefined && actual.gitMode !== expected.gitMode) ||
       (!allowEmpty && (!Buffer.isBuffer(actual.content) || actual.content.length === 0)) ||
       (Buffer.isBuffer(actual.content) && (gitBlobOid(actual.content) !== actual.blobOid || sha256(actual.content) !== actual.sha256))) {
     blockers.push(label);
@@ -751,6 +753,11 @@ async function exactWriteTarget(repoRoot, target, beforeBytes) {
   return { sourcePath: target.sourcePath, operation: target.operation, before: target.before, after: fileProjection(observed, target.after.gitMode) };
 }
 
+function gitModeFromStat(stat) {
+  if (!stat?.isFile() || stat.isSymbolicLink()) return null;
+  return (stat.mode & 0o111) === 0 ? '100644' : '100755';
+}
+
 async function executeExactPatch({ repoRoot, decision, decisionIdentity, authorityIdentity, resolveGitFile, registry }) {
   const decisionResult = evaluateDecision(decision, { resolveGitFile });
   const upstream = revalidateUpstream(resolveGitFile);
@@ -759,6 +766,20 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
   }
   const beforeBytesByPath = new Map();
   const blockers = [];
+  try {
+    const authorityActual = resolveGitFile(decision.payload.authority.sourceCommit, AUTHORITY_PATH);
+    verifyResolvedIdentity(authorityActual, authorityIdentity, blockers, 'authorityIdentity.gitObject');
+  } catch {
+    blockers.push('authorityIdentity.gitObject');
+  }
+  for (const receiptPath of [EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_MARKDOWN_PATH]) {
+    try {
+      await fsPromises.lstat(path.join(repoRoot, receiptPath));
+      blockers.push(`executionReceipt.expectedAbsent.${receiptPath}`);
+    } catch (error) {
+      if (error?.code !== 'ENOENT') blockers.push(`executionReceipt.expectedAbsent.${receiptPath}`);
+    }
+  }
   for (const target of decision.payload.patchPlan.targets) {
     const absolutePath = path.join(repoRoot, target.sourcePath);
     let beforeBytes = null;
@@ -776,8 +797,11 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
       } catch (error) {
         if (error?.code !== 'ENOENT') blockers.push(`patchTarget.temporaryPathExpectedAbsent.${target.sourcePath}`);
       }
-      beforeBytes = await fsPromises.readFile(absolutePath).catch(() => null);
-      if (!beforeBytes || !sameJson(fileProjection(beforeBytes, target.before.gitMode), target.before)) {
+      const beforeStat = await fsPromises.lstat(absolutePath).catch(() => null);
+      const observedGitMode = gitModeFromStat(beforeStat);
+      beforeBytes = observedGitMode && await fsPromises.readFile(absolutePath).catch(() => null);
+      if (!beforeBytes || observedGitMode !== target.before.gitMode ||
+          !sameJson(fileProjection(beforeBytes, observedGitMode), target.before)) {
         blockers.push(`patchTarget.beforeDrift.${target.sourcePath}`);
       } else {
         beforeBytesByPath.set(target.sourcePath, beforeBytes);
