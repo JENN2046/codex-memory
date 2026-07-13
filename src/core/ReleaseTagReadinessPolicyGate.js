@@ -95,6 +95,7 @@ const STOP_L4_FLAG_KEYS = Object.freeze([
   'productionWriteClaimed',
   'fullCapabilityClaimed',
   'modelMemoryCompleteClaimed',
+  'readinessClaimed',
   'rcReadyClaimed',
   'releaseReadyClaimed',
   'deployReadyClaimed',

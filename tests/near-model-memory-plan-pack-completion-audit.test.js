@@ -927,6 +927,7 @@ test('CM2017 stops L4 on runtime write tag release deploy or readiness claims', 
     request: {
       nativeWriteExecuted: true,
       actualTagCreated: true,
+      readinessClaimed: true,
       releaseReadyClaimed: true,
       fullPlanPackCompletedClaimed: true
     }
@@ -937,6 +938,7 @@ test('CM2017 stops L4 on runtime write tag release deploy or readiness claims', 
   assert.equal(result.status, 'near_model_memory_plan_pack_completion_audit_stop_l4');
   assert.ok(result.stopReasons.includes('stop_l4_flag_request.nativeWriteExecuted'));
   assert.ok(result.stopReasons.includes('stop_l4_flag_request.actualTagCreated'));
+  assert.ok(result.stopReasons.includes('stop_l4_flag_request.readinessClaimed'));
   assert.ok(result.stopReasons.includes('stop_l4_flag_request.releaseReadyClaimed'));
   assert.ok(result.stopReasons.includes('stop_l4_flag_request.fullPlanPackCompletedClaimed'));
   assert.equal(result.sideEffects.nativeWriteExecuted, false);
