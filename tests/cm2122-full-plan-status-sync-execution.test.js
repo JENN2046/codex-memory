@@ -263,9 +263,16 @@ test('CM-2123 generation validates at a deterministic in-window time', () => {
 });
 
 test('Git repository, object, and index environment overrides fail before any governance or Git effect', () => {
-  for (const key of ['GIT_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE']) {
+  for (const key of [
+    'GIT_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE',
+    'GIT_GRAFT_FILE', 'GIT_NO_REPLACE_OBJECTS', 'GIT_PREFIX', 'GIT_IMPLICIT_WORK_TREE'
+  ]) {
     assert.throws(() => implementation.assertSafeGitEnvironment({ [key]: '/tmp/cm2122-forbidden' }),
       /unsafe_git_environment/);
+    assert.equal(Object.hasOwn(
+      implementation.sanitizedGitEnvironment({ SAFE_VALUE: 'kept', [key]: '/tmp/cm2122-forbidden' }),
+      key
+    ), false);
     const before = text(['rev-parse', 'HEAD^{commit}'], fixture.repo);
     const rejected = spawnSync(process.execPath, [
       'src/cli/cm2122-full-plan-status-sync.js',
@@ -291,7 +298,10 @@ test('Git repository, object, and index environment overrides fail before any go
 });
 
 test('durable binding review rejects Git environment overrides before reading review evidence', async () => {
-  for (const key of ['GIT_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES']) {
+  for (const key of [
+    'GIT_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES',
+    'GIT_GRAFT_FILE', 'GIT_NO_REPLACE_OBJECTS', 'GIT_PREFIX', 'GIT_IMPLICIT_WORK_TREE'
+  ]) {
     const previous = process.env[key];
     process.env[key] = '/tmp/cm2122-forbidden';
     try {

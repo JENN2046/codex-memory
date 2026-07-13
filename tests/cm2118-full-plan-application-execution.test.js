@@ -268,11 +268,18 @@ test('packet and release generators reject output-path arguments', () => {
 });
 
 test('CM-2118 rejects repository Git environment overrides before packet intake or durable effects', async () => {
-  for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE']) {
+  for (const key of [
+    'GIT_DIR', 'GIT_WORK_TREE', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE',
+    'GIT_GRAFT_FILE', 'GIT_NO_REPLACE_OBJECTS', 'GIT_PREFIX', 'GIT_IMPLICIT_WORK_TREE'
+  ]) {
     assert.throws(
       () => implementation.assertSafeGitEnvironment({ [key]: '/tmp/cm2118-forbidden' }),
       /cm2118_unsafe_git_environment/
     );
+    assert.equal(Object.hasOwn(
+      implementation.sanitizedGitEnvironment({ SAFE_VALUE: 'kept', [key]: '/tmp/cm2118-forbidden' }),
+      key
+    ), false);
     const previous = process.env[key];
     process.env[key] = '/tmp/cm2118-forbidden';
     try {
