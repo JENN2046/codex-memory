@@ -22,6 +22,7 @@ const {
   resolveCommitTree,
   resolveDiffPaths,
   resolveGitFile,
+  resolveGitPathState,
   resolveGovernanceRegistryRoot,
   resolveParentCommit
 } = require('./cm2115-r2-git');
@@ -62,6 +63,7 @@ async function main(argv = process.argv.slice(2)) {
   const receipt = wrapPayload(payload, 'phase2_exact_patch_application_git_binding_receipt_v1');
   const evaluation = evaluateBindingReceipt(receipt, {
     resolveGitFile,
+    resolveGitPathState,
     resolveCommitTree,
     resolveParentCommit,
     resolveDiffPaths

@@ -120,6 +120,11 @@ function sameJson(left, right) {
   return JSON.stringify(canonicalize(left)) === JSON.stringify(canonicalize(right));
 }
 
+function hasExactKeys(value, expectedKeys) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    sameJson(Object.keys(value).sort(), [...expectedKeys].sort());
+}
+
 function exactEvidencePatch() {
   return Object.fromEntries(EXACT_PHASE2_FIELDS.map(field => [field, true]));
 }
@@ -354,6 +359,18 @@ function evaluateDecision(decision = {}, { resolveGitFile } = {}) {
       decision.decisionType !== 'phase2_exact_patch_application_decision_v1' ||
       payload.decisionReference !== DECISION_REFERENCE) blockers.push('decision.identity');
   if (decision.canonicalPayloadSha256 !== sha256Canonical(payload)) blockers.push('decision.payloadSha256');
+  if (!hasExactKeys(payload.authority, [
+    'authorizationReplayAllowed', 'authorizationUseCount', 'blobOid', 'bytes',
+    'gitMode', 'gitObjectType', 'reference', 'sha256', 'sourceCommit',
+    'sourcePath', 'sourceTree'
+  ])) blockers.push('decision.authorityShape');
+  for (const target of payload.patchPlan?.targets || []) {
+    if (!hasExactKeys(target, ['after', 'before', 'operation', 'sourcePath']) ||
+        !hasExactKeys(target.after, ['blobOid', 'bytes', 'gitMode', 'sha256']) ||
+        (target.operation === 'modify' && !hasExactKeys(target.before, ['blobOid', 'bytes', 'gitMode', 'sha256']))) {
+      blockers.push(`decision.targetShape.${target?.sourcePath || 'unknown'}`);
+    }
+  }
   try {
     const expectedDecision = buildDecision({
       authorityGitIdentity: payload.authority,
@@ -891,8 +908,7 @@ function evaluateBindingReceipt(receipt = {}, {
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('bindingReceipt.identityOrHash');
   const payload = receipt.payload || {};
   const app = payload.application || {};
-  const requiredResolvers = [resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths];
-  if (v2) requiredResolvers.push(resolveGitPathState);
+  const requiredResolvers = [resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths, resolveGitPathState];
   if (!requiredResolvers.every(item => typeof item === 'function')) {
     blockers.push('bindingReceipt.gitResolversRequired');
     return { accepted: false, blockers };
@@ -960,13 +976,9 @@ function evaluateBindingReceipt(receipt = {}, {
           beforeBytes = before.content;
         }
       } else {
-        if (v2) {
-          const pathState = resolveGitPathState(app.parentCommit, target.sourcePath);
-          if (!pathState || pathState.exists !== false) {
-            blockers.push(`bindingReceipt.addTargetAlreadyExisted.${target.sourcePath}`);
-          }
-        } else {
-          try { resolveGitFile(app.parentCommit, target.sourcePath); blockers.push(`bindingReceipt.addTargetAlreadyExisted.${target.sourcePath}`); } catch {}
+        const pathState = resolveGitPathState(app.parentCommit, target.sourcePath);
+        if (!pathState || pathState.exists !== false) {
+          blockers.push(`bindingReceipt.addTargetAlreadyExisted.${target.sourcePath}`);
         }
       }
       try {

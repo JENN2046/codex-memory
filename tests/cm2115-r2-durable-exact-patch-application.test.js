@@ -18,6 +18,7 @@ const {
   GOVERNANCE_ROOT_IDENTITY,
   PATCH_PATHS,
   buildAuthorityIntake,
+  buildBindingReceiptPayload,
   buildBindingReceiptV2Payload,
   buildClaimBindingHash,
   buildDecision,
@@ -179,6 +180,21 @@ test('CM-2115-R2 authority intake and exact patch decision fail closed on drift'
   const extraEvaluation = evaluateDecision(extraPayloadClaim, { resolveGitFile: resolver });
   assert.equal(extraEvaluation.accepted, false);
   assert.ok(extraEvaluation.blockers.includes('decision.exactShape'));
+
+  for (const mutate of [
+    value => { value.payload.authority.unauthorizedReadinessClaim = false; },
+    value => { value.payload.patchPlan.targets[0].unauthorizedReadinessClaim = false; },
+    value => { value.payload.patchPlan.targets[0].after.unauthorizedReadinessClaim = false; }
+  ]) {
+    const nestedClaim = structuredClone(fixture.decision);
+    mutate(nestedClaim);
+    const { patchPayloadSha256: _ignoredHash, ...patchPlan } = nestedClaim.payload.patchPlan;
+    nestedClaim.payload.patchPlan.patchPayloadSha256 = sha256Canonical(patchPlan);
+    nestedClaim.canonicalPayloadSha256 = sha256Canonical(nestedClaim.payload);
+    const nestedEvaluation = evaluateDecision(nestedClaim, { resolveGitFile: resolver });
+    assert.equal(nestedEvaluation.accepted, false);
+    assert.ok(nestedEvaluation.blockers.some(item => item.includes('Shape')));
+  }
 });
 
 test('CM-2115-R2 durable claim allows exactly one serial or concurrent claimant', async t => {
@@ -403,6 +419,26 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     }
   };
   assert.equal(evaluateBindingReceipt(receipt, options).accepted, true);
+
+  const v1Receipt = wrapPayload(buildBindingReceiptPayload({
+    applicationCommit: APPLICATION_COMMIT,
+    applicationTree: APPLICATION_TREE,
+    applicationParentCommit: DECISION_COMMIT,
+    applicationParentTree: DECISION_TREE,
+    decisionIdentity: fixture.identity,
+    executionReceiptIdentity: executionIdentity,
+    decision: fixture.decision,
+    diffPathsSha256: sha256Canonical(diffPaths)
+  }), 'phase2_exact_patch_application_git_binding_receipt_v1');
+  assert.equal(evaluateBindingReceipt(v1Receipt, options).accepted, true);
+  const v1TreeAtAddPath = evaluateBindingReceipt(v1Receipt, {
+    ...options,
+    resolveGitPathState: (commit, sourcePath) => commit === DECISION_COMMIT && sourcePath === APPLICATION_STATE_PATH
+      ? { sourceCommit: commit, sourceTree: DECISION_TREE, sourcePath, exists: true, gitObjectType: 'tree' }
+      : options.resolveGitPathState(commit, sourcePath)
+  });
+  assert.equal(v1TreeAtAddPath.accepted, false);
+  assert.ok(v1TreeAtAddPath.blockers.includes(`bindingReceipt.addTargetAlreadyExisted.${APPLICATION_STATE_PATH}`));
 
   const forgedDecision = structuredClone(fixture.decision);
   const forgedBytes = Buffer.from('forged non-canonical completion evidence\n');
