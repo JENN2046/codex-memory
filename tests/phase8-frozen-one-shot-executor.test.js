@@ -4,6 +4,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   FINAL_RELEASE_DECISION_PATH,
+  FINAL_RELEASE_DECISION_BLOB_OID,
+  FINAL_RELEASE_DECISION_SOURCE_COMMIT,
   MANIFEST_PATH,
   exactAllowlist,
   resolvePhase8RegistryGovernanceRoot,
@@ -22,10 +24,16 @@ test('frozen executor accepts only an exact packet commit, not injected callback
   );
   assert.equal(MANIFEST_PATH, 'docs/near-model-memory-plan-pack/phase8_frozen_execution_manifest.json');
   assert.equal(FINAL_RELEASE_DECISION_PATH, 'docs/near-model-memory-plan-pack/phase8_final_execution_release_decision.json');
+  assert.equal(FINAL_RELEASE_DECISION_SOURCE_COMMIT, 'f1e2a8302e91b75beffeb418f57e591cf0789401');
+  assert.equal(FINAL_RELEASE_DECISION_BLOB_OID, 'a53c053ab1b882b0d6927152a0d3ee6db540296a');
 });
 
 test('frozen executor requires a separate final release commit before any Git or runtime action', async () => {
   await assert.rejects(runFrozenExecutor('a'.repeat(40)), /final_release_decision_commit_required/);
+  await assert.rejects(
+    runFrozenExecutor('a'.repeat(40), 'b'.repeat(40)),
+    /final_release_decision_git_identity_mismatch/
+  );
 });
 
 test('registry governance root is derived from Git common-dir and ignores switchable dataDir values', () => {
