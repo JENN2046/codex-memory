@@ -7,7 +7,6 @@ const { execFileSync } = require('node:child_process');
 const {
   resolveCommitTree,
   resolveDiffPaths,
-  resolveDurableClaim,
   resolveGitFile: resolveR2GitFile,
   resolveGitPathState,
   resolveParentCommit
@@ -19,6 +18,13 @@ const {
   canonicalize,
   sha256
 } = require('../core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const {
+  DECISION_REFERENCE: PHASE2_DECISION_REFERENCE,
+  NONCE: PHASE2_NONCE,
+  RECEIPT_ID: PHASE2_RECEIPT_ID,
+  REGISTRY_REFERENCE: PHASE2_REGISTRY_REFERENCE,
+  validateDurableClaim
+} = require('../core/Cm2115R2Phase2CompletionAuditApplication');
 const {
   evaluateCm2115CanonicalFullPlanEvidenceSnapshot
 } = require('../core/Cm2115CanonicalFullPlanEvidenceSnapshotContract');
@@ -33,6 +39,19 @@ const DEFAULT_MARKDOWN_PATH = path.join(
   'near-model-memory-plan-pack',
   'cm2115_r2_canonical_full_plan_evidence_snapshot.md'
 );
+const FROZEN_PHASE2_DURABLE_CLAIM = Object.freeze({
+  schemaVersion: 1,
+  registryReference: PHASE2_REGISTRY_REFERENCE,
+  claimId: '2dca80c9a3a88fdf7c6814964ffc3ca89efa89dcafa6252172995fdeccf36b16',
+  nonceHash: sha256(PHASE2_NONCE),
+  receiptIdHash: sha256(PHASE2_RECEIPT_ID),
+  bindingHash: '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc',
+  decisionReference: PHASE2_DECISION_REFERENCE,
+  authorizationUseCount: 1,
+  authorizationReplayAllowed: false,
+  patchInvocationCount: 1,
+  state: 'CONSUMED_SUCCESS'
+});
 
 function gitText(args) {
   return execFileSync('git', args, {
@@ -78,6 +97,10 @@ function resolveGitFile(sourceCommit, sourcePath) {
 
 function resolveGitSourceObject(sourcePath) {
   return resolveGitFile(BASELINE.sourceCommit, sourcePath);
+}
+
+function resolveFrozenPhase2DurableClaim(bindingHash) {
+  return structuredClone(validateDurableClaim(FROZEN_PHASE2_DURABLE_CLAIM, bindingHash));
 }
 
 function assertFrozenBaseline() {
@@ -139,7 +162,7 @@ function verifySnapshot(snapshot) {
     resolveGitFile,
     resolveParentCommit,
     resolveDiffPaths,
-    resolveDurableClaim,
+    resolveDurableClaim: resolveFrozenPhase2DurableClaim,
     resolveGitPathState,
     isCommitAncestor: (ancestor, descendant) => {
       try {
@@ -170,7 +193,7 @@ function generate(options) {
     resolveCommitTree,
     resolveParentCommit,
     resolveDiffPaths,
-    resolveDurableClaim,
+    resolveDurableClaim: resolveFrozenPhase2DurableClaim,
     resolveGitPathState
   });
   const evaluation = verifySnapshot(snapshot);
@@ -256,6 +279,7 @@ module.exports = {
   resolveGitPathState,
   resolveGitSourceObject,
   resolveParentCommit,
+  resolveFrozenPhase2DurableClaim,
   verifyExisting,
   verifySnapshot
 };

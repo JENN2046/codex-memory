@@ -39,6 +39,7 @@ const {
   buildReceipt,
   extractTapSummaries,
   renderCanonicalMarkdown,
+  resolveFrozenPhase2DurableClaim,
   resolveGitFile: resolveSnapshotGitFile,
   resolveGitSourceObject,
   buildReviewRequest,
@@ -270,6 +271,19 @@ test('CM-2115 snapshot resolves all 164 routes against the frozen real Git basel
   assert.equal(result.traceEntryCount, 164);
   assert.equal(result.uniqueSourceObjectCount, snapshot.payload.counts.uniqueSourceObjectCount);
   assert.equal(result.validationReceiptTargetCommit, 'd3cdc894772171c8c98dbbf6c2d19adf4fcd99e2');
+});
+
+test('snapshot CLI verifies the frozen Phase 2 claim without live registry state', () => {
+  const bindingHash = '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc';
+  const claim = resolveFrozenPhase2DurableClaim(bindingHash);
+  assert.equal(claim.bindingHash, bindingHash);
+  assert.equal(claim.state, 'CONSUMED_SUCCESS');
+  assert.equal(claim.patchInvocationCount, 1);
+  assert.equal(claim.authorizationReplayAllowed, false);
+  assert.throws(
+    () => resolveFrozenPhase2DurableClaim('f'.repeat(64)),
+    /claim_binding_mismatch/
+  );
 });
 
 test('candidate Completion Audit eligibility is kept separate from authoritative state', () => {
