@@ -153,6 +153,29 @@ test('CM-2107 collectors prove original record preservation and exact marker app
   await adapter.shutdown();
 });
 
+test('CM-2107 primary-write shim rechecks the exact one-record store before tombstone append', async t => {
+  const root = await lifecycleStore(t);
+  assert.equal((await collectPreRollbackProjection(root)).accepted, true);
+  await fs.writeFile(
+    path.join(root, STORE_IDENTITY.writeSubdir, 'concurrent-entry.md'),
+    'synthetic-race-fixture'
+  );
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseRootPath: root,
+    knowledgeBaseStorePath: path.join(root, '..', 'unused-derived'),
+    writeSubdir: STORE_IDENTITY.writeSubdir,
+    primaryWriteOnly: true,
+    primaryWritePreflight: () => collectPreRollbackProjection(root)
+  });
+  t.after(() => adapter.shutdown());
+  await assert.rejects(
+    adapter.tombstone(buildTombstonePayload()),
+    /cm2107_pre_rollback_file_set_mismatch/
+  );
+  const entries = await fs.readdir(path.join(root, STORE_IDENTITY.writeSubdir));
+  assert.equal(entries.some(entry => entry.endsWith(`-${EXPECTED.durableMarkerSha256.slice(0, 16)}.md`)), false);
+});
+
 test('CM-2107 packet grants one tombstone, one verify, and no retry/supersede/compensation', () => {
   assert.deepEqual(validatePacket(packetFixture()), []);
   for (const drift of [

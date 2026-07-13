@@ -306,7 +306,8 @@ async function runFrozenCm2107Tombstone(packetCommit, decisionCommit) {
     shim = await startPrimaryWriteOnlyShim({
       storeRoot: governance.internalPaths.storeRoot,
       derivedRuntimeStore: paths.derivedRuntimeStore,
-      bearerToken
+      bearerToken,
+      primaryWritePreflight: () => collectPreRollbackProjection(governance.internalPaths.storeRoot)
     });
     if (shim.authorizationProjection().authorizationRequired !== true) {
       throw new Error('cm2107_local_shim_bearer_not_enforced');

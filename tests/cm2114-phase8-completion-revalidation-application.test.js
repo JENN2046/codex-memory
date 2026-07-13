@@ -77,6 +77,8 @@ test('CM-2114 application receipt rejects replay, new runtime action, or readine
     payload => { payload.applicationCounters.nativeWrites = 1; },
     payload => { payload.appliedState.readinessClaimed = true; },
     payload => { payload.nonClaims.additionalNativeWriteAuthorized = true; },
+    payload => { payload.nonClaims.derivedIndexProofAccepted = true; },
+    payload => { payload.nonClaims.productionProviderProofAccepted = true; },
     payload => { payload.nonClaims.completeV8 = true; }
   ]) {
     const payload = structuredClone(result.receiptPayload);
