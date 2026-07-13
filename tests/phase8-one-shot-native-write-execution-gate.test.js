@@ -138,6 +138,8 @@ function releaseDecision(expected, content, overrides = {}) {
   };
   const bytes = Buffer.from(JSON.stringify(value));
   const expectedBinding = {
+    decisionSourceCommit: '4'.repeat(40),
+    decisionBlobOid: '5'.repeat(40),
     expectedFinalReleaseDecisionReference: value.decisionReference,
     authorizationContentDecisionReference: value.authorizationContentDecisionReference,
     authorizationContentSourceCommit: value.authorizationContentSourceCommit,
