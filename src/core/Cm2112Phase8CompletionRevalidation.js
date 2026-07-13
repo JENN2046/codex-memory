@@ -18,6 +18,15 @@ const REVALIDATION_FIELDS = Object.freeze([
   'actualTransportBindingPassed',
   'stableTargetStoreIdentityPassed'
 ]);
+const DECISION_FIELDS = Object.freeze([
+  'schemaVersion', 'taskId', 'decisionReference', 'decisionType', 'historicalCm2111',
+  'currentState', 'requiredRevalidationEvidence', 'selectedRoute', 'currentAuthority'
+]);
+
+function hasExactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
 
 function evaluateCm2112Phase8CompletionRevalidation(input = {}) {
   const blockers = [];
@@ -26,6 +35,26 @@ function evaluateCm2112Phase8CompletionRevalidation(input = {}) {
   const historicalReceipt = input.historicalReceipt || {};
   const requiredFields = PHASE_REQUIREMENTS.find(item => item.id === PHASE_ID).requiredEvidence;
 
+  if (!hasExactKeys(decision, DECISION_FIELDS)) blockers.push('decision.fields');
+  if (!hasExactKeys(decision.historicalCm2111, [
+    'decisionReference', 'receiptPayloadSha256',
+    'historicalReceiptAcceptedAtApplicationTime', 'historicalReceiptCurrentCompletionAuthority'
+  ])) blockers.push('decision.historicalCm2111.fields');
+  if (!hasExactKeys(decision.currentState, [
+    'phase8Completed', 'phase8CompletionStatus', 'fullPlanPackCompleted', 'readinessClaimed'
+  ])) blockers.push('decision.currentState.fields');
+  if (!hasExactKeys(decision.requiredRevalidationEvidence, REVALIDATION_FIELDS)) {
+    blockers.push('decision.requiredRevalidationEvidence.fields');
+  }
+  if (!hasExactKeys(decision.selectedRoute, [
+    'memoryIntelligenceOwner', 'outerTransport', 'innerTransport',
+    'stableTargetStoreIdentityRequired', 'exactNativeProofRequired',
+    'completionAuditReapplicationRequired'
+  ])) blockers.push('decision.selectedRoute.fields');
+  if (!hasExactKeys(decision.currentAuthority, [
+    'nativeWriteAuthorized', 'verifyAuthorized', 'rollbackOrCompensationAuthorized',
+    'realMemoryReadAuthorized', 'remoteActionAuthorized', 'readinessClaimAuthorized'
+  ])) blockers.push('decision.currentAuthority.fields');
   if (decision.schemaVersion !== 1 || decision.taskId !== 'CM-2112') blockers.push('decision.identity');
   if (decision.decisionReference !== DECISION_REFERENCE) blockers.push('decision.reference');
   if (decision.decisionType !== 'phase8_completion_revalidation') blockers.push('decision.type');
