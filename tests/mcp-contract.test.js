@@ -750,7 +750,7 @@ test('prepare_memory_context preserves useful low-disclosure metadata without ra
           coreTags: ['decision-approved'],
           sourceKinds: ['synthetic-metadata'],
           updatedAt: new Date().toISOString(),
-          title: 'second private title must not escape'
+          title: 'second private title 8675309'
         }
       ];
     };
@@ -778,6 +778,52 @@ test('prepare_memory_context preserves useful low-disclosure metadata without ra
     assert.match(result.memory_context_package.recent_decisions[0].statement, /decision-approved/);
     assert.doesNotMatch(serialized, /"matchedTags"|"coreTags"|"createdAt"|"updatedAt"/);
     assert.doesNotMatch(serialized, /private raw title|second private title|private raw snippet|private raw text|private raw content|private\/source|private-memory-id/);
+  });
+});
+
+test('prepare_memory_context preserves title-only recall semantics through the real metadata projection', async () => {
+  await withApp(async ({ app }) => {
+    app.services.passiveRecallService.search = async () => [
+      {
+        target: 'process',
+        score: 0.9,
+        titleHitCount: 1,
+        sourceKinds: ['synthetic-metadata'],
+        updatedAt: new Date().toISOString(),
+        title: 'Blocker: private transport detail must not escape'
+      },
+      {
+        target: 'process',
+        score: 0.8,
+        titleHitCount: 1,
+        sourceKinds: ['synthetic-metadata'],
+        updatedAt: new Date().toISOString(),
+        title: 'Decision: private approval detail 8675309'
+      }
+    ];
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Projected context semantics',
+        user_request: 'Preserve low-disclosure blocker and decision signals.'
+      },
+      options: {
+        max_items: 2,
+        max_bytes: 6000
+      }
+    });
+    const serialized = JSON.stringify(result);
+
+    assert.equal(result.memory_context_package.blockers.length, 1);
+    assert.match(result.memory_context_package.blockers[0].statement, /blocker signal/i);
+    assert.equal(result.memory_context_package.blockers[0].freshness, 'recent');
+    assert.deepEqual(result.memory_context_package.blockers[0].reason_codes, ['title_match']);
+    assert.equal(result.memory_context_package.recent_decisions.length, 1);
+    assert.match(result.memory_context_package.recent_decisions[0].statement, /decision signal/i);
+    assert.equal(result.memory_context_package.recent_decisions[0].freshness, 'recent');
+    assert.deepEqual(result.memory_context_package.recent_decisions[0].reason_codes, ['title_match']);
+    assert.doesNotMatch(serialized, /private transport detail|private approval detail/);
+    assert.doesNotMatch(serialized, /"title"|"snippet"|"text"|"content"/);
   });
 });
 
