@@ -11,7 +11,7 @@ const test = require('node:test');
 const ROOT = path.resolve(__dirname, '..');
 const implementation = require('../src/core/Cm2118FullPlanApplicationExecution');
 const { resolverOptions: realResolverOptions } = require('../scripts/generate-cm2116-exact-full-plan-application-gate');
-const { parseArgs } = require('../src/cli/cm2118-full-plan-application');
+const { main: runCli, parseArgs } = require('../src/cli/cm2118-full-plan-application');
 const packetGenerator = require('../scripts/generate-cm2118-full-plan-application-execution-packet');
 const releaseGenerator = require('../scripts/generate-cm2119-full-plan-final-execution-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
@@ -279,6 +279,24 @@ test('CM-2118 rejects repository Git environment overrides before packet intake 
       if (previous === undefined) delete process.env[key];
       else process.env[key] = previous;
     }
+  }
+});
+
+test('CM-2118 CLI rejects unsafe Git environment before its repository-root Git read', async () => {
+  const previous = process.env.GIT_DIR;
+  process.env.GIT_DIR = '/tmp/cm2118-forbidden-cli-git-dir';
+  try {
+    await assert.rejects(
+      runCli([
+        '--authorization-content-decision-commit', implementation.CONTENT_DECISION_FREEZE.commit,
+        '--execution-packet-commit', 'a'.repeat(40),
+        '--final-execution-release-decision-commit', 'b'.repeat(40)
+      ]),
+      /cm2118_unsafe_git_environment:GIT_DIR/
+    );
+  } finally {
+    if (previous === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previous;
   }
 });
 

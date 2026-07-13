@@ -392,6 +392,15 @@ test('registry root symlinks and claim timestamps outside the exact release wind
   }
 });
 
+test('receipt writes pin the verified governance directory and never follow its mutable path', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2122FullPlanStatusSyncExecution.js'), 'utf8');
+  assert.match(source, /rootIdentity = await registry\.verifyRoot\(\)/);
+  assert.match(source, /fs\.constants\.O_DIRECTORY \| fs\.constants\.O_NOFOLLOW/);
+  assert.match(source, /`\/proc\/self\/fd\/\$\{rootHandle\.fd\}\/\$\{filename\}`/);
+  assert.match(source, /descriptorStat\.dev !== rootIdentity\.dev \|\| descriptorStat\.ino !== rootIdentity\.ino/);
+  assert.doesNotMatch(source, /fsPromises\.writeFile\(receiptPath, bytes/);
+});
+
 function initializeGovernanceRoot() {
   const root = path.join(
     fixture.repo,

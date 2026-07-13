@@ -725,11 +725,13 @@ class Cm2122StatusSyncClaimRegistry {
   }
 
   async verifyRoot() {
+    let verifiedRootStat = null;
     for (const directory of [path.dirname(this.governanceRoot), this.governanceRoot]) {
       const directoryStat = await this.fs.lstat(directory);
       if (!directoryStat.isDirectory() || directoryStat.isSymbolicLink()) {
         throw new Error('cm2122_governance_root_directory_invalid');
       }
+      if (path.resolve(directory) === path.resolve(this.governanceRoot)) verifiedRootStat = directoryStat;
     }
     const realRoot = await this.fs.realpath(this.governanceRoot);
     if (path.resolve(realRoot) !== path.resolve(this.governanceRoot)) {
@@ -743,6 +745,7 @@ class Cm2122StatusSyncClaimRegistry {
         !sameJson(JSON.parse(bytes.toString('utf8')), GOVERNANCE_ROOT_IDENTITY)) {
       throw new Error('cm2122_governance_root_identity_mismatch');
     }
+    return { dev: verifiedRootStat.dev, ino: verifiedRootStat.ino };
   }
 
   validateEnvelope(envelope, bindingHash, finalReleaseEvidence = null) {
@@ -1484,19 +1487,47 @@ function evaluateBindingReceipt(receipt = {}, { detachedBinding, executionReceip
   };
 }
 
-async function writeExternalReceipt(root, filename, receipt) {
-  const receiptPath = path.join(root, filename);
+async function writeExternalReceipt(registry, filename, receipt) {
+  const rootIdentity = await registry.verifyRoot();
   const bytes = Buffer.from(serializeArtifact(receipt));
   const identity = { bytes: bytes.length, sha256: sha256(bytes), persistenceAcknowledged: false };
+  let rootHandle = null;
+  let receiptHandle = null;
   try {
-    await fsPromises.writeFile(receiptPath, bytes, { flag: 'wx' });
+    if (process.platform !== 'linux' || !Number.isInteger(fs.constants.O_DIRECTORY) ||
+        !Number.isInteger(fs.constants.O_NOFOLLOW)) {
+      throw new Error('cm2122_descriptor_relative_receipt_write_unsupported');
+    }
+    rootHandle = await fsPromises.open(
+      registry.governanceRoot,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+    );
+    const descriptorStat = await rootHandle.stat();
+    if (!descriptorStat.isDirectory() || descriptorStat.dev !== rootIdentity.dev || descriptorStat.ino !== rootIdentity.ino) {
+      throw new Error('cm2122_governance_root_descriptor_identity_mismatch');
+    }
+    const descriptorReceiptPath = `/proc/self/fd/${rootHandle.fd}/${filename}`;
+    receiptHandle = await fsPromises.open(
+      descriptorReceiptPath,
+      fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+      0o600
+    );
+    await receiptHandle.writeFile(bytes);
+    await receiptHandle.sync();
+    const observed = Buffer.alloc(bytes.length);
+    const readback = await receiptHandle.read(observed, 0, bytes.length, 0);
+    if (readback.bytesRead !== bytes.length || !observed.equals(bytes)) {
+      throw new Error(`cm2122_receipt_readback_mismatch:${filename}`);
+    }
+    await rootHandle.sync();
     identity.persistenceAcknowledged = true;
-    const observed = await fsPromises.readFile(receiptPath);
-    if (!observed.equals(bytes)) throw new Error(`cm2122_receipt_readback_mismatch:${filename}`);
     return identity;
   } catch (error) {
     error.cm2122PartialReceiptIdentity = { ...identity };
     throw error;
+  } finally {
+    if (receiptHandle) await receiptHandle.close().catch(() => {});
+    if (rootHandle) await rootHandle.close().catch(() => {});
   }
 }
 
@@ -1672,9 +1703,8 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
     });
     const executionEvaluation = evaluateExecutionReceipt(executionReceipt, { packetEvidence, finalReleaseEvidence });
     if (!executionEvaluation.accepted) throw new Error(`cm2122_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
-    await registry.verifyRoot();
     try {
-      executionIdentity = await writeExternalReceipt(root, EXECUTION_RECEIPT_FILENAME, executionReceipt);
+      executionIdentity = await writeExternalReceipt(registry, EXECUTION_RECEIPT_FILENAME, executionReceipt);
     } catch (error) {
       executionIdentity = error.cm2122PartialReceiptIdentity || null;
       throw error;
@@ -1699,9 +1729,8 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
       finalReleaseEvidence
     });
     if (!bindingEvaluation.accepted) throw new Error(`cm2122_binding_receipt_rejected:${bindingEvaluation.blockers.join(',')}`);
-    await registry.verifyRoot();
     try {
-      bindingIdentity = await writeExternalReceipt(root, BINDING_RECEIPT_FILENAME, bindingReceipt);
+      bindingIdentity = await writeExternalReceipt(registry, BINDING_RECEIPT_FILENAME, bindingReceipt);
     } catch (error) {
       bindingIdentity = error.cm2122PartialReceiptIdentity || null;
       throw error;
