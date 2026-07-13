@@ -306,14 +306,22 @@ test('one-shot registry uses fixed root identity, atomic claim, and rejects seri
     'APPLICATION_COMMIT_INVOCATION_CONSUMED',
     'CONSUMED_AMBIGUOUS',
     {
-      applicationCommitCreated: null,
-      executionReceiptCreated: null,
-      bindingReceiptCreated: null
+      applicationCommitCreated: true,
+      applicationCommit: 'a'.repeat(40),
+      applicationTree: 'b'.repeat(40),
+      executionReceiptCreated: true,
+      executionReceiptSha256: 'c'.repeat(64),
+      bindingReceiptCreated: null,
+      bindingReceiptSha256: 'e'.repeat(64)
     }
   );
-  assert.equal(ambiguous.applicationCommitCreated, null);
-  assert.equal(ambiguous.executionReceiptCreated, null);
+  assert.equal(ambiguous.applicationCommitCreated, true);
+  assert.equal(ambiguous.applicationCommit, 'a'.repeat(40));
+  assert.equal(ambiguous.applicationTree, 'b'.repeat(40));
+  assert.equal(ambiguous.executionReceiptCreated, true);
+  assert.equal(ambiguous.executionReceiptSha256, 'c'.repeat(64));
   assert.equal(ambiguous.bindingReceiptCreated, null);
+  assert.equal(ambiguous.bindingReceiptSha256, 'e'.repeat(64));
   fs.rmSync(root, { recursive: true, force: true });
 });
 
