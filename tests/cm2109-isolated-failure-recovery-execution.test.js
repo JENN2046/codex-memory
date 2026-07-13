@@ -11,7 +11,8 @@ const {
   HARNESS_IDENTITY_BYTES,
   evaluateFailureRecoveryReceipt,
   executeIsolatedFailureRecoveryHarness,
-  sha256
+  sha256,
+  sha256Canonical
 } = require('../src/core/Cm2109IsolatedFailureRecoveryExecution');
 const { runFrozenCm2109, validateDecision, validatePacket } = require('../src/cli/cm2109-isolated-failure-recovery');
 
@@ -111,6 +112,20 @@ test('CM-2109 receipt fails closed on retry, replay, provider, real-memory, or p
     drift.receiptPayloadSha256 = crypto.createHash('sha256').update(JSON.stringify(canonicalize(drift.receiptPayload))).digest('hex');
     assert.equal(evaluateFailureRecoveryReceipt(drift, executionBinding()).accepted, false);
   }
+});
+
+test('CM-2109 receipt rejects rehashed top-level receipt or payload overclaims', async t => {
+  const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2109-extra-field-'));
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  const receipt = await executeIsolatedFailureRecoveryHarness({
+    harnessRoot: path.join(parent, 'harness'),
+    executionBinding: executionBinding()
+  });
+  assert.equal(evaluateFailureRecoveryReceipt({ ...receipt, productionReady: true }, executionBinding()).accepted, false);
+  const drift = structuredClone(receipt);
+  drift.receiptPayload.productionReady = true;
+  drift.receiptPayloadSha256 = sha256Canonical(drift.receiptPayload);
+  assert.equal(evaluateFailureRecoveryReceipt(drift, executionBinding()).accepted, false);
 });
 
 test('CM-2109 packet and decision boundaries reject authority expansion', () => {

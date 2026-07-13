@@ -44,6 +44,11 @@ function sha256Canonical(value) {
   return sha256(JSON.stringify(canonicalize(value)));
 }
 
+function hasExactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
+
 function exactJsonBytes(value) {
   return Buffer.from(JSON.stringify(value), 'utf8');
 }
@@ -272,6 +277,14 @@ async function executeIsolatedFailureRecoveryHarness({
 function evaluateFailureRecoveryReceipt(receipt = {}, expectedBinding = {}) {
   const blockers = [];
   const payload = receipt.receiptPayload || {};
+  if (!hasExactKeys(receipt, [
+    'receiptPayload', 'receiptPayloadSha256', 'failureRecoveryProofEligible',
+    'failureRecoveryProofPassed', 'phase8Completed'
+  ])) blockers.push('receipt.fields');
+  if (!hasExactKeys(payload, [
+    'schemaVersion', 'taskId', 'receiptType', 'result', 'executionBinding', 'harness',
+    'caseResults', 'summary', 'authorization', 'boundaries'
+  ])) blockers.push('receipt.payload.fields');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (receipt.failureRecoveryProofEligible !== true || receipt.failureRecoveryProofPassed !== false || receipt.phase8Completed !== false) blockers.push('receipt.completionBoundary');
   if (payload.result !== 'PASS' || payload.taskId !== 'CM-2109') blockers.push('receipt.result');

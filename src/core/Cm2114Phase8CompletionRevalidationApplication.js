@@ -44,6 +44,11 @@ function canonicalize(value) {
 function sha256(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
 function sha256Canonical(value) { return sha256(JSON.stringify(canonicalize(value))); }
 
+function hasExactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
+
 function expectedPatch() {
   return {
     vcpToolBoxOwnedRuntimeWritePassed: true,
@@ -145,6 +150,11 @@ function executeCm2114Phase8CompletionRevalidationApplication(input = {}) {
 function evaluateApplicationReceipt(receipt = {}) {
   const blockers = [];
   const payload = receipt.receiptPayload || {};
+  if (!hasExactKeys(receipt, ['receiptPayload', 'receiptPayloadSha256'])) blockers.push('receipt.fields');
+  if (!hasExactKeys(payload, [
+    'schemaVersion', 'taskId', 'receiptType', 'decision', 'evidenceBundle', 'proofReceipt',
+    'phaseAudit', 'appliedEvidence', 'appliedState', 'authorization', 'applicationCounters', 'nonClaims'
+  ])) blockers.push('receipt.payload.fields');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.payloadSha256');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 || payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 || payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.bundle');

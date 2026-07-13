@@ -193,6 +193,16 @@ function cm2096RuntimeRouteAccepted(config, expectedRuntimeTarget) {
     httpTarget.mcpToolNameByAction?.tombstone_memory === 'knowledge_base.tombstone';
 }
 
+async function runCm2096VerifyForPostStoreProjection(postStoreProjection, verify) {
+  if (postStoreProjection?.accepted !== true) {
+    return {
+      verifyResult: { accepted: false, reasonCode: postStoreProjection?.reasonCode },
+      verifyOperations: 0
+    };
+  }
+  return { verifyResult: await verify(), verifyOperations: 1 };
+}
+
 async function runFrozenCm2096RollbackV3(executionPacketCommit, futureDecisionCommit) {
   if (!/^[a-f0-9]{40}$/.test(executionPacketCommit || '')) throw new Error('cm2096_execution_packet_commit_required');
   if (!/^[a-f0-9]{40}$/.test(futureDecisionCommit || '')) throw new Error('cm2096_future_tombstone_decision_commit_required');
@@ -311,8 +321,9 @@ async function runFrozenCm2096RollbackV3(executionPacketCommit, futureDecisionCo
       return { accepted: false, state, blockers: ['cm2096_native_tombstone_result_not_success'], tombstoneWriteCalls: 1, verifyOperations: 0 };
     }
     const postStoreProjection = await collectCm2096RealStoreProjection({ knowledgeBaseRootPath: targetStoreRoot, stage: 'post_rollback' });
-    const verifyResult = postStoreProjection.accepted === true
-      ? await verifyCm2096TombstoneExecution({
+    const { verifyResult, verifyOperations } = await runCm2096VerifyForPostStoreProjection(
+      postStoreProjection,
+      () => verifyCm2096TombstoneExecution({
         registry,
         claimId: claim.claimId,
         receiptId: decisionIntake.decision.receiptId,
@@ -324,7 +335,7 @@ async function runFrozenCm2096RollbackV3(executionPacketCommit, futureDecisionCo
         postStoreProjection,
         callAuditMemory: args => app.callTool('audit_memory', args, { executionContext })
       })
-      : { accepted: false, reasonCode: postStoreProjection.reasonCode };
+    );
     const state = verifyResult.accepted === true ? 'CONSUMED_SUCCESS' : 'CONSUMED_AMBIGUOUS_POST_COMMIT';
     await gate.finalize(claim.claimId, state);
     return {
@@ -332,7 +343,7 @@ async function runFrozenCm2096RollbackV3(executionPacketCommit, futureDecisionCo
       state,
       blockers: verifyResult.accepted === true ? [] : [verifyResult.reasonCode],
       tombstoneWriteCalls: 1,
-      verifyOperations: 1,
+      verifyOperations,
       localFallbackUsed: false,
       retryCount: 0,
       supersedeCount: 0,
@@ -369,5 +380,6 @@ module.exports = {
   cm2096RuntimeRouteAccepted,
   exactCm2096Allowlist,
   resolveCm2096RegistryGovernanceRoot,
+  runCm2096VerifyForPostStoreProjection,
   runFrozenCm2096RollbackV3
 };
