@@ -175,6 +175,20 @@ test('CM-2128 exact JSON reader rejects symlinks and low-disclosure drift', () =
   });
 });
 
+test('CM-2129 live governance reader rejects symlinks before reading receipt bytes', () => {
+  withTempDirectory(directory => {
+    const target = path.join(directory, 'target.json');
+    const link = path.join(directory, 'live-receipt.json');
+    fs.writeFileSync(target, '{"accepted":true}\n');
+    fs.symlinkSync(target, link);
+
+    assert.throws(
+      () => review.readLiveGovernanceFile(link, 'execution_receipt'),
+      /cm2129_live_governance_file_invalid:execution_receipt/
+    );
+  });
+});
+
 test('CM-2128 receipt identity deterministically binds bytes, blob OID, raw hash, and canonical payload hash', () => {
   const bytes = Buffer.from('{"artifactType":"fixture_receipt_v1","canonicalPayloadSha256":"' +
     `${'a'.repeat(64)}"}\n`, 'utf8');

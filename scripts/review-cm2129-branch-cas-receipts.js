@@ -69,6 +69,24 @@ function assertPathAbsent(entryPath) {
   throw new Error(`cm2129_review_output_already_exists:${entryPath}`);
 }
 
+function readLiveGovernanceFile(entryPath, label) {
+  let descriptor;
+  try {
+    const stat = fs.lstatSync(entryPath);
+    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('invalid');
+    descriptor = fs.openSync(entryPath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+    const openedStat = fs.fstatSync(descriptor);
+    if (!openedStat.isFile() || openedStat.dev !== stat.dev || openedStat.ino !== stat.ino) {
+      throw new Error('invalid');
+    }
+    return fs.readFileSync(descriptor);
+  } catch {
+    throw new Error(`cm2129_live_governance_file_invalid:${label}`);
+  } finally {
+    if (descriptor !== undefined) fs.closeSync(descriptor);
+  }
+}
+
 function renderMarkdown(review, jsonText) {
   return [
     '# CM-2129 Branch CAS Receipt Independent Review',
@@ -204,8 +222,11 @@ async function buildReview() {
   const governanceRoot = execution.resolveFixedGovernanceRoot(process.cwd());
   const registry = new Cm2126ExactBranchCasClaimRegistry({ governanceRoot });
   const liveClaim = await registry.read(bindingHash, release);
-  const liveClaimBytes = fs.readFileSync(path.join(governanceRoot, claimFileName()));
-  const liveReceiptBytes = fs.readFileSync(path.join(governanceRoot, execution.EXECUTION_RECEIPT_FILENAME));
+  const liveClaimBytes = readLiveGovernanceFile(path.join(governanceRoot, claimFileName()), 'claim');
+  const liveReceiptBytes = readLiveGovernanceFile(
+    path.join(governanceRoot, execution.EXECUTION_RECEIPT_FILENAME),
+    'execution_receipt'
+  );
   if (!sameJson(liveClaim, frozenClaim) || !liveClaimBytes.equals(claimIdentity.content) ||
       !liveReceiptBytes.equals(executionIdentity.content) || liveClaim.state !== SUCCESS_STATE ||
       liveClaim.authorizationReplayAllowed !== false || liveClaim.executionReceiptSha256 !== executionIdentity.sha256) {
@@ -378,5 +399,6 @@ module.exports = {
   buildReview,
   main,
   parseArgs,
+  readLiveGovernanceFile,
   renderMarkdown
 };
