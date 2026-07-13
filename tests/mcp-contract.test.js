@@ -2073,7 +2073,9 @@ test('MCP governed metadata parser projects only approved request context fields
           },
           rollbackPosture: {
             rollback_plan_ref: 'cm-governed-write-rollback-plan'
-          }
+          },
+          approvalDecisionReference: 'CM-TEST-EXACT-APPROVAL-001',
+          claimBindingHash: 'a'.repeat(64)
         },
         rollbackPosture: {
           mode: 'bounded_rollback_plan',
@@ -2120,6 +2122,8 @@ test('MCP governed metadata parser projects only approved request context fields
     primaryRuntime: 'VCPToolBox native memory'
   });
   assert.equal(result.requestContext.exactApprovalResult.rollbackPlanRef, 'cm-governed-write-rollback-plan');
+  assert.equal(result.requestContext.exactApprovalResult.approvalDecisionReference, 'CM-TEST-EXACT-APPROVAL-001');
+  assert.equal(result.requestContext.exactApprovalResult.claimBindingHash, 'a'.repeat(64));
   assert.equal(result.requestContext.rollbackPosture.rollback_plan_ref, 'cm-governed-write-rollback-plan');
   assert.equal(result.requestContext.auditReceipt.receipt_id, 'cm-governed-write-receipt');
   assert.deepEqual(result.requestContext.outputDisclosureBudget, {
@@ -2132,6 +2136,30 @@ test('MCP governed metadata parser projects only approved request context fields
   assert.equal(result.requestContext.trustedExecutionContext.executionContext.agentAlias, 'Codex');
   assert.equal(result.requestContext.trustedExecutionContext.executionContext.scopeId, 'scope-alpha');
   assert.equal(serialized.includes('RAW_PRIVATE_VALUE_SHOULD_NOT_COPY'), false);
+});
+
+test('MCP governed metadata parser rejects invalid exact approval receipt bindings', () => {
+  const result = buildGovernedMcpRequestContextFromParams({
+    _meta: {
+      codexMemoryGovernance: {
+        exactApprovalResult: {
+          accepted: true,
+          approvalDecisionReference: 'https://PRIVATE_APPROVAL_REFERENCE_SHOULD_NOT_COPY',
+          claimBindingHash: 'NOT-A-LOWERCASE-SHA256'
+        }
+      }
+    }
+  });
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, false);
+  assert.deepEqual(result.invalidFields, [
+    'exactApprovalResult.approvalDecisionReference',
+    'exactApprovalResult.claimBindingHash'
+  ]);
+  assert.deepEqual(result.requestContext, {});
+  assert.equal(serialized.includes('PRIVATE_APPROVAL_REFERENCE_SHOULD_NOT_COPY'), false);
+  assert.equal(serialized.includes('NOT-A-LOWERCASE-SHA256'), false);
 });
 
 test('MCP governed metadata parser rejects unsafe output disclosure budget without partial context', () => {
@@ -2692,7 +2720,9 @@ test('MCP tools/call can carry governed metadata to primary native write delegat
                 targetKind: 'mcp_server',
                 primaryRuntime: 'VCPToolBox native memory'
               },
-              rollbackPlanRef: 'cm-governed-write-rollback-plan'
+              rollbackPlanRef: 'cm-governed-write-rollback-plan',
+              approvalDecisionReference: 'CM-TEST-MCP-PHASE8-APPROVAL-001',
+              claimBindingHash: 'b'.repeat(64)
             },
             rollbackPosture: {
               mode: 'bounded_rollback_plan',
@@ -2724,6 +2754,10 @@ test('MCP tools/call can carry governed metadata to primary native write delegat
     });
     const payload = result.response.result.structuredContent;
     const serializedResponse = JSON.stringify(result.response);
+    const auditEntries = await app.stores.auditLogStore.readRecentWriteAudit();
+    const bridgeAuditEntry = auditEntries.find(entry =>
+      entry.eventType === 'governed_mcp_vcp_native_bridge_receipt'
+    );
 
     assert.equal(localWrites, 0);
     assert.equal(nativeCall.toolName, 'record_memory');
@@ -2732,6 +2766,15 @@ test('MCP tools/call can carry governed metadata to primary native write delegat
     assert.equal(nativeCall.arguments.governed_bridge.exact_approval_scope_matched, true);
     assert.equal(nativeCall.arguments.governed_bridge.exact_approval_runtime_target_matched, true);
     assert.equal(nativeCall.arguments.governed_bridge.exact_approval_rollback_plan_matched, true);
+    assert.equal(nativeCall.arguments.governed_bridge.exact_approval_decision_reference, 'CM-TEST-MCP-PHASE8-APPROVAL-001');
+    assert.equal(nativeCall.arguments.governed_bridge.exact_approval_claim_binding_hash, 'b'.repeat(64));
+    assert.equal(
+      nativeCall.governanceMeta.exactApprovalResult.approvalDecisionReference,
+      'CM-TEST-MCP-PHASE8-APPROVAL-001'
+    );
+    assert.equal(nativeCall.governanceMeta.exactApprovalResult.claimBindingHash, 'b'.repeat(64));
+    assert.equal(bridgeAuditEntry.exactApprovalDecisionReference, 'CM-TEST-MCP-PHASE8-APPROVAL-001');
+    assert.equal(bridgeAuditEntry.exactApprovalClaimBindingHash, 'b'.repeat(64));
     assert.equal(nativeCall.arguments.governed_bridge.disclosure_level, 'metadata');
     assert.equal(nativeCall.arguments.governed_bridge.disclosure_max_items, 2);
     assert.equal(nativeCall.arguments.governed_bridge.disclosure_max_bytes, 512);
