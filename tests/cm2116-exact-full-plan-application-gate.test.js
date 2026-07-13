@@ -23,7 +23,8 @@ const git = require('../scripts/cm2115-r2-git');
 const { isCommitAncestor: realIsCommitAncestor } = require('../scripts/generate-cm2115-r2-self-review-decision');
 const {
   parseArgs,
-  renderMarkdown
+  renderMarkdown,
+  resolverOptions
 } = require('../scripts/generate-cm2116-exact-full-plan-application-gate');
 
 const IMPLEMENTATION_COMMIT = '9'.repeat(40);
@@ -202,4 +203,17 @@ test('gate generator fixes output paths and Markdown is an exact JSON mirror', (
   assert.ok(markdown.includes('PASS_GATE_PREPARED_ONLY'));
   assert.ok(markdown.includes(jsonText.trimEnd()));
   assert.ok(GATE_PATH.endsWith('cm2116_r1_exact_full_plan_application_gate.json'));
+});
+
+test('gate resolver factory rejects Git repository and object overrides', () => {
+  for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE']) {
+    const previous = process.env[key];
+    process.env[key] = '/tmp/alternate-git-state';
+    try {
+      assert.throws(() => resolverOptions(), /unsafe_git_environment/);
+    } finally {
+      if (previous === undefined) delete process.env[key];
+      else process.env[key] = previous;
+    }
+  }
 });
