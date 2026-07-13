@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
 const WORKFLOW_SCHEMA_VERSION = 'task_start_memory_context_workflow_v1';
 
@@ -27,7 +28,7 @@ function isPlainObject(value) {
 }
 
 function safeString(value, maxLength = 1000) {
-  return String(value ?? '')
+  return redactSensitiveFragments(String(value ?? ''))
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, maxLength);
@@ -173,6 +174,16 @@ class TaskStartMemoryContextWorkflow {
       access.resultCanBeMistakenForVcpNative === true ||
       access.rawMemoryReturned === true ||
       access.rawAuditReturned === true ||
+      access.rawOutputReturned === true ||
+      access.rawPathReturned === true ||
+      access.rawPathDisclosed === true ||
+      access.endpointReturned === true ||
+      access.endpointDisclosed === true ||
+      access.tokenReturned === true ||
+      access.tokenMaterialReturned === true ||
+      access.tokenMaterialDisclosed === true ||
+      access.credentialReturned === true ||
+      access.credentialsReturned === true ||
       access.providerPayloadReturned === true ||
       !isPlainObject(prepared.memory_context_package)
     ) {
