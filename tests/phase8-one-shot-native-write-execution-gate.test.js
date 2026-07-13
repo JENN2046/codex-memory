@@ -254,6 +254,26 @@ test('two concurrent assertion verifications permit exactly one write invocation
   assert.equal(result.nativeWriteCalls, 1);
 });
 
+test('assertion binding is verified before the write invocation marker is created', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-invalid-assertion-binding-'));
+  const registry = newRegistry(root);
+  const claim = await registry.claim({
+    nonce: 'invalid-binding-nonce',
+    receiptId: 'invalid-binding-receipt',
+    bindingHash: 'a'.repeat(64)
+  });
+
+  await assert.rejects(
+    registry.consumeWriteInvocation(claim.claimId, 'b'.repeat(64)),
+    /authorization_claim_not_consumable/
+  );
+  await assert.rejects(
+    fs.access(path.join(registry.directory, `write-invocation-${claim.claimId}.json`)),
+    error => error.code === 'ENOENT'
+  );
+  assert.equal((await registry.readClaim(claim.claimId)).state, 'CLAIMED');
+});
+
 test('Phase 8 gate does not claim or call runtime when binding validation fails', async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-one-shot-'));
   const expected = binding();

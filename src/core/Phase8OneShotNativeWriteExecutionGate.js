@@ -149,16 +149,16 @@ class Phase8OneShotAuthorizationRegistry {
   }
 
   async consumeWriteInvocation(claimId, bindingHash) {
+    const current = await this.readClaim(claimId);
+    if (current.state !== 'CLAIMED' || current.bindingHash !== bindingHash) {
+      throw new Error('authorization_claim_not_consumable');
+    }
     const markerPath = path.join(this.directory, `write-invocation-${claimId}.json`);
     try {
       await fs.writeFile(markerPath, JSON.stringify({ claimId, invocationCount: 1 }), { flag: 'wx' });
     } catch (error) {
       if (error.code === 'EEXIST') throw new Error('write_invocation_already_consumed');
       throw error;
-    }
-    const current = await this.readClaim(claimId);
-    if (current.state !== 'CLAIMED' || current.bindingHash !== bindingHash) {
-      throw new Error('authorization_claim_not_consumable');
     }
     const statePath = path.join(this.directory, `claim-${claimId}.json`);
     const tempPath = `${statePath}.write-consumed.tmp`;
