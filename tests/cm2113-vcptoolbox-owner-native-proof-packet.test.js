@@ -90,7 +90,8 @@ test('CM-2113 packet rejects self identity, transport drift, and store replaceme
     packet => { packet.transport.outer = 'direct_app_call'; },
     packet => { packet.runtimeTarget.storeInstanceId = 'clone-store'; },
     packet => { packet.fixedRecord.folder = '../outside'; },
-    packet => { packet.fixedRecord.unbound = true; }
+    packet => { packet.fixedRecord.unbound = true; },
+    packet => { packet.nonClaims.productionProviderProofAccepted = true; }
   ]) {
     const packet = packetFixture();
     mutate(packet);
