@@ -21,6 +21,12 @@ function evaluatePhase8FinalExecutionReleaseDecisionIntake({ decisionBytes, obse
   for (const field of ['decisionSourceCommit', 'decisionBlobOid', 'decisionPayloadSha256']) {
     if (!observedBinding[field]) blockers.push(`binding.${field}`);
   }
+  if (observedBinding.decisionSourceCommit !== expectedBinding.decisionSourceCommit) {
+    blockers.push('binding.decisionSourceCommit');
+  }
+  if (observedBinding.decisionBlobOid !== expectedBinding.decisionBlobOid) {
+    blockers.push('binding.decisionBlobOid');
+  }
   if (fileSha256 !== observedBinding.decisionPayloadSha256) blockers.push('binding.decisionPayloadSha256');
   let decision = null;
   try { decision = JSON.parse(decisionBytes.toString('utf8')); } catch { blockers.push('decision.invalidJson'); }
