@@ -145,6 +145,7 @@ const TOOL_DEFINITIONS = [
             title: { type: 'string', maxLength: 300 },
             user_request: { type: 'string', maxLength: 4000 },
             project_id: { type: 'string', maxLength: 200 },
+            scope_id: { type: 'string', maxLength: 200 },
             workspace_id: { type: 'string', maxLength: 200 },
             client_id: { type: 'string', enum: CLIENT_ID_VALUES, maxLength: 200 },
             visibility: { type: 'string', enum: VISIBILITY_VALUES, maxLength: 200 },

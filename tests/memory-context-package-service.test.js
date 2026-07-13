@@ -50,6 +50,7 @@ function baseInput(extra = {}) {
       title: 'Implement governed memory context',
       user_request: 'Use the plan pack and keep default runtime read-only.',
       project_id: 'codex-memory',
+      scope_id: 'scope-a',
       workspace_id: 'workspace-a',
       client_id: 'codex',
       visibility: 'project',
@@ -194,6 +195,7 @@ test('prepare_memory_context applies scope and bounded compression', async () =>
   }));
 
   assert.equal(calls.search[0].args.scope.project_id, 'codex-memory');
+  assert.equal(calls.search[0].args.scope.scope_id, 'scope-a');
   assert.equal(calls.search[0].args.scope.client_id, 'codex');
   assert.equal(calls.search[0].args.scope.strict, true);
   assert.equal(Buffer.byteLength(JSON.stringify(result), 'utf8') <= 1800, true);

@@ -192,6 +192,7 @@ function buildScope(task = {}) {
   const scope = {};
   for (const [taskKey, scopeKey] of [
     ['project_id', 'project_id'],
+    ['scope_id', 'scope_id'],
     ['workspace_id', 'workspace_id'],
     ['client_id', 'client_id'],
     ['visibility', 'visibility']
