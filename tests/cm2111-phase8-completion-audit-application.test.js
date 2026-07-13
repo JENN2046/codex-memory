@@ -91,6 +91,7 @@ test('CM-2111 receipt rejects replay, side effects, full-plan, readiness, or V8 
     payload => { payload.applicationCounters.remoteActions = 1; },
     payload => { payload.appliedState.fullPlanPackCompleted = true; },
     payload => { payload.appliedState.readinessClaimed = true; },
-    payload => { payload.nonClaims.completeV8 = true; }
+    payload => { payload.nonClaims.completeV8 = true; },
+    payload => { payload.nonClaims.derivedIndexProofAccepted = false; }
   ]) { const payload = structuredClone(receipt.receiptPayload); mutate(payload); assert.equal(evaluateApplicationReceipt({ receiptPayload: payload, receiptPayloadSha256: sha256Canonical(payload) }).accepted, false); }
 });
