@@ -7,6 +7,8 @@ const { evaluatePhase8FinalExecutionReleaseDecisionIntake } = require('../src/co
 
 function fixture(overrides = {}) {
   const expectedBinding = {
+    decisionSourceCommit: '4'.repeat(40),
+    decisionBlobOid: '5'.repeat(40),
     expectedFinalReleaseDecisionReference: 'CM-TEST-FINAL-RELEASE',
     authorizationContentDecisionReference: 'CM-TEST-CONTENT',
     authorizationContentSourceCommit: 'a'.repeat(40),
@@ -65,5 +67,14 @@ test('final release intake rejects packet, manifest, expiry, or copied decision 
     const value = fixture(overrides);
     const result = evaluatePhase8FinalExecutionReleaseDecisionIntake({ ...value, now: new Date('2026-07-11T00:00:00.000Z') });
     assert.equal(result.accepted, false, name);
+  }
+  for (const field of ['decisionSourceCommit', 'decisionBlobOid']) {
+    const value = fixture();
+    value.observedBinding[field] = '0'.repeat(40);
+    const result = evaluatePhase8FinalExecutionReleaseDecisionIntake({
+      ...value,
+      now: new Date('2026-07-11T00:00:00.000Z')
+    });
+    assert.equal(result.accepted, false, field);
   }
 });
