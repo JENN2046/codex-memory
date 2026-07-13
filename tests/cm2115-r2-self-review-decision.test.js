@@ -6,6 +6,7 @@ const test = require('node:test');
 const {
   DECISION_PATH,
   IMPLEMENTATION_ARTIFACT_PATHS,
+  REVIEW_REQUEST_DIFF_PATHS,
   REVIEW_REQUEST_FREEZE,
   buildDecision,
   buildDecisionReference,
@@ -151,6 +152,16 @@ test('self-review rejects frozen request, resolver, implementation, or payload d
       }
       return actual;
     }
+  })).accepted, false);
+  assert.equal(evaluateDecision(decision, resolvers({
+    resolveParentCommit: commit => commit === REVIEW_REQUEST_FREEZE.commit
+      ? '0'.repeat(40)
+      : resolvers().resolveParentCommit(commit)
+  })).accepted, false);
+  assert.equal(evaluateDecision(decision, resolvers({
+    resolveDiffPaths: (parent, commit) => commit === REVIEW_REQUEST_FREEZE.commit
+      ? [...REVIEW_REQUEST_DIFF_PATHS, 'docs/near-model-memory-plan-pack/unreviewed.md']
+      : resolvers().resolveDiffPaths(parent, commit)
   })).accepted, false);
   assert.equal(evaluateDecision(decision, resolvers({
     resolveCommitTree: commit => commit === IMPLEMENTATION_COMMIT ? '0'.repeat(40) : git.resolveCommitTree(commit)

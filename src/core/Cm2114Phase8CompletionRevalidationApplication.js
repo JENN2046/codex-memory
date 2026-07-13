@@ -100,9 +100,13 @@ function evaluateDecision(decision = {}) {
   if (decision.schemaVersion !== 1 || decision.taskId !== 'CM-2114' || decision.decisionReference !== DECISION.reference || decision.completionAuditReapplicationAuthorized !== true) blockers.push('decision.authority');
   if (decision.evidenceBundleGitIdentity?.sourceCommit !== BUNDLE.commit || decision.evidenceBundleGitIdentity?.blobOid !== BUNDLE.blobOid || decision.evidenceBundleGitIdentity?.bytes !== BUNDLE.bytes || decision.evidenceBundleGitIdentity?.sha256 !== BUNDLE.rawSha256 || decision.evidenceBundleGitIdentity?.payloadSha256 !== BUNDLE.payloadSha256) blockers.push('decision.evidenceBundle');
   if (decision.newProofReceiptGitIdentity?.sourceCommit !== PROOF.commit || decision.newProofReceiptGitIdentity?.blobOid !== PROOF.blobOid || decision.newProofReceiptGitIdentity?.bytes !== PROOF.bytes || decision.newProofReceiptGitIdentity?.sha256 !== PROOF.rawSha256) blockers.push('decision.newProofReceipt');
-  for (const field of ['vcpToolBoxOwnedRuntimeWritePassed', 'actualTransportBindingPassed', 'stableTargetStoreIdentityPassed']) if (decision.requiredEvidencePatch?.[field] !== true) blockers.push(`decision.requiredEvidencePatch.${field}`);
+  const requiredEvidencePatchFields = ['vcpToolBoxOwnedRuntimeWritePassed', 'actualTransportBindingPassed', 'stableTargetStoreIdentityPassed'];
+  if (!hasExactKeys(decision.requiredEvidencePatch, requiredEvidencePatchFields)) blockers.push('decision.requiredEvidencePatch.fields');
+  for (const field of requiredEvidencePatchFields) if (decision.requiredEvidencePatch?.[field] !== true) blockers.push(`decision.requiredEvidencePatch.${field}`);
   const patch = expectedPatch();
-  for (const field of ['phase8Completed', 'phase8CompletionStatus', 'fullPlanPackCompleted', 'readinessClaimed']) if (decision.allowedCompletionResult?.[field] !== patch[field]) blockers.push(`decision.allowedCompletionResult.${field}`);
+  const allowedCompletionResultFields = ['phase8Completed', 'phase8CompletionStatus', 'fullPlanPackCompleted', 'readinessClaimed'];
+  if (!hasExactKeys(decision.allowedCompletionResult, allowedCompletionResultFields)) blockers.push('decision.allowedCompletionResult.fields');
+  for (const field of allowedCompletionResultFields) if (decision.allowedCompletionResult?.[field] !== patch[field]) blockers.push(`decision.allowedCompletionResult.${field}`);
   if (decision.applicationAuthorization?.useCount !== 1 || decision.applicationAuthorization?.replayAllowed !== false) blockers.push('decision.applicationAuthorization');
   if (decision.applicationSideEffectLimits?.completionAuditPatchApplications !== 1) blockers.push('decision.applicationSideEffectLimits.completionAuditPatchApplications');
   for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (decision.applicationSideEffectLimits?.[field] !== 0) blockers.push(`decision.applicationSideEffectLimits.${field}`);
