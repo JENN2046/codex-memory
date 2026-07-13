@@ -183,7 +183,8 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
   resolveGitFile,
   resolveParentCommit,
   resolveDiffPaths,
-  resolveGitPathState
+  resolveGitPathState,
+  resolveDurableClaim
 } = {}) {
   const blockers = [];
   const resolvedByPath = new Map();
@@ -306,7 +307,7 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
         : receiptIdentity?.content;
       phase2ApplicationReceiptEvaluation = evaluateCm2115R2Phase2ApplicationBindingReceipt(
         JSON.parse(content),
-        { resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths, resolveGitPathState }
+        { resolveGitFile, resolveCommitTree, resolveParentCommit, resolveDiffPaths, resolveGitPathState, resolveDurableClaim }
       );
       if (!phase2ApplicationReceiptEvaluation.accepted) blockers.push('phase2ApplicationReceipt.contract');
     } catch {

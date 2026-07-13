@@ -492,6 +492,24 @@ function claimFileName() {
   return `.cm2115-r2-phase2-application-claim-${claimId()}.json`;
 }
 
+function validateDurableClaim(value, bindingHash = null) {
+  const expectedKeys = [
+    'schemaVersion', 'registryReference', 'claimId', 'nonceHash', 'receiptIdHash',
+    'bindingHash', 'decisionReference', 'authorizationUseCount',
+    'authorizationReplayAllowed', 'patchInvocationCount', 'state'
+  ].sort();
+  if (!value || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify(expectedKeys) ||
+      value.schemaVersion !== 1 || value.claimId !== claimId() || value.registryReference !== REGISTRY_REFERENCE ||
+      value.nonceHash !== sha256(NONCE) || value.receiptIdHash !== sha256(RECEIPT_ID) ||
+      value.authorizationUseCount !== 1 || value.authorizationReplayAllowed !== false ||
+      value.decisionReference !== DECISION_REFERENCE || !['CLAIMED', 'PATCH_INVOCATION_CONSUMED', 'CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS'].includes(value.state) ||
+      ![0, 1].includes(value.patchInvocationCount) ||
+      (value.state === 'CLAIMED' && value.patchInvocationCount !== 0) ||
+      (value.state !== 'CLAIMED' && value.patchInvocationCount !== 1) ||
+      (bindingHash !== null && value.bindingHash !== bindingHash)) throw new Error('cm2115_r2_claim_binding_mismatch');
+  return value;
+}
+
 class Cm2115R2ApplicationClaimRegistry {
   constructor({ governanceRoot, filesystem = fsPromises }) {
     if (typeof governanceRoot !== 'string' || governanceRoot.trim() === '') throw new Error('cm2115_r2_governance_root_required');
@@ -547,21 +565,7 @@ class Cm2115R2ApplicationClaimRegistry {
     const raw = await this.fs.readFile(this.claimPath, 'utf8');
     let value;
     try { value = JSON.parse(raw); } catch { throw new Error('cm2115_r2_claim_corrupt'); }
-    const expectedKeys = [
-      'schemaVersion', 'registryReference', 'claimId', 'nonceHash', 'receiptIdHash',
-      'bindingHash', 'decisionReference', 'authorizationUseCount',
-      'authorizationReplayAllowed', 'patchInvocationCount', 'state'
-    ].sort();
-    if (JSON.stringify(Object.keys(value).sort()) !== JSON.stringify(expectedKeys) ||
-        value.schemaVersion !== 1 || value.claimId !== claimId() || value.registryReference !== REGISTRY_REFERENCE ||
-        value.nonceHash !== sha256(NONCE) || value.receiptIdHash !== sha256(RECEIPT_ID) ||
-        value.authorizationUseCount !== 1 || value.authorizationReplayAllowed !== false ||
-        value.decisionReference !== DECISION_REFERENCE || !['CLAIMED', 'PATCH_INVOCATION_CONSUMED', 'CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS'].includes(value.state) ||
-        ![0, 1].includes(value.patchInvocationCount) ||
-        (value.state === 'CLAIMED' && value.patchInvocationCount !== 0) ||
-        (value.state !== 'CLAIMED' && value.patchInvocationCount !== 1) ||
-        (bindingHash !== null && value.bindingHash !== bindingHash)) throw new Error('cm2115_r2_claim_binding_mismatch');
-    return value;
+    return validateDurableClaim(value, bindingHash);
   }
 
   async transition(bindingHash, expectedState, nextState, patchInvocationCount) {
@@ -933,7 +937,8 @@ function evaluateBindingReceipt(receipt = {}, {
   resolveCommitTree,
   resolveParentCommit,
   resolveDiffPaths,
-  resolveGitPathState
+  resolveGitPathState,
+  resolveDurableClaim
 } = {}) {
   const blockers = [];
   const receiptType = receipt.receiptType;
@@ -995,6 +1000,22 @@ function evaluateBindingReceipt(receipt = {}, {
     }
     if (!executionMarkdownActual.content.equals(renderExecutionReceiptMarkdown(executionReceipt))) {
       blockers.push('bindingReceipt.executionReceiptMarkdownContent');
+    }
+    if (v2) {
+      if (typeof resolveDurableClaim !== 'function') {
+        blockers.push('bindingReceipt.durableClaimResolverRequired');
+      } else {
+        try {
+          const bindingHash = buildClaimBindingHash(identityWithoutContent(decisionActual), decision);
+          const claim = validateDurableClaim(resolveDurableClaim(bindingHash), bindingHash);
+          if (claim.state !== 'CONSUMED_SUCCESS' || claim.patchInvocationCount !== 1 ||
+              payload.registry?.bindingHash !== bindingHash || payload.registry?.finalState !== claim.state) {
+            blockers.push('bindingReceipt.durableClaim');
+          }
+        } catch {
+          blockers.push('bindingReceipt.durableClaim');
+        }
+      }
     }
     for (const target of decision.payload.patchPlan.targets) {
       const after = resolveGitFile(app.commit, target.sourcePath);
@@ -1111,5 +1132,6 @@ module.exports = {
   sha256Canonical,
   validIdentity,
   verifyResolvedIdentity,
+  validateDurableClaim,
   wrapPayload
 };

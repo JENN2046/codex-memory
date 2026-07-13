@@ -23,6 +23,7 @@ const {
   gitText,
   resolveCommitTree,
   resolveDiffPaths,
+  resolveDurableClaim,
   resolveGitFile,
   resolveGitPathState,
   resolveGovernanceRegistryRoot,
@@ -81,7 +82,8 @@ async function main(argv = process.argv.slice(2)) {
     resolveCommitTree,
     resolveParentCommit,
     resolveDiffPaths,
-    resolveGitPathState
+    resolveGitPathState,
+    resolveDurableClaim
   });
   if (!evaluation.accepted) {
     throw new Error(`cm2115_r2_strengthened_binding_receipt_rejected:${evaluation.blockers.join(',')}`);
