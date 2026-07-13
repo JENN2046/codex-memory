@@ -9,6 +9,10 @@ const { createRecordMarkdown } = require('../core/GovernedMcpVcpNativeVcpToolBox
 const { evaluatePhase8ExternalAuthorizationDecisionIntake } = require('../core/Phase8ExternalAuthorizationDecisionIntake');
 const { evaluatePhase8FinalExecutionReleaseDecisionIntake } = require('../core/Phase8FinalExecutionReleaseDecisionIntake');
 const {
+  DECISION_SHA256: EXPECTED_FINAL_RELEASE_DECISION_SHA256,
+  evaluateCm2094Phase8FinalExecutionReleaseDecision
+} = require('../core/Cm2094Phase8FinalExecutionReleaseDecisionContract');
+const {
   Phase8OneShotAuthorizationRegistry,
   createPhase8OneShotNativeWriteExecutionGate,
   sha256,
@@ -18,6 +22,8 @@ const {
 
 const MANIFEST_PATH = 'docs/near-model-memory-plan-pack/phase8_frozen_execution_manifest.json';
 const FINAL_RELEASE_DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_final_execution_release_decision.json';
+const FINAL_RELEASE_DECISION_SOURCE_COMMIT = 'f1e2a8302e91b75beffeb418f57e591cf0789401';
+const FINAL_RELEASE_DECISION_BLOB_OID = 'a53c053ab1b882b0d6927152a0d3ee6db540296a';
 
 function git(args, options = {}) {
   return execFileSync('git', args, { encoding: options.encoding || 'utf8', maxBuffer: 1024 * 1024 });
@@ -60,6 +66,9 @@ function exactAllowlist() {
 async function runFrozenExecutor(executionPacketCommit, finalReleaseDecisionCommit) {
   if (!/^[a-f0-9]{40}$/.test(executionPacketCommit || '')) throw new Error('execution_packet_commit_required');
   if (!/^[a-f0-9]{40}$/.test(finalReleaseDecisionCommit || '')) throw new Error('final_release_decision_commit_required');
+  if (finalReleaseDecisionCommit !== FINAL_RELEASE_DECISION_SOURCE_COMMIT) {
+    throw new Error('final_release_decision_git_identity_mismatch');
+  }
   const manifestBytes = readGitBytes(executionPacketCommit, MANIFEST_PATH);
   const manifestBlobOid = git(['rev-parse', `${executionPacketCommit}:${MANIFEST_PATH}`]).trim();
   const manifest = JSON.parse(manifestBytes.toString('utf8'));
@@ -90,6 +99,11 @@ async function runFrozenExecutor(executionPacketCommit, finalReleaseDecisionComm
 
   const releaseDecisionBytes = readGitBytes(finalReleaseDecisionCommit, FINAL_RELEASE_DECISION_PATH);
   const releaseDecisionBlobOid = git(['rev-parse', `${finalReleaseDecisionCommit}:${FINAL_RELEASE_DECISION_PATH}`]).trim();
+  if (releaseDecisionBlobOid !== FINAL_RELEASE_DECISION_BLOB_OID ||
+      sha256(releaseDecisionBytes) !== EXPECTED_FINAL_RELEASE_DECISION_SHA256 ||
+      evaluateCm2094Phase8FinalExecutionReleaseDecision(releaseDecisionBytes).accepted !== true) {
+    throw new Error('final_execution_release_decision_exact_artifact_rejected');
+  }
   const releaseIntake = evaluatePhase8FinalExecutionReleaseDecisionIntake({
     decisionBytes: releaseDecisionBytes,
     observedBinding: {
@@ -249,4 +263,12 @@ if (require.main === module) {
     .catch(error => { process.stderr.write(`${error.message}\n`); process.exitCode = 1; });
 }
 
-module.exports = { FINAL_RELEASE_DECISION_PATH, MANIFEST_PATH, exactAllowlist, resolvePhase8RegistryGovernanceRoot, runFrozenExecutor };
+module.exports = {
+  FINAL_RELEASE_DECISION_BLOB_OID,
+  FINAL_RELEASE_DECISION_PATH,
+  FINAL_RELEASE_DECISION_SOURCE_COMMIT,
+  MANIFEST_PATH,
+  exactAllowlist,
+  resolvePhase8RegistryGovernanceRoot,
+  runFrozenExecutor
+};
