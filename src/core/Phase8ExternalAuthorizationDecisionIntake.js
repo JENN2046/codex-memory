@@ -51,6 +51,7 @@ function evaluatePhase8ExternalAuthorizationDecisionIntake({ decisionBytes, obse
     }
   }
   if (blockers.length) return { accepted: false, blockers, decision: null };
+  Object.freeze(decision);
   MACHINE_BOUND_CONTENT_DECISIONS.add(decision);
   return { accepted: true, blockers: [], decision, decisionIdentityMachineBound: true, executionAuthorized: false };
 }
