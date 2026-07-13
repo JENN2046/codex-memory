@@ -1033,10 +1033,16 @@ function isMachineBoundReleaseBinding(value) {
   return !!value && machineBoundReleaseBindings.has(value);
 }
 
+function claimBoundReviewTime(claimEnvelope) {
+  const claimedAt = Date.parse(claimEnvelope?.claimedAt || '');
+  if (!Number.isFinite(claimedAt)) throw new Error('cm2126_claimed_at_required_for_receipt_review');
+  return new Date(claimedAt);
+}
+
 function assertExecutionRuntime({ packetEvidence, finalReleaseEvidence }) {
   const repoRoot = fs.realpathSync(gitText(['rev-parse', '--show-toplevel']));
   if (repoRoot !== fs.realpathSync(process.cwd()) || gitText(['branch', '--show-current'], { cwd: repoRoot }) !== '' ||
-      gitText(['status', '--porcelain'], { cwd: repoRoot }) !== '' ||
+      gitText(['status', '--porcelain', '--untracked-files=all'], { cwd: repoRoot }) !== '' ||
       gitText(['rev-parse', 'HEAD^{commit}'], { cwd: repoRoot }) !== finalReleaseEvidence.finalReleaseCommit ||
       gitText(['rev-parse', 'HEAD^{tree}'], { cwd: repoRoot }) !== finalReleaseEvidence.finalReleaseTree) {
     throw new Error('cm2126_clean_detached_final_release_runtime_required');
@@ -1640,7 +1646,7 @@ async function executeBranchCasFromCommits(inputs = {}) {
     const receiptFinalReleaseEvidence = intakeFinalReleaseDecision({
       finalReleaseCommit,
       packetEvidence: receiptPacketEvidence,
-      now: new Date(),
+      now: claimBoundReviewTime(claim),
       ...options
     });
     const receiptBindingHash = buildClaimBindingHash({
@@ -1855,6 +1861,7 @@ module.exports = {
   buildClaimBindingHash,
   buildExecutionPacket,
   buildFinalReleaseDecision,
+  claimBoundReviewTime,
   buildTargetBindings,
   classifyBranchCasCommandFailure,
   deriveTargetWorktree,

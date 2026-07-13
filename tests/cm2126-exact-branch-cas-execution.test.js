@@ -458,6 +458,49 @@ test('unsafe Git environment and caller worktree surfaces fail before claim or G
   assert.throws(() => cli.parseArgs([...cliArgv(), '--worktree', fixture.target]), /exact_three_commit/);
 });
 
+test('detached executor clean check reports untracked files even when Git config hides them', () => {
+  initializeGovernanceRoot();
+  const sentinel = path.join(fixture.repo, 'cm2126-untracked-evidence-sentinel');
+  const refBefore = text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo);
+  git(['config', 'status.showUntrackedFiles', 'no'], fixture.repo);
+  fs.writeFileSync(sentinel, 'fixture only\n');
+  try {
+    const result = runCli();
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /clean_detached_final_release_runtime_required/);
+    assert.equal(fs.existsSync(fixture.claimPath), false);
+    assert.equal(text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo), refBefore);
+  } finally {
+    fs.rmSync(sentinel, { force: true });
+    git(['config', '--unset', 'status.showUntrackedFiles'], fixture.repo);
+  }
+});
+
+test('receipt-time final-release review remains bound to the validated claim time', () => {
+  const claimedAt = fixture.now.toISOString();
+  const reviewTime = fixture.frozenModule.claimBoundReviewTime({ claimedAt });
+  assert.equal(reviewTime.toISOString(), claimedAt);
+  const afterExpiry = new Date(fixture.finalReleaseEvidence.decision.payload.authorization.expiresAt);
+  const expired = fixture.frozenModule.intakeFinalReleaseDecision({
+    finalReleaseCommit: fixture.finalReleaseCommit,
+    packetEvidence: fixture.packetEvidence,
+    now: afterExpiry,
+    ...fixture.gitResolvers
+  });
+  assert.equal(expired.accepted, false);
+  const accepted = fixture.frozenModule.intakeFinalReleaseDecision({
+    finalReleaseCommit: fixture.finalReleaseCommit,
+    packetEvidence: fixture.packetEvidence,
+    now: reviewTime,
+    ...fixture.gitResolvers
+  });
+  assert.equal(accepted.accepted, true, accepted.blockers.join(','));
+  assert.throws(
+    () => fixture.frozenModule.claimBoundReviewTime({ claimedAt: 'invalid' }),
+    /claimed_at_required_for_receipt_review/
+  );
+});
+
 test('core executor rejects every fourth caller key or path before any effect', async () => {
   initializeGovernanceRoot();
   const refBefore = text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo);
