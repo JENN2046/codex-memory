@@ -119,7 +119,7 @@ function resolverFor({
   executionReceiptIdentity = null,
   executionReceiptMarkdownIdentity = null
 } = {}) {
-  return (commit, sourcePath) => {
+  const resolver = (commit, sourcePath) => {
     if (commit === DECISION_COMMIT && sourcePath === DECISION_PATH) return { ...decisionIdentity, content: Buffer.from(decisionIdentity.content) };
     if (commit === BASELINE_COMMIT && sourcePath === AUTHORITY_PATH) return { ...authority, content: Buffer.from(authority.content) };
     if (commit === CM2080.sourceCommit && sourcePath === CM2080.sourcePath) return resolveRealGitFile(commit, sourcePath);
@@ -135,6 +135,17 @@ function resolverFor({
       return targetBaselineResolver(sourcePath);
     }
     throw new Error(`missing:${key}`);
+  };
+  return resolver;
+}
+
+function exactDecisionLineageResolvers(overrides = {}) {
+  return {
+    resolveCommitTree: commit => commit === BASELINE_COMMIT ? BASELINE_TREE : DECISION_TREE,
+    resolveParentCommit: commit => commit === DECISION_COMMIT ? BASELINE_COMMIT : null,
+    resolveDiffPaths: (parentCommit, commit) =>
+      parentCommit === BASELINE_COMMIT && commit === DECISION_COMMIT ? expectedDecisionDiffPaths() : [],
+    ...overrides
   };
 }
 
@@ -153,7 +164,8 @@ async function prepareTempExecution(t) {
   );
   const fixture = decisionFixture();
   const resolver = resolverFor({ decision: fixture.decision, decisionIdentity: fixture.identity, authority: fixture.authority });
-  return { root, governanceRoot, resolver, ...fixture };
+  Object.assign(resolver, exactDecisionLineageResolvers());
+  return { root, governanceRoot, resolver, ...exactDecisionLineageResolvers(), ...fixture };
 }
 
 test('CM-2115-R2 authority intake and exact patch decision fail closed on drift', () => {
@@ -358,6 +370,44 @@ test('CM-2115-R2 rejects decision Git identity drift before claim or patch', asy
     assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), targetBaselineResolver(sourcePath).content);
   }
   await assert.rejects(() => fsp.lstat(path.join(fixture.root, APPLICATION_STATE_PATH)), { code: 'ENOENT' });
+});
+
+test('CM-2115-R2 rejects an unbindable decision commit before claim or patch', async t => {
+  for (const [name, lineageOverrides, expectedBlocker] of [
+    [
+      'unrelated decision sibling change',
+      { resolveDiffPaths: () => [...expectedDecisionDiffPaths(), 'unrelated.txt'] },
+      'decisionIdentity.diffPaths'
+    ],
+    [
+      'decision is not the baseline child',
+      { resolveParentCommit: () => 'f'.repeat(40) },
+      'decisionIdentity.lineage'
+    ]
+  ]) {
+    await t.test(name, async t => {
+      const fixture = await prepareTempExecution(t);
+      Object.assign(fixture.resolver, exactDecisionLineageResolvers(lineageOverrides));
+      const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
+      const result = await executeExactPatch({
+        repoRoot: fixture.root,
+        decision: fixture.decision,
+        decisionIdentity: fixture.identity,
+        authorityIdentity: fixture.authority,
+        resolveGitFile: fixture.resolver,
+        registry
+      });
+
+      assert.equal(result.accepted, false);
+      assert.equal(result.state, 'UNCLAIMED');
+      assert.ok(result.blockers.includes(expectedBlocker));
+      await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
+      for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
+        assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), targetBaselineResolver(sourcePath).content);
+      }
+      await assert.rejects(() => fsp.lstat(path.join(fixture.root, APPLICATION_STATE_PATH)), { code: 'ENOENT' });
+    });
+  }
 });
 
 test('CM-2115-R2 rejects a dangling add target before consuming the claim', async t => {

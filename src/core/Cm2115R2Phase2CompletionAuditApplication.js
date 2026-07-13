@@ -777,7 +777,20 @@ function gitModeFromStat(stat) {
   return (stat.mode & 0o111) === 0 ? '100644' : '100755';
 }
 
-async function executeExactPatch({ repoRoot, decision, decisionIdentity, authorityIdentity, resolveGitFile, registry }) {
+async function executeExactPatch({
+  repoRoot,
+  decision,
+  decisionIdentity,
+  authorityIdentity,
+  resolveGitFile,
+  resolveCommitTree,
+  resolveParentCommit,
+  resolveDiffPaths,
+  registry
+}) {
+  resolveCommitTree ||= resolveGitFile?.resolveCommitTree;
+  resolveParentCommit ||= resolveGitFile?.resolveParentCommit;
+  resolveDiffPaths ||= resolveGitFile?.resolveDiffPaths;
   const decisionResult = evaluateDecision(decision, { resolveGitFile });
   const upstream = revalidateUpstream(resolveGitFile);
   if (!decisionResult.accepted || !upstream.accepted) {
@@ -799,6 +812,24 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
     }
   } catch {
     blockers.push('decisionIdentity.gitObject');
+  }
+  try {
+    if (![resolveCommitTree, resolveParentCommit, resolveDiffPaths].every(item => typeof item === 'function')) {
+      blockers.push('decisionIdentity.lineageResolvers');
+    } else {
+      const baselineCommit = decision.payload.patchPlan.baselineCommit;
+      const baselineTree = decision.payload.patchPlan.baselineTree;
+      if (resolveParentCommit(decisionIdentity.sourceCommit) !== baselineCommit ||
+          resolveCommitTree(baselineCommit) !== baselineTree) {
+        blockers.push('decisionIdentity.lineage');
+      }
+      const decisionDiffPaths = resolveDiffPaths(baselineCommit, decisionIdentity.sourceCommit).sort();
+      if (!sameJson(decisionDiffPaths, expectedDecisionDiffPaths())) {
+        blockers.push('decisionIdentity.diffPaths');
+      }
+    }
+  } catch {
+    blockers.push('decisionIdentity.lineage');
   }
   try {
     const authorityActual = resolveGitFile(decision.payload.authority.sourceCommit, AUTHORITY_PATH);
