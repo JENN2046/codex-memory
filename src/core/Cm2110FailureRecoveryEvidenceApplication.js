@@ -112,6 +112,16 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters.completionAuditPatchApplications');
   for (const field of ['nativeReads', 'nativeWrites', 'failureInjectionExecutions', 'verifyOperations', 'retryOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
+  const expectedBoundaries = {
+    syntheticFailureRecoveryOnly: true,
+    productionFailureRecoveryProven: false,
+    phase8Completed: false,
+    fullPlanPackCompleted: false,
+    readinessClaimed: false
+  };
+  for (const [field, expected] of Object.entries(expectedBoundaries)) {
+    if (payload.boundaries?.[field] !== expected) blockers.push(`receipt.boundaries.${field}`);
+  }
   return { accepted: blockers.length === 0, blockers: [...new Set(blockers)], applicationReceiptAccepted: blockers.length === 0, failureRecoveryProofPassed: blockers.length === 0, phase8Completed: false, additionalNativeActionAuthorized: false };
 }
 

@@ -262,16 +262,25 @@ function appOverrides({ endpoint, bearerToken, appStateRoot }) {
   };
 }
 
-async function startPrimaryWriteOnlyShim({ storeRoot, derivedRuntimeStore, bearerToken }) {
+async function startPrimaryWriteOnlyShim({
+  storeRoot,
+  derivedRuntimeStore,
+  bearerToken,
+  primaryWritePreflight
+}) {
   if (typeof bearerToken !== 'string' || bearerToken.length < 32) {
     throw new Error('cm2106_local_shim_bearer_token_invalid');
+  }
+  if (typeof primaryWritePreflight !== 'function') {
+    throw new Error('cm2106_primary_write_preflight_required');
   }
   const adapter = createVcpToolBoxNativeMemoryAdapter({
     vcpToolBoxRoot: path.resolve(process.cwd(), '../../runtime/VCPToolBox'),
     knowledgeBaseRootPath: storeRoot,
     knowledgeBaseStorePath: derivedRuntimeStore,
     writeSubdir: 'codex-memory-governed',
-    primaryWriteOnly: true
+    primaryWriteOnly: true,
+    primaryWritePreflight
   });
   const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({
     adapter,
@@ -457,7 +466,8 @@ async function runFrozenCm2106RecordWrite(packetCommit, contentDecisionCommit, f
     shim = await startPrimaryWriteOnlyShim({
       storeRoot: governance.internalPaths.storeRoot,
       derivedRuntimeStore: paths.derivedRuntimeStore,
-      bearerToken
+      bearerToken,
+      primaryWritePreflight: () => collectPreWriteProjection(governance.internalPaths.storeRoot)
     });
     if (shim.authorizationProjection().authorizationRequired !== true) {
       throw new Error('cm2106_local_shim_bearer_not_enforced');
