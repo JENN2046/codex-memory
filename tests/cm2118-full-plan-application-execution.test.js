@@ -501,6 +501,58 @@ test('initial claim write stays pinned to the verified governance root across a 
   }
 });
 
+test('claim transition temp write and rename stay pinned across a governance root path swap', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: decisionTime(fixture.finalReleaseEvidence.decision) });
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-transition-root-swap-'));
+  const root = path.join(parent, 'registry');
+  const replacement = path.join(parent, 'replacement');
+  const pinned = path.join(parent, 'pinned');
+  const identity = JSON.stringify(canonicalize(fixture.frozenModule.GOVERNANCE_ROOT_IDENTITY));
+  const bindingHash = 'd'.repeat(64);
+  fs.mkdirSync(root);
+  fs.mkdirSync(replacement);
+  fs.writeFileSync(path.join(root, '.phase8-registry-root-identity.json'), identity);
+  fs.writeFileSync(path.join(replacement, '.phase8-registry-root-identity.json'), identity);
+  try {
+    const initialRegistry = new fixture.frozenModule.Cm2118FullPlanApplicationClaimRegistry({ governanceRoot: root });
+    await initialRegistry.claim(bindingHash, fixture.finalReleaseEvidence);
+    let swapped = false;
+    const filesystem = Object.create(require('node:fs/promises'));
+    filesystem.writeFile = async (target, bytes, options) => {
+      if (!swapped && String(target).endsWith('.APPLICATION_COMMIT_CREATED.tmp')) {
+        fs.renameSync(root, pinned);
+        fs.renameSync(replacement, root);
+        swapped = true;
+      }
+      return require('node:fs/promises').writeFile(target, bytes, options);
+    };
+    const registry = new fixture.frozenModule.Cm2118FullPlanApplicationClaimRegistry({
+      governanceRoot: root,
+      filesystem
+    });
+    const transitioned = await registry.transition(
+      bindingHash,
+      'APPLICATION_COMMIT_INVOCATION_CONSUMED',
+      'APPLICATION_COMMIT_CREATED',
+      {
+        applicationCommitCreated: true,
+        applicationCommit: 'a'.repeat(40),
+        applicationTree: 'b'.repeat(40)
+      }
+    );
+    assert.equal(swapped, true);
+    assert.equal(transitioned.state, 'APPLICATION_COMMIT_CREATED');
+    const pinnedClaim = JSON.parse(fs.readFileSync(
+      path.join(pinned, fixture.frozenModule.claimFileName()),
+      'utf8'
+    ));
+    assert.equal(pinnedClaim.state, 'APPLICATION_COMMIT_CREATED');
+    assert.equal(fs.existsSync(path.join(root, fixture.frozenModule.claimFileName())), false);
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 test('CM-2118 registry rejects a governance root reached through a symlinked parent', async () => {
   const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-registry-parent-'));
   try {
