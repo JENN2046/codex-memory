@@ -50,6 +50,7 @@ function validatePacket(packet = {}, observed = {}) {
   const exactCounts = { maxHarnessRuns: 1, maxClaimCount: 2, maxNativeWriteCalls: 1, maxDurableWrites: 1, maxRetryCount: 0, maxRollbackCount: 0, maxCompensationCount: 0 };
   for (const [field, expected] of Object.entries(exactCounts)) if (packet[field] !== expected) blockers.push(`packet.${field}`);
   for (const field of ['usesCm2094LiveAuthorization', 'usesCm2094Nonce', 'usesCm2094RegistryClaim', 'modifiesCm2094Record', 'productionProviderAllowed', 'realMemoryAllowed', 'localFallbackAllowed', 'defaultMcpExpansionAllowed', 'readinessClaimAllowed']) if (packet[field] !== false) blockers.push(`packet.${field}`);
+  for (const field of ['failureRecoveryProofPassedAtPacketFreeze', 'phase8CompletedAtPacketFreeze']) if (packet[field] !== false) blockers.push(`packet.${field}`);
   return { accepted: blockers.length === 0, blockers };
 }
 
@@ -61,6 +62,7 @@ function validateDecision(decision = {}, binding = {}) {
   const expiry = Date.parse(decision.expiresAt || '');
   if (!Number.isFinite(expiry) || Date.now() >= expiry) blockers.push('decision.expiresAt');
   for (const field of ['productionProviderAuthorized', 'realMemoryAuthorized', 'cm2094AuthorizationReuseAuthorized', 'retryAuthorized', 'rollbackAuthorized', 'compensationAuthorized', 'defaultMcpExpansionAuthorized', 'readinessClaimAuthorized']) if (decision[field] !== false) blockers.push(`decision.${field}`);
+  for (const field of ['failureRecoveryProofPassedByDecisionAlone', 'phase8CompletedByDecisionAlone']) if (decision[field] !== false) blockers.push(`decision.${field}`);
   return { accepted: blockers.length === 0, blockers };
 }
 
