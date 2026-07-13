@@ -466,6 +466,15 @@ test('CM-2115-R2 execution receipt re-resolves all upstream Git objects', async 
     return fixture.resolver(commit, sourcePath);
   };
   assert.equal(evaluateExecutionReceipt(result.receipt, { resolveGitFile: trackingResolver }).accepted, true);
+  const executionReceiptWithExtraSibling = {
+    ...structuredClone(result.receipt),
+    unauthorizedSibling: false
+  };
+  const extraSiblingEvaluation = evaluateExecutionReceipt(executionReceiptWithExtraSibling, {
+    resolveGitFile: trackingResolver
+  });
+  assert.equal(extraSiblingEvaluation.accepted, false);
+  assert.ok(extraSiblingEvaluation.blockers.includes('executionReceipt.exactShape'));
   for (const expected of [
     `${DECISION_COMMIT}:${DECISION_PATH}`,
     `${BASELINE_COMMIT}:${AUTHORITY_PATH}`,
@@ -557,6 +566,13 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     }
   };
   assert.equal(evaluateBindingReceipt(receipt, options).accepted, true);
+  const bindingReceiptWithExtraSibling = {
+    ...structuredClone(receipt),
+    unauthorizedSibling: false
+  };
+  const bindingExtraSiblingEvaluation = evaluateBindingReceipt(bindingReceiptWithExtraSibling, options);
+  assert.equal(bindingExtraSiblingEvaluation.accepted, false);
+  assert.ok(bindingExtraSiblingEvaluation.blockers.includes('bindingReceipt.exactShape'));
 
   const missingDurableClaim = evaluateBindingReceipt(receipt, {
     ...options,

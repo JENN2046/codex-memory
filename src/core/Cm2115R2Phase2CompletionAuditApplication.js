@@ -681,6 +681,9 @@ function renderExecutionReceiptMarkdown(receipt) {
 
 function evaluateExecutionReceipt(receipt = {}, { resolveGitFile } = {}) {
   const blockers = [];
+  if (!hasExactKeys(receipt, ['canonicalPayloadSha256', 'payload', 'receiptType', 'schemaVersion', 'taskId'])) {
+    blockers.push('executionReceipt.exactShape');
+  }
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
       receipt.receiptType !== 'phase2_exact_patch_application_execution_receipt_v1' ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('executionReceipt.identityOrHash');
@@ -958,6 +961,9 @@ function evaluateBindingReceipt(receipt = {}, {
   const blockers = [];
   const receiptType = receipt.receiptType;
   const v2 = receiptType === 'phase2_exact_patch_application_git_binding_receipt_v2';
+  if (!hasExactKeys(receipt, ['canonicalPayloadSha256', 'payload', 'receiptType', 'schemaVersion', 'taskId'])) {
+    blockers.push('bindingReceipt.exactShape');
+  }
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
       !['phase2_exact_patch_application_git_binding_receipt_v1', 'phase2_exact_patch_application_git_binding_receipt_v2'].includes(receiptType) ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('bindingReceipt.identityOrHash');
