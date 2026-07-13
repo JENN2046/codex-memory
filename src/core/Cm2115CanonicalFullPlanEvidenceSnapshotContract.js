@@ -345,7 +345,8 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
   }
   const validationTarget = validationReceipt?.payload?.validationTarget;
   if (validationReceiptEvaluation?.accepted) {
-    if (typeof resolveCommitTree !== 'function' || typeof isCommitAncestor !== 'function') {
+    if (typeof resolveCommitTree !== 'function' || typeof resolveParentCommit !== 'function' ||
+        typeof resolveDiffPaths !== 'function' || typeof isCommitAncestor !== 'function') {
       blockers.push('validationReceipt.gitLineageResolversRequired');
     } else {
       try {
@@ -354,6 +355,10 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
         }
         if (!isCommitAncestor(validationTarget.commit, BASELINE.sourceCommit)) {
           blockers.push('validationReceipt.targetNotAncestorOfBaseline');
+        }
+        if (resolveParentCommit(BASELINE.sourceCommit) !== validationTarget.commit ||
+            !equalJson(resolveDiffPaths(validationTarget.commit, BASELINE.sourceCommit), [LOCAL_VALIDATION_RECEIPT_PATH])) {
+          blockers.push('validationReceipt.notExactBaselineParent');
         }
       } catch {
         blockers.push('validationReceipt.gitLineageUnreadable');

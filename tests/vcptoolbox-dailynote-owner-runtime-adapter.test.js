@@ -40,7 +40,7 @@ process.stdin.on('end', async () => {
 });
 `;
 
-async function setup() {
+async function setup({ emitStderr = false } = {}) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2113-owner-runtime-'));
   const runtimeRoot = path.join(root, 'runtime');
   const pluginDirectory = path.join(runtimeRoot, 'Plugin', 'DailyNote');
@@ -58,7 +58,12 @@ async function setup() {
     communication: { protocol: 'stdio', timeout: 30000 }
   };
   const preload = await fs.readFile(path.join(__dirname, '../src/runtime/cm2113-frozen-clock-preload.js'));
-  const pluginBytes = Buffer.from(fixturePlugin);
+  const pluginBytes = Buffer.from(emitStderr
+    ? fixturePlugin.replace(
+      "process.stdout.write(JSON.stringify({ status: 'success', result: { folder: args.folder, fileName } }));",
+      "process.stderr.write('synthetic diagnostic'); process.stdout.write(JSON.stringify({ status: 'success', result: { folder: args.folder, fileName } }));"
+    )
+    : fixturePlugin);
   const manifestBytes = Buffer.from(JSON.stringify(manifest));
   await fs.writeFile(path.join(pluginDirectory, 'dailynote.js'), pluginBytes);
   await fs.writeFile(path.join(pluginDirectory, 'plugin-manifest.json'), manifestBytes);
@@ -240,6 +245,21 @@ test('CM-2113 adapter binds an exact VCPToolBox DailyNote stdio runtime and stab
   assert.equal(result._nativeRuntimeReceipt.providerApiCalled, false);
   assert.equal(result._nativeRuntimeReceipt.primaryMemoryStoreWritePerformed, true);
   assert.equal(result._nativeRuntimeReceipt.rawMemoryContentDisclosed, false);
+});
+
+test('CM-2113 adapter reports owner-runtime stderr as raw runtime output', async t => {
+  const fixture = await setup({ emitStderr: true });
+  t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
+  const adapter = createVcpToolBoxDailyNoteOwnerRuntimeAdapter({
+    runtimeRoot: fixture.runtimeRoot,
+    storeRoot: fixture.storeRoot,
+    dependencyRoot: fixture.dependencyRoot,
+    fixedRecord: fixture.fixedRecord,
+    expected: fixture.expected
+  });
+  await adapter.preflight();
+  const result = await adapter.record(projectedArgs(fixture));
+  assert.equal(result._nativeRuntimeReceipt.rawRuntimeOutputDisclosed, true);
 });
 
 test('CM-2113 adapter fails closed on runtime, store, payload, or empty-store drift', async t => {

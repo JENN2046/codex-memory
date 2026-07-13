@@ -290,6 +290,7 @@ const STOP_L4_FLAG_KEYS = Object.freeze([
   'providerApiCalled',
   'publicMcpExpanded',
   'defaultRuntimeExpanded',
+  'readinessClaimed',
   'productionReadyClaimed',
   'releaseReadyClaimed',
   'deployReadyClaimed',

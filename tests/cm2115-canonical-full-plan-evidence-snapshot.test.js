@@ -150,6 +150,12 @@ function evaluate(snapshot, resolver = fakeResolverFactory(), extras = {}) {
     resolveCommitTree: commit => commit === VALIDATION_TARGET_COMMIT
       ? VALIDATION_TARGET_TREE
       : binding.resolveCommitTree(commit),
+    resolveParentCommit: commit => commit === snapshot.payload.baseline.sourceCommit
+      ? VALIDATION_TARGET_COMMIT
+      : binding.resolveParentCommit(commit),
+    resolveDiffPaths: (parent, commit) => parent === VALIDATION_TARGET_COMMIT && commit === snapshot.payload.baseline.sourceCommit
+      ? [LOCAL_VALIDATION_RECEIPT_PATH]
+      : binding.resolveDiffPaths(parent, commit),
     isCommitAncestor: (ancestor, descendant) =>
       ancestor === VALIDATION_TARGET_COMMIT && typeof descendant === 'string' && descendant.length === 40,
     ...extras
@@ -374,6 +380,12 @@ test('snapshot contract requires the fresh validation receipt and its Git lineag
   });
   assert.equal(unrelated.accepted, false);
   assert.ok(unrelated.blockers.includes('validationReceipt.targetNotAncestorOfBaseline'));
+
+  const staleAncestor = evaluate(snapshot, fakeResolverFactory(), {
+    resolveParentCommit: () => '4'.repeat(40)
+  });
+  assert.equal(staleAncestor.accepted, false);
+  assert.ok(staleAncestor.blockers.includes('validationReceipt.notExactBaselineParent'));
 });
 
 test('local validation receipt contract rejects failed command or completion/readiness overclaim', () => {
