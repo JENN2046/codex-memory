@@ -347,7 +347,10 @@ function createVcpToolBoxDailyNoteOwnerRuntimeAdapter(options = {}) {
   }
 
   async function record(args = {}) {
-    if (!preflightResult?.accepted) await preflight();
+    // The store is an exact empty synthetic target. Re-run preflight for every
+    // invocation so a prior accepted result cannot authorize a later store
+    // state, then inspect it again immediately before starting the owner.
+    await preflight();
     const businessArgs = projectBusinessRecordArguments(args);
     if (sha256Canonical(businessArgs) !== expected.recordArgumentsCanonicalSha256) {
       throw new Error('owner_runtime_record_arguments_binding_mismatch');
@@ -381,6 +384,11 @@ function createVcpToolBoxDailyNoteOwnerRuntimeAdapter(options = {}) {
       IMAGESERVER_IMAGE_KEY: '',
       IMAGESERVER_FILE_KEY: ''
     };
+    const preWriteStoreProjection = await inspectStore(storeRoot, storeIdentityFilename);
+    if (preWriteStoreProjection.markdown.length !== 0 ||
+        preWriteStoreProjection.directories !== 0) {
+      throw new Error('owner_runtime_store_not_empty_before_write');
+    }
     const execution = await runOwnerRuntime({
       nodeExecutable,
       pluginPath,

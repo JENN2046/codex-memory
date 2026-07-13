@@ -37,6 +37,7 @@ const {
 } = require('../src/core/Cm2107IdentityBoundTombstoneRollback');
 const {
   appOverrides,
+  finalizeCm2107ExecutionReceipt,
   runFrozenCm2107Tombstone,
   validatePacket
 } = require('../src/cli/cm2107-identity-bound-tombstone-rollback');
@@ -328,6 +329,36 @@ test('CM-2107 verify requires exact audit correlation and yields zero effective 
 test('CM-2107 frozen executor requires packet and decision commits before store access', async () => {
   await assert.rejects(runFrozenCm2107Tombstone(null, null), /cm2107_execution_packet_commit_required/);
   await assert.rejects(runFrozenCm2107Tombstone('a'.repeat(40), null), /cm2107_final_release_decision_commit_required/);
+});
+
+test('CM-2107 executor finalizes the printed receipt with durable claim evidence and payload hash', async t => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2107-receipt-evidence-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const claim = {
+    claimId: 'a'.repeat(64),
+    bindingHash: 'b'.repeat(64),
+    nonceHash: 'c'.repeat(64),
+    receiptIdHash: 'd'.repeat(64),
+    writeInvocationCount: 1
+  };
+  await Promise.all([
+    fs.writeFile(path.join(directory, `nonce-${claim.nonceHash}.json`), '{}'),
+    fs.writeFile(path.join(directory, `receipt-${claim.receiptIdHash}.json`), '{}'),
+    fs.writeFile(path.join(directory, `write-invocation-${claim.claimId}.json`), '{}')
+  ]);
+  const receipt = await finalizeCm2107ExecutionReceipt(
+    { schemaVersion: 1, taskId: 'CM-2107' },
+    { directory, readClaim: async () => claim },
+    claim.claimId
+  );
+  const { receiptPayloadSha256, ...payload } = receipt;
+  assert.equal(receipt.claimId, claim.claimId);
+  assert.equal(receipt.claimBindingHash, claim.bindingHash);
+  assert.equal(receipt.nonceMarkerCount, 1);
+  assert.equal(receipt.authorizationReceiptMarkerCount, 1);
+  assert.equal(receipt.writeInvocationMarkerCount, 1);
+  assert.equal(receipt.writeInvocationCount, 1);
+  assert.equal(receiptPayloadSha256, sha256Canonical(payload));
 });
 
 test('CM-2107 frozen rollback receipt proves exact append-only lifecycle rollback', async () => {
