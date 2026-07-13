@@ -277,4 +277,26 @@ test('CM-2113 adapter fails closed on runtime, store, payload, or empty-store dr
   const transportDrift = projectedArgs(fixture);
   transportDrift.governed_bridge.runtime_target.target_reference_name = 'clone-target';
   await assert.rejects(adapter.record(transportDrift), /transport_envelope_binding_mismatch/);
+
+  const postPreflightDrift = await setup();
+  t.after(() => fs.rm(postPreflightDrift.root, { recursive: true, force: true }));
+  const postPreflightAdapter = createVcpToolBoxDailyNoteOwnerRuntimeAdapter({
+    runtimeRoot: postPreflightDrift.runtimeRoot,
+    storeRoot: postPreflightDrift.storeRoot,
+    dependencyRoot: postPreflightDrift.dependencyRoot,
+    fixedRecord: postPreflightDrift.fixedRecord,
+    expected: postPreflightDrift.expected
+  });
+  await postPreflightAdapter.preflight();
+  const unexpectedPath = path.join(postPreflightDrift.storeRoot, 'post-preflight-drift.md');
+  await fs.writeFile(unexpectedPath, 'synthetic drift');
+  await assert.rejects(
+    postPreflightAdapter.record(projectedArgs(postPreflightDrift)),
+    /owner_runtime_store_not_empty/
+  );
+  assert.equal(await fs.readFile(unexpectedPath, 'utf8'), 'synthetic drift');
+  assert.deepEqual(
+    (await fs.readdir(postPreflightDrift.storeRoot)).sort(),
+    [DEFAULT_STORE_IDENTITY_FILENAME, 'post-preflight-drift.md'].sort()
+  );
 });

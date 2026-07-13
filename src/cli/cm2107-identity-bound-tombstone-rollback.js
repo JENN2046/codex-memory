@@ -16,7 +16,11 @@ const {
 } = require('../core/Cm2096TombstoneExecutionDecisionIntake');
 const { createCm2096TombstoneOneShotGate } = require('../core/Cm2096TombstoneOneShotGate');
 const { verifyCm2103GovernanceRoot } = require('../core/Cm2103IdentityBoundStoreGovernance');
-const { startPrimaryWriteOnlyShim } = require('./cm2106-identity-bound-synthetic-record-write');
+const {
+  collectExecutionClaimEvidence,
+  startPrimaryWriteOnlyShim,
+  withReceiptPayloadSha256
+} = require('./cm2106-identity-bound-synthetic-record-write');
 const {
   ALLOWED_SCOPE,
   DECISION_PATH,
@@ -169,6 +173,11 @@ async function ensureAbsent(target, code) {
     if (error.code === 'ENOENT') return;
     throw error;
   }
+}
+
+async function finalizeCm2107ExecutionReceipt(receiptPayload, registry, claimId) {
+  const claimEvidence = await collectExecutionClaimEvidence(registry, claimId);
+  return withReceiptPayloadSha256({ ...receiptPayload, ...claimEvidence });
 }
 
 function appOverrides({ endpoint, bearerToken, appStateRoot }) {
@@ -370,7 +379,7 @@ async function runFrozenCm2107Tombstone(packetCommit, decisionCommit) {
       () => true,
       error => error.code === 'ENOENT' ? false : Promise.reject(error)
     );
-    return {
+    const receiptPayload = {
       schemaVersion: 1,
       taskId: 'CM-2107',
       receiptType: 'identity_bound_append_only_tombstone_execution_receipt',
@@ -401,8 +410,6 @@ async function runFrozenCm2107Tombstone(packetCommit, decisionCommit) {
       durableMarkerBytes: postStoreProjection.tombstoneMarkerProjection.durableBytes,
       durableMarkerSha256: postStoreProjection.tombstoneMarkerProjection.durableSha256,
       markerMemoryIdRef: postStoreProjection.tombstoneMarkerProjection.markerMemoryIdRef,
-      claimId: claim.claimId,
-      claimBindingHash: claim.bindingHash,
       authorizationUseCount: 1,
       authorizationConsumed: true,
       authorizationReplayAllowed: false,
@@ -434,6 +441,7 @@ async function runFrozenCm2107Tombstone(packetCommit, decisionCommit) {
       phase8Completed: false,
       readinessClaimed: false
     };
+    return finalizeCm2107ExecutionReceipt(receiptPayload, registry, claim.claimId);
   } catch (error) {
     const current = await registry.readClaim(claim.claimId).catch(() => null);
     const state = current?.state === 'CLAIMED'
@@ -475,6 +483,7 @@ if (require.main === module) {
 module.exports = {
   appOverrides,
   expectedDecisionBinding,
+  finalizeCm2107ExecutionReceipt,
   runFrozenCm2107Tombstone,
   statePaths,
   validatePacket
