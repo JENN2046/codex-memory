@@ -59,6 +59,9 @@ async function main(argv = process.argv.slice(2)) {
     decisionIdentity,
     authorityIdentity,
     resolveGitFile,
+    resolveCommitTree,
+    resolveParentCommit,
+    resolveDiffPaths,
     registry
   });
   if (!result.accepted) throw new Error(`cm2115_r2_application_rejected:${result.blockers.join(',')}`);
