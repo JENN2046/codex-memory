@@ -138,6 +138,39 @@ test('CM2011 propose_memory_delta rejects raw secret write and readiness fields 
   assert.equal(serialized.includes('SYNTHETIC_TOKEN_SHOULD_NOT_ECHO'), false);
 });
 
+test('CM2011 propose_memory_delta redacts sensitive fragments from allowed proposal strings', () => {
+  const service = new MemoryDeltaProposalService();
+  const rawBearer = ['Bearer', 'SYNTHETIC_PROPOSAL_BEARER_1234567890'].join(' ');
+  const rawApiKey = 'api_key=SYNTHETIC_PROPOSAL_API_KEY_1234567890';
+  const rawPath = 'C:\\Users\\example\\private\\.env';
+  const result = service.propose(validProposalArgs({
+    task: {
+      title: `Review ${rawBearer}`,
+      project_id: 'codex-memory',
+      client_id: 'codex',
+      visibility: 'project'
+    },
+    evidence_refs: [rawPath, `fixture ${rawApiKey}`],
+    candidates: [{
+      target: 'process',
+      summary: `Never echo ${rawBearer}`,
+      evidence_refs: [`source ${rawApiKey}`, rawPath],
+      tags: [`tag ${rawApiKey}`],
+      reusable: true,
+      sensitivity: `label ${rawApiKey}`
+    }]
+  }));
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, true);
+  assert.equal(result.low_disclosure, true);
+  assert.equal(result.raw_values_included, false);
+  assert.equal(serialized.includes('SYNTHETIC_PROPOSAL_BEARER_1234567890'), false);
+  assert.equal(serialized.includes('SYNTHETIC_PROPOSAL_API_KEY_1234567890'), false);
+  assert.equal(serialized.includes(rawPath), false);
+  assert.match(serialized, /<redacted>/);
+});
+
 test('CM2011 propose_memory_delta rejects write commit or production intent', () => {
   const service = new MemoryDeltaProposalService();
   const result = service.propose(validProposalArgs({
