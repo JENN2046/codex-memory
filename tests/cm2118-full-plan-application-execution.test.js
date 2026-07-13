@@ -16,7 +16,12 @@ const packetGenerator = require('../scripts/generate-cm2118-full-plan-applicatio
 const releaseGenerator = require('../scripts/generate-cm2119-full-plan-final-execution-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 const cm2115Git = require('../scripts/cm2115-r2-git');
+const {
+  GOVERNANCE_ROOT_IDENTITY: CM2115_GOVERNANCE_ROOT_IDENTITY,
+  claimFileName: cm2115ClaimFileName
+} = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
+const CM2115_BINDING_HASH = '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc';
 // The frozen executor performs a large number of Git-object checks. A focused
 // run completes in roughly one minute, while the default suite runs many test
 // files concurrently and can take materially longer. Keep a hard ceiling so a
@@ -119,7 +124,7 @@ function resolvers(cwd) {
     resolveGitFile,
     resolveDiffPaths,
     resolveDiffEntries,
-    resolveDurableClaim: bindingHash => cm2115Git.resolveDurableClaim(bindingHash, { cwd }),
+    resolveDurableClaim: () => resolveFixtureDurableClaim(cwd),
     isCommitAncestor
   };
 }
@@ -139,10 +144,31 @@ function commitAll(cwd, message) {
   return text(['rev-parse', 'HEAD^{commit}'], cwd);
 }
 
+function fixtureGovernanceRoot(cwd) {
+  return path.join(cwd, '.git', 'codex-memory-governance', 'phase8-one-shot-authorization-registries');
+}
+
+function seedCm2115DurableClaim(cwd) {
+  const root = fixtureGovernanceRoot(cwd);
+  const claim = cm2115Git.resolveDurableClaim(CM2115_BINDING_HASH, { cwd: ROOT });
+  fs.mkdirSync(root, { recursive: true });
+  fs.writeFileSync(
+    path.join(root, '.phase8-registry-root-identity.json'),
+    JSON.stringify(canonicalize(CM2115_GOVERNANCE_ROOT_IDENTITY))
+  );
+  fs.writeFileSync(path.join(root, cm2115ClaimFileName()), JSON.stringify(canonicalize(claim)));
+}
+
+function resolveFixtureDurableClaim(cwd) {
+  return JSON.parse(fs.readFileSync(path.join(fixtureGovernanceRoot(cwd), cm2115ClaimFileName()), 'utf8'));
+}
+
 function prepareFrozenFixture() {
   const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-e2e-'));
   const repo = path.join(parent, 'repo');
-  git(['worktree', 'add', '--quiet', '--detach', repo, implementation.IMPLEMENTATION_PARENT_FREEZE.commit], ROOT);
+  git(['clone', '--quiet', '--no-hardlinks', ROOT, repo], parent);
+  git(['checkout', '--detach', implementation.IMPLEMENTATION_PARENT_FREEZE.commit], repo);
+  seedCm2115DurableClaim(repo);
   copyImplementationFiles(repo);
   const implementationCommit = commitAll(repo, 'test: freeze cm2118 implementation');
   execFileSync(process.execPath, ['scripts/generate-cm2118-full-plan-application-execution-packet.js'], {
@@ -187,11 +213,6 @@ test.before(() => {
 
 test.after(() => {
   if (fixture?.parent && process.env.CM2118_KEEP_FIXTURE !== '1') {
-    if (fixture.repo && fs.existsSync(fixture.repo)) {
-      try {
-        git(['worktree', 'remove', '--force', fixture.repo], ROOT);
-      } catch {}
-    }
     fs.rmSync(fixture.parent, { recursive: true, force: true });
   }
 });
@@ -447,18 +468,7 @@ function evaluateDurableInFixture() {
 test('fixed executor survives concurrent invocation with exactly one application and durable receipts', {
   timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
 }, async () => {
-  const governanceRoot = path.join(
-    fixture.repo,
-    '.git',
-    'codex-memory-governance',
-    'phase8-one-shot-authorization-registries'
-  );
-  fs.mkdirSync(governanceRoot, { recursive: true });
-  fs.writeFileSync(
-    path.join(governanceRoot, '.phase8-registry-root-identity.json'),
-    JSON.stringify(canonicalize(fixture.frozenModule.GOVERNANCE_ROOT_IDENTITY)),
-    { flag: 'wx' }
-  );
+  const governanceRoot = fixtureGovernanceRoot(fixture.repo);
   git(['checkout', '--detach', fixture.implementationCommit], fixture.repo);
   const [left, right] = await Promise.all([runApplicationProcess(), runApplicationProcess()]);
   assert.equal(left.timedOut, false, JSON.stringify(left));
