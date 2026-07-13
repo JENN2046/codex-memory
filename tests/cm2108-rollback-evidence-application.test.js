@@ -105,7 +105,13 @@ test('CM-2108 receipt contract rejects replay, native side effects, or completio
     payload => { payload.authorization.replayAllowed = true; },
     payload => { payload.applicationCounters.nativeWrites = 1; },
     payload => { payload.appliedEvidence.failureRecoveryProofPassed = true; },
-    payload => { payload.appliedEvidence.phase8Completed = true; }
+    payload => { payload.appliedEvidence.phase8Completed = true; },
+    payload => { payload.boundaries.defaultProductRetrievalTombstoneAwarenessProven = true; },
+    payload => { payload.boundaries.failureRecoveryProofPassed = true; },
+    payload => { payload.boundaries.phase8Completed = true; },
+    payload => { payload.boundaries.fullPlanPackCompleted = true; },
+    payload => { payload.boundaries.readinessClaimed = true; },
+    payload => { payload.boundaries.unreviewedCapability = false; }
   ]) {
     const payload = structuredClone(result.receiptPayload);
     mutate(payload);

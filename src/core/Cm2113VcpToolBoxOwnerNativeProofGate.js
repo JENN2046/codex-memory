@@ -168,6 +168,8 @@ function ownerRuntimeReceiptAccepted(result, expected) {
     native?.providerApiCalled === false &&
     native?.primaryMemoryStoreWritePerformed === true &&
     native?.derivedIndexWritePerformed === false &&
+    native?.memoryReadPerformed === false &&
+    native?.rawRuntimeOutputDisclosed === false &&
     native?.rawMemoryContentDisclosed === false &&
     native?.runtimeLocatorDisclosed === false &&
     native?.tokenMaterialDisclosed === false &&
