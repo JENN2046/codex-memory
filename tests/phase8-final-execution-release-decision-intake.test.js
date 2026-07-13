@@ -54,6 +54,11 @@ test('final execution release intake binds content and exact execution manifest'
   const result = evaluatePhase8FinalExecutionReleaseDecisionIntake({ ...value, now: new Date('2026-07-11T00:00:00.000Z') });
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.executionAuthorized, true);
+  assert.equal(Object.isFrozen(result.decision), true);
+  assert.throws(() => { result.decision.nonce = 'replay-nonce'; }, TypeError);
+  assert.throws(() => { result.decision.receiptId = 'replay-receipt'; }, TypeError);
+  assert.equal(result.decision.nonce, value.expectedBinding.nonce);
+  assert.equal(result.decision.receiptId, value.expectedBinding.receiptId);
 });
 
 test('final release intake rejects packet, manifest, expiry, or copied decision drift', () => {

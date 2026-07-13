@@ -138,6 +138,22 @@ test('CM2016 rejects release note full capability claims for readonly-context', 
   assert.ok(result.blockers.includes('forbidden_release_note_claim_production_write'));
 });
 
+test('CM2016 normalizes case and hyphen variants before capability claim checks', () => {
+  const result = evaluateReleaseTagReadinessPolicyGate({
+    candidateTag: 'v0.2.0-readonly-context-rc',
+    milestone: 'readonly_context',
+    evidence: readonlyContextEvidence(),
+    releaseNotes: releaseNotes({
+      capabilityClaims: ['Full Capability', 'PRODUCTION-WRITE', 'production_write']
+    })
+  });
+
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('forbidden_release_note_claim_full_capability'));
+  assert.ok(result.blockers.includes('forbidden_release_note_claim_production_write'));
+  assert.deepEqual(result.nonClaims.requestedCapabilityClaims, ['full_capability', 'production_write']);
+});
+
 test('CM2016 requires release note non-claims review even when evidence object says reviewed', () => {
   const result = evaluateReleaseTagReadinessPolicyGate({
     candidateTag: 'v0.2.0-readonly-context-rc',
