@@ -6,6 +6,7 @@ const decision = require('../src/core/Cm2121FullPlanStatusSyncContentDecision');
 const generator = require('../scripts/generate-cm2121-full-plan-status-sync-content-decision');
 const { resolverOptions } = require('../scripts/generate-cm2116-exact-full-plan-application-gate');
 const { sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const frozenDecision = require('../docs/near-model-memory-plan-pack/cm2121_exact_full_plan_status_sync_content_decision.json');
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -15,21 +16,7 @@ function prepared() {
   const options = resolverOptions();
   const applicationEvidence = decision.intakeApplication(options);
   assert.equal(applicationEvidence.accepted, true, applicationEvidence.blockers.join(','));
-  const implementation = {
-    commit: 'a'.repeat(40),
-    tree: 'b'.repeat(40),
-    parentCommit: decision.APPLICATION_COMMIT,
-    parentTree: decision.APPLICATION_TREE,
-    diffPaths: decision.IMPLEMENTATION_DIFF_PATHS,
-    diffEntries: decision.IMPLEMENTATION_DIFF_ENTRIES,
-    diffPathsSha256: sha256Canonical(decision.IMPLEMENTATION_DIFF_PATHS),
-    diffEntriesSha256: sha256Canonical(decision.IMPLEMENTATION_DIFF_ENTRIES),
-    artifacts: [
-      { path: decision.IMPLEMENTATION_ARTIFACT_PATHS[0], blobOid: 'c'.repeat(40), bytes: 1, sha256: 'd'.repeat(64) },
-      { path: decision.IMPLEMENTATION_ARTIFACT_PATHS[1], blobOid: 'e'.repeat(40), bytes: 1, sha256: 'f'.repeat(64) },
-      { path: decision.IMPLEMENTATION_ARTIFACT_PATHS[2], blobOid: '1'.repeat(40), bytes: 1, sha256: '2'.repeat(64) }
-    ]
-  };
+  const implementation = clone(frozenDecision.payload.decisionImplementation);
   const artifact = decision.buildDecision({ applicationEvidence, implementation });
   return { options, applicationEvidence, implementation, artifact };
 }
@@ -54,6 +41,16 @@ test('content decision approves content while execution, ref update, and final r
   assert.equal(evaluation.statusSyncPerformed, false);
   assert.equal(evaluation.currentBranchStatusSynchronized, false);
   assert.equal(evaluation.readinessClaimed, false);
+});
+
+test('content decision rejects a caller-supplied implementation not present in Git', () => {
+  const { options, applicationEvidence, implementation } = prepared();
+  const missing = clone(implementation);
+  missing.commit = 'a'.repeat(40);
+  const artifact = decision.buildDecision({ applicationEvidence, implementation: missing });
+  const evaluation = decision.evaluateDecision(artifact, { implementation: missing, ...options });
+  assert.equal(evaluation.accepted, false);
+  assert.ok(evaluation.blockers.includes('decision.implementationUnreadable'));
 });
 
 test('application, patch, execution, final release, branch ref, and readiness drift fail closed', () => {

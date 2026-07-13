@@ -158,6 +158,33 @@ function isMachineBoundApplication(value) {
   return !!value && machineBoundApplications.has(value);
 }
 
+function verifyImplementationIdentity(implementation, options, blockers) {
+  try {
+    const paths = options.resolveDiffPaths(implementation.parentCommit, implementation.commit).sort();
+    const entries = options.resolveDiffEntries(implementation.parentCommit, implementation.commit)
+      .sort((left, right) => left.path.localeCompare(right.path));
+    if (options.resolveCommitTree(implementation.commit) !== implementation.tree ||
+        options.resolveParentCommit(implementation.commit) !== implementation.parentCommit ||
+        options.resolveCommitTree(implementation.parentCommit) !== implementation.parentTree ||
+        !sameJson(paths, implementation.diffPaths) || !sameJson(entries, implementation.diffEntries) ||
+        implementation.diffPathsSha256 !== sha256Canonical(paths) ||
+        implementation.diffEntriesSha256 !== sha256Canonical(entries)) {
+      blockers.push('decision.implementationLineageOrDiff');
+      return;
+    }
+    for (const artifact of implementation.artifacts) {
+      const actual = options.resolveGitFile(implementation.commit, artifact.path);
+      if (!actual || actual.sourceCommit !== implementation.commit || actual.sourceTree !== implementation.tree ||
+          actual.sourcePath !== artifact.path || actual.gitMode !== '100644' || actual.gitObjectType !== 'blob' ||
+          actual.blobOid !== artifact.blobOid || actual.bytes !== artifact.bytes || actual.sha256 !== artifact.sha256 ||
+          !Buffer.isBuffer(actual.content) || gitBlobOid(actual.content) !== artifact.blobOid ||
+          sha256(actual.content) !== artifact.sha256) blockers.push(`decision.implementationArtifact.${artifact.path}`);
+    }
+  } catch {
+    blockers.push('decision.implementationUnreadable');
+  }
+}
+
 function buildDecision({ applicationEvidence, implementation }) {
   if (!applicationEvidence?.accepted || !isMachineBoundApplication(applicationEvidence.application)) {
     throw new Error('cm2121_machine_bound_status_sync_application_required');
@@ -312,6 +339,7 @@ function evaluateDecision(decision = {}, { implementation, ...options } = {}) {
   const blockers = [];
   const applicationEvidence = intakeApplication(options);
   if (!applicationEvidence.accepted) blockers.push(...applicationEvidence.blockers.map(item => `decision.${item}`));
+  verifyImplementationIdentity(implementation || {}, options, blockers);
   let expected = null;
   try {
     expected = buildDecision({ applicationEvidence, implementation });
