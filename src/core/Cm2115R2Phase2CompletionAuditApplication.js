@@ -229,6 +229,12 @@ function fileProjection(bytes, gitMode = '100644') {
   };
 }
 
+function expectedAfterForTarget(target, beforeBytes = null) {
+  const bytes = buildExpectedAfterBytes(target.sourcePath, beforeBytes);
+  const gitMode = target.operation === 'add' ? '100644' : target.before.gitMode;
+  return { bytes, projection: fileProjection(bytes, gitMode) };
+}
+
 function buildPatchTargets(resolveBaselineFile) {
   if (typeof resolveBaselineFile !== 'function') throw new TypeError('cm2115_r2_baseline_resolver_required');
   return PATCH_PATHS.map(sourcePath => {
@@ -701,9 +707,7 @@ function evaluateExecutionReceipt(receipt = {}, { resolveGitFile } = {}) {
 
 async function exactWriteTarget(repoRoot, target, beforeBytes) {
   const absolutePath = path.join(repoRoot, target.sourcePath);
-  const afterBytes = buildExpectedAfterBytes(target.sourcePath, beforeBytes);
-  const expectedMode = target.operation === 'add' ? '100644' : target.before.gitMode;
-  const projection = fileProjection(afterBytes, expectedMode);
+  const { bytes: afterBytes, projection } = expectedAfterForTarget(target, beforeBytes);
   if (!sameJson(projection, target.after)) throw new Error(`cm2115_r2_after_projection_mismatch:${target.sourcePath}`);
   if (target.operation === 'add') {
     await fsPromises.writeFile(absolutePath, afterBytes, { flag: 'wx' });
@@ -739,12 +743,8 @@ async function executeExactPatch({ repoRoot, decision, decisionIdentity, authori
       }
     }
     try {
-      const expectedMode = target.operation === 'add' ? '100644' : target.before.gitMode;
-      const expectedAfter = fileProjection(
-        buildExpectedAfterBytes(target.sourcePath, beforeBytes),
-        expectedMode
-      );
-      if (!sameJson(expectedAfter, target.after)) {
+      const expectedAfter = expectedAfterForTarget(target, beforeBytes);
+      if (!sameJson(expectedAfter.projection, target.after)) {
         blockers.push(`patchTarget.afterDrift.${target.sourcePath}`);
       }
     } catch {
@@ -922,10 +922,16 @@ function evaluateBindingReceipt(receipt = {}, {
       const after = resolveGitFile(app.commit, target.sourcePath);
       if (after.blobOid !== target.after.blobOid || after.bytes !== target.after.bytes || after.sha256 !== target.after.sha256 ||
           after.gitMode !== target.after.gitMode) blockers.push(`bindingReceipt.afterTarget.${target.sourcePath}`);
+      let beforeBytes = null;
       if (target.operation === 'modify') {
         const before = resolveGitFile(app.parentCommit, target.sourcePath);
         if (before.blobOid !== target.before.blobOid || before.bytes !== target.before.bytes || before.sha256 !== target.before.sha256 ||
             before.gitMode !== target.before.gitMode) blockers.push(`bindingReceipt.beforeTarget.${target.sourcePath}`);
+        if (!Buffer.isBuffer(before.content) || !sameJson(fileProjection(before.content, before.gitMode), target.before)) {
+          blockers.push(`bindingReceipt.beforeTargetContent.${target.sourcePath}`);
+        } else {
+          beforeBytes = before.content;
+        }
       } else {
         if (v2) {
           const pathState = resolveGitPathState(app.parentCommit, target.sourcePath);
@@ -935,6 +941,16 @@ function evaluateBindingReceipt(receipt = {}, {
         } else {
           try { resolveGitFile(app.parentCommit, target.sourcePath); blockers.push(`bindingReceipt.addTargetAlreadyExisted.${target.sourcePath}`); } catch {}
         }
+      }
+      try {
+        const expectedAfter = expectedAfterForTarget(target, beforeBytes);
+        if (!sameJson(expectedAfter.projection, target.after) || !Buffer.isBuffer(after.content) ||
+            !after.content.equals(expectedAfter.bytes) ||
+            !sameJson(fileProjection(after.content, after.gitMode), target.after)) {
+          blockers.push(`bindingReceipt.nonCanonicalAfterTarget.${target.sourcePath}`);
+        }
+      } catch {
+        blockers.push(`bindingReceipt.nonCanonicalAfterTarget.${target.sourcePath}`);
       }
     }
     const buildExpected = v2 ? buildBindingReceiptV2Payload : buildBindingReceiptPayload;
@@ -1006,6 +1022,7 @@ module.exports = {
   evaluateBindingReceipt,
   evaluateDecision,
   evaluateExecutionReceipt,
+  expectedAfterForTarget,
   exactEvidencePatch,
   executeExactPatch,
   expectedApplicationDiffPaths,
