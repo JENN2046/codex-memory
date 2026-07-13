@@ -151,7 +151,10 @@ test('delegates bounded record_memory write to native MCP without returning raw 
       client_id: 'other-client',
       visibility: 'workspace'
     },
-    gateResult: acceptedGate(),
+    gateResult: acceptedGate({
+      exact_approval_decision_reference: 'CM-TEST-NATIVE-WRITE-APPROVAL-001',
+      exact_approval_claim_binding_hash: 'c'.repeat(64)
+    }),
     callMcpTool: receiptAwareCallMcpTool(async payload => {
       call = payload;
       return {
@@ -216,6 +219,11 @@ test('delegates bounded record_memory write to native MCP without returning raw 
   assert.equal(call.arguments.governed_bridge.mixed_read_write_allowed, false);
   assert.equal(call.arguments.governed_bridge.unbounded_write_allowed, false);
   assert.equal(call.arguments.governed_bridge.write_requires_exact_approval, true);
+  assert.equal(
+    call.arguments.governed_bridge.exact_approval_decision_reference,
+    'CM-TEST-NATIVE-WRITE-APPROVAL-001'
+  );
+  assert.equal(call.arguments.governed_bridge.exact_approval_claim_binding_hash, 'c'.repeat(64));
   assert.equal(call.arguments.governed_bridge.exact_approval_action_matched, true);
   assert.equal(call.arguments.governed_bridge.exact_approval_scope_matched, true);
   assert.equal(call.arguments.governed_bridge.exact_approval_runtime_target_matched, true);
@@ -243,6 +251,13 @@ test('delegates bounded record_memory write to native MCP without returning raw 
   assert.equal(call.arguments.governed_bridge.audit_receipt_low_disclosure, true);
   assert.equal(call.arguments.governed_bridge.audit_receipt_reference_present, true);
   assert.equal(call.arguments.governed_bridge.audit_receipt_reference_name, 'cm-governed-write-receipt');
+  assert.equal(
+    call.governanceMeta.exactApprovalResult.approvalDecisionReference,
+    'CM-TEST-NATIVE-WRITE-APPROVAL-001'
+  );
+  assert.equal(call.governanceMeta.exactApprovalResult.claimBindingHash, 'c'.repeat(64));
+  assert.equal(result.receipt.exactApprovalDecisionReference, 'CM-TEST-NATIVE-WRITE-APPROVAL-001');
+  assert.equal(result.receipt.exactApprovalClaimBindingHash, 'c'.repeat(64));
   assert.equal(call.arguments.governed_bridge.audit_receipt_event_type, 'governed_mcp_vcp_native_bridge_receipt');
   assert.equal(call.arguments.governed_bridge.audit_receipt_append_required, true);
   assert.equal(call.arguments.governed_bridge.audit_receipt_low_disclosure_bound, true);
@@ -1837,6 +1852,24 @@ test('delegated write arguments preserve write payload but remove locator and to
   assert.equal(delegated.governed_bridge.disclosure_max_bytes, 1024);
   assert.equal(delegated.governed_bridge.rollback_plan_reference_name, 'cm-governed-write-rollback-plan');
   assert.equal(delegated.governed_bridge.audit_receipt_reference_name, 'cm-governed-write-receipt');
+});
+
+test('delegated write envelope drops unsafe exact approval receipt bindings', () => {
+  const delegated = buildDelegatedArguments('record_memory', {
+    target: 'knowledge',
+    title: 'safe title',
+    content: 'safe content',
+    evidence: 'safe evidence'
+  }, acceptedGate({
+    exact_approval_decision_reference: 'https://PRIVATE_APPROVAL_REFERENCE_SHOULD_NOT_FORWARD',
+    exact_approval_claim_binding_hash: 'NOT-A-LOWERCASE-SHA256'
+  }));
+  const serialized = JSON.stringify(delegated);
+
+  assert.equal(delegated.governed_bridge.exact_approval_decision_reference, null);
+  assert.equal(delegated.governed_bridge.exact_approval_claim_binding_hash, null);
+  assert.equal(serialized.includes('PRIVATE_APPROVAL_REFERENCE_SHOULD_NOT_FORWARD'), false);
+  assert.equal(serialized.includes('NOT-A-LOWERCASE-SHA256'), false);
 });
 
 test('delegated write envelope drops target reference when runtime forbidden evidence survived gate', () => {
