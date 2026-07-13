@@ -99,7 +99,9 @@ function evaluateDecision(decision = {}) {
   if (decision.applicationAuthorization?.useCount !== 1 || decision.applicationAuthorization?.replayAllowed !== false) blockers.push('decision.applicationAuthorization');
   if (decision.applicationSideEffectLimits?.completionAuditPatchApplications !== 1) blockers.push('decision.applicationSideEffectLimits.completionAuditPatchApplications');
   for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (decision.applicationSideEffectLimits?.[field] !== 0) blockers.push(`decision.applicationSideEffectLimits.${field}`);
-  for (const field of ['additionalNativeWriteAuthorized', 'derivedIndexProofAccepted', 'productionProviderProofAccepted', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed']) if (decision.nonClaims?.[field] !== false) blockers.push(`decision.nonClaims.${field}`);
+  const nonClaimFields = ['additionalNativeWriteAuthorized', 'derivedIndexProofAccepted', 'productionProviderProofAccepted', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed'];
+  if (!hasExactKeys(decision.nonClaims, nonClaimFields)) blockers.push('decision.nonClaims.fields');
+  for (const field of nonClaimFields) if (decision.nonClaims?.[field] !== false) blockers.push(`decision.nonClaims.${field}`);
   return { accepted: blockers.length === 0, blockers: [...new Set(blockers)] };
 }
 

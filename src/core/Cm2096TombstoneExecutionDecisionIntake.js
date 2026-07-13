@@ -65,7 +65,23 @@ function evaluateCm2096TombstoneExecutionDecisionIntake({ decisionBytes, observe
     const exactFields = [...Object.keys(exact), 'expiresAt', 'approvedAt'].sort();
     if (JSON.stringify(Object.keys(decision).sort()) !== JSON.stringify(exactFields)) blockers.push('decision.fields');
     for (const [field, expected] of Object.entries(exact)) if (decision[field] !== expected) blockers.push(`decision.${field}`);
-    if (!decision.expiresAt || Date.parse(decision.expiresAt) <= new Date(now).getTime()) blockers.push('decision.expiresAt');
+    const approvedAtMs = typeof decision.approvedAt === 'string'
+      ? Date.parse(decision.approvedAt)
+      : Number.NaN;
+    const expiresAtMs = typeof decision.expiresAt === 'string'
+      ? Date.parse(decision.expiresAt)
+      : Number.NaN;
+    const nowMs = new Date(now).getTime();
+    if (!Number.isFinite(approvedAtMs) || !Number.isFinite(nowMs) || approvedAtMs > nowMs) {
+      blockers.push('decision.approvedAt');
+    }
+    if (!Number.isFinite(expiresAtMs) ||
+        !Number.isFinite(nowMs) ||
+        !Number.isFinite(approvedAtMs) ||
+        nowMs >= expiresAtMs ||
+        approvedAtMs >= expiresAtMs) {
+      blockers.push('decision.expiresAt');
+    }
   }
   if (blockers.length) return { accepted: false, blockers, decision: null };
   MACHINE_BOUND_DECISIONS.add(decision);
