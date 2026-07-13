@@ -1033,6 +1033,17 @@ function isMachineBoundReleaseBinding(value) {
   return !!value && machineBoundReleaseBindings.has(value);
 }
 
+async function claimWithDurableRaceReentry({ registry, bindingHash, release, observedAt = new Date() }) {
+  try {
+    return { claim: await registry.claim(bindingHash, release, observedAt), existing: null };
+  } catch (error) {
+    if (error?.message !== 'cm2126_authorization_already_claimed') throw error;
+    const existing = await registry.inspectExisting(bindingHash, release);
+    if (!existing.claimEnvelopePresent) throw error;
+    return { claim: null, existing };
+  }
+}
+
 function claimBoundReviewTime(claimEnvelope) {
   const claimedAt = Date.parse(claimEnvelope?.claimedAt || '');
   if (!Number.isFinite(claimedAt)) throw new Error('cm2126_claimed_at_required_for_receipt_review');
@@ -1545,7 +1556,20 @@ async function executeBranchCasFromCommits(inputs = {}) {
   bindingHash = immediateHash;
   release = releaseBinding(packetEvidence, finalReleaseEvidence, bindingHash);
 
-  let claim = await registry.claim(bindingHash, release, new Date());
+  const claimAttempt = await claimWithDurableRaceReentry({ registry, bindingHash, release });
+  if (claimAttempt.existing) {
+    return existingClaimResult({
+      existing: claimAttempt.existing,
+      bindingHash,
+      repoRoot,
+      target,
+      targetBindings,
+      packetEvidence,
+      finalReleaseEvidence,
+      governanceRoot
+    });
+  }
+  let claim = claimAttempt.claim;
   let state = claim.state;
   let runtimeResult = null;
   let receiptIdentity = null;
@@ -1885,6 +1909,7 @@ module.exports = {
   buildExecutionPacket,
   buildFinalReleaseDecision,
   claimBoundReviewTime,
+  claimWithDurableRaceReentry,
   buildTargetBindings,
   classifyBranchCasCommandFailure,
   deriveTargetWorktree,

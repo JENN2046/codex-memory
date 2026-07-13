@@ -685,6 +685,15 @@ test('registry enforces exact transitions and reentry receipt is readonly', asyn
     let claim = await registry.claim(bindingHash, release, fixture.now);
     assert.equal(claim.state, 'CLAIMED');
     assert.equal(claim.authorizationReplayAllowed, false);
+    const raced = await fixture.frozenModule.claimWithDurableRaceReentry({
+      registry: new fixture.frozenRegistry.Cm2126ExactBranchCasClaimRegistry({ governanceRoot: root }),
+      bindingHash,
+      release,
+      observedAt: fixture.now
+    });
+    assert.equal(raced.claim, null);
+    assert.equal(raced.existing.claimEnvelopePresent, true);
+    assert.equal(raced.existing.state, 'CLAIMED');
     await assert.rejects(
       registry.transition(bindingHash, 'CLAIMED', 'BRANCH_REF_CAS_CONSUMED', {
         branchCasInvocationCount: null,
