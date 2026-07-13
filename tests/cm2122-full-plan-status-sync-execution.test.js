@@ -16,7 +16,11 @@ const packetGenerator = require('../scripts/generate-cm2122-full-plan-status-syn
 const releaseGenerator = require('../scripts/generate-cm2123-full-plan-status-sync-final-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
-const EXECUTOR_CHILD_TIMEOUT_MS = 60_000;
+// The frozen executor performs a large number of Git-object checks. A focused
+// run completes in roughly one minute, while the default suite runs many test
+// files concurrently and can take materially longer. Keep a hard ceiling so a
+// stalled child cannot pin the suite, with enough headroom for loaded CI hosts.
+const EXECUTOR_CHILD_TIMEOUT_MS = 180_000;
 
 function git(args, cwd, options = {}) {
   return execFileSync('git', args, {
