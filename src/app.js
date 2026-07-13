@@ -2689,7 +2689,8 @@ function createCodexMemoryApplication(overrides = {}) {
         if (
           requestContext.exactApprovalResult !== undefined ||
           !cm2096TombstoneAuthorizationAssertionVerifier ||
-          config.governedMcpVcpNativeWriteDelegationMode !== 'primary'
+          config.governedMcpVcpNativeWriteDelegationMode !== 'primary' ||
+          config.governedMcpVcpNativeBridgeGateMode === 'off'
         ) {
           return {
             decision: 'rejected',

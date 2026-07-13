@@ -14,6 +14,7 @@ const TASK_ID = 'CM-2115-R2';
 const DECISION_PATH = 'docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.json';
 const REVIEW_REQUEST_FREEZE = Object.freeze({
   commit: '01c65db824e77400ef144ef8118deaa28b06abcc',
+  parent: '5a2494dd6fc6a3c72015b3f92cf2940759b77b5d',
   tree: 'e6f3c28f0df1d10744ead4f132d064b2dcc3fb41',
   json: Object.freeze({
     path: 'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json',
@@ -29,6 +30,10 @@ const REVIEW_REQUEST_FREEZE = Object.freeze({
     sha256: '3ba20d045b3f085a9aa0eb1b7e1763272e44655443b4b7f120c68e7e7a5f51fb'
   })
 });
+const REVIEW_REQUEST_DIFF_PATHS = Object.freeze([
+  REVIEW_REQUEST_FREEZE.json.path,
+  REVIEW_REQUEST_FREEZE.markdown.path
+]);
 
 const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
   'src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js',
@@ -104,6 +109,14 @@ function evaluateFrozenReviewRequest({
   try {
     if (resolveCommitTree(REVIEW_REQUEST_FREEZE.commit) !== REVIEW_REQUEST_FREEZE.tree) {
       blockers.push('selfReview.reviewRequestTree');
+    }
+    const requestParent = resolveParentCommit(REVIEW_REQUEST_FREEZE.commit);
+    if (requestParent !== REVIEW_REQUEST_FREEZE.parent) {
+      blockers.push('selfReview.reviewRequestParent');
+    }
+    const requestDiffPaths = resolveDiffPaths(requestParent, REVIEW_REQUEST_FREEZE.commit);
+    if (!sameJson([...requestDiffPaths].sort(), [...REVIEW_REQUEST_DIFF_PATHS].sort())) {
+      blockers.push('selfReview.reviewRequestDiffPaths');
     }
     requestIdentity = resolveGitFile(REVIEW_REQUEST_FREEZE.commit, REVIEW_REQUEST_FREEZE.json.path);
     markdownIdentity = resolveGitFile(REVIEW_REQUEST_FREEZE.commit, REVIEW_REQUEST_FREEZE.markdown.path);
@@ -334,6 +347,7 @@ function evaluateDecision(decision = {}, {
 module.exports = {
   DECISION_PATH,
   IMPLEMENTATION_ARTIFACT_PATHS,
+  REVIEW_REQUEST_DIFF_PATHS,
   REVIEW_REQUEST_FREEZE,
   TASK_ID,
   buildDecision,

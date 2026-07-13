@@ -43,6 +43,8 @@ test('CM-2112 grants no native, verify, rollback, remote, or readiness authority
 
 test('CM-2112 fails closed on route, status, authority, or historical binding drift', () => {
   const mutations = [
+    value => { value.decision.productionReady = true; },
+    value => { value.decision.requiredRevalidationEvidence.productionReady = true; },
     value => { value.decision.currentState.phase8Completed = true; },
     value => { value.decision.selectedRoute.memoryIntelligenceOwner = 'codex-memory'; },
     value => { value.decision.selectedRoute.outerTransport = 'direct_app_call'; },

@@ -410,7 +410,9 @@ function createVcpToolBoxDailyNoteOwnerRuntimeAdapter(options = {}) {
     if (!durableBytes.equals(expectedMarkdownBytes)) throw new Error('owner_runtime_durable_bytes_mismatch');
     const resultFolder = normalizeString(execution.parsed?.result?.folder);
     const resultFileName = normalizeString(execution.parsed?.result?.fileName);
-    if (resultFolder !== fixed.folder || resultFileName !== path.basename(files[0])) {
+    const expectedFileName = `${fixed.date}-${fixed.localTime.replace(':', '_')}_00-${fixed.fileName}.md`;
+    const expectedOutputPath = path.join(storeRoot, fixed.folder, expectedFileName);
+    if (files[0] !== expectedOutputPath || resultFolder !== fixed.folder || resultFileName !== expectedFileName) {
       throw new Error('owner_runtime_result_binding_mismatch');
     }
     const durableSha256 = sha256(durableBytes);
