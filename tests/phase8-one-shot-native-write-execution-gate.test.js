@@ -294,11 +294,12 @@ test('Phase 8 gate rejects a machine-bound release whose expiry becomes invalid 
   const gate = createPhase8OneShotNativeWriteExecutionGate({
     registry,
     expectedBinding: expected,
-    now: () => new Date('2026-07-11T00:00:00.000Z')
+    now: () => new Date('2026-07-13T00:00:00.000Z')
   });
   const authorizationContentDecision = decision(expected);
-  const executionReleaseDecision = releaseDecision(expected, authorizationContentDecision);
-  executionReleaseDecision.expiresAt = 'not-a-timestamp';
+  const executionReleaseDecision = releaseDecision(expected, authorizationContentDecision, {
+    expiresAt: '2026-07-12T00:00:00.000Z'
+  });
   let calls = 0;
 
   const result = await gate.execute({

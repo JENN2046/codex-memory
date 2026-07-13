@@ -63,6 +63,7 @@ function evaluatePhase8FinalExecutionReleaseDecisionIntake({ decisionBytes, obse
     }
   }
   if (blockers.length) return { accepted: false, blockers, decision: null };
+  Object.freeze(decision);
   MACHINE_BOUND_RELEASE_DECISIONS.add(decision);
   return { accepted: true, blockers: [], decision, decisionIdentityMachineBound: true, executionAuthorized: true };
 }
