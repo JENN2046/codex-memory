@@ -203,7 +203,15 @@ function createPhase8OneShotNativeWriteExecutionGate({ registry, expectedBinding
     if (executionReleaseDecision?.executionReleaseAuthorized !== true || executionReleaseDecision?.phase8NativeWriteAuthorized !== true) blockers.push('releaseDecision.authorization');
     if (executionReleaseDecision?.token !== 'APPROVE_VCP_BRIDGE_LIVE_RECORD_MEMORY_PROOF_EXACT') blockers.push('releaseDecision.token');
     if (executionReleaseDecision?.allowedAction !== 'live_bridge_record_memory_proof') blockers.push('releaseDecision.allowedAction');
-    if (!executionReleaseDecision?.expiresAt || Date.parse(executionReleaseDecision.expiresAt) <= now().getTime()) blockers.push('releaseDecision.expired');
+    const releaseExpiresAtMs = typeof executionReleaseDecision?.expiresAt === 'string'
+      ? Date.parse(executionReleaseDecision.expiresAt)
+      : Number.NaN;
+    const executionNowMs = now().getTime();
+    if (!Number.isFinite(releaseExpiresAtMs) ||
+        !Number.isFinite(executionNowMs) ||
+        releaseExpiresAtMs <= executionNowMs) {
+      blockers.push('releaseDecision.expired');
+    }
     if (executionReleaseDecision?.authorizationUseCount !== 1) blockers.push('releaseDecision.authorizationUseCount');
     if (executionReleaseDecision?.expectedContextHash !== contextHash) blockers.push('releaseDecision.expectedContextHash');
     if (executionReleaseDecision?.expectedAllowlistHash !== allowlistHash) blockers.push('releaseDecision.expectedAllowlistHash');
