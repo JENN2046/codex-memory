@@ -82,6 +82,7 @@ function evaluateFrozenReviewRequest({
   resolveParentCommit,
   resolveDiffPaths,
   resolveGitPathState,
+  resolveDurableClaim,
   isCommitAncestor
 } = {}) {
   const blockers = [];
@@ -118,6 +119,7 @@ function evaluateFrozenReviewRequest({
       resolveParentCommit,
       resolveDiffPaths,
       resolveGitPathState,
+      resolveDurableClaim,
       isCommitAncestor
     });
     if (!requestEvaluation.accepted) {
@@ -237,6 +239,7 @@ function evaluateDecision(decision = {}, {
   resolveParentCommit,
   resolveDiffPaths,
   resolveGitPathState,
+  resolveDurableClaim,
   isCommitAncestor
 } = {}) {
   const blockers = [];
@@ -251,6 +254,7 @@ function evaluateDecision(decision = {}, {
     resolveParentCommit,
     resolveDiffPaths,
     resolveGitPathState,
+    resolveDurableClaim,
     isCommitAncestor
   });
   if (!reviewEvidence.accepted) blockers.push(...reviewEvidence.blockers);
