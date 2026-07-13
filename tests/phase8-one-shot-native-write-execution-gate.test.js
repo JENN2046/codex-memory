@@ -265,6 +265,37 @@ test('Phase 8 gate does not claim or call runtime when binding validation fails'
   assert.equal(calls, 0);
 });
 
+test('Phase 8 gate rejects a machine-bound release whose expiry becomes invalid before execution', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-invalid-release-expiry-'));
+  const expected = binding();
+  const registry = newRegistry(root);
+  const gate = createPhase8OneShotNativeWriteExecutionGate({
+    registry,
+    expectedBinding: expected,
+    now: () => new Date('2026-07-11T00:00:00.000Z')
+  });
+  const authorizationContentDecision = decision(expected);
+  const executionReleaseDecision = releaseDecision(expected, authorizationContentDecision);
+  executionReleaseDecision.expiresAt = 'not-a-timestamp';
+  let calls = 0;
+
+  const result = await gate.execute({
+    authorizationContentDecision,
+    executionReleaseDecision,
+    runtimeFacts,
+    payloadBytes: payload,
+    payloadBlobOid,
+    executeNativeWrite: async () => { calls += 1; },
+    verifyWrite: async () => ({ accepted: true })
+  });
+
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('releaseDecision.expired'));
+  assert.equal(result.state, 'UNCLAIMED');
+  assert.equal(calls, 0);
+  await assert.rejects(fs.access(registry.directory), error => error.code === 'ENOENT');
+});
+
 test('content approval alone cannot claim nonce or call runtime without final release', async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'phase8-content-only-'));
   const expected = binding();
