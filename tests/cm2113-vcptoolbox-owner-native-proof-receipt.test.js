@@ -38,3 +38,9 @@ test('CM-2113 fails closed on owner, transport, store, replay, or completion ove
     assert.equal(evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value).accepted, false);
   }
 });
+
+test('CM-2113 rejects an additional top-level overclaim field', () => {
+  const value = structuredClone(receipt);
+  value.productionReady = true;
+  assert.equal(evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value).accepted, false);
+});

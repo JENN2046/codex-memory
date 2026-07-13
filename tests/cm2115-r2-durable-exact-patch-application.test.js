@@ -242,6 +242,66 @@ test('CM-2115-R2 rejects rehashed after-projection drift before consuming the cl
   await assert.rejects(() => fsp.lstat(path.join(fixture.root, APPLICATION_STATE_PATH)), { code: 'ENOENT' });
 });
 
+test('CM-2115-R2 rejects forged target modes before consuming the claim', async t => {
+  const fixture = await prepareTempExecution(t);
+  const drift = structuredClone(fixture.decision);
+  const target = drift.payload.patchPlan.targets.find(item => item.operation === 'modify');
+  target.before.gitMode = '100755';
+  target.after.gitMode = '100755';
+  const { patchPayloadSha256: _ignored, ...patchPlanPayload } = drift.payload.patchPlan;
+  drift.payload.patchPlan.patchPayloadSha256 = sha256Canonical(patchPlanPayload);
+  drift.canonicalPayloadSha256 = sha256Canonical(drift.payload);
+  assert.equal(evaluateDecision(drift, { resolveGitFile: fixture.resolver }).accepted, true);
+  const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
+  const result = await executeExactPatch({
+    repoRoot: fixture.root,
+    decision: drift,
+    decisionIdentity: fixture.identity,
+    authorityIdentity: fixture.authority,
+    resolveGitFile: fixture.resolver,
+    registry
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.state, 'UNCLAIMED');
+  assert.ok(result.blockers.includes(`patchTarget.beforeDrift.${target.sourcePath}`));
+  await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
+});
+
+test('CM-2115-R2 rejects occupied receipt output paths before patch or claim', async t => {
+  const fixture = await prepareTempExecution(t);
+  const occupiedPath = path.join(fixture.root, EXECUTION_RECEIPT_PATH);
+  await fsp.writeFile(occupiedPath, 'pre-existing synthetic receipt\n', { flag: 'wx' });
+  const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
+  const result = await executeExactPatch({
+    repoRoot: fixture.root,
+    decision: fixture.decision,
+    decisionIdentity: fixture.identity,
+    authorityIdentity: fixture.authority,
+    resolveGitFile: fixture.resolver,
+    registry
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.state, 'UNCLAIMED');
+  assert.ok(result.blockers.includes(`executionReceipt.expectedAbsent.${EXECUTION_RECEIPT_PATH}`));
+  assert.equal(await fsp.readFile(occupiedPath, 'utf8'), 'pre-existing synthetic receipt\n');
+  await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
+  for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
+    assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), targetBaselineResolver(sourcePath).content);
+  }
+});
+
+test('CM-2115-R2 authority Git entry mode and object type must match the resolved entry', async t => {
+  const fixture = await prepareTempExecution(t);
+  for (const [field, value] of [['gitMode', '100755'], ['gitObjectType', 'tree']]) {
+    const drift = structuredClone(fixture.decision);
+    drift.payload.authority[field] = value;
+    drift.canonicalPayloadSha256 = sha256Canonical(drift.payload);
+    const result = evaluateDecision(drift, { resolveGitFile: fixture.resolver });
+    assert.equal(result.accepted, false);
+    assert.ok(result.blockers.includes('decision.authorityGitObject'));
+  }
+});
+
 test('CM-2115-R2 rejects a dangling add target before consuming the claim', async t => {
   const fixture = await prepareTempExecution(t);
   const addTarget = path.join(fixture.root, APPLICATION_STATE_PATH);
@@ -298,7 +358,7 @@ test('CM-2115-R2 executes one exact patch and a fresh registry instance cannot r
     resolveGitFile: fixture.resolver,
     registry
   });
-  assert.equal(result.accepted, true);
+  assert.equal(result.accepted, true, result.blockers.join(','));
   assert.equal(result.state, 'CONSUMED_SUCCESS');
   assert.equal(result.receipt.payload.currentState.phase2ReceiptBundleAppliedToCompletionAudit, false);
   assert.equal(evaluateExecutionReceipt(result.receipt, { resolveGitFile: fixture.resolver }).accepted, true);

@@ -43,6 +43,11 @@ function canonicalize(value) {
 }
 function sha256(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
 function sha256Canonical(value) { return sha256(JSON.stringify(canonicalize(value))); }
+
+function hasExactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
 function expectedPatch() {
   return { rollbackDrillPassed: true, failureRecoveryProofPassed: true, phase8Completed: false, fullPlanPackCompleted: false, readinessClaimed: false };
 }
@@ -105,6 +110,12 @@ function executeFailureRecoveryEvidenceApplication(input = {}) {
 function evaluateApplicationReceipt(receipt = {}) {
   const blockers = [];
   const payload = receipt.receiptPayload || {};
+  if (!hasExactKeys(receipt, ['receiptPayload', 'receiptPayloadSha256'])) blockers.push('receipt.fields');
+  if (!hasExactKeys(payload, [
+    'schemaVersion', 'taskId', 'receiptType', 'decision', 'sourceFailureRecoveryReceipt',
+    'applicationRuntime', 'contractResults', 'appliedEvidence', 'authorization',
+    'applicationCounters', 'boundaries'
+  ])) blockers.push('receipt.payload.fields');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.sourceFailureRecoveryReceipt?.commit !== SOURCE_RECEIPT.commit || payload.sourceFailureRecoveryReceipt?.blobOid !== SOURCE_RECEIPT.blobOid || payload.sourceFailureRecoveryReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 || payload.sourceFailureRecoveryReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 || payload.sourceFailureRecoveryReceipt?.acceptedAsFailureRecoveryEvidence !== true) blockers.push('receipt.sourceFailureRecoveryReceipt');
