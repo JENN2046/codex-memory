@@ -125,6 +125,33 @@ test('CM2035 blocks commit preflight without an accepted low-disclosure proposal
   assert.equal(result.durable_memory_written, false);
 });
 
+test('CM2035 blocks commit preflight for a review-rejected proposal', () => {
+  const proposalService = new MemoryDeltaProposalService();
+  const rejectedProposal = proposalService.propose({
+    task_id: 'CM-2035',
+    task: {
+      title: 'Rejected proposal must not enter commit preflight',
+      project_id: 'codex-memory',
+      client_id: 'codex',
+      visibility: 'project'
+    },
+    evidence_refs: ['tests/memory-delta-commit-preflight-service.test.js'],
+    candidates: [{
+      target: 'process',
+      intent: 'This candidate is explicitly rejected.',
+      evidence_refs: ['CM-2035 rejected proposal fixture']
+    }],
+    review_decision: 'reject'
+  });
+  const service = new MemoryDeltaCommitPreflightService();
+  const result = service.preflight(validPreflightArgs({ proposal: rejectedProposal }));
+
+  assert.equal(rejectedProposal.status, 'PROPOSE_MEMORY_DELTA_REVIEW_REJECTED');
+  assert.equal(result.accepted, false);
+  assert.equal(result.reasonCode, 'accepted_low_disclosure_proposal_required');
+  assert.deepEqual(result.blockers, ['proposal']);
+});
+
 test('CM2035 stops L4 on default exposure approval acceptance commit write or readiness drift', () => {
   const service = new MemoryDeltaCommitPreflightService();
   const result = service.preflight(validPreflightArgs({
