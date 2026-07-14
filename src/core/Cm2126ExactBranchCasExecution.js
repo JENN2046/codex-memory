@@ -1252,28 +1252,38 @@ async function synchronizeExactIndexEntries(targetPath, targetBindings, repoRoot
   }
 }
 
-async function writeExternalReceipt(root, receipt) {
-  const receiptPath = path.join(root, EXECUTION_RECEIPT_FILENAME);
+function governanceDescriptorPath(rootHandle, filename) {
+  return `/proc/self/fd/${rootHandle.fd}/${filename}`;
+}
+
+async function writeExternalReceipt(registry, receipt) {
   const bytes = Buffer.from(serializeArtifact(receipt));
   const identity = { bytes: bytes.length, sha256: sha256(bytes), persistenceAcknowledged: false };
+  const rootHandle = await registry.openVerifiedRootHandle();
   let handle = null;
   try {
-    handle = await fsPromises.open(receiptPath, 'wx', 0o600);
+    handle = await registry.fs.open(
+      governanceDescriptorPath(rootHandle, EXECUTION_RECEIPT_FILENAME),
+      fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+      0o600
+    );
     await handle.writeFile(bytes);
     await handle.sync();
-    await handle.close();
-    handle = null;
     injectIsolatedTestFault('receipt_write_acknowledgement_lost');
-    const directory = await fsPromises.open(root, 'r');
-    try { await directory.sync(); } finally { await directory.close(); }
-    const observed = await readVerifiedGovernanceFile(receiptPath);
-    if (!observed.equals(bytes)) throw new Error('cm2126_execution_receipt_readback_mismatch');
+    await rootHandle.sync();
+    const observed = Buffer.alloc(bytes.length);
+    const readback = await handle.read(observed, 0, bytes.length, 0);
+    if (readback.bytesRead !== bytes.length || !observed.equals(bytes)) {
+      throw new Error('cm2126_execution_receipt_readback_mismatch');
+    }
     identity.persistenceAcknowledged = true;
     return identity;
   } catch (error) {
-    if (handle) await handle.close().catch(() => {});
     error.cm2126PartialReceiptIdentity = { ...identity };
     throw error;
+  } finally {
+    if (handle) await handle.close().catch(() => {});
+    await rootHandle.close().catch(() => {});
   }
 }
 
@@ -1304,10 +1314,22 @@ async function readVerifiedGovernanceFile(
   }
 }
 
-async function readExternalReceipt(root) {
-  const receiptPath = path.join(root, EXECUTION_RECEIPT_FILENAME);
-  const bytes = await readVerifiedGovernanceFile(receiptPath);
-  return { receipt: JSON.parse(bytes.toString('utf8')), bytes, sha256: sha256(bytes) };
+async function readExternalReceipt(registry) {
+  const rootHandle = await registry.openVerifiedRootHandle();
+  let receiptHandle = null;
+  try {
+    receiptHandle = await registry.fs.open(
+      governanceDescriptorPath(rootHandle, EXECUTION_RECEIPT_FILENAME),
+      fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW
+    );
+    const stat = await receiptHandle.stat();
+    if (!stat.isFile()) throw new Error('cm2126_execution_receipt_invalid');
+    const bytes = Buffer.from(await receiptHandle.readFile());
+    return { receipt: JSON.parse(bytes.toString('utf8')), bytes, sha256: sha256(bytes) };
+  } finally {
+    if (receiptHandle) await receiptHandle.close().catch(() => {});
+    await rootHandle.close().catch(() => {});
+  }
 }
 
 function successfulRuntimeResult({ target, beforeSnapshot, afterSnapshot, beforeOtherRefs, afterOtherRefs }) {
@@ -1384,12 +1406,12 @@ function safeReentryRuntimeObservation(repoRoot, target, targetBindings, envelop
 }
 
 async function existingClaimResult({ existing, bindingHash, repoRoot, target, targetBindings,
-  packetEvidence, finalReleaseEvidence, governanceRoot }) {
+  packetEvidence, finalReleaseEvidence, registry }) {
   let storedReceipt = null;
   let successReceiptAccepted = false;
   if (existing.state === SUCCESS_STATE) {
     try {
-      const external = await readExternalReceipt(governanceRoot);
+      const external = await readExternalReceipt(registry);
       if (external.sha256 === existing.envelope?.executionReceiptSha256) {
         storedReceipt = external.receipt;
         const candidateRuntime = safeReentryRuntimeObservation(
@@ -1502,8 +1524,7 @@ async function terminalizeFailure({ registry, bindingHash, release, state, repoR
   let receiptSha256 = current.executionReceiptSha256;
   if (current.executionReceiptWriteAttempts === 1) {
     try {
-      const receiptPath = path.join(governanceRoot, EXECUTION_RECEIPT_FILENAME);
-      const bytes = await readVerifiedGovernanceFile(receiptPath);
+      const { bytes } = await readExternalReceipt(registry);
       receiptWrites = 1;
       receiptSha256 = sha256(bytes);
     } catch (error) {
@@ -1583,7 +1604,7 @@ async function executeBranchCasFromCommits(inputs = {}) {
       targetBindings,
       packetEvidence,
       finalReleaseEvidence,
-      governanceRoot
+      registry
     });
   }
 
@@ -1631,7 +1652,7 @@ async function executeBranchCasFromCommits(inputs = {}) {
       targetBindings,
       packetEvidence,
       finalReleaseEvidence,
-      governanceRoot
+      registry
     });
   }
   let claim = claimAttempt.claim;
@@ -1817,7 +1838,7 @@ async function executeBranchCasFromCommits(inputs = {}) {
       throw new Error(`cm2126_execution_receipt_rejected:${receiptEvaluation.blockers.join(',')}`);
     }
     try {
-      receiptIdentity = await writeExternalReceipt(governanceRoot, receipt);
+      receiptIdentity = await writeExternalReceipt(registry, receipt);
     } catch (error) {
       receiptIdentity = error.cm2126PartialReceiptIdentity || null;
       throw error;
@@ -1883,7 +1904,7 @@ async function executeBranchCasFromCommits(inputs = {}) {
         targetBindings,
         packetEvidence,
         finalReleaseEvidence,
-        governanceRoot
+        registry
       });
     }
     throw error;
@@ -1928,7 +1949,7 @@ async function evaluateDurableBranchCas({ contentDecisionCommit, packetCommit, f
         claim.targetIndexSynchronizations !== 1 || claim.targetFileSynchronizations !== 9) {
       blockers.push('durable.claimState');
     }
-    const external = await readExternalReceipt(governanceRoot);
+    const external = await readExternalReceipt(registry);
     if (external.sha256 !== claim.executionReceiptSha256) blockers.push('durable.receiptHash');
     const runtimeResult = safeReentryRuntimeObservation(
       process.cwd(),

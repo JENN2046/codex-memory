@@ -165,6 +165,10 @@ class Cm2126ExactBranchCasClaimRegistry {
     }
   }
 
+  async openVerifiedRootHandle() {
+    return openVerifiedGovernanceRoot(this);
+  }
+
   async verifyRoot() {
     let verifiedRootStat = null;
     for (const directory of [path.dirname(this.governanceRoot), this.governanceRoot]) {

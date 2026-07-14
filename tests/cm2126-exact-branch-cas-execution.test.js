@@ -1222,6 +1222,21 @@ test('governance receipt reads use no-follow descriptors and reject path identit
   );
 });
 
+test('execution receipt writes and runtime reads share the registry-pinned governance descriptor', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2126ExactBranchCasExecution.js'), 'utf8');
+  const writeStart = source.indexOf('async function writeExternalReceipt');
+  const readStart = source.indexOf('async function readExternalReceipt');
+  const writeSource = source.slice(writeStart, source.indexOf('\nasync function readVerifiedGovernanceFile', writeStart));
+  const readSource = source.slice(readStart, source.indexOf('\nfunction successfulRuntimeResult', readStart));
+  assert.match(writeSource, /registry\.openVerifiedRootHandle\(\)/);
+  assert.match(writeSource, /governanceDescriptorPath\(rootHandle, EXECUTION_RECEIPT_FILENAME\)/);
+  assert.match(writeSource, /rootHandle\.sync\(\)/);
+  assert.doesNotMatch(writeSource, /path\.join\(root/);
+  assert.match(readSource, /registry\.openVerifiedRootHandle\(\)/);
+  assert.match(readSource, /governanceDescriptorPath\(rootHandle, EXECUTION_RECEIPT_FILENAME\)/);
+  assert.doesNotMatch(readSource, /path\.join\(root/);
+});
+
 test('SUCCESS claim with a missing or corrupt external receipt reenters fail closed with zero effect', () => {
   const originalReceipt = fs.readFileSync(fixture.executionReceiptPath);
   const receiptMode = fs.statSync(fixture.executionReceiptPath).mode & 0o777;
