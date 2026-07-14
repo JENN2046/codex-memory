@@ -1014,7 +1014,8 @@ class Cm2118FullPlanApplicationClaimRegistry {
       APPLICATION_COMMIT_INVOCATION_CONSUMED: ['APPLICATION_COMMIT_CREATED', 'CONSUMED_AMBIGUOUS'],
       APPLICATION_COMMIT_CREATED: ['EXECUTION_RECEIPT_WRITTEN', 'CONSUMED_AMBIGUOUS'],
       EXECUTION_RECEIPT_WRITTEN: ['BINDING_RECEIPT_WRITTEN', 'CONSUMED_AMBIGUOUS'],
-      BINDING_RECEIPT_WRITTEN: ['CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS']
+      BINDING_RECEIPT_WRITTEN: ['CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS'],
+      CONSUMED_SUCCESS: ['CONSUMED_AMBIGUOUS']
     };
     if (!allowed[expectedState]?.includes(state)) throw new Error('cm2118_claim_transition_invalid');
     const rootHandle = await openVerifiedGovernanceRoot(this);
@@ -1734,6 +1735,7 @@ async function executeFullPlanApplicationFromCommits({
     });
     currentState = claimEnvelope.state;
     claimEnvelope = await registry.transition(bindingHash, currentState, 'CONSUMED_SUCCESS');
+    currentState = claimEnvelope.state;
     const durable = await evaluateDurableApplicationBinding({
       authorizationContentDecisionCommit,
       packetCommit,
@@ -1757,7 +1759,7 @@ async function executeFullPlanApplicationFromCommits({
       statusSyncAuthorized: false
     };
   } catch (error) {
-    if (currentState !== 'UNCLAIMED' && currentState !== 'CONSUMED_SUCCESS') {
+    if (currentState !== 'UNCLAIMED') {
       await registry.transition(bindingHash, currentState, 'CONSUMED_AMBIGUOUS', {
         applicationCommitCreated: applicationCommitKnown ? true : null,
         applicationCommit: applicationIdentity?.commit || null,

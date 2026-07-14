@@ -476,6 +476,52 @@ test('one-shot registry uses fixed root identity, atomic claim, and rejects seri
   fs.rmSync(root, { recursive: true, force: true });
 });
 
+test('post-success durable validation failure can only downgrade the consumed claim to ambiguous', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: decisionTime(fixture.finalReleaseEvidence.decision) });
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-post-success-ambiguous-'));
+  fs.writeFileSync(
+    path.join(root, '.phase8-registry-root-identity.json'),
+    JSON.stringify(canonicalize(fixture.frozenModule.GOVERNANCE_ROOT_IDENTITY))
+  );
+  const registry = new fixture.frozenModule.Cm2118FullPlanApplicationClaimRegistry({ governanceRoot: root });
+  const bindingHash = 'd'.repeat(64);
+  try {
+    await registry.claim(bindingHash, fixture.finalReleaseEvidence);
+    await registry.transition(
+      bindingHash,
+      'APPLICATION_COMMIT_INVOCATION_CONSUMED',
+      'APPLICATION_COMMIT_CREATED',
+      {
+        applicationCommitCreated: true,
+        applicationCommit: 'a'.repeat(40),
+        applicationTree: 'b'.repeat(40)
+      }
+    );
+    await registry.transition(bindingHash, 'APPLICATION_COMMIT_CREATED', 'EXECUTION_RECEIPT_WRITTEN', {
+      executionReceiptCreated: true,
+      executionReceiptSha256: 'c'.repeat(64)
+    });
+    await registry.transition(bindingHash, 'EXECUTION_RECEIPT_WRITTEN', 'BINDING_RECEIPT_WRITTEN', {
+      bindingReceiptCreated: true,
+      bindingReceiptSha256: 'e'.repeat(64)
+    });
+    const success = await registry.transition(bindingHash, 'BINDING_RECEIPT_WRITTEN', 'CONSUMED_SUCCESS');
+    assert.equal(success.state, 'CONSUMED_SUCCESS');
+    assert.equal(success.reconciliationRequired, false);
+
+    const ambiguous = await registry.transition(bindingHash, 'CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS');
+    assert.equal(ambiguous.state, 'CONSUMED_AMBIGUOUS');
+    assert.equal(ambiguous.reconciliationRequired, true);
+    assert.equal(ambiguous.authorizationReplayAllowed, false);
+    await assert.rejects(
+      registry.transition(bindingHash, 'CONSUMED_SUCCESS', 'CONSUMED_AMBIGUOUS'),
+      /claim_state_mismatch/
+    );
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('initial claim write stays pinned to the verified governance root across a path swap', async t => {
   t.mock.timers.enable({ apis: ['Date'], now: decisionTime(fixture.finalReleaseEvidence.decision) });
   const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-claim-root-swap-'));
