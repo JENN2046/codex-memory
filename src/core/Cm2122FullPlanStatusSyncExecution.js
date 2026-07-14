@@ -849,6 +849,14 @@ class Cm2122StatusSyncClaimRegistry {
 
   async read(bindingHash, finalReleaseEvidence = null) {
     const rootHandle = await openVerifiedGovernanceRoot(this);
+    try {
+      return await this.readFromRootHandle(rootHandle, bindingHash, finalReleaseEvidence);
+    } finally {
+      await rootHandle.close().catch(() => {});
+    }
+  }
+
+  async readFromRootHandle(rootHandle, bindingHash, finalReleaseEvidence = null) {
     let claimHandle = null;
     try {
       claimHandle = await this.fs.open(
@@ -862,7 +870,6 @@ class Cm2122StatusSyncClaimRegistry {
       return envelope;
     } finally {
       if (claimHandle) await claimHandle.close().catch(() => {});
-      await rootHandle.close().catch(() => {});
     }
   }
 
@@ -958,36 +965,36 @@ class Cm2122StatusSyncClaimRegistry {
       BINDING_RECEIPT_WRITTEN: ['CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION', 'CONSUMED_AMBIGUOUS_POST_COMMIT']
     };
     if (!allowed[expectedState]?.includes(state)) throw new Error('cm2122_claim_transition_invalid');
-    const current = await this.read(bindingHash, finalReleaseEvidence);
-    if (current.state !== expectedState) throw new Error('cm2122_claim_state_mismatch');
-    const next = {
-      ...current,
-      state,
-      detachedStatusCommitCreated: Object.hasOwn(details, 'detachedStatusCommitCreated')
-        ? details.detachedStatusCommitCreated : current.detachedStatusCommitCreated,
-      detachedHeadUpdateAcknowledged: Object.hasOwn(details, 'detachedHeadUpdateAcknowledged')
-        ? details.detachedHeadUpdateAcknowledged : current.detachedHeadUpdateAcknowledged,
-      executionReceiptCreated: Object.hasOwn(details, 'executionReceiptCreated')
-        ? details.executionReceiptCreated : current.executionReceiptCreated,
-      bindingReceiptCreated: Object.hasOwn(details, 'bindingReceiptCreated')
-        ? details.bindingReceiptCreated : current.bindingReceiptCreated,
-      detachedStatusCommit: Object.hasOwn(details, 'detachedStatusCommit') ? details.detachedStatusCommit : current.detachedStatusCommit,
-      detachedStatusTree: Object.hasOwn(details, 'detachedStatusTree') ? details.detachedStatusTree : current.detachedStatusTree,
-      executionReceiptSha256: Object.hasOwn(details, 'executionReceiptSha256')
-        ? details.executionReceiptSha256 : current.executionReceiptSha256,
-      bindingReceiptSha256: Object.hasOwn(details, 'bindingReceiptSha256')
-        ? details.bindingReceiptSha256 : current.bindingReceiptSha256,
-      reconciliationRequired: state !== 'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION'
-    };
-    this.validateEnvelope(next, bindingHash, finalReleaseEvidence);
-    const bytes = Buffer.from(JSON.stringify(canonicalize(next)));
     const rootHandle = await openVerifiedGovernanceRoot(this);
-    const temporaryName = `${claimFileName()}.${state}.tmp`;
-    const temporary = governanceDescriptorPath(rootHandle, temporaryName);
-    const destination = governanceDescriptorPath(rootHandle, claimFileName());
     let temporaryHandle = null;
     let observedHandle = null;
     try {
+      const current = await this.readFromRootHandle(rootHandle, bindingHash, finalReleaseEvidence);
+      if (current.state !== expectedState) throw new Error('cm2122_claim_state_mismatch');
+      const next = {
+        ...current,
+        state,
+        detachedStatusCommitCreated: Object.hasOwn(details, 'detachedStatusCommitCreated')
+          ? details.detachedStatusCommitCreated : current.detachedStatusCommitCreated,
+        detachedHeadUpdateAcknowledged: Object.hasOwn(details, 'detachedHeadUpdateAcknowledged')
+          ? details.detachedHeadUpdateAcknowledged : current.detachedHeadUpdateAcknowledged,
+        executionReceiptCreated: Object.hasOwn(details, 'executionReceiptCreated')
+          ? details.executionReceiptCreated : current.executionReceiptCreated,
+        bindingReceiptCreated: Object.hasOwn(details, 'bindingReceiptCreated')
+          ? details.bindingReceiptCreated : current.bindingReceiptCreated,
+        detachedStatusCommit: Object.hasOwn(details, 'detachedStatusCommit') ? details.detachedStatusCommit : current.detachedStatusCommit,
+        detachedStatusTree: Object.hasOwn(details, 'detachedStatusTree') ? details.detachedStatusTree : current.detachedStatusTree,
+        executionReceiptSha256: Object.hasOwn(details, 'executionReceiptSha256')
+          ? details.executionReceiptSha256 : current.executionReceiptSha256,
+        bindingReceiptSha256: Object.hasOwn(details, 'bindingReceiptSha256')
+          ? details.bindingReceiptSha256 : current.bindingReceiptSha256,
+        reconciliationRequired: state !== 'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION'
+      };
+      this.validateEnvelope(next, bindingHash, finalReleaseEvidence);
+      const bytes = Buffer.from(JSON.stringify(canonicalize(next)));
+      const temporaryName = `${claimFileName()}.${state}.tmp`;
+      const temporary = governanceDescriptorPath(rootHandle, temporaryName);
+      const destination = governanceDescriptorPath(rootHandle, claimFileName());
       temporaryHandle = await this.fs.open(
         temporary,
         fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
