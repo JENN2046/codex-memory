@@ -21,6 +21,22 @@ const {
 
 const PACKET_PATH = 'docs/near-model-memory-plan-pack/phase8_failure_recovery_execution_packet_cm2109.json';
 const DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_failure_recovery_execution_decision_cm2109.json';
+const PACKET_KEYS = Object.freeze([
+  'schemaVersion', 'taskId', 'packetType', 'packetDoesNotAuthorizeExecution',
+  'executionAuthorizedAtPacketFreeze', 'routeDecisionReference', 'implementationCommit',
+  'implementationTree', 'manifestSourceCommit', 'expectedDecisionReference',
+  'harnessRootDirectory', 'harnessRootAuthority', 'governanceRootIdentitySha256',
+  'harnessIdentityBytes', 'harnessIdentitySha256', 'ambiguousPostCommitFixtureBytes',
+  'ambiguousPostCommitFixtureSha256', 'callerPathOverrideAllowed',
+  'environmentPathOverrideAllowed', 'caseManifests', 'maxHarnessRuns', 'maxClaimCount',
+  'maxNativeWriteCalls', 'maxDurableWrites', 'maxRetryCount', 'maxRollbackCount',
+  'maxCompensationCount', 'usesCm2094LiveAuthorization', 'usesCm2094Nonce',
+  'usesCm2094RegistryClaim', 'modifiesCm2094Record', 'productionProviderAllowed',
+  'realMemoryAllowed', 'localFallbackAllowed', 'defaultMcpExpansionAllowed',
+  'readinessClaimAllowed', 'failureRecoveryProofPassedAtPacketFreeze',
+  'phase8CompletedAtPacketFreeze'
+]);
+const CASE_MANIFEST_BINDING_KEYS = Object.freeze(['caseId', 'blobOid', 'bytes', 'sha256']);
 const DECISION_KEYS = Object.freeze([
   'schemaVersion', 'taskId', 'decisionType', 'decisionReference', 'decisionBasis',
   'failureRecoveryExecutionAuthorized', 'authorizationUseCount', 'authorizationReplayAllowed',
@@ -57,6 +73,7 @@ function exactGitBlobOid(commit, filePath) {
 
 function validatePacket(packet = {}, observed = {}) {
   const blockers = [];
+  if (!exactKeys(packet, PACKET_KEYS)) blockers.push('packet.fields');
   if (packet.schemaVersion !== 1 || packet.taskId !== 'CM-2109' || packet.packetType !== 'isolated_three_case_failure_recovery_execution_packet') blockers.push('packet.identity');
   if (packet.packetDoesNotAuthorizeExecution !== true || packet.executionAuthorizedAtPacketFreeze !== false) blockers.push('packet.authority');
   if (packet.implementationCommit !== observed.runtimeCommit || packet.implementationTree !== observed.runtimeTree) blockers.push('packet.runtime');
@@ -66,7 +83,8 @@ function validatePacket(packet = {}, observed = {}) {
   if (!Array.isArray(packet.caseManifests) || packet.caseManifests.length !== 3) blockers.push('packet.caseManifests');
   for (let index = 0; index < CASE_IDS.length; index += 1) {
     const binding = packet.caseManifests?.[index];
-    if (binding?.caseId !== CASE_IDS[index] || binding?.blobOid !== observed.manifestBindings?.[index]?.blobOid || binding?.bytes !== observed.manifestBindings?.[index]?.bytes || binding?.sha256 !== observed.manifestBindings?.[index]?.sha256) blockers.push(`packet.caseManifests.${CASE_IDS[index]}`);
+    if (!exactKeys(binding, CASE_MANIFEST_BINDING_KEYS) ||
+        binding?.caseId !== CASE_IDS[index] || binding?.blobOid !== observed.manifestBindings?.[index]?.blobOid || binding?.bytes !== observed.manifestBindings?.[index]?.bytes || binding?.sha256 !== observed.manifestBindings?.[index]?.sha256) blockers.push(`packet.caseManifests.${CASE_IDS[index]}`);
   }
   const exactCounts = { maxHarnessRuns: 1, maxClaimCount: 2, maxNativeWriteCalls: 1, maxDurableWrites: 1, maxRetryCount: 0, maxRollbackCount: 0, maxCompensationCount: 0 };
   for (const [field, expected] of Object.entries(exactCounts)) if (packet[field] !== expected) blockers.push(`packet.${field}`);

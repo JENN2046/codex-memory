@@ -189,6 +189,7 @@ function cm2096RuntimeRouteAccepted(config, expectedRuntimeTarget) {
     target.targetKind === expectedRuntimeTarget?.targetKind &&
     httpTarget.accepted === true &&
     httpTarget.configured === true &&
+    httpTarget.targetReferenceName === expectedRuntimeTarget?.targetReferenceName &&
     httpTarget.bearerTokenConfigured === true &&
     httpTarget.mcpToolNameByAction?.tombstone_memory === 'knowledge_base.tombstone';
 }
