@@ -582,13 +582,13 @@ test('claim transition temp write and rename stay pinned across a governance roo
     await initialRegistry.claim(bindingHash, fixture.finalReleaseEvidence);
     let swapped = false;
     const filesystem = Object.create(require('node:fs/promises'));
-    filesystem.writeFile = async (target, bytes, options) => {
+    filesystem.open = async (target, ...args) => {
       if (!swapped && String(target).endsWith('.APPLICATION_COMMIT_CREATED.tmp')) {
         fs.renameSync(root, pinned);
         fs.renameSync(replacement, root);
         swapped = true;
       }
-      return require('node:fs/promises').writeFile(target, bytes, options);
+      return require('node:fs/promises').open(target, ...args);
     };
     const registry = new fixture.frozenModule.Cm2118FullPlanApplicationClaimRegistry({
       governanceRoot: root,
@@ -803,5 +803,23 @@ test('claim persistence fsyncs the descriptor-pinned file and directory before c
   assert.match(implementationSource, /rootHandle\.sync\(\)/);
   assert.ok(implementationSource.indexOf('claimHandle.sync()') < implementationSource.indexOf('rootHandle.sync()'));
   assert.ok(implementationSource.indexOf('rootHandle.sync()') < implementationSource.indexOf('return observed'));
+  assert.doesNotMatch(implementationSource, /this\.fs\.writeFile\(/);
+});
+
+test('claim transitions fsync descriptor-pinned bytes and the rename before reporting the state', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2118FullPlanApplicationExecution.js'), 'utf8');
+  const start = source.indexOf('async transition(bindingHash, expectedState, state, details = {})');
+  const end = source.indexOf('\n}\n\nfunction buildClaimBindingHash', start);
+  const implementationSource = source.slice(start, end);
+  assert.match(implementationSource, /this\.fs\.open\(/);
+  assert.match(implementationSource, /O_NOFOLLOW/);
+  assert.match(implementationSource, /temporaryHandle\.writeFile\(bytes\)/);
+  assert.match(implementationSource, /temporaryHandle\.sync\(\)/);
+  assert.match(implementationSource, /temporaryHandle\.read\(observedBytes, 0, bytes\.length, 0\)/);
+  assert.match(implementationSource, /this\.fs\.rename\(temporary, claim\)/);
+  assert.match(implementationSource, /rootHandle\.sync\(\)/);
+  assert.ok(implementationSource.indexOf('temporaryHandle.sync()') < implementationSource.indexOf('this.fs.rename(temporary, claim)'));
+  assert.ok(implementationSource.indexOf('this.fs.rename(temporary, claim)') < implementationSource.indexOf('rootHandle.sync()'));
+  assert.ok(implementationSource.indexOf('rootHandle.sync()') < implementationSource.indexOf('return await readClaimFromGovernanceRootHandle'));
   assert.doesNotMatch(implementationSource, /this\.fs\.writeFile\(/);
 });
