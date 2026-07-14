@@ -8,6 +8,7 @@ const {
   IMPLEMENTATION_PARENT_FREEZE,
   PACKET_MARKDOWN_PATH,
   PACKET_PATH,
+  assertSafeGitEnvironment,
   buildExecutionPacket,
   evaluateExecutionPacket,
   intakeContentDecision,
@@ -96,6 +97,7 @@ function renderMarkdown(packet, jsonText) {
 
 function main(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
+  assertSafeGitEnvironment();
   ensureRepositoryRoot();
   ensureCleanWorktree();
   if (fs.existsSync(PACKET_PATH) || fs.existsSync(PACKET_MARKDOWN_PATH)) {

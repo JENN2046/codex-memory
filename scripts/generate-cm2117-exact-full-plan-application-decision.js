@@ -15,6 +15,9 @@ const {
   sha256
 } = require('../src/core/Cm2117ExactFullPlanApplicationDecision');
 const {
+  assertSafeGitEnvironment
+} = require('../src/core/Cm2118FullPlanApplicationExecution');
+const {
   ensureCleanWorktree,
   gitText,
   resolveCommitTree,
@@ -66,6 +69,7 @@ function renderMarkdown(decision, jsonText) {
 
 function main(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
+  assertSafeGitEnvironment();
   ensureCleanWorktree();
   if (fs.existsSync(DECISION_PATH) || fs.existsSync(DECISION_MARKDOWN_PATH)) {
     throw new Error('cm2117_decision_already_exists');

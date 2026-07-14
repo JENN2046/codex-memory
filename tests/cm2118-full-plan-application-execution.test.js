@@ -267,6 +267,17 @@ test('packet and release generators reject output-path arguments', () => {
   assert.throws(() => releaseGenerator.parseArgs(['--output', '/tmp/x']), /no_output/);
 });
 
+test('packet generator rejects unsafe Git environment before its first Git read', () => {
+  const previous = process.env.GIT_DIR;
+  process.env.GIT_DIR = '/tmp/cm2118-packet-forbidden-git-dir';
+  try {
+    assert.throws(() => packetGenerator.main([]), /cm2118_unsafe_git_environment:GIT_DIR/);
+  } finally {
+    if (previous === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previous;
+  }
+});
+
 test('CM-2118 rejects repository Git environment overrides before packet intake or durable effects', async () => {
   for (const key of [
     'GIT_DIR', 'GIT_WORK_TREE', 'GIT_OBJECT_DIRECTORY', 'GIT_INDEX_FILE',
