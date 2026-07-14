@@ -1164,12 +1164,16 @@ async function synchronizeExactIndexEntries(targetPath, targetBindings, repoRoot
   const lockPath = `${indexPath}.lock`;
   const initialBytes = await fsPromises.readFile(indexPath);
   let lockHandle = null;
+  let lockCreated = false;
+  let renameAttempted = false;
   try {
     lockHandle = await fsPromises.open(lockPath, 'wx', 0o600);
+    lockCreated = true;
     await lockHandle.writeFile(initialBytes);
     await lockHandle.sync();
     await lockHandle.close();
     lockHandle = null;
+    injectIsolatedTestFault('index_pre_rename_failure');
     if (!Buffer.from(await fsPromises.readFile(indexPath)).equals(initialBytes) ||
         targetRefOid(repoRoot) !== NEW_COMMIT ||
         optionalGitText(['rev-parse', 'HEAD^{commit}'], { cwd: targetPath }) !== NEW_COMMIT ||
@@ -1194,6 +1198,7 @@ async function synchronizeExactIndexEntries(targetPath, targetBindings, repoRoot
     }
     const durableLock = await fsPromises.open(lockPath, 'r');
     try { await durableLock.sync(); } finally { await durableLock.close(); }
+    renameAttempted = true;
     await fsPromises.rename(lockPath, indexPath);
     injectIsolatedTestFault('index_rename_acknowledgement_lost');
     const directory = await fsPromises.open(path.dirname(indexPath), 'r');
@@ -1207,6 +1212,11 @@ async function synchronizeExactIndexEntries(targetPath, targetBindings, repoRoot
     }
   } catch (error) {
     if (lockHandle) await lockHandle.close().catch(() => {});
+    if (lockCreated && !renameAttempted) {
+      await fsPromises.unlink(lockPath).catch(cleanupError => {
+        if (cleanupError?.code !== 'ENOENT') error.cm2126IndexLockCleanupError = cleanupError;
+      });
+    }
     throw error;
   }
 }
