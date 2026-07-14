@@ -1180,26 +1180,53 @@ function writeTreeEntries(entries, repoRoot) {
   return gitText(['mktree', '-z'], { cwd: repoRoot, input });
 }
 
-function assertExecutionRuntime({ finalReleaseEvidence, packetEvidence }) {
+function assertRuntimeRepositoryShell(finalReleaseEvidence) {
   const repoRoot = path.resolve(gitText(['rev-parse', '--show-toplevel']));
   if (repoRoot !== path.resolve(process.cwd())) throw new Error('cm2122_repository_root_required');
   if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2122_clean_worktree_required');
   detachedHeadRequired(repoRoot);
   const head = gitText(['rev-parse', 'HEAD^{commit}']);
   const tree = gitText(['rev-parse', 'HEAD^{tree}']);
-  if (head !== finalReleaseEvidence.finalReleaseCommit || tree !== finalReleaseEvidence.finalReleaseTree) {
-    throw new Error('cm2122_final_release_runtime_required');
-  }
   if (targetBranchOid(repoRoot) !== finalReleaseEvidence.finalReleaseCommit) {
     throw new Error('cm2122_target_branch_tip_mismatch');
   }
-  gitText(['var', 'GIT_AUTHOR_IDENT'], { cwd: repoRoot });
-  gitText(['var', 'GIT_COMMITTER_IDENT'], { cwd: repoRoot });
+  return { repoRoot, head, tree };
+}
+
+function verifyRuntimeArtifacts({ repoRoot, head, packetEvidence }) {
   for (const artifact of packetEvidence.packet.payload.implementation.artifacts) {
     const current = realResolverOptions().resolveGitFile(head, artifact.path);
     if (current.blobOid !== artifact.blobOid) throw new Error(`cm2122_runtime_artifact_drift:${artifact.path}`);
   }
+}
+
+function assertExecutionRuntime({ finalReleaseEvidence, packetEvidence, runtimeShell = null }) {
+  const shell = runtimeShell || assertRuntimeRepositoryShell(finalReleaseEvidence);
+  const { repoRoot, head, tree } = shell;
+  if (head !== finalReleaseEvidence.finalReleaseCommit || tree !== finalReleaseEvidence.finalReleaseTree) {
+    throw new Error('cm2122_final_release_runtime_required');
+  }
+  gitText(['var', 'GIT_AUTHOR_IDENT'], { cwd: repoRoot });
+  gitText(['var', 'GIT_COMMITTER_IDENT'], { cwd: repoRoot });
+  verifyRuntimeArtifacts({ repoRoot, head, packetEvidence });
   return repoRoot;
+}
+
+function assertReentryRuntime({ finalReleaseEvidence, packetEvidence, existing, runtimeShell }) {
+  if (!existing.claimEnvelopeBindingVerified || !existing.envelope) {
+    return assertExecutionRuntime({ finalReleaseEvidence, packetEvidence, runtimeShell });
+  }
+  const expectedHead = existing.envelope.detachedStatusCommitCreated === true
+    ? existing.envelope.detachedStatusCommit
+    : finalReleaseEvidence.finalReleaseCommit;
+  const expectedTree = existing.envelope.detachedStatusCommitCreated === true
+    ? existing.envelope.detachedStatusTree
+    : finalReleaseEvidence.finalReleaseTree;
+  if (runtimeShell.head !== expectedHead || runtimeShell.tree !== expectedTree) {
+    throw new Error('cm2122_reentry_runtime_binding_mismatch');
+  }
+  verifyRuntimeArtifacts({ repoRoot: runtimeShell.repoRoot, head: runtimeShell.head, packetEvidence });
+  return runtimeShell.repoRoot;
 }
 
 function assertExecutableStatusAttribution(packetEvidence) {
@@ -1725,7 +1752,8 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
   assertExecutableStatusAttribution(packetEvidence);
   let finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: new Date(), ...options });
   if (!finalReleaseEvidence.accepted) throw new Error(`cm2122_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
-  const repoRoot = assertExecutionRuntime({ finalReleaseEvidence, packetEvidence });
+  const runtimeShell = assertRuntimeRepositoryShell(finalReleaseEvidence);
+  const repoRoot = runtimeShell.repoRoot;
 
   packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
   finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: new Date(), ...options });
@@ -1743,6 +1771,7 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
   let bindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
   const existing = await registry.inspectExisting(bindingHash, finalReleaseEvidence);
   if (existing.claimEnvelopePresent) {
+    assertReentryRuntime({ finalReleaseEvidence, packetEvidence, existing, runtimeShell });
     const reconciliationReceipt = buildReentryReceipt(existing, bindingHash, finalReleaseCommit);
     const reconciliationEvaluation = evaluateReentryReceipt(reconciliationReceipt, {
       existing,
@@ -1756,6 +1785,7 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
       branchRefUpdateAuthorized: false, statusSyncPerformed: false, currentBranchStatusSynchronized: false,
       readinessClaimed: false };
   }
+  assertExecutionRuntime({ finalReleaseEvidence, packetEvidence, runtimeShell });
   for (const filename of [EXECUTION_RECEIPT_FILENAME, BINDING_RECEIPT_FILENAME]) {
     if (fs.existsSync(path.join(root, filename))) throw new Error(`cm2122_preclaim_artifact_exists:${filename}`);
   }
