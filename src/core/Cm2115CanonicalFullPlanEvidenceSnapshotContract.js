@@ -151,6 +151,37 @@ function hex(value, length) {
   return typeof value === 'string' && new RegExp(`^[a-f0-9]{${length}}$`).test(value);
 }
 
+const COLAMETA_PRIVATE_ROOT_FILES = new Set([
+  'plan.json',
+  'memory.md',
+  'decisions.json',
+  'todolist.json',
+  'state.json',
+  'executor-session.json',
+  'settings.json',
+  'runner-settings.json'
+]);
+
+const COLAMETA_PRIVATE_DIRECTORIES = new Set([
+  'runtime',
+  'logs',
+  'reports',
+  'audits',
+  'plan-patches',
+  'tmp',
+  'local',
+  'executor-sessions'
+]);
+
+function isPrivateColaMetaPath(value) {
+  if (!value.startsWith('.colameta/')) return false;
+  const relativePath = value.slice('.colameta/'.length);
+  const parts = relativePath.split('/');
+  return COLAMETA_PRIVATE_ROOT_FILES.has(relativePath) ||
+    COLAMETA_PRIVATE_DIRECTORIES.has(parts[0]) ||
+    parts.at(-1).endsWith('.lock');
+}
+
 function safeSourcePath(value) {
   return typeof value === 'string' &&
     value.length > 0 &&
@@ -162,7 +193,7 @@ function safeSourcePath(value) {
     !/^\.env(?:\.|$)/.test(value) &&
     !/^data\//.test(value) &&
     !/^logs\/.*\.(?:log|jsonl)$/.test(value) &&
-    !/^\.colameta\/(?:runtime|logs|local|tmp|audits|reports|plan-patches)(?:\/|$)/.test(value) &&
+    !isPrivateColaMetaPath(value) &&
     !FORBIDDEN_CIRCULAR_SOURCE_PATHS.includes(value) &&
     (value === LOCAL_VALIDATION_RECEIPT_PATH ||
       !/^docs\/near-model-memory-plan-pack\/cm2115_.*(?:review|application|decision|receipt)/.test(value));
@@ -269,7 +300,10 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
       const pathLabel = binding?.sourcePath || 'unknown';
       observedPaths.push(pathLabel);
       if (!sameKeys(binding, SOURCE_BINDING_KEYS)) blockers.push(`source.fields.${expected.traceKey}.${pathLabel}`);
-      if (!safeSourcePath(binding?.sourcePath)) blockers.push(`source.path.${expected.traceKey}.${pathLabel}`);
+      if (!safeSourcePath(binding?.sourcePath)) {
+        blockers.push(`source.path.${expected.traceKey}.${pathLabel}`);
+        continue;
+      }
       if (binding?.sourceCommit !== BASELINE.sourceCommit || binding?.sourceTree !== BASELINE.sourceTree ||
           binding?.gitObjectType !== 'blob' || !['100644', '100755'].includes(binding?.gitMode) ||
           !hex(binding?.blobOid, 40) || !Number.isInteger(binding?.bytes) || binding.bytes <= 0 ||
