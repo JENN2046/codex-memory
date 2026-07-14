@@ -261,3 +261,35 @@ test('receipt freezer rejects unsafe Git overrides before its first repository r
     else process.env.GIT_DIR = previous;
   }
 });
+
+test('receipt freezer repository reads ignore local replacement refs', () => {
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2120-replace-ref-'));
+  const repo = path.join(parent, 'repo');
+  try {
+    execFileSync('git', ['clone', '--quiet', '--no-hardlinks', ROOT, repo], { stdio: ['ignore', 'pipe', 'pipe'] });
+    const replacement = execFileSync('git', ['rev-parse', 'HEAD^{commit}'], {
+      cwd: repo,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    }).trim();
+    execFileSync('git', ['replace', freezer.APPLICATION_COMMIT, replacement], {
+      cwd: repo,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    const replacedTree = execFileSync('git', ['rev-parse', `${freezer.APPLICATION_COMMIT}^{tree}`], {
+      cwd: repo,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    }).trim();
+    assert.notEqual(replacedTree, freezer.APPLICATION_TREE);
+    const previous = process.cwd();
+    try {
+      process.chdir(repo);
+      assert.doesNotThrow(() => freezer.assertRepositoryBoundary());
+    } finally {
+      process.chdir(previous);
+    }
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});

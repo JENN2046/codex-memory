@@ -10,7 +10,8 @@ const {
   CONTENT_DECISION_FREEZE,
   EXECUTION_RECEIPT_FILENAME,
   assertSafeGitEnvironment,
-  evaluateDurableApplicationBinding
+  evaluateDurableApplicationBinding,
+  sanitizedGitEnvironment
 } = require('../src/core/Cm2118FullPlanApplicationExecution');
 const {
   sha256Canonical
@@ -51,6 +52,7 @@ function sha256(bytes) {
 function gitText(args, options = {}) {
   return execFileSync('git', args, {
     cwd: process.cwd(),
+    env: sanitizedGitEnvironment(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     ...options
@@ -69,6 +71,7 @@ function assertRepositoryBoundary() {
   if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2120_clean_worktree_required');
   execFileSync('git', ['merge-base', '--is-ancestor', FINAL_RELEASE_COMMIT, 'HEAD'], {
     cwd: process.cwd(),
+    env: sanitizedGitEnvironment(),
     stdio: ['ignore', 'ignore', 'pipe']
   });
   if (gitText(['rev-parse', `${APPLICATION_COMMIT}^{tree}`]) !== APPLICATION_TREE ||
@@ -198,6 +201,7 @@ module.exports = {
   FINAL_RELEASE_COMMIT,
   PACKET_COMMIT,
   RECEIPTS,
+  assertRepositoryBoundary,
   main,
   parseArgs,
   readExactReceipt,
