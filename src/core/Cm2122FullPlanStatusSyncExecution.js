@@ -1217,10 +1217,12 @@ function assertReentryRuntime({ finalReleaseEvidence, packetEvidence, existing, 
   if (!existing.claimEnvelopeBindingVerified || !existing.envelope) {
     return assertExecutionRuntime({ finalReleaseEvidence, packetEvidence, runtimeShell });
   }
-  const expectedHead = existing.envelope.detachedStatusCommitCreated === true
+  const detachedHeadAdvanced = existing.envelope.detachedStatusCommitCreated === true &&
+    existing.envelope.detachedHeadUpdateAcknowledged === true;
+  const expectedHead = detachedHeadAdvanced
     ? existing.envelope.detachedStatusCommit
     : finalReleaseEvidence.finalReleaseCommit;
-  const expectedTree = existing.envelope.detachedStatusCommitCreated === true
+  const expectedTree = detachedHeadAdvanced
     ? existing.envelope.detachedStatusTree
     : finalReleaseEvidence.finalReleaseTree;
   if (runtimeShell.head !== expectedHead || runtimeShell.tree !== expectedTree) {
