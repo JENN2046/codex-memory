@@ -71,6 +71,37 @@ function claimFileName() {
   return `.cm2125-exact-branch-cas-claim-${claimId()}.json`;
 }
 
+function governanceDescriptorPath(rootHandle, filename) {
+  return `/proc/self/fd/${rootHandle.fd}/${filename}`;
+}
+
+async function openVerifiedGovernanceRoot(registry) {
+  const rootIdentity = await registry.verifyRoot();
+  if (registry.rootIdentity &&
+      (registry.rootIdentity.dev !== rootIdentity.dev || registry.rootIdentity.ino !== rootIdentity.ino)) {
+    throw new Error('cm2126_governance_root_instance_replaced');
+  }
+  if (process.platform !== 'linux' || !Number.isInteger(fs.constants.O_DIRECTORY) ||
+      !Number.isInteger(fs.constants.O_NOFOLLOW)) {
+    throw new Error('cm2126_descriptor_relative_governance_access_unsupported');
+  }
+  const rootHandle = await registry.fs.open(
+    registry.governanceRoot,
+    fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+  );
+  try {
+    const descriptorStat = await rootHandle.stat();
+    if (!descriptorStat.isDirectory() || descriptorStat.dev !== rootIdentity.dev || descriptorStat.ino !== rootIdentity.ino) {
+      throw new Error('cm2126_governance_root_descriptor_identity_mismatch');
+    }
+    if (!registry.rootIdentity) registry.rootIdentity = Object.freeze({ dev: descriptorStat.dev, ino: descriptorStat.ino });
+    return rootHandle;
+  } catch (error) {
+    await rootHandle.close().catch(() => {});
+    throw error;
+  }
+}
+
 function validCount(value, maximum, nullable = true) {
   return (nullable && value === null) || (Number.isInteger(value) && value >= 0 && value <= maximum);
 }
@@ -111,6 +142,7 @@ class Cm2126ExactBranchCasClaimRegistry {
     this.governanceRoot = governanceRoot;
     this.fs = fsApi;
     this.claimPath = path.join(governanceRoot, claimFileName());
+    this.rootIdentity = null;
   }
 
   async readVerifiedFile(filePath, invalidCode) {
@@ -134,9 +166,11 @@ class Cm2126ExactBranchCasClaimRegistry {
   }
 
   async verifyRoot() {
+    let verifiedRootStat = null;
     for (const directory of [path.dirname(this.governanceRoot), this.governanceRoot]) {
       const stat = await this.fs.lstat(directory);
       if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('cm2126_governance_root_directory_invalid');
+      if (path.resolve(directory) === path.resolve(this.governanceRoot)) verifiedRootStat = stat;
     }
     const observedRoot = await this.fs.realpath(this.governanceRoot);
     if (path.resolve(observedRoot) !== path.resolve(this.governanceRoot)) {
@@ -148,7 +182,7 @@ class Cm2126ExactBranchCasClaimRegistry {
         !sameJson(JSON.parse(identityBytes.toString('utf8')), GOVERNANCE_ROOT_IDENTITY)) {
       throw new Error('cm2126_governance_root_identity_mismatch');
     }
-    return true;
+    return { dev: verifiedRootStat.dev, ino: verifiedRootStat.ino };
   }
 
   async syncFileAndDirectory(targetPath) {
@@ -307,37 +341,50 @@ class Cm2126ExactBranchCasClaimRegistry {
   }
 
   async read(bindingHash, releaseBinding = null) {
-    await this.verifyRoot();
-    const envelope = JSON.parse((await this.readVerifiedFile(this.claimPath, 'cm2126_claim_invalid')).toString('utf8'));
-    this.validateEnvelope(envelope, bindingHash || envelope.bindingHash, releaseBinding);
-    return envelope;
+    const rootHandle = await openVerifiedGovernanceRoot(this);
+    try {
+      return await this.readFromRootHandle(rootHandle, bindingHash, releaseBinding);
+    } finally {
+      await rootHandle.close().catch(() => {});
+    }
+  }
+
+  async readFromRootHandle(rootHandle, bindingHash, releaseBinding = null) {
+    let claimHandle = null;
+    try {
+      claimHandle = await this.fs.open(
+        governanceDescriptorPath(rootHandle, claimFileName()),
+        fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW
+      );
+      const stat = await claimHandle.stat();
+      if (!stat.isFile()) throw new Error('cm2126_claim_invalid');
+      const envelope = JSON.parse((await claimHandle.readFile()).toString('utf8'));
+      this.validateEnvelope(envelope, bindingHash || envelope.bindingHash, releaseBinding);
+      return envelope;
+    } finally {
+      if (claimHandle) await claimHandle.close().catch(() => {});
+    }
   }
 
   async inspectExisting(bindingHash, releaseBinding) {
-    await this.verifyRoot();
+    const rootHandle = await openVerifiedGovernanceRoot(this);
     try {
-      const stat = await this.fs.lstat(this.claimPath);
-      if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('invalid');
+      const envelope = await this.readFromRootHandle(rootHandle, bindingHash, releaseBinding);
+      return { claimEnvelopePresent: true, state: envelope.state, authorizationConsumed: true,
+        replayAllowed: false, reconciliationRequired: envelope.reconciliationRequired,
+        claimEnvelopeBindingVerified: true, envelope };
     } catch (error) {
       if (error.code === 'ENOENT') {
         return { claimEnvelopePresent: false, authorizationConsumed: false, replayAllowed: false };
       }
       return { claimEnvelopePresent: true, state: 'CLAIM_REGISTRY_AMBIGUOUS', authorizationConsumed: true,
         replayAllowed: false, reconciliationRequired: true, claimEnvelopeBindingVerified: false, envelope: null };
-    }
-    try {
-      const envelope = await this.read(bindingHash, releaseBinding);
-      return { claimEnvelopePresent: true, state: envelope.state, authorizationConsumed: true,
-        replayAllowed: false, reconciliationRequired: envelope.reconciliationRequired,
-        claimEnvelopeBindingVerified: true, envelope };
-    } catch {
-      return { claimEnvelopePresent: true, state: 'CLAIM_REGISTRY_AMBIGUOUS', authorizationConsumed: true,
-        replayAllowed: false, reconciliationRequired: true, claimEnvelopeBindingVerified: false, envelope: null };
+    } finally {
+      await rootHandle.close().catch(() => {});
     }
   }
 
   async claim(bindingHash, releaseBinding, observedAt) {
-    await this.verifyRoot();
     if (!/^[a-f0-9]{64}$/.test(bindingHash || '') ||
         !machineReleaseBindingAccepted(releaseBinding, bindingHash)) {
       throw new Error('cm2126_machine_bound_final_release_required');
@@ -387,16 +434,31 @@ class Cm2126ExactBranchCasClaimRegistry {
       reconciliationRequired: true
     };
     this.validateEnvelope(envelope, bindingHash, releaseBinding);
+    const bytes = Buffer.from(JSON.stringify(canonicalize(envelope)));
+    const rootHandle = await openVerifiedGovernanceRoot(this);
+    let claimHandle = null;
     try {
-      await this.fs.writeFile(this.claimPath, JSON.stringify(canonicalize(envelope)), { flag: 'wx' });
-      await this.syncFileAndDirectory(this.claimPath);
+      claimHandle = await this.fs.open(
+        governanceDescriptorPath(rootHandle, claimFileName()),
+        fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+        0o600
+      );
+      await claimHandle.writeFile(bytes);
+      await claimHandle.sync();
+      const observedBytes = Buffer.alloc(bytes.length);
+      const readback = await claimHandle.read(observedBytes, 0, bytes.length, 0);
+      if (readback.bytesRead !== bytes.length || !observedBytes.equals(bytes)) {
+        throw new Error('cm2126_claim_readback_mismatch');
+      }
+      await rootHandle.sync();
     } catch (error) {
       if (error.code === 'EEXIST') throw new Error('cm2126_authorization_already_claimed');
       throw error;
+    } finally {
+      if (claimHandle) await claimHandle.close().catch(() => {});
+      await rootHandle.close().catch(() => {});
     }
-    const observed = await this.read(bindingHash, releaseBinding);
-    if (!sameJson(observed, envelope)) throw new Error('cm2126_claim_readback_mismatch');
-    return observed;
+    return envelope;
   }
 
   async transition(bindingHash, expectedState, state, details = {}, releaseBinding = null) {
@@ -422,26 +484,39 @@ class Cm2126ExactBranchCasClaimRegistry {
       EXECUTION_RECEIPT_WRITE_CONSUMED: [SUCCESS_STATE, 'CONSUMED_EXECUTION_RECEIPT_AMBIGUOUS']
     };
     if (!allowed[expectedState]?.includes(state)) throw new Error('cm2126_claim_transition_invalid');
-    const current = await this.read(bindingHash, releaseBinding);
-    if (current.state !== expectedState) throw new Error('cm2126_claim_state_mismatch');
-    const next = {
-      ...current,
-      ...details,
-      state,
-      terminalStateDurablyRecorded: TERMINAL_FAILURE_STATES.includes(state) || state === SUCCESS_STATE,
-      reconciliationRequired: state !== SUCCESS_STATE
-    };
-    this.validateEnvelope(next, bindingHash, releaseBinding);
-    const temporary = `${this.claimPath}.${state}.tmp`;
-    await this.fs.writeFile(temporary, JSON.stringify(canonicalize(next)), { flag: 'wx' });
-    await this.syncFileAndDirectory(temporary);
-    await this.fs.rename(temporary, this.claimPath);
-    injectIsolatedTransitionFault(state);
-    if (typeof this.fs.open === 'function') {
-      const directory = await this.fs.open(path.dirname(this.claimPath), 'r');
-      try { await directory.sync(); } finally { await directory.close(); }
+    const rootHandle = await openVerifiedGovernanceRoot(this);
+    let temporaryHandle = null;
+    try {
+      const current = await this.readFromRootHandle(rootHandle, bindingHash, releaseBinding);
+      if (current.state !== expectedState) throw new Error('cm2126_claim_state_mismatch');
+      const next = {
+        ...current,
+        ...details,
+        state,
+        terminalStateDurablyRecorded: TERMINAL_FAILURE_STATES.includes(state) || state === SUCCESS_STATE,
+        reconciliationRequired: state !== SUCCESS_STATE
+      };
+      this.validateEnvelope(next, bindingHash, releaseBinding);
+      const temporaryName = `${claimFileName()}.${state}.tmp`;
+      const temporary = governanceDescriptorPath(rootHandle, temporaryName);
+      const destination = governanceDescriptorPath(rootHandle, claimFileName());
+      temporaryHandle = await this.fs.open(
+        temporary,
+        fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+        0o600
+      );
+      await temporaryHandle.writeFile(Buffer.from(JSON.stringify(canonicalize(next))));
+      await temporaryHandle.sync();
+      await temporaryHandle.close();
+      temporaryHandle = null;
+      await this.fs.rename(temporary, destination);
+      await rootHandle.sync();
+      injectIsolatedTransitionFault(state);
+      return await this.readFromRootHandle(rootHandle, bindingHash, releaseBinding);
+    } finally {
+      if (temporaryHandle) await temporaryHandle.close().catch(() => {});
+      await rootHandle.close().catch(() => {});
     }
-    return this.read(bindingHash, releaseBinding);
   }
 }
 

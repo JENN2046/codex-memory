@@ -894,6 +894,44 @@ test('claim registry rejects descriptor identity swaps before reading envelope b
   assert.equal(closeCalls, 1);
 });
 
+test('claim create, read, and transition stay pinned to one verified governance descriptor', () => {
+  const source = fs.readFileSync(
+    path.join(ROOT, 'src/core/Cm2126ExactBranchCasClaimRegistry.js'),
+    'utf8'
+  );
+  assert.match(source, /O_DIRECTORY \| fs\.constants\.O_NOFOLLOW/);
+  assert.match(source, /`\/proc\/self\/fd\/\$\{rootHandle\.fd\}\/\$\{filename\}`/);
+  assert.match(source, /governanceDescriptorPath\(rootHandle, claimFileName\(\)\)/);
+  assert.match(source, /governanceDescriptorPath\(rootHandle, temporaryName\)/);
+  assert.match(source, /cm2126_governance_root_instance_replaced/);
+  assert.match(source, /registry\.rootIdentity = Object\.freeze/);
+  assert.doesNotMatch(source, /this\.fs\.writeFile\(this\.claimPath/);
+  assert.doesNotMatch(source, /this\.fs\.rename\(temporary, this\.claimPath/);
+});
+
+test('one registry instance rejects a replaced governance root even with copied public identity bytes', async () => {
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2126-governance-root-swap-'));
+  const root = path.join(parent, 'registry');
+  const displaced = path.join(parent, 'displaced');
+  const identity = JSON.stringify(canonicalize(fixture.frozenConstants.GOVERNANCE_ROOT_IDENTITY));
+  try {
+    fs.mkdirSync(root);
+    fs.writeFileSync(path.join(root, '.phase8-registry-root-identity.json'), identity);
+    const registry = new fixture.frozenRegistry.Cm2126ExactBranchCasClaimRegistry({ governanceRoot: root });
+    const first = await registry.inspectExisting('0'.repeat(64), null);
+    assert.equal(first.claimEnvelopePresent, false);
+    fs.renameSync(root, displaced);
+    fs.mkdirSync(root);
+    fs.writeFileSync(path.join(root, '.phase8-registry-root-identity.json'), identity);
+    await assert.rejects(
+      registry.inspectExisting('0'.repeat(64), null),
+      /cm2126_governance_root_instance_replaced/
+    );
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 test('isolated fault injection preserves exact terminal counters and forbids replay', () => {
   runIsolatedFault('branch_cas_acknowledgement_lost', ({ claim }) => {
     assert.equal(claim.state, 'CONSUMED_AMBIGUOUS_CAS');
