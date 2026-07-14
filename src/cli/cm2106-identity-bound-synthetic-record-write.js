@@ -100,6 +100,10 @@ function validatePacket(packet) {
     receiptId: EXPECTED.receiptId,
     authorizationRegistryReference: EXPECTED.registryReference,
     authorizationUseCount: 1,
+    runtimeTargetReference: EXPECTED.runtimeTargetReference,
+    primaryWriteOnly: true,
+    priorAttemptReconciledAsNoWrite: true,
+    priorAuthorizationReplayAllowed: false,
     maxNativeWrites: 1,
     maxVerifyOperations: 1,
     maxRollbackOrCompensationOperations: 0,
@@ -128,6 +132,17 @@ function validatePacket(packet) {
     'contentDecisionSha256', 'preflightReceiptSha256', 'contextCanonicalSha256',
     'allowlistCanonicalSha256', 'expectedScopeFingerprint'
   ]) if (!hash64(packet[field])) blockers.push(`packet.${field}`);
+  const expectedKeys = new Set([
+    ...Object.keys(exact),
+    'implementationCommit', 'implementationTree', 'payloadSourceCommit', 'payloadBlobOid',
+    'contentDecisionCommit', 'contentDecisionBlobOid', 'preflightReceiptCommit',
+    'preflightReceiptBlobOid', 'contentDecisionSha256', 'preflightReceiptSha256',
+    'allowedScope', 'contextCanonicalSha256', 'allowlistCanonicalSha256', 'expectedScopeFingerprint',
+    'packetPayloadSha256'
+  ]);
+  if (Object.keys(packet).length !== expectedKeys.size ||
+      Object.keys(packet).some(field => !expectedKeys.has(field))) blockers.push('packet.keys');
+  if (sha256Canonical(packet.allowedScope) !== sha256Canonical(ALLOWED_SCOPE)) blockers.push('packet.allowedScope');
   if (packet.payloadSourceCommit !== packet.implementationCommit) blockers.push('packet.payloadSourceCommit');
   if (packet.expectedScopeFingerprint !== EXPECTED.scopeFingerprint) blockers.push('packet.expectedScopeFingerprint');
   if (packet.allowlistCanonicalSha256 !== sha256Canonical(expectedAllowlist())) blockers.push('packet.allowlist');
