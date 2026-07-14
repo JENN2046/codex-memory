@@ -741,7 +741,6 @@ test('temp clone creates one exact detached 9M commit, binds it, and leaves the 
     assert.equal(receipt.payload.detachedCommit.detachedHeadCasUsed, true);
   }
 
-  git(['checkout', '--detach', fixture.finalReleaseCommit], fixture.repo);
   const durable = evaluateDurableInFixture();
   assert.equal(durable.accepted, true, durable.blockers.join(','));
   assert.equal(durable.detachedStatusCommit, fixture.detachedStatusCommit);
@@ -755,9 +754,9 @@ test('temp clone creates one exact detached 9M commit, binds it, and leaves the 
 test('a new process cannot replay the consumed authorization or move the branch ref', {
   timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
 }, async () => {
-  git(['checkout', '--detach', fixture.finalReleaseCommit], fixture.repo);
   const branchBefore = text(['show-ref', '--hash', '--verify', implementation.FUTURE_BRANCH_REF], fixture.repo);
   const objectsBefore = text(['count-objects', '-v'], fixture.repo);
+  assert.equal(text(['rev-parse', 'HEAD^{commit}'], fixture.repo), fixture.detachedStatusCommit);
   const replay = await runStatusSyncProcess();
   assert.equal(replay.timedOut, false, JSON.stringify(replay));
   assert.equal(replay.code, 0, replay.stderr);
@@ -772,7 +771,7 @@ test('a new process cannot replay the consumed authorization or move the branch 
     text(['show-ref', '--hash', '--verify', implementation.FUTURE_BRANCH_REF], fixture.repo),
     branchBefore
   );
-  assert.equal(text(['rev-parse', 'HEAD^{commit}'], fixture.repo), fixture.finalReleaseCommit);
+  assert.equal(text(['rev-parse', 'HEAD^{commit}'], fixture.repo), fixture.detachedStatusCommit);
   assert.equal(text(['count-objects', '-v'], fixture.repo), objectsBefore);
 
   const registry = new fixture.frozenModule.Cm2122StatusSyncClaimRegistry({

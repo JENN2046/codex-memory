@@ -1408,17 +1408,6 @@ function gitText(args, { cwd = process.cwd(), env = null, input = undefined } = 
   }).trim();
 }
 
-function assertGitCommitIdentity(repoRoot = process.cwd(), runGit = gitText) {
-  for (const identityVariable of ['GIT_AUTHOR_IDENT', 'GIT_COMMITTER_IDENT']) {
-    try {
-      if (!runGit(['var', identityVariable], { cwd: repoRoot })) throw new Error('empty');
-    } catch {
-      throw new Error(`cm2118_git_commit_identity_required:${identityVariable}`);
-    }
-  }
-  return true;
-}
-
 function resolveFixedGovernanceRoot(repoRoot = process.cwd()) {
   assertSafeGitEnvironment();
   const commonDir = path.resolve(repoRoot, gitText(['rev-parse', '--git-common-dir'], { cwd: repoRoot }));
@@ -1724,7 +1713,6 @@ async function executeFullPlanApplicationFromCommits({
     }
     const immediateBindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
     if (immediateBindingHash !== bindingHash) throw new Error('cm2118_immediate_preclaim_binding_drift');
-    assertGitCommitIdentity(repositoryRoot);
     bindingHash = immediateBindingHash;
     let claimEnvelope = await registry.claim(bindingHash, finalReleaseEvidence);
     const claimedAt = claimEnvelope.claimedAt;
@@ -1861,7 +1849,6 @@ module.exports = {
   STATUS_SYNC_PATHS,
   TASK_ID,
   Cm2118FullPlanApplicationClaimRegistry,
-  assertGitCommitIdentity,
   assertSafeGitEnvironment,
   buildExecutionPacket,
   buildFinalReleaseDecision,

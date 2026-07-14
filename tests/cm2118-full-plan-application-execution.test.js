@@ -377,34 +377,17 @@ test('CM-2118 CLI rejects unsafe Git environment before its repository-root Git 
   }
 });
 
-test('CM-2118 preflights author and committer identities before the durable claim', () => {
-  const calls = [];
-  assert.equal(implementation.assertGitCommitIdentity('/fixture/repo', (args, options) => {
-    calls.push({ args, options });
-    return `${args[1]} Fixture <fixture@example.invalid> 0 +0000`;
-  }), true);
-  assert.deepEqual(calls.map(call => call.args), [
-    ['var', 'GIT_AUTHOR_IDENT'],
-    ['var', 'GIT_COMMITTER_IDENT']
-  ]);
-  assert.ok(calls.every(call => call.options.cwd === '/fixture/repo'));
-
-  assert.throws(
-    () => implementation.assertGitCommitIdentity('/fixture/repo', args => {
-      if (args[1] === 'GIT_COMMITTER_IDENT') throw new Error('Committer identity unknown');
-      return 'Author Fixture <fixture@example.invalid> 0 +0000';
-    }),
-    /cm2118_git_commit_identity_required:GIT_COMMITTER_IDENT/
-  );
-
+test('CM-2118 application commits use only the exact frozen identity', () => {
   const executionSource = fs.readFileSync(
     path.join(ROOT, 'src/core/Cm2118FullPlanApplicationExecution.js'),
     'utf8'
   );
-  assert.ok(
-    executionSource.indexOf('assertGitCommitIdentity(repositoryRoot);') <
-      executionSource.indexOf('registry.claim(bindingHash, finalReleaseEvidence)')
-  );
+  assert.equal(implementation.assertGitCommitIdentity, undefined);
+  assert.doesNotMatch(executionSource, /git_commit_identity_required|GIT_AUTHOR_IDENT|GIT_COMMITTER_IDENT/);
+  for (const field of ['GIT_AUTHOR_NAME', 'GIT_AUTHOR_EMAIL', 'GIT_AUTHOR_DATE',
+    'GIT_COMMITTER_NAME', 'GIT_COMMITTER_EMAIL', 'GIT_COMMITTER_DATE']) {
+    assert.match(executionSource, new RegExp(`${field}: APPLICATION_COMMIT_FREEZE\\.`));
+  }
 });
 
 test('CM-2119 generation validates at a deterministic in-window time', () => {
@@ -728,23 +711,17 @@ test('fixed executor survives concurrent invocation with exactly one application
   timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
 }, async () => {
   const governanceRoot = fixtureGovernanceRoot(fixture.repo);
+  const emptyHome = path.join(fixture.parent, 'empty-home');
+  fs.mkdirSync(emptyHome);
   git(['checkout', '--detach', fixture.implementationCommit], fixture.repo);
   const [left, right] = await Promise.all([
     runApplicationProcess({
-      GIT_AUTHOR_NAME: 'Ambient Author A',
-      GIT_AUTHOR_EMAIL: 'ambient-a@example.invalid',
-      GIT_AUTHOR_DATE: '2001-01-01T00:00:00+00:00',
-      GIT_COMMITTER_NAME: 'Ambient Committer A',
-      GIT_COMMITTER_EMAIL: 'ambient-a@example.invalid',
-      GIT_COMMITTER_DATE: '2001-01-01T00:00:00+00:00'
+      HOME: emptyHome,
+      XDG_CONFIG_HOME: emptyHome
     }),
     runApplicationProcess({
-      GIT_AUTHOR_NAME: 'Ambient Author B',
-      GIT_AUTHOR_EMAIL: 'ambient-b@example.invalid',
-      GIT_AUTHOR_DATE: '2030-01-01T00:00:00+00:00',
-      GIT_COMMITTER_NAME: 'Ambient Committer B',
-      GIT_COMMITTER_EMAIL: 'ambient-b@example.invalid',
-      GIT_COMMITTER_DATE: '2030-01-01T00:00:00+00:00'
+      HOME: emptyHome,
+      XDG_CONFIG_HOME: emptyHome
     })
   ]);
   assert.equal(left.timedOut, false, JSON.stringify(left));
