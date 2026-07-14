@@ -85,6 +85,7 @@ function validatePacket(packet) {
     targetMemoryIdRef: 'vcp-kb-5b140bdb1f30f1b0',
     targetRecordBytes: 327,
     targetRecordSha256: '5b140bdb1f30f1b0d08ad3f066bde9a07b56940eecef20a9a196ef278970a5c3',
+    rollbackModel: 'append_only_logical_tombstone',
     payloadCanonicalBytes: EXPECTED.payloadCanonicalBytes,
     payloadCanonicalSha256: EXPECTED.payloadCanonicalSha256,
     durableMarkerBytes: EXPECTED.durableMarkerBytes,
@@ -95,6 +96,8 @@ function validatePacket(packet) {
     receiptId: EXPECTED.receiptId,
     registryReference: EXPECTED.registryReference,
     authorizationUseCount: 1,
+    runtimeTargetReference: EXPECTED.runtimeTargetReference,
+    primaryWriteOnly: true,
     maxTombstoneWrites: 1,
     maxVerifyOperations: 1,
     maxRetries: 0,
@@ -107,6 +110,7 @@ function validatePacket(packet) {
     inPlaceOverwriteAllowed: false,
     existingRealMemoryModificationAllowed: false,
     otherRealMemoryReadAllowed: false,
+    defaultProductRetrievalTombstoneAwarenessProven: false,
     rollbackDrillPassed: false,
     failureRecoveryProofPassed: false,
     phase8Completed: false,
@@ -121,6 +125,14 @@ function validatePacket(packet) {
   for (const field of ['expectedContextHash', 'expectedAllowlistHash', 'expectedScopeFingerprint']) {
     if (!hash64(packet[field])) blockers.push(`packet.${field}`);
   }
+  const expectedKeys = new Set([
+    ...Object.keys(exact),
+    'implementationCommit', 'implementationTree', 'allowedScope', 'expectedContextHash',
+    'expectedAllowlistHash', 'expectedScopeFingerprint', 'packetPayloadSha256'
+  ]);
+  if (Object.keys(packet).length !== expectedKeys.size ||
+      Object.keys(packet).some(field => !expectedKeys.has(field))) blockers.push('packet.keys');
+  if (sha256Canonical(packet.allowedScope) !== sha256Canonical(ALLOWED_SCOPE)) blockers.push('packet.allowedScope');
   if (packet.expectedScopeFingerprint !== EXPECTED.scopeFingerprint) blockers.push('packet.expectedScopeFingerprint');
   if (packet.expectedAllowlistHash !== sha256Canonical(expectedAllowlist())) blockers.push('packet.allowlist');
   if (packet.expectedContextHash !== sha256Canonical(expectedRuntimeContext({
