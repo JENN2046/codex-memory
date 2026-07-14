@@ -327,6 +327,38 @@ test('CM-2118 rejects repository Git environment overrides before packet intake 
   }
 });
 
+test('frozen evidence resolvers ignore local Git replacement refs', () => {
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2118-replace-ref-'));
+  try {
+    const repo = path.join(parent, 'repo');
+    fs.mkdirSync(repo);
+    git(['init', '--quiet'], repo);
+    fs.writeFileSync(path.join(repo, 'evidence.txt'), 'original\n');
+    const original = commitAll(repo, 'test: original evidence');
+    const originalTree = text(['rev-parse', `${original}^{tree}`], repo);
+    fs.writeFileSync(path.join(repo, 'evidence.txt'), 'replacement\n');
+    const replacement = commitAll(repo, 'test: replacement evidence');
+    const replacementTree = text(['rev-parse', `${replacement}^{tree}`], repo);
+    assert.notEqual(originalTree, replacementTree);
+    git(['replace', original, replacement], repo);
+    assert.equal(text(['rev-parse', `${original}^{tree}`], repo), replacementTree);
+
+    const resolverScript = path.join(ROOT, 'scripts/cm2115-r2-git.js');
+    const source = [
+      `const r=require(${JSON.stringify(resolverScript)});`,
+      `process.stdout.write(r.resolveCommitTree(${JSON.stringify(original)}, {cwd:process.cwd()}));`
+    ].join('');
+    const resolved = execFileSync(process.execPath, ['-e', source], {
+      cwd: repo,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    assert.equal(resolved, originalTree);
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 test('CM-2118 CLI rejects unsafe Git environment before its repository-root Git read', async () => {
   const previous = process.env.GIT_DIR;
   process.env.GIT_DIR = '/tmp/cm2118-forbidden-cli-git-dir';

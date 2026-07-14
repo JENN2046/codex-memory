@@ -13,9 +13,14 @@ const {
   validateDurableClaim
 } = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 
+function gitEnvironment(env = process.env) {
+  return { ...env, GIT_NO_REPLACE_OBJECTS: '1' };
+}
+
 function gitText(args, { cwd = process.cwd() } = {}) {
   return execFileSync('git', args, {
     cwd,
+    env: gitEnvironment(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     maxBuffer: 64 * 1024 * 1024
@@ -25,6 +30,7 @@ function gitText(args, { cwd = process.cwd() } = {}) {
 function gitBuffer(args, { cwd = process.cwd() } = {}) {
   return execFileSync('git', args, {
     cwd,
+    env: gitEnvironment(),
     encoding: null,
     stdio: ['ignore', 'pipe', 'pipe'],
     maxBuffer: 64 * 1024 * 1024

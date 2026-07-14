@@ -315,6 +315,18 @@ test('Git repository, object, and index environment overrides fail before any go
   )), false);
 });
 
+test('status-sync resolver intake uses the replace-disabled shared Git helpers', () => {
+  const gitHelperSource = fs.readFileSync(path.join(ROOT, 'scripts/cm2115-r2-git.js'), 'utf8');
+  const gateSource = fs.readFileSync(
+    path.join(ROOT, 'scripts/generate-cm2116-exact-full-plan-application-gate.js'),
+    'utf8'
+  );
+  assert.match(gitHelperSource, /GIT_NO_REPLACE_OBJECTS:\s*'1'/);
+  assert.match(gitHelperSource, /env:\s*gitEnvironment\(\)/);
+  assert.match(gateSource, /function isCommitAncestor\(ancestor, descendant\)/);
+  assert.doesNotMatch(gateSource, /generate-cm2115-r2-self-review-decision/);
+});
+
 test('durable binding review rejects Git environment overrides before reading review evidence', async () => {
   for (const key of [
     'GIT_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES',
