@@ -41,6 +41,21 @@ const {
 
 const IMPLEMENTATION_COMMIT = '9'.repeat(40);
 const IMPLEMENTATION_TREE = '8'.repeat(40);
+const gitFileCache = new Map();
+const commitTreeCache = new Map();
+const parentCommitCache = new Map();
+const diffPathCache = new Map();
+const pathStateCache = new Map();
+const ancestorCache = new Map();
+
+function cached(cache, key, load) {
+  if (!cache.has(key)) cache.set(key, load());
+  return cache.get(key);
+}
+
+function resolveCachedGitFile(commit, sourcePath) {
+  return cached(gitFileCache, `${commit}:${sourcePath}`, () => git.resolveGitFile(commit, sourcePath));
+}
 
 function fakeBlobOid(value) {
   return crypto.createHash('sha1').update(value).digest('hex');
@@ -59,7 +74,7 @@ function gateImplementation() {
 }
 
 function resolveFixtureDurableClaim(bindingHash) {
-  const receiptIdentity = git.resolveGitFile(BASELINE.sourceCommit, PHASE2_APPLICATION_RECEIPT_PATH);
+  const receiptIdentity = resolveCachedGitFile(BASELINE.sourceCommit, PHASE2_APPLICATION_RECEIPT_PATH);
   const receipt = JSON.parse(receiptIdentity.content.toString('utf8'));
   return {
     schemaVersion: 1,
@@ -93,36 +108,46 @@ function resolvers(overrides = {}) {
           content: Buffer.from('x')
         };
       }
-      return git.resolveGitFile(commit, sourcePath);
+      return resolveCachedGitFile(commit, sourcePath);
     },
     resolveCommitTree: commit => commit === IMPLEMENTATION_COMMIT
       ? IMPLEMENTATION_TREE
-      : git.resolveCommitTree(commit),
+      : cached(commitTreeCache, commit, () => git.resolveCommitTree(commit)),
     resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
       ? IMPLEMENTATION_PARENT_FREEZE.commit
-      : git.resolveParentCommit(commit),
+      : cached(parentCommitCache, commit, () => git.resolveParentCommit(commit)),
     resolveDiffPaths: (parent, commit) =>
       parent === IMPLEMENTATION_PARENT_FREEZE.commit && commit === IMPLEMENTATION_COMMIT
         ? [...GATE_IMPLEMENTATION_DIFF_PATHS]
-        : git.resolveDiffPaths(parent, commit),
+        : cached(diffPathCache, `${parent}:${commit}`, () => git.resolveDiffPaths(parent, commit)),
     resolveDiffEntries: (parent, commit) =>
       parent === SELF_REVIEW_INTAKE_FREEZE.parentCommit && commit === SELF_REVIEW_INTAKE_FREEZE.commit
         ? expectedIntakeDiffEntries()
         : [],
-    resolveGitPathState: git.resolveGitPathState,
+    resolveGitPathState: (commit, sourcePath) => cached(
+      pathStateCache,
+      `${commit}:${sourcePath}`,
+      () => git.resolveGitPathState(commit, sourcePath)
+    ),
     resolveDurableClaim: resolveFixtureDurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === SELF_REVIEW_INTAKE_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
-      return realIsCommitAncestor(ancestor, descendant);
+      return cached(ancestorCache, `${ancestor}:${descendant}`, () => realIsCommitAncestor(ancestor, descendant));
     }
   };
   return { ...base, ...overrides };
 }
 
 function validGate() {
-  const intakeEvidence = evaluateFrozenSelfReviewIntake(resolvers());
+  const intakeEvidence = frozenIntakeEvidence();
   assert.equal(intakeEvidence.accepted, true, intakeEvidence.blockers.join(','));
   return buildGate({ gateImplementation: gateImplementation(), intakeEvidence });
+}
+
+let cachedFrozenIntakeEvidence;
+function frozenIntakeEvidence() {
+  if (!cachedFrozenIntakeEvidence) cachedFrozenIntakeEvidence = evaluateFrozenSelfReviewIntake(resolvers());
+  return cachedFrozenIntakeEvidence;
 }
 
 function mutate(gate, change) {
