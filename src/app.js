@@ -803,6 +803,28 @@ function buildGovernedMcpVcpNativeWriteDelegationToolCaller(config = {}, overrid
   return callTool;
 }
 
+function cm2096TombstoneNativeRouteAccepted(config = {}, callMcpTool = null) {
+  const runtimeTarget = config.governedMcpVcpNativeRuntimeTarget || {};
+  const httpMcpTarget = config.governedMcpVcpNativeHttpMcpTarget || {};
+  return (
+    ['observe', 'strict'].includes(config.governedMcpVcpNativeBridgeGateMode) &&
+    config.governedMcpVcpNativeWriteDelegationMode === 'primary' &&
+    config.governedMcpVcpNativeReadDelegationMode === 'off' &&
+    runtimeTarget.accepted === true &&
+    runtimeTarget.configured === true &&
+    runtimeTarget.targetKind === 'mcp_server' &&
+    httpMcpTarget.accepted === true &&
+    httpMcpTarget.configured === true &&
+    httpMcpTarget.targetKind === 'mcp_server' &&
+    httpMcpTarget.targetReferenceName === runtimeTarget.targetReferenceName &&
+    httpMcpTarget.bearerTokenConfigured === true &&
+    httpMcpTarget.mcpToolNameByActionConfigured === true &&
+    httpMcpTarget.mcpToolNameByAction?.tombstone_memory === 'knowledge_base.tombstone' &&
+    typeof callMcpTool === 'function' &&
+    typeof callMcpTool.callWithReceipt === 'function'
+  );
+}
+
 function projectReadShapeProbeTargetResolverObservation(resolverResult) {
   if (!resolverResult) return null;
   const { invokeComponentAction, ...projection } = resolverResult;
@@ -2689,8 +2711,10 @@ function createCodexMemoryApplication(overrides = {}) {
         if (
           requestContext.exactApprovalResult !== undefined ||
           !cm2096TombstoneAuthorizationAssertionVerifier ||
-          config.governedMcpVcpNativeWriteDelegationMode !== 'primary' ||
-          config.governedMcpVcpNativeBridgeGateMode === 'off'
+          !cm2096TombstoneNativeRouteAccepted(
+            config,
+            governedMcpVcpNativeWriteDelegationToolCaller
+          )
         ) {
           return {
             decision: 'rejected',
