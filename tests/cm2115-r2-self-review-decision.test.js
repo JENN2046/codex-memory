@@ -68,7 +68,7 @@ function resolvers(overrides = {}) {
       ? IMPLEMENTATION_TREE
       : git.resolveCommitTree(commit),
     resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
-      ? '7'.repeat(40)
+      ? REVIEW_REQUEST_FREEZE.commit
       : git.resolveParentCommit(commit),
     resolveDiffPaths: (parent, commit) => commit === IMPLEMENTATION_COMMIT
       ? [...IMPLEMENTATION_ARTIFACT_PATHS]
@@ -165,6 +165,11 @@ test('self-review rejects frozen request, resolver, implementation, or payload d
   })).accepted, false);
   assert.equal(evaluateDecision(decision, resolvers({
     resolveCommitTree: commit => commit === IMPLEMENTATION_COMMIT ? '0'.repeat(40) : git.resolveCommitTree(commit)
+  })).accepted, false);
+  assert.equal(evaluateDecision(decision, resolvers({
+    resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
+      ? '7'.repeat(40)
+      : resolvers().resolveParentCommit(commit)
   })).accepted, false);
   assert.equal(evaluateDecision(decision, resolvers({
     resolveDiffPaths: (parent, commit) => commit === IMPLEMENTATION_COMMIT

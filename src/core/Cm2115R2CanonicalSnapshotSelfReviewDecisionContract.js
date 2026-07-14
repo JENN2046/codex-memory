@@ -285,7 +285,7 @@ function evaluateDecision(decision = {}, {
       const implementationParent = resolveParentCommit(implementation.commit);
       const implementationDiffPaths = resolveDiffPaths(implementationParent, implementation.commit).sort();
       if (resolveCommitTree(implementation.commit) !== implementation.tree ||
-          !isCommitAncestor(REVIEW_REQUEST_FREEZE.commit, implementation.commit) ||
+          implementationParent !== REVIEW_REQUEST_FREEZE.commit ||
           !sameJson(implementationDiffPaths, [...IMPLEMENTATION_ARTIFACT_PATHS].sort())) {
         blockers.push('decision.reviewImplementationLineage');
       }
