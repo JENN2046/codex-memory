@@ -111,3 +111,14 @@ test('content decision generator accepts no execution, ref, final release, or ou
     assert.throws(() => generator.parseArgs(argv), /no_arguments/);
   }
 });
+
+test('content decision generator rejects unsafe Git environment before its first Git read', () => {
+  const previous = process.env.GIT_DIR;
+  process.env.GIT_DIR = '/tmp/cm2121-content-decision-forbidden-git-dir';
+  try {
+    assert.throws(() => generator.main([]), /cm2118_unsafe_git_environment:GIT_DIR/);
+  } finally {
+    if (previous === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previous;
+  }
+});

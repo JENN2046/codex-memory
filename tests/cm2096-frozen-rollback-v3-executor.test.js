@@ -58,6 +58,7 @@ test('CM-2096 route preflight requires tombstone write primary and native reads 
     governedMcpVcpNativeHttpMcpTarget: {
       accepted: true,
       configured: true,
+      targetReferenceName: expectedTarget.targetReferenceName,
       bearerTokenConfigured: true,
       mcpToolNameByAction: { tombstone_memory: 'knowledge_base.tombstone' }
     }
@@ -65,6 +66,13 @@ test('CM-2096 route preflight requires tombstone write primary and native reads 
   assert.equal(cm2096RuntimeRouteAccepted(config, expectedTarget), true);
   assert.equal(cm2096RuntimeRouteAccepted({ ...config, governedMcpVcpNativeReadDelegationMode: 'primary' }, expectedTarget), false);
   assert.equal(cm2096RuntimeRouteAccepted({ ...config, governedMcpVcpNativeWriteDelegationMode: 'off' }, expectedTarget), false);
+  assert.equal(cm2096RuntimeRouteAccepted({
+    ...config,
+    governedMcpVcpNativeHttpMcpTarget: {
+      ...config.governedMcpVcpNativeHttpMcpTarget,
+      targetReferenceName: 'different-native-target'
+    }
+  }, expectedTarget), false);
 });
 
 test('CM-2096 post-store projection failure does not count or invoke audit verify', async () => {

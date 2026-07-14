@@ -16,6 +16,7 @@ const {
   serializeArtifact
 } = require('../src/core/Cm2121FullPlanStatusSyncContentDecision');
 const { sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const { assertSafeGitEnvironment } = require('../src/core/Cm2118FullPlanApplicationExecution');
 const { resolverOptions } = require('./generate-cm2116-exact-full-plan-application-gate');
 
 function parseArgs(argv) {
@@ -57,6 +58,7 @@ function buildImplementationIdentity(options) {
 
 function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
+  assertSafeGitEnvironment();
   if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2121_content_decision_clean_worktree_required');
   if (fs.existsSync(DECISION_PATH) || fs.existsSync(DECISION_MARKDOWN_PATH)) {
     throw new Error('cm2121_content_decision_already_exists');

@@ -27,6 +27,7 @@ const {
   resolveDiffEntries: resolveRealDiffEntries
 } = require('../scripts/generate-cm2116-exact-full-plan-application-gate');
 const {
+  main,
   parseArgs,
   renderMarkdown
 } = require('../scripts/generate-cm2117-exact-full-plan-application-decision');
@@ -240,4 +241,15 @@ test('decision generator has fixed outputs and exact Markdown mirror', () => {
   assert.ok(DECISION_PATH.endsWith('cm2117_exact_full_plan_application_decision.json'));
   assert.ok(DECISION_MARKDOWN_PATH.endsWith('cm2117_exact_full_plan_application_decision.md'));
   assert.equal(new Set(DECISION_READINESS_FIELDS).size, DECISION_READINESS_FIELDS.length);
+});
+
+test('decision generator rejects unsafe Git environment before its first Git read', () => {
+  const previous = process.env.GIT_DIR;
+  process.env.GIT_DIR = '/tmp/cm2117-forbidden-git-dir';
+  try {
+    assert.throws(() => main([]), /cm2118_unsafe_git_environment:GIT_DIR/);
+  } finally {
+    if (previous === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previous;
+  }
 });
