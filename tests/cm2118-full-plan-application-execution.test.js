@@ -768,7 +768,7 @@ test('authority exports do not expose raw Git-plumbing or caller-resolver execut
   assert.equal(implementation.APPLICATION_DIFF_ENTRIES.filter(item => item.status === 'A').length, 1);
 });
 
-test('external receipt writes immediately re-verify the fixed governance root', () => {
+test('external receipt writes stay on one verified governance descriptor', () => {
   const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2118FullPlanApplicationExecution.js'), 'utf8');
   for (const [identity, filename] of [
     ['executionReceiptIdentity', 'EXECUTION_RECEIPT_FILENAME'],
@@ -776,7 +776,15 @@ test('external receipt writes immediately re-verify the fixed governance root', 
   ]) {
     assert.match(
       source,
-      new RegExp(`await registry\\.verifyRoot\\(\\);\\s+${identity} = await writeExternalReceipt\\(governanceRoot, ${filename},`)
+      new RegExp(`${identity} = await writeExternalReceipt\\(registry, ${filename},`)
     );
   }
+  const start = source.indexOf('async function writeExternalReceipt');
+  const end = source.indexOf('\nfunction realResolverOptions', start);
+  const implementationSource = source.slice(start, end);
+  assert.match(implementationSource, /openVerifiedGovernanceRoot\(registry\)/);
+  assert.match(implementationSource, /governanceDescriptorPath\(rootHandle, filename\)/);
+  assert.match(implementationSource, /O_NOFOLLOW/);
+  assert.match(implementationSource, /receiptHandle\.read\(observed, 0, bytes\.length, 0\)/);
+  assert.doesNotMatch(implementationSource, /fsPromises\.(writeFile|readFile)\(/);
 });
