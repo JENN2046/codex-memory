@@ -34,7 +34,11 @@ const STOP_L4_FLAG_KEYS = Object.freeze([
   'readinessClaimed',
   'productionReadyClaimed',
   'releaseReadyClaimed',
-  'cutoverReadyClaimed'
+  'cutoverReadyClaimed',
+  'rcReadyClaimed',
+  'deployReadyClaimed',
+  'fullCapabilityClaimed',
+  'modelMemoryCompleteClaimed'
 ]);
 
 const FORBIDDEN_INPUT_KEY_PATTERNS = Object.freeze([
