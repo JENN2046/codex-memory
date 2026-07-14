@@ -155,6 +155,7 @@ function assertSafeGitEnvironment(env = process.env) {
 function sanitizedGitEnvironment(env = process.env) {
   const result = { ...env };
   for (const key of unsafeGitEnvironmentKeys(result)) delete result[key];
+  result.GIT_NO_REPLACE_OBJECTS = '1';
   return result;
 }
 

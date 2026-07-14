@@ -294,10 +294,13 @@ test('CM-2118 rejects repository Git environment overrides before packet intake 
       () => implementation.assertSafeGitEnvironment({ [key]: '/tmp/cm2118-forbidden' }),
       /cm2118_unsafe_git_environment/
     );
-    assert.equal(Object.hasOwn(
-      implementation.sanitizedGitEnvironment({ SAFE_VALUE: 'kept', [key]: '/tmp/cm2118-forbidden' }),
-      key
-    ), false);
+    const sanitized = implementation.sanitizedGitEnvironment({
+      SAFE_VALUE: 'kept',
+      [key]: '/tmp/cm2118-forbidden'
+    });
+    if (key === 'GIT_NO_REPLACE_OBJECTS') assert.equal(sanitized[key], '1');
+    else assert.equal(Object.hasOwn(sanitized, key), false);
+    assert.equal(sanitized.GIT_NO_REPLACE_OBJECTS, '1');
     const previous = process.env[key];
     process.env[key] = '/tmp/cm2118-forbidden';
     try {

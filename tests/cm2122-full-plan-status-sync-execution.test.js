@@ -284,10 +284,13 @@ test('Git repository, object, and index environment overrides fail before any go
   ]) {
     assert.throws(() => implementation.assertSafeGitEnvironment({ [key]: '/tmp/cm2122-forbidden' }),
       /unsafe_git_environment/);
-    assert.equal(Object.hasOwn(
-      implementation.sanitizedGitEnvironment({ SAFE_VALUE: 'kept', [key]: '/tmp/cm2122-forbidden' }),
-      key
-    ), false);
+    const sanitized = implementation.sanitizedGitEnvironment({
+      SAFE_VALUE: 'kept',
+      [key]: '/tmp/cm2122-forbidden'
+    });
+    if (key === 'GIT_NO_REPLACE_OBJECTS') assert.equal(sanitized[key], '1');
+    else assert.equal(Object.hasOwn(sanitized, key), false);
+    assert.equal(sanitized.GIT_NO_REPLACE_OBJECTS, '1');
     const before = text(['rev-parse', 'HEAD^{commit}'], fixture.repo);
     const rejected = spawnSync(process.execPath, [
       'src/cli/cm2122-full-plan-status-sync.js',
