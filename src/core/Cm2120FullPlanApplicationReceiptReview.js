@@ -275,10 +275,28 @@ function buildReviewDecision({ frozenEvidence, durableEvidence, implementation }
   return wrapPayload(payload, 'cm2120_full_plan_application_receipt_review_decision_v1');
 }
 
+function validateReviewImplementation(implementation, options, blockers) {
+  if (!implementation || !sameJson(Object.keys(implementation).sort(), ['commit', 'tree']) ||
+      !/^[a-f0-9]{40}$/.test(implementation.commit || '') ||
+      !/^[a-f0-9]{40}$/.test(implementation.tree || '')) {
+    blockers.push('review.implementationGitIdentity');
+    return;
+  }
+  try {
+    if (options.resolveCommitTree(implementation.commit) !== implementation.tree ||
+        !options.isCommitAncestor(FREEZE_COMMIT, implementation.commit)) {
+      blockers.push('review.implementationGitIdentity');
+    }
+  } catch {
+    blockers.push('review.implementationGitIdentity');
+  }
+}
+
 function evaluateReviewDecision(decision = {}, { implementation, durableEvidence, ...options } = {}) {
   const blockers = [];
   const frozenEvidence = evaluateFrozenReceiptSet(options);
   if (!frozenEvidence.accepted) blockers.push(...frozenEvidence.blockers.map(item => `review.${item}`));
+  validateReviewImplementation(implementation, options, blockers);
   if (!machineBoundDurableEvidence.has(durableEvidence)) blockers.push('review.durableEvidenceMachineBinding');
   let expected = null;
   try {
