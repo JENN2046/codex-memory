@@ -14,6 +14,8 @@ const {
   validateCm2097CaseManifest
 } = require('../core/Cm2097IsolatedFailureRecoveryHarness');
 const {
+  FAILURE_FIXTURE_MARKDOWN,
+  HARNESS_IDENTITY_BYTES,
   HARNESS_ROOT_DIRECTORY,
   evaluateFailureRecoveryReceipt,
   executeIsolatedFailureRecoveryHarness
@@ -78,7 +80,15 @@ function validatePacket(packet = {}, observed = {}) {
   if (packet.packetDoesNotAuthorizeExecution !== true || packet.executionAuthorizedAtPacketFreeze !== false) blockers.push('packet.authority');
   if (packet.implementationCommit !== observed.runtimeCommit || packet.implementationTree !== observed.runtimeTree) blockers.push('packet.runtime');
   if (packet.expectedDecisionReference !== 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION') blockers.push('packet.expectedDecisionReference');
-  if (packet.harnessRootDirectory !== HARNESS_ROOT_DIRECTORY || packet.callerPathOverrideAllowed !== false || packet.environmentPathOverrideAllowed !== false) blockers.push('packet.harnessRoot');
+  if (packet.harnessRootDirectory !== HARNESS_ROOT_DIRECTORY ||
+      packet.harnessRootAuthority !== 'git_common_dir_governance_state' ||
+      packet.harnessIdentityBytes !== HARNESS_IDENTITY_BYTES.length ||
+      packet.harnessIdentitySha256 !== sha256(HARNESS_IDENTITY_BYTES) ||
+      packet.ambiguousPostCommitFixtureBytes !== FAILURE_FIXTURE_MARKDOWN.length ||
+      packet.ambiguousPostCommitFixtureSha256 !== sha256(FAILURE_FIXTURE_MARKDOWN) ||
+      packet.callerPathOverrideAllowed !== false || packet.environmentPathOverrideAllowed !== false) {
+    blockers.push('packet.harnessRoot');
+  }
   if (packet.governanceRootIdentitySha256 !== GOVERNANCE_ROOT_IDENTITY_SHA256) blockers.push('packet.governanceRootIdentitySha256');
   if (!Array.isArray(packet.caseManifests) || packet.caseManifests.length !== 3) blockers.push('packet.caseManifests');
   for (let index = 0; index < CASE_IDS.length; index += 1) {
