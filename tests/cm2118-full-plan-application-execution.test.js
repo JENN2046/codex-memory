@@ -641,7 +641,7 @@ test('CM-2118 registry rejects a governance root reached through a symlinked par
   }
 });
 
-function runApplicationProcess() {
+function runApplicationProcess(environmentOverrides = {}) {
   return new Promise(resolve => {
     const child = spawn(process.execPath, [
       '--require', FIXED_DATE_PRELOAD,
@@ -654,7 +654,8 @@ function runApplicationProcess() {
       env: {
         ...process.env,
         NODE_ENV: 'test',
-        CODEX_MEMORY_TEST_FIXED_NOW: decisionTime(fixture.finalReleaseEvidence.decision).toISOString()
+        CODEX_MEMORY_TEST_FIXED_NOW: decisionTime(fixture.finalReleaseEvidence.decision).toISOString(),
+        ...environmentOverrides
       },
       stdio: ['ignore', 'pipe', 'pipe']
     });
@@ -696,7 +697,24 @@ test('fixed executor survives concurrent invocation with exactly one application
 }, async () => {
   const governanceRoot = fixtureGovernanceRoot(fixture.repo);
   git(['checkout', '--detach', fixture.implementationCommit], fixture.repo);
-  const [left, right] = await Promise.all([runApplicationProcess(), runApplicationProcess()]);
+  const [left, right] = await Promise.all([
+    runApplicationProcess({
+      GIT_AUTHOR_NAME: 'Ambient Author A',
+      GIT_AUTHOR_EMAIL: 'ambient-a@example.invalid',
+      GIT_AUTHOR_DATE: '2001-01-01T00:00:00+00:00',
+      GIT_COMMITTER_NAME: 'Ambient Committer A',
+      GIT_COMMITTER_EMAIL: 'ambient-a@example.invalid',
+      GIT_COMMITTER_DATE: '2001-01-01T00:00:00+00:00'
+    }),
+    runApplicationProcess({
+      GIT_AUTHOR_NAME: 'Ambient Author B',
+      GIT_AUTHOR_EMAIL: 'ambient-b@example.invalid',
+      GIT_AUTHOR_DATE: '2030-01-01T00:00:00+00:00',
+      GIT_COMMITTER_NAME: 'Ambient Committer B',
+      GIT_COMMITTER_EMAIL: 'ambient-b@example.invalid',
+      GIT_COMMITTER_DATE: '2030-01-01T00:00:00+00:00'
+    })
+  ]);
   assert.equal(left.timedOut, false, JSON.stringify(left));
   assert.equal(right.timedOut, false, JSON.stringify(right));
   const successful = [left, right].filter(item => item.code === 0 && item.stdout.includes('PASS_APPLICATION_COMMIT_BOUND'));
@@ -704,6 +722,7 @@ test('fixed executor survives concurrent invocation with exactly one application
   const applicationResult = JSON.parse(successful[0].stdout);
   fixture.applicationCommit = applicationResult.applicationCommit;
   fixture.governanceRoot = governanceRoot;
+  assert.equal(fixture.applicationCommit, fixture.frozenModule.APPLICATION_COMMIT_FREEZE.commit);
   assert.equal(applicationResult.fullPlanPackCompleted, true);
   assert.equal(applicationResult.readinessClaimed, false);
   assert.equal(text(['rev-parse', `${fixture.applicationCommit}^`], fixture.repo), implementation.CONTENT_DECISION_FREEZE.commit);

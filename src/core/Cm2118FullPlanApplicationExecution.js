@@ -36,6 +36,17 @@ const RECEIPT_ID = 'cm2116-full-plan-application-receipt-001';
 const ACTION = 'apply_exact_full_plan_completion_state';
 const FINAL_RELEASE_APPROVED_AT = '2026-07-12T18:00:00+08:00';
 const FINAL_RELEASE_EXPIRES_AT = '2026-07-19T18:00:00+08:00';
+const APPLICATION_COMMIT_FREEZE = Object.freeze({
+  commit: '41097b0fb1118a47f3d16873a12a5e0fcc75a94b',
+  tree: 'fecb13c4f55d634197feab94d1dec5f56575521a',
+  message: 'docs: apply CM-2118 exact full-plan completion state',
+  authorName: 'Jenn',
+  authorEmail: 'jenn515292656@gmail.com',
+  authorDate: '2026-07-12T21:01:42+08:00',
+  committerName: 'Jenn',
+  committerEmail: 'jenn515292656@gmail.com',
+  committerDate: '2026-07-12T21:01:42+08:00'
+});
 
 const GOVERNANCE_ROOT_IDENTITY = Object.freeze({
   registryRootInstanceId: 'cm2093-phase8-governance-root-instance-001',
@@ -1442,10 +1453,22 @@ function createExactApplicationCommitWithGitPlumbing({ repoRoot, packetEvidence,
     gitText(['update-index', '--add', '--cacheinfo', `${target.after.gitMode},${oid},${target.sourcePath}`], { cwd: repoRoot, env });
   }
   const tree = gitText(['write-tree'], { cwd: repoRoot, env });
+  const commitEnvironment = {
+    ...sanitizedGitEnvironment(),
+    GIT_AUTHOR_NAME: APPLICATION_COMMIT_FREEZE.authorName,
+    GIT_AUTHOR_EMAIL: APPLICATION_COMMIT_FREEZE.authorEmail,
+    GIT_AUTHOR_DATE: APPLICATION_COMMIT_FREEZE.authorDate,
+    GIT_COMMITTER_NAME: APPLICATION_COMMIT_FREEZE.committerName,
+    GIT_COMMITTER_EMAIL: APPLICATION_COMMIT_FREEZE.committerEmail,
+    GIT_COMMITTER_DATE: APPLICATION_COMMIT_FREEZE.committerDate
+  };
   const commit = gitText([
     'commit-tree', tree, '-p', CONTENT_DECISION_FREEZE.commit, '-m',
-    'docs: apply CM-2118 exact full-plan completion state'
-  ], { cwd: repoRoot });
+    APPLICATION_COMMIT_FREEZE.message
+  ], { cwd: repoRoot, env: commitEnvironment });
+  if (tree !== APPLICATION_COMMIT_FREEZE.tree || commit !== APPLICATION_COMMIT_FREEZE.commit) {
+    throw new Error('cm2118_application_commit_identity_mismatch');
+  }
   return { commit, tree, parentCommit: CONTENT_DECISION_FREEZE.commit, parentTree: CONTENT_DECISION_FREEZE.tree, indexPath };
 }
 
@@ -1813,6 +1836,7 @@ async function executeFullPlanApplicationFromCommits({
 
 module.exports = {
   ACTION,
+  APPLICATION_COMMIT_FREEZE,
   APPLICATION_DIFF_ENTRIES,
   APPLICATION_DIFF_PATHS,
   APPLICATION_STATE_PATH,
