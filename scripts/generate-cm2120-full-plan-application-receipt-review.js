@@ -13,6 +13,7 @@ const {
   serializeArtifact
 } = require('../src/core/Cm2120FullPlanApplicationReceiptReview');
 const { resolverOptions } = require('./generate-cm2116-exact-full-plan-application-gate');
+const { assertSafeGitEnvironment } = require('../src/core/Cm2118FullPlanApplicationExecution');
 
 function gitText(args) {
   return execFileSync('git', args, {
@@ -29,6 +30,7 @@ function parseArgs(argv) {
 
 async function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
+  assertSafeGitEnvironment();
   if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2120_receipt_review_clean_worktree_required');
   if (fs.existsSync(REVIEW_PATH) || fs.existsSync(REVIEW_MARKDOWN_PATH)) {
     throw new Error('cm2120_receipt_review_already_exists');

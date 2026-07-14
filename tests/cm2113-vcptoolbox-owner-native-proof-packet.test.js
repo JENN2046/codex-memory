@@ -63,7 +63,7 @@ function packetFixture() {
       registryReinitializationAllowed: false,
       registryDeletionAllowed: false
     },
-    governanceRootIdentitySha256: '0'.repeat(64),
+    governanceRootIdentitySha256: '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0',
     bootstrapReceiptGitIdentity: { sourceCommit: 'a'.repeat(40), blobOid: 'b'.repeat(40), bytes: 500, sha256: 'c'.repeat(64) },
     packetPayloadSha256: ''
   };
@@ -91,6 +91,8 @@ test('CM-2113 packet rejects self identity, transport drift, and store replaceme
     packet => { packet.runtimeTarget.storeInstanceId = 'clone-store'; },
     packet => { packet.fixedRecord.folder = '../outside'; },
     packet => { packet.fixedRecord.unbound = true; },
+    packet => { packet.authorization.productionReady = true; },
+    packet => { packet.limits.productionReady = true; },
     packet => { packet.nonClaims.productionProviderProofAccepted = true; }
   ]) {
     const packet = packetFixture();

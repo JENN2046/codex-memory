@@ -118,8 +118,8 @@ function prepared() {
   const frozenEvidence = review.evaluateFrozenReceiptSet(options);
   assert.equal(frozenEvidence.accepted, true, frozenEvidence.blockers.join(','));
   const implementation = {
-    commit: 'a'.repeat(40),
-    tree: 'b'.repeat(40)
+    commit: review.FREEZE_COMMIT,
+    tree: review.FREEZE_TREE
   };
   const decision = review.buildReviewDecision({ frozenEvidence, durableEvidence, implementation });
   return { options, frozenEvidence, implementation, decision };
@@ -197,7 +197,52 @@ test('ordinary caller-supplied durable evidence has no review authority', () => 
   assert.ok(evaluation.blockers.includes('review.durableEvidenceMachineBinding'));
 });
 
+test('review implementation must resolve to the claimed Git tree and reviewed ancestry', () => {
+  const { options, frozenEvidence } = prepared();
+  const implementation = { commit: 'f'.repeat(40), tree: 'e'.repeat(40) };
+  const decision = review.buildReviewDecision({ frozenEvidence, durableEvidence, implementation });
+  const evaluation = review.evaluateReviewDecision(decision, {
+    implementation,
+    durableEvidence,
+    ...options
+  });
+  assert.equal(evaluation.accepted, false);
+  assert.ok(evaluation.blockers.includes('review.implementationGitIdentity'));
+
+  const extraFieldImplementation = {
+    commit: review.FREEZE_COMMIT,
+    tree: review.FREEZE_TREE,
+    unreviewedAuthority: false
+  };
+  const extraFieldDecision = review.buildReviewDecision({
+    frozenEvidence,
+    durableEvidence,
+    implementation: extraFieldImplementation
+  });
+  const extraFieldEvaluation = review.evaluateReviewDecision(extraFieldDecision, {
+    implementation: extraFieldImplementation,
+    durableEvidence,
+    ...options
+  });
+  assert.equal(extraFieldEvaluation.accepted, false);
+  assert.ok(extraFieldEvaluation.blockers.includes('review.implementationGitIdentity'));
+});
+
 test('review generator accepts no arguments or output path overrides', () => {
   assert.deepEqual(generator.parseArgs([]), {});
   assert.throws(() => generator.parseArgs(['--output', '/tmp/x']), /no_arguments/);
+});
+
+test('review generator rejects unsafe Git overrides before its first repository read', async () => {
+  const previous = process.env.GIT_DIR;
+  process.env.GIT_DIR = '/tmp/cm2120-forbidden-git-dir';
+  try {
+    await assert.rejects(
+      generator.main([]),
+      /cm2118_unsafe_git_environment:GIT_DIR/
+    );
+  } finally {
+    if (previous === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previous;
+  }
 });
