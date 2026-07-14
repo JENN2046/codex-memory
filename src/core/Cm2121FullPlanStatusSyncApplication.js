@@ -141,14 +141,10 @@ function projectCurrentFacts(beforeBytes) {
   const evidence = facts.evidenceBaseline || {};
   Object.assign(evidence, {
     cm2117DecisionGitIntakeCompleted: true,
-    cm2117FinalExecutionReleasePresent: false,
-    cm2117ClaimCreated: false,
-    cm2117ApplicationExecuted: false,
-    cm2117ApplicationCommitBound: false,
-    cm2118FinalExecutionReleasePresent: true,
-    cm2118ClaimCreated: true,
-    cm2118ApplicationExecuted: true,
-    cm2118ApplicationCommitBound: true,
+    cm2117FinalExecutionReleasePresent: true,
+    cm2117ClaimCreated: true,
+    cm2117ApplicationExecuted: true,
+    cm2117ApplicationCommitBound: true,
     cm2119ClaimCreated: true,
     cm2119ApplicationExecuted: true,
     cm2119ApplicationCommitCreated: true,

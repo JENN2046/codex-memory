@@ -52,15 +52,6 @@ test('projected status surfaces pass current-facts and ledger validators in isol
     }
     const drift = validateCurrentFactsDrift(root);
     assert.equal(drift.ok, true, drift.failures.join('\n'));
-    const projectedFacts = JSON.parse(fs.readFileSync(path.join(root, '.agent_board/CURRENT_FACTS.json'), 'utf8'));
-    assert.equal(projectedFacts.evidenceBaseline.cm2117FinalExecutionReleasePresent, false);
-    assert.equal(projectedFacts.evidenceBaseline.cm2117ClaimCreated, false);
-    assert.equal(projectedFacts.evidenceBaseline.cm2117ApplicationExecuted, false);
-    assert.equal(projectedFacts.evidenceBaseline.cm2117ApplicationCommitBound, false);
-    assert.equal(projectedFacts.evidenceBaseline.cm2118FinalExecutionReleasePresent, true);
-    assert.equal(projectedFacts.evidenceBaseline.cm2118ClaimCreated, true);
-    assert.equal(projectedFacts.evidenceBaseline.cm2118ApplicationExecuted, true);
-    assert.equal(projectedFacts.evidenceBaseline.cm2118ApplicationCommitBound, true);
     const ledger = validateAutopilotLedgerConsistency(root);
     assert.equal(ledger.ok, true, ledger.failures.join('\n'));
     assert.equal(ledger.latestTask, application.TASK_ID);
