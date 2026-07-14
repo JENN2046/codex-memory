@@ -6,6 +6,7 @@ const test = require('node:test');
 const {
   DECISION_PATH,
   IMPLEMENTATION_ARTIFACT_PATHS,
+  IMPLEMENTATION_LINEAGE_DIFF_PATHS,
   REVIEW_REQUEST_DIFF_PATHS,
   REVIEW_REQUEST_FREEZE,
   buildDecision,
@@ -68,11 +69,14 @@ function resolvers(overrides = {}) {
       ? IMPLEMENTATION_TREE
       : git.resolveCommitTree(commit),
     resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
-      ? REVIEW_REQUEST_FREEZE.commit
+      ? '7'.repeat(40)
       : git.resolveParentCommit(commit),
-    resolveDiffPaths: (parent, commit) => commit === IMPLEMENTATION_COMMIT
-      ? [...IMPLEMENTATION_ARTIFACT_PATHS]
-      : git.resolveDiffPaths(parent, commit),
+    resolveDiffPaths: (parent, commit) => {
+      if (commit !== IMPLEMENTATION_COMMIT) return git.resolveDiffPaths(parent, commit);
+      return parent === REVIEW_REQUEST_FREEZE.commit
+        ? [...IMPLEMENTATION_LINEAGE_DIFF_PATHS]
+        : [...IMPLEMENTATION_ARTIFACT_PATHS];
+    },
     resolveGitPathState: git.resolveGitPathState,
     resolveDurableClaim: resolveFrozenPhase2DurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
@@ -167,9 +171,9 @@ test('self-review rejects frozen request, resolver, implementation, or payload d
     resolveCommitTree: commit => commit === IMPLEMENTATION_COMMIT ? '0'.repeat(40) : git.resolveCommitTree(commit)
   })).accepted, false);
   assert.equal(evaluateDecision(decision, resolvers({
-    resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
-      ? '7'.repeat(40)
-      : resolvers().resolveParentCommit(commit)
+    resolveDiffPaths: (parent, commit) => parent === REVIEW_REQUEST_FREEZE.commit && commit === IMPLEMENTATION_COMMIT
+      ? [...IMPLEMENTATION_LINEAGE_DIFF_PATHS, 'src/core/UnreviewedIntermediateDependency.js']
+      : resolvers().resolveDiffPaths(parent, commit)
   })).accepted, false);
   assert.equal(evaluateDecision(decision, resolvers({
     resolveDiffPaths: (parent, commit) => commit === IMPLEMENTATION_COMMIT
