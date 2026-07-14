@@ -1037,6 +1037,13 @@ test('temp clone performs one exact CAS plus linked-target index and nine-file s
   assert.equal(second.accepted, false);
   assert.equal(second.authorizationConsumed, true);
   assert.equal(second.authorizationReplayAllowed, false);
+  assert.equal(second.branchRefUpdated, true);
+  assert.equal(second.targetWorktreeIndexSynchronized, true);
+  assert.equal(second.targetWorktreeFilesSynchronized, true);
+  assert.equal(second.executionReceiptCreated, true);
+  assert.equal(second.statusSyncPerformed, true);
+  assert.equal(second.currentBranchStatusSynchronized, true);
+  assert.equal(second.fullPlanPackCompleted, true);
   assert.equal(second.reconciliationReceipt.payload.branchCasCallsThisReentry, 0);
   assert.equal(second.reconciliationReceipt.payload.targetIndexSyncCallsThisReentry, 0);
   assert.equal(second.reconciliationReceipt.payload.targetFileWritesThisReentry, 0);
@@ -1316,7 +1323,13 @@ test('a new process replay is readonly and performs zero additional effect', () 
   assert.equal(result.status, 'STOPPED');
   assert.equal(result.authorizationConsumed, true);
   assert.equal(result.authorizationReplayAllowed, false);
+  assert.equal(result.branchRefUpdated, true);
+  assert.equal(result.targetWorktreeIndexSynchronized, true);
+  assert.equal(result.targetWorktreeFilesSynchronized, true);
+  assert.equal(result.executionReceiptCreated, true);
+  assert.equal(result.statusSyncPerformed, true);
   assert.equal(result.currentBranchStatusSynchronized, true);
+  assert.equal(result.fullPlanPackCompleted, true);
   assert.equal(result.reconciliationReceipt.payload.reconciliationRequired, false);
   assert.equal(result.reconciliationReceipt.payload.successReceiptAccepted, true);
   assert.equal(result.reconciliationReceipt.payload.branchCasCallsThisReentry, 0);

@@ -1444,13 +1444,22 @@ async function existingClaimResult({ existing, bindingHash, repoRoot, target, ta
     successReceiptAccepted
   });
   if (!evaluation.accepted) throw new Error(`cm2126_reentry_receipt_rejected:${evaluation.blockers.join(',')}`);
+  const durableSuccess = reconciliationReceipt.payload.branchRefUpdated === true &&
+    reconciliationReceipt.payload.currentBranchStatusSynchronized === true &&
+    reconciliationReceipt.payload.successReceiptAccepted === true &&
+    reconciliationReceipt.payload.runtimeSuccessPostconditionsObserved === true;
   return {
     accepted: false,
     state: existing.state,
     authorizationConsumed: true,
     authorizationReplayAllowed: false,
     branchRefUpdated: reconciliationReceipt.payload.branchRefUpdated,
+    targetWorktreeIndexSynchronized: durableSuccess,
+    targetWorktreeFilesSynchronized: durableSuccess,
+    executionReceiptCreated: durableSuccess,
+    statusSyncPerformed: durableSuccess,
     currentBranchStatusSynchronized: reconciliationReceipt.payload.currentBranchStatusSynchronized,
+    fullPlanPackCompleted: durableSuccess,
     reconciliationReceipt,
     readinessClaimed: false
   };
