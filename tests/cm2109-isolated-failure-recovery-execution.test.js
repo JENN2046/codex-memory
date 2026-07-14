@@ -98,6 +98,7 @@ test('CM-2109 receipt fails closed on retry, replay, provider, real-memory, or p
   const receipt = await executeIsolatedFailureRecoveryHarness({ harnessRoot: path.join(parent, 'harness'), executionBinding: executionBinding() });
   for (const mutate of [
     payload => { payload.summary.totalRetryCount = 1; },
+    payload => { payload.summary.productionReady = true; },
     payload => { payload.authorization.replayAllowed = true; },
     payload => { payload.boundaries.productionProviderCalled = true; },
     payload => { payload.boundaries.realMemoryRead = true; },
