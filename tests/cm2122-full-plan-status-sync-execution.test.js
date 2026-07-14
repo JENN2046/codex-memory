@@ -548,6 +548,16 @@ test('claim transition keeps read and write pinned to one governance descriptor 
   }
 });
 
+test('successful execution replays durable receipts before returning and can terminalize failure as ambiguous', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2122FullPlanStatusSyncExecution.js'), 'utf8');
+  const successTransition = source.indexOf("'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION', {}, finalReleaseEvidence");
+  const durableReplay = source.indexOf('const durableBinding = await evaluateDurableDetachedBinding', successTransition);
+  const successReturn = source.indexOf('accepted: true', durableReplay);
+  assert.ok(successTransition >= 0 && durableReplay > successTransition && successReturn > durableReplay);
+  assert.match(source, /CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION:\s*\['CONSUMED_AMBIGUOUS_POST_COMMIT'\]/);
+  assert.match(source.slice(durableReplay), /if \(state !== 'UNCLAIMED'\)/);
+});
+
 function initializeGovernanceRoot() {
   const root = path.join(
     fixture.repo,

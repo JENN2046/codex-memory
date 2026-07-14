@@ -965,7 +965,8 @@ class Cm2122StatusSyncClaimRegistry {
       STATUS_COMMIT_INVOCATION_CONSUMED: ['DETACHED_STATUS_COMMIT_CREATED', 'CONSUMED_AMBIGUOUS_POST_COMMIT'],
       DETACHED_STATUS_COMMIT_CREATED: ['EXECUTION_RECEIPT_WRITTEN', 'CONSUMED_AMBIGUOUS_POST_COMMIT'],
       EXECUTION_RECEIPT_WRITTEN: ['BINDING_RECEIPT_WRITTEN', 'CONSUMED_AMBIGUOUS_POST_COMMIT'],
-      BINDING_RECEIPT_WRITTEN: ['CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION', 'CONSUMED_AMBIGUOUS_POST_COMMIT']
+      BINDING_RECEIPT_WRITTEN: ['CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION', 'CONSUMED_AMBIGUOUS_POST_COMMIT'],
+      CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION: ['CONSUMED_AMBIGUOUS_POST_COMMIT']
     };
     if (!allowed[expectedState]?.includes(state)) throw new Error('cm2122_claim_transition_invalid');
     const rootHandle = await openVerifiedGovernanceRoot(this);
@@ -1880,6 +1881,16 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
     state = claim.state;
     claim = await registry.transition(bindingHash, state,
       'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION', {}, finalReleaseEvidence);
+    state = claim.state;
+    const durableBinding = await evaluateDurableDetachedBinding({
+      contentDecisionCommit,
+      packetCommit,
+      finalReleaseCommit
+    });
+    if (!durableBinding.accepted || durableBinding.detachedStatusCommit !== claim.detachedStatusCommit ||
+        durableBinding.detachedStatusTree !== claim.detachedStatusTree) {
+      throw new Error(`cm2122_postsuccess_durable_binding_rejected:${durableBinding.blockers.join(',')}`);
+    }
     return {
       accepted: true,
       state: claim.state,
@@ -1895,7 +1906,7 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
       readinessClaimed: false
     };
   } catch (error) {
-    if (state !== 'UNCLAIMED' && state !== 'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION') {
+    if (state !== 'UNCLAIMED') {
       await registry.transition(bindingHash, state, 'CONSUMED_AMBIGUOUS_POST_COMMIT', {
         detachedStatusCommitCreated: detachedIdentity?.commitObjectCreated === true ? true : null,
         detachedHeadUpdateAcknowledged: detachedIdentity?.detachedHeadUpdateAcknowledged === true ? true : null,
