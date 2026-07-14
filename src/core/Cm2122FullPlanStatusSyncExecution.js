@@ -44,6 +44,7 @@ const NONCE = 'cm2122-r2-full-plan-status-sync-001';
 const RECEIPT_ID = 'cm2122-r2-full-plan-status-sync-receipt-001';
 const FINAL_RELEASE_APPROVED_AT = '2026-07-12T00:00:00+08:00';
 const FINAL_RELEASE_EXPIRES_AT = '2026-07-19T23:59:59+08:00';
+const ATTRIBUTION_STALE_PACKET_COMMIT = 'd9f5f8c1cbfb17ac013846006f466c1b0c3ae67f';
 const SUPERSEDED_FREEZE = Object.freeze({
   implementationCommit: '60761ff5b9fc81554f80b16d4597174f212c82b7',
   executionPacketCommit: 'f3db578742ce15599b86674a2476532c802eaa74',
@@ -1199,6 +1200,13 @@ function assertExecutionRuntime({ finalReleaseEvidence, packetEvidence }) {
   return repoRoot;
 }
 
+function assertExecutableStatusAttribution(packetEvidence) {
+  if (packetEvidence?.packetCommit === ATTRIBUTION_STALE_PACKET_COMMIT) {
+    throw new Error('cm2122_frozen_packet_status_attribution_stale');
+  }
+  return true;
+}
+
 function createExactDetachedStatusCommit({ repoRoot, finalReleaseEvidence, packetEvidence }) {
   const targets = packetEvidence.packet.payload.detachedCommitBoundary.targets;
   const partial = {
@@ -1696,6 +1704,7 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
   const options = realResolverOptions();
   let packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
   if (!packetEvidence.accepted) throw new Error(`cm2122_packet_rejected:${packetEvidence.blockers.join(',')}`);
+  assertExecutableStatusAttribution(packetEvidence);
   let finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: new Date(), ...options });
   if (!finalReleaseEvidence.accepted) throw new Error(`cm2122_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
   const repoRoot = assertExecutionRuntime({ finalReleaseEvidence, packetEvidence });
@@ -1852,6 +1861,7 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
 
 module.exports = {
   ACTION,
+  ATTRIBUTION_STALE_PACKET_COMMIT,
   BINDING_RECEIPT_FILENAME,
   CONTENT_DECISION_FREEZE,
   EXECUTION_RECEIPT_FILENAME,
@@ -1884,6 +1894,7 @@ module.exports = {
   buildFinalReleaseDecision,
   buildReentryReceipt,
   assertSafeGitEnvironment,
+  assertExecutableStatusAttribution,
   claimFileName,
   claimId,
   evaluateDurableDetachedBinding,
