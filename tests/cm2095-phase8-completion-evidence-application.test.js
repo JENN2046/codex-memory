@@ -2,8 +2,41 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const { execFileSync } = require('node:child_process');
 const { executeCm2095Phase8CompletionEvidenceApplication } = require('../src/core/Cm2095Phase8CompletionEvidenceApplication');
-const { buildInput } = require('../src/cli/cm2095-phase8-completion-evidence-application');
+const { buildInput, runCli } = require('../src/cli/cm2095-phase8-completion-evidence-application');
+
+test('CM-2095 CLI verifies the exact committed receipt without replaying the application', () => {
+  for (const argv of [[], ['--verify-only']]) {
+    const result = runCli(argv);
+    assert.equal(result.accepted, true, result.blockers.join(', '));
+    assert.equal(result.mode, 'committed_receipt_verification');
+    assert.equal(result.applicationReceiptAccepted, true);
+    assert.equal(result.phase8ReceiptBundleAppliedToCompletionAudit, true);
+    assert.equal(result.phase8Completed, false);
+    assert.equal(result.additionalNativeWriteAuthorized, false);
+  }
+  const output = JSON.parse(execFileSync(process.execPath, [
+    'src/cli/cm2095-phase8-completion-evidence-application.js'
+  ], { encoding: 'utf8' }));
+  assert.equal(output.accepted, true);
+  assert.equal(output.mode, 'committed_receipt_verification');
+});
+
+test('CM-2095 CLI keeps pre-application generation separate after receipt persistence', () => {
+  const result = runCli(['--pre-application']);
+  assert.equal(result.accepted, false);
+  assert.equal(result.mode, 'pre_application_gate');
+  assert.ok(result.blockers.includes('baseline.applicationReceiptAbsent'));
+  assert.equal(result.patchApplicationAccepted, false);
+});
+
+test('CM-2095 CLI rejects unexpected arguments without entering either mode', () => {
+  const result = runCli(['--output', '/tmp/not-allowed']);
+  assert.equal(result.accepted, false);
+  assert.equal(result.mode, 'argument_validation');
+  assert.deepEqual(result.blockers, ['arguments']);
+});
 
 test('CM-2095 application gate, patch boundary, and patch application accept only six supported fields', () => {
   const input = buildInput();
