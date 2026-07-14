@@ -24,7 +24,6 @@ const {
 const {
   resolveFrozenPhase2DurableClaim
 } = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
-const { isCommitAncestor } = require('./generate-cm2115-r2-self-review-decision');
 const { assertSafeGitEnvironment } = require('../src/core/Cm2118FullPlanApplicationExecution');
 
 function parseArgs(argv) {
@@ -43,6 +42,15 @@ function resolveDiffEntries(parentCommit, commit) {
     if (!match) throw new Error('cm2116_diff_entry_invalid');
     return { status: match[1], path: match[2] };
   }).sort((a, b) => a.path.localeCompare(b.path));
+}
+
+function isCommitAncestor(ancestor, descendant) {
+  try {
+    gitText(['merge-base', '--is-ancestor', ancestor, descendant]);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function resolverOptions() {
