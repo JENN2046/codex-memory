@@ -129,6 +129,7 @@ test('CM-2096 runtime route rejects bridge gate off before one-shot claim', () =
     governedMcpVcpNativeHttpMcpTarget: {
       accepted: true,
       configured: true,
+      targetReferenceName: packet.runtimeTarget.targetReferenceName,
       bearerTokenConfigured: true,
       mcpToolNameByAction: { tombstone_memory: 'knowledge_base.tombstone' }
     }
