@@ -4,7 +4,10 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
-const { verifyCm2103GovernanceRoot } = require('../core/Cm2103IdentityBoundStoreGovernance');
+const {
+  GOVERNANCE_ROOT_IDENTITY_SHA256,
+  verifyCm2103GovernanceRoot
+} = require('../core/Cm2103IdentityBoundStoreGovernance');
 const {
   CASE_IDS,
   buildCm2097CaseManifest,
@@ -18,6 +21,23 @@ const {
 
 const PACKET_PATH = 'docs/near-model-memory-plan-pack/phase8_failure_recovery_execution_packet_cm2109.json';
 const DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_failure_recovery_execution_decision_cm2109.json';
+const DECISION_KEYS = Object.freeze([
+  'schemaVersion', 'taskId', 'decisionType', 'decisionReference', 'decisionBasis',
+  'failureRecoveryExecutionAuthorized', 'authorizationUseCount', 'authorizationReplayAllowed',
+  'implementationCommit', 'implementationTree', 'executionPacketCommit', 'executionPacketBlobOid',
+  'executionPacketSha256', 'governanceRootIdentitySha256', 'harnessRootReference', 'caseCount',
+  'maxHarnessRuns', 'maxClaimCount', 'maxNativeWriteCalls', 'maxDurableWrites', 'maxRetryCount',
+  'maxRollbackCount', 'maxCompensationCount', 'expiresAt', 'approvedAt',
+  'productionProviderAuthorized', 'realMemoryAuthorized', 'cm2094AuthorizationReuseAuthorized',
+  'retryAuthorized', 'rollbackAuthorized', 'compensationAuthorized',
+  'defaultMcpExpansionAuthorized', 'readinessClaimAuthorized',
+  'failureRecoveryProofPassedByDecisionAlone', 'phase8CompletedByDecisionAlone'
+]);
+
+function exactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
 
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
@@ -42,6 +62,7 @@ function validatePacket(packet = {}, observed = {}) {
   if (packet.implementationCommit !== observed.runtimeCommit || packet.implementationTree !== observed.runtimeTree) blockers.push('packet.runtime');
   if (packet.expectedDecisionReference !== 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION') blockers.push('packet.expectedDecisionReference');
   if (packet.harnessRootDirectory !== HARNESS_ROOT_DIRECTORY || packet.callerPathOverrideAllowed !== false || packet.environmentPathOverrideAllowed !== false) blockers.push('packet.harnessRoot');
+  if (packet.governanceRootIdentitySha256 !== GOVERNANCE_ROOT_IDENTITY_SHA256) blockers.push('packet.governanceRootIdentitySha256');
   if (!Array.isArray(packet.caseManifests) || packet.caseManifests.length !== 3) blockers.push('packet.caseManifests');
   for (let index = 0; index < CASE_IDS.length; index += 1) {
     const binding = packet.caseManifests?.[index];
@@ -54,13 +75,36 @@ function validatePacket(packet = {}, observed = {}) {
   return { accepted: blockers.length === 0, blockers };
 }
 
-function validateDecision(decision = {}, binding = {}) {
+function validateDecision(decision = {}, binding = {}, now = Date.now()) {
   const blockers = [];
-  if (decision.schemaVersion !== 1 || decision.taskId !== 'CM-2109' || decision.decisionReference !== 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION') blockers.push('decision.identity');
+  if (!exactKeys(decision, DECISION_KEYS)) blockers.push('decision.fields');
+  if (decision.schemaVersion !== 1 || decision.taskId !== 'CM-2109' ||
+      decision.decisionType !== 'self_governed_exact_isolated_failure_recovery_execution' ||
+      decision.decisionReference !== 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION' ||
+      decision.decisionBasis !== 'repository_reality_and_user_delegated_prohibited_first_authority') blockers.push('decision.identity');
   if (decision.failureRecoveryExecutionAuthorized !== true || decision.authorizationUseCount !== 1 || decision.authorizationReplayAllowed !== false) blockers.push('decision.authority');
   for (const [field, expected] of Object.entries(binding)) if (decision[field] !== expected) blockers.push(`decision.${field}`);
+  if (decision.governanceRootIdentitySha256 !== GOVERNANCE_ROOT_IDENTITY_SHA256 ||
+      decision.harnessRootReference !== HARNESS_ROOT_DIRECTORY || decision.caseCount !== CASE_IDS.length) {
+    blockers.push('decision.harnessBinding');
+  }
+  const exactCounts = {
+    maxHarnessRuns: 1,
+    maxClaimCount: 2,
+    maxNativeWriteCalls: 1,
+    maxDurableWrites: 1,
+    maxRetryCount: 0,
+    maxRollbackCount: 0,
+    maxCompensationCount: 0
+  };
+  for (const [field, expected] of Object.entries(exactCounts)) {
+    if (decision[field] !== expected) blockers.push(`decision.${field}`);
+  }
+  const approved = Date.parse(decision.approvedAt || '');
   const expiry = Date.parse(decision.expiresAt || '');
-  if (!Number.isFinite(expiry) || Date.now() >= expiry) blockers.push('decision.expiresAt');
+  if (!Number.isFinite(approved) || now < approved) blockers.push('decision.approvedAt');
+  if (!Number.isFinite(expiry) || now >= expiry) blockers.push('decision.expiresAt');
+  if (!Number.isFinite(approved) || !Number.isFinite(expiry) || approved >= expiry) blockers.push('decision.authorizationWindow');
   for (const field of ['productionProviderAuthorized', 'realMemoryAuthorized', 'cm2094AuthorizationReuseAuthorized', 'retryAuthorized', 'rollbackAuthorized', 'compensationAuthorized', 'defaultMcpExpansionAuthorized', 'readinessClaimAuthorized']) if (decision[field] !== false) blockers.push(`decision.${field}`);
   for (const field of ['failureRecoveryProofPassedByDecisionAlone', 'phase8CompletedByDecisionAlone']) if (decision[field] !== false) blockers.push(`decision.${field}`);
   return { accepted: blockers.length === 0, blockers };

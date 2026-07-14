@@ -15,6 +15,23 @@ const args = {
   confirm: true
 };
 
+function nativeRouteOverrides() {
+  return {
+    governedMcpVcpNativeReadDelegationMode: 'off',
+    governedMcpVcpNativeRuntimeTarget: {
+      targetReferenceName: 'cm2096-vcptoolbox-native-memory-target',
+      targetKind: 'mcp_server'
+    },
+    governedMcpVcpNativeHttpMcpTarget: {
+      endpoint: 'http://127.0.0.1:3096',
+      bearerToken: 'fixture-only-token',
+      mcpToolNameByAction: {
+        tombstone_memory: 'knowledge_base.tombstone'
+      }
+    }
+  };
+}
+
 test('CM-2096 app path rejects caller-supplied exact approval before any tombstone path', async () => {
   const app = createCodexMemoryApplication({
     cm2096TombstoneOneShotEnforcementEnabled: true,
@@ -35,7 +52,8 @@ test('CM-2096 app path rejects invalid assertion and never falls back locally', 
     cm2096TombstoneOneShotEnforcementEnabled: true,
     cm2096TombstoneAuthorizationAssertionVerifier: async () => ({ accepted: false }),
     governedMcpVcpNativeWriteDelegationMode: 'primary',
-    governedMcpVcpNativeBridgeGateMode: 'observe'
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    ...nativeRouteOverrides()
   });
   const result = await app.callTool('tombstone_memory', args, {
     cm2096TombstoneAuthorizationAssertion: { invalid: true }
@@ -43,6 +61,48 @@ test('CM-2096 app path rejects invalid assertion and never falls back locally', 
   assert.equal(result.reasonCode, 'cm2096_tombstone_one_shot_authorization_claim_invalid');
   assert.equal(result.localFallbackWritePerformed, false);
   await app.close();
+});
+
+test('CM-2096 app path rejects an unusable native route before consuming the assertion', async () => {
+  for (const routeOverrides of [
+    {
+      governedMcpVcpNativeRuntimeTarget: {},
+      governedMcpVcpNativeHttpMcpTarget: {
+        endpoint: 'http://127.0.0.1:3096',
+        bearerToken: 'fixture-only-token',
+        mcpToolNameByAction: { tombstone_memory: 'knowledge_base.tombstone' }
+      }
+    },
+    {
+      governedMcpVcpNativeRuntimeTarget: {
+        targetReferenceName: 'cm2096-vcptoolbox-native-memory-target',
+        targetKind: 'mcp_server'
+      },
+      governedMcpVcpNativeHttpMcpTarget: {}
+    }
+  ]) {
+    let assertionVerifierCalls = 0;
+    const app = createCodexMemoryApplication({
+      cm2096TombstoneOneShotEnforcementEnabled: true,
+      cm2096TombstoneAuthorizationAssertionVerifier: async () => {
+        assertionVerifierCalls += 1;
+        return { accepted: true, exactApprovalResult: {} };
+      },
+      governedMcpVcpNativeWriteDelegationMode: 'primary',
+      governedMcpVcpNativeReadDelegationMode: 'off',
+      governedMcpVcpNativeBridgeGateMode: 'observe',
+      ...routeOverrides
+    });
+    const result = await app.callTool('tombstone_memory', args, {
+      cm2096TombstoneAuthorizationAssertion: { opaque: true }
+    });
+    assert.equal(result.decision, 'rejected');
+    assert.equal(assertionVerifierCalls, 0);
+    assert.equal(result.reasonCode, 'cm2096_tombstone_one_shot_authorization_required');
+    assert.equal(result.nativeWritePerformed, false);
+    assert.equal(result.localFallbackWritePerformed, false);
+    await app.close();
+  }
 });
 
 test('CM-2096 app path requires primary native delegation mode', async () => {
