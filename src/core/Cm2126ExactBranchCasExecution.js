@@ -1043,7 +1043,6 @@ async function claimWithDurableRaceReentry({ registry, bindingHash, release, obs
   try {
     return { claim: await registry.claim(bindingHash, release, observedAt), existing: null };
   } catch (error) {
-    if (error?.message !== 'cm2126_authorization_already_claimed') throw error;
     const existing = await registry.inspectExisting(bindingHash, release);
     if (!existing.claimEnvelopePresent) throw error;
     return { claim: null, existing };

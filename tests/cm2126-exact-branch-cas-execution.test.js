@@ -721,6 +721,41 @@ test('registry enforces exact transitions and reentry receipt is readonly', asyn
     assert.equal(raced.claim, null);
     assert.equal(raced.existing.claimEnvelopePresent, true);
     assert.equal(raced.existing.state, 'CLAIMED');
+    const postClaimFailure = await fixture.frozenModule.claimWithDurableRaceReentry({
+      registry: {
+        claim: async () => { throw new Error('synthetic_post_claim_fsync_failure'); },
+        inspectExisting: async () => ({
+          claimEnvelopePresent: true,
+          state: 'CLAIMED',
+          authorizationConsumed: true,
+          replayAllowed: false,
+          reconciliationRequired: true,
+          claimEnvelopeBindingVerified: true,
+          envelope: claim
+        })
+      },
+      bindingHash,
+      release,
+      observedAt: fixture.now
+    });
+    assert.equal(postClaimFailure.claim, null);
+    assert.equal(postClaimFailure.existing.claimEnvelopePresent, true);
+    await assert.rejects(
+      fixture.frozenModule.claimWithDurableRaceReentry({
+        registry: {
+          claim: async () => { throw new Error('synthetic_pre_claim_failure'); },
+          inspectExisting: async () => ({
+            claimEnvelopePresent: false,
+            authorizationConsumed: false,
+            replayAllowed: false
+          })
+        },
+        bindingHash,
+        release,
+        observedAt: fixture.now
+      }),
+      /synthetic_pre_claim_failure/
+    );
     await assert.rejects(
       registry.transition(bindingHash, 'CLAIMED', 'BRANCH_REF_CAS_CONSUMED', {
         branchCasInvocationCount: null,
