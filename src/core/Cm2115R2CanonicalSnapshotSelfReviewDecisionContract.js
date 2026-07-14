@@ -41,6 +41,18 @@ const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
   'tests/cm2115-r2-self-review-decision.test.js',
   'package.json'
 ]);
+const IMPLEMENTATION_LINEAGE_DIFF_PATHS = Object.freeze([
+  '.agent_board/AUTOPILOT_LEDGER.md',
+  '.agent_board/CHECKPOINT.md',
+  '.agent_board/CURRENT_FACTS.json',
+  '.agent_board/HANDOFF.md',
+  '.agent_board/RUN_STATE.md',
+  '.agent_board/TASK_QUEUE.md',
+  '.agent_board/VALIDATION_LOG.md',
+  'CURRENT_STATE.md',
+  'STATUS.md',
+  ...IMPLEMENTATION_ARTIFACT_PATHS
+]);
 
 function buildDecisionReference(reviewImplementation) {
   if (!/^[a-f0-9]{40}$/.test(reviewImplementation?.commit || '')) {
@@ -284,9 +296,12 @@ function evaluateDecision(decision = {}, {
     try {
       const implementationParent = resolveParentCommit(implementation.commit);
       const implementationDiffPaths = resolveDiffPaths(implementationParent, implementation.commit).sort();
+      const implementationLineageDiffPaths =
+        resolveDiffPaths(REVIEW_REQUEST_FREEZE.commit, implementation.commit).sort();
       if (resolveCommitTree(implementation.commit) !== implementation.tree ||
-          implementationParent !== REVIEW_REQUEST_FREEZE.commit ||
-          !sameJson(implementationDiffPaths, [...IMPLEMENTATION_ARTIFACT_PATHS].sort())) {
+          !isCommitAncestor(REVIEW_REQUEST_FREEZE.commit, implementation.commit) ||
+          !sameJson(implementationDiffPaths, [...IMPLEMENTATION_ARTIFACT_PATHS].sort()) ||
+          !sameJson(implementationLineageDiffPaths, [...IMPLEMENTATION_LINEAGE_DIFF_PATHS].sort())) {
         blockers.push('decision.reviewImplementationLineage');
       }
       for (const artifact of implementation.artifacts) {
@@ -347,6 +362,7 @@ function evaluateDecision(decision = {}, {
 module.exports = {
   DECISION_PATH,
   IMPLEMENTATION_ARTIFACT_PATHS,
+  IMPLEMENTATION_LINEAGE_DIFF_PATHS,
   REVIEW_REQUEST_DIFF_PATHS,
   REVIEW_REQUEST_FREEZE,
   TASK_ID,
