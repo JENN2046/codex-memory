@@ -44,7 +44,8 @@ const {
   resolveGitSourceObject,
   buildReviewRequest,
   resolveReviewGitFile,
-  isReviewCommitAncestor
+  isReviewCommitAncestor,
+  reviewRequestResolverOptions
 } = (() => {
   const receiptGenerator = require('../scripts/generate-cm2115-local-validation-receipt');
   const snapshotGenerator = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
@@ -54,7 +55,8 @@ const {
     ...snapshotGenerator,
     buildReviewRequest: reviewGenerator.buildRequest,
     resolveReviewGitFile: reviewGenerator.resolveGitFile,
-    isReviewCommitAncestor: reviewGenerator.isCommitAncestor
+    isReviewCommitAncestor: reviewGenerator.isCommitAncestor,
+    reviewRequestResolverOptions: reviewGenerator.resolverOptions
   };
 })();
 
@@ -292,6 +294,14 @@ test('snapshot CLI verifies the frozen Phase 2 claim without live registry state
     () => resolveFrozenPhase2DurableClaim('f'.repeat(64)),
     /claim_binding_mismatch/
   );
+});
+
+test('review request generator uses the frozen Phase 2 claim without live registry state', () => {
+  const bindingHash = '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc';
+  const claim = reviewRequestResolverOptions().resolveDurableClaim(bindingHash);
+  assert.equal(claim.bindingHash, bindingHash);
+  assert.equal(claim.state, 'CONSUMED_SUCCESS');
+  assert.equal(claim.authorizationReplayAllowed, false);
 });
 
 test('candidate Completion Audit eligibility is kept separate from authoritative state', () => {

@@ -9,6 +9,7 @@ const {
   BINDING_RECEIPT_FILENAME,
   CONTENT_DECISION_FREEZE,
   EXECUTION_RECEIPT_FILENAME,
+  assertSafeGitEnvironment,
   evaluateDurableApplicationBinding
 } = require('../src/core/Cm2118FullPlanApplicationExecution');
 const {
@@ -141,6 +142,7 @@ function renderMarkdown(expected, bytes) {
 
 async function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
+  assertSafeGitEnvironment();
   assertRepositoryBoundary();
   const durable = await evaluateDurableApplicationBinding({
     authorizationContentDecisionCommit: CONTENT_DECISION_FREEZE.commit,

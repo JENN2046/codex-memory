@@ -7,7 +7,6 @@ const { execFileSync } = require('node:child_process');
 const {
   resolveCommitTree,
   resolveDiffPaths,
-  resolveDurableClaim,
   resolveGitFile: resolveR2GitFile,
   resolveGitPathState,
   resolveParentCommit
@@ -26,6 +25,9 @@ const {
   SNAPSHOT_FREEZE,
   evaluateCm2115SnapshotReviewRequest
 } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
+const {
+  resolveFrozenPhase2DurableClaim
+} = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
 
 const DEFAULT_JSON_PATH = path.join(
   'docs',
@@ -79,6 +81,18 @@ function isCommitAncestor(ancestor, descendant) {
   } catch {
     return false;
   }
+}
+
+function resolverOptions() {
+  return {
+    resolveGitFile,
+    resolveCommitTree,
+    isCommitAncestor,
+    resolveParentCommit,
+    resolveDiffPaths,
+    resolveGitPathState,
+    resolveDurableClaim: resolveFrozenPhase2DurableClaim
+  };
 }
 
 function buildRequest() {
@@ -218,15 +232,7 @@ function main() {
     throw new Error('cm2115_review_request_output_already_exists');
   }
   const request = buildRequest();
-  const evaluation = evaluateCm2115SnapshotReviewRequest(request, {
-    resolveGitFile,
-    resolveCommitTree,
-    isCommitAncestor,
-    resolveParentCommit,
-    resolveDiffPaths,
-    resolveGitPathState,
-    resolveDurableClaim
-  });
+  const evaluation = evaluateCm2115SnapshotReviewRequest(request, resolverOptions());
   if (!evaluation.accepted) throw new Error(`cm2115_review_request_rejected:${evaluation.blockers.join(',')}`);
   const jsonText = `${JSON.stringify(canonicalize(request), null, 2)}\n`;
   const markdownText = renderMarkdown(request, jsonText);
@@ -265,6 +271,7 @@ module.exports = {
   buildRequest,
   fileBinding,
   isCommitAncestor,
+  resolverOptions,
   parseArgs,
   renderMarkdown,
   resolveGitFile

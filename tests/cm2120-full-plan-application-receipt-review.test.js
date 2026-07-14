@@ -12,6 +12,7 @@ const review = require('../src/core/Cm2120FullPlanApplicationReceiptReview');
 const cm2118 = require('../src/core/Cm2118FullPlanApplicationExecution');
 const cm2115 = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 const generator = require('../scripts/generate-cm2120-full-plan-application-receipt-review');
+const freezer = require('../scripts/freeze-cm2120-full-plan-application-receipts');
 const { sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -239,6 +240,20 @@ test('review generator rejects unsafe Git overrides before its first repository 
   try {
     await assert.rejects(
       generator.main([]),
+      /cm2118_unsafe_git_environment:GIT_DIR/
+    );
+  } finally {
+    if (previous === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previous;
+  }
+});
+
+test('receipt freezer rejects unsafe Git overrides before its first repository read', async () => {
+  const previous = process.env.GIT_DIR;
+  process.env.GIT_DIR = '/tmp/cm2120-forbidden-freeze-git-dir';
+  try {
+    await assert.rejects(
+      freezer.main([]),
       /cm2118_unsafe_git_environment:GIT_DIR/
     );
   } finally {
