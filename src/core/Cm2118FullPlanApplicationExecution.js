@@ -935,21 +935,32 @@ class Cm2118FullPlanApplicationClaimRegistry {
     const envelope = this.baseEnvelope(bindingHash, finalReleaseEvidence, claimedAt);
     const bytes = Buffer.from(JSON.stringify(canonicalize(envelope)));
     const rootHandle = await openVerifiedGovernanceRoot(this);
+    let claimHandle = null;
     try {
       try {
-        await this.fs.writeFile(
+        claimHandle = await this.fs.open(
           governanceDescriptorPath(rootHandle, claimFileName()),
-          bytes,
-          { flag: 'wx' }
+          fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+          0o600
         );
+        await claimHandle.writeFile(bytes);
+        await claimHandle.sync();
+        const stat = await claimHandle.stat();
+        const observedBytes = Buffer.alloc(bytes.length);
+        const readback = await claimHandle.read(observedBytes, 0, bytes.length, 0);
+        if (!stat.isFile() || stat.size !== bytes.length || readback.bytesRead !== bytes.length ||
+            !observedBytes.equals(bytes)) throw new Error('cm2118_claim_readback_mismatch');
+        await rootHandle.sync();
       } catch (error) {
         if (error?.code === 'EEXIST') throw new Error('cm2118_authorization_already_claimed');
+        if (error?.message === 'cm2118_claim_readback_mismatch') throw error;
         throw new Error('cm2118_claim_persistence_ambiguous');
       }
       const observed = await readClaimFromGovernanceRootHandle(this, rootHandle, bindingHash);
       if (!sameJson(observed, envelope)) throw new Error('cm2118_claim_readback_mismatch');
       return observed;
     } finally {
+      if (claimHandle) await claimHandle.close().catch(() => {});
       await rootHandle.close().catch(() => {});
     }
   }
@@ -1438,6 +1449,7 @@ async function writeExternalReceipt(registry, filename, receipt) {
     if (readback.bytesRead !== bytes.length || !observed.equals(bytes)) {
       throw new Error(`cm2118_receipt_readback_mismatch:${filename}`);
     }
+    await rootHandle.sync();
     return { path: path.join(registry.governanceRoot, filename), bytes: bytes.length, sha256: sha256(bytes) };
   } finally {
     if (receiptHandle) await receiptHandle.close().catch(() => {});
