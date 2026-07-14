@@ -219,6 +219,21 @@ test('CM-2121 content decision is Git-intaken, frozen, and WeakSet machine-bound
   assert.equal(implementation.isMachineBoundContentDecision(JSON.parse(JSON.stringify(evidence.decision))), false);
 });
 
+test('the exact frozen CM-2122 packet cannot replay its stale CM-2117 execution attribution', () => {
+  assert.throws(
+    () => implementation.assertExecutableStatusAttribution({
+      packetCommit: implementation.ATTRIBUTION_STALE_PACKET_COMMIT
+    }),
+    /cm2122_frozen_packet_status_attribution_stale/
+  );
+  assert.equal(implementation.assertExecutableStatusAttribution({ packetCommit: 'a'.repeat(40) }), true);
+  const source = fs.readFileSync('src/core/Cm2122FullPlanStatusSyncExecution.js', 'utf8');
+  assert.ok(
+    source.indexOf('assertExecutableStatusAttribution(packetEvidence);') <
+    source.indexOf('let finalReleaseEvidence = intakeFinalReleaseDecision')
+  );
+});
+
 test('CLI accepts exactly the three frozen commit arguments and rejects every extra surface', () => {
   const content = 'a'.repeat(40);
   const packet = 'b'.repeat(40);
