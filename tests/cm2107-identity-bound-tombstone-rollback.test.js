@@ -80,6 +80,7 @@ function packetFixture(overrides = {}) {
     targetMemoryIdRef: RECORD_EXPECTED.memoryIdRef,
     targetRecordBytes: RECORD_EXPECTED.durableRecordBytes,
     targetRecordSha256: RECORD_EXPECTED.durableRecordSha256,
+    rollbackModel: 'append_only_logical_tombstone',
     payloadCanonicalBytes: EXPECTED.payloadCanonicalBytes,
     payloadCanonicalSha256: EXPECTED.payloadCanonicalSha256,
     durableMarkerBytes: EXPECTED.durableMarkerBytes,
@@ -90,6 +91,9 @@ function packetFixture(overrides = {}) {
     receiptId: EXPECTED.receiptId,
     registryReference: EXPECTED.registryReference,
     authorizationUseCount: 1,
+    allowedScope: ALLOWED_SCOPE,
+    runtimeTargetReference: EXPECTED.runtimeTargetReference,
+    primaryWriteOnly: true,
     expectedScopeFingerprint: EXPECTED.scopeFingerprint,
     expectedContextHash: sha256Canonical(expectedRuntimeContext({
       implementationCommit: '1'.repeat(40), implementationTree: '2'.repeat(40)
@@ -107,6 +111,7 @@ function packetFixture(overrides = {}) {
     inPlaceOverwriteAllowed: false,
     existingRealMemoryModificationAllowed: false,
     otherRealMemoryReadAllowed: false,
+    defaultProductRetrievalTombstoneAwarenessProven: false,
     rollbackDrillPassed: false,
     failureRecoveryProofPassed: false,
     phase8Completed: false,
@@ -186,8 +191,15 @@ test('CM-2107 packet grants one tombstone, one verify, and no retry/supersede/co
     { maxCompensationOperations: 1 },
     { providerCallsAllowed: true },
     { executionAuthorizedAtPacketFreeze: true },
+    { rollbackModel: 'supersede' },
+    { productionReady: true },
     { rollbackDrillPassed: true }
   ]) assert.notDeepEqual(validatePacket(packetFixture(drift)), [], JSON.stringify(drift));
+  const missing = packetFixture();
+  delete missing.rollbackModel;
+  const { packetPayloadSha256: _oldHash, ...missingPayload } = missing;
+  missing.packetPayloadSha256 = sha256Canonical(missingPayload);
+  assert.ok(validatePacket(missing).includes('packet.keys'));
 });
 
 test('CM-2107 accepts only the exact frozen CM-2106 R1 write receipt', async () => {

@@ -79,6 +79,11 @@ function packetFixture(overrides = {}) {
     receiptId: EXPECTED.receiptId,
     authorizationRegistryReference: EXPECTED.registryReference,
     authorizationUseCount: 1,
+    allowedScope: ALLOWED_SCOPE,
+    runtimeTargetReference: EXPECTED.runtimeTargetReference,
+    primaryWriteOnly: true,
+    priorAttemptReconciledAsNoWrite: true,
+    priorAuthorizationReplayAllowed: false,
     expectedScopeFingerprint: EXPECTED.scopeFingerprint,
     contextCanonicalSha256: sha256Canonical(expectedRuntimeContext({
       implementationCommit: '1'.repeat(40),
@@ -190,11 +195,18 @@ test('CM-2106 packet binds exact one-write/one-verify/zero-retry authority', () 
     { providerCallsAllowed: true },
     { derivedIndexWritesAllowed: true },
     { executionAuthorizedAtPacketFreeze: true },
+    { primaryWriteOnly: false },
+    { productionReady: true },
     { expectedScopeFingerprint: 'f'.repeat(64) }
   ]) {
     const result = validatePacket(packetFixture(drift));
     assert.notDeepEqual(result, [], JSON.stringify(drift));
   }
+  const missing = packetFixture();
+  delete missing.primaryWriteOnly;
+  const { packetPayloadSha256: _oldHash, ...missingPayload } = missing;
+  missing.packetPayloadSha256 = sha256Canonical(missingPayload);
+  assert.ok(validatePacket(missing).includes('packet.keys'));
 });
 
 test('CM-2106 app route is local, primary-write-only, and provider disabled', () => {
