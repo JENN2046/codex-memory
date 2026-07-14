@@ -21,7 +21,18 @@ const {
   expectedImplementationDiffEntries,
   fileProjection
 } = require('../src/core/Cm2117ExactFullPlanApplicationDecision');
-const { sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const {
+  BASELINE,
+  PHASE2_APPLICATION_RECEIPT_PATH,
+  sha256,
+  sha256Canonical
+} = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+const {
+  DECISION_REFERENCE: PHASE2_DECISION_REFERENCE,
+  NONCE: PHASE2_NONCE,
+  RECEIPT_ID: PHASE2_RECEIPT_ID,
+  REGISTRY_REFERENCE: PHASE2_REGISTRY_REFERENCE
+} = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 const git = require('../scripts/cm2115-r2-git');
 const {
   resolveDiffEntries: resolveRealDiffEntries
@@ -59,6 +70,24 @@ function baselineIdentity(sourcePath) {
     sourceCommit: IMPLEMENTATION_COMMIT,
     sourceTree: IMPLEMENTATION_TREE,
     content: Buffer.from(actual.content)
+  };
+}
+
+function resolveFixtureDurableClaim(bindingHash) {
+  const receiptIdentity = git.resolveGitFile(BASELINE.sourceCommit, PHASE2_APPLICATION_RECEIPT_PATH);
+  const receipt = JSON.parse(receiptIdentity.content.toString('utf8'));
+  return {
+    schemaVersion: 1,
+    registryReference: PHASE2_REGISTRY_REFERENCE,
+    claimId: receipt.payload.registry.claimId,
+    nonceHash: sha256(PHASE2_NONCE),
+    receiptIdHash: sha256(PHASE2_RECEIPT_ID),
+    bindingHash,
+    decisionReference: PHASE2_DECISION_REFERENCE,
+    authorizationUseCount: 1,
+    authorizationReplayAllowed: false,
+    patchInvocationCount: 1,
+    state: 'CONSUMED_SUCCESS'
   };
 }
 
@@ -106,7 +135,7 @@ function resolvers(overrides = {}) {
       }
       return git.resolveGitPathState(commit, sourcePath);
     },
-    resolveDurableClaim: git.resolveDurableClaim,
+    resolveDurableClaim: resolveFixtureDurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === GATE_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
       return realIsCommitAncestor(ancestor, descendant);
@@ -150,6 +179,17 @@ test('CM-2117 replays the full frozen CM-2116-R1 gate and its nested 7187 intake
   assert.equal(evidence.gate.canonicalPayloadSha256, GATE_FREEZE.canonicalPayloadSha256);
   assert.equal(evidence.gate.payload.upstreamSelfReviewIntake.commit, '7187e5205806a7038a5cfaff8de46ac89ff953f3');
   assert.deepEqual(expectedGateDiffEntries().map(item => item.status), ['A', 'A']);
+});
+
+test('CM-2117 frozen replay does not depend on a live governance claim', () => {
+  const liveResolver = git.resolveDurableClaim;
+  git.resolveDurableClaim = () => { throw new Error('live_governance_claim_must_not_be_read'); };
+  try {
+    const evidence = evaluateFrozenGate(resolvers());
+    assert.equal(evidence.accepted, true, evidence.blockers.join(','));
+  } finally {
+    git.resolveDurableClaim = liveResolver;
+  }
 });
 
 test('CM-2117 freezes five exact targets while keeping execution and completion closed', () => {
