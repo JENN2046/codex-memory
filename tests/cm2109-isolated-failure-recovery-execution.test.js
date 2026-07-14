@@ -164,10 +164,10 @@ test('CM-2109 packet and decision boundaries reject authority expansion', () => 
     harnessRootDirectory: 'phase8-isolated-failure-recovery-harness-001',
     harnessRootAuthority: 'git_common_dir_governance_state',
     governanceRootIdentitySha256: '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0',
-    harnessIdentityBytes: 322,
-    harnessIdentitySha256: 'c'.repeat(64),
-    ambiguousPostCommitFixtureBytes: 139,
-    ambiguousPostCommitFixtureSha256: 'd'.repeat(64),
+    harnessIdentityBytes: HARNESS_IDENTITY_BYTES.length,
+    harnessIdentitySha256: sha256(HARNESS_IDENTITY_BYTES),
+    ambiguousPostCommitFixtureBytes: FAILURE_FIXTURE_MARKDOWN.length,
+    ambiguousPostCommitFixtureSha256: sha256(FAILURE_FIXTURE_MARKDOWN),
     callerPathOverrideAllowed: false,
     environmentPathOverrideAllowed: false,
     caseManifests: CASE_IDS.map((caseId, index) => ({ caseId, ...manifestBindings[index] })),
@@ -191,6 +191,15 @@ test('CM-2109 packet and decision boundaries reject authority expansion', () => 
     phase8CompletedAtPacketFreeze: false
   };
   assert.equal(validatePacket(packet, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, true);
+  for (const mutate of [
+    candidate => { candidate.harnessRootAuthority = 'caller_selected_path'; },
+    candidate => { candidate.harnessIdentitySha256 = 'c'.repeat(64); },
+    candidate => { candidate.ambiguousPostCommitFixtureSha256 = 'd'.repeat(64); }
+  ]) {
+    const candidate = structuredClone(packet);
+    mutate(candidate);
+    assert.equal(validatePacket(candidate, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
+  }
   assert.equal(validatePacket({ ...packet, retryAuthorized: true }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
   const extraCaseClaim = structuredClone(packet);
   extraCaseClaim.caseManifests[0].readinessClaimed = false;
