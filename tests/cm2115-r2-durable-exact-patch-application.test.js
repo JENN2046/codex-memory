@@ -233,7 +233,9 @@ test('CM-2115-R2 rejects rehashed after-projection drift before consuming the cl
   const { patchPayloadSha256: _ignored, ...patchPlanPayload } = drift.payload.patchPlan;
   drift.payload.patchPlan.patchPayloadSha256 = sha256Canonical(patchPlanPayload);
   drift.canonicalPayloadSha256 = sha256Canonical(drift.payload);
-  assert.equal(evaluateDecision(drift, { resolveGitFile: fixture.resolver }).accepted, true);
+  const decisionEvaluation = evaluateDecision(drift, { resolveGitFile: fixture.resolver });
+  assert.equal(decisionEvaluation.accepted, false);
+  assert.ok(decisionEvaluation.blockers.some(item => item.startsWith('decision.targetAfterCanonical.')));
 
   const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
   const result = await executeExactPatch({
@@ -246,7 +248,7 @@ test('CM-2115-R2 rejects rehashed after-projection drift before consuming the cl
   });
   assert.equal(result.accepted, false);
   assert.equal(result.state, 'UNCLAIMED');
-  assert.ok(result.blockers.some(item => item.startsWith('patchTarget.afterDrift.')));
+  assert.ok(result.blockers.some(item => item.startsWith('decision.targetAfterCanonical.')));
   await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
   for (const sourcePath of PATCH_PATHS.filter(item => item !== APPLICATION_STATE_PATH)) {
     assert.deepEqual(await fsp.readFile(path.join(fixture.root, sourcePath)), targetBaselineResolver(sourcePath).content);
@@ -263,7 +265,9 @@ test('CM-2115-R2 rejects forged target modes before consuming the claim', async 
   const { patchPayloadSha256: _ignored, ...patchPlanPayload } = drift.payload.patchPlan;
   drift.payload.patchPlan.patchPayloadSha256 = sha256Canonical(patchPlanPayload);
   drift.canonicalPayloadSha256 = sha256Canonical(drift.payload);
-  assert.equal(evaluateDecision(drift, { resolveGitFile: fixture.resolver }).accepted, true);
+  const decisionEvaluation = evaluateDecision(drift, { resolveGitFile: fixture.resolver });
+  assert.equal(decisionEvaluation.accepted, false);
+  assert.ok(decisionEvaluation.blockers.some(item => item.startsWith('decision.targetBeforeCanonical.')));
   const registry = new Cm2115R2ApplicationClaimRegistry({ governanceRoot: fixture.governanceRoot });
   const result = await executeExactPatch({
     repoRoot: fixture.root,
@@ -275,7 +279,7 @@ test('CM-2115-R2 rejects forged target modes before consuming the claim', async 
   });
   assert.equal(result.accepted, false);
   assert.equal(result.state, 'UNCLAIMED');
-  assert.ok(result.blockers.includes(`patchTarget.beforeDrift.${target.sourcePath}`));
+  assert.ok(result.blockers.includes(`decision.targetBeforeCanonical.${target.sourcePath}`));
   await assert.rejects(() => fsp.lstat(registry.claimPath), { code: 'ENOENT' });
 });
 
@@ -745,7 +749,7 @@ test('CM-2115-R2 binding receipt requires exact parent, diff, targets, and execu
     decisionIdentity: forgedDecisionIdentity,
     authority: fixture.authority
   });
-  assert.equal(evaluateDecision(forgedDecision, { resolveGitFile: forgedBaseResolver }).accepted, true);
+  assert.equal(evaluateDecision(forgedDecision, { resolveGitFile: forgedBaseResolver }).accepted, false);
   const forgedExecutionReceipt = wrapPayload(buildExecutionReceiptPayload({
     decisionIdentity: forgedDecisionIdentity,
     decision: forgedDecision,

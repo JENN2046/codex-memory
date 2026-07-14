@@ -20,6 +20,12 @@ const FIXED_RECORD = Object.freeze({
   localTime: '08:00',
   tag: 'codex-memory, phase8, synthetic-proof, vcptoolbox-owner-runtime'
 });
+const AUTHORIZATION_KEYS = Object.freeze([
+  'action', 'nonce', 'receiptId', 'useCount', 'replayAllowed', 'approvedAt', 'expiresAt'
+]);
+const LIMIT_KEYS = Object.freeze([
+  'nativeWrites', 'verifyOperations', 'retries', 'rollbackOrCompensation'
+]);
 
 function exactKeys(value, keys) {
   return value && typeof value === 'object' && !Array.isArray(value) &&
@@ -69,6 +75,7 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
     packet.transport?.innerAuthorizationRequired !== true
   ) blockers.push('transport.binding');
   if (
+    !exactKeys(packet.authorization, AUTHORIZATION_KEYS) ||
     packet.authorization?.action !== 'live_bridge_record_memory_proof' ||
     !safeReference(packet.authorization?.nonce) || !safeReference(packet.authorization?.receiptId) ||
     packet.authorization?.useCount !== 1 || packet.authorization?.replayAllowed !== false ||
@@ -76,6 +83,7 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
     !packet.authorization?.approvedAt || Number.isNaN(Date.parse(packet.authorization.approvedAt))
   ) blockers.push('authorization.binding');
   if (
+    !exactKeys(packet.limits, LIMIT_KEYS) ||
     packet.limits?.nativeWrites !== 1 || packet.limits?.verifyOperations !== 1 ||
     packet.limits?.retries !== 0 || packet.limits?.rollbackOrCompensation !== 0
   ) blockers.push('limits');

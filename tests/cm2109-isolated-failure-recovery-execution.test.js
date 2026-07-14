@@ -159,6 +159,7 @@ test('CM-2109 packet and decision boundaries reject authority expansion', () => 
     implementationTree: '2'.repeat(40),
     expectedDecisionReference: 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION',
     harnessRootDirectory: 'phase8-isolated-failure-recovery-harness-001',
+    governanceRootIdentitySha256: '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0',
     callerPathOverrideAllowed: false,
     environmentPathOverrideAllowed: false,
     caseManifests: CASE_IDS.map((caseId, index) => ({ caseId, ...manifestBindings[index] })),
@@ -186,8 +187,13 @@ test('CM-2109 packet and decision boundaries reject authority expansion', () => 
   assert.equal(validatePacket({ ...packet, failureRecoveryProofPassedAtPacketFreeze: true }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
   assert.equal(validatePacket({ ...packet, phase8CompletedAtPacketFreeze: true }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
   const binding = { implementationCommit: packet.implementationCommit, implementationTree: packet.implementationTree, executionPacketCommit: 'c'.repeat(40), executionPacketBlobOid: 'd'.repeat(40), executionPacketSha256: 'e'.repeat(64) };
-  const decision = { schemaVersion: 1, taskId: 'CM-2109', decisionReference: 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION', failureRecoveryExecutionAuthorized: true, authorizationUseCount: 1, authorizationReplayAllowed: false, ...binding, expiresAt: '2099-01-01T00:00:00Z', productionProviderAuthorized: false, realMemoryAuthorized: false, cm2094AuthorizationReuseAuthorized: false, retryAuthorized: false, rollbackAuthorized: false, compensationAuthorized: false, defaultMcpExpansionAuthorized: false, readinessClaimAuthorized: false, failureRecoveryProofPassedByDecisionAlone: false, phase8CompletedByDecisionAlone: false };
+  const decision = { schemaVersion: 1, taskId: 'CM-2109', decisionType: 'self_governed_exact_isolated_failure_recovery_execution', decisionReference: 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION', decisionBasis: 'repository_reality_and_user_delegated_prohibited_first_authority', failureRecoveryExecutionAuthorized: true, authorizationUseCount: 1, authorizationReplayAllowed: false, ...binding, governanceRootIdentitySha256: '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0', harnessRootReference: 'phase8-isolated-failure-recovery-harness-001', caseCount: 3, maxHarnessRuns: 1, maxClaimCount: 2, maxNativeWriteCalls: 1, maxDurableWrites: 1, maxRetryCount: 0, maxRollbackCount: 0, maxCompensationCount: 0, approvedAt: '2026-07-12T00:00:00Z', expiresAt: '2099-01-01T00:00:00Z', productionProviderAuthorized: false, realMemoryAuthorized: false, cm2094AuthorizationReuseAuthorized: false, retryAuthorized: false, rollbackAuthorized: false, compensationAuthorized: false, defaultMcpExpansionAuthorized: false, readinessClaimAuthorized: false, failureRecoveryProofPassedByDecisionAlone: false, phase8CompletedByDecisionAlone: false };
   assert.equal(validateDecision(decision, binding).accepted, true);
+  assert.equal(validateDecision({ ...decision, approvedAt: '2098-01-01T00:00:00Z' }, binding).accepted, false);
+  assert.equal(validateDecision({ ...decision, approvedAt: decision.expiresAt }, binding).accepted, false);
+  assert.equal(validateDecision({ ...decision, maxRetryCount: 1 }, binding).accepted, false);
+  assert.equal(validateDecision({ ...decision, governanceRootIdentitySha256: 'f'.repeat(64) }, binding).accepted, false);
+  assert.equal(validateDecision({ ...decision, productionReady: true }, binding).accepted, false);
   assert.equal(validateDecision({ ...decision, retryAuthorized: true }, binding).accepted, false);
   assert.equal(validateDecision({ ...decision, failureRecoveryProofPassedByDecisionAlone: true }, binding).accepted, false);
   assert.equal(validateDecision({ ...decision, phase8CompletedByDecisionAlone: true }, binding).accepted, false);
