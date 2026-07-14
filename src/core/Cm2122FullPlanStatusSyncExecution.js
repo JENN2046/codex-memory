@@ -129,6 +129,7 @@ const CLAIM_ENVELOPE_KEYS = Object.freeze([
 const machineBoundContentDecisions = new WeakSet();
 const machineBoundPackets = new WeakSet();
 const machineBoundFinalReleases = new WeakSet();
+const machineBoundDetachedBindings = new WeakSet();
 const UNSAFE_GIT_ENV_KEYS = Object.freeze(new Set([
   'GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY',
   'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_REPLACE_REF_BASE', 'GIT_SHALLOW_FILE',
@@ -1300,6 +1301,10 @@ function createExactDetachedStatusCommit({ repoRoot, finalReleaseEvidence, packe
 
 function verifyDetachedCommitBinding({ detachedCommit, packetEvidence, finalReleaseEvidence, ...options }) {
   const blockers = [];
+  if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet) ||
+      !finalReleaseEvidence?.accepted || !isMachineBoundFinalReleaseDecision(finalReleaseEvidence.decision)) {
+    blockers.push('detachedBinding.machineBoundEvidenceRequired');
+  }
   const targets = packetEvidence.packet.payload.detachedCommitBoundary.targets;
   let tree = null;
   try {
@@ -1325,7 +1330,7 @@ function verifyDetachedCommitBinding({ detachedCommit, packetEvidence, finalRele
   } catch {
     blockers.push('detachedBinding.unreadable');
   }
-  return {
+  const binding = deepFreeze({
     accepted: blockers.length === 0,
     blockers: [...new Set(blockers)],
     detachedStatusCommit: detachedCommit,
@@ -1341,7 +1346,13 @@ function verifyDetachedCommitBinding({ detachedCommit, packetEvidence, finalRele
     currentBranchStatusSynchronized: false,
     branchRefUpdateAuthorized: false,
     readinessClaimed: false
-  };
+  });
+  if (binding.accepted) machineBoundDetachedBindings.add(binding);
+  return binding;
+}
+
+function isMachineBoundDetachedBinding(value) {
+  return !!value && machineBoundDetachedBindings.has(value);
 }
 
 function buildExecutionReceipt({ packetEvidence, finalReleaseEvidence, bindingHash, detachedBinding, claimedAt }) {
@@ -1418,7 +1429,7 @@ function buildExecutionReceipt({ packetEvidence, finalReleaseEvidence, bindingHa
   return wrapPayload(payload, 'cm2122_r2_detached_status_sync_execution_receipt_v1');
 }
 
-function evaluateExecutionReceipt(receipt = {}, { packetEvidence, finalReleaseEvidence } = {}) {
+function evaluateExecutionReceipt(receipt = {}, { packetEvidence, finalReleaseEvidence, detachedBinding } = {}) {
   const blockers = [];
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
       receipt.artifactType !== 'cm2122_r2_detached_status_sync_execution_receipt_v1' ||
@@ -1426,23 +1437,14 @@ function evaluateExecutionReceipt(receipt = {}, { packetEvidence, finalReleaseEv
   if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet) ||
       !finalReleaseEvidence?.accepted || !isMachineBoundFinalReleaseDecision(finalReleaseEvidence.decision)) {
     blockers.push('executionReceipt.machineBoundEvidenceRequired');
+  } else if (!isMachineBoundDetachedBinding(detachedBinding)) {
+    blockers.push('executionReceipt.machineBoundDetachedBindingRequired');
   } else {
-    const detached = receipt.payload?.detachedCommit || {};
     const expected = buildExecutionReceipt({
       packetEvidence,
       finalReleaseEvidence,
       bindingHash: buildClaimBindingHash({ packetEvidence, finalReleaseEvidence }),
-      detachedBinding: {
-        detachedStatusCommit: detached.commit,
-        detachedStatusTree: detached.tree,
-        parentCommit: detached.parentCommit,
-        parentTree: detached.parentTree,
-        targetBranchRef: detached.targetBranchRef,
-        targetBranchExpectedOld: detached.targetBranchExpectedOld,
-        targetBranchObservedBeforeCommit: detached.targetBranchObservedBeforeCommit,
-        targetBranchObservedAfterCommit: detached.targetBranchObservedAfterCommit,
-        detachedHeadCasUsed: detached.detachedHeadCasUsed
-      },
+      detachedBinding,
       claimedAt: receipt.payload?.registry?.claimedAt
     });
     if (!sameJson(receipt, expected)) blockers.push('executionReceipt.exactContent');
@@ -1548,6 +1550,17 @@ function evaluateBindingReceipt(receipt = {}, { detachedBinding, executionReceip
   if (receipt.schemaVersion !== 1 || receipt.taskId !== TASK_ID ||
       receipt.artifactType !== 'cm2122_r2_detached_status_sync_binding_receipt_v1' ||
       receipt.canonicalPayloadSha256 !== sha256Canonical(receipt.payload || {})) blockers.push('bindingReceipt.identityOrHash');
+  if (!isMachineBoundDetachedBinding(detachedBinding)) {
+    blockers.push('bindingReceipt.machineBoundDetachedBindingRequired');
+  }
+  const executionEvaluation = evaluateExecutionReceipt(executionReceipt, {
+    packetEvidence,
+    finalReleaseEvidence,
+    detachedBinding
+  });
+  if (!executionEvaluation.accepted) {
+    blockers.push(...executionEvaluation.blockers.map(item => `bindingReceipt.${item}`));
+  }
   try {
     const expected = buildBindingReceipt({ detachedBinding, executionReceipt, claimEnvelope, packetEvidence, finalReleaseEvidence });
     if (!sameJson(receipt, expected)) blockers.push('bindingReceipt.exactContent');
@@ -1662,8 +1675,6 @@ async function evaluateDurableDetachedBinding({ contentDecisionCommit, packetCom
     if (execution.sha256 !== claim.executionReceiptSha256 || binding.sha256 !== claim.bindingReceiptSha256) {
       blockers.push('durableBinding.receiptHash');
     }
-    const executionEvaluation = evaluateExecutionReceipt(execution.receipt, { packetEvidence, finalReleaseEvidence });
-    if (!executionEvaluation.accepted) blockers.push(...executionEvaluation.blockers.map(item => `durableBinding.${item}`));
     const detachedBinding = verifyDetachedCommitBinding({
       detachedCommit: claim.detachedStatusCommit,
       packetEvidence,
@@ -1671,6 +1682,12 @@ async function evaluateDurableDetachedBinding({ contentDecisionCommit, packetCom
       ...options
     });
     if (!detachedBinding.accepted) blockers.push(...detachedBinding.blockers.map(item => `durableBinding.${item}`));
+    const executionEvaluation = evaluateExecutionReceipt(execution.receipt, {
+      packetEvidence,
+      finalReleaseEvidence,
+      detachedBinding
+    });
+    if (!executionEvaluation.accepted) blockers.push(...executionEvaluation.blockers.map(item => `durableBinding.${item}`));
     const preBindingClaim = { ...claim, state: 'EXECUTION_RECEIPT_WRITTEN', bindingReceiptCreated: false,
       bindingReceiptSha256: null, reconciliationRequired: true };
     const bindingEvaluation = evaluateBindingReceipt(binding.receipt, {
@@ -1788,7 +1805,11 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
       detachedBinding,
       claimedAt: claim.claimedAt
     });
-    const executionEvaluation = evaluateExecutionReceipt(executionReceipt, { packetEvidence, finalReleaseEvidence });
+    const executionEvaluation = evaluateExecutionReceipt(executionReceipt, {
+      packetEvidence,
+      finalReleaseEvidence,
+      detachedBinding
+    });
     if (!executionEvaluation.accepted) throw new Error(`cm2122_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
     try {
       executionIdentity = await writeExternalReceipt(registry, EXECUTION_RECEIPT_FILENAME, executionReceipt);
@@ -1916,6 +1937,5 @@ module.exports = {
   resolveFixedGovernanceRoot,
   sanitizedGitEnvironment,
   unsafeGitEnvironmentKeys,
-  verifyDetachedCommitBinding,
   wrapPayload
 };

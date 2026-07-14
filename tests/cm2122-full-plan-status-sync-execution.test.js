@@ -692,6 +692,47 @@ test('temp clone creates one exact detached 9M commit, binds it, and leaves the 
     fixture.governanceRoot,
     fixture.frozenModule.BINDING_RECEIPT_FILENAME
   ), 'utf8'));
+  const detached = executionReceipt.payload.detachedCommit;
+  const callerBinding = {
+    accepted: true,
+    blockers: [],
+    detachedStatusCommit: detached.commit,
+    detachedStatusTree: detached.tree,
+    parentCommit: detached.parentCommit,
+    parentTree: detached.parentTree,
+    targetBranchRef: detached.targetBranchRef,
+    targetBranchExpectedOld: detached.targetBranchExpectedOld,
+    targetBranchObservedBeforeCommit: detached.targetBranchObservedBeforeCommit,
+    targetBranchObservedAfterCommit: detached.targetBranchObservedAfterCommit,
+    detachedHeadCasUsed: true
+  };
+  assert.equal(fixture.frozenModule.verifyDetachedCommitBinding, undefined);
+  assert.equal(fixture.frozenModule.isMachineBoundDetachedBinding, undefined);
+  assert.equal(
+    fixture.frozenModule.evaluateExecutionReceipt(executionReceipt, {
+      packetEvidence: fixture.packetEvidence,
+      finalReleaseEvidence: fixture.finalReleaseEvidence,
+      detachedBinding: callerBinding
+    }).accepted,
+    false
+  );
+  const preBindingClaim = {
+    ...claim,
+    state: 'EXECUTION_RECEIPT_WRITTEN',
+    bindingReceiptCreated: false,
+    bindingReceiptSha256: null,
+    reconciliationRequired: true
+  };
+  assert.equal(
+    fixture.frozenModule.evaluateBindingReceipt(bindingReceipt, {
+      detachedBinding: callerBinding,
+      executionReceipt,
+      claimEnvelope: preBindingClaim,
+      packetEvidence: fixture.packetEvidence,
+      finalReleaseEvidence: fixture.finalReleaseEvidence
+    }).accepted,
+    false
+  );
   for (const receipt of [executionReceipt, bindingReceipt]) {
     assert.equal(receipt.payload.detachedCommit.targetBranchRef, implementation.FUTURE_BRANCH_REF);
     assert.equal(receipt.payload.detachedCommit.targetBranchExpectedOld, fixture.finalReleaseCommit);
