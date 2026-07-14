@@ -667,6 +667,41 @@ test('assume-unchanged and skip-worktree index flags fail closed before claim', 
   }
 });
 
+test('split-index targets fail before claim without creating shared-index side effects', () => {
+  initializeGovernanceRoot();
+  const commonDir = path.resolve(fixture.target, text(['rev-parse', '--git-common-dir'], fixture.target));
+  const sharedIndexes = () => fs.readdirSync(commonDir).filter(name => name.startsWith('sharedindex.')).sort();
+  const refBefore = text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo);
+  git(['config', 'extensions.worktreeConfig', 'true'], fixture.repo);
+  try {
+    const sharedBefore = sharedIndexes();
+    git(['config', '--worktree', 'core.splitIndex', 'true'], fixture.target);
+    let result = runCli();
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /target_old_preflight_failed/);
+    assert.equal(fs.existsSync(fixture.claimPath), false);
+    assert.equal(text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo), refBefore);
+    assert.deepEqual(sharedIndexes(), sharedBefore);
+
+    git(['config', '--worktree', 'core.splitIndex', 'false'], fixture.target);
+    git(['-c', 'core.splitIndex=true', 'update-index', '--split-index'], fixture.target);
+    assert.notEqual(
+      text(['-c', 'core.splitIndex=true', 'rev-parse', '--shared-index-path'], fixture.target),
+      ''
+    );
+    result = runCli();
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /target_old_preflight_failed/);
+    assert.equal(fs.existsSync(fixture.claimPath), false);
+    assert.equal(text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo), refBefore);
+  } finally {
+    git(['-c', 'core.splitIndex=true', 'update-index', '--no-split-index'], fixture.target);
+    git(['config', '--worktree', '--unset-all', 'core.splitIndex'], fixture.target);
+    git(['config', '--unset-all', 'extensions.worktreeConfig'], fixture.repo);
+  }
+  assert.equal(text(['status', '--porcelain'], fixture.target), '');
+});
+
 test('registry enforces exact transitions and reentry receipt is readonly', async () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2126-registry-contract-'));
   try {

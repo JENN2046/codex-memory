@@ -931,9 +931,17 @@ function assertPreclaimEffectPathsAbsent(governanceRoot, targetPath, targetBindi
 function exactIndexPolicyMatched(targetPath) {
   try {
     const sparse = optionalGitText(['config', '--bool', 'core.sparseCheckout'], { cwd: targetPath });
+    const splitIndex = optionalGitText(['config', '--bool', 'core.splitIndex'], { cwd: targetPath });
+    const sharedIndexPath = optionalGitText(
+      ['-c', 'core.splitIndex=true', 'rev-parse', '--shared-index-path'],
+      { cwd: targetPath }
+    );
+    const splitIndexMaterialized = sharedIndexPath !== '' &&
+      !/(?:^|\/)sharedindex\.0{40}$/.test(sharedIndexPath);
     const unmerged = gitText(['ls-files', '-u'], { cwd: targetPath });
     const flags = gitText(['ls-files', '-v'], { cwd: targetPath }).split('\n').filter(Boolean);
-    return sparse !== 'true' && unmerged === '' && flags.every(line => line.startsWith('H '));
+    return sparse !== 'true' && splitIndex !== 'true' && !splitIndexMaterialized &&
+      unmerged === '' && flags.every(line => line.startsWith('H '));
   } catch {
     return false;
   }
@@ -946,17 +954,18 @@ function targetSnapshot(repoRoot, target, targetBindings, mode) {
   const ref = targetRefOid(repoRoot);
   const head = optionalGitText(['rev-parse', 'HEAD^{commit}'], { cwd: target.path });
   const symbolicRef = optionalGitText(['symbolic-ref', '-q', 'HEAD'], { cwd: target.path });
-  const indexMatched = indexMatchesCommit(target.path, expectedCommit);
+  const indexPolicyMatched = exactIndexPolicyMatched(target.path);
+  const indexMatched = indexPolicyMatched ? indexMatchesCommit(target.path, expectedCommit) : false;
   const matchedFiles = identities.filter(identity => fileMatchesIdentity(target.path, identity)).length;
   return {
     ref,
     head,
     symbolicRef,
     indexTree: indexMatched ? expectedTree : null,
-    indexPolicyMatched: exactIndexPolicyMatched(target.path),
+    indexPolicyMatched,
     indexLockAbsent: targetIndexLockAbsent(target.path),
     matchedFiles,
-    clean: worktreeClean(target.path)
+    clean: indexPolicyMatched ? worktreeClean(target.path) : false
   };
 }
 
