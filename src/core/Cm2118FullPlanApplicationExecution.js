@@ -1056,8 +1056,26 @@ class Cm2118FullPlanApplicationClaimRegistry {
       const temporaryFilename = `${claimFileName()}.${state}.tmp`;
       const temporary = governanceDescriptorPath(rootHandle, temporaryFilename);
       const claim = governanceDescriptorPath(rootHandle, claimFileName());
-      await this.fs.writeFile(temporary, JSON.stringify(canonicalize(next)), { flag: 'wx' });
-      await this.fs.rename(temporary, claim);
+      const bytes = Buffer.from(JSON.stringify(canonicalize(next)));
+      let temporaryHandle = null;
+      try {
+        temporaryHandle = await this.fs.open(
+          temporary,
+          fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+          0o600
+        );
+        await temporaryHandle.writeFile(bytes);
+        await temporaryHandle.sync();
+        const stat = await temporaryHandle.stat();
+        const observedBytes = Buffer.alloc(bytes.length);
+        const readback = await temporaryHandle.read(observedBytes, 0, bytes.length, 0);
+        if (!stat.isFile() || stat.size !== bytes.length || readback.bytesRead !== bytes.length ||
+            !observedBytes.equals(bytes)) throw new Error('cm2118_claim_transition_readback_mismatch');
+        await this.fs.rename(temporary, claim);
+        await rootHandle.sync();
+      } finally {
+        if (temporaryHandle) await temporaryHandle.close().catch(() => {});
+      }
       return await readClaimFromGovernanceRootHandle(this, rootHandle, bindingHash);
     } finally {
       await rootHandle.close().catch(() => {});
