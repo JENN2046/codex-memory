@@ -24,11 +24,12 @@ application-commit binding contract. Packet `02a78ef8…` has payload SHA
 `2e5299ee…5454`; its JSON/Markdown raw SHA values are `debe3cfd…dad0` and
 `3ea8297b…d80f`. CM-2119 release `dd78a679…` has payload SHA
 `33caf9c6…e579`; JSON/Markdown raw SHA values are `d570e56a…db42` and
-`e189a083…58a4`. Exact Git intake passed. Authorization use count is one and
-replay is false, but no claim or application occurred. The future application
-commit must be a direct child of CM-2117 decision `b1245149…` and contain
-exactly four modified targets plus one added state file. Status sync and all
-readiness claims remain unauthorized.
+`e189a083…58a4`. Exact Git intake passed. At release freeze time no claim or
+application had occurred. The later exact execution consumed the one-shot,
+non-replayable authorization and produced application commit `41097b0f…` as a
+direct child of CM-2117 decision `b1245149…`, with exactly four modified targets
+plus one added state file. That application is now ancestry-anchored and bound
+by the frozen receipts described above. All readiness claims remain false.
 
 CM-2117 implementation `249c9ba1…` freezes a content-only decision contract.
 Decision commit `b1245149…` has payload SHA `50ae5da8…2a5a` and patch payload
