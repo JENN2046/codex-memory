@@ -1419,13 +1419,30 @@ function createExactApplicationCommitWithGitPlumbing({ repoRoot, packetEvidence,
   return { commit, tree, parentCommit: CONTENT_DECISION_FREEZE.commit, parentTree: CONTENT_DECISION_FREEZE.tree, indexPath };
 }
 
-async function writeExternalReceipt(governanceRoot, filename, receipt) {
-  const receiptPath = path.join(governanceRoot, filename);
+async function writeExternalReceipt(registry, filename, receipt) {
   const bytes = Buffer.from(serializeArtifact(receipt));
-  await fsPromises.writeFile(receiptPath, bytes, { flag: 'wx' });
-  const observed = await fsPromises.readFile(receiptPath);
-  if (!observed.equals(bytes)) throw new Error(`cm2118_receipt_readback_mismatch:${filename}`);
-  return { path: receiptPath, bytes: bytes.length, sha256: sha256(bytes) };
+  const rootHandle = await openVerifiedGovernanceRoot(registry);
+  let receiptHandle = null;
+  try {
+    receiptHandle = await registry.fs.open(
+      governanceDescriptorPath(rootHandle, filename),
+      fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
+      0o600
+    );
+    await receiptHandle.writeFile(bytes);
+    await receiptHandle.sync();
+    const stat = await receiptHandle.stat();
+    if (!stat.isFile() || stat.size !== bytes.length) throw new Error(`cm2118_receipt_invalid:${filename}`);
+    const observed = Buffer.alloc(bytes.length);
+    const readback = await receiptHandle.read(observed, 0, bytes.length, 0);
+    if (readback.bytesRead !== bytes.length || !observed.equals(bytes)) {
+      throw new Error(`cm2118_receipt_readback_mismatch:${filename}`);
+    }
+    return { path: path.join(registry.governanceRoot, filename), bytes: bytes.length, sha256: sha256(bytes) };
+  } finally {
+    if (receiptHandle) await receiptHandle.close().catch(() => {});
+    await rootHandle.close().catch(() => {});
+  }
 }
 
 function realResolverOptions() {
@@ -1691,8 +1708,7 @@ async function executeFullPlanApplicationFromCommits({
     if (!executionEvaluation.accepted) throw new Error(`cm2118_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
     executionReceiptIdentity = { sha256: sha256(serializeArtifact(executionReceipt)) };
     executionReceiptWriteAttempted = true;
-    await registry.verifyRoot();
-    executionReceiptIdentity = await writeExternalReceipt(governanceRoot, EXECUTION_RECEIPT_FILENAME, executionReceipt);
+    executionReceiptIdentity = await writeExternalReceipt(registry, EXECUTION_RECEIPT_FILENAME, executionReceipt);
     executionReceiptKnown = true;
     claimEnvelope = await registry.transition(bindingHash, currentState, 'EXECUTION_RECEIPT_WRITTEN', {
       executionReceiptCreated: true,
@@ -1717,8 +1733,7 @@ async function executeFullPlanApplicationFromCommits({
     if (!bindingEvaluation.accepted) throw new Error(`cm2118_binding_receipt_rejected:${bindingEvaluation.blockers.join(',')}`);
     bindingReceiptIdentity = { sha256: sha256(serializeArtifact(bindingReceipt)) };
     bindingReceiptWriteAttempted = true;
-    await registry.verifyRoot();
-    bindingReceiptIdentity = await writeExternalReceipt(governanceRoot, BINDING_RECEIPT_FILENAME, bindingReceipt);
+    bindingReceiptIdentity = await writeExternalReceipt(registry, BINDING_RECEIPT_FILENAME, bindingReceipt);
     bindingReceiptKnown = true;
     claimEnvelope = await registry.transition(bindingHash, currentState, 'BINDING_RECEIPT_WRITTEN', {
       bindingReceiptCreated: true,
