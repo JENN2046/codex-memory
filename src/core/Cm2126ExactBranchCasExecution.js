@@ -1125,10 +1125,12 @@ async function syncTargetFiles(targetPath, targetBindings, options, repoRoot, be
       ? existingMode | 0o100
       : existingMode & ~0o100;
     let handle = null;
+    let temporaryIdentity = null;
     let renameAttempted = false;
     let renameAcknowledged = false;
     try {
       handle = await fsPromises.open(temporary, 'wx', expectedMode);
+      temporaryIdentity = await handle.stat();
       await handle.writeFile(source.content);
       await handle.sync();
       await handle.close();
@@ -1136,6 +1138,7 @@ async function syncTargetFiles(targetPath, targetBindings, options, repoRoot, be
       await fsPromises.chmod(temporary, expectedMode);
       const modeDurabilityHandle = await fsPromises.open(temporary, 'r');
       try { await modeDurabilityHandle.sync(); } finally { await modeDurabilityHandle.close(); }
+      injectIsolatedTestFault('file_pre_rename_failure');
       if (!verifyPerFileEffectBoundary(repoRoot, targetPath, beforeOtherRefs) ||
           !fileMatchesIdentity(targetPath, binding.before)) {
         throw new Error(`cm2126_target_file_pre_rename_drift:${identity.sourcePath}`);
@@ -1152,6 +1155,19 @@ async function syncTargetFiles(targetPath, targetBindings, options, repoRoot, be
       if (!fileMatchesIdentity(targetPath, identity)) throw new Error(`cm2126_target_file_readback_failed:${identity.sourcePath}`);
     } catch (error) {
       if (handle) await handle.close().catch(() => {});
+      if (!renameAttempted && temporaryIdentity) {
+        try {
+          const currentTemporary = await fsPromises.lstat(temporary);
+          if (currentTemporary.isFile() && !currentTemporary.isSymbolicLink() &&
+              currentTemporary.dev === temporaryIdentity.dev && currentTemporary.ino === temporaryIdentity.ino) {
+            await fsPromises.unlink(temporary);
+            const directory = await fsPromises.open(path.dirname(temporary), 'r');
+            try { await directory.sync(); } finally { await directory.close(); }
+          }
+        } catch (cleanupError) {
+          if (cleanupError.code !== 'ENOENT') error.cm2126TemporaryCleanupFailed = true;
+        }
+      }
       error.cm2126TargetFileSynchronizations = renameAttempted && !renameAcknowledged ? null : completed;
       throw error;
     }
