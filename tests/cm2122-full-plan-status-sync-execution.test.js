@@ -446,6 +446,78 @@ test('claim create, read, and transition stay inside the verified governance des
   assert.doesNotMatch(source, /this\.fs\.readFile\(this\.claimPath/);
 });
 
+test('claim transition keeps read and write pinned to one governance descriptor across a path swap', async () => {
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2122-transition-root-swap-'));
+  const root = path.join(parent, 'registry');
+  const replacement = path.join(parent, 'replacement');
+  const displaced = path.join(parent, 'displaced');
+  const identity = JSON.stringify(canonicalize(fixture.frozenModule.GOVERNANCE_ROOT_IDENTITY));
+  const bindingHash = fixture.frozenModule.buildClaimBindingHash({
+    packetEvidence: fixture.packetEvidence,
+    finalReleaseEvidence: fixture.finalReleaseEvidence
+  });
+  fs.mkdirSync(root);
+  fs.mkdirSync(replacement);
+  fs.writeFileSync(path.join(root, '.phase8-registry-root-identity.json'), identity);
+  fs.writeFileSync(path.join(replacement, '.phase8-registry-root-identity.json'), identity);
+  try {
+    const initialRegistry = new fixture.frozenModule.Cm2122StatusSyncClaimRegistry({ governanceRoot: root });
+    await initialRegistry.claim(bindingHash, fixture.finalReleaseEvidence, fixture.now);
+    const initialClaim = fs.readFileSync(path.join(root, fixture.frozenModule.claimFileName()));
+    fs.writeFileSync(path.join(replacement, fixture.frozenModule.claimFileName()), initialClaim);
+
+    let swapped = false;
+    const fsApi = Object.create(require('node:fs/promises'));
+    fsApi.open = async (target, flags, mode) => {
+      const handle = await require('node:fs/promises').open(target, flags, mode);
+      if (!swapped && String(target).endsWith(fixture.frozenModule.claimFileName()) &&
+          flags === (fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW)) {
+        return {
+          stat: (...args) => handle.stat(...args),
+          readFile: async (...args) => {
+            const bytes = await handle.readFile(...args);
+            fs.renameSync(root, displaced);
+            fs.renameSync(replacement, root);
+            swapped = true;
+            return bytes;
+          },
+          close: (...args) => handle.close(...args)
+        };
+      }
+      return handle;
+    };
+    const registry = new fixture.frozenModule.Cm2122StatusSyncClaimRegistry({ governanceRoot: root, fsApi });
+    const next = await registry.transition(
+      bindingHash,
+      'STATUS_COMMIT_INVOCATION_CONSUMED',
+      'DETACHED_STATUS_COMMIT_CREATED',
+      {
+        detachedStatusCommitCreated: true,
+        detachedHeadUpdateAcknowledged: true,
+        detachedStatusCommit: 'a'.repeat(40),
+        detachedStatusTree: 'b'.repeat(40)
+      },
+      fixture.finalReleaseEvidence
+    );
+    assert.equal(swapped, true);
+    assert.equal(next.state, 'DETACHED_STATUS_COMMIT_CREATED');
+    assert.equal(
+      JSON.parse(fs.readFileSync(path.join(displaced, fixture.frozenModule.claimFileName()))).state,
+      'DETACHED_STATUS_COMMIT_CREATED'
+    );
+    assert.equal(
+      JSON.parse(fs.readFileSync(path.join(root, fixture.frozenModule.claimFileName()))).state,
+      'STATUS_COMMIT_INVOCATION_CONSUMED'
+    );
+    assert.deepEqual(
+      fs.readdirSync(root).sort(),
+      ['.phase8-registry-root-identity.json', fixture.frozenModule.claimFileName()].sort()
+    );
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 function initializeGovernanceRoot() {
   const root = path.join(
     fixture.repo,

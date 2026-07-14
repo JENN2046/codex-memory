@@ -41,6 +41,7 @@ const {
 
 const IMPLEMENTATION_COMMIT = '9'.repeat(40);
 const IMPLEMENTATION_TREE = '8'.repeat(40);
+const PHASE2_BINDING_HASH = '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc';
 const gitFileCache = new Map();
 const commitTreeCache = new Map();
 const parentCommitCache = new Map();
@@ -167,6 +168,18 @@ test('CM-2116 replays the exact 7187 intake commit, A/A diff, both blobs, and ne
   assert.equal(evidence.receiptEvaluation.independentReviewPassed, true);
   assert.equal(evidence.receiptEvaluation.independentExternalReviewPassed, false);
   assert.equal(evidence.receiptEvaluation.fullPlanPackCompleted, false);
+});
+
+test('CM-2116 production resolver replays the frozen Phase 2 claim without local governance state', () => {
+  const options = resolverOptions();
+  assert.notEqual(options.resolveDurableClaim, git.resolveDurableClaim);
+  const evidence = evaluateFrozenSelfReviewIntake(options);
+  assert.equal(evidence.accepted, true, evidence.blockers.join(','));
+  const claim = options.resolveDurableClaim(PHASE2_BINDING_HASH);
+  assert.equal(claim.bindingHash, PHASE2_BINDING_HASH);
+  assert.equal(claim.state, 'CONSUMED_SUCCESS');
+  assert.equal(claim.authorizationReplayAllowed, false);
+  assert.throws(() => options.resolveDurableClaim('f'.repeat(64)), /binding_mismatch/);
 });
 
 test('CM-2116 exact gate prepares only a separate application decision', () => {

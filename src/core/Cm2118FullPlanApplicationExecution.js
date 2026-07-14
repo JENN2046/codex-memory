@@ -1430,39 +1430,30 @@ async function writeExternalReceipt(governanceRoot, filename, receipt) {
 
 function realResolverOptions() {
   const { resolverOptions } = require('../../scripts/generate-cm2116-exact-full-plan-application-gate');
-  const gitResolvers = require('../../scripts/cm2115-r2-git');
-  if (typeof gitResolvers.resolveDurableClaim === 'function') {
-    return { ...resolverOptions(), resolveDurableClaim: gitResolvers.resolveDurableClaim };
-  }
   const {
-    GOVERNANCE_ROOT_IDENTITY: cm2115RootIdentity,
-    GOVERNANCE_ROOT_IDENTITY_SHA256: cm2115RootIdentitySha256,
-    canonicalize: cm2115Canonicalize,
-    claimFileName: cm2115ClaimFileName,
-    sha256: cm2115Sha256
+    DECISION_REFERENCE,
+    NONCE: phase2Nonce,
+    RECEIPT_ID: phase2ReceiptId,
+    REGISTRY_REFERENCE: phase2RegistryReference,
+    validateDurableClaim
   } = require('./Cm2115R2Phase2CompletionAuditApplication');
-  const resolveDurableClaim = () => {
-    if (!Number.isInteger(fs.constants.O_NOFOLLOW)) throw new Error('cm2118_no_follow_unavailable');
-    const readRegular = filePath => {
-      const descriptor = fs.openSync(filePath, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
-      try {
-        if (!fs.fstatSync(descriptor).isFile()) throw new Error('cm2118_governance_file_invalid');
-        return fs.readFileSync(descriptor);
-      } finally {
-        fs.closeSync(descriptor);
-      }
-    };
-    const governanceRoot = gitResolvers.resolveGovernanceRegistryRoot();
-    const rootStat = fs.lstatSync(governanceRoot);
-    if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) throw new Error('cm2118_governance_root_invalid');
-    const identityBytes = readRegular(path.join(governanceRoot, '.phase8-registry-root-identity.json'));
-    if (cm2115Sha256(identityBytes) !== cm2115RootIdentitySha256 ||
-        identityBytes.toString('utf8') !== JSON.stringify(cm2115Canonicalize(cm2115RootIdentity))) {
-      throw new Error('cm2118_governance_root_identity_mismatch');
-    }
-    return JSON.parse(readRegular(path.join(governanceRoot, cm2115ClaimFileName())).toString('utf8'));
+  const frozenPhase2Claim = {
+    schemaVersion: 1,
+    registryReference: phase2RegistryReference,
+    claimId: '2dca80c9a3a88fdf7c6814964ffc3ca89efa89dcafa6252172995fdeccf36b16',
+    nonceHash: sha256(phase2Nonce),
+    receiptIdHash: sha256(phase2ReceiptId),
+    bindingHash: '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc',
+    decisionReference: DECISION_REFERENCE,
+    authorizationUseCount: 1,
+    authorizationReplayAllowed: false,
+    patchInvocationCount: 1,
+    state: 'CONSUMED_SUCCESS'
   };
-  return { ...resolverOptions(), resolveDurableClaim };
+  const resolveFrozenPhase2DurableClaim = bindingHash => structuredClone(
+    validateDurableClaim(frozenPhase2Claim, bindingHash)
+  );
+  return { ...resolverOptions(), resolveDurableClaim: resolveFrozenPhase2DurableClaim };
 }
 
 function assertFixedExecutionRuntime(packetEvidence) {

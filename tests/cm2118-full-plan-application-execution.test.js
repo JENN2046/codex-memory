@@ -243,6 +243,13 @@ test('CM-2117 exact content decision is machine-intaken and immutable', () => {
   assert.equal(implementation.isMachineBoundContentDecision(clone), false);
 });
 
+test('CM-2118 content intake uses frozen Phase 2 governance evidence, not author-local claim state', () => {
+  const options = implementation.realResolverOptions();
+  assert.notEqual(options.resolveDurableClaim, require('../scripts/cm2115-r2-git').resolveDurableClaim);
+  const content = implementation.intakeContentDecision(options);
+  assert.equal(content.accepted, true, content.blockers.join(','));
+});
+
 test('CLI accepts exactly three commit arguments and rejects extra surfaces', () => {
   const a = 'a'.repeat(40);
   const b = 'b'.repeat(40);
