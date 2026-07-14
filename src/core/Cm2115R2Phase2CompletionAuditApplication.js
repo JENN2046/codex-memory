@@ -425,6 +425,35 @@ function evaluateDecision(decision = {}, { resolveGitFile } = {}) {
         ['100644', '100755'].includes(target.before.gitMode);
     if (!validAfter || !validBefore) blockers.push(`decision.target.${target?.sourcePath || 'unknown'}`);
   }
+  if (typeof resolveGitFile === 'function') {
+    for (const target of plan.targets || []) {
+      try {
+        let expectedBefore = null;
+        let beforeBytes = null;
+        if (target.operation === 'modify') {
+          const actual = resolveGitFile(plan.baselineCommit, target.sourcePath);
+          if (!actual || actual.sourceCommit !== plan.baselineCommit || actual.sourceTree !== plan.baselineTree ||
+              actual.sourcePath !== target.sourcePath || actual.gitObjectType !== 'blob' ||
+              !['100644', '100755'].includes(actual.gitMode) || !Buffer.isBuffer(actual.content) ||
+              gitBlobOid(actual.content) !== actual.blobOid || sha256(actual.content) !== actual.sha256 ||
+              actual.bytes !== actual.content.length) {
+            blockers.push(`decision.targetBaselineGitObject.${target.sourcePath}`);
+            continue;
+          }
+          beforeBytes = actual.content;
+          expectedBefore = fileProjection(beforeBytes, actual.gitMode);
+        }
+        const expectedAfter = fileProjection(
+          buildExpectedAfterBytes(target.sourcePath, beforeBytes),
+          target.operation === 'add' ? '100644' : expectedBefore.gitMode
+        );
+        if (!sameJson(target.before, expectedBefore)) blockers.push(`decision.targetBeforeCanonical.${target.sourcePath}`);
+        if (!sameJson(target.after, expectedAfter)) blockers.push(`decision.targetAfterCanonical.${target.sourcePath}`);
+      } catch {
+        blockers.push(`decision.targetCanonicalization.${target?.sourcePath || 'unknown'}`);
+      }
+    }
+  }
   if (!sameJson(payload.allowedStateAfterApplication, {
     phase2GovernedNativeReadEvidenceApplicationPassed: true,
     phase2ReceiptBundleAppliedToCompletionAudit: true,
