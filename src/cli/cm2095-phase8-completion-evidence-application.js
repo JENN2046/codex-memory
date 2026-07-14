@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const { execFileSync } = require('node:child_process');
 const { executeCm2095Phase8CompletionEvidenceApplication, sha256 } = require('../core/Cm2095Phase8CompletionEvidenceApplication');
+const { evaluateCm2095Phase8CompletionEvidenceApplicationReceipt } = require('../core/Cm2095Phase8CompletionEvidenceApplicationReceiptContract');
 
 const DECISION_PATH = 'docs/near-model-memory-plan-pack/phase8_completion_evidence_application_decision_cm2095.json';
 const REQUEST_PATH = 'docs/near-model-memory-plan-pack/phase8_completion_evidence_application_request_cm2095.json';
@@ -58,10 +59,81 @@ function buildInput() {
   };
 }
 
+function verifyCommittedReceipt() {
+  const blockers = [];
+  const head = git(['rev-parse', 'HEAD']).trim();
+  let receiptBytes = null;
+  let committedReceiptBytes = null;
+  try {
+    const receiptStat = fs.lstatSync(APPLICATION_RECEIPT_PATH);
+    if (!receiptStat.isFile() || receiptStat.isSymbolicLink()) blockers.push('receipt.worktreeFileType');
+    else receiptBytes = fs.readFileSync(APPLICATION_RECEIPT_PATH);
+  } catch {
+    blockers.push('receipt.worktreeFile');
+  }
+  try {
+    committedReceiptBytes = gitBytes(head, APPLICATION_RECEIPT_PATH);
+  } catch {
+    blockers.push('receipt.committedFile');
+  }
+  if (receiptBytes && committedReceiptBytes && !receiptBytes.equals(committedReceiptBytes)) {
+    blockers.push('receipt.worktreeMatchesHead');
+  }
+
+  let receipt = null;
+  if (receiptBytes) {
+    try {
+      receipt = JSON.parse(receiptBytes.toString('utf8'));
+    } catch {
+      blockers.push('receipt.json');
+    }
+  }
+  const contractResult = receipt
+    ? evaluateCm2095Phase8CompletionEvidenceApplicationReceipt(receipt)
+    : { accepted: false, blockers: [] };
+  blockers.push(...contractResult.blockers);
+  const accepted = blockers.length === 0 && contractResult.accepted === true;
+  return {
+    accepted,
+    mode: 'committed_receipt_verification',
+    contractName: 'Cm2095Phase8CompletionEvidenceApplicationReceiptVerification',
+    blockers,
+    verificationCommit: accepted ? head : null,
+    receiptBlobOid: accepted ? git(['rev-parse', `${head}:${APPLICATION_RECEIPT_PATH}`]).trim() : null,
+    receiptSha256: accepted ? sha256(receiptBytes) : null,
+    applicationReceiptAccepted: accepted,
+    phase8ReceiptBundleAppliedToCompletionAudit: accepted,
+    phase8Completed: false,
+    additionalNativeWriteAuthorized: false
+  };
+}
+
+function runCli(argv = process.argv.slice(2)) {
+  const allowed = argv.length === 0 || (argv.length === 1 && ['--verify-only', '--pre-application'].includes(argv[0]));
+  if (!allowed) {
+    return {
+      accepted: false,
+      mode: 'argument_validation',
+      blockers: ['arguments'],
+      phase8Completed: false,
+      additionalNativeWriteAuthorized: false
+    };
+  }
+  const verifyOnly = argv[0] === '--verify-only';
+  const preApplication = argv[0] === '--pre-application';
+  if (verifyOnly || (!preApplication && fs.existsSync(APPLICATION_RECEIPT_PATH))) {
+    return verifyCommittedReceipt();
+  }
+  return {
+    ...executeCm2095Phase8CompletionEvidenceApplication(buildInput()),
+    mode: 'pre_application_gate'
+  };
+}
+
 if (require.main === module) {
-  const result = executeCm2095Phase8CompletionEvidenceApplication(buildInput());
+  const result = runCli();
   process.stdout.write(`${JSON.stringify(result)}\n`);
   if (!result.accepted) process.exitCode = 1;
 }
 
-module.exports = { buildInput };
+module.exports = { buildInput, runCli, verifyCommittedReceipt };
