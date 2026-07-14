@@ -323,6 +323,7 @@ function evaluateFailureRecoveryReceipt(receipt = {}, expectedBinding = {}) {
     failureRecoveryProofPassed: false,
     phase8Completed: false
   };
+  if (!hasExactKeys(summary, Object.keys(exactSummary))) blockers.push('receipt.summary.fields');
   for (const [field, expected] of Object.entries(exactSummary)) if (summary[field] !== expected) blockers.push(`receipt.summary.${field}`);
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
   const boundaryFields = ['usesCm2094LiveAuthorization', 'usesCm2094Nonce', 'usesCm2094RegistryClaim', 'modifiesCm2094Record', 'productionProviderCalled', 'realMemoryRead', 'realMemoryModified', 'localFallbackUsed', 'automaticRetryPerformed', 'rollbackOrCompensationPerformed', 'rawMemoryReturned', 'rawAuditReturned', 'rawPathDisclosed', 'defaultMcpExpanded', 'readinessClaimed'];
