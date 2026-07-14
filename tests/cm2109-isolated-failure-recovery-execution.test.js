@@ -155,11 +155,18 @@ test('CM-2109 packet and decision boundaries reject authority expansion', () => 
     packetType: 'isolated_three_case_failure_recovery_execution_packet',
     packetDoesNotAuthorizeExecution: true,
     executionAuthorizedAtPacketFreeze: false,
+    routeDecisionReference: 'CM-2097-ROUTE',
     implementationCommit: '1'.repeat(40),
     implementationTree: '2'.repeat(40),
+    manifestSourceCommit: '1'.repeat(40),
     expectedDecisionReference: 'CM-2109-SELF-ISOLATED-FAILURE-RECOVERY-EXECUTION',
     harnessRootDirectory: 'phase8-isolated-failure-recovery-harness-001',
+    harnessRootAuthority: 'git_common_dir_governance_state',
     governanceRootIdentitySha256: '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0',
+    harnessIdentityBytes: 322,
+    harnessIdentitySha256: 'c'.repeat(64),
+    ambiguousPostCommitFixtureBytes: 139,
+    ambiguousPostCommitFixtureSha256: 'd'.repeat(64),
     callerPathOverrideAllowed: false,
     environmentPathOverrideAllowed: false,
     caseManifests: CASE_IDS.map((caseId, index) => ({ caseId, ...manifestBindings[index] })),
@@ -183,6 +190,10 @@ test('CM-2109 packet and decision boundaries reject authority expansion', () => 
     phase8CompletedAtPacketFreeze: false
   };
   assert.equal(validatePacket(packet, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, true);
+  assert.equal(validatePacket({ ...packet, retryAuthorized: true }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
+  const extraCaseClaim = structuredClone(packet);
+  extraCaseClaim.caseManifests[0].readinessClaimed = false;
+  assert.equal(validatePacket(extraCaseClaim, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
   assert.equal(validatePacket({ ...packet, maxRetryCount: 1 }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
   assert.equal(validatePacket({ ...packet, failureRecoveryProofPassedAtPacketFreeze: true }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
   assert.equal(validatePacket({ ...packet, phase8CompletedAtPacketFreeze: true }, { runtimeCommit: packet.implementationCommit, runtimeTree: packet.implementationTree, manifestBindings }).accepted, false);
