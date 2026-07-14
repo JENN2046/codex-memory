@@ -1120,7 +1120,10 @@ async function syncTargetFiles(targetPath, targetBindings, options, repoRoot, be
     }
     const temporary = path.join(path.dirname(absolute),
       `.cm2126-${sha256(identity.sourcePath).slice(0, 16)}.sync.tmp`);
-    const expectedMode = identity.gitMode === '100755' ? 0o755 : 0o644;
+    const existingMode = existing.mode & 0o777;
+    const expectedMode = identity.gitMode === '100755'
+      ? existingMode | 0o100
+      : existingMode & ~0o100;
     let handle = null;
     let renameAttempted = false;
     let renameAcknowledged = false;
@@ -1162,14 +1165,16 @@ async function synchronizeExactIndexEntries(targetPath, targetBindings, repoRoot
   ).join('');
   const indexPath = resolveTargetIndexPath(targetPath);
   const lockPath = `${indexPath}.lock`;
+  const indexMode = (await fsPromises.lstat(indexPath)).mode & 0o777;
   const initialBytes = await fsPromises.readFile(indexPath);
   let lockHandle = null;
   let lockCreated = false;
   let renameAttempted = false;
   try {
-    lockHandle = await fsPromises.open(lockPath, 'wx', 0o600);
+    lockHandle = await fsPromises.open(lockPath, 'wx', indexMode);
     lockCreated = true;
     await lockHandle.writeFile(initialBytes);
+    await lockHandle.chmod(indexMode);
     await lockHandle.sync();
     await lockHandle.close();
     lockHandle = null;
@@ -1188,6 +1193,7 @@ async function synchronizeExactIndexEntries(targetPath, targetBindings, repoRoot
       input: Buffer.from(records, 'utf8'),
       internalEnv
     });
+    await fsPromises.chmod(lockPath, indexMode);
     if (gitText(['write-tree'], { cwd: targetPath, internalEnv }) !== NEW_TREE ||
         !Buffer.from(await fsPromises.readFile(indexPath)).equals(initialBytes) ||
         targetRefOid(repoRoot) !== NEW_COMMIT ||
@@ -1196,6 +1202,7 @@ async function synchronizeExactIndexEntries(targetPath, targetBindings, repoRoot
         !exactIndexPolicyMatched(targetPath) || otherRefsSnapshotSha256(repoRoot) !== beforeOtherRefs) {
       throw new Error('cm2126_target_index_cas_precondition_drift');
     }
+    await fsPromises.chmod(lockPath, indexMode);
     const durableLock = await fsPromises.open(lockPath, 'r');
     try { await durableLock.sync(); } finally { await durableLock.close(); }
     renameAttempted = true;

@@ -265,6 +265,7 @@ function fixedExecutionEnv(env = process.env) {
 function runTwiceInOneProcess() {
   const args = JSON.stringify(exactArgs());
   const source = [
+    'process.umask(0o002);',
     "const m=require('./src/core/Cm2126ExactBranchCasExecution');",
     `(async()=>{const first=await m.executeBranchCasFromCommits(${args});`,
     `const second=await m.executeBranchCasFromCommits(${args});`,
@@ -920,6 +921,23 @@ test('temp clone performs one exact CAS plus linked-target index and nine-file s
   const evidenceHeadBefore = text(['rev-parse', 'HEAD^{commit}'], fixture.repo);
   const objectsBefore = text(['count-objects', '-v'], fixture.repo);
   const remoteRefsBefore = refsSnapshot(fixture.repo);
+  git(['config', 'core.sharedRepository', 'group'], fixture.repo);
+  const targetBindings = fixture.frozenModule.buildTargetBindings(fixture.gitResolvers);
+  const expectedModes = new Map();
+  let preservedNonOwnerExecuteMode = false;
+  for (const binding of targetBindings) {
+    const mode = binding.before.gitMode === '100755'
+      ? 0o775
+      : preservedNonOwnerExecuteMode ? 0o664 : 0o654;
+    if (mode === 0o654) preservedNonOwnerExecuteMode = true;
+    fs.chmodSync(path.join(fixture.target, binding.sourcePath), mode);
+    expectedModes.set(binding.sourcePath, mode);
+  }
+  const targetIndexPath = text(
+    ['rev-parse', '--path-format=absolute', '--git-path', 'index'],
+    fixture.target
+  );
+  fs.chmodSync(targetIndexPath, 0o664);
   const result = runTwiceInOneProcess();
   assert.equal(result.status, 0, result.stderr);
   const { first, second } = JSON.parse(result.stdout);
@@ -954,13 +972,15 @@ test('temp clone performs one exact CAS plus linked-target index and nine-file s
   assert.equal(text(['count-objects', '-v'], fixture.repo), objectsBefore);
   assert.equal(refsSnapshot(fixture.repo), remoteRefsBefore);
 
-  const targetBindings = fixture.frozenModule.buildTargetBindings(fixture.gitResolvers);
   assert.equal(targetBindings.length, 9);
   for (const binding of targetBindings) {
-    const bytes = fs.readFileSync(path.join(fixture.target, binding.sourcePath));
+    const targetFile = path.join(fixture.target, binding.sourcePath);
+    const bytes = fs.readFileSync(targetFile);
     assert.equal(bytes.length, binding.after.bytes, binding.sourcePath);
     assert.equal(sha256(bytes), binding.after.sha256, binding.sourcePath);
+    assert.equal(fs.statSync(targetFile).mode & 0o777, expectedModes.get(binding.sourcePath), binding.sourcePath);
   }
+  assert.equal(fs.statSync(targetIndexPath).mode & 0o777, 0o664);
   assert.deepEqual(
     fixture.gitResolvers.resolveDiffEntries(constants.EXPECTED_OLD, constants.NEW_COMMIT),
     fixture.frozenConstants.STATUS_ENTRIES
