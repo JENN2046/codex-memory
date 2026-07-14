@@ -244,3 +244,24 @@ test('CM2015 rejects raw or readiness-shaped evidence without echoing values', (
   assert.equal(serialized.includes('SYNTHETIC_ECHO_GUARD_RAW_VALUE'), false);
   assert.equal(serialized.includes('SYNTHETIC_ECHO_GUARD_TOKEN_VALUE'), false);
 });
+
+test('CM2015 stops L4 for RC, deploy, full-capability, or model-memory-complete aliases', () => {
+  for (const key of [
+    'rcReadyClaimed',
+    'deployReadyClaimed',
+    'fullCapabilityClaimed',
+    'modelMemoryCompleteClaimed'
+  ]) {
+    const result = evaluateDefaultRuntimePolicyObservationGate({
+      publicToolNames: DEFAULT_RUNTIME_ALLOWED_TOOLS,
+      policy: {
+        requestedDefaultTools: DEFAULT_RUNTIME_ALLOWED_TOOLS,
+        [key]: true
+      }
+    });
+    assert.equal(result.accepted, false, key);
+    assert.equal(result.status, 'default_runtime_policy_stop_l4', key);
+    assert.ok(result.stopReasons.includes(`stop_l4_flag_policy.${key}`), key);
+    assert.equal(result.nextGate, 'stop_before_runtime_or_write_boundary', key);
+  }
+});
