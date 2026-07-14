@@ -32,6 +32,10 @@ const OWNER_RUNTIME_KEYS = Object.freeze([
   'manifestSha256', 'dependencyLockSha256', 'preloadSha256', 'dotenvVersion',
   'dotenvPackageSha256', 'dotenvMainSha256'
 ]);
+const TRANSPORT_KEYS = Object.freeze([
+  'outer', 'inner', 'ownerRuntime', 'contentLengthFramingRequired',
+  'processBoundaryRequired', 'innerAuthorizationRequired'
+]);
 
 function exactKeys(value, keys) {
   return value && typeof value === 'object' && !Array.isArray(value) &&
@@ -74,6 +78,7 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
   if (!hex(packet.runtimeIdentitySha256, 64) || !hex(packet.storeIdentitySha256, 64)) blockers.push('identity.sha256');
   if (!safeReference(packet.storeReference) || !safeReference(packet.storeInstanceId) || !safeReference(packet.lifecycleReference)) blockers.push('store.references');
   if (
+    !exactKeys(packet.transport, TRANSPORT_KEYS) ||
     packet.transport?.outer !== 'stdio_mcp_process' ||
     packet.transport?.inner !== 'local_http_mcp' ||
     packet.transport?.ownerRuntime !== 'stdio' ||

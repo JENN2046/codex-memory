@@ -88,6 +88,7 @@ test('CM-2113 packet rejects self identity, transport drift, and store replaceme
   for (const mutate of [
     packet => { packet.executionPacket = { commit: '1'.repeat(40) }; },
     packet => { packet.ownerRuntime.productionReady = true; },
+    packet => { packet.transport.productionReady = true; },
     packet => { packet.transport.outer = 'direct_app_call'; },
     packet => { packet.runtimeTarget.storeInstanceId = 'clone-store'; },
     packet => { packet.fixedRecord.folder = '../outside'; },

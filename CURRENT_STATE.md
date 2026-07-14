@@ -32,10 +32,12 @@ claim, durable re-entry state, external execution/binding receipts, and an exact
 
 CM-2119 decision `dd78a679…` is an exact two-file child of that packet and
 passed machine Git intake. Decision payload SHA-256 is `33caf9c6…e579`.
-It authorizes one local claim/application only. It does not authorize status
-sync, remote actions, native/provider/real-memory access, or readiness claims.
-The executor has not run, so claim/application/commit/receipt counters remain
-zero. `fullPlanPackCompleted=false` and all 22 readiness fields remain false.
+It authorized one local claim/application only; the later exact execution
+consumed that authorization and produced application commit `41097b0f…`, now
+ancestry-anchored and bound by the frozen receipts described above. The
+authorization is non-replayable. It did not authorize status sync, remote
+actions, native/provider/real-memory access, or readiness claims. All 22
+readiness fields remain false.
 
 ## Current Exact Full-plan Application Decision
 
