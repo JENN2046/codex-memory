@@ -145,6 +145,6 @@ model-memory-complete
 
 | Evidence | Acceptance boundary | Independent review | Current status |
 |---|---|---|---|
-| CM-2115-R2 Phase 2 binding receipt | Durable one-shot claim + exact application commit/tree/diff/pre-post blobs + receipt-time upstream Git revalidation | Required | Pending until binding receipt is frozen |
+| CM-2115-R2 Phase 2 binding receipt | Durable one-shot claim + exact application commit/tree/diff/pre-post blobs + receipt-time upstream Git revalidation | Required | Frozen as the strengthened v2 binding receipt; rebuilt snapshot remains pending independent review |
 
 R1 receipt shape alone is not accepted as current patch evidence.
