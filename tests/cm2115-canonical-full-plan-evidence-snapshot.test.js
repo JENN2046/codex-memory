@@ -414,6 +414,46 @@ test('snapshot contract rejects circular, private, symlink, or non-blob sources'
   assert.equal(safeSourcePath('docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.json'), false);
   assert.equal(safeSourcePath('.env'), false);
   assert.equal(safeSourcePath('data/private.json'), false);
+  for (const sourcePath of [
+    '.colameta/plan.json',
+    '.colameta/memory.md',
+    '.colameta/decisions.json',
+    '.colameta/todolist.json',
+    '.colameta/state.json',
+    '.colameta/executor-session.json',
+    '.colameta/settings.json',
+    '.colameta/runner-settings.json',
+    '.colameta/runtime',
+    '.colameta/runtime/state.json',
+    '.colameta/logs/runtime.md',
+    '.colameta/reports/review.md',
+    '.colameta/audits/audit.md',
+    '.colameta/plan-patches/patch.md',
+    '.colameta/tmp/cache',
+    '.colameta/local/state',
+    '.colameta/executor-sessions/session.json',
+    '.colameta/current.lock',
+    '.colameta/prompts/nested.lock'
+  ]) assert.equal(safeSourcePath(sourcePath), false, sourcePath);
+  for (const sourcePath of [
+    '.colameta/prompts/system.md',
+    '.colameta/rules.md',
+    '.colameta/planner.json',
+    '.colameta/settings.json.bak',
+    '.colameta/prompts/not.locked'
+  ]) assert.equal(safeSourcePath(sourcePath), true, sourcePath);
+
+  const unsafeSnapshot = buildSnapshot(fakeResolverFactory());
+  unsafeSnapshot.payload.entries[0].sourceBindings[0].sourcePath = '.colameta/settings.json';
+  unsafeSnapshot.payloadSha256 = sha256Canonical(unsafeSnapshot.payload);
+  let unsafeResolverCalls = 0;
+  const unsafeResult = evaluate(unsafeSnapshot, sourcePath => {
+    if (sourcePath === '.colameta/settings.json') unsafeResolverCalls += 1;
+    return fakeResolverFactory()(sourcePath);
+  });
+  assert.equal(unsafeResult.accepted, false);
+  assert.ok(unsafeResult.blockers.some(blocker => blocker.startsWith('source.path.')));
+  assert.equal(unsafeResolverCalls, 0);
   const resolver = fakeResolverFactory();
   const snapshot = buildSnapshot(resolver);
   const firstPath = snapshot.payload.entries[0].sourceBindings[0].sourcePath;

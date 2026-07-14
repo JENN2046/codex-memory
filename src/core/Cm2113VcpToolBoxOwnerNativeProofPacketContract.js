@@ -26,6 +26,12 @@ const AUTHORIZATION_KEYS = Object.freeze([
 const LIMIT_KEYS = Object.freeze([
   'nativeWrites', 'verifyOperations', 'retries', 'rollbackOrCompensation'
 ]);
+const OWNER_RUNTIME_KEYS = Object.freeze([
+  'owner', 'component', 'communication', 'runtimeSourceCommit', 'runtimeSourceTree',
+  'pluginBlobOid', 'manifestBlobOid', 'dependencyLockBlobOid', 'pluginSha256',
+  'manifestSha256', 'dependencyLockSha256', 'preloadSha256', 'dotenvVersion',
+  'dotenvPackageSha256', 'dotenvMainSha256'
+]);
 
 function exactKeys(value, keys) {
   return value && typeof value === 'object' && !Array.isArray(value) &&
@@ -57,6 +63,7 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
   if (!hex(packet.implementation?.commit, 40) || !hex(packet.implementation?.tree, 40)) blockers.push('implementation.git');
   const owner = packet.ownerRuntime || {};
   if (
+    !exactKeys(owner, OWNER_RUNTIME_KEYS) ||
     owner.owner !== 'VCPToolBox' || owner.component !== 'DailyNote' || owner.communication !== 'stdio' ||
     !hex(owner.runtimeSourceCommit, 40) || !hex(owner.runtimeSourceTree, 40) ||
     !hex(owner.pluginBlobOid, 40) || !hex(owner.manifestBlobOid, 40) || !hex(owner.dependencyLockBlobOid, 40) ||
