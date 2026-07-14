@@ -558,6 +558,16 @@ test('successful execution replays durable receipts before returning and can ter
   assert.match(source.slice(durableReplay), /if \(state !== 'UNCLAIMED'\)/);
 });
 
+test('reentry expects the detached runtime only after the HEAD update was acknowledged', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2122FullPlanStatusSyncExecution.js'), 'utf8');
+  const start = source.indexOf('function assertReentryRuntime');
+  const end = source.indexOf('\nfunction assertExecutableStatusAttribution', start);
+  const implementationSource = source.slice(start, end);
+  assert.match(implementationSource, /detachedStatusCommitCreated === true &&\s*existing\.envelope\.detachedHeadUpdateAcknowledged === true/);
+  assert.match(implementationSource, /const expectedHead = detachedHeadAdvanced/);
+  assert.match(implementationSource, /const expectedTree = detachedHeadAdvanced/);
+});
+
 function initializeGovernanceRoot() {
   const root = path.join(
     fixture.repo,
