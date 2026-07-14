@@ -542,13 +542,13 @@ test('initial claim write stays pinned to the verified governance root across a 
   fs.writeFileSync(path.join(replacement, '.phase8-registry-root-identity.json'), identity);
   let swapped = false;
   const filesystem = Object.create(require('node:fs/promises'));
-  filesystem.writeFile = async (target, bytes, options) => {
+  filesystem.open = async (target, ...args) => {
     if (!swapped && String(target).endsWith(fixture.frozenModule.claimFileName())) {
       fs.renameSync(root, pinned);
       fs.renameSync(replacement, root);
       swapped = true;
     }
-    return require('node:fs/promises').writeFile(target, bytes, options);
+    return require('node:fs/promises').open(target, ...args);
   };
   try {
     const registry = new fixture.frozenModule.Cm2118FullPlanApplicationClaimRegistry({
@@ -786,5 +786,22 @@ test('external receipt writes stay on one verified governance descriptor', () =>
   assert.match(implementationSource, /governanceDescriptorPath\(rootHandle, filename\)/);
   assert.match(implementationSource, /O_NOFOLLOW/);
   assert.match(implementationSource, /receiptHandle\.read\(observed, 0, bytes\.length, 0\)/);
+  assert.match(implementationSource, /receiptHandle\.sync\(\)/);
+  assert.match(implementationSource, /rootHandle\.sync\(\)/);
   assert.doesNotMatch(implementationSource, /fsPromises\.(writeFile|readFile)\(/);
+});
+
+test('claim persistence fsyncs the descriptor-pinned file and directory before consumption', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src/core/Cm2118FullPlanApplicationExecution.js'), 'utf8');
+  const start = source.indexOf('async claim(bindingHash, finalReleaseEvidence)');
+  const end = source.indexOf('\n  async read(bindingHash', start);
+  const implementationSource = source.slice(start, end);
+  assert.match(implementationSource, /this\.fs\.open\(/);
+  assert.match(implementationSource, /O_NOFOLLOW/);
+  assert.match(implementationSource, /claimHandle\.writeFile\(bytes\)/);
+  assert.match(implementationSource, /claimHandle\.sync\(\)/);
+  assert.match(implementationSource, /rootHandle\.sync\(\)/);
+  assert.ok(implementationSource.indexOf('claimHandle.sync()') < implementationSource.indexOf('rootHandle.sync()'));
+  assert.ok(implementationSource.indexOf('rootHandle.sync()') < implementationSource.indexOf('return observed'));
+  assert.doesNotMatch(implementationSource, /this\.fs\.writeFile\(/);
 });
