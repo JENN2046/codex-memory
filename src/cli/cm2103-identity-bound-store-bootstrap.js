@@ -196,6 +196,9 @@ function buildCm2103BootstrapReceipt({
   claim,
   outcomeStage
 }) {
+  if (claim?.authorizationConsumed !== true) {
+    throw new Error('cm2103_bootstrap_receipt_claim_not_consumed');
+  }
   const success = claim.state === 'CONSUMED_SUCCESS';
   return {
     schemaVersion: 4,

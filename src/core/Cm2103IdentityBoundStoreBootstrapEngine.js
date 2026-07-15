@@ -87,7 +87,8 @@ async function executeCm2103BootstrapFilesystem({
   identityBytes = expectedIdentityBytes()
 } = {}) {
   if (!registry || typeof storeRoot !== 'string' || storeRoot.trim() === '' ||
-      typeof nonce !== 'string' || typeof receiptId !== 'string' ||
+      typeof nonce !== 'string' || nonce.trim() === '' ||
+      typeof receiptId !== 'string' || receiptId.trim() === '' ||
       !/^[a-f0-9]{64}$/.test(bindingHash || '')) {
     throw new Error('cm2103_bootstrap_engine_configuration_invalid');
   }
