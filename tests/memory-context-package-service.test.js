@@ -121,6 +121,32 @@ test('prepare_memory_context builds a low-disclosure task context package from b
   enforceNoForbiddenOutputKeys(result);
 });
 
+test('prepare_memory_context never copies unprojected raw search text into statements', async () => {
+  const { service } = createService({
+    results: [{
+      target: 'process',
+      title: 'Blocker: SYNTHETIC_RAW_TITLE_MUST_NOT_RETURN',
+      snippet: 'SYNTHETIC_RAW_SNIPPET_MUST_NOT_RETURN',
+      text: 'SYNTHETIC_RAW_TEXT_MUST_NOT_RETURN',
+      score: 0.8,
+      titleHitCount: 1
+    }]
+  });
+
+  const result = await service.prepare(baseInput());
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.memory_context_package.blockers.length, 1);
+  assert.equal(
+    result.memory_context_package.blockers[0].statement,
+    'Memory signal 1: bounded recall blocker signal.'
+  );
+  assert.equal(serialized.includes('SYNTHETIC_RAW_TITLE_MUST_NOT_RETURN'), false);
+  assert.equal(serialized.includes('SYNTHETIC_RAW_SNIPPET_MUST_NOT_RETURN'), false);
+  assert.equal(serialized.includes('SYNTHETIC_RAW_TEXT_MUST_NOT_RETURN'), false);
+  enforceNoForbiddenOutputKeys(result);
+});
+
 test('prepare_memory_context labels fallback and cannot be mistaken for native realtime', async () => {
   const { service } = createService({
     searchAccess: {
@@ -283,7 +309,7 @@ test('prepare_memory_context enforces the minimum max_bytes budget with a minima
   enforceNoForbiddenOutputKeys(result);
 });
 
-test('prepare_memory_context redacts sensitive fragments from returned statements', async () => {
+test('prepare_memory_context omits sensitive fragments from unprojected statements', async () => {
   const { service } = createService({
     results: [
       {
@@ -300,5 +326,8 @@ test('prepare_memory_context redacts sensitive fragments from returned statement
 
   assert.equal(serialized.includes('abc123456789'), false);
   assert.equal(serialized.includes('/home/jenn/private/file'), false);
-  assert.equal(serialized.includes('<redacted>'), true);
+  assert.equal(
+    result.memory_context_package.risks[0].statement,
+    'Memory signal 1: bounded recall risk signal.'
+  );
 });

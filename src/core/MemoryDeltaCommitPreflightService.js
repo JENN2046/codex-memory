@@ -44,6 +44,8 @@ const STOP_TRUE_PATHS = Object.freeze([
   ['write'],
   ['confirm'],
   ['durableWrite'],
+  ['durable_write'],
+  ['productionWrite'],
   ['production_write'],
   ['readinessClaimed'],
   ['rcReadyClaimed'],
