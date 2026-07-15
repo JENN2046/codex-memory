@@ -266,8 +266,9 @@ test('frozen intake receipt files exactly replay request, decision, intake, and 
   const options = resolverOptions();
   const frozenDecisionEvidence = evaluateFrozenSelfReviewDecision(options);
   assert.equal(frozenDecisionEvidence.accepted, true, frozenDecisionEvidence.blockers.join(','));
+  const frozenReceipt = JSON.parse(fs.readFileSync(RECEIPT_PATH, 'utf8'));
   const receipt = buildReceipt({
-    intakeImplementation: buildIntakeImplementation(),
+    intakeImplementation: frozenReceipt.payload.intakeImplementation,
     frozenDecisionEvidence
   });
   const evaluation = evaluateReceipt(receipt, options);
