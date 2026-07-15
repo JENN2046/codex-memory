@@ -43,6 +43,11 @@ const DECISION_FIELDS = Object.freeze([
   'allowedCompletionResult', 'applicationAuthorization', 'applicationSideEffectLimits',
   'nonClaims'
 ]);
+const APPLICATION_AUTHORIZATION_FIELDS = Object.freeze(['useCount', 'replayAllowed']);
+const APPLICATION_SIDE_EFFECT_LIMIT_FIELDS = Object.freeze([
+  'completionAuditPatchApplications', 'nativeReads', 'nativeWrites', 'verifyOperations',
+  'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims'
+]);
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -107,9 +112,15 @@ function evaluateDecision(decision = {}) {
   const allowedCompletionResultFields = ['phase8Completed', 'phase8CompletionStatus', 'fullPlanPackCompleted', 'readinessClaimed'];
   if (!hasExactKeys(decision.allowedCompletionResult, allowedCompletionResultFields)) blockers.push('decision.allowedCompletionResult.fields');
   for (const field of allowedCompletionResultFields) if (decision.allowedCompletionResult?.[field] !== patch[field]) blockers.push(`decision.allowedCompletionResult.${field}`);
-  if (decision.applicationAuthorization?.useCount !== 1 || decision.applicationAuthorization?.replayAllowed !== false) blockers.push('decision.applicationAuthorization');
+  if (!hasExactKeys(decision.applicationAuthorization, APPLICATION_AUTHORIZATION_FIELDS) ||
+      decision.applicationAuthorization?.useCount !== 1 || decision.applicationAuthorization?.replayAllowed !== false) {
+    blockers.push('decision.applicationAuthorization');
+  }
+  if (!hasExactKeys(decision.applicationSideEffectLimits, APPLICATION_SIDE_EFFECT_LIMIT_FIELDS)) {
+    blockers.push('decision.applicationSideEffectLimits.fields');
+  }
   if (decision.applicationSideEffectLimits?.completionAuditPatchApplications !== 1) blockers.push('decision.applicationSideEffectLimits.completionAuditPatchApplications');
-  for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (decision.applicationSideEffectLimits?.[field] !== 0) blockers.push(`decision.applicationSideEffectLimits.${field}`);
+  for (const field of APPLICATION_SIDE_EFFECT_LIMIT_FIELDS.filter(field => field !== 'completionAuditPatchApplications')) if (decision.applicationSideEffectLimits?.[field] !== 0) blockers.push(`decision.applicationSideEffectLimits.${field}`);
   const nonClaimFields = ['additionalNativeWriteAuthorized', 'derivedIndexProofAccepted', 'productionProviderProofAccepted', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed'];
   if (!hasExactKeys(decision.nonClaims, nonClaimFields)) blockers.push('decision.nonClaims.fields');
   for (const field of nonClaimFields) if (decision.nonClaims?.[field] !== false) blockers.push(`decision.nonClaims.${field}`);
