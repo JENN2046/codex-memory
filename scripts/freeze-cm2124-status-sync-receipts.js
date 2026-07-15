@@ -73,17 +73,61 @@ function assertCm2124FreezeCleanWorktree() {
   }
 }
 
-function readExactReceipt(root, filename, expected) {
-  const source = path.join(root, filename);
-  const stat = fs.lstatSync(source);
-  if (!stat.isFile() || stat.isSymbolicLink()) throw new Error(`cm2124_receipt_source_invalid:${filename}`);
-  const bytes = fs.readFileSync(source);
-  const receipt = JSON.parse(bytes.toString('utf8'));
-  if (bytes.length !== expected.bytes || sha256(bytes) !== expected.sha256 ||
-      receipt.canonicalPayloadSha256 !== expected.canonicalPayloadSha256) {
-    throw new Error(`cm2124_receipt_identity_mismatch:${filename}`);
+function governanceDescriptorPath(rootHandle, filename) {
+  if (process.platform !== 'linux' || !rootHandle || !Number.isInteger(rootHandle.fd) ||
+      path.basename(filename) !== filename || filename === '.' || filename === '..') {
+    throw new Error('cm2124_descriptor_relative_governance_access_unsupported');
   }
-  return { bytes, receipt };
+  return `/proc/self/fd/${rootHandle.fd}/${filename}`;
+}
+
+async function openVerifiedRootHandle(registry) {
+  if (process.platform !== 'linux' || !Number.isInteger(fs.constants.O_DIRECTORY) ||
+      !Number.isInteger(fs.constants.O_NOFOLLOW)) {
+    throw new Error('cm2124_descriptor_relative_governance_access_unsupported');
+  }
+  const rootIdentity = await registry.verifyRoot();
+  const rootHandle = await fs.promises.open(
+    registry.governanceRoot,
+    fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+  );
+  try {
+    const descriptorStat = await rootHandle.stat();
+    if (!descriptorStat.isDirectory() || descriptorStat.dev !== rootIdentity.dev ||
+        descriptorStat.ino !== rootIdentity.ino) {
+      throw new Error('cm2124_governance_root_descriptor_identity_mismatch');
+    }
+    return rootHandle;
+  } catch (error) {
+    await rootHandle.close().catch(() => {});
+    throw error;
+  }
+}
+
+function readExactReceipt(rootHandle, filename, expected, fileSystem = fs) {
+  let descriptor;
+  try {
+    const source = governanceDescriptorPath(rootHandle, filename);
+    const pathStat = fileSystem.lstatSync(source);
+    if (!pathStat.isFile() || pathStat.isSymbolicLink()) throw new Error('invalid');
+    descriptor = fileSystem.openSync(source, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+    const descriptorStat = fileSystem.fstatSync(descriptor);
+    if (!descriptorStat.isFile() || descriptorStat.dev !== pathStat.dev || descriptorStat.ino !== pathStat.ino) {
+      throw new Error('invalid');
+    }
+    const bytes = fileSystem.readFileSync(descriptor);
+    const receipt = JSON.parse(bytes.toString('utf8'));
+    if (bytes.length !== expected.bytes || sha256(bytes) !== expected.sha256 ||
+        receipt.canonicalPayloadSha256 !== expected.canonicalPayloadSha256) {
+      throw new Error('identity');
+    }
+    return { bytes, receipt };
+  } catch (error) {
+    if (error.message === 'identity') throw new Error(`cm2124_receipt_identity_mismatch:${filename}`);
+    throw new Error(`cm2124_receipt_source_invalid:${filename}`);
+  } finally {
+    if (descriptor !== undefined) fileSystem.closeSync(descriptor);
+  }
 }
 
 function claimBoundReviewTime(receipt) {
@@ -155,23 +199,32 @@ async function buildFreezeArtifacts() {
   const packetEvidence = intakeExecutionPacket({ packetCommit: PACKET_COMMIT, ...options });
   if (!packetEvidence.accepted) throw new Error(`cm2124_packet_rejected:${packetEvidence.blockers.join(',')}`);
   const root = resolveFixedGovernanceRoot();
-  const execution = readExactReceipt(root, EXECUTION_RECEIPT_FILENAME, EXPECTED.execution);
-  const finalReleaseEvidence = intakeFinalReleaseDecision({
-    finalReleaseCommit: FINAL_RELEASE_COMMIT,
-    packetEvidence,
-    now: claimBoundReviewTime(execution.receipt),
-    ...options
-  });
-  if (!finalReleaseEvidence.accepted) throw new Error(`cm2124_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
-  const bindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
   const registry = new Cm2122StatusSyncClaimRegistry({ governanceRoot: root });
-  const claim = await registry.read(bindingHash, finalReleaseEvidence);
+  const rootHandle = await openVerifiedRootHandle(registry);
+  let execution;
+  let finalReleaseEvidence;
+  let claim;
+  let binding;
+  try {
+    execution = readExactReceipt(rootHandle, EXECUTION_RECEIPT_FILENAME, EXPECTED.execution);
+    finalReleaseEvidence = intakeFinalReleaseDecision({
+      finalReleaseCommit: FINAL_RELEASE_COMMIT,
+      packetEvidence,
+      now: claimBoundReviewTime(execution.receipt),
+      ...options
+    });
+    if (!finalReleaseEvidence.accepted) throw new Error(`cm2124_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
+    const bindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
+    claim = await registry.readFromRootHandle(rootHandle, bindingHash, finalReleaseEvidence);
+    binding = readExactReceipt(rootHandle, BINDING_RECEIPT_FILENAME, EXPECTED.binding);
+  } finally {
+    await rootHandle.close().catch(() => {});
+  }
   if (claim.state !== 'CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION' ||
       claim.detachedStatusCommit !== DETACHED_STATUS_COMMIT || claim.detachedStatusTree !== DETACHED_STATUS_TREE ||
       claim.branchRefUpdateCount !== 0 || claim.authorizationReplayAllowed !== false) {
     throw new Error('cm2124_claim_state_rejected');
   }
-  const binding = readExactReceipt(root, BINDING_RECEIPT_FILENAME, EXPECTED.binding);
   const executionEvaluation = evaluateExecutionReceipt(execution.receipt, { packetEvidence, finalReleaseEvidence });
   if (!executionEvaluation.accepted) throw new Error(`cm2124_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
   const detachedBinding = verifyDetachedCommitBinding({
@@ -298,8 +351,11 @@ module.exports = {
   assertCm2124FreezeCleanWorktree,
   buildFreezeArtifacts,
   claimBoundReviewTime,
+  governanceDescriptorPath,
   main,
+  openVerifiedRootHandle,
   parseArgs,
+  readExactReceipt,
   receiptIdentity,
   renderMarkdown
 };

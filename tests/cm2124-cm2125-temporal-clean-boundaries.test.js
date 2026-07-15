@@ -41,6 +41,44 @@ test('CM-2124 release revalidation is pinned to the exact receipt claim window',
   }
 });
 
+test('CM-2124 receipt reads stay pinned to one verified root across path replacement', () => {
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2124-root-swap-'));
+  const root = path.join(parent, 'governance');
+  const movedRoot = path.join(parent, 'verified-governance');
+  const filename = 'execution-receipt.json';
+  const receipt = {
+    artifactType: 'fixture',
+    canonicalPayloadSha256: 'a'.repeat(64)
+  };
+  const verifiedBytes = Buffer.from(`${JSON.stringify(receipt)}\n`);
+  const replacementBytes = Buffer.from(`${JSON.stringify({ ...receipt, artifactType: 'replacement' })}\n`);
+  fs.mkdirSync(root);
+  fs.writeFileSync(path.join(root, filename), verifiedBytes);
+  const rootDescriptor = fs.openSync(
+    root,
+    fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+  );
+  try {
+    fs.renameSync(root, movedRoot);
+    fs.mkdirSync(root);
+    fs.writeFileSync(path.join(root, filename), replacementBytes);
+    const result = freeze.readExactReceipt(
+      { fd: rootDescriptor },
+      filename,
+      {
+        bytes: verifiedBytes.length,
+        sha256: require('node:crypto').createHash('sha256').update(verifiedBytes).digest('hex'),
+        canonicalPayloadSha256: receipt.canonicalPayloadSha256
+      }
+    );
+    assert.deepEqual(result.bytes, verifiedBytes);
+    assert.deepEqual(result.receipt, receipt);
+  } finally {
+    fs.closeSync(rootDescriptor);
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 test('CM-2124 and CM-2125 clean gates see untracked files hidden by Git config', () => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2124-clean-gate-'));
   try {
