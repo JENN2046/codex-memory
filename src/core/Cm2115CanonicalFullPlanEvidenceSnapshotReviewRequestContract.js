@@ -237,10 +237,11 @@ function evaluateCm2115SnapshotReviewRequest(request, {
     blockers.push('payload.fields');
   }
 
-  if (!sameKeys(payload?.snapshot, SNAPSHOT_KEYS) ||
-      !sameKeys(payload?.snapshot?.json, JSON_BINDING_KEYS) ||
-      !sameKeys(payload?.snapshot?.markdown, FILE_BINDING_KEYS) ||
-      !equalJson(payload?.snapshot, SNAPSHOT_FREEZE)) {
+  const snapshotBindingAccepted = sameKeys(payload?.snapshot, SNAPSHOT_KEYS) &&
+      sameKeys(payload?.snapshot?.json, JSON_BINDING_KEYS) &&
+      sameKeys(payload?.snapshot?.markdown, FILE_BINDING_KEYS) &&
+      equalJson(payload?.snapshot, SNAPSHOT_FREEZE);
+  if (!snapshotBindingAccepted) {
     blockers.push('payload.snapshot');
   }
   if (!sameKeys(payload?.sourceBaseline, BASELINE_KEYS) ||
@@ -249,15 +250,15 @@ function evaluateCm2115SnapshotReviewRequest(request, {
     blockers.push('payload.sourceBaseline');
   }
 
-  const snapshotJson = payload?.snapshot?.json && verifyFileBinding(
+  const snapshotJson = snapshotBindingAccepted && verifyFileBinding(
     payload.snapshot.json,
     payload.snapshot.commit,
     resolveGitFile,
     blockers,
     'snapshot.json'
   );
-  const snapshotMarkdown = verifyFileBinding(
-    payload?.snapshot?.markdown || {},
+  const snapshotMarkdown = snapshotBindingAccepted && verifyFileBinding(
+    payload.snapshot.markdown,
     payload?.snapshot?.commit,
     resolveGitFile,
     blockers,
@@ -293,15 +294,16 @@ function evaluateCm2115SnapshotReviewRequest(request, {
   }
 
   const validation = payload?.localValidationReceipt;
-  if (!sameKeys(validation, VALIDATION_KEYS) ||
-      validation?.commit !== BASELINE.sourceCommit || validation?.tree !== BASELINE.sourceTree ||
-      validation?.path !== LOCAL_VALIDATION_RECEIPT_PATH ||
-      !hex(validation?.blobOid, 40) || !Number.isInteger(validation?.bytes) || validation.bytes <= 0 ||
-      !hex(validation?.sha256, 64) || !hex(validation?.canonicalPayloadSha256, 64) ||
-      !hex(validation?.validationTargetCommit, 40) || !hex(validation?.validationTargetTree, 40)) {
+  const validationBindingAccepted = sameKeys(validation, VALIDATION_KEYS) &&
+      validation?.commit === BASELINE.sourceCommit && validation?.tree === BASELINE.sourceTree &&
+      validation?.path === LOCAL_VALIDATION_RECEIPT_PATH &&
+      hex(validation?.blobOid, 40) && Number.isInteger(validation?.bytes) && validation.bytes > 0 &&
+      hex(validation?.sha256, 64) && hex(validation?.canonicalPayloadSha256, 64) &&
+      hex(validation?.validationTargetCommit, 40) && hex(validation?.validationTargetTree, 40);
+  if (!validationBindingAccepted) {
     blockers.push('payload.localValidationReceipt');
   }
-  const validationFile = validation && verifyFileBinding(
+  const validationFile = validationBindingAccepted && verifyFileBinding(
     validation,
     validation.commit,
     resolveGitFile,
@@ -325,18 +327,17 @@ function evaluateCm2115SnapshotReviewRequest(request, {
   }
 
   const implementation = payload?.reviewImplementation;
-  if (!sameKeys(implementation, IMPLEMENTATION_KEYS) ||
-      implementation?.commit !== REVIEW_IMPLEMENTATION_FREEZE.commit ||
-      implementation?.tree !== REVIEW_IMPLEMENTATION_FREEZE.tree ||
-      !Array.isArray(implementation?.artifacts) ||
-      !equalJson(implementation?.artifacts?.map(item => item?.path), IMPLEMENTATION_ARTIFACT_PATHS)) {
+  const implementationBindingAccepted = sameKeys(implementation, IMPLEMENTATION_KEYS) &&
+      implementation?.commit === REVIEW_IMPLEMENTATION_FREEZE.commit &&
+      implementation?.tree === REVIEW_IMPLEMENTATION_FREEZE.tree &&
+      Array.isArray(implementation?.artifacts) &&
+      equalJson(implementation.artifacts.map(item => item?.path), IMPLEMENTATION_ARTIFACT_PATHS) &&
+      implementation.artifacts.every(artifact =>
+        sameKeys(artifact, ARTIFACT_KEYS) && hex(artifact?.blobOid, 40));
+  if (!implementationBindingAccepted) {
     blockers.push('payload.reviewImplementation');
   }
-  for (const artifact of implementation?.artifacts || []) {
-    if (!sameKeys(artifact, ARTIFACT_KEYS) || !hex(artifact?.blobOid, 40)) {
-      blockers.push(`implementation.artifact.${artifact?.path || 'unknown'}`);
-      continue;
-    }
+  for (const artifact of implementationBindingAccepted ? implementation.artifacts : []) {
     try {
       const actual = resolveGitFile(implementation.commit, artifact.path);
       if (actual.gitObjectType !== 'blob' || actual.blobOid !== artifact.blobOid) {
@@ -352,18 +353,20 @@ function evaluateCm2115SnapshotReviewRequest(request, {
     try {
       if (resolveCommitTree(SNAPSHOT_FREEZE.commit) !== SNAPSHOT_FREEZE.tree ||
           resolveCommitTree(BASELINE.sourceCommit) !== BASELINE.sourceTree ||
-          resolveCommitTree(implementation.commit) !== implementation.tree) {
+          (implementationBindingAccepted && resolveCommitTree(implementation.commit) !== implementation.tree)) {
         blockers.push('gitLineage.tree');
       }
       if (!isCommitAncestor(BASELINE.sourceCommit, SNAPSHOT_FREEZE.commit)) {
         blockers.push('gitLineage.ancestor');
       }
-      if (typeof resolveParentCommit !== 'function' || typeof resolveDiffPaths !== 'function') {
+      if (implementationBindingAccepted &&
+          (typeof resolveParentCommit !== 'function' || typeof resolveDiffPaths !== 'function')) {
         blockers.push('reviewImplementation.gitLineageResolversRequired');
-      } else if (resolveParentCommit(implementation.commit) !== REVIEW_IMPLEMENTATION_FREEZE.parentCommit ||
-          resolveCommitTree(REVIEW_IMPLEMENTATION_FREEZE.parentCommit) !== REVIEW_IMPLEMENTATION_FREEZE.parentTree) {
+      } else if (implementationBindingAccepted &&
+          (resolveParentCommit(implementation.commit) !== REVIEW_IMPLEMENTATION_FREEZE.parentCommit ||
+          resolveCommitTree(REVIEW_IMPLEMENTATION_FREEZE.parentCommit) !== REVIEW_IMPLEMENTATION_FREEZE.parentTree)) {
         blockers.push('reviewImplementation.parent');
-      } else if (!equalJson(
+      } else if (implementationBindingAccepted && !equalJson(
         resolveDiffPaths(REVIEW_IMPLEMENTATION_FREEZE.parentCommit, implementation.commit).sort(),
         [...REVIEW_IMPLEMENTATION_FREEZE.diffPaths].sort()
       )) {
