@@ -13,26 +13,28 @@ const {
 const TASK_ID = 'CM-2115-R2';
 const DECISION_PATH = 'docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.json';
 const REVIEW_REQUEST_FREEZE = Object.freeze({
-  commit: '01c65db824e77400ef144ef8118deaa28b06abcc',
-  parent: '5a2494dd6fc6a3c72015b3f92cf2940759b77b5d',
-  tree: 'e6f3c28f0df1d10744ead4f132d064b2dcc3fb41',
+  commit: '81ee0106ed8cd9b10dc30120ecb7ee6d8897fc79',
+  parent: 'f1054a2d83d16860ac532daefe6bd1ac300813ed',
+  tree: 'c68cd2ad68258db7a8569faf728aed3c5aed1fd3',
   json: Object.freeze({
     path: 'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json',
-    blobOid: '3c99fb6829d10f250eff1b0b873eb8e0d075f59f',
+    blobOid: '08bc3ffbe9a39b3dbbe42bdbf14781c021d4dba6',
     bytes: 5973,
-    sha256: '4b62b41753c66443b7e7f2a315729c9317172399b06fc8d618a2dd7625501cba',
-    canonicalPayloadSha256: '9b9c158a6652a36256b663e16fdbed9656485143df37c8c9ee13a96fc215bdf0'
+    sha256: 'fc56ff4ab271b1f59505ed2ce62e680dc55854b5c696b9f5409357ad25c77953',
+    canonicalPayloadSha256: '81d68f6b61caf43756e171640fe44a92ac9989be3e5e2b5971ebb79a2cda4d91'
   }),
   markdown: Object.freeze({
     path: 'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md',
-    blobOid: 'df309bac7afdf891081c52b8397d47762d3a1f49',
+    blobOid: 'afe3b7f21055872369228e7adf178e7de9856212',
     bytes: 6983,
-    sha256: '3ba20d045b3f085a9aa0eb1b7e1763272e44655443b4b7f120c68e7e7a5f51fb'
+    sha256: '58f9b65e88397bb0570500588134c756e3ea975506cb4c0d94b2f7adebbab3a5'
   })
 });
 const REVIEW_REQUEST_DIFF_PATHS = Object.freeze([
   REVIEW_REQUEST_FREEZE.json.path,
-  REVIEW_REQUEST_FREEZE.markdown.path
+  REVIEW_REQUEST_FREEZE.markdown.path,
+  'src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js',
+  'tests/cm2115-canonical-full-plan-evidence-snapshot.test.js'
 ]);
 
 const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
