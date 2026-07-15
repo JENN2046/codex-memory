@@ -78,6 +78,30 @@ function sameJson(left, right) {
   return JSON.stringify(canonicalize(left)) === JSON.stringify(canonicalize(right));
 }
 
+function renderSelfReviewDecisionMarkdown(decision) {
+  const jsonText = `${JSON.stringify(canonicalize(decision), null, 2)}\n`;
+  return [
+    '# CM-2115-R2 Internal Snapshot Self-review Decision',
+    '',
+    `Decision reference: \`${decision.payload.decisionReference}\``,
+    `Canonical payload SHA-256: \`${decision.canonicalPayloadSha256}\``,
+    '',
+    'Result: PASS_INTERNAL_SELF_REVIEW_ONLY.',
+    '',
+    'This is a repository-internal, frozen-object, independent second-pass review.',
+    'It is not an external review and does not claim an external reviewer.',
+    'It permits only preparation of a separate full-plan application gate;',
+    'it does not authorize or apply full-plan completion or any readiness claim.',
+    '',
+    '## Exact JSON mirror',
+    '',
+    '```json',
+    jsonText.trimEnd(),
+    '```',
+    ''
+  ].join('\n');
+}
+
 function identityWithoutContent(value) {
   const { content, ...identity } = value;
   return identity;
@@ -372,6 +396,7 @@ module.exports = {
   evaluateDecision,
   evaluateFrozenReviewRequest,
   identityWithoutContent,
+  renderSelfReviewDecisionMarkdown,
   sha256,
   sha256Canonical
 };

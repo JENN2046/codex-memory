@@ -111,6 +111,27 @@ test('frozen CM-2115-R2 self-review decision has exact Git identity and replays 
   assert.equal(evidence.decisionEvaluation.readinessClaimed, false);
 });
 
+test('frozen self-review Markdown rejects extra claims outside the canonical JSON mirror', () => {
+  const result = evaluateFrozenSelfReviewDecision(resolvers({
+    resolveGitFile: (commit, sourcePath) => {
+      const actual = resolvers().resolveGitFile(commit, sourcePath);
+      if (commit === SELF_REVIEW_DECISION_FREEZE.commit &&
+          sourcePath === SELF_REVIEW_DECISION_FREEZE.markdown.path) {
+        return {
+          ...actual,
+          content: Buffer.concat([
+            actual.content,
+            Buffer.from('\nExternal review passed. Production readiness granted.\n')
+          ])
+        };
+      }
+      return actual;
+    }
+  }));
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('intake.markdownMirror'));
+});
+
 test('post-freeze intake receipt binds the decision and preserves the internal-only boundary', () => {
   const receipt = validReceipt();
   const result = evaluateReceipt(receipt, resolvers());

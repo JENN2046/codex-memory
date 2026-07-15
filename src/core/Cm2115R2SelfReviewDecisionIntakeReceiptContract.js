@@ -6,6 +6,7 @@ const {
   buildDecisionReference,
   evaluateDecision,
   identityWithoutContent,
+  renderSelfReviewDecisionMarkdown,
   sha256,
   sha256Canonical
 } = require('./Cm2115R2CanonicalSnapshotSelfReviewDecisionContract');
@@ -109,7 +110,7 @@ function evaluateFrozenSelfReviewDecision({
         decision.payload?.decisionReference !== buildDecisionReference(decision.payload?.reviewImplementation)) {
       blockers.push('intake.decisionReferenceOrPayload');
     }
-    if (!markdownIdentity.content.toString('utf8').includes(jsonIdentity.content.toString('utf8').trimEnd())) {
+    if (markdownIdentity.content.toString('utf8') !== renderSelfReviewDecisionMarkdown(decision)) {
       blockers.push('intake.markdownMirror');
     }
     decisionEvaluation = evaluateDecision(decision, {

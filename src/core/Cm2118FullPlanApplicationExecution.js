@@ -1651,30 +1651,24 @@ async function executeFullPlanApplicationFromCommits({
   let packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
   if (!packetEvidence.accepted) throw new Error(`cm2118_execution_packet_rejected:${packetEvidence.blockers.join(',')}`);
   const repositoryRoot = assertFixedExecutionRuntime(packetEvidence);
-  const initialNow = new Date();
-  let finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: initialNow, ...options });
-  if (!finalReleaseEvidence.accepted) {
-    throw new Error(`cm2118_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
+  const historicalReviewTime = new Date(Date.parse(FINAL_RELEASE_APPROVED_AT) + 1);
+  const historicalReleaseEvidence = intakeFinalReleaseDecision({
+    finalReleaseCommit,
+    packetEvidence,
+    now: historicalReviewTime,
+    ...options
+  });
+  const historicalContentEvidence = intakeContentDecision(options);
+  if (!historicalReleaseEvidence.accepted || !historicalContentEvidence.accepted) {
+    throw new Error('cm2118_historical_upstream_revalidation_failed');
   }
-
-  // Re-intake all three upstream Git objects immediately before the first durable claim.
-  packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
-  finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: new Date(), ...options });
-  const contentEvidence = intakeContentDecision(options);
-  if (!contentEvidence.accepted || !packetEvidence.accepted || !finalReleaseEvidence.accepted) {
-    throw new Error('cm2118_preclaim_upstream_revalidation_failed');
-  }
-  const blockers = [];
-  verifyTargetsAtCommit(CONTENT_DECISION_FREEZE.commit, packetEvidence.packet.payload.applicationBoundary.targets,
-    options, blockers, 'execution.contentDecisionParentTarget');
-  verifyTargetsAtCommit(finalReleaseCommit, packetEvidence.packet.payload.applicationBoundary.targets,
-    options, blockers, 'execution.finalReleaseTarget');
-  if (blockers.length) throw new Error(`cm2118_preclaim_target_revalidation_failed:${blockers.join(',')}`);
-
   const governanceRoot = resolveFixedGovernanceRoot(repositoryRoot);
   const registry = new Cm2118FullPlanApplicationClaimRegistry({ governanceRoot });
-  let bindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
-  const existing = await registry.inspectExisting(bindingHash);
+  const historicalBindingHash = buildClaimBindingHash({
+    packetEvidence,
+    finalReleaseEvidence: historicalReleaseEvidence
+  });
+  const existing = await registry.inspectExisting(historicalBindingHash);
   if (existing.claimEnvelopePresent) {
     return {
       accepted: false,
@@ -1690,6 +1684,28 @@ async function executeFullPlanApplicationFromCommits({
       statusSyncAuthorized: false
     };
   }
+  const initialNow = new Date();
+  let finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: initialNow, ...options });
+  if (!finalReleaseEvidence.accepted) {
+    throw new Error(`cm2118_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
+  }
+
+  // Re-intake all three upstream Git objects immediately before the first durable claim.
+  packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
+  finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: new Date(), ...options });
+  const preclaimContentEvidence = intakeContentDecision(options);
+  if (!preclaimContentEvidence.accepted || !packetEvidence.accepted || !finalReleaseEvidence.accepted) {
+    throw new Error('cm2118_preclaim_upstream_revalidation_failed');
+  }
+  const blockers = [];
+  verifyTargetsAtCommit(CONTENT_DECISION_FREEZE.commit, packetEvidence.packet.payload.applicationBoundary.targets,
+    options, blockers, 'execution.contentDecisionParentTarget');
+  verifyTargetsAtCommit(finalReleaseCommit, packetEvidence.packet.payload.applicationBoundary.targets,
+    options, blockers, 'execution.finalReleaseTarget');
+  if (blockers.length) throw new Error(`cm2118_preclaim_target_revalidation_failed:${blockers.join(',')}`);
+
+  let bindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
+  if (bindingHash !== historicalBindingHash) throw new Error('cm2118_preclaim_binding_hash_drift');
   for (const filename of [EXECUTION_RECEIPT_FILENAME, BINDING_RECEIPT_FILENAME, `.cm2118-application-index-${claimId()}`]) {
     if (fs.existsSync(path.join(governanceRoot, filename))) throw new Error(`cm2118_preclaim_artifact_already_exists:${filename}`);
   }

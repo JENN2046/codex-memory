@@ -609,7 +609,7 @@ function initializeGovernanceRoot() {
   fixture.governanceRoot = root;
 }
 
-function runStatusSyncProcess() {
+function runStatusSyncProcess(fixedNow = fixture.now.toISOString()) {
   return new Promise(resolve => {
     const child = spawn(process.execPath, [
       '--require', FIXED_DATE_PRELOAD,
@@ -622,7 +622,7 @@ function runStatusSyncProcess() {
       env: {
         ...process.env,
         NODE_ENV: 'test',
-        CODEX_MEMORY_TEST_FIXED_NOW: fixture.now.toISOString()
+        CODEX_MEMORY_TEST_FIXED_NOW: fixedNow
       },
       stdio: ['ignore', 'pipe', 'pipe']
     });
@@ -841,4 +841,18 @@ test('a new process cannot replay the consumed authorization or move the branch 
   assert.equal(reentryReceipt.payload.authorizationReplayAllowed, false);
   assert.equal(reentryReceipt.payload.branchRefUpdateAuthorized, false);
   assert.equal(reentryReceipt.payload.currentBranchStatusSynchronized, false);
+});
+
+test('consumed status-sync authorization remains readonly-reentrant after final-release expiry', {
+  timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
+}, async () => {
+  const replay = await runStatusSyncProcess('2026-07-20T00:00:00+08:00');
+  assert.equal(replay.timedOut, false, JSON.stringify(replay));
+  assert.equal(replay.code, 0, replay.stderr);
+  const result = JSON.parse(replay.stdout);
+  assert.equal(result.status, 'STOPPED');
+  assert.equal(result.authorizationConsumed, true);
+  assert.equal(result.authorizationReplayAllowed, false);
+  assert.equal(result.statusSyncPerformed, false);
+  assert.equal(result.currentBranchStatusSynchronized, false);
 });
