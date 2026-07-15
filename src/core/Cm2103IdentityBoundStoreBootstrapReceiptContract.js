@@ -170,7 +170,9 @@ function validateEnvelopeProjection(receipt, blockers) {
     exactField(receipt, blockers, 'storeDirectoryExistenceCheckedBeforeClaim', true);
     exactField(receipt, blockers, 'storeDirectoryAbsentBeforeClaim', true);
     if (receipt.outcomeStage === 'claim_envelope_persistence_unknown') {
+      exactField(receipt, blockers, 'claimEnvelopePresent', null);
       exactField(receipt, blockers, 'claimEnvelopeBindingVerified', false);
+      exactField(receipt, blockers, 'governanceFilesystemEffectsPresent', null);
     } else {
       exactField(receipt, blockers, 'claimEnvelopePresent', true);
       exactField(receipt, blockers, 'claimEnvelopeBindingVerified', true);
