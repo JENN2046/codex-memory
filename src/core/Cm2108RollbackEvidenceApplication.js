@@ -195,8 +195,20 @@ function evaluateApplicationReceipt(receipt = {}) {
   ])) blockers.push('receipt.payload.fields');
   if (payload.schemaVersion !== 1 || payload.taskId !== 'CM-2108' || payload.receiptType !== 'rollback_evidence_completion_audit_application_receipt') blockers.push('receipt.payload.identity');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
-  if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
-  if (payload.sourceRollbackReceipt?.commit !== SOURCE_RECEIPT.commit || payload.sourceRollbackReceipt?.blobOid !== SOURCE_RECEIPT.blobOid || payload.sourceRollbackReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 || payload.sourceRollbackReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 || payload.sourceRollbackReceipt?.acceptedAsRollbackEvidence !== true) blockers.push('receipt.sourceRollbackReceipt');
+  if (!hasExactKeys(payload.decision, ['reference', 'commit', 'blobOid', 'bytes', 'sha256'])) blockers.push('receipt.decision.fields');
+  if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit ||
+      payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.bytes !== DECISION.bytes ||
+      payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
+  if (!hasExactKeys(payload.sourceRollbackReceipt, [
+    'commit', 'tree', 'blobOid', 'bytes', 'sha256', 'payloadSha256', 'acceptedAsRollbackEvidence'
+  ])) blockers.push('receipt.sourceRollbackReceipt.fields');
+  if (payload.sourceRollbackReceipt?.commit !== SOURCE_RECEIPT.commit ||
+      payload.sourceRollbackReceipt?.tree !== SOURCE_RECEIPT.tree ||
+      payload.sourceRollbackReceipt?.blobOid !== SOURCE_RECEIPT.blobOid ||
+      payload.sourceRollbackReceipt?.bytes !== SOURCE_RECEIPT.bytes ||
+      payload.sourceRollbackReceipt?.sha256 !== SOURCE_RECEIPT.rawSha256 ||
+      payload.sourceRollbackReceipt?.payloadSha256 !== SOURCE_RECEIPT.payloadSha256 ||
+      payload.sourceRollbackReceipt?.acceptedAsRollbackEvidence !== true) blockers.push('receipt.sourceRollbackReceipt');
   if (!hasExactKeys(payload.applicationRuntime, [
     'commit', 'tree', 'cleanBeforeApplication',
     'completionAuditBaselineBlobOid', 'traceMatrixBaselineBlobOid'
