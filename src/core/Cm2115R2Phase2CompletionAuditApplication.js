@@ -400,6 +400,9 @@ function evaluateDecision(decision = {}, { resolveGitFile } = {}) {
       payload.registry?.receiptId !== RECEIPT_ID || payload.registry?.claimCreateCount !== 1 ||
       payload.registry?.replayAllowed !== false) blockers.push('decision.registry');
   const plan = payload.patchPlan || {};
+  const authorityMatchesPatchBaseline = payload.authority?.sourceCommit === plan.baselineCommit &&
+    payload.authority?.sourceTree === plan.baselineTree;
+  if (!authorityMatchesPatchBaseline) blockers.push('decision.authorityBaseline');
   if (!/^[a-f0-9]{40}$/.test(plan.baselineCommit || '') || !/^[a-f0-9]{40}$/.test(plan.baselineTree || '') ||
       !sameJson(plan.allowedPaths, PATCH_PATHS) ||
       !sameJson(plan.executionReceiptPaths, [EXECUTION_RECEIPT_PATH, EXECUTION_RECEIPT_MARKDOWN_PATH]) ||
@@ -470,7 +473,8 @@ function evaluateDecision(decision = {}, { resolveGitFile } = {}) {
     remoteActions: 0,
     readinessClaims: 0
   })) blockers.push('decision.sideEffectLimits');
-  if (typeof resolveGitFile === 'function' && validIdentity(payload.authority, AUTHORITY_PATH)) {
+  if (typeof resolveGitFile === 'function' && validIdentity(payload.authority, AUTHORITY_PATH) &&
+      authorityMatchesPatchBaseline) {
     try {
       const actual = resolveGitFile(payload.authority.sourceCommit, AUTHORITY_PATH);
       verifyResolvedIdentity(actual, payload.authority, blockers, 'decision.authorityGitObject');

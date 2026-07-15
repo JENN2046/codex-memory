@@ -479,6 +479,28 @@ test('snapshot contract rejects circular, private, symlink, or non-blob sources'
   for (const sourcePath of privateStatePaths) {
     assert.equal(safeSourcePath(sourcePath), false, sourcePath);
   }
+  const vcsInternalPaths = [
+    '.git/config',
+    'nested/.git/config',
+    '.hg/hgrc',
+    'nested/.svn/wc.db',
+    '.bzr/branch/format',
+    '_darcs/inventory',
+    'CVS/Root',
+    'RCS/config,v',
+    'SCCS/s.config',
+    '.jj/repo/store/type',
+    '.pijul/pristine/db',
+    '.repo/manifests.git/config',
+    '.sl/store/requires',
+    '_MTN/options',
+    '.fossil-settings/ignore-glob',
+    '.fslckout',
+    '_FOSSIL_'
+  ];
+  for (const sourcePath of vcsInternalPaths) {
+    assert.equal(safeSourcePath(sourcePath), false, sourcePath);
+  }
   for (const sourcePath of [
     '.colameta/prompts/system.md',
     '.colameta/rules.md',
@@ -510,6 +532,19 @@ test('snapshot contract rejects circular, private, symlink, or non-blob sources'
     assert.equal(result.accepted, false, sourcePath);
     assert.ok(result.blockers.some(blocker => blocker.startsWith('source.path.')), sourcePath);
     assert.equal(privateResolverCalls, 0, sourcePath);
+  }
+  for (const sourcePath of vcsInternalPaths) {
+    const privateSnapshot = buildSnapshot(fakeResolverFactory());
+    privateSnapshot.payload.entries[0].sourceBindings[0].sourcePath = sourcePath;
+    privateSnapshot.canonicalPayloadSha256 = sha256Canonical(privateSnapshot.payload);
+    let resolverCalls = 0;
+    const result = evaluate(privateSnapshot, resolvedPath => {
+      if (resolvedPath === sourcePath) resolverCalls += 1;
+      return fakeResolverFactory()(resolvedPath);
+    });
+    assert.equal(result.accepted, false, sourcePath);
+    assert.ok(result.blockers.some(blocker => blocker.startsWith('source.path.')), sourcePath);
+    assert.equal(resolverCalls, 0, sourcePath);
   }
   const resolver = fakeResolverFactory();
   const snapshot = buildSnapshot(resolver);
