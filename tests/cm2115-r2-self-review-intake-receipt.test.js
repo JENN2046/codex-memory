@@ -260,6 +260,12 @@ test('intake generator has fixed outputs and exact Markdown mirror', () => {
   assert.ok(markdown.includes('PASS_INTERNAL_SELF_REVIEW_DECISION_INTAKE_ONLY'));
   assert.ok(markdown.includes(jsonText.trimEnd()));
   assert.ok(RECEIPT_PATH.endsWith('cm2115_r2_internal_self_review_decision_intake_receipt.json'));
+  assert.equal(receipt.payload.intake.exactDecisionArtifactPathCount, 2);
+  assert.equal(receipt.payload.intake.exactDecisionArtifactPathsMatched, true);
+  assert.equal(receipt.payload.intake.exactFreezeCommitPathCount, 3);
+  assert.equal(receipt.payload.intake.exactFreezeCommitPathsMatched, true);
+  assert.equal(receipt.payload.intake.supportingTestPathMatched, true);
+  assert.equal(Object.hasOwn(receipt.payload.intake, 'exactTwoPathDiffMatched'), false);
 });
 
 test('frozen intake receipt files exactly replay request, decision, intake, and canonical rendering', () => {

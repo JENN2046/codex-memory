@@ -1,7 +1,7 @@
 # CM-2115-R2 Internal Self-review Decision Intake Receipt
 
 Receipt reference: `CM-2115-R2-SELF-REVIEW-INTAKE-PASS-4295CDDF-DB494839-8DA931E9`
-Canonical payload SHA-256: `a720f6222554bb6cea919520819cfd4db03cdf3b7def5fa08643d587accdc062`
+Canonical payload SHA-256: `682ef39d5bb3cf41b916967346527643ac4e41a8ae81886d3ad6c7527f394c8d`
 
 Result: PASS_INTERNAL_SELF_REVIEW_DECISION_INTAKE_ONLY.
 
@@ -13,7 +13,7 @@ Full-plan completion and every readiness state remain false.
 
 ```json
 {
-  "canonicalPayloadSha256": "a720f6222554bb6cea919520819cfd4db03cdf3b7def5fa08643d587accdc062",
+  "canonicalPayloadSha256": "682ef39d5bb3cf41b916967346527643ac4e41a8ae81886d3ad6c7527f394c8d",
   "payload": {
     "authorityBoundary": {
       "externalReviewPerformedByThisIntake": false,
@@ -34,14 +34,18 @@ Full-plan completion and every readiness state remain false.
       "actionableFindingCount": 0,
       "commitTreeAndParentMatched": true,
       "decisionContractReplayed": true,
+      "exactDecisionArtifactPathCount": 2,
+      "exactDecisionArtifactPathsMatched": true,
+      "exactFreezeCommitPathCount": 3,
+      "exactFreezeCommitPathsMatched": true,
       "exactSchemaAccepted": true,
-      "exactTwoPathDiffMatched": true,
       "frozenSnapshotReplayed": true,
       "gitBlobMatched": true,
       "markdownMirrorMatched": true,
       "rawBytesMatched": true,
       "resolvedTraceEntryCount": 164,
       "sourceObjectMismatchCount": 0,
+      "supportingTestPathMatched": true,
       "traceEntryCount": 164,
       "uniqueSourceObjectCount": 105
     },
