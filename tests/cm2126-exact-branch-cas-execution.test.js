@@ -893,7 +893,7 @@ test('registry enforces exact transitions and reentry receipt is readonly', asyn
   }
 });
 
-test('registry removes its verified transition temp after a pre-rename write failure', async () => {
+test('registry removes its verified transition temp after pre-rename write or rename rejection', async () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2126-transition-temp-'));
   try {
     fs.writeFileSync(
@@ -936,6 +936,23 @@ test('registry removes its verified transition temp after a pre-rename write fai
     await assert.rejects(
       faultingRegistry.transition(bindingHash, 'CLAIMED', transitionState, details, release),
       /synthetic_transition_write_failure/
+    );
+    assert.equal(fs.existsSync(temporaryPath), false);
+    const renameRejectingRegistry = new fixture.frozenRegistry.Cm2126ExactBranchCasClaimRegistry({
+      governanceRoot: root,
+      fsApi: {
+        ...fsPromises,
+        rename: async (source, destination) => {
+          if (String(source).endsWith(`.${transitionState}.tmp`)) {
+            throw new Error('synthetic_transition_rename_rejection');
+          }
+          return fsPromises.rename(source, destination);
+        }
+      }
+    });
+    await assert.rejects(
+      renameRejectingRegistry.transition(bindingHash, 'CLAIMED', transitionState, details, release),
+      /synthetic_transition_rename_rejection/
     );
     assert.equal(fs.existsSync(temporaryPath), false);
     const transitioned = await registry.transition(bindingHash, 'CLAIMED', transitionState, details, release);

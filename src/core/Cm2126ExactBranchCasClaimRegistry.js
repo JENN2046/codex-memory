@@ -519,8 +519,8 @@ class Cm2126ExactBranchCasClaimRegistry {
       await temporaryHandle.sync();
       await temporaryHandle.close();
       temporaryHandle = null;
-      renameAttempted = true;
       await this.fs.rename(temporary, destination);
+      renameAttempted = true;
       await rootHandle.sync();
       injectIsolatedTransitionFault(state);
       return await this.readFromRootHandle(rootHandle, bindingHash, releaseBinding);
