@@ -202,6 +202,17 @@ test('CM2011 propose_memory_delta rejects write commit or production intent', ()
   assert.equal(result.access.durableMemoryWritten, false);
 });
 
+test('CM2011 proposal service rejects durable-write intent aliases on direct internal calls', () => {
+  const service = new MemoryDeltaProposalService();
+  for (const field of ['durable_write', 'productionWrite']) {
+    const result = service.propose(validProposalArgs({ [field]: true }));
+    assert.equal(result.accepted, false, field);
+    assert.equal(result.reasonCode, 'write_commit_or_production_intent_not_allowed_on_proposal_path', field);
+    assert.equal(result.access.memoryWritten, false, field);
+    assert.equal(result.access.durableMemoryWritten, false, field);
+  }
+});
+
 test('CM2035 commit_memory_delta contract points to operator preflight and stays unregistered by default', () => {
   const draft = buildCommitContractDraft();
 
