@@ -217,6 +217,41 @@ process.stdin.on('end', () => {
   assert.equal(result.parsed.delayed, true);
 });
 
+test('owner preload is an exact Node argument and does not leak through NODE_OPTIONS', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2113 owner preload '));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const preloadPath = path.join(root, 'frozen clock preload.js');
+  const pluginPath = path.join(root, 'owner.js');
+  await fs.writeFile(preloadPath, 'globalThis.__CM2113_OWNER_PRELOAD__ = true;\n');
+  await fs.writeFile(pluginPath, String.raw`'use strict';
+const { execFileSync } = require('node:child_process');
+process.stdin.resume();
+process.stdin.on('end', () => {
+  const descendant = JSON.parse(execFileSync(process.execPath, ['-e', 'process.stdout.write(JSON.stringify({preloaded:Boolean(globalThis.__CM2113_OWNER_PRELOAD__),nodeOptionsPresent:Boolean(process.env.NODE_OPTIONS)}))'], { encoding: 'utf8' }));
+  process.stdout.write(JSON.stringify({
+    status: 'success',
+    ownerPreloaded: Boolean(globalThis.__CM2113_OWNER_PRELOAD__),
+    ownerNodeOptionsPresent: Boolean(process.env.NODE_OPTIONS),
+    descendant
+  }));
+});
+`);
+
+  const result = await runOwnerRuntime({
+    nodeExecutable: process.execPath,
+    pluginPath,
+    pluginDirectory: root,
+    input: { synthetic: true },
+    env: { ...process.env, NODE_OPTIONS: '--require=must-not-be-inherited' },
+    execArgv: ['--require', preloadPath],
+    timeoutMs: 3000
+  });
+
+  assert.equal(result.parsed.ownerPreloaded, true);
+  assert.equal(result.parsed.ownerNodeOptionsPresent, false);
+  assert.deepEqual(result.parsed.descendant, { preloaded: false, nodeOptionsPresent: false });
+});
+
 test('CM-2113 adapter binds an exact VCPToolBox DailyNote stdio runtime and stable store identity', async t => {
   const fixture = await setup();
   t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
