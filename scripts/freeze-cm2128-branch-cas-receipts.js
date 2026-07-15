@@ -172,6 +172,18 @@ function readExactJson(sourcePath, expected, label) {
   return { bytes, value };
 }
 
+function governanceDescriptorPath(rootHandle, filename) {
+  if (process.platform !== 'linux' || !rootHandle || !Number.isInteger(rootHandle.fd) ||
+      path.basename(filename) !== filename || filename === '.' || filename === '..') {
+    throw new Error('cm2128_descriptor_relative_governance_access_unsupported');
+  }
+  return `/proc/self/fd/${rootHandle.fd}/${filename}`;
+}
+
+function readExactGovernanceJson(rootHandle, filename, expected, label) {
+  return readExactJson(governanceDescriptorPath(rootHandle, filename), expected, label);
+}
+
 function receiptIdentity(outputPath, sourceFilename, artifact) {
   return {
     sourceFilename,
@@ -299,17 +311,27 @@ async function buildFreezeArtifacts() {
   const release = execution.releaseBinding(packetEvidence, finalReleaseEvidence, bindingHash);
   const governanceRoot = execution.resolveFixedGovernanceRoot(process.cwd());
   const registry = new Cm2126ExactBranchCasClaimRegistry({ governanceRoot });
-  const claim = await registry.read(bindingHash, release);
-  const claimArtifact = readExactJson(
-    path.join(governanceRoot, claimFileName()),
-    EXPECTED.claim,
-    'claim'
-  );
-  const executionArtifact = readExactJson(
-    path.join(governanceRoot, execution.EXECUTION_RECEIPT_FILENAME),
-    EXPECTED.execution,
-    'execution_receipt'
-  );
+  const governanceRootHandle = await registry.openVerifiedRootHandle();
+  let claim;
+  let claimArtifact;
+  let executionArtifact;
+  try {
+    claim = await registry.read(bindingHash, release);
+    claimArtifact = readExactGovernanceJson(
+      governanceRootHandle,
+      claimFileName(),
+      EXPECTED.claim,
+      'claim'
+    );
+    executionArtifact = readExactGovernanceJson(
+      governanceRootHandle,
+      execution.EXECUTION_RECEIPT_FILENAME,
+      EXPECTED.execution,
+      'execution_receipt'
+    );
+  } finally {
+    await governanceRootHandle.close().catch(() => {});
+  }
   if (!sameJson(claimArtifact.value, claim) || claim.state !== SUCCESS_STATE ||
       claim.authorizationUseCount !== 1 || claim.authorizationConsumed !== true ||
       claim.authorizationReplayAllowed !== false || claim.branchRefUpdates !== 1 ||
@@ -441,11 +463,13 @@ module.exports = {
   assertLowDisclosure,
   buildFreezeArtifacts,
   gitIdentityWithoutContent,
+  governanceDescriptorPath,
   main,
   parseArgs,
   projectClaim,
   projectExecutionReceipt,
   readExactJson,
+  readExactGovernanceJson,
   readVerifiedFileSync,
   receiptIdentity,
   renderMarkdown,

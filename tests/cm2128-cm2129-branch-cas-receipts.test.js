@@ -215,6 +215,38 @@ test('CM-2128 verified reader rejects descriptor identity swaps before reading b
   assert.equal(closeCalls, 1);
 });
 
+test('CM-2128 receipt reads stay pinned to the verified root across a path replacement', () => {
+  withTempDirectory(parent => {
+    const root = path.join(parent, 'governance');
+    const movedRoot = path.join(parent, 'verified-governance');
+    const filename = 'claim.json';
+    const verifiedBytes = Buffer.from('{"source":"verified-root"}\n');
+    const replacementBytes = Buffer.from('{"source":"replacement-root"}\n');
+    fs.mkdirSync(root);
+    fs.writeFileSync(path.join(root, filename), verifiedBytes);
+    const rootDescriptor = fs.openSync(
+      root,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+    );
+
+    try {
+      fs.renameSync(root, movedRoot);
+      fs.mkdirSync(root);
+      fs.writeFileSync(path.join(root, filename), replacementBytes);
+      const artifact = freeze.readExactGovernanceJson(
+        { fd: rootDescriptor },
+        filename,
+        { bytes: verifiedBytes.length, sha256: sha256(verifiedBytes) },
+        'claim'
+      );
+      assert.deepEqual(artifact.bytes, verifiedBytes);
+      assert.deepEqual(artifact.value, { source: 'verified-root' });
+    } finally {
+      fs.closeSync(rootDescriptor);
+    }
+  });
+});
+
 test('CM-2129 live governance reader rejects symlinks before reading receipt bytes', () => {
   withTempDirectory(directory => {
     const target = path.join(directory, 'target.json');
