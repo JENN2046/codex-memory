@@ -174,7 +174,9 @@ test('CM2035 rejects accepted proposals that report nested provider or MCP side 
   for (const mutateProposal of [
     proposal => { proposal.audit_receipt.provider_api_called = true; },
     proposal => { proposal.audit_receipt.public_mcp_expanded = true; },
+    proposal => { proposal.audit_receipt.vcp_toolbox_runtime_called = true; },
     proposal => { proposal.governance_contract.providerApiCalled = true; },
+    proposal => { proposal.governance_contract.nativeWritePerformed = true; },
     proposal => { proposal.access.mcpMemoryWriteCalled = true; },
     proposal => { proposal.access.providerApiCalled = true; },
     proposal => { proposal.access.vcpToolBoxRuntimeCalled = true; },
