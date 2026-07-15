@@ -49,6 +49,8 @@ function createCm2096TombstoneOneShotGate({ registry, expectedBinding, now = () 
         preStoreProjection?.targetRecordProjection?.memoryIdRef !== expectedBinding.targetMemoryIdRef ||
         preStoreProjection?.targetRecordProjection?.durableBytes !== expectedBinding.targetRecordBytes ||
         preStoreProjection?.targetRecordProjection?.durableSha256 !== expectedBinding.targetRecordSha256 ||
+        preStoreProjection?.targetRecordProjection?.rawContentIncluded !== false ||
+        preStoreProjection?.targetRecordProjection?.rawPathDisclosed !== false ||
         preStoreProjection?.otherRealMemoryRead !== false ||
         preStoreProjection?.otherRealMemoryModified !== false ||
         preStoreProjection?.rawMemoryReturned !== false ||

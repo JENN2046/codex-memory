@@ -136,6 +136,17 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.bytes !== DECISION.bytes || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
   if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 || payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 || payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.evidenceBundle');
   if (payload.phaseAudit?.phaseId !== PHASE_ID || payload.phaseAudit?.accepted !== true || payload.phaseAudit?.missingEvidence?.length !== 0 || payload.phaseAudit?.fullPlanPackCompleted !== false) blockers.push('receipt.phaseAudit');
+  if (!hasExactKeys(payload.applicationRuntime, [
+    'commit', 'tree', 'cleanBeforeApplication',
+    'completionAuditBaselineBlobOid', 'traceMatrixBaselineBlobOid'
+  ])) blockers.push('receipt.applicationRuntime.fields');
+  if (!/^[a-f0-9]{40}$/.test(payload.applicationRuntime?.commit || '') ||
+      !/^[a-f0-9]{40}$/.test(payload.applicationRuntime?.tree || '') ||
+      payload.applicationRuntime?.cleanBeforeApplication !== true ||
+      payload.applicationRuntime?.completionAuditBaselineBlobOid !== BASELINE.completionAuditBlobOid ||
+      payload.applicationRuntime?.traceMatrixBaselineBlobOid !== BASELINE.traceMatrixBlobOid) {
+    blockers.push('receipt.applicationRuntime');
+  }
   if (!hasExactKeys(payload.appliedState, Object.keys(expectedPatch()))) blockers.push('receipt.appliedState.fields');
   for (const [field, expected] of Object.entries(expectedPatch())) if (payload.appliedState?.[field] !== expected) blockers.push(`receipt.appliedState.${field}`);
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
