@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const fs = require('node:fs');
 const test = require('node:test');
 const {
   DECISION_PATH,
@@ -21,6 +22,7 @@ const {
   resolveFrozenPhase2DurableClaim
 } = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
 const {
+  buildReviewImplementation,
   isCommitAncestor: realIsCommitAncestor,
   parseArgs,
   renderMarkdown,
@@ -240,4 +242,22 @@ test('self-review generator has fixed outputs and Markdown preserves exact JSON'
   assert.ok(markdown.includes('PASS_INTERNAL_SELF_REVIEW_ONLY'));
   assert.ok(markdown.includes(jsonText.trimEnd()));
   assert.ok(DECISION_PATH.endsWith('cm2115_r2_internal_self_review_decision.json'));
+});
+
+test('frozen self-review decision files exactly match the reviewed lineage and canonical renderers', () => {
+  const options = resolverOptions();
+  const reviewEvidence = evaluateFrozenReviewRequest(options);
+  assert.equal(reviewEvidence.accepted, true, reviewEvidence.blockers.join(','));
+  const decision = buildDecision({
+    reviewImplementation: buildReviewImplementation(),
+    reviewEvidence
+  });
+  const evaluation = evaluateDecision(decision, options);
+  assert.equal(evaluation.accepted, true, evaluation.blockers.join(','));
+  const jsonText = `${JSON.stringify(canonicalize(decision), null, 2)}\n`;
+  assert.equal(fs.readFileSync(DECISION_PATH, 'utf8'), jsonText);
+  assert.equal(
+    fs.readFileSync(DECISION_PATH.replace(/\.json$/, '.md'), 'utf8'),
+    renderMarkdown(decision, jsonText)
+  );
 });
