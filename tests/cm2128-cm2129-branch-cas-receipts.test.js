@@ -22,6 +22,13 @@ function source(relativePath) {
   return fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
 }
 
+function gitBlobOid(bytes) {
+  return crypto.createHash('sha1')
+    .update(`blob ${bytes.length}\0`)
+    .update(bytes)
+    .digest('hex');
+}
+
 function withTempDirectory(callback) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2128-receipts-'));
   try {
@@ -379,6 +386,37 @@ test('CM-2128 and CM-2129 Markdown renderers preserve an exact JSON mirror and n
   assert.match(reviewMarkdown, /Result: PASS/);
   assert.match(reviewMarkdown, /grants no replay, ref, remote, native-memory/);
   assert.ok(reviewMarkdown.includes(reviewJson.trimEnd()));
+});
+
+test('CM-2129 keeps historical execution evidence separate from the shipped hardened executor', () => {
+  const packet = JSON.parse(source(
+    'docs/near-model-memory-plan-pack/cm2126_exact_branch_cas_execution_packet.json'
+  ));
+  const historical = packet.payload.implementation.artifacts.find(
+    artifact => artifact.path === 'src/core/Cm2126ExactBranchCasExecution.js'
+  );
+  assert.deepEqual(historical, {
+    blobOid: '17f0c19dd94270c9d9c41e3222b86ab601703c3c',
+    bytes: 82553,
+    path: 'src/core/Cm2126ExactBranchCasExecution.js',
+    sha256: '38fb8b7b320bc372443a7ad300295c63f628b0daa8f5b6b910aecab719c5212c'
+  });
+
+  const currentBytes = fs.readFileSync(path.join(ROOT, historical.path));
+  assert.equal(gitBlobOid(currentBytes), 'e24a81285ce89a272d31587108b5a54f2f981f04');
+  assert.equal(sha256(currentBytes), '5e27a9b9840bf7a16ec6dcc1300135c685941378df6350fa2ab94e38dc7ccec6');
+  assert.notEqual(sha256(currentBytes), historical.sha256);
+
+  const boundary = source(
+    'docs/near-model-memory-plan-pack/cm2129_post_execution_hardening_boundary.md'
+  );
+  assert.match(boundary, /historical_branch_cas_receipt_preserved: true/);
+  assert.match(boundary, /historical_authorization_replay_allowed: false/);
+  assert.match(boundary, /current_shipped_executor_authorized_by_cm2127: false/);
+  assert.match(boundary, /current_shipped_executor_execution_proof_accepted: false/);
+  assert.match(boundary, /current_shipped_executor_branch_cas_may_execute: false/);
+  assert.match(boundary, /additional_branch_ref_update_authorized: false/);
+  assert.match(boundary, /readiness_claimed: false/);
 });
 
 test('receipt freeze and review scripts statically exclude executor, ref-update, remote, and alternate-output entry points', () => {
