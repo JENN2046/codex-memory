@@ -194,14 +194,19 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid || payload.evidenceBundle?.bytes !== BUNDLE.bytes || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 || payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 || payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.bundle');
   if (!hasExactKeys(payload.proofReceipt, proofReceiptFields)) blockers.push('receipt.proof.fields');
   if (payload.proofReceipt?.commit !== PROOF.commit || payload.proofReceipt?.blobOid !== PROOF.blobOid || payload.proofReceipt?.bytes !== PROOF.bytes || payload.proofReceipt?.sha256 !== PROOF.rawSha256) blockers.push('receipt.proof');
-  if (payload.phaseAudit?.accepted !== true || payload.phaseAudit?.missingEvidence?.length !== 0 || payload.phaseAudit?.fullPlanPackCompleted !== false) blockers.push('receipt.phaseAudit');
+  if (!hasExactKeys(payload.phaseAudit, ['phaseId', 'accepted', 'missingEvidence', 'fullPlanPackCompleted'])) blockers.push('receipt.phaseAudit.fields');
+  if (payload.phaseAudit?.phaseId !== PHASE_ID || payload.phaseAudit?.accepted !== true ||
+      !Array.isArray(payload.phaseAudit?.missingEvidence) || payload.phaseAudit.missingEvidence.length !== 0 ||
+      payload.phaseAudit?.fullPlanPackCompleted !== false) blockers.push('receipt.phaseAudit');
   const appliedEvidenceFields = ['vcpToolBoxOwnedRuntimeWritePassed', 'actualTransportBindingPassed', 'stableTargetStoreIdentityPassed'];
   if (!hasExactKeys(payload.appliedEvidence, appliedEvidenceFields)) blockers.push('receipt.appliedEvidence.fields');
   for (const field of appliedEvidenceFields) if (payload.appliedEvidence?.[field] !== true) blockers.push(`receipt.appliedEvidence.${field}`);
   const appliedState = expectedPatch();
   if (!hasExactKeys(payload.appliedState, Object.keys(appliedState))) blockers.push('receipt.appliedState.fields');
   for (const [field, expected] of Object.entries(appliedState)) if (payload.appliedState?.[field] !== expected) blockers.push(`receipt.appliedState.${field}`);
+  if (!hasExactKeys(payload.authorization, ['useCount', 'consumed', 'replayAllowed'])) blockers.push('receipt.authorization.fields');
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
+  if (!hasExactKeys(payload.applicationCounters, APPLICATION_SIDE_EFFECT_LIMIT_FIELDS)) blockers.push('receipt.applicationCounters.fields');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters');
   for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
   const historicalNonClaimFields = ['additionalNativeWriteAuthorized', 'productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed'];
