@@ -26,6 +26,8 @@ test('CM-2113 fails closed on owner, transport, store, replay, or completion ove
     value => { value.ownerRuntime.memoryIntelligenceOwner = 'codex-memory'; },
     value => { value.transport.outerProcessBoundary = false; },
     value => { value.transport.innerAuthorizationMatched = false; },
+    value => { value.store.reference = 'attacker-selected-store'; },
+    value => { value.store.instanceId = 'attacker-selected-instance'; },
     value => { value.store.identitySha256 = '0'.repeat(64); },
     value => { value.authorization.replayAllowed = true; },
     value => { value.priorAttempt.preserved = false; },

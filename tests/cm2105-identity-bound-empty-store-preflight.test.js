@@ -93,6 +93,7 @@ test('CM-2105 preflight decision rejects native, content-read, authority, or exp
     { recordMemoryAuthorized: true },
     { realMemoryReadAuthorized: true },
     { rawPathDisclosureAuthorized: true },
+    { approvedAt: '2026-07-12T03:21:00+08:00' },
     { expiresAt: '2026-07-12T03:15:00+08:00' },
     { unexpected: true }
   ]) {
