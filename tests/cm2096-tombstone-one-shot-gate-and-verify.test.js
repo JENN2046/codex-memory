@@ -202,6 +202,7 @@ function postStoreProjection(binding = expectedBinding()) {
       rawPathDisclosed: false
     },
     sourceCandidateMemoryIdRefs: [binding.targetMemoryIdRef, binding.expectedMarkerMemoryIdRef],
+    sourceCandidateRefCount: 2,
     otherRealMemoryRead: false,
     otherRealMemoryModified: false,
     rawMemoryReturned: false,
@@ -449,6 +450,32 @@ test('CM-2096 verify accepts only the exact write receipt and then derives tombs
   assert.equal(result.rawMemoryReturned, false);
   assert.equal(result.rawPathDisclosed, false);
   assert.equal(calls, 1);
+});
+
+test('CM-2096 verify requires exact post-store candidate evidence before registry or audit access', async () => {
+  const binding = expectedBinding();
+  const base = postStoreProjection(binding);
+  for (const [name, projection] of [
+    ['missing', { ...base, sourceCandidateMemoryIdRefs: undefined }],
+    ['empty', { ...base, sourceCandidateMemoryIdRefs: [], sourceCandidateRefCount: 0 }],
+    ['target-only', { ...base, sourceCandidateMemoryIdRefs: [binding.targetMemoryIdRef], sourceCandidateRefCount: 1 }],
+    ['marker-only', { ...base, sourceCandidateMemoryIdRefs: [binding.expectedMarkerMemoryIdRef], sourceCandidateRefCount: 1 }],
+    ['reversed', { ...base, sourceCandidateMemoryIdRefs: [binding.expectedMarkerMemoryIdRef, binding.targetMemoryIdRef] }],
+    ['duplicate', { ...base, sourceCandidateMemoryIdRefs: [binding.targetMemoryIdRef, binding.targetMemoryIdRef] }],
+    ['extra', { ...base, sourceCandidateMemoryIdRefs: [binding.targetMemoryIdRef, binding.expectedMarkerMemoryIdRef, 'vcp-kb-aaaaaaaaaaaaaaaa'], sourceCandidateRefCount: 3 }]
+  ]) {
+    let registryReads = 0;
+    let auditCalls = 0;
+    const result = await verifyCm2096TombstoneExecution({
+      registry: { readClaim: async () => { registryReads += 1; return null; } },
+      postStoreProjection: projection,
+      callAuditMemory: async () => { auditCalls += 1; return {}; }
+    });
+    assert.equal(result.accepted, false, name);
+    assert.equal(result.reasonCode, 'cm2096_post_store_candidate_evidence_invalid', name);
+    assert.equal(registryReads, 0, name);
+    assert.equal(auditCalls, 0, name);
+  }
 });
 
 test('CM-2096 verify rejects raw disclosure in the post-store projection before audit', async t => {
