@@ -20,7 +20,7 @@ The independent review itself must keep application authority, completion state,
 
 ```json
 {
-  "canonicalPayloadSha256": "81d68f6b61caf43756e171640fe44a92ac9989be3e5e2b5971ebb79a2cda4d91",
+  "canonicalPayloadSha256": "cce599aad762528787d303abb2aff3cf3ff98dc4d60a78c0ab563131fac23a72",
   "payload": {
     "currentState": {
       "fullPlanPackCompleted": false,
@@ -71,11 +71,11 @@ The independent review itself must keep application authority, completion state,
     "reviewImplementation": {
       "artifacts": [
         {
-          "blobOid": "95c3c7412570966510a9e7b818a450f2be0b9924",
+          "blobOid": "0b0739ad54a32afe43690147f7069d08084012ec",
           "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js"
         },
         {
-          "blobOid": "78ffd39f8c5b6ba3d957bc50dfe436ab0fafb709",
+          "blobOid": "9ada91d500f22106797b7c49c87290175528444e",
           "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotContract.js"
         },
         {
@@ -83,11 +83,11 @@ The independent review itself must keep application authority, completion state,
           "path": "src/core/Cm2115LocalValidationReceiptContract.js"
         },
         {
-          "blobOid": "0d38f4cfcc44e56059a032d46e8c5d176e508a37",
+          "blobOid": "230a50d4e124fb6ff4c06ed795f2217781ad0f85",
           "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js"
         },
         {
-          "blobOid": "9e3064109d4147c356b4114f1323c6f79d26053f",
+          "blobOid": "1245b4934149aeacf8dd170ad80f2ec3d0a77073",
           "path": "src/cli/cm2115-canonical-full-plan-evidence-snapshot.js"
         },
         {
@@ -95,7 +95,7 @@ The independent review itself must keep application authority, completion state,
           "path": "scripts/generate-cm2115-local-validation-receipt.js"
         },
         {
-          "blobOid": "fa3ca32c0fb755317abbbcd97ef4f49151af2c68",
+          "blobOid": "7932e39a2e7857b589712f274bc79553fba2a9d4",
           "path": "scripts/generate-cm2115-independent-review-request.js"
         },
         {
@@ -115,12 +115,12 @@ The independent review itself must keep application authority, completion state,
           "path": "tests/cm2115-r2-durable-exact-patch-application.test.js"
         },
         {
-          "blobOid": "292a4450de0274584e606c24bf6cef7364851e3d",
+          "blobOid": "613a15094aa59daa78012e0e4edbc1b592f50083",
           "path": "tests/cm2115-canonical-full-plan-evidence-snapshot.test.js"
         }
       ],
-      "commit": "346965101c2a9cc517f3563d6ec9fe1d6fca5bad",
-      "tree": "e1801b575397708ea869830fdfd56dbf9383761f"
+      "commit": "399ddc54a0b0009d017528905fa72bd4dc52a519",
+      "tree": "f4106e62109c3ab28abb1fe4968ecbf239aa8a21"
     },
     "reviewScope": {
       "exactAuthorizedReceiptEntryCount": 21,

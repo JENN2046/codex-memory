@@ -45,6 +45,7 @@ const {
   resolveGitFile: resolveSnapshotGitFile,
   resolveGitSourceObject,
   buildReviewRequest,
+  renderReviewRequestMarkdown,
   resolveReviewGitFile,
   isReviewCommitAncestor,
   reviewRequestResolverOptions
@@ -56,6 +57,7 @@ const {
     ...receiptGenerator,
     ...snapshotGenerator,
     buildReviewRequest: reviewGenerator.buildRequest,
+    renderReviewRequestMarkdown: reviewGenerator.renderMarkdown,
     resolveReviewGitFile: reviewGenerator.resolveGitFile,
     isReviewCommitAncestor: reviewGenerator.isCommitAncestor,
     reviewRequestResolverOptions: reviewGenerator.resolverOptions
@@ -768,6 +770,20 @@ test('independent review request binds the frozen snapshot and stays non-authori
   const staleResult = evaluateCm2115SnapshotReviewRequest(staleRequest, reviewRequestResolvers());
   assert.equal(staleResult.accepted, false);
   assert.ok(staleResult.blockers.includes('payload.reviewImplementation'));
+});
+
+test('frozen independent review request files exactly match the canonical JSON and Markdown renderers', () => {
+  const request = buildReviewRequest();
+  const jsonText = `${JSON.stringify(canonicalize(request), null, 2)}\n`;
+  const markdownText = renderReviewRequestMarkdown(request, jsonText);
+  assert.equal(
+    fs.readFileSync('docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json', 'utf8'),
+    jsonText
+  );
+  assert.equal(
+    fs.readFileSync('docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md', 'utf8'),
+    markdownText
+  );
 });
 
 test('independent review request rejects leading or trailing claims outside the canonical snapshot Markdown', () => {

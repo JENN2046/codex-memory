@@ -47,15 +47,19 @@ const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
   'tests/cm2115-canonical-full-plan-evidence-snapshot.test.js'
 ]);
 const REVIEW_IMPLEMENTATION_FREEZE = Object.freeze({
-  commit: '346965101c2a9cc517f3563d6ec9fe1d6fca5bad',
-  tree: 'e1801b575397708ea869830fdfd56dbf9383761f',
-  parentCommit: 'a0d50dd9ae5fd3ff1a7ae2dc107ff4ee50f12dec',
-  parentTree: '0517ebda2a90d8a4002f5dfefcce36d20da218bf',
+  commit: '399ddc54a0b0009d017528905fa72bd4dc52a519',
+  tree: 'f4106e62109c3ab28abb1fe4968ecbf239aa8a21',
+  parentCommit: 'f040a7148cb8ae1e6c4739af95f42251ee38c102',
+  parentTree: 'eedb05cc5298f8c0da7074343db47afef75380d3',
   diffPaths: Object.freeze([
+    'scripts/generate-cm2115-independent-review-request.js',
+    'src/cli/cm2115-canonical-full-plan-evidence-snapshot.js',
+    'src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js',
     'src/core/Cm2115CanonicalFullPlanEvidenceSnapshotContract.js',
-    'src/core/Cm2115R2Phase2CompletionAuditApplication.js',
+    'src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js',
+    'src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js',
     'tests/cm2115-canonical-full-plan-evidence-snapshot.test.js',
-    'tests/cm2115-r2-durable-exact-patch-application.test.js'
+    'tests/cm2115-r2-self-review-decision.test.js'
   ])
 });
 
