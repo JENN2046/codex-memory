@@ -28,6 +28,12 @@ async function verifyCm2096TombstoneExecution({ registry, claimId, receiptId, de
   if (!registry || typeof callAuditMemory !== 'function' || postStoreProjection?.accepted !== true || postStoreProjection?.stage !== 'post_rollback') {
     return { accepted: false, reasonCode: 'cm2096_verify_configuration_or_store_projection_missing' };
   }
+  if (postStoreProjection.rawMemoryReturned !== false ||
+      postStoreProjection.rawPathDisclosed !== false ||
+      postStoreProjection.targetRecordProjection?.rawPathDisclosed !== false ||
+      postStoreProjection.tombstoneMarkerProjection?.rawPathDisclosed !== false) {
+    return { accepted: false, reasonCode: 'cm2096_post_store_projection_disclosure_boundary_failed' };
+  }
   const claim = await registry.readClaim(claimId).catch(() => null);
   if (!claim ||
       claim.state !== 'WRITE_INVOCATION_CONSUMED' ||
