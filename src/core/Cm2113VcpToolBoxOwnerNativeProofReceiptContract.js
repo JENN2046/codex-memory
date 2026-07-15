@@ -31,6 +31,14 @@ const PRIOR_ATTEMPT_FIELDS = Object.freeze([
   'attempt', 'finalState', 'authorizationConsumed', 'authorizationReplayAllowed',
   'durableRecordCountObserved', 'preserved'
 ]);
+const EXPECTED_IMPLEMENTATION = Object.freeze({
+  commit: '388e62b55e62dcae472ed0da69319d916edb97a8',
+  tree: '99bb3ed9c1ea5f549b8f9e3d215e72147823f670'
+});
+const EXPECTED_OWNER_RUNTIME_SOURCE = Object.freeze({
+  sourceCommit: '555b3b538f6eb736e530c2912de678c5941f9985',
+  sourceTree: 'fd82d403e79f36f749eb7f555b4736eae3eacdff'
+});
 const EXPECTED_GIT_IDENTITIES = Object.freeze({
   executionPacketGitIdentity: Object.freeze({
     sourceCommit: '59a2c87b44f93f2c15e5785e9c3c501df60f1eaf',
@@ -74,15 +82,15 @@ function evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(receipt = {}) {
   ])) blockers.push('receipt.fields');
   if (receipt.schemaVersion !== 1 || receipt.taskId !== 'CM-2113' || receipt.receiptType !== 'vcptoolbox_owner_native_proof_receipt' || receipt.result !== 'PASS') blockers.push('receipt.identity');
   if (!hasExactKeys(receipt.implementation, IMPLEMENTATION_FIELDS) ||
-      !/^[a-f0-9]{40}$/.test(receipt.implementation?.commit || '') ||
-      !/^[a-f0-9]{40}$/.test(receipt.implementation?.tree || '')) blockers.push('receipt.implementation');
+      receipt.implementation?.commit !== EXPECTED_IMPLEMENTATION.commit ||
+      receipt.implementation?.tree !== EXPECTED_IMPLEMENTATION.tree) blockers.push('receipt.implementation');
   for (const field of ['executionPacketGitIdentity', 'contentDecisionGitIdentity', 'finalReleaseDecisionGitIdentity', 'bootstrapReceiptGitIdentity']) {
     const identity = receipt[field];
     if (!exactGitIdentity(identity, EXPECTED_GIT_IDENTITIES[field])) blockers.push(`receipt.${field}`);
   }
   if (!hasExactKeys(receipt.executionReceipt, EXECUTION_RECEIPT_FIELDS) || receipt.executionReceipt?.finalState !== 'CONSUMED_SUCCESS' || receipt.executionReceipt?.bytes !== 2160 || receipt.executionReceipt?.sha256 !== '805f93f5f414194e754c14064ee8fa3875b61c351ffff0b206dcf56c61ac3685') blockers.push('receipt.executionReceipt');
   if (!hasExactKeys(receipt.transportReceipt, TRANSPORT_RECEIPT_FIELDS) || receipt.transportReceipt?.bytes !== 1847 || receipt.transportReceipt?.sha256 !== '5d429bd9004b19df31e247e147394879aeb2362b78241bd9757c45e25ca39b58') blockers.push('receipt.transportReceipt');
-  if (!hasExactKeys(receipt.ownerRuntime, OWNER_RUNTIME_FIELDS) || receipt.ownerRuntime?.memoryIntelligenceOwner !== 'VCPToolBox' || receipt.ownerRuntime?.component !== 'DailyNote' || receipt.ownerRuntime?.communication !== 'stdio' || receipt.ownerRuntime?.pluginBlobMatched !== true || receipt.ownerRuntime?.manifestBlobMatched !== true || receipt.ownerRuntime?.dependencyBindingMatched !== true || receipt.ownerRuntime?.providerCalled !== false) blockers.push('receipt.ownerRuntime');
+  if (!hasExactKeys(receipt.ownerRuntime, OWNER_RUNTIME_FIELDS) || receipt.ownerRuntime?.memoryIntelligenceOwner !== 'VCPToolBox' || receipt.ownerRuntime?.component !== 'DailyNote' || receipt.ownerRuntime?.sourceCommit !== EXPECTED_OWNER_RUNTIME_SOURCE.sourceCommit || receipt.ownerRuntime?.sourceTree !== EXPECTED_OWNER_RUNTIME_SOURCE.sourceTree || receipt.ownerRuntime?.communication !== 'stdio' || receipt.ownerRuntime?.pluginBlobMatched !== true || receipt.ownerRuntime?.manifestBlobMatched !== true || receipt.ownerRuntime?.dependencyBindingMatched !== true || receipt.ownerRuntime?.providerCalled !== false) blockers.push('receipt.ownerRuntime');
   if (!hasExactKeys(receipt.transport, TRANSPORT_FIELDS) || receipt.transport?.outer !== 'stdio_mcp' || receipt.transport?.outerProcessBoundary !== true || receipt.transport?.contentLengthFramesSent !== 3 || receipt.transport?.contentLengthFramesReceived !== 3 || JSON.stringify(receipt.transport?.exposedToolNames) !== JSON.stringify(['record_memory']) || receipt.transport?.recordMemoryCallCount !== 1 || receipt.transport?.directApplicationCallByClient !== false || receipt.transport?.inner !== 'local_http_transport' || receipt.transport?.innerAuthorizationMatched !== true || receipt.transport?.ownerRuntime !== 'stdio' || receipt.transport?.endpointDisclosed !== false || receipt.transport?.tokenMaterialDisclosed !== false) blockers.push('receipt.transport');
   if (!hasExactKeys(receipt.store, STORE_FIELDS) || receipt.store?.identitySha256 !== '0294fc5c92dbcfc535057cf8c8e77901e5223c83b906b26dba8e29bf659cfaab' || receipt.store?.identityPresentBeforeFirstNativeWrite !== true || receipt.store?.identityMatchedBeforeAndAfter !== true || receipt.store?.syntheticOnly !== true || receipt.store?.recordCount !== 1 || receipt.store?.durableBytes !== 357 || receipt.store?.durableSha256 !== 'f8f845371e1eebf2dbce80e6bc0b86ed656f95712b409ac8fabc24a4cf393e50' || receipt.store?.rawMemoryReturned !== false || receipt.store?.rawPathDisclosed !== false) blockers.push('receipt.store');
   if (!hasExactKeys(receipt.authorization, AUTHORIZATION_FIELDS) || receipt.authorization?.attempt !== 2 || receipt.authorization?.useCount !== 1 || receipt.authorization?.consumed !== true || receipt.authorization?.replayAllowed !== false || receipt.authorization?.nativeWriteCalls !== 1 || receipt.authorization?.verifyOperations !== 1 || receipt.authorization?.verifyAccepted !== true || receipt.authorization?.localFallbackUsed !== false || receipt.authorization?.automaticRetryPerformed !== false || receipt.authorization?.rollbackOrCompensationPerformed !== false) blockers.push('receipt.authorization');
