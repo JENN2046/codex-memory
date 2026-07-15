@@ -43,6 +43,7 @@ const FORBIDDEN_INPUT_KEYS = Object.freeze([
   'rawPayload',
   'rawPrompt',
   'readinessClaim',
+  'readinessClaimed',
   'rcReadyClaimed',
   'releaseReady',
   'responseBody',
