@@ -11,10 +11,12 @@ const {
 } = require('../core/Cm2102IdentityBoundRollbackLifecycleFoundation');
 const {
   evaluateCm2104BootstrapAuthorizationContentDecisionIntake,
+  evaluateCm2104BootstrapAuthorizationContentDecisionReconciliationIdentity,
   isMachineBoundCm2104BootstrapAuthorizationContentDecision
 } = require('../core/Cm2104IdentityBoundStoreBootstrapAuthorizationContentDecisionIntake');
 const {
   evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake,
+  evaluateCm2104BootstrapFinalExecutionReleaseDecisionReconciliationIdentity,
   isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision
 } = require('../core/Cm2104IdentityBoundStoreBootstrapFinalExecutionReleaseDecisionIntake');
 const {
@@ -302,6 +304,52 @@ function buildCm2103BootstrapReceipt({
   };
 }
 
+async function selectCm2103BootstrapDecisionIntakes({
+  registry,
+  nonce,
+  receiptId,
+  historicalContentDecisionIntake,
+  historicalFinalReleaseDecisionIntake,
+  evaluateActiveContentDecision,
+  evaluateActiveFinalReleaseDecision
+}) {
+  if (!historicalContentDecisionIntake?.accepted ||
+      historicalContentDecisionIntake.reconciliationIdentityAccepted !== true ||
+      historicalContentDecisionIntake.executionAuthorized !== false ||
+      isMachineBoundCm2104BootstrapAuthorizationContentDecision(historicalContentDecisionIntake.decision)) {
+    throw new Error('cm2103_authorization_content_decision_intake_rejected');
+  }
+  if (!historicalFinalReleaseDecisionIntake?.accepted ||
+      historicalFinalReleaseDecisionIntake.reconciliationIdentityAccepted !== true ||
+      historicalFinalReleaseDecisionIntake.executionAuthorized !== false ||
+      isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision(historicalFinalReleaseDecisionIntake.decision)) {
+    throw new Error('cm2103_final_execution_release_decision_intake_rejected');
+  }
+  const unused = await registry.preflightUnused({ nonce, receiptId });
+  if (!unused.accepted) return {
+    existingDurableClaim: true,
+    contentDecisionIntake: historicalContentDecisionIntake,
+    finalReleaseDecisionIntake: historicalFinalReleaseDecisionIntake
+  };
+  const contentDecisionIntake = evaluateActiveContentDecision();
+  if (!contentDecisionIntake.accepted ||
+      !isMachineBoundCm2104BootstrapAuthorizationContentDecision(contentDecisionIntake.decision) ||
+      contentDecisionIntake.executionAuthorized !== false) {
+    throw new Error('cm2103_authorization_content_decision_intake_rejected');
+  }
+  const finalReleaseDecisionIntake = evaluateActiveFinalReleaseDecision();
+  if (!finalReleaseDecisionIntake.accepted ||
+      !isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision(finalReleaseDecisionIntake.decision) ||
+      finalReleaseDecisionIntake.executionAuthorized !== true) {
+    throw new Error('cm2103_final_execution_release_decision_intake_rejected');
+  }
+  return {
+    existingDurableClaim: false,
+    contentDecisionIntake,
+    finalReleaseDecisionIntake
+  };
+}
+
 async function runFrozenCm2103Bootstrap(
   authorizationGatePacketCommit,
   authorizationContentDecisionCommit,
@@ -402,24 +450,28 @@ async function runFrozenCm2103Bootstrap(
     'rev-parse', `${authorizationContentDecisionCommit}:${AUTHORIZATION_CONTENT_DECISION_PATH}`
   ]).trim();
   const contentDecisionSha256 = sha256(contentDecisionBytes);
-  const contentDecisionIntake = evaluateCm2104BootstrapAuthorizationContentDecisionIntake({
+  const decisionNow = new Date();
+  const contentDecisionExpectedBinding = expectedAuthorizationContentDecisionBinding({
+    packet,
+    authorizationGatePacketCommit,
+    authorizationGatePacketBlobOid: packetBlobOid,
+    authorizationGatePacketBytes: packetBytes
+  });
+  const historicalContentDecisionIntake =
+    evaluateCm2104BootstrapAuthorizationContentDecisionReconciliationIdentity({
     decisionBytes: contentDecisionBytes,
     observedBinding: {
       decisionSourceCommit: authorizationContentDecisionCommit,
       decisionBlobOid: contentDecisionBlobOid,
       decisionSha256: contentDecisionSha256
     },
-    expectedBinding: expectedAuthorizationContentDecisionBinding({
-      packet,
-      authorizationGatePacketCommit,
-      authorizationGatePacketBlobOid: packetBlobOid,
-      authorizationGatePacketBytes: packetBytes
-    }),
-    now: new Date()
+    expectedBinding: contentDecisionExpectedBinding,
+    now: decisionNow
   });
-  if (!contentDecisionIntake.accepted ||
-      !isMachineBoundCm2104BootstrapAuthorizationContentDecision(contentDecisionIntake.decision) ||
-      contentDecisionIntake.executionAuthorized !== false) {
+  if (!historicalContentDecisionIntake.accepted ||
+      historicalContentDecisionIntake.reconciliationIdentityAccepted !== true ||
+      historicalContentDecisionIntake.executionAuthorized !== false ||
+      isMachineBoundCm2104BootstrapAuthorizationContentDecision(historicalContentDecisionIntake.decision)) {
     throw new Error('cm2103_authorization_content_decision_intake_rejected');
   }
 
@@ -431,28 +483,31 @@ async function runFrozenCm2103Bootstrap(
     'rev-parse', `${finalExecutionReleaseDecisionCommit}:${FINAL_EXECUTION_RELEASE_DECISION_PATH}`
   ]).trim();
   const finalReleaseDecisionSha256 = sha256(finalReleaseDecisionBytes);
-  const finalReleaseDecisionIntake = evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake({
+  const finalReleaseExpectedBinding = expectedFinalExecutionReleaseDecisionBinding({
+    packet,
+    authorizationGatePacketCommit,
+    authorizationGatePacketBlobOid: packetBlobOid,
+    authorizationGatePacketBytes: packetBytes,
+    authorizationContentDecision: historicalContentDecisionIntake.decision,
+    authorizationContentDecisionCommit,
+    authorizationContentDecisionBlobOid: contentDecisionBlobOid,
+    authorizationContentDecisionSha256: contentDecisionSha256
+  });
+  const historicalFinalReleaseDecisionIntake =
+    evaluateCm2104BootstrapFinalExecutionReleaseDecisionReconciliationIdentity({
     decisionBytes: finalReleaseDecisionBytes,
     observedBinding: {
       decisionSourceCommit: finalExecutionReleaseDecisionCommit,
       decisionBlobOid: finalReleaseDecisionBlobOid,
       decisionSha256: finalReleaseDecisionSha256
     },
-    expectedBinding: expectedFinalExecutionReleaseDecisionBinding({
-      packet,
-      authorizationGatePacketCommit,
-      authorizationGatePacketBlobOid: packetBlobOid,
-      authorizationGatePacketBytes: packetBytes,
-      authorizationContentDecision: contentDecisionIntake.decision,
-      authorizationContentDecisionCommit,
-      authorizationContentDecisionBlobOid: contentDecisionBlobOid,
-      authorizationContentDecisionSha256: contentDecisionSha256
-    }),
-    now: new Date()
+    expectedBinding: finalReleaseExpectedBinding,
+    now: decisionNow
   });
-  if (!finalReleaseDecisionIntake.accepted ||
-      !isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision(finalReleaseDecisionIntake.decision) ||
-      finalReleaseDecisionIntake.executionAuthorized !== true) {
+  if (!historicalFinalReleaseDecisionIntake.accepted ||
+      historicalFinalReleaseDecisionIntake.reconciliationIdentityAccepted !== true ||
+      historicalFinalReleaseDecisionIntake.executionAuthorized !== false ||
+      isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision(historicalFinalReleaseDecisionIntake.decision)) {
     throw new Error('cm2103_final_execution_release_decision_intake_rejected');
   }
 
@@ -485,6 +540,34 @@ async function runFrozenCm2103Bootstrap(
   const registry = new Cm2103IdentityBoundStoreBootstrapRegistry({
     authorizationRegistryRoot: governance.internalPaths.authorizationRegistryRoot
   });
+  const selectedDecisionIntakes = await selectCm2103BootstrapDecisionIntakes({
+    registry,
+    nonce: packet.nonce,
+    receiptId: packet.receiptId,
+    historicalContentDecisionIntake,
+    historicalFinalReleaseDecisionIntake,
+    evaluateActiveContentDecision: () => evaluateCm2104BootstrapAuthorizationContentDecisionIntake({
+      decisionBytes: contentDecisionBytes,
+      observedBinding: {
+        decisionSourceCommit: authorizationContentDecisionCommit,
+        decisionBlobOid: contentDecisionBlobOid,
+        decisionSha256: contentDecisionSha256
+      },
+      expectedBinding: contentDecisionExpectedBinding,
+      now: decisionNow
+    }),
+    evaluateActiveFinalReleaseDecision: () => evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake({
+      decisionBytes: finalReleaseDecisionBytes,
+      observedBinding: {
+        decisionSourceCommit: finalExecutionReleaseDecisionCommit,
+        decisionBlobOid: finalReleaseDecisionBlobOid,
+        decisionSha256: finalReleaseDecisionSha256
+      },
+      expectedBinding: finalReleaseExpectedBinding,
+      now: decisionNow
+    })
+  });
+  const { contentDecisionIntake, finalReleaseDecisionIntake } = selectedDecisionIntakes;
   const observedContentDecision = {
     decision: contentDecisionIntake.decision,
     sourceCommit: authorizationContentDecisionCommit,
@@ -560,5 +643,6 @@ module.exports = {
   expectedAuthorizationContentDecisionBinding,
   expectedFinalExecutionReleaseDecisionBinding,
   runFrozenCm2103Bootstrap,
+  selectCm2103BootstrapDecisionIntakes,
   verifyFrozenGitObject
 };
