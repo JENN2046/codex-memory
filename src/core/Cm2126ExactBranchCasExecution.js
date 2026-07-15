@@ -636,6 +636,36 @@ function buildFinalReleaseDecision({ packetEvidence }) {
   return wrapPayload(payload, 'cm2127_exact_branch_cas_final_execution_release_v1', FINAL_RELEASE_TASK_ID);
 }
 
+function renderCm2127FinalReleaseMarkdown(decision) {
+  const jsonText = serializeArtifact(decision);
+  return [
+    '# CM-2127 Exact Branch CAS Final Execution Release',
+    '',
+    `Decision reference: \`${decision.payload.decisionReference}\``,
+    `Canonical payload SHA-256: \`${decision.canonicalPayloadSha256}\``,
+    '',
+    'Result: PASS_FINAL_EXECUTION_RELEASE_CONTENT_PREPARED_ONLY.',
+    '',
+    'After exact Git intake, this decision may release one future claim, one exact',
+    'expected-old local Branch CAS, one linked-worktree index synchronization, nine',
+    'exact file synchronizations, and one low-disclosure execution receipt. Freezing',
+    'these bytes does not run the executor or perform any of those effects. Automatic',
+    'retry, rollback, cleanup, force, ref deletion, other-ref update, remote action,',
+    'and every readiness claim remain forbidden.',
+    '',
+    'Execution also requires exclusive operator quiescence for the linked',
+    'worktree. Non-cooperative concurrent file writers are outside the authorized',
+    'threat model; any observed drift must stop in reconciliation.',
+    '',
+    '## Exact JSON mirror',
+    '',
+    '```json',
+    jsonText.trimEnd(),
+    '```',
+    ''
+  ].join('\n');
+}
+
 function evaluateFinalReleaseDecision(decision = {}, { packetEvidence, now = new Date() } = {}) {
   const blockers = [];
   if (decision.schemaVersion !== 1 || decision.taskId !== FINAL_RELEASE_TASK_ID ||
@@ -718,7 +748,7 @@ function intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now = 
         !sameJson(paths, FINAL_RELEASE_DIFF_PATHS) || !sameJson(entries, FINAL_RELEASE_DIFF_ENTRIES) ||
         jsonIdentity.gitMode !== '100644' || jsonIdentity.gitObjectType !== 'blob' ||
         markdownIdentity.gitMode !== '100644' || markdownIdentity.gitObjectType !== 'blob' ||
-        !markdownIdentity.content.toString('utf8').includes(jsonIdentity.content.toString('utf8').trimEnd())) {
+        !markdownIdentity.content.equals(Buffer.from(renderCm2127FinalReleaseMarkdown(decision), 'utf8'))) {
       blockers.push('finalReleaseIntake.lineageOrFiles');
     }
     const evaluation = evaluateFinalReleaseDecision(decision, { packetEvidence, now });
@@ -2029,6 +2059,7 @@ module.exports = {
   parseWorktreeList,
   realResolverOptions,
   readVerifiedGovernanceFile,
+  renderCm2127FinalReleaseMarkdown,
   releaseBinding,
   resolveFixedGovernanceRoot,
   targetSnapshot,

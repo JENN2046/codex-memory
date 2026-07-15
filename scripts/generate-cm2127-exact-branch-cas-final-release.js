@@ -12,6 +12,7 @@ const {
   deriveTargetWorktree,
   evaluateFinalReleaseDecision,
   intakeExecutionPacket,
+  renderCm2127FinalReleaseMarkdown,
   verifyTargetOldPreflight
 } = require('../src/core/Cm2126ExactBranchCasExecution');
 const {
@@ -43,32 +44,10 @@ function ensureRepositoryRoot() {
 }
 
 function renderMarkdown(decision, jsonText) {
-  return [
-    '# CM-2127 Exact Branch CAS Final Execution Release',
-    '',
-    `Decision reference: \`${decision.payload.decisionReference}\``,
-    `Canonical payload SHA-256: \`${decision.canonicalPayloadSha256}\``,
-    '',
-    'Result: PASS_FINAL_EXECUTION_RELEASE_CONTENT_PREPARED_ONLY.',
-    '',
-    'After exact Git intake, this decision may release one future claim, one exact',
-    'expected-old local Branch CAS, one linked-worktree index synchronization, nine',
-    'exact file synchronizations, and one low-disclosure execution receipt. Freezing',
-    'these bytes does not run the executor or perform any of those effects. Automatic',
-    'retry, rollback, cleanup, force, ref deletion, other-ref update, remote action,',
-    'and every readiness claim remain forbidden.',
-    '',
-    'Execution also requires exclusive operator quiescence for the linked',
-    'worktree. Non-cooperative concurrent file writers are outside the authorized',
-    'threat model; any observed drift must stop in reconciliation.',
-    '',
-    '## Exact JSON mirror',
-    '',
-    '```json',
-    jsonText.trimEnd(),
-    '```',
-    ''
-  ].join('\n');
+  if (jsonText !== serializeArtifact(decision)) {
+    throw new Error('cm2127_release_json_rendering_mismatch');
+  }
+  return renderCm2127FinalReleaseMarkdown(decision);
 }
 
 function main(argv = process.argv.slice(2)) {

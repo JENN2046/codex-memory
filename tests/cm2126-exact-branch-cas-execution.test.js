@@ -489,6 +489,58 @@ test('final release rejects candidate-controlled authorization window extensions
   }
 });
 
+test('final release intake rejects leading or trailing claims outside canonical Markdown', () => {
+  const frozenJson = fixture.gitResolvers.resolveGitFile(
+    fixture.finalReleaseCommit,
+    fixture.frozenModule.FINAL_RELEASE_PATH
+  ).content;
+  const frozenMarkdown = fixture.gitResolvers.resolveGitFile(
+    fixture.finalReleaseCommit,
+    fixture.frozenModule.FINAL_RELEASE_MARKDOWN_PATH
+  ).content;
+  assert.equal(
+    releaseGenerator.renderMarkdown(fixture.finalReleaseEvidence.decision, frozenJson.toString('utf8')),
+    frozenMarkdown.toString('utf8')
+  );
+  assert.throws(
+    () => releaseGenerator.renderMarkdown(
+      fixture.finalReleaseEvidence.decision,
+      `${frozenJson.toString('utf8')}UNAUTHORIZED\n`
+    ),
+    /json_rendering_mismatch/
+  );
+  for (const mutateMarkdown of [
+    content => Buffer.concat([Buffer.from('UNAUTHORIZED: branchRefUpdateAuthorized=broader\n'), content]),
+    content => Buffer.concat([content, Buffer.from('\nUNAUTHORIZED: readinessClaimed=true\n')])
+  ]) {
+    const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2126-final-release-fork-'));
+    const repo = path.join(parent, 'evidence');
+    try {
+      git(['clone', '--quiet', '--no-hardlinks', fixture.repo, repo], parent);
+      git(['config', 'user.name', 'CM2126 Test'], repo);
+      git(['config', 'user.email', 'cm2126@example.invalid'], repo);
+      git(['checkout', '--quiet', '--detach', fixture.packetCommit], repo);
+      const jsonPath = path.join(repo, fixture.frozenModule.FINAL_RELEASE_PATH);
+      const markdownPath = path.join(repo, fixture.frozenModule.FINAL_RELEASE_MARKDOWN_PATH);
+      fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
+      fs.writeFileSync(jsonPath, frozenJson);
+      fs.writeFileSync(markdownPath, mutateMarkdown(frozenMarkdown));
+      const forkCommit = commitAll(repo, 'test: fork final release with non-canonical markdown');
+      const forkResolvers = resolvers(repo);
+      const result = fixture.frozenModule.intakeFinalReleaseDecision({
+        finalReleaseCommit: forkCommit,
+        packetEvidence: fixture.packetEvidence,
+        now: fixture.now,
+        ...forkResolvers
+      });
+      assert.equal(result.accepted, false);
+      assert.ok(result.blockers.includes('finalReleaseIntake.lineageOrFiles'));
+    } finally {
+      fs.rmSync(parent, { recursive: true, force: true });
+    }
+  }
+});
+
 test('unsafe Git environment and caller worktree surfaces fail before claim or Git effect', () => {
   initializeGovernanceRoot();
   const refBefore = text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo);
