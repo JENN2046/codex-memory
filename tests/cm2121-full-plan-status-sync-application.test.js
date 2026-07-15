@@ -89,3 +89,14 @@ test('application generator accepts no output or execution arguments', () => {
   assert.throws(() => generator.parseArgs(['--execute']), /no_arguments/);
   assert.throws(() => generator.parseArgs(['--output', '/tmp/x']), /no_arguments/);
 });
+
+test('application generator rejects unsafe Git context before repository reads or writes', () => {
+  const previous = process.env.GIT_DIR;
+  process.env.GIT_DIR = '/tmp/cm2121-forbidden-git-dir';
+  try {
+    assert.throws(() => generator.main([]), /cm2122_unsafe_git_environment:GIT_DIR/);
+  } finally {
+    if (previous === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previous;
+  }
+});
