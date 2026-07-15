@@ -1201,9 +1201,6 @@ function inspectRuntimeRepositoryShell(finalReleaseEvidence) {
   detachedHeadRequired(repoRoot);
   const head = gitText(['rev-parse', 'HEAD^{commit}']);
   const tree = gitText(['rev-parse', 'HEAD^{tree}']);
-  if (targetBranchOid(repoRoot) !== finalReleaseEvidence.finalReleaseCommit) {
-    throw new Error('cm2122_target_branch_tip_mismatch');
-  }
   return { repoRoot, head, tree, worktreeClean };
 }
 
@@ -1218,6 +1215,9 @@ function assertExecutionRuntime({ finalReleaseEvidence, packetEvidence, runtimeS
   const shell = runtimeShell || inspectRuntimeRepositoryShell(finalReleaseEvidence);
   const { repoRoot, head, tree } = shell;
   if (!shell.worktreeClean) throw new Error('cm2122_clean_worktree_required');
+  if (targetBranchOid(repoRoot) !== finalReleaseEvidence.finalReleaseCommit) {
+    throw new Error('cm2122_target_branch_tip_mismatch');
+  }
   if (head !== finalReleaseEvidence.finalReleaseCommit || tree !== finalReleaseEvidence.finalReleaseTree) {
     throw new Error('cm2122_final_release_runtime_required');
   }

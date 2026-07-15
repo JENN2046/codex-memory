@@ -940,6 +940,33 @@ test('a new process cannot replay the consumed authorization or move the branch 
   assert.equal(reentryReceipt.payload.currentBranchStatusSynchronized, false);
 });
 
+test('consumed status-sync authorization remains readonly-reentrant after the target branch advances', {
+  timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
+}, async () => {
+  const expectedOld = text(['show-ref', '--hash', '--verify', implementation.FUTURE_BRANCH_REF], fixture.repo);
+  git(['update-ref', implementation.FUTURE_BRANCH_REF, fixture.detachedStatusCommit, expectedOld], fixture.repo);
+  try {
+    const replay = await runStatusSyncProcess();
+    assert.equal(replay.timedOut, false, JSON.stringify(replay));
+    assert.equal(replay.code, 0, replay.stderr);
+    const result = JSON.parse(replay.stdout);
+    assert.equal(result.status, 'STOPPED');
+    assert.equal(result.authorizationConsumed, true);
+    assert.equal(result.authorizationReplayAllowed, false);
+    assert.equal(result.branchRefUpdateAuthorized, false);
+    assert.equal(result.statusSyncPerformed, false);
+    assert.equal(result.currentBranchStatusSynchronized, false);
+    assert.equal(
+      text(['show-ref', '--hash', '--verify', implementation.FUTURE_BRANCH_REF], fixture.repo),
+      fixture.detachedStatusCommit
+    );
+  } finally {
+    git([
+      'update-ref', implementation.FUTURE_BRANCH_REF, expectedOld, fixture.detachedStatusCommit
+    ], fixture.repo);
+  }
+});
+
 test('consumed status-sync authorization remains readonly-reentrant after final-release expiry', {
   timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
 }, async () => {
