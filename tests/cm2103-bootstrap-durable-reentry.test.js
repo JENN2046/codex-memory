@@ -415,6 +415,55 @@ test('CM-2103 R2 corrupt existing envelope yields low-disclosure ambiguous recon
   assert.equal(evaluated.contract.acceptedAsReconciliationEvidence, true);
 });
 
+test('CM-2103 R2 rejects persisted claims whose consumed flag drifted false', async t => {
+  for (const sourceState of ['CLAIMED', 'CONSUMED_SUCCESS']) {
+    await t.test(sourceState, async t => {
+      const target = await fixture(t, `consumed-false-${sourceState.toLowerCase()}`);
+      const firstRegistry = new Cm2103IdentityBoundStoreBootstrapRegistry({
+        authorizationRegistryRoot: target.authorizationRegistryRoot
+      });
+      if (sourceState === 'CLAIMED') {
+        await firstRegistry.claim({
+          nonce: target.nonce,
+          receiptId: target.receiptId,
+          bindingHash: BINDING_HASH
+        });
+      } else {
+        const first = await execute({ target, registry: firstRegistry });
+        assert.equal(first.state, 'CONSUMED_SUCCESS');
+      }
+      const claimPath = firstRegistry.envelopePath({
+        nonce: target.nonce,
+        receiptId: target.receiptId
+      }).claimPath;
+      const drifted = JSON.parse(await fs.readFile(claimPath, 'utf8'));
+      drifted.authorizationConsumed = false;
+      await fs.writeFile(claimPath, JSON.stringify(drifted));
+
+      const guard = noStoreReentryFilesystem(target.storeRoot);
+      const reentryRegistry = new Cm2103IdentityBoundStoreBootstrapRegistry({
+        authorizationRegistryRoot: target.authorizationRegistryRoot,
+        filesystem: guard.api
+      });
+      const result = await execute({ target, registry: reentryRegistry, filesystem: guard.api });
+      assert.equal(result.state, 'CLAIM_REGISTRY_AMBIGUOUS');
+      assert.equal(result.claim.claimEnvelopeBindingVerified, false);
+      assert.equal(result.claim.reentrySourceState, null);
+      assertNoReentryStoreEffects(guard, result);
+      const evaluated = receiptFor(result);
+      assert.equal(evaluated.contract.shapeAccepted, true, evaluated.contract.blockers.join(', '));
+      assert.equal(evaluated.contract.acceptedAsReconciliationEvidence, true);
+      assert.throws(() => buildCm2103BootstrapReceipt({
+        packet: receiptPacket,
+        observedContentDecision: { decision: { decisionReference: 'x' } },
+        observedFinalReleaseDecision: { decision: { decisionReference: 'y' } },
+        executionPacketBytes: Buffer.from('packet'),
+        claim: drifted
+      }), /cm2103_bootstrap_receipt_claim_not_consumed/);
+    });
+  }
+});
+
 test('CM-2103 R2 unreadable existing envelope preserves presence without reading target store', async t => {
   const target = await fixture(t, 'unreadable');
   await createClaimAtState(target, 'CLAIMED');
