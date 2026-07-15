@@ -49,6 +49,22 @@ function item(overrides = {}) {
   };
 }
 
+function projectedItem(overrides = {}, classification = 'must_know') {
+  const result = item(overrides);
+  return {
+    ...result,
+    memoryContextProjection: {
+      projectionVersion: 1,
+      lowDisclosure: true,
+      statement: result.title,
+      classification,
+      freshness: 'recent',
+      reasonCodes: ['title_match'],
+      conflict: false
+    }
+  };
+}
+
 const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
   {
     id: 'project_fact_recall',
@@ -57,9 +73,9 @@ const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
       title: 'Recall codex-memory role'
     }),
     results: [
-      item({
+      projectedItem({
         title: 'Current state: codex-memory is the governed MCP bridge plus local fallback audit validation compatibility offline continuity layer'
-      })
+      }, 'current_state')
     ],
     expectations: [
       { kind: 'bucket_contains', bucket: 'current_state', text: 'governed MCP bridge' }
@@ -72,10 +88,10 @@ const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
       title: 'Recall architecture decision'
     }),
     results: [
-      item({
+      projectedItem({
         target: 'process',
         title: 'Decision: keep VCPToolBox native memory as final memory intelligence owner'
-      })
+      }, 'recent_decisions')
     ],
     expectations: [
       { kind: 'bucket_contains', bucket: 'recent_decisions', text: 'VCPToolBox native memory' }
@@ -88,10 +104,10 @@ const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
       title: 'Recall active blocker'
     }),
     results: [
-      item({
+      projectedItem({
         target: 'process',
         title: 'Blocker: operator-only full surface still requires exact approval and proof gates'
-      })
+      }, 'blockers')
     ],
     expectations: [
       { kind: 'bucket_contains', bucket: 'blockers', text: 'operator-only full surface' },
@@ -105,10 +121,10 @@ const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
       title: 'Recall project operating preference'
     }),
     results: [
-      item({
+      projectedItem({
         target: 'process',
         title: 'User preference: default response language for project work is Simplified Chinese'
-      })
+      }, 'must_know')
     ],
     expectations: [
       { kind: 'bucket_contains', bucket: 'must_know', text: 'Simplified Chinese' }
@@ -153,7 +169,7 @@ const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
       visibility: 'private'
     }),
     results: [
-      item({
+      projectedItem({
         title: 'Current state: current client private preference may be used',
         scope: {
           project_id: 'codex-memory',
@@ -161,7 +177,7 @@ const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
           client_id: 'codex',
           visibility: 'private'
         }
-      }),
+      }, 'current_state'),
       item({
         title: 'PRIVATE_OTHER_CLIENT_SHOULD_NOT_LEAK',
         scope: {
@@ -185,7 +201,7 @@ const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
       workspace_id: 'workspace-main'
     }),
     results: [
-      item({
+      projectedItem({
         title: 'Current state: workspace-main context is in scope',
         scope: {
           project_id: 'codex-memory',
@@ -193,7 +209,7 @@ const DEFAULT_RECALL_QUALITY_SUITE = Object.freeze([
           client_id: 'codex',
           visibility: 'project'
         }
-      }),
+      }, 'current_state'),
       item({
         title: 'OTHER_WORKSPACE_SHOULD_NOT_LEAK',
         scope: {
