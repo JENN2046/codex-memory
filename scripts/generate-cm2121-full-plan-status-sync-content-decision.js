@@ -16,7 +16,10 @@ const {
   serializeArtifact
 } = require('../src/core/Cm2121FullPlanStatusSyncContentDecision');
 const { sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
-const { assertSafeGitEnvironment } = require('../src/core/Cm2118FullPlanApplicationExecution');
+const {
+  assertSafeGitEnvironment,
+  sanitizedGitEnvironment
+} = require('../src/core/Cm2118FullPlanApplicationExecution');
 const { resolverOptions } = require('./generate-cm2116-exact-full-plan-application-gate');
 
 function parseArgs(argv) {
@@ -27,6 +30,7 @@ function parseArgs(argv) {
 function gitText(args) {
   return execFileSync('git', args, {
     cwd: process.cwd(),
+    env: sanitizedGitEnvironment(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   }).trim();
@@ -63,10 +67,7 @@ function main(argv = process.argv.slice(2)) {
   if (fs.existsSync(DECISION_PATH) || fs.existsSync(DECISION_MARKDOWN_PATH)) {
     throw new Error('cm2121_content_decision_already_exists');
   }
-  execFileSync('git', ['merge-base', '--is-ancestor', APPLICATION_COMMIT, 'HEAD'], {
-    cwd: process.cwd(),
-    stdio: ['ignore', 'ignore', 'pipe']
-  });
+  gitText(['merge-base', '--is-ancestor', APPLICATION_COMMIT, 'HEAD']);
   const options = resolverOptions();
   const applicationEvidence = intakeApplication(options);
   if (!applicationEvidence.accepted) {
