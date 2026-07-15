@@ -1,8 +1,7 @@
 'use strict';
 
 const {
-  RECEIPT_PATH: SELF_REVIEW_INTAKE_PATH,
-  evaluateReceipt: evaluateSelfReviewIntakeReceipt
+  RECEIPT_PATH: SELF_REVIEW_INTAKE_PATH
 } = require('./Cm2115R2SelfReviewDecisionIntakeReceiptContract');
 const {
   canonicalize,
@@ -142,6 +141,46 @@ function expectedIntakeDiffEntries() {
   return expectedIntakeDiffPaths().map(path => ({ status: 'A', path }));
 }
 
+function evaluateHistoricalSelfReviewIntakeReceipt(receipt) {
+  const blockers = [];
+  const boundary = receipt?.payload?.authorityBoundary;
+  if (!sameKeys(receipt, ['canonicalPayloadSha256', 'payload', 'receiptType', 'schemaVersion', 'taskId']) ||
+      receipt.schemaVersion !== 1 || receipt.taskId !== 'CM-2115-R2' ||
+      receipt.receiptType !== 'repository_internal_self_review_decision_post_freeze_intake_receipt_v1' ||
+      receipt.canonicalPayloadSha256 !== SELF_REVIEW_INTAKE_FREEZE.canonicalPayloadSha256 ||
+      sha256Canonical(receipt.payload) !== SELF_REVIEW_INTAKE_FREEZE.canonicalPayloadSha256) {
+    blockers.push('receipt.exactHistoricalEnvelope');
+  }
+  if (!boundary || boundary.independentReviewPassed !== true ||
+      boundary.independentReviewMode !== 'repository_internal_separate_pass' ||
+      boundary.independentExternalReviewPassed !== false ||
+      boundary.historicalCm2080ExternalReviewPassedPreserved !== true ||
+      boundary.fullPlanApplicationAuthorizedByThisReceipt !== false ||
+      boundary.fullPlanApplicationExecuted !== false || boundary.fullPlanPackCompleted !== false ||
+      boundary.readinessClaimed !== false || boundary.externalReviewPerformedByThisIntake !== false ||
+      boundary.selfReviewSatisfiesIndependentExternalReview !== false) {
+    blockers.push('receipt.authorityBoundary');
+  }
+  const nonClaims = receipt?.payload?.nonClaims;
+  const sideEffects = receipt?.payload?.sideEffects;
+  if (!nonClaims || Object.values(nonClaims).some(value => value !== false) ||
+      !sideEffects || Object.values(sideEffects).some(value => value !== 0)) {
+    blockers.push('receipt.nonClaimsOrSideEffects');
+  }
+  return {
+    accepted: blockers.length === 0,
+    blockers,
+    independentReviewPassed: boundary?.independentReviewPassed,
+    independentReviewMode: boundary?.independentReviewMode,
+    independentExternalReviewPassed: boundary?.independentExternalReviewPassed,
+    historicalCm2080ExternalReviewPassedPreserved:
+      boundary?.historicalCm2080ExternalReviewPassedPreserved,
+    fullPlanApplicationAuthorized: boundary?.fullPlanApplicationAuthorizedByThisReceipt,
+    fullPlanPackCompleted: boundary?.fullPlanPackCompleted,
+    readinessClaimed: boundary?.readinessClaimed
+  };
+}
+
 function evaluateFrozenSelfReviewIntake(options = {}) {
   const blockers = [];
   const required = [
@@ -200,7 +239,7 @@ function evaluateFrozenSelfReviewIntake(options = {}) {
     if (!markdownIdentity.content.toString('utf8').includes(jsonIdentity.content.toString('utf8').trimEnd())) {
       blockers.push('gate.intakeMarkdownMirror');
     }
-    receiptEvaluation = evaluateSelfReviewIntakeReceipt(receipt, options);
+    receiptEvaluation = evaluateHistoricalSelfReviewIntakeReceipt(receipt);
     if (!receiptEvaluation.accepted) {
       blockers.push(...receiptEvaluation.blockers.map(item => `gate.intakeReceipt.${item}`));
     }
