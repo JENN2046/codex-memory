@@ -6,6 +6,7 @@ const test = require('node:test');
 const {
   DECISION_PATH,
   IMPLEMENTATION_ARTIFACT_PATHS,
+  IMPLEMENTATION_DIFF_PATHS,
   IMPLEMENTATION_LINEAGE_DIFF_PATHS,
   REVIEW_REQUEST_DIFF_PATHS,
   REVIEW_REQUEST_FREEZE,
@@ -76,7 +77,7 @@ function resolvers(overrides = {}) {
       if (commit !== IMPLEMENTATION_COMMIT) return git.resolveDiffPaths(parent, commit);
       return parent === REVIEW_REQUEST_FREEZE.commit
         ? [...IMPLEMENTATION_LINEAGE_DIFF_PATHS]
-        : [...IMPLEMENTATION_ARTIFACT_PATHS];
+        : [...IMPLEMENTATION_DIFF_PATHS];
     },
     resolveGitPathState: git.resolveGitPathState,
     resolveDurableClaim: resolveFrozenPhase2DurableClaim,

@@ -1,7 +1,7 @@
 # CM-2115-R2 Internal Self-review Decision Intake Receipt
 
-Receipt reference: `CM-2115-R2-SELF-REVIEW-INTAKE-PASS-03242787-116D74B3-DF0444BD`
-Canonical payload SHA-256: `ffb0a0cf5db9fff8f04c70d0eb50af4a7adda6db9b0c7f44d3a081675e58eaba`
+Receipt reference: `CM-2115-R2-SELF-REVIEW-INTAKE-PASS-377812D9-798A91B2-825FC1A2`
+Canonical payload SHA-256: `26e273292bd15f71cc08974d25482ea23e1390a626af43559f6ec7b9c641d391`
 
 Result: PASS_INTERNAL_SELF_REVIEW_DECISION_INTAKE_ONLY.
 
@@ -13,7 +13,7 @@ Full-plan completion and every readiness state remain false.
 
 ```json
 {
-  "canonicalPayloadSha256": "ffb0a0cf5db9fff8f04c70d0eb50af4a7adda6db9b0c7f44d3a081675e58eaba",
+  "canonicalPayloadSha256": "26e273292bd15f71cc08974d25482ea23e1390a626af43559f6ec7b9c641d391",
   "payload": {
     "authorityBoundary": {
       "externalReviewPerformedByThisIntake": false,
@@ -48,23 +48,15 @@ Full-plan completion and every readiness state remain false.
     "intakeImplementation": {
       "artifacts": [
         {
-          "blobOid": "692df9df815f0cf7e47ee9fcbd054fdcb3f9dc39",
+          "blobOid": "c060bc201ef941ba2b60b050e445a1fb5c51caab",
           "path": "src/core/Cm2115R2SelfReviewDecisionIntakeReceiptContract.js"
         },
         {
-          "blobOid": "3159795ebd1b400227b992fdd15d3d900924eb54",
-          "path": "scripts/generate-cm2115-r2-self-review-intake-receipt.js"
-        },
-        {
-          "blobOid": "ba9af745a1a37c8b9e2891582b4646392ae97152",
+          "blobOid": "24a87f8a2d4a0e0f2770b092185f917f752cfe11",
           "path": "tests/cm2115-r2-self-review-intake-receipt.test.js"
         },
         {
-          "blobOid": "eb0db13f374c6b84e7df33cb050617ee2c643012",
-          "path": "package.json"
-        },
-        {
-          "blobOid": "cac52c26899ef3b206d9c264df6685da060426c4",
+          "blobOid": "e65ccb23d1ade28bc2af27d3910c5c4b26fe5cab",
           "path": "src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js"
         },
         {
@@ -72,20 +64,20 @@ Full-plan completion and every readiness state remain false.
           "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js"
         },
         {
-          "blobOid": "f38429ddefbecf97a966ede9bab1724f09ded7a6",
+          "blobOid": "85dc17a4e51fe9a1811bff9991276a4baf44a1f1",
           "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js"
         },
         {
-          "blobOid": "bf0f8c4c321c8e34a3a7c8452db77371592b08ee",
+          "blobOid": "afcab5ec528a58059f39e383bb41a6069d63e7d6",
           "path": "scripts/cm2115-r2-git.js"
         },
         {
-          "blobOid": "45e70706fca7dcb19314ea8ad80adbcbd740b2b7",
+          "blobOid": "9802f119b05cc32f1136d3f58be21daab086e615",
           "path": "scripts/generate-cm2115-r2-self-review-decision.js"
         }
       ],
-      "commit": "df0444bdd46322d52f1dd65eaf78c135f09c556b",
-      "tree": "8f979aec895f3c96c5b8aa4f5f15fe9d40f453eb"
+      "commit": "825fc1a2894560a7b166c8d62b5b328074e6ca98",
+      "tree": "082f743f1f5a7d8746ccdd289febb9a22dba9bfb"
     },
     "nonClaims": {
       "completeV8": false,
@@ -97,24 +89,24 @@ Full-plan completion and every readiness state remain false.
       "rcReady": false,
       "releaseReady": false
     },
-    "receiptReference": "CM-2115-R2-SELF-REVIEW-INTAKE-PASS-03242787-116D74B3-DF0444BD",
+    "receiptReference": "CM-2115-R2-SELF-REVIEW-INTAKE-PASS-377812D9-798A91B2-825FC1A2",
     "receiptType": "repository_internal_self_review_decision_post_freeze_intake_receipt_v1",
     "reviewedRequest": {
-      "commit": "01c65db824e77400ef144ef8118deaa28b06abcc",
+      "commit": "81ee0106ed8cd9b10dc30120ecb7ee6d8897fc79",
       "json": {
-        "blobOid": "3c99fb6829d10f250eff1b0b873eb8e0d075f59f",
+        "blobOid": "08bc3ffbe9a39b3dbbe42bdbf14781c021d4dba6",
         "bytes": 5973,
-        "canonicalPayloadSha256": "9b9c158a6652a36256b663e16fdbed9656485143df37c8c9ee13a96fc215bdf0",
+        "canonicalPayloadSha256": "81d68f6b61caf43756e171640fe44a92ac9989be3e5e2b5971ebb79a2cda4d91",
         "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json",
-        "sha256": "4b62b41753c66443b7e7f2a315729c9317172399b06fc8d618a2dd7625501cba"
+        "sha256": "fc56ff4ab271b1f59505ed2ce62e680dc55854b5c696b9f5409357ad25c77953"
       },
       "markdown": {
-        "blobOid": "df309bac7afdf891081c52b8397d47762d3a1f49",
+        "blobOid": "afe3b7f21055872369228e7adf178e7de9856212",
         "bytes": 6983,
         "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md",
-        "sha256": "3ba20d045b3f085a9aa0eb1b7e1763272e44655443b4b7f120c68e7e7a5f51fb"
+        "sha256": "58f9b65e88397bb0570500588134c756e3ea975506cb4c0d94b2f7adebbab3a5"
       },
-      "tree": "e6f3c28f0df1d10744ead4f132d064b2dcc3fb41"
+      "tree": "c68cd2ad68258db7a8569faf728aed3c5aed1fd3"
     },
     "reviewedSnapshot": {
       "commit": "8d25298563e512456c614eb6fec6af6bdc02bf8f",
@@ -134,30 +126,30 @@ Full-plan completion and every readiness state remain false.
       "tree": "8649b063591c7063b726ef48b3a99ccf45fe7f23"
     },
     "selfReviewDecision": {
-      "canonicalPayloadSha256": "032427870f5bbbf1035edc7291302a1e480b93040cd9f088873b45d58546a1d4",
+      "canonicalPayloadSha256": "377812d904e60ec569b57c9d9e2eded76a83a797e1f076160598e4db41c2f3a5",
       "json": {
-        "blobOid": "6b4b751d23a46e27c4502a0b2a27e0efc4f6eff4",
+        "blobOid": "441da37af718989450f0ec632f3ca09dac773c3e",
         "bytes": 5011,
         "gitMode": "100644",
         "gitObjectType": "blob",
-        "sha256": "f5dd9c58e6a296cb857f85a3a4fde5ee3ae33ed9cf8ce793ddc6482be63d8e41",
-        "sourceCommit": "116d74b3c69069fc377a861c01ed8105ee3fda11",
+        "sha256": "ec1c32ee890f2d886af345cbaf51bacc2c0166746fd536e6d66f5576f612d136",
+        "sourceCommit": "798a91b23bc84788fd6a69d4dad61ab5e135f70e",
         "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.json",
-        "sourceTree": "c10a9e75ba99113c9c3c6d6bc2991bcf58ecd804"
+        "sourceTree": "7bfcb9f625b4af0828458c0f56756bb7ebe756b4"
       },
       "markdown": {
-        "blobOid": "2ea6d6e73cd82604d950b6bc6dbcc875b8034752",
+        "blobOid": "7a1b4198ed56d627dda8f637f1023a37d48c1ccd",
         "bytes": 5606,
         "gitMode": "100644",
         "gitObjectType": "blob",
-        "sha256": "f945a9beb8d40d6ca270455ba081c9ecc0fd08cdaaaee7c39fbd33d77ce63fc2",
-        "sourceCommit": "116d74b3c69069fc377a861c01ed8105ee3fda11",
+        "sha256": "2b147124cfb74cf5067748246690be9dfed5b6022d033c64086bdd4de1e1fbf4",
+        "sourceCommit": "798a91b23bc84788fd6a69d4dad61ab5e135f70e",
         "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.md",
-        "sourceTree": "c10a9e75ba99113c9c3c6d6bc2991bcf58ecd804"
+        "sourceTree": "7bfcb9f625b4af0828458c0f56756bb7ebe756b4"
       },
-      "parentCommit": "68c8088a56511b6d6b598e293a6a39130c254a49",
-      "parentTree": "92f15d54d50ccc62443d9a37e10f3338e010c831",
-      "reference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-9B9C158A-68C8088A"
+      "parentCommit": "fe3fa28821282348f4b8e94dafe1dc904226b461",
+      "parentTree": "5b03dae54a30ff826a029daffd0aa3ed630c583a",
+      "reference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-81D68F6B-FE3FA288"
     },
     "sideEffects": {
       "durableMutations": 0,

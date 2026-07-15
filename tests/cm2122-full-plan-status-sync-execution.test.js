@@ -609,7 +609,7 @@ function initializeGovernanceRoot() {
   fixture.governanceRoot = root;
 }
 
-function runStatusSyncProcess(fixedNow = fixture.now.toISOString()) {
+function runStatusSyncProcess(fixedNow = fixture.now.toISOString(), environment = {}) {
   return new Promise(resolve => {
     const child = spawn(process.execPath, [
       '--require', FIXED_DATE_PRELOAD,
@@ -622,7 +622,8 @@ function runStatusSyncProcess(fixedNow = fixture.now.toISOString()) {
       env: {
         ...process.env,
         NODE_ENV: 'test',
-        CODEX_MEMORY_TEST_FIXED_NOW: fixedNow
+        CODEX_MEMORY_TEST_FIXED_NOW: fixedNow,
+        ...environment
       },
       stdio: ['ignore', 'pipe', 'pipe']
     });
@@ -669,7 +670,18 @@ test('temp clone creates one exact detached 9M commit, binds it, and leaves the 
   assert.equal(branchBefore, fixture.finalReleaseCommit);
   assert.equal(text(['branch', '--show-current'], fixture.repo), '');
 
-  const result = await runStatusSyncProcess();
+  git(['config', '--unset-all', 'user.name'], fixture.repo);
+  git(['config', '--unset-all', 'user.email'], fixture.repo);
+  const emptyHome = path.join(path.dirname(fixture.repo), 'empty-home');
+  fs.mkdirSync(emptyHome);
+  const result = await runStatusSyncProcess(fixture.now.toISOString(), {
+    HOME: emptyHome,
+    XDG_CONFIG_HOME: emptyHome,
+    GIT_AUTHOR_NAME: '',
+    GIT_AUTHOR_EMAIL: '',
+    GIT_COMMITTER_NAME: '',
+    GIT_COMMITTER_EMAIL: ''
+  });
   assert.equal(result.timedOut, false, JSON.stringify(result));
   assert.equal(result.code, 0, result.stderr);
   const payload = JSON.parse(result.stdout);
@@ -686,6 +698,17 @@ test('temp clone creates one exact detached 9M commit, binds it, and leaves the 
 
   fixture.detachedStatusCommit = payload.detachedStatusCommit;
   assert.match(fixture.detachedStatusCommit, /^[a-f0-9]{40}$/);
+  assert.equal(
+    text(['show', '-s', '--format=%an%n%ae%n%aI%n%cn%n%ce%n%cI', fixture.detachedStatusCommit], fixture.repo),
+    [
+      implementation.DETACHED_STATUS_COMMIT_IDENTITY.authorName,
+      implementation.DETACHED_STATUS_COMMIT_IDENTITY.authorEmail,
+      implementation.DETACHED_STATUS_COMMIT_IDENTITY.authorDate,
+      implementation.DETACHED_STATUS_COMMIT_IDENTITY.committerName,
+      implementation.DETACHED_STATUS_COMMIT_IDENTITY.committerEmail,
+      implementation.DETACHED_STATUS_COMMIT_IDENTITY.committerDate
+    ].join('\n')
+  );
   assert.equal(text(['rev-parse', 'HEAD^{commit}'], fixture.repo), fixture.detachedStatusCommit);
   assert.equal(text(['rev-parse', `${fixture.detachedStatusCommit}^`], fixture.repo), fixture.finalReleaseCommit);
   assert.equal(
