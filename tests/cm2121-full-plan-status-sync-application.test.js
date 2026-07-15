@@ -61,6 +61,22 @@ test('projected status surfaces pass current-facts and ledger validators in isol
   }
 });
 
+test('CURRENT_FACTS projection preserves historical CM-2121 evidence without re-closing current status sync', () => {
+  const { options } = prepared();
+  const before = options.resolveGitFile(application.BASELINE_COMMIT, application.CURRENT_FACTS_PATH);
+  const projected = JSON.parse(application.projectStatusFile(application.CURRENT_FACTS_PATH, before.content));
+  assert.equal(projected.evidenceBaseline.cm2121StatusSyncPerformed, true);
+  assert.equal(projected.planPackCompletion.fullPlanStatusSyncPerformed, false);
+});
+
+test('active application generation no longer reproduces the historical frozen patch hash', () => {
+  const { artifact } = prepared();
+  assert.notEqual(
+    artifact.payload.patchPlan.patchPayloadSha256,
+    '2d4cbe41b0747d9dac31a77a02f70e389356c72d5f9307ab415f9f1af893ef92'
+  );
+});
+
 test('review identity, target, readiness, authority, and side-effect drift fail closed', () => {
   const { options, artifact } = prepared();
   for (const mutate of [
