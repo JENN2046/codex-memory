@@ -15,22 +15,22 @@ const { canonicalize } = require('./Cm2115CanonicalFullPlanEvidenceSnapshot');
 const TASK_ID = 'CM-2115-R2';
 const RECEIPT_PATH = 'docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.json';
 const SELF_REVIEW_DECISION_FREEZE = Object.freeze({
-  commit: '798a91b23bc84788fd6a69d4dad61ab5e135f70e',
-  tree: '7bfcb9f625b4af0828458c0f56756bb7ebe756b4',
-  parentCommit: 'fe3fa28821282348f4b8e94dafe1dc904226b461',
-  parentTree: '5b03dae54a30ff826a029daffd0aa3ed630c583a',
-  canonicalPayloadSha256: '377812d904e60ec569b57c9d9e2eded76a83a797e1f076160598e4db41c2f3a5',
+  commit: 'db494839c2b415316521bb5da3fd4a0db737106e',
+  tree: '8f3c5f9efa23bd6f67167c2b780011a7078a01e1',
+  parentCommit: 'b6009d521e8b1f87be244c7acac19417bc0bb1da',
+  parentTree: '5d5d9275ed4513e99d6de8ec595fd8f42cd59358',
+  canonicalPayloadSha256: '4295cddf6494c6002ff97b18364d0111accb8245a90e4992c8bdc5a301f53afc',
   json: Object.freeze({
     path: DECISION_PATH,
-    blobOid: '441da37af718989450f0ec632f3ca09dac773c3e',
+    blobOid: '2f9d1d228a50129eb6cf63e12aac879c2f3f2162',
     bytes: 5011,
-    sha256: 'ec1c32ee890f2d886af345cbaf51bacc2c0166746fd536e6d66f5576f612d136'
+    sha256: '79f9629da5b07b45808c8c57f8dd0b1c4c5a098187b6bee2505470264abfa14e'
   }),
   markdown: Object.freeze({
     path: DECISION_PATH.replace(/\.json$/, '.md'),
-    blobOid: '7a1b4198ed56d627dda8f637f1023a37d48c1ccd',
+    blobOid: '8d425f8f1fef990da38fe17e4c4f2f02aa30230d',
     bytes: 5606,
-    sha256: '2b147124cfb74cf5067748246690be9dfed5b6022d033c64086bdd4de1e1fbf4'
+    sha256: 'cb15f8b50adb58ef8dfef40f820d5d43de8f1de38d6c0383b2ca33fead0ade40'
   })
 });
 
@@ -93,7 +93,6 @@ function evaluateFrozenSelfReviewDecision({
     const expectedDiffPaths = [
       SELF_REVIEW_DECISION_FREEZE.json.path,
       SELF_REVIEW_DECISION_FREEZE.markdown.path,
-      'src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js',
       'tests/cm2115-r2-self-review-decision.test.js'
     ].sort();
     if (!sameJson(diffPaths, expectedDiffPaths)) blockers.push('intake.decisionDiffPaths');

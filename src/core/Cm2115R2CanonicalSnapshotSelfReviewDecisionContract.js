@@ -7,27 +7,28 @@ const {
 } = require('./Cm2115CanonicalFullPlanEvidenceSnapshot');
 const {
   SNAPSHOT_FREEZE,
-  evaluateCm2115SnapshotReviewRequest
+  evaluateCm2115SnapshotReviewRequest,
+  renderCm2115SnapshotReviewRequestMarkdown
 } = require('./Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
 
 const TASK_ID = 'CM-2115-R2';
 const DECISION_PATH = 'docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.json';
 const REVIEW_REQUEST_FREEZE = Object.freeze({
-  commit: '81ee0106ed8cd9b10dc30120ecb7ee6d8897fc79',
-  parent: 'f1054a2d83d16860ac532daefe6bd1ac300813ed',
-  tree: 'c68cd2ad68258db7a8569faf728aed3c5aed1fd3',
+  commit: 'a715d5ca76aae2fa688407c34a1ab7d99c52cb46',
+  parent: '399ddc54a0b0009d017528905fa72bd4dc52a519',
+  tree: '74a9f350d2ec66e8260b99e9a4f6c3e457b102dc',
   json: Object.freeze({
     path: 'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json',
-    blobOid: '08bc3ffbe9a39b3dbbe42bdbf14781c021d4dba6',
+    blobOid: '861abf1bb1ba06bd129c0b33b1c97f61a622b57b',
     bytes: 5973,
-    sha256: 'fc56ff4ab271b1f59505ed2ce62e680dc55854b5c696b9f5409357ad25c77953',
-    canonicalPayloadSha256: '81d68f6b61caf43756e171640fe44a92ac9989be3e5e2b5971ebb79a2cda4d91'
+    sha256: 'ead0d8df10e7e15a4e76cb7fa78dc41f4374f49524b246f1fc78abb288c91c6f',
+    canonicalPayloadSha256: 'cce599aad762528787d303abb2aff3cf3ff98dc4d60a78c0ab563131fac23a72'
   }),
   markdown: Object.freeze({
     path: 'docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md',
-    blobOid: 'afe3b7f21055872369228e7adf178e7de9856212',
+    blobOid: 'da6043b49159b34d3e91a72b80b68c22b51278a7',
     bytes: 6983,
-    sha256: '58f9b65e88397bb0570500588134c756e3ea975506cb4c0d94b2f7adebbab3a5'
+    sha256: '54e4de16eb89c06e91fd15e8c69ece351c3e71816201fe6ffb06f3b50f949ff6'
   })
 });
 const REVIEW_REQUEST_DIFF_PATHS = Object.freeze([
@@ -155,6 +156,10 @@ function evaluateFrozenReviewRequest({
     verifyFrozenFile(requestIdentity, REVIEW_REQUEST_FREEZE.json, blockers, 'selfReview.reviewRequestJson');
     verifyFrozenFile(markdownIdentity, REVIEW_REQUEST_FREEZE.markdown, blockers, 'selfReview.reviewRequestMarkdown');
     request = JSON.parse(requestIdentity.content.toString('utf8'));
+    const expectedMarkdown = Buffer.from(renderCm2115SnapshotReviewRequestMarkdown(request), 'utf8');
+    if (!markdownIdentity.content.equals(expectedMarkdown)) {
+      blockers.push('selfReview.reviewRequestMarkdownMirror');
+    }
     if (request.canonicalPayloadSha256 !== REVIEW_REQUEST_FREEZE.json.canonicalPayloadSha256) {
       blockers.push('selfReview.reviewRequestPayloadSha256');
     }

@@ -26,6 +26,37 @@ function doc(name) {
   return `${DOCS}${name}`;
 }
 
+function renderCanonicalSnapshotMarkdown(snapshot) {
+  const jsonText = `${JSON.stringify(canonicalize(snapshot), null, 2)}\n`;
+  const counts = snapshot.payload.counts;
+  return [
+    '# CM-2115-R2 Canonical Full-plan Evidence Snapshot',
+    '',
+    'This is a content-equivalent review surface for the canonical JSON snapshot.',
+    'It is prepared for independent Git-object and semantic-route review only.',
+    '',
+    `- Source commit: \`${snapshot.payload.baseline.sourceCommit}\``,
+    `- Source tree: \`${snapshot.payload.baseline.sourceTree}\``,
+    `- Canonical payload SHA-256: \`${snapshot.canonicalPayloadSha256}\``,
+    `- Trace entries: \`${counts.totalTraceEntryCount}\``,
+    `- Resolved trace entries: \`${counts.resolvedTraceEntryCount}\``,
+    `- Placeholder refs: \`${counts.fakePlaceholderRefCount}\``,
+    `- Unique source objects: \`${counts.uniqueSourceObjectCount}\``,
+    `- Candidate completion eligible: \`${snapshot.payload.candidateAudit.completionEligibleForIndependentReview}\``,
+    `- Authoritative fullPlanPackCompleted: \`${snapshot.payload.currentState.fullPlanPackCompleted}\``,
+    `- Readiness claimed: \`${snapshot.payload.currentState.readinessClaimed}\``,
+    '',
+    'The candidate audit result is not an application. Independent review and a separate application gate remain required.',
+    '',
+    '## Exact JSON mirror',
+    '',
+    '```json',
+    jsonText.trimEnd(),
+    '```',
+    ''
+  ].join('\n');
+}
+
 const LOCAL_VALIDATION_RECEIPT_PATH = doc('cm2115_r2_local_validation_receipt.json');
 const PHASE2_APPLICATION_RECEIPT_PATH = doc('phase2_completion_audit_application_binding_receipt_cm2115_r2_v2.json');
 
@@ -694,6 +725,7 @@ module.exports = {
   derivationClassFor,
   evidenceKindFor,
   requiredTraceDescriptors,
+  renderCanonicalSnapshotMarkdown,
   sha256,
   sha256Canonical,
   sourcePathsFor
