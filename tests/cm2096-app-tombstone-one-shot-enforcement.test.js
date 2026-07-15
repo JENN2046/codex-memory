@@ -32,6 +32,49 @@ function nativeRouteOverrides() {
   };
 }
 
+function exactTombstoneApprovalResult() {
+  return {
+    accepted: true,
+    allowedAction: 'live_bridge_tombstone_memory_proof',
+    allowedScope: {
+      project_id: 'codex-memory',
+      workspace_id: 'codex-memory-phase8-proof',
+      scope_id: 'cm2089-phase8-native-write-proof-001',
+      client_id: 'Codex',
+      visibility: 'project'
+    },
+    runtimeTarget: {
+      primaryRuntime: 'VCPToolBox native memory',
+      targetReferenceName: 'cm2096-vcptoolbox-native-memory-target',
+      targetKind: 'mcp_server'
+    },
+    rollbackPlanRef: 'cm2096-append-only-logical-tombstone-rollback-drill',
+    approvalDecisionReference: 'CM-2096-ER-FUTURE-TOMBSTONE-EXECUTION-DECISION',
+    claimBindingHash: 'a'.repeat(64)
+  };
+}
+
+function matchingRequestContext(assertion) {
+  return {
+    executionContext: {
+      agentAlias: 'Codex',
+      agentId: 'cm2096-fixture-test',
+      clientId: 'codex',
+      projectId: 'codex-memory',
+      workspaceId: 'codex-memory-phase8-proof',
+      scopeId: 'cm2089-phase8-native-write-proof-001',
+      visibility: 'project',
+      requestSource: 'cm2096-fixture-test'
+    },
+    cm2096TombstoneAuthorizationAssertion: assertion,
+    auditReceipt: { receiptId: 'cm2096-tombstone-drill-receipt-001' },
+    rollbackPosture: {
+      mode: 'mutation_cleanup_plan',
+      rollbackPlanRef: 'cm2096-append-only-logical-tombstone-rollback-drill'
+    }
+  };
+}
+
 test('CM-2096 app path rejects caller-supplied exact approval before any tombstone path', async () => {
   const app = createCodexMemoryApplication({
     cm2096TombstoneOneShotEnforcementEnabled: true,
@@ -96,6 +139,42 @@ test('CM-2096 app path rejects an unusable native route before consuming the ass
     const result = await app.callTool('tombstone_memory', args, {
       cm2096TombstoneAuthorizationAssertion: { opaque: true }
     });
+    assert.equal(result.decision, 'rejected');
+    assert.equal(assertionVerifierCalls, 0);
+    assert.equal(result.reasonCode, 'cm2096_tombstone_one_shot_authorization_required');
+    assert.equal(result.nativeWritePerformed, false);
+    assert.equal(result.localFallbackWritePerformed, false);
+    await app.close();
+  }
+});
+
+test('CM-2096 app path rejects drifted bridge approval context before consuming the assertion', async () => {
+  for (const driftRequestContext of [
+    requestContext => {
+      requestContext.executionContext.scopeId = 'drifted-scope';
+    },
+    requestContext => {
+      requestContext.rollbackPosture.rollbackPlanRef = 'drifted-rollback-plan';
+    }
+  ]) {
+    let assertionVerifierCalls = 0;
+    const exactApprovalResult = exactTombstoneApprovalResult();
+    const assertion = { exactApprovalResult };
+    const app = createCodexMemoryApplication({
+      cm2096TombstoneOneShotEnforcementEnabled: true,
+      cm2096TombstoneAuthorizationAssertionVerifier: async () => {
+        assertionVerifierCalls += 1;
+        return { accepted: true, exactApprovalResult };
+      },
+      governedMcpVcpNativeWriteDelegationMode: 'primary',
+      governedMcpVcpNativeBridgeGateMode: 'observe',
+      ...nativeRouteOverrides()
+    });
+    const requestContext = matchingRequestContext(assertion);
+    driftRequestContext(requestContext);
+
+    const result = await app.callTool('tombstone_memory', args, requestContext);
+
     assert.equal(result.decision, 'rejected');
     assert.equal(assertionVerifierCalls, 0);
     assert.equal(result.reasonCode, 'cm2096_tombstone_one_shot_authorization_required');
