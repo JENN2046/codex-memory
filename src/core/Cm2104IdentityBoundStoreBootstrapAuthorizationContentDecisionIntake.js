@@ -4,6 +4,12 @@ const crypto = require('node:crypto');
 
 const MACHINE_BOUND_CONTENT_DECISIONS = new WeakSet();
 
+function deepFreeze(value) {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  for (const nested of Object.values(value)) deepFreeze(nested);
+  return Object.freeze(value);
+}
+
 const CONTENT_DECISION_KEYS = Object.freeze([
   'schemaVersion', 'taskId', 'decisionType', 'decisionReference',
   'authorizationContentApproved', 'bootstrapExecutionAuthorized',
@@ -170,6 +176,7 @@ function evaluateCm2104BootstrapAuthorizationContentDecisionIntake({
   if (blockers.length) {
     return { accepted: false, blockers: [...new Set(blockers)], decision: null, executionAuthorized: false };
   }
+  deepFreeze(decision);
   MACHINE_BOUND_CONTENT_DECISIONS.add(decision);
   return {
     accepted: true,
