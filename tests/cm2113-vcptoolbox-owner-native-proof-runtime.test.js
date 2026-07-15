@@ -16,6 +16,7 @@ const bootstrapDecision = JSON.parse(fs.readFileSync(path.join(
   __dirname,
   '../docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_runtime_bootstrap_decision_cm2113.json'
 ), 'utf8'));
+const FROZEN_REVIEW_TIME = new Date('2026-07-12T12:00:00+08:00');
 
 test('CM-2113 runtime and controller require all three frozen Git commits before effects', async () => {
   await assert.rejects(runCm2113Runtime(null, null, null), /git_commit_argument_required/);
@@ -38,10 +39,10 @@ test('CM-2113 controller waits for stdio close rather than process exit', async 
 });
 
 test('CM-2113 bootstrap decision rejects nested non-claim expansion', () => {
-  assert.equal(decisionAccepted(bootstrapDecision), true);
+  assert.equal(decisionAccepted(bootstrapDecision, FROZEN_REVIEW_TIME), true);
   const drifted = structuredClone(bootstrapDecision);
   drifted.nonClaims.productionReady = true;
-  assert.equal(decisionAccepted(drifted), false);
+  assert.equal(decisionAccepted(drifted, FROZEN_REVIEW_TIME), false);
 });
 
 test('CM-2113 bootstrap decision rejects an approval that is not effective yet', () => {
