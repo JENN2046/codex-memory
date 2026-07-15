@@ -86,6 +86,12 @@ test('active Markdown projection describes revalidation while historical project
       assert.doesNotMatch(block, /fullPlanPackCompleted=true/);
       assert.match(block, /pending revalidation/);
     }
+    if (sourcePath === 'STATUS.md') {
+      assert.match(active, /durable claim reached `CONSUMED_SUCCESS`/);
+      assert.match(active, /historical executor is inactive and non-replayable/);
+      assert.doesNotMatch(active, /no claim or application occurred/);
+      assert.doesNotMatch(active, /execution remains unclaimed/);
+    }
   }
   const frozen = options.resolveGitFile('096eaf0c42f8e76180177eef7d16bf6edd605858', application.APPLICATION_PATH);
   const historical = application.evaluateHistoricalFrozenApplication(JSON.parse(frozen.content), options);
