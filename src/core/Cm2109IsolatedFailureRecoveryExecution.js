@@ -29,6 +29,16 @@ const FAILURE_FIXTURE_MARKDOWN = Buffer.from(
   'No user memory. No production provider. Not RC_READY.\n',
   'utf8'
 );
+const CASE_RESULT_FIELDS = Object.freeze([
+  'caseId', 'failureStage', 'nonce', 'receiptId', 'registryReference',
+  'finalState', 'casePassed', 'claimCount', 'writeInvocationCount',
+  'nativeWriteCalls', 'durableWrites', 'retryCount', 'rollbackCount',
+  'compensationCount', 'authorizationReplayAllowed', 'productionProviderCalled',
+  'realMemoryRead', 'realMemoryModified', 'localFallbackUsed', 'rawMemoryReturned',
+  'rawPathDisclosed', 'authorizationConsumed', 'claimEnvelopeCreated',
+  'writeInvocationMarkerCreated', 'durableFixtureBytes', 'durableFixtureSha256',
+  'acknowledgementReturned', 'stopReason'
+]);
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -301,6 +311,7 @@ function evaluateFailureRecoveryReceipt(receipt = {}, expectedBinding = {}) {
   ];
   for (const expected of expectedCaseValues) {
     const item = payload.caseResults?.find(value => value.caseId === expected.id);
+    if (!hasExactKeys(item, CASE_RESULT_FIELDS)) blockers.push(`receipt.caseResults.${expected.id}.fields`);
     if (!item || item.casePassed !== true || item.finalState !== expected.state || item.claimCount !== expected.claims || item.writeInvocationCount !== expected.invocations || item.nativeWriteCalls !== expected.writes || item.durableWrites !== expected.durable || item.authorizationConsumed !== expected.consumed || item.authorizationReplayAllowed !== false || item.retryCount !== 0 || item.rollbackCount !== 0 || item.compensationCount !== 0 || item.productionProviderCalled !== false || item.realMemoryRead !== false || item.realMemoryModified !== false || item.localFallbackUsed !== false || item.rawMemoryReturned !== false || item.rawPathDisclosed !== false) blockers.push(`receipt.caseResults.${expected.id}`);
   }
   const ambiguous = payload.caseResults?.find(value => value.caseId === CASE_IDS[2]);
