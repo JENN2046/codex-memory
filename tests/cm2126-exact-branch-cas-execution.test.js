@@ -541,6 +541,58 @@ test('final release intake rejects leading or trailing claims outside canonical 
   }
 });
 
+test('final release intake rejects non-canonical JSON bytes with canonical Markdown', () => {
+  const frozenJson = fixture.gitResolvers.resolveGitFile(
+    fixture.finalReleaseCommit,
+    fixture.frozenModule.FINAL_RELEASE_PATH
+  ).content;
+  const frozenMarkdown = fixture.gitResolvers.resolveGitFile(
+    fixture.finalReleaseCommit,
+    fixture.frozenModule.FINAL_RELEASE_MARKDOWN_PATH
+  ).content;
+  const decision = JSON.parse(frozenJson.toString('utf8'));
+  const canonicalText = frozenJson.toString('utf8');
+  const frozenResult = fixture.frozenModule.intakeFinalReleaseDecision({
+    finalReleaseCommit: fixture.finalReleaseCommit,
+    packetEvidence: fixture.packetEvidence,
+    now: fixture.now,
+    ...fixture.gitResolvers
+  });
+  assert.equal(frozenResult.accepted, true);
+  const nonCanonicalJsonVariants = [
+    Buffer.from(`\n${canonicalText}`, 'utf8'),
+    Buffer.from(`{"schemaVersion":999,${canonicalText.slice(1)}`, 'utf8')
+  ];
+  for (const nonCanonicalJson of nonCanonicalJsonVariants) {
+    assert.deepEqual(JSON.parse(nonCanonicalJson.toString('utf8')), decision);
+    assert.equal(nonCanonicalJson.equals(frozenJson), false);
+    const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2126-final-release-json-fork-'));
+    const repo = path.join(parent, 'evidence');
+    try {
+      git(['clone', '--quiet', '--no-hardlinks', fixture.repo, repo], parent);
+      git(['config', 'user.name', 'CM2126 Test'], repo);
+      git(['config', 'user.email', 'cm2126@example.invalid'], repo);
+      git(['checkout', '--quiet', '--detach', fixture.packetCommit], repo);
+      const jsonPath = path.join(repo, fixture.frozenModule.FINAL_RELEASE_PATH);
+      const markdownPath = path.join(repo, fixture.frozenModule.FINAL_RELEASE_MARKDOWN_PATH);
+      fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
+      fs.writeFileSync(jsonPath, nonCanonicalJson);
+      fs.writeFileSync(markdownPath, frozenMarkdown);
+      const forkCommit = commitAll(repo, 'test: fork final release with non-canonical JSON');
+      const result = fixture.frozenModule.intakeFinalReleaseDecision({
+        finalReleaseCommit: forkCommit,
+        packetEvidence: fixture.packetEvidence,
+        now: fixture.now,
+        ...resolvers(repo)
+      });
+      assert.equal(result.accepted, false);
+      assert.ok(result.blockers.includes('finalReleaseIntake.lineageOrFiles'));
+    } finally {
+      fs.rmSync(parent, { recursive: true, force: true });
+    }
+  }
+});
+
 test('unsafe Git environment and caller worktree surfaces fail before claim or Git effect', () => {
   initializeGovernanceRoot();
   const refBefore = text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo);

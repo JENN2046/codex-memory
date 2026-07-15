@@ -748,6 +748,7 @@ function intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now = 
         !sameJson(paths, FINAL_RELEASE_DIFF_PATHS) || !sameJson(entries, FINAL_RELEASE_DIFF_ENTRIES) ||
         jsonIdentity.gitMode !== '100644' || jsonIdentity.gitObjectType !== 'blob' ||
         markdownIdentity.gitMode !== '100644' || markdownIdentity.gitObjectType !== 'blob' ||
+        !jsonIdentity.content.equals(Buffer.from(serializeArtifact(decision), 'utf8')) ||
         !markdownIdentity.content.equals(Buffer.from(renderCm2127FinalReleaseMarkdown(decision), 'utf8'))) {
       blockers.push('finalReleaseIntake.lineageOrFiles');
     }
