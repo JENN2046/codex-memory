@@ -219,6 +219,31 @@ test('CM-2121 content decision is Git-intaken, frozen, and WeakSet machine-bound
   assert.equal(implementation.isMachineBoundContentDecision(JSON.parse(JSON.stringify(evidence.decision))), false);
 });
 
+test('CM-2122 packet consumes the exact CM-2121 one-shot registry authority', () => {
+  const contentEvidence = fixture.frozenModule.intakeContentDecision(fixture.gitResolvers);
+  assert.equal(contentEvidence.accepted, true, contentEvidence.blockers.join(','));
+  const authorized = contentEvidence.decision.payload.authorizationContent;
+  const packetRegistry = fixture.packetEvidence.packet.payload.oneShotRegistry;
+  assert.deepEqual({
+    registryReference: packetRegistry.registryReference,
+    nonce: packetRegistry.nonce,
+    receiptId: packetRegistry.receiptId
+  }, {
+    registryReference: authorized.registryReference,
+    nonce: authorized.nonce,
+    receiptId: authorized.receiptId
+  });
+
+  const drifted = JSON.parse(JSON.stringify(fixture.packetEvidence.packet));
+  drifted.payload.oneShotRegistry.registryReference = 'cm2122-r2-full-plan-status-sync-registry-001';
+  drifted.payload.oneShotRegistry.nonce = 'cm2122-r2-full-plan-status-sync-001';
+  drifted.payload.oneShotRegistry.receiptId = 'cm2122-r2-full-plan-status-sync-receipt-001';
+  drifted.canonicalPayloadSha256 = sha256Canonical(drifted.payload);
+  const evaluation = fixture.frozenModule.evaluateExecutionPacket(drifted, fixture.gitResolvers);
+  assert.equal(evaluation.accepted, false);
+  assert.ok(evaluation.blockers.includes('packet.exactContent'));
+});
+
 test('the exact frozen CM-2122 packet cannot replay its stale CM-2117 execution attribution', () => {
   assert.throws(
     () => implementation.assertExecutableStatusAttribution({
