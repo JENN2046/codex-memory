@@ -254,6 +254,28 @@ test('CM-2128 receipt identity deterministically binds bytes, blob OID, raw hash
   });
 });
 
+test('CM-2129 review requires the exact complete CM-2128 manifest shape and freeze reference', () => {
+  const payload = Object.fromEntries(review.MANIFEST_PAYLOAD_KEYS.map(key => [key, null]));
+  payload.freezeReference = review.FREEZE_REFERENCE;
+  const manifest = {
+    schemaVersion: 1,
+    taskId: 'CM-2128',
+    artifactType: 'cm2128_branch_cas_receipt_freeze_manifest_v1',
+    canonicalPayloadSha256: 'a'.repeat(64),
+    payload
+  };
+  assert.equal(review.manifestShapeAccepted(manifest), true);
+  assert.equal(review.manifestShapeAccepted({ ...manifest, productionReady: true }), false);
+  assert.equal(review.manifestShapeAccepted({
+    ...manifest,
+    payload: { ...payload, productionReady: true }
+  }), false);
+  assert.equal(review.manifestShapeAccepted({
+    ...manifest,
+    payload: { ...payload, freezeReference: 'CM-2128-FORKED' }
+  }), false);
+});
+
 test('CM-2129 accepts only the fixed claim and execution receipt source filenames', () => {
   const manifest = {
     payload: {

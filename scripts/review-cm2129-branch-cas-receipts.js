@@ -54,6 +54,30 @@ const REVIEW_PATH = 'docs/near-model-memory-plan-pack/cm2129_branch_cas_receipt_
 const REVIEW_MARKDOWN_PATH = REVIEW_PATH.replace(/\.json$/, '.md');
 const FREEZE_DIFF_PATHS = Object.freeze(Object.values(OUTPUTS).sort());
 const FREEZE_DIFF_ENTRIES = Object.freeze(FREEZE_DIFF_PATHS.map(sourcePath => ({ status: 'A', path: sourcePath })));
+const FREEZE_REFERENCE = 'CM-2128-BRANCH-CAS-RECEIPT-FREEZE-907A2BEA-0EF4EF2B';
+const MANIFEST_KEYS = Object.freeze([
+  'schemaVersion', 'taskId', 'artifactType', 'canonicalPayloadSha256', 'payload'
+]);
+const MANIFEST_PAYLOAD_KEYS = Object.freeze([
+  'freezeReference', 'freezeImplementationCommit', 'freezeImplementationTree',
+  'freezeImplementationParent', 'freezeImplementationDiffPaths',
+  'freezeImplementationDiffEntries', 'freezeImplementationArtifacts',
+  'contentDecisionCommit', 'executionPacketCommit', 'finalReleaseCommit',
+  'targetRef', 'targetCommit', 'targetTree', 'bindingHash', 'claimReceipt',
+  'executionReceipt', 'claimProjection', 'executionProjection', 'verification',
+  'currentBoundary'
+]);
+
+function exactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    sameJson(Object.keys(value).sort(), [...expected].sort());
+}
+
+function manifestShapeAccepted(manifest = {}) {
+  return exactKeys(manifest, MANIFEST_KEYS) &&
+    exactKeys(manifest.payload, MANIFEST_PAYLOAD_KEYS) &&
+    manifest.payload.freezeReference === FREEZE_REFERENCE;
+}
 
 function parseArgs(argv) {
   if (argv.length !== 0) throw new Error('cm2129_review_no_arguments_allowed');
@@ -150,7 +174,8 @@ async function buildReview() {
   const manifest = JSON.parse(manifestIdentity.content.toString('utf8'));
   const frozenClaim = JSON.parse(claimIdentity.content.toString('utf8'));
   const frozenReceipt = JSON.parse(executionIdentity.content.toString('utf8'));
-  if (manifest.schemaVersion !== 1 || manifest.taskId !== 'CM-2128' ||
+  if (!manifestShapeAccepted(manifest) ||
+      manifest.schemaVersion !== 1 || manifest.taskId !== 'CM-2128' ||
       manifest.artifactType !== 'cm2128_branch_cas_receipt_freeze_manifest_v1' ||
       manifest.canonicalPayloadSha256 !== sha256Canonical(manifest.payload || {}) ||
       manifest.payload.freezeImplementationCommit !== implementationCommit ||
@@ -398,12 +423,16 @@ if (require.main === module) {
 }
 
 module.exports = {
+  FREEZE_REFERENCE,
   FREEZE_DIFF_ENTRIES,
   FREEZE_DIFF_PATHS,
+  MANIFEST_KEYS,
+  MANIFEST_PAYLOAD_KEYS,
   REVIEW_MARKDOWN_PATH,
   REVIEW_PATH,
   buildReview,
   main,
+  manifestShapeAccepted,
   parseArgs,
   readLiveGovernanceFile,
   receiptSourceFilenamesAccepted,
