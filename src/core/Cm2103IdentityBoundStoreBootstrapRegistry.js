@@ -39,7 +39,15 @@ function safeKey(value) {
   return sha256(String(value || ''));
 }
 
+function assertAuthorizationIdentifiers(nonce, receiptId) {
+  if (typeof nonce !== 'string' || nonce.trim() === '' ||
+      typeof receiptId !== 'string' || receiptId.trim() === '') {
+    throw new Error('cm2103_authorization_identifier_required');
+  }
+}
+
 function claimIdentity({ nonce, receiptId }) {
+  assertAuthorizationIdentifiers(nonce, receiptId);
   const nonceHash = safeKey(nonce);
   const receiptIdHash = safeKey(receiptId);
   const claimId = sha256(JSON.stringify(canonicalize({ nonceHash, receiptIdHash })));
@@ -110,6 +118,7 @@ function exactEnvelopeBinding(value, expected) {
     value?.governanceFilesystemEffectAttempted === true &&
     value?.governanceFilesystemEffectsPresent === true &&
     value?.authorizationUseCount === 1 &&
+    value?.authorizationConsumed === true &&
     value?.authorizationReplayAllowed === false &&
     value?.automaticRetryAllowed === false &&
     value?.automaticCleanupAllowed === false;
@@ -270,6 +279,7 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
   }
 
   async preflightUnused({ nonce, receiptId }) {
+    assertAuthorizationIdentifiers(nonce, receiptId);
     await this.verifyGovernanceRootIdentity();
     const target = this.envelopePath({ nonce, receiptId });
     try {
@@ -282,6 +292,7 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
   }
 
   async inspectExistingClaimForReconciliation({ nonce, receiptId, bindingHash }) {
+    assertAuthorizationIdentifiers(nonce, receiptId);
     await this.verifyGovernanceRootIdentity();
     const target = this.envelopePath({ nonce, receiptId });
     const expected = baseClaimEnvelope({ nonce, receiptId, bindingHash });
@@ -442,6 +453,7 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
   }
 
   async claim({ nonce, receiptId, bindingHash }) {
+    assertAuthorizationIdentifiers(nonce, receiptId);
     await this.verifyGovernanceRootIdentity();
     const target = this.envelopePath({ nonce, receiptId });
     const expected = baseClaimEnvelope({ nonce, receiptId, bindingHash });
