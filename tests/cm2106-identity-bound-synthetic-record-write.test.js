@@ -181,8 +181,13 @@ test('primary-write-only adapter does not initialize or create the derived runti
     primaryWriteOnly: true
   });
   const payloadBytes = await fs.readFile(path.join(__dirname, '..', PAYLOAD_PATH));
-  await adapter.record(JSON.parse(payloadBytes.toString('utf8')));
+  const result = await adapter.record(JSON.parse(payloadBytes.toString('utf8')));
   await assert.rejects(fs.lstat(derived), error => error.code === 'ENOENT');
+  assert.equal(result._nativeRuntimeReceipt.nativeRuntimeCalled, false);
+  assert.equal(result._nativeRuntimeReceipt.nativeRuntimeInitialized, false);
+  assert.equal(result._nativeRuntimeReceipt.isolatedRuntimeStoreUsed, false);
+  assert.equal(result._nativeRuntimeReceipt.primaryMemoryStoreWritePerformed, true);
+  assert.equal(result._nativeRuntimeReceipt.derivedIndexWritePerformed, false);
   await adapter.shutdown();
 });
 

@@ -286,6 +286,7 @@ test('CM-2107 strict bridge delegates one primary-write-only tombstone marker', 
   assert.equal(result.receipt.nativeInvocationReceipt.statusClass, 'success');
   assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.nativeRuntimeCalled, false);
   assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.nativeRuntimeInitialized, false);
+  assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.isolatedRuntimeStoreUsed, false);
   assert.equal(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.durableWritePerformed, true);
   assert.equal(server.getLowDisclosureAuthorizationProjection().authorizationRequired, true);
   assert.equal(server.getLowDisclosureAuthorizationProjection().rejectedAuthorizationCount, 1);

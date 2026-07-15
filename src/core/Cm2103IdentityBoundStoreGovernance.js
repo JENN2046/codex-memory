@@ -18,6 +18,7 @@ const GOVERNANCE_ROOT_IDENTITY = Object.freeze({
 const GOVERNANCE_ROOT_IDENTITY_BYTES = Buffer.from(JSON.stringify(GOVERNANCE_ROOT_IDENTITY), 'utf8');
 const GOVERNANCE_ROOT_IDENTITY_SHA256 = '240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0';
 const AUTHORIZATION_REGISTRY_ROOT_DIRECTORY = 'phase8-one-shot-authorization-registries';
+const VERIFIED_INTERNAL_PATHS = new WeakMap();
 
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
@@ -68,15 +69,20 @@ async function verifyCm2103GovernanceRoot(gitCommonDir) {
       sha256Canonical(GOVERNANCE_ROOT_IDENTITY) !== GOVERNANCE_ROOT_IDENTITY_SHA256) {
     throw new Error('cm2103_governance_root_identity_mismatch');
   }
-  return {
+  const verification = Object.freeze({
     accepted: true,
     governanceRootIdentityReference: GOVERNANCE_ROOT_IDENTITY.registryRootReference,
     governanceRootIdentityBytes: observed.length,
     governanceRootIdentitySha256: sha256(observed),
     storeRootBindingSha256: STORE_ROOT_BINDING_CANONICAL_SHA256,
-    rawPathDisclosed: false,
-    internalPaths
-  };
+    rawPathDisclosed: false
+  });
+  VERIFIED_INTERNAL_PATHS.set(verification, internalPaths);
+  return verification;
+}
+
+function getVerifiedCm2103GovernanceInternalPaths(verification) {
+  return VERIFIED_INTERNAL_PATHS.get(verification) || null;
 }
 
 async function observeCm2103StoreDirectoryAbsent(storeRoot) {
@@ -95,6 +101,7 @@ module.exports = {
   GOVERNANCE_ROOT_IDENTITY_BYTES,
   GOVERNANCE_ROOT_IDENTITY_SHA256,
   deriveCm2103GovernancePaths,
+  getVerifiedCm2103GovernanceInternalPaths,
   observeCm2103StoreDirectoryAbsent,
   verifyCm2103GovernanceRoot
 };
