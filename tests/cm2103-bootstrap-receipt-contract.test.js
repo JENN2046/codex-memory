@@ -77,6 +77,7 @@ function baseClaim(overrides = {}) {
     claimStateWriteAttempts: 7,
     claimStateWrites: 7,
     terminalStateDurablyRecorded: true,
+    authorizationConsumed: true,
     ...overrides
   };
 }

@@ -252,6 +252,38 @@ test('CM-2103 R1 existing store remains UNCLAIMED without reading identity or wr
   assert.deepEqual(entries, ['.phase8-registry-root-identity.json']);
 });
 
+test('CM-2103 R1 rejects blank authorization identifiers before any durable effect', async t => {
+  for (const [label, nonce, receiptId] of [
+    ['empty-nonce', '', 'receipt'],
+    ['blank-nonce', '   ', 'receipt'],
+    ['empty-receipt', 'nonce', ''],
+    ['blank-receipt', 'nonce', '\t']
+  ]) {
+    await t.test(label, async t => {
+      const fixture = await createFixture(t);
+      await assert.rejects(executeCm2103BootstrapFilesystem({
+        registry: fixture.registry,
+        storeRoot: fixture.storeRoot,
+        nonce,
+        receiptId,
+        bindingHash: 'a'.repeat(64),
+        filesystem: fixture.filesystem,
+        identityBytes: expectedIdentityBytes()
+      }), /cm2103_bootstrap_engine_configuration_invalid/);
+      await assert.rejects(fixture.registry.claim({
+        nonce,
+        receiptId,
+        bindingHash: 'a'.repeat(64)
+      }), /cm2103_authorization_identifier_required/);
+      assert.deepEqual(
+        await fs.readdir(fixture.authorizationRegistryRoot),
+        ['.phase8-registry-root-identity.json']
+      );
+      assert.equal(await fs.access(fixture.storeRoot).then(() => true, () => false), false);
+    });
+  }
+});
+
 test('CM-2103 R1 atomic claim distinguishes no-create from persisted acknowledgement ambiguity', async t => {
   await t.test('claim write fails before creation and leaves no partial marker set', async t => {
     const fixture = await createFixture(t, 'claim_before_write');

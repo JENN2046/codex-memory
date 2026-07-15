@@ -772,6 +772,28 @@ test('independent review request binds the frozen snapshot and stays non-authori
   assert.ok(staleResult.blockers.includes('payload.reviewImplementation'));
 });
 
+test('independent review request requires snapshot content for contract replay', () => {
+  const request = buildReviewRequest();
+  const base = reviewRequestResolvers();
+  const result = evaluateCm2115SnapshotReviewRequest(request, {
+    ...base,
+    resolveGitFile: (commit, sourcePath) => {
+      const actual = base.resolveGitFile(commit, sourcePath);
+      if (commit === request.payload.snapshot.commit &&
+          sourcePath === request.payload.snapshot.json.path) {
+        const { content, ...identityOnly } = actual;
+        return identityOnly;
+      }
+      return actual;
+    }
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.readyToSubmitForIndependentReview, false);
+  assert.equal(result.snapshotContractAccepted, false);
+  assert.ok(result.blockers.includes('snapshot.json.contentRequired'));
+  assert.ok(result.blockers.includes('snapshot.contract'));
+});
+
 test('frozen independent review request files exactly match the canonical JSON and Markdown renderers', () => {
   const request = buildReviewRequest();
   const jsonText = `${JSON.stringify(canonicalize(request), null, 2)}\n`;
