@@ -1350,8 +1350,27 @@ test('temp clone performs one exact CAS plus linked-target index and nine-file s
     fixture.target
   );
   fs.chmodSync(targetIndexPath, 0o664);
-  const result = runTwiceInOneProcess();
+  const hooksPath = path.join(fixture.parent, 'rejecting-hooks');
+  const hookSentinel = path.join(fixture.parent, 'reference-transaction-hook-ran');
+  const hookPath = path.join(hooksPath, 'reference-transaction');
+  fs.mkdirSync(hooksPath);
+  fs.writeFileSync(hookPath, [
+    '#!/bin/sh',
+    `printf '%s\\n' "$1" >> '${hookSentinel}'`,
+    '[ "$1" = prepared ] && exit 73',
+    'exit 0',
+    ''
+  ].join('\n'));
+  fs.chmodSync(hookPath, 0o755);
+  git(['config', 'core.hooksPath', hooksPath], fixture.repo);
+  let result;
+  try {
+    result = runTwiceInOneProcess();
+  } finally {
+    git(['config', '--unset', 'core.hooksPath'], fixture.repo);
+  }
   assert.equal(result.status, 0, result.stderr);
+  assert.equal(fs.existsSync(hookSentinel), false);
   const { first, second } = JSON.parse(result.stdout);
   assert.equal(first.accepted, true);
   assert.equal(first.state, fixture.frozenRegistry.SUCCESS_STATE);

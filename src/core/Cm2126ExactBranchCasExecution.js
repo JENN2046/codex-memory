@@ -1746,7 +1746,10 @@ async function executeBranchCasFromCommits(inputs = {}) {
     state = claim.state;
     branchCasInvocationCount = 1;
     try {
-      gitBuffer(['update-ref', '--no-deref', TARGET_REF, NEW_COMMIT, EXPECTED_OLD], { cwd: repoRoot });
+      gitBuffer([
+        '-c', 'core.hooksPath=/dev/null',
+        'update-ref', '--no-deref', TARGET_REF, NEW_COMMIT, EXPECTED_OLD
+      ], { cwd: repoRoot });
       injectIsolatedTestFault('branch_cas_acknowledgement_lost');
       branchCasReturnedSuccess = true;
     } catch (error) {
