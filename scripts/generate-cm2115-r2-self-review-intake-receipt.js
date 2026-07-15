@@ -17,11 +17,13 @@ const {
   gitText,
   resolveCommitTree,
   resolveDiffPaths,
-  resolveDurableClaim,
   resolveGitFile,
   resolveGitPathState,
   resolveParentCommit
 } = require('./cm2115-r2-git');
+const {
+  resolveFrozenPhase2DurableClaim
+} = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
 const { isCommitAncestor } = require('./generate-cm2115-r2-self-review-decision');
 
 const MARKDOWN_PATH = RECEIPT_PATH.replace(/\.json$/, '.md');
@@ -39,7 +41,7 @@ function resolverOptions() {
     resolveParentCommit,
     resolveDiffPaths,
     resolveGitPathState,
-    resolveDurableClaim,
+    resolveDurableClaim: resolveFrozenPhase2DurableClaim,
     isCommitAncestor
   };
 }
