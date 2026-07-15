@@ -135,10 +135,14 @@ function evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake({
     }
     if (decision.expiresAt !== expectedBinding.expectedExpiresAt) blockers.push('decision.expiresAt.binding');
     const approvedAt = Date.parse(decision.approvedAt || '');
+    const contentApprovedAt = Date.parse(expectedBinding.authorizationContentDecisionApprovedAt || '');
     const expiresAt = Date.parse(decision.expiresAt || '');
     const nowMs = new Date(now).getTime();
     if (!Number.isFinite(approvedAt) || !Number.isFinite(nowMs) || approvedAt > nowMs) {
       blockers.push('decision.approvedAt');
+    }
+    if (!Number.isFinite(contentApprovedAt) || approvedAt <= contentApprovedAt) {
+      blockers.push('decision.approvedAt.contentOrder');
     }
     if (!Number.isFinite(expiresAt) || !Number.isFinite(nowMs) || nowMs >= expiresAt || approvedAt >= expiresAt) {
       blockers.push('decision.expiresAt');
