@@ -104,8 +104,14 @@ test('CM-2111 receipt rejects replay, side effects, full-plan, readiness, or V8 
     'phase8_completion_audit_application_receipt_cm2111.json'
   ), 'utf8'));
   for (const mutate of [
+    payload => { payload.phaseAudit.productionReady = true; },
+    payload => { payload.phaseAudit.missingEvidence = { length: 0 }; },
+    payload => { payload.contractResults.completionAuditGate = 'forged_gate'; },
+    payload => { payload.contractResults.productionReady = true; },
     payload => { payload.authorization.replayAllowed = true; },
+    payload => { payload.authorization.productionReady = true; },
     payload => { payload.applicationCounters.remoteActions = 1; },
+    payload => { payload.applicationCounters.productionReady = true; },
     payload => { payload.appliedState.fullPlanPackCompleted = true; },
     payload => { payload.appliedState.readinessClaimed = true; },
     payload => { payload.appliedState.productionReady = true; },
