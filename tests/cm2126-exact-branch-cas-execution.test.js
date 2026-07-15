@@ -462,6 +462,56 @@ test('frozen packet and final release keep every current state false and current
   assert.equal(text(['status', '--porcelain'], fixture.target), '');
 });
 
+test('packet intake requires canonical JSON and Markdown bytes', () => {
+  const frozenJson = fixture.gitResolvers.resolveGitFile(
+    fixture.packetCommit,
+    fixture.frozenModule.PACKET_PATH
+  ).content;
+  const frozenMarkdown = fixture.gitResolvers.resolveGitFile(
+    fixture.packetCommit,
+    fixture.frozenModule.PACKET_MARKDOWN_PATH
+  ).content;
+  assert.equal(
+    packetGenerator.renderMarkdown(fixture.packetEvidence.packet, frozenJson.toString('utf8')),
+    frozenMarkdown.toString('utf8')
+  );
+  assert.throws(
+    () => packetGenerator.renderMarkdown(
+      fixture.packetEvidence.packet,
+      `${frozenJson.toString('utf8')}UNAUTHORIZED\n`
+    ),
+    /json_rendering_mismatch/
+  );
+  for (const mutateMarkdown of [
+    content => Buffer.concat([Buffer.from('UNAUTHORIZED: broader governance authority\n'), content]),
+    content => Buffer.concat([content, Buffer.from('\nUNAUTHORIZED: readinessClaimed=true\n')])
+  ]) {
+    const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2126-packet-markdown-fork-'));
+    const repo = path.join(parent, 'evidence');
+    try {
+      git(['clone', '--quiet', '--no-hardlinks', fixture.repo, repo], parent);
+      git(['config', 'user.name', 'CM2126 Test'], repo);
+      git(['config', 'user.email', 'cm2126@example.invalid'], repo);
+      git(['checkout', '--quiet', '--detach', fixture.implementationCommit], repo);
+      const jsonPath = path.join(repo, fixture.frozenModule.PACKET_PATH);
+      const markdownPath = path.join(repo, fixture.frozenModule.PACKET_MARKDOWN_PATH);
+      fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
+      fs.writeFileSync(jsonPath, frozenJson);
+      fs.writeFileSync(markdownPath, mutateMarkdown(frozenMarkdown));
+      const forkCommit = commitAll(repo, 'test: fork packet with non-canonical markdown');
+      const result = fixture.frozenModule.intakeExecutionPacket({
+        packetCommit: forkCommit,
+        targetWorktreeIdentity: fixture.targetIdentity,
+        ...resolvers(repo)
+      });
+      assert.equal(result.accepted, false);
+      assert.ok(result.blockers.includes('packetIntake.lineageOrFiles'));
+    } finally {
+      fs.rmSync(parent, { recursive: true, force: true });
+    }
+  }
+});
+
 test('final release rejects candidate-controlled authorization window extensions', () => {
   const frozen = fixture.finalReleaseEvidence.decision;
   const rebuilt = fixture.frozenModule.buildFinalReleaseDecision({

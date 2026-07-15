@@ -515,6 +515,38 @@ function evaluateExecutionPacket(packet = {}, { targetWorktreeIdentity, ...optio
   };
 }
 
+function renderCm2126ExecutionPacketMarkdown(packet) {
+  const jsonText = serializeArtifact(packet);
+  return [
+    '# CM-2126 Exact Branch CAS Execution Packet',
+    '',
+    `Packet reference: \`${packet.payload.packetReference}\``,
+    `Canonical payload SHA-256: \`${packet.canonicalPayloadSha256}\``,
+    '',
+    'Result: PASS_NON_EXECUTING_PACKET_PREPARED_ONLY.',
+    '',
+    'This packet freezes the exact local Branch CAS executor, persistent one-shot',
+    'claim registry, linked-worktree index and nine-file synchronization boundary,',
+    'execution/reentry receipt contracts, and failure state machine. It does not',
+    'create a claim, update a ref, modify an index or file, write a receipt, perform',
+    'a remote action, or synchronize current branch status. A separate exact',
+    'CM-2127 final execution release remains required.',
+    '',
+    'Operational boundary: the local target worktree must remain exclusively',
+    'quiescent during the nine-file synchronization. The executor repeatedly',
+    'checks exact file and parent identities, but ordinary filesystem rename is',
+    'an atomic replacement, not an OS-level expected-old content CAS. An',
+    'uncooperative concurrent file writer is outside this frozen threat model.',
+    '',
+    '## Exact JSON mirror',
+    '',
+    '```json',
+    jsonText.trimEnd(),
+    '```',
+    ''
+  ].join('\n');
+}
+
 function intakeExecutionPacket({ packetCommit, targetWorktreeIdentity, ...options } = {}) {
   const blockers = [];
   let packet = null;
@@ -539,7 +571,8 @@ function intakeExecutionPacket({ packetCommit, targetWorktreeIdentity, ...option
         !sameJson(paths, PACKET_DIFF_PATHS) || !sameJson(entries, PACKET_DIFF_ENTRIES) ||
         jsonIdentity.gitMode !== '100644' || jsonIdentity.gitObjectType !== 'blob' ||
         markdownIdentity.gitMode !== '100644' || markdownIdentity.gitObjectType !== 'blob' ||
-        !markdownIdentity.content.toString('utf8').includes(jsonIdentity.content.toString('utf8').trimEnd())) {
+        !jsonIdentity.content.equals(Buffer.from(serializeArtifact(packet), 'utf8')) ||
+        !markdownIdentity.content.equals(Buffer.from(renderCm2126ExecutionPacketMarkdown(packet), 'utf8'))) {
       blockers.push('packetIntake.lineageOrFiles');
     }
     const evaluation = evaluateExecutionPacket(packet, { targetWorktreeIdentity, ...options });
@@ -2060,6 +2093,7 @@ module.exports = {
   parseWorktreeList,
   realResolverOptions,
   readVerifiedGovernanceFile,
+  renderCm2126ExecutionPacketMarkdown,
   renderCm2127FinalReleaseMarkdown,
   releaseBinding,
   resolveFixedGovernanceRoot,

@@ -13,6 +13,7 @@ const {
   deriveTargetWorktree,
   evaluateExecutionPacket,
   intakeContentDecision,
+  renderCm2126ExecutionPacketMarkdown,
   verifyTargetOldPreflight
 } = require('../src/core/Cm2126ExactBranchCasExecution');
 const {
@@ -82,34 +83,10 @@ function resolveImplementation() {
 }
 
 function renderMarkdown(packet, jsonText) {
-  return [
-    '# CM-2126 Exact Branch CAS Execution Packet',
-    '',
-    `Packet reference: \`${packet.payload.packetReference}\``,
-    `Canonical payload SHA-256: \`${packet.canonicalPayloadSha256}\``,
-    '',
-    'Result: PASS_NON_EXECUTING_PACKET_PREPARED_ONLY.',
-    '',
-    'This packet freezes the exact local Branch CAS executor, persistent one-shot',
-    'claim registry, linked-worktree index and nine-file synchronization boundary,',
-    'execution/reentry receipt contracts, and failure state machine. It does not',
-    'create a claim, update a ref, modify an index or file, write a receipt, perform',
-    'a remote action, or synchronize current branch status. A separate exact',
-    'CM-2127 final execution release remains required.',
-    '',
-    'Operational boundary: the local target worktree must remain exclusively',
-    'quiescent during the nine-file synchronization. The executor repeatedly',
-    'checks exact file and parent identities, but ordinary filesystem rename is',
-    'an atomic replacement, not an OS-level expected-old content CAS. An',
-    'uncooperative concurrent file writer is outside this frozen threat model.',
-    '',
-    '## Exact JSON mirror',
-    '',
-    '```json',
-    jsonText.trimEnd(),
-    '```',
-    ''
-  ].join('\n');
+  if (jsonText !== serializeArtifact(packet)) {
+    throw new Error('cm2126_packet_json_rendering_mismatch');
+  }
+  return renderCm2126ExecutionPacketMarkdown(packet);
 }
 
 function main(argv = process.argv.slice(2)) {
