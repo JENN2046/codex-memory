@@ -1055,6 +1055,15 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
     assert.equal(output.reconciliationReceipt.payload.targetIndexLockAbsent, true);
   });
 
+  runIsolatedFault('index_rename_rejected', ({ claim, output }) => {
+    assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
+    assert.equal(claim.branchRefUpdates, 1);
+    assert.equal(claim.targetIndexSyncAttempts, 1);
+    assert.equal(claim.targetIndexSynchronizations, 0);
+    assert.equal(claim.targetFileSynchronizations, 0);
+    assert.equal(output.reconciliationReceipt.payload.targetIndexLockAbsent, true);
+  });
+
   runIsolatedFault('index_rename_acknowledgement_lost', ({ claim }) => {
     assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
     assert.equal(claim.branchRefUpdates, 1);
@@ -1074,6 +1083,17 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
   });
 
   runIsolatedFault('file_pre_rename_failure', ({ claim }) => {
+    assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
+    assert.equal(claim.targetIndexSynchronizations, 1);
+    assert.equal(claim.targetFileSyncAttempts, 1);
+    assert.equal(claim.targetFileSynchronizations, 0);
+    assert.doesNotMatch(
+      text(['status', '--porcelain', '--untracked-files=all'], fixture.target),
+      /\.cm2126-.*\.sync\.tmp/
+    );
+  });
+
+  runIsolatedFault('file_rename_rejected', ({ claim }) => {
     assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
     assert.equal(claim.targetIndexSynchronizations, 1);
     assert.equal(claim.targetFileSyncAttempts, 1);

@@ -1154,8 +1154,9 @@ async function syncTargetFiles(targetPath, targetBindings, options, repoRoot, be
         throw new Error(`cm2126_target_file_pre_rename_drift:${identity.sourcePath}`);
       }
       assertTargetParentChain(root, identity.sourcePath);
-      renameAttempted = true;
+      injectIsolatedTestFault('file_rename_rejected');
       await fsPromises.rename(temporary, absolute);
+      renameAttempted = true;
       injectIsolatedTestFault('file_rename_acknowledgement_lost');
       renameAcknowledged = true;
       completed += 1;
@@ -1231,8 +1232,9 @@ async function synchronizeExactIndexEntries(targetPath, targetBindings, repoRoot
     await fsPromises.chmod(lockPath, indexMode);
     const durableLock = await fsPromises.open(lockPath, 'r');
     try { await durableLock.sync(); } finally { await durableLock.close(); }
-    renameAttempted = true;
+    injectIsolatedTestFault('index_rename_rejected');
     await fsPromises.rename(lockPath, indexPath);
+    renameAttempted = true;
     injectIsolatedTestFault('index_rename_acknowledgement_lost');
     const directory = await fsPromises.open(path.dirname(indexPath), 'r');
     try { await directory.sync(); } finally { await directory.close(); }
