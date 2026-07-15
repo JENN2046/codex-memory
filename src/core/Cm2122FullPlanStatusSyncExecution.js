@@ -33,6 +33,14 @@ const {
 const TASK_ID = 'CM-2122-R2';
 const FINAL_RELEASE_TASK_ID = 'CM-2123-R2';
 const ACTION = 'apply_exact_full_plan_status_sync_detached_commit';
+const DETACHED_STATUS_COMMIT_IDENTITY = Object.freeze({
+  authorName: 'Jenn',
+  authorEmail: 'jenn515292656@gmail.com',
+  authorDate: '2026-07-12T22:58:36+08:00',
+  committerName: 'Jenn',
+  committerEmail: 'jenn515292656@gmail.com',
+  committerDate: '2026-07-12T22:58:36+08:00'
+});
 const PACKET_PATH = 'docs/near-model-memory-plan-pack/cm2122_r2_full_plan_status_sync_execution_packet.json';
 const PACKET_MARKDOWN_PATH = PACKET_PATH.replace(/\.json$/, '.md');
 const FINAL_RELEASE_PATH = 'docs/near-model-memory-plan-pack/cm2123_r2_full_plan_status_sync_final_release.json';
@@ -1120,11 +1128,11 @@ function buildClaimBindingHash({ packetEvidence, finalReleaseEvidence }) {
   });
 }
 
-function gitText(args, { cwd = process.cwd(), input = undefined } = {}) {
+function gitText(args, { cwd = process.cwd(), input = undefined, env = process.env } = {}) {
   return execFileSync('git', args, {
     cwd,
     input,
-    env: sanitizedGitEnvironment(),
+    env: sanitizedGitEnvironment(env),
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
     maxBuffer: 64 * 1024 * 1024
@@ -1212,8 +1220,6 @@ function assertExecutionRuntime({ finalReleaseEvidence, packetEvidence, runtimeS
   if (head !== finalReleaseEvidence.finalReleaseCommit || tree !== finalReleaseEvidence.finalReleaseTree) {
     throw new Error('cm2122_final_release_runtime_required');
   }
-  gitText(['var', 'GIT_AUTHOR_IDENT'], { cwd: repoRoot });
-  gitText(['var', 'GIT_COMMITTER_IDENT'], { cwd: repoRoot });
   verifyRuntimeArtifacts({ repoRoot, head, packetEvidence });
   return repoRoot;
 }
@@ -1295,9 +1301,19 @@ function createExactDetachedStatusCommit({ repoRoot, finalReleaseEvidence, packe
       if (target) Object.assign(entry, { mode: target.after.gitMode, type: 'blob', oid: target.after.blobOid });
     }
     partial.tree = writeTreeEntries(rootEntries, repoRoot);
+    const commitEnvironment = {
+      ...sanitizedGitEnvironment(),
+      GIT_AUTHOR_NAME: DETACHED_STATUS_COMMIT_IDENTITY.authorName,
+      GIT_AUTHOR_EMAIL: DETACHED_STATUS_COMMIT_IDENTITY.authorEmail,
+      GIT_AUTHOR_DATE: DETACHED_STATUS_COMMIT_IDENTITY.authorDate,
+      GIT_COMMITTER_NAME: DETACHED_STATUS_COMMIT_IDENTITY.committerName,
+      GIT_COMMITTER_EMAIL: DETACHED_STATUS_COMMIT_IDENTITY.committerEmail,
+      GIT_COMMITTER_DATE: DETACHED_STATUS_COMMIT_IDENTITY.committerDate
+    };
     partial.commit = gitText(['commit-tree', partial.tree, '-p', finalReleaseEvidence.finalReleaseCommit], {
       cwd: repoRoot,
-      input: 'docs: apply CM-2122 detached full-plan status sync\n'
+      input: 'docs: apply CM-2122 detached full-plan status sync\n',
+      env: commitEnvironment
     });
     partial.commitObjectCreated = true;
     const preCasBinding = verifyDetachedCommitBinding({
@@ -1955,6 +1971,7 @@ module.exports = {
   ATTRIBUTION_STALE_PACKET_COMMIT,
   BINDING_RECEIPT_FILENAME,
   CONTENT_DECISION_FREEZE,
+  DETACHED_STATUS_COMMIT_IDENTITY,
   EXECUTION_RECEIPT_FILENAME,
   FINAL_RELEASE_DIFF_ENTRIES,
   FINAL_RELEASE_DIFF_PATHS,
