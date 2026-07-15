@@ -1194,17 +1194,17 @@ function writeTreeEntries(entries, repoRoot) {
   return gitText(['mktree', '-z'], { cwd: repoRoot, input });
 }
 
-function assertRuntimeRepositoryShell(finalReleaseEvidence) {
+function inspectRuntimeRepositoryShell(finalReleaseEvidence) {
   const repoRoot = path.resolve(gitText(['rev-parse', '--show-toplevel']));
   if (repoRoot !== path.resolve(process.cwd())) throw new Error('cm2122_repository_root_required');
-  if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2122_clean_worktree_required');
+  const worktreeClean = gitText(['status', '--porcelain']) === '';
   detachedHeadRequired(repoRoot);
   const head = gitText(['rev-parse', 'HEAD^{commit}']);
   const tree = gitText(['rev-parse', 'HEAD^{tree}']);
   if (targetBranchOid(repoRoot) !== finalReleaseEvidence.finalReleaseCommit) {
     throw new Error('cm2122_target_branch_tip_mismatch');
   }
-  return { repoRoot, head, tree };
+  return { repoRoot, head, tree, worktreeClean };
 }
 
 function verifyRuntimeArtifacts({ repoRoot, head, packetEvidence }) {
@@ -1215,8 +1215,9 @@ function verifyRuntimeArtifacts({ repoRoot, head, packetEvidence }) {
 }
 
 function assertExecutionRuntime({ finalReleaseEvidence, packetEvidence, runtimeShell = null }) {
-  const shell = runtimeShell || assertRuntimeRepositoryShell(finalReleaseEvidence);
+  const shell = runtimeShell || inspectRuntimeRepositoryShell(finalReleaseEvidence);
   const { repoRoot, head, tree } = shell;
+  if (!shell.worktreeClean) throw new Error('cm2122_clean_worktree_required');
   if (head !== finalReleaseEvidence.finalReleaseCommit || tree !== finalReleaseEvidence.finalReleaseTree) {
     throw new Error('cm2122_final_release_runtime_required');
   }
@@ -1785,7 +1786,11 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
   if (!historicalReleaseEvidence.accepted || !historicalContentEvidence.accepted) {
     throw new Error('cm2122_historical_upstream_revalidation_failed');
   }
-  const runtimeShell = assertRuntimeRepositoryShell(historicalReleaseEvidence);
+  // Inspect the durable claim before enforcing the clean-worktree execution
+  // gate. A post-CAS filesystem failure can legitimately leave the detached
+  // worktree dirty; that consumed authorization must remain readonly-reentrant
+  // without granting another execution attempt.
+  const runtimeShell = inspectRuntimeRepositoryShell(historicalReleaseEvidence);
   const repoRoot = runtimeShell.repoRoot;
   const root = resolveFixedGovernanceRoot(repoRoot);
   const registry = new Cm2122StatusSyncClaimRegistry({ governanceRoot: root });
