@@ -121,5 +121,6 @@ test('CM-2096 lifecycle layer rejects unrelated markers and unverified filtering
   const lifecycle = projectCm2096MarkerAwareLifecycle({ targetRecordProjection: target, tombstoneMarkerProjection: marker });
   assert.equal(lifecycle.accepted, false);
   assert.throws(() => filterCm2096EffectiveCandidateRefs([expected.targetMemoryIdRef], lifecycle), /not_verified/);
+  assert.throws(() => filterCm2096EffectiveCandidateRefs(undefined, lifecycle), /invalid_selected_field/);
   assert.throws(() => filterCm2096EffectiveCandidateRefs(['raw candidate content'], { ...lifecycle, accepted: true, effectiveLifecycleStatus: 'tombstoned', effectiveMemoryEligible: false }), /invalid_selected_field/);
 });

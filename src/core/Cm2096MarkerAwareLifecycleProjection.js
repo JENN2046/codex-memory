@@ -51,7 +51,7 @@ function projectCm2096MarkerAwareLifecycle({ targetRecordProjection, tombstoneMa
   });
 }
 
-function filterCm2096EffectiveCandidateRefs(candidateMemoryIdRefs = [], lifecycleProjection = {}) {
+function filterCm2096EffectiveCandidateRefs(candidateMemoryIdRefs, lifecycleProjection = {}) {
   if (!Array.isArray(candidateMemoryIdRefs) || candidateMemoryIdRefs.some(ref => typeof ref !== 'string' || !/^vcp-kb-[a-f0-9]{16}$/.test(ref))) {
     throw new Error('invalid_selected_field_candidate_refs');
   }

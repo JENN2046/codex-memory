@@ -36,6 +36,14 @@ async function verifyCm2096TombstoneExecution({ registry, claimId, receiptId, de
       postStoreProjection.tombstoneMarkerProjection?.rawPathDisclosed !== false) {
     return { accepted: false, reasonCode: 'cm2096_post_store_projection_disclosure_boundary_failed' };
   }
+  const sourceRefs = postStoreProjection.sourceCandidateMemoryIdRefs;
+  const targetRef = postStoreProjection.targetRecordProjection?.memoryIdRef;
+  const markerRef = postStoreProjection.tombstoneMarkerProjection?.markerMemoryIdRef;
+  if (!Array.isArray(sourceRefs) || postStoreProjection.sourceCandidateRefCount !== 2 ||
+      sourceRefs.length !== 2 || sourceRefs[0] !== targetRef || sourceRefs[1] !== markerRef ||
+      targetRef === markerRef || sourceRefs.some(ref => typeof ref !== 'string' || !/^vcp-kb-[a-f0-9]{16}$/.test(ref))) {
+    return { accepted: false, reasonCode: 'cm2096_post_store_candidate_evidence_invalid' };
+  }
   const claim = await registry.readClaim(claimId).catch(() => null);
   if (!claim ||
       claim.state !== 'WRITE_INVOCATION_CONSUMED' ||

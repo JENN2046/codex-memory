@@ -38,6 +38,7 @@ const {
 const {
   GOVERNANCE_ROOT_IDENTITY,
   GOVERNANCE_ROOT_IDENTITY_SHA256,
+  getVerifiedCm2103GovernanceInternalPaths,
   verifyCm2103GovernanceRoot
 } = require('../core/Cm2103IdentityBoundStoreGovernance');
 
@@ -513,6 +514,8 @@ async function runFrozenCm2103Bootstrap(
 
   const gitCommonDir = git(['rev-parse', '--git-common-dir']).trim();
   const governance = await verifyCm2103GovernanceRoot(gitCommonDir);
+  const governanceInternalPaths = getVerifiedCm2103GovernanceInternalPaths(governance);
+  if (!governanceInternalPaths) throw new Error('cm2103_governance_internal_binding_missing');
   if (governance.governanceRootIdentityReference !== GOVERNANCE_ROOT_IDENTITY.registryRootReference ||
       governance.governanceRootIdentitySha256 !== GOVERNANCE_ROOT_IDENTITY_SHA256 ||
       governance.storeRootBindingSha256 !== STORE_ROOT_BINDING_CANONICAL_SHA256) {
@@ -538,7 +541,7 @@ async function runFrozenCm2103Bootstrap(
     receiptId: packet.receiptId
   });
   const registry = new Cm2103IdentityBoundStoreBootstrapRegistry({
-    authorizationRegistryRoot: governance.internalPaths.authorizationRegistryRoot
+    authorizationRegistryRoot: governanceInternalPaths.authorizationRegistryRoot
   });
   const selectedDecisionIntakes = await selectCm2103BootstrapDecisionIntakes({
     registry,
@@ -591,7 +594,7 @@ async function runFrozenCm2103Bootstrap(
   };
   const execution = await executeCm2103BootstrapFilesystem({
     registry,
-    storeRoot: governance.internalPaths.storeRoot,
+    storeRoot: governanceInternalPaths.storeRoot,
     nonce: packet.nonce,
     receiptId: packet.receiptId,
     bindingHash,
