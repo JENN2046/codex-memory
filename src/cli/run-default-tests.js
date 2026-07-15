@@ -42,6 +42,14 @@ const SELF_REFERENTIAL_FILES = [
   'dashboard-cli.test.js'
 ];
 
+// Full frozen-replay executor tests intentionally create temporary Git
+// repositories and run multiple subprocess lifecycles. Keep them available as
+// an explicit E2E gate without adding several minutes to every default-safe run.
+const FROZEN_REPLAY_E2E_FILES = [
+  'cm2118-full-plan-application-execution.test.js',
+  'cm2122-full-plan-status-sync-execution.test.js'
+];
+
 const CHILD_PROCESS_STDIO_DEPENDENT_FILES = [
   'a5-approval-check-cli.test.js',
   'active-memory-cli.test.js',
@@ -175,6 +183,7 @@ function resolveExcluded({ childProcessStdioSupported = detectChildProcessStdioS
     ...PROVIDER_DEPENDENT_FILES,
     ...DAEMON_DEPENDENT_FILES,
     ...SELF_REFERENTIAL_FILES,
+    ...FROZEN_REPLAY_E2E_FILES,
     ...FIXTURE_DRIFT_FILES
   ]);
   if (!childProcessStdioSupported) {
@@ -201,6 +210,7 @@ function resolveDefaultSafeFiles(testsDir, options = {}) {
       if (PROVIDER_DEPENDENT_FILES.includes(f)) return { file: f, reason: 'provider_dependent' };
       if (DAEMON_DEPENDENT_FILES.includes(f)) return { file: f, reason: 'daemon_dependent' };
       if (SELF_REFERENTIAL_FILES.includes(f)) return { file: f, reason: 'self_referential' };
+      if (FROZEN_REPLAY_E2E_FILES.includes(f)) return { file: f, reason: 'frozen_replay_e2e' };
       if (FIXTURE_DRIFT_FILES.includes(f)) return { file: f, reason: 'fixture_drift' };
       if (!childProcessStdioSupported && CHILD_PROCESS_STDIO_DEPENDENT_FILES.includes(f)) {
         return { file: f, reason: 'child_process_stdio_unavailable' };
@@ -232,6 +242,7 @@ function buildExcludedSummary(excludedDetails = []) {
       'provider_dependent',
       'daemon_dependent',
       'self_referential',
+      'frozen_replay_e2e',
       'child_process_stdio_unavailable'
     ],
     fixtureDriftStatus: fixtureDriftFiles.length === 0 ? 'clear' : 'active_unacceptable',
@@ -405,6 +416,7 @@ module.exports = {
   PROVIDER_DEPENDENT_FILES,
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
+  FROZEN_REPLAY_E2E_FILES,
   CHILD_PROCESS_STDIO_DEPENDENT_FILES,
   FIXTURE_DRIFT_FILES,
   GOVERNED_NATIVE_BRIDGE_DEFAULT_SAFE_REQUIRED_FILES,

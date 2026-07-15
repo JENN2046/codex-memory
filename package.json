@@ -84,6 +84,7 @@
     "test:hardening": "node --test --test-concurrency=1 tests/http-no-token-search-rejection.test.js tests/security-profile-config.test.js tests/external-provider-gate.test.js tests/stdio-message-size-limit.test.js tests/tool-argument-validator-limits.test.js tests/json-rpc-error-redaction.test.js && node --test tests/gate-ci-env-override-evidence.test.js",
     "test:provider": "node ./src/cli/run-provider-tests.js",
     "test:all": "npm test && npm run test:hardening",
+    "test:frozen-replay-e2e": "node --test --test-concurrency=1 tests/cm2118-full-plan-application-execution.test.js tests/cm2122-full-plan-status-sync-execution.test.js",
     "cm2115:validation-receipt": "node ./scripts/generate-cm2115-local-validation-receipt.js",
     "cm2115:snapshot": "node ./src/cli/cm2115-canonical-full-plan-evidence-snapshot.js",
     "cm2115:review-request": "node ./scripts/generate-cm2115-independent-review-request.js",

@@ -8,6 +8,7 @@ const {
   PROVIDER_DEPENDENT_FILES,
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
+  FROZEN_REPLAY_E2E_FILES,
   CHILD_PROCESS_STDIO_DEPENDENT_FILES,
   FIXTURE_DRIFT_FILES,
   GOVERNED_NATIVE_BRIDGE_DEFAULT_SAFE_REQUIRED_FILES,
@@ -48,6 +49,18 @@ test('default runner excludes all self-referential files', () => {
   const expected = SELF_REFERENTIAL_FILES;
   for (const file of expected) {
     assert.ok(selfExcluded.some(e => e.file === file), `${file} should be excluded as self_referential`);
+  }
+});
+
+test('default runner excludes frozen-replay executor E2E files', () => {
+  const testsDir = path.join(process.cwd(), 'tests');
+  const { safeFiles, excludedDetails } = resolveDefaultSafeFiles(testsDir, {
+    childProcessStdioSupported: true
+  });
+  for (const file of FROZEN_REPLAY_E2E_FILES) {
+    assert.equal(safeFiles.includes(file), false, `${file} must be opt-in`);
+    assert.ok(excludedDetails.some(detail =>
+      detail.file === file && detail.reason === 'frozen_replay_e2e'));
   }
 });
 
@@ -113,6 +126,7 @@ test('default runner reports excluded details with correct reasons', () => {
     'provider_dependent',
     'daemon_dependent',
     'self_referential',
+    'frozen_replay_e2e',
     'fixture_drift',
     'child_process_stdio_unavailable'
   ];
@@ -133,6 +147,7 @@ test('default runner summarizes active fixture drift as clear when none is exclu
     'provider_dependent',
     'daemon_dependent',
     'self_referential',
+    'frozen_replay_e2e',
     'child_process_stdio_unavailable'
   ]);
 });
