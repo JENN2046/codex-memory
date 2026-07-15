@@ -49,8 +49,9 @@ and the complete readiness alias set. Gate commit `f6b7f9a5…` has payload SHA
 `7187e520…` identity and fixes a five-path future patch allowlist. The earlier
 `c3f3457b…` gate is immutable superseded history and is not current authority.
 At the CM-2116 gate checkpoint no full-plan application decision was present.
-CM-2117 through CM-2119 now supersede that checkpoint as the active route;
-execution remains unclaimed, while completion and readiness remain false.
+CM-2117 through CM-2119 later superseded that historical checkpoint. Their
+one-shot execution is now consumed and non-replayable; current completion is
+reopened for revalidation, while every readiness field remains false.
 
 CM-2115-R2 internal self-review implementation is frozen at `68c8088a…`.
 Decision commit `116d74b3…` has payload SHA-256 `03242787…a1d4` and records
