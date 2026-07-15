@@ -171,6 +171,24 @@ function isAcceptedProposal(proposal) {
     proposal.audit_receipt.memory_written === false &&
     proposal.audit_receipt.durable_memory_written === false &&
     proposal.audit_receipt.production_write_performed === false &&
+    proposal.audit_receipt.provider_api_called === false &&
+    proposal.audit_receipt.public_mcp_expanded === false &&
+    proposal.audit_receipt.readiness_claimed === false &&
+    isPlainObject(proposal.governance_contract) &&
+    proposal.governance_contract.memoryWritten === false &&
+    proposal.governance_contract.durableMemoryWritten === false &&
+    proposal.governance_contract.providerApiCalled === false &&
+    proposal.governance_contract.publicMcpExpanded === false &&
+    proposal.governance_contract.readinessClaimed === false &&
+    isPlainObject(proposal.access) &&
+    proposal.access.memoryWritten === false &&
+    proposal.access.durableMemoryWritten === false &&
+    proposal.access.productionWritePerformed === false &&
+    proposal.access.mcpMemoryWriteCalled === false &&
+    proposal.access.providerApiCalled === false &&
+    proposal.access.vcpToolBoxRuntimeCalled === false &&
+    proposal.access.publicMcpExpanded === false &&
+    proposal.access.readinessClaimed === false &&
     isPlainObject(proposal.rollback_posture) &&
     proposal.rollback_posture.future_commit_requires_rollback_plan === true &&
     isPlainObject(proposal.commit_contract) &&
