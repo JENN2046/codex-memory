@@ -1,12 +1,16 @@
 'use strict';
 
 const path = require('node:path');
+const fs = require('node:fs/promises');
+const os = require('node:os');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   GOVERNANCE_ROOT_IDENTITY_BYTES,
   GOVERNANCE_ROOT_IDENTITY_SHA256,
-  deriveCm2103GovernancePaths
+  deriveCm2103GovernancePaths,
+  getVerifiedCm2103GovernanceInternalPaths,
+  verifyCm2103GovernanceRoot
 } = require('../src/core/Cm2103IdentityBoundStoreGovernance');
 const {
   summarizeCm2103BootstrapState,
@@ -75,4 +79,22 @@ test('CM-2103 derives the store only from Git common-dir governance state', () =
   assert.equal(GOVERNANCE_ROOT_IDENTITY_BYTES.length, 216);
   assert.equal(sha256(GOVERNANCE_ROOT_IDENTITY_BYTES), GOVERNANCE_ROOT_IDENTITY_SHA256);
   assert.throws(() => deriveCm2103GovernancePaths(''), /git_common_dir_required/);
+});
+
+test('CM-2103 governance verification keeps raw paths in a private machine binding', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2103-governance-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const paths = deriveCm2103GovernancePaths(root);
+  await fs.mkdir(paths.authorizationRegistryRoot, { recursive: true });
+  await fs.writeFile(paths.governanceRootIdentityPath, GOVERNANCE_ROOT_IDENTITY_BYTES, { flag: 'wx' });
+
+  const result = await verifyCm2103GovernanceRoot(root);
+  assert.equal(result.accepted, true);
+  assert.equal(result.rawPathDisclosed, false);
+  assert.equal(Object.hasOwn(result, 'internalPaths'), false);
+  assert.equal(JSON.stringify(result).includes(root), false);
+  assert.deepEqual(getVerifiedCm2103GovernanceInternalPaths(result), paths);
+  assert.equal(Object.isFrozen(getVerifiedCm2103GovernanceInternalPaths(result)), true);
+  assert.equal(getVerifiedCm2103GovernanceInternalPaths({ ...result }), null);
+  assert.equal(getVerifiedCm2103GovernanceInternalPaths(structuredClone(result)), null);
 });
