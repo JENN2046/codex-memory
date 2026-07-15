@@ -311,6 +311,53 @@ test('CM-2103 R2 persistence-unknown preserves governance filesystem effect as n
   assert.equal(driftResult.shapeAccepted, false);
 });
 
+test('CM-2103 transition rejects a replaced persisted claim envelope', async t => {
+  const target = await fixture(t, 'transition-envelope-drift');
+  const registry = new Cm2103IdentityBoundStoreBootstrapRegistry({
+    authorizationRegistryRoot: target.authorizationRegistryRoot
+  });
+  const claimed = await registry.claim({
+    nonce: target.nonce,
+    receiptId: target.receiptId,
+    bindingHash: BINDING_HASH
+  });
+  const claimPath = registry.claimPathFromId(claimed.claim.claimId);
+  await fs.writeFile(claimPath, JSON.stringify({ ...claimed.claim, bindingHash: 'f'.repeat(64) }));
+  await assert.rejects(
+    registry.transition(claimed.claim.claimId, 'CONSUME_DIRECTORY_CREATE', {
+      directoryCreateAttempts: 1,
+      directoryCreates: null,
+      storeDirectoryCreated: null
+    }),
+    /cm2103_bootstrap_claim_envelope_changed_before_transition/
+  );
+  assert.equal((await registry.readClaim(claimed.claim.claimId)).state, 'CLAIMED');
+});
+
+test('CM-2103 concurrent transitions consume one persisted state exactly once', async t => {
+  const target = await fixture(t, 'transition-concurrency');
+  const registry = new Cm2103IdentityBoundStoreBootstrapRegistry({
+    authorizationRegistryRoot: target.authorizationRegistryRoot
+  });
+  const claimed = await registry.claim({
+    nonce: target.nonce,
+    receiptId: target.receiptId,
+    bindingHash: BINDING_HASH
+  });
+  const effects = {
+    directoryCreateAttempts: 1,
+    directoryCreates: null,
+    storeDirectoryCreated: null
+  };
+  const attempts = await Promise.allSettled([
+    registry.transition(claimed.claim.claimId, 'CONSUME_DIRECTORY_CREATE', effects),
+    registry.transition(claimed.claim.claimId, 'CONSUME_DIRECTORY_CREATE', effects)
+  ]);
+  assert.equal(attempts.filter(item => item.status === 'fulfilled').length, 1);
+  assert.equal(attempts.filter(item => item.status === 'rejected').length, 1);
+  assert.equal((await registry.readClaim(claimed.claim.claimId)).state, 'STORE_DIRECTORY_CREATE_CONSUMED');
+});
+
 test('CM-2103 R2 new process projects every durable nonterminal claim without target-store access', async t => {
   for (const [sourceState, expected] of Object.entries(NONTERMINAL_REENTRY)) {
     await t.test(sourceState, async t => {
