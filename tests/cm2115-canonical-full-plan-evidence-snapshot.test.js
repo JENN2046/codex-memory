@@ -848,3 +848,56 @@ test('review request cannot self-approve review, application, completion, or rea
     assert.equal(result.accepted, false);
   }
 });
+
+test('rejected request bindings never resolve caller-selected commits or paths', () => {
+  const original = buildReviewRequest();
+  const attackerCommits = new Set(['a'.repeat(40), 'b'.repeat(40), 'c'.repeat(40)]);
+  const attackerPaths = new Set(['private/snapshot.json', 'private/snapshot.md',
+    'private/validation.json', 'private/implementation.js']);
+  const mutations = [
+    copy => {
+      copy.payload.snapshot.commit = 'a'.repeat(40);
+      copy.payload.snapshot.json.path = 'private/snapshot.json';
+      copy.payload.snapshot.markdown.path = 'private/snapshot.md';
+    },
+    copy => {
+      copy.payload.localValidationReceipt.commit = 'b'.repeat(40);
+      copy.payload.localValidationReceipt.path = 'private/validation.json';
+    },
+    copy => {
+      copy.payload.reviewImplementation.commit = 'c'.repeat(40);
+      copy.payload.reviewImplementation.artifacts[0].path = 'private/implementation.js';
+    }
+  ];
+  for (const change of mutations) {
+    const candidate = structuredClone(original);
+    change(candidate);
+    candidate.canonicalPayloadSha256 = sha256Canonical(candidate.payload);
+    const base = reviewRequestResolvers();
+    const guardCommit = commit => {
+      assert.equal(attackerCommits.has(commit), false, `resolved attacker commit ${commit}`);
+    };
+    const result = evaluateCm2115SnapshotReviewRequest(candidate, {
+      ...base,
+      resolveGitFile: (commit, sourcePath) => {
+        guardCommit(commit);
+        assert.equal(attackerPaths.has(sourcePath), false, `resolved attacker path ${sourcePath}`);
+        return base.resolveGitFile(commit, sourcePath);
+      },
+      resolveCommitTree: commit => {
+        guardCommit(commit);
+        return base.resolveCommitTree(commit);
+      },
+      resolveParentCommit: commit => {
+        guardCommit(commit);
+        return base.resolveParentCommit(commit);
+      },
+      resolveDiffPaths: (parentCommit, commit) => {
+        guardCommit(parentCommit);
+        guardCommit(commit);
+        return base.resolveDiffPaths(parentCommit, commit);
+      }
+    });
+    assert.equal(result.accepted, false);
+  }
+});
