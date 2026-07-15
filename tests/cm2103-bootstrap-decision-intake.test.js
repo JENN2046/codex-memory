@@ -146,7 +146,21 @@ test('CM-2103 intake machine-binds only the exact future bootstrap decision', ()
   assert.equal(result.accepted, true, result.blockers.join(', '));
   assert.equal(result.executionAuthorized, true);
   assert.equal(result.nativeActionsAuthorized, 0);
+  assert.equal(Object.isFrozen(result.decision), true);
   assert.equal(isMachineBoundCm2103BootstrapDecision(result.decision), true);
+  assert.throws(() => {
+    result.decision.bootstrapExecutionAuthorized = false;
+  }, TypeError);
+  assert.throws(() => {
+    result.decision.storeRootBindingSha256 = '0'.repeat(64);
+  }, TypeError);
+  assert.throws(() => {
+    result.decision.expiresAt = '1970-01-01T00:00:00.000Z';
+  }, TypeError);
+  assert.equal(result.decision.bootstrapExecutionAuthorized, true);
+  assert.equal(result.decision.storeRootBindingSha256, expectedBinding.storeRootBindingSha256);
+  assert.equal(result.decision.expiresAt, expectedBinding.expectedExpiresAt);
+  assert.equal(isMachineBoundCm2103BootstrapDecision({ ...result.decision }), false);
 });
 
 test('CM-2103 intake fails closed on schema, authority, identity, limit, replay, or expiry drift', () => {

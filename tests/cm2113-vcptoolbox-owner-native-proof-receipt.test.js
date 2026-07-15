@@ -85,3 +85,18 @@ test('CM-2113 binds every upstream Git identity to its frozen exact object', () 
     }
   }
 });
+
+test('CM-2113 binds the implementation and owner runtime to their frozen sources', () => {
+  for (const [section, field, drift, blocker] of [
+    ['implementation', 'commit', 'f'.repeat(40), 'receipt.implementation'],
+    ['implementation', 'tree', 'e'.repeat(40), 'receipt.implementation'],
+    ['ownerRuntime', 'sourceCommit', 'd'.repeat(40), 'receipt.ownerRuntime'],
+    ['ownerRuntime', 'sourceTree', 'c'.repeat(40), 'receipt.ownerRuntime']
+  ]) {
+    const value = structuredClone(receipt);
+    value[section][field] = drift;
+    const result = evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value);
+    assert.equal(result.accepted, false, `${section}.${field}`);
+    assert.ok(result.blockers.includes(blocker), `${section}.${field}`);
+  }
+});
