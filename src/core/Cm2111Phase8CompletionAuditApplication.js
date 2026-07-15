@@ -134,7 +134,13 @@ function evaluateApplicationReceipt(receipt = {}) {
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.receiptPayloadSha256');
   if (!hasExactKeys(payload.decision, ['reference', 'commit', 'blobOid', 'bytes', 'sha256'])) blockers.push('receipt.decision.fields');
   if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.bytes !== DECISION.bytes || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
-  if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 || payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 || payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.evidenceBundle');
+  if (!hasExactKeys(payload.evidenceBundle, [
+    'commit', 'blobOid', 'bytes', 'sha256', 'payloadSha256', 'requiredEvidenceCount'
+  ])) blockers.push('receipt.evidenceBundle.fields');
+  if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid ||
+      payload.evidenceBundle?.bytes !== BUNDLE.bytes || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 ||
+      payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 ||
+      payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.evidenceBundle');
   if (payload.phaseAudit?.phaseId !== PHASE_ID || payload.phaseAudit?.accepted !== true || payload.phaseAudit?.missingEvidence?.length !== 0 || payload.phaseAudit?.fullPlanPackCompleted !== false) blockers.push('receipt.phaseAudit');
   if (!hasExactKeys(payload.applicationRuntime, [
     'commit', 'tree', 'cleanBeforeApplication',
