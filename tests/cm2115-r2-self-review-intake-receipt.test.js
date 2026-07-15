@@ -109,10 +109,10 @@ test('frozen CM-2115-R2 self-review decision has exact Git identity and replays 
   assert.equal(evidence.decisionEvaluation.externalReviewPassed, false);
   assert.equal(evidence.decisionEvaluation.fullPlanPackCompleted, false);
   assert.equal(evidence.decisionEvaluation.readinessClaimed, false);
-  assert.equal(evidence.decision.payload.reviewedRequest.commit, '81ee0106ed8cd9b10dc30120ecb7ee6d8897fc79');
+  assert.equal(evidence.decision.payload.reviewedRequest.commit, 'a715d5ca76aae2fa688407c34a1ab7d99c52cb46');
   assert.equal(
     evidence.decision.payload.reviewedRequest.json.canonicalPayloadSha256,
-    '81d68f6b61caf43756e171640fe44a92ac9989be3e5e2b5971ebb79a2cda4d91'
+    'cce599aad762528787d303abb2aff3cf3ff98dc4d60a78c0ab563131fac23a72'
   );
 });
 
