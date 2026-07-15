@@ -122,6 +122,10 @@ test('CM-2111 receipt rejects rehashed identity drift and top-level field expans
     receipt => { receipt.receiptPayload.receiptType = 'forged_receipt'; },
     receipt => { receipt.receiptPayload.decision.bytes += 1; },
     receipt => { receipt.receiptPayload.decision.productionReady = true; },
+    receipt => { receipt.receiptPayload.applicationRuntime.cleanBeforeApplication = false; },
+    receipt => { receipt.receiptPayload.applicationRuntime.completionAuditBaselineBlobOid = '0'.repeat(40); },
+    receipt => { receipt.receiptPayload.applicationRuntime.traceMatrixBaselineBlobOid = '0'.repeat(40); },
+    receipt => { receipt.receiptPayload.applicationRuntime.unreviewedRuntimeClaim = false; },
     receipt => { receipt.receiptPayload.unreviewedClaim = false; },
     receipt => { receipt.unreviewedClaim = false; }
   ]) {
