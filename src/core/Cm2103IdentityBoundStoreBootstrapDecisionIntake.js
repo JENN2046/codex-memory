@@ -100,6 +100,12 @@ function isHash(value, length) {
   return typeof value === 'string' && new RegExp(`^[a-f0-9]{${length}}$`).test(value);
 }
 
+function deepFreeze(value) {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  for (const nested of Object.values(value)) deepFreeze(nested);
+  return Object.freeze(value);
+}
+
 function isMachineBoundCm2103BootstrapDecision(decision) {
   return Boolean(decision && typeof decision === 'object' && MACHINE_BOUND_DECISIONS.has(decision));
 }
@@ -224,6 +230,7 @@ function evaluateCm2103BootstrapDecisionIntake({ decisionBytes, observedBinding,
   if (blockers.length) {
     return { accepted: false, blockers: [...new Set(blockers)], decision: null, executionAuthorized: false };
   }
+  deepFreeze(decision);
   MACHINE_BOUND_DECISIONS.add(decision);
   return {
     accepted: true,
