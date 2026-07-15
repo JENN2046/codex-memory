@@ -113,12 +113,13 @@ function expectedFinalReleaseDecision(expectedBinding) {
   };
 }
 
-function evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake({
+function evaluateFinalReleaseDecision({
   decisionBytes,
   observedBinding,
   expectedBinding,
-  now = new Date()
-} = {}) {
+  now = new Date(),
+  requireActiveAuthorization
+}) {
   const blockers = [];
   if (!Buffer.isBuffer(decisionBytes) || !observedBinding || !expectedBinding) {
     return { accepted: false, blockers: ['missing_input'], decision: null, executionAuthorized: false };
@@ -150,7 +151,8 @@ function evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake({
     if (!Number.isFinite(contentApprovedAt) || approvedAt <= contentApprovedAt) {
       blockers.push('decision.approvedAt.contentOrder');
     }
-    if (!Number.isFinite(expiresAt) || !Number.isFinite(nowMs) || nowMs >= expiresAt || approvedAt >= expiresAt) {
+    if (!Number.isFinite(expiresAt) || !Number.isFinite(nowMs) || approvedAt >= expiresAt ||
+        (requireActiveAuthorization && nowMs >= expiresAt)) {
       blockers.push('decision.expiresAt');
     }
   }
@@ -158,20 +160,30 @@ function evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake({
     return { accepted: false, blockers: [...new Set(blockers)], decision: null, executionAuthorized: false };
   }
   deepFreeze(decision);
-  MACHINE_BOUND_FINAL_RELEASE_DECISIONS.add(decision);
+  if (requireActiveAuthorization) MACHINE_BOUND_FINAL_RELEASE_DECISIONS.add(decision);
   return {
     accepted: true,
     blockers: [],
     decision,
-    decisionIdentityMachineBound: true,
-    executionAuthorized: true,
+    decisionIdentityMachineBound: requireActiveAuthorization,
+    executionAuthorized: requireActiveAuthorization,
+    reconciliationIdentityAccepted: !requireActiveAuthorization,
     nativeActionsAuthorized: 0
   };
+}
+
+function evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake(options = {}) {
+  return evaluateFinalReleaseDecision({ ...options, requireActiveAuthorization: true });
+}
+
+function evaluateCm2104BootstrapFinalExecutionReleaseDecisionReconciliationIdentity(options = {}) {
+  return evaluateFinalReleaseDecision({ ...options, requireActiveAuthorization: false });
 }
 
 module.exports = {
   FINAL_RELEASE_DECISION_KEYS,
   evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake,
+  evaluateCm2104BootstrapFinalExecutionReleaseDecisionReconciliationIdentity,
   expectedFinalReleaseDecision,
   isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision
 };
