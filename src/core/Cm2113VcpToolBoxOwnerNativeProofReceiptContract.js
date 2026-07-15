@@ -31,6 +31,37 @@ const PRIOR_ATTEMPT_FIELDS = Object.freeze([
   'attempt', 'finalState', 'authorizationConsumed', 'authorizationReplayAllowed',
   'durableRecordCountObserved', 'preserved'
 ]);
+const EXPECTED_GIT_IDENTITIES = Object.freeze({
+  executionPacketGitIdentity: Object.freeze({
+    sourceCommit: '59a2c87b44f93f2c15e5785e9c3c501df60f1eaf',
+    blobOid: 'a08bd4e2033e3af8854452a08d79d3031bf32103',
+    bytes: 5239,
+    sha256: 'a77662caf6c28c5df0457541eb28bd83c94af975ee37f22d8e2b2db6a1331d82'
+  }),
+  contentDecisionGitIdentity: Object.freeze({
+    sourceCommit: '0f10573581bf752d0c41ee3c8e8ca53dda04a094',
+    blobOid: 'bc90fac2b46b87a70b117f6707b3e7b07f1cab3c',
+    bytes: 3265,
+    sha256: 'cead009dc0d97dfc8dd44765e980ab0ebd0e288db70abdc42342cc6959119fc6'
+  }),
+  finalReleaseDecisionGitIdentity: Object.freeze({
+    sourceCommit: 'b0f49560295c065beed1ab050430f6c628ee4280',
+    blobOid: '59d04da17e85f0f6ac38c4258f6eda417f8eec0f',
+    bytes: 3642,
+    sha256: '3211ce484a8ebb5d59dbc6010870d36775463d5ab4a96d6470aac71b2f89174a'
+  }),
+  bootstrapReceiptGitIdentity: Object.freeze({
+    sourceCommit: 'ce3cd322c85571e70940c8a539dd6e169c496184',
+    blobOid: 'fae14d9c08cadea862d896dfc4815a56726d8ebb',
+    bytes: 2139,
+    sha256: '14cc7a42004049b19ebefdcd8fa34778deb87e4190800e8c63469bf5f897eba1'
+  })
+});
+
+function exactGitIdentity(identity, expected) {
+  return hasExactKeys(identity, GIT_IDENTITY_FIELDS) &&
+    GIT_IDENTITY_FIELDS.every(field => identity[field] === expected[field]);
+}
 
 function evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(receipt = {}) {
   const blockers = [];
@@ -47,10 +78,7 @@ function evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(receipt = {}) {
       !/^[a-f0-9]{40}$/.test(receipt.implementation?.tree || '')) blockers.push('receipt.implementation');
   for (const field of ['executionPacketGitIdentity', 'contentDecisionGitIdentity', 'finalReleaseDecisionGitIdentity', 'bootstrapReceiptGitIdentity']) {
     const identity = receipt[field];
-    if (!hasExactKeys(identity, GIT_IDENTITY_FIELDS) ||
-        !/^[a-f0-9]{40}$/.test(identity?.sourceCommit || '') || !/^[a-f0-9]{40}$/.test(identity?.blobOid || '') ||
-        !Number.isInteger(identity?.bytes) || identity.bytes <= 0 ||
-        !/^[a-f0-9]{64}$/.test(identity?.sha256 || '')) blockers.push(`receipt.${field}`);
+    if (!exactGitIdentity(identity, EXPECTED_GIT_IDENTITIES[field])) blockers.push(`receipt.${field}`);
   }
   if (!hasExactKeys(receipt.executionReceipt, EXECUTION_RECEIPT_FIELDS) || receipt.executionReceipt?.finalState !== 'CONSUMED_SUCCESS' || receipt.executionReceipt?.bytes !== 2160 || receipt.executionReceipt?.sha256 !== '805f93f5f414194e754c14064ee8fa3875b61c351ffff0b206dcf56c61ac3685') blockers.push('receipt.executionReceipt');
   if (!hasExactKeys(receipt.transportReceipt, TRANSPORT_RECEIPT_FIELDS) || receipt.transportReceipt?.bytes !== 1847 || receipt.transportReceipt?.sha256 !== '5d429bd9004b19df31e247e147394879aeb2362b78241bd9757c45e25ca39b58') blockers.push('receipt.transportReceipt');
