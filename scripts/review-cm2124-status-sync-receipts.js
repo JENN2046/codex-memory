@@ -47,6 +47,14 @@ const REVIEW_PATH = 'docs/near-model-memory-plan-pack/cm2124_status_sync_receipt
 const REVIEW_MARKDOWN_PATH = REVIEW_PATH.replace(/\.json$/, '.md');
 const FREEZE_DIFF_PATHS = Object.freeze(Object.values(OUTPUTS).sort());
 const FREEZE_DIFF_ENTRIES = Object.freeze(FREEZE_DIFF_PATHS.map(sourcePath => ({ status: 'A', path: sourcePath })));
+const MANIFEST_KEYS = Object.freeze([
+  'schemaVersion', 'taskId', 'artifactType', 'canonicalPayloadSha256', 'payload'
+]);
+
+function exactKeys(value, expected) {
+  return value && typeof value === 'object' && !Array.isArray(value) &&
+    sameJson(Object.keys(value).sort(), [...expected].sort());
+}
 
 function parseArgs(argv) {
   if (argv.length !== 0) throw new Error('cm2124_review_no_arguments_allowed');
@@ -146,7 +154,9 @@ function buildExpectedFreezePayload({
 }
 
 function assertExactFreezeManifest(manifest, expectedPayload, markdownIdentity) {
-  if (!sameJson(manifest.payload, expectedPayload)) throw new Error('cm2124_manifest_projection_rejected');
+  if (!exactKeys(manifest, MANIFEST_KEYS) || !sameJson(manifest.payload, expectedPayload)) {
+    throw new Error('cm2124_manifest_projection_rejected');
+  }
   const expectedMarkdown = Buffer.from(renderFreezeMarkdown(manifest, serializeArtifact(manifest)), 'utf8');
   if (!markdownIdentity || markdownIdentity.gitObjectType !== 'blob' ||
       markdownIdentity.gitMode !== '100644' || !Buffer.isBuffer(markdownIdentity.content) ||

@@ -47,6 +47,12 @@ test('CM-2124 review requires the exact full freeze projection and markdown mirr
     );
   }
 
+  const expanded = { ...structuredClone(manifest), readinessClaimed: true };
+  assert.throws(
+    () => assertExactFreezeManifest(expanded, manifest.payload, markdownIdentity(expanded)),
+    /manifest_projection_rejected/
+  );
+
   assert.throws(
     () => assertExactFreezeManifest(manifest, manifest.payload, {
       ...markdownIdentity(),
