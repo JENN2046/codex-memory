@@ -6,8 +6,7 @@ const {
   BASELINE_COMMIT,
   BASELINE_TREE,
   REVIEW_DECISION,
-  buildApplication,
-  evaluateApplication
+  evaluateHistoricalFrozenApplication
 } = require('./Cm2121FullPlanStatusSyncApplication');
 const {
   READINESS_FIELDS
@@ -133,7 +132,7 @@ function intakeApplication(options = {}) {
         application.payload?.patchPlan?.patchPayloadSha256 !== APPLICATION_IDENTITY.patchPayloadSha256) {
       blockers.push('contentDecision.applicationExactContent');
     }
-    const evaluation = evaluateApplication(application, options);
+    const evaluation = evaluateHistoricalFrozenApplication(application, options);
     if (!evaluation.accepted || evaluation.applicationPrepared !== true ||
         evaluation.statusSyncAuthorized !== false || evaluation.statusSyncPerformed !== false ||
         evaluation.currentBranchStatusSynchronized !== false || evaluation.readinessClaimed !== false) {

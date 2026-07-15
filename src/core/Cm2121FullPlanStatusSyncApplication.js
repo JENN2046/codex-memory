@@ -90,7 +90,7 @@ function insertTableRow(text, row, label) {
   return lines.join('\n');
 }
 
-function projectCurrentFacts(beforeBytes) {
+function projectCurrentFacts(beforeBytes, projection = {}) {
   const facts = JSON.parse(beforeBytes.toString('utf8'));
   facts.updatedAt = '2026-07-12';
   facts.taskId = TASK_ID;
@@ -118,7 +118,11 @@ function projectCurrentFacts(beforeBytes) {
     fullPlanApplicationAuthorizationConsumed: true,
     fullPlanApplicationAuthorizationReplayAllowed: false,
     fullPlanApplicationReceiptReviewPassed: true,
-    fullPlanStatusSyncPerformed: true,
+    // CM-2121 did perform the historical synchronization (recorded separately
+    // in evidenceBaseline), but the current status synchronization was later
+    // reopened for revalidation. Only the byte-exact historical artifact
+    // verifier may request the old projected value.
+    fullPlanStatusSyncPerformed: projection.historicalFrozenStatusSync === true,
     fullPlanPackCompleted: true,
     readinessClaimed: false
   };
@@ -288,9 +292,15 @@ function projectMarkdown(sourcePath, beforeBytes) {
   return Buffer.from(text);
 }
 
-function projectStatusFile(sourcePath, beforeBytes) {
+function projectStatusFileForProjection(sourcePath, beforeBytes, projection = {}) {
   if (!STATUS_SYNC_PATHS.includes(sourcePath)) throw new Error(`cm2121_status_path_not_allowed:${sourcePath}`);
-  return sourcePath === CURRENT_FACTS_PATH ? projectCurrentFacts(beforeBytes) : projectMarkdown(sourcePath, beforeBytes);
+  return sourcePath === CURRENT_FACTS_PATH
+    ? projectCurrentFacts(beforeBytes, projection)
+    : projectMarkdown(sourcePath, beforeBytes);
+}
+
+function projectStatusFile(sourcePath, beforeBytes) {
+  return projectStatusFileForProjection(sourcePath, beforeBytes);
 }
 
 function verifyReviewDecisionIdentity(options, blockers) {
@@ -321,7 +331,7 @@ function verifyReviewDecisionIdentity(options, blockers) {
   }
 }
 
-function buildTargets(options, blockers) {
+function buildTargets(options, blockers, projection = {}) {
   const targets = [];
   for (const sourcePath of STATUS_SYNC_PATHS) {
     try {
@@ -330,7 +340,7 @@ function buildTargets(options, blockers) {
         blockers.push(`statusSync.before.${sourcePath}`);
         continue;
       }
-      const afterBytes = projectStatusFile(sourcePath, before.content);
+      const afterBytes = projectStatusFileForProjection(sourcePath, before.content, projection);
       targets.push({
         sourcePath,
         operation: 'modify',
@@ -354,12 +364,12 @@ function buildTargets(options, blockers) {
   return targets;
 }
 
-function buildApplication(options = {}) {
+function buildApplicationForProjection(options = {}, projection = {}) {
   const blockers = [];
   if (!['resolveCommitTree', 'resolveParentCommit', 'resolveDiffPaths', 'resolveGitFile']
     .every(name => typeof options[name] === 'function')) throw new Error('cm2121_git_resolvers_required');
   verifyReviewDecisionIdentity(options, blockers);
-  const targets = buildTargets(options, blockers);
+  const targets = buildTargets(options, blockers, projection);
   if (targets.length !== STATUS_SYNC_PATHS.length) blockers.push('statusSync.targetCount');
   if (blockers.length) throw new Error(`cm2121_application_blocked:${[...new Set(blockers)].join(',')}`);
   const payload = {
@@ -436,11 +446,15 @@ function buildApplication(options = {}) {
   return wrapPayload(payload, 'cm2121_exact_full_plan_status_sync_application_v1');
 }
 
-function evaluateApplication(application = {}, options = {}) {
+function buildApplication(options = {}) {
+  return buildApplicationForProjection(options);
+}
+
+function evaluateApplicationForProjection(application = {}, options = {}, projection = {}) {
   const blockers = [];
   let expected = null;
   try {
-    expected = buildApplication(options);
+    expected = buildApplicationForProjection(options, projection);
     if (!sameJson(application, expected)) blockers.push('statusSync.exactContent');
   } catch (error) {
     blockers.push(error.message);
@@ -468,6 +482,17 @@ function evaluateApplication(application = {}, options = {}) {
   };
 }
 
+function evaluateApplication(application = {}, options = {}) {
+  return evaluateApplicationForProjection(application, options);
+}
+
+// Existing CM-2121/2122/2123 Git objects bind the original projection. Keep
+// that byte-exact historical verification separate from the active generator,
+// which must not recreate the subsequently reopened current-state flag.
+function evaluateHistoricalFrozenApplication(application = {}, options = {}) {
+  return evaluateApplicationForProjection(application, options, { historicalFrozenStatusSync: true });
+}
+
 module.exports = {
   APPLICATION_MARKDOWN_PATH,
   APPLICATION_PATH,
@@ -482,6 +507,7 @@ module.exports = {
   buildApplication,
   canonicalize,
   evaluateApplication,
+  evaluateHistoricalFrozenApplication,
   projectStatusFile,
   serializeArtifact,
   wrapPayload
