@@ -46,6 +46,36 @@ const { isCommitAncestor: realIsCommitAncestor } = require('../scripts/generate-
 
 const IMPLEMENTATION_COMMIT = '9'.repeat(40);
 const IMPLEMENTATION_TREE = '8'.repeat(40);
+const resolverCache = {
+  files: new Map(),
+  trees: new Map(),
+  parents: new Map(),
+  diffPaths: new Map(),
+  diffEntries: new Map(),
+  pathStates: new Map(),
+  ancestors: new Map()
+};
+
+function cacheKey(...parts) {
+  return parts.join('\0');
+}
+
+function cachedGitFile(commit, sourcePath) {
+  const key = cacheKey(commit, sourcePath);
+  if (!resolverCache.files.has(key)) resolverCache.files.set(key, git.resolveGitFile(commit, sourcePath));
+  const value = resolverCache.files.get(key);
+  return { ...value, content: Buffer.from(value.content) };
+}
+
+function cachedScalar(cache, key, resolve) {
+  if (!cache.has(key)) cache.set(key, resolve());
+  return cache.get(key);
+}
+
+function cachedArray(cache, key, resolve) {
+  if (!cache.has(key)) cache.set(key, resolve());
+  return cache.get(key).map(item => typeof item === 'object' ? { ...item } : item);
+}
 
 function fakeArtifactContent(sourcePath) {
   return Buffer.from(`cm2117-artifact:${sourcePath}`);
@@ -64,7 +94,7 @@ function decisionImplementation() {
 }
 
 function baselineIdentity(sourcePath) {
-  const actual = git.resolveGitFile(IMPLEMENTATION_PARENT_FREEZE.commit, sourcePath);
+  const actual = cachedGitFile(IMPLEMENTATION_PARENT_FREEZE.commit, sourcePath);
   return {
     ...actual,
     sourceCommit: IMPLEMENTATION_COMMIT,
@@ -74,7 +104,7 @@ function baselineIdentity(sourcePath) {
 }
 
 function resolveFixtureDurableClaim(bindingHash) {
-  const receiptIdentity = git.resolveGitFile(BASELINE.sourceCommit, PHASE2_APPLICATION_RECEIPT_PATH);
+  const receiptIdentity = cachedGitFile(BASELINE.sourceCommit, PHASE2_APPLICATION_RECEIPT_PATH);
   const receipt = JSON.parse(receiptIdentity.content.toString('utf8'));
   return {
     schemaVersion: 1,
@@ -112,33 +142,37 @@ function resolvers(overrides = {}) {
           return baselineIdentity(sourcePath);
         }
       }
-      return git.resolveGitFile(commit, sourcePath);
+      return cachedGitFile(commit, sourcePath);
     },
     resolveCommitTree: commit => commit === IMPLEMENTATION_COMMIT
       ? IMPLEMENTATION_TREE
-      : git.resolveCommitTree(commit),
+      : cachedScalar(resolverCache.trees, commit, () => git.resolveCommitTree(commit)),
     resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
       ? IMPLEMENTATION_PARENT_FREEZE.commit
-      : git.resolveParentCommit(commit),
+      : cachedScalar(resolverCache.parents, commit, () => git.resolveParentCommit(commit)),
     resolveDiffPaths: (parent, commit) =>
       parent === IMPLEMENTATION_PARENT_FREEZE.commit && commit === IMPLEMENTATION_COMMIT
         ? [...IMPLEMENTATION_DIFF_PATHS]
-        : git.resolveDiffPaths(parent, commit),
+        : cachedArray(resolverCache.diffPaths, cacheKey(parent, commit), () => git.resolveDiffPaths(parent, commit)),
     resolveDiffEntries: (parent, commit) =>
       parent === IMPLEMENTATION_PARENT_FREEZE.commit && commit === IMPLEMENTATION_COMMIT
         ? expectedImplementationDiffEntries()
-        : resolveRealDiffEntries(parent, commit),
+        : cachedArray(resolverCache.diffEntries, cacheKey(parent, commit),
+          () => resolveRealDiffEntries(parent, commit)),
     resolveGitPathState: (commit, sourcePath) => {
       if (commit === IMPLEMENTATION_COMMIT &&
           FUTURE_APPLICATION_TARGETS.some(item => item.path === sourcePath && item.operation === 'add')) {
         return { sourceCommit: commit, sourcePath, exists: false };
       }
-      return git.resolveGitPathState(commit, sourcePath);
+      const key = cacheKey(commit, sourcePath);
+      const value = cachedScalar(resolverCache.pathStates, key, () => git.resolveGitPathState(commit, sourcePath));
+      return { ...value };
     },
     resolveDurableClaim: resolveFixtureDurableClaim,
     isCommitAncestor: (ancestor, descendant) => {
       if (ancestor === GATE_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
-      return realIsCommitAncestor(ancestor, descendant);
+      return cachedScalar(resolverCache.ancestors, cacheKey(ancestor, descendant),
+        () => realIsCommitAncestor(ancestor, descendant));
     }
   };
   return { ...base, ...overrides };
