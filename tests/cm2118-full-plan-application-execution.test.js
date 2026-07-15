@@ -27,10 +27,10 @@ const {
 const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
 const CM2115_BINDING_HASH = '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc';
 // The frozen executor performs a large number of Git-object checks. A focused
-// run completes in roughly one minute, while the default suite runs many test
-// files concurrently and can take materially longer. Keep a hard ceiling so a
-// stalled child cannot pin the suite, with enough headroom for loaded CI hosts.
-const EXECUTOR_CHILD_TIMEOUT_MS = 180_000;
+// run can exceed three minutes on loaded or linked-clone CI hosts. This suite
+// is opt-in, so keep a generous hard ceiling that still kills a genuinely
+// stalled child without turning normal frozen replay into a timeout failure.
+const EXECUTOR_CHILD_TIMEOUT_MS = 600_000;
 
 function git(args, cwd, options = {}) {
   return execFileSync('git', args, {

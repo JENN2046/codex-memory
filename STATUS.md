@@ -6,14 +6,14 @@ Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2121 exact full-plan status synchronization`.
 Current validation: `CMV-2214`.
-Current fact: the exact application commit is ancestry-anchored, both low-disclosure receipts are frozen and internally reviewed, the one-shot authorization is consumed/non-replayable, and the nine-path status synchronization records `fullPlanPackCompleted=true`.
+Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
 All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## CM-2121 Bound Full-plan Application Status
 
-Application `41097b0f…` is ancestry-anchored with exact tree `fecb13c4…`. Receipt freeze `727e8128…` preserves both byte-exact low-disclosure receipts, and internal review `521348cf…` passes. Authorization is consumed/non-replayable; the nine-path status synchronization records `fullPlanPackCompleted=true`.
+Application `41097b0f…` remains historical ancestry-anchored evidence with exact tree `fecb13c4…`. Receipt freeze `727e8128…` preserves both byte-exact low-disclosure receipts, and internal review `521348cf…` passes. Authorization is consumed/non-replayable; current completion remains false pending revalidation.
 
 This completion is limited to the imported plan-pack evidence state. Production, release, deploy, cutover, `RC_READY`, complete V8, and all other readiness fields remain false. No native/provider/real-memory/remote action is authorized or performed by the status synchronization.
 

@@ -67,6 +67,30 @@ test('CURRENT_FACTS projection preserves historical CM-2121 evidence without re-
   const projected = JSON.parse(application.projectStatusFile(application.CURRENT_FACTS_PATH, before.content));
   assert.equal(projected.evidenceBaseline.cm2121StatusSyncPerformed, true);
   assert.equal(projected.planPackCompletion.fullPlanStatusSyncPerformed, false);
+  assert.equal(projected.planPackCompletion.fullPlanPackCompleted, false);
+  assert.equal(projected.status.scope, 'near_model_memory_plan_pack_reopened_needs_revalidation_no_readiness_claim');
+  assert.equal(
+    projected.validationSummary.find(item => item.id === application.VALIDATION_ID).status,
+    'COMPLETED_STATUS_REOPENED_FULL_PLAN_NEEDS_REVALIDATION_READINESS_FALSE'
+  );
+});
+
+test('active Markdown projection describes revalidation while historical projection stays frozen', () => {
+  const { options } = prepared();
+  for (const sourcePath of STATUS_SYNC_PATHS.filter(item => item !== application.CURRENT_FACTS_PATH)) {
+    const before = options.resolveGitFile(application.BASELINE_COMMIT, sourcePath);
+    const active = application.projectStatusFile(sourcePath, before.content).toString('utf8');
+    if (active.includes('<!-- CURRENT-FACTS-ACTIVE-START -->')) {
+      const block = active.split('<!-- CURRENT-FACTS-ACTIVE-START -->')[1]
+        .split('<!-- CURRENT-FACTS-ACTIVE-END -->')[0];
+      assert.doesNotMatch(block, /fullPlanPackCompleted=true/);
+      assert.match(block, /pending revalidation/);
+    }
+  }
+  const frozen = options.resolveGitFile('096eaf0c42f8e76180177eef7d16bf6edd605858', application.APPLICATION_PATH);
+  const historical = application.evaluateHistoricalFrozenApplication(JSON.parse(frozen.content), options);
+  assert.equal(historical.accepted, true, historical.blockers.join(','));
+  assert.equal(application.evaluateApplication(JSON.parse(frozen.content), options).accepted, false);
 });
 
 test('active application generation no longer reproduces the historical frozen patch hash', () => {

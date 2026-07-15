@@ -91,6 +91,7 @@ function insertTableRow(text, row, label) {
 }
 
 function projectCurrentFacts(beforeBytes, projection = {}) {
+  const historical = projection.historicalFrozenStatusSync === true;
   const facts = JSON.parse(beforeBytes.toString('utf8'));
   facts.updatedAt = '2026-07-12';
   facts.taskId = TASK_ID;
@@ -122,15 +123,17 @@ function projectCurrentFacts(beforeBytes, projection = {}) {
     // in evidenceBaseline), but the current status synchronization was later
     // reopened for revalidation. Only the byte-exact historical artifact
     // verifier may request the old projected value.
-    fullPlanStatusSyncPerformed: projection.historicalFrozenStatusSync === true,
-    fullPlanPackCompleted: true,
+    fullPlanStatusSyncPerformed: historical,
+    fullPlanPackCompleted: historical,
     readinessClaimed: false
   };
   facts.status = {
     ...facts.status,
     project: 'NOT_READY_BLOCKED',
     rc: 'RC_NOT_READY_BLOCKED',
-    scope: 'near_model_memory_plan_pack_completed_evidence_bound_status_synced_no_readiness_claim',
+    scope: historical
+      ? 'near_model_memory_plan_pack_completed_evidence_bound_status_synced_no_readiness_claim'
+      : 'near_model_memory_plan_pack_reopened_needs_revalidation_no_readiness_claim',
     notReleaseReady: true,
     notProductionReady: true,
     notDeployReady: true,
@@ -140,7 +143,9 @@ function projectCurrentFacts(beforeBytes, projection = {}) {
   facts.validationSummary = [{
     id: VALIDATION_ID,
     scope: 'CM-2121 exact full-plan status synchronization',
-    status: 'COMPLETED_FULL_PLAN_APPLICATION_BOUND_STATUS_SYNCED_READINESS_FALSE'
+    status: historical
+      ? 'COMPLETED_FULL_PLAN_APPLICATION_BOUND_STATUS_SYNCED_READINESS_FALSE'
+      : 'COMPLETED_STATUS_REOPENED_FULL_PLAN_NEEDS_REVALIDATION_READINESS_FALSE'
   }, ...(facts.validationSummary || []).filter(item => item.id !== VALIDATION_ID)];
   const evidence = facts.evidenceBaseline || {};
   Object.assign(evidence, {
@@ -189,7 +194,8 @@ function projectCurrentFacts(beforeBytes, projection = {}) {
   return Buffer.from(`${JSON.stringify(canonicalize(facts), null, 2)}\n`);
 }
 
-function projectMarkdown(sourcePath, beforeBytes) {
+function projectMarkdown(sourcePath, beforeBytes, projection = {}) {
+  const historical = projection.historicalFrozenStatusSync === true;
   let text = beforeBytes.toString('utf8');
   const commonActive = [
     `Current facts snapshot: \`${CURRENT_FACTS_PATH}\`.`,
@@ -289,6 +295,30 @@ function projectMarkdown(sourcePath, beforeBytes) {
       '## Historical CM-2118/CM-2119 Release State', ''
     ].join('\n'), 'status-current');
   }
+  if (!historical) {
+    const replacements = [
+      ['fullPlanPackCompleted=true', 'fullPlanPackCompleted=false (pending revalidation)'],
+      ['full_plan=true', 'full_plan=false'],
+      ['COMPLETED_FULL_PLAN_APPLICATION_BOUND_STATUS_SYNCED_READINESS_FALSE',
+        'COMPLETED_STATUS_REOPENED_FULL_PLAN_NEEDS_REVALIDATION_READINESS_FALSE'],
+      ['completed_full_plan_application_bound_status_synced_readiness_false',
+        'completed_status_reopened_full_plan_needs_revalidation_readiness_false'],
+      ['FULL_PLAN_APPLICATION_BOUND_STATUS_SYNCED_READINESS_FALSE',
+        'COMPLETED_STATUS_REOPENED_FULL_PLAN_NEEDS_REVALIDATION_READINESS_FALSE'],
+      ['Full plan-pack evidence is complete', 'Full plan-pack completion needs revalidation'],
+      ['Full-plan application evidence: bound and synchronized.',
+        'Full-plan application evidence: historically bound; current synchronization is reopened for revalidation.'],
+      ['Exact full-plan application bound and status synchronized; readiness remains false',
+        'Historical full-plan application bound; current status sync reopened for revalidation; readiness remains false'],
+      ['The exact full-plan application is now bound and ancestry-anchored.',
+        'The historical exact full-plan application remains bound and ancestry-anchored; current completion is reopened for revalidation.'],
+      ['## CM-2121 Bound Full-plan Application Status',
+        '## CM-2121 Reopened Full-plan Status Revalidation'],
+      ['## CM-2121 Bound Full-plan Completion Status Sync',
+        '## CM-2121 Reopened Full-plan Status Revalidation']
+    ];
+    for (const [from, to] of replacements) text = text.split(from).join(to);
+  }
   return Buffer.from(text);
 }
 
@@ -296,7 +326,7 @@ function projectStatusFileForProjection(sourcePath, beforeBytes, projection = {}
   if (!STATUS_SYNC_PATHS.includes(sourcePath)) throw new Error(`cm2121_status_path_not_allowed:${sourcePath}`);
   return sourcePath === CURRENT_FACTS_PATH
     ? projectCurrentFacts(beforeBytes, projection)
-    : projectMarkdown(sourcePath, beforeBytes);
+    : projectMarkdown(sourcePath, beforeBytes, projection);
 }
 
 function projectStatusFile(sourcePath, beforeBytes) {
@@ -388,7 +418,7 @@ function buildApplicationForProjection(options = {}, projection = {}) {
       onlyAuthoritativeTransition: {
         field: 'fullPlanPackCompleted',
         before: false,
-        after: true
+        after: projection.historicalFrozenStatusSync === true
       },
       statusSyncPerformedOnlyAfterFutureExactApplication: true,
       readinessFieldsForcedFalse: [...READINESS_FIELDS]

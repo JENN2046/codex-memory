@@ -411,10 +411,15 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
         claimEnvelopeBindingVerified: false
       })
     };
+    if (!validPersistedClaimEnvelope(observed, expected)) return {
+      accepted: false,
+      state: 'CLAIM_REGISTRY_AMBIGUOUS',
+      authorizationConsumed: true,
+      reasonCode: 'cm2103_claim_envelope_persistence_unknown',
+      claim: syntheticClaimRegistryAmbiguous(expected)
+    };
     if (TERMINAL_STATES.includes(observed.state)) {
-      const projection = validPersistedClaimEnvelope(observed, expected)
-        ? reentryProjectionFromObserved(observed)
-        : corruptExistingClaimProjection(expected);
+      const projection = reentryProjectionFromObserved(observed);
       return {
         accepted: projection.state === 'CONSUMED_SUCCESS',
         state: projection.state,

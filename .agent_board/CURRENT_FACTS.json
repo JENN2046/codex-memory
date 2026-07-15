@@ -536,7 +536,7 @@
     "fullPlanApplicationFinalExecutionReleasePresent": true,
     "fullPlanApplicationGatePrepared": true,
     "fullPlanApplicationReceiptReviewPassed": true,
-    "fullPlanPackCompleted": true,
+    "fullPlanPackCompleted": false,
     "fullPlanStatusSyncPerformed": false,
     "independentExternalReviewPassed": false,
     "independentReviewMode": "repository_internal_separate_pass",
@@ -568,7 +568,7 @@
     "notReleaseReady": true,
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_completed_evidence_bound_status_synced_no_readiness_claim"
+    "scope": "near_model_memory_plan_pack_reopened_needs_revalidation_no_readiness_claim"
   },
   "taskId": "CM-2121",
   "updatedAt": "2026-07-12",
@@ -577,7 +577,7 @@
     {
       "id": "CMV-2214",
       "scope": "CM-2121 exact full-plan status synchronization",
-      "status": "COMPLETED_FULL_PLAN_APPLICATION_BOUND_STATUS_SYNCED_READINESS_FALSE"
+      "status": "COMPLETED_STATUS_REOPENED_FULL_PLAN_NEEDS_REVALIDATION_READINESS_FALSE"
     },
     {
       "id": "CMV-2213",
