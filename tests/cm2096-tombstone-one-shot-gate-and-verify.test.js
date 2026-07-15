@@ -309,6 +309,27 @@ test('CM-2096 tombstone assertion is atomically consumable exactly once', async 
   assert.equal(record.writeInvocationCount, 1);
 });
 
+test('CM-2096 machine-bound decision is immutable after intake', async () => {
+  const binding = expectedBinding();
+  const decision = intakeDecision(binding);
+  assert.equal(Object.isFrozen(decision), true);
+  for (const [field, drift] of [
+    ['token', 'caller-replaced-token'],
+    ['executionReleaseAuthorized', false],
+    ['maxTombstoneWrites', 99]
+  ]) {
+    assert.throws(() => { decision[field] = drift; }, TypeError);
+  }
+  const registry = await newRegistry();
+  const gate = createCm2096TombstoneOneShotGate({
+    registry,
+    expectedBinding: binding,
+    now: () => new Date('2026-07-11T00:00:00.000Z')
+  });
+  const claimed = await gate.claim({ decision, preStoreProjection: preStoreProjection(binding) });
+  assert.equal(claimed.accepted, true, claimed.blockers.join(', '));
+});
+
 test('CM-2096 tombstone assertion keeps claim-time exact approval immutable and gate-owned', async () => {
   const binding = expectedBinding();
   const registry = await newRegistry();

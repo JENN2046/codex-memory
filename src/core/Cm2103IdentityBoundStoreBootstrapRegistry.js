@@ -236,6 +236,13 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
     }
     this.authorizationRegistryRoot = authorizationRegistryRoot;
     this.fs = filesystem;
+    this.activeClaims = new Map();
+    this.transitionsInFlight = new Set();
+  }
+
+  rememberActiveClaim(claim) {
+    const snapshot = JSON.parse(JSON.stringify(claim));
+    this.activeClaims.set(snapshot.claimId, Object.freeze(snapshot));
   }
 
   envelopePath({ nonce, receiptId } = {}) {
@@ -407,6 +414,7 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
       };
     }
     try {
+      this.rememberActiveClaim(observed);
       const terminal = await this.transition(observed.claimId, 'CLAIM_AMBIGUOUS');
       return {
         accepted: false,
@@ -439,6 +447,7 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
     const expected = baseClaimEnvelope({ nonce, receiptId, bindingHash });
     try {
       await this.fs.writeFile(target.claimPath, JSON.stringify(expected), { flag: 'wx' });
+      this.rememberActiveClaim(expected);
       return { accepted: true, state: 'CLAIMED', authorizationConsumed: true, claim: expected };
     } catch (error) {
       if (error.code === 'EEXIST') {
@@ -454,6 +463,18 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
   }
 
   async transition(claimId, event, effects = {}, { priorFailedStateWriteAttempts = 0 } = {}) {
+    if (this.transitionsInFlight.has(claimId)) {
+      throw new Error('cm2103_bootstrap_transition_already_in_flight');
+    }
+    this.transitionsInFlight.add(claimId);
+    try {
+      return await this.transitionActive(claimId, event, effects, { priorFailedStateWriteAttempts });
+    } finally {
+      this.transitionsInFlight.delete(claimId);
+    }
+  }
+
+  async transitionActive(claimId, event, effects = {}, { priorFailedStateWriteAttempts = 0 } = {}) {
     const allowedEffectKeys = new Set([
       'directoryCreateAttempts',
       'directoryCreates',
@@ -474,7 +495,13 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
     if (!Number.isInteger(priorFailedStateWriteAttempts) || priorFailedStateWriteAttempts < 0 || priorFailedStateWriteAttempts > 1) {
       throw new Error('cm2103_prior_failed_state_write_attempts_invalid');
     }
+    const expectedCurrent = this.activeClaims.get(claimId);
+    if (!expectedCurrent) throw new Error('cm2103_bootstrap_transition_claim_not_active');
     const current = await this.readClaim(claimId);
+    if (!validPersistedClaimEnvelope(current, expectedCurrent) ||
+        JSON.stringify(canonicalize(current)) !== JSON.stringify(canonicalize(expectedCurrent))) {
+      throw new Error('cm2103_bootstrap_claim_envelope_changed_before_transition');
+    }
     const nextState = transitionCm2103BootstrapState(current.state, event);
     const next = {
       ...current,
@@ -517,6 +544,7 @@ class Cm2103IdentityBoundStoreBootstrapRegistry {
       wrapped.causeCode = error.code || 'unknown';
       throw wrapped;
     }
+    this.rememberActiveClaim(next);
     return { ...next, summary: summarizeCm2103BootstrapState(nextState) };
   }
 }
