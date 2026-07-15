@@ -148,6 +148,25 @@ test('CM-2114 application receipt rejects rehashed top-level receipt or payload 
   assert.equal(evaluateApplicationReceipt(receipt).accepted, false);
 });
 
+test('CM-2114 application receipt binds exact nested Git identities including byte counts', () => {
+  const result = executeCm2114Phase8CompletionRevalidationApplication(input());
+  for (const mutate of [
+    payload => { payload.decision.bytes += 1; },
+    payload => { payload.evidenceBundle.bytes += 1; },
+    payload => { payload.proofReceipt.bytes += 1; },
+    payload => { payload.decision.productionReady = true; },
+    payload => { payload.evidenceBundle.productionReady = true; },
+    payload => { payload.proofReceipt.productionReady = true; }
+  ]) {
+    const payload = structuredClone(result.receiptPayload);
+    mutate(payload);
+    assert.equal(evaluateApplicationReceipt({
+      receiptPayload: payload,
+      receiptPayloadSha256: require('../src/core/Cm2114Phase8CompletionRevalidationApplication').sha256Canonical(payload)
+    }).accepted, false);
+  }
+});
+
 test('CM-2114 frozen application receipt passes the exact receipt contract', () => {
   const result = evaluateApplicationReceipt(applicationReceipt);
   assert.equal(result.accepted, true, result.blockers.join(', '));
