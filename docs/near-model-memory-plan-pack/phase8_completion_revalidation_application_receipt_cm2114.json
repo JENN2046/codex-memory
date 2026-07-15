@@ -60,6 +60,8 @@
     },
     "nonClaims": {
       "additionalNativeWriteAuthorized": false,
+      "derivedIndexProofAccepted": false,
+      "productionProviderProofAccepted": false,
       "productionReady": false,
       "releaseReady": false,
       "rcReady": false,
@@ -68,5 +70,5 @@
       "readinessClaimed": false
     }
   },
-  "receiptPayloadSha256": "2097572efc48b4a78ce0fb684b01141561823f8063e393215256cf98c517c045"
+  "receiptPayloadSha256": "c31ef072c5c44ca0c65817319828e6083f7155dff8edcbc85457ab746167dc82"
 }
