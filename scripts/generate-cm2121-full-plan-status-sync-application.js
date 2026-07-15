@@ -11,6 +11,10 @@ const {
   serializeArtifact
 } = require('../src/core/Cm2121FullPlanStatusSyncApplication');
 const { resolverOptions } = require('./generate-cm2116-exact-full-plan-application-gate');
+const {
+  assertSafeGitEnvironment,
+  sanitizedGitEnvironment
+} = require('../src/core/Cm2122FullPlanStatusSyncExecution');
 
 function parseArgs(argv) {
   if (argv.length !== 0) throw new Error('cm2121_status_sync_application_no_arguments_allowed');
@@ -20,6 +24,7 @@ function parseArgs(argv) {
 function gitText(args) {
   return execFileSync('git', args, {
     cwd: process.cwd(),
+    env: sanitizedGitEnvironment(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   }).trim();
@@ -27,6 +32,7 @@ function gitText(args) {
 
 function main(argv = process.argv.slice(2)) {
   parseArgs(argv);
+  assertSafeGitEnvironment(process.env);
   if (gitText(['status', '--porcelain']) !== '') throw new Error('cm2121_clean_worktree_required');
   if (fs.existsSync(APPLICATION_PATH) || fs.existsSync(APPLICATION_MARKDOWN_PATH)) {
     throw new Error('cm2121_status_sync_application_already_exists');

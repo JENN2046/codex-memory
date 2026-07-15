@@ -36,6 +36,10 @@ const TRANSPORT_KEYS = Object.freeze([
   'outer', 'inner', 'ownerRuntime', 'contentLengthFramingRequired',
   'processBoundaryRequired', 'innerAuthorizationRequired'
 ]);
+const RUNTIME_TARGET_KEYS = Object.freeze([
+  'primaryRuntime', 'targetKind', 'targetReferenceName',
+  'storeReference', 'storeInstanceId', 'storeIdentitySha256'
+]);
 
 function exactKeys(value, keys) {
   return value && typeof value === 'object' && !Array.isArray(value) &&
@@ -129,6 +133,7 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
     packet.executionContext?.visibility !== packet.allowedScope?.visibility
   ) blockers.push('executionContext.scopeBinding');
   if (
+    !exactKeys(packet.runtimeTarget, RUNTIME_TARGET_KEYS) ||
     packet.runtimeTarget?.primaryRuntime !== 'VCPToolBox native memory' ||
     packet.runtimeTarget?.targetKind !== 'mcp_server' ||
     !safeReference(packet.runtimeTarget?.targetReferenceName) ||
