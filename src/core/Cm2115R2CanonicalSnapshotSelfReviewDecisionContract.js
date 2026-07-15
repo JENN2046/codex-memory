@@ -43,17 +43,11 @@ const IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
   'tests/cm2115-r2-self-review-decision.test.js',
   'package.json'
 ]);
+const IMPLEMENTATION_DIFF_PATHS = Object.freeze([
+  'src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js'
+]);
 const IMPLEMENTATION_LINEAGE_DIFF_PATHS = Object.freeze([
-  '.agent_board/AUTOPILOT_LEDGER.md',
-  '.agent_board/CHECKPOINT.md',
-  '.agent_board/CURRENT_FACTS.json',
-  '.agent_board/HANDOFF.md',
-  '.agent_board/RUN_STATE.md',
-  '.agent_board/TASK_QUEUE.md',
-  '.agent_board/VALIDATION_LOG.md',
-  'CURRENT_STATE.md',
-  'STATUS.md',
-  ...IMPLEMENTATION_ARTIFACT_PATHS
+  ...IMPLEMENTATION_DIFF_PATHS
 ]);
 
 function buildDecisionReference(reviewImplementation) {
@@ -326,7 +320,7 @@ function evaluateDecision(decision = {}, {
         resolveDiffPaths(REVIEW_REQUEST_FREEZE.commit, implementation.commit).sort();
       if (resolveCommitTree(implementation.commit) !== implementation.tree ||
           !isCommitAncestor(REVIEW_REQUEST_FREEZE.commit, implementation.commit) ||
-          !sameJson(implementationDiffPaths, [...IMPLEMENTATION_ARTIFACT_PATHS].sort()) ||
+          !sameJson(implementationDiffPaths, [...IMPLEMENTATION_DIFF_PATHS].sort()) ||
           !sameJson(implementationLineageDiffPaths, [...IMPLEMENTATION_LINEAGE_DIFF_PATHS].sort())) {
         blockers.push('decision.reviewImplementationLineage');
       }
@@ -388,6 +382,7 @@ function evaluateDecision(decision = {}, {
 module.exports = {
   DECISION_PATH,
   IMPLEMENTATION_ARTIFACT_PATHS,
+  IMPLEMENTATION_DIFF_PATHS,
   IMPLEMENTATION_LINEAGE_DIFF_PATHS,
   REVIEW_REQUEST_DIFF_PATHS,
   REVIEW_REQUEST_FREEZE,

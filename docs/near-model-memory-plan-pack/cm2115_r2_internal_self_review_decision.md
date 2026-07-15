@@ -1,7 +1,7 @@
 # CM-2115-R2 Internal Snapshot Self-review Decision
 
-Decision reference: `CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-9B9C158A-68C8088A`
-Canonical payload SHA-256: `032427870f5bbbf1035edc7291302a1e480b93040cd9f088873b45d58546a1d4`
+Decision reference: `CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-81D68F6B-FE3FA288`
+Canonical payload SHA-256: `377812d904e60ec569b57c9d9e2eded76a83a797e1f076160598e4db41c2f3a5`
 
 Result: PASS_INTERNAL_SELF_REVIEW_ONLY.
 
@@ -14,7 +14,7 @@ it does not authorize or apply full-plan completion or any readiness claim.
 
 ```json
 {
-  "canonicalPayloadSha256": "032427870f5bbbf1035edc7291302a1e480b93040cd9f088873b45d58546a1d4",
+  "canonicalPayloadSha256": "377812d904e60ec569b57c9d9e2eded76a83a797e1f076160598e4db41c2f3a5",
   "decisionType": "canonical_full_plan_snapshot_internal_self_review_decision_v1",
   "payload": {
     "currentState": {
@@ -36,7 +36,7 @@ it does not authorize or apply full-plan completion or any readiness claim.
       "selfReviewSatisfiesIndependentExternalReview": false,
       "separateFullPlanApplicationMayBePrepared": true
     },
-    "decisionReference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-9B9C158A-68C8088A",
+    "decisionReference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-81D68F6B-FE3FA288",
     "decisionType": "repository_internal_independent_snapshot_self_review_v1",
     "findings": {
       "actionableFindingCount": 0,
@@ -63,24 +63,24 @@ it does not authorize or apply full-plan completion or any readiness claim.
     "reviewImplementation": {
       "artifacts": [
         {
-          "blobOid": "cac52c26899ef3b206d9c264df6685da060426c4",
+          "blobOid": "fa24094f517a618776c1d62f13b66264af5772cc",
           "path": "src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js"
         },
         {
-          "blobOid": "45e70706fca7dcb19314ea8ad80adbcbd740b2b7",
+          "blobOid": "9802f119b05cc32f1136d3f58be21daab086e615",
           "path": "scripts/generate-cm2115-r2-self-review-decision.js"
         },
         {
-          "blobOid": "fd043cb822737710970e7d14101bdca846735405",
+          "blobOid": "7e0214e1e619dfe9286f408b61a5301b077072ae",
           "path": "tests/cm2115-r2-self-review-decision.test.js"
         },
         {
-          "blobOid": "4b32a086384fa8052a8244f8edc49c88a2da63c3",
+          "blobOid": "eb0db13f374c6b84e7df33cb050617ee2c643012",
           "path": "package.json"
         }
       ],
-      "commit": "68c8088a56511b6d6b598e293a6a39130c254a49",
-      "tree": "92f15d54d50ccc62443d9a37e10f3338e010c831"
+      "commit": "fe3fa28821282348f4b8e94dafe1dc904226b461",
+      "tree": "5b03dae54a30ff826a029daffd0aa3ed630c583a"
     },
     "reviewMode": {
       "externalReviewPerformed": false,
@@ -92,21 +92,21 @@ it does not authorize or apply full-plan completion or any readiness claim.
       "repositoryRealityControlsDecision": true
     },
     "reviewedRequest": {
-      "commit": "01c65db824e77400ef144ef8118deaa28b06abcc",
+      "commit": "81ee0106ed8cd9b10dc30120ecb7ee6d8897fc79",
       "json": {
-        "blobOid": "3c99fb6829d10f250eff1b0b873eb8e0d075f59f",
+        "blobOid": "08bc3ffbe9a39b3dbbe42bdbf14781c021d4dba6",
         "bytes": 5973,
-        "canonicalPayloadSha256": "9b9c158a6652a36256b663e16fdbed9656485143df37c8c9ee13a96fc215bdf0",
+        "canonicalPayloadSha256": "81d68f6b61caf43756e171640fe44a92ac9989be3e5e2b5971ebb79a2cda4d91",
         "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json",
-        "sha256": "4b62b41753c66443b7e7f2a315729c9317172399b06fc8d618a2dd7625501cba"
+        "sha256": "fc56ff4ab271b1f59505ed2ce62e680dc55854b5c696b9f5409357ad25c77953"
       },
       "markdown": {
-        "blobOid": "df309bac7afdf891081c52b8397d47762d3a1f49",
+        "blobOid": "afe3b7f21055872369228e7adf178e7de9856212",
         "bytes": 6983,
         "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md",
-        "sha256": "3ba20d045b3f085a9aa0eb1b7e1763272e44655443b4b7f120c68e7e7a5f51fb"
+        "sha256": "58f9b65e88397bb0570500588134c756e3ea975506cb4c0d94b2f7adebbab3a5"
       },
-      "tree": "e6f3c28f0df1d10744ead4f132d064b2dcc3fb41"
+      "tree": "c68cd2ad68258db7a8569faf728aed3c5aed1fd3"
     },
     "reviewedSnapshot": {
       "commit": "8d25298563e512456c614eb6fec6af6bdc02bf8f",
