@@ -8,10 +8,10 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Exact full-plan application bound and status synchronized; readiness remains false |
+| Status | Historical full-plan application bound; current completion and status sync reopened for revalidation; readiness remains false |
 | Current task | `CM-2121 exact full-plan status synchronization` |
 | Current validation | `CMV-2214` |
-| Current route | Full plan-pack evidence is complete; any readiness or external action remains separately gated |
+| Current route | Full plan-pack completion needs revalidation; any readiness or external action remains separately gated |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -20,7 +20,7 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 Application `41097b0f…` / tree `fecb13c4…` is ancestry-anchored with its exact `4M+1A` target set. Freeze commit `727e8128…` preserves the byte-exact execution and binding receipts; internal review `521348cf…` passed. The one-shot authorization is `CONSUMED_SUCCESS`, use count one, and non-replayable.
 
-`fullPlanPackCompleted=true` now describes the bounded plan-pack evidence state. This is not production, release, deploy, cutover, `RC_READY`, complete V8, or another readiness claim; every readiness field remains false.
+The historical bound application remains evidence, but current `fullPlanPackCompleted=false` pending revalidation. This is not production, release, deploy, cutover, `RC_READY`, complete V8, or another readiness claim; every readiness field remains false.
 
 ## Historical Final Execution Release
 
