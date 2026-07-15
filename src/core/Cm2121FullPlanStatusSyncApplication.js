@@ -294,6 +294,26 @@ function projectMarkdown(sourcePath, beforeBytes, projection = {}) {
       '',
       '## Historical CM-2118/CM-2119 Release State', ''
     ].join('\n'), 'status-current');
+    if (!historical) {
+      const releaseStart = text.indexOf('## Historical CM-2118/CM-2119 Release State');
+      const releaseEnd = text.indexOf('\nCM-2115-R2 internal self-review implementation', releaseStart);
+      if (releaseStart === -1 || releaseEnd === -1 ||
+          text.indexOf('## Historical CM-2118/CM-2119 Release State', releaseStart + 1) !== -1) {
+        throw new Error('cm2121_projection_anchor_invalid:status-historical-release');
+      }
+      const historicalRelease = [
+        '## Historical CM-2118/CM-2119 Release State', '',
+        'CM-2118 implementation `45c53bf5…` froze the fixed-root claim registry, three-commit secure executor, low-disclosure external receipts, and exact application-commit binding contract. Packet `02a78ef8…` and CM-2119 release `dd78a679…` passed exact Git intake and authorized one local application with replay forbidden.',
+        '',
+        'That authorization was subsequently consumed by application `41097b0f…`: the durable claim reached `CONSUMED_SUCCESS`, use count and patch invocation count are one, and receipts frozen at `727e8128…` were accepted by review `521348cf…`. The historical executor is inactive and non-replayable; it is not an unclaimed future route.',
+        '',
+        'CM-2117 decision `b1245149…` supplied the content-only parent and exact five-path target boundary. CM-2116 gate `f6b7f9a5…` remains an immutable pre-execution checkpoint; its then-current zero counters do not describe the later consumed application evidence.',
+        '',
+        'The current status synchronization is reopened for revalidation, so `fullPlanPackCompleted=false (pending revalidation)`. All readiness claims remain false, and no additional application, native-memory, provider, real-memory, or remote action is authorized.',
+        ''
+      ].join('\n');
+      text = `${text.slice(0, releaseStart)}${historicalRelease}${text.slice(releaseEnd)}`;
+    }
   }
   if (!historical) {
     const replacements = [
