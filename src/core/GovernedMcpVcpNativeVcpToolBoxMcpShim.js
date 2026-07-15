@@ -541,7 +541,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     : process.env.KNOWLEDGEBASE_STORE_PATH
       ? path.resolve(process.env.KNOWLEDGEBASE_STORE_PATH)
       : '';
-  const isolatedRuntimeStoreUsed = Boolean(knowledgeBaseStorePath);
+  const isolatedRuntimeStoreConfigured = Boolean(knowledgeBaseStorePath);
   const primaryWriteOnly = options.primaryWriteOnly === true;
   const primaryWritePreflight = typeof options.primaryWritePreflight === 'function'
     ? options.primaryWritePreflight
@@ -610,7 +610,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       runtimeReceipt: defaultReadRuntimeReceipt({
         providerApiCalled: true,
         memoryReadPerformed: true,
-        isolatedRuntimeStoreUsed
+        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured
       })
     };
   }
@@ -689,7 +689,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_write',
-        isolatedRuntimeStoreUsed,
+        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured && !primaryWriteOnly,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false
       })
@@ -723,7 +723,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_mutation_marker',
-        isolatedRuntimeStoreUsed,
+        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured && !primaryWriteOnly,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false
       })
