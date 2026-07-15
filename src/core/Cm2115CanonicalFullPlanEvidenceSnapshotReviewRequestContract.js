@@ -265,7 +265,10 @@ function evaluateCm2115SnapshotReviewRequest(request, {
     'snapshot.markdown'
   );
   let snapshotEvaluation = null;
-  if (snapshotJson?.content) {
+  const snapshotContentAvailable = Buffer.isBuffer(snapshotJson?.content) ||
+    typeof snapshotJson?.content === 'string';
+  if (snapshotJson && !snapshotContentAvailable) blockers.push('snapshot.json.contentRequired');
+  if (snapshotContentAvailable) {
     try {
       const snapshot = JSON.parse(Buffer.isBuffer(snapshotJson.content)
         ? snapshotJson.content.toString('utf8')
@@ -292,6 +295,7 @@ function evaluateCm2115SnapshotReviewRequest(request, {
       blockers.push('snapshot.json.invalid');
     }
   }
+  if (snapshotEvaluation?.accepted !== true) blockers.push('snapshot.contract');
 
   const validation = payload?.localValidationReceipt;
   const validationBindingAccepted = sameKeys(validation, VALIDATION_KEYS) &&
