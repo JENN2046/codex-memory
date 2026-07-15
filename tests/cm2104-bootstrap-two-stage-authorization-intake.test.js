@@ -112,6 +112,11 @@ test('CM-2104 content intake machine-binds approval content without execution au
   assert.equal(result.finalExecutionReleaseRequired, true);
   assert.equal(isMachineBoundCm2104BootstrapAuthorizationContentDecision(result.decision), true);
   assert.equal(isMachineBoundCm2104BootstrapAuthorizationContentDecision({ ...result.decision }), false);
+  assert.equal(Object.isFrozen(result.decision), true);
+  assert.throws(() => { result.decision.bootstrapExecutionAuthorized = true; }, TypeError);
+  assert.throws(() => { result.decision.allowedAction = 'caller-drift'; }, TypeError);
+  assert.equal(result.decision.bootstrapExecutionAuthorized, false);
+  assert.equal(result.decision.allowedAction, 'initialize_identity_bound_synthetic_store');
 });
 
 test('CM-2104 content intake rejects authority, packet, identity, or expiry drift', () => {
@@ -156,6 +161,11 @@ test('CM-2104 final release must bind the exact content Git identity before auth
   assert.equal(result.executionAuthorized, true);
   assert.equal(isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision(result.decision), true);
   assert.equal(isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision({ ...result.decision }), false);
+  assert.equal(Object.isFrozen(result.decision), true);
+  assert.throws(() => { result.decision.bootstrapExecutionAuthorized = false; }, TypeError);
+  assert.throws(() => { result.decision.allowedAction = 'caller-drift'; }, TypeError);
+  assert.equal(result.decision.bootstrapExecutionAuthorized, true);
+  assert.equal(result.decision.allowedAction, 'initialize_identity_bound_synthetic_store');
 
   for (const drift of [
     { authorizationContentDecisionSourceCommit: '3'.repeat(40) },
