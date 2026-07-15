@@ -21,7 +21,8 @@ const {
 const { isCommitAncestor: realIsCommitAncestor } = require('../scripts/generate-cm2115-r2-self-review-decision');
 const {
   parseArgs,
-  renderMarkdown
+  renderMarkdown,
+  resolverOptions
 } = require('../scripts/generate-cm2115-r2-self-review-intake-receipt');
 const { canonicalize } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 
@@ -89,6 +90,10 @@ function validReceipt() {
   assert.equal(frozenDecisionEvidence.accepted, true, frozenDecisionEvidence.blockers.join(','));
   return buildReceipt({ intakeImplementation: intakeImplementation(), frozenDecisionEvidence });
 }
+
+test('intake generator resolves the frozen Phase 2 claim without local governance state', () => {
+  assert.equal(resolverOptions().resolveDurableClaim, resolveFrozenPhase2DurableClaim);
+});
 
 function mutate(receipt, fn) {
   const copy = structuredClone(receipt);

@@ -248,6 +248,48 @@ test('review generator rejects unsafe Git overrides before its first repository 
   }
 });
 
+test('review generator implementation reads ignore local replacement refs', () => {
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2120-review-replace-ref-'));
+  const repo = path.join(parent, 'repo');
+  try {
+    execFileSync('git', ['clone', '--quiet', '--no-hardlinks', ROOT, repo], { stdio: ['ignore', 'pipe', 'pipe'] });
+    const cleanGitEnv = { ...process.env, GIT_NO_REPLACE_OBJECTS: '1' };
+    const cleanGitText = args => execFileSync('git', args, {
+      cwd: repo,
+      env: cleanGitEnv,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    }).trim();
+    const head = cleanGitText(['rev-parse', 'HEAD^{commit}']);
+    const realTree = cleanGitText(['rev-parse', 'HEAD^{tree}']);
+    const replacement = cleanGitText(['rev-parse', 'HEAD^']);
+    execFileSync('git', ['replace', head, replacement], {
+      cwd: repo,
+      env: cleanGitEnv,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    const replacedTree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], {
+      cwd: repo,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    }).trim();
+    assert.notEqual(replacedTree, realTree);
+    const previous = process.cwd();
+    let implementation;
+    try {
+      process.chdir(repo);
+      implementation = generator.buildReviewImplementationIdentity();
+    } finally {
+      process.chdir(previous);
+    }
+    assert.equal(implementation.commit, head);
+    assert.equal(implementation.tree, realTree);
+    assert.notEqual(implementation.tree, replacedTree);
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 test('receipt freezer rejects unsafe Git overrides before its first repository read', async () => {
   const previous = process.env.GIT_DIR;
   process.env.GIT_DIR = '/tmp/cm2120-forbidden-freeze-git-dir';
