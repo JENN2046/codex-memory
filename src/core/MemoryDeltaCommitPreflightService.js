@@ -86,8 +86,55 @@ const COUNTER_FIELDS = Object.freeze([
   'readinessClaims'
 ]);
 
+const ACCEPTED_PROPOSAL_EVIDENCE_KEYS = Object.freeze({
+  audit_receipt: Object.freeze([
+    'schemaVersion',
+    'low_disclosure',
+    'raw_payload_included',
+    'raw_values_included',
+    'memory_written',
+    'durable_memory_written',
+    'production_write_performed',
+    'provider_api_called',
+    'public_mcp_expanded',
+    'readiness_claimed',
+    'review_status'
+  ]),
+  governance_contract: Object.freeze([
+    'contractName',
+    'contractMode',
+    'decision',
+    'proposalGenerated',
+    'proposalSubmitted',
+    'auditReceiptGenerated',
+    'memoryWritten',
+    'durableMemoryWritten',
+    'providerApiCalled',
+    'publicMcpExpanded',
+    'readinessClaimed'
+  ]),
+  access: Object.freeze([
+    'memoryRead',
+    'memoryWritten',
+    'durableMemoryWritten',
+    'productionWritePerformed',
+    'mcpMemoryWriteCalled',
+    'providerApiCalled',
+    'vcpToolBoxRuntimeCalled',
+    'publicMcpExpanded',
+    'readinessClaimed'
+  ])
+});
+
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function hasExactKeys(value, expectedKeys) {
+  if (!isPlainObject(value)) return false;
+  const actualKeys = Object.keys(value);
+  return actualKeys.length === expectedKeys.length &&
+    expectedKeys.every(key => Object.prototype.hasOwnProperty.call(value, key));
 }
 
 function safeString(value, maxLength = 220) {
@@ -166,7 +213,7 @@ function isAcceptedProposal(proposal) {
     proposal.staging.durable === false &&
     proposal.staging.production_write === false &&
     proposal.staging.operator_commit_required === true &&
-    isPlainObject(proposal.audit_receipt) &&
+    hasExactKeys(proposal.audit_receipt, ACCEPTED_PROPOSAL_EVIDENCE_KEYS.audit_receipt) &&
     proposal.audit_receipt.low_disclosure === true &&
     proposal.audit_receipt.memory_written === false &&
     proposal.audit_receipt.durable_memory_written === false &&
@@ -174,13 +221,13 @@ function isAcceptedProposal(proposal) {
     proposal.audit_receipt.provider_api_called === false &&
     proposal.audit_receipt.public_mcp_expanded === false &&
     proposal.audit_receipt.readiness_claimed === false &&
-    isPlainObject(proposal.governance_contract) &&
+    hasExactKeys(proposal.governance_contract, ACCEPTED_PROPOSAL_EVIDENCE_KEYS.governance_contract) &&
     proposal.governance_contract.memoryWritten === false &&
     proposal.governance_contract.durableMemoryWritten === false &&
     proposal.governance_contract.providerApiCalled === false &&
     proposal.governance_contract.publicMcpExpanded === false &&
     proposal.governance_contract.readinessClaimed === false &&
-    isPlainObject(proposal.access) &&
+    hasExactKeys(proposal.access, ACCEPTED_PROPOSAL_EVIDENCE_KEYS.access) &&
     proposal.access.memoryWritten === false &&
     proposal.access.durableMemoryWritten === false &&
     proposal.access.productionWritePerformed === false &&
