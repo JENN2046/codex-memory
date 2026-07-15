@@ -1,12 +1,18 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 const test = require('node:test');
 const decision = require('../src/core/Cm2121FullPlanStatusSyncContentDecision');
 const generator = require('../scripts/generate-cm2121-full-plan-status-sync-content-decision');
 const { resolverOptions } = require('../scripts/generate-cm2116-exact-full-plan-application-gate');
 const { sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 const frozenDecision = require('../docs/near-model-memory-plan-pack/cm2121_exact_full_plan_status_sync_content_decision.json');
+
+const ROOT = path.resolve(__dirname, '..');
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -121,4 +127,45 @@ test('content decision generator rejects unsafe Git environment before its first
     if (previous === undefined) delete process.env.GIT_DIR;
     else process.env.GIT_DIR = previous;
   }
+});
+
+test('content decision generator ignores repository-local replace refs', t => {
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2121-replace-ref-'));
+  t.after(() => fs.rmSync(parent, { recursive: true, force: true }));
+  const repo = path.join(parent, 'repo');
+  execFileSync('git', ['clone', '--quiet', '--no-hardlinks', ROOT, repo]);
+  execFileSync('git', ['config', 'user.name', 'CM-2121 test'], { cwd: repo });
+  execFileSync('git', ['config', 'user.email', 'cm2121@example.invalid'], { cwd: repo });
+  const cleanGitEnv = { ...process.env, GIT_NO_REPLACE_OBJECTS: '1' };
+  const gitText = args => execFileSync('git', args, {
+    cwd: repo,
+    env: cleanGitEnv,
+    encoding: 'utf8'
+  }).trim();
+  const head = gitText(['rev-parse', 'HEAD^{commit}']);
+  const realTree = gitText(['rev-parse', 'HEAD^{tree}']);
+  const replacementTree = gitText(['rev-parse', 'HEAD^^{tree}']);
+  assert.notEqual(replacementTree, realTree);
+  const replacementCommit = execFileSync('git', [
+    'commit-tree', replacementTree, '-p', `${head}^`
+  ], {
+    cwd: repo,
+    env: cleanGitEnv,
+    input: 'CM-2121 replace-ref fixture\n',
+    encoding: 'utf8'
+  }).trim();
+  execFileSync('git', ['replace', head, replacementCommit], { cwd: repo, env: cleanGitEnv });
+
+  const output = execFileSync(process.execPath, ['-e', [
+    `const generator = require(${JSON.stringify(path.join(ROOT, 'scripts/generate-cm2121-full-plan-status-sync-content-decision.js'))});`,
+    `const { resolverOptions } = require(${JSON.stringify(path.join(ROOT, 'scripts/generate-cm2116-exact-full-plan-application-gate.js'))});`,
+    'process.stdout.write(JSON.stringify(generator.buildImplementationIdentity(resolverOptions())));'
+  ].join('')], {
+    cwd: repo,
+    encoding: 'utf8'
+  });
+  const implementation = JSON.parse(output);
+  assert.equal(implementation.commit, head);
+  assert.equal(implementation.tree, realTree);
+  assert.notEqual(implementation.tree, replacementTree);
 });

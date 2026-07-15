@@ -825,6 +825,28 @@ function cm2096TombstoneNativeRouteAccepted(config = {}, callMcpTool = null) {
   );
 }
 
+function cm2096TombstoneBridgeApprovalAccepted({ args, requestContext = {}, config = {} } = {}) {
+  const assertion = requestContext.cm2096TombstoneAuthorizationAssertion;
+  if (!assertion || typeof assertion !== 'object' || Array.isArray(assertion)) return null;
+  const approvalDescriptor = Object.getOwnPropertyDescriptor(assertion, 'exactApprovalResult');
+  if (!approvalDescriptor || !Object.prototype.hasOwnProperty.call(approvalDescriptor, 'value')) {
+    return null;
+  }
+  const preflightRequestContext = {
+    ...requestContext,
+    exactApprovalResult: approvalDescriptor.value
+  };
+  delete preflightRequestContext.cm2096TombstoneAuthorizationAssertion;
+  return validateGovernedMcpVcpNativeBridgeGate(
+    buildGovernedMcpVcpNativeBridgeGateInput({
+      toolName: 'tombstone_memory',
+      args,
+      requestContext: preflightRequestContext,
+      config
+    })
+  ).accepted === true;
+}
+
 function projectReadShapeProbeTargetResolverObservation(resolverResult) {
   if (!resolverResult) return null;
   const { invokeComponentAction, ...projection } = resolverResult;
@@ -2714,7 +2736,8 @@ function createCodexMemoryApplication(overrides = {}) {
           !cm2096TombstoneNativeRouteAccepted(
             config,
             governedMcpVcpNativeWriteDelegationToolCaller
-          )
+          ) ||
+          cm2096TombstoneBridgeApprovalAccepted({ args, requestContext, config }) === false
         ) {
           return {
             decision: 'rejected',
