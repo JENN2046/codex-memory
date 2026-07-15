@@ -136,12 +136,13 @@ function expectedContentDecision(expectedBinding) {
   };
 }
 
-function evaluateCm2104BootstrapAuthorizationContentDecisionIntake({
+function evaluateContentDecision({
   decisionBytes,
   observedBinding,
   expectedBinding,
-  now = new Date()
-} = {}) {
+  now = new Date(),
+  requireActiveAuthorization
+}) {
   const blockers = [];
   if (!Buffer.isBuffer(decisionBytes) || !observedBinding || !expectedBinding) {
     return { accepted: false, blockers: ['missing_input'], decision: null, executionAuthorized: false };
@@ -169,7 +170,8 @@ function evaluateCm2104BootstrapAuthorizationContentDecisionIntake({
     if (!Number.isFinite(approvedAt) || !Number.isFinite(nowMs) || approvedAt > nowMs) {
       blockers.push('decision.approvedAt');
     }
-    if (!Number.isFinite(expiresAt) || !Number.isFinite(nowMs) || nowMs >= expiresAt || approvedAt >= expiresAt) {
+    if (!Number.isFinite(expiresAt) || !Number.isFinite(nowMs) || approvedAt >= expiresAt ||
+        (requireActiveAuthorization && nowMs >= expiresAt)) {
       blockers.push('decision.expiresAt');
     }
   }
@@ -177,21 +179,31 @@ function evaluateCm2104BootstrapAuthorizationContentDecisionIntake({
     return { accepted: false, blockers: [...new Set(blockers)], decision: null, executionAuthorized: false };
   }
   deepFreeze(decision);
-  MACHINE_BOUND_CONTENT_DECISIONS.add(decision);
+  if (requireActiveAuthorization) MACHINE_BOUND_CONTENT_DECISIONS.add(decision);
   return {
     accepted: true,
     blockers: [],
     decision,
-    decisionIdentityMachineBound: true,
+    decisionIdentityMachineBound: requireActiveAuthorization,
     authorizationContentApproved: true,
     executionAuthorized: false,
-    finalExecutionReleaseRequired: true
+    finalExecutionReleaseRequired: true,
+    reconciliationIdentityAccepted: !requireActiveAuthorization
   };
+}
+
+function evaluateCm2104BootstrapAuthorizationContentDecisionIntake(options = {}) {
+  return evaluateContentDecision({ ...options, requireActiveAuthorization: true });
+}
+
+function evaluateCm2104BootstrapAuthorizationContentDecisionReconciliationIdentity(options = {}) {
+  return evaluateContentDecision({ ...options, requireActiveAuthorization: false });
 }
 
 module.exports = {
   CONTENT_DECISION_KEYS,
   evaluateCm2104BootstrapAuthorizationContentDecisionIntake,
+  evaluateCm2104BootstrapAuthorizationContentDecisionReconciliationIdentity,
   expectedContentDecision,
   isMachineBoundCm2104BootstrapAuthorizationContentDecision
 };
