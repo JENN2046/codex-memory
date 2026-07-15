@@ -23,7 +23,8 @@ const {
   IMPLEMENTATION_ARTIFACT_PATHS,
   REVIEW_IMPLEMENTATION_FREEZE,
   SNAPSHOT_FREEZE,
-  evaluateCm2115SnapshotReviewRequest
+  evaluateCm2115SnapshotReviewRequest,
+  renderCm2115SnapshotReviewRequestMarkdown
 } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
 const {
   resolveFrozenPhase2DurableClaim
@@ -197,32 +198,9 @@ function buildRequest() {
 }
 
 function renderMarkdown(request, jsonText) {
-  return [
-    '# CM-2115-R2 Canonical Full-plan Evidence Snapshot Independent Review Request',
-    '',
-    'Review only the frozen snapshot and its 164 exact Git-object/semantic-route bindings.',
-    'This request does not authorize a completion application and does not change repository state.',
-    '',
-    `- Snapshot commit: \`${request.payload.snapshot.commit}\``,
-    `- Snapshot JSON blob: \`${request.payload.snapshot.json.blobOid}\``,
-    `- Snapshot JSON SHA-256: \`${request.payload.snapshot.json.sha256}\``,
-    `- Snapshot payload SHA-256: \`${request.payload.snapshot.json.canonicalPayloadSha256}\``,
-    `- Source baseline: \`${request.payload.sourceBaseline.commit}\``,
-    `- Trace entries: \`${request.payload.reviewScope.traceEntryCount}\``,
-    `- Placeholder refs: \`${request.payload.reviewScope.fakePlaceholderRefCount}\``,
-    `- Current fullPlanPackCompleted: \`${request.payload.currentState.fullPlanPackCompleted}\``,
-    `- Current readinessClaimed: \`${request.payload.currentState.readinessClaimed}\``,
-    '',
-    'If and only if the independent review passes, a separate application request may be prepared later.',
-    'The independent review itself must keep application authority, completion state, and all readiness claims false.',
-    '',
-    '## Exact JSON mirror',
-    '',
-    '```json',
-    jsonText.trimEnd(),
-    '```',
-    ''
-  ].join('\n');
+  const expectedJsonText = `${JSON.stringify(canonicalize(request), null, 2)}\n`;
+  if (jsonText !== expectedJsonText) throw new Error('cm2115_review_request_json_rendering_mismatch');
+  return renderCm2115SnapshotReviewRequestMarkdown(request);
 }
 
 function main() {

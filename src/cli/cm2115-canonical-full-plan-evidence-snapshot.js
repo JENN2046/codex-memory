@@ -16,6 +16,7 @@ const {
   BASELINE,
   buildSnapshot,
   canonicalize,
+  renderCanonicalSnapshotMarkdown,
   sha256
 } = require('../core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 const {
@@ -126,33 +127,9 @@ function assertCleanWorktree() {
 }
 
 function renderCanonicalMarkdown(snapshot, jsonText) {
-  const counts = snapshot.payload.counts;
-  return [
-    '# CM-2115-R2 Canonical Full-plan Evidence Snapshot',
-    '',
-    'This is a content-equivalent review surface for the canonical JSON snapshot.',
-    'It is prepared for independent Git-object and semantic-route review only.',
-    '',
-    `- Source commit: \`${snapshot.payload.baseline.sourceCommit}\``,
-    `- Source tree: \`${snapshot.payload.baseline.sourceTree}\``,
-    `- Canonical payload SHA-256: \`${snapshot.canonicalPayloadSha256}\``,
-    `- Trace entries: \`${counts.totalTraceEntryCount}\``,
-    `- Resolved trace entries: \`${counts.resolvedTraceEntryCount}\``,
-    `- Placeholder refs: \`${counts.fakePlaceholderRefCount}\``,
-    `- Unique source objects: \`${counts.uniqueSourceObjectCount}\``,
-    `- Candidate completion eligible: \`${snapshot.payload.candidateAudit.completionEligibleForIndependentReview}\``,
-    `- Authoritative fullPlanPackCompleted: \`${snapshot.payload.currentState.fullPlanPackCompleted}\``,
-    `- Readiness claimed: \`${snapshot.payload.currentState.readinessClaimed}\``,
-    '',
-    'The candidate audit result is not an application. Independent review and a separate application gate remain required.',
-    '',
-    '## Exact JSON mirror',
-    '',
-    '```json',
-    jsonText.trimEnd(),
-    '```',
-    ''
-  ].join('\n');
+  const expectedJsonText = `${JSON.stringify(canonicalize(snapshot), null, 2)}\n`;
+  if (jsonText !== expectedJsonText) throw new Error('cm2115_snapshot_json_rendering_mismatch');
+  return renderCanonicalSnapshotMarkdown(snapshot);
 }
 
 function verifySnapshot(snapshot) {

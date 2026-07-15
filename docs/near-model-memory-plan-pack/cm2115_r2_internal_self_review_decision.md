@@ -1,7 +1,7 @@
 # CM-2115-R2 Internal Snapshot Self-review Decision
 
-Decision reference: `CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-81D68F6B-FE3FA288`
-Canonical payload SHA-256: `377812d904e60ec569b57c9d9e2eded76a83a797e1f076160598e4db41c2f3a5`
+Decision reference: `CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-CCE599AA-B6009D52`
+Canonical payload SHA-256: `4295cddf6494c6002ff97b18364d0111accb8245a90e4992c8bdc5a301f53afc`
 
 Result: PASS_INTERNAL_SELF_REVIEW_ONLY.
 
@@ -14,7 +14,7 @@ it does not authorize or apply full-plan completion or any readiness claim.
 
 ```json
 {
-  "canonicalPayloadSha256": "377812d904e60ec569b57c9d9e2eded76a83a797e1f076160598e4db41c2f3a5",
+  "canonicalPayloadSha256": "4295cddf6494c6002ff97b18364d0111accb8245a90e4992c8bdc5a301f53afc",
   "decisionType": "canonical_full_plan_snapshot_internal_self_review_decision_v1",
   "payload": {
     "currentState": {
@@ -36,7 +36,7 @@ it does not authorize or apply full-plan completion or any readiness claim.
       "selfReviewSatisfiesIndependentExternalReview": false,
       "separateFullPlanApplicationMayBePrepared": true
     },
-    "decisionReference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-81D68F6B-FE3FA288",
+    "decisionReference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-CCE599AA-B6009D52",
     "decisionType": "repository_internal_independent_snapshot_self_review_v1",
     "findings": {
       "actionableFindingCount": 0,
@@ -63,7 +63,7 @@ it does not authorize or apply full-plan completion or any readiness claim.
     "reviewImplementation": {
       "artifacts": [
         {
-          "blobOid": "fa24094f517a618776c1d62f13b66264af5772cc",
+          "blobOid": "87489663c3a7150c177abbb658f3f157ce7d4f0d",
           "path": "src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js"
         },
         {
@@ -71,7 +71,7 @@ it does not authorize or apply full-plan completion or any readiness claim.
           "path": "scripts/generate-cm2115-r2-self-review-decision.js"
         },
         {
-          "blobOid": "7e0214e1e619dfe9286f408b61a5301b077072ae",
+          "blobOid": "fa0429b7fcb91dc8f788c2db335444a0e075eca6",
           "path": "tests/cm2115-r2-self-review-decision.test.js"
         },
         {
@@ -79,8 +79,8 @@ it does not authorize or apply full-plan completion or any readiness claim.
           "path": "package.json"
         }
       ],
-      "commit": "fe3fa28821282348f4b8e94dafe1dc904226b461",
-      "tree": "5b03dae54a30ff826a029daffd0aa3ed630c583a"
+      "commit": "b6009d521e8b1f87be244c7acac19417bc0bb1da",
+      "tree": "5d5d9275ed4513e99d6de8ec595fd8f42cd59358"
     },
     "reviewMode": {
       "externalReviewPerformed": false,
@@ -92,21 +92,21 @@ it does not authorize or apply full-plan completion or any readiness claim.
       "repositoryRealityControlsDecision": true
     },
     "reviewedRequest": {
-      "commit": "81ee0106ed8cd9b10dc30120ecb7ee6d8897fc79",
+      "commit": "a715d5ca76aae2fa688407c34a1ab7d99c52cb46",
       "json": {
-        "blobOid": "08bc3ffbe9a39b3dbbe42bdbf14781c021d4dba6",
+        "blobOid": "861abf1bb1ba06bd129c0b33b1c97f61a622b57b",
         "bytes": 5973,
-        "canonicalPayloadSha256": "81d68f6b61caf43756e171640fe44a92ac9989be3e5e2b5971ebb79a2cda4d91",
+        "canonicalPayloadSha256": "cce599aad762528787d303abb2aff3cf3ff98dc4d60a78c0ab563131fac23a72",
         "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json",
-        "sha256": "fc56ff4ab271b1f59505ed2ce62e680dc55854b5c696b9f5409357ad25c77953"
+        "sha256": "ead0d8df10e7e15a4e76cb7fa78dc41f4374f49524b246f1fc78abb288c91c6f"
       },
       "markdown": {
-        "blobOid": "afe3b7f21055872369228e7adf178e7de9856212",
+        "blobOid": "da6043b49159b34d3e91a72b80b68c22b51278a7",
         "bytes": 6983,
         "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md",
-        "sha256": "58f9b65e88397bb0570500588134c756e3ea975506cb4c0d94b2f7adebbab3a5"
+        "sha256": "54e4de16eb89c06e91fd15e8c69ece351c3e71816201fe6ffb06f3b50f949ff6"
       },
-      "tree": "c68cd2ad68258db7a8569faf728aed3c5aed1fd3"
+      "tree": "74a9f350d2ec66e8260b99e9a4f6c3e457b102dc"
     },
     "reviewedSnapshot": {
       "commit": "8d25298563e512456c614eb6fec6af6bdc02bf8f",

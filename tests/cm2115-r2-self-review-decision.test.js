@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const fs = require('node:fs');
 const test = require('node:test');
 const {
   DECISION_PATH,
@@ -109,6 +110,26 @@ test('CM-2115-R2 internal self-review independently revalidates the frozen snaps
   assert.equal(evidence.requestEvaluation.readyToSubmitForIndependentReview, true);
   assert.equal(evidence.requestEvaluation.fullPlanPackCompleted, false);
   assert.equal(evidence.requestEvaluation.readinessClaimed, false);
+});
+
+test('self-review rejects leading or trailing claims outside the canonical review-request Markdown', () => {
+  for (const mutateBytes of [
+    content => Buffer.concat([Buffer.from('STALE CLAIM: applicationAuthorized=true\n'), content]),
+    content => Buffer.concat([content, Buffer.from('\nTRAILING CLAIM: readiness=true\n')])
+  ]) {
+    const base = resolvers();
+    const evidence = evaluateFrozenReviewRequest({
+      ...base,
+      resolveGitFile: (commit, sourcePath) => {
+        const actual = base.resolveGitFile(commit, sourcePath);
+        return commit === REVIEW_REQUEST_FREEZE.commit && sourcePath === REVIEW_REQUEST_FREEZE.markdown.path
+          ? { ...actual, content: mutateBytes(actual.content) }
+          : actual;
+      }
+    });
+    assert.equal(evidence.accepted, false);
+    assert.ok(evidence.blockers.includes('selfReview.reviewRequestMarkdownMirror'));
+  }
 });
 
 test('self-review generation replays the frozen Phase 2 claim without local governance state', () => {
@@ -220,4 +241,17 @@ test('self-review generator has fixed outputs and Markdown preserves exact JSON'
   assert.ok(markdown.includes('PASS_INTERNAL_SELF_REVIEW_ONLY'));
   assert.ok(markdown.includes(jsonText.trimEnd()));
   assert.ok(DECISION_PATH.endsWith('cm2115_r2_internal_self_review_decision.json'));
+});
+
+test('frozen self-review decision files exactly match the reviewed lineage and canonical renderers', () => {
+  const options = resolverOptions();
+  const decision = JSON.parse(fs.readFileSync(DECISION_PATH, 'utf8'));
+  const evaluation = evaluateDecision(decision, options);
+  assert.equal(evaluation.accepted, true, evaluation.blockers.join(','));
+  const jsonText = `${JSON.stringify(canonicalize(decision), null, 2)}\n`;
+  assert.equal(fs.readFileSync(DECISION_PATH, 'utf8'), jsonText);
+  assert.equal(
+    fs.readFileSync(DECISION_PATH.replace(/\.json$/, '.md'), 'utf8'),
+    renderMarkdown(decision, jsonText)
+  );
 });

@@ -312,6 +312,16 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
     blockers.push('entries.orderOrCoverage');
   }
 
+  // Treat route coverage as an authorization boundary for source resolution.
+  // Validate the complete binding list first so a later mismatched entry cannot
+  // cause an attacker-selected working-tree path to be read by the resolver.
+  const sourceCoverageMatches = specs.map((expected, index) => {
+    const sourceBindings = entries[index]?.sourceBindings;
+    return Array.isArray(sourceBindings) &&
+      equalJson(sourceBindings.map(binding => binding?.sourcePath), expected.sourcePaths);
+  });
+  const sourceCoverageComplete = entries.length === specs.length && sourceCoverageMatches.every(Boolean);
+
   const observedPaths = [];
   entries.forEach((entry, index) => {
     const expected = specs[index];
@@ -324,8 +334,7 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
       blockers.push(`entry.route.${expected.traceKey}`);
     }
     const bindings = Array.isArray(entry.sourceBindings) ? entry.sourceBindings : [];
-    if (!Array.isArray(entry.sourceBindings) ||
-        !equalJson(bindings.map(binding => binding?.sourcePath), expected.sourcePaths)) {
+    if (!sourceCoverageMatches[index]) {
       blockers.push(`entry.sourceCoverage.${expected.traceKey}`);
     }
     for (const binding of bindings) {
@@ -342,6 +351,7 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
           !hex(binding?.sha256, 64)) {
         blockers.push(`source.identity.${expected.traceKey}.${pathLabel}`);
       }
+      if (!sourceCoverageComplete) continue;
       if (typeof resolveSourceObject !== 'function') {
         blockers.push('source.resolverRequired');
         continue;
@@ -365,7 +375,7 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
   }
 
   let phase2ApplicationReceiptEvaluation = null;
-  if (typeof resolveSourceObject === 'function') {
+  if (sourceCoverageComplete && typeof resolveSourceObject === 'function') {
     try {
       const receiptIdentity = resolve(PHASE2_APPLICATION_RECEIPT_PATH);
       const content = Buffer.isBuffer(receiptIdentity?.content)
@@ -398,7 +408,7 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
   let validationReceipt = null;
   let validationReceiptEvaluation = null;
   let validationReceiptIsCurrentR2 = false;
-  if (typeof resolveSourceObject === 'function') {
+  if (sourceCoverageComplete && typeof resolveSourceObject === 'function') {
     try {
       const validationIdentity = resolve(LOCAL_VALIDATION_RECEIPT_PATH);
       const content = Buffer.isBuffer(validationIdentity?.content)
