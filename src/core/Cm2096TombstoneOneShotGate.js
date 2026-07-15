@@ -7,6 +7,7 @@ const INTERNAL_ASSERTION = Symbol('cm2096-tombstone-one-shot-assertion');
 
 function createCm2096TombstoneOneShotGate({ registry, expectedBinding, now = () => new Date() }) {
   if (!registry || !expectedBinding) throw new Error('cm2096_gate_configuration_required');
+  const gateOwnedAssertions = new WeakMap();
 
   async function claim({ decision, preStoreProjection }) {
     const blockers = [];
@@ -63,31 +64,46 @@ function createCm2096TombstoneOneShotGate({ registry, expectedBinding, now = () 
       receiptId: decision.receiptId
     });
     const claimRecord = await registry.claim({ nonce: decision.nonce, receiptId: decision.receiptId, bindingHash });
-    const exactApprovalResult = {
+    const exactApprovalResult = Object.freeze({
       accepted: true,
       allowedAction: 'live_bridge_tombstone_memory_proof',
-      allowedScope: expectedBinding.allowedScope,
-      runtimeTarget: expectedBinding.runtimeTarget,
+      allowedScope: Object.freeze({ ...expectedBinding.allowedScope }),
+      runtimeTarget: Object.freeze({ ...expectedBinding.runtimeTarget }),
       rollbackPlanRef: expectedBinding.rollbackPlanReference,
       approvalDecisionReference: decision.decisionReference,
       claimBindingHash: bindingHash,
       approvedAt: decision.approvedAt
-    };
+    });
+    const assertion = Object.freeze({
+      [INTERNAL_ASSERTION]: true,
+      claimId: claimRecord.claimId,
+      bindingHash,
+      exactApprovalResult
+    });
+    gateOwnedAssertions.set(assertion, Object.freeze({
+      claimId: claimRecord.claimId,
+      bindingHash,
+      exactApprovalResult
+    }));
     return {
       accepted: true,
       blockers: [],
       state: 'CLAIMED',
       claimId: claimRecord.claimId,
       bindingHash,
-      assertion: { [INTERNAL_ASSERTION]: true, claimId: claimRecord.claimId, bindingHash, exactApprovalResult }
+      assertion
     };
   }
 
   async function verifyAssertion(assertion) {
-    if (!assertion || assertion[INTERNAL_ASSERTION] !== true) return { accepted: false };
-    const claimRecord = await registry.consumeWriteInvocation(assertion.claimId, assertion.bindingHash).catch(() => null);
+    const gateOwnedAssertion = assertion && gateOwnedAssertions.get(assertion);
+    if (!gateOwnedAssertion || assertion[INTERNAL_ASSERTION] !== true) return { accepted: false };
+    const claimRecord = await registry.consumeWriteInvocation(
+      gateOwnedAssertion.claimId,
+      gateOwnedAssertion.bindingHash
+    ).catch(() => null);
     if (!claimRecord || claimRecord.state !== 'WRITE_INVOCATION_CONSUMED') return { accepted: false };
-    return { accepted: true, exactApprovalResult: assertion.exactApprovalResult };
+    return { accepted: true, exactApprovalResult: gateOwnedAssertion.exactApprovalResult };
   }
 
   async function finalize(claimId, state) {
