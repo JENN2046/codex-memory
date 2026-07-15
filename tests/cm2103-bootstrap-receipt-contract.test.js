@@ -171,6 +171,26 @@ test('CM-2103 R1 contract accepts partial and ambiguous receipts only as reconci
   assert.equal(receipts[2].storeDirectoryCreated, null);
 });
 
+test('CM-2103 persistence-unknown receipt preserves unknown envelope presence', () => {
+  const receipt = buildReceipt('claim_envelope_persistence_unknown', {
+    state: 'CLAIM_REGISTRY_AMBIGUOUS',
+    claimEnvelopePresent: null,
+    claimEnvelopeBindingVerified: false,
+    governanceFilesystemEffectsPresent: null,
+    directoryCreateAttempts: 0, directoryCreates: 0, storeDirectoryCreated: false,
+    identityWriteAttempts: 0, identityWrites: 0, identityWriteAttempted: false,
+    identityCreated: false, identityBytes: 0, identitySha256: null,
+    identityReadbackAttempts: 0, identityReadbackVerifications: 0,
+    identityReadbackMatched: false, claimEnvelopeCreates: null, claimStateWrites: null,
+    terminalStateDurablyRecorded: false
+  });
+  assert.equal(evaluate(receipt).shapeAccepted, true);
+  for (const field of ['claimEnvelopePresent', 'governanceFilesystemEffectsPresent']) {
+    const drift = { ...receipt, [field]: true };
+    assert.equal(evaluate(drift).shapeAccepted, false, field);
+  }
+});
+
 test('CM-2103 R1 union rejects unknown-to-false collapse, counter drift, retry, cleanup, native effects, or overclaims', () => {
   const base = buildReceipt('identity_write_acknowledgement_ambiguous', {
     state: 'CONSUMED_PARTIAL_BOOTSTRAP', identityWrites: null, identityCreated: null,

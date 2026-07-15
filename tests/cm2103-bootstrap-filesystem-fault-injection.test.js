@@ -136,6 +136,11 @@ function createFaultFilesystem({ storeRoot, fault }) {
         await fs.writeFile(target, data, options);
         throw ioError();
       }
+      if (claimEnvelope && once('claim_extra_field_after_success')) {
+        const envelope = JSON.parse(data.toString());
+        await fs.writeFile(target, JSON.stringify({ ...envelope, raw: 'forbidden' }), options);
+        throw ioError();
+      }
       if (target === identityPath && once('identity_after_success')) {
         await fs.writeFile(target, data, options);
         throw ioError();
@@ -309,6 +314,21 @@ test('CM-2103 R1 atomic claim distinguishes no-create from persisted acknowledge
     assert.equal(evaluated.contract.shapeAccepted, true, evaluated.contract.blockers.join(', '));
     assert.equal(evaluated.contract.acceptedAsReconciliationEvidence, true);
     await assertClaimCannotReplay(fixture, 'claim-after');
+  });
+  await t.test('claim recovery rejects an envelope with extra fields before remembering it', async t => {
+    const fixture = await createFixture(t, 'claim_extra_field_after_success');
+    const result = await executeFixture(fixture, 'claim-extra-field');
+    assert.equal(result.state, 'CLAIM_REGISTRY_AMBIGUOUS');
+    assert.equal(result.outcomeStage, 'claim_envelope_persistence_unknown');
+    assert.equal(result.claim.claimEnvelopePresent, null);
+    assert.equal(result.claim.claimEnvelopeBindingVerified, false);
+    assert.equal(result.claim.governanceFilesystemEffectsPresent, null);
+    assert.equal('raw' in result.claim, false);
+    assert.equal(JSON.stringify(result).includes('forbidden'), false);
+    assert.equal(await fs.access(fixture.storeRoot).then(() => true, () => false), false);
+    const evaluated = evaluateExecutionReceipt(result);
+    assert.equal(evaluated.contract.shapeAccepted, true, evaluated.contract.blockers.join(', '));
+    assert.equal(evaluated.contract.acceptedAsReconciliationEvidence, true);
   });
   await t.test('claim acknowledgement and terminal persistence both fail but receipt remains reconstructable', async t => {
     const fixture = await createFixture(t, 'claim_terminal_double_failure');
