@@ -10,8 +10,10 @@ const {
   EXECUTION_RECEIPT_FILENAME,
   EXPECTED_OLD,
   EXPECTED_OLD_TREE,
+  FINAL_RELEASE_APPROVED_AT,
   FINAL_RELEASE_DIFF_ENTRIES,
   FINAL_RELEASE_DIFF_PATHS,
+  FINAL_RELEASE_EXPIRES_AT,
   FINAL_RELEASE_MARKDOWN_PATH,
   FINAL_RELEASE_PATH,
   FINAL_RELEASE_TASK_ID,
@@ -567,7 +569,7 @@ function isMachineBoundExecutionPacket(value) {
   return !!value && machineBoundPackets.has(value);
 }
 
-function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
+function buildFinalReleaseDecision({ packetEvidence }) {
   if (!packetEvidence?.accepted || !isMachineBoundExecutionPacket(packetEvidence.packet)) {
     throw new Error('cm2127_machine_bound_execution_packet_required');
   }
@@ -597,8 +599,8 @@ function buildFinalReleaseDecision({ packetEvidence, approvedAt, expiresAt }) {
       exactAction: ACTION,
       authorizationUseCount: 1,
       authorizationReplayAllowed: false,
-      approvedAt,
-      expiresAt,
+      approvedAt: FINAL_RELEASE_APPROVED_AT,
+      expiresAt: FINAL_RELEASE_EXPIRES_AT,
       branchCasClaimCreationAuthorized: true,
       branchCasExecutionAuthorized: true,
       branchRefUpdateAuthorized: true,
@@ -642,11 +644,7 @@ function evaluateFinalReleaseDecision(decision = {}, { packetEvidence, now = new
     blockers.push('finalRelease.machineBoundPacketRequired');
   } else {
     try {
-      const expected = buildFinalReleaseDecision({
-        packetEvidence,
-        approvedAt: decision.payload?.authorization?.approvedAt,
-        expiresAt: decision.payload?.authorization?.expiresAt
-      });
+      const expected = buildFinalReleaseDecision({ packetEvidence });
       if (!sameJson(decision, expected)) blockers.push('finalRelease.exactContent');
     } catch {
       blockers.push('finalRelease.exactContent');
@@ -657,6 +655,10 @@ function evaluateFinalReleaseDecision(decision = {}, { packetEvidence, now = new
   const approvedAt = Date.parse(authority.approvedAt || '');
   const expiresAt = Date.parse(authority.expiresAt || '');
   const observedAt = now instanceof Date ? now.getTime() : Date.parse(now);
+  if (authority.approvedAt !== FINAL_RELEASE_APPROVED_AT ||
+      authority.expiresAt !== FINAL_RELEASE_EXPIRES_AT) {
+    blockers.push('finalRelease.authorizationWindowBinding');
+  }
   if (!Number.isFinite(approvedAt) || !Number.isFinite(expiresAt) || !Number.isFinite(observedAt) ||
       approvedAt >= expiresAt || observedAt < approvedAt || observedAt >= expiresAt) {
     blockers.push('finalRelease.authorizationWindow');
@@ -1984,8 +1986,10 @@ module.exports = {
   ACTION,
   CONTENT_DECISION_FREEZE,
   EXECUTION_RECEIPT_FILENAME,
+  FINAL_RELEASE_APPROVED_AT,
   FINAL_RELEASE_DIFF_ENTRIES,
   FINAL_RELEASE_DIFF_PATHS,
+  FINAL_RELEASE_EXPIRES_AT,
   FINAL_RELEASE_MARKDOWN_PATH,
   FINAL_RELEASE_PATH,
   FINAL_RELEASE_TASK_ID,

@@ -461,6 +461,33 @@ test('frozen packet and final release keep every current state false and current
   assert.equal(text(['status', '--porcelain'], fixture.target), '');
 });
 
+test('final release rejects candidate-controlled authorization window extensions', () => {
+  const frozen = fixture.finalReleaseEvidence.decision;
+  const rebuilt = fixture.frozenModule.buildFinalReleaseDecision({
+    packetEvidence: fixture.packetEvidence,
+    approvedAt: '2026-07-14T00:00:00+08:00',
+    expiresAt: '2027-07-19T23:59:59+08:00'
+  });
+  assert.equal(rebuilt.payload.authorization.approvedAt, frozen.payload.authorization.approvedAt);
+  assert.equal(rebuilt.payload.authorization.expiresAt, frozen.payload.authorization.expiresAt);
+
+  for (const [field, value, observedAt] of [
+    ['approvedAt', '2026-07-13T00:00:00+08:00', '2026-07-14T00:00:00+08:00'],
+    ['expiresAt', '2027-07-19T23:59:59+08:00', '2027-01-01T00:00:00+08:00']
+  ]) {
+    const candidate = structuredClone(frozen);
+    candidate.payload.authorization[field] = value;
+    candidate.canonicalPayloadSha256 = sha256Canonical(candidate.payload);
+    const evaluation = fixture.frozenModule.evaluateFinalReleaseDecision(candidate, {
+      packetEvidence: fixture.packetEvidence,
+      now: new Date(observedAt)
+    });
+    assert.equal(evaluation.accepted, false, field);
+    assert.ok(evaluation.blockers.includes('finalRelease.exactContent'), field);
+    assert.ok(evaluation.blockers.includes('finalRelease.authorizationWindowBinding'), field);
+  }
+});
+
 test('unsafe Git environment and caller worktree surfaces fail before claim or Git effect', () => {
   initializeGovernanceRoot();
   const refBefore = text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo);
