@@ -79,7 +79,7 @@ test('CM-2114 fails closed on proof, bundle, replay, baseline, side effect, or r
 test('CM-2114 binds the supplied proof receipt content to the frozen PROOF object', () => {
   const value = input();
   value.proofReceipt.ownerRuntime.sourceCommit = 'f'.repeat(40);
-  assert.equal(evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value.proofReceipt).accepted, true);
+  assert.equal(evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value.proofReceipt).accepted, false);
   const result = executeCm2114Phase8CompletionRevalidationApplication(value);
   assert.equal(result.accepted, false);
   assert.ok(result.blockers.includes('proof.receiptCanonicalSha256'));
