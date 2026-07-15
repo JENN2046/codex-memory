@@ -12,6 +12,9 @@ const {
   executeCm2113OwnerRuntimeBootstrap
 } = require('../src/core/Cm2113VcpToolBoxOwnerRuntimeBootstrap');
 const { sha256 } = require('../src/core/VcpToolBoxDailyNoteOwnerRuntimeAdapter');
+const { decisionAccepted } = require('../src/cli/cm2113-vcptoolbox-owner-runtime-bootstrap');
+
+const DECISION_PATH = path.join(__dirname, '../docs/near-model-memory-plan-pack/phase8_vcptoolbox_owner_runtime_bootstrap_decision_cm2113.json');
 
 async function setup() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cm2113-bootstrap-'));
@@ -90,4 +93,18 @@ test('CM-2113 bootstrap is exclusive and fails before effects on authority or so
   await assert.rejects(executeCm2113OwnerRuntimeBootstrap({ ...base, ownerSource: { ...base.ownerSource, pluginBytes: Buffer.from('drift') } }), /source_binding_mismatch/);
   await executeCm2113OwnerRuntimeBootstrap(base);
   await assert.rejects(executeCm2113OwnerRuntimeBootstrap(base), /root_already_exists/);
+});
+
+test('CM-2113 bootstrap decision rejects rehashed nested authority fields', () => {
+  const decision = JSON.parse(require('node:fs').readFileSync(DECISION_PATH, 'utf8'));
+  const now = new Date('2026-07-12T12:00:00+08:00');
+  assert.equal(decisionAccepted(decision, now), true);
+  for (const mutate of [
+    value => { value.implementation.productionReady = true; },
+    value => { value.ownerRuntime.productionReady = true; }
+  ]) {
+    const candidate = structuredClone(decision);
+    mutate(candidate);
+    assert.equal(decisionAccepted(candidate, now), false);
+  }
 });

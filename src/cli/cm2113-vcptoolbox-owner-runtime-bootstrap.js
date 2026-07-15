@@ -55,10 +55,19 @@ function decisionAccepted(decision, now = new Date()) {
   const nonClaimKeys = [
     'nativeWritePerformed', 'phase8Completed', 'readinessClaimed', 'recordMemoryCalled'
   ];
+  const implementationKeys = ['commit', 'tree'];
+  const ownerRuntimeKeys = [
+    'owner', 'component', 'communication', 'runtimeSourceCommit', 'runtimeSourceTree',
+    'pluginBlobOid', 'manifestBlobOid', 'pluginSha256', 'manifestSha256',
+    'dependencyLockBlobOid', 'dependencyLockSha256', 'dotenvVersion',
+    'dotenvPackageSha256', 'dotenvMainSha256'
+  ];
   const nowMs = new Date(now).getTime();
   const approvedAt = Date.parse(decision?.approvedAt || '');
   const expiresAt = Date.parse(decision?.expiresAt || '');
   return exactKeys(decision, keys) &&
+    exactKeys(decision.implementation, implementationKeys) &&
+    exactKeys(decision.ownerRuntime, ownerRuntimeKeys) &&
     exactKeys(decision.nonClaims, nonClaimKeys) &&
     decision.schemaVersion === 1 && decision.taskId === 'CM-2113' &&
     decision.action === 'initialize_vcptoolbox_owner_runtime_and_synthetic_store' &&

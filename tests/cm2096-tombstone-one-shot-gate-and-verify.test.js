@@ -307,6 +307,50 @@ test('CM-2096 tombstone assertion is atomically consumable exactly once', async 
   assert.equal(record.writeInvocationCount, 1);
 });
 
+test('CM-2096 tombstone assertion keeps claim-time exact approval immutable and gate-owned', async () => {
+  const binding = expectedBinding();
+  const registry = await newRegistry();
+  const gate = createCm2096TombstoneOneShotGate({
+    registry,
+    expectedBinding: binding,
+    now: () => new Date('2026-07-11T00:00:00.000Z')
+  });
+  const claim = await gate.claim({
+    decision: intakeDecision(binding),
+    preStoreProjection: preStoreProjection(binding)
+  });
+  assert.equal(claim.accepted, true, claim.blockers.join(', '));
+  const claimTimeApproval = claim.assertion.exactApprovalResult;
+  const forgedApproval = {
+    ...claimTimeApproval,
+    allowedScope: { ...claimTimeApproval.allowedScope, scope_id: 'caller-drifted-scope' },
+    rollbackPlanRef: 'caller-drifted-rollback-plan'
+  };
+
+  try {
+    claim.assertion.exactApprovalResult = forgedApproval;
+  } catch {}
+  try {
+    claimTimeApproval.allowedScope.scope_id = 'caller-nested-drift';
+  } catch {}
+
+  const verified = await gate.verifyAssertion(claim.assertion);
+
+  try {
+    claim.assertion.claimId = 'caller-drifted-claim';
+  } catch {}
+
+  assert.equal(verified.accepted, true);
+  assert.strictEqual(verified.exactApprovalResult, claimTimeApproval);
+  assert.equal(verified.exactApprovalResult.allowedScope.scope_id, binding.allowedScope.scope_id);
+  assert.equal(verified.exactApprovalResult.rollbackPlanRef, binding.rollbackPlanReference);
+  assert.equal(claim.assertion.claimId, claim.claimId);
+  assert.equal(Object.isFrozen(claim.assertion), true);
+  assert.equal(Object.isFrozen(claimTimeApproval), true);
+  assert.equal(Object.isFrozen(claimTimeApproval.allowedScope), true);
+  assert.equal(Object.isFrozen(claimTimeApproval.runtimeTarget), true);
+});
+
 test('CM-2096 claim fails before registry mutation for copied decision, expiry, or store drift', async () => {
   const binding = expectedBinding();
   for (const [decision, projection, now, blocker] of [

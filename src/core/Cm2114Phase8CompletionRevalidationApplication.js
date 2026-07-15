@@ -167,6 +167,9 @@ function executeCm2114Phase8CompletionRevalidationApplication(input = {}) {
 function evaluateApplicationReceipt(receipt = {}) {
   const blockers = [];
   const payload = receipt.receiptPayload || {};
+  const decisionFields = ['reference', 'commit', 'blobOid', 'bytes', 'sha256'];
+  const evidenceBundleFields = ['commit', 'blobOid', 'bytes', 'sha256', 'payloadSha256', 'requiredEvidenceCount'];
+  const proofReceiptFields = ['commit', 'blobOid', 'bytes', 'sha256'];
   if (!hasExactKeys(receipt, ['receiptPayload', 'receiptPayloadSha256'])) blockers.push('receipt.fields');
   if (!hasExactKeys(payload, [
     'schemaVersion', 'taskId', 'receiptType', 'decision', 'evidenceBundle', 'proofReceipt',
@@ -174,9 +177,12 @@ function evaluateApplicationReceipt(receipt = {}) {
   ])) blockers.push('receipt.payload.fields');
   if (payload.schemaVersion !== 1 || payload.taskId !== 'CM-2114' || payload.receiptType !== 'phase8_completion_revalidation_application_receipt') blockers.push('receipt.payload.identity');
   if (sha256Canonical(payload) !== receipt.receiptPayloadSha256) blockers.push('receipt.payloadSha256');
-  if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
-  if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 || payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 || payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.bundle');
-  if (payload.proofReceipt?.commit !== PROOF.commit || payload.proofReceipt?.blobOid !== PROOF.blobOid || payload.proofReceipt?.sha256 !== PROOF.rawSha256) blockers.push('receipt.proof');
+  if (!hasExactKeys(payload.decision, decisionFields)) blockers.push('receipt.decision.fields');
+  if (payload.decision?.reference !== DECISION.reference || payload.decision?.commit !== DECISION.commit || payload.decision?.blobOid !== DECISION.blobOid || payload.decision?.bytes !== DECISION.bytes || payload.decision?.sha256 !== DECISION.rawSha256) blockers.push('receipt.decision');
+  if (!hasExactKeys(payload.evidenceBundle, evidenceBundleFields)) blockers.push('receipt.bundle.fields');
+  if (payload.evidenceBundle?.commit !== BUNDLE.commit || payload.evidenceBundle?.blobOid !== BUNDLE.blobOid || payload.evidenceBundle?.bytes !== BUNDLE.bytes || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 || payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 || payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.bundle');
+  if (!hasExactKeys(payload.proofReceipt, proofReceiptFields)) blockers.push('receipt.proof.fields');
+  if (payload.proofReceipt?.commit !== PROOF.commit || payload.proofReceipt?.blobOid !== PROOF.blobOid || payload.proofReceipt?.bytes !== PROOF.bytes || payload.proofReceipt?.sha256 !== PROOF.rawSha256) blockers.push('receipt.proof');
   if (payload.phaseAudit?.accepted !== true || payload.phaseAudit?.missingEvidence?.length !== 0 || payload.phaseAudit?.fullPlanPackCompleted !== false) blockers.push('receipt.phaseAudit');
   const appliedEvidenceFields = ['vcpToolBoxOwnedRuntimeWritePassed', 'actualTransportBindingPassed', 'stableTargetStoreIdentityPassed'];
   if (!hasExactKeys(payload.appliedEvidence, appliedEvidenceFields)) blockers.push('receipt.appliedEvidence.fields');

@@ -138,6 +138,22 @@ test('CM2011 propose_memory_delta rejects raw secret write and readiness fields 
   assert.equal(serialized.includes('SYNTHETIC_TOKEN_SHOULD_NOT_ECHO'), false);
 });
 
+test('CM2011 proposal service rejects readiness aliases on direct internal calls', () => {
+  const service = new MemoryDeltaProposalService();
+  for (const key of [
+    'rcReadyClaimed',
+    'deployReadyClaimed',
+    'fullCapabilityClaimed',
+    'modelMemoryCompleteClaimed'
+  ]) {
+    const result = service.propose(validProposalArgs({ [key]: true }));
+    assert.equal(result.accepted, false, key);
+    assert.equal(result.reasonCode, 'forbidden_raw_secret_write_or_overclaim_fields', key);
+    assert.deepEqual(result.forbiddenFields, [key], key);
+    assert.equal(result.access.readinessClaimed, false, key);
+  }
+});
+
 test('CM2011 propose_memory_delta redacts sensitive fragments from allowed proposal strings', () => {
   const service = new MemoryDeltaProposalService();
   const rawBearer = ['Bearer', 'SYNTHETIC_PROPOSAL_BEARER_1234567890'].join(' ');
