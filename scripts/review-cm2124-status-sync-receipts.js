@@ -222,7 +222,11 @@ async function buildReview() {
     finalReleaseEvidence,
     ...options
   });
-  const executionEvaluation = evaluateExecutionReceipt(executionReceipt, { packetEvidence, finalReleaseEvidence });
+  const executionEvaluation = evaluateExecutionReceipt(executionReceipt, {
+    packetEvidence,
+    finalReleaseEvidence,
+    detachedBinding
+  });
   const preBindingClaim = {
     ...claim,
     state: 'EXECUTION_RECEIPT_WRITTEN',

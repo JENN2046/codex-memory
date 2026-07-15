@@ -61,3 +61,16 @@ test('CM-2124 review requires the exact full freeze projection and markdown mirr
     /freeze_markdown_mirror_rejected/
   );
 });
+
+test('CM-2124 freeze and review pass machine-bound detached evidence into execution receipt evaluation', () => {
+  for (const relativePath of [
+    'scripts/freeze-cm2124-status-sync-receipts.js',
+    'scripts/review-cm2124-status-sync-receipts.js'
+  ]) {
+    const source = fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+    assert.match(
+      source,
+      /evaluateExecutionReceipt\([\s\S]*?\{[\s\S]*?packetEvidence,[\s\S]*?finalReleaseEvidence,[\s\S]*?detachedBinding[\s\S]*?\}\)/
+    );
+  }
+});

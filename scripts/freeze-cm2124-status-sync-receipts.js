@@ -225,8 +225,6 @@ async function buildFreezeArtifacts() {
       claim.branchRefUpdateCount !== 0 || claim.authorizationReplayAllowed !== false) {
     throw new Error('cm2124_claim_state_rejected');
   }
-  const executionEvaluation = evaluateExecutionReceipt(execution.receipt, { packetEvidence, finalReleaseEvidence });
-  if (!executionEvaluation.accepted) throw new Error(`cm2124_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
   const detachedBinding = verifyDetachedCommitBinding({
     detachedCommit: DETACHED_STATUS_COMMIT,
     packetEvidence,
@@ -234,6 +232,12 @@ async function buildFreezeArtifacts() {
     ...options
   });
   if (!detachedBinding.accepted) throw new Error(`cm2124_detached_binding_rejected:${detachedBinding.blockers.join(',')}`);
+  const executionEvaluation = evaluateExecutionReceipt(execution.receipt, {
+    packetEvidence,
+    finalReleaseEvidence,
+    detachedBinding
+  });
+  if (!executionEvaluation.accepted) throw new Error(`cm2124_execution_receipt_rejected:${executionEvaluation.blockers.join(',')}`);
   const preBindingClaim = {
     ...claim,
     state: 'EXECUTION_RECEIPT_WRITTEN',
