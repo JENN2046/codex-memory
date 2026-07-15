@@ -537,7 +537,7 @@
     "fullPlanApplicationGatePrepared": true,
     "fullPlanApplicationReceiptReviewPassed": true,
     "fullPlanPackCompleted": true,
-    "fullPlanStatusSyncPerformed": true,
+    "fullPlanStatusSyncPerformed": false,
     "independentExternalReviewPassed": false,
     "independentReviewMode": "repository_internal_separate_pass",
     "independentReviewPassed": true,
