@@ -30,7 +30,9 @@ async function verifyCm2096TombstoneExecution({ registry, claimId, receiptId, de
   }
   if (postStoreProjection.rawMemoryReturned !== false ||
       postStoreProjection.rawPathDisclosed !== false ||
+      postStoreProjection.targetRecordProjection?.rawContentIncluded !== false ||
       postStoreProjection.targetRecordProjection?.rawPathDisclosed !== false ||
+      postStoreProjection.tombstoneMarkerProjection?.rawContentIncluded !== false ||
       postStoreProjection.tombstoneMarkerProjection?.rawPathDisclosed !== false) {
     return { accepted: false, reasonCode: 'cm2096_post_store_projection_disclosure_boundary_failed' };
   }
