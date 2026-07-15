@@ -111,7 +111,9 @@ test('CM-2114 application receipt rejects replay, new runtime action, or readine
     payload => { payload.appliedState.readinessClaimed = true; },
     payload => { payload.appliedState.productionReady = true; },
     payload => { payload.nonClaims.additionalNativeWriteAuthorized = true; },
+    payload => { delete payload.nonClaims.derivedIndexProofAccepted; },
     payload => { payload.nonClaims.derivedIndexProofAccepted = true; },
+    payload => { delete payload.nonClaims.productionProviderProofAccepted; },
     payload => { payload.nonClaims.productionProviderProofAccepted = true; },
     payload => { payload.nonClaims.completeV8 = true; },
     payload => { payload.nonClaims.productionProviderProofAcceptedV2 = false; }

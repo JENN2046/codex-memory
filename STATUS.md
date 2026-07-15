@@ -12,7 +12,7 @@ Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-CM-2114 applies receipt payload SHA-256 `2097572e…c045` and revalidates all 18
+CM-2114 applies receipt payload SHA-256 `c31ef072…dc82` and revalidates all 18
 Phase 8 evidence fields. CM-2113 used the official VCPToolBox DailyNote runtime,
 a real child stdio MCP boundary, authenticated local HTTP MCP, and stable store
 identity SHA `0294fc5c…cfaab`; its durable synthetic record is 357 bytes with SHA

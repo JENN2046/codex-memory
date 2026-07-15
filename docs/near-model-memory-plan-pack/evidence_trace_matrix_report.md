@@ -8,7 +8,7 @@ Date: `2026-07-10`
 
 The three reopened exact-receipt entries now trace to the frozen CM-2113 owner
 proof receipt (`cd0b9864…`, raw SHA-256 `1996cdd6…8162`) and the CM-2114
-application receipt (`2097572e…c045`):
+application receipt (`c31ef072…dc82`):
 
 - `vcpToolBoxOwnedRuntimeWritePassed=true` traces to the exact VCPToolBox
   `DailyNote` Git objects and one exact 357-byte owner-runtime write;

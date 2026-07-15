@@ -12,7 +12,7 @@ Current handoff: Phase 8 is revalidated complete from the exact CM-2113 owner-ru
 
 ## Active Handoff
 
-CM-2114 applied the 18-field bundle and receipt payload SHA `2097572e…c045`.
+CM-2114 applied the 18-field bundle and receipt payload SHA `c31ef072…dc82`.
 The three CM-2112 gaps now trace to CM-2113 exact evidence: VCPToolBox-owned
 DailyNote, real process stdio MCP plus authenticated local HTTP MCP, and stable
 store identity SHA `0294fc5c…cfaab`. Current Phase 8 status is

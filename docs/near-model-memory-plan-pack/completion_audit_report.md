@@ -24,7 +24,7 @@ The proof used one synthetic VCPToolBox `DailyNote` write through a real
 child-process Content-Length stdio MCP boundary, authenticated local HTTP MCP,
 and the official DailyNote stdio runtime. The stable synthetic store identity
 matched before and after the exact 357-byte durable Markdown write. Application
-receipt payload SHA-256 is `2097572e…c045`. The proof authorization and the
+receipt payload SHA-256 is `c31ef072…dc82`. The proof authorization and the
 application authorization are consumed and not replayable. No additional
 native action, provider call, real-memory read, rollback, compensation, remote
 action, full-plan completion, production/release readiness, or `RC_READY` claim
