@@ -22,7 +22,8 @@ const {
 const {
   isCommitAncestor: realIsCommitAncestor,
   parseArgs,
-  renderMarkdown
+  renderMarkdown,
+  resolverOptions
 } = require('../scripts/generate-cm2115-r2-self-review-decision');
 const { canonicalize } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 
@@ -107,6 +108,14 @@ test('CM-2115-R2 internal self-review independently revalidates the frozen snaps
   assert.equal(evidence.requestEvaluation.readyToSubmitForIndependentReview, true);
   assert.equal(evidence.requestEvaluation.fullPlanPackCompleted, false);
   assert.equal(evidence.requestEvaluation.readinessClaimed, false);
+});
+
+test('self-review generation replays the frozen Phase 2 claim without local governance state', () => {
+  const options = resolverOptions();
+  assert.equal(options.resolveDurableClaim, resolveFrozenPhase2DurableClaim);
+  assert.notEqual(options.resolveDurableClaim, git.resolveDurableClaim);
+  const bindingHash = '8ec9206dc2dad88f7fb88302c30bae6113b7ec0b909f37354c56c50d8f253ebc';
+  assert.equal(options.resolveDurableClaim(bindingHash).bindingHash, bindingHash);
 });
 
 test('CM-2115-R2 self-review decision passes only as an internal separate review', () => {
