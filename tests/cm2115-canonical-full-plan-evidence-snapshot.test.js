@@ -380,6 +380,25 @@ test('snapshot contract rejects semantically unrelated but well-formed source su
   assert.ok(result.blockers.some(blocker => blocker.startsWith('entry.sourceCoverage.')));
 });
 
+test('snapshot contract never resolves coverage-rejected private-looking source bindings', () => {
+  for (const rejectedSourcePath of ['.npmrc', '.netrc', '.ssh/config']) {
+    const snapshot = buildSnapshot(fakeResolverFactory());
+    const candidate = mutate(snapshot, copy => {
+      copy.payload.entries[0].sourceBindings[0].sourcePath = rejectedSourcePath;
+    });
+    const resolvedPaths = [];
+    const safeFixtureResolver = fakeResolverFactory();
+    const result = evaluate(candidate, sourcePath => {
+      resolvedPaths.push(sourcePath);
+      return safeFixtureResolver(sourcePath);
+    });
+
+    assert.equal(result.accepted, false);
+    assert.ok(result.blockers.some(blocker => blocker.startsWith('entry.sourceCoverage.')));
+    assert.deepEqual(resolvedPaths, []);
+  }
+});
+
 test('snapshot construction and contract reject invalid Phase 2 application semantics', () => {
   const validResolver = fakeResolverFactory();
   const actual = validResolver(PHASE2_APPLICATION_RECEIPT_PATH);
@@ -749,6 +768,27 @@ test('independent review request binds the frozen snapshot and stays non-authori
   const staleResult = evaluateCm2115SnapshotReviewRequest(staleRequest, reviewRequestResolvers());
   assert.equal(staleResult.accepted, false);
   assert.ok(staleResult.blockers.includes('payload.reviewImplementation'));
+});
+
+test('independent review request rejects leading or trailing claims outside the canonical snapshot Markdown', () => {
+  const request = buildReviewRequest();
+  for (const mutateBytes of [
+    content => Buffer.concat([Buffer.from('STALE CLAIM: readiness=true\n'), content]),
+    content => Buffer.concat([content, Buffer.from('\nTRAILING CLAIM: fullPlanPackCompleted=true\n')])
+  ]) {
+    const base = reviewRequestResolvers();
+    const result = evaluateCm2115SnapshotReviewRequest(request, {
+      ...base,
+      resolveGitFile: (commit, sourcePath) => {
+        const actual = base.resolveGitFile(commit, sourcePath);
+        return commit === request.payload.snapshot.commit && sourcePath === request.payload.snapshot.markdown.path
+          ? { ...actual, content: mutateBytes(actual.content) }
+          : actual;
+      }
+    });
+    assert.equal(result.accepted, false);
+    assert.ok(result.blockers.includes('snapshot.markdown.mirror'));
+  }
 });
 
 test('independent review request requires the exact implementation parent and diff paths', () => {

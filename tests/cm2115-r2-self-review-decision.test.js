@@ -111,6 +111,26 @@ test('CM-2115-R2 internal self-review independently revalidates the frozen snaps
   assert.equal(evidence.requestEvaluation.readinessClaimed, false);
 });
 
+test('self-review rejects leading or trailing claims outside the canonical review-request Markdown', () => {
+  for (const mutateBytes of [
+    content => Buffer.concat([Buffer.from('STALE CLAIM: applicationAuthorized=true\n'), content]),
+    content => Buffer.concat([content, Buffer.from('\nTRAILING CLAIM: readiness=true\n')])
+  ]) {
+    const base = resolvers();
+    const evidence = evaluateFrozenReviewRequest({
+      ...base,
+      resolveGitFile: (commit, sourcePath) => {
+        const actual = base.resolveGitFile(commit, sourcePath);
+        return commit === REVIEW_REQUEST_FREEZE.commit && sourcePath === REVIEW_REQUEST_FREEZE.markdown.path
+          ? { ...actual, content: mutateBytes(actual.content) }
+          : actual;
+      }
+    });
+    assert.equal(evidence.accepted, false);
+    assert.ok(evidence.blockers.includes('selfReview.reviewRequestMarkdownMirror'));
+  }
+});
+
 test('self-review generation replays the frozen Phase 2 claim without local governance state', () => {
   const options = resolverOptions();
   assert.equal(options.resolveDurableClaim, resolveFrozenPhase2DurableClaim);

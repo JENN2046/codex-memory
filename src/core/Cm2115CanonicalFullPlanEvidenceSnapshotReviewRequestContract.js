@@ -4,6 +4,7 @@ const {
   BASELINE,
   LOCAL_VALIDATION_RECEIPT_PATH,
   canonicalize,
+  renderCanonicalSnapshotMarkdown,
   sha256Canonical
 } = require('./Cm2115CanonicalFullPlanEvidenceSnapshot');
 const {
@@ -160,6 +161,36 @@ function equalJson(left, right) {
   return JSON.stringify(canonicalize(left)) === JSON.stringify(canonicalize(right));
 }
 
+function renderCm2115SnapshotReviewRequestMarkdown(request) {
+  const jsonText = `${JSON.stringify(canonicalize(request), null, 2)}\n`;
+  return [
+    '# CM-2115-R2 Canonical Full-plan Evidence Snapshot Independent Review Request',
+    '',
+    'Review only the frozen snapshot and its 164 exact Git-object/semantic-route bindings.',
+    'This request does not authorize a completion application and does not change repository state.',
+    '',
+    `- Snapshot commit: \`${request.payload.snapshot.commit}\``,
+    `- Snapshot JSON blob: \`${request.payload.snapshot.json.blobOid}\``,
+    `- Snapshot JSON SHA-256: \`${request.payload.snapshot.json.sha256}\``,
+    `- Snapshot payload SHA-256: \`${request.payload.snapshot.json.canonicalPayloadSha256}\``,
+    `- Source baseline: \`${request.payload.sourceBaseline.commit}\``,
+    `- Trace entries: \`${request.payload.reviewScope.traceEntryCount}\``,
+    `- Placeholder refs: \`${request.payload.reviewScope.fakePlaceholderRefCount}\``,
+    `- Current fullPlanPackCompleted: \`${request.payload.currentState.fullPlanPackCompleted}\``,
+    `- Current readinessClaimed: \`${request.payload.currentState.readinessClaimed}\``,
+    '',
+    'If and only if the independent review passes, a separate application request may be prepared later.',
+    'The independent review itself must keep application authority, completion state, and all readiness claims false.',
+    '',
+    '## Exact JSON mirror',
+    '',
+    '```json',
+    jsonText.trimEnd(),
+    '```',
+    ''
+  ].join('\n');
+}
+
 function verifyFileBinding(binding, commit, resolveGitFile, blockers, label) {
   if (typeof resolveGitFile !== 'function') {
     blockers.push('gitFileResolverRequired');
@@ -221,7 +252,7 @@ function evaluateCm2115SnapshotReviewRequest(request, {
     blockers,
     'snapshot.json'
   );
-  verifyFileBinding(
+  const snapshotMarkdown = verifyFileBinding(
     payload?.snapshot?.markdown || {},
     payload?.snapshot?.commit,
     resolveGitFile,
@@ -236,6 +267,10 @@ function evaluateCm2115SnapshotReviewRequest(request, {
         : snapshotJson.content);
       if (snapshot.canonicalPayloadSha256 !== SNAPSHOT_FREEZE.json.canonicalPayloadSha256) {
         blockers.push('snapshot.payloadSha256');
+      }
+      const expectedMarkdown = Buffer.from(renderCanonicalSnapshotMarkdown(snapshot), 'utf8');
+      if (!Buffer.isBuffer(snapshotMarkdown?.content) || !snapshotMarkdown.content.equals(expectedMarkdown)) {
+        blockers.push('snapshot.markdown.mirror');
       }
       snapshotEvaluation = evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
         resolveSourceObject: sourcePath => resolveGitFile(BASELINE.sourceCommit, sourcePath),
@@ -416,5 +451,6 @@ module.exports = {
   SNAPSHOT_FREEZE,
   SNAPSHOT_KEYS,
   VALIDATION_KEYS,
-  evaluateCm2115SnapshotReviewRequest
+  evaluateCm2115SnapshotReviewRequest,
+  renderCm2115SnapshotReviewRequestMarkdown
 };

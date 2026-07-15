@@ -7,7 +7,8 @@ const {
 } = require('./Cm2115CanonicalFullPlanEvidenceSnapshot');
 const {
   SNAPSHOT_FREEZE,
-  evaluateCm2115SnapshotReviewRequest
+  evaluateCm2115SnapshotReviewRequest,
+  renderCm2115SnapshotReviewRequestMarkdown
 } = require('./Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
 
 const TASK_ID = 'CM-2115-R2';
@@ -155,6 +156,10 @@ function evaluateFrozenReviewRequest({
     verifyFrozenFile(requestIdentity, REVIEW_REQUEST_FREEZE.json, blockers, 'selfReview.reviewRequestJson');
     verifyFrozenFile(markdownIdentity, REVIEW_REQUEST_FREEZE.markdown, blockers, 'selfReview.reviewRequestMarkdown');
     request = JSON.parse(requestIdentity.content.toString('utf8'));
+    const expectedMarkdown = Buffer.from(renderCm2115SnapshotReviewRequestMarkdown(request), 'utf8');
+    if (!markdownIdentity.content.equals(expectedMarkdown)) {
+      blockers.push('selfReview.reviewRequestMarkdownMirror');
+    }
     if (request.canonicalPayloadSha256 !== REVIEW_REQUEST_FREEZE.json.canonicalPayloadSha256) {
       blockers.push('selfReview.reviewRequestPayloadSha256');
     }
