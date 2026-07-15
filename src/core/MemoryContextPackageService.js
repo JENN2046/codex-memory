@@ -154,14 +154,10 @@ function freshnessBucket(item = {}, now = Date.now()) {
 function deriveStatement(item = {}, index) {
   const projected = normalizeMemoryContextProjection(item);
   if (projected) return projected.statement;
-  const source = safeString(item.title || item.snippet || item.text || '', 420);
-  if (source) return source;
-  const tags = uniqueTokens([...(item.matchedTags || []), ...(item.coreTags || [])])
-    .map(tag => safeString(tag, 80))
-    .filter(Boolean)
-    .slice(0, 4);
-  if (tags.length > 0) return `Memory signal ${index + 1}: ${tags.join(', ')}`;
-  return `Memory signal ${index + 1}: bounded recall match without returned raw content.`;
+  const classification = classifyRawResult(item);
+  const label = LOW_DISCLOSURE_STATEMENT_LABELS[classification] ||
+    LOW_DISCLOSURE_STATEMENT_LABELS.must_know;
+  return `Memory signal ${index + 1}: ${label}.`;
 }
 
 function lowerSearchText(item = {}) {
