@@ -23,6 +23,7 @@ const FIXED_RECORD = Object.freeze({
 const AUTHORIZATION_KEYS = Object.freeze([
   'action', 'nonce', 'receiptId', 'useCount', 'replayAllowed', 'approvedAt', 'expiresAt'
 ]);
+const IMPLEMENTATION_KEYS = Object.freeze(['commit', 'tree']);
 const LIMIT_KEYS = Object.freeze([
   'nativeWrites', 'verifyOperations', 'retries', 'rollbackOrCompensation'
 ]);
@@ -68,7 +69,10 @@ function validateCm2113VcpToolBoxOwnerNativeProofPacket(packet = {}) {
   }
   const { packetPayloadSha256, ...payload } = packet;
   if (!hex(packetPayloadSha256, 64) || sha256Canonical(payload) !== packetPayloadSha256) blockers.push('packet.payloadSha256');
-  if (!hex(packet.implementation?.commit, 40) || !hex(packet.implementation?.tree, 40)) blockers.push('implementation.git');
+  if (!exactKeys(packet.implementation, IMPLEMENTATION_KEYS) ||
+      !hex(packet.implementation?.commit, 40) || !hex(packet.implementation?.tree, 40)) {
+    blockers.push('implementation.git');
+  }
   const owner = packet.ownerRuntime || {};
   if (
     !exactKeys(owner, OWNER_RUNTIME_KEYS) ||

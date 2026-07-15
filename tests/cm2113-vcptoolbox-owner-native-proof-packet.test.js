@@ -87,6 +87,7 @@ test('CM-2113 packet is acyclic and binds exact owner runtime, transport, and st
 test('CM-2113 packet rejects self identity, transport drift, and store replacement authority', () => {
   for (const mutate of [
     packet => { packet.executionPacket = { commit: '1'.repeat(40) }; },
+    packet => { packet.implementation.productionReady = true; },
     packet => { packet.ownerRuntime.productionReady = true; },
     packet => { packet.transport.productionReady = true; },
     packet => { packet.transport.outer = 'direct_app_call'; },

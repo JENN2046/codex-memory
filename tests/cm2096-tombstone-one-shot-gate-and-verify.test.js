@@ -164,7 +164,9 @@ function preStoreProjection(binding = expectedBinding()) {
     targetRecordProjection: {
       memoryIdRef: binding.targetMemoryIdRef,
       durableBytes: binding.targetRecordBytes,
-      durableSha256: binding.targetRecordSha256
+      durableSha256: binding.targetRecordSha256,
+      rawContentIncluded: false,
+      rawPathDisclosed: false
     },
     otherRealMemoryRead: false,
     otherRealMemoryModified: false,
@@ -356,7 +358,15 @@ test('CM-2096 claim fails before registry mutation for copied decision, expiry, 
   for (const [decision, projection, now, blocker] of [
     [{ ...intakeDecision(binding) }, preStoreProjection(binding), new Date('2026-07-11T00:00:00.000Z'), 'decision.machineBoundIntake'],
     [intakeDecision(binding), preStoreProjection(binding), new Date('2031-01-01T00:00:00.000Z'), 'decision.expired'],
-    [intakeDecision(binding), { ...preStoreProjection(binding), markerAbsent: false }, new Date('2026-07-11T00:00:00.000Z'), 'store.preflight']
+    [intakeDecision(binding), { ...preStoreProjection(binding), markerAbsent: false }, new Date('2026-07-11T00:00:00.000Z'), 'store.preflight'],
+    [intakeDecision(binding), {
+      ...preStoreProjection(binding),
+      targetRecordProjection: { ...preStoreProjection(binding).targetRecordProjection, rawContentIncluded: true }
+    }, new Date('2026-07-11T00:00:00.000Z'), 'store.preflight'],
+    [intakeDecision(binding), {
+      ...preStoreProjection(binding),
+      targetRecordProjection: { ...preStoreProjection(binding).targetRecordProjection, rawPathDisclosed: true }
+    }, new Date('2026-07-11T00:00:00.000Z'), 'store.preflight']
   ]) {
     const registry = await newRegistry();
     const gate = createCm2096TombstoneOneShotGate({ registry, expectedBinding: binding, now: () => now });
@@ -426,7 +436,9 @@ test('CM-2096 verify rejects raw disclosure in the post-store projection before 
   for (const [name, mutateProjection] of [
     ['top-level raw memory', projection => { projection.rawMemoryReturned = true; }],
     ['top-level raw path', projection => { projection.rawPathDisclosed = true; }],
+    ['target raw content', projection => { projection.targetRecordProjection.rawContentIncluded = true; }],
     ['target raw path', projection => { projection.targetRecordProjection.rawPathDisclosed = true; }],
+    ['marker raw content', projection => { projection.tombstoneMarkerProjection.rawContentIncluded = true; }],
     ['marker raw path', projection => { projection.tombstoneMarkerProjection.rawPathDisclosed = true; }]
   ]) {
     await t.test(name, async () => {

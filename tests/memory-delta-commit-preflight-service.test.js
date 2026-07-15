@@ -152,6 +152,45 @@ test('CM2035 blocks commit preflight for a review-rejected proposal', () => {
   assert.deepEqual(result.blockers, ['proposal']);
 });
 
+test('CM2035 rejects accepted proposals with nested readiness overclaims', () => {
+  const service = new MemoryDeltaCommitPreflightService();
+  for (const mutateProposal of [
+    proposal => { proposal.audit_receipt.readiness_claimed = true; },
+    proposal => { proposal.governance_contract.readinessClaimed = true; },
+    proposal => { proposal.access.readinessClaimed = true; }
+  ]) {
+    const proposal = acceptedProposal();
+    mutateProposal(proposal);
+    const result = service.preflight(validPreflightArgs({ proposal }));
+    assert.equal(result.accepted, false);
+    assert.equal(result.reasonCode, 'accepted_low_disclosure_proposal_required');
+    assert.deepEqual(result.blockers, ['proposal']);
+    assert.equal(result.readiness_claimed, false);
+  }
+});
+
+test('CM2035 rejects accepted proposals that report nested provider or MCP side effects', () => {
+  const service = new MemoryDeltaCommitPreflightService();
+  for (const mutateProposal of [
+    proposal => { proposal.audit_receipt.provider_api_called = true; },
+    proposal => { proposal.audit_receipt.public_mcp_expanded = true; },
+    proposal => { proposal.governance_contract.providerApiCalled = true; },
+    proposal => { proposal.access.mcpMemoryWriteCalled = true; },
+    proposal => { proposal.access.providerApiCalled = true; },
+    proposal => { proposal.access.vcpToolBoxRuntimeCalled = true; },
+    proposal => { proposal.access.publicMcpExpanded = true; }
+  ]) {
+    const proposal = acceptedProposal();
+    mutateProposal(proposal);
+    const result = service.preflight(validPreflightArgs({ proposal }));
+    assert.equal(result.accepted, false);
+    assert.equal(result.reasonCode, 'accepted_low_disclosure_proposal_required');
+    assert.deepEqual(result.blockers, ['proposal']);
+    assert.equal(result.provider_api_called, false);
+    assert.equal(result.public_mcp_expanded, false);
+  }
+});
+
 test('CM2035 stops L4 on default exposure approval acceptance commit write or readiness drift', () => {
   const service = new MemoryDeltaCommitPreflightService();
   const result = service.preflight(validPreflightArgs({
