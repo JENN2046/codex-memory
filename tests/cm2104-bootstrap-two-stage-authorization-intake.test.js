@@ -5,14 +5,19 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   evaluateCm2104BootstrapAuthorizationContentDecisionIntake,
+  evaluateCm2104BootstrapAuthorizationContentDecisionReconciliationIdentity,
   expectedContentDecision,
   isMachineBoundCm2104BootstrapAuthorizationContentDecision
 } = require('../src/core/Cm2104IdentityBoundStoreBootstrapAuthorizationContentDecisionIntake');
 const {
   evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake,
+  evaluateCm2104BootstrapFinalExecutionReleaseDecisionReconciliationIdentity,
   expectedFinalReleaseDecision,
   isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision
 } = require('../src/core/Cm2104IdentityBoundStoreBootstrapFinalExecutionReleaseDecisionIntake');
+const {
+  selectCm2103BootstrapDecisionIntakes
+} = require('../src/cli/cm2103-identity-bound-store-bootstrap');
 
 const expectedContentBinding = Object.freeze({
   expectedContentDecisionReference: 'CM-2104-TEST-CONTENT',
@@ -189,4 +194,106 @@ test('CM-2104 final release must bind the exact content Git identity before auth
     assert.equal(rejected.accepted, false, JSON.stringify(drift));
     assert.equal(rejected.executionAuthorized, false);
   }
+});
+
+test('CM-2104 expired exact decisions are reconciliation-only for an existing durable claim', async () => {
+  const now = new Date('2026-07-16T00:00:00+08:00');
+  const contentFixture = bytesAndBinding(contentDecision(), 'f', '0');
+  const historicalContent = evaluateCm2104BootstrapAuthorizationContentDecisionReconciliationIdentity({
+    ...contentFixture,
+    expectedBinding: expectedContentBinding,
+    now
+  });
+  assert.equal(historicalContent.accepted, true, historicalContent.blockers.join(', '));
+  assert.equal(historicalContent.reconciliationIdentityAccepted, true);
+  assert.equal(historicalContent.executionAuthorized, false);
+  assert.equal(isMachineBoundCm2104BootstrapAuthorizationContentDecision(historicalContent.decision), false);
+
+  const binding = finalBinding(contentFixture.observedBinding);
+  const finalDecision = {
+    ...expectedFinalReleaseDecision(binding),
+    expiresAt: binding.expectedExpiresAt,
+    approvedAt: '2026-07-12T11:00:00+08:00'
+  };
+  const finalFixture = bytesAndBinding(finalDecision, '1', '2');
+  const historicalFinal = evaluateCm2104BootstrapFinalExecutionReleaseDecisionReconciliationIdentity({
+    ...finalFixture,
+    expectedBinding: binding,
+    now
+  });
+  assert.equal(historicalFinal.accepted, true, historicalFinal.blockers.join(', '));
+  assert.equal(historicalFinal.reconciliationIdentityAccepted, true);
+  assert.equal(historicalFinal.executionAuthorized, false);
+  assert.equal(isMachineBoundCm2104BootstrapFinalExecutionReleaseDecision(historicalFinal.decision), false);
+
+  let activeIntakeCalls = 0;
+  const selected = await selectCm2103BootstrapDecisionIntakes({
+    registry: {
+      async preflightUnused() { return { accepted: false, unused: false }; }
+    },
+    nonce: expectedContentBinding.nonce,
+    receiptId: expectedContentBinding.receiptId,
+    historicalContentDecisionIntake: historicalContent,
+    historicalFinalReleaseDecisionIntake: historicalFinal,
+    evaluateActiveContentDecision() { activeIntakeCalls += 1; throw new Error('must_not_run'); },
+    evaluateActiveFinalReleaseDecision() { activeIntakeCalls += 1; throw new Error('must_not_run'); }
+  });
+  assert.equal(selected.existingDurableClaim, true);
+  assert.equal(selected.contentDecisionIntake, historicalContent);
+  assert.equal(selected.finalReleaseDecisionIntake, historicalFinal);
+  assert.equal(activeIntakeCalls, 0);
+});
+
+test('CM-2104 expired decisions remain rejected when no durable claim exists', async () => {
+  const now = new Date('2026-07-16T00:00:00+08:00');
+  const contentFixture = bytesAndBinding(contentDecision(), 'f', '0');
+  const historicalContent = evaluateCm2104BootstrapAuthorizationContentDecisionReconciliationIdentity({
+    ...contentFixture,
+    expectedBinding: expectedContentBinding,
+    now
+  });
+  const binding = finalBinding(contentFixture.observedBinding);
+  const finalDecision = {
+    ...expectedFinalReleaseDecision(binding),
+    expiresAt: binding.expectedExpiresAt,
+    approvedAt: '2026-07-12T11:00:00+08:00'
+  };
+  const finalFixture = bytesAndBinding(finalDecision, '1', '2');
+  const historicalFinal = evaluateCm2104BootstrapFinalExecutionReleaseDecisionReconciliationIdentity({
+    ...finalFixture,
+    expectedBinding: binding,
+    now
+  });
+  let preflightCalls = 0;
+  let finalActiveIntakeCalls = 0;
+  await assert.rejects(
+    selectCm2103BootstrapDecisionIntakes({
+      registry: {
+        async preflightUnused() {
+          preflightCalls += 1;
+          return { accepted: true, unused: true };
+        }
+      },
+      nonce: expectedContentBinding.nonce,
+      receiptId: expectedContentBinding.receiptId,
+      historicalContentDecisionIntake: historicalContent,
+      historicalFinalReleaseDecisionIntake: historicalFinal,
+      evaluateActiveContentDecision: () => evaluateCm2104BootstrapAuthorizationContentDecisionIntake({
+        ...contentFixture,
+        expectedBinding: expectedContentBinding,
+        now
+      }),
+      evaluateActiveFinalReleaseDecision() {
+        finalActiveIntakeCalls += 1;
+        return evaluateCm2104BootstrapFinalExecutionReleaseDecisionIntake({
+          ...finalFixture,
+          expectedBinding: binding,
+          now
+        });
+      }
+    }),
+    /cm2103_authorization_content_decision_intake_rejected/
+  );
+  assert.equal(preflightCalls, 1);
+  assert.equal(finalActiveIntakeCalls, 0);
 });
