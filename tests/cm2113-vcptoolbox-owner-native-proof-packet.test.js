@@ -91,6 +91,7 @@ test('CM-2113 packet rejects self identity, transport drift, and store replaceme
     packet => { packet.transport.productionReady = true; },
     packet => { packet.transport.outer = 'direct_app_call'; },
     packet => { packet.runtimeTarget.storeInstanceId = 'clone-store'; },
+    packet => { packet.runtimeTarget.productionReady = true; },
     packet => { packet.fixedRecord.folder = '../outside'; },
     packet => { packet.fixedRecord.unbound = true; },
     packet => { packet.authorization.productionReady = true; },

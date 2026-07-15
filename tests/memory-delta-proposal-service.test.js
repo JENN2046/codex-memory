@@ -141,6 +141,7 @@ test('CM2011 propose_memory_delta rejects raw secret write and readiness fields 
 test('CM2011 proposal service rejects readiness aliases on direct internal calls', () => {
   const service = new MemoryDeltaProposalService();
   for (const key of [
+    'readinessClaimed',
     'rcReadyClaimed',
     'deployReadyClaimed',
     'fullCapabilityClaimed',
