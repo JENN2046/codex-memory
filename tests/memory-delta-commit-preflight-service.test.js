@@ -201,7 +201,15 @@ test('CM2035 stops L4 on default exposure approval acceptance commit write or re
 
 test('CM2035 blocks top-level commit and write intent aliases', () => {
   const service = new MemoryDeltaCommitPreflightService();
-  for (const field of ['commit', 'write', 'confirm', 'durableWrite', 'production_write']) {
+  for (const field of [
+    'commit',
+    'write',
+    'confirm',
+    'durableWrite',
+    'durable_write',
+    'productionWrite',
+    'production_write'
+  ]) {
     const result = service.preflight(validPreflightArgs({ [field]: true }));
     assert.equal(result.accepted, false);
     assert.equal(result.reasonCode, 'stop_l4');

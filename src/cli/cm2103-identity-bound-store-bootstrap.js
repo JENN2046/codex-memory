@@ -124,6 +124,7 @@ function expectedFinalExecutionReleaseDecisionBinding({
     authorizationContentDecisionSourceCommit: authorizationContentDecisionCommit,
     authorizationContentDecisionBlobOid,
     authorizationContentDecisionSha256,
+    authorizationContentDecisionApprovedAt: authorizationContentDecision.approvedAt,
     executionPacketCommit: authorizationGatePacketCommit,
     executionPacketBlobOid: authorizationGatePacketBlobOid,
     executionPacketSha256: sha256(authorizationGatePacketBytes),

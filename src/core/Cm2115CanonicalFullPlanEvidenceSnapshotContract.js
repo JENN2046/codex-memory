@@ -172,6 +172,7 @@ const COLAMETA_PRIVATE_DIRECTORIES = new Set([
   'local',
   'executor-sessions'
 ]);
+const PRIVATE_STATE_ROOT_DIRECTORIES = new Set(['.claude', '.omc', '.tmp']);
 
 function isPrivateColaMetaPath(value) {
   if (!value.startsWith('.colameta/')) return false;
@@ -180,6 +181,13 @@ function isPrivateColaMetaPath(value) {
   return COLAMETA_PRIVATE_ROOT_FILES.has(relativePath) ||
     COLAMETA_PRIVATE_DIRECTORIES.has(parts[0]) ||
     parts.at(-1).endsWith('.lock');
+}
+
+function isPrivateRepositoryStatePath(value) {
+  const parts = value.split('/');
+  return PRIVATE_STATE_ROOT_DIRECTORIES.has(parts[0]) ||
+    value === 'tmp-compare.json' ||
+    /(?:^|\/)[^/]+\.sqlite(?:-(?:shm|wal))?$/.test(value);
 }
 
 function safeSourcePath(value) {
@@ -194,6 +202,7 @@ function safeSourcePath(value) {
     !/^data\//.test(value) &&
     !/^logs\/.*\.(?:log|jsonl)$/.test(value) &&
     !isPrivateColaMetaPath(value) &&
+    !isPrivateRepositoryStatePath(value) &&
     !FORBIDDEN_CIRCULAR_SOURCE_PATHS.includes(value) &&
     (value === LOCAL_VALIDATION_RECEIPT_PATH ||
       !/^docs\/near-model-memory-plan-pack\/cm2115_.*(?:review|application|decision|receipt)/.test(value));
@@ -365,6 +374,7 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
 
   let validationReceipt = null;
   let validationReceiptEvaluation = null;
+  let validationReceiptIsCurrentR2 = false;
   if (typeof resolveSourceObject === 'function') {
     try {
       const validationIdentity = resolve(LOCAL_VALIDATION_RECEIPT_PATH);
@@ -373,13 +383,16 @@ function evaluateCm2115CanonicalFullPlanEvidenceSnapshot(snapshot, {
         : validationIdentity?.content;
       validationReceipt = JSON.parse(content);
       validationReceiptEvaluation = evaluateCm2115LocalValidationReceipt(validationReceipt);
+      validationReceiptIsCurrentR2 = validationReceipt?.taskId === 'CM-2115-R2' &&
+        validationReceipt?.receiptType === 'canonical_full_plan_local_validation_receipt_v3';
       if (!validationReceiptEvaluation.accepted) blockers.push('validationReceipt.contract');
+      if (!validationReceiptIsCurrentR2) blockers.push('validationReceipt.currentR2Required');
     } catch {
       blockers.push('validationReceipt.unreadable');
     }
   }
   const validationTarget = validationReceipt?.payload?.validationTarget;
-  if (validationReceiptEvaluation?.accepted) {
+  if (validationReceiptEvaluation?.accepted && validationReceiptIsCurrentR2) {
     if (typeof resolveCommitTree !== 'function' || typeof resolveParentCommit !== 'function' ||
         typeof resolveDiffPaths !== 'function' || typeof isCommitAncestor !== 'function') {
       blockers.push('validationReceipt.gitLineageResolversRequired');

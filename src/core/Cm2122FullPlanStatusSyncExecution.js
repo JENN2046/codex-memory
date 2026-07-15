@@ -39,9 +39,9 @@ const FINAL_RELEASE_PATH = 'docs/near-model-memory-plan-pack/cm2123_r2_full_plan
 const FINAL_RELEASE_MARKDOWN_PATH = FINAL_RELEASE_PATH.replace(/\.json$/, '.md');
 const EXECUTION_RECEIPT_FILENAME = 'cm2122-r2-full-plan-status-sync-execution-receipt-001.json';
 const BINDING_RECEIPT_FILENAME = 'cm2122-r2-full-plan-status-sync-binding-receipt-001.json';
-const REGISTRY_REFERENCE = 'cm2122-r2-full-plan-status-sync-registry-001';
-const NONCE = 'cm2122-r2-full-plan-status-sync-001';
-const RECEIPT_ID = 'cm2122-r2-full-plan-status-sync-receipt-001';
+const REGISTRY_REFERENCE = 'cm2121-full-plan-status-sync-registry-001';
+const NONCE = 'cm2121-full-plan-status-sync-001';
+const RECEIPT_ID = 'cm2121-full-plan-status-sync-receipt-001';
 const FINAL_RELEASE_APPROVED_AT = '2026-07-12T00:00:00+08:00';
 const FINAL_RELEASE_EXPIRES_AT = '2026-07-19T23:59:59+08:00';
 const ATTRIBUTION_STALE_PACKET_COMMIT = 'd9f5f8c1cbfb17ac013846006f466c1b0c3ae67f';
@@ -294,6 +294,11 @@ function buildExecutionPacket({ implementation, contentEvidence }) {
     throw new Error('cm2122_machine_bound_content_decision_required');
   }
   const decision = contentEvidence.decision;
+  const authorizationContent = decision.payload?.authorizationContent;
+  if (authorizationContent?.registryReference !== REGISTRY_REFERENCE ||
+      authorizationContent?.nonce !== NONCE || authorizationContent?.receiptId !== RECEIPT_ID) {
+    throw new Error('cm2122_content_authority_registry_binding_required');
+  }
   const payload = {
     packetReference: `CM-2122-R2-STATUS-SYNC-EXECUTION-PACKET-${decision.canonicalPayloadSha256.slice(0, 8)}-${implementation.commit.slice(0, 8)}`.toUpperCase(),
     packetType: 'non_executing_exact_status_sync_execution_packet',
@@ -356,9 +361,9 @@ function buildExecutionPacket({ implementation, contentEvidence }) {
     oneShotRegistry: {
       governanceRootAuthority: 'git_common_dir_fixed_governance_root',
       governanceRootIdentitySha256: GOVERNANCE_ROOT_IDENTITY_SHA256,
-      registryReference: REGISTRY_REFERENCE,
-      nonce: NONCE,
-      receiptId: RECEIPT_ID,
+      registryReference: authorizationContent.registryReference,
+      nonce: authorizationContent.nonce,
+      receiptId: authorizationContent.receiptId,
       claimIdDerivationExcludesBindingHash: true,
       atomicExclusiveCreateRequired: true,
       durableReentryRequired: true,
