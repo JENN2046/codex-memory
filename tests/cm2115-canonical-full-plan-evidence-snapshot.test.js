@@ -153,6 +153,38 @@ function validValidationReceipt() {
   });
 }
 
+function legacyValidationReceipt(version) {
+  const receipt = structuredClone(validValidationReceipt());
+  if (version === 1) {
+    receipt.taskId = 'CM-2115';
+    receipt.receiptType = 'canonical_full_plan_local_validation_receipt_v1';
+    delete receipt.payload.validationTarget.worktreeCleanAfterCommands;
+    receipt.payload.commandResults[0].commandId = 'cm2115_snapshot_focused';
+    receipt.payload.commandResults[0].command =
+      'node --test tests/cm2115-canonical-full-plan-evidence-snapshot.test.js';
+    receipt.payload.evidenceSemantics = {
+      phase1RegressionTestsPassed: true,
+      testAllPassed: true,
+      gateCiPassed: true,
+      snapshotContractTestsPassed: true
+    };
+  } else {
+    receipt.taskId = 'CM-2115-R1';
+    receipt.receiptType = 'canonical_full_plan_local_validation_receipt_v2';
+    receipt.payload.commandResults[0].commandId = 'cm2115_r1_phase2_application_focused';
+    receipt.payload.commandResults[0].command =
+      'node --test tests/cm2115-r1-phase2-completion-audit-application.test.js';
+    receipt.payload.evidenceSemantics = {
+      phase1RegressionTestsPassed: true,
+      testAllPassed: true,
+      gateCiPassed: true,
+      phase2ApplicationTestsPassed: true
+    };
+  }
+  receipt.canonicalPayloadSha256 = sha256Canonical(receipt.payload);
+  return receipt;
+}
+
 function fakeResolverFactory({ receipt = validValidationReceipt(), overrides = {} } = {}) {
   return sourcePath => {
     if (overrides[sourcePath]) return overrides[sourcePath];
@@ -435,6 +467,18 @@ test('snapshot contract rejects circular, private, symlink, or non-blob sources'
     '.colameta/current.lock',
     '.colameta/prompts/nested.lock'
   ]) assert.equal(safeSourcePath(sourcePath), false, sourcePath);
+  const privateStatePaths = [
+    '.claude/session.json',
+    '.omc/state.json',
+    '.tmp/cache',
+    'tmp-compare.json',
+    'db.sqlite',
+    'data.sqlite-shm',
+    'nested/data.sqlite-wal'
+  ];
+  for (const sourcePath of privateStatePaths) {
+    assert.equal(safeSourcePath(sourcePath), false, sourcePath);
+  }
   for (const sourcePath of [
     '.colameta/prompts/system.md',
     '.colameta/rules.md',
@@ -445,7 +489,7 @@ test('snapshot contract rejects circular, private, symlink, or non-blob sources'
 
   const unsafeSnapshot = buildSnapshot(fakeResolverFactory());
   unsafeSnapshot.payload.entries[0].sourceBindings[0].sourcePath = '.colameta/settings.json';
-  unsafeSnapshot.payloadSha256 = sha256Canonical(unsafeSnapshot.payload);
+  unsafeSnapshot.canonicalPayloadSha256 = sha256Canonical(unsafeSnapshot.payload);
   let unsafeResolverCalls = 0;
   const unsafeResult = evaluate(unsafeSnapshot, sourcePath => {
     if (sourcePath === '.colameta/settings.json') unsafeResolverCalls += 1;
@@ -454,6 +498,19 @@ test('snapshot contract rejects circular, private, symlink, or non-blob sources'
   assert.equal(unsafeResult.accepted, false);
   assert.ok(unsafeResult.blockers.some(blocker => blocker.startsWith('source.path.')));
   assert.equal(unsafeResolverCalls, 0);
+  for (const sourcePath of privateStatePaths) {
+    const privateSnapshot = buildSnapshot(fakeResolverFactory());
+    privateSnapshot.payload.entries[0].sourceBindings[0].sourcePath = sourcePath;
+    privateSnapshot.canonicalPayloadSha256 = sha256Canonical(privateSnapshot.payload);
+    let privateResolverCalls = 0;
+    const result = evaluate(privateSnapshot, resolvedPath => {
+      if (resolvedPath === sourcePath) privateResolverCalls += 1;
+      return fakeResolverFactory()(resolvedPath);
+    });
+    assert.equal(result.accepted, false, sourcePath);
+    assert.ok(result.blockers.some(blocker => blocker.startsWith('source.path.')), sourcePath);
+    assert.equal(privateResolverCalls, 0, sourcePath);
+  }
   const resolver = fakeResolverFactory();
   const snapshot = buildSnapshot(resolver);
   const firstPath = snapshot.payload.entries[0].sourceBindings[0].sourcePath;
@@ -494,6 +551,18 @@ test('snapshot contract requires the fresh validation receipt and its Git lineag
   });
   assert.equal(staleAncestor.accepted, false);
   assert.ok(staleAncestor.blockers.includes('validationReceipt.notExactBaselineParent'));
+});
+
+test('R2 snapshot rejects legacy validation receipts accepted by the shared validator', () => {
+  for (const version of [1, 2]) {
+    const receipt = legacyValidationReceipt(version);
+    assert.equal(evaluateCm2115LocalValidationReceipt(receipt).accepted, true, `legacy v${version}`);
+    const resolver = fakeResolverFactory({ receipt });
+    const snapshot = buildSnapshot(resolver);
+    const result = evaluate(snapshot, resolver);
+    assert.equal(result.accepted, false, `legacy v${version}`);
+    assert.ok(result.blockers.includes('validationReceipt.currentR2Required'), `legacy v${version}`);
+  }
 });
 
 test('local validation receipt contract rejects failed command or completion/readiness overclaim', () => {

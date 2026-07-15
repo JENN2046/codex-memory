@@ -101,12 +101,16 @@ function requestWriteIntentPresent(value) {
     value.execute,
     value.write,
     value.durableWrite,
+    value.durable_write,
+    value.productionWrite,
     value.production_write,
     options.commit,
     options.confirm,
     options.execute,
     options.write,
     options.durableWrite,
+    options.durable_write,
+    options.productionWrite,
     options.production_write
   ].some(item => item === true);
 }
