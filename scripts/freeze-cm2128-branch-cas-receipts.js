@@ -127,7 +127,7 @@ function assertLowDisclosure(value) {
         /^(?:[A-Za-z]:\/|\/)/.test(normalizedPath) ||
         /(?:^|\/)\.\.(?:\/|$)|(?:^|\/)\.git(?:\/|$)/.test(normalizedPath) ||
         /(?:^|\/)(?:\.env(?:\.[^/]*)?|data|logs|\.colameta|\.omc|\.claude|\.tmp)(?:\/|$)/.test(normalizedPath) ||
-        /(?:BEGIN (?:RSA|OPENSSH|PRIVATE)|Bearer\s+[A-Za-z0-9._-]{20,}|sk-[A-Za-z0-9_-]{20,})/.test(current)) {
+        /(?:BEGIN (?:RSA|OPENSSH|PRIVATE)|Bearer\s+[A-Za-z0-9._-]{20,}|sk-[A-Za-z0-9_-]{20,}|(?:AKIA|ASIA)[A-Z0-9]{16})/.test(current)) {
       throw new Error('cm2128_low_disclosure_string_boundary_failed');
     }
   }

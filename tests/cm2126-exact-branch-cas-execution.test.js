@@ -3,6 +3,7 @@
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
+const fsPromises = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync, spawnSync } = require('node:child_process');
@@ -887,6 +888,58 @@ test('registry enforces exact transitions and reentry receipt is readonly', asyn
     assert.equal(receipt.payload.targetIndexSyncCallsThisReentry, 0);
     assert.equal(receipt.payload.targetFileWritesThisReentry, 0);
     assert.equal(receipt.payload.currentBranchStatusSynchronized, false);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('registry removes its verified transition temp after a pre-rename write failure', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2126-transition-temp-'));
+  try {
+    fs.writeFileSync(
+      path.join(root, '.phase8-registry-root-identity.json'),
+      JSON.stringify(canonicalize(fixture.frozenConstants.GOVERNANCE_ROOT_IDENTITY)),
+      { flag: 'wx' }
+    );
+    const bindingHash = fixture.frozenModule.buildClaimBindingHash({
+      packetEvidence: fixture.packetEvidence,
+      finalReleaseEvidence: fixture.finalReleaseEvidence
+    });
+    const release = fixture.frozenModule.releaseBinding(
+      fixture.packetEvidence,
+      fixture.finalReleaseEvidence,
+      bindingHash
+    );
+    const registry = new fixture.frozenRegistry.Cm2126ExactBranchCasClaimRegistry({ governanceRoot: root });
+    await registry.claim(bindingHash, release, fixture.now);
+    const transitionState = 'BRANCH_REF_CAS_CONSUMED';
+    const temporaryPath = path.join(root, `${fixture.frozenRegistry.claimFileName()}.${transitionState}.tmp`);
+    const faultingFileSystem = {
+      ...fsPromises,
+      open: async (entryPath, ...args) => {
+        const handle = await fsPromises.open(entryPath, ...args);
+        if (!String(entryPath).endsWith(`.${transitionState}.tmp`)) return handle;
+        return {
+          fd: handle.fd,
+          stat: handle.stat.bind(handle),
+          writeFile: async () => { throw new Error('synthetic_transition_write_failure'); },
+          sync: handle.sync.bind(handle),
+          close: handle.close.bind(handle)
+        };
+      }
+    };
+    const faultingRegistry = new fixture.frozenRegistry.Cm2126ExactBranchCasClaimRegistry({
+      governanceRoot: root,
+      fsApi: faultingFileSystem
+    });
+    const details = { branchCasInvocationCount: null, branchRefCasAttempts: 1, branchRefUpdates: null };
+    await assert.rejects(
+      faultingRegistry.transition(bindingHash, 'CLAIMED', transitionState, details, release),
+      /synthetic_transition_write_failure/
+    );
+    assert.equal(fs.existsSync(temporaryPath), false);
+    const transitioned = await registry.transition(bindingHash, 'CLAIMED', transitionState, details, release);
+    assert.equal(transitioned.state, transitionState);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

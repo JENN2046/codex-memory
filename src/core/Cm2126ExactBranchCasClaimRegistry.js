@@ -490,6 +490,9 @@ class Cm2126ExactBranchCasClaimRegistry {
     if (!allowed[expectedState]?.includes(state)) throw new Error('cm2126_claim_transition_invalid');
     const rootHandle = await openVerifiedGovernanceRoot(this);
     let temporaryHandle = null;
+    let temporary = null;
+    let temporaryIdentity = null;
+    let renameAttempted = false;
     try {
       const current = await this.readFromRootHandle(rootHandle, bindingHash, releaseBinding);
       if (current.state !== expectedState) throw new Error('cm2126_claim_state_mismatch');
@@ -502,21 +505,43 @@ class Cm2126ExactBranchCasClaimRegistry {
       };
       this.validateEnvelope(next, bindingHash, releaseBinding);
       const temporaryName = `${claimFileName()}.${state}.tmp`;
-      const temporary = governanceDescriptorPath(rootHandle, temporaryName);
+      temporary = governanceDescriptorPath(rootHandle, temporaryName);
       const destination = governanceDescriptorPath(rootHandle, claimFileName());
       temporaryHandle = await this.fs.open(
         temporary,
         fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_NOFOLLOW,
         0o600
       );
+      const temporaryStat = await temporaryHandle.stat();
+      if (!temporaryStat.isFile()) throw new Error('cm2126_claim_transition_temp_invalid');
+      temporaryIdentity = { dev: temporaryStat.dev, ino: temporaryStat.ino };
       await temporaryHandle.writeFile(Buffer.from(JSON.stringify(canonicalize(next))));
       await temporaryHandle.sync();
       await temporaryHandle.close();
       temporaryHandle = null;
+      renameAttempted = true;
       await this.fs.rename(temporary, destination);
       await rootHandle.sync();
       injectIsolatedTransitionFault(state);
       return await this.readFromRootHandle(rootHandle, bindingHash, releaseBinding);
+    } catch (error) {
+      if (temporaryHandle) {
+        await temporaryHandle.close().catch(() => {});
+        temporaryHandle = null;
+      }
+      if (!renameAttempted && temporary && temporaryIdentity) {
+        try {
+          const currentTemporary = await this.fs.lstat(temporary);
+          if (currentTemporary.isFile() && !currentTemporary.isSymbolicLink() &&
+              currentTemporary.dev === temporaryIdentity.dev && currentTemporary.ino === temporaryIdentity.ino) {
+            await this.fs.unlink(temporary);
+            await rootHandle.sync();
+          }
+        } catch (cleanupError) {
+          if (cleanupError?.code !== 'ENOENT') error.cm2126TransitionTempCleanupFailed = true;
+        }
+      }
+      throw error;
     } finally {
       if (temporaryHandle) await temporaryHandle.close().catch(() => {});
       await rootHandle.close().catch(() => {});
