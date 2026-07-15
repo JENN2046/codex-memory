@@ -420,6 +420,42 @@ test('CM-2096 verify accepts only the exact write receipt and then derives tombs
   assert.equal(calls, 1);
 });
 
+test('CM-2096 verify rejects raw disclosure in the post-store projection before audit', async t => {
+  const binding = expectedBinding();
+  const decision = intakeDecision(binding);
+  for (const [name, mutateProjection] of [
+    ['top-level raw memory', projection => { projection.rawMemoryReturned = true; }],
+    ['top-level raw path', projection => { projection.rawPathDisclosed = true; }],
+    ['target raw path', projection => { projection.targetRecordProjection.rawPathDisclosed = true; }],
+    ['marker raw path', projection => { projection.tombstoneMarkerProjection.rawPathDisclosed = true; }]
+  ]) {
+    await t.test(name, async () => {
+      const registry = await newRegistry();
+      const gate = createCm2096TombstoneOneShotGate({ registry, expectedBinding: binding, now: () => new Date('2026-07-11T00:00:00.000Z') });
+      const claimed = await gate.claim({ decision, preStoreProjection: preStoreProjection(binding) });
+      assert.equal((await gate.verifyAssertion(claimed.assertion)).accepted, true);
+      const projection = postStoreProjection(binding);
+      mutateProjection(projection);
+      let called = false;
+      const result = await verifyCm2096TombstoneExecution({
+        registry,
+        claimId: claimed.claimId,
+        receiptId: binding.receiptId,
+        decisionReference: decision.decisionReference,
+        claimBindingHash: claimed.bindingHash,
+        runtimeTargetReferenceName: binding.runtimeTarget.targetReferenceName,
+        scope: binding.allowedScope,
+        expectedScopeFingerprint: sha256Canonical(binding.allowedScope),
+        postStoreProjection: projection,
+        callAuditMemory: async () => { called = true; return auditReport(binding, decision.decisionReference, claimed.bindingHash); }
+      });
+      assert.equal(result.accepted, false);
+      assert.equal(result.reasonCode, 'cm2096_post_store_projection_disclosure_boundary_failed');
+      assert.equal(called, false);
+    });
+  }
+});
+
 test('CM-2096 verify rejects receipt, decision, claim, target, or raw-output drift', async t => {
   const binding = expectedBinding();
   const decision = intakeDecision(binding);

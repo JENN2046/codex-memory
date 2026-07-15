@@ -209,6 +209,23 @@ test('CM2035 blocks top-level commit and write intent aliases', () => {
   }
 });
 
+test('CM2035 stops L4 on top-level readiness claim aliases', () => {
+  const service = new MemoryDeltaCommitPreflightService();
+  for (const field of [
+    'readinessClaimed',
+    'rcReadyClaimed',
+    'deployReadyClaimed',
+    'fullCapabilityClaimed',
+    'modelMemoryCompleteClaimed'
+  ]) {
+    const result = service.preflight(validPreflightArgs({ [field]: true }));
+    assert.equal(result.accepted, false, field);
+    assert.equal(result.reasonCode, 'stop_l4', field);
+    assert.ok(result.blockers.includes(field), field);
+    assert.equal(result.readiness_claimed, false, field);
+  }
+});
+
 test('CM2035 requires the accepted proposal task to match the preflight task', () => {
   const service = new MemoryDeltaCommitPreflightService();
   const result = service.preflight(validPreflightArgs({ task_id: 'CM-9999' }));

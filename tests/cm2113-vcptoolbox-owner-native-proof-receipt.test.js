@@ -45,3 +45,20 @@ test('CM-2113 rejects an additional top-level overclaim field', () => {
   value.productionReady = true;
   assert.equal(evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value).accepted, false);
 });
+
+test('CM-2113 rejects additional claims in every nested receipt section', () => {
+  for (const section of [
+    'implementation', 'executionPacketGitIdentity', 'contentDecisionGitIdentity',
+    'finalReleaseDecisionGitIdentity', 'bootstrapReceiptGitIdentity', 'executionReceipt',
+    'transportReceipt', 'ownerRuntime', 'transport', 'store', 'authorization',
+    'priorAttempt', 'completionEvidence', 'nonClaims'
+  ]) {
+    const value = structuredClone(receipt);
+    value[section].productionReady = true;
+    assert.equal(
+      evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value).accepted,
+      false,
+      section
+    );
+  }
+});
