@@ -13,14 +13,25 @@ const {
   serializeArtifact
 } = require('../src/core/Cm2120FullPlanApplicationReceiptReview');
 const { resolverOptions } = require('./generate-cm2116-exact-full-plan-application-gate');
-const { assertSafeGitEnvironment } = require('../src/core/Cm2118FullPlanApplicationExecution');
+const {
+  assertSafeGitEnvironment,
+  sanitizedGitEnvironment
+} = require('../src/core/Cm2118FullPlanApplicationExecution');
 
 function gitText(args) {
   return execFileSync('git', args, {
     cwd: process.cwd(),
+    env: sanitizedGitEnvironment(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   }).trim();
+}
+
+function buildReviewImplementationIdentity() {
+  return {
+    commit: gitText(['rev-parse', 'HEAD^{commit}']),
+    tree: gitText(['rev-parse', 'HEAD^{tree}'])
+  };
 }
 
 function parseArgs(argv) {
@@ -40,10 +51,7 @@ async function main(argv = process.argv.slice(2)) {
   if (!frozenEvidence.accepted) throw new Error(`cm2120_frozen_receipts_rejected:${frozenEvidence.blockers.join(',')}`);
   const durableEvidence = await evaluateCurrentDurableEvidence();
   if (!durableEvidence.accepted) throw new Error(`cm2120_durable_evidence_rejected:${durableEvidence.blockers.join(',')}`);
-  const implementation = {
-    commit: gitText(['rev-parse', 'HEAD^{commit}']),
-    tree: gitText(['rev-parse', 'HEAD^{tree}'])
-  };
+  const implementation = buildReviewImplementationIdentity();
   const decision = buildReviewDecision({ frozenEvidence, durableEvidence, implementation });
   const evaluation = evaluateReviewDecision(decision, { implementation, durableEvidence, ...options });
   if (!evaluation.accepted) throw new Error(`cm2120_review_decision_rejected:${evaluation.blockers.join(',')}`);
@@ -89,4 +97,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main, parseArgs };
+module.exports = { buildReviewImplementationIdentity, main, parseArgs };
