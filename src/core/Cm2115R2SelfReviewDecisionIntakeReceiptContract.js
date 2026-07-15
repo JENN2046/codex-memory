@@ -15,30 +15,28 @@ const { canonicalize } = require('./Cm2115CanonicalFullPlanEvidenceSnapshot');
 const TASK_ID = 'CM-2115-R2';
 const RECEIPT_PATH = 'docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.json';
 const SELF_REVIEW_DECISION_FREEZE = Object.freeze({
-  commit: '116d74b3c69069fc377a861c01ed8105ee3fda11',
-  tree: 'c10a9e75ba99113c9c3c6d6bc2991bcf58ecd804',
-  parentCommit: '68c8088a56511b6d6b598e293a6a39130c254a49',
-  parentTree: '92f15d54d50ccc62443d9a37e10f3338e010c831',
-  canonicalPayloadSha256: '032427870f5bbbf1035edc7291302a1e480b93040cd9f088873b45d58546a1d4',
+  commit: '798a91b23bc84788fd6a69d4dad61ab5e135f70e',
+  tree: '7bfcb9f625b4af0828458c0f56756bb7ebe756b4',
+  parentCommit: 'fe3fa28821282348f4b8e94dafe1dc904226b461',
+  parentTree: '5b03dae54a30ff826a029daffd0aa3ed630c583a',
+  canonicalPayloadSha256: '377812d904e60ec569b57c9d9e2eded76a83a797e1f076160598e4db41c2f3a5',
   json: Object.freeze({
     path: DECISION_PATH,
-    blobOid: '6b4b751d23a46e27c4502a0b2a27e0efc4f6eff4',
+    blobOid: '441da37af718989450f0ec632f3ca09dac773c3e',
     bytes: 5011,
-    sha256: 'f5dd9c58e6a296cb857f85a3a4fde5ee3ae33ed9cf8ce793ddc6482be63d8e41'
+    sha256: 'ec1c32ee890f2d886af345cbaf51bacc2c0166746fd536e6d66f5576f612d136'
   }),
   markdown: Object.freeze({
     path: DECISION_PATH.replace(/\.json$/, '.md'),
-    blobOid: '2ea6d6e73cd82604d950b6bc6dbcc875b8034752',
+    blobOid: '7a1b4198ed56d627dda8f637f1023a37d48c1ccd',
     bytes: 5606,
-    sha256: 'f945a9beb8d40d6ca270455ba081c9ecc0fd08cdaaaee7c39fbd33d77ce63fc2'
+    sha256: '2b147124cfb74cf5067748246690be9dfed5b6022d033c64086bdd4de1e1fbf4'
   })
 });
 
 const INTAKE_IMPLEMENTATION_DIFF_PATHS = Object.freeze([
   'src/core/Cm2115R2SelfReviewDecisionIntakeReceiptContract.js',
-  'scripts/generate-cm2115-r2-self-review-intake-receipt.js',
-  'tests/cm2115-r2-self-review-intake-receipt.test.js',
-  'package.json'
+  'tests/cm2115-r2-self-review-intake-receipt.test.js'
 ]);
 
 const INTAKE_IMPLEMENTATION_ARTIFACT_PATHS = Object.freeze([
@@ -94,7 +92,9 @@ function evaluateFrozenSelfReviewDecision({
     ).sort();
     const expectedDiffPaths = [
       SELF_REVIEW_DECISION_FREEZE.json.path,
-      SELF_REVIEW_DECISION_FREEZE.markdown.path
+      SELF_REVIEW_DECISION_FREEZE.markdown.path,
+      'src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js',
+      'tests/cm2115-r2-self-review-decision.test.js'
     ].sort();
     if (!sameJson(diffPaths, expectedDiffPaths)) blockers.push('intake.decisionDiffPaths');
 

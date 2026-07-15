@@ -32,6 +32,8 @@ const {
 } = require('../src/core/Cm2115R2Phase2CompletionAuditApplication');
 const snapshotGit = require('../scripts/cm2115-r2-git');
 const {
+  IMPLEMENTATION_ARTIFACT_PATHS,
+  REVIEW_IMPLEMENTATION_FREEZE,
   evaluateCm2115SnapshotReviewRequest
 } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract');
 const {
@@ -717,6 +719,36 @@ test('independent review request binds the frozen snapshot and stays non-authori
   assert.equal(result.applicationAuthorized, false);
   assert.equal(result.fullPlanPackCompleted, false);
   assert.equal(result.readinessClaimed, false);
+  assert.equal(request.payload.reviewImplementation.commit, REVIEW_IMPLEMENTATION_FREEZE.commit);
+  assert.equal(request.payload.reviewImplementation.tree, REVIEW_IMPLEMENTATION_FREEZE.tree);
+  assert.match(
+    resolveReviewGitFile(
+      REVIEW_IMPLEMENTATION_FREEZE.commit,
+      'src/core/Cm2115CanonicalFullPlanEvidenceSnapshotContract.js'
+    ).content.toString('utf8'),
+    /VCS_INTERNAL_PATH_COMPONENTS/
+  );
+  assert.match(
+    resolveReviewGitFile(
+      REVIEW_IMPLEMENTATION_FREEZE.commit,
+      'src/core/Cm2115R2Phase2CompletionAuditApplication.js'
+    ).content.toString('utf8'),
+    /decision\.authorityBaseline/
+  );
+
+  const staleRequest = structuredClone(request);
+  staleRequest.payload.reviewImplementation = {
+    commit: '5a2494dd6fc6a3c72015b3f92cf2940759b77b5d',
+    tree: 'ab04eff94dc1655378a6f88e5cdbf1ddf3f82d14',
+    artifacts: IMPLEMENTATION_ARTIFACT_PATHS.map(artifactPath => ({
+      path: artifactPath,
+      blobOid: resolveReviewGitFile('5a2494dd6fc6a3c72015b3f92cf2940759b77b5d', artifactPath).blobOid
+    }))
+  };
+  staleRequest.canonicalPayloadSha256 = sha256Canonical(staleRequest.payload);
+  const staleResult = evaluateCm2115SnapshotReviewRequest(staleRequest, reviewRequestResolvers());
+  assert.equal(staleResult.accepted, false);
+  assert.ok(staleResult.blockers.includes('payload.reviewImplementation'));
 });
 
 test('independent review request requires the exact implementation parent and diff paths', () => {
@@ -732,7 +764,7 @@ test('independent review request requires the exact implementation parent and di
 
   const diffDrift = evaluateCm2115SnapshotReviewRequest(request, {
     ...reviewRequestResolvers(),
-    resolveDiffPaths: (parent, commit) => parent === request.payload.snapshot.commit &&
+    resolveDiffPaths: (parent, commit) => parent === REVIEW_IMPLEMENTATION_FREEZE.parentCommit &&
         commit === request.payload.reviewImplementation.commit
       ? ['src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js']
       : snapshotGit.resolveDiffPaths(parent, commit)
