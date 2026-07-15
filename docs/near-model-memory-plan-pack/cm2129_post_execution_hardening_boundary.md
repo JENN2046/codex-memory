@@ -17,9 +17,29 @@ The post-execution `reference-transaction` hook hardening changed the shipped
 executor source to:
 
 ```yaml
-executor_blob_oid: "e24a81285ce89a272d31587108b5a54f2f981f04"
-executor_sha256: "5e27a9b9840bf7a16ec6dcc1300135c685941378df6350fa2ab94e38dc7ccec6"
+executor_blob_oid: "27754872cdc14ed16639d1b80feef69104dea6f3"
+executor_sha256: "cb75a18245dc3a61da17650b0d38611532947d07804792f49ec4b2985fdd1544"
 ```
+
+The later hidden-untracked worktree check likewise changed the CM-2125 content
+decision generator after the consumed decision had already been frozen. The
+historical decision accurately binds the generator that created it:
+
+```yaml
+historical_content_generator_blob_oid: "df5ba8aecfa34fd3542982888c8b5fdc36e5104b"
+historical_content_generator_bytes: 6015
+historical_content_generator_sha256: "5bf077e5ad51315c0f266a6989653850f5d5d28da355ad56109b1522ab81bc57"
+
+current_content_generator_blob_oid: "74508b4dab93b80c110148a86d9781af2a4a7020"
+current_content_generator_bytes: 6197
+current_content_generator_sha256: "fb442ed2eb2ec298bc7b15da530239fd691327e843b81042898213db303ab754"
+```
+
+The current generator forces `--untracked-files=all`; the historical generator
+did not. Rebinding the already-consumed CM-2125 decision to the later generator
+would misstate which bytes produced the authorized decision. The later
+generator is hardened source for future packets only and carries no CM-2125 or
+CM-2127 execution authority.
 
 The historical decision and receipts must not be rewritten to name the later
 blob: doing so would falsely claim that different bytes performed an already
@@ -33,6 +53,8 @@ historical_authorization_replay_allowed: false
 current_shipped_executor_authorized_by_cm2127: false
 current_shipped_executor_execution_proof_accepted: false
 current_shipped_executor_branch_cas_may_execute: false
+current_content_generator_authorized_by_cm2125: false
+current_content_generator_execution_proof_accepted: false
 
 additional_branch_ref_update_authorized: false
 remote_action_authorized: false

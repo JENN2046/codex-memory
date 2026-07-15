@@ -29,6 +29,20 @@ function gitBlobOid(bytes) {
     .digest('hex');
 }
 
+function gitFileIdentity(commit, relativePath) {
+  const bytes = execFileSync('git', ['show', `${commit}:${relativePath}`], {
+    cwd: ROOT,
+    encoding: null,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  return {
+    blobOid: gitBlobOid(bytes),
+    bytes: bytes.length,
+    path: relativePath,
+    sha256: sha256(bytes)
+  };
+}
+
 function withTempDirectory(callback) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2128-receipts-'));
   try {
@@ -403,8 +417,8 @@ test('CM-2129 keeps historical execution evidence separate from the shipped hard
   });
 
   const currentBytes = fs.readFileSync(path.join(ROOT, historical.path));
-  assert.equal(gitBlobOid(currentBytes), 'e24a81285ce89a272d31587108b5a54f2f981f04');
-  assert.equal(sha256(currentBytes), '5e27a9b9840bf7a16ec6dcc1300135c685941378df6350fa2ab94e38dc7ccec6');
+  assert.equal(gitBlobOid(currentBytes), '27754872cdc14ed16639d1b80feef69104dea6f3');
+  assert.equal(sha256(currentBytes), 'cb75a18245dc3a61da17650b0d38611532947d07804792f49ec4b2985fdd1544');
   assert.notEqual(sha256(currentBytes), historical.sha256);
 
   const boundary = source(
@@ -415,6 +429,22 @@ test('CM-2129 keeps historical execution evidence separate from the shipped hard
   assert.match(boundary, /current_shipped_executor_authorized_by_cm2127: false/);
   assert.match(boundary, /current_shipped_executor_execution_proof_accepted: false/);
   assert.match(boundary, /current_shipped_executor_branch_cas_may_execute: false/);
+  const historicalGenerator = gitFileIdentity(
+    'f8483a1d189f444d7481032252e17003680006a6',
+    'scripts/generate-cm2125-exact-branch-cas-content-decision.js'
+  );
+  assert.deepEqual(historicalGenerator, {
+    blobOid: 'df5ba8aecfa34fd3542982888c8b5fdc36e5104b',
+    bytes: 6015,
+    path: 'scripts/generate-cm2125-exact-branch-cas-content-decision.js',
+    sha256: '5bf077e5ad51315c0f266a6989653850f5d5d28da355ad56109b1522ab81bc57'
+  });
+  const currentGeneratorBytes = fs.readFileSync(path.join(ROOT, historicalGenerator.path));
+  assert.equal(gitBlobOid(currentGeneratorBytes), '74508b4dab93b80c110148a86d9781af2a4a7020');
+  assert.equal(sha256(currentGeneratorBytes), 'fb442ed2eb2ec298bc7b15da530239fd691327e843b81042898213db303ab754');
+  assert.notEqual(sha256(currentGeneratorBytes), historicalGenerator.sha256);
+  assert.match(boundary, /current_content_generator_authorized_by_cm2125: false/);
+  assert.match(boundary, /current_content_generator_execution_proof_accepted: false/);
   assert.match(boundary, /additional_branch_ref_update_authorized: false/);
   assert.match(boundary, /readiness_claimed: false/);
 });

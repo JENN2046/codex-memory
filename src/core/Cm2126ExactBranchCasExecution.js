@@ -966,13 +966,16 @@ function resolveTargetIndexPath(targetPath) {
 }
 
 function targetIndexLockAbsent(targetPath) {
-  try {
-    fs.lstatSync(`${resolveTargetIndexPath(targetPath)}.lock`);
-    return false;
-  } catch (error) {
-    if (error.code === 'ENOENT') return true;
-    throw error;
+  const indexLockPath = `${resolveTargetIndexPath(targetPath)}.lock`;
+  for (const lockPath of [indexLockPath, `${indexLockPath}.lock`]) {
+    try {
+      fs.lstatSync(lockPath);
+      return false;
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
   }
+  return true;
 }
 
 function assertPathAbsent(entryPath, errorCode) {

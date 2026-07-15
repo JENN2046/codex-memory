@@ -825,16 +825,17 @@ test('assume-unchanged and skip-worktree index flags fail closed before claim', 
   }
 
   const indexPath = text(['rev-parse', '--path-format=absolute', '--git-path', 'index'], fixture.target);
-  const lockPath = `${indexPath}.lock`;
-  fs.writeFileSync(lockPath, 'synthetic stale index lock\n', { flag: 'wx' });
-  try {
-    const result = runCli();
-    assert.notEqual(result.status, 0);
-    assert.match(result.stderr, /target_old_preflight_failed/);
-    assert.equal(fs.existsSync(fixture.claimPath), false);
-    assert.equal(text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo), constants.EXPECTED_OLD);
-  } finally {
-    fs.rmSync(lockPath);
+  for (const lockPath of [`${indexPath}.lock`, `${indexPath}.lock.lock`]) {
+    fs.writeFileSync(lockPath, 'synthetic stale index lock\n', { flag: 'wx' });
+    try {
+      const result = runCli();
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /target_old_preflight_failed/);
+      assert.equal(fs.existsSync(fixture.claimPath), false);
+      assert.equal(text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo), constants.EXPECTED_OLD);
+    } finally {
+      fs.rmSync(lockPath);
+    }
   }
 
   fs.symlinkSync('missing-receipt-target', fixture.executionReceiptPath);
