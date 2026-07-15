@@ -62,3 +62,26 @@ test('CM-2113 rejects additional claims in every nested receipt section', () => 
     );
   }
 });
+
+test('CM-2113 binds every upstream Git identity to its frozen exact object', () => {
+  const drifts = {
+    sourceCommit: 'f'.repeat(40),
+    blobOid: 'e'.repeat(40),
+    bytes: 9999,
+    sha256: 'd'.repeat(64)
+  };
+  for (const section of [
+    'executionPacketGitIdentity', 'contentDecisionGitIdentity',
+    'finalReleaseDecisionGitIdentity', 'bootstrapReceiptGitIdentity'
+  ]) {
+    for (const [field, drift] of Object.entries(drifts)) {
+      const value = structuredClone(receipt);
+      value[section][field] = drift;
+      assert.equal(
+        evaluateCm2113VcpToolBoxOwnerNativeProofReceipt(value).accepted,
+        false,
+        `${section}.${field}`
+      );
+    }
+  }
+});
