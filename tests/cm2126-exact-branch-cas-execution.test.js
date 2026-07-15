@@ -1354,6 +1354,29 @@ test('execution receipt writes and runtime reads share the registry-pinned gover
   assert.doesNotMatch(readSource, /path\.join\(root/);
 });
 
+test('SUCCESS reentry preserves the accepted receipt across unrelated ref drift', () => {
+  const unrelatedRef = 'refs/heads/cm2126-unrelated-after-success';
+  git(['update-ref', unrelatedRef, constants.EXPECTED_OLD], fixture.repo);
+  try {
+    const replay = runCli();
+    assert.equal(replay.status, 0, replay.stderr);
+    const result = JSON.parse(replay.stdout);
+    assert.equal(result.status, 'STOPPED');
+    assert.equal(result.authorizationConsumed, true);
+    assert.equal(result.authorizationReplayAllowed, false);
+    assert.equal(result.branchRefUpdated, true);
+    assert.equal(result.currentBranchStatusSynchronized, true);
+    assert.equal(result.executionReceiptCreated, true);
+    assert.equal(result.fullPlanPackCompleted, true);
+    assert.equal(result.reconciliationReceipt.payload.successReceiptAccepted, true);
+    assert.equal(result.reconciliationReceipt.payload.branchCasCallsThisReentry, 0);
+    assert.equal(result.reconciliationReceipt.payload.targetIndexSyncCallsThisReentry, 0);
+    assert.equal(result.reconciliationReceipt.payload.targetFileWritesThisReentry, 0);
+  } finally {
+    git(['update-ref', '-d', unrelatedRef], fixture.repo);
+  }
+});
+
 test('SUCCESS claim with a missing or corrupt external receipt reenters fail closed with zero effect', () => {
   const originalReceipt = fs.readFileSync(fixture.executionReceiptPath);
   const receiptMode = fs.statSync(fixture.executionReceiptPath).mode & 0o777;

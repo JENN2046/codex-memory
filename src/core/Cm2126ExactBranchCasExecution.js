@@ -1401,8 +1401,9 @@ function safeReentryRuntimeObservation(repoRoot, target, targetBindings, envelop
       targetFileSynchronizations: envelope?.targetFileSynchronizations ?? null,
       verificationAttempts: envelope?.verificationAttempts ?? null,
       otherRefsSnapshotBeforeSha256: stored.otherRefsSnapshotBeforeSha256 || otherRefs,
-      otherRefsSnapshotAfterSha256: otherRefs,
-      otherRefUpdates: stored.otherRefsSnapshotBeforeSha256 && stored.otherRefsSnapshotBeforeSha256 !== otherRefs ? 1 : 0
+      otherRefsSnapshotAfterSha256: stored.otherRefsSnapshotAfterSha256 ||
+        stored.otherRefsSnapshotBeforeSha256 || otherRefs,
+      otherRefUpdates: Number.isInteger(stored.otherRefUpdates) ? stored.otherRefUpdates : 0
     };
   } catch {
     return null;
