@@ -1774,7 +1774,6 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
   const options = realResolverOptions();
   let packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
   if (!packetEvidence.accepted) throw new Error(`cm2122_packet_rejected:${packetEvidence.blockers.join(',')}`);
-  assertExecutableStatusAttribution(packetEvidence);
   const historicalReviewTime = new Date(Date.parse(FINAL_RELEASE_APPROVED_AT) + 1);
   const historicalReleaseEvidence = intakeFinalReleaseDecision({
     finalReleaseCommit,
@@ -1819,6 +1818,11 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
       branchRefUpdateAuthorized: false, statusSyncPerformed: false, currentBranchStatusSynchronized: false,
       readinessClaimed: false };
   }
+  // The historical packet is deliberately retired for every new claim, but a
+  // durable consumed claim must remain inspectable through the read-only
+  // reentry path above. Do not turn packet retirement into loss of
+  // reconciliation evidence.
+  assertExecutableStatusAttribution(packetEvidence);
   let finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: new Date(), ...options });
   if (!finalReleaseEvidence.accepted) throw new Error(`cm2122_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
 
