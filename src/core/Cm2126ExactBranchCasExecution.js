@@ -45,7 +45,8 @@ const {
   buildReentryReceipt,
   evaluateExecutionReceipt,
   evaluateReentryReceipt,
-  exactRuntimeSuccess
+  exactRuntimeSuccess,
+  reentrySideEffectOutcomes
 } = require('./Cm2126ExactBranchCasReceiptContract');
 const {
   evaluateDecision: evaluateContentDecision
@@ -1471,6 +1472,7 @@ async function existingClaimResult({ existing, bindingHash, repoRoot, target, ta
     successReceiptAccepted
   });
   if (!evaluation.accepted) throw new Error(`cm2126_reentry_receipt_rejected:${evaluation.blockers.join(',')}`);
+  const sideEffects = reentrySideEffectOutcomes(existing.envelope);
   const durableSuccess = reconciliationReceipt.payload.branchRefUpdated === true &&
     reconciliationReceipt.payload.currentBranchStatusSynchronized === true &&
     reconciliationReceipt.payload.successReceiptAccepted === true &&
@@ -1480,11 +1482,11 @@ async function existingClaimResult({ existing, bindingHash, repoRoot, target, ta
     state: existing.state,
     authorizationConsumed: true,
     authorizationReplayAllowed: false,
-    branchRefUpdated: reconciliationReceipt.payload.branchRefUpdated,
-    targetWorktreeIndexSynchronized: durableSuccess,
-    targetWorktreeFilesSynchronized: durableSuccess,
-    executionReceiptCreated: durableSuccess,
-    statusSyncPerformed: durableSuccess,
+    branchRefUpdated: sideEffects.branchRefUpdated,
+    targetWorktreeIndexSynchronized: sideEffects.targetWorktreeIndexSynchronized,
+    targetWorktreeFilesSynchronized: sideEffects.targetWorktreeFilesSynchronized,
+    executionReceiptCreated: sideEffects.executionReceiptCreated,
+    statusSyncPerformed: sideEffects.statusSyncPerformed,
     currentBranchStatusSynchronized: reconciliationReceipt.payload.currentBranchStatusSynchronized,
     fullPlanPackCompleted: durableSuccess,
     reconciliationReceipt,

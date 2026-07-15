@@ -233,6 +233,26 @@ function effectiveReentryState(existingState) {
   return 'CLAIM_REGISTRY_AMBIGUOUS';
 }
 
+function completedCounterOutcome(value, completedValue) {
+  if (value === null || value === undefined) return null;
+  return value === completedValue;
+}
+
+function reentrySideEffectOutcomes(envelope = null) {
+  const branchRefUpdated = completedCounterOutcome(envelope?.branchRefUpdates, 1);
+  const targetWorktreeIndexSynchronized = completedCounterOutcome(envelope?.targetIndexSynchronizations, 1);
+  const targetWorktreeFilesSynchronized = completedCounterOutcome(envelope?.targetFileSynchronizations, 9);
+  const executionReceiptCreated = completedCounterOutcome(envelope?.executionReceiptWrites, 1);
+  return {
+    branchRefUpdated,
+    targetWorktreeIndexSynchronized,
+    targetWorktreeFilesSynchronized,
+    executionReceiptCreated,
+    statusSyncPerformed: branchRefUpdated === true && targetWorktreeIndexSynchronized === true &&
+      targetWorktreeFilesSynchronized === true
+  };
+}
+
 function buildReentryReceipt({ existing, bindingHash, runtimeObservation, packetEvidence, finalReleaseEvidence,
   successReceiptAccepted = false }) {
   if (!existing?.claimEnvelopePresent || !/^[a-f0-9]{64}$/.test(bindingHash || '')) {
@@ -243,6 +263,7 @@ function buildReentryReceipt({ existing, bindingHash, runtimeObservation, packet
   const runtimeExactSuccess = exactRuntimeSuccess(runtimeObservation || {});
   const durableSuccess = existing.state === SUCCESS_STATE && existing.claimEnvelopeBindingVerified === true &&
     successReceiptAccepted === true;
+  const sideEffects = reentrySideEffectOutcomes(envelope);
   return wrapPayload({
     receiptType: 'exact_branch_cas_claim_readonly_reentry_projection',
     contentDecisionCommit: packetEvidence?.packet?.payload?.contentDecision?.commit || null,
@@ -270,7 +291,7 @@ function buildReentryReceipt({ existing, bindingHash, runtimeObservation, packet
     durableSuccessStateObserved: durableSuccess,
     successReceiptAccepted: successReceiptAccepted === true,
     runtimeSuccessPostconditionsObserved: runtimeExactSuccess,
-    branchRefUpdated: durableSuccess && runtimeExactSuccess,
+    branchRefUpdated: sideEffects.branchRefUpdated,
     currentBranchStatusSynchronized: durableSuccess && runtimeExactSuccess,
     automaticRetryAllowed: false,
     automaticRollbackAllowed: false,
@@ -318,5 +339,6 @@ module.exports = {
   exactPreReceiptClaim,
   exactRuntimeSuccess,
   identityWithoutContent,
+  reentrySideEffectOutcomes,
   wrapPayload
 };

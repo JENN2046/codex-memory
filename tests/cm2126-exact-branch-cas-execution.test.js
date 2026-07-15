@@ -1030,7 +1030,7 @@ test('one registry instance rejects a replaced governance root even with copied 
 });
 
 test('isolated fault injection preserves exact terminal counters and forbids replay', () => {
-  runIsolatedFault('branch_cas_acknowledgement_lost', ({ claim }) => {
+  runIsolatedFault('branch_cas_acknowledgement_lost', ({ claim, output }) => {
     assert.equal(claim.state, 'CONSUMED_AMBIGUOUS_CAS');
     assert.equal(claim.branchCasInvocationCount, 1);
     assert.equal(claim.branchRefUpdates, null);
@@ -1038,6 +1038,11 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
     assert.equal(claim.targetFileSynchronizations, 0);
     assert.equal(claim.executionReceiptWrites, 0);
     assert.equal(text(['show-ref', '--hash', '--verify', constants.TARGET_REF], fixture.repo), constants.NEW_COMMIT);
+    assert.equal(output.branchRefUpdated, null);
+    assert.equal(output.targetWorktreeIndexSynchronized, false);
+    assert.equal(output.targetWorktreeFilesSynchronized, false);
+    assert.equal(output.executionReceiptCreated, false);
+    assert.equal(output.statusSyncPerformed, false);
   });
 
   runIsolatedFault('branch_ref_postcheck_failure', ({ claim }) => {
@@ -1081,12 +1086,17 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
     assert.equal(output.reconciliationReceipt.payload.targetIndexLockAbsent, true);
   });
 
-  runIsolatedFault('index_rename_acknowledgement_lost', ({ claim }) => {
+  runIsolatedFault('index_rename_acknowledgement_lost', ({ claim, output }) => {
     assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
     assert.equal(claim.branchRefUpdates, 1);
     assert.equal(claim.targetIndexSynchronizations, 1);
     assert.equal(claim.targetFileSynchronizations, 0);
     assert.equal(claim.executionReceiptWrites, 0);
+    assert.equal(output.branchRefUpdated, true);
+    assert.equal(output.targetWorktreeIndexSynchronized, true);
+    assert.equal(output.targetWorktreeFilesSynchronized, false);
+    assert.equal(output.executionReceiptCreated, false);
+    assert.equal(output.statusSyncPerformed, false);
   });
 
   runIsolatedFault('index_lock_before_first_file_sync', ({ claim, output }) => {
@@ -1121,16 +1131,21 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
     );
   });
 
-  runIsolatedFault('file_rename_acknowledgement_lost', ({ claim }) => {
+  runIsolatedFault('file_rename_acknowledgement_lost', ({ claim, output }) => {
     assert.equal(claim.state, 'CONSUMED_REF_UPDATED_WORKTREE_SYNC_PARTIAL');
     assert.equal(claim.targetIndexSynchronizations, 1);
     assert.equal(claim.targetFileSyncAttempts, 1);
     assert.equal(claim.targetFileSynchronizations, null);
     assert.equal(claim.targetFilesMatchedCount, 1);
     assert.equal(claim.executionReceiptWrites, 0);
+    assert.equal(output.branchRefUpdated, true);
+    assert.equal(output.targetWorktreeIndexSynchronized, true);
+    assert.equal(output.targetWorktreeFilesSynchronized, null);
+    assert.equal(output.executionReceiptCreated, false);
+    assert.equal(output.statusSyncPerformed, false);
   });
 
-  runIsolatedFault('receipt_write_acknowledgement_lost', ({ claim }) => {
+  runIsolatedFault('receipt_write_acknowledgement_lost', ({ claim, output }) => {
     assert.equal(claim.state, 'CONSUMED_EXECUTION_RECEIPT_AMBIGUOUS');
     assert.equal(claim.branchRefUpdates, 1);
     assert.equal(claim.targetIndexSynchronizations, 1);
@@ -1139,6 +1154,13 @@ test('isolated fault injection preserves exact terminal counters and forbids rep
     assert.equal(claim.executionReceiptWrites, 1);
     assert.match(claim.executionReceiptSha256, /^[a-f0-9]{64}$/);
     assert.equal(fs.existsSync(fixture.executionReceiptPath), true);
+    assert.equal(output.branchRefUpdated, true);
+    assert.equal(output.targetWorktreeIndexSynchronized, true);
+    assert.equal(output.targetWorktreeFilesSynchronized, true);
+    assert.equal(output.executionReceiptCreated, true);
+    assert.equal(output.statusSyncPerformed, true);
+    assert.equal(output.currentBranchStatusSynchronized, false);
+    assert.equal(output.fullPlanPackCompleted, false);
   });
 
   runIsolatedFault('transition_after_rename:TARGET_INDEX_SYNCHRONIZED', ({ claim }) => {
@@ -1377,7 +1399,7 @@ test('SUCCESS reentry preserves the accepted receipt across unrelated ref drift'
   }
 });
 
-test('SUCCESS claim with a missing or corrupt external receipt reenters fail closed with zero effect', () => {
+test('SUCCESS claim with a missing or corrupt receipt preserves prior effects but rejects completion', () => {
   const originalReceipt = fs.readFileSync(fixture.executionReceiptPath);
   const receiptMode = fs.statSync(fixture.executionReceiptPath).mode & 0o777;
   const before = {
@@ -1394,15 +1416,15 @@ test('SUCCESS claim with a missing or corrupt external receipt reenters fail clo
     assert.equal(result.status, 'STOPPED');
     assert.equal(result.authorizationConsumed, true);
     assert.equal(result.authorizationReplayAllowed, false);
-    assert.equal(result.branchRefUpdated, false);
-    assert.equal(result.targetWorktreeIndexSynchronized, false);
-    assert.equal(result.targetWorktreeFilesSynchronized, false);
-    assert.equal(result.executionReceiptCreated, false);
-    assert.equal(result.statusSyncPerformed, false);
+    assert.equal(result.branchRefUpdated, true);
+    assert.equal(result.targetWorktreeIndexSynchronized, true);
+    assert.equal(result.targetWorktreeFilesSynchronized, true);
+    assert.equal(result.executionReceiptCreated, true);
+    assert.equal(result.statusSyncPerformed, true);
     assert.equal(result.currentBranchStatusSynchronized, false);
     assert.equal(result.reconciliationReceipt.payload.reconciliationRequired, true);
     assert.equal(result.reconciliationReceipt.payload.successReceiptAccepted, false);
-    assert.equal(result.reconciliationReceipt.payload.branchRefUpdated, false);
+    assert.equal(result.reconciliationReceipt.payload.branchRefUpdated, true);
     assert.equal(result.reconciliationReceipt.payload.currentBranchStatusSynchronized, false);
     assert.equal(result.reconciliationReceipt.payload.branchCasCallsThisReentry, 0);
     assert.equal(result.reconciliationReceipt.payload.targetIndexSyncCallsThisReentry, 0);
