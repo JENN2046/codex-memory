@@ -141,7 +141,10 @@ function evaluateApplicationReceipt(receipt = {}) {
       payload.evidenceBundle?.bytes !== BUNDLE.bytes || payload.evidenceBundle?.sha256 !== BUNDLE.rawSha256 ||
       payload.evidenceBundle?.payloadSha256 !== BUNDLE.payloadSha256 ||
       payload.evidenceBundle?.requiredEvidenceCount !== REQUIRED_FIELDS.length) blockers.push('receipt.evidenceBundle');
-  if (payload.phaseAudit?.phaseId !== PHASE_ID || payload.phaseAudit?.accepted !== true || payload.phaseAudit?.missingEvidence?.length !== 0 || payload.phaseAudit?.fullPlanPackCompleted !== false) blockers.push('receipt.phaseAudit');
+  if (!hasExactKeys(payload.phaseAudit, ['phaseId', 'accepted', 'missingEvidence', 'fullPlanPackCompleted'])) blockers.push('receipt.phaseAudit.fields');
+  if (payload.phaseAudit?.phaseId !== PHASE_ID || payload.phaseAudit?.accepted !== true ||
+      !Array.isArray(payload.phaseAudit?.missingEvidence) || payload.phaseAudit.missingEvidence.length !== 0 ||
+      payload.phaseAudit?.fullPlanPackCompleted !== false) blockers.push('receipt.phaseAudit');
   if (!hasExactKeys(payload.applicationRuntime, [
     'commit', 'tree', 'cleanBeforeApplication',
     'completionAuditBaselineBlobOid', 'traceMatrixBaselineBlobOid'
@@ -155,9 +158,22 @@ function evaluateApplicationReceipt(receipt = {}) {
   }
   if (!hasExactKeys(payload.appliedState, Object.keys(expectedPatch()))) blockers.push('receipt.appliedState.fields');
   for (const [field, expected] of Object.entries(expectedPatch())) if (payload.appliedState?.[field] !== expected) blockers.push(`receipt.appliedState.${field}`);
+  const expectedContractResults = {
+    completionAuditGate: 'cm2111_phase8_completion_audit_gate_accepted',
+    patchBoundary: 'cm2111_phase8_completion_patch_boundary_accepted',
+    patchApplication: 'cm2111_phase8_completion_patch_application_accepted'
+  };
+  if (!hasExactKeys(payload.contractResults, Object.keys(expectedContractResults))) blockers.push('receipt.contractResults.fields');
+  for (const [field, expected] of Object.entries(expectedContractResults)) {
+    if (payload.contractResults?.[field] !== expected) blockers.push(`receipt.contractResults.${field}`);
+  }
+  if (!hasExactKeys(payload.authorization, ['useCount', 'consumed', 'replayAllowed'])) blockers.push('receipt.authorization.fields');
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
+  const counterFields = ['completionAuditPatchApplications', 'nativeReads', 'nativeWrites', 'verifyOperations',
+    'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims'];
+  if (!hasExactKeys(payload.applicationCounters, counterFields)) blockers.push('receipt.applicationCounters.fields');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters.completionAuditPatchApplications');
-  for (const field of ['nativeReads', 'nativeWrites', 'verifyOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
+  for (const field of counterFields.filter(field => field !== 'completionAuditPatchApplications')) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
   const nonClaimFields = ['productionReady', 'releaseReady', 'rcReady', 'completeV8', 'fullPlanPackCompleted', 'readinessClaimed'];
   if (JSON.stringify(Object.keys(payload.nonClaims || {}).sort()) !== JSON.stringify([...nonClaimFields].sort())) blockers.push('receipt.nonClaims.fields');
   for (const field of nonClaimFields) if (payload.nonClaims?.[field] !== false) blockers.push(`receipt.nonClaims.${field}`);

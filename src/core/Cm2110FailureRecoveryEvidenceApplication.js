@@ -146,9 +146,23 @@ function evaluateApplicationReceipt(receipt = {}) {
   const appliedEvidence = expectedPatch();
   if (!hasExactKeys(payload.appliedEvidence, Object.keys(appliedEvidence))) blockers.push('receipt.appliedEvidence.fields');
   for (const [field, expected] of Object.entries(appliedEvidence)) if (payload.appliedEvidence?.[field] !== expected) blockers.push(`receipt.appliedEvidence.${field}`);
+  const expectedContractResults = {
+    applicationGate: 'cm2110_failure_recovery_evidence_application_gate_accepted',
+    patchBoundary: 'cm2110_failure_recovery_evidence_patch_boundary_accepted',
+    patchApplication: 'cm2110_failure_recovery_evidence_patch_application_accepted'
+  };
+  if (!hasExactKeys(payload.contractResults, Object.keys(expectedContractResults))) blockers.push('receipt.contractResults.fields');
+  for (const [field, expected] of Object.entries(expectedContractResults)) {
+    if (payload.contractResults?.[field] !== expected) blockers.push(`receipt.contractResults.${field}`);
+  }
+  if (!hasExactKeys(payload.authorization, ['useCount', 'consumed', 'replayAllowed'])) blockers.push('receipt.authorization.fields');
   if (payload.authorization?.useCount !== 1 || payload.authorization?.consumed !== true || payload.authorization?.replayAllowed !== false) blockers.push('receipt.authorization');
+  const counterFields = ['completionAuditPatchApplications', 'nativeReads', 'nativeWrites',
+    'failureInjectionExecutions', 'verifyOperations', 'retryOperations', 'rollbackOrCompensationOperations',
+    'remoteActions', 'readinessClaims'];
+  if (!hasExactKeys(payload.applicationCounters, counterFields)) blockers.push('receipt.applicationCounters.fields');
   if (payload.applicationCounters?.completionAuditPatchApplications !== 1) blockers.push('receipt.applicationCounters.completionAuditPatchApplications');
-  for (const field of ['nativeReads', 'nativeWrites', 'failureInjectionExecutions', 'verifyOperations', 'retryOperations', 'rollbackOrCompensationOperations', 'remoteActions', 'readinessClaims']) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
+  for (const field of counterFields.filter(field => field !== 'completionAuditPatchApplications')) if (payload.applicationCounters?.[field] !== 0) blockers.push(`receipt.applicationCounters.${field}`);
   const expectedBoundaries = {
     syntheticFailureRecoveryOnly: true,
     productionFailureRecoveryProven: false,
