@@ -76,6 +76,7 @@ function finalBinding(contentObserved) {
     authorizationContentDecisionSourceCommit: contentObserved.decisionSourceCommit,
     authorizationContentDecisionBlobOid: contentObserved.decisionBlobOid,
     authorizationContentDecisionSha256: contentObserved.decisionSha256,
+    authorizationContentDecisionApprovedAt: contentDecision().approvedAt,
     executionPacketCommit: expectedContentBinding.executionPacketCommit,
     executionPacketBlobOid: expectedContentBinding.executionPacketBlobOid,
     executionPacketSha256: expectedContentBinding.executionPacketSha256,
@@ -163,6 +164,8 @@ test('CM-2104 final release must bind the exact content Git identity before auth
     { bootstrapExecutionAuthorized: false },
     { maxStoreDirectoryCreates: 2 },
     { maxNativeWrites: 1 },
+    { approvedAt: '2026-07-12T08:59:59+08:00' },
+    { approvedAt: contentDecision().approvedAt },
     { approvedAt: '2026-07-12T12:00:00.001+08:00' },
     { approvedAt: binding.expectedExpiresAt },
     { expiresAt: '2026-07-12T11:30:00+08:00' }
