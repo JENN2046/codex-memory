@@ -173,6 +173,24 @@ const COLAMETA_PRIVATE_DIRECTORIES = new Set([
   'executor-sessions'
 ]);
 const PRIVATE_STATE_ROOT_DIRECTORIES = new Set(['.claude', '.omc', '.tmp']);
+const VCS_INTERNAL_PATH_COMPONENTS = new Set([
+  '.git',
+  '.hg',
+  '.svn',
+  '.bzr',
+  '_darcs',
+  'CVS',
+  'RCS',
+  'SCCS',
+  '.jj',
+  '.pijul',
+  '.repo',
+  '.sl',
+  '_MTN',
+  '.fossil-settings',
+  '.fslckout',
+  '_FOSSIL_'
+]);
 
 function isPrivateColaMetaPath(value) {
   if (!value.startsWith('.colameta/')) return false;
@@ -190,6 +208,10 @@ function isPrivateRepositoryStatePath(value) {
     /(?:^|\/)[^/]+\.sqlite(?:-(?:shm|wal))?$/.test(value);
 }
 
+function isVcsInternalPath(value) {
+  return value.split('/').some(part => VCS_INTERNAL_PATH_COMPONENTS.has(part));
+}
+
 function safeSourcePath(value) {
   return typeof value === 'string' &&
     value.length > 0 &&
@@ -203,6 +225,7 @@ function safeSourcePath(value) {
     !/^logs\/.*\.(?:log|jsonl)$/.test(value) &&
     !isPrivateColaMetaPath(value) &&
     !isPrivateRepositoryStatePath(value) &&
+    !isVcsInternalPath(value) &&
     !FORBIDDEN_CIRCULAR_SOURCE_PATHS.includes(value) &&
     (value === LOCAL_VALIDATION_RECEIPT_PATH ||
       !/^docs\/near-model-memory-plan-pack\/cm2115_.*(?:review|application|decision|receipt)/.test(value));

@@ -349,6 +349,39 @@ test('CM-2115-R2 authority Git entry mode and object type must match the resolve
   }
 });
 
+test('CM-2115-R2 authority Git identity must be the exact patch baseline object', () => {
+  const fixture = decisionFixture();
+  const sideCommit = '7'.repeat(40);
+  const sideTree = '8'.repeat(40);
+  const drift = structuredClone(fixture.decision);
+  drift.payload.authority.sourceCommit = sideCommit;
+  drift.payload.authority.sourceTree = sideTree;
+  drift.canonicalPayloadSha256 = sha256Canonical(drift.payload);
+  const sideAuthority = {
+    ...fixture.authority,
+    sourceCommit: sideCommit,
+    sourceTree: sideTree
+  };
+  const baselineResolver = resolverFor({
+    decision: drift,
+    decisionIdentity: fixture.identity,
+    authority: fixture.authority
+  });
+  let sideAuthorityResolverCalls = 0;
+  const resolver = (commit, sourcePath) => {
+    if (commit === sideCommit && sourcePath === AUTHORITY_PATH) {
+      sideAuthorityResolverCalls += 1;
+      return { ...sideAuthority, content: Buffer.from(sideAuthority.content) };
+    }
+    return baselineResolver(commit, sourcePath);
+  };
+
+  const result = evaluateDecision(drift, { resolveGitFile: resolver });
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('decision.authorityBaseline'));
+  assert.equal(sideAuthorityResolverCalls, 0);
+});
+
 test('CM-2115-R2 rejects decision Git identity drift before claim or patch', async t => {
   const fixture = await prepareTempExecution(t);
   const decisionIdentity = {
