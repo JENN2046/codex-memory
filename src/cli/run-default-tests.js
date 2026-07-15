@@ -47,6 +47,7 @@ const SELF_REFERENTIAL_FILES = [
 // an explicit E2E gate without adding several minutes to every default-safe run.
 const FROZEN_REPLAY_E2E_FILES = [
   'cm2118-full-plan-application-execution.test.js',
+  'cm2120-full-plan-application-receipt-review.test.js',
   'cm2122-full-plan-status-sync-execution.test.js'
 ];
 
