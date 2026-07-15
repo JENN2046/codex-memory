@@ -245,7 +245,7 @@ test('CM-2122 packet consumes the exact CM-2121 one-shot registry authority', ()
   assert.ok(evaluation.blockers.includes('packet.exactContent'));
 });
 
-test('the exact frozen CM-2122 packet cannot replay its stale CM-2117 execution attribution', () => {
+test('the exact frozen CM-2122 packet permits consumed reentry but cannot create a new claim', () => {
   assert.throws(
     () => implementation.assertExecutableStatusAttribution({
       packetCommit: implementation.ATTRIBUTION_STALE_PACKET_COMMIT
@@ -254,6 +254,10 @@ test('the exact frozen CM-2122 packet cannot replay its stale CM-2117 execution 
   );
   assert.equal(implementation.assertExecutableStatusAttribution({ packetCommit: 'a'.repeat(40) }), true);
   const source = fs.readFileSync('src/core/Cm2122FullPlanStatusSyncExecution.js', 'utf8');
+  assert.ok(
+    source.indexOf('const existing = await registry.inspectExisting') <
+    source.indexOf('assertExecutableStatusAttribution(packetEvidence);')
+  );
   assert.ok(
     source.indexOf('assertExecutableStatusAttribution(packetEvidence);') <
     source.indexOf('let finalReleaseEvidence = intakeFinalReleaseDecision')
