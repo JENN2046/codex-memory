@@ -119,11 +119,13 @@ function governedTransportEnvelopeAccepted(args, expected) {
     bridge?.readiness_claimed === false;
 }
 
-function runOwnerRuntime({ nodeExecutable, pluginPath, pluginDirectory, input, env, timeoutMs }) {
+function runOwnerRuntime({ nodeExecutable, pluginPath, pluginDirectory, input, env, execArgv = [], timeoutMs }) {
   return new Promise((resolve, reject) => {
-    const child = spawn(nodeExecutable, [pluginPath], {
+    const childEnv = { ...env };
+    delete childEnv.NODE_OPTIONS;
+    const child = spawn(nodeExecutable, [...execArgv, pluginPath], {
       cwd: pluginDirectory,
-      env,
+      env: childEnv,
       shell: false,
       windowsHide: true,
       stdio: ['pipe', 'pipe', 'pipe']
@@ -372,7 +374,6 @@ function createVcpToolBoxDailyNoteOwnerRuntimeAdapter(options = {}) {
       LANG: 'C.UTF-8',
       LC_ALL: 'C.UTF-8',
       NODE_PATH: dependencyRoot,
-      NODE_OPTIONS: `--require=${preloadPath}`,
       NODE_NO_WARNINGS: '1',
       TZ: options.timeZone || 'Asia/Shanghai',
       KNOWLEDGEBASE_ROOT_PATH: storeRoot,
@@ -395,6 +396,7 @@ function createVcpToolBoxDailyNoteOwnerRuntimeAdapter(options = {}) {
       pluginDirectory,
       input: dailyNoteInput,
       env,
+      execArgv: ['--require', preloadPath],
       timeoutMs
     });
     await readExactRegularFile(pluginPath, expected.pluginSha256);
