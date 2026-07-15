@@ -16,6 +16,7 @@ const packetGenerator = require('../scripts/generate-cm2122-full-plan-status-syn
 const releaseGenerator = require('../scripts/generate-cm2123-full-plan-status-sync-final-release');
 const { canonicalize, sha256Canonical } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
 const FIXED_DATE_PRELOAD = path.join(ROOT, 'tests/helpers/fixed-date-preload.js');
+const POST_CAS_WRITE_FAULT_PRELOAD = path.join(ROOT, 'tests/helpers/cm2122-post-cas-write-fault-preload.js');
 // The frozen executor performs a large number of Git-object checks. A focused
 // run completes in roughly one minute, while the default suite runs many test
 // files concurrently and can take materially longer. Keep a hard ceiling so a
@@ -615,8 +616,12 @@ function initializeGovernanceRoot() {
 
 function runStatusSyncProcessFor(targetFixture, fixedNow = targetFixture.now.toISOString(), environment = {}) {
   return new Promise(resolve => {
+    const preloadArgs = ['--require', FIXED_DATE_PRELOAD];
+    if (environment.CM2122_TEST_FAIL_WORKTREE_WRITE_PATH) {
+      preloadArgs.push('--require', POST_CAS_WRITE_FAULT_PRELOAD);
+    }
     const child = spawn(process.execPath, [
-      '--require', FIXED_DATE_PRELOAD,
+      ...preloadArgs,
       'src/cli/cm2122-full-plan-status-sync.js',
       '--content-decision-commit', implementation.CONTENT_DECISION_FREEZE.commit,
       '--execution-packet-commit', targetFixture.packetCommit,
@@ -692,12 +697,12 @@ test('dirty detached worktree after post-CAS write failure remains readonly-reen
     assert.equal(text(['rev-parse', 'HEAD^{commit}'], interrupted.repo), interrupted.finalReleaseCommit);
     fs.writeFileSync(targetPath, originalTarget);
     assert.equal(text(['status', '--porcelain'], interrupted.repo), '');
-    fs.chmodSync(targetPath, 0o444);
-
-    const failed = await runStatusSyncProcessFor(interrupted);
+    const failed = await runStatusSyncProcessFor(interrupted, interrupted.now.toISOString(), {
+      CM2122_TEST_FAIL_WORKTREE_WRITE_PATH: targetPath
+    });
     assert.equal(failed.timedOut, false, JSON.stringify(failed));
     assert.notEqual(failed.code, 0);
-    fs.chmodSync(targetPath, 0o644);
+    assert.match(failed.stderr, /cm2122_test_post_cas_worktree_write_failure/);
 
     const dirtyHead = text(['rev-parse', 'HEAD^{commit}'], interrupted.repo);
     const dirtyStatus = text(['status', '--porcelain'], interrupted.repo);
