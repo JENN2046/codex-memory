@@ -4,6 +4,12 @@ const crypto = require('node:crypto');
 
 const MACHINE_BOUND_DECISIONS = new WeakSet();
 
+function deepFreeze(value) {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  for (const nested of Object.values(value)) deepFreeze(nested);
+  return Object.freeze(value);
+}
+
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
 }
@@ -84,6 +90,7 @@ function evaluateCm2096TombstoneExecutionDecisionIntake({ decisionBytes, observe
     }
   }
   if (blockers.length) return { accepted: false, blockers, decision: null };
+  deepFreeze(decision);
   MACHINE_BOUND_DECISIONS.add(decision);
   return { accepted: true, blockers: [], decision, decisionIdentityMachineBound: true, executionAuthorized: true };
 }
