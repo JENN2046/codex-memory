@@ -593,9 +593,9 @@ test('reentry expects the detached runtime only after the HEAD update was acknow
   assert.match(implementationSource, /const expectedTree = detachedHeadAdvanced/);
 });
 
-function initializeGovernanceRoot() {
+function initializeGovernanceRootFor(targetFixture) {
   const root = path.join(
-    fixture.repo,
+    targetFixture.repo,
     '.git',
     'codex-memory-governance',
     'phase8-one-shot-authorization-registries'
@@ -603,22 +603,26 @@ function initializeGovernanceRoot() {
   fs.mkdirSync(root, { recursive: true });
   fs.writeFileSync(
     path.join(root, '.phase8-registry-root-identity.json'),
-    JSON.stringify(canonicalize(fixture.frozenModule.GOVERNANCE_ROOT_IDENTITY)),
+    JSON.stringify(canonicalize(targetFixture.frozenModule.GOVERNANCE_ROOT_IDENTITY)),
     { flag: 'wx' }
   );
-  fixture.governanceRoot = root;
+  targetFixture.governanceRoot = root;
 }
 
-function runStatusSyncProcess(fixedNow = fixture.now.toISOString(), environment = {}) {
+function initializeGovernanceRoot() {
+  initializeGovernanceRootFor(fixture);
+}
+
+function runStatusSyncProcessFor(targetFixture, fixedNow = targetFixture.now.toISOString(), environment = {}) {
   return new Promise(resolve => {
     const child = spawn(process.execPath, [
       '--require', FIXED_DATE_PRELOAD,
       'src/cli/cm2122-full-plan-status-sync.js',
       '--content-decision-commit', implementation.CONTENT_DECISION_FREEZE.commit,
-      '--execution-packet-commit', fixture.packetCommit,
-      '--final-execution-release-commit', fixture.finalReleaseCommit
+      '--execution-packet-commit', targetFixture.packetCommit,
+      '--final-execution-release-commit', targetFixture.finalReleaseCommit
     ], {
-      cwd: fixture.repo,
+      cwd: targetFixture.repo,
       env: {
         ...process.env,
         NODE_ENV: 'test',
@@ -648,6 +652,10 @@ function runStatusSyncProcess(fixedNow = fixture.now.toISOString(), environment 
   });
 }
 
+function runStatusSyncProcess(fixedNow = fixture.now.toISOString(), environment = {}) {
+  return runStatusSyncProcessFor(fixture, fixedNow, environment);
+}
+
 function evaluateDurableInFixture() {
   const source = [
     "const m=require('./src/core/Cm2122FullPlanStatusSyncExecution');",
@@ -659,6 +667,67 @@ function evaluateDurableInFixture() {
     stdio: ['ignore', 'pipe', 'pipe']
   }));
 }
+
+test('dirty detached worktree after post-CAS write failure remains readonly-reentrant', {
+  timeout: (EXECUTOR_CHILD_TIMEOUT_MS * 2) + 30_000
+}, async () => {
+  const interrupted = prepareFrozenFixture();
+  try {
+    initializeGovernanceRootFor(interrupted);
+    git(['update-ref', implementation.FUTURE_BRANCH_REF, interrupted.finalReleaseCommit], interrupted.repo);
+    git(['checkout', '--detach', interrupted.finalReleaseCommit], interrupted.repo);
+    const target = interrupted.packetEvidence.packet.payload.detachedCommitBoundary.targets
+      .find(item => item.before.gitMode === '100644');
+    assert.ok(target);
+    const targetPath = path.join(interrupted.repo, target.sourcePath);
+    const originalTarget = fs.readFileSync(targetPath);
+    fs.appendFileSync(targetPath, '\nCM-2122 unclaimed dirty fixture\n');
+    const unclaimedDirty = await runStatusSyncProcessFor(interrupted);
+    assert.notEqual(unclaimedDirty.code, 0);
+    assert.match(unclaimedDirty.stderr, /cm2122_clean_worktree_required/);
+    assert.equal(
+      fs.existsSync(path.join(interrupted.governanceRoot, interrupted.frozenModule.claimFileName())),
+      false
+    );
+    assert.equal(text(['rev-parse', 'HEAD^{commit}'], interrupted.repo), interrupted.finalReleaseCommit);
+    fs.writeFileSync(targetPath, originalTarget);
+    assert.equal(text(['status', '--porcelain'], interrupted.repo), '');
+    fs.chmodSync(targetPath, 0o444);
+
+    const failed = await runStatusSyncProcessFor(interrupted);
+    assert.equal(failed.timedOut, false, JSON.stringify(failed));
+    assert.notEqual(failed.code, 0);
+    fs.chmodSync(targetPath, 0o644);
+
+    const dirtyHead = text(['rev-parse', 'HEAD^{commit}'], interrupted.repo);
+    const dirtyStatus = text(['status', '--porcelain'], interrupted.repo);
+    const branchBefore = text(['show-ref', '--hash', '--verify', implementation.FUTURE_BRANCH_REF], interrupted.repo);
+    const claimPath = path.join(interrupted.governanceRoot, interrupted.frozenModule.claimFileName());
+    const claimBefore = fs.readFileSync(claimPath);
+    assert.notEqual(dirtyHead, interrupted.finalReleaseCommit);
+    assert.notEqual(dirtyStatus, '');
+
+    const reentry = await runStatusSyncProcessFor(interrupted);
+    assert.equal(reentry.timedOut, false, JSON.stringify(reentry));
+    assert.equal(reentry.code, 0, reentry.stderr);
+    const result = JSON.parse(reentry.stdout);
+    assert.equal(result.status, 'STOPPED');
+    assert.equal(result.authorizationConsumed, true);
+    assert.equal(result.authorizationReplayAllowed, false);
+    assert.equal(result.branchRefUpdateAuthorized, false);
+    assert.equal(result.statusSyncPerformed, false);
+    assert.equal(result.currentBranchStatusSynchronized, false);
+    assert.equal(text(['rev-parse', 'HEAD^{commit}'], interrupted.repo), dirtyHead);
+    assert.equal(text(['status', '--porcelain'], interrupted.repo), dirtyStatus);
+    assert.equal(
+      text(['show-ref', '--hash', '--verify', implementation.FUTURE_BRANCH_REF], interrupted.repo),
+      branchBefore
+    );
+    assert.deepEqual(fs.readFileSync(claimPath), claimBefore);
+  } finally {
+    fs.rmSync(interrupted.parent, { recursive: true, force: true });
+  }
+});
 
 test('temp clone creates one exact detached 9M commit, binds it, and leaves the branch ref unchanged', {
   timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
