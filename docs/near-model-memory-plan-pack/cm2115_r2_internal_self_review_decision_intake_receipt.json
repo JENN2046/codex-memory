@@ -1,5 +1,5 @@
 {
-  "canonicalPayloadSha256": "26e273292bd15f71cc08974d25482ea23e1390a626af43559f6ec7b9c641d391",
+  "canonicalPayloadSha256": "a720f6222554bb6cea919520819cfd4db03cdf3b7def5fa08643d587accdc062",
   "payload": {
     "authorityBoundary": {
       "externalReviewPerformedByThisIntake": false,
@@ -34,23 +34,23 @@
     "intakeImplementation": {
       "artifacts": [
         {
-          "blobOid": "c060bc201ef941ba2b60b050e445a1fb5c51caab",
+          "blobOid": "c3057d175d4b90ea302bc428796d223976114ed4",
           "path": "src/core/Cm2115R2SelfReviewDecisionIntakeReceiptContract.js"
         },
         {
-          "blobOid": "24a87f8a2d4a0e0f2770b092185f917f752cfe11",
+          "blobOid": "5e66e3be12f83bdcd8e7ba59ae6f5deb35706065",
           "path": "tests/cm2115-r2-self-review-intake-receipt.test.js"
         },
         {
-          "blobOid": "e65ccb23d1ade28bc2af27d3910c5c4b26fe5cab",
+          "blobOid": "87489663c3a7150c177abbb658f3f157ce7d4f0d",
           "path": "src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js"
         },
         {
-          "blobOid": "95c3c7412570966510a9e7b818a450f2be0b9924",
+          "blobOid": "0b0739ad54a32afe43690147f7069d08084012ec",
           "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js"
         },
         {
-          "blobOid": "85dc17a4e51fe9a1811bff9991276a4baf44a1f1",
+          "blobOid": "10d41d94b18f2c99e11857831d0183e584385089",
           "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js"
         },
         {
@@ -62,8 +62,8 @@
           "path": "scripts/generate-cm2115-r2-self-review-decision.js"
         }
       ],
-      "commit": "825fc1a2894560a7b166c8d62b5b328074e6ca98",
-      "tree": "082f743f1f5a7d8746ccdd289febb9a22dba9bfb"
+      "commit": "8da931e9a442184e3d4107886994af34d3315434",
+      "tree": "bdbf53b3908977f84cdb5fa0db9e62a5937eb659"
     },
     "nonClaims": {
       "completeV8": false,
@@ -75,24 +75,24 @@
       "rcReady": false,
       "releaseReady": false
     },
-    "receiptReference": "CM-2115-R2-SELF-REVIEW-INTAKE-PASS-377812D9-798A91B2-825FC1A2",
+    "receiptReference": "CM-2115-R2-SELF-REVIEW-INTAKE-PASS-4295CDDF-DB494839-8DA931E9",
     "receiptType": "repository_internal_self_review_decision_post_freeze_intake_receipt_v1",
     "reviewedRequest": {
-      "commit": "81ee0106ed8cd9b10dc30120ecb7ee6d8897fc79",
+      "commit": "a715d5ca76aae2fa688407c34a1ab7d99c52cb46",
       "json": {
-        "blobOid": "08bc3ffbe9a39b3dbbe42bdbf14781c021d4dba6",
+        "blobOid": "861abf1bb1ba06bd129c0b33b1c97f61a622b57b",
         "bytes": 5973,
-        "canonicalPayloadSha256": "81d68f6b61caf43756e171640fe44a92ac9989be3e5e2b5971ebb79a2cda4d91",
+        "canonicalPayloadSha256": "cce599aad762528787d303abb2aff3cf3ff98dc4d60a78c0ab563131fac23a72",
         "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json",
-        "sha256": "fc56ff4ab271b1f59505ed2ce62e680dc55854b5c696b9f5409357ad25c77953"
+        "sha256": "ead0d8df10e7e15a4e76cb7fa78dc41f4374f49524b246f1fc78abb288c91c6f"
       },
       "markdown": {
-        "blobOid": "afe3b7f21055872369228e7adf178e7de9856212",
+        "blobOid": "da6043b49159b34d3e91a72b80b68c22b51278a7",
         "bytes": 6983,
         "path": "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md",
-        "sha256": "58f9b65e88397bb0570500588134c756e3ea975506cb4c0d94b2f7adebbab3a5"
+        "sha256": "54e4de16eb89c06e91fd15e8c69ece351c3e71816201fe6ffb06f3b50f949ff6"
       },
-      "tree": "c68cd2ad68258db7a8569faf728aed3c5aed1fd3"
+      "tree": "74a9f350d2ec66e8260b99e9a4f6c3e457b102dc"
     },
     "reviewedSnapshot": {
       "commit": "8d25298563e512456c614eb6fec6af6bdc02bf8f",
@@ -112,30 +112,30 @@
       "tree": "8649b063591c7063b726ef48b3a99ccf45fe7f23"
     },
     "selfReviewDecision": {
-      "canonicalPayloadSha256": "377812d904e60ec569b57c9d9e2eded76a83a797e1f076160598e4db41c2f3a5",
+      "canonicalPayloadSha256": "4295cddf6494c6002ff97b18364d0111accb8245a90e4992c8bdc5a301f53afc",
       "json": {
-        "blobOid": "441da37af718989450f0ec632f3ca09dac773c3e",
+        "blobOid": "2f9d1d228a50129eb6cf63e12aac879c2f3f2162",
         "bytes": 5011,
         "gitMode": "100644",
         "gitObjectType": "blob",
-        "sha256": "ec1c32ee890f2d886af345cbaf51bacc2c0166746fd536e6d66f5576f612d136",
-        "sourceCommit": "798a91b23bc84788fd6a69d4dad61ab5e135f70e",
+        "sha256": "79f9629da5b07b45808c8c57f8dd0b1c4c5a098187b6bee2505470264abfa14e",
+        "sourceCommit": "db494839c2b415316521bb5da3fd4a0db737106e",
         "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.json",
-        "sourceTree": "7bfcb9f625b4af0828458c0f56756bb7ebe756b4"
+        "sourceTree": "8f3c5f9efa23bd6f67167c2b780011a7078a01e1"
       },
       "markdown": {
-        "blobOid": "7a1b4198ed56d627dda8f637f1023a37d48c1ccd",
+        "blobOid": "8d425f8f1fef990da38fe17e4c4f2f02aa30230d",
         "bytes": 5606,
         "gitMode": "100644",
         "gitObjectType": "blob",
-        "sha256": "2b147124cfb74cf5067748246690be9dfed5b6022d033c64086bdd4de1e1fbf4",
-        "sourceCommit": "798a91b23bc84788fd6a69d4dad61ab5e135f70e",
+        "sha256": "cb15f8b50adb58ef8dfef40f820d5d43de8f1de38d6c0383b2ca33fead0ade40",
+        "sourceCommit": "db494839c2b415316521bb5da3fd4a0db737106e",
         "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.md",
-        "sourceTree": "7bfcb9f625b4af0828458c0f56756bb7ebe756b4"
+        "sourceTree": "8f3c5f9efa23bd6f67167c2b780011a7078a01e1"
       },
-      "parentCommit": "fe3fa28821282348f4b8e94dafe1dc904226b461",
-      "parentTree": "5b03dae54a30ff826a029daffd0aa3ed630c583a",
-      "reference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-81D68F6B-FE3FA288"
+      "parentCommit": "b6009d521e8b1f87be244c7acac19417bc0bb1da",
+      "parentTree": "5d5d9275ed4513e99d6de8ec595fd8f42cd59358",
+      "reference": "CM-2115-R2-SELF-REVIEW-PASS-AFC1F726-CCE599AA-B6009D52"
     },
     "sideEffects": {
       "durableMutations": 0,

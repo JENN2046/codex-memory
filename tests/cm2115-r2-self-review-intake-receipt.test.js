@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const fs = require('node:fs');
 const test = require('node:test');
 const {
   INTAKE_IMPLEMENTATION_ARTIFACT_PATHS,
@@ -20,6 +21,7 @@ const {
 } = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
 const { isCommitAncestor: realIsCommitAncestor } = require('../scripts/generate-cm2115-r2-self-review-decision');
 const {
+  buildIntakeImplementation,
   parseArgs,
   renderMarkdown,
   resolverOptions
@@ -258,4 +260,22 @@ test('intake generator has fixed outputs and exact Markdown mirror', () => {
   assert.ok(markdown.includes('PASS_INTERNAL_SELF_REVIEW_DECISION_INTAKE_ONLY'));
   assert.ok(markdown.includes(jsonText.trimEnd()));
   assert.ok(RECEIPT_PATH.endsWith('cm2115_r2_internal_self_review_decision_intake_receipt.json'));
+});
+
+test('frozen intake receipt files exactly replay request, decision, intake, and canonical rendering', () => {
+  const options = resolverOptions();
+  const frozenDecisionEvidence = evaluateFrozenSelfReviewDecision(options);
+  assert.equal(frozenDecisionEvidence.accepted, true, frozenDecisionEvidence.blockers.join(','));
+  const receipt = buildReceipt({
+    intakeImplementation: buildIntakeImplementation(),
+    frozenDecisionEvidence
+  });
+  const evaluation = evaluateReceipt(receipt, options);
+  assert.equal(evaluation.accepted, true, evaluation.blockers.join(','));
+  const jsonText = `${JSON.stringify(canonicalize(receipt), null, 2)}\n`;
+  assert.equal(fs.readFileSync(RECEIPT_PATH, 'utf8'), jsonText);
+  assert.equal(
+    fs.readFileSync(RECEIPT_PATH.replace(/\.json$/, '.md'), 'utf8'),
+    renderMarkdown(receipt, jsonText)
+  );
 });

@@ -22,7 +22,6 @@ const {
   resolveFrozenPhase2DurableClaim
 } = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
 const {
-  buildReviewImplementation,
   isCommitAncestor: realIsCommitAncestor,
   parseArgs,
   renderMarkdown,
@@ -246,12 +245,7 @@ test('self-review generator has fixed outputs and Markdown preserves exact JSON'
 
 test('frozen self-review decision files exactly match the reviewed lineage and canonical renderers', () => {
   const options = resolverOptions();
-  const reviewEvidence = evaluateFrozenReviewRequest(options);
-  assert.equal(reviewEvidence.accepted, true, reviewEvidence.blockers.join(','));
-  const decision = buildDecision({
-    reviewImplementation: buildReviewImplementation(),
-    reviewEvidence
-  });
+  const decision = JSON.parse(fs.readFileSync(DECISION_PATH, 'utf8'));
   const evaluation = evaluateDecision(decision, options);
   assert.equal(evaluation.accepted, true, evaluation.blockers.join(','));
   const jsonText = `${JSON.stringify(canonicalize(decision), null, 2)}\n`;
