@@ -221,11 +221,47 @@ test('CM-2129 live governance reader rejects symlinks before reading receipt byt
     const link = path.join(directory, 'live-receipt.json');
     fs.writeFileSync(target, '{"accepted":true}\n');
     fs.symlinkSync(target, link);
-
-    assert.throws(
-      () => review.readLiveGovernanceFile(link, 'execution_receipt'),
-      /cm2129_live_governance_file_invalid:execution_receipt/
+    const rootDescriptor = fs.openSync(
+      directory,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
     );
+
+    try {
+      assert.throws(
+        () => review.readLiveGovernanceFile({ fd: rootDescriptor }, path.basename(link), 'execution_receipt'),
+        /cm2129_live_governance_file_invalid:execution_receipt/
+      );
+    } finally {
+      fs.closeSync(rootDescriptor);
+    }
+  });
+});
+
+test('CM-2129 live governance reads stay pinned to the verified root across a path replacement', () => {
+  withTempDirectory(parent => {
+    const root = path.join(parent, 'governance');
+    const movedRoot = path.join(parent, 'verified-governance');
+    const filename = 'execution-receipt.json';
+    const verifiedBytes = Buffer.from('{"source":"verified-root"}\n');
+    const replacementBytes = Buffer.from('{"source":"replacement-root"}\n');
+    fs.mkdirSync(root);
+    fs.writeFileSync(path.join(root, filename), verifiedBytes);
+    const rootDescriptor = fs.openSync(
+      root,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+    );
+
+    try {
+      fs.renameSync(root, movedRoot);
+      fs.mkdirSync(root);
+      fs.writeFileSync(path.join(root, filename), replacementBytes);
+      assert.deepEqual(
+        review.readLiveGovernanceFile({ fd: rootDescriptor }, filename, 'execution_receipt'),
+        verifiedBytes
+      );
+    } finally {
+      fs.closeSync(rootDescriptor);
+    }
   });
 });
 

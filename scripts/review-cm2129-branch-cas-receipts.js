@@ -98,21 +98,30 @@ function receiptSourceFilenamesAccepted(manifest = {}) {
     manifest.payload?.executionReceipt?.sourceFilename === execution.EXECUTION_RECEIPT_FILENAME;
 }
 
-function readLiveGovernanceFile(entryPath, label) {
+function governanceDescriptorPath(rootHandle, filename) {
+  if (process.platform !== 'linux' || !rootHandle || !Number.isInteger(rootHandle.fd) ||
+      path.basename(filename) !== filename || filename === '.' || filename === '..') {
+    throw new Error('cm2129_descriptor_relative_governance_access_unsupported');
+  }
+  return `/proc/self/fd/${rootHandle.fd}/${filename}`;
+}
+
+function readLiveGovernanceFile(rootHandle, filename, label, fileSystem = fs) {
   let descriptor;
   try {
-    const stat = fs.lstatSync(entryPath);
+    const entryPath = governanceDescriptorPath(rootHandle, filename);
+    const stat = fileSystem.lstatSync(entryPath);
     if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('invalid');
-    descriptor = fs.openSync(entryPath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
-    const openedStat = fs.fstatSync(descriptor);
+    descriptor = fileSystem.openSync(entryPath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+    const openedStat = fileSystem.fstatSync(descriptor);
     if (!openedStat.isFile() || openedStat.dev !== stat.dev || openedStat.ino !== stat.ino) {
       throw new Error('invalid');
     }
-    return fs.readFileSync(descriptor);
+    return fileSystem.readFileSync(descriptor);
   } catch {
     throw new Error(`cm2129_live_governance_file_invalid:${label}`);
   } finally {
-    if (descriptor !== undefined) fs.closeSync(descriptor);
+    if (descriptor !== undefined) fileSystem.closeSync(descriptor);
   }
 }
 
@@ -252,12 +261,21 @@ async function buildReview() {
   const release = execution.releaseBinding(packetEvidence, finalReleaseEvidence, bindingHash);
   const governanceRoot = execution.resolveFixedGovernanceRoot(process.cwd());
   const registry = new Cm2126ExactBranchCasClaimRegistry({ governanceRoot });
-  const liveClaim = await registry.read(bindingHash, release);
-  const liveClaimBytes = readLiveGovernanceFile(path.join(governanceRoot, claimFileName()), 'claim');
-  const liveReceiptBytes = readLiveGovernanceFile(
-    path.join(governanceRoot, execution.EXECUTION_RECEIPT_FILENAME),
-    'execution_receipt'
-  );
+  const governanceRootHandle = await registry.openVerifiedRootHandle();
+  let liveClaim;
+  let liveClaimBytes;
+  let liveReceiptBytes;
+  try {
+    liveClaim = await registry.read(bindingHash, release);
+    liveClaimBytes = readLiveGovernanceFile(governanceRootHandle, claimFileName(), 'claim');
+    liveReceiptBytes = readLiveGovernanceFile(
+      governanceRootHandle,
+      execution.EXECUTION_RECEIPT_FILENAME,
+      'execution_receipt'
+    );
+  } finally {
+    await governanceRootHandle.close().catch(() => {});
+  }
   if (!sameJson(liveClaim, frozenClaim) || !liveClaimBytes.equals(claimIdentity.content) ||
       !liveReceiptBytes.equals(executionIdentity.content) || liveClaim.state !== SUCCESS_STATE ||
       liveClaim.authorizationReplayAllowed !== false || liveClaim.executionReceiptSha256 !== executionIdentity.sha256) {
@@ -431,6 +449,7 @@ module.exports = {
   REVIEW_MARKDOWN_PATH,
   REVIEW_PATH,
   buildReview,
+  governanceDescriptorPath,
   main,
   manifestShapeAccepted,
   parseArgs,
