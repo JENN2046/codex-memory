@@ -1758,10 +1758,48 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
   let packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
   if (!packetEvidence.accepted) throw new Error(`cm2122_packet_rejected:${packetEvidence.blockers.join(',')}`);
   assertExecutableStatusAttribution(packetEvidence);
+  const historicalReviewTime = new Date(Date.parse(FINAL_RELEASE_APPROVED_AT) + 1);
+  const historicalReleaseEvidence = intakeFinalReleaseDecision({
+    finalReleaseCommit,
+    packetEvidence,
+    now: historicalReviewTime,
+    ...options
+  });
+  const historicalContentEvidence = intakeContentDecision(options);
+  if (!historicalReleaseEvidence.accepted || !historicalContentEvidence.accepted) {
+    throw new Error('cm2122_historical_upstream_revalidation_failed');
+  }
+  const runtimeShell = assertRuntimeRepositoryShell(historicalReleaseEvidence);
+  const repoRoot = runtimeShell.repoRoot;
+  const root = resolveFixedGovernanceRoot(repoRoot);
+  const registry = new Cm2122StatusSyncClaimRegistry({ governanceRoot: root });
+  const historicalBindingHash = buildClaimBindingHash({
+    packetEvidence,
+    finalReleaseEvidence: historicalReleaseEvidence
+  });
+  const existing = await registry.inspectExisting(historicalBindingHash, historicalReleaseEvidence);
+  if (existing.claimEnvelopePresent) {
+    assertReentryRuntime({
+      finalReleaseEvidence: historicalReleaseEvidence,
+      packetEvidence,
+      existing,
+      runtimeShell
+    });
+    const reconciliationReceipt = buildReentryReceipt(existing, historicalBindingHash, finalReleaseCommit);
+    const reconciliationEvaluation = evaluateReentryReceipt(reconciliationReceipt, {
+      existing,
+      bindingHash: historicalBindingHash,
+      finalReleaseCommit
+    });
+    if (!reconciliationEvaluation.accepted) throw new Error('cm2122_reentry_receipt_rejected');
+    return { accepted: false, state: existing.state, authorizationConsumed: true, authorizationReplayAllowed: false,
+      detachedStatusCommitCreated: existing.envelope?.detachedStatusCommitCreated ?? null,
+      reconciliationReceipt,
+      branchRefUpdateAuthorized: false, statusSyncPerformed: false, currentBranchStatusSynchronized: false,
+      readinessClaimed: false };
+  }
   let finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: new Date(), ...options });
   if (!finalReleaseEvidence.accepted) throw new Error(`cm2122_final_release_rejected:${finalReleaseEvidence.blockers.join(',')}`);
-  const runtimeShell = assertRuntimeRepositoryShell(finalReleaseEvidence);
-  const repoRoot = runtimeShell.repoRoot;
 
   packetEvidence = intakeExecutionPacket({ packetCommit, ...options });
   finalReleaseEvidence = intakeFinalReleaseDecision({ finalReleaseCommit, packetEvidence, now: new Date(), ...options });
@@ -1774,25 +1812,8 @@ async function executeStatusSyncFromCommits({ contentDecisionCommit, packetCommi
     options, targetBlockers, 'execution.before');
   if (targetBlockers.length) throw new Error(`cm2122_preclaim_target_drift:${targetBlockers.join(',')}`);
 
-  const root = resolveFixedGovernanceRoot(repoRoot);
-  const registry = new Cm2122StatusSyncClaimRegistry({ governanceRoot: root });
   let bindingHash = buildClaimBindingHash({ packetEvidence, finalReleaseEvidence });
-  const existing = await registry.inspectExisting(bindingHash, finalReleaseEvidence);
-  if (existing.claimEnvelopePresent) {
-    assertReentryRuntime({ finalReleaseEvidence, packetEvidence, existing, runtimeShell });
-    const reconciliationReceipt = buildReentryReceipt(existing, bindingHash, finalReleaseCommit);
-    const reconciliationEvaluation = evaluateReentryReceipt(reconciliationReceipt, {
-      existing,
-      bindingHash,
-      finalReleaseCommit
-    });
-    if (!reconciliationEvaluation.accepted) throw new Error('cm2122_reentry_receipt_rejected');
-    return { accepted: false, state: existing.state, authorizationConsumed: true, authorizationReplayAllowed: false,
-      detachedStatusCommitCreated: existing.envelope?.detachedStatusCommitCreated ?? null,
-      reconciliationReceipt,
-      branchRefUpdateAuthorized: false, statusSyncPerformed: false, currentBranchStatusSynchronized: false,
-      readinessClaimed: false };
-  }
+  if (bindingHash !== historicalBindingHash) throw new Error('cm2122_preclaim_binding_hash_drift');
   assertExecutionRuntime({ finalReleaseEvidence, packetEvidence, runtimeShell });
   for (const filename of [EXECUTION_RECEIPT_FILENAME, BINDING_RECEIPT_FILENAME]) {
     if (fs.existsSync(path.join(root, filename))) throw new Error(`cm2122_preclaim_artifact_exists:${filename}`);

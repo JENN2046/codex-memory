@@ -656,7 +656,7 @@ test('CM-2118 registry rejects a governance root reached through a symlinked par
   }
 });
 
-function runApplicationProcess(environmentOverrides = {}) {
+function runApplicationProcess(environmentOverrides = {}, fixedNow = decisionTime(fixture.finalReleaseEvidence.decision).toISOString()) {
   return new Promise(resolve => {
     const child = spawn(process.execPath, [
       '--require', FIXED_DATE_PRELOAD,
@@ -669,7 +669,7 @@ function runApplicationProcess(environmentOverrides = {}) {
       env: {
         ...process.env,
         NODE_ENV: 'test',
-        CODEX_MEMORY_TEST_FIXED_NOW: decisionTime(fixture.finalReleaseEvidence.decision).toISOString(),
+        CODEX_MEMORY_TEST_FIXED_NOW: fixedNow,
         ...environmentOverrides
       },
       stdio: ['ignore', 'pipe', 'pipe']
@@ -774,6 +774,19 @@ test('new process cannot replay consumed authorization', {
   assert.equal(result.authorizationReplayAllowed, false);
   assert.equal(result.fullPlanPackCompleted, false);
   assert.equal(text(['count-objects', '-v'], fixture.repo), before);
+});
+
+test('consumed authorization remains readonly-reentrant after final-release expiry', {
+  timeout: EXECUTOR_CHILD_TIMEOUT_MS + 15_000
+}, async () => {
+  const replay = await runApplicationProcess({}, '2026-07-20T00:00:00+08:00');
+  assert.equal(replay.timedOut, false, JSON.stringify(replay));
+  assert.equal(replay.code, 0, replay.stderr);
+  const result = JSON.parse(replay.stdout);
+  assert.equal(result.status, 'STOPPED');
+  assert.equal(result.authorizationConsumed, true);
+  assert.equal(result.authorizationReplayAllowed, false);
+  assert.equal(result.fullPlanPackCompleted, false);
 });
 
 test('durable binding rejects receipt/readiness drift instead of accepting caller-supplied objects', () => {
