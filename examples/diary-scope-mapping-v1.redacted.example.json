@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "mappingReference": "jenn-vcp-diary-scope-v1",
+  "defaultPolicy": "deny",
+  "entries": [
+    {
+      "partitionReference": "codex-private-base-v1",
+      "diaryName": "INTERNAL_RUNTIME_VALUE",
+      "classification": "client_private",
+      "clientId": "Codex",
+      "projectId": null,
+      "workspaceId": null,
+      "readProfiles": ["exact_visibility", "task_start_context"],
+      "writeEligible": true
+    }
+  ]
+}

@@ -46,6 +46,9 @@ const ALLOWED_TOP_LEVEL_KIND_CATEGORIES = Object.freeze([
 ]);
 const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'invalid_governance_metadata',
+  'diary_scope_authorization_rejected',
+  'diary_scope_mapping_binding_mismatch',
+  'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
   'native_runtime_call_failed',
   'native_tool_public_binding_mismatch',
@@ -190,6 +193,21 @@ function lowDisclosureNativeRuntimeReceipt(receipt = null) {
       isolatedRuntimeStoreUsed: false,
       primaryMemoryStoreWritePerformed: false,
       derivedIndexWritePerformed: false,
+      authorizationResolvedBeforeProvider: false,
+      diaryAllowlistEnforcedBeforeIndexLoad: false,
+      diaryAllowlistEnforcedBeforeVectorSearch: false,
+      resultScopePostcheckPassed: false,
+      unscopedNativeSearchUsed: false,
+      mappingReferenceBound: false,
+      mappingDigestBound: false,
+      allowedDiaryCount: 0,
+      rawDiaryNamesReturned: false,
+      scopeIdAccepted: false,
+      scopeIdAudited: false,
+      scopeIdFingerprintBound: false,
+      scopeIdAffectsDiaryAcl: false,
+      scopeIdEnforcementClaimed: false,
+      omittedPartitionCategories: [],
       rawRuntimeOutputDisclosed: false,
       rawMemoryContentDisclosed: false,
       runtimeLocatorDisclosed: false,
@@ -226,6 +244,28 @@ function lowDisclosureNativeRuntimeReceipt(receipt = null) {
     isolatedRuntimeStoreUsed: receipt.isolatedRuntimeStoreUsed === true,
     primaryMemoryStoreWritePerformed: receipt.primaryMemoryStoreWritePerformed === true,
     derivedIndexWritePerformed: receipt.derivedIndexWritePerformed === true,
+    authorizationResolvedBeforeProvider: receipt.authorizationResolvedBeforeProvider === true,
+    diaryAllowlistEnforcedBeforeIndexLoad: receipt.diaryAllowlistEnforcedBeforeIndexLoad === true,
+    diaryAllowlistEnforcedBeforeVectorSearch: receipt.diaryAllowlistEnforcedBeforeVectorSearch === true,
+    resultScopePostcheckPassed: receipt.resultScopePostcheckPassed === true,
+    unscopedNativeSearchUsed: receipt.unscopedNativeSearchUsed === true,
+    mappingReferenceBound: receipt.mappingReferenceBound === true,
+    mappingDigestBound: receipt.mappingDigestBound === true,
+    allowedDiaryCount: Number.isInteger(receipt.allowedDiaryCount) &&
+      receipt.allowedDiaryCount >= 1 && receipt.allowedDiaryCount <= 8
+      ? receipt.allowedDiaryCount
+      : 0,
+    rawDiaryNamesReturned: false,
+    scopeIdAccepted: receipt.scopeIdAccepted === true,
+    scopeIdAudited: receipt.scopeIdAudited === true,
+    scopeIdFingerprintBound: receipt.scopeIdFingerprintBound === true,
+    scopeIdAffectsDiaryAcl: false,
+    scopeIdEnforcementClaimed: false,
+    omittedPartitionCategories: Array.isArray(receipt.omittedPartitionCategories)
+      ? receipt.omittedPartitionCategories.filter(value =>
+          ['project_shared', 'workspace_shared'].includes(value)
+        )
+      : [],
     rawRuntimeOutputDisclosed: receipt.rawRuntimeOutputDisclosed === true,
     rawMemoryContentDisclosed: receipt.rawMemoryContentDisclosed === true,
     runtimeLocatorDisclosed: receipt.runtimeLocatorDisclosed === true,
@@ -732,6 +772,32 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
       }
 
       const value = extractJsonRpcToolResultValue(jsonRpcResponse);
+      const rawNativeRuntimeReceipt = extractJsonRpcNativeRuntimeReceipt(jsonRpcResponse);
+      const expected = payload.governanceMeta?.scopeEnforcement;
+      if (
+        ['search_memory', 'memory_overview', 'audit_memory'].includes(publicToolName) &&
+        expected?.mode === 'diary_allowlist_v1' &&
+        expected?.bound === true
+      ) {
+        const bindingMatched = isPlainObject(rawNativeRuntimeReceipt) &&
+          rawNativeRuntimeReceipt.actualMappingReference === expected.expectedMappingReference &&
+          rawNativeRuntimeReceipt.actualMappingDigest === expected.expectedMappingDigest &&
+          rawNativeRuntimeReceipt.mappingReferenceBound === true &&
+          rawNativeRuntimeReceipt.mappingDigestBound === true;
+        if (!bindingMatched) {
+          const error = createStatusError('diary_scope_mapping_binding_mismatch', 'client_error');
+          error.lowDisclosureReceipt = buildLowDisclosureInvocationReceipt({
+            targetReferenceName,
+            toolName: publicToolName,
+            statusClass: 'client_error',
+            httpStatusClass: httpStatusClass(httpStatus),
+            jsonRpcResponseIdMatched: true,
+            governanceMetadataSent,
+            nativeRuntimeReceipt: rawNativeRuntimeReceipt
+          });
+          throw error;
+        }
+      }
       return {
         value,
         receipt: buildLowDisclosureInvocationReceipt({
@@ -743,7 +809,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
           valueAvailable: true,
           governanceMetadataSent,
           value,
-          nativeRuntimeReceipt: extractJsonRpcNativeRuntimeReceipt(jsonRpcResponse)
+          nativeRuntimeReceipt: rawNativeRuntimeReceipt
         })
       };
     } catch (error) {

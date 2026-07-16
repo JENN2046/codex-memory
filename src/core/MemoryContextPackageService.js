@@ -350,6 +350,28 @@ function sourceRuntime(searchResult = {}) {
   return 'local_compatibility';
 }
 
+function nativeRuntimeMutationFacts(searchResult = {}) {
+  const runtime = searchResult?.receipt?.nativeInvocationReceipt?.nativeRuntimeReceipt;
+  return {
+    primary_memory_write_performed: runtime?.primaryMemoryStoreWritePerformed === true,
+    derived_index_write_performed: runtime?.derivedIndexWritePerformed === true,
+    other_durable_mutation_performed: runtime?.durableWritePerformed === true &&
+      runtime?.primaryMemoryStoreWritePerformed !== true &&
+      runtime?.derivedIndexWritePerformed !== true
+  };
+}
+
+function compositeInvocationMetadata(searchResult = {}) {
+  return {
+    invocation_profile: 'composite_governed_native_read',
+    native_first: true,
+    direct_native_tool: false,
+    read_allowed: true,
+    write_allowed: false,
+    local_fallback_explicitly_marked: true
+  };
+}
+
 function recallRejected(searchResult = {}) {
   if (!isPlainObject(searchResult)) return false;
   return searchResult.accepted === false ||
@@ -360,6 +382,7 @@ function recallRejected(searchResult = {}) {
 function buildRecallRejectedResponse(searchResult = {}) {
   const selectedSourceRuntime = sourceRuntime(searchResult);
   const nativeUnavailable = selectedSourceRuntime === 'vcp_native_unavailable';
+  const mutationFacts = nativeRuntimeMutationFacts(searchResult);
   return {
     status: 'PREPARE_MEMORY_CONTEXT_RECALL_REJECTED',
     accepted: false,
@@ -367,6 +390,7 @@ function buildRecallRejectedResponse(searchResult = {}) {
     reasonCode: nativeUnavailable
       ? 'vcp_native_recall_unavailable'
       : 'governed_recall_unavailable',
+    invocation_metadata: compositeInvocationMetadata(searchResult),
     access: {
       mode: 'prepare_memory_context_readonly',
       selectedProjection: true,
@@ -377,7 +401,7 @@ function buildRecallRejectedResponse(searchResult = {}) {
       memoryReadPerformed: searchResult?.access?.memoryReadPerformed === true,
       localMemoryFallbackUsed: false,
       resultCanBeMistakenForVcpNative: false,
-      durableMutationPerformed: false,
+      durableMutationPerformed: Object.values(mutationFacts).some(Boolean),
       productionWritePerformed: false,
       rawMemoryReturned: false,
       rawAuditReturned: false,
@@ -483,12 +507,14 @@ function buildAuditReceipt({ task, query, results, searchResult, overview, audit
     resultProjectionDigest,
     fallback: hasFallback(searchResult)
   });
+  const mutationFacts = nativeRuntimeMutationFacts(searchResult);
   return {
     schemaVersion: 'prepare_memory_context_audit_receipt_v1',
     receipt_id: `pmc_${sha256Hex(seed).slice(0, 16)}`,
     generated_at: new Date().toISOString(),
     read_only: true,
-    durable_mutation_performed: false,
+    durable_mutation_performed: Object.values(mutationFacts).some(Boolean),
+    ...mutationFacts,
     production_write_performed: false,
     raw_memory_returned: false,
     raw_audit_returned: false,
@@ -533,34 +559,37 @@ function buildMinimalBoundedResponse(result) {
       blockers: [],
       risks: [],
       forbidden_assumptions: [],
-      recommended_next_step: 'Memory context omitted to fit the response budget; inspect repository evidence.',
-      source_breakdown: {
-        search_result_count: 0,
-        fallback_used: fallbackUsed,
-        source_runtime: selectedSourceRuntime,
-        vcp_toolbox_native_memory_owner: true
-      },
-      audit_receipt: null
+      recommended_next_step: 'Inspect repository evidence.',
+      audit_receipt: result?.memory_context_package?.audit_receipt
+        ? {
+            schemaVersion: result.memory_context_package.audit_receipt.schemaVersion,
+            receipt_id: result.memory_context_package.audit_receipt.receipt_id,
+            read_only: true,
+            durable_mutation_performed:
+              result.memory_context_package.audit_receipt.durable_mutation_performed === true,
+            primary_memory_write_performed:
+              result.memory_context_package.audit_receipt.primary_memory_write_performed === true,
+            derived_index_write_performed:
+              result.memory_context_package.audit_receipt.derived_index_write_performed === true,
+            other_durable_mutation_performed:
+              result.memory_context_package.audit_receipt.other_durable_mutation_performed === true,
+            production_write_performed: false,
+            low_disclosure: true
+          }
+        : null
     },
+    invocation_metadata: result?.invocation_metadata || null,
     access: {
-      mode: 'prepare_memory_context_readonly',
-      selectedProjection: true,
       readOnly: true,
       lowDisclosure: true,
-      durableMutationPerformed: false,
+      durableMutationPerformed: result?.access?.durableMutationPerformed === true,
       productionWritePerformed: false,
       rawMemoryReturned: false,
-      rawAuditReturned: false,
       readinessClaimed: false,
       sourceRuntime: selectedSourceRuntime,
-      localMemoryFallbackUsed: fallbackUsed,
-      resultCanBeMistakenForVcpNative: false
+      localMemoryFallbackUsed: fallbackUsed
     },
-    compression: { applied: true, mode: 'minimal_bounded_envelope' },
-    nonClaims: {
-      productionReadiness: false,
-      productionWriteReady: false
-    }
+    compression: { applied: true, mode: 'minimal_bounded_envelope' }
   };
 }
 
@@ -616,7 +645,10 @@ function enforceMaxBytes(result, maxBytes) {
         schemaVersion: pkg.audit_receipt.schemaVersion,
         receipt_id: pkg.audit_receipt.receipt_id,
         read_only: true,
-        durable_mutation_performed: false,
+        durable_mutation_performed: pkg.audit_receipt.durable_mutation_performed === true,
+        primary_memory_write_performed: pkg.audit_receipt.primary_memory_write_performed === true,
+        derived_index_write_performed: pkg.audit_receipt.derived_index_write_performed === true,
+        other_durable_mutation_performed: pkg.audit_receipt.other_durable_mutation_performed === true,
         production_write_performed: false,
         raw_memory_returned: false,
         raw_audit_returned: false,
@@ -737,6 +769,7 @@ class MemoryContextPackageService {
     const response = {
       status: 'PREPARE_MEMORY_CONTEXT_ACCEPTED',
       accepted: true,
+      invocation_metadata: compositeInvocationMetadata(searchResult),
       memory_context_package: pkg,
       access: {
         mode: 'prepare_memory_context_readonly',
@@ -744,7 +777,7 @@ class MemoryContextPackageService {
         selectedProjectionVersion: 1,
         readOnly: true,
         lowDisclosure: true,
-        durableMutationPerformed: false,
+        durableMutationPerformed: Object.values(nativeRuntimeMutationFacts(searchResult)).some(Boolean),
         productionWritePerformed: false,
         rawMemoryReturned: false,
         rawAuditReturned: false,

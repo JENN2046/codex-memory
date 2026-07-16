@@ -101,6 +101,9 @@ const ALLOWED_TOP_LEVEL_KIND_CATEGORIES = Object.freeze([
 ]);
 const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'invalid_governance_metadata',
+  'diary_scope_authorization_rejected',
+  'diary_scope_mapping_binding_mismatch',
+  'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
   'native_runtime_call_failed',
   'native_tool_public_binding_mismatch',
@@ -358,6 +361,18 @@ function invalidFieldsForDelegation({ toolName, args = {}, gateResult, callMcpTo
   ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.native_scope_filtering_proven');
   }
+  if (request.scope_enforcement_mode !== 'diary_allowlist_v1') {
+    invalidFields.push('gateResult.normalizedBridgeRequest.scope_enforcement_mode');
+  }
+  if (request.expected_mapping_reference !== 'jenn-vcp-diary-scope-v1') {
+    invalidFields.push('gateResult.normalizedBridgeRequest.expected_mapping_reference');
+  }
+  if (!/^sha256:[a-f0-9]{64}$/.test(request.expected_mapping_digest || '')) {
+    invalidFields.push('gateResult.normalizedBridgeRequest.expected_mapping_digest');
+  }
+  if (!['exact_visibility', 'task_start_context'].includes(request.recall_profile)) {
+    invalidFields.push('gateResult.normalizedBridgeRequest.recall_profile');
+  }
   if (request.scope_identifier_present !== true) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope_identifier_present');
   }
@@ -547,6 +562,28 @@ function lowDisclosureNativeInvocationReceipt(value, expected = {}) {
       isolatedRuntimeStoreUsed: nativeRuntimeReceipt.isolatedRuntimeStoreUsed === true,
       primaryMemoryStoreWritePerformed: nativeRuntimeReceipt.primaryMemoryStoreWritePerformed === true,
       derivedIndexWritePerformed: nativeRuntimeReceipt.derivedIndexWritePerformed === true,
+      authorizationResolvedBeforeProvider: nativeRuntimeReceipt.authorizationResolvedBeforeProvider === true,
+      diaryAllowlistEnforcedBeforeIndexLoad: nativeRuntimeReceipt.diaryAllowlistEnforcedBeforeIndexLoad === true,
+      diaryAllowlistEnforcedBeforeVectorSearch: nativeRuntimeReceipt.diaryAllowlistEnforcedBeforeVectorSearch === true,
+      resultScopePostcheckPassed: nativeRuntimeReceipt.resultScopePostcheckPassed === true,
+      unscopedNativeSearchUsed: nativeRuntimeReceipt.unscopedNativeSearchUsed === true,
+      mappingReferenceBound: nativeRuntimeReceipt.mappingReferenceBound === true,
+      mappingDigestBound: nativeRuntimeReceipt.mappingDigestBound === true,
+      allowedDiaryCount: Number.isInteger(nativeRuntimeReceipt.allowedDiaryCount) &&
+        nativeRuntimeReceipt.allowedDiaryCount >= 1 && nativeRuntimeReceipt.allowedDiaryCount <= 8
+        ? nativeRuntimeReceipt.allowedDiaryCount
+        : 0,
+      rawDiaryNamesReturned: false,
+      scopeIdAccepted: nativeRuntimeReceipt.scopeIdAccepted === true,
+      scopeIdAudited: nativeRuntimeReceipt.scopeIdAudited === true,
+      scopeIdFingerprintBound: nativeRuntimeReceipt.scopeIdFingerprintBound === true,
+      scopeIdAffectsDiaryAcl: false,
+      scopeIdEnforcementClaimed: false,
+      omittedPartitionCategories: Array.isArray(nativeRuntimeReceipt.omittedPartitionCategories)
+        ? nativeRuntimeReceipt.omittedPartitionCategories.filter(value =>
+            ['project_shared', 'workspace_shared'].includes(value)
+          )
+        : [],
       rawRuntimeOutputDisclosed: nativeRuntimeReceipt.rawRuntimeOutputDisclosed === true,
       rawMemoryContentDisclosed: nativeRuntimeReceipt.rawMemoryContentDisclosed === true,
       runtimeLocatorDisclosed: nativeRuntimeReceipt.runtimeLocatorDisclosed === true,
@@ -583,6 +620,25 @@ function nativeInvocationReceiptReadSideEffectsAbsent(receipt) {
     : {};
   return nativeRuntimeReceipt.memoryWritePerformed !== true &&
     nativeRuntimeReceipt.primaryMemoryStoreWritePerformed !== true;
+}
+
+function nativeInvocationReceiptDiaryScopeBound(receipt) {
+  const runtime = isPlainObject(receipt?.nativeRuntimeReceipt)
+    ? receipt.nativeRuntimeReceipt
+    : {};
+  return runtime.present === true &&
+    runtime.authorizationResolvedBeforeProvider === true &&
+    runtime.diaryAllowlistEnforcedBeforeIndexLoad === true &&
+    runtime.diaryAllowlistEnforcedBeforeVectorSearch === true &&
+    runtime.resultScopePostcheckPassed === true &&
+    runtime.unscopedNativeSearchUsed === false &&
+    runtime.mappingReferenceBound === true &&
+    runtime.mappingDigestBound === true &&
+    Number.isInteger(runtime.allowedDiaryCount) &&
+    runtime.allowedDiaryCount >= 1 && runtime.allowedDiaryCount <= 8 &&
+    runtime.rawDiaryNamesReturned === false &&
+    runtime.scopeIdAffectsDiaryAcl === false &&
+    runtime.scopeIdEnforcementClaimed === false;
 }
 
 function sanitizeScope(scope) {
@@ -805,6 +861,25 @@ function buildMcpGovernanceMetadata(toolName, gateResult = {}) {
   const canonicalScope = canonicalScopeFromGate(gateResult);
   return {
     schemaVersion: GOVERNANCE_METADATA_SCHEMA_VERSION,
+    scopeEnforcement: {
+      mode: request.scope_enforcement_mode === 'diary_allowlist_v1'
+        ? request.scope_enforcement_mode
+        : null,
+      expectedMappingReference: request.expected_mapping_reference === 'jenn-vcp-diary-scope-v1'
+        ? request.expected_mapping_reference
+        : null,
+      expectedMappingDigest: /^sha256:[a-f0-9]{64}$/.test(request.expected_mapping_digest || '')
+        ? request.expected_mapping_digest
+        : null,
+      recallProfile: ['exact_visibility', 'task_start_context'].includes(request.recall_profile)
+        ? request.recall_profile
+        : null,
+      bound: request.native_scope_filtering_proven === true,
+      toolArgumentsMayOverride: false,
+      governanceMetadataMayOverride: false,
+      scopeIdAffectsDiaryAcl: false,
+      scopeIdEnforcementClaimed: false
+    },
     trustedExecutionContext: {
       accepted: request.trusted_execution_context_accepted === true,
       source: GOVERNED_CONTEXT_SOURCE,
@@ -1177,7 +1252,8 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
   if (
     !nativeInvocationReceipt ||
     nativeInvocationReceiptExecutionBound(receipt.nativeInvocationReceipt) !== true ||
-    nativeInvocationReceiptGovernanceMetadataBound(receipt.nativeInvocationReceipt) !== true
+    nativeInvocationReceiptGovernanceMetadataBound(receipt.nativeInvocationReceipt) !== true ||
+    nativeInvocationReceiptDiaryScopeBound(receipt.nativeInvocationReceipt) !== true
   ) {
     return {
       ...rejected('native_read_delegation_native_invocation_receipt_unbound', input),

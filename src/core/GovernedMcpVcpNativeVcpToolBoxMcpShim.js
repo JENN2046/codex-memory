@@ -20,6 +20,9 @@ const {
 const {
   buildMemoryContextLowDisclosureProjection
 } = require('./MemoryContextPackageService');
+const { resolveRead } = require('./DiaryScopeMapping');
+const { loadDiaryScopeMapping } = require('./DiaryScopeMappingLoader');
+const { postCheckNativeDiaryResults } = require('./NativeDiaryResultPostCheck');
 
 const GOVERNANCE_METADATA_PATH = 'params._meta.codexMemoryGovernance';
 const PUBLIC_TOOL_TO_NATIVE_TOOLS = Object.freeze({
@@ -34,17 +37,26 @@ const GOVERNANCE_ARGUMENT_KEYS = Object.freeze(new Set([
   'accesspath',
   'auditreceipt',
   'clientid',
+  'alloweddiaries',
+  'alloweddiarynames',
+  'diary',
+  'diaryname',
+  'diarynames',
   'exactapprovalresult',
   'governedbridge',
   'governancemeta',
   'invocationprofile',
   'localmemoryrole',
+  'mappingdigest',
+  'mappingreference',
   'outputdisclosurebudget',
   'primaryruntime',
   'readwriteauthority',
   'rollbackposture',
   'runtimetarget',
   'scope',
+  'scopeenforcement',
+  'scopeenforcementmode',
   'visibility'
 ]));
 const SHIM_SERVER_NAME = 'codex-memory-governed-vcp-toolbox-native-shim';
@@ -80,6 +92,34 @@ function nativeRuntimeReceipt(overrides = {}) {
     isolatedRuntimeStoreUsed: overrides.isolatedRuntimeStoreUsed === true,
     primaryMemoryStoreWritePerformed: overrides.primaryMemoryStoreWritePerformed === true,
     derivedIndexWritePerformed: overrides.derivedIndexWritePerformed === true,
+    authorizationResolvedBeforeProvider: overrides.authorizationResolvedBeforeProvider === true,
+    diaryAllowlistEnforcedBeforeIndexLoad: overrides.diaryAllowlistEnforcedBeforeIndexLoad === true,
+    diaryAllowlistEnforcedBeforeVectorSearch: overrides.diaryAllowlistEnforcedBeforeVectorSearch === true,
+    resultScopePostcheckPassed: overrides.resultScopePostcheckPassed === true,
+    unscopedNativeSearchUsed: overrides.unscopedNativeSearchUsed === true,
+    mappingReferenceBound: overrides.mappingReferenceBound === true,
+    mappingDigestBound: overrides.mappingDigestBound === true,
+    allowedDiaryCount: Number.isInteger(overrides.allowedDiaryCount) &&
+      overrides.allowedDiaryCount >= 1 && overrides.allowedDiaryCount <= 8
+      ? overrides.allowedDiaryCount
+      : 0,
+    rawDiaryNamesReturned: false,
+    scopeIdAccepted: overrides.scopeIdAccepted === true,
+    scopeIdAudited: overrides.scopeIdAudited === true,
+    scopeIdFingerprintBound: overrides.scopeIdFingerprintBound === true,
+    scopeIdAffectsDiaryAcl: false,
+    scopeIdEnforcementClaimed: false,
+    omittedPartitionCategories: Array.isArray(overrides.omittedPartitionCategories)
+      ? overrides.omittedPartitionCategories.filter(value =>
+          ['project_shared', 'workspace_shared'].includes(value)
+        )
+      : [],
+    actualMappingReference: typeof overrides.actualMappingReference === 'string'
+      ? overrides.actualMappingReference
+      : null,
+    actualMappingDigest: /^sha256:[a-f0-9]{64}$/.test(overrides.actualMappingDigest || '')
+      ? overrides.actualMappingDigest
+      : null,
     rawRuntimeOutputDisclosed: false,
     rawMemoryContentDisclosed: false,
     runtimeLocatorDisclosed: false,
@@ -103,7 +143,7 @@ function jsonRpcResult(id, structuredContent, runtimeReceipt = null) {
   };
 }
 
-function lowDisclosureShimMeta(enableWrite = false) {
+function lowDisclosureShimMeta(enableWrite = false, mappingState = null) {
   return {
     bridge: 'codex-memory-governed-vcp-toolbox-native-memory',
     primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
@@ -118,6 +158,12 @@ function lowDisclosureShimMeta(enableWrite = false) {
     configEnvRead: false,
     providerApiCalled: false,
     nativeRuntimeCalled: false,
+    scopeEnforcementMode: 'diary_allowlist_v1',
+    mappingConfigured: mappingState?.configured === true,
+    mappingReferenceBound: mappingState?.accepted === true,
+    mappingDigestBound: mappingState?.accepted === true,
+    exactMappingReferenceDisclosed: false,
+    exactMappingDigestDisclosed: false,
     readinessClaimed: false
   };
 }
@@ -234,7 +280,7 @@ function nativeToolDescriptors(enableWrite = false) {
   return descriptors;
 }
 
-function initializeResult(enableWrite = false) {
+function initializeResult(enableWrite = false, mappingState = null) {
   return {
     protocolVersion: SHIM_PROTOCOL_VERSION,
     serverInfo: {
@@ -246,14 +292,14 @@ function initializeResult(enableWrite = false) {
         listChanged: false
       }
     },
-    _meta: lowDisclosureShimMeta(enableWrite)
+    _meta: lowDisclosureShimMeta(enableWrite, mappingState)
   };
 }
 
-function toolsListResult(enableWrite = false) {
+function toolsListResult(enableWrite = false, mappingState = null) {
   return {
     tools: nativeToolDescriptors(enableWrite),
-    _meta: lowDisclosureShimMeta(enableWrite)
+    _meta: lowDisclosureShimMeta(enableWrite, mappingState)
   };
 }
 
@@ -434,11 +480,13 @@ function bucketCount(value) {
 function defaultReadRuntimeReceipt({
   providerApiCalled = false,
   memoryReadPerformed = true,
-  isolatedRuntimeStoreUsed = false
+  isolatedRuntimeStoreUsed = false,
+  authorization = null,
+  resultScopePostcheckPassed = false
 } = {}) {
   return nativeRuntimeReceipt({
     nativeRuntimeCalled: true,
-    nativeRuntimeInitialized: true,
+    nativeRuntimeInitialized: false,
     providerApiCalled,
     memoryReadPerformed,
     memoryWritePerformed: false,
@@ -450,7 +498,21 @@ function defaultReadRuntimeReceipt({
       : null,
     isolatedRuntimeStoreUsed,
     primaryMemoryStoreWritePerformed: false,
-    derivedIndexWritePerformed: providerApiCalled === true && memoryReadPerformed === true
+    derivedIndexWritePerformed: providerApiCalled === true && memoryReadPerformed === true,
+    authorizationResolvedBeforeProvider: authorization?.accepted === true,
+    diaryAllowlistEnforcedBeforeIndexLoad: authorization?.accepted === true,
+    diaryAllowlistEnforcedBeforeVectorSearch: authorization?.accepted === true,
+    resultScopePostcheckPassed,
+    unscopedNativeSearchUsed: false,
+    mappingReferenceBound: authorization?.accepted === true,
+    mappingDigestBound: authorization?.accepted === true,
+    allowedDiaryCount: authorization?.allowedDiaryCount,
+    scopeIdAccepted: authorization?.scopeIdAccepted === true,
+    scopeIdAudited: authorization?.scopeIdAudited === true,
+    scopeIdFingerprintBound: authorization?.scopeIdFingerprintBound === true,
+    omittedPartitionCategories: authorization?.omittedCategories,
+    actualMappingReference: authorization?.mappingReference,
+    actualMappingDigest: authorization?.mappingDigest
   });
 }
 
@@ -541,6 +603,7 @@ function createMutationMarkdown(toolName, args = {}) {
 }
 
 function createVcpToolBoxNativeMemoryAdapter(options = {}) {
+  const runtimeInjected = Boolean(options.knowledgeBaseManager && options.embeddingUtils);
   const vcpToolBoxRoot = path.resolve(options.vcpToolBoxRoot || process.env.VCPTOOLBOX_ROOT || process.cwd());
   const knowledgeBaseManagerPath = path.join(vcpToolBoxRoot, 'KnowledgeBaseManager.js');
   const embeddingUtilsPath = path.join(vcpToolBoxRoot, 'EmbeddingUtils.js');
@@ -560,13 +623,15 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     ? options.primaryWritePreflight
     : null;
   const writeSubdir = safeFilenamePart(options.writeSubdir || 'codex-memory-governed');
-  let knowledgeBaseManager = null;
-  let embeddingUtils = null;
+  let knowledgeBaseManager = options.knowledgeBaseManager || null;
+  let embeddingUtils = options.embeddingUtils || null;
 
   function loadRuntime() {
-    process.env.KNOWLEDGEBASE_ROOT_PATH = knowledgeBaseRootPath;
-    if (knowledgeBaseStorePath) {
-      process.env.KNOWLEDGEBASE_STORE_PATH = knowledgeBaseStorePath;
+    if (!runtimeInjected) {
+      process.env.KNOWLEDGEBASE_ROOT_PATH = knowledgeBaseRootPath;
+      if (knowledgeBaseStorePath) {
+        process.env.KNOWLEDGEBASE_STORE_PATH = knowledgeBaseStorePath;
+      }
     }
     if (!knowledgeBaseManager) {
       knowledgeBaseManager = require(knowledgeBaseManagerPath);
@@ -603,45 +668,90 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     }
   }
 
-  async function runNativeReadProbe(args = {}, fallbackQuery = 'codex memory governed native read proof') {
-    await ensureReady();
+  async function runNativeReadProbe(
+    args = {},
+    fallbackQuery = 'codex memory governed native read proof',
+    authorization = null
+  ) {
+    if (
+      authorization?.accepted !== true ||
+      !Array.isArray(authorization.allowedDiaryNames) ||
+      authorization.allowedDiaryNames.length < 1 ||
+      authorization.allowedDiaryNames.length > 8
+    ) {
+      throw new Error('native_diary_authorization_required');
+    }
+    loadRuntime();
     const query = boundedString(args.query, 1000) || fallbackQuery;
     const limit = normalizeLimit(args.limit ?? args.max_results, 1);
-    const embeddings = await embeddingUtils.getEmbeddingsBatch([query], {
-      apiUrl: process.env.API_URL,
-      apiKey: process.env.API_Key,
-      model: process.env.WhitelistEmbeddingModel
-    });
+    const embeddings = await embeddingUtils.getEmbeddingsBatch(
+      [query],
+      runtimeInjected
+        ? {}
+        : {
+            apiUrl: process.env.API_URL,
+            apiKey: process.env.API_Key,
+            model: process.env.WhitelistEmbeddingModel
+          }
+    );
     const vector = embeddings && embeddings[0];
     if (!vector) {
       throw new Error('native_query_vector_unavailable');
     }
-    const results = await knowledgeBaseManager.search(vector, limit, 0);
+    const results = await knowledgeBaseManager.search(
+      authorization.allowedDiaryNames,
+      vector,
+      limit,
+      0,
+      []
+    );
+    const postcheck = postCheckNativeDiaryResults(results, authorization.allowedDiaryNames);
+    if (!postcheck.accepted) throw new Error(postcheck.reasonCode);
     return {
       results: projectReadResults(results),
       rawResultCount: Array.isArray(results) ? results.length : 0,
       runtimeReceipt: defaultReadRuntimeReceipt({
         providerApiCalled: true,
         memoryReadPerformed: true,
-        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured
+        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured,
+        authorization,
+        resultScopePostcheckPassed: true
       })
     };
   }
 
-  async function search(args = {}) {
+  async function search(args = {}, context = {}) {
+    if (context.authorization?.accepted !== true) {
+      throw new Error('native_diary_authorization_required');
+    }
     const query = boundedString(args.query, 1000);
-    if (!query.trim()) return { results: [] };
-    const readProbe = await runNativeReadProbe(args, 'codex memory governed native search proof');
+    if (!query.trim()) {
+      return {
+        results: [],
+        _nativeRuntimeReceipt: defaultReadRuntimeReceipt({
+          providerApiCalled: false,
+          memoryReadPerformed: false,
+          authorization: context.authorization,
+          resultScopePostcheckPassed: true
+        })
+      };
+    }
+    const readProbe = await runNativeReadProbe(
+      args,
+      'codex memory governed native search proof',
+      context.authorization
+    );
     return {
       results: readProbe.results,
       _nativeRuntimeReceipt: readProbe.runtimeReceipt
     };
   }
 
-  async function overview(args = {}) {
+  async function overview(args = {}, context = {}) {
     const readProbe = await runNativeReadProbe(
       { ...args, limit: normalizeLimit(args.limit ?? args.max_results, 1) },
-      'codex memory governed native overview proof'
+      'codex memory governed native overview proof',
+      context.authorization
     );
     return {
       overview: {
@@ -654,13 +764,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     };
   }
 
-  async function audit(args = {}) {
+  async function audit(args = {}, context = {}) {
     const readProbe = await runNativeReadProbe(
       {
         ...args,
         limit: normalizeLimit(args.window ?? args.limit ?? args.max_results, 1)
       },
-      'codex memory governed native audit proof'
+      'codex memory governed native audit proof',
+      context.authorization
     );
     return {
       audit: {
@@ -763,6 +874,11 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
 function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
   const adapter = options.adapter || createVcpToolBoxNativeMemoryAdapter(options);
   const enableWrite = options.enableWrite === true;
+  const mappingState = loadDiaryScopeMapping({
+    mapping: options.diaryScopeMapping,
+    mappingPath: options.diaryScopeMappingPath,
+    readFileSync: options.readFileSync
+  });
 
   return async function handleJsonRpc(body = {}) {
     if (!isPlainObject(body) || body.jsonrpc !== '2.0') {
@@ -772,14 +888,14 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
       return {
         jsonrpc: '2.0',
         id: body.id,
-        result: initializeResult(enableWrite)
+        result: initializeResult(enableWrite, mappingState)
       };
     }
     if (body.method === 'tools/list') {
       return {
         jsonrpc: '2.0',
         id: body.id,
-        result: toolsListResult(enableWrite)
+        result: toolsListResult(enableWrite, mappingState)
       };
     }
     if (body.method !== 'tools/call') {
@@ -806,6 +922,32 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
     );
     try {
       if (['knowledge_base.search', 'memory_overview', 'audit_memory'].includes(nativeToolName)) {
+        const scopeEnforcement = governanceMeta?.scopeEnforcement;
+        if (
+          mappingState.accepted !== true ||
+          scopeEnforcement?.mode !== 'diary_allowlist_v1' ||
+          scopeEnforcement?.bound !== true ||
+          scopeEnforcement?.expectedMappingReference !== mappingState.mappingReference ||
+          scopeEnforcement?.expectedMappingDigest !== mappingState.mappingDigest
+        ) {
+          return jsonRpcError(body.id, -32602, 'Diary scope enforcement rejected', {
+            reasonCode: mappingState.accepted === true
+              ? 'diary_scope_mapping_binding_mismatch'
+              : 'diary_scope_mapping_missing',
+            lowDisclosure: true
+          });
+        }
+        const authorization = resolveRead({
+          mapping: mappingState.mapping,
+          trustedScope: canonicalScopeFromGovernanceMeta(governanceMeta),
+          recallProfile: scopeEnforcement.recallProfile
+        });
+        if (authorization.accepted !== true || authorization.allowedDiaryCount < 1) {
+          return jsonRpcError(body.id, -32602, 'Diary scope authorization rejected', {
+            reasonCode: 'diary_scope_authorization_rejected',
+            lowDisclosure: true
+          });
+        }
         const methodName = nativeToolName === 'knowledge_base.search'
           ? 'search'
           : nativeToolName === 'memory_overview'
@@ -818,9 +960,13 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
           });
         }
         const nativeResult = await adapter[methodName](args, {
-          publicToolName: governance.publicToolName
+          publicToolName: governance.publicToolName,
+          authorization
         });
-        const runtimeReceipt = nativeResult?._nativeRuntimeReceipt || defaultReadRuntimeReceipt();
+        const runtimeReceipt = nativeResult?._nativeRuntimeReceipt || defaultReadRuntimeReceipt({
+          authorization,
+          resultScopePostcheckPassed: true
+        });
         const { _nativeRuntimeReceipt, ...structuredContent } = isPlainObject(nativeResult) ? nativeResult : {};
         return jsonRpcResult(body.id, structuredContent, runtimeReceipt);
       }

@@ -91,7 +91,15 @@ function gateResult(
     counters: {}
   });
   if (scopeFilteringProven) {
-    result.normalizedBridgeRequest.native_scope_filtering_proven = true;
+    Object.assign(result.normalizedBridgeRequest, {
+      native_scope_filtering_proven: true,
+      scope_enforcement_mode: 'diary_allowlist_v1',
+      expected_mapping_reference: 'jenn-vcp-diary-scope-v1',
+      expected_mapping_digest: `sha256:${'a'.repeat(64)}`,
+      recall_profile: 'exact_visibility',
+      scope_id_affects_diary_acl: false,
+      scope_id_enforcement_claimed: false
+    });
   }
   return result;
 }
@@ -112,6 +120,38 @@ function nativeInvocationReceiptForPayload(payload, overrides = {}) {
     httpStatusClass: 'success',
     responseShapeCategory: 'object_top_level_kind_only_no_field_names',
     topLevelKindCategory: 'object',
+    nativeRuntimeReceipt: {
+      present: true,
+      nativeRuntimeCalled: true,
+      nativeRuntimeInitialized: false,
+      providerApiCalled: true,
+      memoryReadPerformed: true,
+      memoryWritePerformed: false,
+      durableWritePerformed: true,
+      durableWriteScope: 'native_runtime_store',
+      isolatedRuntimeStoreUsed: false,
+      primaryMemoryStoreWritePerformed: false,
+      derivedIndexWritePerformed: true,
+      authorizationResolvedBeforeProvider: true,
+      diaryAllowlistEnforcedBeforeIndexLoad: true,
+      diaryAllowlistEnforcedBeforeVectorSearch: true,
+      resultScopePostcheckPassed: true,
+      unscopedNativeSearchUsed: false,
+      mappingReferenceBound: true,
+      mappingDigestBound: true,
+      allowedDiaryCount: 1,
+      rawDiaryNamesReturned: false,
+      scopeIdAccepted: true,
+      scopeIdAudited: true,
+      scopeIdFingerprintBound: true,
+      scopeIdAffectsDiaryAcl: false,
+      scopeIdEnforcementClaimed: false,
+      rawRuntimeOutputDisclosed: false,
+      rawMemoryContentDisclosed: false,
+      runtimeLocatorDisclosed: false,
+      tokenMaterialDisclosed: false,
+      readinessClaimed: false
+    },
     ...overrides
   };
 }
@@ -352,7 +392,13 @@ test('fails closed before native invocation for scope-bound visibility without f
     assert.equal(result.reasonCode, 'invalid_governed_native_read_delegation_boundary', visibility);
     assert.deepEqual(
       result.invalidFields,
-      ['gateResult.normalizedBridgeRequest.native_scope_filtering_proven'],
+      [
+        'gateResult.normalizedBridgeRequest.native_scope_filtering_proven',
+        'gateResult.normalizedBridgeRequest.scope_enforcement_mode',
+        'gateResult.normalizedBridgeRequest.expected_mapping_reference',
+        'gateResult.normalizedBridgeRequest.expected_mapping_digest',
+        'gateResult.normalizedBridgeRequest.recall_profile'
+      ],
       visibility
     );
     assert.equal(result.runtimeCalled, false, visibility);

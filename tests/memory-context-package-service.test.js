@@ -308,6 +308,44 @@ test('prepare_memory_context consumes approved projected statement, classificati
   assert.equal(result.memory_context_package.audit_receipt.source_runtime, 'vcp_native');
 });
 
+test('prepare_memory_context reports composite native-first metadata and derived-index mutation truthfully', async () => {
+  const { service } = createService({
+    searchResult: {
+      status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED',
+      accepted: true,
+      results: [],
+      access: {
+        localMemoryFallbackUsed: false
+      },
+      receipt: {
+        nativeInvocationReceipt: {
+          nativeRuntimeReceipt: {
+            primaryMemoryStoreWritePerformed: false,
+            derivedIndexWritePerformed: true,
+            durableWritePerformed: true
+          }
+        }
+      }
+    }
+  });
+
+  const result = await service.prepare(baseInput());
+  assert.deepEqual(result.invocation_metadata, {
+    invocation_profile: 'composite_governed_native_read',
+    native_first: true,
+    direct_native_tool: false,
+    read_allowed: true,
+    write_allowed: false,
+    local_fallback_explicitly_marked: true
+  });
+  assert.equal(result.access.durableMutationPerformed, true);
+  assert.equal(result.memory_context_package.audit_receipt.primary_memory_write_performed, false);
+  assert.equal(result.memory_context_package.audit_receipt.derived_index_write_performed, true);
+  assert.equal(result.memory_context_package.audit_receipt.other_durable_mutation_performed, false);
+  assert.equal(result.memory_context_package.audit_receipt.durable_mutation_performed, true);
+  assert.equal(result.memory_context_package.audit_receipt.production_write_performed, false);
+});
+
 test('prepare_memory_context audit receipt binds full scope and stable result projections', async () => {
   const resultTemplate = tag => ({
     target: 'process',

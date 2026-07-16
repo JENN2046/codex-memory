@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codex-memory.local/schemas/diary-scope-mapping-v1.schema.json",
+  "title": "Diary Scope Mapping v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "mappingReference", "defaultPolicy", "entries"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "mappingReference": { "const": "jenn-vcp-diary-scope-v1" },
+    "defaultPolicy": { "const": "deny" },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["partitionReference", "diaryName", "classification", "clientId", "projectId", "workspaceId", "readProfiles", "writeEligible"],
+        "properties": {
+          "partitionReference": { "type": "string", "minLength": 1 },
+          "diaryName": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "classification": { "enum": ["client_private", "project_shared", "workspace_shared", "compatibility_only", "ambiguous"] },
+          "clientId": { "type": ["string", "null"] },
+          "projectId": { "type": ["string", "null"] },
+          "workspaceId": { "type": ["string", "null"] },
+          "readProfiles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "enum": ["exact_visibility", "task_start_context"] }
+          },
+          "writeEligible": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
