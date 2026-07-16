@@ -62,7 +62,11 @@ test('synthetic VCP conformance covers single/multi diary and never loads unauth
   const result = await runSyntheticVcpSelectedDiaryConformance({
     sourceIdentity: identity,
     async createManager({ isolatedRoot, isolatedStoreRoot, syntheticDiaryLabels, recordIndexLoad }) {
-      const rows = new Map(syntheticDiaryLabels.map(label => [label, [{ diaryName: label, score: 1 }]]));
+      const rows = new Map(syntheticDiaryLabels.map(label => [label, [{
+        diaryName: label,
+        fullPath: `${label}/entry.md`,
+        score: 1
+      }]]));
       assert.ok(isolatedStoreRoot.startsWith(isolatedRoot));
       return {
         evidence: {
@@ -96,6 +100,42 @@ test('synthetic VCP conformance covers single/multi diary and never loads unauth
   assert.equal(result.globalSearchCalls, 0);
   assert.equal(result.providerCalls, 0);
   assert.equal(result.existingStoreRead, false);
+});
+
+test('synthetic VCP conformance accepts the exact VCP single-diary fullPath source shape', async () => {
+  const fixture = sourceFixture();
+  const identity = verifyVcpSelectedDiarySourceIdentity(fixture.manifest, fixture.resolver);
+  const result = await runSyntheticVcpSelectedDiaryConformance({
+    sourceIdentity: identity,
+    async createManager({ isolatedRoot, isolatedStoreRoot, syntheticDiaryLabels, recordIndexLoad }) {
+      const [clientDiary, projectDiary] = syntheticDiaryLabels;
+      return {
+        evidence: {
+          isolatedRootBound: isolatedStoreRoot.startsWith(isolatedRoot),
+          isolatedStoreRoot,
+          sourceIdentityDigest: identity.identityDigest,
+          existingInputsRead: false,
+          providerConfigured: false,
+          publicServiceStarted: false
+        },
+        manager: {
+          async search(allowedLabels) {
+            for (const label of allowedLabels) recordIndexLoad(label);
+            if (allowedLabels.length === 1) {
+              return [{ fullPath: `${clientDiary}/entry.md`, score: 1 }];
+            }
+            return [
+              { diaryName: clientDiary, fullPath: `${clientDiary}/entry.md`, score: 1 },
+              { diaryName: projectDiary, fullPath: `${projectDiary}/entry.md`, score: 0.9 }
+            ];
+          }
+        }
+      };
+    }
+  });
+  assert.equal(result.accepted, true);
+  assert.equal(result.singleDiaryPassed, true);
+  assert.equal(result.multiDiaryPassed, true);
 });
 
 function receiptChain({ derivedIndexWrite = false } = {}) {
