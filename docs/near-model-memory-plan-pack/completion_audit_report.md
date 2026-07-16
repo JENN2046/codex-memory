@@ -1083,3 +1083,51 @@ separate Phase 10 requirement evaluated only after Completion Audit application.
 The prior external review decision remains `changes_required`, so
 `externalReviewPassed`, review-bundle application, tag approval, and Phase 8
 write authorization remain false. Full plan-pack completion remains false.
+
+## CM-2115-R1 Update
+
+CM-2115-R1 repairs the missing post-replay Phase 2 Completion Audit
+application. The exact application decision is frozen at
+`docs/near-model-memory-plan-pack/phase2_completion_audit_application_decision_cm2115_r1.json`.
+It binds the CM-2080 external-review decision, the accepted 6937-byte Phase 2
+machine manifest, and the accepted 795-byte Windows/WSL receipt by their exact
+source commits, trees, blob OIDs, byte lengths, and SHA-256 values.
+
+The single-use low-disclosure application receipt is frozen at
+`docs/near-model-memory-plan-pack/phase2_completion_audit_application_receipt_cm2115_r1.json`.
+It applies exactly these nine Phase 2 fields:
+
+```text
+nativeTargetBindingPassed
+nativeReadProofPassed
+fallbackDistinctionPassed
+lowDisclosureProofPassed
+auditReceiptPassed
+scopeVisibilityIsolationPassed
+wslLinuxProofPassed
+windowsWslSmokePassed
+phase2ReceiptBundleAppliedToCompletionAudit
+```
+
+The receipt explicitly rejects the superseded CM-2074 application as current
+authority. Application authorization is consumed and non-replayable. The
+application performed one repository Completion Audit evidence patch and zero
+native reads, native writes, durable mutations, provider calls, real-memory
+reads, remote actions, or readiness claims.
+
+This repair does not accept the CM-2115 snapshot independent review, does not
+complete the full plan pack, and does not establish production, release,
+deploy, cutover, `RC_READY`, complete-V8, or any other readiness state.
+
+## CM-2115-R2 Exact Phase 2 Application Binding
+
+CM-2115-R2 supersedes the R1 application claim. Its execution receipt is
+created only after a durable one-shot claim and exact readback of the
+allowlisted Completion Audit patch. A separate Git binding receipt must
+then bind the application commit/tree, direct parent, exact diff, and every
+pre/post blob before this application may serve as current evidence.
+
+Machine state: `docs/near-model-memory-plan-pack/phase2_completion_audit_application_state_cm2115_r2.json`.
+
+`independentReviewPassed=false`, `fullPlanPackCompleted=false`, and
+`readinessClaimed=false` remain authoritative.

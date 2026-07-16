@@ -4,11 +4,39 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2114 Phase 8 completion revalidation application`.
-Current validation: `CMV-2206`.
+Current checkpoint: `CM-2115-R2 durable one-shot and exact patch binding repair`.
+Current validation: `CMV-2209`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2115-R2 Durable One-shot and Exact Patch Binding Repair
+
+Status: `DURABLE_EXACT_PATCH_BOUND_R2_SNAPSHOT_FROZEN_INDEPENDENT_REVIEW_PENDING_FULL_PLAN_FALSE_NO_READY_CLAIM`
+
+- Durable claim state is `CONSUMED_SUCCESS`, use count and patch invocation count are one, and replay is forbidden.
+- Application commit `49979a55…` is bound to decision `c8dbbcd8…`, its direct parent/tree, exact seven-path diff, and every pre/post patch object.
+- Strengthened receipt `d3cdc894…` additionally binds the execution-receipt Markdown and typed absence check; payload SHA is `95945eeb…6b89`.
+- Receipt-time validation re-resolves CM-2080, the Phase 2 manifest, and Windows/WSL smoke from exact Git objects.
+- Source baseline `933d29e4…` records R2 `8/8`, full `test:all`, and fixture-only `gate:ci`; snapshot `8d252985…` binds 164/164 entries to 105 blobs with zero placeholders.
+- Review request `01c65db8…` is submission-only; R1 and CM-2074 are historical, not current authority.
+- `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and `readinessClaimed=false`.
+
+Validation: `CMV-2209`.
+
+## Historical CM-2115 Canonical Full-plan Evidence Snapshot (Superseded)
+
+Status: `CANONICAL_164_TRACE_SNAPSHOT_FROZEN_INDEPENDENT_REVIEW_PENDING_NO_APPLICATION_NO_READY_CLAIM`
+
+- Source baseline `7a72206b…` includes a fresh low-disclosure command receipt.
+- Snapshot commit `3798ecc1…` binds 164/164 trace entries to 105 real Git blobs with exact source commit/tree/blob/bytes/SHA.
+- The frozen route table contains 21 exact-receipt entries, six external-review entries, and zero placeholders.
+- Candidate Completion Audit evaluation was eligible at that checkpoint, but its Phase 2 route lacked a current exact application and is superseded by CM-2115-R1.
+- Review request commit `3313edb8…` requests independent Git-object and semantic review only.
+- Internal frozen-object recheck passed Git-object integrity only; it is not the R1 semantic review or an external decision.
+- Application preparation/execution and every readiness claim remain false.
+
+Validation: `CMV-2207`.
 
 ## CM-2114 Phase 8 Completion Revalidation Application
 

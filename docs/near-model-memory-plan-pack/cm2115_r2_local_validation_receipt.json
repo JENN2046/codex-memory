@@ -1,0 +1,127 @@
+{
+  "canonicalPayloadSha256": "2d0239a59b688951122a870642c5d06e15428926cf1cead4612e8cd1855c7192",
+  "payload": {
+    "commandResults": [
+      {
+        "command": "node --test tests/cm2115-r2-durable-exact-patch-application.test.js",
+        "commandId": "cm2115_r2_durable_exact_patch_focused",
+        "exitCode": 0,
+        "safeSummary": null,
+        "status": "PASS",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutSha256": "0cf600ca448bf0d32000686d718e9e6aa6255bf944b528a570f7145b57ead144",
+        "tapSummaries": [
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 8,
+            "skipped": 0,
+            "tests": 8,
+            "todo": 0
+          }
+        ]
+      },
+      {
+        "command": "npm run test:all",
+        "commandId": "test_all",
+        "exitCode": 0,
+        "safeSummary": null,
+        "status": "PASS",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutSha256": "def9d8513f3525c88b9f896bb4dde4da85ecafca49048f9ba3498070389bfe5d",
+        "tapSummaries": [
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 5402,
+            "skipped": 0,
+            "tests": 5402,
+            "todo": 0
+          },
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 94,
+            "skipped": 0,
+            "tests": 94,
+            "todo": 0
+          },
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 6,
+            "skipped": 0,
+            "tests": 6,
+            "todo": 0
+          }
+        ]
+      },
+      {
+        "command": "npm run gate:ci -- --json",
+        "commandId": "gate_ci",
+        "exitCode": 0,
+        "safeSummary": {
+          "checkStatusesSha256": "eb594c9903bb0eb27ca843ed9b0f3b2a4d5a12b36391816431a9805f0658af75",
+          "failedCheckCount": 0,
+          "fixtureOnly": true,
+          "noDaemon": true,
+          "noNetwork": true,
+          "noProvider": true,
+          "summaryOk": true,
+          "unsafeEnvOverrideDetected": false
+        },
+        "status": "PASS",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutSha256": "bdf2d2f59cb838b44bfcdf7c0150e5a66ee3b98d1153b109d59c33dbb42b8bca",
+        "tapSummaries": [
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 5402,
+            "skipped": 0,
+            "tests": 5402,
+            "todo": 0
+          }
+        ]
+      }
+    ],
+    "currentState": {
+      "fullPlanPackCompleted": false,
+      "phase8Completed": true,
+      "readinessClaimed": false
+    },
+    "evidenceSemantics": {
+      "gateCiPassed": true,
+      "phase1RegressionTestsPassed": true,
+      "phase2DurableExactPatchTestsPassed": true,
+      "testAllPassed": true
+    },
+    "nonClaims": {
+      "completeV8": false,
+      "cutoverReady": false,
+      "deployReady": false,
+      "fullPlanPackCompleted": false,
+      "productionReady": false,
+      "rcReady": false,
+      "releaseReady": false
+    },
+    "sideEffects": {
+      "durableMutations": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0
+    },
+    "validationTarget": {
+      "commit": "d3cdc894772171c8c98dbbf6c2d19adf4fcd99e2",
+      "tree": "586f63c92460799ed71ae538c2636fa823cc8a57",
+      "worktreeCleanAfterCommands": true,
+      "worktreeCleanAtStart": true
+    }
+  },
+  "receiptType": "canonical_full_plan_local_validation_receipt_v3",
+  "schemaVersion": 1,
+  "taskId": "CM-2115-R2"
+}

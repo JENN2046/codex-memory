@@ -4,13 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2114 Phase 8 completion revalidation application`.
-Current validation: `CMV-2206`.
-Current handoff: Phase 8 is revalidated complete from the exact CM-2113 owner-runtime/transport/store receipt. Preserve both consumed attempt markers and the synthetic record; no native authorization is active. Full plan-pack and readiness remain false.
+Current task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
+Current validation: `CMV-2209`.
+Current handoff: submit review request commit `01c65db8…` for independent review of snapshot commit `8d252985…`. Do not prepare or execute the full-plan application until an exact independent PASS is frozen. Full plan-pack and readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2115-R2 closes the R1 one-shot and patch-binding gaps. The durable claim is
+consumed exactly once; application commit `49979a55…` binds decision
+`c8dbbcd8…`, the direct parent/tree, exact seven-path diff, five pre/post patch
+objects, and both execution-receipt artifacts. Strengthened receipt
+`d3cdc894…` has payload SHA `95945eeb…6b89` and revalidates the three upstream
+Git objects at receipt time.
+
+The rebuilt snapshot binds 164 entries to 105 exact Git blobs at source baseline
+`933d29e4…`; JSON raw SHA is `607fa483…8feb` and payload SHA is
+`afc1f726…cbb6`. Review request `01c65db8…` has payload SHA
+`9b9c158a…bdf0` and is submission-only. The next legal state transition is an
+independent review decision. Until an exact PASS is frozen, full-plan
+application authority, full-plan completion, and all readiness states are false.
 
 CM-2114 applied the 18-field bundle and receipt payload SHA `c31ef072…dc82`.
 The three CM-2112 gaps now trace to CM-2113 exact evidence: VCPToolBox-owned

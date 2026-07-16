@@ -42,6 +42,7 @@
 | CM-2114 Phase 8 revalidation application receipt | 18/18 Phase 8 evidence；只完成 Phase 8，不完成完整计划包、不声明 readiness | 否，read-only tag 可不等 | 是，`revalidated_complete` |
 | CM-2080 exact external review decision | Phase 9/10 external-review prerequisite | 是 | 是 |
 | CM-2082 Completion Audit application receipt | Phase 9/10 review-bundle application field only | 是 | 是 |
+| CM-2115-R1 Phase 2 Completion Audit application receipt | CM-2080-reviewed Phase 2 machine manifest + Windows/WSL receipt；九项 exact evidence 一次性应用 | 是 | 是 |
 | native read proof | Phase 2 | 是 | 是 |
 | fallback distinction | Phase 2 | 是 | 是 |
 | low-disclosure proof | Phase 2 | 是 | 是 |
@@ -139,3 +140,11 @@ complete-realtime-memory
 production-write-ready
 model-memory-complete
 ```
+
+## CM-2115-R2 Exact Application Boundary
+
+| Evidence | Acceptance boundary | Independent review | Current status |
+|---|---|---|---|
+| CM-2115-R2 Phase 2 binding receipt | Durable one-shot claim + exact application commit/tree/diff/pre-post blobs + receipt-time upstream Git revalidation | Required | Frozen as the strengthened v2 binding receipt; rebuilt snapshot remains pending independent review |
+
+R1 receipt shape alone is not accepted as current patch evidence.

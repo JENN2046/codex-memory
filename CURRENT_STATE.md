@@ -8,15 +8,37 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Phase 8 revalidated complete; full plan pack and readiness remain incomplete/unclaimed |
-| Current task | `CM-2114 Phase 8 completion revalidation application` |
-| Current validation | `CMV-2206` |
-| Current route | Preserve consumed CM-2113 evidence and continue only with a separately selected remaining plan-pack gap |
+| Status | CM-2115-R2 durable one-shot and exact patch binding repaired; rebuilt 164-trace snapshot pending independent review; full plan and readiness remain false |
+| Current task | `CM-2115-R2 durable one-shot and exact patch binding repair` |
+| Current validation | `CMV-2209` |
+| Current route | Obtain an independent decision over the exact snapshot; only afterward prepare a separate one-field completion application |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## Current Revalidation Result
+## Current Snapshot Result
+
+CM-2115-R2 applies the exact CM-2080-reviewed Phase 2 manifest and Windows/WSL
+receipt through one durable consumed Git-common-dir claim. Decision commit is
+`c8dbbcd8…`; exact application commit is `49979a55…`; strengthened binding
+receipt commit is `d3cdc894…`, with payload SHA-256 `95945eeb…6b89`. It binds
+the direct parent, exact seven-path diff, five patch targets, execution JSON and
+Markdown, and receipt-time CM-2080/manifest/smoke Git revalidation. R1 and
+CM-2074 remain historical, not current authority.
+
+At baseline `933d29e4…`, the v3 snapshot maps all 164 Completion Audit trace
+slots to exact Git objects. It contains 105 unique blobs and zero placeholders;
+all nine Phase 2 exact entries use the strengthened R2 binding receipt. Fresh
+baseline validation records R2 `8/8`, `test:all` `5402/5402 + 94/94 + 6/6`,
+and fixture-only/no-network/no-provider `gate:ci` success. Snapshot contract and
+review-request tests are `19/19`. Snapshot commit is `8d252985…`; review request
+commit is `01c65db8…`.
+
+The candidate audit is eligible but non-authoritative. Independent review has
+not passed, no full-plan application is prepared or authorized,
+`fullPlanPackCompleted=false`, and all readiness fields remain false.
+
+## Historical Phase 8 Revalidation Result
 
 CM-2111 remains historical, including its consumed record/tombstone/failure
 authorizations and receipt SHA `d2617505…faec`. CM-2113 added an exact official

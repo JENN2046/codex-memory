@@ -1,0 +1,127 @@
+{
+  "canonicalPayloadSha256": "8425a00811966da58950add34c09323b7f9c70c184f295cd5e36095e8bc59950",
+  "payload": {
+    "commandResults": [
+      {
+        "command": "node --test tests/cm2115-r1-phase2-completion-audit-application.test.js",
+        "commandId": "cm2115_r1_phase2_application_focused",
+        "exitCode": 0,
+        "safeSummary": null,
+        "status": "PASS",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutSha256": "5e8255f715867608ddccdcebec7f4ff282b0cb5eac576aa426884ad95b4cd23f",
+        "tapSummaries": [
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 6,
+            "skipped": 0,
+            "tests": 6,
+            "todo": 0
+          }
+        ]
+      },
+      {
+        "command": "npm run test:all",
+        "commandId": "test_all",
+        "exitCode": 0,
+        "safeSummary": null,
+        "status": "PASS",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutSha256": "a8b24458dc3df71748e6e59a1f8499995a7aa458236c2727bfdbcdce86ca4063",
+        "tapSummaries": [
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 5393,
+            "skipped": 0,
+            "tests": 5393,
+            "todo": 0
+          },
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 94,
+            "skipped": 0,
+            "tests": 94,
+            "todo": 0
+          },
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 6,
+            "skipped": 0,
+            "tests": 6,
+            "todo": 0
+          }
+        ]
+      },
+      {
+        "command": "npm run gate:ci -- --json",
+        "commandId": "gate_ci",
+        "exitCode": 0,
+        "safeSummary": {
+          "checkStatusesSha256": "eb594c9903bb0eb27ca843ed9b0f3b2a4d5a12b36391816431a9805f0658af75",
+          "failedCheckCount": 0,
+          "fixtureOnly": true,
+          "noDaemon": true,
+          "noNetwork": true,
+          "noProvider": true,
+          "summaryOk": true,
+          "unsafeEnvOverrideDetected": false
+        },
+        "status": "PASS",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutSha256": "77a45f4030503eece2c2cc282493d7f891487936e8ebc09e069219c7736e4b02",
+        "tapSummaries": [
+          {
+            "cancelled": 0,
+            "fail": 0,
+            "pass": 5393,
+            "skipped": 0,
+            "tests": 5393,
+            "todo": 0
+          }
+        ]
+      }
+    ],
+    "currentState": {
+      "fullPlanPackCompleted": false,
+      "phase8Completed": true,
+      "readinessClaimed": false
+    },
+    "evidenceSemantics": {
+      "gateCiPassed": true,
+      "phase1RegressionTestsPassed": true,
+      "phase2ApplicationTestsPassed": true,
+      "testAllPassed": true
+    },
+    "nonClaims": {
+      "completeV8": false,
+      "cutoverReady": false,
+      "deployReady": false,
+      "fullPlanPackCompleted": false,
+      "productionReady": false,
+      "rcReady": false,
+      "releaseReady": false
+    },
+    "sideEffects": {
+      "durableMutations": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0
+    },
+    "validationTarget": {
+      "commit": "3e7edf9da62347afa15595bca5ec8fbdad19f415",
+      "tree": "815a4c722587d3e68e4df85100cb5e577a37d633",
+      "worktreeCleanAfterCommands": true,
+      "worktreeCleanAtStart": true
+    }
+  },
+  "receiptType": "canonical_full_plan_local_validation_receipt_v2",
+  "schemaVersion": 1,
+  "taskId": "CM-2115-R1"
+}

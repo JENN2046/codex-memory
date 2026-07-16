@@ -4,8 +4,8 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Latest active task: `CM-2114 Phase 8 completion revalidation application`.
-Latest validation: `CMV-2206`.
+Latest active task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
+Latest validation: `CMV-2209`.
 Current active task rows should reference `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -44,6 +44,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2115 | 2115 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Green R2 durable repository evidence application binding and snapshot rebuild; independent review and full-plan application still gated | R2 durable claim/application/binding receipts; validation receipt; 164-entry snapshot; review request/contracts/tests/status | Repair persistent one-shot enforcement, bind the exact application commit/diff/pre-post objects, revalidate three upstream Git objects, and rebuild the R2 snapshot | R2 `8/8`; snapshot/review `19/19`; frozen-baseline `test:all` `5402/5402 + 94/94 + 6/6`; fixture-only `gate:ci`; snapshot/review verify; docs/current-facts/ledger/diff | authorization consumed/non-replayable; no new patch/native/provider/real-memory/remote effect during strengthened receipt and snapshot rebuild | exact independent PASS over R2 snapshot required before separate one-field full-plan application | COMPLETED_DURABLE_EXACT_PATCH_BOUND_R2_SNAPSHOT_REBUILT_INDEPENDENT_REVIEW_PENDING_FULL_PLAN_FALSE_NO_READY_CLAIM |
 | CM-2114 | 2114 | done | P8-native-write-proof / P6-docs-drift | Consumed synthetic proof; no active native authority | CM-2113 receipts; CM-2114 bundle/decision/application; completion audit/trace/status | Revalidate Phase 8 from exact VCPToolBox owner runtime, transport, and stable store proof | exact Git/hash/receipt; 18/18 audit; focused/default/docs/current-facts/ledger/diff | preserve attempt markers, store identity, and record; no replay/deletion/cleanup | Phase 8 only; full plan/readiness remain false | COMPLETED_PHASE8_REVALIDATED_EXACT_OWNER_RUNTIME_TRANSPORT_STORE_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM |
 | CM-2113 | 2113 | done | P8-native-write-proof | Exact owner write authorization consumed; attempt 001 preserved | owner adapter; stdio/HTTP transport; stable store; execution/transport receipts | Produce exact VCPToolBox-owned runtime proof | official Git objects; one owner write/verify; stable identity; no provider/fallback/retry/rollback | attempt 001 ambiguous/no durable; attempt 002 success; both non-replayable | separate CM-2114 application required | COMPLETED_EXACT_VCPTOOLBOX_OWNER_PROOF_RECEIPT_PHASE8_APPLICATION_PENDING |
 | CM-2112 | 2112 | done | P8-native-write-proof / P6-docs-drift | Exact synthetic native proof route; no current write authority | completion audit/trace; CM-2112 decision/contract/tests/status; future exact VCP runtime/transport/store proof | Reopen Phase 8 and replace insufficient runtime claims with exact owner-runtime/transport/store proof | old CM-2111 bundle rejected; three missing fields; focused/default/strict/docs gates; later exact receipt | preserve historical receipts and consumed markers; no replay or private-store access | new exact synthetic proof plus separate Completion Audit application required | COMPLETED_PHASE8_NEEDS_REVALIDATION_EXACT_VCP_RUNTIME_TRANSPORT_STORE_PROOF_REQUIRED |

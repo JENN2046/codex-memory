@@ -660,3 +660,30 @@ reviewed decision packet, not packet acceptance, not an acceptance decision,
 not exact receipt evidence, not external-review evidence, not tag approval
 evidence, not evidence material acceptance, not evidence application, and not
 completion-audit patch evidence.
+
+## CM-2115-R1 Trace Note
+
+CM-2115-R1 replaces the invalid current route for
+`phase2ReceiptBundleAppliedToCompletionAudit`. The superseded CM-2074 report
+and the CM-2077/2079 replay report cannot serve as current application
+authority by themselves. The current exact-authorized application source is:
+
+```text
+docs/near-model-memory-plan-pack/phase2_completion_audit_application_receipt_cm2115_r1.json
+```
+
+That receipt binds the CM-2080 decision and both accepted Phase 2 machine
+objects by exact Git identity, applies all nine exact Phase 2 fields once, and
+keeps `independentReviewPassed`, `fullPlanPackCompleted`, and
+`readinessClaimed` false. CM-2115-R1 performs no runtime, native memory,
+provider, real-memory, remote, or readiness action.
+
+## CM-2115-R2 Exact Patch Binding Trace
+
+The nine Phase 2 exact fields may use CM-2115-R2 only through the final
+application binding receipt. The execution receipt alone is insufficient.
+The binding receipt must re-read CM-2080, the Phase 2 manifest, and the
+Windows/WSL receipt from their exact Git objects and verify the application
+commit direct-parent relation plus the allowlisted pre/post blob set.
+
+R1 remains historical and is not current application authority.

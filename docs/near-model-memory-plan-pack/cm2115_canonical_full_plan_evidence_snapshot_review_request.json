@@ -1,0 +1,133 @@
+{
+  "canonicalPayloadSha256": "739df21dc447fb094d307998892a602333089bd161305370c5add0bd05423b6a",
+  "payload": {
+    "currentState": {
+      "fullPlanPackCompleted": false,
+      "phase8Completed": true,
+      "readinessClaimed": false
+    },
+    "localValidationReceipt": {
+      "blobOid": "9e025f5c9e47e907a4ad722cff4500a2493f20f9",
+      "bytes": 3637,
+      "canonicalPayloadSha256": "8b4b5ac1f883905de88569d08a199120ce1513c9391fab9dc527251edd85a7a2",
+      "commit": "7a72206b11da5b09d37ee7d65ac16b58f924ed3d",
+      "path": "docs/near-model-memory-plan-pack/cm2115_local_validation_receipt.json",
+      "sha256": "d4ee9bf4e4978cf6fc7ae166fbc85a2a53ccd22bf9b7968c625ed5d91d644249",
+      "tree": "82930c5027423f5cccbacbde7542091b497e00db",
+      "validationTargetCommit": "20df1440ffdab8e1fda6a0786be36ff6523ef5c9",
+      "validationTargetTree": "854ea4775f495fec77edfcdbe06d84eb28b3ddad"
+    },
+    "nonClaims": {
+      "completeV8": false,
+      "cutoverReady": false,
+      "deployReady": false,
+      "fullBridgeCompletion": false,
+      "fullRealtimeMemory": false,
+      "modelMemoryComplete": false,
+      "productionReady": false,
+      "rcReady": false,
+      "releaseReady": false
+    },
+    "requestedDecisionBoundary": {
+      "applicationExecutionAuthorizedByReviewRequest": false,
+      "applicationPreparationAuthorizedByReviewRequest": false,
+      "fullPlanPackCompleted": false,
+      "independentSnapshotReviewPassed": false,
+      "independentSnapshotReviewRequested": true,
+      "readinessClaimed": false,
+      "separateApplicationGateRequiredAfterIndependentPass": true
+    },
+    "requiredReviewChecks": {
+      "allTraceGitObjectBindingsReviewRequested": true,
+      "allTraceSemanticRoutesReviewRequested": true,
+      "candidateCompletionAuditReviewRequested": true,
+      "nonClaimAndZeroSideEffectReviewRequested": true,
+      "snapshotCanonicalPayloadReviewRequested": true,
+      "snapshotRawBytesAndHashReviewRequested": true,
+      "validationReceiptAndLineageReviewRequested": true
+    },
+    "reviewImplementation": {
+      "artifacts": [
+        {
+          "blobOid": "06c9fabc8abb699a704a8f11e9ad5054bd8aa949",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js"
+        },
+        {
+          "blobOid": "b3f1679e814270af3d3ef080900cc802cb4035b2",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotContract.js"
+        },
+        {
+          "blobOid": "cc7cae63b3f84b8b73963f994e2205c29b166da2",
+          "path": "src/core/Cm2115LocalValidationReceiptContract.js"
+        },
+        {
+          "blobOid": "ecc6942dc393644e2fed703da51d32797254b61a",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js"
+        },
+        {
+          "blobOid": "fbbd80f57be52281118ade4f91add20b8797b293",
+          "path": "src/cli/cm2115-canonical-full-plan-evidence-snapshot.js"
+        },
+        {
+          "blobOid": "2d755b0794b441935ba2e2ffa45398d5f8c3c170",
+          "path": "scripts/generate-cm2115-local-validation-receipt.js"
+        },
+        {
+          "blobOid": "402535d82e97de469954545b1311374c8a09e1b4",
+          "path": "scripts/generate-cm2115-independent-review-request.js"
+        },
+        {
+          "blobOid": "18d7ce43ace73a57b7a459d03e41b49dcde77eee",
+          "path": "tests/cm2115-canonical-full-plan-evidence-snapshot.test.js"
+        }
+      ],
+      "commit": "ae70e78dc694e07dfaaa44363635abe536a5f92c",
+      "tree": "14fb062a5449644fca9b01d4fbb35a2aab552de8"
+    },
+    "reviewScope": {
+      "exactAuthorizedReceiptEntryCount": 21,
+      "externalReviewEntryCount": 6,
+      "fakePlaceholderRefCount": 0,
+      "objectiveInvariantCount": 13,
+      "phaseRequirementCount": 11,
+      "resolvedTraceEntryCount": 164,
+      "traceEntryCount": 164,
+      "uniqueEvidenceFieldCount": 146,
+      "uniqueSourceObjectCount": 105
+    },
+    "reviewStatus": "pending_independent_review",
+    "sideEffects": {
+      "durableMutations": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0
+    },
+    "snapshot": {
+      "commit": "3798ecc1ba8303f6b9f7291120eca6ca31642745",
+      "json": {
+        "blobOid": "4c9feaf9d771f27e545595f7a5b810204efffb56",
+        "bytes": 292481,
+        "canonicalPayloadSha256": "f9b4fd170bd25a51a8d30fc183d519e54bec8bdd18b3f0a85123e114635c85b7",
+        "path": "docs/near-model-memory-plan-pack/cm2115_canonical_full_plan_evidence_snapshot.json",
+        "sha256": "564aeaa2884bf6a9fa7177faa629fb2fd7913e2c6e6088302f4e81cbea745e33"
+      },
+      "markdown": {
+        "blobOid": "4b8274527d008a7a52e56d8067ea4861e34afbe5",
+        "bytes": 293276,
+        "path": "docs/near-model-memory-plan-pack/cm2115_canonical_full_plan_evidence_snapshot.md",
+        "sha256": "26820065e2edb50dc3c77db64854edc00e7175a8d2c05d7770d4ac01aac61f3d"
+      },
+      "tree": "988a58c83efd63ac807b3f5d869bf4a00cf8a7f4"
+    },
+    "sourceBaseline": {
+      "commit": "7a72206b11da5b09d37ee7d65ac16b58f924ed3d",
+      "tree": "82930c5027423f5cccbacbde7542091b497e00db"
+    }
+  },
+  "requestType": "canonical_full_plan_evidence_snapshot_independent_review_request_v1",
+  "schemaVersion": 1,
+  "taskId": "CM-2115"
+}

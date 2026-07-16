@@ -4,13 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2114 Phase 8 completion revalidation application`.
-Current validation: `CMV-2206`.
-Current project status: CM-2113 produced exact VCPToolBox-owned runtime, actual transport, and stable synthetic store evidence; CM-2114 applied all 18 Phase 8 fields. `phase8Completed=true` and `phase8CompletionStatus=revalidated_complete`. Full plan-pack and every readiness claim remain false.
-Current route: `PHASE8_REVALIDATED_COMPLETE_FULL_PLAN_INCOMPLETE_NO_READY_CLAIM`.
+Current task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
+Current validation: `CMV-2209`.
+Current project status: the CM-2080 Phase 2 application now has one durable consumed claim, an exact application commit/tree/diff binding, receipt-time revalidation of all three upstream Git objects, and a strengthened v2 binding receipt. The rebuilt 164-entry R2 snapshot is pending independent review. `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and every readiness claim remains false.
+Current route: `CM2115_R2_DURABLE_EXACT_PATCH_BOUND_SNAPSHOT_REBUILT_INDEPENDENT_REVIEW_PENDING_NO_READY_CLAIM`.
 Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+CM-2115-R2 freezes authority intake `f458277d…`, exact decision `c8dbbcd8…`,
+and application commit `49979a55…`. Its Git-common-dir claim is
+`CONSUMED_SUCCESS`, use count is one, replay is forbidden, and patch invocation
+count is one. Strengthened binding receipt commit `d3cdc894…` binds all seven
+changed paths, including the execution-receipt JSON and exact Markdown mirror;
+payload SHA-256 is `95945eeb…6b89`. The old R1 receipt remains historical and
+is not current application authority.
+
+The R2 source baseline is `933d29e4…`; snapshot commit `8d252985…` binds
+164/164 entries to 105 real Git blobs with zero placeholders. Snapshot payload
+SHA-256 is `afc1f726…cbb6`. Review request commit `01c65db8…` has payload
+SHA-256 `9b9c158a…bdf0` and is submission-only. Neither the snapshot nor the
+request approves independent review, full-plan application, completion, or
+readiness.
 
 CM-2114 applies receipt payload SHA-256 `c31ef072…dc82` and revalidates all 18
 Phase 8 evidence fields. CM-2113 used the official VCPToolBox DailyNote runtime,

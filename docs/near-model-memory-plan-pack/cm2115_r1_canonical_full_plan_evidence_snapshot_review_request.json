@@ -1,0 +1,150 @@
+{
+  "canonicalPayloadSha256": "f4e3eb235dbc0426d1fbe2e5efefddbbc6256861b38aa5a4ed931cffd39c010c",
+  "payload": {
+    "currentState": {
+      "fullPlanPackCompleted": false,
+      "phase8Completed": true,
+      "readinessClaimed": false
+    },
+    "localValidationReceipt": {
+      "blobOid": "48617668302d34d288bf8cc8c7f86bfe6da7ef41",
+      "bytes": 3695,
+      "canonicalPayloadSha256": "8425a00811966da58950add34c09323b7f9c70c184f295cd5e36095e8bc59950",
+      "commit": "bfcb57acce1e09b4cef5f817ffd2489cfa32e046",
+      "path": "docs/near-model-memory-plan-pack/cm2115_r1_local_validation_receipt.json",
+      "sha256": "f044fac967f8ac281f4edd162f1e691a7cd9aa34cee4d61c16fa5bca65fbb61a",
+      "tree": "efa5133fb0de0d14582933bf771986d81b04cf9b",
+      "validationTargetCommit": "3e7edf9da62347afa15595bca5ec8fbdad19f415",
+      "validationTargetTree": "815a4c722587d3e68e4df85100cb5e577a37d633"
+    },
+    "nonClaims": {
+      "completeV8": false,
+      "cutoverReady": false,
+      "deployReady": false,
+      "fullBridgeCompletion": false,
+      "fullRealtimeMemory": false,
+      "modelMemoryComplete": false,
+      "productionReady": false,
+      "rcReady": false,
+      "releaseReady": false
+    },
+    "requestedDecisionBoundary": {
+      "applicationExecutionAuthorizedByReviewRequest": false,
+      "applicationPreparationAuthorizedByReviewRequest": false,
+      "fullPlanPackCompleted": false,
+      "independentSnapshotReviewPassed": false,
+      "independentSnapshotReviewRequested": true,
+      "readinessClaimed": false,
+      "separateApplicationGateRequiredAfterIndependentPass": true
+    },
+    "requiredReviewChecks": {
+      "allTraceGitObjectBindingsReviewRequested": true,
+      "allTraceSemanticRoutesReviewRequested": true,
+      "candidateCompletionAuditReviewRequested": true,
+      "nonClaimAndZeroSideEffectReviewRequested": true,
+      "phase2ApplicationReceiptSemanticReviewRequested": true,
+      "snapshotCanonicalPayloadReviewRequested": true,
+      "snapshotRawBytesAndHashReviewRequested": true,
+      "validationReceiptAndLineageReviewRequested": true
+    },
+    "reviewImplementation": {
+      "artifacts": [
+        {
+          "blobOid": "061dfad19b766bc7c24ddcef8c26242b18e5dbee",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js"
+        },
+        {
+          "blobOid": "d65345acbf32dbe0d5c782b1c4ab151a130df0ef",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotContract.js"
+        },
+        {
+          "blobOid": "ba8ee03d8856ba0594a4368240e4fa8bb9cbf5b3",
+          "path": "src/core/Cm2115LocalValidationReceiptContract.js"
+        },
+        {
+          "blobOid": "9b2d2706597128d3c2e819a00064cfae1557d830",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js"
+        },
+        {
+          "blobOid": "aa9a73565063f16d0a7b099020b68f7d0fb4bf7c",
+          "path": "src/cli/cm2115-canonical-full-plan-evidence-snapshot.js"
+        },
+        {
+          "blobOid": "e93f86ebe1020df74ed89a86cb3b92f9d7576dfc",
+          "path": "scripts/generate-cm2115-local-validation-receipt.js"
+        },
+        {
+          "blobOid": "ce36f7ee493ab910b4ebb2382002908caef449cd",
+          "path": "scripts/generate-cm2115-independent-review-request.js"
+        },
+        {
+          "blobOid": "bb379e7460bbf70dcc887bbf823915555c39c7d4",
+          "path": "src/core/Cm2115R1Phase2CompletionAuditApplication.js"
+        },
+        {
+          "blobOid": "c8b4a51cbafbd5da48ae3b1f877625b24349855e",
+          "path": "scripts/generate-cm2115-r1-phase2-application-decision.js"
+        },
+        {
+          "blobOid": "5d3092c23499f0091d0d5fb06d7486edd89888a3",
+          "path": "scripts/apply-cm2115-r1-phase2-completion-audit.js"
+        },
+        {
+          "blobOid": "74c5d73c8ba667607bf82bbf020618c1bf56ca7c",
+          "path": "tests/cm2115-r1-phase2-completion-audit-application.test.js"
+        },
+        {
+          "blobOid": "c49611b4180c9f861f179f3906db058bc5c9ff0f",
+          "path": "tests/cm2115-canonical-full-plan-evidence-snapshot.test.js"
+        }
+      ],
+      "commit": "9b31c34e8e208ec61c861017738f1e70afadff28",
+      "tree": "084f898075a98f5f884fe3fba098281ebe188389"
+    },
+    "reviewScope": {
+      "exactAuthorizedReceiptEntryCount": 21,
+      "externalReviewEntryCount": 6,
+      "fakePlaceholderRefCount": 0,
+      "objectiveInvariantCount": 13,
+      "phaseRequirementCount": 11,
+      "resolvedTraceEntryCount": 164,
+      "traceEntryCount": 164,
+      "uniqueEvidenceFieldCount": 146,
+      "uniqueSourceObjectCount": 105
+    },
+    "reviewStatus": "pending_independent_review",
+    "sideEffects": {
+      "durableMutations": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0
+    },
+    "snapshot": {
+      "commit": "56d3e04ccf342d47cec687ba42557a4ead76e804",
+      "json": {
+        "blobOid": "14f7a4eacd5234df453eac21b54d46ece83d9e15",
+        "bytes": 296444,
+        "canonicalPayloadSha256": "5d4a380d2a2dae4383f83f367bdea2ad137bc14211828e14f4faf521a77546ac",
+        "path": "docs/near-model-memory-plan-pack/cm2115_r1_canonical_full_plan_evidence_snapshot.json",
+        "sha256": "4bff4c1573ea74d2e6808bf0ea86ad8e7a1fdc756c83bc558bb57794954d9c09"
+      },
+      "markdown": {
+        "blobOid": "608ef4e2fe78f55d1f8eae3d9be45188d6549cfa",
+        "bytes": 297242,
+        "path": "docs/near-model-memory-plan-pack/cm2115_r1_canonical_full_plan_evidence_snapshot.md",
+        "sha256": "56a4f09bac1f7f961f7c4acb746c30bef498d1ed53dfc9f8531b6b831f06d59a"
+      },
+      "tree": "312827b5ed08e750fba6ed880d401a45dd684b3f"
+    },
+    "sourceBaseline": {
+      "commit": "bfcb57acce1e09b4cef5f817ffd2489cfa32e046",
+      "tree": "efa5133fb0de0d14582933bf771986d81b04cf9b"
+    }
+  },
+  "requestType": "canonical_full_plan_evidence_snapshot_independent_review_request_v2",
+  "schemaVersion": 2,
+  "taskId": "CM-2115-R1"
+}

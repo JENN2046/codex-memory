@@ -1,0 +1,288 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const test = require('node:test');
+const {
+  INTAKE_IMPLEMENTATION_ARTIFACT_PATHS,
+  INTAKE_IMPLEMENTATION_DIFF_PATHS,
+  RECEIPT_PATH,
+  SELF_REVIEW_DECISION_FREEZE,
+  buildReceipt,
+  buildReceiptReference,
+  evaluateFrozenSelfReviewDecision,
+  evaluateReceipt
+} = require('../src/core/Cm2115R2SelfReviewDecisionIntakeReceiptContract');
+const { sha256Canonical } = require('../src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract');
+const git = require('../scripts/cm2115-r2-git');
+const {
+  resolveFrozenPhase2DurableClaim
+} = require('../src/cli/cm2115-canonical-full-plan-evidence-snapshot');
+const { isCommitAncestor: realIsCommitAncestor } = require('../scripts/generate-cm2115-r2-self-review-decision');
+const {
+  buildIntakeImplementation,
+  parseArgs,
+  renderMarkdown,
+  resolverOptions
+} = require('../scripts/generate-cm2115-r2-self-review-intake-receipt');
+const { canonicalize } = require('../src/core/Cm2115CanonicalFullPlanEvidenceSnapshot');
+
+const IMPLEMENTATION_COMMIT = '9'.repeat(40);
+const IMPLEMENTATION_TREE = '8'.repeat(40);
+
+function fakeBlobOid(value) {
+  return crypto.createHash('sha1').update(value).digest('hex');
+}
+
+function artifact(path) {
+  return { path, blobOid: fakeBlobOid(`intake:${path}`) };
+}
+
+function intakeImplementation() {
+  return {
+    commit: IMPLEMENTATION_COMMIT,
+    tree: IMPLEMENTATION_TREE,
+    artifacts: INTAKE_IMPLEMENTATION_ARTIFACT_PATHS.map(artifact)
+  };
+}
+
+function resolvers(overrides = {}) {
+  const base = {
+    resolveGitFile: (commit, sourcePath) => {
+      if (commit === IMPLEMENTATION_COMMIT) {
+        if (!INTAKE_IMPLEMENTATION_ARTIFACT_PATHS.includes(sourcePath)) throw new Error('fake_artifact_missing');
+        const expected = artifact(sourcePath);
+        return {
+          sourceCommit: commit,
+          sourceTree: IMPLEMENTATION_TREE,
+          sourcePath,
+          gitMode: '100644',
+          gitObjectType: 'blob',
+          blobOid: expected.blobOid,
+          bytes: 1,
+          sha256: '7'.repeat(64),
+          content: Buffer.from('x')
+        };
+      }
+      return git.resolveGitFile(commit, sourcePath);
+    },
+    resolveCommitTree: commit => commit === IMPLEMENTATION_COMMIT
+      ? IMPLEMENTATION_TREE
+      : git.resolveCommitTree(commit),
+    resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
+      ? SELF_REVIEW_DECISION_FREEZE.commit
+      : git.resolveParentCommit(commit),
+    resolveDiffPaths: (fromCommit, toCommit) =>
+      fromCommit === SELF_REVIEW_DECISION_FREEZE.commit && toCommit === IMPLEMENTATION_COMMIT
+        ? [...INTAKE_IMPLEMENTATION_DIFF_PATHS]
+        : git.resolveDiffPaths(fromCommit, toCommit),
+    resolveGitPathState: git.resolveGitPathState,
+    resolveDurableClaim: resolveFrozenPhase2DurableClaim,
+    isCommitAncestor: (ancestor, descendant) => {
+      if (ancestor === SELF_REVIEW_DECISION_FREEZE.commit && descendant === IMPLEMENTATION_COMMIT) return true;
+      return realIsCommitAncestor(ancestor, descendant);
+    }
+  };
+  return { ...base, ...overrides };
+}
+
+function validReceipt() {
+  const frozenDecisionEvidence = evaluateFrozenSelfReviewDecision(resolvers());
+  assert.equal(frozenDecisionEvidence.accepted, true, frozenDecisionEvidence.blockers.join(','));
+  return buildReceipt({ intakeImplementation: intakeImplementation(), frozenDecisionEvidence });
+}
+
+test('intake generator resolves the frozen Phase 2 claim without local governance state', () => {
+  assert.equal(resolverOptions().resolveDurableClaim, resolveFrozenPhase2DurableClaim);
+});
+
+function mutate(receipt, fn) {
+  const copy = structuredClone(receipt);
+  fn(copy);
+  copy.canonicalPayloadSha256 = sha256Canonical(copy.payload);
+  return copy;
+}
+
+test('frozen CM-2115-R2 self-review decision has exact Git identity and replays cleanly', () => {
+  const evidence = evaluateFrozenSelfReviewDecision(resolvers());
+  assert.equal(evidence.accepted, true, evidence.blockers.join(','));
+  assert.equal(evidence.decisionEvaluation.independentReviewPassed, true);
+  assert.equal(evidence.decisionEvaluation.externalReviewPassed, false);
+  assert.equal(evidence.decisionEvaluation.fullPlanPackCompleted, false);
+  assert.equal(evidence.decisionEvaluation.readinessClaimed, false);
+  assert.equal(evidence.decision.payload.reviewedRequest.commit, 'a715d5ca76aae2fa688407c34a1ab7d99c52cb46');
+  assert.equal(
+    evidence.decision.payload.reviewedRequest.json.canonicalPayloadSha256,
+    'cce599aad762528787d303abb2aff3cf3ff98dc4d60a78c0ab563131fac23a72'
+  );
+});
+
+test('frozen self-review Markdown rejects extra claims outside the canonical JSON mirror', () => {
+  const result = evaluateFrozenSelfReviewDecision(resolvers({
+    resolveGitFile: (commit, sourcePath) => {
+      const actual = resolvers().resolveGitFile(commit, sourcePath);
+      if (commit === SELF_REVIEW_DECISION_FREEZE.commit &&
+          sourcePath === SELF_REVIEW_DECISION_FREEZE.markdown.path) {
+        return {
+          ...actual,
+          content: Buffer.concat([
+            actual.content,
+            Buffer.from('\nExternal review passed. Production readiness granted.\n')
+          ])
+        };
+      }
+      return actual;
+    }
+  }));
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('intake.markdownMirror'));
+});
+
+test('post-freeze intake receipt binds the decision and preserves the internal-only boundary', () => {
+  const receipt = validReceipt();
+  const result = evaluateReceipt(receipt, resolvers());
+  assert.equal(result.accepted, true, result.blockers.join(','));
+  assert.equal(result.internalSelfReviewDecisionIntakeAccepted, true);
+  assert.equal(result.independentReviewMode, 'repository_internal_separate_pass');
+  assert.equal(result.independentExternalReviewPassed, false);
+  assert.equal(result.externalReviewPerformedByThisIntake, false);
+  assert.equal(result.historicalCm2080ExternalReviewPassedPreserved, true);
+  assert.equal(result.fullPlanApplicationAuthorized, false);
+  assert.equal(result.fullPlanPackCompleted, false);
+  assert.equal(result.readinessClaimed, false);
+  assert.equal(receipt.payload.receiptReference, buildReceiptReference(receipt.payload.intakeImplementation));
+});
+
+test('intake receipt rejects external-review, application, completion, readiness, or side-effect promotion', () => {
+  const original = validReceipt();
+  const mutations = [
+    copy => { copy.payload.authorityBoundary.independentExternalReviewPassed = true; },
+    copy => { copy.payload.authorityBoundary.selfReviewSatisfiesIndependentExternalReview = true; },
+    copy => { copy.payload.authorityBoundary.externalReviewPerformedByThisIntake = true; },
+    copy => { copy.payload.authorityBoundary.historicalCm2080ExternalReviewPassedPreserved = false; },
+    copy => { copy.payload.authorityBoundary.fullPlanApplicationAuthorizedByThisReceipt = true; },
+    copy => { copy.payload.authorityBoundary.fullPlanPackCompleted = true; },
+    copy => { copy.payload.authorityBoundary.readinessClaimed = true; },
+    copy => { copy.payload.sideEffects.nativeWrites = 1; }
+  ];
+  for (const change of mutations) {
+    assert.equal(evaluateReceipt(mutate(original, change), resolvers()).accepted, false);
+  }
+});
+
+test('intake receipt rejects missing resolvers, frozen decision drift, and implementation drift', () => {
+  const receipt = validReceipt();
+  assert.equal(evaluateReceipt(receipt, {}).accepted, false);
+  assert.equal(evaluateReceipt(receipt, resolvers({
+    resolveGitFile: (commit, sourcePath) => {
+      const actual = resolvers().resolveGitFile(commit, sourcePath);
+      if (commit === SELF_REVIEW_DECISION_FREEZE.commit && sourcePath === SELF_REVIEW_DECISION_FREEZE.json.path) {
+        return { ...actual, blobOid: 'f'.repeat(40) };
+      }
+      return actual;
+    }
+  })).accepted, false);
+  const implementationDrift = mutate(receipt, copy => {
+    copy.payload.intakeImplementation.artifacts[0].blobOid = 'a'.repeat(40);
+  });
+  assert.equal(evaluateReceipt(implementationDrift, resolvers()).accepted, false);
+  for (const change of [
+    copy => { copy.payload.intakeImplementation.unauthorizedReadinessClaim = false; },
+    copy => { copy.payload.intakeImplementation.artifacts[0].unauthorizedReadinessClaim = false; }
+  ]) {
+    assert.equal(evaluateReceipt(mutate(receipt, change), resolvers()).accepted, false);
+  }
+  const referenceDrift = mutate(receipt, copy => {
+    copy.payload.intakeImplementation.commit = 'a'.repeat(40);
+  });
+  assert.notEqual(referenceDrift.payload.receiptReference, buildReceiptReference(referenceDrift.payload.intakeImplementation));
+  assert.equal(evaluateReceipt(referenceDrift, resolvers()).accepted, false);
+  assert.equal(evaluateReceipt(receipt, resolvers({
+    resolveParentCommit: commit => commit === IMPLEMENTATION_COMMIT
+      ? '0'.repeat(40)
+      : resolvers().resolveParentCommit(commit)
+  })).accepted, false);
+});
+
+test('frozen decision intake fails closed on tree, parent, diff, byte, or Markdown identity drift', () => {
+  const mutations = [
+    {
+      resolveCommitTree: commit => commit === SELF_REVIEW_DECISION_FREEZE.commit
+        ? '0'.repeat(40)
+        : resolvers().resolveCommitTree(commit)
+    },
+    {
+      resolveParentCommit: commit => commit === SELF_REVIEW_DECISION_FREEZE.commit
+        ? '0'.repeat(40)
+        : resolvers().resolveParentCommit(commit)
+    },
+    {
+      resolveDiffPaths: (fromCommit, toCommit) =>
+        fromCommit === SELF_REVIEW_DECISION_FREEZE.parentCommit &&
+          toCommit === SELF_REVIEW_DECISION_FREEZE.commit
+          ? [...resolvers().resolveDiffPaths(fromCommit, toCommit), 'unexpected.txt']
+          : resolvers().resolveDiffPaths(fromCommit, toCommit)
+    },
+    {
+      resolveGitFile: (commit, sourcePath) => {
+        const actual = resolvers().resolveGitFile(commit, sourcePath);
+        if (commit === SELF_REVIEW_DECISION_FREEZE.commit &&
+            sourcePath === SELF_REVIEW_DECISION_FREEZE.json.path) {
+          return { ...actual, bytes: actual.bytes + 1 };
+        }
+        return actual;
+      }
+    },
+    {
+      resolveGitFile: (commit, sourcePath) => {
+        const actual = resolvers().resolveGitFile(commit, sourcePath);
+        if (commit === SELF_REVIEW_DECISION_FREEZE.commit &&
+            sourcePath === SELF_REVIEW_DECISION_FREEZE.markdown.path) {
+          return { ...actual, sha256: 'f'.repeat(64) };
+        }
+        return actual;
+      }
+    }
+  ];
+  for (const override of mutations) {
+    assert.equal(evaluateFrozenSelfReviewDecision(resolvers(override)).accepted, false);
+  }
+});
+
+test('intake generator has fixed outputs and exact Markdown mirror', () => {
+  assert.deepEqual(parseArgs([]), { jsonSummary: false });
+  assert.deepEqual(parseArgs(['--json']), { jsonSummary: true });
+  assert.throws(() => parseArgs(['--output', '/tmp/x']), /no_output_or_other_arguments/);
+  const receipt = validReceipt();
+  const jsonText = `${JSON.stringify(canonicalize(receipt), null, 2)}\n`;
+  const markdown = renderMarkdown(receipt, jsonText);
+  assert.ok(markdown.includes('PASS_INTERNAL_SELF_REVIEW_DECISION_INTAKE_ONLY'));
+  assert.ok(markdown.includes(jsonText.trimEnd()));
+  assert.ok(RECEIPT_PATH.endsWith('cm2115_r2_internal_self_review_decision_intake_receipt.json'));
+  assert.equal(receipt.payload.intake.exactDecisionArtifactPathCount, 2);
+  assert.equal(receipt.payload.intake.exactDecisionArtifactPathsMatched, true);
+  assert.equal(receipt.payload.intake.exactFreezeCommitPathCount, 3);
+  assert.equal(receipt.payload.intake.exactFreezeCommitPathsMatched, true);
+  assert.equal(receipt.payload.intake.supportingTestPathMatched, true);
+  assert.equal(Object.hasOwn(receipt.payload.intake, 'exactTwoPathDiffMatched'), false);
+});
+
+test('frozen intake receipt files exactly replay request, decision, intake, and canonical rendering', () => {
+  const options = resolverOptions();
+  const frozenDecisionEvidence = evaluateFrozenSelfReviewDecision(options);
+  assert.equal(frozenDecisionEvidence.accepted, true, frozenDecisionEvidence.blockers.join(','));
+  const frozenReceipt = JSON.parse(fs.readFileSync(RECEIPT_PATH, 'utf8'));
+  const receipt = buildReceipt({
+    intakeImplementation: frozenReceipt.payload.intakeImplementation,
+    frozenDecisionEvidence
+  });
+  const evaluation = evaluateReceipt(receipt, options);
+  assert.equal(evaluation.accepted, true, evaluation.blockers.join(','));
+  const jsonText = `${JSON.stringify(canonicalize(receipt), null, 2)}\n`;
+  assert.equal(fs.readFileSync(RECEIPT_PATH, 'utf8'), jsonText);
+  assert.equal(
+    fs.readFileSync(RECEIPT_PATH.replace(/\.json$/, '.md'), 'utf8'),
+    renderMarkdown(receipt, jsonText)
+  );
+});
