@@ -1,0 +1,105 @@
+# CM-2124 Status-sync Receipt Independent Review
+
+Review reference: `CM-2124-RECEIPT-REVIEW-PASS-8D3AEFD3-5CE9D65A`
+Canonical payload SHA-256: `ff3aad1c4007e54e3afcab8497fb65f3472f1270ee5124627a4370c89587924c`
+
+Result: PASS.
+
+The two frozen receipts, detached 9M commit, one-shot claim, and target-branch
+non-update boundary were independently replayed. This review does not update
+the target branch or authorize Branch CAS, remote actions, or readiness.
+
+## Exact JSON mirror
+
+```json
+{
+  "artifactType": "cm2124_status_sync_receipt_independent_review_v1",
+  "canonicalPayloadSha256": "ff3aad1c4007e54e3afcab8497fb65f3472f1270ee5124627a4370c89587924c",
+  "payload": {
+    "bindingReceipt": {
+      "artifactType": "cm2122_r2_detached_status_sync_binding_receipt_v1",
+      "blobOid": "bb3d764f0d072271128e2174d82361e68d509221",
+      "bytes": 12174,
+      "canonicalPayloadSha256": "f03cb5d8a78d17c5f9b90005edc7a45d32b2113c39a29b0f403ffe268e01d023",
+      "gitMode": "100644",
+      "outputPath": "docs/near-model-memory-plan-pack/cm2124_status_sync_binding_receipt.json",
+      "sha256": "5ce9d65ab6e2c6d3a957c30ce65c7195dce0619cb88312fb18bb52ecd982f28f",
+      "sourceFilename": "cm2122-r2-full-plan-status-sync-binding-receipt-001.json"
+    },
+    "currentBoundary": {
+      "branchRefUpdateAuthorized": false,
+      "branchRefUpdated": false,
+      "currentBranchStatusSynchronized": false,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaimed": false,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "statusSyncPerformed": false,
+      "targetBranchOid": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f",
+      "targetBranchRef": "refs/heads/codex/near-model-memory-frozen-replay-v2"
+    },
+    "detachedStatusCommit": "eb016872c834a8a8b36ed8edd8ce1aeb0db599c8",
+    "detachedStatusParent": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f",
+    "detachedStatusTree": "c129ecfaa134a47f30ed98f17d74151989c1a547",
+    "executionReceipt": {
+      "artifactType": "cm2122_r2_detached_status_sync_execution_receipt_v1",
+      "blobOid": "cb9bb00944b992ed75a0665156d3785b40548d91",
+      "bytes": 12435,
+      "canonicalPayloadSha256": "a040c6e948fe1ac740fa5bf22a7f29d95e901b1a64102599384221204ddf5e2d",
+      "gitMode": "100644",
+      "outputPath": "docs/near-model-memory-plan-pack/cm2124_status_sync_execution_receipt.json",
+      "sha256": "8d3aefd3a335f4b850dfc07369d23c411bd0bd49028c597455c28d5d8f518120",
+      "sourceFilename": "cm2122-r2-full-plan-status-sync-execution-receipt-001.json"
+    },
+    "freezeCommit": "86fc18bcfe9173af3cab3afca0522290f6f1f87c",
+    "freezeDiffEntries": [
+      {
+        "path": "docs/near-model-memory-plan-pack/cm2124_status_sync_binding_receipt.json",
+        "status": "A"
+      },
+      {
+        "path": "docs/near-model-memory-plan-pack/cm2124_status_sync_execution_receipt.json",
+        "status": "A"
+      },
+      {
+        "path": "docs/near-model-memory-plan-pack/cm2124_status_sync_receipt_freeze_manifest.json",
+        "status": "A"
+      },
+      {
+        "path": "docs/near-model-memory-plan-pack/cm2124_status_sync_receipt_freeze_manifest.md",
+        "status": "A"
+      }
+    ],
+    "freezeDiffPaths": [
+      "docs/near-model-memory-plan-pack/cm2124_status_sync_binding_receipt.json",
+      "docs/near-model-memory-plan-pack/cm2124_status_sync_execution_receipt.json",
+      "docs/near-model-memory-plan-pack/cm2124_status_sync_receipt_freeze_manifest.json",
+      "docs/near-model-memory-plan-pack/cm2124_status_sync_receipt_freeze_manifest.md"
+    ],
+    "freezeParentCommit": "19dad4e0c6b48977a526b1ee2e05aeb369adf97f",
+    "freezeTree": "10bd4586209d5d3c3fe8d85082fb25f33a6595b1",
+    "manifest": {
+      "blobOid": "b454be44406a267c6bdf880b7adc08d086410fe4",
+      "bytes": 3458,
+      "canonicalPayloadSha256": "ec51dbfd4e485115a295877bc03110776985900e3285b9a35b570a5cbe092062",
+      "path": "docs/near-model-memory-plan-pack/cm2124_status_sync_receipt_freeze_manifest.json",
+      "sha256": "d6ab82b0401f15d70d267a2682080518ccc5c1c38b3622581b90b41e97876e36"
+    },
+    "reviewReference": "CM-2124-RECEIPT-REVIEW-PASS-8D3AEFD3-5CE9D65A",
+    "verification": {
+      "authorizationConsumed": true,
+      "authorizationReplayAllowed": false,
+      "bindingReceiptAccepted": true,
+      "detachedCommitBindingAccepted": true,
+      "durableBindingAccepted": true,
+      "executionReceiptAccepted": true,
+      "finalReleaseGitIntakeAccepted": true,
+      "packetGitIntakeAccepted": true
+    }
+  },
+  "schemaVersion": 1,
+  "taskId": "CM-2124"
+}
+```

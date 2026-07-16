@@ -41,7 +41,7 @@ test('CM1448 release test gate matrix matches default-safe excluded categories',
   assert.equal(packageJson.scripts['test:migration'], 'node ./src/cli/run-release-gate-tests.js migration');
   assert.equal(
     packageJson.scripts['test:frozen-replay-e2e'],
-    'node --test --test-concurrency=1 tests/cm2118-full-plan-application-execution.test.js tests/cm2120-full-plan-application-receipt-review.test.js tests/cm2122-full-plan-status-sync-execution.test.js'
+    'node --test --test-concurrency=1 tests/cm2118-full-plan-application-execution.test.js tests/cm2120-full-plan-application-receipt-review.test.js tests/cm2122-full-plan-status-sync-execution.test.js tests/cm2126-exact-branch-cas-execution.test.js'
   );
 });
 

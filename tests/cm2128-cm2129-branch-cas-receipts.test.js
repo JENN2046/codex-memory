@@ -1,0 +1,498 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
+const test = require('node:test');
+
+const ROOT = path.resolve(__dirname, '..');
+const freeze = require('../scripts/freeze-cm2128-branch-cas-receipts');
+const review = require('../scripts/review-cm2129-branch-cas-receipts');
+const execution = require('../src/core/Cm2126ExactBranchCasExecution');
+const { claimFileName } = require('../src/core/Cm2126ExactBranchCasClaimRegistry');
+
+function sha256(bytes) {
+  return crypto.createHash('sha256').update(bytes).digest('hex');
+}
+
+function source(relativePath) {
+  return fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
+}
+
+function gitBlobOid(bytes) {
+  return crypto.createHash('sha1')
+    .update(`blob ${bytes.length}\0`)
+    .update(bytes)
+    .digest('hex');
+}
+
+function gitFileIdentity(commit, relativePath) {
+  const bytes = execFileSync('git', ['show', `${commit}:${relativePath}`], {
+    cwd: ROOT,
+    encoding: null,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  return {
+    blobOid: gitBlobOid(bytes),
+    bytes: bytes.length,
+    path: relativePath,
+    sha256: sha256(bytes)
+  };
+}
+
+function withTempDirectory(callback) {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2128-receipts-'));
+  try {
+    return callback(directory);
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+}
+
+test('CM-2128 and CM-2129 accept no arguments and expose only fixed relative output paths', () => {
+  assert.equal(freeze.parseArgs([]), undefined);
+  assert.equal(review.parseArgs([]), undefined);
+  for (const argv of [
+    ['--output', 'alternate.json'],
+    ['--claim', 'alternate.json'],
+    ['positional']
+  ]) {
+    assert.throws(() => freeze.parseArgs(argv), /cm2128_freeze_no_arguments_allowed/);
+    assert.throws(() => review.parseArgs(argv), /cm2129_review_no_arguments_allowed/);
+  }
+
+  const outputs = [
+    ...Object.values(freeze.OUTPUTS),
+    review.REVIEW_PATH,
+    review.REVIEW_MARKDOWN_PATH
+  ];
+  assert.equal(new Set(outputs).size, 6);
+  for (const output of outputs) {
+    assert.equal(path.isAbsolute(output), false);
+    assert.equal(output.includes('..'), false);
+    assert.ok(output.startsWith('docs/near-model-memory-plan-pack/'));
+  }
+  assert.deepEqual(review.FREEZE_DIFF_PATHS, Object.values(freeze.OUTPUTS).sort());
+  assert.deepEqual(freeze.IMPLEMENTATION_DIFF_PATHS, [
+    'scripts/freeze-cm2128-branch-cas-receipts.js',
+    'scripts/review-cm2129-branch-cas-receipts.js',
+    'tests/cm2128-cm2129-branch-cas-receipts.test.js'
+  ]);
+  assert.deepEqual(
+    review.FREEZE_DIFF_ENTRIES,
+    review.FREEZE_DIFF_PATHS.map(output => ({ status: 'A', path: output }))
+  );
+});
+
+test('CM-2128 low-disclosure scanner accepts bounded metadata and rejects nested paths or secret-shaped strings', () => {
+  assert.equal(freeze.assertLowDisclosure({
+    commit: 'a'.repeat(40),
+    sha256: 'b'.repeat(64),
+    nested: [{ targetRef: 'refs/heads/codex/example' }]
+  }), true);
+
+  for (const unsafe of [
+    { nested: [{ path: path.join('/home', 'jenn', 'private') }] },
+    { nested: [{ path: '/workspace/codex-memory/private' }] },
+    { nested: [{ path: '/root/private' }] },
+    { nested: [{ path: '/opt/private' }] },
+    { nested: [{ path: 'file:///workspace/codex-memory/private' }] },
+    { nested: [{ path: 'FILE:///C:/Users/Example/private' }] },
+    { nested: [{ path: '~/workspace/codex-memory/private' }] },
+    { nested: [{ path: '~jenn/.ssh/config' }] },
+    { nested: [{ path: '~root/private' }] },
+    { nested: [{ path: '~operator/workspace/receipt.json' }] },
+    { nested: [{ path: '~' }] },
+    { nested: { path: 'C:\\Users\\Example\\private' } },
+    { nested: { path: '../private/receipt.json' } },
+    { nested: { path: '..\\private\\receipt.json' } },
+    { nested: { path: '.git/worktrees/private/index' } },
+    { nested: { path: '.git\\config' } },
+    { nested: { path: '\\\\server\\share\\secret' } },
+    { nested: { path: 'data/private-memory.jsonl' } },
+    { nested: { path: 'data\\private-memory.jsonl' } },
+    { nested: { path: 'logs/private-audit.jsonl' } },
+    { nested: { credential: `sk-${'x'.repeat(20)}` } },
+    { nested: { authorization: `Bearer ${'x'.repeat(20)}` } },
+    { nested: { privateKey: `BEGIN ${'PRIVATE'} KEY` } },
+    { nested: { credential: `AKIA${'A'.repeat(16)}` } },
+    { nested: { credential: `ASIA${'B'.repeat(16)}` } },
+    { nested: { ['/home/jenn/private/receipt.json']: 'safe-value' } },
+    { nested: { [`Bearer ${'x'.repeat(20)}`]: 'safe-value' } },
+    { nested: { [`sk-${'x'.repeat(20)}`]: 'safe-value' } },
+    { nested: { [`AKIA${'A'.repeat(16)}`]: 'safe-value' } }
+  ]) {
+    assert.throws(
+      () => freeze.assertLowDisclosure(unsafe),
+      /cm2128_low_disclosure_string_boundary_failed/
+    );
+  }
+});
+
+test('CM-2128 clean-detached check forces untracked-file reporting despite Git config', () => {
+  withTempDirectory(directory => {
+    const git = args => execFileSync('git', args, {
+      cwd: directory,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    }).trim();
+    execFileSync('git', ['init', '--quiet'], { cwd: directory, stdio: 'ignore' });
+    git(['config', 'user.email', 'cm2128@example.invalid']);
+    git(['config', 'user.name', 'CM-2128 Test']);
+    fs.writeFileSync(path.join(directory, 'tracked.txt'), 'tracked\n');
+    git(['add', 'tracked.txt']);
+    git(['commit', '--quiet', '-m', 'fixture']);
+    git(['checkout', '--quiet', '--detach']);
+    git(['config', 'status.showUntrackedFiles', 'no']);
+    fs.writeFileSync(path.join(directory, 'untracked-sentinel.txt'), 'untracked\n');
+
+    assert.equal(git(['status', '--porcelain']), '');
+    assert.throws(
+      () => freeze.assertCleanDetachedWorktree(git),
+      /cm2128_clean_detached_worktree_required/
+    );
+
+    fs.rmSync(path.join(directory, 'untracked-sentinel.txt'));
+    assert.doesNotThrow(() => freeze.assertCleanDetachedWorktree(git));
+  });
+});
+
+test('CM-2128 exact JSON reader binds file shape, raw bytes, and SHA-256 and fails closed on drift', () => {
+  withTempDirectory(directory => {
+    const file = path.join(directory, 'receipt.json');
+    const bytes = Buffer.from('{"accepted":true,"count":1}\n', 'utf8');
+    fs.writeFileSync(file, bytes);
+    const expected = { bytes: bytes.length, sha256: sha256(bytes) };
+
+    const exact = freeze.readExactJson(file, expected, 'fixture');
+    assert.ok(exact.bytes.equals(bytes));
+    assert.deepEqual(exact.value, { accepted: true, count: 1 });
+
+    assert.throws(
+      () => freeze.readExactJson(file, { ...expected, bytes: expected.bytes + 1 }, 'fixture'),
+      /cm2128_fixture_identity_mismatch/
+    );
+    assert.throws(
+      () => freeze.readExactJson(file, { ...expected, sha256: '0'.repeat(64) }, 'fixture'),
+      /cm2128_fixture_identity_mismatch/
+    );
+
+    const changed = Buffer.from('{"accepted":true,"count":2}\n', 'utf8');
+    fs.writeFileSync(file, changed);
+    assert.throws(
+      () => freeze.readExactJson(file, expected, 'fixture'),
+      /cm2128_fixture_identity_mismatch/
+    );
+  });
+});
+
+test('CM-2128 exact JSON reader rejects symlinks and low-disclosure drift', () => {
+  withTempDirectory(directory => {
+    const target = path.join(directory, 'target.json');
+    const link = path.join(directory, 'link.json');
+    const bytes = Buffer.from('{"accepted":true}\n', 'utf8');
+    fs.writeFileSync(target, bytes);
+    fs.symlinkSync(target, link);
+    const expected = { bytes: bytes.length, sha256: sha256(bytes) };
+    assert.throws(
+      () => freeze.readExactJson(link, expected, 'fixture'),
+      /cm2128_fixture_source_invalid/
+    );
+
+    const unsafe = Buffer.from(JSON.stringify({ path: path.join('/home', 'jenn', 'private') }), 'utf8');
+    fs.writeFileSync(target, unsafe);
+    assert.throws(
+      () => freeze.readExactJson(target, { bytes: unsafe.length, sha256: sha256(unsafe) }, 'fixture'),
+      /cm2128_low_disclosure_string_boundary_failed/
+    );
+  });
+});
+
+test('CM-2128 verified reader rejects descriptor identity swaps before reading bytes', () => {
+  let readCalls = 0;
+  let closeCalls = 0;
+  const pathStat = {
+    dev: 1,
+    ino: 2,
+    isFile: () => true,
+    isSymbolicLink: () => false
+  };
+  const fileSystem = {
+    lstatSync: () => pathStat,
+    openSync: () => 17,
+    fstatSync: () => ({ ...pathStat, ino: 3, isFile: () => true }),
+    readFileSync: () => { readCalls += 1; return Buffer.from('{}'); },
+    closeSync: () => { closeCalls += 1; }
+  };
+
+  assert.throws(
+    () => freeze.readVerifiedFileSync('/fixed/receipt.json', 'fixture', fileSystem),
+    /cm2128_fixture_source_invalid/
+  );
+  assert.equal(readCalls, 0);
+  assert.equal(closeCalls, 1);
+});
+
+test('CM-2128 receipt reads stay pinned to the verified root across a path replacement', () => {
+  withTempDirectory(parent => {
+    const root = path.join(parent, 'governance');
+    const movedRoot = path.join(parent, 'verified-governance');
+    const filename = 'claim.json';
+    const verifiedBytes = Buffer.from('{"source":"verified-root"}\n');
+    const replacementBytes = Buffer.from('{"source":"replacement-root"}\n');
+    fs.mkdirSync(root);
+    fs.writeFileSync(path.join(root, filename), verifiedBytes);
+    const rootDescriptor = fs.openSync(
+      root,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+    );
+
+    try {
+      fs.renameSync(root, movedRoot);
+      fs.mkdirSync(root);
+      fs.writeFileSync(path.join(root, filename), replacementBytes);
+      const artifact = freeze.readExactGovernanceJson(
+        { fd: rootDescriptor },
+        filename,
+        { bytes: verifiedBytes.length, sha256: sha256(verifiedBytes) },
+        'claim'
+      );
+      assert.deepEqual(artifact.bytes, verifiedBytes);
+      assert.deepEqual(artifact.value, { source: 'verified-root' });
+    } finally {
+      fs.closeSync(rootDescriptor);
+    }
+  });
+});
+
+test('CM-2129 live governance reader rejects symlinks before reading receipt bytes', () => {
+  withTempDirectory(directory => {
+    const target = path.join(directory, 'target.json');
+    const link = path.join(directory, 'live-receipt.json');
+    fs.writeFileSync(target, '{"accepted":true}\n');
+    fs.symlinkSync(target, link);
+    const rootDescriptor = fs.openSync(
+      directory,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+    );
+
+    try {
+      assert.throws(
+        () => review.readLiveGovernanceFile({ fd: rootDescriptor }, path.basename(link), 'execution_receipt'),
+        /cm2129_live_governance_file_invalid:execution_receipt/
+      );
+    } finally {
+      fs.closeSync(rootDescriptor);
+    }
+  });
+});
+
+test('CM-2129 live governance reads stay pinned to the verified root across a path replacement', () => {
+  withTempDirectory(parent => {
+    const root = path.join(parent, 'governance');
+    const movedRoot = path.join(parent, 'verified-governance');
+    const filename = 'execution-receipt.json';
+    const verifiedBytes = Buffer.from('{"source":"verified-root"}\n');
+    const replacementBytes = Buffer.from('{"source":"replacement-root"}\n');
+    fs.mkdirSync(root);
+    fs.writeFileSync(path.join(root, filename), verifiedBytes);
+    const rootDescriptor = fs.openSync(
+      root,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY | fs.constants.O_NOFOLLOW
+    );
+
+    try {
+      fs.renameSync(root, movedRoot);
+      fs.mkdirSync(root);
+      fs.writeFileSync(path.join(root, filename), replacementBytes);
+      assert.deepEqual(
+        review.readLiveGovernanceFile({ fd: rootDescriptor }, filename, 'execution_receipt'),
+        verifiedBytes
+      );
+    } finally {
+      fs.closeSync(rootDescriptor);
+    }
+  });
+});
+
+test('CM-2128 receipt identity deterministically binds bytes, blob OID, raw hash, and canonical payload hash', () => {
+  const bytes = Buffer.from('{"artifactType":"fixture_receipt_v1","canonicalPayloadSha256":"' +
+    `${'a'.repeat(64)}"}\n`, 'utf8');
+  const identity = freeze.receiptIdentity(
+    freeze.OUTPUTS.execution,
+    'source-receipt.json',
+    {
+      bytes,
+      value: JSON.parse(bytes.toString('utf8'))
+    }
+  );
+  const header = Buffer.from(`blob ${bytes.length}\0`, 'utf8');
+
+  assert.deepEqual(identity, {
+    sourceFilename: 'source-receipt.json',
+    outputPath: freeze.OUTPUTS.execution,
+    gitMode: '100644',
+    blobOid: crypto.createHash('sha1').update(header).update(bytes).digest('hex'),
+    bytes: bytes.length,
+    sha256: sha256(bytes),
+    artifactType: 'fixture_receipt_v1',
+    canonicalPayloadSha256: 'a'.repeat(64)
+  });
+});
+
+test('CM-2129 review requires the exact complete CM-2128 manifest shape and freeze reference', () => {
+  const payload = Object.fromEntries(review.MANIFEST_PAYLOAD_KEYS.map(key => [key, null]));
+  payload.freezeReference = review.FREEZE_REFERENCE;
+  const manifest = {
+    schemaVersion: 1,
+    taskId: 'CM-2128',
+    artifactType: 'cm2128_branch_cas_receipt_freeze_manifest_v1',
+    canonicalPayloadSha256: 'a'.repeat(64),
+    payload
+  };
+  assert.equal(review.manifestShapeAccepted(manifest), true);
+  assert.equal(review.manifestShapeAccepted({ ...manifest, productionReady: true }), false);
+  assert.equal(review.manifestShapeAccepted({
+    ...manifest,
+    payload: { ...payload, productionReady: true }
+  }), false);
+  assert.equal(review.manifestShapeAccepted({
+    ...manifest,
+    payload: { ...payload, freezeReference: 'CM-2128-FORKED' }
+  }), false);
+});
+
+test('CM-2129 accepts only the fixed claim and execution receipt source filenames', () => {
+  const manifest = {
+    payload: {
+      claimReceipt: { sourceFilename: claimFileName() },
+      executionReceipt: { sourceFilename: execution.EXECUTION_RECEIPT_FILENAME }
+    }
+  };
+  assert.equal(review.receiptSourceFilenamesAccepted(manifest), true);
+  manifest.payload.claimReceipt.sourceFilename = 'forked-claim.json';
+  assert.equal(review.receiptSourceFilenamesAccepted(manifest), false);
+  manifest.payload.claimReceipt.sourceFilename = claimFileName();
+  manifest.payload.executionReceipt.sourceFilename = 'forked-execution.json';
+  assert.equal(review.receiptSourceFilenamesAccepted(manifest), false);
+});
+
+test('CM-2128 and CM-2129 Markdown renderers preserve an exact JSON mirror and non-authority boundary', () => {
+  const manifest = {
+    canonicalPayloadSha256: 'a'.repeat(64),
+    payload: { freezeReference: 'CM-2128-TEST' }
+  };
+  const manifestJson = `${JSON.stringify(manifest)}\n`;
+  const manifestMarkdown = freeze.renderMarkdown(manifest, manifestJson);
+  assert.match(manifestMarkdown, /CM-2128 Branch CAS Receipt Freeze Manifest/);
+  assert.match(manifestMarkdown, /does\s+not replay the authorization/);
+  assert.ok(manifestMarkdown.includes(manifestJson.trimEnd()));
+
+  const receiptReview = {
+    canonicalPayloadSha256: 'b'.repeat(64),
+    payload: { reviewReference: 'CM-2129-TEST' }
+  };
+  const reviewJson = `${JSON.stringify(receiptReview)}\n`;
+  const reviewMarkdown = review.renderMarkdown(receiptReview, reviewJson);
+  assert.match(reviewMarkdown, /Result: PASS/);
+  assert.match(reviewMarkdown, /grants no replay, ref, remote, native-memory/);
+  assert.ok(reviewMarkdown.includes(reviewJson.trimEnd()));
+});
+
+test('CM-2129 keeps historical execution evidence separate from the shipped hardened executor', () => {
+  const packet = JSON.parse(source(
+    'docs/near-model-memory-plan-pack/cm2126_exact_branch_cas_execution_packet.json'
+  ));
+  const historical = packet.payload.implementation.artifacts.find(
+    artifact => artifact.path === 'src/core/Cm2126ExactBranchCasExecution.js'
+  );
+  assert.deepEqual(historical, {
+    blobOid: '17f0c19dd94270c9d9c41e3222b86ab601703c3c',
+    bytes: 82553,
+    path: 'src/core/Cm2126ExactBranchCasExecution.js',
+    sha256: '38fb8b7b320bc372443a7ad300295c63f628b0daa8f5b6b910aecab719c5212c'
+  });
+
+  const currentBytes = fs.readFileSync(path.join(ROOT, historical.path));
+  assert.equal(gitBlobOid(currentBytes), '27754872cdc14ed16639d1b80feef69104dea6f3');
+  assert.equal(sha256(currentBytes), 'cb75a18245dc3a61da17650b0d38611532947d07804792f49ec4b2985fdd1544');
+  assert.notEqual(sha256(currentBytes), historical.sha256);
+
+  const boundary = source(
+    'docs/near-model-memory-plan-pack/cm2129_post_execution_hardening_boundary.md'
+  );
+  assert.match(boundary, /historical_branch_cas_receipt_preserved: true/);
+  assert.match(boundary, /historical_authorization_replay_allowed: false/);
+  assert.match(boundary, /current_shipped_executor_authorized_by_cm2127: false/);
+  assert.match(boundary, /current_shipped_executor_execution_proof_accepted: false/);
+  assert.match(boundary, /current_shipped_executor_branch_cas_may_execute: false/);
+  const historicalGenerator = gitFileIdentity(
+    'f8483a1d189f444d7481032252e17003680006a6',
+    'scripts/generate-cm2125-exact-branch-cas-content-decision.js'
+  );
+  assert.deepEqual(historicalGenerator, {
+    blobOid: 'df5ba8aecfa34fd3542982888c8b5fdc36e5104b',
+    bytes: 6015,
+    path: 'scripts/generate-cm2125-exact-branch-cas-content-decision.js',
+    sha256: '5bf077e5ad51315c0f266a6989653850f5d5d28da355ad56109b1522ab81bc57'
+  });
+  const currentGeneratorBytes = fs.readFileSync(path.join(ROOT, historicalGenerator.path));
+  assert.equal(gitBlobOid(currentGeneratorBytes), '74508b4dab93b80c110148a86d9781af2a4a7020');
+  assert.equal(sha256(currentGeneratorBytes), 'fb442ed2eb2ec298bc7b15da530239fd691327e843b81042898213db303ab754');
+  assert.notEqual(sha256(currentGeneratorBytes), historicalGenerator.sha256);
+  assert.match(boundary, /current_content_generator_authorized_by_cm2125: false/);
+  assert.match(boundary, /current_content_generator_execution_proof_accepted: false/);
+  assert.match(boundary, /additional_branch_ref_update_authorized: false/);
+  assert.match(boundary, /readiness_claimed: false/);
+});
+
+test('receipt freeze and review scripts statically exclude executor, ref-update, remote, and alternate-output entry points', () => {
+  const freezeSource = source('scripts/freeze-cm2128-branch-cas-receipts.js');
+  const reviewSource = source('scripts/review-cm2129-branch-cas-receipts.js');
+  for (const scriptSource of [freezeSource, reviewSource]) {
+    assert.doesNotMatch(scriptSource, /require\(['"]node:child_process['"]\)/);
+    assert.doesNotMatch(scriptSource, /require\(['"]\.\.\/src\/cli\//);
+    assert.doesNotMatch(scriptSource, /executeBranchCasFromCommits/);
+    assert.doesNotMatch(scriptSource, /(?:^|\s)(?:git\s+)?update-ref(?:\s|$)/m);
+    assert.doesNotMatch(scriptSource, /(?:^|\s)(?:git\s+)?push(?:\s|$)/m);
+    assert.doesNotMatch(scriptSource, /--output|--claim|--receipt/);
+  }
+  assert.match(freezeSource, /--untracked-files=all/);
+  assert.match(reviewSource, /assertCleanDetachedWorktree\(\)/);
+
+  const freezeWrites = [...freezeSource.matchAll(/fs\.writeFileSync\(([^,]+),/g)]
+    .map(match => match[1].trim());
+  const reviewWrites = [...reviewSource.matchAll(/fs\.writeFileSync\(([^,]+),/g)]
+    .map(match => match[1].trim());
+  assert.deepEqual(freezeWrites, [
+    'OUTPUTS.claim',
+    'OUTPUTS.execution',
+    'OUTPUTS.manifest',
+    'OUTPUTS.markdown'
+  ]);
+  assert.deepEqual(reviewWrites, ['REVIEW_PATH', 'REVIEW_MARKDOWN_PATH']);
+  assert.equal((freezeSource.match(/flag:\s*'wx'/g) || []).length, 4);
+  assert.equal((reviewSource.match(/flag:\s*'wx'/g) || []).length, 2);
+});
+
+test('frozen raw identities and commit bindings are exact constants and fail closed under local comparison drift', () => {
+  assert.match(freeze.CONTENT_COMMIT, /^[a-f0-9]{40}$/);
+  assert.match(freeze.PACKET_COMMIT, /^[a-f0-9]{40}$/);
+  assert.match(freeze.FINAL_RELEASE_COMMIT, /^[a-f0-9]{40}$/);
+  assert.match(freeze.FINAL_RELEASE_TREE, /^[a-f0-9]{40}$/);
+  assert.match(freeze.EXPECTED.claim.sha256, /^[a-f0-9]{64}$/);
+  assert.match(freeze.EXPECTED.execution.sha256, /^[a-f0-9]{64}$/);
+  assert.match(freeze.EXPECTED.execution.canonicalPayloadSha256, /^[a-f0-9]{64}$/);
+  assert.equal(freeze.EXPECTED.claim.bytes, 1645);
+  assert.equal(freeze.EXPECTED.execution.bytes, 25430);
+
+  const expectedClaim = { ...freeze.EXPECTED.claim };
+  const driftedClaim = { ...expectedClaim, sha256: '0'.repeat(64) };
+  assert.notDeepEqual(driftedClaim, expectedClaim);
+  const expectedExecution = { ...freeze.EXPECTED.execution };
+  const driftedExecution = { ...expectedExecution, bytes: expectedExecution.bytes + 1 };
+  assert.notDeepEqual(driftedExecution, expectedExecution);
+});

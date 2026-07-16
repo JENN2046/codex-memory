@@ -1,0 +1,315 @@
+{
+  "artifactType": "cm2122_r2_detached_status_sync_binding_receipt_v1",
+  "canonicalPayloadSha256": "f03cb5d8a78d17c5f9b90005edc7a45d32b2113c39a29b0f403ffe268e01d023",
+  "payload": {
+    "boundCandidateState": {
+      "branchRefUpdateDecisionRequired": true,
+      "currentBranchStatusSynchronized": false,
+      "fullPlanPackCompleted": true,
+      "readiness": {
+        "completeRealtimeMemory": false,
+        "completeRealtimeMemoryClaimed": false,
+        "completeV8": false,
+        "completeV8Claimed": false,
+        "cutoverReady": false,
+        "cutoverReadyClaimed": false,
+        "deployReady": false,
+        "deployReadyClaimed": false,
+        "fullBridgeCompletion": false,
+        "fullBridgeCompletionClaimed": false,
+        "fullPlanPackCompletedClaimed": false,
+        "fullRealtimeMemory": false,
+        "fullRealtimeMemoryClaimed": false,
+        "modelMemoryComplete": false,
+        "modelMemoryCompleteClaimed": false,
+        "productionReady": false,
+        "productionReadyClaimed": false,
+        "rcReady": false,
+        "rcReadyClaimed": false,
+        "readinessClaimed": false,
+        "releaseReady": false,
+        "releaseReadyClaimed": false
+      },
+      "statusSyncContentAppliedInDetachedCommit": true,
+      "statusSyncPerformed": false
+    },
+    "contentDecision": {
+      "canonicalPayloadSha256": "b3ef390494b9fd8a4f217f584abe93dfefc38e951cbe224d9c9a3600087b1112",
+      "commit": "096eaf0c42f8e76180177eef7d16bf6edd605858",
+      "json": {
+        "blobOid": "7a3d9667b51220d2623658e2d673bd5fee88e09d",
+        "bytes": 18815,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "a42fd82c5e78fbdac04a8a3f4847b95e3953d45ee233d8496d4eeaa8bff5775f",
+        "sourceCommit": "096eaf0c42f8e76180177eef7d16bf6edd605858",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2121_exact_full_plan_status_sync_content_decision.json",
+        "sourceTree": "e4c81196919a949ae616f5caa7222ff7869e06a7"
+      },
+      "machineGitIntakeRequired": true,
+      "markdown": {
+        "blobOid": "277c023772ee0ffd5a0696a9b6a9516894e9059d",
+        "bytes": 19459,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "eb7cd8f846f03f019eaf6266e1b79c7ca50cc10a71bd3673ad93d9ec538c3b87",
+        "sourceCommit": "096eaf0c42f8e76180177eef7d16bf6edd605858",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2121_exact_full_plan_status_sync_content_decision.md",
+        "sourceTree": "e4c81196919a949ae616f5caa7222ff7869e06a7"
+      },
+      "parentCommit": "620cf6d3446d3af0de95a85ca2f6045bec2005d7",
+      "parentTree": "0bf7b88e2c83b970112adfc6209446014bbe0871",
+      "patchPayloadSha256": "2d4cbe41b0747d9dac31a77a02f70e389356c72d5f9307ab415f9f1af893ef92",
+      "reference": "CM-2121-EXACT-STATUS-SYNC-CONTENT-DECISION-7C489A3A-2D4CBE41-43CDC772",
+      "tree": "e4c81196919a949ae616f5caa7222ff7869e06a7"
+    },
+    "detachedCommit": {
+      "commit": "eb016872c834a8a8b36ed8edd8ce1aeb0db599c8",
+      "detachedHeadCasUsed": true,
+      "exactEntries": [
+        {
+          "path": ".agent_board/AUTOPILOT_LEDGER.md",
+          "status": "M"
+        },
+        {
+          "path": ".agent_board/CHECKPOINT.md",
+          "status": "M"
+        },
+        {
+          "path": ".agent_board/CURRENT_FACTS.json",
+          "status": "M"
+        },
+        {
+          "path": ".agent_board/HANDOFF.md",
+          "status": "M"
+        },
+        {
+          "path": ".agent_board/RUN_STATE.md",
+          "status": "M"
+        },
+        {
+          "path": ".agent_board/TASK_QUEUE.md",
+          "status": "M"
+        },
+        {
+          "path": ".agent_board/VALIDATION_LOG.md",
+          "status": "M"
+        },
+        {
+          "path": "CURRENT_STATE.md",
+          "status": "M"
+        },
+        {
+          "path": "STATUS.md",
+          "status": "M"
+        }
+      ],
+      "exactPaths": [
+        ".agent_board/AUTOPILOT_LEDGER.md",
+        ".agent_board/CHECKPOINT.md",
+        ".agent_board/CURRENT_FACTS.json",
+        ".agent_board/HANDOFF.md",
+        ".agent_board/RUN_STATE.md",
+        ".agent_board/TASK_QUEUE.md",
+        ".agent_board/VALIDATION_LOG.md",
+        "CURRENT_STATE.md",
+        "STATUS.md"
+      ],
+      "parentCommit": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f",
+      "parentTree": "9e8185956ba4229a3238e162a4e9a092e1d4915c",
+      "patchPayloadSha256": "2d4cbe41b0747d9dac31a77a02f70e389356c72d5f9307ab415f9f1af893ef92",
+      "targetBranchExpectedOld": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f",
+      "targetBranchObservedAfterCommit": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f",
+      "targetBranchObservedBeforeCommit": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f",
+      "targetBranchRef": "refs/heads/codex/near-model-memory-frozen-replay-v2",
+      "targets": [
+        {
+          "after": {
+            "blobOid": "8491c252aee4fe5e6d213e4fe055fcd1ea20161a",
+            "bytes": 1743479,
+            "gitMode": "100644",
+            "sha256": "3cf6d5871f5d3a6d3b9c233ae7e1ef79a00e8f5753f4cc36d86ec350f0917009"
+          },
+          "before": {
+            "blobOid": "ed2f84db73a5323da62fc69492dfd57d4390cdfd",
+            "bytes": 1742487,
+            "gitMode": "100644",
+            "sha256": "bde6d583f3360adf0e9effa693b0270d749e942dc5be137daf99ecff91aa8127"
+          },
+          "operation": "modify",
+          "sourcePath": ".agent_board/AUTOPILOT_LEDGER.md"
+        },
+        {
+          "after": {
+            "blobOid": "0aa6ca6e12cf602156795c26a9364f127215fa07",
+            "bytes": 941200,
+            "gitMode": "100644",
+            "sha256": "d9ed7e6e1ab6984a3689804ca6652f51608ebec43b279fac77fd0e15247e4474"
+          },
+          "before": {
+            "blobOid": "73f919063b64dbf0e5e951dd2e2f6d66d95a76c7",
+            "bytes": 940202,
+            "gitMode": "100644",
+            "sha256": "c4f2ba6ab2c9ca551b97087aa89ad4b9ce7055548ef2711013c2c920af38d74b"
+          },
+          "operation": "modify",
+          "sourcePath": ".agent_board/CHECKPOINT.md"
+        },
+        {
+          "after": {
+            "blobOid": "70b2dc8f1aa03ffb319338abba213d912767cb2f",
+            "bytes": 200532,
+            "gitMode": "100644",
+            "sha256": "bdf3f9f3bf6dc4279e5da1a3fa63da5e9d1b030cb1eaa776551155fbe5e1d2f1"
+          },
+          "before": {
+            "blobOid": "4dc9b5672679fe69e265523ddc39af95425824e5",
+            "bytes": 198010,
+            "gitMode": "100644",
+            "sha256": "219bc8740d7d6aa349e1ada45e52e9c3cd92a7372836c130d5cca9aad4d1b001"
+          },
+          "operation": "modify",
+          "sourcePath": ".agent_board/CURRENT_FACTS.json"
+        },
+        {
+          "after": {
+            "blobOid": "ff448595a6d3450ef5496634ac46577266106e03",
+            "bytes": 251386,
+            "gitMode": "100644",
+            "sha256": "0c00c7716b2b4110be8937463703b0cb7f808d1fd8fa3ff26c717e283e67e694"
+          },
+          "before": {
+            "blobOid": "fb4c08b3636f602fda0aaba8e09560b8ae10c0d2",
+            "bytes": 250632,
+            "gitMode": "100644",
+            "sha256": "fcf396951c0a028821855894b884e34b14255f566443728434b17955166d21e2"
+          },
+          "operation": "modify",
+          "sourcePath": ".agent_board/HANDOFF.md"
+        },
+        {
+          "after": {
+            "blobOid": "37ae648e7f9fa66a0cc2f57332907cdc50a487a4",
+            "bytes": 22070,
+            "gitMode": "100644",
+            "sha256": "2ba1c9ce6f5867e3501711a1011ff1e99bfe64be526e22cc53ec711b1b76c007"
+          },
+          "before": {
+            "blobOid": "43a44f6a87db218459bf6c015b703fbbe1cae13d",
+            "bytes": 21999,
+            "gitMode": "100644",
+            "sha256": "cd5183973aa4302ac86a75c4c6616980d971cfc47232af07a070b3e3589ac81a"
+          },
+          "operation": "modify",
+          "sourcePath": ".agent_board/RUN_STATE.md"
+        },
+        {
+          "after": {
+            "blobOid": "fd6f656a1d6dbc564b659e7650d54db25f7af5d3",
+            "bytes": 929797,
+            "gitMode": "100644",
+            "sha256": "63ba8c45ff073d92a5a23a25587c63644bef2b14d6067b39792ef9e8f262d916"
+          },
+          "before": {
+            "blobOid": "b555a1b4a0626f944a43dfeb6d1091f3e8efbec3",
+            "bytes": 928913,
+            "gitMode": "100644",
+            "sha256": "49e8a9b59a8f9449a6ab7b73463b18f8cb8acbc9fd478bad3ed2438b1c4ab509"
+          },
+          "operation": "modify",
+          "sourcePath": ".agent_board/TASK_QUEUE.md"
+        },
+        {
+          "after": {
+            "blobOid": "e926142c602e4b327b3bdea06f87b6518682d3dc",
+            "bytes": 1039790,
+            "gitMode": "100644",
+            "sha256": "1184e3e7f88042c09907fea4bc5b6e58c01f716ad12219dd50dc0c5f611e7c8b"
+          },
+          "before": {
+            "blobOid": "adc89da59095cdeda7984cf01ebce0bf0bcd2586",
+            "bytes": 1038780,
+            "gitMode": "100644",
+            "sha256": "a7b1cd3831f476090dd59a22738f2853a5fb1b4e385adcc68f0d2497b6bca714"
+          },
+          "operation": "modify",
+          "sourcePath": ".agent_board/VALIDATION_LOG.md"
+        },
+        {
+          "after": {
+            "blobOid": "3d9cc10dd031d55c3d690fa465d3ea0e9abb3f99",
+            "bytes": 663011,
+            "gitMode": "100644",
+            "sha256": "8f6d18cee35004e94255066b9798d5f1f4fb40b55a17b8b38c8d3bbc4e7098f8"
+          },
+          "before": {
+            "blobOid": "a266dc2d0c769f0487bf9fae72878c6a8d1d487c",
+            "bytes": 662506,
+            "gitMode": "100644",
+            "sha256": "55f2756f72b33bfc012004abf155f305cc269abd90a73bcbd95a92e677d30481"
+          },
+          "operation": "modify",
+          "sourcePath": "CURRENT_STATE.md"
+        },
+        {
+          "after": {
+            "blobOid": "fbeb8f56cac42242f358491373f095510a8ac707",
+            "bytes": 897134,
+            "gitMode": "100644",
+            "sha256": "985196040269a8a5c2e429002cb203562a801c47e00ba93ff6c6d51ff9a3731a"
+          },
+          "before": {
+            "blobOid": "8d3761576fc3e26fe1b47bcf7d9b81f86054ad79",
+            "bytes": 896851,
+            "gitMode": "100644",
+            "sha256": "b1ae06349aaf57fba84288d3f3d7b3f5622be2df55535e32980c66e01eb7a5ad"
+          },
+          "operation": "modify",
+          "sourcePath": "STATUS.md"
+        }
+      ],
+      "tree": "c129ecfaa134a47f30ed98f17d74151989c1a547"
+    },
+    "executionPacket": {
+      "blobOid": "967647daf5448fa156065a12b3c26909fe2692b6",
+      "canonicalPayloadSha256": "eef0709afd7829d397cc75359b0e7a47b31e9b14e0be014b7dae3c68df214ed8",
+      "commit": "d9f5f8c1cbfb17ac013846006f466c1b0c3ae67f"
+    },
+    "executionReceipt": {
+      "canonicalPayloadSha256": "a040c6e948fe1ac740fa5bf22a7f29d95e901b1a64102599384221204ddf5e2d",
+      "rawSha256": "8d3aefd3a335f4b850dfc07369d23c411bd0bd49028c597455c28d5d8f518120"
+    },
+    "finalRelease": {
+      "blobOid": "3a5404fcc2879717630a19384f40ee4914bffeac",
+      "canonicalPayloadSha256": "68e93fc3b7f16ad47e20fdb6c7f4d21093279ec646b9e3d99d2c64d4ee211410",
+      "commit": "869d9d6e62eebd7ce1c04cfe9e7a3b394355937f"
+    },
+    "receiptType": "detached_full_plan_status_sync_commit_binding_receipt",
+    "registry": {
+      "authorizationConsumed": true,
+      "authorizationReplayAllowed": false,
+      "authorizationUseCount": 1,
+      "bindingHash": "cf8d8ab85b3284968ede2c75b868493fdb66a086638f9123e89a1a819e956edf",
+      "claimId": "02d4d06cf469d6a238041a98f54fade7c23978bf94d888ecaca3f165b4825fe3",
+      "claimedAt": "2026-07-12T14:58:34.109Z",
+      "detachedCommitInvocationCount": 1,
+      "finalStateRequired": "CONSUMED_SUCCESS_DETACHED_COMMIT_BOUND_AWAITING_REF_DECISION",
+      "registryReference": "cm2122-r2-full-plan-status-sync-registry-001",
+      "stateAtBindingReceipt": "EXECUTION_RECEIPT_WRITTEN"
+    },
+    "sideEffects": {
+      "branchRefUpdates": 0,
+      "detachedHeadUpdates": 1,
+      "detachedStatusCommits": 1,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "repositoryPatches": 1
+    }
+  },
+  "schemaVersion": 1,
+  "taskId": "CM-2122-R2"
+}
