@@ -3036,6 +3036,52 @@ test('primary_with_local_fallback uses local read path when governed native read
   });
 });
 
+test('Claude local fallback preserves trusted Claude client isolation and shared visibility', async () => {
+  let nativeCalls = 0;
+  let localSearchOptions = null;
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeReadDelegationToolCaller: async payload => {
+      nativeCalls += 1;
+      throw governedNativeTransportErrorForPayload(
+        payload,
+        'PRIVATE_CLAUDE_NATIVE_FAILURE_SHOULD_NOT_ECHO'
+      );
+    }
+  }, async app => {
+    app.services.passiveRecallService.search = async options => {
+      localSearchOptions = options;
+      return [];
+    };
+
+    const result = await app.callTool('search_memory', {
+      query: 'Claude fallback scope must remain isolated',
+      target: 'both',
+      limit: 1,
+      include_content: false,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'workspace-alpha',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, claudeContext());
+    const serialized = JSON.stringify(result);
+
+    assert.equal(nativeCalls, 1);
+    assert.equal(result.access.localMemoryFallbackUsed, true);
+    assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
+    assert.equal(localSearchOptions.candidateFilters.projectId, 'codex-memory');
+    assert.equal(localSearchOptions.candidateFilters.workspaceId, 'workspace-alpha');
+    assert.equal(localSearchOptions.candidateFilters.clientId, 'Claude');
+    assert.deepEqual(localSearchOptions.candidateFilters.visibility, ['shared']);
+    assert.equal(localSearchOptions.auditContext.scope.scopeClientId, 'Claude');
+    assert.deepEqual(localSearchOptions.auditContext.scope.scopeVisibility, ['shared']);
+    assert.equal(serialized.includes('PRIVATE_CLAUDE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
+  });
+});
+
 test('primary_with_local_fallback clamps local search fallback to governed disclosure budget and scope', async () => {
   const observations = [];
   let nativeCalls = 0;

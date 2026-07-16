@@ -1589,8 +1589,8 @@ function governedMcpVcpNativeFallbackScope(gateResult = {}) {
       projected[key] = scope[key];
     }
   }
-  if (scope.client_id === 'Codex') {
-    projected.client_id = 'Codex';
+  if (GOVERNED_NATIVE_CLIENTS.includes(scope.client_id)) {
+    projected.client_id = scope.client_id;
   }
   if (GOVERNED_MCP_VCP_NATIVE_FALLBACK_VISIBILITIES.includes(scope.visibility)) {
     projected.visibility = scope.visibility;
