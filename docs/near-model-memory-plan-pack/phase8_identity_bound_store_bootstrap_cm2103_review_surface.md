@@ -1,0 +1,102 @@
+# CM-2103 Identity-bound Store Bootstrap Executor Canonical Review Surface
+
+本审查面完整呈现 CM-2103 非执行 packet 的规范等价 JSON，并绑定 foundation 决定、
+实现源码和 packet Git 对象。它不包含未来精确 bootstrap 决定，因此不能执行 bootstrap、
+创建 store/identity、claim nonce、运行 empty-store preflight 或调用 native memory 工具。
+
+## Foundation decision binding
+
+```yaml
+decision_reference: "CM-2102-ER-20260711-FOUNDATION-PASS-NO-EXECUTION-D6CE7C74"
+commit: "9f73db8c6d1b7cba1a24d262880c7d37b953d2a0"
+tree: "7a4a96dc3b150dc27e6b99fab2ed6f633fb02583"
+blob_oid: "ea628021d499fcc883a7489a8f93a6284fdb2164"
+bytes: 4250
+sha256: "9dfd43e3ad9dea0c072a181bf8ae7fd48b4e1c49e171936518972abd22d7a0dc"
+payload_sha256: "b1642dd9ca418ea260ec6cb204793a0a3f1eda16f411a361b4f57f3c0ee872c0"
+execution_authority_carried: false
+```
+
+## Implementation binding
+
+```yaml
+commit: "809ec09b1909efe5602c5a46a5a2b6e3e367dc16"
+tree: "a9f6b7ef58828951a39e2d5502e8e703500d23ff"
+
+decision_intake_blob_oid: "0a96c71ea6726f4a54b2664c37ce591998d827e6"
+state_machine_blob_oid: "0a1f2fb3fd45ad068a25cd876614707880d4f2f6"
+governance_verifier_blob_oid: "2aa9b0b21cdd9fb01c0d82a8f5a3e66fc3a65ef7"
+authorization_registry_blob_oid: "3682eef40bc9bd76b4a64930b9b9ab852c097723"
+execution_packet_contract_blob_oid: "c04896d0823cdcf40cba314698f1cae4b2d85e3b"
+receipt_contract_blob_oid: "200ba96b5189afd8d901a6d7167dbeab5e2d1227"
+frozen_executor_blob_oid: "cfb6e0024010894ab7c0ea905e3d23879bcc3587"
+```
+
+## Packet binding
+
+```yaml
+commit: "a58cfe7e79580a08738b94e0497c5ff6c85d8b8b"
+tree: "78ea8f77437a92e7ef660a5f1cb8fcbba6494cd3"
+
+json_blob_oid: "b2f9bce9ce3ec45045a10fe52c4b1e4e4ef15a72"
+json_bytes: 9722
+json_sha256: "d9d896acca13e9a3d31210f97c23e81040f0a80e4252324e6d364ef78f604d31"
+packet_payload_sha256: "a8f2fa968c1149fec956b408cbb518773f7296a7be6733fdf47c0f1d8ff1b968"
+
+markdown_blob_oid: "d584fcfc5b6ca3111d699bc5151c2d85fcef6b10"
+markdown_bytes: 1813
+markdown_sha256: "47910edfeee29af44003ccb78be9f36adeb55dbcd1828fa9d9afabd50377ed0e"
+```
+
+## Implementation properties
+
+```yaml
+exact_future_decision_intake: true
+strict_decision_schema: true
+decision_git_commit_blob_sha_binding: true
+expiry_exactly_bound: "2026-07-15T18:00:00+08:00"
+
+store_root_authority: "git_common_dir_governance_state"
+caller_path_allowed: false
+environment_path_override_allowed: false
+governance_root_identity_verified_before_claim: true
+store_root_binding_recomputed_before_claim: true
+
+directory_attempt_consumed_before_mkdir: true
+identity_attempt_consumed_before_write: true
+automatic_retry_allowed: false
+automatic_cleanup_allowed: false
+partial_or_ambiguous_reconciliation_requires_new_decision: true
+
+future_decision_present_at_freeze: false
+bootstrap_execution_authorized_at_freeze: false
+```
+
+## Focused validation
+
+```yaml
+tests: 12
+passed: 12
+failed: 0
+
+store_directory_created: false
+store_identity_created: false
+nonce_claimed: false
+empty_store_preflight_executed: false
+native_actions: 0
+```
+
+## Complete canonical-equivalent packet JSON
+
+下列单行 JSON 与 packet 文件解析后的对象逐字段等价；递归键排序 payload SHA-256 为
+`a8f2fa968c1149fec956b408cbb518773f7296a7be6733fdf47c0f1d8ff1b968`。
+
+```json
+{"schemaVersion":1,"taskId":"CM-2103","packetType":"identity_bound_synthetic_store_bootstrap_execution_packet_non_executing","packetPurpose":"independent_review_of_exact_one_shot_bootstrap_executor_without_execution","foundationDecisionReference":"CM-2102-ER-20260711-FOUNDATION-PASS-NO-EXECUTION-D6CE7C74","foundationDecisionSourceCommit":"9f73db8c6d1b7cba1a24d262880c7d37b953d2a0","foundationDecisionSourceTree":"7a4a96dc3b150dc27e6b99fab2ed6f633fb02583","foundationDecisionPath":"docs/near-model-memory-plan-pack/phase8_identity_bound_foundation_review_decision_cm2102.json","foundationDecisionBlobOid":"ea628021d499fcc883a7489a8f93a6284fdb2164","foundationDecisionBytes":4250,"foundationDecisionSha256":"9dfd43e3ad9dea0c072a181bf8ae7fd48b4e1c49e171936518972abd22d7a0dc","foundationDecisionPayloadSha256":"b1642dd9ca418ea260ec6cb204793a0a3f1eda16f411a361b4f57f3c0ee872c0","foundationPacketSourceCommit":"0c80561ae6ce2145becf438624ffdd21d1a62726","foundationPacketSourceTree":"a9c8dd787af840ad8e849fd7d3f9189614e997ff","foundationPacketPath":"docs/near-model-memory-plan-pack/phase8_identity_bound_rollback_lifecycle_foundation_cm2102.json","foundationPacketBlobOid":"929f7d39de0c01c2af5ec03c1000bfe00d8e311c","foundationPacketBytes":5460,"foundationPacketSha256":"d6ce7c743a6a0969e4468daf7577a8681b128eefc788b3412fbf4124bea72a70","foundationPacketPayloadSha256":"1739ce4bcbe870a6e41f845f8b0f30b943ceb17b671c857e9049161f13b47638","bootstrapRequestSourceCommit":"0c80561ae6ce2145becf438624ffdd21d1a62726","bootstrapRequestPath":"docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_authorization_request_cm2102.json","bootstrapRequestBlobOid":"a75b15ae7519b608338160b8ba52ede3e9ff832c","bootstrapRequestBytes":7096,"bootstrapRequestSha256":"2318692aec334acd75b54d9bdac71ada9a2c2d3d3255b76cf97a5095421927ad","bootstrapRequestPayloadSha256":"60d153e913cf1b9f1873c6e5ac98e9dfa1cb35e142eebc701dfca13ac23784da","implementationCommit":"809ec09b1909efe5602c5a46a5a2b6e3e367dc16","implementationTree":"a9f6b7ef58828951a39e2d5502e8e703500d23ff","implementationArtifacts":{"decisionIntake":{"path":"src/core/Cm2103IdentityBoundStoreBootstrapDecisionIntake.js","blobOid":"0a96c71ea6726f4a54b2664c37ce591998d827e6"},"stateMachine":{"path":"src/core/Cm2103IdentityBoundStoreBootstrapState.js","blobOid":"0a1f2fb3fd45ad068a25cd876614707880d4f2f6"},"governanceVerifier":{"path":"src/core/Cm2103IdentityBoundStoreGovernance.js","blobOid":"2aa9b0b21cdd9fb01c0d82a8f5a3e66fc3a65ef7"},"authorizationRegistry":{"path":"src/core/Cm2103IdentityBoundStoreBootstrapRegistry.js","blobOid":"3682eef40bc9bd76b4a64930b9b9ab852c097723"},"executionPacketContract":{"path":"src/core/Cm2103IdentityBoundStoreBootstrapExecutionPacketContract.js","blobOid":"c04896d0823cdcf40cba314698f1cae4b2d85e3b"},"receiptContract":{"path":"src/core/Cm2103IdentityBoundStoreBootstrapReceiptContract.js","blobOid":"200ba96b5189afd8d901a6d7167dbeab5e2d1227"},"frozenExecutor":{"path":"src/cli/cm2103-identity-bound-store-bootstrap.js","blobOid":"cfb6e0024010894ab7c0ea905e3d23879bcc3587"}},"expectedFutureDecisionReference":"CM-2103-ER-20260711-IDENTITY-BOUND-STORE-BOOTSTRAP-0A7CEB6C-017307C9","futureDecisionPath":"docs/near-model-memory-plan-pack/phase8_identity_bound_store_bootstrap_decision_cm2103.json","frozenExecutorInputs":["execution_packet_commit","future_exact_bootstrap_decision_commit"],"callerStorePathAllowed":false,"environmentStorePathOverrideAllowed":false,"callerIdentityBytesAllowed":false,"callerStoreReferenceOverrideAllowed":false,"callerLifecycleOverrideAllowed":false,"callerWriteCallbackAllowed":false,"callerReconciliationCallbackAllowed":false,"action":"initialize_identity_bound_synthetic_store","lifecycleReference":"phase8-identity-bound-rollback-lifecycle-001","storeReference":"phase8-identity-bound-synthetic-rollback-store-001","storeInstanceId":"phase8-identity-bound-synthetic-rollback-store-instance-001","storeRole":"phase8_identity_bound_synthetic_rollback_store","syntheticOnly":true,"identityFilename":".codex-memory-cm2102-store-identity.json","identityBytes":633,"identitySha256":"017307c9a1cb3e216895934b9c2aae8fa5773b909afebe87d3f91bc0a5736f57","storeRootDerivation":{"schemaVersion":1,"authority":"git_common_dir_governance_state","governanceRootIdentityReference":"codex-memory-phase8-governance-root","governanceRootIdentitySha256":"240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0","governanceRootIdentityVerificationRequired":true,"governanceRootReinitializationAllowed":false,"governanceRootReplacementAllowed":false,"governanceParentSubdir":"codex-memory-governance","storeDirectoryName":"phase8-identity-bound-synthetic-rollback-store-001","callerPathAllowed":false,"environmentPathOverrideAllowed":false,"rawPathDisclosureAllowed":false,"parentDirectoryMustAlreadyExist":true,"storeDirectoryMustBeAbsentBeforeBootstrap":true,"storeDirectoryCreateMode":"exclusive_mkdir","identityCreateMode":"exclusive_create_only"},"storeRootBinding":{"authority":"git_common_dir_governance_state","governanceRootIdentityReference":"codex-memory-phase8-governance-root","governanceRootIdentitySha256":"240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0","lifecycleReference":"phase8-identity-bound-rollback-lifecycle-001","schemaVersion":1,"storeDirectoryName":"phase8-identity-bound-synthetic-rollback-store-001","storeIdentitySha256":"017307c9a1cb3e216895934b9c2aae8fa5773b909afebe87d3f91bc0a5736f57","storeInstanceId":"phase8-identity-bound-synthetic-rollback-store-instance-001","storeReference":"phase8-identity-bound-synthetic-rollback-store-001"},"storeRootBindingCanonicalBytes":616,"storeRootBindingSha256":"0a7ceb6cf658d517de2a3eb30ee09195dbeb9d46800f42ac87edf7f7cb11dd94","governanceRootIdentity":{"registryRootInstanceId":"cm2093-phase8-governance-root-instance-001","registryRootReference":"codex-memory-phase8-governance-root","registryRootReinitializationAllowed":false,"registryRootReplacementAllowed":false},"governanceRootIdentitySha256":"240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0","authorizationRegistryIdentity":{"authorizationRegistryReference":"cm2103-identity-bound-store-bootstrap-registry-001","lifecycleReference":"phase8-identity-bound-rollback-lifecycle-001","registryDeletionAllowed":false,"registryReinitializationAllowed":false,"registryStorageRole":"durable-local-governance-state","schemaVersion":1,"storeRootBindingSha256":"0a7ceb6cf658d517de2a3eb30ee09195dbeb9d46800f42ac87edf7f7cb11dd94"},"authorizationRegistryIdentitySha256":"2af9e6ef6731e8bc86a7d367a1a7902760df5b45f3e0599563d6a2bd5d28ef2e","nonce":"cm2102-identity-bound-store-bootstrap-001","receiptId":"cm2102-identity-bound-store-bootstrap-receipt-001","requestedExpiresAt":"2026-07-15T18:00:00+08:00","authorizationUseCount":1,"authorizationReplayAllowed":false,"stateSequence":["UNCLAIMED","CLAIMED","STORE_DIRECTORY_CREATE_CONSUMED","STORE_DIRECTORY_CREATED","IDENTITY_WRITE_CONSUMED","IDENTITY_CREATED","CONSUMED_SUCCESS","CONSUMED_PARTIAL_BOOTSTRAP","CONSUMED_AMBIGUOUS"],"maxStoreDirectoryCreates":1,"maxIdentityWrites":1,"maxIdentityReadbackVerifications":1,"maxDirectoryEnumerations":0,"maxRecordContentReads":0,"maxNativeReads":0,"maxNativeWrites":0,"maxRecordMemoryCalls":0,"maxTombstoneMemoryCalls":0,"maxVerifyOperations":0,"maxRetries":0,"parentDirectoryCreationAllowed":false,"identityOverwriteAllowed":false,"identityReplacementAllowed":false,"identityReinitializationAllowed":false,"identityDeletionAllowed":false,"automaticRetryAllowed":false,"automaticCleanupAllowed":false,"existingStoreDirectoryOutcome":"stop_without_read_delete_replace_or_reconcile","partialBootstrapOutcome":"stop_without_retry_cleanup_or_reconciliation","ambiguousBootstrapOutcome":"stop_without_retry_cleanup_or_reconciliation","futureDecisionPresentAtFreeze":false,"bootstrapExecutionAuthorizedAtFreeze":false,"storeDirectoryCreatedAtFreeze":false,"storeIdentityCreatedAtFreeze":false,"emptyStorePreflightAuthorizedAtFreeze":false,"emptyStorePreflightExecutedAtFreeze":false,"recordMemoryAuthorizedAtFreeze":false,"tombstoneMemoryAuthorizedAtFreeze":false,"verifyAuthorizedAtFreeze":false,"nonceClaimedAtFreeze":false,"receiptCreatedAtFreeze":false,"nativeReadsAtFreeze":0,"nativeWritesAtFreeze":0,"rollbackOrCompensationOperationsAtFreeze":0,"rollbackDrillPassed":false,"failureRecoveryProofPassed":false,"phase8Completed":false,"fullPlanPackCompleted":false,"readinessClaimed":false,"readyForImplementationReview":true,"readyForBootstrapAuthorizationReview":false,"executionBlockersAtFreeze":["future_exact_bootstrap_decision_absent","bootstrap_execution_not_authorized","store_directory_creation_not_authorized","store_identity_creation_not_authorized"],"packetPayloadSha256":"a8f2fa968c1149fec956b408cbb518773f7296a7be6733fdf47c0f1d8ff1b968"}
+```
+
+## Non-claims
+
+该 packet 不证明 bootstrap 已执行，不证明 store/identity 已创建，不授权 empty-store
+preflight、record、tombstone 或 verify，也不改变 `rollbackDrillPassed`、
+`failureRecoveryProofPassed`、`phase8Completed`、完整计划包或 readiness 状态。

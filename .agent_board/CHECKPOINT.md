@@ -4,11 +4,57 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2095 Phase 8 completion evidence application receipt`.
-Current validation: `CMV-2198`.
+Current checkpoint: `CM-2099 CM-2096 rollback execution packet v3`.
+Current validation: `CMV-2203`.
 Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2096 Frozen Rollback Packet v3
+
+Status: `V3_NON_EXECUTING_STACK_PREPARED_REVIEW_REQUIRED_NO_TOMBSTONE_PHASE8_INCOMPLETE`
+
+- V2 independent review decision is frozen at `79b7aeb4…`.
+- V3 implementation `6f4f7867…` binds immutable target-store identity, exact pre/post projections, and native-read-off verify preflight.
+- One internal assertion is atomically consumable once; exact audit receipt, claim, target, scope, marker, and unchanged target are correlated.
+- Frozen executor accepts only packet and future decision Git commits; caller callbacks, store paths, projections, candidates, targets, and actions are not accepted.
+- Packet `1ba07b0c…` records missing store-bootstrap receipt, preflight, runtime route, and exact execution decision; tombstone/verify/claim counters remain zero.
+
+Validation: `CMV-2203`.
+
+## CM-2096 Frozen Rollback Packet v2
+
+Status: `V2_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE`
+
+- Semantic decision is frozen with exact Git/blob/SHA binding.
+- Target ref `vcp-kb-4f863f52455147c6` is derived from CM-2094 durable SHA.
+- Actual shim serializer freezes a 507-byte marker with SHA `27a5e586…6263a`.
+- Marker-aware lifecycle filters only safe candidate refs and returns no raw content.
+- Executor execution hard-stops; action and verify counters remain zero.
+
+Validation: `CMV-2202`.
+
+## CM-2096 Semantic Packet / CM-2097 Isolated Harness
+
+Status: `PACKET_AND_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE`
+
+- Rollback route selects append-only logical tombstone; marker-only is not proof.
+- Marker-aware effective-visibility verify remains explicitly unfrozen.
+- Failure harness has three immutable manifests and no execution API.
+- All native, verify, retry, rollback, compensation, and recovery counters are zero.
+
+Validation: `CMV-2201`.
+
+## CM-2096 / CM-2097 Remaining Evidence Requests
+
+Status: `REMAINING_EVIDENCE_REQUESTS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE`
+
+- CM-2095 application receipt review `...PASS-8C8A22F8` is recorded.
+- Rollback drill and failure recovery are submitted as independent request boundaries.
+- No mechanism is selected or executed; native/recovery/rollback counters remain zero.
+- Both evidence fields, Phase 8 completion, and readiness remain false.
+
+Validation: `CMV-2200`.
 
 ## CM-2095 Completion Evidence Application
 

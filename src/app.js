@@ -803,6 +803,50 @@ function buildGovernedMcpVcpNativeWriteDelegationToolCaller(config = {}, overrid
   return callTool;
 }
 
+function cm2096TombstoneNativeRouteAccepted(config = {}, callMcpTool = null) {
+  const runtimeTarget = config.governedMcpVcpNativeRuntimeTarget || {};
+  const httpMcpTarget = config.governedMcpVcpNativeHttpMcpTarget || {};
+  return (
+    ['observe', 'strict'].includes(config.governedMcpVcpNativeBridgeGateMode) &&
+    config.governedMcpVcpNativeWriteDelegationMode === 'primary' &&
+    config.governedMcpVcpNativeReadDelegationMode === 'off' &&
+    runtimeTarget.accepted === true &&
+    runtimeTarget.configured === true &&
+    runtimeTarget.targetKind === 'mcp_server' &&
+    httpMcpTarget.accepted === true &&
+    httpMcpTarget.configured === true &&
+    httpMcpTarget.targetKind === 'mcp_server' &&
+    httpMcpTarget.targetReferenceName === runtimeTarget.targetReferenceName &&
+    httpMcpTarget.bearerTokenConfigured === true &&
+    httpMcpTarget.mcpToolNameByActionConfigured === true &&
+    httpMcpTarget.mcpToolNameByAction?.tombstone_memory === 'knowledge_base.tombstone' &&
+    typeof callMcpTool === 'function' &&
+    typeof callMcpTool.callWithReceipt === 'function'
+  );
+}
+
+function cm2096TombstoneBridgeApprovalAccepted({ args, requestContext = {}, config = {} } = {}) {
+  const assertion = requestContext.cm2096TombstoneAuthorizationAssertion;
+  if (!assertion || typeof assertion !== 'object' || Array.isArray(assertion)) return null;
+  const approvalDescriptor = Object.getOwnPropertyDescriptor(assertion, 'exactApprovalResult');
+  if (!approvalDescriptor || !Object.prototype.hasOwnProperty.call(approvalDescriptor, 'value')) {
+    return null;
+  }
+  const preflightRequestContext = {
+    ...requestContext,
+    exactApprovalResult: approvalDescriptor.value
+  };
+  delete preflightRequestContext.cm2096TombstoneAuthorizationAssertion;
+  return validateGovernedMcpVcpNativeBridgeGate(
+    buildGovernedMcpVcpNativeBridgeGateInput({
+      toolName: 'tombstone_memory',
+      args,
+      requestContext: preflightRequestContext,
+      config
+    })
+  ).accepted === true;
+}
+
 function projectReadShapeProbeTargetResolverObservation(resolverResult) {
   if (!resolverResult) return null;
   const { invokeComponentAction, ...projection } = resolverResult;
@@ -2292,6 +2336,12 @@ function createCodexMemoryApplication(overrides = {}) {
     typeof overrides.phase8OneShotAuthorizationAssertionVerifier === 'function'
       ? overrides.phase8OneShotAuthorizationAssertionVerifier
       : null;
+  const cm2096TombstoneOneShotEnforcementEnabled =
+    overrides.cm2096TombstoneOneShotEnforcementEnabled === true;
+  const cm2096TombstoneAuthorizationAssertionVerifier =
+    typeof overrides.cm2096TombstoneAuthorizationAssertionVerifier === 'function'
+      ? overrides.cm2096TombstoneAuthorizationAssertionVerifier
+      : null;
   const recordMemoryPrincipalScopeAuthorizationRuntime =
     buildRecordMemoryPrincipalScopeAuthorizationRuntime(
       config.recordMemoryPrincipalScopeAuthorization
@@ -2679,6 +2729,44 @@ function createCodexMemoryApplication(overrides = {}) {
         };
         delete effectiveRequestContext.phase8OneShotAuthorizationAssertion;
       }
+      if (toolName === 'tombstone_memory' && cm2096TombstoneOneShotEnforcementEnabled) {
+        if (
+          requestContext.exactApprovalResult !== undefined ||
+          !cm2096TombstoneAuthorizationAssertionVerifier ||
+          !cm2096TombstoneNativeRouteAccepted(
+            config,
+            governedMcpVcpNativeWriteDelegationToolCaller
+          ) ||
+          cm2096TombstoneBridgeApprovalAccepted({ args, requestContext, config }) === false
+        ) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'cm2096_tombstone_one_shot_authorization_required',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        const assertionResult = await cm2096TombstoneAuthorizationAssertionVerifier(
+          requestContext.cm2096TombstoneAuthorizationAssertion
+        );
+        if (assertionResult?.accepted !== true || !assertionResult.exactApprovalResult) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'cm2096_tombstone_one_shot_authorization_claim_invalid',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        effectiveRequestContext = {
+          ...requestContext,
+          exactApprovalResult: assertionResult.exactApprovalResult
+        };
+        delete effectiveRequestContext.cm2096TombstoneAuthorizationAssertion;
+      }
       let governedNativeReadFallbackContext = null;
       let governedNativeReadFallbackAuditReceipt = null;
       let governedNativeReadFallbackArgs = null;
@@ -3061,6 +3149,16 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'tombstone_memory') {
+        if (cm2096TombstoneOneShotEnforcementEnabled) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'cm2096_tombstone_local_fallback_forbidden',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
         return executePublicControlledMutationTool(
           toolName,
           args,

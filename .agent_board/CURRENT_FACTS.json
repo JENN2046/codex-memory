@@ -10,8 +10,8 @@
     "freshGitRequiredBeforeRuntimeAction": true
   },
   "updatedAt": "2026-07-11",
-  "taskId": "CM-2095",
-  "validationId": "CMV-2198",
+  "taskId": "CM-2099",
+  "validationId": "CMV-2203",
   "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
@@ -140,6 +140,50 @@
     "phase8OutputDisclosureBudgetPassed": true,
     "phase8AuditReceiptPassed": true,
     "phase8CompletionEvidenceApplicationReceiptPayloadSha256": "8c8a22f89863214ccbe2d0e64b75a0526cc32f1e21d83d7159e109e6fa200939",
+    "phase8CompletionEvidenceApplicationReceiptReviewReference": "CM-2095-ER-20260711-APPLICATION-RECEIPT-PASS-8C8A22F8",
+    "phase8CompletionEvidenceApplicationReceiptReviewPassed": true,
+    "phase8RollbackDrillEvidenceRequestPrepared": true,
+    "phase8FailureRecoveryEvidenceRequestPrepared": true,
+    "phase8RemainingEvidenceExecutionAuthorized": false,
+    "phase8RollbackRouteDecisionReference": "CM-2096-ER-20260711-ROLLBACK-ROUTE-PASS-NO-EXECUTION-BB6EBB76",
+    "phase8FailureRecoveryRouteDecisionReference": "CM-2097-ER-20260711-FAILURE-RECOVERY-ROUTE-PASS-NO-EXECUTION-C8DBFB58",
+    "phase8RollbackSemanticPacketPrepared": true,
+    "phase8RollbackMarkerCanonicalSha256": "0407cbcfffce19c8b015f1d18c10735ebe3c45b348e62ec8b1e6e76de509e467",
+    "phase8RollbackMarkerAwareVerifyImplementationFrozen": true,
+    "phase8RollbackSemanticDecisionReference": "CM-2096-ER-20260711-SEMANTIC-PACKET-PASS-51F21F60-NO-EXECUTION",
+    "phase8RollbackSemanticDecisionCommit": "ac465bd659d430821127db92c2b1cc327758421d",
+    "phase8RollbackTargetMemoryIdRef": "vcp-kb-4f863f52455147c6",
+    "phase8RollbackPayloadCanonicalSha256": "661e7eaf21cee1d31ebbaf81188fb65d4a1a0f5116ebd114aa37ca15a1251166",
+    "phase8RollbackDurableMarkerBytes": 507,
+    "phase8RollbackDurableMarkerSha256": "27a5e58649908bbc4f835d891149d028e71dcc5042dcb13daaa597bd4286263a",
+    "phase8RollbackExecutionPacketV2Prepared": true,
+    "phase8RollbackV2ReviewDecisionReference": "CM-2096-ER-20260711-V2-PACKET-PASS-NO-EXECUTION-47E81469",
+    "phase8RollbackV2ReviewDecisionCommit": "79b7aeb4dc63145bb12a500e6318f349417ceca7",
+    "phase8RollbackV3ImplementationCommit": "6f4f7867e8260fc79113239de4ff8d73b1425de9",
+    "phase8RollbackV3ImplementationTree": "c9247b19a9d84e170f62ced27a190051bbeb7a3a",
+    "phase8RollbackExecutionPacketV3Prepared": true,
+    "phase8RollbackExecutionPacketV3Commit": "1ba07b0cfab17da432a860e2c640569288e626e0",
+    "phase8RollbackExecutionPacketV3Tree": "f0919cf536bba3d965979cdf0f65f8b5f31bbd93",
+    "phase8RollbackExecutionPacketV3BlobOid": "74c42292f61dcf7e6033207c573a878f6f1ea64c",
+    "phase8RollbackExecutionPacketV3FileSha256": "75fafecd9b5be4195aef83328bb5d18ab9f3bf33502a731d79a05c04287d9768",
+    "phase8RollbackExecutionPacketV3PayloadSha256": "0b925a72d24deb004112b0f847c8b70cc533f0d84a91f11eda78e435aefa097d",
+    "phase8RollbackExecutionPacketV3ReviewSurfaceCommit": "b113a5e60f4f923f23f7950eecc5aa4cb2abb61a",
+    "phase8RollbackExecutionPacketV3ReviewSurfaceSha256": "8ffe8f86b7efd23f72a0336e177e136011acca74ab45a9405d9013443426d91a",
+    "phase8RollbackTargetStoreIdentitySha256": "e28d9b2ffae919aeb2f49a5882badac92a0df20d6886400137cdbf3527000a13",
+    "phase8RollbackTargetStoreBootstrapReceiptPresent": false,
+    "phase8RollbackTargetStorePreflightExecuted": false,
+    "phase8RollbackRealStoreProjectionCollectorFrozen": true,
+    "phase8RollbackTombstoneOneShotGateFrozen": true,
+    "phase8RollbackExactReceiptCorrelationFrozen": true,
+    "phase8RollbackVerifyNativeReadDelegationRequiredOff": true,
+    "phase8RollbackFrozenExecutorAcceptsOnlyGitCommits": true,
+    "phase8RollbackFutureExecutionDecisionPresent": false,
+    "phase8RollbackReadyForV3ImplementationReview": true,
+    "phase8RollbackReadyForActionSpecificExecutionAuthorization": false,
+    "phase8RollbackExecutionAuthorized": false,
+    "phase8FailureRecoveryHarnessPrepared": true,
+    "phase8FailureRecoveryManifestCount": 3,
+    "phase8FailureRecoveryExecutionApiPresent": false,
     "phase8RollbackDrillPassed": false,
     "phase8FailureRecoveryProofPassed": false,
     "phase8DerivedIndexProofAccepted": false,
@@ -156,7 +200,7 @@
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_evidence_applied_rollback_failure_missing_phase8_incomplete_receipt_review_required",
+    "scope": "near_model_memory_plan_pack_cm2096_v3_non_executing_stack_prepared_review_required_phase8_incomplete",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -164,6 +208,31 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2203",
+      "scope": "CM-2099 CM-2096 rollback execution packet v3",
+      "status": "COMPLETED_V3_NON_EXECUTING_STACK_PREPARED_REVIEW_REQUIRED_NO_TOMBSTONE_PHASE8_INCOMPLETE"
+    },
+    {
+      "id": "CMV-2202",
+      "scope": "CM-2098 CM-2096 frozen rollback execution packet v2",
+      "status": "COMPLETED_V2_ROLLBACK_PACKET_PREPARED_NO_TOMBSTONE_EXECUTION_PHASE8_INCOMPLETE"
+    },
+    {
+      "id": "CMV-2201",
+      "scope": "CM-2096 rollback semantic packet and CM-2097 isolated failure harness",
+      "status": "COMPLETED_PACKET_AND_HARNESS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE"
+    },
+    {
+      "id": "CMV-2200",
+      "scope": "CM-2096 rollback and CM-2097 failure-recovery independent request preparation",
+      "status": "COMPLETED_REMAINING_EVIDENCE_REQUESTS_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE"
+    },
+    {
+      "id": "CMV-2199",
+      "scope": "CM-2096 rollback drill evidence request preparation",
+      "status": "COMPLETED_ROLLBACK_DRILL_EVIDENCE_REQUEST_PREPARED_NO_EXECUTION_PHASE8_INCOMPLETE"
+    },
     {
       "id": "CMV-2198",
       "scope": "CM-2095 exact Phase 8 completion evidence application",

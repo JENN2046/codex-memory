@@ -8,20 +8,23 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2095 six-field evidence applied; rollback/failure missing; Phase 8 incomplete |
-| Current task | `CM-2095 Phase 8 completion evidence application receipt` |
-| Current validation | `CMV-2198` |
-| Current route | Independent application receipt review; no new native action |
+| Status | CM-2096 v3 non-executing stack and packet prepared; bootstrap/preflight/decision still absent; Phase 8 incomplete |
+| Current task | `CM-2099 CM-2096 rollback execution packet v3` |
+| Current validation | `CMV-2203` |
+| Current route | Independent v3 implementation review; no tombstone/verify/nonce claim |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## Future Candidate Routes
 
-CM-2095 application gate, patch boundary, and patch application accepted once.
-Six receipt-backed fields plus `phase8ReceiptBundleAppliedToCompletionAudit` are
-now applied. Rollback/failure requirements remain false, preventing Phase 8 and
-full-plan completion. The application receipt requires independent review.
+CM-2096 v2 implementation review passed without execution authority. V3 binds
+an immutable synthetic-store identity, collects exact target/marker hashes from
+the real selected store, atomically consumes one tombstone assertion, correlates
+the exact audit receipt, and freezes a two-Git-commit executor. The target-store
+bootstrap receipt, live preflight, and future exact decision are absent, so
+execution authorization, rollback evidence, and Phase 8 remain false. CM-2097
+remains separate.
 
 CM-2095 requests a separate application decision for the six receipt-backed
 fields supported by the accepted CM-2094 proof. Rollback and failure-recovery

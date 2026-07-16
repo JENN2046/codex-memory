@@ -1,0 +1,21 @@
+# CM-2096 / CM-2097 Canonical Read-Only Review Surface
+
+本文件仅为 ColaMeta 跳过 JSON 原文时提供内容等价的只读审查面。三个代码块逐字对应同提交中的 JSON 对象；本文件不授权执行。
+
+## CM-2095 Application Receipt Review Intake
+
+```json
+{"schemaVersion":1,"taskId":"CM-2096","result":"PASS","reviewReference":"CM-2095-ER-20260711-APPLICATION-RECEIPT-PASS-8C8A22F8","applicationReceiptAccepted":true,"completionAuditPatchAccepted":true,"phase8ReceiptBundleApplied":true,"applicationDecisionReference":"CM-2095-ER-20260711-COMPLETION-EVIDENCE-APPLICATION-PASS-2E98CE0C","applicationDecisionCommit":"83ac6f8d45a92d04453e9f280d5dbd054a663132","applicationGateCommit":"e2bb3e9b4bf1f1e7dd8d4a74295360c3b8c7a513","applicationReceiptCommit":"5bbfe6e3327b98a863bd68fc6d34e9dd1e1acfe9","receiptPayloadCanonicalSha256":"8c8a22f89863214ccbe2d0e64b75a0526cc32f1e21d83d7159e109e6fa200939","rollbackDrillPassed":false,"failureRecoveryProofPassed":false,"phase8Completed":false,"fullPlanPackCompleted":false,"readinessClaimed":false,"additionalNativeWriteAuthorized":false,"rollbackAuthorized":false,"failureRecoveryActionAuthorized":false,"compensationAuthorized":false,"applicationAuthorizationConsumed":true,"applicationAuthorizationReplayAllowed":false}
+```
+
+## CM-2096 Rollback Drill Request
+
+```json
+{"schemaVersion":1,"taskId":"CM-2096","requestType":"phase8_rollback_drill_evidence_authorization_preparation","reviewedApplicationReceiptReference":"CM-2095-ER-20260711-APPLICATION-RECEIPT-PASS-8C8A22F8","requestedEvidenceField":"rollbackDrillPassed","requestPrepared":true,"authorizationRequestedNow":false,"executionRequestedNow":false,"rollbackDrillPassed":false,"failureRecoveryProofPassed":false,"phase8Completed":false,"fullPlanPackCompleted":false,"readinessClaimed":false,"independentFromFailureRecovery":true,"futureExactActionRequired":true,"futureFrozenExecutorRequired":true,"futureExactTargetBindingRequired":true,"futureOneShotRegistryRequired":true,"futureLowDisclosureReceiptRequired":true,"futureIndependentReceiptReviewRequired":true,"syntheticCm2094RecordOnly":true,"existingRealMemoryModificationAllowed":false,"realMemoryReadAllowed":false,"rawPrivateMemoryAccessAllowed":false,"localFallbackAllowed":false,"automaticRetryAllowed":false,"automaticRollbackAllowed":false,"registryMarkerDeletionAllowed":false,"registryRebuildAllowed":false,"compensationCountsAsNativeWrite":true,"nativeActionsAuthorizedNow":0,"verifyOperationsAuthorizedNow":0,"rollbackOrCompensationOperationsAuthorizedNow":0,"prohibitedInference":["tombstone_or_supersede_mechanism_selected","rollback_execution_authorized","compensation_execution_authorized","phase8_completed"]}
+```
+
+## CM-2097 Failure Recovery Request
+
+```json
+{"schemaVersion":1,"taskId":"CM-2097","requestType":"phase8_failure_recovery_evidence_authorization_preparation","reviewedApplicationReceiptReference":"CM-2095-ER-20260711-APPLICATION-RECEIPT-PASS-8C8A22F8","requestedEvidenceField":"failureRecoveryProofPassed","requestPrepared":true,"authorizationRequestedNow":false,"executionRequestedNow":false,"failureRecoveryProofPassed":false,"rollbackDrillPassed":false,"phase8Completed":false,"fullPlanPackCompleted":false,"readinessClaimed":false,"independentFromRollbackDrill":true,"futureExactFailureInjectionRequired":true,"futureFrozenExecutorRequired":true,"futureExactFailureStageBindingRequired":true,"futureOneShotRegistryRequired":true,"futureLowDisclosureReceiptRequired":true,"futureIndependentReceiptReviewRequired":true,"syntheticEvidenceOnly":true,"existingRealMemoryModificationAllowed":false,"realMemoryReadAllowed":false,"rawPrivateMemoryAccessAllowed":false,"localFallbackAllowed":false,"automaticRetryAllowed":false,"automaticRollbackAllowed":false,"rollbackOrCompensationAllowed":false,"registryMarkerDeletionAllowed":false,"registryRebuildAllowed":false,"nativeActionsAuthorizedNow":0,"verifyOperationsAuthorizedNow":0,"failureRecoveryOperationsAuthorizedNow":0,"requiredFutureCases":["pre_claim_failure_no_side_effect","pre_commit_failure_consumes_claim_without_retry","ambiguous_post_commit_stops_without_retry_or_compensation"],"prohibitedInference":["failure_injection_implemented","failure_recovery_execution_authorized","rollback_execution_authorized","phase8_completed"]}
+```
