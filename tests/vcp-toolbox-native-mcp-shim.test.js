@@ -80,6 +80,42 @@ test('native read initializes the selected-diary runtime before provider and sco
   assert.equal(result._nativeRuntimeReceipt.unscopedNativeSearchUsed, false);
 });
 
+test('native read rejects a manager configured for an unscoped startup scan before initialization', async () => {
+  const calls = [];
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseManager: {
+      config: { fullScanOnStartup: true },
+      async initialize() {
+        calls.push('initialize');
+      },
+      async search() {
+        calls.push('search');
+        return [];
+      }
+    },
+    embeddingUtils: {
+      async getEmbeddingsBatch() {
+        calls.push('embedding');
+        return [[0.1, 0.2]];
+      }
+    }
+  });
+
+  await assert.rejects(
+    adapter.search({ query: 'governed read', limit: 1 }, {
+      authorization: {
+        accepted: true,
+        allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+        allowedDiaryCount: 1,
+        mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+        mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+      }
+    }),
+    /native_unscoped_initialization_forbidden/
+  );
+  assert.deepEqual(calls, []);
+});
+
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];

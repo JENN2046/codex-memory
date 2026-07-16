@@ -15,6 +15,7 @@ const {
   collectOperationAcceptanceBlockers,
   operationAccepted,
   parseArgs,
+  resolveAcceptanceOptions,
   runGovernedVcpNativeAcceptance,
   validateGovernedVcpNativeAcceptanceEvidenceArtifact
 } = require('../src/cli/governed-vcp-native-acceptance');
@@ -70,6 +71,17 @@ test('acceptance CLI rejects unsupported client identities instead of falling ba
   assert.equal(result.status, 1);
   assert.match(result.stderr, /invalid_client_id/);
   assert.equal(result.stdout, '');
+});
+
+test('programmatic acceptance options let an explicit client override an invalid env default', () => {
+  assert.equal(resolveAcceptanceOptions(
+    { clientId: 'Claude' },
+    { CODEX_MEMORY_CLIENT_ID: 'claud' }
+  ).clientId, 'Claude');
+  assert.throws(
+    () => resolveAcceptanceOptions({ clientId: 'manual' }, {}),
+    /invalid_client_id/
+  );
 });
 
 function runCli(args = []) {

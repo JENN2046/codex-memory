@@ -1782,11 +1782,23 @@ async function writeEvidenceArtifact(result = {}, evidenceOutputPath = '') {
   };
 }
 
-async function runGovernedVcpNativeAcceptance(rawOptions = {}) {
+function resolveAcceptanceOptions(rawOptions = {}, env = process.env) {
+  const explicitClientId = Object.prototype.hasOwnProperty.call(rawOptions, 'clientId')
+    ? rawOptions.clientId
+    : undefined;
+  const parseEnv = explicitClientId === undefined
+    ? env
+    : { ...env, CODEX_MEMORY_CLIENT_ID: explicitClientId };
   const options = {
-    ...parseArgs([], process.env),
+    ...parseArgs([], parseEnv),
     ...rawOptions
   };
+  options.clientId = governedNativeClientOrDefault(options.clientId);
+  return options;
+}
+
+async function runGovernedVcpNativeAcceptance(rawOptions = {}) {
+  const options = resolveAcceptanceOptions(rawOptions, process.env);
   if (options.includeWriteSuite) options.includeWrite = true;
   const configOverrides = buildConfigOverrides(options);
   const config = createConfig(configOverrides);
@@ -1981,6 +1993,7 @@ module.exports = {
   operationAccepted,
   parseArgs,
   projectOperationResult,
+  resolveAcceptanceOptions,
   runGovernedVcpNativeAcceptance,
   validateGovernedVcpNativeAcceptanceEvidenceArtifact,
   verifyGovernedVcpNativeAcceptanceEvidenceFile,

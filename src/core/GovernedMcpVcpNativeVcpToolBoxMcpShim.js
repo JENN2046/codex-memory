@@ -626,6 +626,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   function loadRuntime() {
     if (!runtimeInjected) {
       process.env.KNOWLEDGEBASE_ROOT_PATH = knowledgeBaseRootPath;
+      process.env.KNOWLEDGEBASE_FULL_SCAN_ON_STARTUP = 'false';
       if (knowledgeBaseStorePath) {
         process.env.KNOWLEDGEBASE_STORE_PATH = knowledgeBaseStorePath;
       }
@@ -640,6 +641,9 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
 
   async function ensureReady() {
     loadRuntime();
+    if (knowledgeBaseManager?.config?.fullScanOnStartup === true) {
+      throw new Error('native_unscoped_initialization_forbidden');
+    }
     if (knowledgeBaseManager && typeof knowledgeBaseManager.initialize === 'function') {
       await knowledgeBaseManager.initialize();
     }
