@@ -4,19 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2130 final-main full-plan revalidation`.
-Current validation: `CMV-2215`.
-Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
-The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
+Current task: `CM-2131 post-PR21 main baseline and native-context proof status sync`.
+Current validation: `CMV-2216`.
+Current fact: observed `main` baseline `49f4ad14…` / tree `930d182c…` matches PR #21 head tree, and exact-head main CI passed.
+Fresh proof at PR #21 head `f8268aad…` passed with `source_runtime=vcp_native`, no fallback, `memoryWritePerformed=false`, `primaryMemoryStoreWritePerformed=false`, `rawDisclosure=false`, and `result_item_count=0`; the bounded proof used one derived-index cache write.
+The native-first path is proven, but non-empty recall and recall relevance are not. Production/release/deploy/cutover/RC/complete-V8/readiness remain false; this status sync made no new provider/runtime/memory/remote call.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Final `main` baseline `d78ad8f7…` / tree `0a503ded…` has passed CM-2130 revalidation. PRs #14 through #19 are six regular merge commits in strict first-parent order; 17 frozen evidence artifacts and nine status surfaces passed exact Git-object, canonical-hash, consumed/non-replayable, and non-readiness checks.
+Observed `main` merge `49f4ad14…` / tree `930d182c…` exactly matches PR #21 head tree and passed exact-head main CI. The historical frozen evidence manifest remains accepted at `d78ad8f7…`; current-facts drift and the key governed native-context contracts also pass without a new provider call.
 
-The historical bound application and branch-CAS result are accepted as evidence, but current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false` remain unchanged. The next route, if desired, is a separate exact status-sync decision; do not replay historical authorization. Production, release, deploy, cutover, `RC_READY`, complete V8, and all other readiness fields remain false.
+Fresh proof at `f8268aad…` passed with `source_runtime=vcp_native`, no fallback, no memory/primary-store write, one permitted derived-index cache write, no raw disclosure, and `result_item_count=0`. Native-first execution is proven; non-empty recall and relevance are not. CM-2131 synchronizes this governed state while keeping `fullPlanPackCompleted=false` and every readiness field false. Next route: finish PR CI/review, then request merge authorization separately.
 
 ## Previous Active Handoff
 CM-2118 uses a single secure entry that accepts only content commit

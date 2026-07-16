@@ -35,7 +35,7 @@ test('exact nine-path status-sync application is prepared but non-executing', ()
   assert.equal(evaluation.readinessClaimed, false);
 });
 
-test('historical projected status stays ledger-valid but cannot replace current-facts schema v3', () => {
+test('historical projected status stays ledger-valid but cannot replace current-facts schema v4', () => {
   const { options } = prepared();
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2121-status-projection-'));
   try {
@@ -52,7 +52,7 @@ test('historical projected status stays ledger-valid but cannot replace current-
     }
     const drift = validateCurrentFactsDrift(root);
     assert.equal(drift.ok, false);
-    assert.match(drift.failures.join('\n'), /schemaVersion must be 3/);
+    assert.match(drift.failures.join('\n'), /schemaVersion must be 4/);
     assert.match(drift.failures.join('\n'), /must not use top-level branch/);
     const ledger = validateAutopilotLedgerConsistency(root);
     assert.equal(ledger.ok, true, ledger.failures.join('\n'));

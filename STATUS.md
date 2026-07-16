@@ -4,13 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2130 final-main full-plan revalidation`.
-Current validation: `CMV-2215`.
-Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
-The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
+Current task: `CM-2131 post-PR21 main baseline and native-context proof status sync`.
+Current validation: `CMV-2216`.
+Current fact: observed `main` baseline `49f4ad14…` / tree `930d182c…` matches PR #21 head tree, and exact-head main CI passed.
+Fresh proof at PR #21 head `f8268aad…` passed with `source_runtime=vcp_native`, no fallback, `memoryWritePerformed=false`, `primaryMemoryStoreWritePerformed=false`, `rawDisclosure=false`, and `result_item_count=0`; the bounded proof used one derived-index cache write.
+The native-first path is proven, but non-empty recall and recall relevance are not. Production/release/deploy/cutover/RC/complete-V8/readiness remain false; this status sync made no new provider/runtime/memory/remote call.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2131 Post-PR21 Main Baseline And Native-context Proof Status Sync
+
+The observed `main` baseline is merge commit `49f4ad14…` with tree `930d182c…`. Its tree exactly matches PR #21 head `f8268aad…`, and GitHub Actions run `29507304212` passed on that exact merge commit. The frozen-evidence manifest still accepts baseline `d78ad8f7…`, and the current-facts drift check plus 52 governed native-context contract tests pass without a provider call.
+
+The separately authorized fresh proof at PR #21 head passed with one initialize, tools/list, prepare-memory-context, native search, provider request, and governed bridge audit receipt. It reported `source_runtime=vcp_native`, `fallback_used=false`, `memory_write_performed=false`, `primary_memory_store_write_performed=false`, `derived_index_write_performed=true`, `raw_disclosure=false`, and `result_item_count=0`.
+
+This proves the bounded native-first task-start path and its fail-closed disclosure/write boundaries. It does not prove a non-empty recall result or recall relevance. `fullPlanPackCompleted=false`; production, release, deploy, cutover, `RC_READY`, complete V8, and readiness remain false. This status sync performed no new provider, runtime, memory, or remote call; merging its PR remains separately authorized.
 
 ## CM-2130 Final-main Full-plan Revalidation
 

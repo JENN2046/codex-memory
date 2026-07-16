@@ -16,6 +16,7 @@ const {
 } = require("../scripts/validate_current_facts_drift");
 
 const SHA = "28353d83884483b989d0d5631091b7e777cc7ccf";
+const TREE = "930d182ce34a99ff4851e4671c705526cd51cc3d";
 
 function writeFile(root, relativePath, text) {
   const fullPath = path.join(root, relativePath);
@@ -68,7 +69,7 @@ function validationLog() {
 
 function facts() {
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     factsMode: "committed_status_snapshot",
     gitFactsSource: "fresh_git_commands",
     liveGitFactsCommitted: false,
@@ -83,6 +84,21 @@ function facts() {
     validationId: "CMV-1521",
     baseBranch: "main",
     repositoryObservation: {
+      baselineObservation: {
+        baselineBranch: "main",
+        baselineCommit: SHA,
+        baselineTree: TREE,
+        baselineWorktreeClean: true,
+        mainCiHeadCommit: SHA,
+        mainCiPassed: true,
+        mainCiRunId: "29507304212",
+        mergeTreeMatchesPrHeadTree: true,
+        observedAt: "2026-07-16",
+        prHeadCommit: SHA,
+        prHeadTree: TREE,
+        prNumber: 21,
+        source: "fresh_git_commands_and_github_actions"
+      },
       observedAtCommitted: false,
       observedBranchCommitted: false,
       observedHeadCommitted: false,
@@ -94,10 +110,30 @@ function facts() {
     },
     governanceState: {
       evidenceRevalidated: true,
-      freshNativeContextProofPerformed: false,
+      freshNativeContextProofHead: SHA,
+      freshNativeContextProofPassed: true,
+      freshNativeContextProofPerformed: true,
+      freshNativeContextProofSourceRuntime: "vcp_native",
+      freshNativeContextProofCallCounts: {
+        governedBridgeAuditReceipt: 1,
+        initialize: 1,
+        nativeSearch: 1,
+        prepareMemoryContext: 1,
+        providerRequest: 1,
+        toolsList: 1
+      },
+      freshNativeContextProofDerivedIndexWritePerformed: true,
+      freshNativeContextProofFallbackUsed: false,
+      freshNativeContextProofMemoryWritePerformed: false,
+      freshNativeContextProofPrimaryMemoryStoreWritePerformed: false,
+      freshNativeContextProofRawDisclosure: false,
+      freshNativeContextProofResultItemCount: 0,
+      nativeFirstPathProven: true,
+      nonEmptyRecallProven: false,
       planPackCompleted: false,
+      recallRelevanceProven: false,
       readinessClaimed: false,
-      statusSyncPerformed: false
+      statusSyncPerformed: true
     },
     pr: {
       number: null,
@@ -144,13 +180,13 @@ function workspace() {
   return root;
 }
 
-test("current facts validator accepts schema v3 separated repository/evidence/governance state", () => {
+test("current facts validator accepts schema v4 frozen baseline observation and governed proof state", () => {
   const root = workspace();
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, true, result.failures.join("\n"));
 });
 
-test("current facts validator rejects schema v3 committed live git head fields", () => {
+test("current facts validator rejects schema v4 committed live git head fields", () => {
   const root = workspace();
   const changedFacts = facts();
   changedFacts.localHead = SHA;
@@ -158,8 +194,8 @@ test("current facts validator rejects schema v3 committed live git head fields",
   writeFile(root, FACTS_PATH, `${JSON.stringify(changedFacts, null, 2)}\n`);
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);
-  assert.match(result.failures.join("\n"), /schema v3 must not commit localHead/);
-  assert.match(result.failures.join("\n"), /schema v3 must not commit originHead/);
+  assert.match(result.failures.join("\n"), /schema v4 must not commit localHead/);
+  assert.match(result.failures.join("\n"), /schema v4 must not commit originHead/);
 });
 
 test("current facts validator rejects a historical branch at the live top level", () => {
@@ -182,6 +218,26 @@ test("current facts validator rejects stale live git policy", () => {
   assert.equal(result.ok, false);
   assert.match(result.failures.join("\n"), /liveGitFactsCommitted must be false/);
   assert.match(result.failures.join("\n"), /liveGitFactsPolicy\.currentHeadCommitted must be false/);
+});
+
+test("current facts validator rejects baseline and PR head tree mismatch", () => {
+  const root = workspace();
+  const changedFacts = facts();
+  changedFacts.repositoryObservation.baselineObservation.prHeadTree = SHA;
+  writeFile(root, FACTS_PATH, `${JSON.stringify(changedFacts, null, 2)}\n`);
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /baseline tree must match the PR head tree/);
+});
+
+test("current facts validator rejects relevance claims from an empty proof", () => {
+  const root = workspace();
+  const changedFacts = facts();
+  changedFacts.governanceState.recallRelevanceProven = true;
+  writeFile(root, FACTS_PATH, `${JSON.stringify(changedFacts, null, 2)}\n`);
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /cannot prove non-empty recall or relevance/);
 });
 
 test("current facts validator rejects full SHA in active markdown blocks", () => {

@@ -8,13 +8,21 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Final-main full-plan evidence revalidated; current completion/status sync remain false and separate; readiness remains false |
-| Current task | `CM-2130 final-main full-plan revalidation` |
-| Current validation | `CMV-2215` |
-| Current route | Decide any exact status sync separately; readiness and external actions remain separately gated |
+| Status | PR #21 main baseline and fresh native-context proof synchronized; proof result is empty; readiness remains false |
+| Current task | `CM-2131 post-PR21 main baseline and native-context proof status sync` |
+| Current validation | `CMV-2216` |
+| Current route | Complete status-sync PR CI/review; request merge authorization separately; non-empty recall/relevance proof remains separate |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## Post-PR21 Main Baseline And Fresh Proof
+
+Fresh Git observation binds `main` merge commit `49f4ad14…` to tree `930d182c…`; that tree exactly matches PR #21 head `f8268aad…`. Exact-head main CI run `29507304212` passed. Frozen evidence remains independently accepted at its historical `d78ad8f7…` baseline.
+
+The previously authorized, exact-head fresh proof passed through `prepare_memory_context` with `source_runtime=vcp_native`, one bounded native search, no fallback, no memory or primary-store write, one permitted derived-index cache write, and no raw disclosure. Its `result_item_count=0`, so it proves native-first execution but not non-empty recall or relevance.
+
+This status sync adds no provider call, runtime action, memory access, or readiness authority. `fullPlanPackCompleted=false`, and production/release/deploy/cutover/RC/complete-V8/readiness remain false. The status-sync PR must pass CI/review, and merge requires separate exact authorization.
 
 ## Final-main Full-plan Revalidation
 
