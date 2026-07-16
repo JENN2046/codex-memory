@@ -97,7 +97,7 @@ function parseArgs(argv = [], env = process.env) {
     query: 'codex memory governed native acceptance probe',
     limit: 1,
     writeTitle: 'codex-memory governed native acceptance probe',
-    writeContent: 'Low-disclosure governed native bridge acceptance probe from Codex.',
+    writeContent: 'Low-disclosure governed native bridge acceptance probe.',
     writeEvidence: 'Acceptance command explicitly requested governed native record_memory delegation.',
     tombstoneMemoryId: 'codex-memory-governed-native-acceptance-record-ref',
     supersedeOldMemoryId: 'codex-memory-governed-native-acceptance-old-ref',

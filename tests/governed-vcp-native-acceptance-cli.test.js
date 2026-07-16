@@ -34,6 +34,8 @@ test('acceptance CLI binds Claude identity without changing the public MCP surfa
   const writeContext = buildWriteContext('record_memory', options);
 
   assert.equal(options.clientId, 'Claude');
+  assert.equal(options.writeContent, 'Low-disclosure governed native bridge acceptance probe.');
+  assert.equal(options.writeContent.includes('Codex'), false);
   assert.equal(config.allowedAgentAlias, 'Claude');
   assert.equal(config.defaultClientId, 'Claude');
   assert.equal(context.executionContext.agentAlias, 'Claude');
