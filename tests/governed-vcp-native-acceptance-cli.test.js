@@ -42,6 +42,30 @@ test('acceptance CLI binds Claude identity without changing the public MCP surfa
   assert.equal(writeContext.exactApprovalResult.allowedScope.client_id, 'Claude');
 });
 
+test('acceptance CLI rejects unsupported client identities instead of falling back to Codex', () => {
+  assert.throws(
+    () => parseArgs(['--client-id', 'claud'], {}),
+    /invalid_client_id/
+  );
+  assert.throws(
+    () => parseArgs(['--client-id'], {}),
+    /invalid_client_id/
+  );
+  assert.throws(
+    () => parseArgs([], { CODEX_MEMORY_CLIENT_ID: 'claud' }),
+    /invalid_client_id/
+  );
+  assert.throws(
+    () => buildConfigOverrides({ clientId: 'claud' }),
+    /invalid_client_id/
+  );
+
+  const result = runCli(['--json', '--client-id', 'claud']);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /invalid_client_id/);
+  assert.equal(result.stdout, '');
+});
+
 function runCli(args = []) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd: workspaceRoot,

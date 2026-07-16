@@ -61,6 +61,17 @@ const ALLOWED_NATIVE_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'unsupported_native_tool'
 ]);
 
+function governedNativeClientOrDefault(value, fallback = 'Codex') {
+  const provided = typeof value === 'string' ? value.trim() : '';
+  if (!provided) {
+    if (fallback) return fallback;
+    throw new Error('invalid_client_id');
+  }
+  const canonical = canonicalGovernedNativeClient(provided);
+  if (!canonical) throw new Error('invalid_client_id');
+  return canonical;
+}
+
 function parseArgs(argv = [], env = process.env) {
   const options = {
     json: false,
@@ -82,7 +93,7 @@ function parseArgs(argv = [], env = process.env) {
     workspaceId: env.CODEX_MEMORY_WORKSPACE_ID || DEFAULT_WORKSPACE_ID,
     scopeId: env.CODEX_MEMORY_SCOPE_ID || '',
     visibility: env.CODEX_MEMORY_VISIBILITY || DEFAULT_VISIBILITY,
-    clientId: canonicalGovernedNativeClient(env.CODEX_MEMORY_CLIENT_ID) || 'Codex',
+    clientId: governedNativeClientOrDefault(env.CODEX_MEMORY_CLIENT_ID),
     query: 'codex memory governed native acceptance probe',
     limit: 1,
     writeTitle: 'codex-memory governed native acceptance probe',
@@ -177,7 +188,7 @@ function parseArgs(argv = [], env = process.env) {
       continue;
     }
     if (token === '--client-id') {
-      options.clientId = canonicalGovernedNativeClient(argv[index + 1]) || '';
+      options.clientId = governedNativeClientOrDefault(argv[index + 1], null);
       index += 1;
       continue;
     }
@@ -267,7 +278,7 @@ function defaultToolNameByAction(options = {}) {
 }
 
 function buildConfigOverrides(options = {}) {
-  const clientId = canonicalGovernedNativeClient(options.clientId) || 'Codex';
+  const clientId = governedNativeClientOrDefault(options.clientId);
   const toolNameByAction = optionalOverride(options.toolNameByAction) ||
     JSON.stringify(defaultToolNameByAction(options));
   return {
@@ -301,7 +312,7 @@ function buildConfigOverrides(options = {}) {
 }
 
 function buildReadContext(options = {}) {
-  const clientId = canonicalGovernedNativeClient(options.clientId) || 'Codex';
+  const clientId = governedNativeClientOrDefault(options.clientId);
   return {
     executionContext: {
       agentAlias: clientId,
@@ -317,7 +328,7 @@ function buildReadContext(options = {}) {
 }
 
 function buildWriteContext(toolName = 'record_memory', options = {}) {
-  const clientId = canonicalGovernedNativeClient(options.clientId) || 'Codex';
+  const clientId = governedNativeClientOrDefault(options.clientId);
   const scope = {
     project_id: options.projectId,
     workspace_id: options.workspaceId,
@@ -371,7 +382,7 @@ function buildReadSuiteArgs(toolName, options = {}) {
 }
 
 function buildWriteArgs(toolName = 'record_memory', options = {}) {
-  const clientId = canonicalGovernedNativeClient(options.clientId) || 'Codex';
+  const clientId = governedNativeClientOrDefault(options.clientId);
   if (toolName === 'tombstone_memory') {
     return {
       memory_id: options.tombstoneMemoryId,
