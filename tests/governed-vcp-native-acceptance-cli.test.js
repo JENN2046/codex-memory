@@ -9,14 +9,80 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  buildConfigOverrides,
+  buildReadContext,
+  buildWriteContext,
   collectOperationAcceptanceBlockers,
   operationAccepted,
+  parseArgs,
+  resolveAcceptanceOptions,
   runGovernedVcpNativeAcceptance,
   validateGovernedVcpNativeAcceptanceEvidenceArtifact
 } = require('../src/cli/governed-vcp-native-acceptance');
 
 const cliPath = path.join('src', 'cli', 'governed-vcp-native-acceptance.js');
 const workspaceRoot = path.resolve(__dirname, '..');
+
+test('acceptance CLI binds Claude identity without changing the public MCP surface', () => {
+  const options = parseArgs([
+    '--client-id', 'claude',
+    '--project-id', 'codex-memory',
+    '--workspace-id', 'agents-os',
+    '--visibility', 'private'
+  ], {});
+  const config = buildConfigOverrides(options);
+  const context = buildReadContext(options);
+  const writeContext = buildWriteContext('record_memory', options);
+
+  assert.equal(options.clientId, 'Claude');
+  assert.equal(options.writeContent, 'Low-disclosure governed native bridge acceptance probe.');
+  assert.equal(options.writeContent.includes('Codex'), false);
+  assert.equal(config.allowedAgentAlias, 'Claude');
+  assert.equal(config.defaultClientId, 'Claude');
+  assert.equal(context.executionContext.agentAlias, 'Claude');
+  assert.equal(context.executionContext.clientId, 'Claude');
+  assert.equal(context.executionContext.visibility, 'private');
+  assert.equal(writeContext.exactApprovalResult.allowedScope.client_id, 'Claude');
+});
+
+test('acceptance CLI rejects unsupported client identities instead of falling back to Codex', () => {
+  assert.throws(
+    () => parseArgs(['--client-id', 'claud'], {}),
+    /invalid_client_id/
+  );
+  assert.throws(
+    () => parseArgs(['--client-id'], {}),
+    /invalid_client_id/
+  );
+  assert.throws(
+    () => parseArgs([], { CODEX_MEMORY_CLIENT_ID: 'claud' }),
+    /invalid_client_id/
+  );
+  assert.equal(
+    parseArgs(['--client-id', 'Codex'], { CODEX_MEMORY_CLIENT_ID: 'claud' }).clientId,
+    'Codex'
+  );
+  assert.throws(
+    () => buildConfigOverrides({ clientId: 'claud' }),
+    /invalid_client_id/
+  );
+
+  const result = runCli(['--json', '--client-id', 'claud']);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /invalid_client_id/);
+  assert.equal(result.stdout, '');
+});
+
+test('programmatic acceptance options let an explicit client override an invalid env default', () => {
+  assert.equal(resolveAcceptanceOptions(
+    { clientId: 'Claude' },
+    { CODEX_MEMORY_CLIENT_ID: 'claud' }
+  ).clientId, 'Claude');
+  assert.throws(
+    () => resolveAcceptanceOptions({ clientId: 'manual' }, {}),
+    /invalid_client_id/
+  );
+});
 
 function runCli(args = []) {
   return spawnSync(process.execPath, [cliPath, ...args], {

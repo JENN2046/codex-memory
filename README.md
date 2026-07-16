@@ -115,9 +115,11 @@ also exposed as a default read-only context package tool, and
 `propose_memory_delta` is exposed as a default proposal-only tool. The legacy
 `7605` service is kept as rollback while `7625` is observed in real use.
 
-The governed contract now includes both Codex and Claude. Repository tests
-cover identity/scope binding for both clients; the historical live dogfood
-evidence is Codex-only, so Claude runtime completion is not claimed.
+The governed contract includes both Codex and Claude. Diary-partition v1 has a
+low-disclosure Stage 3B live proof for both clients across private, project,
+workspace, shared-union, and task-start reads. Four clean bootstrap partitions
+were used; all 13 legacy partitions remained excluded and unread. This is a
+v1 isolation closeout, not a production, release, deploy, or cutover claim.
 
 The default server MCP surface is read-only plus proposal-only: `tools/list`
 exposes only `search_memory`, `memory_overview`, `audit_memory`,
@@ -155,7 +157,8 @@ Governed native reads are fail-closed unless both sides are startup-bound to
 digest, and the shim must load the matching mapping with
 `--diary-scope-mapping /path/to/mapping.json`. The repository contains only a
 redacted example; it does not contain or derive a live diary inventory. See
-[Diary scope enforcement v1](docs/DIARY_SCOPE_ENFORCEMENT_V1.md).
+[Diary scope enforcement v1](docs/DIARY_SCOPE_ENFORCEMENT_V1.md) and the
+[Stage 3B closeout](docs/DIARY_SCOPE_STAGE3B_CLOSEOUT.md).
 
 Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public

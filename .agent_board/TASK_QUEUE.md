@@ -4,11 +4,11 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2131 post-PR21 main baseline and native-context proof status sync`.
-Current validation: `CMV-2216`.
-Current fact: observed `main` baseline `49f4ad14…` / tree `930d182c…` matches PR #21 head tree, and exact-head main CI passed.
-Fresh proof at PR #21 head `f8268aad…` passed with `source_runtime=vcp_native`, no fallback, `memoryWritePerformed=false`, `primaryMemoryStoreWritePerformed=false`, `rawDisclosure=false`, and `result_item_count=0`; the bounded proof used one derived-index cache write.
-The native-first path is proven, but non-empty recall and recall relevance are not. Production/release/deploy/cutover/RC/complete-V8/readiness remain false; this status sync made no new provider/runtime/memory/remote call.
+Current task: `CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout`.
+Current validation: `CMV-2217`.
+Current fact: four clean governed partitions and four authorized bootstrap memories were indexed; all 13 legacy partitions remained excluded and unread.
+Codex/Claude private, project, workspace, shared-union, and task-start live reads passed non-empty relevance, isolation, mapping binding, source post-check, and zero-unscoped-search checks.
+Stage 3B is `V1_COMPLETE`; bootstrap primary writes were exactly four and live-proof primary writes were zero. Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -46,6 +46,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2132 | 2132 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance / P9-codex-claude-client-scope | Authorized local bootstrap, provider-bound proof, and bounded runtime/config activation; no production action | diary-scope runtime/config fixes; low-disclosure closeout and active status surfaces | Complete clean-partition diary v1 activation and live Codex/Claude isolation proof | exact VCP conformance; four-partition indexing; MCP/HTTP contract; ten live reads; targeted/default/hardening/strict/docs/CI gates | private rollback mapping/config retained; public write disabled; legacy set untouched; live proof writes zero | normal PR CI/review and regular merge authorized; production/release/cutover remain forbidden | COMPLETED_V1_LIVE_ISOLATION_PROOF_PASS_PRODUCTION_RELEASE_CUTOVER_READINESS_FALSE |
 | CM-2131 | 2131 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Narrow status contract and tracked governance-state sync; no runtime/provider action | nine status/governance surfaces; current-facts validator and existing tests | Bind PR #21 merge observation and fresh native-context proof PASS without converting an empty result into recall/relevance or readiness proof | exact merge/head tree equality; main CI; frozen manifest; current-facts v4; native-context contracts; docs/ledger/diff gates | preserve live-head separation; no new provider/runtime/memory action; no new CM-21xx one-shot script | PR CI/review required; merge requires separate exact authorization | COMPLETED_MAIN_BASELINE_REVALIDATED_NATIVE_CONTEXT_PROOF_PASS_RESULT_EMPTY_STATUS_SYNCED_READINESS_FALSE |
 | CM-2130 | 2130 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Read-only final-main Git/evidence verification | CM-2130 contract/generator/tests; JSON/Markdown evidence; nine active status surfaces | Revalidate the full-plan evidence chain on exact final main after PRs #14-#19 | regular-merge chain; 17 evidence artifacts; nine status surfaces; canonical hashes; consumed/non-replayable and readiness-false drift tests | no historical authorization replay; no status-sync/ref update/native/provider/real-memory/remote effect | any future status sync requires a separate exact decision; no readiness authority | COMPLETED_FINAL_MAIN_EVIDENCE_REVALIDATED_STATUS_SYNC_SEPARATE_FULL_PLAN_FALSE_READINESS_FALSE |
 | CM-2121 | 2121 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Exact local status sync only | nine status/governance paths | Preserve historical synchronization evidence while reopening current completion for revalidation | exact receipt review; nine before/after blobs; current-facts drift; ledger consistency; docs/diff checks | authorization consumed/non-replayable; no native/provider/real-memory/remote effect | separate exact status-sync decision/release required; no readiness authority | COMPLETED_STATUS_REOPENED_FULL_PLAN_NEEDS_REVALIDATION_READINESS_FALSE |

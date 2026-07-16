@@ -699,12 +699,16 @@ function createConfig(overrides = {}) {
       runtimeTarget: governedMcpVcpNativeRuntimeTarget,
       httpMcpTarget: governedMcpVcpNativeHttpMcpTarget.publicConfig
     });
-  const expectedDiaryScopeMappingReference = typeof overrides.expectedDiaryScopeMappingReference === 'string'
-    ? overrides.expectedDiaryScopeMappingReference.trim()
-    : '';
-  const expectedDiaryScopeMappingDigest = typeof overrides.expectedDiaryScopeMappingDigest === 'string'
-    ? overrides.expectedDiaryScopeMappingDigest.trim()
-    : '';
+  const expectedDiaryScopeMappingReference = String(pickFirstNonEmpty(
+    overrides.expectedDiaryScopeMappingReference,
+    process.env.CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_REFERENCE,
+    ''
+  )).trim();
+  const expectedDiaryScopeMappingDigest = String(pickFirstNonEmpty(
+    overrides.expectedDiaryScopeMappingDigest,
+    process.env.CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_DIGEST,
+    ''
+  )).trim();
   const governedMcpVcpNativeScopeEnforcement = Object.freeze({
     scopeEnforcementMode: 'diary_allowlist_v1',
     expectedMappingReference: expectedDiaryScopeMappingReference === 'jenn-vcp-diary-scope-v1'

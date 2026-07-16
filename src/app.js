@@ -1184,7 +1184,7 @@ function projectGovernedNativeBridgeObservationSummary(observation = {}) {
     rawScopePersisted: false,
     rawScopeValueReturned: false,
     clientIdentitySource: GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE,
-    clientIdentityBound: request.client_id === 'Codex',
+    clientIdentityBound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
     clientIdentityToolArgumentsMayOverride: false,
     clientIdentityGovernanceMetadataMayOverride: false,
     scopeBoundarySource: GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE,

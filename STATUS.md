@@ -4,13 +4,37 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2131 post-PR21 main baseline and native-context proof status sync`.
-Current validation: `CMV-2216`.
-Current fact: observed `main` baseline `49f4ad14…` / tree `930d182c…` matches PR #21 head tree, and exact-head main CI passed.
-Fresh proof at PR #21 head `f8268aad…` passed with `source_runtime=vcp_native`, no fallback, `memoryWritePerformed=false`, `primaryMemoryStoreWritePerformed=false`, `rawDisclosure=false`, and `result_item_count=0`; the bounded proof used one derived-index cache write.
-The native-first path is proven, but non-empty recall and recall relevance are not. Production/release/deploy/cutover/RC/complete-V8/readiness remain false; this status sync made no new provider/runtime/memory/remote call.
+Current task: `CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout`.
+Current validation: `CMV-2217`.
+Current fact: four clean governed partitions and four authorized bootstrap memories were indexed in an isolated store; all 13 legacy partitions remained excluded and unread.
+Provider-bound Codex/Claude private, project, workspace, shared-union, and task-start reads passed non-empty relevance, isolation, mapping binding, source post-check, and zero-unscoped-search checks.
+Stage 3B is `V1_COMPLETE`; bootstrap primary writes were exactly four and live-proof primary writes were zero. Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2132 Diary-partition V1 Stage 3B Closeout
+
+The authorized local bootstrap created four clean governed partitions and one
+non-sensitive proof record in each. The derived index contains exactly those
+four governed partitions; full startup scan was disabled. Thirteen legacy
+partitions remain ambiguous/excluded with no raw-content read, migration,
+reclassification, delete, move, or mapping inclusion.
+
+The private mapping is startup-only and absent from Git. Shim actual and bridge
+expected reference/digest bindings matched. Local service health and MCP/HTTP
+initialize/tools-list contracts passed with five public read/proposal tools and
+no public write surface. Ten provider-bound reads covered both clients' exact
+private/project/workspace/shared visibility and task-start unions. All were
+non-empty and relevant; isolation, source post-check, mapping binding, and
+`unscoped_native_search_count=0` passed. Bootstrap primary writes: 4. Live-proof
+primary writes: 0. Derived-index writes occurred only in the bootstrap/index
+phase and were reported.
+
+The independent runtime artifact is private, immutable at creation, and binds
+the exact codex-memory/VCP source identities, mapping binding, and receipt
+chain without publishing diary names, mapping contents, exact digest, tokens,
+raw memories, or provider responses. Verdict: `V1_COMPLETE`. Production,
+release, deploy, cutover, RC, complete-V8, and readiness remain false.
 
 ## CM-2131 Post-PR21 Main Baseline And Native-context Proof Status Sync
 
