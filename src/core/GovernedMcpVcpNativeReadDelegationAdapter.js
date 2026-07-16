@@ -32,7 +32,8 @@ const ALLOWED_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
 const SCOPE_FILTERING_REQUIRED_VISIBILITIES = Object.freeze([
   'private',
   'workspace',
-  'project'
+  'project',
+  'shared'
 ]);
 const ALLOWED_DISCLOSURE_LEVELS = Object.freeze([
   'none',
@@ -348,7 +349,10 @@ function invalidFieldsForDelegation({ toolName, args = {}, gateResult, callMcpTo
   ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope.visibility');
   }
-  if (SCOPE_FILTERING_REQUIRED_VISIBILITIES.includes(request.visibility)) {
+  if (
+    SCOPE_FILTERING_REQUIRED_VISIBILITIES.includes(request.visibility) &&
+    request.native_scope_filtering_proven !== true
+  ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.native_scope_filtering_proven');
   }
   if (request.scope_identifier_present !== true) {

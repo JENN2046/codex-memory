@@ -26,8 +26,11 @@ const {
   SOURCE_AUTHORITY
 } = require('../src/core/GovernedMcpVcpNativeRuntimeTargetConfig');
 
-function gateResult(toolName = 'search_memory', { visibility = 'shared' } = {}) {
-  return validateGovernedMcpVcpNativeBridgeGate({
+function gateResult(
+  toolName = 'search_memory',
+  { visibility = 'shared', scopeFilteringProven = true } = {}
+) {
+  const result = validateGovernedMcpVcpNativeBridgeGate({
     product_goal: {
       primary_runtime: REQUIRED_PRIMARY_RUNTIME,
       primary_value: REQUIRED_PRIMARY_VALUE,
@@ -87,6 +90,10 @@ function gateResult(toolName = 'search_memory', { visibility = 'shared' } = {}) 
     },
     counters: {}
   });
+  if (scopeFilteringProven) {
+    result.normalizedBridgeRequest.native_scope_filtering_proven = true;
+  }
+  return result;
 }
 
 function nativeInvocationReceiptForPayload(payload, overrides = {}) {
@@ -331,7 +338,10 @@ test('fails closed before native invocation for scope-bound visibility without f
     const result = await executeGovernedMcpVcpNativeReadDelegation({
       toolName: 'search_memory',
       args: { query: 'bounded query' },
-      gateResult: gateResult('search_memory', { visibility }),
+      gateResult: gateResult('search_memory', {
+        visibility,
+        scopeFilteringProven: false
+      }),
       callMcpTool: receiptAwareCallMcpTool(async () => {
         calls += 1;
         return { results: [] };
