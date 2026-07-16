@@ -4,21 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2130 final-main full-plan revalidation`.
-Current validation: `CMV-2215`.
-Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
-The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
+Current task: `CM-2131 post-PR21 main baseline and native-context proof status sync`.
+Current validation: `CMV-2216`.
+Current fact: observed `main` baseline `49f4ad14…` / tree `930d182c…` matches PR #21 head tree, and exact-head main CI passed.
+Fresh proof at PR #21 head `f8268aad…` passed with `source_runtime=vcp_native`, no fallback, `memoryWritePerformed=false`, `primaryMemoryStoreWritePerformed=false`, `rawDisclosure=false`, and `result_item_count=0`; the bounded proof used one derived-index cache write.
+The native-first path is proven, but non-empty recall and recall relevance are not. Production/release/deploy/cutover/RC/complete-V8/readiness remain false; this status sync made no new provider/runtime/memory/remote call.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Final-main evidence: CM-2130 revalidation passed over baseline `d78ad8f7…` / tree `0a503ded…`.
-- Full-plan application/branch-CAS evidence: accepted historically; current completion/status sync remain false and separate.
+- Main baseline: merge `49f4ad14…` / tree `930d182c…`; tree matches PR #21 head and exact-head main CI passed.
+- Frozen evidence: accepted independently at historical baseline `d78ad8f7…` / tree `0a503ded…`.
+- Fresh native context: PASS at `f8268aad…`; native-first path proven, `result_item_count=0`, non-empty recall/relevance unproven.
+- Full-plan application/branch-CAS evidence: accepted historically; current full-plan completion remains false.
+- Status sync: performed locally in CM-2131; PR CI/review and merge are separate delivery gates.
 - Application authorization: consumed, non-replayable, inactive.
 - Readiness: all aliases false.
-- Native/provider/real-memory/remote authority from this task: none.
+- New native/provider/real-memory/remote authority from this task: none.
 
 ## Historical Run State Archive
 

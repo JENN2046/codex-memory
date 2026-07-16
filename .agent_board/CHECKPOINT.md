@@ -4,13 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2130 final-main full-plan revalidation`.
-Current validation: `CMV-2215`.
-Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
-The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
+Current task: `CM-2131 post-PR21 main baseline and native-context proof status sync`.
+Current validation: `CMV-2216`.
+Current fact: observed `main` baseline `49f4ad14…` / tree `930d182c…` matches PR #21 head tree, and exact-head main CI passed.
+Fresh proof at PR #21 head `f8268aad…` passed with `source_runtime=vcp_native`, no fallback, `memoryWritePerformed=false`, `primaryMemoryStoreWritePerformed=false`, `rawDisclosure=false`, and `result_item_count=0`; the bounded proof used one derived-index cache write.
+The native-first path is proven, but non-empty recall and recall relevance are not. Production/release/deploy/cutover/RC/complete-V8/readiness remain false; this status sync made no new provider/runtime/memory/remote call.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2131 Post-PR21 Main Baseline And Native-context Proof Status Sync
+
+Status: `MAIN_BASELINE_REVALIDATED_NATIVE_CONTEXT_PROOF_PASS_RESULT_EMPTY_STATUS_SYNCED_READINESS_FALSE`
+
+- Observed `main` merge `49f4ad14…` / tree `930d182c…` matches PR #21 head tree; exact-head main CI passed.
+- Frozen evidence remains accepted at historical baseline `d78ad8f7…`; no historical authorization was replayed.
+- Fresh proof at `f8268aad…` passed with native-first source, no fallback, no memory/primary-store write, one permitted derived-index cache write, and no raw disclosure.
+- `result_item_count=0`; non-empty recall and recall relevance remain unproven.
+- `fullPlanPackCompleted=false`; production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+- CM-2131 performs only the governed status sync; its PR CI/review and merge remain separate gates.
+
+Validation: `CMV-2216`.
 
 ## CM-2130 Final-main Full-plan Revalidation
 

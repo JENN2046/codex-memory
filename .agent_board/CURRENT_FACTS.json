@@ -480,10 +480,30 @@
   "gitFactsSource": "fresh_git_commands",
   "governanceState": {
     "evidenceRevalidated": true,
-    "freshNativeContextProofPerformed": false,
+    "freshNativeContextProofHead": "f8268aadbe339992e3aaf5375c436a423e33c9fd",
+    "freshNativeContextProofPassed": true,
+    "freshNativeContextProofPerformed": true,
+    "freshNativeContextProofSourceRuntime": "vcp_native",
+    "freshNativeContextProofCallCounts": {
+      "governedBridgeAuditReceipt": 1,
+      "initialize": 1,
+      "nativeSearch": 1,
+      "prepareMemoryContext": 1,
+      "providerRequest": 1,
+      "toolsList": 1
+    },
+    "freshNativeContextProofDerivedIndexWritePerformed": true,
+    "freshNativeContextProofFallbackUsed": false,
+    "freshNativeContextProofMemoryWritePerformed": false,
+    "freshNativeContextProofPrimaryMemoryStoreWritePerformed": false,
+    "freshNativeContextProofRawDisclosure": false,
+    "freshNativeContextProofResultItemCount": 0,
+    "nativeFirstPathProven": true,
+    "nonEmptyRecallProven": false,
     "planPackCompleted": false,
+    "recallRelevanceProven": false,
     "readinessClaimed": false,
-    "statusSyncPerformed": false
+    "statusSyncPerformed": true
   },
   "liveGitFactsCommitted": false,
   "liveGitFactsPolicy": {
@@ -497,6 +517,8 @@
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
     "live provider/API calls",
+    "non-empty fresh native context recall",
+    "fresh native context recall relevance",
     "broad record_memory reliability",
     "production write reliability",
     "production readiness",
@@ -543,6 +565,8 @@
   ],
   "planPackCompletion": {
     "finalMainFullPlanEvidenceRevalidationPassed": true,
+    "freshNativeContextProofPassed": true,
+    "freshNativeContextProofResultItemCount": 0,
     "fullPlanApplicationApplied": true,
     "fullPlanApplicationAuthorizationConsumed": true,
     "fullPlanApplicationAuthorizationReplayAllowed": false,
@@ -564,6 +588,9 @@
     "independentReviewPassed": true,
     "internalIndependentRecheckPassed": true,
     "phase8Completed": true,
+    "postPr21MainBaselineRevalidated": true,
+    "nonEmptyRecallProven": false,
+    "recallRelevanceProven": false,
     "readinessClaimed": false,
     "snapshotCandidateCompletionEligible": true,
     "snapshotIndependentReviewPassed": true
@@ -581,13 +608,28 @@
     "source": "docs/near-model-memory-plan-pack/cm2120_full_plan_application_receipt_review_decision.json"
   },
   "repositoryObservation": {
+    "baselineObservation": {
+      "baselineBranch": "main",
+      "baselineCommit": "49f4ad1415dc5a98fbe8f98ae04ca4160930b78e",
+      "baselineTree": "930d182ce34a99ff4851e4671c705526cd51cc3d",
+      "baselineWorktreeClean": true,
+      "mainCiHeadCommit": "49f4ad1415dc5a98fbe8f98ae04ca4160930b78e",
+      "mainCiPassed": true,
+      "mainCiRunId": "29507304212",
+      "mergeTreeMatchesPrHeadTree": true,
+      "observedAt": "2026-07-16",
+      "prHeadCommit": "f8268aadbe339992e3aaf5375c436a423e33c9fd",
+      "prHeadTree": "930d182ce34a99ff4851e4671c705526cd51cc3d",
+      "prNumber": 21,
+      "source": "fresh_git_commands_and_github_actions"
+    },
     "freshGitRequiredBeforeBranchSensitiveAction": true,
     "observedAtCommitted": false,
     "observedBranchCommitted": false,
     "observedHeadCommitted": false,
     "worktreeStateCommitted": false
   },
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "status": {
     "completeV8Claimed": false,
     "notCutoverReady": true,
@@ -596,12 +638,17 @@
     "notReleaseReady": true,
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_final_main_evidence_revalidated_status_sync_separate_no_readiness_claim"
+    "scope": "post_pr21_main_baseline_revalidated_native_context_proof_pass_result_empty_status_synced_readiness_false"
   },
-  "taskId": "CM-2130",
+  "taskId": "CM-2131",
   "updatedAt": "2026-07-16",
-  "validationId": "CMV-2215",
+  "validationId": "CMV-2216",
   "validationSummary": [
+    {
+      "id": "CMV-2216",
+      "scope": "CM-2131 post-PR21 main baseline and native-context proof status sync",
+      "status": "COMPLETED_MAIN_BASELINE_REVALIDATED_NATIVE_CONTEXT_PROOF_PASS_RESULT_EMPTY_STATUS_SYNCED_READINESS_FALSE"
+    },
     {
       "id": "CMV-2215",
       "scope": "CM-2130 final-main full-plan revalidation",
