@@ -60,7 +60,9 @@ returns a bounded memory context package:
 - source breakdown
 - audit receipt
 
-Implementation should reuse the existing local recall and support stack:
+Implementation uses governed native recall first. The existing local recall and
+support stack is retained for explicit fallback, compatibility, audit, and
+offline continuity:
 
 - `KnowledgeBaseRecallPipeline`
 - `CandidateGenerator`
@@ -72,7 +74,8 @@ Implementation should reuse the existing local recall and support stack:
 - `MemoryOverviewService`
 
 The layer converts bounded search results into a task-oriented memory context
-package. It is not a from-zero recall rewrite.
+package. Every package identifies its source runtime and local results cannot be
+presented as native. It is not a from-zero recall rewrite.
 
 This layer is the first step toward a near-model-memory experience.
 

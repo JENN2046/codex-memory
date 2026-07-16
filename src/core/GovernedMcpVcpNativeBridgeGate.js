@@ -16,6 +16,10 @@ const {
   SOURCE_AUTHORITY
 } = require('./GovernedMcpVcpNativeRuntimeTargetConfig');
 const { TOOL_DEFINITIONS } = require('./constants');
+const {
+  GOVERNED_NATIVE_VISIBILITIES,
+  canonicalGovernedNativeClient
+} = require('./MemoryAccessContract');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeBridgeGate';
 const CONTRACT_VERSION = 'governed_mcp_vcp_native_bridge_gate_v1';
@@ -32,11 +36,7 @@ const REQUIRED_REQUEST_DIMENSIONS = Object.freeze([
   'rollback_posture'
 ]);
 
-const ALLOWED_VISIBILITIES = Object.freeze([
-  'private',
-  'project',
-  'workspace'
-]);
+const ALLOWED_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
 
 const ALLOWED_INVOCATION_PROFILES = Object.freeze([
   'governed_read_only',
@@ -370,7 +370,7 @@ function normalizeTrustedExecutionContext(trustedContextResult, clientId) {
   const referenceValues = [agentAlias, trustedClientId, projectId, workspaceId, scopeId].filter(Boolean);
   const referencesSafe = referenceValues.every(isSafeReferenceName);
   const visibilityAccepted = !visibility || ALLOWED_VISIBILITIES.includes(visibility);
-  const agentAliasMatches = agentAlias === String(clientId || '');
+  const agentAliasMatches = canonicalGovernedNativeClient(agentAlias) === clientId;
 
   return {
     supplied: true,
@@ -890,8 +890,12 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
   }
 
   const effectiveRequest = isPlainObject(request) ? request : {};
-  const clientId = firstString(getAlias(effectiveRequest, 'client_id', 'clientId'));
-  if (!REQUIRED_CLIENTS.includes(clientId)) blockers.push('client_id_must_be_codex');
+  const clientId = canonicalGovernedNativeClient(
+    firstString(getAlias(effectiveRequest, 'client_id', 'clientId'))
+  );
+  if (!clientId || !REQUIRED_CLIENTS.includes(clientId)) {
+    blockers.push('client_id_must_be_governed_native_client');
+  }
 
   const scope = normalizeScope(effectiveRequest.scope, effectiveRequest, clientId);
   const trustedExecutionContext = normalizeTrustedExecutionContext(
@@ -903,14 +907,14 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
     if (!trustedExecutionContext.accepted) blockers.push('trusted_execution_context_must_be_accepted_when_supplied');
     if (!trustedExecutionContext.agentAliasMatches) blockers.push('trusted_execution_context_agent_alias_must_match_client_id');
     if (!trustedExecutionContext.referencesSafe) blockers.push('trusted_execution_context_references_must_be_safe');
-    if (!trustedExecutionContext.visibilityAccepted) blockers.push('trusted_execution_context_visibility_must_be_private_project_or_workspace');
+    if (!trustedExecutionContext.visibilityAccepted) blockers.push('trusted_execution_context_visibility_must_be_governed_visibility');
     if (!trustedScopeMatches) blockers.push('scope_must_match_trusted_execution_context');
   }
   if (!scope.accepted) {
     if (!isPlainObject(effectiveRequest.scope)) blockers.push('scope_must_be_plain_object');
     if (!scope.hasIdentifier) blockers.push('scope_identifier_required');
     if (scope.hasIdentifier && !scope.identifiersSafe) blockers.push('scope_identifier_must_be_safe_reference');
-    if (!scope.visibility) blockers.push('visibility_must_be_private_project_or_workspace');
+    if (!scope.visibility) blockers.push('visibility_must_be_governed_visibility');
     if (!scope.clientMatches) blockers.push('scope_client_id_must_match_client_id');
   }
 
@@ -1014,7 +1018,7 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
         blockers.push('write_authority_exact_approval_scope_references_must_be_safe');
       }
       if (!exactApproval.scopeVisibilityAccepted) {
-        blockers.push('write_authority_exact_approval_scope_visibility_must_be_private_project_or_workspace');
+        blockers.push('write_authority_exact_approval_scope_visibility_must_be_governed_visibility');
       }
       if (!exactApproval.runtimeTargetReferenceSafe) {
         blockers.push('write_authority_exact_approval_runtime_target_reference_must_be_safe');
@@ -1044,7 +1048,7 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
     blockers,
     normalizedProductGoal: productGoalResult.normalizedProductGoal,
     normalizedBridgeRequest: {
-      client_id: clientId === 'Codex' ? clientId : null,
+      client_id: REQUIRED_CLIENTS.includes(clientId) ? clientId : null,
       trusted_execution_context_supplied: trustedExecutionContext.supplied,
       trusted_execution_context_accepted: trustedExecutionContext.accepted,
       trusted_execution_context_scope_matched: trustedScopeMatches,

@@ -249,6 +249,22 @@ function codexContext(overrides = {}) {
   };
 }
 
+function claudeContext(overrides = {}) {
+  return {
+    executionContext: {
+      agentAlias: 'Claude',
+      agentId: 'claude-desktop',
+      clientId: 'claude',
+      projectId: 'codex-memory',
+      workspaceId: 'workspace-alpha',
+      visibility: 'shared',
+      requestSource: 'governed-mcp-vcp-native-bridge-app-integration',
+      ...(overrides.executionContext || {})
+    },
+    ...(overrides.requestContext || {})
+  };
+}
+
 function exactWriteApprovalResult(overrides = {}) {
   return {
     accepted: true,
@@ -1391,7 +1407,7 @@ test('projection sanitizes unsafe supplied trusted context before bridge gate in
   });
   assert.equal(input.trusted_execution_context.private_extra, undefined);
   assert.ok(result.blockers.includes('trusted_execution_context_agent_alias_must_match_client_id'));
-  assert.ok(result.blockers.includes('trusted_execution_context_visibility_must_be_private_project_or_workspace'));
+  assert.ok(result.blockers.includes('trusted_execution_context_visibility_must_be_governed_visibility'));
   assert.ok(result.blockers.includes('scope_must_match_trusted_execution_context'));
   for (const privateString of privateStrings) {
     assert.equal(serialized.includes(privateString), false);
@@ -2251,6 +2267,229 @@ test('primary read delegation returns governed VCP native low-disclosure result 
   }
 });
 
+test('prepare_memory_context uses governed native recall before local compatibility search', async () => {
+  let nativeCalls = 0;
+  let localCalls = 0;
+  const rawNativeValue = 'RAW_NATIVE_CONTEXT_VALUE_SHOULD_NOT_ECHO';
+  const nativeCaller = async () => {
+    nativeCalls += 1;
+    return {
+      results: [{
+        memoryContextProjection: {
+          projectionVersion: 1,
+          lowDisclosure: true,
+          statement: 'Use the governed native context path for task start.',
+          classification: 'current_state',
+          freshness: 'recent',
+          reasonCodes: ['semantic_match'],
+          conflict: false
+        },
+        sourceKinds: ['vcp_native'],
+        content: rawNativeValue
+      }]
+    };
+  };
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeReadDelegationToolCaller: nativeCaller
+  }, async app => {
+    app.services.passiveRecallService.search = async () => {
+      localCalls += 1;
+      return [];
+    };
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Native task-start context',
+        user_request: 'Prepare the governed memory package.'
+      }
+    }, codexContext());
+    const serialized = JSON.stringify(result);
+
+    assert.equal(result.accepted, true);
+    assert.equal(nativeCalls, 1);
+    assert.equal(localCalls, 0);
+    assert.equal(result.access.sourceRuntime, 'vcp_native');
+    assert.equal(result.access.localMemoryFallbackUsed, false);
+    assert.equal(result.memory_context_package.source_breakdown.source_runtime, 'vcp_native');
+    assert.equal(result.memory_context_package.source_breakdown.fallback_used, false);
+    assert.deepEqual(
+      result.memory_context_package.source_breakdown.reused_surfaces,
+      [
+        'GovernedRecallGateway',
+        'GovernedMcpVcpNativeBridgeGate',
+        'GovernedMcpVcpNativeReadDelegationAdapter',
+        'VCPToolBox native memory'
+      ]
+    );
+    assert.deepEqual(
+      result.memory_context_package.source_breakdown.experimental_heuristics,
+      []
+    );
+    assert.equal(
+      result.memory_context_package.source_breakdown.reused_surfaces
+        .includes('KnowledgeBaseRecallPipeline'),
+      false
+    );
+    assert.equal(
+      result.memory_context_package.current_state[0].statement,
+      'Use the governed native context path for task start.'
+    );
+    assert.deepEqual(
+      result.memory_context_package.current_state[0].source_kinds,
+      ['vcp_native']
+    );
+    assert.equal(serialized.includes(rawNativeValue), false);
+  });
+});
+
+test('Claude native recall is bound to trusted Claude shared scope', async () => {
+  let nativeCall = null;
+  const nativeCaller = async payload => {
+    nativeCall = payload;
+    return { results: [] };
+  };
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeReadDelegationToolCaller: nativeCaller
+  }, async app => {
+    const result = await app.callTool('search_memory', {
+      query: 'Claude governed recall',
+      scope: {
+        project_id: 'payload-project-must-not-override',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, claudeContext());
+
+    assert.equal(result.accepted, true);
+    assert.equal(result.source_runtime, 'vcp_native');
+    assert.equal(nativeCall.arguments.scope.client_id, 'Claude');
+    assert.equal(nativeCall.arguments.scope.visibility, 'shared');
+    assert.equal(nativeCall.arguments.scope.project_id, 'codex-memory');
+    assert.equal(
+      nativeCall.governanceMeta.trustedExecutionContext.executionContext.clientId,
+      'Claude'
+    );
+    assert.equal(
+      nativeCall.governanceMeta.trustedExecutionContext.executionContext.visibility,
+      'shared'
+    );
+  });
+});
+
+test('prepare_memory_context fails closed when primary native recall is rejected', async () => {
+  let nativeCalls = 0;
+  let localCalls = 0;
+  let overviewCalls = 0;
+  let auditCalls = 0;
+  const nativeCaller = async payload => {
+    nativeCalls += 1;
+    throw governedNativeTransportErrorForPayload(
+      payload,
+      'SYNTHETIC_PRIVATE_NATIVE_FAILURE_MUST_NOT_ECHO'
+    );
+  };
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeReadDelegationToolCaller: nativeCaller
+  }, async app => {
+    app.services.passiveRecallService.search = async () => {
+      localCalls += 1;
+      return [];
+    };
+    app.services.overviewService.getAuthenticatedBoundedOverview = async () => {
+      overviewCalls += 1;
+      return {};
+    };
+    app.services.auditMemoryReadonlyService.run = async () => {
+      auditCalls += 1;
+      return {};
+    };
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Rejected native task-start context',
+        user_request: 'Fail closed without a local package.',
+        project_id: 'codex-memory',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, codexContext());
+    const serialized = JSON.stringify(result);
+
+    assert.equal(result.status, 'PREPARE_MEMORY_CONTEXT_RECALL_REJECTED');
+    assert.equal(result.accepted, false);
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.reasonCode, 'vcp_native_recall_unavailable');
+    assert.equal(result.access.sourceRuntime, 'vcp_native_unavailable');
+    assert.equal(result.access.nativeRecallAccepted, false);
+    assert.equal(result.access.localMemoryFallbackUsed, false);
+    assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
+    assert.equal(result.memory_context_package, undefined);
+    assert.equal(nativeCalls, 1);
+    assert.equal(localCalls, 0);
+    assert.equal(overviewCalls, 0);
+    assert.equal(auditCalls, 0);
+    assert.equal(serialized.includes('SYNTHETIC_PRIVATE_NATIVE_FAILURE_MUST_NOT_ECHO'), false);
+  });
+});
+
+test('prepare_memory_context labels audited local fallback and never presents it as native', async () => {
+  let nativeCalls = 0;
+  let localCalls = 0;
+  const nativeCaller = async payload => {
+    nativeCalls += 1;
+    throw governedNativeTransportErrorForPayload(payload, 'native context unavailable');
+  };
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeReadDelegationToolCaller: nativeCaller
+  }, async app => {
+    app.services.passiveRecallService.search = async () => {
+      localCalls += 1;
+      return [{
+        score: 0.8,
+        sourceKinds: ['local_fixture'],
+        memoryContextProjection: {
+          projectionVersion: 1,
+          lowDisclosure: true,
+          statement: 'Local fallback context is explicitly bounded.',
+          classification: 'must_know',
+          freshness: 'established',
+          reasonCodes: ['semantic_match'],
+          conflict: false
+        }
+      }];
+    };
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Fallback task-start context',
+        user_request: 'Prepare the governed memory package.'
+      }
+    }, codexContext());
+
+    assert.equal(result.accepted, true);
+    assert.equal(nativeCalls, 1);
+    assert.equal(localCalls, 1);
+    assert.equal(result.access.sourceRuntime, 'local_fallback');
+    assert.equal(result.access.localMemoryFallbackUsed, true);
+    assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
+    assert.equal(result.memory_context_package.source_breakdown.source_runtime, 'local_fallback');
+    assert.equal(result.memory_context_package.source_breakdown.fallback_used, true);
+    assert.equal(result.memory_context_package.source_breakdown.search_result_count, 0);
+  });
+});
+
 test('primary memory_overview read delegation carries canonical bridge scope to native MCP', async () => {
   let nativeCall = null;
   await withTempApp({
@@ -2794,6 +3033,52 @@ test('primary_with_local_fallback uses local read path when governed native read
     assert.equal(serializedResult.includes('PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedObservation.includes('PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedAudit.includes('PRIVATE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
+  });
+});
+
+test('Claude local fallback preserves trusted Claude client isolation and shared visibility', async () => {
+  let nativeCalls = 0;
+  let localSearchOptions = null;
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeReadDelegationToolCaller: async payload => {
+      nativeCalls += 1;
+      throw governedNativeTransportErrorForPayload(
+        payload,
+        'PRIVATE_CLAUDE_NATIVE_FAILURE_SHOULD_NOT_ECHO'
+      );
+    }
+  }, async app => {
+    app.services.passiveRecallService.search = async options => {
+      localSearchOptions = options;
+      return [];
+    };
+
+    const result = await app.callTool('search_memory', {
+      query: 'Claude fallback scope must remain isolated',
+      target: 'both',
+      limit: 1,
+      include_content: false,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'workspace-alpha',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, claudeContext());
+    const serialized = JSON.stringify(result);
+
+    assert.equal(nativeCalls, 1);
+    assert.equal(result.access.localMemoryFallbackUsed, true);
+    assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
+    assert.equal(localSearchOptions.candidateFilters.projectId, 'codex-memory');
+    assert.equal(localSearchOptions.candidateFilters.workspaceId, 'workspace-alpha');
+    assert.equal(localSearchOptions.candidateFilters.clientId, 'Claude');
+    assert.deepEqual(localSearchOptions.candidateFilters.visibility, ['shared']);
+    assert.equal(localSearchOptions.auditContext.scope.scopeClientId, 'Claude');
+    assert.deepEqual(localSearchOptions.auditContext.scope.scopeVisibility, ['shared']);
+    assert.equal(serialized.includes('PRIVATE_CLAUDE_NATIVE_FAILURE_SHOULD_NOT_ECHO'), false);
   });
 });
 

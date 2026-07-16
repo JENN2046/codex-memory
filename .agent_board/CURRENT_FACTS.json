@@ -1,6 +1,5 @@
 {
   "baseBranch": "main",
-  "branch": "codex/near-model-memory-frozen-replay-v2",
   "constraints": {
     "claudeMdUntrackedUntouched": true,
     "freshGitFactsRequiredBeforeBranchSensitiveAction": true,
@@ -18,6 +17,7 @@
     "noRawVectorSync": true
   },
   "evidenceBaseline": {
+    "snapshotBranch": "codex/near-model-memory-frozen-replay-v2",
     "candidateTag": "v0.2.0-readonly-context-rc",
     "candidateTagTargetCommit": "170ee33963cd0a41565625b41418d12702dd221b",
     "candidateTagTargetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33",
@@ -478,6 +478,13 @@
   },
   "factsMode": "committed_status_snapshot",
   "gitFactsSource": "fresh_git_commands",
+  "governanceState": {
+    "evidenceRevalidated": true,
+    "freshNativeContextProofPerformed": false,
+    "planPackCompleted": false,
+    "readinessClaimed": false,
+    "statusSyncPerformed": false
+  },
   "liveGitFactsCommitted": false,
   "liveGitFactsPolicy": {
     "currentHeadCommitted": false,
@@ -573,7 +580,14 @@
     "presentInLocalCheckout": true,
     "source": "docs/near-model-memory-plan-pack/cm2120_full_plan_application_receipt_review_decision.json"
   },
-  "schemaVersion": 2,
+  "repositoryObservation": {
+    "freshGitRequiredBeforeBranchSensitiveAction": true,
+    "observedAtCommitted": false,
+    "observedBranchCommitted": false,
+    "observedHeadCommitted": false,
+    "worktreeStateCommitted": false
+  },
+  "schemaVersion": 3,
   "status": {
     "completeV8Claimed": false,
     "notCutoverReady": true,

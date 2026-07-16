@@ -10,6 +10,7 @@ product_goal:
   primary_value: governance, not memory intelligence
   clients:
     - Codex
+    - Claude
   access_path: governed MCP tools
   governed_dimensions:
     - client_id
@@ -36,22 +37,17 @@ continuity, compatibility, and validation fixtures. The product value is
 governance around native memory behavior, not replacing VCPToolBox memory
 intelligence with a parallel local intelligence engine.
 
-## 0.1 Recent Primary Work Goal
+## 0.1 Current Convergence Goal
 
-The recent primary work goal is now complete implementation of the imported
-near-model-memory implementation plan pack:
+The current narrow phase is **Native Context and Contract Convergence**:
 
 - source: `docs/near-model-memory-plan-pack/00_README.md`
-- total target: implement the full plan-pack sequence from read-only native
-  access, memory context package, workflow integration, recall quality, memory
-  delta proposal/staging, operator-only full surface, native write proof, and
-  observation/review gates
-- immediate milestone: Phase 3 / Memory Context Package MVP
-- immediate implementation target: `prepare_memory_context`
-- implementation posture: reuse existing local memory, SQLite shadow, vector
-  index, `KnowledgeBaseRecallPipeline`, `CandidateGenerator`, `TagMemoEngine`,
-  scope/lifecycle filters, `AuditLogStore`, `MemoryOverviewService`, and write
-  governance instead of rebuilding from zero
+- freeze one client/visibility contract across schema, gate, docs, and tests
+- make `prepare_memory_context` use the governed native read path first
+- use local recall only as an explicit fallback or compatibility path
+- label every context package as `vcp_native`, `local_fallback`, or
+  `local_compatibility`
+- keep fresh live native read and Claude runtime proof as separate evidence work
 - default posture: read-only context packaging first; no durable mutation; no
   default production write
 - runtime ownership: VCPToolBox native memory remains the final memory
@@ -74,8 +70,8 @@ durable production write.
 ## 1. Legacy Long-Term Context (Not Current Product Goal)
 
 The material below is legacy roadmap context. It must not override Section 0.
-For the current governed VCPToolBox-native bridge work, the active client is
-Codex only, the primary runtime is VCPToolBox native memory, and
+For the current governed VCPToolBox-native bridge work, the governed client
+contract is Codex and Claude, the primary runtime is VCPToolBox native memory, and
 `codex-memory` provides governance rather than memory intelligence.
 
 Historical wording described `codex-memory` as an independent replacement-style

@@ -24,6 +24,12 @@ const REUSED_SURFACES = Object.freeze([
   'AuditLogStore',
   'MemoryOverviewService'
 ]);
+const NATIVE_CONTEXT_SURFACES = Object.freeze([
+  'GovernedRecallGateway',
+  'GovernedMcpVcpNativeBridgeGate',
+  'GovernedMcpVcpNativeReadDelegationAdapter',
+  'VCPToolBox native memory'
+]);
 const CONTEXT_CLASSIFICATIONS = Object.freeze([
   'must_know',
   'recent_decisions',
@@ -325,6 +331,72 @@ function hasFallback(searchResult = {}) {
     searchResult?.governedNativeReadFallback?.used === true;
 }
 
+function sourceRuntime(searchResult = {}) {
+  if (hasFallback(searchResult)) return 'local_fallback';
+  if (
+    searchResult?.status === 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED' &&
+    searchResult?.accepted === true &&
+    searchResult?.decision !== 'rejected'
+  ) return 'vcp_native';
+  if (
+    String(searchResult?.status || '').startsWith('GOVERNED_MCP_VCP_NATIVE_') ||
+    ['vcp_native', 'vcp_native_unavailable'].includes(searchResult?.source_runtime)
+  ) {
+    return 'vcp_native_unavailable';
+  }
+  if (['local_fallback', 'local_compatibility'].includes(searchResult?.source_runtime)) {
+    return searchResult.source_runtime;
+  }
+  return 'local_compatibility';
+}
+
+function recallRejected(searchResult = {}) {
+  if (!isPlainObject(searchResult)) return false;
+  return searchResult.accepted === false ||
+    searchResult.decision === 'rejected' ||
+    sourceRuntime(searchResult) === 'vcp_native_unavailable';
+}
+
+function buildRecallRejectedResponse(searchResult = {}) {
+  const selectedSourceRuntime = sourceRuntime(searchResult);
+  const nativeUnavailable = selectedSourceRuntime === 'vcp_native_unavailable';
+  return {
+    status: 'PREPARE_MEMORY_CONTEXT_RECALL_REJECTED',
+    accepted: false,
+    decision: 'rejected',
+    reasonCode: nativeUnavailable
+      ? 'vcp_native_recall_unavailable'
+      : 'governed_recall_unavailable',
+    access: {
+      mode: 'prepare_memory_context_readonly',
+      selectedProjection: true,
+      selectedProjectionVersion: 1,
+      readOnly: true,
+      lowDisclosure: true,
+      nativeRecallAccepted: false,
+      memoryReadPerformed: searchResult?.access?.memoryReadPerformed === true,
+      localMemoryFallbackUsed: false,
+      resultCanBeMistakenForVcpNative: false,
+      durableMutationPerformed: false,
+      productionWritePerformed: false,
+      rawMemoryReturned: false,
+      rawAuditReturned: false,
+      rawOutputReturned: false,
+      providerPayloadReturned: false,
+      tokenMaterialReturned: false,
+      endpointReturned: false,
+      readinessClaimed: false,
+      sourceRuntime: selectedSourceRuntime
+    },
+    nonClaims: {
+      modelInternalMemory: false,
+      productionReadiness: false,
+      productionWriteReady: false,
+      fullSurfaceDefault: false
+    }
+  };
+}
+
 function buildRecommendedNextStep(pkg) {
   if (pkg.blockers.length > 0) {
     return 'Address the blocker memory first, then continue with the task using current repository evidence.';
@@ -422,6 +494,7 @@ function buildAuditReceipt({ task, query, results, searchResult, overview, audit
     raw_audit_returned: false,
     provider_payload_returned: false,
     fallback_used: hasFallback(searchResult),
+    source_runtime: sourceRuntime(searchResult),
     search_result_count: results.length,
     scope_fingerprint: scopeFingerprint,
     result_projection_digest: resultProjectionDigest,
@@ -449,6 +522,7 @@ function enforceNoForbiddenOutputKeys(value, path = []) {
 
 function buildMinimalBoundedResponse(result) {
   const fallbackUsed = result?.access?.localMemoryFallbackUsed === true;
+  const selectedSourceRuntime = result?.access?.sourceRuntime || 'local_compatibility';
   return {
     status: 'PREPARE_MEMORY_CONTEXT_ACCEPTED',
     accepted: true,
@@ -463,6 +537,7 @@ function buildMinimalBoundedResponse(result) {
       source_breakdown: {
         search_result_count: 0,
         fallback_used: fallbackUsed,
+        source_runtime: selectedSourceRuntime,
         vcp_toolbox_native_memory_owner: true
       },
       audit_receipt: null
@@ -477,6 +552,7 @@ function buildMinimalBoundedResponse(result) {
       rawMemoryReturned: false,
       rawAuditReturned: false,
       readinessClaimed: false,
+      sourceRuntime: selectedSourceRuntime,
       localMemoryFallbackUsed: fallbackUsed,
       resultCanBeMistakenForVcpNative: false
     },
@@ -529,8 +605,9 @@ function enforceMaxBytes(result, maxBytes) {
       pkg[bucket] = [];
     }
     pkg.recommended_next_step = 'Memory context was compressed to fit the response budget; inspect repository evidence before acting.';
-    pkg.source_breakdown.reused_surfaces = ['KnowledgeBaseRecallPipeline', 'CandidateGenerator', 'TagMemoEngine'];
-    pkg.source_breakdown.experimental_heuristics = ['TagMemoEngine'];
+    pkg.source_breakdown.reused_surfaces = pkg.source_breakdown.reused_surfaces.slice(0, 3);
+    pkg.source_breakdown.experimental_heuristics =
+      pkg.source_breakdown.experimental_heuristics.slice(0, 1);
     pkg.source_breakdown.local_memory_role = ['fallback', 'audit', 'context packaging'];
     delete pkg.source_breakdown.overview_projection_mode;
     delete pkg.source_breakdown.audit_projection_mode;
@@ -545,6 +622,7 @@ function enforceMaxBytes(result, maxBytes) {
         raw_audit_returned: false,
         provider_payload_returned: false,
         fallback_used: pkg.audit_receipt.fallback_used,
+        source_runtime: pkg.audit_receipt.source_runtime,
         search_result_count: pkg.audit_receipt.search_result_count,
         low_disclosure: true
       };
@@ -596,7 +674,13 @@ class MemoryContextPackageService {
         ...(scope ? { scope } : {})
       }, readOnlyContext)
       : { results: [] };
+    if (recallRejected(searchResult)) {
+      const rejected = buildRecallRejectedResponse(searchResult);
+      enforceNoForbiddenOutputKeys(rejected);
+      return rejected;
+    }
     const results = normalizeSearchResults(searchResult).slice(0, maxItems);
+    const selectedSourceRuntime = sourceRuntime(searchResult);
     const overview = this.overviewService
       ? await this.overviewService.getAuthenticatedBoundedOverview({ auditWindow: 50 })
       : null;
@@ -637,6 +721,13 @@ class MemoryContextPackageService {
       target_counts: buildTargetCounts(results),
       source_kinds: uniqueTokens(results.flatMap(sourceKinds)).slice(0, 10),
       fallback_used: hasFallback(searchResult),
+      source_runtime: selectedSourceRuntime,
+      reused_surfaces: selectedSourceRuntime === 'vcp_native'
+        ? [...NATIVE_CONTEXT_SURFACES]
+        : [...REUSED_SURFACES],
+      experimental_heuristics: selectedSourceRuntime === 'vcp_native'
+        ? []
+        : [...EXPERIMENTAL_HEURISTICS],
       result_can_be_mistaken_for_native: false,
       overview_projection_mode: overview?.access?.mode || 'authenticated_bounded_overview',
       audit_projection_mode: audit?.access?.mode || 'audit_memory_readonly_bounded'
@@ -668,6 +759,7 @@ class MemoryContextPackageService {
         tokenMaterialReturned: false,
         endpointReturned: false,
         readinessClaimed: false,
+        sourceRuntime: selectedSourceRuntime,
         localMemoryFallbackUsed: hasFallback(searchResult),
         resultCanBeMistakenForVcpNative: false
       },
@@ -692,6 +784,8 @@ module.exports = {
   EXPERIMENTAL_HEURISTICS,
   FORBIDDEN_OUTPUT_KEYS,
   MemoryContextPackageService,
+  NATIVE_CONTEXT_SURFACES,
   REUSED_SURFACES,
-  enforceNoForbiddenOutputKeys
+  enforceNoForbiddenOutputKeys,
+  normalizeMemoryContextProjection
 };

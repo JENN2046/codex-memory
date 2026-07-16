@@ -85,10 +85,14 @@ stale cleanup 不会误删新 owner lock。
 
 ```text
 不从零实现召回。
-复用现有 KnowledgeBaseRecallPipeline、CandidateGenerator、TagMemoEngine、
+优先复用受治理 VCP native `search_memory` 路径；native 不可用且策略允许时，
+才复用现有 KnowledgeBaseRecallPipeline、CandidateGenerator、TagMemoEngine、
 scope/lifecycle filters、SQLite shadow、vector index、AuditLogStore、
-MemoryOverviewService，把 bounded search results 转换成 task-oriented
-memory context package。
+MemoryOverviewService 作为显式 local fallback / compatibility，把 bounded
+search results 转换成 task-oriented memory context package。
+
+输出必须标记 `vcp_native`、`local_fallback` 或 `local_compatibility`，本地结果
+不得伪装为 native。
 ```
 
 新增工具：

@@ -21,6 +21,10 @@ const {
   REQUIRED_PRIMARY_RUNTIME,
   validateGovernedMcpNativeGovernanceMetadataCoversCurrentProductGoal
 } = require('./CurrentProductGoalContract');
+const {
+  GOVERNED_NATIVE_VISIBILITIES,
+  canonicalGovernedNativeClient
+} = require('./MemoryAccessContract');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeReadOnlyProbeAdapter';
 const CONTRACT_MODE = 'governed_mcp_bridge_readonly_no_write_probe_receipt_no_runtime';
@@ -350,12 +354,12 @@ function buildReadShapeProbeGovernanceMetadata({ toolName, gateResult }) {
       accepted: request.trusted_execution_context_accepted === true,
       source: 'trusted_execution_context_or_transport',
       executionContext: {
-        agentAlias: 'Codex',
-        clientId: 'Codex',
+        agentAlias: canonicalGovernedNativeClient(request.client_id),
+        clientId: canonicalGovernedNativeClient(request.client_id),
         projectId: scope.project_id || null,
         scopeId: scope.scope_id || null,
         workspaceId: scope.workspace_id || null,
-        visibility: safeEnum(request.visibility, ['private', 'project', 'workspace'])
+        visibility: safeEnum(request.visibility, GOVERNED_NATIVE_VISIBILITIES)
       }
     },
     runtimeTarget: {

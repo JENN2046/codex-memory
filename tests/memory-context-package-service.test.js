@@ -6,7 +6,14 @@ const {
   enforceNoForbiddenOutputKeys
 } = require('../src/core/MemoryContextPackageService');
 
-function createService({ results = [], searchAccess = {}, audit = {}, overview = {} } = {}) {
+function createService({
+  results = [],
+  searchAccess = {},
+  searchResult = null,
+  sourceRuntime,
+  audit = {},
+  overview = {}
+} = {}) {
   const calls = {
     search: [],
     overview: 0,
@@ -15,9 +22,15 @@ function createService({ results = [], searchAccess = {}, audit = {}, overview =
   const service = new MemoryContextPackageService({
     async searchMemory(args, requestContext) {
       calls.search.push({ args, requestContext });
+      if (searchResult) return searchResult;
       return {
         results,
-        access: searchAccess
+        access: searchAccess,
+        ...(sourceRuntime === 'vcp_native' ? {
+          status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED',
+          accepted: true
+        } : {}),
+        ...(sourceRuntime ? { source_runtime: sourceRuntime } : {})
       };
     },
     overviewService: {
@@ -149,6 +162,7 @@ test('prepare_memory_context never copies unprojected raw search text into state
 
 test('prepare_memory_context labels fallback and cannot be mistaken for native realtime', async () => {
   const { service } = createService({
+    sourceRuntime: 'local_fallback',
     searchAccess: {
       localMemoryFallbackUsed: true,
       resultCanBeMistakenForVcpNative: false
@@ -168,8 +182,62 @@ test('prepare_memory_context labels fallback and cannot be mistaken for native r
   assert.equal(result.access.localMemoryFallbackUsed, true);
   assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
   assert.equal(result.memory_context_package.source_breakdown.fallback_used, true);
+  assert.equal(result.access.sourceRuntime, 'local_fallback');
+  assert.equal(result.memory_context_package.source_breakdown.source_runtime, 'local_fallback');
+  assert.equal(result.memory_context_package.audit_receipt.source_runtime, 'local_fallback');
   assert.equal(result.memory_context_package.source_breakdown.result_can_be_mistaken_for_native, false);
   assert.equal(result.memory_context_package.audit_receipt.fallback_used, true);
+});
+
+test('prepare_memory_context fails closed on rejected native recall before local overview or audit reads', async () => {
+  const { service, calls } = createService({
+    searchResult: {
+      status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_REJECTED',
+      accepted: false,
+      decision: 'rejected',
+      source_runtime: 'vcp_native_unavailable',
+      access: {
+        memoryReadPerformed: false,
+        localMemoryFallbackUsed: false,
+        rawMemoryReturned: false
+      }
+    }
+  });
+
+  const result = await service.prepare(baseInput());
+
+  assert.equal(result.status, 'PREPARE_MEMORY_CONTEXT_RECALL_REJECTED');
+  assert.equal(result.accepted, false);
+  assert.equal(result.decision, 'rejected');
+  assert.equal(result.reasonCode, 'vcp_native_recall_unavailable');
+  assert.equal(result.access.sourceRuntime, 'vcp_native_unavailable');
+  assert.equal(result.access.nativeRecallAccepted, false);
+  assert.equal(result.access.memoryReadPerformed, false);
+  assert.equal(result.access.localMemoryFallbackUsed, false);
+  assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
+  assert.equal(result.access.rawMemoryReturned, false);
+  assert.equal(result.memory_context_package, undefined);
+  assert.equal(calls.overview, 0);
+  assert.deepEqual(calls.audit, []);
+  enforceNoForbiddenOutputKeys(result);
+});
+
+test('prepare_memory_context rejects inconsistent explicit native source without accepted delegation evidence', async () => {
+  const { service, calls } = createService({
+    searchResult: {
+      source_runtime: 'vcp_native',
+      results: []
+    }
+  });
+
+  const result = await service.prepare(baseInput());
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.decision, 'rejected');
+  assert.equal(result.reasonCode, 'vcp_native_recall_unavailable');
+  assert.equal(result.access.sourceRuntime, 'vcp_native_unavailable');
+  assert.equal(calls.overview, 0);
+  assert.deepEqual(calls.audit, []);
 });
 
 test('prepare_memory_context handles empty memory without mutation or readiness claims', async () => {
@@ -205,10 +273,12 @@ test('prepare_memory_context surfaces stale and conflict candidates as risks', a
 
 test('prepare_memory_context consumes approved projected statement, classification, freshness, and reasons', async () => {
   const { service } = createService({
+    sourceRuntime: 'vcp_native',
     results: [
       {
         target: 'process',
         score: 0.8,
+        sourceKinds: ['vcp_native'],
         titleHitCount: 1,
         memoryContextProjection: {
           projectionVersion: 1,
@@ -232,6 +302,10 @@ test('prepare_memory_context consumes approved projected statement, classificati
   );
   assert.equal(result.memory_context_package.blockers[0].freshness, 'recent');
   assert.deepEqual(result.memory_context_package.blockers[0].reason_codes, ['title_match']);
+  assert.deepEqual(result.memory_context_package.blockers[0].source_kinds, ['vcp_native']);
+  assert.equal(result.access.sourceRuntime, 'vcp_native');
+  assert.equal(result.memory_context_package.source_breakdown.source_runtime, 'vcp_native');
+  assert.equal(result.memory_context_package.audit_receipt.source_runtime, 'vcp_native');
 });
 
 test('prepare_memory_context audit receipt binds full scope and stable result projections', async () => {

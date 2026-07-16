@@ -13,6 +13,13 @@ const {
 const {
   isSafeReferenceName
 } = require('./VcpToolBoxSafeReference');
+const {
+  GOVERNED_NATIVE_VISIBILITIES,
+  canonicalGovernedNativeClient
+} = require('./MemoryAccessContract');
+const {
+  buildMemoryContextLowDisclosureProjection
+} = require('./MemoryContextPackageService');
 
 const GOVERNANCE_METADATA_PATH = 'params._meta.codexMemoryGovernance';
 const PUBLIC_TOOL_TO_NATIVE_TOOLS = Object.freeze({
@@ -337,11 +344,12 @@ function sanitizeNativeBusinessArguments(value, depth = 0) {
 function canonicalScopeFromGovernanceMeta(governanceMeta = {}) {
   const executionContext = governanceMeta?.trustedExecutionContext?.executionContext || {};
   const scope = {};
+  const clientId = canonicalGovernedNativeClient(executionContext.clientId);
   if (isSafeReferenceName(executionContext.projectId)) scope.project_id = executionContext.projectId;
   if (isSafeReferenceName(executionContext.workspaceId)) scope.workspace_id = executionContext.workspaceId;
   if (isSafeReferenceName(executionContext.scopeId)) scope.scope_id = executionContext.scopeId;
-  if (executionContext.clientId === 'Codex') scope.client_id = 'Codex';
-  if (['private', 'project', 'workspace'].includes(executionContext.visibility)) {
+  if (clientId) scope.client_id = clientId;
+  if (GOVERNED_NATIVE_VISIBILITIES.includes(executionContext.visibility)) {
     scope.visibility = executionContext.visibility;
   }
   return Object.keys(scope).length > 0 ? scope : null;
@@ -349,6 +357,9 @@ function canonicalScopeFromGovernanceMeta(governanceMeta = {}) {
 
 function canonicalGovernedBridgeFromGovernanceMeta(nativeToolName, publicToolName, governanceMeta = {}) {
   const scope = canonicalScopeFromGovernanceMeta(governanceMeta);
+  const clientId = canonicalGovernedNativeClient(
+    governanceMeta?.trustedExecutionContext?.executionContext?.clientId
+  );
   const readAllowed = governanceMeta?.readWriteAuthority?.readAllowed === true;
   const writeAllowed = governanceMeta?.readWriteAuthority?.writeAllowed === true;
   const targetReferenceName = isSafeReferenceName(governanceMeta?.runtimeTarget?.targetReferenceName)
@@ -357,7 +368,7 @@ function canonicalGovernedBridgeFromGovernanceMeta(nativeToolName, publicToolNam
   return {
     primary_runtime: REQUIRED_PRIMARY_RUNTIME,
     access_path: REQUIRED_ACCESS_PATH,
-    client_id: 'Codex',
+    client_id: clientId,
     scope,
     visibility: scope?.visibility || null,
     runtime_target: {
@@ -445,7 +456,7 @@ function defaultReadRuntimeReceipt({
 
 function projectReadResults(results = []) {
   if (!Array.isArray(results)) return [];
-  return results.slice(0, 5).map(item => ({
+  return results.slice(0, 5).map((item, index) => ({
     sourceFilePresent: typeof item?.sourceFile === 'string' && item.sourceFile.length > 0,
     scorePresent: typeof item?.score === 'number',
     tagCountBucket: Array.isArray(item?.matchedTags)
@@ -454,7 +465,9 @@ function projectReadResults(results = []) {
         : item.matchedTags.length <= 5
           ? 'bounded'
           : 'over_budget'
-      : 'unknown'
+      : 'unknown',
+    sourceKinds: ['vcp_native'],
+    memoryContextProjection: buildMemoryContextLowDisclosureProjection(item, index)
   }));
 }
 

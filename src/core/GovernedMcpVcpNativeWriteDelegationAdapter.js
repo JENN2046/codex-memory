@@ -12,6 +12,11 @@ const {
 const {
   isSafeReferenceName
 } = require('./VcpToolBoxSafeReference');
+const {
+  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_VISIBILITIES,
+  canonicalGovernedNativeClient
+} = require('./MemoryAccessContract');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeWriteDelegationAdapter';
 const CONTRACT_MODE = 'governed_mcp_vcp_native_primary_write_low_disclosure_delegation';
@@ -25,11 +30,7 @@ const WRITE_TOOL_EXACT_APPROVAL_ACTIONS = Object.freeze({
   tombstone_memory: 'live_bridge_tombstone_memory_proof',
   supersede_memory: 'live_bridge_supersede_memory_proof'
 });
-const ALLOWED_VISIBILITIES = Object.freeze([
-  'private',
-  'project',
-  'workspace'
-]);
+const ALLOWED_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
 const ALLOWED_DISCLOSURE_LEVELS = Object.freeze([
   'none',
   'receipt_only',
@@ -258,7 +259,7 @@ function safeEnum(value, allowedValues, fallback = null) {
 }
 
 function safeBridgeClientId(value) {
-  return value === 'Codex' ? 'Codex' : null;
+  return canonicalGovernedNativeClient(value);
 }
 
 function safeVisibility(value) {
@@ -519,13 +520,21 @@ function invalidFieldsForDelegation({ toolName, args = {}, gateResult, callMcpTo
     invalidFields.push('gateResult.normalizedBridgeRequest.access_path');
   }
   const scope = isPlainObject(request.scope) ? request.scope : {};
-  if (request.client_id !== 'Codex') invalidFields.push('gateResult.normalizedBridgeRequest.client_id');
+  if (!GOVERNED_NATIVE_CLIENTS.includes(request.client_id)) invalidFields.push('gateResult.normalizedBridgeRequest.client_id');
   if (!isPlainObject(request.scope)) invalidFields.push('gateResult.normalizedBridgeRequest.scope');
-  if (scope.client_id !== 'Codex') invalidFields.push('gateResult.normalizedBridgeRequest.scope.client_id');
+  if (
+    !GOVERNED_NATIVE_CLIENTS.includes(scope.client_id) ||
+    scope.client_id !== request.client_id
+  ) {
+    invalidFields.push('gateResult.normalizedBridgeRequest.scope.client_id');
+  }
   if (!ALLOWED_VISIBILITIES.includes(request.visibility)) {
     invalidFields.push('gateResult.normalizedBridgeRequest.visibility');
   }
-  if (scope.visibility !== request.visibility) {
+  if (
+    !ALLOWED_VISIBILITIES.includes(scope.visibility) ||
+    scope.visibility !== request.visibility
+  ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope.visibility');
   }
   if (request.scope_identifier_present !== true) {
@@ -883,7 +892,7 @@ function sanitizeScope(scope) {
   for (const key of ['project_id', 'workspace_id', 'scope_id']) {
     if (typeof scope[key] === 'string' && isSafeReferenceName(scope[key])) output[key] = scope[key];
   }
-  if (scope.client_id === 'Codex') output.client_id = 'Codex';
+  if (GOVERNED_NATIVE_CLIENTS.includes(scope.client_id)) output.client_id = scope.client_id;
   if (ALLOWED_VISIBILITIES.includes(scope.visibility)) output.visibility = scope.visibility;
   if (scope.strict === true || scope.strict === false) output.strict = scope.strict;
   return Object.keys(output).length > 0 ? output : undefined;
@@ -973,7 +982,7 @@ function buildDelegatedArguments(toolName, args = {}, gateResult = {}) {
     local_memory_raw_content_disclosed: false,
     visibility: safeVisibility(request.visibility),
     client_identity_source: GOVERNED_CONTEXT_SOURCE,
-    client_identity_bound: request.client_id === 'Codex',
+    client_identity_bound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
     client_identity_tool_arguments_may_override: false,
     client_identity_governance_metadata_may_override: false,
     scope_boundary_source: GOVERNED_CONTEXT_SOURCE,
@@ -1109,8 +1118,8 @@ function buildMcpGovernanceMetadata(toolName, gateResult = {}) {
       accepted: request.trusted_execution_context_accepted === true,
       source: GOVERNED_CONTEXT_SOURCE,
       executionContext: {
-        agentAlias: 'Codex',
-        clientId: 'Codex',
+        agentAlias: safeBridgeClientId(request.client_id),
+        clientId: safeBridgeClientId(request.client_id),
         projectId: canonicalScope?.project_id || null,
         scopeId: canonicalScope?.scope_id || null,
         workspaceId: canonicalScope?.workspace_id || null,
@@ -1283,7 +1292,7 @@ function buildReceipt({ toolName, targetReferenceName, gateResult, statusClass, 
     runtimeTargetToolArgumentsMayOverride: false,
     runtimeTargetGovernanceMetadataMayOverride: false,
     clientIdentitySource: GOVERNED_CONTEXT_SOURCE,
-    clientIdentityBound: request.client_id === 'Codex',
+    clientIdentityBound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
     clientIdentityToolArgumentsMayOverride: false,
     clientIdentityGovernanceMetadataMayOverride: false,
     scopeBoundarySource: GOVERNED_CONTEXT_SOURCE,

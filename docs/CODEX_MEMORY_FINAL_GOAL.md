@@ -2,12 +2,12 @@
 
 ## Goal
 
-`codex-memory` is a governed external memory runtime for Codex.
+`codex-memory` is a governed external memory runtime for Codex and Claude.
 
 Its final goal is:
 
 ```text
-Codex gets complete, realtime, governed access to VCPToolBox native memory
+Codex and Claude get bounded, governed access to VCPToolBox native memory
 through MCP, the codex-memory governance layer, and the VCPToolBox native
 memory runtime, then uses that access through a memory context package and
 task-start automatic recall to approach a near-model-memory experience.
@@ -61,8 +61,9 @@ The intended experience is not "the user asks Codex to search memory." The
 intended experience is that Codex starts each task already carrying the relevant
 governed memory context.
 
-`prepare_memory_context` should reuse the existing local recall stack instead
-of starting from zero:
+`prepare_memory_context` should use governed VCP native recall first. When that
+path is unavailable and policy permits fallback, it reuses the existing local
+recall stack instead of starting from zero:
 
 - `KnowledgeBaseRecallPipeline`
 - `CandidateGenerator`
@@ -73,8 +74,9 @@ of starting from zero:
 - `AuditLogStore`
 - `MemoryOverviewService`
 
-Its job is to transform bounded search results and support projections into a
-task-oriented context package.
+Its job is to transform bounded native or explicitly marked local results and
+support projections into a task-oriented context package. The package must
+identify `vcp_native`, `local_fallback`, or `local_compatibility`.
 
 ## Local Memory Role
 

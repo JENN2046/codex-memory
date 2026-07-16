@@ -316,7 +316,10 @@ test('HTTP MCP should expose health and tools/list', async () => {
     const auditMemory = payload.result.tools.find(tool => tool.name === 'audit_memory');
     const validateMemory = payload.result.tools.find(tool => tool.name === 'validate_memory');
     assert.equal(searchMemory._meta.codexMemoryGovernedBridge.nativeBridge.direction, 'read');
-    assert.deepEqual(searchMemory._meta.codexMemoryGovernedBridge.clientIdentity.allowedClientIds, ['Codex']);
+    assert.deepEqual(
+      searchMemory._meta.codexMemoryGovernedBridge.clientIdentity.allowedClientIds,
+      ['Codex', 'Claude']
+    );
     assert.equal(searchMemory._meta.codexMemoryGovernedBridge.clientIdentity.toolArgumentsMayOverride, false);
     assert.equal(
       searchMemory._meta.codexMemoryGovernedBridge.clientIdentity
@@ -329,7 +332,7 @@ test('HTTP MCP should expose health and tools/list', async () => {
     );
     assert.deepEqual(
       searchMemory._meta.codexMemoryGovernedBridge.scopeBoundary.acceptedVisibility,
-      ['private', 'project', 'workspace']
+      ['private', 'workspace', 'project', 'shared']
     );
     assert.equal(searchMemory._meta.codexMemoryGovernedBridge.scopeBoundary.toolArgumentsMayOverride, false);
     assert.equal(

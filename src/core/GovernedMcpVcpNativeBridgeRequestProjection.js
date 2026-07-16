@@ -17,6 +17,10 @@ const {
 const {
   isSafeReferenceName
 } = require('./VcpToolBoxSafeReference');
+const {
+  GOVERNED_NATIVE_VISIBILITIES,
+  canonicalGovernedNativeClient
+} = require('./MemoryAccessContract');
 
 const READ_ONLY_TOOL_NAMES = Object.freeze([
   'search_memory',
@@ -35,11 +39,7 @@ const NATIVE_BRIDGE_TOOL_NAMES = Object.freeze([
   ...MUTATION_TOOL_NAMES
 ]);
 
-const ALLOWED_VISIBILITIES = Object.freeze([
-  'private',
-  'project',
-  'workspace'
-]);
+const ALLOWED_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
 
 const ALLOWED_DISCLOSURE_LEVELS = Object.freeze([
   'none',
@@ -202,7 +202,7 @@ function projectedTrustedVisibilityField(value, fallback) {
 
 function projectedTrustedClientIdField(value, fallback) {
   const supplied = normalizeString(value);
-  if (supplied) return isCodexReference(supplied) ? 'Codex' : 'invalid-trusted-client';
+  if (supplied) return canonicalGovernedNativeClient(supplied) || 'invalid-trusted-client';
   return fallback || null;
 }
 
@@ -230,11 +230,6 @@ function projectedToolName(value) {
     : 'invalid-mcp-tool';
 }
 
-function isCodexReference(value) {
-  const normalized = normalizeString(value);
-  return isSafeReferenceName(normalized) && /^codex(?:$|[._-])/i.test(normalized);
-}
-
 function inferGovernedClientId({ config = {}, requestContext = {} } = {}) {
   const executionContext = isPlainObject(requestContext.executionContext)
     ? requestContext.executionContext
@@ -249,7 +244,8 @@ function inferGovernedClientId({ config = {}, requestContext = {} } = {}) {
   ];
 
   for (const candidate of candidates) {
-    if (isCodexReference(candidate)) return 'Codex';
+    const clientId = canonicalGovernedNativeClient(candidate);
+    if (clientId) return clientId;
   }
 
   return null;
@@ -265,7 +261,7 @@ function projectedScopeClientId(requestContext = {}, config = {}) {
     config.defaultClientId
   );
   if (suppliedClientId) {
-    return isCodexReference(suppliedClientId) ? 'Codex' : 'invalid-client-id';
+    return canonicalGovernedNativeClient(suppliedClientId) || 'invalid-client-id';
   }
   return inferGovernedClientId({ config, requestContext }) || '';
 }
@@ -402,7 +398,7 @@ function buildTrustedExecutionContextProjection(requestContext = {}, config = {}
   }
 
   return {
-    accepted: agentAlias === 'Codex',
+    accepted: REQUIRED_CLIENTS.includes(agentAlias),
     executionContext: {
       ...(agentAlias ? {
         agentAlias

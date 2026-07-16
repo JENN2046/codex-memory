@@ -2,8 +2,9 @@
 
 Primary manual: [中文使用说明书](README.zh-CN.md)
 
-`codex-memory` is the governed MCP bridge that lets Codex access VCPToolBox
-native memory without making `codex-memory` the memory-intelligence owner.
+`codex-memory` is the governed MCP bridge that lets Codex and Claude access
+VCPToolBox native memory without making `codex-memory` the memory-intelligence
+owner.
 
 The Chinese manual is the canonical usage guide for the current deployment.
 This English README is kept as a short project summary and compatibility entry
@@ -13,7 +14,7 @@ The product goal is governance: who may access memory, which scope and runtime
 they may use, how much output can be disclosed, what evidence is recorded, and
 how rollback stays bounded.
 
-当前目标是让 Codex 通过 `codex-memory` 治理桥，完整、受控、可审计地
+当前目标是让 Codex 与 Claude 通过 `codex-memory` 治理桥，受控、可审计地
 使用 VCPToolBox native memory runtime。
 
 Long-term goal and boundary documents:
@@ -22,16 +23,22 @@ Long-term goal and boundary documents:
 - [Capability Layer Model](docs/CAPABILITY_LAYER_MODEL.md)
 - [Non-Claims](docs/NON_CLAIMS.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
+- [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
 ## Current Status
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current primary work goal: complete the imported near-model-memory plan pack.
+Current primary work goal: Native Context and Contract Convergence.
 The Phase 3 `prepare_memory_context` MVP is implemented as a default read-only
-context package tool by reusing the existing recall/write support pipelines
-rather than rebuilding recall from zero. VCPToolBox native memory remains the
-final memory intelligence owner.
+context package tool. Its recall gateway now uses the same governed native read
+path as `search_memory`, then enters an audited local fallback only when the
+configured native mode permits it. Every package identifies `vcp_native`,
+`local_fallback`, or `local_compatibility`. This code-level convergence still
+requires fresh live runtime proof. A rejected primary native recall does not
+produce an accepted empty package: it fails closed with
+`PREPARE_MEMORY_CONTEXT_RECALL_REJECTED`, `isError: true`, and
+`source_runtime: vcp_native_unavailable`.
 The Phase 4 local task-start wrapper is also present: it derives task context,
 calls `prepare_memory_context`, injects a bounded summary when available, and
 marks `memory_unavailable` when memory context cannot be prepared.
@@ -85,7 +92,7 @@ action.
 Current active path:
 
 ```text
-Codex
+Codex or Claude
   -> vcp_codex_memory MCP on 127.0.0.1:7625
   -> codex-memory governed bridge
   -> VCP native shim on 127.0.0.1:7615
@@ -107,6 +114,10 @@ Those tools are currently exposed as read-only. `prepare_memory_context` is
 also exposed as a default read-only context package tool, and
 `propose_memory_delta` is exposed as a default proposal-only tool. The legacy
 `7605` service is kept as rollback while `7625` is observed in real use.
+
+The governed contract now includes both Codex and Claude. Repository tests
+cover identity/scope binding for both clients; the historical live dogfood
+evidence is Codex-only, so Claude runtime completion is not claimed.
 
 The default server MCP surface is read-only plus proposal-only: `tools/list`
 exposes only `search_memory`, `memory_overview`, `audit_memory`,
@@ -143,8 +154,12 @@ Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public
 response shapes. The included shim exposes `knowledge_base.search`,
 `memory_overview`, and `audit_memory` for the read suite by default.
-`prepare_memory_context` packages governed local read results and receipts; it
-is not a direct native-bridge delegation tool.
+`prepare_memory_context` calls the governed `search_memory` path through the
+shared recall gateway. Native results are projected into the context package;
+local results appear only as `local_fallback` or `local_compatibility` and
+cannot be mistaken for native results. Native rejection and transport failure
+use `vcp_native_unavailable`; they are never labeled as successful
+`vcp_native` context.
 Task-start workflow wiring remains local and read-only; it does not perform
 durable mutation or production write.
 `propose_memory_delta` packages proposal-only staging and governance receipts;

@@ -19,6 +19,7 @@ const {
   buildMemoryContextLowDisclosureProjection,
   MemoryContextPackageService
 } = require('./core/MemoryContextPackageService');
+const { GovernedRecallGateway } = require('./core/GovernedRecallGateway');
 const { TaskStartMemoryContextWorkflow } = require('./core/TaskStartMemoryContextWorkflow');
 const { MemoryDeltaProposalService } = require('./core/MemoryDeltaProposalService');
 const {
@@ -105,12 +106,12 @@ const {
 const {
   buildGovernedNativeBridgeAuditMemoryDecisionProvider
 } = require('./core/GovernedNativeBridgeAuditMemoryProjection');
+const {
+  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_VISIBILITIES
+} = require('./core/MemoryAccessContract');
 
-const GOVERNED_MCP_VCP_NATIVE_FALLBACK_VISIBILITIES = Object.freeze([
-  'private',
-  'project',
-  'workspace'
-]);
+const GOVERNED_MCP_VCP_NATIVE_FALLBACK_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
 const GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE = 'trusted_execution_context_or_transport';
 
 function normalizeScopeVisibility(value) {
@@ -990,11 +991,11 @@ function safeBridgeRollbackApplyPolicy(value) {
 }
 
 function safeBridgeClientId(value) {
-  return value === 'Codex' ? 'Codex' : null;
+  return GOVERNED_NATIVE_CLIENTS.includes(value) ? value : null;
 }
 
 function safeBridgeVisibility(value) {
-  return ['private', 'project', 'workspace'].includes(value) ? value : null;
+  return GOVERNED_NATIVE_VISIBILITIES.includes(value) ? value : null;
 }
 
 function safeBridgeInvocationProfile(value) {
@@ -1588,8 +1589,8 @@ function governedMcpVcpNativeFallbackScope(gateResult = {}) {
       projected[key] = scope[key];
     }
   }
-  if (scope.client_id === 'Codex') {
-    projected.client_id = 'Codex';
+  if (GOVERNED_NATIVE_CLIENTS.includes(scope.client_id)) {
+    projected.client_id = scope.client_id;
   }
   if (GOVERNED_MCP_VCP_NATIVE_FALLBACK_VISIBILITIES.includes(scope.visibility)) {
     projected.visibility = scope.visibility;
@@ -2611,12 +2612,16 @@ function createCodexMemoryApplication(overrides = {}) {
     return { results: policyFiltered };
   }
 
+  let application = null;
+  const governedRecallGateway = new GovernedRecallGateway({
+    callSearchMemory: (searchArgs, searchRequestContext) => {
+      if (!application) throw new Error('governed_recall_gateway_application_not_ready');
+      return application.callTool('search_memory', searchArgs, searchRequestContext);
+    }
+  });
   const memoryContextPackageService = new MemoryContextPackageService({
     searchMemory: (searchArgs, searchRequestContext) =>
-      runSearchMemoryWithTimeout(
-        ({ signal }) => executeSearchMemory(searchArgs, searchRequestContext, { signal }),
-        { timeoutMs: config.searchMemoryTimeoutMs }
-      ),
+      governedRecallGateway.search(searchArgs, searchRequestContext),
     overviewService,
     auditMemoryReadonlyService
   });
@@ -2626,7 +2631,7 @@ function createCodexMemoryApplication(overrides = {}) {
   });
   const memoryDeltaProposalService = new MemoryDeltaProposalService();
 
-  return {
+  application = {
     config,
     stores: {
       diaryStore,
@@ -2652,6 +2657,7 @@ function createCodexMemoryApplication(overrides = {}) {
       taskStartMemoryContextWorkflow,
       memoryDeltaProposalService,
       auditMemoryReadonlyService,
+      governedRecallGateway,
       governedNativeBridgeObservationStore
     },
     adapters: {
@@ -3248,6 +3254,7 @@ function createCodexMemoryApplication(overrides = {}) {
       await shadowStore.close();
     }
   };
+  return application;
 }
 
 module.exports = {

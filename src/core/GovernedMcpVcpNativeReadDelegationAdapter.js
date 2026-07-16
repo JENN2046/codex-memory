@@ -12,6 +12,14 @@ const {
 const {
   isSafeReferenceName
 } = require('./VcpToolBoxSafeReference');
+const {
+  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_VISIBILITIES,
+  canonicalGovernedNativeClient
+} = require('./MemoryAccessContract');
+const {
+  normalizeMemoryContextProjection
+} = require('./MemoryContextPackageService');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeReadDelegationAdapter';
 const CONTRACT_MODE = 'governed_mcp_vcp_native_primary_read_low_disclosure_delegation';
@@ -20,11 +28,7 @@ const DELEGATABLE_READ_TOOLS = Object.freeze([
   'memory_overview',
   'audit_memory'
 ]);
-const ALLOWED_VISIBILITIES = Object.freeze([
-  'private',
-  'project',
-  'workspace'
-]);
+const ALLOWED_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
 const ALLOWED_DISCLOSURE_LEVELS = Object.freeze([
   'none',
   'receipt_only',
@@ -122,7 +126,7 @@ function safeEnum(value, allowedValues, fallback = null) {
 }
 
 function safeBridgeClientId(value) {
-  return value === 'Codex' ? 'Codex' : null;
+  return canonicalGovernedNativeClient(value);
 }
 
 function safeVisibility(value) {
@@ -322,13 +326,21 @@ function invalidFieldsForDelegation({ toolName, args = {}, gateResult, callMcpTo
     invalidFields.push('gateResult.normalizedBridgeRequest.access_path');
   }
   const scope = isPlainObject(request.scope) ? request.scope : {};
-  if (request.client_id !== 'Codex') invalidFields.push('gateResult.normalizedBridgeRequest.client_id');
+  if (!GOVERNED_NATIVE_CLIENTS.includes(request.client_id)) invalidFields.push('gateResult.normalizedBridgeRequest.client_id');
   if (!isPlainObject(request.scope)) invalidFields.push('gateResult.normalizedBridgeRequest.scope');
-  if (scope.client_id !== 'Codex') invalidFields.push('gateResult.normalizedBridgeRequest.scope.client_id');
+  if (
+    !GOVERNED_NATIVE_CLIENTS.includes(scope.client_id) ||
+    scope.client_id !== request.client_id
+  ) {
+    invalidFields.push('gateResult.normalizedBridgeRequest.scope.client_id');
+  }
   if (!ALLOWED_VISIBILITIES.includes(request.visibility)) {
     invalidFields.push('gateResult.normalizedBridgeRequest.visibility');
   }
-  if (scope.visibility !== request.visibility) {
+  if (
+    !ALLOWED_VISIBILITIES.includes(scope.visibility) ||
+    scope.visibility !== request.visibility
+  ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope.visibility');
   }
   if (request.scope_identifier_present !== true) {
@@ -564,7 +576,7 @@ function sanitizeScope(scope) {
   for (const key of ['project_id', 'workspace_id', 'scope_id']) {
     if (typeof scope[key] === 'string' && isSafeReferenceName(scope[key])) output[key] = scope[key];
   }
-  if (scope.client_id === 'Codex') output.client_id = 'Codex';
+  if (GOVERNED_NATIVE_CLIENTS.includes(scope.client_id)) output.client_id = scope.client_id;
   if (ALLOWED_VISIBILITIES.includes(scope.visibility)) output.visibility = scope.visibility;
   if (scope.strict === true || scope.strict === false) output.strict = scope.strict;
   return Object.keys(output).length > 0 ? output : undefined;
@@ -686,7 +698,7 @@ function buildReadGovernedBridgeEnvelope(gateResult = {}) {
     local_memory_raw_content_disclosed: false,
     visibility: safeVisibility(request.visibility),
     client_identity_source: GOVERNED_CONTEXT_SOURCE,
-    client_identity_bound: request.client_id === 'Codex',
+    client_identity_bound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
     client_identity_tool_arguments_may_override: false,
     client_identity_governance_metadata_may_override: false,
     scope_boundary_source: GOVERNED_CONTEXT_SOURCE,
@@ -782,8 +794,8 @@ function buildMcpGovernanceMetadata(toolName, gateResult = {}) {
       accepted: request.trusted_execution_context_accepted === true,
       source: GOVERNED_CONTEXT_SOURCE,
       executionContext: {
-        agentAlias: 'Codex',
-        clientId: 'Codex',
+        agentAlias: safeBridgeClientId(request.client_id),
+        clientId: safeBridgeClientId(request.client_id),
         projectId: canonicalScope?.project_id || null,
         scopeId: canonicalScope?.scope_id || null,
         workspaceId: canonicalScope?.workspace_id || null,
@@ -933,6 +945,7 @@ function buildAccess({ statusClass, fallbackEligible, fallbackUsed }) {
     selectedProjection: true,
     selectedProjectionVersion: 1,
     primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
+    sourceRuntime: statusClass === 'success' ? 'vcp_native' : null,
     localMemoryRole: fallbackUsed ? 'fallback' : 'not_used',
     lowDisclosure: true,
     rawOutputReturned: false,
@@ -953,6 +966,31 @@ function buildAccess({ statusClass, fallbackEligible, fallbackUsed }) {
     localMemoryFallbackEligible: fallbackEligible === true,
     localMemoryFallbackUsed: fallbackUsed === true
   };
+}
+
+function projectNativeSearchResults(nativeValue, maxItems = 5) {
+  const items = Array.isArray(nativeValue)
+    ? nativeValue
+    : Array.isArray(nativeValue?.results)
+      ? nativeValue.results
+      : Array.isArray(nativeValue?.items)
+        ? nativeValue.items
+        : [];
+  return items.slice(0, maxItems).flatMap(item => {
+    const projected = normalizeMemoryContextProjection(item);
+    if (!projected) return [];
+    const score = Number(item?.score);
+    return [{
+      memoryContextProjection: {
+        projectionVersion: 1,
+        lowDisclosure: true,
+        ...projected
+      },
+      sourceKinds: ['vcp_native'],
+      target: 'native',
+      ...(Number.isFinite(score) ? { score } : {})
+    }];
+  });
 }
 
 function buildReceipt({ toolName, targetReferenceName, gateResult, statusClass, nativeValue, nativeInvocationReceipt }) {
@@ -980,7 +1018,7 @@ function buildReceipt({ toolName, targetReferenceName, gateResult, statusClass, 
     runtimeTargetToolArgumentsMayOverride: false,
     runtimeTargetGovernanceMetadataMayOverride: false,
     clientIdentitySource: GOVERNED_CONTEXT_SOURCE,
-    clientIdentityBound: request.client_id === 'Codex',
+    clientIdentityBound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
     clientIdentityToolArgumentsMayOverride: false,
     clientIdentityGovernanceMetadataMayOverride: false,
     scopeBoundarySource: GOVERNED_CONTEXT_SOURCE,
@@ -1193,6 +1231,13 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
       status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED',
       accepted: true,
       toolName,
+      source_runtime: 'vcp_native',
+      ...(toolName === 'search_memory' ? {
+        results: projectNativeSearchResults(
+          nativeValue,
+          disclosureMaxItemsFromGate(gateResult)
+        )
+      } : {}),
       access: buildAccess({
         statusClass: 'success',
         fallbackEligible: false,
@@ -1200,6 +1245,7 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
       }),
       summary: {
         primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
+        sourceRuntime: 'vcp_native',
         delegated: true,
         responseShapeCategory: receipt.responseShapeCategory,
         topLevelKindCategory: receipt.topLevelKindCategory,

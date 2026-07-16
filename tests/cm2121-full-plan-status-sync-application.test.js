@@ -35,7 +35,7 @@ test('exact nine-path status-sync application is prepared but non-executing', ()
   assert.equal(evaluation.readinessClaimed, false);
 });
 
-test('projected status surfaces pass current-facts and ledger validators in isolation', () => {
+test('historical projected status stays ledger-valid but cannot replace current-facts schema v3', () => {
   const { options } = prepared();
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2121-status-projection-'));
   try {
@@ -51,7 +51,9 @@ test('projected status surfaces pass current-facts and ledger validators in isol
       fs.writeFileSync(target, options.resolveGitFile(application.BASELINE_COMMIT, sourcePath).content);
     }
     const drift = validateCurrentFactsDrift(root);
-    assert.equal(drift.ok, true, drift.failures.join('\n'));
+    assert.equal(drift.ok, false);
+    assert.match(drift.failures.join('\n'), /schemaVersion must be 3/);
+    assert.match(drift.failures.join('\n'), /must not use top-level branch/);
     const ledger = validateAutopilotLedgerConsistency(root);
     assert.equal(ledger.ok, true, ledger.failures.join('\n'));
     assert.equal(ledger.latestTask, application.TASK_ID);

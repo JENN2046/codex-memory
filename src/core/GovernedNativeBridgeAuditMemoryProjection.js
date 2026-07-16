@@ -7,6 +7,10 @@ const {
   validateGovernedMcpReadFallbackReceiptCoversLocalMemoryRole
 } = require('./CurrentProductGoalContract');
 const { isSafeReferenceName } = require('./VcpToolBoxSafeReference');
+const {
+  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_VISIBILITIES
+} = require('./MemoryAccessContract');
 
 const BRIDGE_RECEIPT_EVENT_TYPE = 'governed_mcp_vcp_native_bridge_receipt';
 const READ_FALLBACK_RECEIPT_EVENT_TYPE = 'governed_mcp_vcp_native_read_fallback_receipt';
@@ -47,11 +51,11 @@ function safeDelegationDirection(value) {
 }
 
 function safeBridgeClientId(value) {
-  return value === 'Codex' ? 'Codex' : null;
+  return safeEnum(value, GOVERNED_NATIVE_CLIENTS);
 }
 
 function safeBridgeVisibility(value) {
-  return safeEnum(value, ['private', 'project', 'workspace']);
+  return safeEnum(value, GOVERNED_NATIVE_VISIBILITIES);
 }
 
 function safeBridgeInvocationProfile(value) {
