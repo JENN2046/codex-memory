@@ -349,6 +349,9 @@ function invalidFieldsForDelegation({ toolName, args = {}, gateResult, callMcpTo
   ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope.visibility');
   }
+  // Gate 0 intentionally leaves this proof absent in production. Every
+  // governed visibility remains fail closed until diary_allowlist_v1 binds a
+  // non-empty selected-diary allowlist before provider and native execution.
   if (
     SCOPE_FILTERING_REQUIRED_VISIBILITIES.includes(request.visibility) &&
     request.native_scope_filtering_proven !== true

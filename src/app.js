@@ -2812,7 +2812,8 @@ function createCodexMemoryApplication(overrides = {}) {
           isGovernedMcpVcpNativeReadDelegationTool(toolName) &&
           SCOPE_FILTERING_REQUIRED_VISIBILITIES.includes(
             gateResult.normalizedBridgeRequest?.visibility
-          );
+          ) &&
+          gateResult.normalizedBridgeRequest?.native_scope_filtering_proven !== true;
         const readShapeProbeTargetResolverResult = gateResult.accepted === true &&
           !skipUnmappedNativeReadAction &&
           !nativeScopeFilteringUnproven
