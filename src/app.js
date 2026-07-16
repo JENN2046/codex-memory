@@ -16,6 +16,12 @@ const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
 const {
+  buildMemoryContextLowDisclosureProjection,
+  MemoryContextPackageService
+} = require('./core/MemoryContextPackageService');
+const { TaskStartMemoryContextWorkflow } = require('./core/TaskStartMemoryContextWorkflow');
+const { MemoryDeltaProposalService } = require('./core/MemoryDeltaProposalService');
+const {
   ACCESS_MODE: AUDIT_MEMORY_ACCESS_MODE,
   AuditMemoryReadonlyService,
   SERVICE_STATUS_ACCEPTED: AUDIT_MEMORY_SERVICE_STATUS_ACCEPTED
@@ -314,7 +320,10 @@ function normalizeInternalPrecisionPolicyContext(requestContext = {}) {
 
 function normalizeInternalNoRawContentRead(requestContext = {}) {
   const executionContext = requestContext.executionContext || {};
-  if (requestContext.authenticatedBoundedSearch === true) {
+  if (
+    requestContext.authenticatedBoundedSearch === true
+    || requestContext.memoryContextPackageReadOnly === true
+  ) {
     return true;
   }
   if (!Object.prototype.hasOwnProperty.call(executionContext, 'noRawContentRead')) {
@@ -396,6 +405,49 @@ function projectAuthenticatedBoundedSearchResponse(results = []) {
   return {
     access: {
       mode: 'authenticated_bounded_search',
+      selectedProjection: true,
+      selectedProjectionVersion: 1,
+      includeContent: false,
+      rawContentReturned: false,
+      pathsReturned: false,
+      memoryIdsReturned: false,
+      titlesReturned: false,
+      snippetsReturned: false
+    },
+    resultCount: safeResults.length,
+    results: safeResults
+  };
+}
+
+function projectMemoryContextPackageSearchResult(item = {}, index = 0) {
+  const projectTokens = values => Array.isArray(values)
+    ? [...new Set(values
+      .filter(value => typeof value === 'string')
+      .map(value => value.trim().slice(0, 80))
+      .filter(Boolean))].slice(0, 16)
+    : [];
+  const projectTimestamp = value => {
+    if (typeof value !== 'string') return null;
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? new Date(parsed).toISOString() : null;
+  };
+  return {
+    ...projectBoundedSearchResult(item),
+    matchedTags: projectTokens(item.matchedTags),
+    coreTags: projectTokens(item.coreTags),
+    createdAt: projectTimestamp(item.createdAt),
+    updatedAt: projectTimestamp(item.updatedAt),
+    memoryContextProjection: buildMemoryContextLowDisclosureProjection(item, index)
+  };
+}
+
+function projectMemoryContextPackageSearchResponse(results = []) {
+  const safeResults = Array.isArray(results)
+    ? results.map(projectMemoryContextPackageSearchResult)
+    : [];
+  return {
+    access: {
+      mode: 'memory_context_package_metadata_search',
       selectedProjection: true,
       selectedProjectionVersion: 1,
       includeContent: false,
@@ -2234,6 +2286,12 @@ async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
 
 function createCodexMemoryApplication(overrides = {}) {
   const config = createConfig(overrides);
+  const phase8OneShotNativeWriteEnforcementEnabled =
+    overrides.phase8OneShotNativeWriteEnforcementEnabled === true;
+  const phase8OneShotAuthorizationAssertionVerifier =
+    typeof overrides.phase8OneShotAuthorizationAssertionVerifier === 'function'
+      ? overrides.phase8OneShotAuthorizationAssertionVerifier
+      : null;
   const recordMemoryPrincipalScopeAuthorizationRuntime =
     buildRecordMemoryPrincipalScopeAuthorizationRuntime(
       config.recordMemoryPrincipalScopeAuthorization
@@ -2425,10 +2483,12 @@ function createCodexMemoryApplication(overrides = {}) {
   async function executeSearchMemory(args = {}, requestContext = {}, { signal = null } = {}) {
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const authenticatedBoundedSearch = isAuthenticatedBoundedSearchRequest(requestContext);
-    if (authenticatedBoundedSearch && args.include_content === true) {
-      return buildAuthenticatedBoundedSearchRejected('authenticated bounded search does not allow include_content=true.');
+    const metadataOnlyBoundedSearch = authenticatedBoundedSearch
+      || requestContext.memoryContextPackageReadOnly === true;
+    if (metadataOnlyBoundedSearch && args.include_content === true) {
+      return buildAuthenticatedBoundedSearchRejected('metadata-only bounded search does not allow include_content=true.');
     }
-    const readOnly = requestContext.noTokenReadOnly === true || authenticatedBoundedSearch;
+    const readOnly = requestContext.noTokenReadOnly === true || metadataOnlyBoundedSearch;
     const precisionPolicyContext = normalizeInternalPrecisionPolicyContext(requestContext)
       || buildAuthenticatedBoundedSearchPrecisionPolicyContext(args, requestContext);
     const noRawContentRead = normalizeInternalNoRawContentRead(requestContext);
@@ -2492,11 +2552,29 @@ function createCodexMemoryApplication(overrides = {}) {
         policyAudit
       });
     }
+    if (requestContext.memoryContextPackageReadOnly === true) {
+      return projectMemoryContextPackageSearchResponse(policyFiltered);
+    }
     if (authenticatedBoundedSearch) {
       return projectAuthenticatedBoundedSearchResponse(policyFiltered);
     }
     return { results: policyFiltered };
   }
+
+  const memoryContextPackageService = new MemoryContextPackageService({
+    searchMemory: (searchArgs, searchRequestContext) =>
+      runSearchMemoryWithTimeout(
+        ({ signal }) => executeSearchMemory(searchArgs, searchRequestContext, { signal }),
+        { timeoutMs: config.searchMemoryTimeoutMs }
+      ),
+    overviewService,
+    auditMemoryReadonlyService
+  });
+  const taskStartMemoryContextWorkflow = new TaskStartMemoryContextWorkflow({
+    prepareMemoryContext: (prepareArgs, prepareRequestContext) =>
+      memoryContextPackageService.prepare(prepareArgs, prepareRequestContext)
+  });
+  const memoryDeltaProposalService = new MemoryDeltaProposalService();
 
   return {
     config,
@@ -2520,6 +2598,9 @@ function createCodexMemoryApplication(overrides = {}) {
       passiveRecallService,
       activeRecallService,
       overviewService,
+      memoryContextPackageService,
+      taskStartMemoryContextWorkflow,
+      memoryDeltaProposalService,
       auditMemoryReadonlyService,
       governedNativeBridgeObservationStore
     },
@@ -2563,6 +2644,41 @@ function createCodexMemoryApplication(overrides = {}) {
       }
     },
     async callTool(toolName, args = {}, requestContext = {}) {
+      let effectiveRequestContext = requestContext;
+      if (toolName === 'record_memory' && phase8OneShotNativeWriteEnforcementEnabled) {
+        if (
+          requestContext.exactApprovalResult !== undefined ||
+          !phase8OneShotAuthorizationAssertionVerifier ||
+          config.governedMcpVcpNativeWriteDelegationMode !== 'primary'
+        ) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'phase8_one_shot_authorization_required',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        const assertionResult = await phase8OneShotAuthorizationAssertionVerifier(
+          requestContext.phase8OneShotAuthorizationAssertion
+        );
+        if (assertionResult?.accepted !== true || !assertionResult.exactApprovalResult) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'phase8_one_shot_authorization_claim_invalid',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        effectiveRequestContext = {
+          ...requestContext,
+          exactApprovalResult: assertionResult.exactApprovalResult
+        };
+        delete effectiveRequestContext.phase8OneShotAuthorizationAssertion;
+      }
       let governedNativeReadFallbackContext = null;
       let governedNativeReadFallbackAuditReceipt = null;
       let governedNativeReadFallbackArgs = null;
@@ -2588,7 +2704,7 @@ function createCodexMemoryApplication(overrides = {}) {
           buildGovernedMcpVcpNativeBridgeGateInput({
             toolName,
             args,
-            requestContext,
+            requestContext: effectiveRequestContext,
             config
           })
         );
@@ -2752,7 +2868,17 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'record_memory') {
-        return writeService.record(args, requestContext);
+        if (phase8OneShotNativeWriteEnforcementEnabled) {
+          return {
+            decision: 'rejected',
+            reasonCode: 'phase8_one_shot_local_fallback_forbidden',
+            lowDisclosure: true,
+            nativeWritePerformed: false,
+            durableWritePerformed: false,
+            localFallbackWritePerformed: false
+          };
+        }
+        return writeService.record(args, effectiveRequestContext);
       }
 
       if (toolName === 'search_memory') {
@@ -2782,6 +2908,14 @@ function createCodexMemoryApplication(overrides = {}) {
             localFallbackAuditReceipt: governedNativeReadFallbackAuditReceipt
           }
         );
+      }
+
+      if (toolName === 'prepare_memory_context') {
+        return memoryContextPackageService.prepare(args, requestContext);
+      }
+
+      if (toolName === 'propose_memory_delta') {
+        return memoryDeltaProposalService.propose(args, requestContext);
       }
 
       if (toolName === 'memory_overview') {

@@ -313,9 +313,11 @@ test('CM1558 runtime no-op projection does not expand public MCP surface', () =>
     'search_memory',
     'memory_overview',
     'audit_memory',
-    'validate_memory',
+  'prepare_memory_context',
+'propose_memory_delta',
+'validate_memory',
     'tombstone_memory',
     'supersede_memory'
   ]));
-  assert.equal(TOOL_DEFINITIONS.length, 7);
+  assert.equal(TOOL_DEFINITIONS.length, 9);
 });

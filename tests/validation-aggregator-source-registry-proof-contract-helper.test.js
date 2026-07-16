@@ -22,7 +22,7 @@ function buildInput(patch = {}) {
     status: 'blocked',
     decision: 'NOT_READY_BLOCKED',
     validationAggregatorFullImplementation: false,
-    publicMcpTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
+    publicMcpTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
     sourceRegistry: REQUIRED_SOURCE_REGISTRY_IDS.map(id => ({
       id,
       sourceType: 'local_safe_evidence',

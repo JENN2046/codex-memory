@@ -15,7 +15,7 @@ const REQUIRES_A5_FOR = Object.freeze([
   'rc_cutover'
 ]);
 
-const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const RUNTIME_COMPLETION_GAPS = Object.freeze([
   'runtime_schema_version_enforcement_not_fully_proven',

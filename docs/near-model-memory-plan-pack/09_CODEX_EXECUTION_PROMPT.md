@@ -111,7 +111,20 @@ Build the first version of memory context package.
    - source_breakdown
    - audit_receipt
 
-4. Tests:
+4. Reuse existing implementation surfaces:
+   - `KnowledgeBaseRecallPipeline`
+   - `CandidateGenerator`
+   - `TagMemoEngine`
+   - scope / lifecycle filters
+   - SQLite shadow
+   - vector index
+   - `AuditLogStore`
+   - `MemoryOverviewService`
+
+5. Treat EPA / Residual Pyramid / advanced TagMemo narratives as experimental
+   recall heuristics only.
+
+6. Tests:
    - native success
    - fallback label
    - empty memory
@@ -121,7 +134,7 @@ Build the first version of memory context package.
    - oversized compression
    - low-disclosure
 
-5. Produce MVP report.
+7. Produce MVP report.
 
 ### Acceptance
 

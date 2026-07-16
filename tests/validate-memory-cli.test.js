@@ -385,5 +385,5 @@ test('validate-memory CLI rejects raw workspace_id attempts in low-risk summary'
 test('validate-memory CLI observes approved public MCP controlled mutation surface', () => {
   const toolNames = TOOL_DEFINITIONS.map(tool => tool.name).sort();
 
-  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
 });

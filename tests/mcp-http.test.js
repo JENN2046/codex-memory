@@ -150,6 +150,7 @@ async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
     dataDir: path.join(tempBasePath, 'data'),
     httpPort: 0,
     allowExternalProvider: false,
+    mcpPublicToolSurface: 'full',
     ...receiptAwareNativeCallerOverrides(appOverrides)
   });
 
@@ -309,7 +310,7 @@ test('HTTP MCP should expose health and tools/list', async () => {
       })
     });
     const payload = await tools.json();
-    assert.equal(payload.result.tools.length, 7);
+    assert.equal(payload.result.tools.length, 9);
     const searchMemory = payload.result.tools.find(tool => tool.name === 'search_memory');
     const recordMemory = payload.result.tools.find(tool => tool.name === 'record_memory');
     const auditMemory = payload.result.tools.find(tool => tool.name === 'audit_memory');

@@ -85,7 +85,7 @@ test('P62 completion audit keeps critical runtime gaps explicit', () => {
 test('P62 completion audit preserves A5 hard stops and public MCP freeze', () => {
   const fixture = loadFixture();
 
-  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
   for (const action of [
     'push',

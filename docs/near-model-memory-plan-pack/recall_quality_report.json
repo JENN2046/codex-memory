@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "memory_context_recall_quality_gate_v1",
+  "generated_at": "2026-07-10T00:00:00.000Z",
+  "status": "PASS",
+  "summary": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0
+  },
+  "coverage": [
+    "project_fact_recall",
+    "historical_decision_recall",
+    "current_blocker_recall",
+    "user_preference_recall",
+    "stale_fact_filtering",
+    "conflict_fact_surfacing",
+    "private_isolation",
+    "workspace_isolation",
+    "fallback_distinction"
+  ],
+  "access": {
+    "fixtureOnly": true,
+    "readOnly": true,
+    "durableMutationPerformed": false,
+    "productionWritePerformed": false,
+    "providerApiCalled": false,
+    "vcpToolBoxRuntimeCalled": false,
+    "mcpMemoryToolCalled": false,
+    "rawMemoryRead": false,
+    "rawAuditRead": false,
+    "readinessClaimed": false
+  },
+  "nonClaims": {
+    "productionRecallQuality": false,
+    "liveRuntimeProof": false,
+    "nativeReadProof": false,
+    "nativeWriteProof": false,
+    "fullPlanPackCompletion": false
+  },
+  "cases": [
+    {
+      "id": "project_fact_recall",
+      "label": "project fact recall",
+      "status": "PASS",
+      "expectedCoverage": ["bucket_contains"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 0,
+          "recent_decisions": 0,
+          "current_state": 1,
+          "blockers": 0,
+          "risks": 0,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": false,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    },
+    {
+      "id": "historical_decision_recall",
+      "label": "historical decision recall",
+      "status": "PASS",
+      "expectedCoverage": ["bucket_contains"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 0,
+          "recent_decisions": 1,
+          "current_state": 0,
+          "blockers": 0,
+          "risks": 0,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": false,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    },
+    {
+      "id": "current_blocker_recall",
+      "label": "current blocker recall",
+      "status": "PASS",
+      "expectedCoverage": ["bucket_contains", "next_step_mentions"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 0,
+          "recent_decisions": 0,
+          "current_state": 0,
+          "blockers": 1,
+          "risks": 0,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": false,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    },
+    {
+      "id": "user_preference_recall",
+      "label": "user preference recall",
+      "status": "PASS",
+      "expectedCoverage": ["bucket_contains"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 1,
+          "recent_decisions": 0,
+          "current_state": 0,
+          "blockers": 0,
+          "risks": 0,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": false,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    },
+    {
+      "id": "stale_fact_filtering",
+      "label": "stale fact filtering",
+      "status": "PASS",
+      "expectedCoverage": ["risk_reason"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 0,
+          "recent_decisions": 0,
+          "current_state": 1,
+          "blockers": 0,
+          "risks": 1,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": false,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    },
+    {
+      "id": "conflict_fact_surfacing",
+      "label": "conflict fact surfacing",
+      "status": "PASS",
+      "expectedCoverage": ["risk_reason"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 1,
+          "recent_decisions": 0,
+          "current_state": 0,
+          "blockers": 0,
+          "risks": 1,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": false,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    },
+    {
+      "id": "private_isolation",
+      "label": "private isolation",
+      "status": "PASS",
+      "expectedCoverage": ["bucket_contains", "not_serialized"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 0,
+          "recent_decisions": 0,
+          "current_state": 1,
+          "blockers": 0,
+          "risks": 0,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": false,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    },
+    {
+      "id": "workspace_isolation",
+      "label": "workspace isolation",
+      "status": "PASS",
+      "expectedCoverage": ["bucket_contains", "not_serialized"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 0,
+          "recent_decisions": 0,
+          "current_state": 1,
+          "blockers": 0,
+          "risks": 0,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": false,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    },
+    {
+      "id": "fallback_distinction",
+      "label": "fallback distinction",
+      "status": "PASS",
+      "expectedCoverage": ["fallback_used", "not_mistaken_for_native"],
+      "observed": {
+        "bucketCounts": {
+          "must_know": 0,
+          "recent_decisions": 0,
+          "current_state": 1,
+          "blockers": 0,
+          "risks": 0,
+          "forbidden_assumptions": 0
+        },
+        "fallback_used": true,
+        "result_can_be_mistaken_for_native": false,
+        "search_result_count": 1
+      }
+    }
+  ]
+}

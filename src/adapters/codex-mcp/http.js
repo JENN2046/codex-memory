@@ -54,6 +54,8 @@ const NO_TOKEN_BLOCKED_TOOLS = new Set([
   'update_memory',
   'forget_memory',
   'supersede_memory',
+  'prepare_memory_context',
+  'propose_memory_delta',
   'audit_memory',
   'checkpoint_memory',
   'handoff_memory',

@@ -4,27 +4,196 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2006 trusted-full-read receipt closeout / route decision`.
-Current validation: `CMV-2107`.
-Current handoff: CM-2006 closes out the CM-2005 low-disclosure trusted-full-read receipt: bounded attempt completed, array/zero-item shape projected, read-shape unlocked true, raw output persisted false, write counters zero, readiness false. CM-2005 single-use authority is consumed and cannot be reused.
+Current task: `CM-2095 Phase 8 completion evidence application receipt`.
+Current validation: `CMV-2198`.
+Current handoff: CM-2095 application consumed once and applied six supported fields plus bundle application. Rollback/failure remain false; Phase 8 incomplete. Submit receipt review; no new native action.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-Goal: continue from CM-2006 only within safe local/no-live planning boundaries unless Jenn supplies a new fresh exact boundary for any additional trusted-full-read attempt or broader inference.
+CM-2095 application is applied and non-replayable. Receipt payload SHA is
+`8c8a22f8…0939`. Completion Audit and trace report now bind the six accepted
+fields and bundle application. Rollback/failure gaps, provider/derived-index
+non-proof, Phase 8 incomplete, and all readiness non-claims remain preserved.
 
-Current status: `COMPLETED_VALIDATED_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_CM2005_BOUNDED_ATTEMPT_COMPLETED_READ_SHAPE_UNLOCKED_NO_RAW_OUTPUT_NO_WRITE_NO_READINESS`; production/release/cutover ready no; complete V8 not claimed. Public MCP surface remains unchanged. CM-2006 adds `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md` and records the CM-2005 low-disclosure projection only. Raw diagnostic values, endpoint/locator values, request bodies, raw responses, raw errors, logs, secrets, private memory content, memory IDs, and raw target material values must not be committed into source/docs/status. CM-2005 approval reuse, retry, new trusted-full-read execution, target material binding, runtime/network/VCPToolBox calls, writes, durable mutations, provider/API calls, dependency changes, public MCP expansion, VCPToolBox core modification, release/deploy/cutover/push, M15/RC unlock, and readiness claims remain forbidden without new exact authority.
+CM-2095 is the active gate. Review `CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6`
+accepts the one-shot proof but ends the authorization lifecycle. Application is
+requested, not performed. Any application must preserve rollback/failure gaps,
+derived-index/provider non-proof, Phase 8 incomplete, and no readiness claim.
+
+CM-2094 execution is complete and non-replayable. Decision commit `f1e2a830…`
+binds the exact 1325-byte decision. Registry state is `CONSUMED_SUCCESS`; native
+write calls `1`, verify operations `1`, durable record SHA `4f863f52…`, fallback
+`false`, retry/rollback/compensation `0`. Phase 8 completion is not yet accepted.
+
+CM-2094 is the active gate. The frozen manifest binds packet `66cfae23…`, blob
+`549f157e…`, raw SHA `0786167b…`, context `f1cf912c…`, allowlist `b69cc85d…`,
+and the exact CM-2093 decision/bootstrap chain. Only an independently frozen,
+machine-intaken final release decision can permit one execution.
+
+CM-2093 remains the completed upstream gate. It binds a stable root identity under Git common-dir,
+not switchable `dataDir`, and requires a second Git-intake final release decision.
+The approved content covered one root bootstrap only. It cannot claim nonce or
+call `record_memory`; the root initialization is governance state, not native execution.
+
+The root is initialized under the separately approved bootstrap step and its
+receipt review passed. This does not change Phase 8 authorization.
+
+Historical CM-2092 requested only a machine-bindable external decision
+content object. Even a positive content decision cannot execute a write: its exact
+bytes must first be committed, independently hashed, bound into a frozen manifest,
+and approved by a separate final execution-release review. Phase 8 remains false;
+nonce claims, write, verify, rollback, compensation, and real-memory reads are zero.
+
+Goal: complete the imported near-model-memory plan pack. Current local source,
+contract, fixture, and machine-evidence preparation is substantial. CM-2079
+closed the clean-checkout, runtime-head, replayable Phase 2 receipt, Windows/WSL,
+actual tools/list, and validation-record findings. CM-2080 external review now
+passes for the exact frozen binding. CM-2082 applied that evidence to Completion
+Audit, and CM-2083 accepted the exact Tag Approval Packet. The first three
+decision slots are true and Phase 8 remains false. CM-2087 completed the exact
+single tag push; Release and all later remote actions remain separate Red boundaries.
+
+The long legacy status paragraph below is retained as historical context and
+does not override the CM-2081 active block above. Its older statements about
+missing Phase 2 or external-review evidence are superseded by CM-2079/CM-2080.
+
+Current status: `COMPLETED_VALIDATED_EVIDENCE_MATERIAL_REVIEWED_DECISION_PACKET_REFERENCE_REVIEW_BOUNDARY_NO_PACKET_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM`; production/release/cutover ready no; full plan-pack completion not claimed; complete V8 not claimed. Public MCP default surface remains read-only plus proposal-only and includes `prepare_memory_context` and `propose_memory_delta`; `commit_memory_delta` remains not default/public and is only represented by local operator preflight evidence. Direct governed native read delegation remains limited to `search_memory`, `memory_overview`, and `audit_memory`. CM-2071 consumes the CM-2070 reference intake execution result and prepares low-disclosure reviewed acceptance decision boundary checklist entries, then binds `evidenceMaterialReviewedDecisionPacketReferenceReviewBoundaryPassed` into the acceptance chain as local_contract evidence only. It does not receive actual reviewed decision packet body/value; does not accept an actual reviewed decision packet; does not accept an acceptance decision packet, submit or make an acceptance decision, accept exact authorization, approval, receipts, review evidence, tag approval, or evidence material; does not apply evidence or completion-audit patches; does not disclose endpoint/locator/request/response/raw/review/private-memory values; does not call VCPToolBox/runtime/provider surfaces; does not execute native read/write; does not mutate durable state; does not expand public MCP or default runtime; does not create/push tags, publish releases, deploy/cut over, complete phases, or claim readiness. The full plan pack still lacks actual low-disclosure Phase 2 native read proof, fallback distinction, low-disclosure proof, audit/scope visibility, WSL/Linux proof, Windows/WSL smoke receipts, receipt application, and patch evidence; actual Phase 8 exact-authorized native side-effect, durable write, verify, rollback, failure, output, audit, exact approval enforcement, receipt application, and patch evidence; Phase 9 observation/external review evidence for completion; and Phase 10 external review/tag approval packet evidence for completion. VCPToolBox native memory remains final memory intelligence owner. Native runtime calls, native write production, durable mutation, default expansion, external review completion, actual release/tag/deploy/cutover/push, M15/RC unlock, and readiness claims remain forbidden without separate evidence and approval.
 
 Workspace: `A:\codex-memory`.
 
 Current entrypoints:
 
 - `CURRENT_STATE.md`
+- `PROJECT_GOAL.md`
 - `.agent_board/CURRENT_FACTS.json`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/HANDOFF.md`
+- `src/core/MemoryContextPackageService.js`
+- `src/core/Phase2NativeReadProofReceiptBundleContract.js`
+- `src/core/Phase2PlatformProofReceiptReviewContract.js`
+- `src/core/Phase2AuditScopeReceiptReviewContract.js`
+- `src/core/Phase2LowDisclosureProofReceiptReviewContract.js`
+- `src/core/Phase2FallbackDistinctionReceiptReviewContract.js`
+- `src/core/Phase2NativeReadProofReceiptReviewContract.js`
+- `src/core/Phase2NativeTargetBindingReceiptReviewContract.js`
+- `src/core/Phase2NativeReadProofReceiptSchemaCompatibilityContract.js`
+- `src/core/NativeReadResponseShapeCompatibilityContract.js`
+- `src/core/MemoryContextRecallQualityGate.js`
+- `src/core/MemoryDeltaProposalService.js`
+- `src/core/MemoryDeltaCommitPreflightService.js`
+- `src/core/OperatorFullSurfaceProofGate.js`
+- `src/core/NativeWriteProductionProofContract.js`
+- `src/core/NativeWriteRealRootProofReadinessGate.js`
+- `src/core/DefaultRuntimePolicyObservationGate.js`
+- `src/core/ReleaseTagReadinessPolicyGate.js`
+- `src/core/NearModelMemoryPlanPackCompletionAudit.js`
+- `src/core/NearModelMemoryPlanPackEvidenceTraceMatrix.js`
+- `src/core/NearModelMemoryPlanPackRemainingEvidenceRouteContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceApplicationRouterContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialMetadataGateContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialMetadataPacketContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialAcceptancePreflightContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialIntakeBoundaryContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialManualReviewGateContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialAcceptanceEligibilityGateContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialAcceptanceDecisionRequestBoundaryContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialAcceptanceDecisionPacketMetadataGateContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialReviewedDecisionPacketReadinessGateContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialReviewedDecisionPacketIntakePreflightContract.js`
+- `src/core/NearModelMemoryPlanPackEvidenceMaterialReviewedDecisionPacketReferenceReviewBoundaryContract.js`
+- `src/core/PlanPackExternalReviewCompletionAuditPatchApplicationContract.js`
+- `src/core/PlanPackExternalReviewCompletionAuditPatchBoundaryContract.js`
+- `src/core/PlanPackExternalReviewEvidenceApplicationPatchPreflightContract.js`
+- `src/core/PlanPackExternalReviewEvidenceBundleContract.js`
+- `src/core/Phase2NativeReadProofReceiptApplicationPatchPreflightContract.js`
+- `src/core/Phase8NativeWriteProofReceiptApplicationPatchPreflightContract.js`
+- `src/core/Phase8NativeWriteProofReceiptBundleContract.js`
+- `src/core/Phase8NativeWriteProofReceiptAuditIntakeContract.js`
+- `src/core/PlanPackExternalReviewEvidenceIntakeContract.js`
+- `src/core/Phase2NativeReadProofReceiptAuditIntakeContract.js`
+- `src/core/Phase2NativeReadProofEvidenceGate.js`
+- `src/core/Phase2NativeReadProofReadinessGate.js`
+- `src/core/Phase2NativeReadProofApprovalPacketContract.js`
+- `src/core/Phase2NativeReadProofReceiptBundleContract.js`
+- `src/core/TaskStartMemoryContextWorkflow.js`
+- `tests/memory-context-package-service.test.js`
+- `tests/phase2-platform-proof-receipt-review-contract.test.js`
+- `tests/phase2-audit-scope-receipt-review-contract.test.js`
+- `tests/phase2-low-disclosure-proof-receipt-review-contract.test.js`
+- `tests/phase2-fallback-distinction-receipt-review-contract.test.js`
+- `tests/phase2-native-read-proof-receipt-review-contract.test.js`
+- `tests/phase2-native-target-binding-receipt-review-contract.test.js`
+- `tests/phase2-native-read-proof-receipt-schema-compatibility-contract.test.js`
+- `tests/memory-context-recall-quality-gate.test.js`
+- `tests/memory-delta-proposal-service.test.js`
+- `tests/memory-delta-commit-preflight-service.test.js`
+- `tests/operator-full-surface-proof-gate.test.js`
+- `tests/native-write-production-proof-contract.test.js`
+- `tests/native-write-real-root-proof-readiness-gate.test.js`
+- `tests/default-runtime-policy-observation-gate.test.js`
+- `tests/release-tag-readiness-policy-gate.test.js`
+- `tests/near-model-memory-plan-pack-evidence-application-router-contract.test.js`
+- `tests/near-model-memory-plan-pack-evidence-material-metadata-gate-contract.test.js`
+- `tests/near-model-memory-plan-pack-evidence-material-intake-boundary-contract.test.js`
+- `tests/near-model-memory-plan-pack-evidence-material-manual-review-gate-contract.test.js`
+- `tests/near-model-memory-plan-pack-completion-audit.test.js`
+- `tests/near-model-memory-plan-pack-evidence-trace-matrix.test.js`
+- `tests/near-model-memory-plan-pack-evidence-material-reviewed-decision-packet-readiness-gate-contract.test.js`
+- `tests/near-model-memory-plan-pack-evidence-material-reviewed-decision-packet-intake-preflight-contract.test.js`
+- `tests/near-model-memory-plan-pack-evidence-material-reviewed-decision-packet-reference-review-boundary-contract.test.js`
+- `tests/plan-pack-external-review-evidence-application-patch-preflight-contract.test.js`
+- `tests/plan-pack-external-review-evidence-bundle-contract.test.js`
+- `tests/phase2-native-read-proof-receipt-application-patch-preflight-contract.test.js`
+- `tests/phase8-native-write-proof-receipt-application-patch-preflight-contract.test.js`
+- `tests/phase8-native-write-proof-receipt-bundle-contract.test.js`
+- `tests/phase8-native-write-proof-receipt-audit-intake-contract.test.js`
+- `tests/plan-pack-external-review-evidence-intake-contract.test.js`
+- `tests/phase2-native-read-proof-receipt-audit-intake-contract.test.js`
+- `tests/phase2-native-read-proof-evidence-gate.test.js`
+- `tests/phase2-native-read-proof-readiness-gate.test.js`
+- `tests/phase2-native-read-proof-approval-packet-contract.test.js`
+- `tests/phase2-native-read-proof-receipt-bundle-contract.test.js`
+- `tests/native-write-real-root-proof-readiness-gate.test.js`
+- `tests/task-start-memory-context-workflow.test.js`
+- `tests/mcp-contract.test.js`
+- `README.md`
+- `docs/CAPABILITY_LAYER_MODEL.md`
+- `docs/near-model-memory-plan-pack/00_README.md`
+- `docs/near-model-memory-plan-pack/04_PHASE_PLAN.md`
+- `docs/near-model-memory-plan-pack/06_ACCEPTANCE_MATRIX.md`
+- `docs/near-model-memory-plan-pack/recall_quality_report.json`
+- `docs/near-model-memory-plan-pack/recall_quality_report.md`
+- `docs/near-model-memory-plan-pack/phase2_receipt_application_patch_preflight_contract_report.md`
+- `docs/near-model-memory-plan-pack/phase2_platform_proof_receipt_review_report.md`
+- `docs/near-model-memory-plan-pack/phase2_low_disclosure_proof_receipt_review_report.md`
+- `docs/near-model-memory-plan-pack/phase2_fallback_distinction_receipt_review_report.md`
+- `docs/near-model-memory-plan-pack/phase2_native_read_proof_receipt_review_report.md`
+- `docs/near-model-memory-plan-pack/phase2_native_target_binding_receipt_review_report.md`
+- `docs/near-model-memory-plan-pack/native_read_receipt_schema_compatibility_report.md`
+- `docs/near-model-memory-plan-pack/memory_delta_commit_preflight_report.md`
+- `docs/near-model-memory-plan-pack/external_review_evidence_application_patch_preflight_contract_report.md`
+- `docs/near-model-memory-plan-pack/external_review_evidence_bundle_contract_report.md`
+- `docs/near-model-memory-plan-pack/phase9_phase10_external_review_intake_completion_audit_integration_report.md`
+- `docs/near-model-memory-plan-pack/operator_full_surface_proof_report.md`
+- `docs/near-model-memory-plan-pack/native_write_contract_preflight_report.md`
+- `docs/near-model-memory-plan-pack/real_root_write_readiness_gate_report.md`
+- `docs/near-model-memory-plan-pack/phase8_native_write_receipt_application_patch_preflight_contract_report.md`
+- `docs/near-model-memory-plan-pack/phase8_native_write_receipt_bundle_contract_report.md`
+- `docs/near-model-memory-plan-pack/phase8_native_write_receipt_audit_intake_contract_report.md`
+- `docs/near-model-memory-plan-pack/completion_audit_report.md`
+- `docs/near-model-memory-plan-pack/phase1_acceptance_gate_report.md`
+- `docs/near-model-memory-plan-pack/phase2_native_read_proof_evidence_gate_report.md`
+- `docs/near-model-memory-plan-pack/phase2_native_read_proof_readiness_gate_report.md`
+- `docs/near-model-memory-plan-pack/phase2_native_read_proof_approval_packet_contract_report.md`
+- `docs/near-model-memory-plan-pack/phase2_native_read_proof_receipt_bundle_contract_report.md`
+- `docs/near-model-memory-plan-pack/phase2_completion_audit_receipt_bundle_integration_report.md`
+- `docs/near-model-memory-plan-pack/evidence_trace_matrix_report.md`
+- `docs/near-model-memory-plan-pack/evidence_material_reviewed_decision_packet_reference_review_boundary_report.md`
+- `docs/near-model-memory-plan-pack/phase2_receipt_audit_intake_contract_report.md`
+- `docs/near-model-memory-plan-pack/external_review_evidence_intake_contract_report.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM2006_TRUSTED_FULL_READ_RECEIPT_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1997_TEMP_LOCAL_READ_SHAPE_CLOSEOUT_ROUTE_DECISION.md`
 - `docs/VCP_MEMORY_PLAN_PACKAGE_CM1998_TRUSTED_FULL_READ_PREPARATION_PREFLIGHT.md`

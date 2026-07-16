@@ -4,7 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p66-validation-aggregator-baseline-binding-proo
 const EXPECTED_POLICY_VERSION = 'p66-validation-aggregator-baseline-binding-proof-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p66-validation-aggregator-baseline-binding-proof-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const BASELINE_KINDS = Object.freeze([
   'rc_target_commit',

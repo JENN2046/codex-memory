@@ -138,7 +138,7 @@ test('CM1594 adapter contract preserves seven-tool public MCP surface', () => {
   const fixture = loadFixture();
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
-  assert.equal(TOOL_DEFINITIONS.length, 7);
+  assert.equal(TOOL_DEFINITIONS.length, 9);
 });
 
 test('CM1594 adapter inputs use bounded tag projection only', () => {

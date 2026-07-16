@@ -292,9 +292,11 @@ test('CM1555 implementation does not expand public MCP surface', () => {
     'search_memory',
     'memory_overview',
     'audit_memory',
-    'validate_memory',
+  'prepare_memory_context',
+'propose_memory_delta',
+'validate_memory',
     'tombstone_memory',
     'supersede_memory'
   ]));
-  assert.equal(publicToolNames().length, 7);
+  assert.equal(publicToolNames().length, 9);
 });

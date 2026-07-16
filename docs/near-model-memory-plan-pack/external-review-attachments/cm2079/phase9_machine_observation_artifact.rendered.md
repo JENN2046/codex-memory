@@ -1,0 +1,122 @@
+# Phase 9 Machine Observation Artifact — Canonical Rendered Copy
+
+Source file: `phase9_machine_observation_artifact.json`
+
+Source byte length: `3793`
+
+Source SHA-256: `138ad75ed7d41d88c689544cac217ddfa6ef751f2fe586c997fa37163f18968d`
+
+The UTF-8 bytes inside the JSON fence, including the final LF immediately
+before the closing fence, are byte-for-byte identical to the source JSON.
+
+```json
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2078",
+  "replayTaskId": "CM-2079",
+  "generatedAt": "2026-07-10T19:11:53.092Z",
+  "sourceCommit": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+  "sourceTree": "bac696fac692509572ecd1ab889a5b3aedc4b9a6",
+  "worktreeClean": true,
+  "loadedRuntimeHead": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+  "runtimeHeadEvidenceSource": "actual_stdio_process_executed_from_clean_frozen_checkout",
+  "runtimeHeadMatchesSourceCommit": true,
+  "actualToolsList": {
+    "source": "actual_stdio_initialize_and_tools_list_from_frozen_checkout",
+    "observedAt": "2026-07-10T19:08:47.802Z",
+    "serverName": "vcp_codex_memory",
+    "tools": [
+      "audit_memory",
+      "memory_overview",
+      "prepare_memory_context",
+      "propose_memory_delta",
+      "search_memory"
+    ],
+    "sha256": "ce81d5cacf22a7ee60a53179639f9c18a72dfb147a8379c4bfad6c2394a91b9d",
+    "stderrCategory": "nonempty_redacted",
+    "rawToolSchemasCaptured": false,
+    "rawRuntimeOutputCaptured": false
+  },
+  "defaultRuntimePolicyGateSummary": {
+    "accepted": true,
+    "status": "default_runtime_policy_hold_read_context_proposal_accepted",
+    "toolNames": [
+      "audit_memory",
+      "memory_overview",
+      "prepare_memory_context",
+      "propose_memory_delta",
+      "search_memory"
+    ],
+    "missingDefaultTools": [],
+    "forbiddenDefaultTools": [],
+    "commitMemoryDeltaPublicRegistered": false,
+    "observationComplete": true,
+    "equivalentDogfoodReviewAccepted": true,
+    "externalReviewAccepted": false,
+    "defaultExpansionAllowed": false,
+    "productionWriteDefaultAllowed": false,
+    "durableMutationPerformed": false,
+    "providerApiCalled": false,
+    "readinessClaimed": false,
+    "sha256": "e390de04972790893100dd9b14200f58e60eaa81e8bb068b3dd748d7176e6133"
+  },
+  "boundedDogfoodWorkflow": {
+    "workflowClass": "governed_native_read_three_tool_bounded_workflow",
+    "phase2ManifestRef": "docs/near-model-memory-plan-pack/phase2_machine_execution_evidence_manifest.json",
+    "phase2ManifestSha256": "9697fec7e60ac3a51f9339e1dd4694075f818940007cbc653c89f5ca01ce0e03",
+    "safeCallRefs": [
+      "CM-2077-P2-1-search_memory",
+      "CM-2077-P2-2-memory_overview",
+      "CM-2077-P2-3-audit_memory"
+    ],
+    "actualRuntimeCallsObserved": true,
+    "lowDisclosureOnly": true,
+    "validationFixtureUsed": true,
+    "productionProviderProofClaimed": false,
+    "memoryWrites": 0,
+    "primaryMemoryStoreWrites": 0,
+    "defaultRuntimeExpansions": 0
+  },
+  "validationExecutionRecords": {
+    "testAll": {
+      "commandCategory": "npm_test_all",
+      "executedAt": "2026-07-10T19:10:22.922Z",
+      "exitStatusCategory": "zero",
+      "passed": true,
+      "recordRef": "CM-2079-TEST-ALL-1822d7e84924",
+      "suitePassCounts": [
+        5091,
+        94,
+        6
+      ],
+      "stdoutSha256": "c862b27037cfb5b958a321988ad1ce10bc272f0e4ab700e789cbf284123a3296",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawOutputPersisted": false
+    },
+    "gateCi": {
+      "commandCategory": "npm_gate_ci_json",
+      "executedAt": "2026-07-10T19:11:53.087Z",
+      "exitStatusCategory": "zero",
+      "passed": true,
+      "recordRef": "CM-2079-GATE-CI-1822d7e84924",
+      "fixtureOnly": true,
+      "noNetwork": true,
+      "noProvider": true,
+      "failedCheckCount": 0,
+      "resultSha256": "2158fdeb55f0f74e06eca32dea0b92c9ce9fa14804a5f4cea1ae781696e4d089",
+      "rawOutputPersisted": false
+    }
+  },
+  "observationCompletionDerivation": {
+    "eligible": true,
+    "reason": "clean_frozen_runtime_matched_phase2_and_validation_replay_passed",
+    "phase9ObservationAcceptedFromThisArtifact": true
+  },
+  "rawOutputCaptured": false,
+  "privateMemoryCaptured": false,
+  "readinessClaimed": false
+}
+```
+
+This rendering grants no external-review acceptance, application, tag, write,
+remote action, or readiness claim.

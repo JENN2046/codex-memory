@@ -491,7 +491,7 @@ test('P66.39 helper redacts sensitive normalized output', () => {
 });
 
 test('P66.39 helper exports required constants exactly', () => {
-  assert.deepEqual(PUBLIC_MCP_TOOLS, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(PUBLIC_MCP_TOOLS, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.deepEqual(REQUIRED_STAGE_IDS, [
     'review_packet_intake',
     'approval_packet_evaluation',

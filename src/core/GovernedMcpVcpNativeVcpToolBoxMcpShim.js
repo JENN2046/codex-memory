@@ -873,6 +873,7 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options = {}) {
 module.exports = {
   GOVERNANCE_METADATA_PATH,
   PUBLIC_TOOL_TO_NATIVE_TOOLS,
+  createRecordMarkdown,
   createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler,
   createGovernedMcpVcpNativeVcpToolBoxMcpShimServer,
   createVcpToolBoxNativeMemoryAdapter,

@@ -138,7 +138,7 @@ test('P52 blocked actions preserve A5 boundaries', () => {
   }
 
   assert.equal(fixture.publicToolsFrozen, true);
-  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('P52 safety flags forbid collection, execution, mutation, provider, config, and remote writes', () => {

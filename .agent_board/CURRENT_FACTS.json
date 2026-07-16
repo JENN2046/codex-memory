@@ -9,10 +9,10 @@
     "freshGitRequiredBeforeRemoteAction": true,
     "freshGitRequiredBeforeRuntimeAction": true
   },
-  "updatedAt": "2026-07-08",
-  "taskId": "CM-2006",
-  "validationId": "CMV-2107",
-  "branch": "main",
+  "updatedAt": "2026-07-11",
+  "taskId": "CM-2095",
+  "validationId": "CMV-2198",
+  "branch": "codex/near-model-memory-frozen-replay-v2",
   "baseBranch": "main",
   "pr": {
     "number": null,
@@ -26,10 +26,137 @@
     "source": "none",
     "presentInLocalCheckout": null
   },
+  "evidenceBaseline": {
+    "sourceCommit": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+    "worktreeClean": true,
+    "loadedRuntimeHead": "1822d7e8492424cd4b8849d544df087cf9c8edad",
+    "runtimeHeadMatchesSourceCommit": true,
+    "phase2MachineEvidenceEligible": true,
+    "phase9MachineObservationEligible": true,
+    "canonicalPayloadSha256": "2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2",
+    "validationFixtureUsed": true,
+    "productionProviderProofClaimed": false,
+    "evidenceCommit": "c0b8c24eb89efdd76305dc725b5416f7ce46a3a1",
+    "evidenceTree": "bf5bbdaf47a7f05988d8e8d1b8ab4479e1a65ae4",
+    "gitObjectEvidenceSurfaceVerified": true,
+    "externalReviewDecisionReference": "CM-2080-ER-20260711-PASS-F440C1BD-2215BB33",
+    "completionAuditApplicationDecisionReference": "CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33",
+    "completionAuditApplicationRequestCommit": "88d11e94dc238145ba9317589cebda52f73910e1",
+    "completionAuditApplicationReceiptPayloadSha256": "b74dd9ad7077754e98aaff266d62bd1a25223eb392d35108e5926a9eca16cfeb",
+    "candidateTag": "v0.2.0-readonly-context-rc",
+    "candidateTagTargetCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+    "candidateTagTargetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33",
+    "tagApprovalPacketPayloadSha256": "c06836b4c9de74f8031cf665f050b9e1c668edfd2a1584a26713c28263c6aa43",
+    "tagCandidateReleaseNotesSha256": "e429fe2a5cc537b2e168c531b79666b1cb5b1ec5bd5aaef26ec4cbab3ec5d90e",
+    "tagApprovalPacketPreparedForIndependentReview": true,
+    "tagApprovalDecisionReference": "CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4",
+    "tagCreationAuthorizationDecisionReference": "CM-2084-ER-20260711-LOCAL-ANNOTATED-TAG-CREATE-C06836B4",
+    "tagCreationAuthorized": true,
+    "tagCreationAuthorizationConsumed": true,
+    "tagCreationAuthorizationReplayAllowed": false,
+    "tagCreated": true,
+    "tagObjectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
+    "tagCreationReceiptPayloadSha256": "b6c2a597f109ca4a17f10dde88d505f81caf892ee607eb35b562693e77e7d3d0",
+    "localTagReceiptReviewReference": "CM-2085-ER-20260711-LOCAL-TAG-RECEIPT-PASS-BAF7ECCE",
+    "localTagReceiptReviewPassed": true,
+    "tagPushAuthorizationRequested": true,
+    "tagPushAuthorizationDecisionReference": "CM-2086-ER-20260711-EXACT-TAG-PUSH-BAF7ECCE",
+    "tagPushAuthorizationConsumed": true,
+    "tagPushReceiptPayloadSha256": "df1e41dd0d6915b9b978c51a7d41614ed91a2f1873f22eb34131bb45035f626b",
+    "tagPushReceiptReviewReference": "CM-2087-ER-20260711-TAG-PUSH-RECEIPT-PASS-DF1E41DD",
+    "tagPushReceiptReviewPassed": true,
+    "tagPushAuthorized": true,
+    "tagPushed": true,
+    "completionAuditBeforeTagApprovalOrderEnforced": true,
+    "externalReviewPassed": true,
+    "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
+    "tagApprovalPacketPassed": true,
+    "phase8NativeWriteAuthorizationRequested": true,
+    "phase8NativeWriteAuthorizationGranted": true,
+    "phase8PriorDecisionReference": "CM-2092-ER-20260711-FAIL-CLOSED-FINAL-RELEASE-AND-REGISTRY-ROOT-INCOMPLETE",
+    "phase8ReapplicationPrepared": true,
+    "phase8OneShotMachineEnforced": true,
+    "phase8HardenedRuntimeSourceCommit": "e1785994f599f2ef4c4bcf891bbf1e2b34f0630c",
+    "phase8HardenedRuntimeSourceTree": "c6205686a8e9bbc4171eaea516567336ad70cf42",
+    "phase8DecisionContentIssuanceRequested": true,
+    "phase8DecisionContentExecutable": false,
+    "phase8FinalExecutionReleaseReviewRequired": true,
+    "phase8FinalExecutionReleaseMachineEnforced": true,
+    "phase8RegistryRootUsesGitCommonDir": true,
+    "phase8RegistryRootInitialized": true,
+    "phase8RegistryRootIdentityCanonicalSha256": "240fd4f7108637d57593ac22478316d84560cd49e8e6c16c2577a9c07cd2d5a0",
+    "phase8ContentApprovalRequested": true,
+    "phase8RegistryRootBootstrapAuthorizationRequested": true,
+    "phase8ContentDecisionExecutable": false,
+    "phase8ContentDecisionReference": "CM-2093-ER-20260711-CONTENT-ROOT-BOOTSTRAP-PASS-240FD4F7",
+    "phase8ContentDecisionSourceCommit": "aecc431de4533e1c3a0e9f42948b217f835b4c7e",
+    "phase8ContentDecisionBlobOid": "bc251e7a34152b41724f3c098fee12baefe0f787",
+    "phase8ContentDecisionPayloadSha256": "9fb37b29e18ee65225e8e2fcb9628260ba93afb5ced6c195388e390570daa5dc",
+    "phase8RegistryRootBootstrapAuthorizationConsumed": true,
+    "phase8RegistryRootBootstrapReplayAllowed": false,
+    "phase8RegistryRootBootstrapReceiptReviewReference": "CM-2093-ER-20260711-REGISTRY-ROOT-BOOTSTRAP-RECEIPT-PASS-BDD96776",
+    "phase8RegistryRootBootstrapReceiptReviewPassed": true,
+    "phase8ExecutionPacketCommit": "66cfae232b6609bbede9debc6f897f74ed8551c0",
+    "phase8ExecutionPacketTree": "88a4a6f92a9d380f568963604a8dbae3b9fe07c4",
+    "phase8ExecutionManifestBlobOid": "549f157ed65d0675fccfb2c8b68698a31c4666f2",
+    "phase8ExecutionManifestSha256": "0786167ba860d869873fdc32dad167a411d7d85617e2c08b01c1d4604ba3131d",
+    "phase8ExecutionManifestPayloadSha256": "11bbbc72e4586654c0996d63090b586ec0da7bb4f2cccfc90b63af07cf31d0ee",
+    "phase8FinalExecutionReleaseAuthorizationRequested": true,
+    "phase8FinalExecutionReleaseAuthorized": true,
+    "phase8FinalExecutionReleaseDecisionReference": "CM-2094-ER-PHASE8-FINAL-EXECUTION-RELEASE-F1CF912C-B69CC85D",
+    "phase8FinalExecutionReleaseDecisionCommit": "f1e2a8302e91b75beffeb418f57e591cf0789401",
+    "phase8FinalExecutionReleaseDecisionBlobOid": "a53c053ab1b882b0d6927152a0d3ee6db540296a",
+    "phase8FinalExecutionReleaseDecisionSha256": "db9dd1cc6f884806e8ea0337e3d09765608fa0892ad7f29011d822805c1c0ccf",
+    "phase8NonceClaimed": true,
+    "phase8NativeExecutionReceiptCreated": true,
+    "phase8AuthorizationConsumed": true,
+    "phase8AuthorizationReplayAllowed": false,
+    "phase8RegistryFinalState": "CONSUMED_SUCCESS",
+    "phase8NativeWriteCalls": 1,
+    "phase8VerifyOperations": 1,
+    "phase8VerifyAccepted": true,
+    "phase8DurableRecordBytes": 269,
+    "phase8DurableRecordSha256": "4f863f52455147c691c873cc5821f82e9904b6df554d6aeaf2ac960a1baa3828",
+    "phase8LocalFallbackUsed": false,
+    "phase8RetryPerformed": false,
+    "phase8RollbackOrCompensationPerformed": false,
+    "phase8CompletionClaimed": false,
+    "phase8ExecutionReceiptReviewReference": "CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6",
+    "phase8ExecutionReceiptReviewPassed": true,
+    "phase8NativeWriteProofAccepted": true,
+    "phase8CompletionEvidenceApplicationRequested": true,
+    "phase8CompletionEvidenceAlreadyApplied": true,
+    "phase8CompletionAuditPatchAlreadyApplied": true,
+    "phase8CompletionEvidenceApplicationDecisionReference": "CM-2095-ER-20260711-COMPLETION-EVIDENCE-APPLICATION-PASS-2E98CE0C",
+    "phase8CompletionEvidenceApplicationDecisionCommit": "83ac6f8d45a92d04453e9f280d5dbd054a663132",
+    "phase8CompletionEvidenceApplicationRuntimeCommit": "e2bb3e9b4bf1f1e7dd8d4a74295360c3b8c7a513",
+    "phase8CompletionEvidenceApplicationAuthorizationConsumed": true,
+    "phase8CompletionEvidenceApplicationReplayAllowed": false,
+    "phase8ReceiptBundleAppliedToCompletionAudit": true,
+    "phase8ExactApprovalEnforcementPassed": true,
+    "phase8NativeSideEffectReceiptPassed": true,
+    "phase8RealRootDurableWriteProofPassed": true,
+    "phase8VerifyWritePassed": true,
+    "phase8OutputDisclosureBudgetPassed": true,
+    "phase8AuditReceiptPassed": true,
+    "phase8CompletionEvidenceApplicationReceiptPayloadSha256": "8c8a22f89863214ccbe2d0e64b75a0526cc32f1e21d83d7159e109e6fa200939",
+    "phase8RollbackDrillPassed": false,
+    "phase8FailureRecoveryProofPassed": false,
+    "phase8DerivedIndexProofAccepted": false,
+    "phase8ProviderExecutionProofAccepted": false,
+    "phase8LatestRuntimeSourceCommit": "10b1ea49257c0aa2c26e50a2291142093589d938",
+    "phase8LatestRuntimeSourceTree": "f4273910483c096ff03d3c33f01c59187a2f6e2b",
+    "phase8RequestedContextCanonicalSha256": "f1cf912c1609dbf70ac07794c7b691e85f92e4c6daceda168e444d175dc49283",
+    "phase8RequestedAllowlistCanonicalSha256": "b69cc85dc7b9387425342ffbec7c299317dcf1eaa6948d4042503399a6b33e20",
+    "phase8RequestedCanonicalPayloadSha256": "91d3b2ed314641bb372237aa9490a2803da6ea060b4457c5e7694c738a6b9aee",
+    "phase8RequestedMaxNativeWrites": 1,
+    "phase8RequestedMaxVerifyOperations": 1,
+    "phase8RequestedMaxRollbackOrCompensationOperations": 0
+  },
   "status": {
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "trusted_full_read_receipt_closeout_cm2005_bounded_attempt_completed_read_shape_unlocked_no_raw_output_no_write_no_readiness",
+    "scope": "near_model_memory_plan_pack_evidence_applied_rollback_failure_missing_phase8_incomplete_receipt_review_required",
     "notReleaseReady": true,
     "notProductionReady": true,
     "notDeployReady": true,
@@ -37,6 +164,461 @@
     "completeV8Claimed": false
   },
   "validationSummary": [
+    {
+      "id": "CMV-2198",
+      "scope": "CM-2095 exact Phase 8 completion evidence application",
+      "status": "COMPLETED_EVIDENCE_APPLIED_ROLLBACK_FAILURE_MISSING_PHASE8_INCOMPLETE_RECEIPT_REVIEW_REQUIRED"
+    },
+    {
+      "id": "CMV-2197",
+      "scope": "CM-2095 Phase 8 completion evidence application request",
+      "status": "COMPLETED_COMPLETION_EVIDENCE_APPLICATION_REQUESTED_PHASE8_INCOMPLETE_NO_NEW_NATIVE_AUTHORITY"
+    },
+    {
+      "id": "CMV-2196",
+      "scope": "CM-2094 exact one-shot native execution and low-disclosure receipt",
+      "status": "COMPLETED_CONSUMED_SUCCESS_ONE_WRITE_ONE_VERIFY_RECEIPT_REVIEW_REQUIRED_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2195",
+      "scope": "CM-2094 exact frozen execution manifest and final release request",
+      "status": "COMPLETED_FINAL_EXECUTION_RELEASE_REQUESTED_PHASE8_FALSE_UNCLAIMED_NO_NATIVE_EXECUTION"
+    },
+    {
+      "id": "CMV-2194",
+      "scope": "CM-2093 exact registry root bootstrap and low-disclosure receipt",
+      "status": "COMPLETED_REGISTRY_ROOT_INITIALIZED_AUTHORIZATION_CONSUMED_PHASE8_FALSE_NO_NATIVE_EXECUTION"
+    },
+    {
+      "id": "CMV-2193",
+      "scope": "CM-2093 Phase 8 content approval and registry-root request",
+      "status": "COMPLETED_PHASE8_CONTENT_AND_ROOT_BOOTSTRAP_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2192",
+      "scope": "CM-2092 Phase 8 authorization decision content issuance request",
+      "status": "COMPLETED_PHASE8_DECISION_CONTENT_ISSUANCE_REQUESTED_FOURTH_SLOT_FALSE_NO_EXECUTION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2191",
+      "scope": "CM-2091 machine-enforced Phase 8 native write reapplication",
+      "status": "COMPLETED_PHASE8_MACHINE_ENFORCED_REAPPLICATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2190",
+      "scope": "CM-2089 exact Phase 8 native write authorization request",
+      "status": "COMPLETED_EXACT_PHASE8_NATIVE_WRITE_AUTHORIZATION_REQUESTED_NOT_GRANTED_NO_EXECUTION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2189",
+      "scope": "CM-2088 exact tag push receipt review intake",
+      "status": "COMPLETED_TAG_PUSH_RECEIPT_REVIEW_PASSED_NO_NEW_REMOTE_AUTHORITY_NO_PHASE8_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2188",
+      "scope": "CM-2087 exact one-use tag push and low-disclosure receipt",
+      "status": "COMPLETED_EXACT_TAG_PUSH_AUTHORIZATION_CONSUMED_NO_BRANCH_NO_RELEASE_NO_PHASE8_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2187",
+      "scope": "CM-2086 local tag receipt review intake and exact tag push authorization request",
+      "status": "COMPLETED_LOCAL_TAG_RECEIPT_REVIEW_PASSED_TAG_PUSH_REQUESTED_NOT_AUTHORIZED_NO_REMOTE_ACTION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2186",
+      "scope": "CM-2085 exact one-use local unsigned annotated tag creation and receipt",
+      "status": "COMPLETED_LOCAL_ANNOTATED_TAG_CREATED_AUTHORIZATION_CONSUMED_NO_PUSH_NO_RELEASE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2185",
+      "scope": "CM-2084 exact Tag Approval decision intake and local tag creation authorization request",
+      "status": "COMPLETED_TAG_APPROVAL_PACKET_PASSED_TAG_CREATION_REQUESTED_NOT_AUTHORIZED_NO_TAG_NO_PUSH_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2184",
+      "scope": "CM-2083 real hash-bound Tag Approval Packet and independent review request",
+      "status": "COMPLETED_TAG_APPROVAL_PACKET_PREPARED_FOR_INDEPENDENT_REVIEW_TAG_APPROVAL_FALSE_NO_TAG_NO_PUSH_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2183",
+      "scope": "CM-2082 authorized Completion Audit evidence application and low-disclosure receipt",
+      "status": "COMPLETED_EXTERNAL_REVIEW_BUNDLE_APPLIED_TO_COMPLETION_AUDIT_TAG_APPROVAL_AND_PHASE8_FALSE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2182",
+      "scope": "CM-2081 CM-2080 final external-review decision intake and Completion Audit application request",
+      "status": "COMPLETED_EXTERNAL_REVIEW_DECISION_ACCEPTED_APPLICATION_REQUESTED_NOT_EXECUTED_THREE_DECISIONS_FALSE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2181",
+      "scope": "CM-2080 independently retrievable Git-object evidence surface and second external-review reapplication",
+      "status": "COMPLETED_GIT_OBJECT_EVIDENCE_SURFACE_VERIFIED_SECOND_EXTERNAL_REVIEW_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2180",
+      "scope": "CM-2079 clean frozen runtime-matched Phase 2/9 replay and external-review reapplication",
+      "status": "COMPLETED_CLEAN_FROZEN_REPLAY_PASSED_EXTERNAL_REVIEW_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2179",
+      "scope": "CM-2078 machine-verifiable review evidence rebaseline and canonical bundle",
+      "status": "COMPLETED_MACHINE_EVIDENCE_REBASELINE_VALID_REPLAY_REQUIRED_ALL_DECISIONS_FALSE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2178",
+      "scope": "CM-2077 Phase 2 machine execution evidence",
+      "status": "COMPLETED_MACHINE_PHASE2_EVIDENCE_SHAPE_VALID_FROZEN_RUNTIME_MATCHED_REPLAY_REQUIRED"
+    },
+    {
+      "id": "CMV-2177",
+      "scope": "CM-2076 external review hash-bound handoff bundle",
+      "status": "COMPLETED_VALIDATED_HASH_BOUND_EXTERNAL_REVIEW_HANDOFF_PREPARED_DECISIONS_PENDING_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2176",
+      "scope": "CM-2075 Phase 9 equivalent dogfood observation evidence",
+      "status": "COMPLETED_VALIDATED_PHASE9_EQUIVALENT_DOGFOOD_OBSERVATION_APPLIED_EXTERNAL_REVIEW_PENDING_NO_EXPANSION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2175",
+      "scope": "CM-2074 Phase 2 governed native read evidence application",
+      "status": "COMPLETED_VALIDATED_PHASE2_EXACT_RECEIPTS_APPLIED_PHASE2_COMPLETED_FULL_PLAN_INCOMPLETE_NO_WRITE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2174",
+      "scope": "CM-2073 Phase 2 governed native read observation contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_GOVERNED_NATIVE_READ_PARTIAL_OBSERVATION_PHASE2_INCOMPLETE_NO_WRITE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2173",
+      "scope": "CM-2072 evidence material reviewed acceptance decision boundary contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_REVIEWED_ACCEPTANCE_DECISION_BOUNDARY_NO_PACKET_ACCEPTANCE_NO_DECISION_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2172",
+      "scope": "CM-2071 evidence material reviewed decision packet reference review boundary contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_REVIEWED_DECISION_PACKET_REFERENCE_REVIEW_BOUNDARY_NO_PACKET_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2171",
+      "scope": "CM-2070 evidence material reviewed decision packet reference intake execution contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_REVIEWED_DECISION_PACKET_REFERENCE_INTAKE_EXECUTION_NO_PACKET_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2170",
+      "scope": "CM-2069 evidence material reviewed decision packet intake preflight contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_REVIEWED_DECISION_PACKET_INTAKE_PREFLIGHT_NO_PACKET_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2169",
+      "scope": "CM-2068 evidence material reviewed decision packet readiness gate contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_REVIEWED_DECISION_PACKET_READINESS_GATE_NO_PACKET_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2168",
+      "scope": "CM-2067 evidence material acceptance chain completion-audit binding",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_ACCEPTANCE_CHAIN_COMPLETION_AUDIT_BINDING_NO_PACKET_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2167",
+      "scope": "CM-2066 evidence material acceptance decision packet metadata gate contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_ACCEPTANCE_DECISION_PACKET_METADATA_GATE_NO_PACKET_ACCEPTANCE_NO_DECISION_SUBMISSION_NO_ACCEPTANCE_DECISION_NO_AUTHORIZATION_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2166",
+      "scope": "CM-2065 evidence material acceptance decision request boundary contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_ACCEPTANCE_DECISION_REQUEST_BOUNDARY_NO_DECISION_SUBMISSION_NO_ACCEPTANCE_DECISION_NO_AUTHORIZATION_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2165",
+      "scope": "CM-2064 evidence material acceptance eligibility gate contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_ACCEPTANCE_ELIGIBILITY_GATE_NO_ACCEPTANCE_DECISION_NO_AUTHORIZATION_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2164",
+      "scope": "CM-2063 evidence material manual review gate contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_MANUAL_REVIEW_GATE_NO_REVIEW_COMPLETION_NO_AUTHORIZATION_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2163",
+      "scope": "CM-2062 evidence material intake boundary contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_INTAKE_BOUNDARY_NO_AUTHORIZATION_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2162",
+      "scope": "CM-2061 evidence material acceptance preflight contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_ACCEPTANCE_PREFLIGHT_NO_AUTHORIZATION_ACCEPTANCE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2161",
+      "scope": "CM-2060 evidence material metadata packet contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_METADATA_PACKET_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2160",
+      "scope": "CM-2059 evidence material metadata gate contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_MATERIAL_METADATA_GATE_NO_MATERIAL_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2159",
+      "scope": "CM-2058 evidence application router contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_APPLICATION_ROUTER_NO_EVIDENCE_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2158",
+      "scope": "CM-2057 evidence request packet rollup contract",
+      "status": "COMPLETED_VALIDATED_EVIDENCE_REQUEST_PACKET_ROLLUP_NO_EVIDENCE_ACCEPTANCE_NO_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2157",
+      "scope": "CM-2056 external review request boundary contract",
+      "status": "COMPLETED_VALIDATED_EXTERNAL_REVIEW_REQUEST_BOUNDARY_NO_REVIEW_ACCEPTANCE_NO_TAG_NO_PHASE_COMPLETION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2156",
+      "scope": "CM-2055 Phase 8 exact receipt request boundary contract",
+      "status": "COMPLETED_VALIDATED_PHASE8_EXACT_RECEIPT_REQUEST_BOUNDARY_NO_RECEIPT_ACCEPTANCE_NO_PHASE_COMPLETION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2155",
+      "scope": "CM-2054 Phase 2 exact receipt request boundary contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_EXACT_RECEIPT_REQUEST_BOUNDARY_NO_RECEIPT_ACCEPTANCE_NO_PHASE_COMPLETION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2154",
+      "scope": "CM-2053 remaining evidence route contract",
+      "status": "COMPLETED_VALIDATED_REMAINING_EVIDENCE_ROUTE_CONTRACT_NO_EVIDENCE_ACCEPTANCE_NO_PHASE_COMPLETION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2153",
+      "scope": "CM-2052 external review completion-audit patch application contract",
+      "status": "COMPLETED_VALIDATED_EXTERNAL_REVIEW_COMPLETION_AUDIT_PATCH_APPLICATION_CONTRACT_NO_REVIEW_ACCEPTANCE_NO_TAG_APPROVAL_NO_PHASE_COMPLETION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2152",
+      "scope": "CM-2051 external review completion-audit patch boundary contract",
+      "status": "COMPLETED_VALIDATED_EXTERNAL_REVIEW_COMPLETION_AUDIT_PATCH_BOUNDARY_CONTRACT_NO_REVIEW_ACCEPTANCE_NO_BUNDLE_APPLICATION_NO_PATCH_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2151",
+      "scope": "CM-2050 external review bundle application receipt contract",
+      "status": "COMPLETED_VALIDATED_EXTERNAL_REVIEW_BUNDLE_APPLICATION_RECEIPT_CONTRACT_NO_REVIEW_ACCEPTANCE_NO_BUNDLE_APPLICATION_NO_PATCH_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2150",
+      "scope": "CM-2049 external review bundle application gate local contract",
+      "status": "COMPLETED_VALIDATED_EXTERNAL_REVIEW_BUNDLE_APPLICATION_GATE_LOCAL_CONTRACT_NO_REVIEW_ACCEPTANCE_NO_BUNDLE_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2149",
+      "scope": "CM-2048 release/tag external review chain binding local contract",
+      "status": "COMPLETED_VALIDATED_RELEASE_TAG_EXTERNAL_REVIEW_CHAIN_BINDING_LOCAL_CONTRACT_NO_REVIEW_ACCEPTANCE_NO_TAG_APPROVAL_NO_TAG_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2148",
+      "scope": "CM-2047 external review patch hardened bundle binding local contract",
+      "status": "COMPLETED_VALIDATED_EXTERNAL_REVIEW_PATCH_HARDENED_BUNDLE_BINDING_LOCAL_CONTRACT_NO_REVIEW_ACCEPTANCE_NO_TAG_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2147",
+      "scope": "CM-2046 Phase 8 receipt patch hardened bundle binding local contract",
+      "status": "COMPLETED_VALIDATED_PHASE8_RECEIPT_PATCH_HARDENED_BUNDLE_BINDING_LOCAL_CONTRACT_NO_LIVE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2146",
+      "scope": "CM-2045 Phase 2 receipt intake and patch hardened bundle binding local contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_RECEIPT_INTAKE_PATCH_HARDENED_BUNDLE_BINDING_LOCAL_CONTRACT_NO_LIVE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2145",
+      "scope": "CM-2044 Phase 2 receipt bundle review-chain hardening local contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_RECEIPT_BUNDLE_REVIEW_CHAIN_HARDENING_LOCAL_CONTRACT_NO_LIVE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2144",
+      "scope": "CM-2043 Phase 2 platform proof receipt review local contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_PLATFORM_PROOF_RECEIPT_REVIEW_LOCAL_CONTRACT_NO_LIVE_NO_COMMAND_OUTPUT_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2143",
+      "scope": "CM-2042 Phase 2 audit scope receipt review local contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_AUDIT_SCOPE_RECEIPT_REVIEW_LOCAL_CONTRACT_NO_LIVE_NO_RAW_AUDIT_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2142",
+      "scope": "CM-2041 Phase 2 low-disclosure proof receipt review local contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_LOW_DISCLOSURE_PROOF_RECEIPT_REVIEW_LOCAL_CONTRACT_NO_LIVE_NO_RAW_OUTPUT_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2141",
+      "scope": "CM-2040 Phase 2 fallback distinction receipt review local contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_FALLBACK_DISTINCTION_RECEIPT_REVIEW_LOCAL_CONTRACT_NO_LIVE_NO_FALLBACK_COMPARISON_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2140",
+      "scope": "CM-2039 Phase 2 native read proof receipt review local contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_NATIVE_READ_PROOF_RECEIPT_REVIEW_LOCAL_CONTRACT_NO_LIVE_NO_NATIVE_READ_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2139",
+      "scope": "CM-2038 Phase 2 native target binding receipt review local contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_NATIVE_TARGET_BINDING_RECEIPT_REVIEW_LOCAL_CONTRACT_NO_LIVE_NO_TARGET_BINDING_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2138",
+      "scope": "CM-2037 native read receipt schema compatibility local contract",
+      "status": "COMPLETED_VALIDATED_NATIVE_READ_RECEIPT_SCHEMA_COMPATIBILITY_LOCAL_CONTRACT_NO_LIVE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2137",
+      "scope": "CM-2036 native read response shape compatibility local contract",
+      "status": "COMPLETED_VALIDATED_NATIVE_READ_RESPONSE_SHAPE_COMPATIBILITY_LOCAL_CONTRACT_NO_LIVE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2136",
+      "scope": "CM-2035 memory delta operator-only commit preflight",
+      "status": "COMPLETED_VALIDATED_MEMORY_DELTA_OPERATOR_COMMIT_PREFLIGHT_NO_DEFAULT_MCP_NO_WRITE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2135",
+      "scope": "CM-2034 Phase 9/10 external review evidence application patch preflight and completion-audit requirement",
+      "status": "COMPLETED_VALIDATED_PHASE9_PHASE10_EXTERNAL_REVIEW_EVIDENCE_APPLICATION_PATCH_PREFLIGHT_NO_REVIEW_ACCEPTANCE_NO_TAG_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2134",
+      "scope": "CM-2033 Phase 9/10 external review evidence bundle contract and completion-audit prerequisite",
+      "status": "COMPLETED_VALIDATED_PHASE9_PHASE10_EXTERNAL_REVIEW_EVIDENCE_BUNDLE_CONTRACT_NO_REVIEW_ACCEPTANCE_NO_TAG_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2133",
+      "scope": "CM-2032 Phase 9/10 external review intake completion-audit integration",
+      "status": "COMPLETED_VALIDATED_PHASE9_PHASE10_EXTERNAL_REVIEW_INTAKE_COMPLETION_AUDIT_INTEGRATION_NO_REVIEW_ACCEPTANCE_NO_TAG_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2132",
+      "scope": "CM-2031 Phase 2 receipt application patch preflight and completion-audit requirement",
+      "status": "COMPLETED_VALIDATED_PHASE2_RECEIPT_APPLICATION_PATCH_PREFLIGHT_NO_APPROVAL_NO_LIVE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2131",
+      "scope": "CM-2030 Phase 8 receipt application patch preflight and completion-audit requirement",
+      "status": "COMPLETED_VALIDATED_PHASE8_RECEIPT_APPLICATION_PATCH_PREFLIGHT_NO_APPROVAL_NO_WRITE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2130",
+      "scope": "CM-2029 Phase 8 native write receipt bundle contract and completion-audit prerequisite",
+      "status": "COMPLETED_VALIDATED_PHASE8_NATIVE_WRITE_RECEIPT_BUNDLE_CONTRACT_NO_APPROVAL_NO_WRITE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2129",
+      "scope": "CM-2028 Phase 8 receipt audit intake completion-audit integration",
+      "status": "COMPLETED_VALIDATED_PHASE8_RECEIPT_AUDIT_INTAKE_COMPLETION_AUDIT_INTEGRATION_NO_APPROVAL_NO_WRITE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2128",
+      "scope": "CM-2027 Phase 8 native write receipt audit intake preflight contract",
+      "status": "COMPLETED_VALIDATED_PHASE8_NATIVE_WRITE_RECEIPT_AUDIT_INTAKE_PREFLIGHT_NO_APPROVAL_NO_WRITE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2127",
+      "scope": "CM-2026 Phase 9/10 external review evidence intake preflight contract",
+      "status": "COMPLETED_VALIDATED_EXTERNAL_REVIEW_EVIDENCE_INTAKE_PREFLIGHT_NO_REVIEW_ACCEPTANCE_NO_TAG_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2126",
+      "scope": "CM-2025 Phase 2 receipt audit intake preflight contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_RECEIPT_AUDIT_INTAKE_PREFLIGHT_NO_LIVE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2125",
+      "scope": "CM-2024 near-model-memory evidence trace matrix",
+      "status": "COMPLETED_VALIDATED_PLAN_PACK_EVIDENCE_TRACE_MATRIX_NO_LIVE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2124",
+      "scope": "CM-2023 Phase 2 completion audit receipt bundle integration",
+      "status": "COMPLETED_VALIDATED_PHASE2_COMPLETION_AUDIT_RECEIPT_BUNDLE_INTEGRATION_NO_LIVE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2123",
+      "scope": "CM-2022 Phase 2 native read proof receipt bundle contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_NATIVE_READ_PROOF_RECEIPT_BUNDLE_CONTRACT_NO_LIVE_NO_RECEIPT_APPLICATION_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2122",
+      "scope": "CM-2021 Phase 2 native read proof approval packet contract",
+      "status": "COMPLETED_VALIDATED_PHASE2_NATIVE_READ_PROOF_APPROVAL_PACKET_CONTRACT_NO_LIVE_NO_APPROVAL_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2121",
+      "scope": "CM-2020 Phase 2 native read proof readiness gate",
+      "status": "COMPLETED_VALIDATED_PHASE2_NATIVE_READ_PROOF_READINESS_GATE_NO_LIVE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2120",
+      "scope": "CM-2019 Phase 2 native read proof evidence gate",
+      "status": "COMPLETED_VALIDATED_PHASE2_NATIVE_READ_PROOF_EVIDENCE_GATE_NO_LIVE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2119",
+      "scope": "CM-2018 Phase 1 acceptance gate evidence",
+      "status": "COMPLETED_VALIDATED_PHASE1_TEST_ALL_AND_GATE_CI_PASS_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2118",
+      "scope": "CM-2017 near-model-memory plan pack completion audit",
+      "status": "COMPLETED_VALIDATED_PLAN_PACK_COMPLETION_AUDIT_INCOMPLETE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2117",
+      "scope": "CM-2016 release tag readiness policy gate",
+      "status": "COMPLETED_VALIDATED_RELEASE_TAG_READINESS_POLICY_GATE_NO_TAG_NO_RELEASE_NO_READY_CLAIM"
+    },
+    {
+      "id": "CMV-2116",
+      "scope": "CM-2015 default runtime policy observation gate",
+      "status": "COMPLETED_VALIDATED_DEFAULT_RUNTIME_POLICY_OBSERVATION_GATE_READ_CONTEXT_PROPOSAL_HOLD_NO_DEFAULT_WRITE_EXPANSION"
+    },
+    {
+      "id": "CMV-2115",
+      "scope": "CM-2014 real-root write readiness gate",
+      "status": "COMPLETED_VALIDATED_REAL_ROOT_WRITE_READINESS_GATE_NO_APPROVAL_NO_EXECUTION_NO_READINESS"
+    },
+    {
+      "id": "CMV-2114",
+      "scope": "CM-2013 native write contract preflight",
+      "status": "COMPLETED_VALIDATED_NATIVE_WRITE_CONTRACT_PREFLIGHT_NO_REAL_ROOT_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2113",
+      "scope": "CM-2012 operator-only full surface proof gate",
+      "status": "COMPLETED_VALIDATED_OPERATOR_ONLY_FULL_SURFACE_PROOF_GATE_NO_NATIVE_WRITE_NO_DEFAULT_EXPANSION"
+    },
+    {
+      "id": "CMV-2112",
+      "scope": "CM-2011 proposal-only memory delta MCP tool",
+      "status": "COMPLETED_VALIDATED_PROPOSE_MEMORY_DELTA_PROPOSAL_ONLY_NO_COMMIT_NO_WRITE_NO_NATIVE_DELEGATION"
+    },
+    {
+      "id": "CMV-2111",
+      "scope": "CM-2010 memory context recall quality gate fixture baseline",
+      "status": "COMPLETED_VALIDATED_MEMORY_CONTEXT_RECALL_QUALITY_GATE_FIXTURE_BASELINE_NO_LIVE_NO_WRITE_NO_READINESS"
+    },
+    {
+      "id": "CMV-2110",
+      "scope": "CM-2009 task-start memory context workflow wrapper",
+      "status": "COMPLETED_VALIDATED_TASK_START_MEMORY_CONTEXT_WORKFLOW_WRAPPER_LOCAL_READONLY"
+    },
+    {
+      "id": "CMV-2109",
+      "scope": "CM-2008 prepare_memory_context default read-only MVP",
+      "status": "COMPLETED_VALIDATED_PREPARE_MEMORY_CONTEXT_DEFAULT_READONLY_MVP_NO_WRITE_NO_NATIVE_DELEGATION"
+    },
+    {
+      "id": "CMV-2108",
+      "scope": "CM-2007 near-model-memory plan pack primary goal selection",
+      "status": "COMPLETED_VALIDATED_FULL_PLAN_PACK_PRIMARY_GOAL_RECORDED_NEXT_PHASE3_REUSES_EXISTING_RECALL_WRITE_PIPELINES"
+    },
     {
       "id": "CMV-2107",
       "scope": "CM-2006 trusted-full-read receipt closeout / route decision",
@@ -2994,6 +3576,7 @@
     }
   ],
   "notValidated": [
+    "independent tag push authorization",
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
     "live provider/API calls",
@@ -3029,7 +3612,7 @@
     "stage 3 production rollout evidence",
     "strict principal/scope production deployment control",
     "confirmed mutation",
-    "public MCP expansion beyond current seven-tool surface",
+    "public MCP expansion beyond current five-tool plan-pack default surface",
     "follow-up search validation for CM-1432 corrected write proof",
     "real query quality proof",
     "startup/watchdog warning source change",
@@ -3043,14 +3626,14 @@
   ],
   "constraints": {
     "claudeMdUntrackedUntouched": true,
-    "noProviderCalls": true,
+    "noProviderCalls": false,
     "noRawMemoryAccess": true,
     "noFullDailyNoteSync": true,
     "noAllDailyNoteRead": true,
     "noRawRagSync": true,
     "noRawVectorSync": true,
     "noRawPromptSync": true,
-    "noLiveVcpProof": true,
+    "noLiveVcpProof": false,
     "noEffectiveMemoryWrites": false,
     "noBearerTokenUse": true,
     "noPushWithoutExplicitAuthorization": true,

@@ -820,6 +820,14 @@ function normalizeExactApproval(exactApprovalResult, invocationProfile, scope, r
       exactApprovalResult.approved_runtime_target
   );
   const approvalRollbackPlanRef = normalizeApprovalRollbackPlanRef(exactApprovalResult);
+  const approvalDecisionReference = firstString(
+    exactApprovalResult.approvalDecisionReference,
+    exactApprovalResult.approval_decision_reference
+  );
+  const claimBindingHash = firstString(
+    exactApprovalResult.claimBindingHash,
+    exactApprovalResult.claim_binding_hash
+  );
   const forbiddenFields = collectForbiddenRuntimeTargetFields(exactApprovalResult);
 
   return {
@@ -837,6 +845,10 @@ function normalizeExactApproval(exactApprovalResult, invocationProfile, scope, r
     runtimeTargetPrimaryRuntimeAccepted: approvalRuntimeTarget.primaryRuntimeAccepted,
     rollbackPlanReferencePresent: approvalRollbackPlanRef.planReferencePresent,
     rollbackPlanReferenceSafe: approvalRollbackPlanRef.planReferenceSafe,
+    approvalDecisionReference: isSafeReferenceName(approvalDecisionReference)
+      ? approvalDecisionReference
+      : null,
+    claimBindingHash: /^[a-f0-9]{64}$/.test(claimBindingHash) ? claimBindingHash : null,
     forbiddenFieldCount: forbiddenFields.length
   };
 }
@@ -1069,6 +1081,8 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
       exact_approval_rollback_plan_reference_present: authority.writeAllowed ? exactApproval.rollbackPlanReferencePresent : false,
       exact_approval_rollback_plan_reference_safe: authority.writeAllowed ? exactApproval.rollbackPlanReferenceSafe : false,
       exact_approval_forbidden_field_count: authority.writeAllowed ? exactApproval.forbiddenFieldCount : 0,
+      exact_approval_decision_reference: authority.writeAllowed ? exactApproval.approvalDecisionReference : null,
+      exact_approval_claim_binding_hash: authority.writeAllowed ? exactApproval.claimBindingHash : null,
       disclosure_level: disclosureBudget.level,
       disclosure_max_items: disclosureBudget.maxItems,
       disclosure_max_bytes: disclosureBudget.maxBytes,

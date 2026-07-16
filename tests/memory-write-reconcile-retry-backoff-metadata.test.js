@@ -90,7 +90,7 @@ test('CM-1067 retry backoff helper does not start app worker or expand public to
   try {
     assert.ok(app.services.memoryWriteReconcileWorker);
     assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
-    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
   } finally {
     await app.close();
   }

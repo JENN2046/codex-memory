@@ -63,7 +63,7 @@ test('P16.2 fixture declares no-side-effect safety boundaries', () => {
   assert.equal(fixture.safety.providerCalls, 0);
   assert.equal(fixture.safety.durableMemoryTouched, false);
   assert.equal(fixture.safety.runtimeTuning, false);
-  assert.deepEqual(fixture.safety.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.safety.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.equal(fixture.safety.validateMemoryPublicTool, false);
 });
 

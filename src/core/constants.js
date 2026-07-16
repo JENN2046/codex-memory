@@ -131,6 +131,142 @@ const TOOL_DEFINITIONS = [
     }
   },
   {
+    name: 'prepare_memory_context',
+    title: 'Prepare Memory Context',
+    description: 'Build a read-only, low-disclosure task-start memory context package from bounded governed recall, overview, and audit projections. Does not perform durable mutation or production write.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        task: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            title: { type: 'string', maxLength: 300 },
+            user_request: { type: 'string', maxLength: 4000 },
+            project_id: { type: 'string', maxLength: 200 },
+            scope_id: { type: 'string', maxLength: 200 },
+            workspace_id: { type: 'string', maxLength: 200 },
+            client_id: { type: 'string', enum: CLIENT_ID_VALUES, maxLength: 200 },
+            visibility: { type: 'string', enum: VISIBILITY_VALUES, maxLength: 200 },
+            repo: { type: 'string', maxLength: 300 },
+            current_branch: { type: 'string', maxLength: 200 },
+            current_files: {
+              type: 'array',
+              items: { type: 'string', maxLength: 300 },
+              maxItems: 30
+            },
+            strict_scope: { type: 'boolean' }
+          }
+        },
+        options: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            max_items: { type: 'integer', minimum: 1, maximum: 10 },
+            max_bytes: { type: 'integer', minimum: 1200, maximum: 24000 },
+            include_risks: { type: 'boolean' },
+            include_user_preferences: { type: 'boolean' }
+          }
+        }
+      }
+    }
+  },
+  {
+    name: 'propose_memory_delta',
+    title: 'Propose Memory Delta',
+    description: 'Create a low-disclosure, proposal-only task-end memory delta package with staging, audit receipt, rollback posture, and operator-only commit contract draft. Does not perform durable mutation, provider call, production write, or public commit.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        task_id: { type: 'string', pattern: '^CM-[0-9]{4}$', maxLength: 40 },
+        task: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            task_id: { type: 'string', pattern: '^CM-[0-9]{4}$', maxLength: 40 },
+            title: { type: 'string', maxLength: 220 },
+            project_id: { type: 'string', maxLength: 200 },
+            workspace_id: { type: 'string', maxLength: 200 },
+            client_id: { type: 'string', enum: CLIENT_ID_VALUES, maxLength: 200 },
+            visibility: { type: 'string', enum: VISIBILITY_VALUES, maxLength: 200 }
+          }
+        },
+        evidence_refs: {
+          oneOf: [
+            { type: 'string', maxLength: 180 },
+            { type: 'array', items: { type: 'string', maxLength: 180 }, maxItems: 8 }
+          ]
+        },
+        candidates: {
+          type: 'array',
+          maxItems: 5,
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              target: { type: 'string', enum: ['process', 'knowledge'] },
+              intent: { type: 'string', minLength: 1, maxLength: 220 },
+              summary: { type: 'string', maxLength: 220 },
+              title: { type: 'string', maxLength: 220 },
+              evidence_refs: {
+                oneOf: [
+                  { type: 'string', maxLength: 160 },
+                  { type: 'array', items: { type: 'string', maxLength: 160 }, maxItems: 3 }
+                ]
+              },
+              tags: {
+                oneOf: [
+                  { type: 'string', maxLength: 60 },
+                  { type: 'array', items: { type: 'string', maxLength: 60 }, maxItems: 8 }
+                ]
+              },
+              reusable: { type: 'boolean' },
+              sensitivity: { type: 'string', maxLength: 80 }
+            }
+          }
+        },
+        candidate_memories: {
+          type: 'array',
+          maxItems: 5,
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              target: { type: 'string', enum: ['process', 'knowledge'] },
+              intent: { type: 'string', minLength: 1, maxLength: 220 },
+              summary: { type: 'string', maxLength: 220 },
+              title: { type: 'string', maxLength: 220 },
+              evidence_refs: {
+                oneOf: [
+                  { type: 'string', maxLength: 160 },
+                  { type: 'array', items: { type: 'string', maxLength: 160 }, maxItems: 3 }
+                ]
+              },
+              tags: {
+                oneOf: [
+                  { type: 'string', maxLength: 60 },
+                  { type: 'array', items: { type: 'string', maxLength: 60 }, maxItems: 8 }
+                ]
+              },
+              reusable: { type: 'boolean' },
+              sensitivity: { type: 'string', maxLength: 80 }
+            }
+          }
+        },
+        review_decision: { type: 'string', enum: ['accept', 'reject'] },
+        options: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            proposal_only: { type: 'boolean', enum: [true] }
+          }
+        }
+      }
+    }
+  },
+  {
     name: 'validate_memory',
     title: 'Validate Memory',
     description: 'Controlled mutation public MCP tool registered under exact approval. Public calls are dry-run bounded by default; confirmed durable mutation requires a separate exact mutation approval and is rejected on this public path.',

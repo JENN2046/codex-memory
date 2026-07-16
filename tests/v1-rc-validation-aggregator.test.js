@@ -141,7 +141,7 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.equal(fixture.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(fixture.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
   assert.equal(fixture.decision, 'NOT_READY_BLOCKED');
-  assert.deepEqual(fixture.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('decision contract includes blocked, partial, and ready labels without overclaiming readiness', () => {
@@ -719,8 +719,8 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
 test('public MCP tools remain exactly the frozen readonly audit tool contract', () => {
   const fixture = loadFixture();
 
-  assert.deepEqual(fixture.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
-  assert.deepEqual(fixture.public_mcp_tools.slice().sort(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+  assert.deepEqual(fixture.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.public_mcp_tools.slice().sort(), ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
 });
 
 test('fixture forbids fake quality, provider latency, raw workspace, and secret surfaces', () => {

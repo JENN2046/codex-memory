@@ -663,6 +663,15 @@ function buildLowDisclosureReceiptAuditEntry(input = {}) {
       : null,
     exactApprovalActionMatched: exactApprovalUntainted &&
       normalizeBoolean(request.exact_approval_action_matched),
+    exactApprovalDecisionReference: exactApprovalUntainted &&
+      isSafeReferenceName(request.exact_approval_decision_reference)
+      ? request.exact_approval_decision_reference
+      : null,
+    exactApprovalClaimBindingHash: exactApprovalUntainted &&
+      typeof request.exact_approval_claim_binding_hash === 'string' &&
+      /^[a-f0-9]{64}$/.test(request.exact_approval_claim_binding_hash)
+      ? request.exact_approval_claim_binding_hash
+      : null,
     exactApprovalScopeMatched: exactApprovalUntainted &&
       normalizeBoolean(request.exact_approval_scope_matched),
     exactApprovalRuntimeTargetMatched: exactApprovalUntainted &&

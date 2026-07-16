@@ -102,7 +102,7 @@ test('CM1587 runtime recall projection fixture preserves public MCP surface', ()
   const fixture = loadFixture();
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
-  assert.equal(TOOL_DEFINITIONS.length, 7);
+  assert.equal(TOOL_DEFINITIONS.length, 9);
 });
 
 test('CM1588 runtime recall projection output is deterministic internal no-op', () => {

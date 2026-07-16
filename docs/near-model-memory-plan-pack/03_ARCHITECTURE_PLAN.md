@@ -34,9 +34,9 @@ Codex task starts
   -> memory context package
   -> Codex executes task with injected context
   -> propose_memory_delta
-  -> approval / policy gate
-  -> commit_memory_delta
-  -> VCPToolBox native durable write
+  -> local staging / audit / policy gate
+  -> optional operator-approved commit_memory_delta
+  -> optional VCPToolBox native durable write
   -> verify_write
   -> audit receipt + rollback posture
 ```
@@ -48,15 +48,36 @@ Codex task starts
 | Codex | 执行任务、读取 memory context、提出 memory delta |
 | codex-memory MCP server | 对 Codex 暴露受治理 MCP surface |
 | codex-memory governance layer | client_id、scope、visibility、runtime、权限、披露预算、审计、回滚 |
+| existing local memory / SQLite shadow / vector index | fallback、audit、validation fixture、compatibility、offline continuity、context packaging 的本地支撑 |
+| KnowledgeBaseRecallPipeline / CandidateGenerator | `prepare_memory_context` 的主要召回与候选生成底座 |
+| TagMemoEngine / EPA / Residual Pyramid | experimental recall heuristics，只能辅助排序、分组、解释和 context packaging |
+| scope / lifecycle filters | 保证 context package 不跨 scope、不误用 tombstoned / superseded / rejected 记忆 |
+| AuditLogStore / MemoryOverviewService | 为 context package 提供审计、状态、概览和 source breakdown |
+| local write governance pipeline | `propose_memory_delta`、staging、audit 的底座，不是默认 production write |
 | VCP native shim / adapter | 把 codex-memory 调用转换成 VCPToolBox native memory 调用 |
 | VCPToolBox native memory | 原生记忆行为 owner，真正 source of truth |
-| local memory | fallback、audit、validation fixture、compatibility、offline continuity |
 
 ## 4. 必须新增的关键能力
 
 ### 4.1 `prepare_memory_context`
 
 不是普通搜索工具，而是任务前上下文构建器。
+
+它不从零开始实现召回。它应复用：
+
+- `KnowledgeBaseRecallPipeline`
+- `CandidateGenerator`
+- `TagMemoEngine`
+- local memory
+- SQLite shadow
+- vector index
+- scope filters
+- lifecycle filters
+- `AuditLogStore`
+- `MemoryOverviewService`
+
+核心动作是把 bounded search results 转换成 task-oriented memory context
+package。
 
 输入：
 
@@ -105,6 +126,16 @@ no durable mutation
 no production write
 ```
 
+实现应复用现有本地 write pipeline / write governance：
+
+- proposal construction
+- staging
+- validation
+- audit receipt
+- rollback posture metadata
+
+它不是默认生产写入路径。
+
 ### 4.3 `commit_memory_delta`
 
 operator-only / approval-only。
@@ -149,4 +180,7 @@ read proof 不是 write proof。
 search-shaped payload 不能冒充 overview/audit。
 operator-only 不是 default runtime。
 fallback 不是 native realtime。
+本地 recall/write pipeline 必须保留并复用。
+EPA / Residual Pyramid / TagMemo 高级叙事只是 experimental recall heuristics。
+VCPToolBox native memory 继续是最终 memory intelligence owner。
 ```

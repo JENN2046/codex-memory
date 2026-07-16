@@ -8,6 +8,8 @@
 让 Codex 通过 MCP、codex-memory 治理层和 VCPToolBox native memory runtime，获得接近模型内置记忆体验的外部长期记忆能力。
 ```
 
+这意味着完整实现本计划包，而不是只实现其中一个阶段。
+
 这个目标包含两层。
 
 ### 1.1 底座能力目标
@@ -64,7 +66,19 @@ Codex 在任务开始前自动获得当前应记得的 memory context package，
 把 fallback 伪装成 native realtime
 把 codex-memory 变成新的记忆智能 owner
 绕过 VCPToolBox native memory runtime
+重写一套 VCPToolBox 原生记忆智能
+把 EPA / Residual Pyramid / TagMemo 高级叙事包装成已验证生产智能
 ```
+
+本地记忆、SQLite shadow、向量索引、recall pipeline、write governance
+必须保留。它们的角色是 fallback、audit、validation fixture、
+compatibility、offline continuity、context packaging、proposal/staging。
+
+VCPToolBox native memory 继续是最终 memory intelligence owner。
+
+EPA / Residual Pyramid / TagMemo 高级叙事降级为 experimental recall
+heuristics；可以辅助 candidate ranking、grouping、explanation 和
+`prepare_memory_context`，但不能作为生产记忆智能声明。
 
 ## 3. 禁止声明
 

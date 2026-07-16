@@ -1,0 +1,86 @@
+{
+  "packetPayload": {
+    "schemaVersion": 1,
+    "taskId": "CM-2083",
+    "packetStatus": "ready_for_independent_tag_approval_review",
+    "candidate": {
+      "tag": "v0.2.0-readonly-context-rc",
+      "milestone": "readonly_context",
+      "targetCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+      "targetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33",
+      "sourceBranch": "codex/near-model-memory-frozen-replay-v2"
+    },
+    "bindings": {
+      "externalReviewDecisionReference": "CM-2080-ER-20260711-PASS-F440C1BD-2215BB33",
+      "completionAuditApplicationDecisionReference": "CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33",
+      "applicationRequestCommit": "88d11e94dc238145ba9317589cebda52f73910e1",
+      "completionAuditApplicationCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+      "canonicalPayloadSha256": "2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2",
+      "completionAuditApplicationReceiptPayloadSha256": "b74dd9ad7077754e98aaff266d62bd1a25223eb392d35108e5926a9eca16cfeb"
+    },
+    "releaseNotes": {
+      "sourceRef": "docs/near-model-memory-plan-pack/tag_candidate_release_notes_cm2083.md",
+      "bytes": 1582,
+      "sha256": "e429fe2a5cc537b2e168c531b79666b1cb5b1ec5bd5aaef26ec4cbab3ec5d90e",
+      "nonClaimsReviewed": true,
+      "capabilityClaims": []
+    },
+    "evidence": {
+      "phase1BlockersFixed": true,
+      "testAllPassed": true,
+      "gateCiPassed": true,
+      "defaultReadOnlySurfacePassed": true,
+      "nativeReadProofPassed": true,
+      "fallbackDistinctionPassed": true,
+      "prepareMemoryContextMvpPassed": true,
+      "recallQualityBaselinePassed": true,
+      "readmeNonClaimsPassed": true,
+      "releaseNoteNonClaimsReviewed": true,
+      "externalReviewEvidenceIntakePassed": true,
+      "externalReviewEvidenceBundleContractPassed": true,
+      "externalReviewEvidencePatchHardenedBundleBindingPassed": true,
+      "externalReviewEvidenceApplicationPatchPreflightPassed": true,
+      "externalReviewPassed": true
+    },
+    "currentDecisions": {
+      "externalReviewPassed": true,
+      "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
+      "tagApprovalPacketPassed": false,
+      "phase8NativeWriteAuthorizationGranted": false
+    },
+    "requestedDecision": {
+      "externalReviewPassed": true,
+      "externalReviewEvidenceBundleAppliedToCompletionAudit": true,
+      "tagApprovalPacketPassed": true,
+      "phase8NativeWriteAuthorizationGranted": false
+    },
+    "localPolicyGate": {
+      "status": "release_tag_readiness_policy_accepted",
+      "policyShapeAccepted": true,
+      "externalReviewEvidenceChainAccepted": true,
+      "tagApprovalPacketPassedByLocalPolicy": false,
+      "releaseReadyClaimed": false,
+      "rcReadyClaimed": false
+    },
+    "executionBoundaries": {
+      "independentTagApprovalDecisionRequired": true,
+      "packetApprovalDoesNotAuthorizeTagCreation": true,
+      "packetApprovalDoesNotAuthorizeTagPush": true,
+      "separateExactTagCreationAuthorizationRequired": true,
+      "separateExactTagPushAuthorizationRequired": true,
+      "tagCreated": false,
+      "tagPushed": false,
+      "releasePublished": false,
+      "deploymentTriggered": false,
+      "cutoverPerformed": false,
+      "phase8NativeWriteAuthorized": false,
+      "nativeMemoryWritePerformed": false,
+      "realMemoryReadOrModified": false,
+      "defaultMcpExpanded": false,
+      "commitMemoryDeltaPublic": false,
+      "readinessClaimed": false,
+      "fullPlanPackCompletedClaimed": false
+    }
+  },
+  "packetPayloadSha256": "c06836b4c9de74f8031cf665f050b9e1c668edfd2a1584a26713c28263c6aa43"
+}

@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2006 trusted-full-read receipt closeout / route decision`.
-Current validation: `CMV-2107`.
-Current status: CM-2006 closes out the CM-2005 low-disclosure trusted-full-read receipt. The CM-2005 bounded attempt completed with array/zero-item shape projection and read-shape unlocked true, while raw output persisted false, write counters zero, and readiness false. CM-2005 single-use authority is consumed and cannot be reused.
+Current task: `CM-2095 Phase 8 completion evidence application receipt`.
+Current validation: `CMV-2198`.
+Current status: Six supported fields and bundle application applied once; rollback/failure missing; Phase 8 incomplete; receipt review required.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,7 +37,9 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is local planning or a new exact boundary display if Jenn wants another bounded attempt or any broader inference from CM-2005. Do not reuse CM-2005 authority, retry trusted-full-read, generate request bodies or approval lines, call runtime/VCPToolBox, bind target material, disclose endpoint/locator/request/response/error/log/secret/private-memory/memory-id/raw-material values, write memory, mutate durable stores, expand public MCP, push/release/deploy/cutover, unlock M15/RC, or claim readiness without fresh exact authority.
+Next safe action is independent review of the CM-2095 application receipt. Do
+not replay the application or alter rollback/failure/Phase 8 completion fields;
+never perform an additional native action.
 
 ## Historical Run Notes
 

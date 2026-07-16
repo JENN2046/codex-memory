@@ -81,6 +81,16 @@ stale cleanup 不会误删新 owner lock。
 新增 prepare_memory_context，让 Codex 任务前自动获得当前应记得的上下文包。
 ```
 
+实现原则：
+
+```text
+不从零实现召回。
+复用现有 KnowledgeBaseRecallPipeline、CandidateGenerator、TagMemoEngine、
+scope/lifecycle filters、SQLite shadow、vector index、AuditLogStore、
+MemoryOverviewService，把 bounded search results 转换成 task-oriented
+memory context package。
+```
+
 新增工具：
 
 - `prepare_memory_context`
@@ -138,6 +148,14 @@ no durable mutation
 
 ```text
 任务结束后生成建议沉淀内容，但不默认写入生产。
+```
+
+实现原则：
+
+```text
+复用现有本地 write pipeline / write governance 做 proposal、staging、
+validation、audit receipt 和 rollback posture metadata。
+本阶段不是默认 production write。
 ```
 
 新增工具：

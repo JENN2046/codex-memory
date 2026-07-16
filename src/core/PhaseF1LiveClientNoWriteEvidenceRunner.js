@@ -6,6 +6,8 @@ const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const REQUIRED_PUBLIC_TOOLS = Object.freeze([
   'audit_memory',
   'memory_overview',
+  'prepare_memory_context',
+  'propose_memory_delta',
   'record_memory',
   'search_memory',
   'supersede_memory',

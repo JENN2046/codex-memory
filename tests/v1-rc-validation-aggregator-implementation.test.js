@@ -2786,7 +2786,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
 test('minimal implementation preserves public MCP readonly audit tool freeze', () => {
   const report = buildV1RcValidationAggregatorReport();
 
-  assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('validation aggregator rejects serialized runtime evidence summary without same-process brand', () => {
@@ -4750,7 +4750,7 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
-  assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('validation evidence reader exposes only explicit committed and local validation inputs', () => {

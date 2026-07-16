@@ -7,7 +7,7 @@ const fixturePath = path.join(__dirname, 'fixtures', 'memory-governance-lifecycl
 const fixtureText = fs.readFileSync(fixturePath, 'utf8');
 const fixture = JSON.parse(fixtureText);
 
-const PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
+const PUBLIC_MCP_TOOLS = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 const REQUIRED_TOP_LEVEL_FIELDS = [
   'acceptedForPlanning',

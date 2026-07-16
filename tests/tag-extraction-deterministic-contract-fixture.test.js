@@ -287,7 +287,7 @@ test('CM1552 fixture declares fixture-only boundaries and seven public tools', (
   assert.equal(fixture.safety.completeV8Claimed, false);
   assert.equal(fixture.safety.runtimeRankingChanged, false);
   assert.deepEqual(sorted(publicToolNames()), sorted(fixture.safety.publicMcpTools));
-  assert.equal(publicToolNames().length, 7);
+  assert.equal(publicToolNames().length, fixture.safety.publicMcpTools.length);
 });
 
 test('CM1552 inputs use only bounded memory text and metadata projection', () => {

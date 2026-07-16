@@ -37,6 +37,9 @@ Codex must have governed access to VCPToolBox native memory for:
 VCPToolBox native memory remains the source of truth and behavior owner.
 `codex-memory` must not become a competing memory intelligence owner.
 
+The active target is complete implementation of the imported near-model-memory
+plan pack, not only one phase of it.
+
 ## Experience Goal
 
 Codex should receive a task-start memory context package before meaningful
@@ -58,6 +61,21 @@ The intended experience is not "the user asks Codex to search memory." The
 intended experience is that Codex starts each task already carrying the relevant
 governed memory context.
 
+`prepare_memory_context` should reuse the existing local recall stack instead
+of starting from zero:
+
+- `KnowledgeBaseRecallPipeline`
+- `CandidateGenerator`
+- `TagMemoEngine`
+- scope and lifecycle filters
+- SQLite shadow
+- vector index
+- `AuditLogStore`
+- `MemoryOverviewService`
+
+Its job is to transform bounded search results and support projections into a
+task-oriented context package.
+
 ## Local Memory Role
 
 Local memory is auxiliary only:
@@ -67,9 +85,19 @@ Local memory is auxiliary only:
 - validation fixture
 - compatibility
 - offline continuity
+- context packaging
+- proposal/staging
 
 Fallback must always be marked as fallback. It must never be presented as native
 realtime VCPToolBox memory.
+
+The local write pipeline and write governance are retained for
+`propose_memory_delta`, staging, validation, and audit. They are not default
+production write.
+
+EPA, Residual Pyramid, and advanced TagMemo narratives are experimental recall
+heuristics. They may assist ranking, grouping, explanation, and context
+packaging, but they are not production memory intelligence claims.
 
 ## Success Standard
 

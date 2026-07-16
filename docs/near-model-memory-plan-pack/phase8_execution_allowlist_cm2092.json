@@ -1,0 +1,22 @@
+{
+  "nativeWriteTools": ["record_memory"],
+  "nativeWriteActions": ["live_bridge_record_memory_proof"],
+  "maxNativeWrites": 1,
+  "verifySurface": "verifyPhase8NativeWriteAuditProjection",
+  "verifyTool": "audit_memory",
+  "verifyAuditFamily": "governance",
+  "verifyWindow": 10,
+  "selectedFieldsOnly": true,
+  "maxVerifyOperations": 1,
+  "rollbackOrCompensationActions": [],
+  "maxRollbackOrCompensationOperations": 0,
+  "localFallbackWriteAllowed": false,
+  "automaticRetryAllowed": false,
+  "automaticRollbackAllowed": false,
+  "existingMemoryModificationAllowed": false,
+  "rawPrivateMemoryAccessAllowed": false,
+  "defaultMcpExpansionAllowed": false,
+  "remoteGitActionsAllowed": false,
+  "releaseDeployCutoverAllowed": false,
+  "readinessClaimAllowed": false
+}

@@ -4,7 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p66-validation-aggregator-governance-runtime-lo
 const EXPECTED_POLICY_VERSION = 'p66-validation-aggregator-governance-runtime-loop-gap-fixture-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p66-validation-aggregator-governance-runtime-loop-gap-fixture-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const REQUIRED_STAGE_IDS = Object.freeze([
   'review_packet_intake',

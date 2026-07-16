@@ -1,0 +1,42 @@
+{
+  "receiptPayload": {
+    "schemaVersion": 1,
+    "taskId": "CM-2085",
+    "authorizationDecisionReference": "CM-2084-ER-20260711-LOCAL-ANNOTATED-TAG-CREATE-C06836B4",
+    "authorizationUseCount": 1,
+    "authorizationConsumed": true,
+    "tag": {
+      "name": "v0.2.0-readonly-context-rc",
+      "objectType": "tag",
+      "tagObjectOid": "baf7eccee586979c08a6f63eead3c8e581d55e3c",
+      "signed": false,
+      "annotation": "codex-memory readonly-context RC candidate; not RC_READY; no release authorization",
+      "peeledCommit": "170ee33963cd0a41565625b41418d12702dd221b",
+      "targetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33"
+    },
+    "binding": {
+      "packetPayloadSha256": "c06836b4c9de74f8031cf665f050b9e1c668edfd2a1584a26713c28263c6aa43",
+      "tagApprovalDecisionReference": "CM-2083-ER-20260711-TAG-PACKET-PASS-C06836B4"
+    },
+    "boundaries": {
+      "tagPushAuthorized": false,
+      "tagPushed": false,
+      "branchPushAuthorized": false,
+      "branchPushed": false,
+      "releaseCreated": false,
+      "releasePublished": false,
+      "packagePublished": false,
+      "deploymentTriggered": false,
+      "cutoverPerformed": false,
+      "phase8NativeWriteAuthorized": false,
+      "nativeMemoryWritePerformed": false,
+      "realMemoryReadOrModified": false,
+      "defaultMcpExpanded": false,
+      "commitMemoryDeltaPublic": false,
+      "readinessClaimed": false,
+      "fullPlanPackCompletedClaimed": false,
+      "remoteActionPerformed": false
+    }
+  },
+  "receiptPayloadSha256": "b6c2a597f109ca4a17f10dde88d505f81caf892ee607eb35b562693e77e7d3d0"
+}

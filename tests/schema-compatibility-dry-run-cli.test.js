@@ -52,7 +52,7 @@ test('schema compatibility dry-run CLI preserves current bounded public MCP surf
   const report = parseJsonResult(runCli(['--json']));
 
   assert.equal(report.publicMcpTools.frozen, true);
-  assert.deepEqual(report.publicMcpTools.tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(report.publicMcpTools.tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
   assert.equal(report.safety.publicMcpExpanded, false);
 });
 

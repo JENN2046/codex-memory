@@ -158,6 +158,15 @@ no durable mutation
 
 ### P3-T2：实现 context package builder
 
+实现要求：
+
+```text
+不要从零重写召回。
+复用 KnowledgeBaseRecallPipeline、CandidateGenerator、TagMemoEngine、
+scope/lifecycle filters、SQLite shadow、vector index、AuditLogStore、
+MemoryOverviewService。
+```
+
 输入：
 
 ```text
@@ -168,6 +177,12 @@ task title / request / project / workspace / client / visibility
 
 ```text
 must_know / decisions / state / blockers / risks / forbidden assumptions / next step / audit
+```
+
+核心转换：
+
+```text
+bounded search results -> task-oriented memory context package
 ```
 
 ### P3-T3：测试

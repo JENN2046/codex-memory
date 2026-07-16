@@ -724,6 +724,14 @@ function exactApprovalResultForTool(toolName, requestContext = {}) {
     value !== undefined && typeof value !== 'string'
   );
   const rollbackPlanRefUnsafe = rollbackPlanRef !== '' && !isSafeReferenceName(rollbackPlanRef);
+  const approvalDecisionReference = safeReferenceOrNull(firstString(
+    approval.approvalDecisionReference,
+    approval.approval_decision_reference,
+    approval.approvalId,
+    approval.approval_id
+  ));
+  const claimBindingHash = firstString(approval.claimBindingHash, approval.claim_binding_hash);
+  const safeClaimBindingHash = /^[a-f0-9]{64}$/.test(claimBindingHash) ? claimBindingHash : null;
 
   return {
     accepted: approval.accepted === true &&
@@ -746,7 +754,9 @@ function exactApprovalResultForTool(toolName, requestContext = {}) {
         : exactApprovalRuntimeTargetProjection(runtimeTarget),
     ...(!approvalHasForbiddenField && !rollbackPlanRefMalformed && rollbackPlanRef ? {
       rollbackPlanRef: rollbackPlanRefUnsafe ? '' : rollbackPlanRef
-    } : {})
+    } : {}),
+    ...(approvalDecisionReference ? { approvalDecisionReference } : {}),
+    ...(safeClaimBindingHash ? { claimBindingHash: safeClaimBindingHash } : {})
   };
 }
 

@@ -49,7 +49,18 @@ function receiptAwareNativeToolCaller(caller) {
   Object.assign(wrapped, caller);
   wrapped.callWithReceipt = async payload => ({
     value: await caller(payload),
-    receipt: nativeInvocationReceiptForPayload(payload)
+    receipt: nativeInvocationReceiptForPayload(payload, {
+      ...(payload.toolName === 'record_memory' ||
+      payload.toolName === 'tombstone_memory' ||
+      payload.toolName === 'supersede_memory'
+        ? {
+            nativeRuntimeReceipt: {
+              memoryWritePerformed: true,
+              durableWritePerformed: true
+            }
+          }
+        : {})
+    })
   });
   return wrapped;
 }
@@ -102,7 +113,7 @@ test('codex-memory MCP should initialize a session and expose expected server in
     assert.ok(result.sessionId);
     assert.equal(result.response.result.protocolVersion, '2025-06-18');
     assert.equal(result.response.result.serverInfo.name, 'vcp_codex_memory');
-    assert.match(result.response.result.instructions, /read-only by default/);
+    assert.match(result.response.result.instructions, /read-only plus proposal-only by default/);
     assert.match(result.response.result.instructions, /params\._meta\.codexMemoryGovernance/);
     assert.equal(
       result.response.result._meta.codexMemoryGovernedBridge.productGoal.primaryRuntime,
@@ -613,7 +624,7 @@ test('governed native bridge tool metadata sanitizes unsafe runtime target confi
   assert.equal(serialized.includes('SECRET_SOURCE_SHOULD_NOT_ECHO'), false);
 });
 
-test('codex-memory MCP defaults to read-only public surface', async () => {
+test('codex-memory MCP defaults to read-only plus proposal-only public surface', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
     const list = await server.handleJsonRpc({
@@ -624,7 +635,83 @@ test('codex-memory MCP defaults to read-only public surface', async () => {
     });
     assert.deepEqual(
       list.response.result.tools.map(tool => tool.name).sort(),
-      ['audit_memory', 'memory_overview', 'search_memory']
+      ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'search_memory']
+    );
+    const prepareMemoryContext = list.response.result.tools.find(tool =>
+      tool.name === 'prepare_memory_context'
+    );
+    assert.ok(prepareMemoryContext.inputSchema.properties.task.properties.scope_id);
+
+    const contextPackage = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'prepare_memory_context',
+        arguments: {
+          task: {
+            title: 'Default read-only context smoke',
+            user_request: 'Build a task-start memory package without mutation.',
+            project_id: 'codex-memory',
+            scope_id: 'scope-default-smoke',
+            client_id: 'codex',
+            visibility: 'project'
+          },
+          options: {
+            max_items: 2,
+            max_bytes: 6000
+          }
+        }
+      }
+    });
+
+    assert.equal(contextPackage.response.result.isError, false);
+    assert.equal(
+      contextPackage.response.result.structuredContent.access.mode,
+      'prepare_memory_context_readonly'
+    );
+    assert.equal(
+      contextPackage.response.result.structuredContent.access.durableMutationPerformed,
+      false
+    );
+
+    const proposal = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'tools/call',
+      params: {
+        name: 'propose_memory_delta',
+        arguments: {
+          task_id: 'CM-2011',
+          task: {
+            title: 'Default proposal-only delta smoke',
+            project_id: 'codex-memory',
+            client_id: 'codex',
+            visibility: 'project'
+          },
+          evidence_refs: ['tests/mcp-contract.test.js'],
+          candidates: [{
+            target: 'process',
+            intent: 'propose_memory_delta is exposed as proposal-only by default.',
+            evidence_refs: ['default MCP surface contract test'],
+            tags: ['proposal-only']
+          }]
+        }
+      }
+    });
+
+    assert.equal(proposal.response.result.isError, false);
+    assert.equal(
+      proposal.response.result.structuredContent.status,
+      'PROPOSE_MEMORY_DELTA_ACCEPTED'
+    );
+    assert.equal(
+      proposal.response.result.structuredContent.access.memoryWritten,
+      false
+    );
+    assert.equal(
+      proposal.response.result.structuredContent.commit_contract.public_mcp_registered,
+      false
     );
 
     const hiddenWrite = await server.handleJsonRpc({
@@ -649,6 +736,138 @@ test('codex-memory MCP defaults to read-only public surface', async () => {
   });
 });
 
+test('prepare_memory_context preserves useful low-disclosure metadata without raw candidate fields', async () => {
+  await withApp(async ({ app }) => {
+    let searchOptions = null;
+    app.services.passiveRecallService.search = async options => {
+      searchOptions = options;
+      return [
+        {
+          target: 'process',
+          score: 0.9,
+          matchedTags: ['blocker-policy', 'governance'],
+          sourceKinds: ['synthetic-metadata'],
+          updatedAt: new Date().toISOString(),
+          title: 'private raw title must not escape',
+          snippet: 'private raw snippet must not escape',
+          text: 'private raw text must not escape',
+          content: 'private raw content must not escape',
+          sourceFile: 'private/source.md',
+          memoryId: 'private-memory-id'
+        },
+        {
+          target: 'process',
+          score: 0.8,
+          coreTags: ['decision-approved'],
+          sourceKinds: ['synthetic-metadata'],
+          updatedAt: new Date().toISOString(),
+          title: 'second private title 8675309'
+        }
+      ];
+    };
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Metadata-only context package',
+        user_request: 'Use bounded recall without raw memory fields.'
+      },
+      options: {
+        max_items: 2,
+        max_bytes: 6000
+      }
+    });
+    const serialized = JSON.stringify(result);
+
+    assert.equal(searchOptions.readOnly, true);
+    assert.equal(searchOptions.noRawContentRead, true);
+    assert.equal(searchOptions.includeContent, false);
+    assert.equal(result.access.rawMemoryReturned, false);
+    assert.equal(result.memory_context_package.blockers.length, 1);
+    assert.equal(result.memory_context_package.blockers[0].freshness, 'recent');
+    assert.match(result.memory_context_package.blockers[0].statement, /blocker-policy/);
+    assert.equal(result.memory_context_package.recent_decisions.length, 1);
+    assert.match(result.memory_context_package.recent_decisions[0].statement, /decision-approved/);
+    assert.doesNotMatch(serialized, /"matchedTags"|"coreTags"|"createdAt"|"updatedAt"/);
+    assert.doesNotMatch(serialized, /private raw title|second private title|private raw snippet|private raw text|private raw content|private\/source|private-memory-id/);
+  });
+});
+
+test('prepare_memory_context preserves title-only recall semantics through the real metadata projection', async () => {
+  await withApp(async ({ app }) => {
+    app.services.passiveRecallService.search = async () => [
+      {
+        target: 'process',
+        score: 0.9,
+        titleHitCount: 1,
+        sourceKinds: ['synthetic-metadata'],
+        updatedAt: new Date().toISOString(),
+        title: 'Blocker: private transport detail must not escape'
+      },
+      {
+        target: 'process',
+        score: 0.8,
+        titleHitCount: 1,
+        sourceKinds: ['synthetic-metadata'],
+        updatedAt: new Date().toISOString(),
+        title: 'Decision: private approval detail 8675309'
+      }
+    ];
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Projected context semantics',
+        user_request: 'Preserve low-disclosure blocker and decision signals.'
+      },
+      options: {
+        max_items: 2,
+        max_bytes: 6000
+      }
+    });
+    const serialized = JSON.stringify(result);
+
+    assert.equal(result.memory_context_package.blockers.length, 1);
+    assert.match(result.memory_context_package.blockers[0].statement, /blocker signal/i);
+    assert.equal(result.memory_context_package.blockers[0].freshness, 'recent');
+    assert.deepEqual(result.memory_context_package.blockers[0].reason_codes, ['title_match']);
+    assert.equal(result.memory_context_package.recent_decisions.length, 1);
+    assert.match(result.memory_context_package.recent_decisions[0].statement, /decision signal/i);
+    assert.equal(result.memory_context_package.recent_decisions[0].freshness, 'recent');
+    assert.deepEqual(result.memory_context_package.recent_decisions[0].reason_codes, ['title_match']);
+    assert.doesNotMatch(serialized, /private transport detail|private approval detail/);
+    assert.doesNotMatch(serialized, /"title"|"snippet"|"text"|"content"/);
+  });
+});
+
+test('prepare_memory_context forwards scope_id into the real app recall boundary', async () => {
+  await withApp(async ({ app }) => {
+    let searchOptions = null;
+    app.services.passiveRecallService.search = async options => {
+      searchOptions = options;
+      return [];
+    };
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Scope-isolated context package',
+        project_id: 'codex-memory',
+        scope_id: 'scope-metadata-only',
+        workspace_id: 'workspace-alpha',
+        client_id: 'codex',
+        visibility: 'project'
+      },
+      options: {
+        max_items: 2,
+        max_bytes: 6000
+      }
+    });
+
+    assert.equal(result.accepted, true);
+    assert.equal(searchOptions.candidateFilters.scopeId, 'scope-metadata-only');
+    assert.equal(searchOptions.auditContext.scope.scopeIdPresent, true);
+    assert.equal(searchOptions.auditContext.scope.scopeStrict, true);
+  });
+});
+
 test('hardened MCP surface ignores explicit public tool names defensively', async () => {
   const config = {
     securityProfile: 'hardened',
@@ -659,7 +878,7 @@ test('hardened MCP surface ignores explicit public tool names defensively', asyn
   };
   assert.deepEqual(
     getPublicToolDefinitions(config).map(tool => tool.name).sort(),
-    ['audit_memory', 'memory_overview', 'search_memory']
+    ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'search_memory']
   );
 
   const server = new CodexMemoryMcpServer({
@@ -709,7 +928,7 @@ test('codex-memory MCP full surface can execute record/search/overview', async (
       method: 'tools/list',
       params: {}
     }, requestContext);
-    assert.equal(list.response.result.tools.length, 7);
+    assert.equal(list.response.result.tools.length, 9);
 
     const recordProcess = await server.handleJsonRpc({
       jsonrpc: '2.0',
@@ -801,7 +1020,7 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
       jsonrpc: '2.0', id: 1, method: 'tools/list', params: {}
     });
     const tools = list.response.result.tools;
-    assert.deepEqual(tools.map(tool => tool.name).sort(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+    assert.deepEqual(tools.map(tool => tool.name).sort(), ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
     const recordMemory = tools.find(t => t.name === 'record_memory');
     assert.ok(recordMemory);
     const schema = recordMemory.inputSchema;
@@ -1925,6 +2144,30 @@ test('MCP runtime schema validation should reject invalid scope with -32602', as
   });
 });
 
+test('MCP runtime schema validation rejects invalid proposal task_id patterns before normalization', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 13,
+      method: 'tools/call',
+      params: {
+        name: 'propose_memory_delta',
+        arguments: {
+          task_id: 'BAD',
+          candidates: [{
+            target: 'process',
+            intent: 'This proposal must not be attributed to a default task.'
+          }]
+        }
+      }
+    });
+
+    assert.equal(result.response.error.code, -32602);
+    assert.match(result.response.error.data, /task_id/);
+  });
+});
+
 test('MCP governed metadata parser projects only approved request context fields', () => {
   const result = buildGovernedMcpRequestContextFromParams({
     _meta: {
@@ -1946,7 +2189,9 @@ test('MCP governed metadata parser projects only approved request context fields
           },
           rollbackPosture: {
             rollback_plan_ref: 'cm-governed-write-rollback-plan'
-          }
+          },
+          approvalDecisionReference: 'CM-TEST-EXACT-APPROVAL-001',
+          claimBindingHash: 'a'.repeat(64)
         },
         rollbackPosture: {
           mode: 'bounded_rollback_plan',
@@ -1993,6 +2238,8 @@ test('MCP governed metadata parser projects only approved request context fields
     primaryRuntime: 'VCPToolBox native memory'
   });
   assert.equal(result.requestContext.exactApprovalResult.rollbackPlanRef, 'cm-governed-write-rollback-plan');
+  assert.equal(result.requestContext.exactApprovalResult.approvalDecisionReference, 'CM-TEST-EXACT-APPROVAL-001');
+  assert.equal(result.requestContext.exactApprovalResult.claimBindingHash, 'a'.repeat(64));
   assert.equal(result.requestContext.rollbackPosture.rollback_plan_ref, 'cm-governed-write-rollback-plan');
   assert.equal(result.requestContext.auditReceipt.receipt_id, 'cm-governed-write-receipt');
   assert.deepEqual(result.requestContext.outputDisclosureBudget, {
@@ -2005,6 +2252,30 @@ test('MCP governed metadata parser projects only approved request context fields
   assert.equal(result.requestContext.trustedExecutionContext.executionContext.agentAlias, 'Codex');
   assert.equal(result.requestContext.trustedExecutionContext.executionContext.scopeId, 'scope-alpha');
   assert.equal(serialized.includes('RAW_PRIVATE_VALUE_SHOULD_NOT_COPY'), false);
+});
+
+test('MCP governed metadata parser rejects invalid exact approval receipt bindings', () => {
+  const result = buildGovernedMcpRequestContextFromParams({
+    _meta: {
+      codexMemoryGovernance: {
+        exactApprovalResult: {
+          accepted: true,
+          approvalDecisionReference: 'https://PRIVATE_APPROVAL_REFERENCE_SHOULD_NOT_COPY',
+          claimBindingHash: 'NOT-A-LOWERCASE-SHA256'
+        }
+      }
+    }
+  });
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, false);
+  assert.deepEqual(result.invalidFields, [
+    'exactApprovalResult.approvalDecisionReference',
+    'exactApprovalResult.claimBindingHash'
+  ]);
+  assert.deepEqual(result.requestContext, {});
+  assert.equal(serialized.includes('PRIVATE_APPROVAL_REFERENCE_SHOULD_NOT_COPY'), false);
+  assert.equal(serialized.includes('NOT-A-LOWERCASE-SHA256'), false);
 });
 
 test('MCP governed metadata parser rejects unsafe output disclosure budget without partial context', () => {
@@ -2565,7 +2836,9 @@ test('MCP tools/call can carry governed metadata to primary native write delegat
                 targetKind: 'mcp_server',
                 primaryRuntime: 'VCPToolBox native memory'
               },
-              rollbackPlanRef: 'cm-governed-write-rollback-plan'
+              rollbackPlanRef: 'cm-governed-write-rollback-plan',
+              approvalDecisionReference: 'CM-TEST-MCP-PHASE8-APPROVAL-001',
+              claimBindingHash: 'b'.repeat(64)
             },
             rollbackPosture: {
               mode: 'bounded_rollback_plan',
@@ -2597,6 +2870,10 @@ test('MCP tools/call can carry governed metadata to primary native write delegat
     });
     const payload = result.response.result.structuredContent;
     const serializedResponse = JSON.stringify(result.response);
+    const auditEntries = await app.stores.auditLogStore.readRecentWriteAudit();
+    const bridgeAuditEntry = auditEntries.find(entry =>
+      entry.eventType === 'governed_mcp_vcp_native_bridge_receipt'
+    );
 
     assert.equal(localWrites, 0);
     assert.equal(nativeCall.toolName, 'record_memory');
@@ -2605,6 +2882,15 @@ test('MCP tools/call can carry governed metadata to primary native write delegat
     assert.equal(nativeCall.arguments.governed_bridge.exact_approval_scope_matched, true);
     assert.equal(nativeCall.arguments.governed_bridge.exact_approval_runtime_target_matched, true);
     assert.equal(nativeCall.arguments.governed_bridge.exact_approval_rollback_plan_matched, true);
+    assert.equal(nativeCall.arguments.governed_bridge.exact_approval_decision_reference, 'CM-TEST-MCP-PHASE8-APPROVAL-001');
+    assert.equal(nativeCall.arguments.governed_bridge.exact_approval_claim_binding_hash, 'b'.repeat(64));
+    assert.equal(
+      nativeCall.governanceMeta.exactApprovalResult.approvalDecisionReference,
+      'CM-TEST-MCP-PHASE8-APPROVAL-001'
+    );
+    assert.equal(nativeCall.governanceMeta.exactApprovalResult.claimBindingHash, 'b'.repeat(64));
+    assert.equal(bridgeAuditEntry.exactApprovalDecisionReference, 'CM-TEST-MCP-PHASE8-APPROVAL-001');
+    assert.equal(bridgeAuditEntry.exactApprovalClaimBindingHash, 'b'.repeat(64));
     assert.equal(nativeCall.arguments.governed_bridge.disclosure_level, 'metadata');
     assert.equal(nativeCall.arguments.governed_bridge.disclosure_max_items, 2);
     assert.equal(nativeCall.arguments.governed_bridge.disclosure_max_bytes, 512);
@@ -3063,6 +3349,61 @@ test('MCP search_memory timeout should abort before post-timeout read-policy aud
     enableLifecycleReadPolicy: true,
     searchMemoryTimeoutMs: 5
   });
+});
+
+test('MCP prepare_memory_context recall uses the configured search timeout and abort signal', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    let receivedSignal = false;
+    let overviewCalls = 0;
+    let auditCalls = 0;
+
+    app.services.passiveRecallService.search = async ({ signal }) => {
+      receivedSignal = !!signal;
+      return new Promise(resolve => {
+        signal.addEventListener('abort', () => {
+          setTimeout(() => resolve([]), 10);
+        }, { once: true });
+      });
+    };
+    app.services.overviewService.getAuthenticatedBoundedOverview = async () => {
+      overviewCalls += 1;
+      return {};
+    };
+    app.services.auditMemoryReadonlyService.run = async () => {
+      auditCalls += 1;
+      return {};
+    };
+
+    const startedAt = Date.now();
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 15,
+      method: 'tools/call',
+      params: {
+        name: 'prepare_memory_context',
+        arguments: {
+          task: {
+            title: 'Timeout context package',
+            user_request: 'Recall must not pin the MCP session SHOULD_NOT_LEAK_0562.'
+          }
+        }
+      }
+    });
+    const elapsedMs = Date.now() - startedAt;
+    await new Promise(resolve => setTimeout(resolve, 50));
+    const serialized = JSON.stringify(result.response);
+
+    assert.equal(receivedSignal, true);
+    assert.equal(overviewCalls, 0);
+    assert.equal(auditCalls, 0);
+    assert.equal(result.response.error.code, -32002);
+    assert.equal(result.response.error.message, 'Search memory timeout');
+    assert.equal(result.response.error.data.code, 'SEARCH_MEMORY_TIMEOUT');
+    assert.equal(result.response.error.data.timeoutMs, 5);
+    assert.ok(elapsedMs < 1000);
+    assert.doesNotMatch(serialized, /SHOULD_NOT_LEAK_0562/);
+  }, { searchMemoryTimeoutMs: 5 });
 });
 
 test('MCP schema contract should expose scope in search_memory', async () => {

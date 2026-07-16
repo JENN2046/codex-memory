@@ -90,7 +90,7 @@ test('CM1596 dry-run adapter preserves seven-tool public MCP surface', () => {
   const fixture = loadFixture();
 
   assert.deepEqual(sorted(TOOL_DEFINITIONS.map(tool => tool.name)), sorted(fixture.expectedPublicTools));
-  assert.equal(TOOL_DEFINITIONS.length, 7);
+  assert.equal(TOOL_DEFINITIONS.length, 9);
 });
 
 test('CM1596 dry-run adapter produces deterministic plans for fixture cases', () => {

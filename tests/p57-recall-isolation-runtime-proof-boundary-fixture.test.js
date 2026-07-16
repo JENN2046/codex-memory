@@ -5,7 +5,7 @@ const test = require('node:test');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'p57-recall-isolation-runtime-proof-boundary-v1.json');
 
-const expectedPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
+const expectedPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 const expectedSourceEvidenceIds = [
   'p38_recall_isolation_fixture',

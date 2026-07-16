@@ -87,7 +87,7 @@ test('CM-1035 internal write reconcile service is app-mounted without public MCP
   try {
     assert.ok(app.services.memoryWriteReconcileService);
     assert.equal(typeof app.services.memoryWriteReconcileService.replayPending, 'function');
-    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+    assert.deepEqual(publicToolNames(), ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
     await assert.rejects(
       () => app.callTool('memory_write_reconcile', {}),
       /Unknown tool: memory_write_reconcile/

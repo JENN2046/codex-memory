@@ -41,7 +41,7 @@ function buildInput(patch = {}) {
     expectedBaselineCommit: 'bcce0ba000000000000000000000000000000000',
     expectedSourceRegistryVersion: 'p66-source-registry-proof-v1',
     validationAggregatorFullImplementation: false,
-    publicMcpTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
+    publicMcpTools: ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'],
     evidenceRecords: [
       buildEvidenceRecord()
     ],

@@ -10,6 +10,8 @@
     "search_memory",
     "memory_overview",
     "audit_memory",
+    "prepare_memory_context",
+    "propose_memory_delta",
     "validate_memory",
     "tombstone_memory",
     "supersede_memory"
@@ -88,8 +90,14 @@
       "requiresReason": true,
       "requiresEvidence": true,
       "allowedLifecycleTransitions": [
-        { "from": "active", "to": "superseded" },
-        { "from": "stale", "to": "superseded" }
+        {
+          "from": "active",
+          "to": "superseded"
+        },
+        {
+          "from": "stale",
+          "to": "superseded"
+        }
       ],
       "forbiddenActions": [
         "missing_supersedes_link",
@@ -137,11 +145,26 @@
       "requiresReason": true,
       "requiresEvidence": true,
       "allowedLifecycleTransitions": [
-        { "from": "proposal", "to": "tombstoned" },
-        { "from": "active", "to": "tombstoned" },
-        { "from": "stale", "to": "tombstoned" },
-        { "from": "superseded", "to": "tombstoned" },
-        { "from": "rejected", "to": "tombstoned" }
+        {
+          "from": "proposal",
+          "to": "tombstoned"
+        },
+        {
+          "from": "active",
+          "to": "tombstoned"
+        },
+        {
+          "from": "stale",
+          "to": "tombstoned"
+        },
+        {
+          "from": "superseded",
+          "to": "tombstoned"
+        },
+        {
+          "from": "rejected",
+          "to": "tombstoned"
+        }
       ],
       "forbiddenActions": [
         "hard_delete_by_default",
@@ -232,12 +255,26 @@
       "requiresReason": true,
       "requiresEvidence": true,
       "allowedLifecycleTransitions": [
-        { "from": "proposal", "to": "active", "requiresEvidence": true },
-        { "from": "stale", "to": "active", "requiresEvidence": true }
+        {
+          "from": "proposal",
+          "to": "active",
+          "requiresEvidence": true
+        },
+        {
+          "from": "stale",
+          "to": "active",
+          "requiresEvidence": true
+        }
       ],
       "forbiddenLifecycleTransitions": [
-        { "from": "rejected", "to": "active" },
-        { "from": "tombstoned", "to": "active" }
+        {
+          "from": "rejected",
+          "to": "active"
+        },
+        {
+          "from": "tombstoned",
+          "to": "active"
+        }
       ],
       "forbiddenActions": [
         "auto_promote_without_evidence",

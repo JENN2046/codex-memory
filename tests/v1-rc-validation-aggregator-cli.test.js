@@ -318,7 +318,7 @@ test('minimal validation aggregator CLI preserves honest blocked decision', () =
 test('minimal validation aggregator CLI preserves current bounded public MCP surface', () => {
   const report = parseJsonResult(runCli());
 
-  assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('minimal validation aggregator CLI keeps runtime blockers visible', () => {
@@ -616,7 +616,7 @@ test('minimal validation aggregator CLI rejects live or side-effect flags', () =
     assert.equal(report.safety.providerCalls, 0, flag);
     assert.equal(report.safety.serviceStarted, false, flag);
     assert.equal(report.safety.durableMemoryTouched, false, flag);
-    assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+    assert.deepEqual(report.public_mcp_tools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
     assert.ok(report.evidence_sources.decision, flag);
     assert.equal(report.evidence.p24Aggregator.rc9DecisionPacketEmbedded, true, flag);
     assert.equal(report.evidence.p24Aggregator.zeroGapCloseoutAuditEmbedded, true, flag);

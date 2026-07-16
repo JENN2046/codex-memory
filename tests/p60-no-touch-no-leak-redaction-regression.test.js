@@ -14,6 +14,8 @@ const centralizedRedactionTargets = [
   'src/core/MemoryGovernanceApprovalPacketContract.js',
   'src/core/MemoryGovernanceAuditEvidenceContract.js',
   'src/core/MemoryGovernanceReviewSurfaceContract.js',
+  'src/core/MemoryDeltaCommitPreflightService.js',
+  'src/core/MemoryDeltaProposalService.js',
   'src/core/EvidenceManifestContract.js',
   'src/core/EvidenceRuntimeTraceContract.js',
   'src/core/GovernanceLoopBoundaryContract.js',

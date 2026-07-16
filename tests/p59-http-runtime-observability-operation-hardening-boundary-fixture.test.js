@@ -9,7 +9,7 @@ const fixturePath = path.join(
   'p59-http-runtime-observability-operation-hardening-boundary-v1.json'
 );
 
-const expectedPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
+const expectedPublicMcpTools = ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory'];
 
 const expectedSourceEvidenceIds = [
   'p46_http_no_token_mutation_redaction_tests',

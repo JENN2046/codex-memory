@@ -68,7 +68,7 @@ test('public MCP tools remain frozen and dry-run first is required', () => {
   assert.equal(fixture.dryRunFirst, true);
   assert.equal(fixture.mutationDefault, false);
   assert.equal(fixture.hardDeleteAllowed, false);
-  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 });
 
 test('tool candidates do not mutate by default', () => {

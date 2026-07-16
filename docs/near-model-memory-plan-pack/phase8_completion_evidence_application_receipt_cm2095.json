@@ -1,0 +1,70 @@
+{
+  "receiptPayload": {
+    "schemaVersion": 1,
+    "taskId": "CM-2095",
+    "decision": {
+      "reference": "CM-2095-ER-20260711-COMPLETION-EVIDENCE-APPLICATION-PASS-2E98CE0C",
+      "commit": "83ac6f8d45a92d04453e9f280d5dbd054a663132",
+      "blobOid": "d8e8f1d86d98bfc71c45f7fd2d3adb92c5a47818",
+      "sha256": "8ddd5bd82bb8ddcfa10e17e61620688c0667daf5d6643fa9b8e1480fa019ae33"
+    },
+    "applicationRequest": {
+      "commit": "a593b73fe1b53a4d00d572d5f72157acf033285c",
+      "blobOid": "d5e94b7a6f7e497e2de8b2429a401baead245eed",
+      "sha256": "2e98ce0c6614d668ff4f6f93d7e48e475c37c8f493480ae7564a880497819477"
+    },
+    "executionReceipt": {
+      "reviewReference": "CM-2094-ER-20260711-NATIVE-WRITE-RECEIPT-PASS-FD22CEC6",
+      "commit": "91c20ce4c9b85966ef2da6b7c37563ebbce0f365",
+      "blobOid": "b310146b5219cb4db0e463275f10e8aae4d2f94a",
+      "sha256": "fd22cec67c8d95eab2f95c10a52207529847d83942354331ba372f5edc41f277"
+    },
+    "applicationRuntime": {
+      "commit": "e2bb3e9b4bf1f1e7dd8d4a74295360c3b8c7a513",
+      "tree": "07eb3efbe98264f514547952da228ae919000c1e",
+      "cleanBeforeApplication": true,
+      "completionAuditBaselineBlobOid": "b892bc8bd847ee38671955442574b2bfd3525b19",
+      "traceMatrixBaselineBlobOid": "765c3ea69ad8200f289604429ca2c7d3d8a445e8"
+    },
+    "contractResults": {
+      "applicationGate": "phase8_completion_evidence_application_gate_accepted",
+      "patchBoundary": "phase8_completion_evidence_patch_boundary_accepted",
+      "patchApplication": "phase8_completion_evidence_patch_application_accepted"
+    },
+    "appliedEvidence": {
+      "exactApprovalEnforcementPassed": true,
+      "nativeSideEffectReceiptPassed": true,
+      "realRootDurableWriteProofPassed": true,
+      "verifyWritePassed": true,
+      "rollbackDrillPassed": false,
+      "failureRecoveryProofPassed": false,
+      "outputDisclosureBudgetPassed": true,
+      "auditReceiptPassed": true,
+      "phase8ReceiptBundleAppliedToCompletionAudit": true,
+      "phase8Completed": false,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    },
+    "authorization": {
+      "useCount": 1,
+      "consumed": true,
+      "replayAllowed": false
+    },
+    "applicationCounters": {
+      "completionEvidenceApplications": 1,
+      "completionAuditPatchApplications": 1,
+      "nativeWriteCalls": 0,
+      "verifyOperations": 0,
+      "rollbackOrCompensationOperations": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "readinessClaims": 0
+    },
+    "unsupportedEvidence": {
+      "derivedIndexProofAccepted": false,
+      "providerExecutionProofAccepted": false,
+      "productionProviderProofAccepted": false
+    }
+  },
+  "receiptPayloadSha256": "8c8a22f89863214ccbe2d0e64b75a0526cc32f1e21d83d7159e109e6fa200939"
+}

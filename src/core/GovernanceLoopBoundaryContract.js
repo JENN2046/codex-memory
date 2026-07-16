@@ -4,7 +4,7 @@ const EXPECTED_SCHEMA_VERSION = 'p56-governance-executable-loop-boundary-v1';
 const EXPECTED_POLICY_VERSION = 'p56-governance-loop-policy-v1';
 const EXPECTED_MANIFEST_VERSION = 'p56-governance-loop-manifest-v1';
 
-const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+const PUBLIC_MCP_TOOLS = Object.freeze(['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
 const REQUIRED_SOURCE_EVIDENCE_IDS = Object.freeze([
   'p31_lifecycle_contract_helper',

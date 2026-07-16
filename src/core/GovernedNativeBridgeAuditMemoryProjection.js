@@ -408,6 +408,11 @@ function projectGovernedNativeBridgeAuditReceipt(entry = {}) {
     writeRequiresExactApproval: safeBoolean(entry.writeRequiresExactApproval),
     exactApprovalAction: safeBridgeExactApprovalAction(entry.exactApprovalAction),
     exactApprovalActionMatched: safeBoolean(entry.exactApprovalActionMatched),
+    exactApprovalDecisionReference: safeReference(entry.exactApprovalDecisionReference),
+    exactApprovalClaimBindingHash: typeof entry.exactApprovalClaimBindingHash === 'string' &&
+      /^[a-f0-9]{64}$/.test(entry.exactApprovalClaimBindingHash)
+      ? entry.exactApprovalClaimBindingHash
+      : null,
     exactApprovalScopeMatched: safeBoolean(entry.exactApprovalScopeMatched),
     exactApprovalRuntimeTargetMatched: safeBoolean(entry.exactApprovalRuntimeTargetMatched),
     exactApprovalRollbackPlanMatched: safeBoolean(entry.exactApprovalRollbackPlanMatched),
@@ -628,7 +633,16 @@ function buildGovernedNativeBridgeAuditMemoryDecisionProvider({ auditLogStore } 
     if (!Array.isArray(entries)) return [];
     return entries
       .filter(entry => scopeFilterMatchesEntry(scopeFilter, entry))
-      .map(projectGovernedNativeAuditDecision)
+      .map(entry => {
+        const decision = projectGovernedNativeAuditDecision(entry);
+        if (scopeFilter && decision?.governedNativeBridgeReceipt) {
+          decision.governedNativeBridgeReceipt.scopeFingerprintMatched = true;
+        }
+        if (scopeFilter && decision?.governedNativeReadFallbackReceipt) {
+          decision.governedNativeReadFallbackReceipt.scopeFingerprintMatched = true;
+        }
+        return decision;
+      })
       .filter(Boolean)
       .slice(0, boundedWindow);
   };

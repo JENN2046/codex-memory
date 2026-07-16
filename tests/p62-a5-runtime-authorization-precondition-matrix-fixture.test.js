@@ -133,7 +133,7 @@ test('P62 authorization precondition matrix fails closed for unsafe evidence and
 test('P62 authorization precondition matrix preserves public MCP freeze and forbidden claims', () => {
   const fixture = loadFixture();
 
-  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
+  assert.deepEqual(fixture.publicMcpTools, ['record_memory', 'search_memory', 'memory_overview', 'audit_memory', 'prepare_memory_context', 'propose_memory_delta', 'validate_memory', 'tombstone_memory', 'supersede_memory']);
 
   for (const claim of [
     'authorization_granted',

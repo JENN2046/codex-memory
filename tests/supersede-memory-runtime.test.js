@@ -545,5 +545,5 @@ test('supersede_memory requires exact pair ids and bidirectional links', async (
 test('supersede_memory is registered as an approved public MCP tool', () => {
   const toolNames = TOOL_DEFINITIONS.map(tool => tool.name).sort();
 
-  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
+  assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'prepare_memory_context', 'propose_memory_delta', 'record_memory', 'search_memory', 'supersede_memory', 'tombstone_memory', 'validate_memory']);
 });

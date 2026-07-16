@@ -198,7 +198,7 @@ test('lifecycle policy audit summary avoids raw workspace_id while recording sco
   });
 });
 
-test('MCP public tools remain read-only by default', async () => {
+test('MCP public tools remain read-only plus proposal-only by default', async () => {
   await withApp({ enableLifecycleReadPolicy: true }, async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
     const response = await server.handleJsonRpc({
@@ -208,6 +208,12 @@ test('MCP public tools remain read-only by default', async () => {
     }, requestContext);
 
     const toolNames = response.response.result.tools.map(tool => tool.name).sort();
-    assert.deepEqual(toolNames, ['audit_memory', 'memory_overview', 'search_memory']);
+    assert.deepEqual(toolNames, [
+      'audit_memory',
+      'memory_overview',
+      'prepare_memory_context',
+      'propose_memory_delta',
+      'search_memory'
+    ]);
   });
 });
