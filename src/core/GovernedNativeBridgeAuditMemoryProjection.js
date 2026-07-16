@@ -9,7 +9,8 @@ const {
 const { isSafeReferenceName } = require('./VcpToolBoxSafeReference');
 const {
   GOVERNED_NATIVE_CLIENTS,
-  GOVERNED_NATIVE_VISIBILITIES
+  GOVERNED_NATIVE_VISIBILITIES,
+  canonicalGovernedNativeClient
 } = require('./MemoryAccessContract');
 
 const BRIDGE_RECEIPT_EVENT_TYPE = 'governed_mcp_vcp_native_bridge_receipt';
@@ -294,11 +295,9 @@ function buildRequestedScopeAuditFilter(scope = {}) {
     normalizedScope[key] = scope[key];
   }
   if (Object.prototype.hasOwnProperty.call(scope, 'client_id')) {
-    if (scope.client_id === 'Codex' || scope.client_id === 'codex') {
-      normalizedScope.client_id = 'Codex';
-    } else {
-      return { matchNone: true };
-    }
+    const clientId = canonicalGovernedNativeClient(scope.client_id);
+    if (!clientId) return { matchNone: true };
+    normalizedScope.client_id = clientId;
   }
   if (Object.prototype.hasOwnProperty.call(scope, 'visibility')) {
     const visibility = safeBridgeVisibility(scope.visibility);
@@ -316,7 +315,9 @@ function buildRequestedScopeAuditFilter(scope = {}) {
   }, {});
 
   return {
-    clientId: stableScope.client_id === 'Codex' ? 'Codex' : null,
+    clientId: GOVERNED_NATIVE_CLIENTS.includes(stableScope.client_id)
+      ? stableScope.client_id
+      : null,
     visibility: safeBridgeVisibility(stableScope.visibility),
     scopeFieldNames: scopeKeys,
     scopeIdentifierFieldNames: scopeKeys

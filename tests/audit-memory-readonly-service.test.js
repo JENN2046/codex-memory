@@ -14,6 +14,7 @@ const {
   MUTATION_INPUT_KEYS
 } = require('../src/core/AuditMemoryReadonlyToolDraft');
 const {
+  buildRequestedScopeAuditFilter,
   buildGovernedNativeBridgeAuditMemoryDecisionProvider,
   projectGovernedNativeAuditDecision,
   projectGovernedNativeBridgeAuditReceipt,
@@ -37,6 +38,21 @@ function scopeFingerprint(scope) {
     .update(JSON.stringify(source), 'utf8')
     .digest('hex');
 }
+
+test('governed native audit scope filter canonicalizes both supported clients and rejects unknown clients', () => {
+  assert.equal(buildRequestedScopeAuditFilter({
+    client_id: 'claude',
+    visibility: 'private'
+  }).clientId, 'Claude');
+  assert.equal(buildRequestedScopeAuditFilter({
+    client_id: 'codex',
+    visibility: 'private'
+  }).clientId, 'Codex');
+  assert.deepEqual(buildRequestedScopeAuditFilter({
+    client_id: 'manual',
+    visibility: 'private'
+  }), { matchNone: true });
+});
 
 function governedBridgeReceiptEntry(overrides = {}) {
   const toolName = overrides.toolName || 'record_memory';
