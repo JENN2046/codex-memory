@@ -234,6 +234,8 @@ test('fallback audit preparation rejects appended receipt that does not authoriz
 });
 
 function codexContext(overrides = {}) {
+  const exactApprovalVisibility =
+    overrides.requestContext?.exactApprovalResult?.allowedScope?.visibility;
   return {
     executionContext: {
       agentAlias: 'Codex',
@@ -241,7 +243,7 @@ function codexContext(overrides = {}) {
       clientId: 'codex',
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
-      visibility: 'private',
+      visibility: exactApprovalVisibility || 'shared',
       requestSource: 'governed-mcp-vcp-native-bridge-app-integration',
       ...(overrides.executionContext || {})
     },
@@ -353,7 +355,7 @@ test('projection turns app call context into a governed VCPToolBox-native bridge
   assert.equal(input.trusted_execution_context.executionContext.agentAlias, 'Codex');
   assert.equal(result.normalizedBridgeRequest.trusted_execution_context_supplied, true);
   assert.equal(result.normalizedBridgeRequest.trusted_execution_context_scope_matched, true);
-  assert.equal(result.normalizedBridgeRequest.visibility, 'private');
+  assert.equal(result.normalizedBridgeRequest.visibility, 'shared');
   assert.equal(result.normalizedBridgeRequest.runtime_target, 'VCPToolBox native memory');
   assert.equal(result.normalizedBridgeRequest.runtime_target_reference_name, 'operator-vcp-toolbox-service-ref');
   assert.equal(result.normalizedBridgeRequest.runtime_target_kind, 'mcp_server');
@@ -487,7 +489,10 @@ test('projection and gate bind every native bridge tool to its governed access m
     assert.equal(result.normalizedBridgeRequest.audit_receipt_required, true, item.toolName);
     assert.equal(result.normalizedBridgeRequest.audit_receipt_low_disclosure, true, item.toolName);
     assert.equal(result.normalizedBridgeRequest.raw_output_allowed, false, item.toolName);
-    assert.deepEqual(result.normalizedBridgeRequest.scope, scope, item.toolName);
+    assert.deepEqual(result.normalizedBridgeRequest.scope, {
+      ...scope,
+      visibility: item.writeAllowed ? 'private' : 'shared'
+    }, item.toolName);
     if (item.writeAllowed) {
       assert.equal(result.normalizedBridgeRequest.exact_approval_action, item.exactApprovalAction, item.toolName);
       assert.equal(result.normalizedBridgeRequest.exact_approval_action_matched, true, item.toolName);
@@ -547,7 +552,7 @@ test('projection does not let tool arguments authorize governed bridge scope', (
     project_id: 'codex-memory',
     workspace_id: 'workspace-alpha',
     client_id: 'Codex',
-    visibility: 'private'
+    visibility: 'shared'
   });
   assert.equal(result.normalizedBridgeRequest.trusted_execution_context_scope_matched, true);
   assert.equal(serialized.includes('attacker-project'), false);
@@ -2008,7 +2013,7 @@ test('primary read delegation returns governed VCP native low-disclosure result 
         workspace_id: 'workspace-alpha',
         scope_id: 'scope-alpha',
         client_id: 'Codex',
-        visibility: 'private'
+        visibility: 'shared'
       });
       assert.equal(body.params.arguments.governed_bridge.primary_runtime, 'VCPToolBox native memory');
       assert.deepEqual(body.params.arguments.governed_bridge.runtime_target, {
@@ -2155,7 +2160,7 @@ test('primary read delegation returns governed VCP native low-disclosure result 
       ]);
       assert.equal(
         server.requests[1].body.params.arguments.governed_bridge.scope_fingerprint,
-        'f34c14c55b2f97e90cee55b0ad91abeff0941991b895e0ca64e3d9248b98c3d8'
+        '4c3ad339c97fee84bfc3c2d95b29f4f16aea899e34e1631a7512e48b8de47aec'
       );
       assert.equal(server.requests[1].body.params.arguments.governed_bridge.raw_scope_persisted, false);
       assert.equal(server.requests[1].body.params.arguments.governed_bridge.invocation_transport, 'mcp');
@@ -2204,7 +2209,7 @@ test('primary read delegation returns governed VCP native low-disclosure result 
       assert.equal(result.receipt.localAuditReceipt.status, 'appended');
       assert.equal(bridgeReceipt.delegationDirection, 'read');
       assert.equal(bridgeReceipt.clientId, 'Codex');
-      assert.equal(bridgeReceipt.visibility, 'private');
+      assert.equal(bridgeReceipt.visibility, 'shared');
       assert.equal(bridgeReceipt.scopePresent, true);
       assert.equal(bridgeReceipt.scopeIdentifierPresent, true);
       assert.deepEqual(bridgeReceipt.scopeFieldNames, [
@@ -2382,6 +2387,64 @@ test('Claude native recall is bound to trusted Claude shared scope', async () =>
   });
 });
 
+test('Codex and Claude scope-bound native reads fail closed before native or local recall', async () => {
+  const observations = [];
+  let nativeCalls = 0;
+  let shapeProbeCalls = 0;
+  let localCalls = 0;
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeReadShapeProbeInvoker: async () => {
+      shapeProbeCalls += 1;
+      return { status: 'shape_probe_should_not_run' };
+    },
+    governedMcpVcpNativeReadDelegationToolCaller: async () => {
+      nativeCalls += 1;
+      return { results: [] };
+    }
+  }, async app => {
+    app.services.passiveRecallService.search = async () => {
+      localCalls += 1;
+      return [];
+    };
+
+    for (const clientId of ['Codex', 'Claude']) {
+      for (const visibility of ['private', 'workspace', 'project']) {
+        const requestContext = clientId === 'Codex'
+          ? codexContext({ executionContext: { visibility } })
+          : claudeContext({ executionContext: { visibility } });
+        const result = await app.callTool('search_memory', {
+          query: 'bounded scope enforcement check',
+          include_content: false,
+          limit: 1
+        }, requestContext);
+        const observation = observations.at(-1);
+
+        assert.equal(result.status, 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_REJECTED', `${clientId}:${visibility}`);
+        assert.equal(result.reasonCode, 'invalid_governed_native_read_delegation_boundary', `${clientId}:${visibility}`);
+        assert.equal(result.access.runtimeCalled, false, `${clientId}:${visibility}`);
+        assert.equal(result.access.vcpToolBoxCalled, false, `${clientId}:${visibility}`);
+        assert.equal(result.access.mcpToolCalled, false, `${clientId}:${visibility}`);
+        assert.equal(result.access.memoryReadPerformed, false, `${clientId}:${visibility}`);
+        assert.equal(result.access.localMemoryFallbackEligible, false, `${clientId}:${visibility}`);
+        assert.equal(result.access.localMemoryFallbackUsed, false, `${clientId}:${visibility}`);
+        assert.deepEqual(
+          observation.readDelegationResult.invalidFields,
+          ['gateResult.normalizedBridgeRequest.native_scope_filtering_proven'],
+          `${clientId}:${visibility}`
+        );
+      }
+    }
+  });
+
+  assert.equal(nativeCalls, 0);
+  assert.equal(shapeProbeCalls, 0);
+  assert.equal(localCalls, 0);
+});
+
 test('prepare_memory_context fails closed when primary native recall is rejected', async () => {
   let nativeCalls = 0;
   let localCalls = 0;
@@ -2516,13 +2579,13 @@ test('primary memory_overview read delegation carries canonical bridge scope to 
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.deepEqual(nativeCall.arguments.governed_bridge.scope, {
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(nativeCall.arguments.governed_bridge.local_memory_role, 'not_used');
     assert.equal(nativeCall.arguments.governed_bridge.local_memory_source_runtime, null);
@@ -2668,7 +2731,7 @@ test('primary read delegation binds every governed read tool on the real app pat
         scope_id: 'scope-alpha',
         workspace_id: 'workspace-alpha',
         client_id: 'Codex',
-        visibility: 'private'
+        visibility: 'shared'
       });
       if (readCase.toolName === 'search_memory') {
         assert.equal(nativePayload.arguments.include_content, false);
@@ -2761,7 +2824,7 @@ test('primary read delegation ignores cross-client payload scope and uses canoni
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.deepEqual(nativePayload.arguments.governed_bridge.scope, nativePayload.arguments.scope);
     assert.equal(serializedResult.includes('LOCAL_CROSS_CLIENT_CONTENT_SHOULD_NOT_ECHO'), false);
@@ -2812,7 +2875,7 @@ test('primary read delegation ignores unsafe payload scope and does not forward 
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(serializedResult.includes('LOCAL_UNSAFE_SCOPE_CONTENT_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedResult.includes('SECRET_SCOPE_SHOULD_NOT_ECHO'), false);
@@ -2865,7 +2928,7 @@ test('primary read delegation ignores safe payload scope drift from trusted exec
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(serializedResult.includes('LOCAL_SCOPE_DRIFT_CONTENT_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedResult.includes('other-project'), false);
@@ -3119,14 +3182,14 @@ test('primary_with_local_fallback clamps local search fallback to governed discl
           projectId: 'codex-memory',
           workspaceId: 'workspace-alpha',
           clientId: 'Codex',
-          visibility: 'private'
+          visibility: 'shared'
         }],
         ['local-fallback-scope-mismatch', {
           scopeId: 'scope-beta',
           projectId: 'codex-memory',
           workspaceId: 'workspace-alpha',
           clientId: 'Codex',
-          visibility: 'private'
+          visibility: 'shared'
         }]
       ]);
     };
@@ -3158,7 +3221,7 @@ test('primary_with_local_fallback clamps local search fallback to governed discl
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       clientId: 'Codex',
-      visibility: ['private']
+      visibility: ['shared']
     });
     assert.equal(result.results.length, 1);
     assert.equal(result.results[0].score, 0.81);
@@ -3319,7 +3382,7 @@ test('primary_with_local_fallback sanitizes local audit fallback raw flag and wi
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(result.access.localMemoryFallbackUsed, true);
     assert.equal(result.access.localMemoryFallbackReadPerformed, true);

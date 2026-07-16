@@ -29,6 +29,11 @@ const DELEGATABLE_READ_TOOLS = Object.freeze([
   'audit_memory'
 ]);
 const ALLOWED_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
+const SCOPE_FILTERING_REQUIRED_VISIBILITIES = Object.freeze([
+  'private',
+  'workspace',
+  'project'
+]);
 const ALLOWED_DISCLOSURE_LEVELS = Object.freeze([
   'none',
   'receipt_only',
@@ -342,6 +347,9 @@ function invalidFieldsForDelegation({ toolName, args = {}, gateResult, callMcpTo
     scope.visibility !== request.visibility
   ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope.visibility');
+  }
+  if (SCOPE_FILTERING_REQUIRED_VISIBILITIES.includes(request.visibility)) {
+    invalidFields.push('gateResult.normalizedBridgeRequest.native_scope_filtering_proven');
   }
   if (request.scope_identifier_present !== true) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope_identifier_present');
@@ -1274,6 +1282,7 @@ module.exports = {
   CONTRACT_MODE,
   CONTRACT_NAME,
   DELEGATABLE_READ_TOOLS,
+  SCOPE_FILTERING_REQUIRED_VISIBILITIES,
   buildDelegatedArguments,
   executeGovernedMcpVcpNativeReadDelegation
 };

@@ -7,6 +7,7 @@ const {
   validateGovernedMcpVcpNativeBridgeGate
 } = require('../src/core/GovernedMcpVcpNativeBridgeGate');
 const {
+  SCOPE_FILTERING_REQUIRED_VISIBILITIES,
   buildDelegatedArguments,
   executeGovernedMcpVcpNativeReadDelegation
 } = require('../src/core/GovernedMcpVcpNativeReadDelegationAdapter');
@@ -25,7 +26,7 @@ const {
   SOURCE_AUTHORITY
 } = require('../src/core/GovernedMcpVcpNativeRuntimeTargetConfig');
 
-function gateResult(toolName = 'search_memory') {
+function gateResult(toolName = 'search_memory', { visibility = 'shared' } = {}) {
   return validateGovernedMcpVcpNativeBridgeGate({
     product_goal: {
       primary_runtime: REQUIRED_PRIMARY_RUNTIME,
@@ -40,7 +41,7 @@ function gateResult(toolName = 'search_memory') {
       scope: {
         project_id: 'codex-memory',
         workspace_id: 'workspace-alpha',
-        visibility: 'private'
+        visibility
       },
       runtime_target: {
         kind: 'vcp_toolbox_native_memory',
@@ -81,7 +82,7 @@ function gateResult(toolName = 'search_memory') {
         agentAlias: 'Codex',
         projectId: 'codex-memory',
         workspaceId: 'workspace-alpha',
-        visibility: 'private'
+        visibility
       }
     },
     counters: {}
@@ -129,7 +130,7 @@ test('builds low-disclosure delegated arguments for read-only tools from governe
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'codex',
-      visibility: 'private',
+      visibility: 'shared',
       unsupported: 'SHOULD_NOT_PASS'
     }
   }, gateResult('search_memory'));
@@ -148,7 +149,7 @@ test('builds low-disclosure delegated arguments for read-only tools from governe
     project_id: 'codex-memory',
     workspace_id: 'workspace-alpha',
     client_id: 'Codex',
-    visibility: 'private'
+    visibility: 'shared'
   });
   assert.deepEqual(searchDelegated.governed_bridge, {
     primary_runtime: 'VCPToolBox native memory',
@@ -174,7 +175,7 @@ test('builds low-disclosure delegated arguments for read-only tools from governe
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     },
     scope_present: true,
     scope_identifier_present: true,
@@ -189,7 +190,7 @@ test('builds low-disclosure delegated arguments for read-only tools from governe
       'project_id',
       'workspace_id'
     ],
-    scope_fingerprint: '5f3544ce179efd0c3fd67066999029fa567975577f7f446f78fe9e2e04f34bc1',
+    scope_fingerprint: '2931bf55168c1dee221fdcb5ea1cf659061f764f176aeaa5718d43af4507d8c0',
     raw_scope_persisted: false,
     raw_scope_value_returned: false,
     local_memory_role: 'not_used',
@@ -199,7 +200,7 @@ test('builds low-disclosure delegated arguments for read-only tools from governe
     local_memory_result_returned: false,
     local_memory_result_can_be_mistaken_for_vcp_native: false,
     local_memory_raw_content_disclosed: false,
-    visibility: 'private',
+    visibility: 'shared',
     client_identity_source: 'trusted_execution_context_or_transport',
     client_identity_bound: true,
     client_identity_tool_arguments_may_override: false,
@@ -292,7 +293,7 @@ test('builds low-disclosure delegated arguments for read-only tools from governe
     project_id: 'codex-memory',
     workspace_id: 'workspace-alpha',
     client_id: 'Codex',
-    visibility: 'private'
+    visibility: 'shared'
   });
   assert.equal(auditDelegated.governed_bridge.audit_receipt_required, true);
   assert.equal(auditDelegated.governed_bridge.low_disclosure, true);
@@ -318,10 +319,42 @@ test('builds low-disclosure delegated arguments for read-only tools from governe
     project_id: 'codex-memory',
     workspace_id: 'workspace-alpha',
     client_id: 'Codex',
-    visibility: 'private'
+    visibility: 'shared'
   });
   assert.equal(overviewDelegated.governed_bridge.disclosure_max_items, 5);
   assert.equal(overviewDelegated.governed_bridge.disclosure_max_bytes, 4096);
+});
+
+test('fails closed before native invocation for scope-bound visibility without filtering proof', async () => {
+  for (const visibility of SCOPE_FILTERING_REQUIRED_VISIBILITIES) {
+    let calls = 0;
+    const result = await executeGovernedMcpVcpNativeReadDelegation({
+      toolName: 'search_memory',
+      args: { query: 'bounded query' },
+      gateResult: gateResult('search_memory', { visibility }),
+      callMcpTool: receiptAwareCallMcpTool(async () => {
+        calls += 1;
+        return { results: [] };
+      })
+    });
+
+    assert.equal(result.accepted, false, visibility);
+    assert.equal(result.reasonCode, 'invalid_governed_native_read_delegation_boundary', visibility);
+    assert.deepEqual(
+      result.invalidFields,
+      ['gateResult.normalizedBridgeRequest.native_scope_filtering_proven'],
+      visibility
+    );
+    assert.equal(result.runtimeCalled, false, visibility);
+    assert.equal(result.vcpToolBoxCalled, false, visibility);
+    assert.equal(result.mcpToolCalled, false, visibility);
+    assert.equal(result.memoryReadPerformed, false, visibility);
+    assert.equal(result.localMemoryFallbackEligible, false, visibility);
+    assert.equal(result.localMemoryFallbackUsed, false, visibility);
+    assert.equal(result.rawRequestBodyDisclosed, false, visibility);
+    assert.equal(result.rawResponseBodyDisclosed, false, visibility);
+    assert.equal(calls, 0, visibility);
+  }
 });
 
 test('read delegation rejects search arguments beyond MCP schema bounds before native call', async () => {
@@ -393,7 +426,7 @@ test('delegates governed read to native MCP caller and returns only low-disclosu
       assert.equal(payload.toolName, 'search_memory');
       assert.equal(payload.arguments.include_content, false);
       assert.equal(payload.arguments.scope.client_id, 'Codex');
-      assert.equal(payload.arguments.scope.visibility, 'private');
+      assert.equal(payload.arguments.scope.visibility, 'shared');
       assert.equal(payload.arguments.governed_bridge.primary_runtime, 'VCPToolBox native memory');
       assert.equal(
         payload.arguments.governed_bridge.runtime_target.target_reference_name,
