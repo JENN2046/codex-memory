@@ -12,6 +12,7 @@ const {
 const {
   getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig
 } = require('../core/GovernedMcpVcpNativeHttpMcpTargetConfig');
+const { canonicalGovernedNativeClient } = require('../core/MemoryAccessContract');
 
 const DEFAULT_TARGET_REFERENCE_NAME = 'operator-vcp-toolbox-service-ref';
 const DEFAULT_PROJECT_ID = 'codex-memory';
@@ -81,6 +82,7 @@ function parseArgs(argv = [], env = process.env) {
     workspaceId: env.CODEX_MEMORY_WORKSPACE_ID || DEFAULT_WORKSPACE_ID,
     scopeId: env.CODEX_MEMORY_SCOPE_ID || '',
     visibility: env.CODEX_MEMORY_VISIBILITY || DEFAULT_VISIBILITY,
+    clientId: canonicalGovernedNativeClient(env.CODEX_MEMORY_CLIENT_ID) || 'Codex',
     query: 'codex memory governed native acceptance probe',
     limit: 1,
     writeTitle: 'codex-memory governed native acceptance probe',
@@ -174,6 +176,11 @@ function parseArgs(argv = [], env = process.env) {
       index += 1;
       continue;
     }
+    if (token === '--client-id') {
+      options.clientId = canonicalGovernedNativeClient(argv[index + 1]) || '';
+      index += 1;
+      continue;
+    }
     if (token === '--query') {
       options.query = argv[index + 1] || '';
       index += 1;
@@ -260,19 +267,20 @@ function defaultToolNameByAction(options = {}) {
 }
 
 function buildConfigOverrides(options = {}) {
+  const clientId = canonicalGovernedNativeClient(options.clientId) || 'Codex';
   const toolNameByAction = optionalOverride(options.toolNameByAction) ||
     JSON.stringify(defaultToolNameByAction(options));
   return {
     projectBasePath: optionalOverride(options.projectBasePath),
     dataDir: optionalOverride(options.dataDir),
     logsDir: optionalOverride(options.logsDir),
-    allowedAgentAlias: 'Codex',
-    defaultAgentId: 'codex-governed-native-acceptance',
+    allowedAgentAlias: clientId,
+    defaultAgentId: `${clientId.toLowerCase()}-governed-native-acceptance`,
     defaultRequestSource: 'governed-vcp-native-acceptance',
     defaultProjectId: options.projectId,
     defaultWorkspaceId: options.workspaceId,
     defaultScopeId: options.scopeId,
-    defaultClientId: 'Codex',
+    defaultClientId: clientId,
     defaultVisibility: options.visibility,
     governedMcpVcpNativeBridgeGateMode: 'strict',
     governedMcpVcpNativeReadDelegationMode: 'primary',
@@ -293,11 +301,12 @@ function buildConfigOverrides(options = {}) {
 }
 
 function buildReadContext(options = {}) {
+  const clientId = canonicalGovernedNativeClient(options.clientId) || 'Codex';
   return {
     executionContext: {
-      agentAlias: 'Codex',
-      agentId: 'codex-governed-native-acceptance',
-      clientId: 'codex',
+      agentAlias: clientId,
+      agentId: `${clientId.toLowerCase()}-governed-native-acceptance`,
+      clientId,
       projectId: options.projectId,
       workspaceId: options.workspaceId,
       scopeId: options.scopeId,
@@ -308,10 +317,11 @@ function buildReadContext(options = {}) {
 }
 
 function buildWriteContext(toolName = 'record_memory', options = {}) {
+  const clientId = canonicalGovernedNativeClient(options.clientId) || 'Codex';
   const scope = {
     project_id: options.projectId,
     workspace_id: options.workspaceId,
-    client_id: 'Codex',
+    client_id: clientId,
     visibility: options.visibility,
     ...(options.scopeId ? { scope_id: options.scopeId } : {})
   };
@@ -361,13 +371,14 @@ function buildReadSuiteArgs(toolName, options = {}) {
 }
 
 function buildWriteArgs(toolName = 'record_memory', options = {}) {
+  const clientId = canonicalGovernedNativeClient(options.clientId) || 'Codex';
   if (toolName === 'tombstone_memory') {
     return {
       memory_id: options.tombstoneMemoryId,
       reason: 'Governed native tombstone acceptance probe.',
       evidence: options.writeEvidence,
       tombstone_reason: 'governed_native_acceptance_probe',
-      actor_client_id: 'Codex',
+      actor_client_id: clientId,
       request_source: 'governed-vcp-native-acceptance',
       confirm: true,
       dry_run: false
@@ -381,7 +392,7 @@ function buildWriteArgs(toolName = 'record_memory', options = {}) {
       evidence: options.writeEvidence,
       supersedes_link: options.supersedeOldMemoryId,
       superseded_by_link: options.supersedeNewMemoryId,
-      actor_client_id: 'Codex',
+      actor_client_id: clientId,
       request_source: 'governed-vcp-native-acceptance',
       confirm: true,
       dry_run: false

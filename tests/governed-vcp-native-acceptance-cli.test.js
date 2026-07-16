@@ -9,14 +9,38 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  buildConfigOverrides,
+  buildReadContext,
+  buildWriteContext,
   collectOperationAcceptanceBlockers,
   operationAccepted,
+  parseArgs,
   runGovernedVcpNativeAcceptance,
   validateGovernedVcpNativeAcceptanceEvidenceArtifact
 } = require('../src/cli/governed-vcp-native-acceptance');
 
 const cliPath = path.join('src', 'cli', 'governed-vcp-native-acceptance.js');
 const workspaceRoot = path.resolve(__dirname, '..');
+
+test('acceptance CLI binds Claude identity without changing the public MCP surface', () => {
+  const options = parseArgs([
+    '--client-id', 'claude',
+    '--project-id', 'codex-memory',
+    '--workspace-id', 'agents-os',
+    '--visibility', 'private'
+  ], {});
+  const config = buildConfigOverrides(options);
+  const context = buildReadContext(options);
+  const writeContext = buildWriteContext('record_memory', options);
+
+  assert.equal(options.clientId, 'Claude');
+  assert.equal(config.allowedAgentAlias, 'Claude');
+  assert.equal(config.defaultClientId, 'Claude');
+  assert.equal(context.executionContext.agentAlias, 'Claude');
+  assert.equal(context.executionContext.clientId, 'Claude');
+  assert.equal(context.executionContext.visibility, 'private');
+  assert.equal(writeContext.exactApprovalResult.allowedScope.client_id, 'Claude');
+});
 
 function runCli(args = []) {
   return spawnSync(process.execPath, [cliPath, ...args], {

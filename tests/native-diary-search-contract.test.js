@@ -46,11 +46,12 @@ test('governed native read uses only the selected-diary array search signature',
     { authorization: authorization() }
   );
 
-  assert.equal(calls.initialize, 0);
+  assert.equal(calls.initialize, 1);
   assert.equal(calls.embedding, 1);
   assert.equal(calls.search.length, 1);
   assert.deepEqual(calls.search[0][0], ['SYNTHETIC_CODEX_PRIVATE']);
   assert.deepEqual(calls.search[0].slice(2), [1, 0, []]);
+  assert.equal(result._nativeRuntimeReceipt.nativeRuntimeInitialized, true);
   assert.equal(result._nativeRuntimeReceipt.authorizationResolvedBeforeProvider, true);
   assert.equal(result._nativeRuntimeReceipt.diaryAllowlistEnforcedBeforeIndexLoad, true);
   assert.equal(result._nativeRuntimeReceipt.diaryAllowlistEnforcedBeforeVectorSearch, true);

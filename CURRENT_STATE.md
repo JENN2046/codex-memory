@@ -8,13 +8,36 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | PR #21 main baseline and fresh native-context proof synchronized; proof result is empty; readiness remains false |
-| Current task | `CM-2131 post-PR21 main baseline and native-context proof status sync` |
-| Current validation | `CMV-2216` |
-| Current route | Complete status-sync PR CI/review; request merge authorization separately; non-empty recall/relevance proof remains separate |
+| Status | Diary-partition v1 Stage 3B live isolation proof complete; production/release/cutover readiness remains false |
+| Current task | `CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout` |
+| Current validation | `CMV-2217` |
+| Current route | Deliver the low-disclosure closeout through normal PR/CI/review and regular merge |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## Diary-partition V1 Stage 3B Closeout
+
+Stage 3B created four clean governed partitions and exactly four authorized
+bootstrap primary-memory records. The isolated derived store indexed all four;
+startup full scan was disabled, no legacy partition entered the store, and all
+13 legacy partitions remained ambiguous/excluded without content reads,
+migration, reclassification, deletion, or movement.
+
+The startup-only private mapping and bridge/shim bindings matched exactly. The
+local native shim and codex-memory MCP endpoints passed initialize/tools-list
+contracts with no write tool exposed. Provider-bound reads passed for Codex and
+Claude across private, project, workspace, shared union, and
+`prepare_memory_context` task-start context. Every result passed source
+post-check, every receipt bound the mapping, and unrestricted/global search
+count remained zero. Live proof performed zero primary-memory writes; the
+bootstrap/index phase accurately records four primary writes and derived-index
+writes. An independent exact-binding artifact remains private and is not
+committed.
+
+Final verdict for the authorized boundary is `V1_COMPLETE`. It is not a
+production-ready, release-ready, deploy-ready, cutover-ready, or complete-V8
+claim. See `docs/DIARY_SCOPE_STAGE3B_CLOSEOUT.md`.
 
 ## Post-PR21 Main Baseline And Fresh Proof
 

@@ -478,6 +478,7 @@ function bucketCount(value) {
 }
 
 function defaultReadRuntimeReceipt({
+  nativeRuntimeInitialized = false,
   providerApiCalled = false,
   memoryReadPerformed = true,
   isolatedRuntimeStoreUsed = false,
@@ -486,19 +487,15 @@ function defaultReadRuntimeReceipt({
 } = {}) {
   return nativeRuntimeReceipt({
     nativeRuntimeCalled: true,
-    nativeRuntimeInitialized: false,
+    nativeRuntimeInitialized,
     providerApiCalled,
     memoryReadPerformed,
     memoryWritePerformed: false,
-    durableWritePerformed: providerApiCalled === true && memoryReadPerformed === true,
-    durableWriteScope: providerApiCalled === true && memoryReadPerformed === true
-      ? isolatedRuntimeStoreUsed
-        ? 'isolated_derived_index'
-        : 'native_runtime_store'
-      : null,
+    durableWritePerformed: false,
+    durableWriteScope: null,
     isolatedRuntimeStoreUsed,
     primaryMemoryStoreWritePerformed: false,
-    derivedIndexWritePerformed: providerApiCalled === true && memoryReadPerformed === true,
+    derivedIndexWritePerformed: false,
     authorizationResolvedBeforeProvider: authorization?.accepted === true,
     diaryAllowlistEnforcedBeforeIndexLoad: authorization?.accepted === true,
     diaryAllowlistEnforcedBeforeVectorSearch: authorization?.accepted === true,
@@ -681,7 +678,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     ) {
       throw new Error('native_diary_authorization_required');
     }
-    loadRuntime();
+    await ensureReady();
     const query = boundedString(args.query, 1000) || fallbackQuery;
     const limit = normalizeLimit(args.limit ?? args.max_results, 1);
     const embeddings = await embeddingUtils.getEmbeddingsBatch(
@@ -711,6 +708,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       results: projectReadResults(results),
       rawResultCount: Array.isArray(results) ? results.length : 0,
       runtimeReceipt: defaultReadRuntimeReceipt({
+        nativeRuntimeInitialized: true,
         providerApiCalled: true,
         memoryReadPerformed: true,
         isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured,

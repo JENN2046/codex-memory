@@ -22,6 +22,16 @@
     "candidateTagTargetCommit": "170ee33963cd0a41565625b41418d12702dd221b",
     "candidateTagTargetTree": "c3e12feb3ab338f4eabaa3964483d2d8b1f43b33",
     "canonicalPayloadSha256": "2215bb33de9eb58cb3fb4c9d04ba57c77bd6794aeae9e1d73966477a6f8622f2",
+    "diaryPartitionV1Stage3bBootstrapPrimaryMemoryWrites": 4,
+    "diaryPartitionV1Stage3bCleanPartitionsCreated": 4,
+    "diaryPartitionV1Stage3bIndependentRuntimeArtifactPresent": true,
+    "diaryPartitionV1Stage3bLegacyPartitionsExcluded": 13,
+    "diaryPartitionV1Stage3bLiveProofPrimaryMemoryWrites": 0,
+    "diaryPartitionV1Stage3bMappingBindingPassed": true,
+    "diaryPartitionV1Stage3bProviderCalls": 10,
+    "diaryPartitionV1Stage3bTaskStartNativeRecallPassed": true,
+    "diaryPartitionV1Stage3bUnscopedNativeSearchCount": 0,
+    "diaryPartitionV1Stage3bVerdict": "V1_COMPLETE",
     "cm2115CanonicalSnapshotPrepared": true,
     "cm2115FullPlanApplicationApplied": false,
     "cm2115FullPlanApplicationAuthorized": false,
@@ -638,12 +648,17 @@
     "notReleaseReady": true,
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "post_pr21_main_baseline_revalidated_native_context_proof_pass_result_empty_status_synced_readiness_false"
+    "scope": "diary_partition_v1_stage3b_live_proof_complete_production_release_cutover_readiness_false"
   },
-  "taskId": "CM-2131",
-  "updatedAt": "2026-07-16",
-  "validationId": "CMV-2216",
+  "taskId": "CM-2132",
+  "updatedAt": "2026-07-17",
+  "validationId": "CMV-2217",
   "validationSummary": [
+    {
+      "id": "CMV-2217",
+      "scope": "CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout",
+      "status": "COMPLETED_V1_LIVE_ISOLATION_PROOF_PASS_PRODUCTION_RELEASE_CUTOVER_READINESS_FALSE"
+    },
     {
       "id": "CMV-2216",
       "scope": "CM-2131 post-PR21 main baseline and native-context proof status sync",

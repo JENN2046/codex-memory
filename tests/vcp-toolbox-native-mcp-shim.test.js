@@ -8,7 +8,8 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
-  createGovernedMcpVcpNativeVcpToolBoxMcpShimServer
+  createGovernedMcpVcpNativeVcpToolBoxMcpShimServer,
+  createVcpToolBoxNativeMemoryAdapter
 } = require('../src/core/GovernedMcpVcpNativeVcpToolBoxMcpShim');
 const {
   GOVERNANCE_METADATA_SCHEMA_VERSION
@@ -37,6 +38,47 @@ const SYNTHETIC_DIARY_SCOPE_MAPPING = Object.freeze({
   }]
 });
 const SYNTHETIC_MAPPING_BINDING = validateMapping(SYNTHETIC_DIARY_SCOPE_MAPPING);
+
+test('native read initializes the selected-diary runtime before provider and scoped search', async () => {
+  const calls = [];
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseManager: {
+      async initialize() {
+        calls.push('initialize');
+      },
+      async search(diaryNames) {
+        calls.push(['search', diaryNames]);
+        return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+      }
+    },
+    embeddingUtils: {
+      async getEmbeddingsBatch() {
+        calls.push('embedding');
+        return [[0.1, 0.2]];
+      }
+    }
+  });
+
+  const result = await adapter.search({ query: 'governed read', limit: 1 }, {
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+      allowedDiaryCount: 1,
+      mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+      mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+    }
+  });
+
+  assert.deepEqual(calls, [
+    'initialize',
+    'embedding',
+    ['search', ['SYNTHETIC_CODEX_PRIVATE']]
+  ]);
+  assert.equal(result._nativeRuntimeReceipt.nativeRuntimeInitialized, true);
+  assert.equal(result._nativeRuntimeReceipt.derivedIndexWritePerformed, false);
+  assert.equal(result._nativeRuntimeReceipt.durableWritePerformed, false);
+  assert.equal(result._nativeRuntimeReceipt.unscopedNativeSearchUsed, false);
+});
 
 function readBody(req) {
   return new Promise((resolve, reject) => {

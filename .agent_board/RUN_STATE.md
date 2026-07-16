@@ -4,11 +4,11 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2131 post-PR21 main baseline and native-context proof status sync`.
-Current validation: `CMV-2216`.
-Current fact: observed `main` baseline `49f4ad14…` / tree `930d182c…` matches PR #21 head tree, and exact-head main CI passed.
-Fresh proof at PR #21 head `f8268aad…` passed with `source_runtime=vcp_native`, no fallback, `memoryWritePerformed=false`, `primaryMemoryStoreWritePerformed=false`, `rawDisclosure=false`, and `result_item_count=0`; the bounded proof used one derived-index cache write.
-The native-first path is proven, but non-empty recall and recall relevance are not. Production/release/deploy/cutover/RC/complete-V8/readiness remain false; this status sync made no new provider/runtime/memory/remote call.
+Current task: `CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout`.
+Current validation: `CMV-2217`.
+Current fact: four clean governed partitions and four authorized bootstrap memories were indexed; all 13 legacy partitions remained excluded and unread.
+Codex/Claude private, project, workspace, shared-union, and task-start live reads passed non-empty relevance, isolation, mapping binding, source post-check, and zero-unscoped-search checks.
+Stage 3B is `V1_COMPLETE`; bootstrap primary writes were exactly four and live-proof primary writes were zero. Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
