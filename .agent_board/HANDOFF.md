@@ -4,18 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2121 exact full-plan status synchronization`.
-Current validation: `CMV-2214`.
-Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
+Current task: `CM-2130 final-main full-plan revalidation`.
+Current validation: `CMV-2215`.
+Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
+The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-The exact full-plan application is now bound and ancestry-anchored. Application `41097b0f…` has the exact five-path tree, receipt freeze `727e8128…` preserves both raw receipts, and internal review `521348cf…` accepts their Git identities and non-claim boundary. The one-shot authorization is consumed and cannot be replayed.
+Final `main` baseline `d78ad8f7…` / tree `0a503ded…` has passed CM-2130 revalidation. PRs #14 through #19 are six regular merge commits in strict first-parent order; 17 frozen evidence artifacts and nine status surfaces passed exact Git-object, canonical-hash, consumed/non-replayable, and non-readiness checks.
 
-The historical bound application remains evidence, but current `fullPlanPackCompleted=false` pending revalidation. Production, release, deploy, cutover, `RC_READY`, complete V8, and all other readiness fields remain false. No native/provider/real-memory/remote action is active.
+The historical bound application and branch-CAS result are accepted as evidence, but current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false` remain unchanged. The next route, if desired, is a separate exact status-sync decision; do not replay historical authorization. Production, release, deploy, cutover, `RC_READY`, complete V8, and all other readiness fields remain false.
 
 ## Previous Active Handoff
 CM-2118 uses a single secure entry that accepts only content commit

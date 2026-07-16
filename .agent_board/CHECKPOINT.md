@@ -4,12 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2121 exact full-plan status synchronization`.
-Current validation: `CMV-2214`.
-Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
+Current task: `CM-2130 final-main full-plan revalidation`.
+Current validation: `CMV-2215`.
+Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
+The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2130 Final-main Full-plan Revalidation
+
+Status: `FINAL_MAIN_EVIDENCE_REVALIDATED_STATUS_SYNC_SEPARATE_FULL_PLAN_FALSE_READINESS_FALSE`
+
+- Baseline `d78ad8f7…` / tree `0a503ded…` contains PRs #14-#19 as six exact regular merge commits in strict first-parent order.
+- Seventeen frozen CM-2120/2121/2128/2129 artifacts and nine committed status surfaces passed Git-object and canonical-hash replay.
+- Historical application and branch-CAS evidence is accepted; every consumed authorization remains non-replayable.
+- Current `fullPlanStatusSyncPerformed=false` and `fullPlanPackCompleted=false`; an exact status sync remains separate.
+- Every readiness alias remains false; no new patch, ref update, native/provider/real-memory/remote action occurred.
+
+Validation: `CMV-2215`.
 
 ## CM-2121 Bound Full-plan Completion Status Sync
 

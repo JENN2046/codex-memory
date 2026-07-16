@@ -263,6 +263,19 @@
     "cm2120ReceiptReviewPassed": true,
     "cm2121ReadinessClaimed": false,
     "cm2121StatusSyncPerformed": true,
+    "cm2130EvidenceArtifactCount": 17,
+    "cm2130FinalMainBaselineCommit": "d78ad8f7c0d3e3dc1c713870d07faf7958ecb84c",
+    "cm2130FinalMainBaselineTree": "0a503ded7180f2a38bedda7d2fd61c1f98beffea",
+    "cm2130FinalMainEvidenceRevalidated": true,
+    "cm2130FullPlanPackCompleted": false,
+    "cm2130FullPlanStatusSyncPerformed": false,
+    "cm2130MergeCount": 6,
+    "cm2130ReadinessClaimed": false,
+    "cm2130RevalidationArtifactPayloadSha256": "0135b59374536fb9cd9c6ecbb5bf3baede059c1b802667900eed40c491fbc2d8",
+    "cm2130RevalidationArtifactRawSha256": "65c8220542725f6bc8ac03a7fec30a6136278c07fa628545c0440ab3e4ee3a57",
+    "cm2130RevalidationReference": "CM-2130-FINAL-MAIN-FULL-PLAN-REVALIDATION-D78AD8F7-0A503DED",
+    "cm2130StatusSurfaceCount": 9,
+    "cm2130StatusSyncStillSeparate": true,
     "completionAuditApplicationDecisionReference": "CM-2081-ER-20260711-APPROVE-COMPLETION-AUDIT-2215BB33",
     "completionAuditApplicationReceiptPayloadSha256": "b74dd9ad7077754e98aaff266d62bd1a25223eb392d35108e5926a9eca16cfeb",
     "completionAuditApplicationRequestCommit": "88d11e94dc238145ba9317589cebda52f73910e1",
@@ -522,6 +535,7 @@
     "committed live Git head facts"
   ],
   "planPackCompletion": {
+    "finalMainFullPlanEvidenceRevalidationPassed": true,
     "fullPlanApplicationApplied": true,
     "fullPlanApplicationAuthorizationConsumed": true,
     "fullPlanApplicationAuthorizationReplayAllowed": false,
@@ -568,12 +582,17 @@
     "notReleaseReady": true,
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "near_model_memory_plan_pack_reopened_needs_revalidation_no_readiness_claim"
+    "scope": "near_model_memory_plan_pack_final_main_evidence_revalidated_status_sync_separate_no_readiness_claim"
   },
-  "taskId": "CM-2121",
-  "updatedAt": "2026-07-12",
-  "validationId": "CMV-2214",
+  "taskId": "CM-2130",
+  "updatedAt": "2026-07-16",
+  "validationId": "CMV-2215",
   "validationSummary": [
+    {
+      "id": "CMV-2215",
+      "scope": "CM-2130 final-main full-plan revalidation",
+      "status": "COMPLETED_FINAL_MAIN_EVIDENCE_REVALIDATED_STATUS_SYNC_SEPARATE_FULL_PLAN_FALSE_READINESS_FALSE"
+    },
     {
       "id": "CMV-2214",
       "scope": "CM-2121 exact full-plan status synchronization",

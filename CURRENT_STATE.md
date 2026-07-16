@@ -8,13 +8,19 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Historical full-plan application bound; current completion and status sync reopened for revalidation; readiness remains false |
-| Current task | `CM-2121 exact full-plan status synchronization` |
-| Current validation | `CMV-2214` |
-| Current route | Full plan-pack completion needs revalidation; any readiness or external action remains separately gated |
+| Status | Final-main full-plan evidence revalidated; current completion/status sync remain false and separate; readiness remains false |
+| Current task | `CM-2130 final-main full-plan revalidation` |
+| Current validation | `CMV-2215` |
+| Current route | Decide any exact status sync separately; readiness and external actions remain separately gated |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## Final-main Full-plan Revalidation
+
+Final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves PRs #14 through #19 as six regular merge commits in strict first-parent order. CM-2130 re-read 17 frozen CM-2120/2121/2128/2129 evidence artifacts and the nine committed status surfaces from that exact baseline; Git identities, canonical payload hashes, one-shot consumption/non-replay, receipt review, branch-CAS freeze/review, zero-new-side-effect limits, and all false readiness aliases passed.
+
+This is evidence acceptance, not a status-sync execution. Current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false` remain unchanged. The revalidation did not replay an authorization, patch status files as a completion action, update a branch ref, call a provider, access real memory, or claim readiness. Machine evidence: `docs/near-model-memory-plan-pack/cm2130_final_main_full_plan_revalidation.json`.
 
 ## Current Bound Full-plan Application
 
