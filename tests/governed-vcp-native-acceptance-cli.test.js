@@ -57,6 +57,10 @@ test('acceptance CLI rejects unsupported client identities instead of falling ba
     () => parseArgs([], { CODEX_MEMORY_CLIENT_ID: 'claud' }),
     /invalid_client_id/
   );
+  assert.equal(
+    parseArgs(['--client-id', 'Codex'], { CODEX_MEMORY_CLIENT_ID: 'claud' }).clientId,
+    'Codex'
+  );
   assert.throws(
     () => buildConfigOverrides({ clientId: 'claud' }),
     /invalid_client_id/

@@ -93,7 +93,7 @@ function parseArgs(argv = [], env = process.env) {
     workspaceId: env.CODEX_MEMORY_WORKSPACE_ID || DEFAULT_WORKSPACE_ID,
     scopeId: env.CODEX_MEMORY_SCOPE_ID || '',
     visibility: env.CODEX_MEMORY_VISIBILITY || DEFAULT_VISIBILITY,
-    clientId: governedNativeClientOrDefault(env.CODEX_MEMORY_CLIENT_ID),
+    clientId: env.CODEX_MEMORY_CLIENT_ID || 'Codex',
     query: 'codex memory governed native acceptance probe',
     limit: 1,
     writeTitle: 'codex-memory governed native acceptance probe',
@@ -188,7 +188,11 @@ function parseArgs(argv = [], env = process.env) {
       continue;
     }
     if (token === '--client-id') {
-      options.clientId = governedNativeClientOrDefault(argv[index + 1], null);
+      const explicitClientId = typeof argv[index + 1] === 'string'
+        ? argv[index + 1].trim()
+        : '';
+      if (!explicitClientId) throw new Error('invalid_client_id');
+      options.clientId = explicitClientId;
       index += 1;
       continue;
     }
@@ -248,6 +252,7 @@ function parseArgs(argv = [], env = process.env) {
     }
   }
 
+  options.clientId = governedNativeClientOrDefault(options.clientId);
   return options;
 }
 
