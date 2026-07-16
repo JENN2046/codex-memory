@@ -6,6 +6,7 @@ const path = require('node:path');
 const {
   DAEMON_DEPENDENT_FILES,
   FIXTURE_DRIFT_FILES,
+  FROZEN_REPLAY_E2E_FILES,
   PROVIDER_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
   resolveExcluded
@@ -20,13 +21,14 @@ test('CM1448 release test gate matrix matches default-safe excluded categories',
   const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
   const excluded = resolveExcluded();
 
-  for (const label of ['provider', 'daemon', 'self-referential', 'fixture-drift']) {
+  for (const label of ['provider', 'daemon', 'self-referential', 'frozen-replay E2E', 'fixture-drift']) {
     assert.match(matrix, new RegExp(label, 'i'));
   }
   for (const file of [
     ...PROVIDER_DEPENDENT_FILES,
     ...DAEMON_DEPENDENT_FILES,
     ...SELF_REFERENTIAL_FILES,
+    ...FROZEN_REPLAY_E2E_FILES,
     ...FIXTURE_DRIFT_FILES
   ]) {
     assert.equal(excluded.has(file), true, file);
@@ -37,6 +39,10 @@ test('CM1448 release test gate matrix matches default-safe excluded categories',
   assert.equal(packageJson.scripts['test:release-candidate'], 'node ./src/cli/run-release-gate-tests.js release-candidate');
   assert.equal(packageJson.scripts['test:parity'], 'node ./src/cli/run-release-gate-tests.js parity');
   assert.equal(packageJson.scripts['test:migration'], 'node ./src/cli/run-release-gate-tests.js migration');
+  assert.equal(
+    packageJson.scripts['test:frozen-replay-e2e'],
+    'node --test --test-concurrency=1 tests/cm2118-full-plan-application-execution.test.js tests/cm2120-full-plan-application-receipt-review.test.js tests/cm2122-full-plan-status-sync-execution.test.js'
+  );
 });
 
 test('CM1459 release gate scripts remain local and do not claim readiness', () => {

@@ -4,12 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
-Current validation: `CMV-2209`.
-Current status: the Phase 2 application has one durable consumed claim, exact application commit/diff/pre-post binding, and receipt-time upstream Git revalidation. The rebuilt 164-entry R2 snapshot is frozen and pending independent review. `independentReviewPassed=false`, `fullPlanPackCompleted=false`; every readiness claim remains false.
-Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
+Current task: `CM-2121 exact full-plan status synchronization`.
+Current validation: `CMV-2214`.
+Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## Current Run State
+
+- Full-plan application evidence: historically bound; current synchronization is reopened for revalidation.
+- Application authorization: consumed, non-replayable, inactive.
+- Readiness: all aliases false.
+- Native/provider/real-memory/remote authority from this task: none.
 
 ## Historical Run State Archive
 
@@ -37,11 +44,7 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of CM-2115-R2 snapshot commit `8d252985…`
-and review-request commit `01c65db8…`. Only after an exact PASS is frozen may a
-separate one-field `fullPlanPackCompleted` application be requested. Do not
-replay native actions, prepare application authority early, or infer production,
-release, deploy, cutover, RC, complete-V8, or readiness from candidate eligibility.
+Any readiness, release, deploy, cutover, tag, push, native-memory, provider, or real-memory action requires a new exact boundary. Do not replay the consumed full-plan application authorization.
 
 ## Historical Run Notes
 

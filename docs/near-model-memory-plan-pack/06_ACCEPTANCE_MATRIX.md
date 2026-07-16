@@ -148,3 +148,11 @@ model-memory-complete
 | CM-2115-R2 Phase 2 binding receipt | Durable one-shot claim + exact application commit/tree/diff/pre-post blobs + receipt-time upstream Git revalidation | Required | Frozen as the strengthened v2 binding receipt; rebuilt snapshot remains pending independent review |
 
 R1 receipt shape alone is not accepted as current patch evidence.
+
+## CM-2117 Exact Full-plan Application Boundary
+
+| Evidence | Acceptance boundary | Current status |
+|---|---|---|
+| CM-2117 full-plan application | Exact five-path patch + durable one-shot claim + direct-child application commit + separate binding receipt | Pending final execution release and application binding |
+
+Gate or decision-content acceptance alone does not complete the plan pack.

@@ -1,0 +1,442 @@
+{
+  "canonicalPayloadSha256": "50ae5da8e81885abf2f45af87d41bef19ea0cb355999cd76449f52ed53c22a5a",
+  "decisionType": "exact_full_plan_application_content_decision_v1",
+  "payload": {
+    "allowedStateAfterBoundApplication": {
+      "fullPlanPackCompleted": true,
+      "historicalCm2080ExternalReviewPassed": true,
+      "independentExternalReviewPassed": false,
+      "independentReviewMode": "repository_internal_separate_pass",
+      "independentReviewPassed": true,
+      "phase8Completed": true,
+      "readiness": {
+        "completeRealtimeMemory": false,
+        "completeRealtimeMemoryClaimed": false,
+        "completeV8": false,
+        "completeV8Claimed": false,
+        "cutoverReady": false,
+        "cutoverReadyClaimed": false,
+        "deployReady": false,
+        "deployReadyClaimed": false,
+        "fullBridgeCompletion": false,
+        "fullBridgeCompletionClaimed": false,
+        "fullPlanPackCompletedClaimed": false,
+        "fullRealtimeMemory": false,
+        "fullRealtimeMemoryClaimed": false,
+        "modelMemoryComplete": false,
+        "modelMemoryCompleteClaimed": false,
+        "productionReady": false,
+        "productionReadyClaimed": false,
+        "rcReady": false,
+        "rcReadyClaimed": false,
+        "readinessClaimed": false,
+        "releaseReady": false,
+        "releaseReadyClaimed": false
+      }
+    },
+    "authorizationContent": {
+      "action": "apply_exact_full_plan_completion_state",
+      "alternateOutputPathAllowed": false,
+      "applicationExecutionAuthorized": false,
+      "authorizationContentApproved": true,
+      "authorizationReplayAllowed": false,
+      "authorizationUseCount": 1,
+      "automaticCleanupAllowed": false,
+      "automaticRetryAllowed": false,
+      "callerSuppliedAcceptedBooleanAllowed": false,
+      "finalExecutionReleaseRequired": true,
+      "nonce": "cm2116-full-plan-application-001",
+      "receiptId": "cm2116-full-plan-application-receipt-001",
+      "registryReference": "cm2116-full-plan-application-registry-001"
+    },
+    "currentSideEffects": {
+      "claimCreates": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "repositoryPatches": 0
+    },
+    "currentState": {
+      "claimCreated": false,
+      "finalExecutionReleasePresent": false,
+      "fullPlanApplicationAuthorized": false,
+      "fullPlanApplicationCommitBound": false,
+      "fullPlanApplicationDecisionContentApproved": true,
+      "fullPlanApplicationDecisionGitIntakeCompleted": false,
+      "fullPlanApplicationExecuted": false,
+      "fullPlanApplicationGatePrepared": true,
+      "fullPlanPackCompleted": false,
+      "readinessClaimed": false
+    },
+    "decisionImplementation": {
+      "artifacts": [
+        {
+          "blobOid": "8e802faa46b2fc2dd0319a94808b13f3681edddb",
+          "path": "src/core/Cm2117ExactFullPlanApplicationDecision.js"
+        },
+        {
+          "blobOid": "80a1bb31b740ebc2c609ef5c082a04c79f9a1823",
+          "path": "scripts/generate-cm2117-exact-full-plan-application-decision.js"
+        },
+        {
+          "blobOid": "d5d38034872146841450cdd8884c87ca4220c787",
+          "path": "tests/cm2117-exact-full-plan-application-decision.test.js"
+        },
+        {
+          "blobOid": "f6801e2f815251c6d0dcf53afe9f8d12f9c936f6",
+          "path": "package.json"
+        },
+        {
+          "blobOid": "c6a469d588ce1d7e4e8e1c905d1df553bc6d75d0",
+          "path": "src/core/Cm2116ExactFullPlanApplicationGate.js"
+        },
+        {
+          "blobOid": "692df9df815f0cf7e47ee9fcbd054fdcb3f9dc39",
+          "path": "src/core/Cm2115R2SelfReviewDecisionIntakeReceiptContract.js"
+        },
+        {
+          "blobOid": "cac52c26899ef3b206d9c264df6685da060426c4",
+          "path": "src/core/Cm2115R2CanonicalSnapshotSelfReviewDecisionContract.js"
+        },
+        {
+          "blobOid": "95c3c7412570966510a9e7b818a450f2be0b9924",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshot.js"
+        },
+        {
+          "blobOid": "2e42add5ff740966edaf8dbd011935d86a992a6d",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotContract.js"
+        },
+        {
+          "blobOid": "f38429ddefbecf97a966ede9bab1724f09ded7a6",
+          "path": "src/core/Cm2115CanonicalFullPlanEvidenceSnapshotReviewRequestContract.js"
+        },
+        {
+          "blobOid": "532912c74f1736f643ed7437923f743baeef0954",
+          "path": "src/core/NearModelMemoryPlanPackCompletionAudit.js"
+        },
+        {
+          "blobOid": "bf0f8c4c321c8e34a3a7c8452db77371592b08ee",
+          "path": "scripts/cm2115-r2-git.js"
+        },
+        {
+          "blobOid": "45e70706fca7dcb19314ea8ad80adbcbd740b2b7",
+          "path": "scripts/generate-cm2115-r2-self-review-decision.js"
+        },
+        {
+          "blobOid": "f740d7200e4a3aac7e7a103fe651d60ad317d2a8",
+          "path": "scripts/generate-cm2116-exact-full-plan-application-gate.js"
+        }
+      ],
+      "commit": "249c9ba173b1849ef59bef2410e3d874e1750f31",
+      "tree": "f993c3a2abf0cd17bddb90c418cb06cf95e6cdfe"
+    },
+    "decisionReference": "CM-2117-EXACT-FULL-PLAN-APPLICATION-CONTENT-DECISION-7591EFB0-F6B7F9A5-249C9BA1",
+    "decisionType": "exact_full_plan_application_content_decision",
+    "futureFinalReleaseRequirements": {
+      "corruptOrExistingClaimMustFailClosed": true,
+      "decisionGitIdentityMustBindCommitTreeParentDiffBlobBytesRawAndPayloadSha256": true,
+      "decisionMustBeFrozenInGit": true,
+      "durableAtomicOneShotClaimRequired": true,
+      "exactBeforeAfterPatchRequired": true,
+      "exactDecisionAndGateRevalidationRequired": true,
+      "exactDirectChildApplicationCommitRequired": true,
+      "executionReceiptMayBeFrozenOnlyWithSeparateBindingReceiptCommit": true,
+      "frozenExecutorImplementationCommitTreeAndArtifactsRequired": true,
+      "lowDisclosureExecutionReceiptMustRemainOutsideApplicationCommit": true,
+      "receiptTimeDecisionGateAndBaselineRevalidationRequired": true,
+      "separateApplicationCommitBindingReceiptRequired": true
+    },
+    "futureSideEffectLimits": {
+      "claimCreates": 1,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "remoteActions": 0,
+      "repositoryPatches": 1
+    },
+    "gateBinding": {
+      "canonicalPayloadSha256": "7591efb0ff598666bd764b99155fd05f7b7fb97c3229a4bfea855a5eb552430c",
+      "commit": "f6b7f9a584946058ac8606e36efb7492dbf4da74",
+      "diffEntries": [
+        {
+          "path": "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.json",
+          "status": "A"
+        },
+        {
+          "path": "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.md",
+          "status": "A"
+        }
+      ],
+      "diffEntriesSha256": "80a4e54519f681e4c62c084216b18a1e7a3de4cf2396df04c37828a0b1edb57b",
+      "diffPaths": [
+        "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.json",
+        "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.md"
+      ],
+      "diffPathsSha256": "75e8066e114bcda3ec26b689009dfb1cdcf723a03307a8c1bdb507e4b2ef224f",
+      "gateContractReplayed": true,
+      "gateReference": "CM-2116-R1-EXACT-FULL-PLAN-APPLICATION-GATE-FFB0A0CF-7187E520-629CA75F",
+      "json": {
+        "blobOid": "5741cabeaf48680288bc48358716376754ce8177",
+        "bytes": 11204,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "db625f6218b2b2249953c4c66f4c8a2b99011cf8dad310aaa0e63a017f804442",
+        "sourceCommit": "f6b7f9a584946058ac8606e36efb7492dbf4da74",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.json",
+        "sourceTree": "6004160d460c0498de756d8b740a9fb90bfc19f4"
+      },
+      "markdown": {
+        "blobOid": "66d95391a77341143a76581de063fa5709c5d3e1",
+        "bytes": 11735,
+        "gitMode": "100644",
+        "gitObjectType": "blob",
+        "sha256": "2f1e5bb974ceaa8934fac4dd7be9c7af08f727fa904a5fc250ac4153c38c10f5",
+        "sourceCommit": "f6b7f9a584946058ac8606e36efb7492dbf4da74",
+        "sourcePath": "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.md",
+        "sourceTree": "6004160d460c0498de756d8b740a9fb90bfc19f4"
+      },
+      "parentCommit": "629ca75fe2141049d11e41ce13551a0fde8cbc4e",
+      "parentTree": "6ad868b1a41539b80d0214a567b8589f9b0e3376",
+      "tree": "6004160d460c0498de756d8b740a9fb90bfc19f4",
+      "upstreamReceiptContractReplayed": true,
+      "upstreamSelfReviewIntake": {
+        "actionableFindingCount": 0,
+        "canonicalPayloadSha256": "ffb0a0cf5db9fff8f04c70d0eb50af4a7adda6db9b0c7f44d3a081675e58eaba",
+        "canonicalSnapshotContractReplayed": true,
+        "commit": "7187e5205806a7038a5cfaff8de46ac89ff953f3",
+        "diffEntries": [
+          {
+            "path": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.json",
+            "status": "A"
+          },
+          {
+            "path": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.md",
+            "status": "A"
+          }
+        ],
+        "diffEntriesSha256": "7c12df84fa903b94bce7ddd0cd4d79668d35b3761392bd195c6b2fc2535eb011",
+        "diffPaths": [
+          "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.json",
+          "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.md"
+        ],
+        "diffPathsSha256": "5ebc7026ba88a2a89eac8e9ee313b06ae1a7654530d7c650dd48032d9b47b0cf",
+        "exactReceiptContractReplayed": true,
+        "json": {
+          "blobOid": "2a2c8f0192e1ef60b91f63c8c7b9104eece621e6",
+          "bytes": 6801,
+          "gitMode": "100644",
+          "gitObjectType": "blob",
+          "sha256": "bd533593604df36d2f2b449a9c29ed72dfffd0246d490bff83cc6c185dbf044f",
+          "sourceCommit": "7187e5205806a7038a5cfaff8de46ac89ff953f3",
+          "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.json",
+          "sourceTree": "6a5eed26226a7e75edc28f3e884f65ec296f5b2c"
+        },
+        "markdown": {
+          "blobOid": "7a0340b8075d12482a81c4545dd565fd073369a3",
+          "bytes": 7378,
+          "gitMode": "100644",
+          "gitObjectType": "blob",
+          "sha256": "4bcd7ed3a6c3edb5a8df140d4fdb6095e26537d4d617c36883fae4d057c18219",
+          "sourceCommit": "7187e5205806a7038a5cfaff8de46ac89ff953f3",
+          "sourcePath": "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.md",
+          "sourceTree": "6a5eed26226a7e75edc28f3e884f65ec296f5b2c"
+        },
+        "parentCommit": "df0444bdd46322d52f1dd65eaf78c135f09c556b",
+        "parentTree": "8f979aec895f3c96c5b8aa4f5f15fe9d40f453eb",
+        "receiptReference": "CM-2115-R2-SELF-REVIEW-INTAKE-PASS-03242787-116D74B3-DF0444BD",
+        "resolvedTraceEntryCount": 164,
+        "sourceObjectMismatchCount": 0,
+        "traceEntryCount": 164,
+        "tree": "6a5eed26226a7e75edc28f3e884f65ec296f5b2c",
+        "uniqueSourceObjectCount": 105
+      }
+    },
+    "nonClaims": {
+      "completeRealtimeMemory": false,
+      "completeRealtimeMemoryClaimed": false,
+      "completeV8": false,
+      "completeV8Claimed": false,
+      "cutoverReady": false,
+      "cutoverReadyClaimed": false,
+      "deployReady": false,
+      "deployReadyClaimed": false,
+      "fullBridgeCompletion": false,
+      "fullBridgeCompletionClaimed": false,
+      "fullPlanPackCompletedClaimed": false,
+      "fullRealtimeMemory": false,
+      "fullRealtimeMemoryClaimed": false,
+      "modelMemoryComplete": false,
+      "modelMemoryCompleteClaimed": false,
+      "productionReady": false,
+      "productionReadyClaimed": false,
+      "rcReady": false,
+      "rcReadyClaimed": false,
+      "readinessClaimed": false,
+      "releaseReady": false,
+      "releaseReadyClaimed": false
+    },
+    "patchPlan": {
+      "additionalSemanticStateChangesAllowed": false,
+      "allowedAuthoritativeStateTransition": {
+        "field": "fullPlanPackCompleted",
+        "from": false,
+        "to": true
+      },
+      "allowedTargets": [
+        {
+          "operation": "modify",
+          "path": "docs/near-model-memory-plan-pack/completion_audit_report.md"
+        },
+        {
+          "operation": "modify",
+          "path": "docs/near-model-memory-plan-pack/evidence_trace_matrix_report.md"
+        },
+        {
+          "operation": "modify",
+          "path": "docs/near-model-memory-plan-pack/06_ACCEPTANCE_MATRIX.md"
+        },
+        {
+          "operation": "modify",
+          "path": "docs/near-model-memory-plan-pack/07_CAPABILITY_MATRIX.md"
+        },
+        {
+          "operation": "add",
+          "path": "docs/near-model-memory-plan-pack/cm2116_full_plan_application_state.json"
+        }
+      ],
+      "applicationCommitMustBeDirectChildOfFrozenDecisionCommit": true,
+      "exactFivePathApplicationDiffRequired": true,
+      "executionReceiptIncludedInApplicationCommit": false,
+      "genericReceiptPathExceptionAllowed": false,
+      "historicalImmutablePaths": [
+        "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.json",
+        "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot.md",
+        "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.json",
+        "docs/near-model-memory-plan-pack/cm2115_r2_canonical_full_plan_evidence_snapshot_review_request.md",
+        "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.json",
+        "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision.md",
+        "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.json",
+        "docs/near-model-memory-plan-pack/cm2115_r2_internal_self_review_decision_intake_receipt.md",
+        "docs/near-model-memory-plan-pack/cm2116_exact_full_plan_application_gate.json",
+        "docs/near-model-memory-plan-pack/cm2116_exact_full_plan_application_gate.md",
+        "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.json",
+        "docs/near-model-memory-plan-pack/cm2116_r1_exact_full_plan_application_gate.md",
+        "docs/near-model-memory-plan-pack/cm2117_exact_full_plan_application_decision.json",
+        "docs/near-model-memory-plan-pack/cm2117_exact_full_plan_application_decision.md"
+      ],
+      "patchPayloadSha256": "988386ae254f401e7e682ba4b09f26a0dc5ba96bee3c7a68200cbe4218cc49bd",
+      "readinessFieldsMustRemainFalse": [
+        "productionReady",
+        "releaseReady",
+        "deployReady",
+        "cutoverReady",
+        "rcReady",
+        "completeV8",
+        "modelMemoryComplete",
+        "fullRealtimeMemory",
+        "fullBridgeCompletion",
+        "readinessClaimed",
+        "productionReadyClaimed",
+        "releaseReadyClaimed",
+        "deployReadyClaimed",
+        "cutoverReadyClaimed",
+        "rcReadyClaimed",
+        "completeV8Claimed",
+        "fullPlanPackCompletedClaimed",
+        "modelMemoryCompleteClaimed",
+        "completeRealtimeMemoryClaimed",
+        "fullRealtimeMemoryClaimed",
+        "fullBridgeCompletionClaimed",
+        "completeRealtimeMemory"
+      ],
+      "separateApplicationCommitBindingReceiptRequired": true,
+      "sourceBaselineCommit": "249c9ba173b1849ef59bef2410e3d874e1750f31",
+      "sourceBaselineTree": "f993c3a2abf0cd17bddb90c418cb06cf95e6cdfe",
+      "statusSyncAllowedOnlyAfterBindingReceiptPasses": true,
+      "targets": [
+        {
+          "after": {
+            "blobOid": "634dc19caef779dca01d49f8af9f2a4b08797f6d",
+            "bytes": 61272,
+            "gitMode": "100644",
+            "sha256": "dfa2028e5d63e7ec73329adceee52caaf4f742ab7c9c777ca238e837878089b6"
+          },
+          "before": {
+            "blobOid": "49dd3a39ef4796cdf587b3d5394ef6add78172b1",
+            "bytes": 60686,
+            "gitMode": "100644",
+            "sha256": "c791409aca283f546ab013f058c4ae98fa1b74e9574c1c6040e1ab516b624091"
+          },
+          "operation": "modify",
+          "sourcePath": "docs/near-model-memory-plan-pack/completion_audit_report.md"
+        },
+        {
+          "after": {
+            "blobOid": "7aeb3ce1c9b9af2d3c71797590fba1ab28b31420",
+            "bytes": 34457,
+            "gitMode": "100644",
+            "sha256": "66afc8f2c0eefe595ccd9ee1616968c7afe023c8da2cd7e4bac98d37b7c1422c"
+          },
+          "before": {
+            "blobOid": "4cd86ef5efada6c3f927da923fe7d4dad73d26b4",
+            "bytes": 34125,
+            "gitMode": "100644",
+            "sha256": "339bd48cba47ae02ac7dc60227bec8565880912d817b1da20161458fec71ccd0"
+          },
+          "operation": "modify",
+          "sourcePath": "docs/near-model-memory-plan-pack/evidence_trace_matrix_report.md"
+        },
+        {
+          "after": {
+            "blobOid": "21fdc9610602582fbcbef5c4c00b274695ca2782",
+            "bytes": 9204,
+            "gitMode": "100644",
+            "sha256": "28a8bd8581efc2415bfe444d1eff472c1181d92e239c94e77d446659d09abb01"
+          },
+          "before": {
+            "blobOid": "00426318115ca3b531b139437820b2150ee4d931",
+            "bytes": 8810,
+            "gitMode": "100644",
+            "sha256": "52a8953f6030fc5d69fa2b3a8f4dbc9c547f94ce53d1fce488717a2f29e954df"
+          },
+          "operation": "modify",
+          "sourcePath": "docs/near-model-memory-plan-pack/06_ACCEPTANCE_MATRIX.md"
+        },
+        {
+          "after": {
+            "blobOid": "f9131fde89684182e182f952bedf75b60adbcab5",
+            "bytes": 19496,
+            "gitMode": "100644",
+            "sha256": "d487b391c7c0a95d98415714f4e6fb4773d0d66e0c3099a1286860573fd0a6c1"
+          },
+          "before": {
+            "blobOid": "28d9962c13c6e80bf90bdb8b88f32eed3126d58a",
+            "bytes": 19139,
+            "gitMode": "100644",
+            "sha256": "eea322dceed7e38dfaf3380fca194edd47fac2bb6ad4cc0564b076681a612e7d"
+          },
+          "operation": "modify",
+          "sourcePath": "docs/near-model-memory-plan-pack/07_CAPABILITY_MATRIX.md"
+        },
+        {
+          "after": {
+            "blobOid": "def3705a3e36a44bdf42ecf2974c26ae937259ed",
+            "bytes": 1808,
+            "gitMode": "100644",
+            "sha256": "d431ea83f848b949b9da1e8fa2b7e9f8cff804890da1b6dce35d522a7352d2c8"
+          },
+          "before": null,
+          "operation": "add",
+          "sourcePath": "docs/near-model-memory-plan-pack/cm2116_full_plan_application_state.json"
+        }
+      ]
+    }
+  },
+  "schemaVersion": 1,
+  "taskId": "CM-2117"
+}

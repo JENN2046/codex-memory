@@ -84,6 +84,7 @@
     "test:hardening": "node --test --test-concurrency=1 tests/http-no-token-search-rejection.test.js tests/security-profile-config.test.js tests/external-provider-gate.test.js tests/stdio-message-size-limit.test.js tests/tool-argument-validator-limits.test.js tests/json-rpc-error-redaction.test.js && node --test tests/gate-ci-env-override-evidence.test.js",
     "test:provider": "node ./src/cli/run-provider-tests.js",
     "test:all": "npm test && npm run test:hardening",
+    "test:frozen-replay-e2e": "node --test --test-concurrency=1 tests/cm2118-full-plan-application-execution.test.js tests/cm2120-full-plan-application-receipt-review.test.js tests/cm2122-full-plan-status-sync-execution.test.js",
     "cm2115:validation-receipt": "node ./scripts/generate-cm2115-local-validation-receipt.js",
     "cm2115:snapshot": "node ./src/cli/cm2115-canonical-full-plan-evidence-snapshot.js",
     "cm2115:review-request": "node ./scripts/generate-cm2115-independent-review-request.js",
@@ -95,7 +96,17 @@
     "cm2115-r2:binding-receipt": "node ./scripts/generate-cm2115-r2-application-binding-receipt.js",
     "cm2115-r2:strengthened-binding-receipt": "node ./scripts/generate-cm2115-r2-strengthened-binding-receipt.js",
     "cm2115-r2:self-review": "node ./scripts/generate-cm2115-r2-self-review-decision.js",
-    "cm2115-r2:self-review-intake": "node ./scripts/generate-cm2115-r2-self-review-intake-receipt.js"
+    "cm2115-r2:self-review-intake": "node ./scripts/generate-cm2115-r2-self-review-intake-receipt.js",
+    "cm2116-r1:full-plan-gate": "node ./scripts/generate-cm2116-exact-full-plan-application-gate.js",
+    "cm2117:full-plan-decision": "node ./scripts/generate-cm2117-exact-full-plan-application-decision.js",
+    "cm2118:execution-packet": "node ./scripts/generate-cm2118-full-plan-application-execution-packet.js",
+    "cm2119:final-execution-release": "node ./scripts/generate-cm2119-full-plan-final-execution-release.js",
+    "cm2120:freeze-receipts": "node ./scripts/freeze-cm2120-full-plan-application-receipts.js",
+    "cm2120:review-receipts": "node ./scripts/generate-cm2120-full-plan-application-receipt-review.js",
+    "cm2121:status-sync-application": "node ./scripts/generate-cm2121-full-plan-status-sync-application.js",
+    "cm2121:status-sync-content-decision": "node ./scripts/generate-cm2121-full-plan-status-sync-content-decision.js",
+    "cm2122:status-sync-execution-packet": "node ./scripts/generate-cm2122-full-plan-status-sync-execution-packet.js",
+    "cm2123:status-sync-final-release": "node ./scripts/generate-cm2123-full-plan-status-sync-final-release.js"
   },
   "engines": {
     "node": ">=22.0.0"

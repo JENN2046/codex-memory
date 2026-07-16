@@ -16,7 +16,8 @@ This matrix prevents a common overclaim: default local tests are useful regressi
 
 | Gate | Current Meaning | Release Claim Allowed |
 |---|---|---|
-| `npm test` | Default local safe regression suite through `src/cli/run-default-tests.js`; excludes known provider, daemon, and self-referential classes; fixture-drift exclusions must remain empty and visible if reintroduced | no |
+| `npm test` | Default local safe regression suite through `src/cli/run-default-tests.js`; excludes known provider, daemon, self-referential, and multi-minute frozen-replay E2E classes; fixture-drift exclusions must remain empty and visible if reintroduced | no |
+| `npm run test:frozen-replay-e2e` | Opt-in, serial execution of the CM-2118, CM-2120, and CM-2122 frozen Git-replay executor suites; retains full one-shot/reentry coverage outside the default-safe latency budget | no |
 | `npm run test:migration` | Local migration-adjacent test subset through `src/cli/run-release-gate-tests.js migration`; temp DB and dry-run gates only | no |
 | `npm run test:parity` | Local parity/governance contract subset through `src/cli/run-release-gate-tests.js parity`; no provider, daemon, or public MCP expansion | no |
 | `npm run test:release-candidate` | Local release-candidate evidence subset through `src/cli/run-release-gate-tests.js release-candidate`; reports `RC_NOT_READY_BLOCKED` contract status | no |

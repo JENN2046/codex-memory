@@ -4,25 +4,76 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current checkpoint: `CM-2115-R2 durable one-shot and exact patch binding repair`.
-Current validation: `CMV-2209`.
-Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json` as a committed status snapshot; live Git facts require fresh Git commands.
+Current task: `CM-2121 exact full-plan status synchronization`.
+Current validation: `CMV-2214`.
+Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## CM-2115-R2 Durable One-shot and Exact Patch Binding Repair
+## CM-2121 Bound Full-plan Completion Status Sync
 
-Status: `DURABLE_EXACT_PATCH_BOUND_R2_SNAPSHOT_FROZEN_INDEPENDENT_REVIEW_PENDING_FULL_PLAN_FALSE_NO_READY_CLAIM`
+Status: `COMPLETED_STATUS_REOPENED_FULL_PLAN_NEEDS_REVALIDATION_READINESS_FALSE`
 
-- Durable claim state is `CONSUMED_SUCCESS`, use count and patch invocation count are one, and replay is forbidden.
-- Application commit `49979a55…` is bound to decision `c8dbbcd8…`, its direct parent/tree, exact seven-path diff, and every pre/post patch object.
-- Strengthened receipt `d3cdc894…` additionally binds the execution-receipt Markdown and typed absence check; payload SHA is `95945eeb…6b89`.
-- Receipt-time validation re-resolves CM-2080, the Phase 2 manifest, and Windows/WSL smoke from exact Git objects.
-- Source baseline `933d29e4…` records R2 `8/8`, full `test:all`, and fixture-only `gate:ci`; snapshot `8d252985…` binds 164/164 entries to 105 blobs with zero placeholders.
-- Review request `01c65db8…` is submission-only; R1 and CM-2074 are historical, not current authority.
-- `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and `readinessClaimed=false`.
+- Application `41097b0f…` / tree `fecb13c4…` is anchored in branch ancestry with the exact `4M+1A` target set.
+- Receipt freeze `727e8128…` preserves the exact 7986-byte execution and 7546-byte binding receipts; review `521348cf…` passed.
+- Authorization final state is `CONSUMED_SUCCESS`, use count and patch count are one, and replay is forbidden.
+- The historical status application changed only nine governance/status paths; current `fullPlanPackCompleted=false` pending revalidation.
+- Every readiness alias remains false; no native/provider/real-memory/remote action occurs.
 
-Validation: `CMV-2209`.
+Validation: `CMV-2214`.
+
+## Historical CM-2118/CM-2119 Executor Packet and Final Release
+
+Status: `FINAL_RELEASE_FROZEN_ONE_SHOT_APPLICATION_AUTHORIZED_UNCLAIMED_FULL_PLAN_FALSE_NO_READY_CLAIM`
+
+- Implementation `45c53bf5…`; packet `02a78ef8…`; final release `dd78a679…`.
+- Packet payload `2e5299ee…5454`; release payload `33caf9c6…e579`.
+- Secure entry accepts only the exact content, packet, and release commits; it derives the fixed governance root internally and does not expose raw plumbing/resolver authority.
+- Isolated two-process E2E proves one claimant only, new-process replay denial, direct parent `b1245149…`, exact `4M+1A`, external receipts, and readiness-drift rejection.
+- Final release Git intake passed, but the executor was not run: claim, patch, application commit, binding receipt, native/provider/real-memory/remote effects are zero.
+- `fullPlanPackCompleted=false`, `statusSyncAuthorized=false`, and every readiness field remains false.
+
+Validation: `CMV-2213`.
+
+## CM-2117 Exact Full-plan Application Content Decision
+
+Status: `EXACT_CONTENT_DECISION_FROZEN_FINAL_RELEASE_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM`
+
+- Implementation `249c9ba1…`; decision commit `b1245149…`; payload `50ae5da8…2a5a`; patch payload `988386ae…49bd`.
+- The decision binds the complete CM-2116-R1 gate, nested `7187e520…` intake, five exact before/after targets, 14 immutable paths, and 22 false readiness fields.
+- `authorizationContentApproved=true`, but `applicationExecutionAuthorized=false` and a separate final release is required.
+- No claim, patch, application commit, binding receipt, completion transition, runtime/native/provider/real-memory/remote action, or readiness claim occurred.
+- `fullPlanPackCompleted=false` and `readinessClaimed=false`.
+
+Validation: `CMV-2212`.
+
+## CM-2116-R1 Exact Full-plan Application Gate
+
+Status: `EXACT_GATE_PREPARED_DECISION_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM`
+
+- R1 implementation `629ca75f…` rejects hidden implementation/artifact authority and covers all frozen readiness aliases.
+- Gate commit `f6b7f9a5…`, payload `7591efb0…2430c`, replays the full `7187e520…` commit/tree/parent/A-A diff/blob/bytes/raw-SHA/payload-SHA chain.
+- JSON blob `5741cabe…17d7` is 11204 bytes; Markdown blob `66d95391…d3e1` is 11735 bytes and is an exact JSON mirror.
+- The old `c3f3457b…` gate is superseded history with `usedAsCurrentAuthority=false`.
+- Gate preparation does not create an application decision, authorization, claim, patch, application commit, or binding receipt.
+- `fullPlanPackCompleted=false` and `readinessClaimed=false`.
+
+Validation: `CMV-2211`.
+
+## CM-2115-R2 Internal Canonical Snapshot Self-review
+
+Status: `INTERNAL_SELF_REVIEW_INTAKE_PASSED_SEPARATE_FULL_PLAN_APPLICATION_PENDING_NO_READY_CLAIM`
+
+- Internal self-review decision `116d74b3…` has payload SHA `03242787…a1d4`; its implementation is `68c8088a…`.
+- Post-freeze intake receipt `7187e520…` has payload SHA `ffb0a0cf…eaba` and binds the exact decision commit/tree/parent/two-path diff, JSON/Markdown blobs/bytes/raw SHA, and replay implementation.
+- Independent second-pass recomputation verified 164/164 traces, 411 source bindings, and 105 unique Git objects with zero mismatch or actionable finding.
+- `independentReviewPassed=true` is scoped to `repository_internal_separate_pass`; `independentExternalReviewPassed=false` and this self-review does not impersonate external review.
+- Historical CM-2080 `externalReviewPassed=true` remains unchanged.
+- Full-plan application preparation is the next separate gate; it is not authorized or applied here.
+- `fullPlanPackCompleted=false` and `readinessClaimed=false`.
+
+Validation: `CMV-2210`.
 
 ## Historical CM-2115 Canonical Full-plan Evidence Snapshot (Superseded)
 

@@ -1131,3 +1131,15 @@ Machine state: `docs/near-model-memory-plan-pack/phase2_completion_audit_applica
 
 `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and
 `readinessClaimed=false` remain authoritative.
+
+## CM-2117 Exact Full-plan Application Boundary
+
+CM-2117 permits one exact repository application only after a separate
+machine-bound final execution release. The application must use one durable
+claim, the frozen five-path patch, and a direct-child Git commit. A separate
+binding receipt must validate that commit before status synchronization.
+
+Machine state: `docs/near-model-memory-plan-pack/cm2116_full_plan_application_state.json`.
+
+`fullPlanPackCompleted=true` becomes current only after the exact application
+commit binding receipt passes. Every readiness field remains false.

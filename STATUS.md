@@ -4,13 +4,65 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2115-R2 durable one-shot and exact patch binding repair`.
-Current validation: `CMV-2209`.
-Current project status: the CM-2080 Phase 2 application now has one durable consumed claim, an exact application commit/tree/diff binding, receipt-time revalidation of all three upstream Git objects, and a strengthened v2 binding receipt. The rebuilt 164-entry R2 snapshot is pending independent review. `independentReviewPassed=false`, `fullPlanPackCompleted=false`, and every readiness claim remains false.
-Current route: `CM2115_R2_DURABLE_EXACT_PATCH_BOUND_SNAPSHOT_REBUILT_INDEPENDENT_REVIEW_PENDING_NO_READY_CLAIM`.
-Current rule: active status summaries reference `.agent_board/CURRENT_FACTS.json` as a committed status/validation snapshot; live Git facts require fresh Git commands.
+Current task: `CM-2121 exact full-plan status synchronization`.
+Current validation: `CMV-2214`.
+Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2121 Bound Full-plan Application Status
+
+Application `41097b0f…` remains historical ancestry-anchored evidence with exact tree `fecb13c4…`. Receipt freeze `727e8128…` preserves both byte-exact low-disclosure receipts, and internal review `521348cf…` passes. Authorization is consumed/non-replayable; current completion remains false pending revalidation.
+
+This completion is limited to the imported plan-pack evidence state. Production, release, deploy, cutover, `RC_READY`, complete V8, and all other readiness fields remain false. No native/provider/real-memory/remote action is authorized or performed by the status synchronization.
+
+## Historical CM-2118/CM-2119 Release State
+CM-2118 implementation `45c53bf5…` freezes the fixed-root claim registry,
+three-commit secure executor, low-disclosure external receipts, and exact
+application-commit binding contract. Packet `02a78ef8…` has payload SHA
+`2e5299ee…5454`; its JSON/Markdown raw SHA values are `debe3cfd…dad0` and
+`3ea8297b…d80f`. CM-2119 release `dd78a679…` has payload SHA
+`33caf9c6…e579`; JSON/Markdown raw SHA values are `d570e56a…db42` and
+`e189a083…58a4`. Exact Git intake passed. At release freeze time no claim or
+application had occurred. The later exact execution consumed the one-shot,
+non-replayable authorization and produced application commit `41097b0f…` as a
+direct child of CM-2117 decision `b1245149…`, with exactly four modified targets
+plus one added state file. That application is now ancestry-anchored and bound
+by the frozen receipts described above. All readiness claims remain false.
+
+CM-2117 implementation `249c9ba1…` freezes a content-only decision contract.
+Decision commit `b1245149…` has payload SHA `50ae5da8…2a5a` and patch payload
+SHA `988386ae…49bd`. Its JSON is blob `8427d80c…49b3`, 18810 bytes, raw SHA
+`1d4feb41…6a27`; the exact Markdown mirror is blob `51d5d3df…1c57`, 19419
+bytes, raw SHA `18e959fb…341c`. Five exact targets, 14 immutable paths, and 22
+false readiness/non-claim fields are frozen. `authorizationContentApproved=true`
+does not open execution: a separate final release must first bind this complete
+decision Git identity and a frozen executor. No claim, patch, completion, or
+readiness state changed.
+
+CM-2116-R1 implementation `629ca75f…` hardens the gate with exact-key schemas
+and the complete readiness alias set. Gate commit `f6b7f9a5…` has payload SHA
+`7591efb0…2430c`; its JSON is blob `5741cabe…17d7`, 11204 bytes, raw SHA
+`db625f62…04442`, and its exact Markdown mirror is blob `66d95391…d3e1`,
+11735 bytes, raw SHA `2f1e5bb9…10f5`. The gate replays the full
+`7187e520…` identity and fixes a five-path future patch allowlist. The earlier
+`c3f3457b…` gate is immutable superseded history and is not current authority.
+At the CM-2116 gate checkpoint no full-plan application decision was present.
+CM-2117 through CM-2119 later superseded that historical checkpoint. Their
+one-shot execution is now consumed and non-replayable; current completion is
+reopened for revalidation, while every readiness field remains false.
+
+CM-2115-R2 internal self-review implementation is frozen at `68c8088a…`.
+Decision commit `116d74b3…` has payload SHA-256 `03242787…a1d4` and records
+zero actionable findings over snapshot `8d252985…` and request `01c65db8…`.
+Post-freeze intake receipt `7187e520…` has payload SHA-256
+`ffb0a0cf…eaba`; it re-reads the exact decision commit/tree/parent/two-path
+diff, JSON/Markdown blobs, bytes, raw SHA-256 values, implementation artifacts,
+and all frozen snapshot routes. This is repository-internal review under Jenn's
+self-review policy. It neither impersonates a new external review nor changes
+the historical CM-2080 external-review decision. It permits preparation of a
+separate exact full-plan application only; it does not authorize or apply it.
 
 CM-2115-R2 freezes authority intake `f458277d…`, exact decision `c8dbbcd8…`,
 and application commit `49979a55…`. Its Git-common-dir claim is
