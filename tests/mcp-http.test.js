@@ -88,6 +88,7 @@ const RECORD_MEMORY_PRINCIPAL_SCOPE_POLICY = {
 };
 
 function governedNativeCodexContext(requestContext = {}) {
+  const { visibility = 'private', ...governedRequestContext } = requestContext;
   return {
     executionContext: {
       agentAlias: 'Codex',
@@ -95,10 +96,10 @@ function governedNativeCodexContext(requestContext = {}) {
       clientId: 'codex',
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
-      visibility: 'private',
+      visibility,
       requestSource: 'codex-memory-mcp'
     },
-    ...requestContext
+    ...governedRequestContext
   };
 }
 
@@ -943,7 +944,7 @@ test('HTTP MCP bearer health exposes latest governed native bridge probe summary
   const rawPrivateValue = 'RAW_NATIVE_PROBE_VALUE_SHOULD_NOT_ECHO';
 
   await withHttpServer(async ({ app, address }) => {
-    await app.callTool('audit_memory', {}, governedNativeCodexContext());
+    await app.callTool('audit_memory', {}, governedNativeCodexContext({ visibility: 'shared' }));
 
     const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'), {
       headers: {
@@ -961,7 +962,7 @@ test('HTTP MCP bearer health exposes latest governed native bridge probe summary
     assert.equal(nativeBridge.latest.mode, 'observe');
     assert.equal(nativeBridge.latest.gateAccepted, true);
     assert.equal(nativeBridge.latest.clientId, 'Codex');
-    assert.equal(nativeBridge.latest.visibility, 'private');
+    assert.equal(nativeBridge.latest.visibility, 'shared');
     assert.equal(nativeBridge.latest.scopePresent, true);
     assert.equal(nativeBridge.latest.scopeIdentifierPresent, true);
     assert.equal(nativeBridge.latest.scopeIdentifierSafe, true);
@@ -1031,7 +1032,7 @@ test('HTTP MCP bearer health exposes latest governed native bridge probe summary
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     defaultClientId: 'codex',
-    defaultVisibility: 'private',
+    defaultVisibility: 'shared',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeRuntimeTarget: {
       targetReferenceName: 'operator-vcp-toolbox-service-ref',
@@ -1082,7 +1083,7 @@ test('HTTP MCP bearer health binds latest governed native read delegation receip
     const result = await app.callTool(
       'search_memory',
       { query: 'governed native delegation health evidence' },
-      governedNativeCodexContext()
+      governedNativeCodexContext({ visibility: 'shared' })
     );
     const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'), {
       headers: {
@@ -1098,7 +1099,7 @@ test('HTTP MCP bearer health binds latest governed native read delegation receip
     assert.equal(nativeBridge.observationCount, 1);
     assert.equal(nativeBridge.latest.toolName, 'search_memory');
     assert.equal(nativeBridge.latest.clientId, 'Codex');
-    assert.equal(nativeBridge.latest.visibility, 'private');
+    assert.equal(nativeBridge.latest.visibility, 'shared');
     assert.equal(nativeBridge.latest.scopePresent, true);
     assert.equal(nativeBridge.latest.scopeIdentifierPresent, true);
     assert.equal(nativeBridge.latest.scopeIdentifierSafe, true);
@@ -1191,7 +1192,7 @@ test('HTTP MCP bearer health binds latest governed native read delegation receip
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     defaultClientId: 'codex',
-    defaultVisibility: 'private',
+    defaultVisibility: 'shared',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary',
     governedMcpVcpNativeRuntimeTarget: {
@@ -1238,7 +1239,7 @@ test('HTTP MCP bearer health exposes unbound native read delegation reason', asy
     const result = await app.callTool(
       'search_memory',
       { query: 'governed native unbound read health evidence' },
-      governedNativeCodexContext()
+      governedNativeCodexContext({ visibility: 'shared' })
     );
     const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'), {
       headers: {
@@ -1257,7 +1258,7 @@ test('HTTP MCP bearer health exposes unbound native read delegation reason', asy
     assert.equal(nativeBridge.observationCount, 1);
     assert.equal(nativeBridge.latest.toolName, 'search_memory');
     assert.equal(nativeBridge.latest.clientId, 'Codex');
-    assert.equal(nativeBridge.latest.visibility, 'private');
+    assert.equal(nativeBridge.latest.visibility, 'shared');
     assert.equal(nativeBridge.latest.invocationProfile, 'governed_read_only');
     assert.equal(nativeBridge.latest.readAllowed, true);
     assert.equal(nativeBridge.latest.writeAllowed, false);
@@ -1294,7 +1295,7 @@ test('HTTP MCP bearer health exposes unbound native read delegation reason', asy
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     defaultClientId: 'codex',
-    defaultVisibility: 'private',
+    defaultVisibility: 'shared',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary',
     governedMcpVcpNativeRuntimeTarget: {
@@ -4258,7 +4259,7 @@ test('HTTP MCP bearer audit_memory returns governed native bridge receipt from p
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(nativeReadCall.arguments.governed_bridge.primary_runtime, 'VCPToolBox native memory');
     assert.deepEqual(nativeReadCall.arguments.governed_bridge.runtime_target, {
@@ -4279,7 +4280,7 @@ test('HTTP MCP bearer audit_memory returns governed native bridge receipt from p
     });
     assert.equal(nativeReadCall.arguments.governed_bridge.client_id, 'Codex');
     assert.equal(nativeReadCall.arguments.governed_bridge.access_path, 'governed MCP tools');
-    assert.equal(nativeReadCall.arguments.governed_bridge.visibility, 'private');
+    assert.equal(nativeReadCall.arguments.governed_bridge.visibility, 'shared');
     assert.deepEqual(nativeReadCall.arguments.governed_bridge.scope, nativeReadCall.arguments.scope);
     assert.equal(nativeReadCall.arguments.governed_bridge.scope_present, true);
     assert.equal(nativeReadCall.arguments.governed_bridge.scope_identifier_present, true);
@@ -4296,7 +4297,7 @@ test('HTTP MCP bearer audit_memory returns governed native bridge receipt from p
     ]);
     assert.equal(
       nativeReadCall.arguments.governed_bridge.scope_fingerprint,
-      '5f3544ce179efd0c3fd67066999029fa567975577f7f446f78fe9e2e04f34bc1'
+      '2931bf55168c1dee221fdcb5ea1cf659061f764f176aeaa5718d43af4507d8c0'
     );
     assert.equal(nativeReadCall.arguments.governed_bridge.raw_scope_persisted, false);
     assert.equal(nativeReadCall.arguments.governed_bridge.local_memory_role, 'not_used');
@@ -4376,7 +4377,7 @@ test('HTTP MCP bearer audit_memory returns governed native bridge receipt from p
     assert.equal(receipt.toolName, 'search_memory');
     assert.equal(receipt.delegationDirection, 'read');
     assert.equal(receipt.clientId, 'Codex');
-    assert.equal(receipt.visibility, 'private');
+    assert.equal(receipt.visibility, 'shared');
     assert.equal(receipt.scopePresent, true);
     assert.equal(receipt.scopeIdentifierPresent, true);
     assert.equal(receipt.scopeFingerprintPresent, true);
@@ -4486,7 +4487,7 @@ test('HTTP MCP bearer audit_memory returns governed native bridge receipt from p
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     defaultClientId: 'codex',
-    defaultVisibility: 'private',
+    defaultVisibility: 'shared',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
     governedMcpVcpNativeRuntimeTarget: {
@@ -4664,7 +4665,7 @@ test('HTTP MCP bearer audit_memory exposes unbound native read receipt without l
     assert.equal(receipt.toolName, 'search_memory');
     assert.equal(receipt.delegationDirection, 'read');
     assert.equal(receipt.clientId, 'Codex');
-    assert.equal(receipt.visibility, 'private');
+    assert.equal(receipt.visibility, 'shared');
     assert.equal(receipt.readAllowed, true);
     assert.equal(receipt.writeAllowed, false);
     assert.equal(receipt.delegationStatusClass, 'native_invocation_receipt_unbound');
@@ -4691,7 +4692,7 @@ test('HTTP MCP bearer audit_memory exposes unbound native read receipt without l
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     defaultClientId: 'codex',
-    defaultVisibility: 'private',
+    defaultVisibility: 'shared',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
     governedMcpVcpNativeRuntimeTarget: {
@@ -4886,7 +4887,7 @@ test('HTTP MCP bearer audit_memory exposes governed native read output budget bu
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     defaultClientId: 'codex',
-    defaultVisibility: 'private',
+    defaultVisibility: 'shared',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
     governedMcpVcpNativeRuntimeTarget: {
@@ -4959,7 +4960,7 @@ test('HTTP MCP bearer search_memory uses audited local fallback after native rea
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       clientId: 'Codex',
-      visibility: ['private']
+      visibility: ['shared']
     });
     assert.equal(result.access.primaryRuntime, 'VCPToolBox native memory');
     assert.equal(result.access.localMemoryRole, 'fallback');
@@ -5028,7 +5029,7 @@ test('HTTP MCP bearer search_memory uses audited local fallback after native rea
     assert.equal(fallbackReceipt.localMemoryRole, 'fallback');
     assert.equal(fallbackReceipt.localMemorySourceRuntime, 'codex_memory_local_fallback');
     assert.equal(fallbackReceipt.clientId, 'Codex');
-    assert.equal(fallbackReceipt.visibility, 'private');
+    assert.equal(fallbackReceipt.visibility, 'shared');
     assert.equal(fallbackReceipt.scopePresent, true);
     assert.equal(fallbackReceipt.scopeIdentifierPresent, true);
     assert.equal(fallbackReceipt.scopeFingerprintPresent, true);
@@ -5060,7 +5061,7 @@ test('HTTP MCP bearer search_memory uses audited local fallback after native rea
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     defaultClientId: 'codex',
-    defaultVisibility: 'private',
+    defaultVisibility: 'shared',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
     governedMcpVcpNativeRuntimeTarget: {
@@ -5525,7 +5526,7 @@ test('HTTP MCP authenticated memory_overview returns governed native bridge obse
     assert.equal(nativeBridge.observationCount, 1);
     assert.equal(nativeBridge.latest.toolName, 'memory_overview');
     assert.equal(nativeBridge.latest.clientId, 'Codex');
-    assert.equal(nativeBridge.latest.visibility, 'private');
+    assert.equal(nativeBridge.latest.visibility, 'shared');
     assert.equal(nativeBridge.latest.scopePresent, true);
     assert.equal(nativeBridge.latest.scopeIdentifierPresent, true);
     assert.equal(nativeBridge.latest.scopeIdentifierSafe, true);
@@ -5576,7 +5577,7 @@ test('HTTP MCP authenticated memory_overview returns governed native bridge obse
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     defaultClientId: 'codex',
-    defaultVisibility: 'private',
+    defaultVisibility: 'shared',
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeRuntimeTarget: {
       targetReferenceName: 'operator-vcp-toolbox-service-ref',

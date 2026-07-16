@@ -3176,7 +3176,7 @@ test('MCP tools/call binds sparse trusted context metadata to transport scope be
             project_id: 'codex-memory',
             workspace_id: 'workspace-alpha',
             client_id: 'codex',
-            visibility: 'private'
+            visibility: 'shared'
           }
         },
         _meta: {
@@ -3209,7 +3209,7 @@ test('MCP tools/call binds sparse trusted context metadata to transport scope be
         projectId: 'codex-memory',
         scopeId: 'scope-beta',
         workspaceId: 'workspace-beta',
-        visibility: 'private'
+        visibility: 'shared'
       }
     });
     const payload = result.response.result.structuredContent;
@@ -3222,7 +3222,7 @@ test('MCP tools/call binds sparse trusted context metadata to transport scope be
       project_id: 'codex-memory',
       workspace_id: 'workspace-beta',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.deepEqual(nativePayload.arguments.governed_bridge.scope, nativePayload.arguments.scope);
     assert.equal(serializedResponse.includes('RAW_QUERY_SHOULD_NOT_ECHO'), false);

@@ -788,7 +788,7 @@ test('acceptance CLI can use VCPToolBox native MCP shim as governed native targe
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read',
       writeTitle: 'acceptance write',
       writeContent: 'acceptance write body',

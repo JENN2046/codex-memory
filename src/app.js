@@ -2809,6 +2809,7 @@ function createCodexMemoryApplication(overrides = {}) {
         const skipUnmappedNativeReadAction =
           shouldSkipGovernedMcpVcpNativeReadDelegationForUnmappedAction(config, toolName);
         const nativeScopeFilteringUnproven =
+          isGovernedMcpVcpNativeReadDelegationTool(toolName) &&
           SCOPE_FILTERING_REQUIRED_VISIBILITIES.includes(
             gateResult.normalizedBridgeRequest?.visibility
           );

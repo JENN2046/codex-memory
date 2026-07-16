@@ -464,7 +464,7 @@ test('governed VCP native acceptance CLI runs read and write through full govern
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read',
       writeTitle: 'acceptance write',
       writeContent: 'acceptance write body',
@@ -668,7 +668,7 @@ test('governed VCP native acceptance CLI rejects search-shaped read-suite accept
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read suite',
       toolNameByAction: JSON.stringify({
         search_memory: 'knowledge_base.search',
@@ -753,7 +753,7 @@ test('governed VCP native acceptance CLI can prove read suite with default shape
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read suite',
       evidenceOutputPath
     });
@@ -808,7 +808,7 @@ test('governed VCP native acceptance allows isolated derived-index writes during
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance isolated native read'
     });
 
@@ -867,7 +867,7 @@ test('governed VCP native acceptance reports whitelisted native JSON-RPC error r
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read jsonrpc failure',
       evidenceOutputPath
     });
@@ -1043,7 +1043,7 @@ test('governed VCP native acceptance CLI can prove the governed lifecycle write 
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance write suite',
       writeTitle: 'acceptance write suite',
       writeContent: 'acceptance write body',
