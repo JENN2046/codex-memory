@@ -12,6 +12,7 @@ function parseArgs(argv = [], env = process.env) {
     vcpToolBoxRoot: env.VCPTOOLBOX_ROOT || '/home/jenn/AGENTS_OS_Workspace/runtime/VCPToolBox',
     knowledgeBaseRootPath: env.KNOWLEDGEBASE_ROOT_PATH || '',
     knowledgeBaseStorePath: env.KNOWLEDGEBASE_STORE_PATH || '',
+    diaryScopeMappingPath: env.CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH || '',
     enableWrite: false
   };
 
@@ -39,6 +40,11 @@ function parseArgs(argv = [], env = process.env) {
     }
     if (token === '--kb-store') {
       options.knowledgeBaseStorePath = argv[index + 1] || options.knowledgeBaseStorePath;
+      index += 1;
+      continue;
+    }
+    if (token === '--diary-scope-mapping') {
+      options.diaryScopeMappingPath = argv[index + 1] || options.diaryScopeMappingPath;
       index += 1;
       continue;
     }
@@ -79,6 +85,7 @@ async function main() {
     ],
     endpointDisclosed: true,
     isolatedRuntimeStoreConfigured: Boolean(options.knowledgeBaseStorePath),
+    diaryScopeMappingConfigured: Boolean(options.diaryScopeMappingPath),
     runtimeStorePathDisclosed: false,
     tokenMaterialDisclosed: false,
     readinessClaimed: false

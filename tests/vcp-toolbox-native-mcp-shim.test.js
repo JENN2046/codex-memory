@@ -19,6 +19,24 @@ const {
 const {
   parseArgs
 } = require('../src/cli/vcp-toolbox-native-mcp-shim');
+const { validateMapping } = require('../src/core/DiaryScopeMapping');
+
+const SYNTHETIC_DIARY_SCOPE_MAPPING = Object.freeze({
+  schemaVersion: 1,
+  mappingReference: 'jenn-vcp-diary-scope-v1',
+  defaultPolicy: 'deny',
+  entries: [{
+    partitionReference: 'synthetic-codex-private-v1',
+    diaryName: 'SYNTHETIC_CODEX_PRIVATE',
+    classification: 'client_private',
+    clientId: 'Codex',
+    projectId: null,
+    workspaceId: null,
+    readProfiles: ['exact_visibility', 'task_start_context'],
+    writeEligible: true
+  }]
+});
+const SYNTHETIC_MAPPING_BINDING = validateMapping(SYNTHETIC_DIARY_SCOPE_MAPPING);
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -63,6 +81,7 @@ async function withShimServer(options = {}) {
   const calls = [];
   const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({
     enableWrite: true,
+    diaryScopeMapping: SYNTHETIC_DIARY_SCOPE_MAPPING,
     adapter: {
       async search(args) {
         calls.push({ tool: 'search', args });
@@ -137,12 +156,15 @@ test('VCPToolBox native MCP shim CLI accepts isolated knowledge-base store path 
     '/PRIVATE/VCPToolBox/dailynote',
     '--kb-store',
     '/PRIVATE/codex-memory-isolated-vector-store',
+    '--diary-scope-mapping',
+    '/PRIVATE/codex-memory-diary-scope-mapping.json',
     '--enable-write'
   ], {});
 
   assert.equal(options.vcpToolBoxRoot, '/PRIVATE/VCPToolBox');
   assert.equal(options.knowledgeBaseRootPath, '/PRIVATE/VCPToolBox/dailynote');
   assert.equal(options.knowledgeBaseStorePath, '/PRIVATE/codex-memory-isolated-vector-store');
+  assert.equal(options.diaryScopeMappingPath, '/PRIVATE/codex-memory-diary-scope-mapping.json');
   assert.equal(options.enableWrite, true);
 });
 
@@ -155,6 +177,17 @@ function governanceMeta(toolName = 'search_memory') {
   const write = Object.prototype.hasOwnProperty.call(exactApprovalActions, toolName);
   return {
     schemaVersion: GOVERNANCE_METADATA_SCHEMA_VERSION,
+    scopeEnforcement: {
+      mode: 'diary_allowlist_v1',
+      expectedMappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+      expectedMappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest,
+      recallProfile: 'exact_visibility',
+      bound: true,
+      toolArgumentsMayOverride: false,
+      governanceMetadataMayOverride: false,
+      scopeIdAffectsDiaryAcl: false,
+      scopeIdEnforcementClaimed: false
+    },
     trustedExecutionContext: {
       accepted: true,
       source: 'trusted_execution_context_or_transport',
@@ -397,6 +430,47 @@ test('VCPToolBox native MCP shim rejects tools/call without governed metadata', 
   }
 });
 
+test('VCPToolBox native MCP shim rejects missing and mismatched mapping before native execution', async () => {
+  for (const scenario of ['missing', 'mismatch']) {
+    let nativeCalls = 0;
+    const shim = await withShimServer({
+      ...(scenario === 'missing' ? { diaryScopeMapping: undefined } : {}),
+      adapter: {
+        async search() {
+          nativeCalls += 1;
+          return { results: [] };
+        }
+      }
+    });
+    try {
+      const metadata = governanceMeta('search_memory');
+      if (scenario === 'mismatch') {
+        metadata.scopeEnforcement.expectedMappingDigest = `sha256:${'b'.repeat(64)}`;
+      }
+      const result = await postJson(shim.url, {
+        jsonrpc: '2.0',
+        id: `mapping-${scenario}`,
+        method: 'tools/call',
+        params: {
+          name: 'knowledge_base.search',
+          arguments: { query: 'synthetic' },
+          _meta: { codexMemoryGovernance: metadata }
+        }
+      });
+      assert.equal(result.error.code, -32602);
+      assert.equal(
+        result.error.data.reasonCode,
+        scenario === 'missing'
+          ? 'diary_scope_mapping_missing'
+          : 'diary_scope_mapping_binding_mismatch'
+      );
+      assert.equal(nativeCalls, 0);
+    } finally {
+      await shim.close();
+    }
+  }
+});
+
 test('VCPToolBox native MCP shim fails closed when native read cannot produce a result', async () => {
   let called = false;
   const shim = await withShimServer({
@@ -574,6 +648,11 @@ test('VCPToolBox native MCP shim rebuilds read governance arguments from metadat
             read_allowed: false,
             write_allowed: true
           },
+          diaryName: 'FORGED_DIARY',
+          allowedDiaryNames: ['FORGED_DIARY'],
+          mappingReference: 'forged-reference',
+          mappingDigest: `sha256:${'b'.repeat(64)}`,
+          scopeEnforcementMode: 'forged-mode',
           filters: {
             keep: 'business-filter',
             runtimeTarget: { endpoint: 'http://private-target.invalid' }
@@ -588,6 +667,11 @@ test('VCPToolBox native MCP shim rebuilds read governance arguments from metadat
     assert.equal(result.error, undefined);
     assert.equal(calls.length, 1);
     assert.equal(calls[0].query, 'needle');
+    assert.equal(calls[0].diaryName, undefined);
+    assert.equal(calls[0].allowedDiaryNames, undefined);
+    assert.equal(calls[0].mappingReference, undefined);
+    assert.equal(calls[0].mappingDigest, undefined);
+    assert.equal(calls[0].scopeEnforcementMode, undefined);
     assert.deepEqual(calls[0].filters, { keep: 'business-filter' });
     assert.equal(calls[0].scope.client_id, 'Codex');
     assert.equal(calls[0].scope.visibility, 'private');

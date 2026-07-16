@@ -516,6 +516,9 @@ function buildLowDisclosureReceiptAuditEntry(input = {}) {
   const nativeInvocationReceipt = isPlainObject(receipt.nativeInvocationReceipt)
     ? receipt.nativeInvocationReceipt
     : {};
+  const nativeRuntimeReceipt = isPlainObject(nativeInvocationReceipt.nativeRuntimeReceipt)
+    ? nativeInvocationReceipt.nativeRuntimeReceipt
+    : {};
 
   const scopeAudit = buildScopeAuditProjection(request);
   const actualToolName = safeGovernedBridgeToolName(input.toolName);
@@ -829,6 +832,37 @@ function buildLowDisclosureReceiptAuditEntry(input = {}) {
     nativeInvocationTopLevelKindCategory: nativeInvocationEvidenceAccepted
       ? safeEnum(nativeInvocationReceipt.topLevelKindCategory, ALLOWED_TOP_LEVEL_KIND_CATEGORIES)
       : null,
+    authorizationResolvedBeforeProvider: nativeInvocationEvidenceAccepted &&
+      normalizeBoolean(nativeRuntimeReceipt.authorizationResolvedBeforeProvider),
+    diaryAllowlistEnforcedBeforeIndexLoad: nativeInvocationEvidenceAccepted &&
+      normalizeBoolean(nativeRuntimeReceipt.diaryAllowlistEnforcedBeforeIndexLoad),
+    diaryAllowlistEnforcedBeforeVectorSearch: nativeInvocationEvidenceAccepted &&
+      normalizeBoolean(nativeRuntimeReceipt.diaryAllowlistEnforcedBeforeVectorSearch),
+    resultScopePostcheckPassed: nativeInvocationEvidenceAccepted &&
+      normalizeBoolean(nativeRuntimeReceipt.resultScopePostcheckPassed),
+    unscopedNativeSearchUsed: nativeInvocationEvidenceAccepted &&
+      normalizeBoolean(nativeRuntimeReceipt.unscopedNativeSearchUsed),
+    mappingReferenceBound: nativeInvocationEvidenceAccepted &&
+      normalizeBoolean(nativeRuntimeReceipt.mappingReferenceBound),
+    mappingDigestBound: nativeInvocationEvidenceAccepted &&
+      normalizeBoolean(nativeRuntimeReceipt.mappingDigestBound),
+    allowedDiaryCount: nativeInvocationEvidenceAccepted &&
+      Number.isInteger(nativeRuntimeReceipt.allowedDiaryCount) &&
+      nativeRuntimeReceipt.allowedDiaryCount >= 1 && nativeRuntimeReceipt.allowedDiaryCount <= 8
+      ? nativeRuntimeReceipt.allowedDiaryCount
+      : 0,
+    rawDiaryNamesReturned: false,
+    scopeIdAccepted: nativeInvocationEvidenceAccepted && normalizeBoolean(nativeRuntimeReceipt.scopeIdAccepted),
+    scopeIdAudited: nativeInvocationEvidenceAccepted && normalizeBoolean(nativeRuntimeReceipt.scopeIdAudited),
+    scopeIdFingerprintBound: nativeInvocationEvidenceAccepted &&
+      normalizeBoolean(nativeRuntimeReceipt.scopeIdFingerprintBound),
+    scopeIdAffectsDiaryAcl: false,
+    scopeIdEnforcementClaimed: false,
+    omittedPartitionCategories: Array.isArray(nativeRuntimeReceipt.omittedPartitionCategories)
+      ? nativeRuntimeReceipt.omittedPartitionCategories.filter(value =>
+          ['project_shared', 'workspace_shared'].includes(value)
+        )
+      : [],
     localMemoryFallbackEligible: executionEvidence.localMemoryFallbackEligible,
     localMemoryFallbackUsed: executionEvidence.localMemoryFallbackUsed,
     runtimeCalled: executionEvidence.runtimeCalled,

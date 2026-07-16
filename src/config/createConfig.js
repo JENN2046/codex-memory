@@ -699,6 +699,27 @@ function createConfig(overrides = {}) {
       runtimeTarget: governedMcpVcpNativeRuntimeTarget,
       httpMcpTarget: governedMcpVcpNativeHttpMcpTarget.publicConfig
     });
+  const expectedDiaryScopeMappingReference = typeof overrides.expectedDiaryScopeMappingReference === 'string'
+    ? overrides.expectedDiaryScopeMappingReference.trim()
+    : '';
+  const expectedDiaryScopeMappingDigest = typeof overrides.expectedDiaryScopeMappingDigest === 'string'
+    ? overrides.expectedDiaryScopeMappingDigest.trim()
+    : '';
+  const governedMcpVcpNativeScopeEnforcement = Object.freeze({
+    scopeEnforcementMode: 'diary_allowlist_v1',
+    expectedMappingReference: expectedDiaryScopeMappingReference === 'jenn-vcp-diary-scope-v1'
+      ? expectedDiaryScopeMappingReference
+      : null,
+    expectedMappingDigest: /^sha256:[a-f0-9]{64}$/.test(expectedDiaryScopeMappingDigest)
+      ? expectedDiaryScopeMappingDigest
+      : null,
+    configured: expectedDiaryScopeMappingReference === 'jenn-vcp-diary-scope-v1' &&
+      /^sha256:[a-f0-9]{64}$/.test(expectedDiaryScopeMappingDigest),
+    toolArgumentsMayOverride: false,
+    governanceMetadataMayOverride: false,
+    scopeIdAffectsDiaryAcl: false,
+    readinessClaimed: false
+  });
   const requestedMcpPublicToolSurface = normalizeMcpPublicToolSurface(
     pickFirstNonEmpty(
       overrides.mcpPublicToolSurface,
@@ -849,6 +870,7 @@ function createConfig(overrides = {}) {
       readinessClaimed: false
     },
     governedMcpVcpNativeBridgeConfigWarnings,
+    governedMcpVcpNativeScopeEnforcement,
     governedMcpVcpNativeRuntimeTarget,
     governedMcpVcpNativeHttpMcpTarget: governedMcpVcpNativeHttpMcpTarget.publicConfig,
     recordMemoryPrincipalScopeAuthorization:

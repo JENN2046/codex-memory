@@ -145,10 +145,17 @@ npm run --silent vcp-native:prod-proof:wsl-newapi -- read
 Manual low-disclosure native proof entry points:
 
 ```bash
-npm run vcp-native:shim -- --vcp-root /path/to/VCPToolBox --kb-store /tmp/codex-memory-vcp-derived-store
+npm run vcp-native:shim -- --vcp-root /path/to/VCPToolBox --kb-store /tmp/codex-memory-vcp-derived-store --diary-scope-mapping /path/to/mapping.json
 npm run vcp-native:acceptance -- --endpoint http://127.0.0.1:7615/mcp/vcp-native --target-ref operator-vcp-toolbox-service-ref --include-read-suite --evidence-output /tmp/codex-memory-vcp-native-evidence.json
 npm run vcp-native:acceptance -- --json --verify-evidence /tmp/codex-memory-vcp-native-evidence.json
 ```
+
+Governed native reads are fail-closed unless both sides are startup-bound to
+`diary_allowlist_v1`: the bridge must carry the expected mapping reference and
+digest, and the shim must load the matching mapping with
+`--diary-scope-mapping /path/to/mapping.json`. The repository contains only a
+redacted example; it does not contain or derive a live diary inventory. See
+[Diary scope enforcement v1](docs/DIARY_SCOPE_ENFORCEMENT_V1.md).
 
 Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public
@@ -282,6 +289,7 @@ node --test tests/security-profile-config.test.js tests/governed-mcp-vcp-native-
 
 ## Documentation
 
+- Diary scope enforcement: [docs/DIARY_SCOPE_ENFORCEMENT_V1.md](docs/DIARY_SCOPE_ENFORCEMENT_V1.md)
 - Runtime ledger: [docs/GOVERNED_NATIVE_BRIDGE_RUNTIME_LEDGER.md](docs/GOVERNED_NATIVE_BRIDGE_RUNTIME_LEDGER.md)
 - WSL-local NewAPI proof runbook: [docs/VCP_NATIVE_PROD_PROOF_WSL_NEWAPI_RUNBOOK.md](docs/VCP_NATIVE_PROD_PROOF_WSL_NEWAPI_RUNBOOK.md)
 - Historical client integration runbook: [docs/CODEX_CLAUDE_CLIENT_INTEGRATION_RUNBOOK.md](docs/CODEX_CLAUDE_CLIENT_INTEGRATION_RUNBOOK.md)

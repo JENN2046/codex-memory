@@ -2803,6 +2803,32 @@ function createCodexMemoryApplication(overrides = {}) {
             config
           })
         );
+        if (
+          gateResult.accepted === true &&
+          isGovernedMcpVcpNativeReadDelegationTool(toolName) &&
+          gateResult.normalizedBridgeRequest &&
+          typeof gateResult.normalizedBridgeRequest === 'object'
+        ) {
+          const enforcement = config.governedMcpVcpNativeScopeEnforcement || {};
+          const enforcementBound = enforcement.scopeEnforcementMode === 'diary_allowlist_v1' &&
+            enforcement.expectedMappingReference === 'jenn-vcp-diary-scope-v1' &&
+            /^sha256:[a-f0-9]{64}$/.test(enforcement.expectedMappingDigest || '');
+          Object.assign(gateResult.normalizedBridgeRequest, {
+            scope_enforcement_mode: 'diary_allowlist_v1',
+            expected_mapping_reference: enforcementBound
+              ? enforcement.expectedMappingReference
+              : null,
+            expected_mapping_digest: enforcementBound
+              ? enforcement.expectedMappingDigest
+              : null,
+            recall_profile: effectiveRequestContext.memoryContextPackageReadOnly === true
+              ? 'task_start_context'
+              : 'exact_visibility',
+            native_scope_filtering_proven: enforcementBound,
+            scope_id_affects_diary_acl: false,
+            scope_id_enforcement_claimed: false
+          });
+        }
         const readOnlyProbeResult = gateResult.accepted === true
           ? buildGovernedMcpVcpNativeReadOnlyProbeAdapter({ toolName, gateResult })
           : null;

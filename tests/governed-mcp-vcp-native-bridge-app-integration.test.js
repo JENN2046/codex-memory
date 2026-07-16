@@ -6,7 +6,7 @@ const test = require('node:test');
 // Governed native read success/fallback coverage is retained below for the
 // diary-allowlist stage. Until that trusted proof is wired, every public
 // visibility must fail closed before any native probe, call, or local fallback.
-const diaryAllowlistPendingTest = test.skip;
+const diaryAllowlistPendingTest = test;
 const fs = require('node:fs/promises');
 const http = require('node:http');
 const os = require('node:os');
@@ -47,14 +47,30 @@ function nativeRuntimeReceiptForTool(toolName) {
     present: true,
     nativeRuntimeCalled: true,
     nativeRuntimeInitialized: true,
-    providerApiCalled: writePerformed,
+    providerApiCalled: true,
     memoryReadPerformed: !writePerformed,
     memoryWritePerformed: writePerformed,
-    durableWritePerformed: writePerformed,
-    durableWriteScope: writePerformed ? 'primary_memory_write' : null,
+    durableWritePerformed: true,
+    durableWriteScope: writePerformed ? 'primary_memory_write' : 'native_runtime_store',
     isolatedRuntimeStoreUsed: false,
     primaryMemoryStoreWritePerformed: writePerformed,
-    derivedIndexWritePerformed: false,
+    derivedIndexWritePerformed: !writePerformed,
+    authorizationResolvedBeforeProvider: !writePerformed,
+    diaryAllowlistEnforcedBeforeIndexLoad: !writePerformed,
+    diaryAllowlistEnforcedBeforeVectorSearch: !writePerformed,
+    resultScopePostcheckPassed: !writePerformed,
+    unscopedNativeSearchUsed: false,
+    mappingReferenceBound: !writePerformed,
+    mappingDigestBound: !writePerformed,
+    allowedDiaryCount: writePerformed ? 0 : 1,
+    rawDiaryNamesReturned: false,
+    scopeIdAccepted: !writePerformed,
+    scopeIdAudited: !writePerformed,
+    scopeIdFingerprintBound: !writePerformed,
+    scopeIdAffectsDiaryAcl: false,
+    scopeIdEnforcementClaimed: false,
+    actualMappingReference: writePerformed ? null : 'jenn-vcp-diary-scope-v1',
+    actualMappingDigest: writePerformed ? null : `sha256:${'a'.repeat(64)}`,
     rawRuntimeOutputDisclosed: false,
     rawMemoryContentDisclosed: false,
     runtimeLocatorDisclosed: false,
@@ -137,6 +153,8 @@ async function withTempApp(overrides, handler) {
     defaultProjectId: 'codex-memory',
     defaultWorkspaceId: 'workspace-alpha',
     governedMcpVcpNativeRuntimeTarget: trustedRuntimeTargetConfig(),
+    expectedDiaryScopeMappingReference: 'jenn-vcp-diary-scope-v1',
+    expectedDiaryScopeMappingDigest: `sha256:${'a'.repeat(64)}`,
     ...receiptAwareNativeCallerOverrides(overrides)
   });
 
@@ -1838,22 +1856,7 @@ diaryAllowlistPendingTest('WSL NewAPI runtime profile routes read tools to shape
         },
         _meta: {
           codexMemoryNativeRuntimeReceipt: {
-            present: true,
-            nativeRuntimeCalled: true,
-            nativeRuntimeInitialized: true,
-            providerApiCalled: true,
-            memoryReadPerformed: true,
-            memoryWritePerformed: false,
-            durableWritePerformed: false,
-            durableWriteScope: null,
-            isolatedRuntimeStoreUsed: false,
-            primaryMemoryStoreWritePerformed: false,
-            derivedIndexWritePerformed: false,
-            rawRuntimeOutputDisclosed: false,
-            rawMemoryContentDisclosed: false,
-            runtimeLocatorDisclosed: false,
-            tokenMaterialDisclosed: false,
-            readinessClaimed: false
+            ...nativeRuntimeReceiptForTool('search_memory')
           }
         }
       }
@@ -2092,6 +2095,9 @@ diaryAllowlistPendingTest('primary read delegation returns governed VCP native l
             memoryId: 'RAW_MEMORY_ID_SHOULD_NOT_ECHO',
             content: rawPrivateValue
           }]
+        },
+        _meta: {
+          codexMemoryNativeRuntimeReceipt: nativeRuntimeReceiptForTool('search_memory')
         }
       }
     }));
@@ -2401,6 +2407,8 @@ test('Codex and Claude scope-bound native reads fail closed before native or loc
   let auditCalls = 0;
 
   await withTempApp({
+    expectedDiaryScopeMappingReference: null,
+    expectedDiaryScopeMappingDigest: null,
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
     governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
@@ -2453,7 +2461,11 @@ test('Codex and Claude scope-bound native reads fail closed before native or loc
           assert.equal(result.access.localMemoryFallbackUsed, false, label);
           assert.deepEqual(
             observation.readDelegationResult.invalidFields,
-            ['gateResult.normalizedBridgeRequest.native_scope_filtering_proven'],
+            [
+              'gateResult.normalizedBridgeRequest.native_scope_filtering_proven',
+              'gateResult.normalizedBridgeRequest.expected_mapping_reference',
+              'gateResult.normalizedBridgeRequest.expected_mapping_digest'
+            ],
             label
           );
         }
@@ -3919,22 +3931,14 @@ diaryAllowlistPendingTest('primary read delegation rejects native success receip
     },
     receipt: nativeInvocationReceiptForPayload(payload, {
       nativeRuntimeReceipt: {
-        present: true,
-        nativeRuntimeCalled: true,
-        nativeRuntimeInitialized: true,
+        ...nativeRuntimeReceiptForTool('search_memory'),
         providerApiCalled: false,
-        memoryReadPerformed: true,
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_write',
         isolatedRuntimeStoreUsed: false,
         primaryMemoryStoreWritePerformed: true,
-        derivedIndexWritePerformed: false,
-        rawRuntimeOutputDisclosed: false,
-        rawMemoryContentDisclosed: false,
-        runtimeLocatorDisclosed: false,
-        tokenMaterialDisclosed: false,
-        readinessClaimed: false
+        derivedIndexWritePerformed: false
       }
     })
   });
