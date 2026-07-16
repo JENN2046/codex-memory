@@ -148,7 +148,7 @@ test('codex-memory MCP should initialize a session and expose expected server in
     );
     assert.deepEqual(
       result.response.result._meta.codexMemoryGovernedBridge.clientIdentity.allowedClientIds,
-      ['Codex']
+      ['Codex', 'Claude']
     );
     assert.equal(
       result.response.result._meta.codexMemoryGovernedBridge.clientIdentity.toolArgumentsMayOverride,
@@ -160,7 +160,7 @@ test('codex-memory MCP should initialize a session and expose expected server in
     );
     assert.deepEqual(
       result.response.result._meta.codexMemoryGovernedBridge.scopeBoundary.acceptedVisibility,
-      ['private', 'project', 'workspace']
+      ['private', 'workspace', 'project', 'shared']
     );
     assert.equal(
       result.response.result._meta.codexMemoryGovernedBridge.scopeBoundary.rawScopeValueReturned,
@@ -499,13 +499,13 @@ test('governed native bridge server metadata helper summarizes product goal with
   assert.equal(meta.runtimeTarget.governanceMetadataMayOverride, false);
   assert.equal(meta.runtimeTarget.endpointDisclosed, false);
   assert.equal(meta.runtimeTarget.tokenMaterialDisclosed, false);
-  assert.deepEqual(meta.clientIdentity.allowedClientIds, ['Codex']);
+  assert.deepEqual(meta.clientIdentity.allowedClientIds, ['Codex', 'Claude']);
   assert.equal(meta.clientIdentity.governanceMetadataMayOverrideTransportContext, false);
   assert.deepEqual(
     meta.scopeBoundary.requiredFieldNames,
     ['project_id', 'scope_id', 'workspace_id', 'client_id', 'visibility']
   );
-  assert.deepEqual(meta.scopeBoundary.acceptedVisibility, ['private', 'project', 'workspace']);
+  assert.deepEqual(meta.scopeBoundary.acceptedVisibility, ['private', 'workspace', 'project', 'shared']);
   assert.equal(meta.scopeBoundary.toolArgumentsMayOverride, false);
   assert.deepEqual(meta.readWriteAuthority.readTools, ['search_memory', 'memory_overview', 'audit_memory']);
   assert.deepEqual(meta.readWriteAuthority.writeTools, ['record_memory', 'tombstone_memory', 'supersede_memory']);
@@ -1032,7 +1032,7 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
     for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'task_id', 'conversation_id', 'retention_policy']) {
       assert.equal(schema.properties[field].maxLength, 200, `${field} should have maxLength 200`);
     }
-    assert.deepEqual(schema.properties.client_id.enum, ['codex', 'claude', 'omc', 'manual']);
+    assert.deepEqual(schema.properties.client_id.enum, ['codex', 'claude', 'manual']);
     assert.deepEqual(schema.properties.visibility.enum, ['private', 'workspace', 'project', 'shared']);
     assert.ok(schema.properties.task_id);
     assert.ok(schema.properties.conversation_id);
@@ -1094,7 +1094,10 @@ test('MCP tools/list exposes governed native bridge metadata without locator dis
     assert.equal(searchMemory._meta.codexMemoryGovernedBridge.nativeBridge.eligible, true);
     assert.equal(searchMemory._meta.codexMemoryGovernedBridge.nativeBridge.direction, 'read');
     assert.equal(searchMemory._meta.codexMemoryGovernedBridge.nativeBridge.invocationProfile, 'governed_read_only');
-    assert.deepEqual(searchMemory._meta.codexMemoryGovernedBridge.clientIdentity.allowedClientIds, ['Codex']);
+    assert.deepEqual(
+      searchMemory._meta.codexMemoryGovernedBridge.clientIdentity.allowedClientIds,
+      ['Codex', 'Claude']
+    );
     assert.equal(searchMemory._meta.codexMemoryGovernedBridge.clientIdentity.toolArgumentsMayOverride, false);
     assert.equal(
       searchMemory._meta.codexMemoryGovernedBridge.clientIdentity
@@ -1107,7 +1110,7 @@ test('MCP tools/list exposes governed native bridge metadata without locator dis
     );
     assert.deepEqual(
       searchMemory._meta.codexMemoryGovernedBridge.scopeBoundary.acceptedVisibility,
-      ['private', 'project', 'workspace']
+      ['private', 'workspace', 'project', 'shared']
     );
     assert.equal(searchMemory._meta.codexMemoryGovernedBridge.scopeBoundary.toolArgumentsMayOverride, false);
     assert.equal(
@@ -1476,7 +1479,7 @@ test('MCP tools/list binds each native bridge tool to the public governed access
       assert.equal(meta.nativeBridge.writeAllowed, expected.writeAllowed, expected.toolName);
       assert.equal(meta.nativeBridge.exactApprovalRequired, expected.exactApprovalRequired, expected.toolName);
       assert.equal(meta.nativeBridge.exactApprovalAction, expected.exactApprovalAction, expected.toolName);
-      assert.deepEqual(meta.clientIdentity.allowedClientIds, ['Codex'], expected.toolName);
+      assert.deepEqual(meta.clientIdentity.allowedClientIds, ['Codex', 'Claude'], expected.toolName);
       assert.equal(meta.clientIdentity.source, 'trusted_execution_context_or_transport', expected.toolName);
       assert.equal(meta.clientIdentity.toolArgumentsMayOverride, false, expected.toolName);
       assert.equal(
@@ -1490,7 +1493,11 @@ test('MCP tools/list binds each native bridge tool to the public governed access
         ['project_id', 'scope_id', 'workspace_id', 'client_id', 'visibility'],
         expected.toolName
       );
-      assert.deepEqual(meta.scopeBoundary.acceptedVisibility, ['private', 'project', 'workspace'], expected.toolName);
+      assert.deepEqual(
+        meta.scopeBoundary.acceptedVisibility,
+        ['private', 'workspace', 'project', 'shared'],
+        expected.toolName
+      );
       assert.equal(meta.scopeBoundary.toolArgumentsMayOverride, false, expected.toolName);
       assert.equal(
         meta.scopeBoundary.governanceMetadataMayOverrideTransportContext,
@@ -2686,7 +2693,7 @@ test('MCP governed metadata parser rejects unsafe scope and trusted context iden
   assert.equal(serialized.includes('SHOULD_NOT_COPY'), false);
 });
 
-test('MCP governed metadata parser rejects shared visibility for native bridge governance metadata', () => {
+test('MCP governed metadata parser accepts shared visibility from trusted governance metadata', () => {
   const result = buildGovernedMcpRequestContextFromParams({
     _meta: {
       codexMemoryGovernance: {
@@ -2712,12 +2719,16 @@ test('MCP governed metadata parser rejects shared visibility for native bridge g
     }
   });
 
-  assert.equal(result.accepted, false);
-  assert.deepEqual(result.invalidFields, [
-    'exactApprovalResult.allowedScope.visibility',
-    'trustedExecutionContext.executionContext.visibility'
-  ]);
-  assert.deepEqual(result.requestContext, {});
+  assert.equal(result.accepted, true);
+  assert.deepEqual(result.invalidFields, []);
+  assert.equal(
+    result.requestContext.exactApprovalResult.allowedScope.visibility,
+    'shared'
+  );
+  assert.equal(
+    result.requestContext.trustedExecutionContext.executionContext.visibility,
+    'shared'
+  );
 });
 
 test('MCP governed request context merge rejects trusted context drift from transport context', () => {
@@ -3427,7 +3438,7 @@ test('MCP schema contract should expose scope in search_memory', async () => {
     assert.ok(Array.isArray(scopeSchema.properties.visibility.oneOf));
     assert.deepEqual(scopeSchema.properties.visibility.oneOf.map(option => option.type), ['string', 'array']);
     assert.equal(scopeSchema.properties.visibility.oneOf[1].items.type, 'string');
-    assert.deepEqual(scopeSchema.properties.client_id.enum, ['codex', 'claude', 'omc', 'manual']);
+    assert.deepEqual(scopeSchema.properties.client_id.enum, ['codex', 'claude', 'manual']);
     assert.deepEqual(scopeSchema.properties.visibility.oneOf[0].enum, ['private', 'workspace', 'project', 'shared']);
     assert.deepEqual(scopeSchema.properties.visibility.oneOf[1].items.enum, ['private', 'workspace', 'project', 'shared']);
     assert.ok(scopeSchema.properties.strict);

@@ -16,6 +16,10 @@ const {
 const {
   SOURCE_AUTHORITY
 } = require('./GovernedMcpVcpNativeRuntimeTargetConfig');
+const {
+  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_VISIBILITIES
+} = require('./MemoryAccessContract');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeBridgeAuditReceiptRecorder';
 const READ_DELEGATION_CONTRACT_NAME = 'GovernedMcpVcpNativeReadDelegationAdapter';
@@ -41,11 +45,7 @@ const ALLOWED_SCOPE_FIELD_NAMES = Object.freeze([
   'visibility',
   'workspace_id'
 ]);
-const ALLOWED_VISIBILITIES = Object.freeze([
-  'private',
-  'project',
-  'workspace'
-]);
+const ALLOWED_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
 const ALLOWED_INVOCATION_PROFILES = Object.freeze([
   'governed_read_only',
   'governed_bounded_write'
@@ -244,7 +244,7 @@ function buildScopeAuditProjection(request = {}) {
     return output;
   }, {});
   return {
-    clientId: request.client_id === 'Codex' ? 'Codex' : null,
+    clientId: GOVERNED_NATIVE_CLIENTS.includes(request.client_id) ? request.client_id : null,
     visibility: safeEnum(request.visibility || scope.visibility, ALLOWED_VISIBILITIES),
     scopePresent: scopeKeys.length > 0,
     scopeIdentifierPresent: identifierKeys.length > 0,
@@ -256,7 +256,7 @@ function buildScopeAuditProjection(request = {}) {
     rawScopePersisted: false,
     rawScopeValueReturned: false,
     clientIdentitySource: GOVERNED_CONTEXT_SOURCE,
-    clientIdentityBound: request.client_id === 'Codex',
+    clientIdentityBound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
     clientIdentityToolArgumentsMayOverride: false,
     clientIdentityGovernanceMetadataMayOverride: false,
     scopeBoundarySource: GOVERNED_CONTEXT_SOURCE,
@@ -954,7 +954,9 @@ function buildLowDisclosureReadFallbackAuditEntry(input = {}) {
     primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
     delegationDirection: 'read',
     toolName: safeGovernedBridgeToolName(input.toolName),
-    clientId: fallbackContext.clientId === 'Codex' ? 'Codex' : null,
+    clientId: GOVERNED_NATIVE_CLIENTS.includes(fallbackContext.clientId)
+      ? fallbackContext.clientId
+      : null,
     visibility: safeEnum(fallbackContext.visibility, ALLOWED_VISIBILITIES),
     scopePresent,
     scopeIdentifierPresent,

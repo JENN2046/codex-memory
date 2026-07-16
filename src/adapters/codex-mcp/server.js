@@ -28,6 +28,9 @@ const {
 } = require('../../core/ToolArgumentValidator');
 const { redactSensitiveFragments } = require('../../core/SensitiveFragmentRedaction');
 const { isSafeReferenceName } = require('../../core/VcpToolBoxSafeReference');
+const {
+  GOVERNED_NATIVE_VISIBILITIES
+} = require('../../core/MemoryAccessContract');
 
 function jsonRpcSuccess(id, result) {
   return { jsonrpc: '2.0', id, result };
@@ -414,7 +417,7 @@ function buildGovernedMcpToolMetadata(toolName, config = {}) {
         ? ['project_id', 'scope_id', 'workspace_id', 'client_id', 'visibility']
         : [],
       acceptedVisibility: nativeBridgeEligible
-        ? ['private', 'project', 'workspace']
+        ? [...GOVERNED_NATIVE_VISIBILITIES]
         : [],
       toolArgumentsMayOverride: false,
       governanceMetadataMayOverrideTransportContext: false,
@@ -707,7 +710,7 @@ function buildGovernedMcpServerMetadata(config = {}) {
     scopeBoundary: {
       source: 'trusted_execution_context_or_transport',
       requiredFieldNames: ['project_id', 'scope_id', 'workspace_id', 'client_id', 'visibility'],
-      acceptedVisibility: ['private', 'project', 'workspace'],
+      acceptedVisibility: [...GOVERNED_NATIVE_VISIBILITIES],
       toolArgumentsMayOverride: false,
       governanceMetadataMayOverrideTransportContext: false,
       rawScopeValueReturned: false
@@ -903,7 +906,7 @@ function pickGovernedEnumString(source, keys, allowedValues, invalidFields, fiel
 function pickGovernedVisibilityString(source, keys, invalidFields, fieldName) {
   const value = pickReferenceCandidate(source, keys);
   if (value === undefined) return undefined;
-  if (['private', 'project', 'workspace'].includes(value)) return value;
+  if (GOVERNED_NATIVE_VISIBILITIES.includes(value)) return value;
   if (Array.isArray(invalidFields) && fieldName) invalidFields.push(fieldName);
   return undefined;
 }

@@ -245,14 +245,14 @@ function governedReadFallbackToolResult(overrides = {}) {
   };
 }
 
-test('accepts current Codex governed VCPToolBox-native product goal', () => {
+test('accepts current Codex and Claude governed VCPToolBox-native product goal', () => {
   const result = validateCurrentProductGoalContract(currentGoal());
 
   assert.equal(result.accepted, true);
   assert.equal(result.decision, 'current_product_goal_accepted');
   assert.equal(result.normalizedProductGoal.primary_runtime, 'VCPToolBox native memory');
   assert.equal(result.normalizedProductGoal.primary_value, 'governance, not memory intelligence');
-  assert.deepEqual(result.normalizedProductGoal.clients, ['Codex']);
+  assert.deepEqual(result.normalizedProductGoal.clients, ['Codex', 'Claude']);
   assert.deepEqual(result.normalizedProductGoal.governed_dimensions, [
     'client_id',
     'scope',
@@ -292,10 +292,10 @@ test('rejects goals that make codex-memory the primary memory-intelligence runti
   assert.equal(result.vcpToolBoxCalled, false);
 });
 
-test('rejects current-client expansion beyond Codex', () => {
+test('rejects current-client expansion beyond Codex and Claude', () => {
   const result = validateCurrentProductGoalContract(currentGoal({
     product_goal: {
-      clients: ['Codex', 'Claude']
+      clients: ['Codex', 'Claude', 'Manual']
     }
   }));
 
@@ -303,19 +303,30 @@ test('rejects current-client expansion beyond Codex', () => {
   assert.ok(result.blockers.includes('clients_must_match_current_product_goal_exact_order'));
 });
 
-test('repository goal docs keep active client scoped to Codex only', () => {
+test('repository goal docs keep the active client contract scoped to Codex and Claude', () => {
   const repoRoot = path.resolve(__dirname, '..');
   const readme = fs.readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
   const projectGoal = fs.readFileSync(path.join(repoRoot, 'PROJECT_GOAL.md'), 'utf8');
   const readmeCurrentIntro = readme.slice(0, readme.indexOf('当前 governed VCPToolBox native bridge 入口：'));
   const currentGoalSection = projectGoal.slice(0, projectGoal.indexOf('## 1.'));
 
-  assert.match(readmeCurrentIntro, /当前目标是让 Codex 通过 `codex-memory` 治理桥/);
-  assert.doesNotMatch(readmeCurrentIntro, /Codex\s*\/\s*Claude/);
+  assert.match(readmeCurrentIntro, /当前目标是让 Codex 与 Claude 通过 `codex-memory` 治理桥/);
   assert.match(currentGoalSection, /clients:\n\s+- Codex/);
-  assert.doesNotMatch(currentGoalSection, /Claude/);
+  assert.match(currentGoalSection, /\s+- Claude/);
   assert.match(projectGoal, /## 1\. Legacy Long-Term Context \(Not Current Product Goal\)/);
   assert.match(projectGoal, /must not override Section 0/);
+});
+
+test('canonical Chinese manual keeps the complete five-tool default configuration', () => {
+  const repoRoot = path.resolve(__dirname, '..');
+  const manual = fs.readFileSync(path.join(repoRoot, 'README.zh-CN.md'), 'utf8');
+  const expectedEnabledTools =
+    'enabled_tools = ["search_memory", "memory_overview", "audit_memory", "prepare_memory_context", "propose_memory_delta"]';
+
+  assert.match(manual, /当前默认开放给 Codex \/ Claude 的五工具面是：/);
+  assert.ok(manual.includes(expectedEnabledTools));
+  assert.match(manual, /\[mcp_servers\.vcp_codex_memory\.tools\.prepare_memory_context\]/);
+  assert.match(manual, /\[mcp_servers\.vcp_codex_memory\.tools\.propose_memory_delta\]/);
 });
 
 test('rejects missing governed dimensions or local fallback role drift', () => {

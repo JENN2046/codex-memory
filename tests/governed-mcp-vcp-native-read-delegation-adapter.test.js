@@ -641,7 +641,7 @@ test('read delegation rejects matching native receipt when governance metadata w
 test('rejects read delegation when required read governance fields did not survive gate', async () => {
   let calls = 0;
   const gate = gateResult('search_memory');
-  gate.normalizedBridgeRequest.client_id = 'Claude';
+  gate.normalizedBridgeRequest.client_id = 'Manual';
   gate.normalizedBridgeRequest.visibility = 'public';
   gate.normalizedBridgeRequest.scope_identifier_present = false;
   gate.normalizedBridgeRequest.scope = {

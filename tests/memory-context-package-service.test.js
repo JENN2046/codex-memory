@@ -6,7 +6,13 @@ const {
   enforceNoForbiddenOutputKeys
 } = require('../src/core/MemoryContextPackageService');
 
-function createService({ results = [], searchAccess = {}, audit = {}, overview = {} } = {}) {
+function createService({
+  results = [],
+  searchAccess = {},
+  sourceRuntime,
+  audit = {},
+  overview = {}
+} = {}) {
   const calls = {
     search: [],
     overview: 0,
@@ -17,7 +23,8 @@ function createService({ results = [], searchAccess = {}, audit = {}, overview =
       calls.search.push({ args, requestContext });
       return {
         results,
-        access: searchAccess
+        access: searchAccess,
+        ...(sourceRuntime ? { source_runtime: sourceRuntime } : {})
       };
     },
     overviewService: {
@@ -149,6 +156,7 @@ test('prepare_memory_context never copies unprojected raw search text into state
 
 test('prepare_memory_context labels fallback and cannot be mistaken for native realtime', async () => {
   const { service } = createService({
+    sourceRuntime: 'local_fallback',
     searchAccess: {
       localMemoryFallbackUsed: true,
       resultCanBeMistakenForVcpNative: false
@@ -168,6 +176,9 @@ test('prepare_memory_context labels fallback and cannot be mistaken for native r
   assert.equal(result.access.localMemoryFallbackUsed, true);
   assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
   assert.equal(result.memory_context_package.source_breakdown.fallback_used, true);
+  assert.equal(result.access.sourceRuntime, 'local_fallback');
+  assert.equal(result.memory_context_package.source_breakdown.source_runtime, 'local_fallback');
+  assert.equal(result.memory_context_package.audit_receipt.source_runtime, 'local_fallback');
   assert.equal(result.memory_context_package.source_breakdown.result_can_be_mistaken_for_native, false);
   assert.equal(result.memory_context_package.audit_receipt.fallback_used, true);
 });
@@ -205,10 +216,12 @@ test('prepare_memory_context surfaces stale and conflict candidates as risks', a
 
 test('prepare_memory_context consumes approved projected statement, classification, freshness, and reasons', async () => {
   const { service } = createService({
+    sourceRuntime: 'vcp_native',
     results: [
       {
         target: 'process',
         score: 0.8,
+        sourceKinds: ['vcp_native'],
         titleHitCount: 1,
         memoryContextProjection: {
           projectionVersion: 1,
@@ -232,6 +245,10 @@ test('prepare_memory_context consumes approved projected statement, classificati
   );
   assert.equal(result.memory_context_package.blockers[0].freshness, 'recent');
   assert.deepEqual(result.memory_context_package.blockers[0].reason_codes, ['title_match']);
+  assert.deepEqual(result.memory_context_package.blockers[0].source_kinds, ['vcp_native']);
+  assert.equal(result.access.sourceRuntime, 'vcp_native');
+  assert.equal(result.memory_context_package.source_breakdown.source_runtime, 'vcp_native');
+  assert.equal(result.memory_context_package.audit_receipt.source_runtime, 'vcp_native');
 });
 
 test('prepare_memory_context audit receipt binds full scope and stable result projections', async () => {

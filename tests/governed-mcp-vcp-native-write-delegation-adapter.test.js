@@ -766,13 +766,13 @@ test('rejects write delegation unless exact approval rollback and audit controls
     toolName: 'record_memory',
     args: {},
     gateResult: acceptedGate({
-      client_id: 'Claude',
+      client_id: 'Manual',
       visibility: 'public',
       scope_identifier_present: false,
       scope: {
         project_id: 'codex-memory',
         workspace_id: 'workspace-alpha',
-        client_id: 'Claude',
+        client_id: 'Manual',
         visibility: 'workspace'
       },
       runtime_target: 'codex-memory local memory',

@@ -9,7 +9,7 @@ const SHA40_RE = /^[0-9a-f]{40}$/;
 const SHA40_SCAN_RE = /\b[0-9a-f]{40}\b/gi;
 const CM_RE = /^CM-\d{4}$/;
 const CMV_RE = /^CMV-\d{4}$/;
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 const FACTS_MODE = "committed_status_snapshot";
 const GIT_FACTS_SOURCE = "fresh_git_commands";
 const ACTIVE_START = "<!-- CURRENT-FACTS-ACTIVE-START -->";
@@ -90,10 +90,10 @@ function validateCurrentFactsSchema(facts, failures) {
   if (facts.gitFactsSource !== GIT_FACTS_SOURCE) failures.push(`gitFactsSource must be ${GIT_FACTS_SOURCE}`);
   if (facts.liveGitFactsCommitted !== false) failures.push("liveGitFactsCommitted must be false");
   if (Object.prototype.hasOwnProperty.call(facts, "localHead")) {
-    failures.push("schema v2 must not commit localHead; collect live git facts with fresh git commands");
+    failures.push("schema v3 must not commit localHead; collect live git facts with fresh git commands");
   }
   if (Object.prototype.hasOwnProperty.call(facts, "originHead")) {
-    failures.push("schema v2 must not commit originHead; collect live git facts with fresh git commands");
+    failures.push("schema v3 must not commit originHead; collect live git facts with fresh git commands");
   }
   const liveGitFactsPolicy = facts.liveGitFactsPolicy;
   if (!liveGitFactsPolicy || typeof liveGitFactsPolicy !== "object" || Array.isArray(liveGitFactsPolicy)) {
@@ -113,7 +113,48 @@ function validateCurrentFactsSchema(facts, failures) {
   }
   if (!CM_RE.test(String(facts.taskId || ""))) failures.push("taskId must look like CM-0000");
   if (!CMV_RE.test(String(facts.validationId || ""))) failures.push("validationId must look like CMV-0000");
-  if (!facts.branch || typeof facts.branch !== "string") failures.push("branch is required");
+  if (Object.prototype.hasOwnProperty.call(facts, "branch")) {
+    failures.push("schema v3 must not use top-level branch for historical evidence");
+  }
+  const repositoryObservation = facts.repositoryObservation;
+  if (!repositoryObservation || typeof repositoryObservation !== "object" || Array.isArray(repositoryObservation)) {
+    failures.push("repositoryObservation object is required");
+  } else {
+    for (const field of [
+      "observedAtCommitted",
+      "observedBranchCommitted",
+      "observedHeadCommitted",
+      "worktreeStateCommitted"
+    ]) {
+      if (repositoryObservation[field] !== false) {
+        failures.push(`repositoryObservation.${field} must be false`);
+      }
+    }
+    if (repositoryObservation.freshGitRequiredBeforeBranchSensitiveAction !== true) {
+      failures.push("repositoryObservation.freshGitRequiredBeforeBranchSensitiveAction must be true");
+    }
+  }
+  if (!facts.evidenceBaseline || typeof facts.evidenceBaseline.snapshotBranch !== "string") {
+    failures.push("evidenceBaseline.snapshotBranch is required");
+  }
+  const governanceState = facts.governanceState;
+  if (!governanceState || typeof governanceState !== "object" || Array.isArray(governanceState)) {
+    failures.push("governanceState object is required");
+  } else {
+    if (governanceState.evidenceRevalidated !== true) {
+      failures.push("governanceState.evidenceRevalidated must be true");
+    }
+    for (const field of [
+      "freshNativeContextProofPerformed",
+      "planPackCompleted",
+      "readinessClaimed",
+      "statusSyncPerformed"
+    ]) {
+      if (governanceState[field] !== false) {
+        failures.push(`governanceState.${field} must be false`);
+      }
+    }
+  }
   if (!facts.baseBranch || typeof facts.baseBranch !== "string") failures.push("baseBranch is required");
 
   const projectStatus = facts.status && facts.status.project;

@@ -13,8 +13,13 @@ const VECTOR_INDEX_FILE_NAME = 'memory-vectors.json';
 const CHAT_INDEX_FILE_NAME = 'chat-history-index.json';
 const CANDIDATE_CACHE_FILE_NAME = 'candidate-cache.json';
 
-const CLIENT_ID_VALUES = ['codex', 'claude', 'omc', 'manual'];
-const VISIBILITY_VALUES = ['private', 'workspace', 'project', 'shared'];
+const {
+  PUBLIC_MEMORY_CLIENT_ID_VALUES,
+  PUBLIC_MEMORY_VISIBILITY_VALUES
+} = require('./MemoryAccessContract');
+
+const CLIENT_ID_VALUES = [...PUBLIC_MEMORY_CLIENT_ID_VALUES];
+const VISIBILITY_VALUES = [...PUBLIC_MEMORY_VISIBILITY_VALUES];
 
 function boundedString(maxLength = 200) {
   return { type: 'string', minLength: 1, maxLength };
@@ -23,8 +28,8 @@ function boundedString(maxLength = 200) {
 const TOOL_DEFINITIONS = [
   {
     name: 'record_memory',
-    title: 'Record Codex Memory',
-    description: 'Write normal Codex memory through the standalone Codex memory core. Do not use this for dream diary entries.',
+    title: 'Record Governed Memory',
+    description: 'Submit a governed memory write through the configured memory runtime. VCPToolBox owns native memory behavior; durable native writes require the active operator authorization boundary. Do not use this for dream diary entries.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -56,8 +61,8 @@ const TOOL_DEFINITIONS = [
   },
   {
     name: 'search_memory',
-    title: 'Search Codex Memory',
-    description: 'Search over the Codex process and knowledge diaries with diary-compatible recall output. When scope is supplied, scope fields are applied as recall filters; strict marks the scoped search as a hard isolation intent for audit/overview.',
+    title: 'Search Governed Memory',
+    description: 'Search the configured governed memory runtime. VCPToolBox owns native recall; local diary-compatible recall is an explicitly marked fallback or compatibility path. Trusted scope fields are applied as recall filters.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -92,8 +97,8 @@ const TOOL_DEFINITIONS = [
   },
   {
     name: 'memory_overview',
-    title: 'Codex Memory Overview',
-    description: 'Operational overview of memory writes, recall activity, shadow sync, and adaptive profile. HTTP no-token calls return only a selected low-disclosure overview projection; bearer-token HTTP calls return a bounded low-disclosure overview projection by default.',
+    title: 'Governed Memory Overview',
+    description: 'Operational overview of governed native bridge evidence and bounded local auxiliary state. HTTP no-token calls return only a selected low-disclosure overview projection; bearer-token HTTP calls return a bounded low-disclosure overview projection by default.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -121,8 +126,8 @@ const TOOL_DEFINITIONS = [
             scope_id: { type: 'string', maxLength: 200 },
             workspace_id: { type: 'string', maxLength: 200 },
             workspace_id_present: { type: 'boolean' },
-            client_id: { type: 'string', maxLength: 200 },
-            visibility: { type: 'string', maxLength: 200 },
+            client_id: { type: 'string', enum: CLIENT_ID_VALUES, maxLength: 200 },
+            visibility: { type: 'string', enum: VISIBILITY_VALUES, maxLength: 200 },
             task_id: { type: 'string', maxLength: 200 }
           }
         },
@@ -133,7 +138,7 @@ const TOOL_DEFINITIONS = [
   {
     name: 'prepare_memory_context',
     title: 'Prepare Memory Context',
-    description: 'Build a read-only, low-disclosure task-start memory context package from bounded governed recall, overview, and audit projections. Does not perform durable mutation or production write.',
+    description: 'Build a read-only, low-disclosure task-start package from governed native-first recall plus explicitly marked local fallback, overview, and audit projections. Does not perform durable mutation or production write.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

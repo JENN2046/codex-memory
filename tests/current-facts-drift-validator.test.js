@@ -68,7 +68,7 @@ function validationLog() {
 
 function facts() {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     factsMode: "committed_status_snapshot",
     gitFactsSource: "fresh_git_commands",
     liveGitFactsCommitted: false,
@@ -81,8 +81,24 @@ function facts() {
     updatedAt: "2026-06-03",
     taskId: "CM-1403",
     validationId: "CMV-1521",
-    branch: "docs/current-facts-active-slimdown",
     baseBranch: "main",
+    repositoryObservation: {
+      observedAtCommitted: false,
+      observedBranchCommitted: false,
+      observedHeadCommitted: false,
+      worktreeStateCommitted: false,
+      freshGitRequiredBeforeBranchSensitiveAction: true
+    },
+    evidenceBaseline: {
+      snapshotBranch: "docs/current-facts-active-slimdown"
+    },
+    governanceState: {
+      evidenceRevalidated: true,
+      freshNativeContextProofPerformed: false,
+      planPackCompleted: false,
+      readinessClaimed: false,
+      statusSyncPerformed: false
+    },
     pr: {
       number: null,
       head: null,
@@ -128,13 +144,13 @@ function workspace() {
   return root;
 }
 
-test("current facts validator accepts schema v2 committed status snapshots", () => {
+test("current facts validator accepts schema v3 separated repository/evidence/governance state", () => {
   const root = workspace();
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, true, result.failures.join("\n"));
 });
 
-test("current facts validator rejects schema v2 committed live git head fields", () => {
+test("current facts validator rejects schema v3 committed live git head fields", () => {
   const root = workspace();
   const changedFacts = facts();
   changedFacts.localHead = SHA;
@@ -142,8 +158,18 @@ test("current facts validator rejects schema v2 committed live git head fields",
   writeFile(root, FACTS_PATH, `${JSON.stringify(changedFacts, null, 2)}\n`);
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);
-  assert.match(result.failures.join("\n"), /schema v2 must not commit localHead/);
-  assert.match(result.failures.join("\n"), /schema v2 must not commit originHead/);
+  assert.match(result.failures.join("\n"), /schema v3 must not commit localHead/);
+  assert.match(result.failures.join("\n"), /schema v3 must not commit originHead/);
+});
+
+test("current facts validator rejects a historical branch at the live top level", () => {
+  const root = workspace();
+  const changedFacts = facts();
+  changedFacts.branch = "historical-evidence-branch";
+  writeFile(root, FACTS_PATH, `${JSON.stringify(changedFacts, null, 2)}\n`);
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must not use top-level branch/);
 });
 
 test("current facts validator rejects stale live git policy", () => {

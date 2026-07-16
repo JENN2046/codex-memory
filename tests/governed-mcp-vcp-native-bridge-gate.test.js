@@ -242,19 +242,28 @@ test('rejects scope that drifts from trusted execution context', () => {
   assert.equal(serialized.includes('codex-memory'), false);
 });
 
-test('rejects non-Codex client access and current-goal client expansion', () => {
+test('accepts Claude as a governed native client in the frozen product goal', () => {
   const result = validateGovernedMcpVcpNativeBridgeGate(gateInput({
-    product_goal: {
-      clients: ['Codex', 'Claude']
-    },
     bridge_request: {
       client_id: 'Claude'
     }
   }));
 
+  assert.equal(result.accepted, true);
+  assert.equal(result.normalizedBridgeRequest.client_id, 'Claude');
+  assert.equal(result.normalizedBridgeRequest.scope.client_id, 'Claude');
+  assert.equal(result.vcpToolBoxCalled, false);
+});
+
+test('rejects clients outside the frozen governed native client contract', () => {
+  const result = validateGovernedMcpVcpNativeBridgeGate(gateInput({
+    bridge_request: {
+      client_id: 'Manual'
+    }
+  }));
+
   assert.equal(result.accepted, false);
-  assert.ok(result.blockers.includes('client_id_must_be_codex'));
-  assert.ok(result.blockers.includes('clients_must_match_current_product_goal_exact_order'));
+  assert.ok(result.blockers.includes('client_id_must_be_governed_native_client'));
   assert.equal(result.normalizedBridgeRequest.client_id, null);
   assert.equal(result.vcpToolBoxCalled, false);
 });
@@ -296,7 +305,7 @@ test('rejects missing governed dimensions before any runtime or MCP invocation',
 
   assert.equal(result.accepted, false);
   assert.ok(result.blockers.includes('scope_identifier_required'));
-  assert.ok(result.blockers.includes('visibility_must_be_private_project_or_workspace'));
+  assert.ok(result.blockers.includes('visibility_must_be_governed_visibility'));
   assert.ok(result.blockers.includes('runtime_target_reference_must_be_configured_by_bridge'));
   assert.ok(result.blockers.includes('output_disclosure_budget_must_be_low_disclosure_and_bounded'));
   assert.ok(result.blockers.includes('audit_receipt_must_be_required_low_disclosure_and_referenced'));
@@ -1022,7 +1031,7 @@ test('rejects unsafe exact approval governance fields without echoing them', () 
 
   assert.equal(result.accepted, false);
   assert.ok(result.blockers.includes('write_authority_exact_approval_scope_references_must_be_safe'));
-  assert.ok(result.blockers.includes('write_authority_exact_approval_scope_visibility_must_be_private_project_or_workspace'));
+  assert.ok(result.blockers.includes('write_authority_exact_approval_scope_visibility_must_be_governed_visibility'));
   assert.ok(result.blockers.includes('write_authority_exact_approval_runtime_target_reference_must_be_safe'));
   assert.ok(result.blockers.includes('write_authority_exact_approval_runtime_target_kind_must_be_mcp_server'));
   assert.ok(result.blockers.includes('write_authority_exact_approval_runtime_target_must_be_vcp_toolbox_native_memory'));

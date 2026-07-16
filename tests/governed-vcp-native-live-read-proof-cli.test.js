@@ -180,7 +180,7 @@ test('product goal progress marks fixture-backed accepted proof as substantive b
 
   assert.equal(progress.primaryRuntime, 'VCPToolBox native memory');
   assert.equal(progress.primaryValue, 'governance, not memory intelligence');
-  assert.deepEqual(progress.clients, ['Codex']);
+  assert.deepEqual(progress.clients, ['Codex', 'Claude']);
   assert.equal(progress.accessPath, 'governed MCP tools');
   assert.equal(progress.allGovernedDimensionsCovered, true);
   assert.equal(progress.acceptanceArtifactVerified, true);

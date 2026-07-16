@@ -1,5 +1,10 @@
 'use strict';
 
+const {
+  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_VISIBILITIES
+} = require('./MemoryAccessContract');
+
 const CONTRACT_NAME = 'CurrentProductGoalContract';
 const CONTRACT_VERSION = 'current_product_goal_v1';
 
@@ -7,9 +12,7 @@ const REQUIRED_PRIMARY_RUNTIME = 'VCPToolBox native memory';
 const REQUIRED_PRIMARY_VALUE = 'governance, not memory intelligence';
 const REQUIRED_ACCESS_PATH = 'governed MCP tools';
 
-const REQUIRED_CLIENTS = Object.freeze([
-  'Codex'
-]);
+const REQUIRED_CLIENTS = GOVERNED_NATIVE_CLIENTS;
 
 const REQUIRED_GOVERNED_DIMENSIONS = Object.freeze([
   'client_id',
@@ -225,6 +228,12 @@ function requireEqual(blockers, metadata, path, expected) {
   if (valueAtPath(metadata, path) !== expected) blockers.push(`${path}_must_equal_${String(expected)}`);
 }
 
+function requireOneOf(blockers, metadata, path, expected, blockerName = null) {
+  if (!expected.includes(valueAtPath(metadata, path))) {
+    blockers.push(blockerName || `${path}_must_match_current_product_goal_value`);
+  }
+}
+
 function requireArrayExact(blockers, metadata, path, expected) {
   const actual = valueAtPath(metadata, path);
   if (!Array.isArray(actual) || !sameExactList(actual, expected)) {
@@ -388,11 +397,12 @@ function validateGovernedMcpMetadataCoversCurrentProductGoal(metadata = {}, opti
     'client_id',
     'visibility'
   ]);
-  requireArrayExact(blockers, meta, 'scopeBoundary.acceptedVisibility', [
-    'private',
-    'project',
-    'workspace'
-  ]);
+  requireArrayExact(
+    blockers,
+    meta,
+    'scopeBoundary.acceptedVisibility',
+    GOVERNED_NATIVE_VISIBILITIES
+  );
   requireEqual(blockers, meta, 'scopeBoundary.toolArgumentsMayOverride', false);
   requireEqual(blockers, meta, 'scopeBoundary.governanceMetadataMayOverrideTransportContext', false);
   requireEqual(blockers, meta, 'scopeBoundary.rawScopeValueReturned', false);
@@ -674,11 +684,12 @@ function validateGovernedMcpServerMetadataCoversCurrentProductGoal(metadata = {}
     'client_id',
     'visibility'
   ]);
-  requireArrayExact(blockers, meta, 'scopeBoundary.acceptedVisibility', [
-    'private',
-    'project',
-    'workspace'
-  ]);
+  requireArrayExact(
+    blockers,
+    meta,
+    'scopeBoundary.acceptedVisibility',
+    GOVERNED_NATIVE_VISIBILITIES
+  );
   requireEqual(blockers, meta, 'scopeBoundary.toolArgumentsMayOverride', false);
   requireEqual(blockers, meta, 'scopeBoundary.governanceMetadataMayOverrideTransportContext', false);
   requireEqual(blockers, meta, 'scopeBoundary.rawScopeValueReturned', false);
@@ -908,14 +919,20 @@ function validateGovernedMcpBridgeGateResultCoversCurrentProductGoal(gateResult 
     blockers.push('normalizedBridgeRequest.mcp_tool_name_must_be_current_product_goal_native_bridge_tool');
   }
 
-  requireEqual(blockers, request, 'client_id', 'Codex');
+  requireOneOf(
+    blockers,
+    request,
+    'client_id',
+    REQUIRED_CLIENTS,
+    'normalizedBridgeRequest.client_id_must_be_governed_native_client'
+  );
   requireEqual(blockers, request, 'access_path', REQUIRED_ACCESS_PATH);
   requireEqual(blockers, request, 'scope_identifier_present', true);
   requireEqual(blockers, request, 'scope_identifier_safe', true);
-  requireEqual(blockers, request, 'scope.client_id', 'Codex');
+  requireEqual(blockers, request, 'scope.client_id', valueAtPath(request, 'client_id'));
   requireEqual(blockers, request, 'scope.visibility', valueAtPath(request, 'visibility'));
-  if (!['private', 'project', 'workspace'].includes(valueAtPath(request, 'visibility'))) {
-    blockers.push('normalizedBridgeRequest.visibility_must_be_private_project_or_workspace');
+  if (!GOVERNED_NATIVE_VISIBILITIES.includes(valueAtPath(request, 'visibility'))) {
+    blockers.push('normalizedBridgeRequest.visibility_must_be_governed_visibility');
   }
   if (request.trusted_execution_context_supplied === true) {
     requireEqual(blockers, request, 'trusted_execution_context_accepted', true);
@@ -1069,14 +1086,20 @@ function validateGovernedMcpNativeDelegatedArgumentsCoversCurrentProductGoal(
   requireEqual(blockers, bridge, 'runtime_target.endpoint_disclosed', false);
   requireEqual(blockers, bridge, 'runtime_target.token_material_disclosed', false);
 
-  requireEqual(blockers, bridge, 'client_id', 'Codex');
+  requireOneOf(
+    blockers,
+    bridge,
+    'client_id',
+    REQUIRED_CLIENTS,
+    'governed_bridge.client_id_must_be_governed_native_client'
+  );
   requireEqual(blockers, bridge, 'scope_present', true);
   requireEqual(blockers, bridge, 'scope_identifier_present', true);
   requireEqual(blockers, bridge, 'scope_identifier_safe', true);
-  requireEqual(blockers, bridge, 'scope.client_id', 'Codex');
+  requireEqual(blockers, bridge, 'scope.client_id', valueAtPath(bridge, 'client_id'));
   requireEqual(blockers, bridge, 'scope.visibility', valueAtPath(bridge, 'visibility'));
-  if (!['private', 'project', 'workspace'].includes(valueAtPath(bridge, 'visibility'))) {
-    blockers.push('governed_bridge.visibility_must_be_private_project_or_workspace');
+  if (!GOVERNED_NATIVE_VISIBILITIES.includes(valueAtPath(bridge, 'visibility'))) {
+    blockers.push('governed_bridge.visibility_must_be_governed_visibility');
   }
   if (!Array.isArray(bridge.scope_field_names) || !bridge.scope_field_names.includes('client_id') ||
       !bridge.scope_field_names.includes('visibility')) {
@@ -1263,12 +1286,23 @@ function validateGovernedMcpNativeGovernanceMetadataCoversCurrentProductGoal(
 
   requireEqual(blockers, metadata, 'trustedExecutionContext.accepted', true);
   requireEqual(blockers, metadata, 'trustedExecutionContext.source', 'trusted_execution_context_or_transport');
-  requireEqual(blockers, metadata, 'trustedExecutionContext.executionContext.agentAlias', 'Codex');
-  requireEqual(blockers, metadata, 'trustedExecutionContext.executionContext.clientId', 'Codex');
-  if (!['private', 'project', 'workspace'].includes(
+  requireOneOf(
+    blockers,
+    metadata,
+    'trustedExecutionContext.executionContext.agentAlias',
+    REQUIRED_CLIENTS,
+    'trustedExecutionContext.executionContext.agentAlias_must_be_governed_native_client'
+  );
+  requireEqual(
+    blockers,
+    metadata,
+    'trustedExecutionContext.executionContext.clientId',
+    valueAtPath(metadata, 'trustedExecutionContext.executionContext.agentAlias')
+  );
+  if (!GOVERNED_NATIVE_VISIBILITIES.includes(
     valueAtPath(metadata, 'trustedExecutionContext.executionContext.visibility')
   )) {
-    blockers.push('trustedExecutionContext.executionContext.visibility_must_be_private_project_or_workspace');
+    blockers.push('trustedExecutionContext.executionContext.visibility_must_be_governed_visibility');
   }
   const projectId = valueAtPath(metadata, 'trustedExecutionContext.executionContext.projectId');
   const scopeId = valueAtPath(metadata, 'trustedExecutionContext.executionContext.scopeId');
@@ -1420,9 +1454,15 @@ function validateGovernedMcpOverviewStatusCoversCurrentProductGoal(status = {}) 
   if (!REQUIRED_NATIVE_BRIDGE_TOOLS.includes(toolName)) {
     blockers.push('latest.toolName_must_be_current_product_goal_native_bridge_tool');
   }
-  requireEqual(blockers, latest, 'clientId', 'Codex');
-  if (!['private', 'project', 'workspace'].includes(valueAtPath(latest, 'visibility'))) {
-    blockers.push('latest.visibility_must_be_private_project_or_workspace');
+  requireOneOf(
+    blockers,
+    latest,
+    'clientId',
+    REQUIRED_CLIENTS,
+    'latest.clientId_must_be_governed_native_client'
+  );
+  if (!GOVERNED_NATIVE_VISIBILITIES.includes(valueAtPath(latest, 'visibility'))) {
+    blockers.push('latest.visibility_must_be_governed_visibility');
   }
   requireEqual(blockers, latest, 'scopePresent', true);
   requireEqual(blockers, latest, 'scopeIdentifierPresent', true);

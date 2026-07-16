@@ -2,7 +2,7 @@
 
 Purpose: keep Codex work on `codex-memory` fast, current, and auditable without loading long historical state into every turn.
 
-This contract controls the default context packet for project work. It does not weaken `AGENTS.md`, `.agent_board/CURRENT_FACTS.json` schema v2, Red Lane approvals, validation gates, or source/test authority.
+This contract controls the default context packet for project work. It does not weaken `AGENTS.md`, `.agent_board/CURRENT_FACTS.json` schema v3, Red Lane approvals, validation gates, or source/test authority.
 
 ## Default Intake Packet
 
