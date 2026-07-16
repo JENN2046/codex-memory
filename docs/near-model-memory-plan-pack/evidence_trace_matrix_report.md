@@ -4,6 +4,81 @@ Task id: `CM-2024`
 Validation id: `CMV-2125`
 Date: `2026-07-10`
 
+## CM-2114 Phase 8 Revalidation Trace Application
+
+The three reopened exact-receipt entries now trace to the frozen CM-2113 owner
+proof receipt (`cd0b9864…`, raw SHA-256 `1996cdd6…8162`) and the CM-2114
+application receipt (`c31ef072…dc82`):
+
+- `vcpToolBoxOwnedRuntimeWritePassed=true` traces to the exact VCPToolBox
+  `DailyNote` Git objects and one exact 357-byte owner-runtime write;
+- `actualTransportBindingPassed=true` traces to 3/3 Content-Length stdio MCP
+  frames, a real child process boundary, authenticated local HTTP MCP, and
+  DailyNote stdio;
+- `stableTargetStoreIdentityPassed=true` traces to identity SHA-256
+  `0294fc5c…cfaab`, matched before and after the write.
+
+The Phase 8 trace now has 18/18 accepted evidence fields and no missing entry.
+`phase8Completed=true` and `phase8CompletionStatus=revalidated_complete` apply
+only to Phase 8. Full-plan completion and every readiness claim remain false.
+
+## CM-2112 Phase 8 Revalidation Trace Update (historical checkpoint)
+
+The CM-2111 trace remains historical. The current Phase 8 trace adds three
+future exact-authorized receipt requirements:
+
+- `vcpToolBoxOwnedRuntimeWritePassed`;
+- `actualTransportBindingPassed`;
+- `stableTargetStoreIdentityPassed`.
+
+All three were missing at that checkpoint. Consequently CM-2112 reported
+`phase8Completed=false` and `phase8CompletionStatus=needs_revalidation`.
+Local contracts, old receipt booleans, direct app calls, and synthetic local
+filesystem writes cannot satisfy these entries.
+
+## CM-2111 Phase 8 Completion Trace Update
+
+Historically, all fifteen then-required Phase 8 requirements traced to accepted local-contract and exact
+receipt/application evidence. The Phase 8-only completion audit reports:
+
+```yaml
+phase_id: "phase8_native_write_production_proof"
+accepted: true
+missing_evidence: []
+phase8Completed: true # historical CM-2111 result; superseded for current status by CM-2112
+```
+
+The application receipt payload SHA-256 is `d2617505…faec`. The trace does not
+set `fullPlanPackCompleted` or any readiness field and does not infer provider,
+derived-index, default-product retrieval, production, release, deploy, cutover,
+`RC_READY`, or complete-V8 status.
+
+## CM-2110 Failure-Recovery Application Trace Update
+
+`failureRecoveryProofPassed` now traces to the exact CM-2109 isolated
+three-case execution receipt and its one-shot CM-2110 application receipt. The
+evidence separately proves pre-claim failure, consumed pre-commit failure, and
+ambiguous post-commit stop behavior with zero retry, rollback, or compensation.
+
+Application receipt payload SHA-256 is `9d96290a…ecd6`. Together with CM-2108,
+both remaining Phase 8 execution-proof fields are now accepted and applied.
+CM-2111 subsequently runs that separate completion-audit gate. No production
+failure-recovery, provider, release, or readiness inference is permitted.
+
+## CM-2108 Rollback Application Trace Update
+
+`rollbackDrillPassed` now traces to the exact CM-2107 identity-bound tombstone
+execution receipt and the one-shot CM-2108 application receipt. The chain
+binds the original synthetic record hash, exact marker hash, one tombstone
+write, one correlated verify, original-record preservation, and a zero-target
+effective lifecycle projection.
+
+The application receipt payload SHA-256 is `8517b8e9…0a0b`.
+`failureRecoveryProofPassed` remains false, so Phase 8 and the full plan pack
+remain incomplete. Default product retrieval tombstone awareness, provider
+execution, readiness, release, and production claims remain outside this
+evidence.
+
 ## CM-2095 Phase 8 Application Trace Update
 
 The exact approval, native side effect, primary durable Markdown, verify,
@@ -12,9 +87,11 @@ receipt evidence in `phase8_completion_evidence_application_receipt_cm2095.json`
 `phase8ReceiptBundleAppliedToCompletionAudit` is applied by the separately
 authorized CM-2095 patch. Receipt payload SHA-256 is `8c8a22f8…0939`.
 
-`rollbackDrillPassed` and `failureRecoveryProofPassed` remain future exact
-evidence and false. Derived-index/provider proof remains unaccepted. Therefore
-Phase 8 and the full plan pack remain incomplete, with no readiness claim.
+At the CM-2095 application point, `rollbackDrillPassed` and
+`failureRecoveryProofPassed` were future exact evidence and false. CM-2108 now
+applies the rollback field separately; failure recovery remains false.
+Derived-index/provider proof remains unaccepted. Therefore Phase 8 and the full
+plan pack remain incomplete, with no readiness claim.
 
 ## CM-2082 Application Trace Update
 
@@ -84,6 +161,9 @@ Receipt-backed Phase 8 fields include:
 - `exactApprovalEnforcementPassed`;
 - `nativeSideEffectReceiptPassed`;
 - `realRootDurableWriteProofPassed`;
+- `vcpToolBoxOwnedRuntimeWritePassed`;
+- `actualTransportBindingPassed`;
+- `stableTargetStoreIdentityPassed`;
 - `verifyWritePassed`;
 - `rollbackDrillPassed`;
 - `failureRecoveryProofPassed`;

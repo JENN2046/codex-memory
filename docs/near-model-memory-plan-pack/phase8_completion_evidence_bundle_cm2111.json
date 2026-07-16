@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2111",
+  "bundleType": "phase8_completion_audit_evidence_bundle",
+  "sourceCommit": "ee88f40a264795f85c92c36d468ae6180bfc59fb",
+  "phaseId": "phase8_native_write_production_proof",
+  "evidence": {
+    "nativeWriteContractPreflightPassed": true,
+    "realRootWriteReadinessGatePassed": true,
+    "phase8ReceiptAuditIntakePassed": true,
+    "phase8ReceiptBundleContractPassed": true,
+    "phase8ReceiptPatchHardenedBundleBindingPassed": true,
+    "phase8ReceiptApplicationPatchPreflightPassed": true,
+    "exactApprovalEnforcementPassed": true,
+    "nativeSideEffectReceiptPassed": true,
+    "realRootDurableWriteProofPassed": true,
+    "verifyWritePassed": true,
+    "rollbackDrillPassed": true,
+    "failureRecoveryProofPassed": true,
+    "outputDisclosureBudgetPassed": true,
+    "auditReceiptPassed": true,
+    "phase8ReceiptBundleAppliedToCompletionAudit": true
+  },
+  "localContractSources": [
+    {
+      "path": "docs/near-model-memory-plan-pack/native_write_contract_preflight_report.md",
+      "blobOid": "47031fe18e0939fc3226fb3911a07616f25882bf"
+    },
+    {
+      "path": "docs/near-model-memory-plan-pack/real_root_write_readiness_gate_report.md",
+      "blobOid": "199dcaa064796e185b1b5cec208acf5925e3e416"
+    },
+    {
+      "path": "docs/near-model-memory-plan-pack/phase8_native_write_receipt_audit_intake_contract_report.md",
+      "blobOid": "7570803d0baf9ba87383a49130764950885318c0"
+    },
+    {
+      "path": "docs/near-model-memory-plan-pack/phase8_native_write_receipt_bundle_contract_report.md",
+      "blobOid": "ee199e446031efcfc23d63f8ec687e611da0f29e"
+    },
+    {
+      "path": "docs/near-model-memory-plan-pack/phase8_receipt_patch_hardened_bundle_binding_report.md",
+      "blobOid": "5ef8c71c16ea421e010638c19bce1e475d649e5d"
+    },
+    {
+      "path": "docs/near-model-memory-plan-pack/phase8_native_write_receipt_application_patch_preflight_contract_report.md",
+      "blobOid": "f116219926265b49983863cdfd6fda7e22868b64"
+    }
+  ],
+  "applicationReceipts": {
+    "nativeWrite": {
+      "commit": "5bbfe6e3327b98a863bd68fc6d34e9dd1e1acfe9",
+      "blobOid": "5269b14598a0e2bca079fc20fda1f922642b2803",
+      "rawSha256": "4657cb0bdf2e44c2b4d0407ed2d1f090162a365601c208cb9e29a90fd5a3fa95",
+      "payloadSha256": "8c8a22f89863214ccbe2d0e64b75a0526cc32f1e21d83d7159e109e6fa200939"
+    },
+    "rollback": {
+      "commit": "67a05fc55092db53be0dbf3b50bd3d23ddbdafd7",
+      "blobOid": "3129e9531074d26919667eabc646cf58a28a63ad",
+      "rawSha256": "d645b3308ef683f7932d81375cd58f19b1198440d33069d694d7cc3cd4f8d83c",
+      "payloadSha256": "8517b8e930f4d78d203fc6d8f1a7256f4c7b4ab303183cdf56db8aa70c320a0b"
+    },
+    "failureRecovery": {
+      "commit": "ee88f40a264795f85c92c36d468ae6180bfc59fb",
+      "blobOid": "979d8758327472a25b6dc727d30fda5a40e15efd",
+      "rawSha256": "f4cded56f7d663d355ed840eac2f07551b1450bec7a6c58be2b24f3eb8ff579d",
+      "payloadSha256": "9d96290a35a42886ec8afe127520da9926f054d1b772b44d7ca3877ce1b0ecd6"
+    }
+  },
+  "currentState": {
+    "phase8Completed": false,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "allowedCompletionResult": {
+    "phase8Completed": true,
+    "fullPlanPackCompleted": false,
+    "readinessClaimed": false
+  },
+  "sideEffectCounters": {
+    "nativeReads": 0,
+    "nativeWrites": 0,
+    "verifyOperations": 0,
+    "rollbackOrCompensationOperations": 0,
+    "remoteActions": 0,
+    "readinessClaims": 0
+  }
+}

@@ -4,6 +4,119 @@ Task: `CM-2017 near-model-memory plan pack completion audit`
 Validation: `CMV-2118`
 Date: 2026-07-10
 
+## CM-2114 Phase 8 Completion Revalidation Application
+
+CM-2114 applies the exact CM-2113 VCPToolBox owner proof receipt to the reopened
+18-field Phase 8 audit. The new receipt proves the three fields CM-2112 left
+missing:
+
+```yaml
+vcpToolBoxOwnedRuntimeWritePassed: true
+actualTransportBindingPassed: true
+stableTargetStoreIdentityPassed: true
+phase8Completed: true
+phase8CompletionStatus: revalidated_complete
+fullPlanPackCompleted: false
+readinessClaimed: false
+```
+
+The proof used one synthetic VCPToolBox `DailyNote` write through a real
+child-process Content-Length stdio MCP boundary, authenticated local HTTP MCP,
+and the official DailyNote stdio runtime. The stable synthetic store identity
+matched before and after the exact 357-byte durable Markdown write. Application
+receipt payload SHA-256 is `c31ef072…dc82`. The proof authorization and the
+application authorization are consumed and not replayable. No additional
+native action, provider call, real-memory read, rollback, compensation, remote
+action, full-plan completion, production/release readiness, or `RC_READY` claim
+is authorized or implied.
+
+## CM-2112 Phase 8 Completion Revalidation (resolved by CM-2114)
+
+CM-2111 remains a historical, hash-bound application record. It is no longer
+current completion authority. Repository reality showed that its 15-field
+bundle did not independently bind the claimed native side effect to a
+VCPToolBox-owned runtime, the actual stdio→local-HTTP transport chain, and a
+stable target/store identity.
+
+At the CM-2112 checkpoint, the audit required three additional exact-receipt
+fields:
+
+```yaml
+vcpToolBoxOwnedRuntimeWritePassed: false
+actualTransportBindingPassed: false
+stableTargetStoreIdentityPassed: false
+phase8Completed: false
+phase8CompletionStatus: needs_revalidation
+```
+
+The historical CM-2111 bundle still fails closed when replayed by itself. The
+separate CM-2113 proof and CM-2114 application now satisfy those fields without
+rewriting CM-2111 history. CM-2112 itself authorized no native or remote action.
+
+## CM-2111 Phase 8 Completion Audit Application
+
+At the time of its application, the exact Phase 8 evidence bundle contained all
+15 then-required fields. The historical
+Completion Audit independently evaluated
+`phase8_native_write_production_proof` as accepted with no missing evidence,
+and the one-shot CM-2111 patch application succeeded.
+
+```yaml
+rollbackDrillPassed: true
+failureRecoveryProofPassed: true
+phase8Completed: true
+fullPlanPackCompleted: false
+readinessClaimed: false
+```
+
+Application receipt payload SHA-256 is `d2617505…faec`. No native, provider,
+remote, release, deploy, cutover, or readiness action occurred during this
+application. After CM-2112 this historical result is not current completion
+authority. It was an evidence-gate result only; it is not
+production readiness, release readiness, `RC_READY`, complete V8, or full
+plan-pack completion.
+
+## CM-2110 Failure-Recovery Evidence Application
+
+The exact CM-2109 isolated three-case failure-recovery receipt was accepted and
+applied once under decision
+`CM-2110-SELF-FAILURE-RECOVERY-EVIDENCE-APPLICATION-07C1CF3B`.
+
+```yaml
+rollbackDrillPassed: true
+failureRecoveryProofPassed: true
+phase8Completed: false
+fullPlanPackCompleted: false
+readinessClaimed: false
+```
+
+Application receipt payload SHA-256 is `9d96290a…ecd6`. This patch records
+synthetic failure-recovery evidence only. It did not rerun any failure case or
+perform native memory, provider, retry, rollback, compensation, remote, or
+readiness actions. Both remaining Phase 8 execution-proof fields are now
+applied; Phase 8 completion still requires a separate completion-audit gate.
+
+## CM-2108 Rollback Evidence Application
+
+The self-governed exact application decision
+`CM-2108-SELF-ROLLBACK-EVIDENCE-APPLICATION-928DA067` bound the accepted
+CM-2107 rollback receipt and authorized one Completion Audit patch.
+
+```yaml
+rollbackDrillPassed: true
+failureRecoveryProofPassed: false
+phase8Completed: false
+fullPlanPackCompleted: false
+readinessClaimed: false
+```
+
+Application gate, patch boundary, patch application, and receipt validation all
+accepted. Receipt payload SHA-256 is `8517b8e9…0a0b`. The source evidence proves
+one append-only tombstone and one marker-aware lifecycle verify against the
+identity-bound synthetic store. It does not claim default product retrieval
+tombstone awareness and did not execute another native action. Phase 8 remains
+incomplete only because failure-recovery proof has not yet been applied.
+
 ## CM-2095 Authorized Phase 8 Evidence Application
 
 Decision `CM-2095-ER-20260711-COMPLETION-EVIDENCE-APPLICATION-PASS-2E98CE0C`

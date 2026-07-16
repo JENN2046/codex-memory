@@ -1,0 +1,21 @@
+{
+  "target": "process",
+  "title": "CM-2106 identity-bound synthetic rollback lifecycle record",
+  "content": "Synthetic rollback lifecycle proof record. No user memory. Non-production. Not RC_READY.",
+  "evidence": "CM-2105 empty-store preflight passed; Route B identity-bound synthetic lifecycle only.",
+  "validated": true,
+  "reusable": false,
+  "tags": [
+    "cm2106",
+    "phase8",
+    "identity-bound-rollback"
+  ],
+  "sensitivity": "none",
+  "scope_id": "cm2106-phase8-identity-bound-rollback-001",
+  "project_id": "codex-memory",
+  "workspace_id": "codex-memory-phase8-rollback-proof",
+  "client_id": "codex",
+  "visibility": "project",
+  "task_id": "CM-2106",
+  "retention_policy": "synthetic-rollback-lifecycle-only"
+}

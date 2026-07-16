@@ -4,9 +4,9 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2099 CM-2096 rollback execution packet v3`.
-Current validation: `CMV-2203`.
-Current status: V3 target-store identity/collector, one-shot tombstone gate, exact verifier, two-commit executor, and packet prepared; bootstrap/preflight/decision absent; no tombstone/verify authority; Phase 8 incomplete.
+Current task: `CM-2114 Phase 8 completion revalidation application`.
+Current validation: `CMV-2206`.
+Current status: `phase8Completed=true` and `phase8CompletionStatus=revalidated_complete` from exact CM-2113/2114 evidence. Both proof authorizations are consumed; no additional native action is allowed. Full plan-pack and every readiness claim remain false.
 Branch and HEAD values are intentionally not repeated here or in `.agent_board/CURRENT_FACTS.json`; collect live Git facts with fresh Git output.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -37,10 +37,11 @@ Branch and HEAD values are intentionally not repeated here or in `.agent_board/C
 
 ## Next Safe Action
 
-Next safe action is independent review of CM-2096 v3 implementation and packet.
-Do not initialize the target-store identity, call `tombstone_memory`, run verify,
-claim nonce/registry, create an execution receipt, or alter rollback/Phase 8
-evidence fields without the next exact independent decisions.
+Next safe action is evidence-preserving review or work on a separately scoped
+plan-pack gap. Do not replay `record_memory`, tombstone, verify, failure
+injection, or authorization claims; do not delete/rebuild governance markers;
+and do not infer production, release, deploy, cutover, RC, complete-V8, or
+full-plan readiness from Phase 8 completion.
 
 ## Historical Run Notes
 

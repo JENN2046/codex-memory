@@ -760,6 +760,26 @@ function lowDisclosureNativeInvocationReceipt(value, expected = {}) {
       rawMemoryContentDisclosed: nativeRuntimeReceipt.rawMemoryContentDisclosed === true,
       runtimeLocatorDisclosed: nativeRuntimeReceipt.runtimeLocatorDisclosed === true,
       tokenMaterialDisclosed: nativeRuntimeReceipt.tokenMaterialDisclosed === true,
+      memoryIntelligenceOwner: nativeRuntimeReceipt.memoryIntelligenceOwner === 'VCPToolBox'
+        ? 'VCPToolBox'
+        : null,
+      ownerRuntimeComponent: nativeRuntimeReceipt.ownerRuntimeComponent === 'DailyNote'
+        ? 'DailyNote'
+        : null,
+      ownerRuntimeCommunication: nativeRuntimeReceipt.ownerRuntimeCommunication === 'stdio'
+        ? 'stdio'
+        : null,
+      ownerRuntimeSourceCommitMatched: nativeRuntimeReceipt.ownerRuntimeSourceCommitMatched === true,
+      ownerRuntimeSourceTreeMatched: nativeRuntimeReceipt.ownerRuntimeSourceTreeMatched === true,
+      ownerRuntimePluginBlobMatched: nativeRuntimeReceipt.ownerRuntimePluginBlobMatched === true,
+      ownerRuntimeManifestBlobMatched: nativeRuntimeReceipt.ownerRuntimeManifestBlobMatched === true,
+      stableStoreIdentityMatched: nativeRuntimeReceipt.stableStoreIdentityMatched === true,
+      durableBytes: Number.isInteger(nativeRuntimeReceipt.durableBytes) && nativeRuntimeReceipt.durableBytes > 0
+        ? nativeRuntimeReceipt.durableBytes
+        : null,
+      durableSha256: /^[a-f0-9]{64}$/.test(nativeRuntimeReceipt.durableSha256 || '')
+        ? nativeRuntimeReceipt.durableSha256
+        : null,
       readinessClaimed: nativeRuntimeReceipt.readinessClaimed === true
     },
     readinessClaimed: false

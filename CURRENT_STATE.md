@@ -8,15 +8,26 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | CM-2096 v3 non-executing stack and packet prepared; bootstrap/preflight/decision still absent; Phase 8 incomplete |
-| Current task | `CM-2099 CM-2096 rollback execution packet v3` |
-| Current validation | `CMV-2203` |
-| Current route | Independent v3 implementation review; no tombstone/verify/nonce claim |
+| Status | Phase 8 revalidated complete; full plan pack and readiness remain incomplete/unclaimed |
+| Current task | `CM-2114 Phase 8 completion revalidation application` |
+| Current validation | `CMV-2206` |
+| Current route | Preserve consumed CM-2113 evidence and continue only with a separately selected remaining plan-pack gap |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## Future Candidate Routes
+## Current Revalidation Result
+
+CM-2111 remains historical, including its consumed record/tombstone/failure
+authorizations and receipt SHA `d2617505…faec`. CM-2113 added an exact official
+VCPToolBox DailyNote owner-runtime write, real stdio→authenticated-local-HTTP→stdio
+transport evidence, and stable identity-bound synthetic store proof. CM-2114
+applied those three new fields to the 18-field audit. Current status is
+`phase8Completed=true` and `phase8CompletionStatus=revalidated_complete`.
+Full-plan completion and every readiness state remain false. No native
+authorization is active or replayable.
+
+## Historical / Future Candidate Routes
 
 CM-2096 v2 implementation review passed without execution authority. V3 binds
 an immutable synthetic-store identity, collects exact target/marker hashes from

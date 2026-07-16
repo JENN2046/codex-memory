@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "taskId": "CM-2113",
+  "decisionReference": "CM-2113-SELF-VCPTOOLBOX-OWNER-NATIVE-PROOF-FINAL-002-0294FC5C",
+  "executionReleaseAuthorized": true,
+  "nativeWriteAuthorized": true,
+  "authorizationUseCount": 1,
+  "automaticRetryAllowed": false,
+  "rollbackOrCompensationAllowed": false,
+  "expiresAt": "2026-07-15T18:00:00+08:00",
+  "approvedAt": "2026-07-12T10:51:48+08:00",
+  "contentDecisionGitIdentity": {
+    "sourceCommit": "0f10573581bf752d0c41ee3c8e8ca53dda04a094",
+    "blobOid": "bc90fac2b46b87a70b117f6707b3e7b07f1cab3c",
+    "bytes": 3265,
+    "sha256": "cead009dc0d97dfc8dd44765e980ab0ebd0e288db70abdc42342cc6959119fc6"
+  },
+  "executionPacketGitIdentity": {
+    "sourceCommit": "59a2c87b44f93f2c15e5785e9c3c501df60f1eaf",
+    "blobOid": "a08bd4e2033e3af8854452a08d79d3031bf32103",
+    "bytes": 5239,
+    "sha256": "a77662caf6c28c5df0457541eb28bd83c94af975ee37f22d8e2b2db6a1331d82"
+  },
+  "implementation": {
+    "commit": "388e62b55e62dcae472ed0da69319d916edb97a8",
+    "tree": "99bb3ed9c1ea5f549b8f9e3d215e72147823f670"
+  },
+  "ownerRuntime": {
+    "owner": "VCPToolBox",
+    "component": "DailyNote",
+    "communication": "stdio",
+    "runtimeSourceCommit": "555b3b538f6eb736e530c2912de678c5941f9985",
+    "runtimeSourceTree": "fd82d403e79f36f749eb7f555b4736eae3eacdff",
+    "pluginBlobOid": "2e3ff4ae08fd0746d5d53b74d34486ac9f623448",
+    "manifestBlobOid": "7a9fc4812c4a0cf03415c165fa1a64e9c36748ed",
+    "dependencyLockBlobOid": "3c695ea1d0608a463fe2bf0b3484a3c38759e534",
+    "pluginSha256": "4eee260c13965283001ed305af1b86aeddbaf0b7502fad784546397f0c8b4614",
+    "manifestSha256": "a3d73021cc4b3c1e9e4af310c0d18a182ac7e77dd21ca8e5527b879dfefb77b9",
+    "dependencyLockSha256": "d8d61f42b61b04b7005c7f7788c5d58e2f3e284442fc4beba08c8e476feb8e0c",
+    "preloadSha256": "5587f26d208167368cec4da3e7da6c2c80ff020f4b6a3263d9c34c034621551f",
+    "dotenvVersion": "16.6.1",
+    "dotenvPackageSha256": "922be338d27d6b0b3a238f8da99daeb1f42ef972e71b4568d5104bbef661f5f5",
+    "dotenvMainSha256": "3381601545980775b6ecd2bf078ce369a3b24316e10a3182ab78811f01dc83b5"
+  },
+  "transport": {
+    "outer": "stdio_mcp_process",
+    "inner": "local_http_mcp",
+    "ownerRuntime": "stdio",
+    "contentLengthFramingRequired": true,
+    "processBoundaryRequired": true,
+    "innerAuthorizationRequired": true
+  },
+  "store": {
+    "reference": "phase8-vcptoolbox-owner-native-proof-store-001",
+    "instanceId": "phase8-vcptoolbox-owner-native-proof-store-instance-001",
+    "lifecycleReference": "phase8-vcptoolbox-owner-native-proof-lifecycle-001",
+    "identitySha256": "0294fc5c92dbcfc535057cf8c8e77901e5223c83b906b26dba8e29bf659cfaab",
+    "syntheticOnly": true,
+    "identityPresentBeforeFirstNativeWrite": true,
+    "replacementAllowed": false,
+    "reinitializationAllowed": false
+  },
+  "payload": {
+    "canonicalSha256": "3ed7989e975e2e750aabd77f320e7ba065631d1e2374cedebdc53df055f8bf4a",
+    "durableSha256": "f8f845371e1eebf2dbce80e6bc0b86ed656f95712b409ac8fabc24a4cf393e50",
+    "durableBytes": 357
+  },
+  "authorization": {
+    "action": "live_bridge_record_memory_proof",
+    "nonce": "cm2113-vcptoolbox-owner-native-proof-nonce-002",
+    "receiptId": "cm2113-vcptoolbox-owner-native-proof-receipt-002",
+    "useCount": 1,
+    "replayAllowed": false,
+    "approvedAt": "2026-07-12T10:51:48+08:00",
+    "expiresAt": "2026-07-15T18:00:00+08:00"
+  },
+  "limits": {
+    "nativeWrites": 1,
+    "verifyOperations": 1,
+    "retries": 0,
+    "rollbackOrCompensation": 0
+  },
+  "nonClaims": {
+    "productionReady": false,
+    "releaseReady": false,
+    "rcReady": false,
+    "fullPlanPackCompleted": false
+  }
+}

@@ -541,7 +541,11 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     : process.env.KNOWLEDGEBASE_STORE_PATH
       ? path.resolve(process.env.KNOWLEDGEBASE_STORE_PATH)
       : '';
-  const isolatedRuntimeStoreUsed = Boolean(knowledgeBaseStorePath);
+  const isolatedRuntimeStoreConfigured = Boolean(knowledgeBaseStorePath);
+  const primaryWriteOnly = options.primaryWriteOnly === true;
+  const primaryWritePreflight = typeof options.primaryWritePreflight === 'function'
+    ? options.primaryWritePreflight
+    : null;
   const writeSubdir = safeFilenamePart(options.writeSubdir || 'codex-memory-governed');
   let knowledgeBaseManager = null;
   let embeddingUtils = null;
@@ -566,6 +570,26 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     }
   }
 
+  async function ensurePrimaryWriteReady(toolName) {
+    if (!primaryWriteOnly) {
+      await ensureReady();
+      return;
+    }
+    const rootStat = await fs.lstat(knowledgeBaseRootPath);
+    if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) {
+      throw new Error('primary_write_root_invalid');
+    }
+    if (primaryWritePreflight) {
+      const projection = await primaryWritePreflight({
+        toolName,
+        knowledgeBaseRootPath
+      });
+      if (projection?.accepted !== true) {
+        throw new Error('primary_write_preflight_rejected');
+      }
+    }
+  }
+
   async function runNativeReadProbe(args = {}, fallbackQuery = 'codex memory governed native read proof') {
     await ensureReady();
     const query = boundedString(args.query, 1000) || fallbackQuery;
@@ -586,7 +610,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       runtimeReceipt: defaultReadRuntimeReceipt({
         providerApiCalled: true,
         memoryReadPerformed: true,
-        isolatedRuntimeStoreUsed
+        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured
       })
     };
   }
@@ -639,7 +663,6 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   }
 
   async function record(args = {}) {
-    await ensureReady();
     const title = boundedString(args.title, 200) || 'codex-memory governed native record';
     const markdown = createRecordMarkdown(args);
     const digest = crypto
@@ -650,6 +673,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     const dir = path.join(knowledgeBaseRootPath, writeSubdir);
     const filename = `${new Date().toISOString().replace(/[:.]/g, '-')}-${safeFilenamePart(title)}-${digest}.md`;
     const filePath = path.join(dir, filename);
+    await ensurePrimaryWriteReady('record_memory');
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(filePath, markdown, { encoding: 'utf8', flag: 'wx' });
     return {
@@ -658,14 +682,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       write_shape: 'markdown_dailynote_file',
       raw_path_disclosed: false,
       _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: true,
-        nativeRuntimeInitialized: true,
+        nativeRuntimeCalled: !primaryWriteOnly,
+        nativeRuntimeInitialized: !primaryWriteOnly,
         providerApiCalled: false,
         memoryReadPerformed: false,
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_write',
-        isolatedRuntimeStoreUsed,
+        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured && !primaryWriteOnly,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false
       })
@@ -673,7 +697,6 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   }
 
   async function mutationMarker(toolName, args = {}) {
-    await ensureReady();
     const markdown = createMutationMarkdown(toolName, args);
     const digest = crypto
       .createHash('sha256')
@@ -683,6 +706,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     const dir = path.join(knowledgeBaseRootPath, writeSubdir);
     const filename = `${new Date().toISOString().replace(/[:.]/g, '-')}-${safeFilenamePart(toolName)}-${digest}.md`;
     const filePath = path.join(dir, filename);
+    await ensurePrimaryWriteReady(toolName);
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(filePath, markdown, { encoding: 'utf8', flag: 'wx' });
     return {
@@ -692,14 +716,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       mutation_tool: toolName,
       raw_path_disclosed: false,
       _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: true,
-        nativeRuntimeInitialized: true,
+        nativeRuntimeCalled: !primaryWriteOnly,
+        nativeRuntimeInitialized: !primaryWriteOnly,
         providerApiCalled: false,
         memoryReadPerformed: false,
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_mutation_marker',
-        isolatedRuntimeStoreUsed,
+        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured && !primaryWriteOnly,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false
       })
@@ -712,7 +736,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     audit,
     record,
     tombstone: args => mutationMarker('tombstone_memory', args),
-    supersede: args => mutationMarker('supersede_memory', args)
+    supersede: args => mutationMarker('supersede_memory', args),
+    async shutdown() {
+      if (knowledgeBaseManager && typeof knowledgeBaseManager.shutdown === 'function') {
+        await knowledgeBaseManager.shutdown();
+      }
+      knowledgeBaseManager = null;
+      embeddingUtils = null;
+    }
   };
 }
 
@@ -850,11 +881,35 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
 
 function createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options = {}) {
   const handler = createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options);
+  const expectedBearerToken = typeof options.expectedBearerToken === 'string'
+    ? options.expectedBearerToken
+    : '';
+  let authorizedRequestCount = 0;
+  let rejectedAuthorizationCount = 0;
   const server = http.createServer(async (req, res) => {
     if (req.method !== 'POST') {
       res.writeHead(405, { 'content-type': 'application/json' });
       res.end(JSON.stringify(jsonRpcError(null, -32601, 'Method not found')));
       return;
+    }
+    if (expectedBearerToken) {
+      const actualHeader = typeof req.headers.authorization === 'string'
+        ? req.headers.authorization
+        : '';
+      const actualBytes = Buffer.from(actualHeader, 'utf8');
+      const expectedBytes = Buffer.from(`Bearer ${expectedBearerToken}`, 'utf8');
+      const matched = actualBytes.length === expectedBytes.length &&
+        crypto.timingSafeEqual(actualBytes, expectedBytes);
+      if (!matched) {
+        rejectedAuthorizationCount += 1;
+        res.writeHead(401, { 'content-type': 'application/json' });
+        res.end(JSON.stringify(jsonRpcError(null, -32001, 'Unauthorized', {
+          reasonCode: 'transport_authorization_rejected',
+          lowDisclosure: true
+        })));
+        return;
+      }
+      authorizedRequestCount += 1;
     }
     try {
       const rawBody = await readRequestBody(req, options.maxRequestBytes || 1024 * 1024);
@@ -866,6 +921,12 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options = {}) {
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify(jsonRpcError(null, -32700, 'Parse error')));
     }
+  });
+  server.getLowDisclosureAuthorizationProjection = () => ({
+    authorizationRequired: Boolean(expectedBearerToken),
+    authorizedRequestCount,
+    rejectedAuthorizationCount,
+    tokenMaterialDisclosed: false
   });
   return server;
 }
