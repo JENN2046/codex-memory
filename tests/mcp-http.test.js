@@ -86,6 +86,8 @@ const RECORD_MEMORY_PRINCIPAL_SCOPE_POLICY = {
   allowedWorkspaceIds: ['workspace-alpha'],
   allowedClientIds: ['codex']
 };
+const TEST_DIARY_SCOPE_MAPPING_REFERENCE = 'jenn-vcp-diary-scope-v1';
+const TEST_DIARY_SCOPE_MAPPING_DIGEST = `sha256:${'7'.repeat(64)}`;
 
 function governedNativeCodexContext(requestContext = {}) {
   const { visibility = 'private', ...governedRequestContext } = requestContext;
@@ -151,6 +153,8 @@ async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
     dataDir: path.join(tempBasePath, 'data'),
     httpPort: 0,
     allowExternalProvider: false,
+    expectedDiaryScopeMappingReference: TEST_DIARY_SCOPE_MAPPING_REFERENCE,
+    expectedDiaryScopeMappingDigest: TEST_DIARY_SCOPE_MAPPING_DIGEST,
     mcpPublicToolSurface: 'full',
     ...receiptAwareNativeCallerOverrides(appOverrides)
   });
@@ -176,6 +180,40 @@ async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
 }
 
 function nativeInvocationReceiptForPayload(payload, overrides = {}) {
+  const readTool = ['search_memory', 'memory_overview', 'audit_memory'].includes(payload.toolName);
+  const writeTool = ['record_memory', 'tombstone_memory', 'supersede_memory'].includes(payload.toolName);
+  const defaultNativeRuntimeReceipt = {
+    present: readTool || writeTool,
+    nativeRuntimeCalled: readTool || writeTool,
+    nativeRuntimeInitialized: false,
+    providerApiCalled: readTool,
+    memoryReadPerformed: readTool,
+    memoryWritePerformed: writeTool,
+    durableWritePerformed: writeTool,
+    durableWriteScope: writeTool ? 'primary_memory_write' : null,
+    isolatedRuntimeStoreUsed: false,
+    primaryMemoryStoreWritePerformed: writeTool,
+    derivedIndexWritePerformed: false,
+    authorizationResolvedBeforeProvider: readTool,
+    diaryAllowlistEnforcedBeforeIndexLoad: readTool,
+    diaryAllowlistEnforcedBeforeVectorSearch: readTool,
+    resultScopePostcheckPassed: readTool,
+    unscopedNativeSearchUsed: false,
+    mappingReferenceBound: readTool,
+    mappingDigestBound: readTool,
+    allowedDiaryCount: readTool ? 1 : 0,
+    rawDiaryNamesReturned: false,
+    scopeIdAccepted: readTool,
+    scopeIdAudited: readTool,
+    scopeIdFingerprintBound: readTool,
+    scopeIdAffectsDiaryAcl: false,
+    scopeIdEnforcementClaimed: false,
+    rawRuntimeOutputDisclosed: false,
+    rawMemoryContentDisclosed: false,
+    runtimeLocatorDisclosed: false,
+    tokenMaterialDisclosed: false,
+    readinessClaimed: false
+  };
   return {
     targetReferenceName: payload.targetReferenceName,
     targetKind: 'mcp_server',
@@ -195,18 +233,27 @@ function nativeInvocationReceiptForPayload(payload, overrides = {}) {
     rawRequestBodyDisclosed: false,
     rawResponseBodyDisclosed: false,
     readinessClaimed: false,
-    ...overrides
+    ...overrides,
+    nativeRuntimeReceipt: {
+      ...defaultNativeRuntimeReceipt,
+      ...(overrides.nativeRuntimeReceipt || {})
+    }
   };
 }
 
 function receiptAwareNativeToolCaller(caller) {
-  if (typeof caller !== 'function' || typeof caller.callWithReceipt === 'function') return caller;
+  if (typeof caller !== 'function') return caller;
   const wrapped = async payload => caller(payload);
   Object.assign(wrapped, caller);
-  wrapped.callWithReceipt = async payload => ({
-    value: await caller(payload),
-    receipt: nativeInvocationReceiptForPayload(payload)
-  });
+  wrapped.callWithReceipt = async payload => {
+    const result = typeof caller.callWithReceipt === 'function'
+      ? await caller.callWithReceipt(payload)
+      : { value: await caller(payload), receipt: {} };
+    return {
+      ...result,
+      receipt: nativeInvocationReceiptForPayload(payload, result?.receipt || {})
+    };
+  };
   return wrapped;
 }
 
