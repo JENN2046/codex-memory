@@ -2,6 +2,11 @@
 
 const assert = require('node:assert/strict');
 const test = require('node:test');
+
+// Governed native read success/fallback coverage is retained below for the
+// diary-allowlist stage. Until that trusted proof is wired, every public
+// visibility must fail closed before any native probe, call, or local fallback.
+const diaryAllowlistPendingTest = test.skip;
 const fs = require('node:fs/promises');
 const http = require('node:http');
 const os = require('node:os');
@@ -234,6 +239,8 @@ test('fallback audit preparation rejects appended receipt that does not authoriz
 });
 
 function codexContext(overrides = {}) {
+  const exactApprovalVisibility =
+    overrides.requestContext?.exactApprovalResult?.allowedScope?.visibility;
   return {
     executionContext: {
       agentAlias: 'Codex',
@@ -241,7 +248,7 @@ function codexContext(overrides = {}) {
       clientId: 'codex',
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
-      visibility: 'private',
+      visibility: exactApprovalVisibility || 'shared',
       requestSource: 'governed-mcp-vcp-native-bridge-app-integration',
       ...(overrides.executionContext || {})
     },
@@ -353,7 +360,7 @@ test('projection turns app call context into a governed VCPToolBox-native bridge
   assert.equal(input.trusted_execution_context.executionContext.agentAlias, 'Codex');
   assert.equal(result.normalizedBridgeRequest.trusted_execution_context_supplied, true);
   assert.equal(result.normalizedBridgeRequest.trusted_execution_context_scope_matched, true);
-  assert.equal(result.normalizedBridgeRequest.visibility, 'private');
+  assert.equal(result.normalizedBridgeRequest.visibility, 'shared');
   assert.equal(result.normalizedBridgeRequest.runtime_target, 'VCPToolBox native memory');
   assert.equal(result.normalizedBridgeRequest.runtime_target_reference_name, 'operator-vcp-toolbox-service-ref');
   assert.equal(result.normalizedBridgeRequest.runtime_target_kind, 'mcp_server');
@@ -487,7 +494,10 @@ test('projection and gate bind every native bridge tool to its governed access m
     assert.equal(result.normalizedBridgeRequest.audit_receipt_required, true, item.toolName);
     assert.equal(result.normalizedBridgeRequest.audit_receipt_low_disclosure, true, item.toolName);
     assert.equal(result.normalizedBridgeRequest.raw_output_allowed, false, item.toolName);
-    assert.deepEqual(result.normalizedBridgeRequest.scope, scope, item.toolName);
+    assert.deepEqual(result.normalizedBridgeRequest.scope, {
+      ...scope,
+      visibility: item.writeAllowed ? 'private' : 'shared'
+    }, item.toolName);
     if (item.writeAllowed) {
       assert.equal(result.normalizedBridgeRequest.exact_approval_action, item.exactApprovalAction, item.toolName);
       assert.equal(result.normalizedBridgeRequest.exact_approval_action_matched, true, item.toolName);
@@ -547,7 +557,7 @@ test('projection does not let tool arguments authorize governed bridge scope', (
     project_id: 'codex-memory',
     workspace_id: 'workspace-alpha',
     client_id: 'Codex',
-    visibility: 'private'
+    visibility: 'shared'
   });
   assert.equal(result.normalizedBridgeRequest.trusted_execution_context_scope_matched, true);
   assert.equal(serialized.includes('attacker-project'), false);
@@ -1557,7 +1567,7 @@ test('projection rejects args-only scope when no transport or configured scope e
   assert.equal(serialized.includes('args-only-workspace'), false);
 });
 
-test('observe mode records governed bridge gate receipt on real app.callTool path', async () => {
+diaryAllowlistPendingTest('observe mode records governed bridge gate receipt on real app.callTool path', async () => {
   const observations = [];
   await withTempApp({
     governedMcpVcpNativeBridgeGateMode: 'observe',
@@ -1654,7 +1664,7 @@ test('no-token memory_overview bypasses governed native bridge work', async () =
   });
 });
 
-test('observe mode can run one injected governed VCP native read-shape probe without raw disclosure', async () => {
+diaryAllowlistPendingTest('observe mode can run one injected governed VCP native read-shape probe without raw disclosure', async () => {
   const observations = [];
   let invocations = 0;
   await withTempApp({
@@ -1696,7 +1706,7 @@ test('observe mode can run one injected governed VCP native read-shape probe wit
   });
 });
 
-test('observe mode resolves governed VCP native target from registered safe reference invoker', async () => {
+diaryAllowlistPendingTest('observe mode resolves governed VCP native target from registered safe reference invoker', async () => {
   const observations = [];
   let invocations = 0;
   await withTempApp({
@@ -1730,7 +1740,7 @@ test('observe mode resolves governed VCP native target from registered safe refe
   });
 });
 
-test('observe mode can run one governed HTTP MCP tools/call probe without exposing endpoint token or raw response', async () => {
+diaryAllowlistPendingTest('observe mode can run one governed HTTP MCP tools/call probe without exposing endpoint token or raw response', async () => {
   const observations = [];
   const secretToken = 'SECRET_TOKEN_SHOULD_NOT_ECHO';
   const rawPrivateValue = 'RAW_PRIVATE_VALUE_SHOULD_NOT_ECHO';
@@ -1803,7 +1813,7 @@ test('observe mode can run one governed HTTP MCP tools/call probe without exposi
   }
 });
 
-test('WSL NewAPI runtime profile routes read tools to shape-compatible governed native HTTP MCP target', async () => {
+diaryAllowlistPendingTest('WSL NewAPI runtime profile routes read tools to shape-compatible governed native HTTP MCP target', async () => {
   const observations = [];
   const secretToken = 'PROFILE_SECRET_TOKEN_SHOULD_NOT_ECHO';
   const rawNativeValue = 'PROFILE_RAW_NATIVE_VALUE_SHOULD_NOT_ECHO';
@@ -1916,7 +1926,7 @@ test('WSL NewAPI runtime profile routes read tools to shape-compatible governed 
   }
 });
 
-test('observe mode builds governed HTTP MCP probe invoker from trusted config private target', async () => {
+diaryAllowlistPendingTest('observe mode builds governed HTTP MCP probe invoker from trusted config private target', async () => {
   const observations = [];
   const secretToken = 'SECRET_TOKEN_FROM_CONFIG_SHOULD_NOT_ECHO';
   const rawPrivateValue = 'RAW_PRIVATE_VALUE_FROM_CONFIG_SHOULD_NOT_ECHO';
@@ -1985,7 +1995,7 @@ test('observe mode builds governed HTTP MCP probe invoker from trusted config pr
   }
 });
 
-test('primary read delegation returns governed VCP native low-disclosure result instead of local memory output', async () => {
+diaryAllowlistPendingTest('primary read delegation returns governed VCP native low-disclosure result instead of local memory output', async () => {
   const observations = [];
   const secretToken = 'SECRET_TOKEN_FOR_PRIMARY_DELEGATION_SHOULD_NOT_ECHO';
   const rawPrivateValue = 'RAW_NATIVE_MEMORY_CONTENT_SHOULD_NOT_ECHO';
@@ -2008,7 +2018,7 @@ test('primary read delegation returns governed VCP native low-disclosure result 
         workspace_id: 'workspace-alpha',
         scope_id: 'scope-alpha',
         client_id: 'Codex',
-        visibility: 'private'
+        visibility: 'shared'
       });
       assert.equal(body.params.arguments.governed_bridge.primary_runtime, 'VCPToolBox native memory');
       assert.deepEqual(body.params.arguments.governed_bridge.runtime_target, {
@@ -2155,7 +2165,7 @@ test('primary read delegation returns governed VCP native low-disclosure result 
       ]);
       assert.equal(
         server.requests[1].body.params.arguments.governed_bridge.scope_fingerprint,
-        'f34c14c55b2f97e90cee55b0ad91abeff0941991b895e0ca64e3d9248b98c3d8'
+        '4c3ad339c97fee84bfc3c2d95b29f4f16aea899e34e1631a7512e48b8de47aec'
       );
       assert.equal(server.requests[1].body.params.arguments.governed_bridge.raw_scope_persisted, false);
       assert.equal(server.requests[1].body.params.arguments.governed_bridge.invocation_transport, 'mcp');
@@ -2204,7 +2214,7 @@ test('primary read delegation returns governed VCP native low-disclosure result 
       assert.equal(result.receipt.localAuditReceipt.status, 'appended');
       assert.equal(bridgeReceipt.delegationDirection, 'read');
       assert.equal(bridgeReceipt.clientId, 'Codex');
-      assert.equal(bridgeReceipt.visibility, 'private');
+      assert.equal(bridgeReceipt.visibility, 'shared');
       assert.equal(bridgeReceipt.scopePresent, true);
       assert.equal(bridgeReceipt.scopeIdentifierPresent, true);
       assert.deepEqual(bridgeReceipt.scopeFieldNames, [
@@ -2267,7 +2277,7 @@ test('primary read delegation returns governed VCP native low-disclosure result 
   }
 });
 
-test('prepare_memory_context uses governed native recall before local compatibility search', async () => {
+diaryAllowlistPendingTest('prepare_memory_context uses governed native recall before local compatibility search', async () => {
   let nativeCalls = 0;
   let localCalls = 0;
   const rawNativeValue = 'RAW_NATIVE_CONTEXT_VALUE_SHOULD_NOT_ECHO';
@@ -2345,7 +2355,7 @@ test('prepare_memory_context uses governed native recall before local compatibil
   });
 });
 
-test('Claude native recall is bound to trusted Claude shared scope', async () => {
+diaryAllowlistPendingTest('Claude native recall is bound to trusted Claude shared scope', async () => {
   let nativeCall = null;
   const nativeCaller = async payload => {
     nativeCall = payload;
@@ -2382,7 +2392,98 @@ test('Claude native recall is bound to trusted Claude shared scope', async () =>
   });
 });
 
-test('prepare_memory_context fails closed when primary native recall is rejected', async () => {
+test('Codex and Claude scope-bound native reads fail closed before native or local recall', async () => {
+  const observations = [];
+  let nativeCalls = 0;
+  let shapeProbeCalls = 0;
+  let localCalls = 0;
+  let overviewCalls = 0;
+  let auditCalls = 0;
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeReadShapeProbeInvoker: async () => {
+      shapeProbeCalls += 1;
+      return { status: 'shape_probe_should_not_run' };
+    },
+    governedMcpVcpNativeReadDelegationToolCaller: async () => {
+      nativeCalls += 1;
+      return { results: [] };
+    }
+  }, async app => {
+    app.services.passiveRecallService.search = async () => {
+      localCalls += 1;
+      return [];
+    };
+    app.services.overviewService.getAuthenticatedBoundedOverview = async () => {
+      overviewCalls += 1;
+      return {};
+    };
+    app.services.auditMemoryReadonlyService.run = async () => {
+      auditCalls += 1;
+      return {};
+    };
+
+    for (const clientId of ['Codex', 'Claude']) {
+      for (const visibility of ['private', 'workspace', 'project', 'shared']) {
+        const requestContext = clientId === 'Codex'
+          ? codexContext({ executionContext: { visibility } })
+          : claudeContext({ executionContext: { visibility } });
+        for (const { toolName, args } of [
+          {
+            toolName: 'search_memory',
+            args: { query: 'bounded scope enforcement check', include_content: false, limit: 1 }
+          },
+          { toolName: 'memory_overview', args: { auditWindow: 1, limit: 1 } },
+          { toolName: 'audit_memory', args: { include_raw: false, window: 1 } }
+        ]) {
+          const result = await app.callTool(toolName, args, requestContext);
+          const observation = observations.at(-1);
+          const label = `${clientId}:${visibility}:${toolName}`;
+
+          assert.equal(result.status, 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_REJECTED', label);
+          assert.equal(result.reasonCode, 'invalid_governed_native_read_delegation_boundary', label);
+          assert.equal(result.access.runtimeCalled, false, label);
+          assert.equal(result.access.vcpToolBoxCalled, false, label);
+          assert.equal(result.access.mcpToolCalled, false, label);
+          assert.equal(result.access.memoryReadPerformed, false, label);
+          assert.equal(result.access.localMemoryFallbackEligible, false, label);
+          assert.equal(result.access.localMemoryFallbackUsed, false, label);
+          assert.deepEqual(
+            observation.readDelegationResult.invalidFields,
+            ['gateResult.normalizedBridgeRequest.native_scope_filtering_proven'],
+            label
+          );
+        }
+
+        const contextResult = await app.callTool('prepare_memory_context', {
+          task: {
+            title: 'Fail closed task-start context',
+            user_request: 'Do not use unfiltered native or local memory.',
+            project_id: 'codex-memory',
+            client_id: clientId.toLowerCase(),
+            visibility
+          }
+        }, requestContext);
+        assert.equal(contextResult.status, 'PREPARE_MEMORY_CONTEXT_RECALL_REJECTED');
+        assert.equal(contextResult.accepted, false);
+        assert.equal(contextResult.access.nativeRecallAccepted, false);
+        assert.equal(contextResult.access.localMemoryFallbackUsed, false);
+        assert.equal(contextResult.memory_context_package, undefined);
+      }
+    }
+  });
+
+  assert.equal(nativeCalls, 0);
+  assert.equal(shapeProbeCalls, 0);
+  assert.equal(localCalls, 0);
+  assert.equal(overviewCalls, 0);
+  assert.equal(auditCalls, 0);
+});
+
+diaryAllowlistPendingTest('prepare_memory_context fails closed when primary native recall is rejected', async () => {
   let nativeCalls = 0;
   let localCalls = 0;
   let overviewCalls = 0;
@@ -2441,7 +2542,7 @@ test('prepare_memory_context fails closed when primary native recall is rejected
   });
 });
 
-test('prepare_memory_context labels audited local fallback and never presents it as native', async () => {
+diaryAllowlistPendingTest('prepare_memory_context labels audited local fallback and never presents it as native', async () => {
   let nativeCalls = 0;
   let localCalls = 0;
   const nativeCaller = async payload => {
@@ -2490,7 +2591,7 @@ test('prepare_memory_context labels audited local fallback and never presents it
   });
 });
 
-test('primary memory_overview read delegation carries canonical bridge scope to native MCP', async () => {
+diaryAllowlistPendingTest('primary memory_overview read delegation carries canonical bridge scope to native MCP', async () => {
   let nativeCall = null;
   await withTempApp({
     governedMcpVcpNativeBridgeGateMode: 'observe',
@@ -2516,13 +2617,13 @@ test('primary memory_overview read delegation carries canonical bridge scope to 
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.deepEqual(nativeCall.arguments.governed_bridge.scope, {
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(nativeCall.arguments.governed_bridge.local_memory_role, 'not_used');
     assert.equal(nativeCall.arguments.governed_bridge.local_memory_source_runtime, null);
@@ -2549,7 +2650,7 @@ test('primary memory_overview read delegation carries canonical bridge scope to 
   });
 });
 
-test('primary read delegation binds every governed read tool on the real app path', async () => {
+diaryAllowlistPendingTest('primary read delegation binds every governed read tool on the real app path', async () => {
   const readCases = [
     {
       toolName: 'search_memory',
@@ -2668,7 +2769,7 @@ test('primary read delegation binds every governed read tool on the real app pat
         scope_id: 'scope-alpha',
         workspace_id: 'workspace-alpha',
         client_id: 'Codex',
-        visibility: 'private'
+        visibility: 'shared'
       });
       if (readCase.toolName === 'search_memory') {
         assert.equal(nativePayload.arguments.include_content, false);
@@ -2718,7 +2819,7 @@ test('primary read delegation binds every governed read tool on the real app pat
   }
 });
 
-test('primary read delegation ignores cross-client payload scope and uses canonical scope', async () => {
+diaryAllowlistPendingTest('primary read delegation ignores cross-client payload scope and uses canonical scope', async () => {
   const observations = [];
   let nativePayload = null;
   await withTempApp({
@@ -2761,7 +2862,7 @@ test('primary read delegation ignores cross-client payload scope and uses canoni
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.deepEqual(nativePayload.arguments.governed_bridge.scope, nativePayload.arguments.scope);
     assert.equal(serializedResult.includes('LOCAL_CROSS_CLIENT_CONTENT_SHOULD_NOT_ECHO'), false);
@@ -2770,7 +2871,7 @@ test('primary read delegation ignores cross-client payload scope and uses canoni
   });
 });
 
-test('primary read delegation ignores unsafe payload scope and does not forward it', async () => {
+diaryAllowlistPendingTest('primary read delegation ignores unsafe payload scope and does not forward it', async () => {
   const observations = [];
   let nativePayload = null;
   await withTempApp({
@@ -2812,7 +2913,7 @@ test('primary read delegation ignores unsafe payload scope and does not forward 
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(serializedResult.includes('LOCAL_UNSAFE_SCOPE_CONTENT_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedResult.includes('SECRET_SCOPE_SHOULD_NOT_ECHO'), false);
@@ -2822,7 +2923,7 @@ test('primary read delegation ignores unsafe payload scope and does not forward 
   });
 });
 
-test('primary read delegation ignores safe payload scope drift from trusted execution context', async () => {
+diaryAllowlistPendingTest('primary read delegation ignores safe payload scope drift from trusted execution context', async () => {
   const observations = [];
   let nativePayload = null;
   await withTempApp({
@@ -2865,7 +2966,7 @@ test('primary read delegation ignores safe payload scope drift from trusted exec
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(serializedResult.includes('LOCAL_SCOPE_DRIFT_CONTENT_SHOULD_NOT_ECHO'), false);
     assert.equal(serializedResult.includes('other-project'), false);
@@ -2875,7 +2976,7 @@ test('primary read delegation ignores safe payload scope drift from trusted exec
   });
 });
 
-test('primary read delegation rejects successful native read when required audit receipt cannot be appended', async () => {
+diaryAllowlistPendingTest('primary read delegation rejects successful native read when required audit receipt cannot be appended', async () => {
   const observations = [];
   await withTempApp({
     governedMcpVcpNativeBridgeGateMode: 'observe',
@@ -2931,7 +3032,7 @@ test('primary read delegation rejects successful native read when required audit
   });
 });
 
-test('primary_with_local_fallback uses local read path when governed native read delegation fails', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback uses local read path when governed native read delegation fails', async () => {
   const observations = [];
   let nativeCalls = 0;
   await withTempApp({
@@ -3036,7 +3137,7 @@ test('primary_with_local_fallback uses local read path when governed native read
   });
 });
 
-test('Claude local fallback preserves trusted Claude client isolation and shared visibility', async () => {
+diaryAllowlistPendingTest('Claude local fallback preserves trusted Claude client isolation and shared visibility', async () => {
   let nativeCalls = 0;
   let localSearchOptions = null;
   await withTempApp({
@@ -3082,7 +3183,7 @@ test('Claude local fallback preserves trusted Claude client isolation and shared
   });
 });
 
-test('primary_with_local_fallback clamps local search fallback to governed disclosure budget and scope', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback clamps local search fallback to governed disclosure budget and scope', async () => {
   const observations = [];
   let nativeCalls = 0;
   let localSearchInput = null;
@@ -3119,14 +3220,14 @@ test('primary_with_local_fallback clamps local search fallback to governed discl
           projectId: 'codex-memory',
           workspaceId: 'workspace-alpha',
           clientId: 'Codex',
-          visibility: 'private'
+          visibility: 'shared'
         }],
         ['local-fallback-scope-mismatch', {
           scopeId: 'scope-beta',
           projectId: 'codex-memory',
           workspaceId: 'workspace-alpha',
           clientId: 'Codex',
-          visibility: 'private'
+          visibility: 'shared'
         }]
       ]);
     };
@@ -3158,7 +3259,7 @@ test('primary_with_local_fallback clamps local search fallback to governed discl
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       clientId: 'Codex',
-      visibility: ['private']
+      visibility: ['shared']
     });
     assert.equal(result.results.length, 1);
     assert.equal(result.results[0].score, 0.81);
@@ -3170,7 +3271,7 @@ test('primary_with_local_fallback clamps local search fallback to governed discl
   });
 });
 
-test('primary_with_local_fallback returns empty local search fallback for zero-item disclosure budget', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback returns empty local search fallback for zero-item disclosure budget', async () => {
   let nativeCalls = 0;
   let localSearchCalled = false;
   const observations = [];
@@ -3231,7 +3332,7 @@ test('primary_with_local_fallback returns empty local search fallback for zero-i
   });
 });
 
-test('primary_with_local_fallback sanitizes forged fallback scope before local read', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback sanitizes forged fallback scope before local read', async () => {
   let nativeCalls = 0;
   let localSearchInput = null;
   const observations = [];
@@ -3279,7 +3380,7 @@ test('primary_with_local_fallback sanitizes forged fallback scope before local r
   });
 });
 
-test('primary_with_local_fallback sanitizes local audit fallback raw flag and window', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback sanitizes local audit fallback raw flag and window', async () => {
   const observations = [];
   let localAuditArgs = null;
   await withTempApp({
@@ -3319,7 +3420,7 @@ test('primary_with_local_fallback sanitizes local audit fallback raw flag and wi
       project_id: 'codex-memory',
       workspace_id: 'workspace-alpha',
       client_id: 'Codex',
-      visibility: 'private'
+      visibility: 'shared'
     });
     assert.equal(result.access.localMemoryFallbackUsed, true);
     assert.equal(result.access.localMemoryFallbackReadPerformed, true);
@@ -3329,7 +3430,7 @@ test('primary_with_local_fallback sanitizes local audit fallback raw flag and wi
   });
 });
 
-test('primary_with_local_fallback returns empty local audit fallback for zero-item disclosure budget', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback returns empty local audit fallback for zero-item disclosure budget', async () => {
   let nativeCalls = 0;
   let localAuditCalled = false;
   const observations = [];
@@ -3399,7 +3500,7 @@ test('primary_with_local_fallback returns empty local audit fallback for zero-it
   });
 });
 
-test('primary_with_local_fallback returns empty local overview fallback for zero-item disclosure budget', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback returns empty local overview fallback for zero-item disclosure budget', async () => {
   let nativeCalls = 0;
   let boundedOverviewCalls = 0;
   let fullOverviewCalls = 0;
@@ -3469,7 +3570,7 @@ test('primary_with_local_fallback returns empty local overview fallback for zero
   });
 });
 
-test('primary_with_local_fallback strips raw local fallback result fields at projection boundary', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback strips raw local fallback result fields at projection boundary', async () => {
   await withTempApp({
     governedMcpVcpNativeBridgeGateMode: 'observe',
     governedMcpVcpNativeReadDelegationMode: 'primary_with_local_fallback',
@@ -3596,7 +3697,7 @@ test('primary_with_local_fallback strips raw local fallback result fields at pro
   });
 });
 
-test('primary_with_local_fallback uses bounded local memory_overview projection only', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback uses bounded local memory_overview projection only', async () => {
   const observations = [];
   let nativeCalls = 0;
   let fullOverviewCalls = 0;
@@ -3669,7 +3770,7 @@ test('primary_with_local_fallback uses bounded local memory_overview projection 
   });
 });
 
-test('primary_with_local_fallback rejects local fallback when fallback audit receipt cannot be appended', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback rejects local fallback when fallback audit receipt cannot be appended', async () => {
   const observations = [];
   let nativeCalls = 0;
   await withTempApp({
@@ -3751,7 +3852,7 @@ test('primary_with_local_fallback rejects local fallback when fallback audit rec
   });
 });
 
-test('primary_with_local_fallback rejects over-budget native read without local fallback', async () => {
+diaryAllowlistPendingTest('primary_with_local_fallback rejects over-budget native read without local fallback', async () => {
   const observations = [];
   await withTempApp({
     governedMcpVcpNativeBridgeGateMode: 'observe',
@@ -3807,7 +3908,7 @@ test('primary_with_local_fallback rejects over-budget native read without local 
   });
 });
 
-test('primary read delegation rejects native success receipts that report write side effects', async () => {
+diaryAllowlistPendingTest('primary read delegation rejects native success receipts that report write side effects', async () => {
   const observations = [];
   const nativeCaller = async () => ({
     results: []
@@ -3887,7 +3988,7 @@ test('primary read delegation rejects native success receipts that report write 
   });
 });
 
-test('primary read delegation ignores raw-output tool argument before native read', async () => {
+diaryAllowlistPendingTest('primary read delegation ignores raw-output tool argument before native read', async () => {
   const observations = [];
   let nativePayload = null;
   await withTempApp({
@@ -5213,7 +5314,7 @@ test('primary write delegation failure returns low-disclosure rejection and skip
   });
 });
 
-test('observe mode rejects unsafe registered target invoker metadata without executing it', async () => {
+diaryAllowlistPendingTest('observe mode rejects unsafe registered target invoker metadata without executing it', async () => {
   const observations = [];
   let invocations = 0;
   await withTempApp({

@@ -412,7 +412,9 @@ function minimalAcceptedEvidenceArtifact() {
   };
 }
 
-test('governed VCP native acceptance CLI runs read and write through full governed bridge without disclosure', async () => {
+// Native-read acceptance resumes only after diary_allowlist_v1 supplies the
+// trusted scope-filtering proof. Gate 0 intentionally makes these paths unreachable.
+test.skip('governed VCP native acceptance CLI runs read and write through full governed bridge without disclosure', async () => {
   const secretToken = 'SECRET_TOKEN_SHOULD_NOT_APPEAR';
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(req.headers.authorization, `Bearer ${secretToken}`);
@@ -464,7 +466,7 @@ test('governed VCP native acceptance CLI runs read and write through full govern
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read',
       writeTitle: 'acceptance write',
       writeContent: 'acceptance write body',
@@ -643,7 +645,7 @@ test('governed VCP native acceptance CLI runs read and write through full govern
   }
 });
 
-test('governed VCP native acceptance CLI rejects search-shaped read-suite acceptance maps', async () => {
+test.skip('governed VCP native acceptance CLI rejects search-shaped read-suite acceptance maps', async () => {
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
     assert.ok(['knowledge_base.search', 'memory_overview', 'audit_memory'].includes(body.params.name));
@@ -668,7 +670,7 @@ test('governed VCP native acceptance CLI rejects search-shaped read-suite accept
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read suite',
       toolNameByAction: JSON.stringify({
         search_memory: 'knowledge_base.search',
@@ -722,7 +724,7 @@ test('governed VCP native acceptance CLI rejects search-shaped read-suite accept
   }
 });
 
-test('governed VCP native acceptance CLI can prove read suite with default shape-compatible native tools', async () => {
+test.skip('governed VCP native acceptance CLI can prove read suite with default shape-compatible native tools', async () => {
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
     assert.ok(['knowledge_base.search', 'memory_overview', 'audit_memory'].includes(body.params.name));
@@ -753,7 +755,7 @@ test('governed VCP native acceptance CLI can prove read suite with default shape
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read suite',
       evidenceOutputPath
     });
@@ -780,7 +782,7 @@ test('governed VCP native acceptance CLI can prove read suite with default shape
   }
 });
 
-test('governed VCP native acceptance allows isolated derived-index writes during native read', async () => {
+test.skip('governed VCP native acceptance allows isolated derived-index writes during native read', async () => {
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
     assert.equal(body.params.name, 'knowledge_base.search');
@@ -808,7 +810,7 @@ test('governed VCP native acceptance allows isolated derived-index writes during
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance isolated native read'
     });
 
@@ -833,7 +835,7 @@ test('governed VCP native acceptance allows isolated derived-index writes during
   }
 });
 
-test('governed VCP native acceptance reports whitelisted native JSON-RPC error reasons without raw disclosure', async () => {
+test.skip('governed VCP native acceptance reports whitelisted native JSON-RPC error reasons without raw disclosure', async () => {
   const rawErrorMessage = 'RAW_NATIVE_JSONRPC_FAILURE_SHOULD_NOT_ECHO';
   const rawUnsafeDetail = 'PRIVATE_NATIVE_JSONRPC_DETAIL_SHOULD_NOT_ECHO';
   const server = await withJsonRpcServer(async (req, res, body) => {
@@ -867,7 +869,7 @@ test('governed VCP native acceptance reports whitelisted native JSON-RPC error r
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read jsonrpc failure',
       evidenceOutputPath
     });
@@ -995,7 +997,7 @@ test('governed VCP native acceptance reports whitelisted native JSON-RPC error r
   }
 });
 
-test('governed VCP native acceptance CLI can prove the governed lifecycle write suite', async () => {
+test.skip('governed VCP native acceptance CLI can prove the governed lifecycle write suite', async () => {
   const server = await withJsonRpcServer(async (req, res, body) => {
     const governance = body.params._meta.codexMemoryGovernance;
     const publicToolName = governance.invocationProfile.toolName;
@@ -1043,7 +1045,7 @@ test('governed VCP native acceptance CLI can prove the governed lifecycle write 
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance write suite',
       writeTitle: 'acceptance write suite',
       writeContent: 'acceptance write body',

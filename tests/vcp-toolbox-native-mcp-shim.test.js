@@ -770,7 +770,8 @@ test('VCPToolBox native MCP shim rejects lifecycle writes when native write is d
   }
 });
 
-test('acceptance CLI can use VCPToolBox native MCP shim as governed native target', async () => {
+// Pending diary_allowlist_v1: native-read acceptance must remain fail closed.
+test.skip('acceptance CLI can use VCPToolBox native MCP shim as governed native target', async () => {
   const shim = await withShimServer();
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-vcp-shim-test-'));
   try {
@@ -788,7 +789,7 @@ test('acceptance CLI can use VCPToolBox native MCP shim as governed native targe
       projectId: 'codex-memory',
       workspaceId: 'workspace-alpha',
       scopeId: 'scope-alpha',
-      visibility: 'private',
+      visibility: 'shared',
       query: 'acceptance read',
       writeTitle: 'acceptance write',
       writeContent: 'acceptance write body',

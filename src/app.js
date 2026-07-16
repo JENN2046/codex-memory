@@ -87,6 +87,7 @@ const {
   getGovernedMcpVcpNativeHttpMcpTargetPrivateConfig
 } = require('./core/GovernedMcpVcpNativeHttpMcpTargetConfig');
 const {
+  SCOPE_FILTERING_REQUIRED_VISIBILITIES,
   executeGovernedMcpVcpNativeReadDelegation
 } = require('./core/GovernedMcpVcpNativeReadDelegationAdapter');
 const {
@@ -2807,8 +2808,15 @@ function createCodexMemoryApplication(overrides = {}) {
           : null;
         const skipUnmappedNativeReadAction =
           shouldSkipGovernedMcpVcpNativeReadDelegationForUnmappedAction(config, toolName);
+        const nativeScopeFilteringUnproven =
+          isGovernedMcpVcpNativeReadDelegationTool(toolName) &&
+          SCOPE_FILTERING_REQUIRED_VISIBILITIES.includes(
+            gateResult.normalizedBridgeRequest?.visibility
+          ) &&
+          gateResult.normalizedBridgeRequest?.native_scope_filtering_proven !== true;
         const readShapeProbeTargetResolverResult = gateResult.accepted === true &&
-          !skipUnmappedNativeReadAction
+          !skipUnmappedNativeReadAction &&
+          !nativeScopeFilteringUnproven
           ? resolveGovernedMcpVcpNativeReadShapeProbeTarget({
             gateResult,
             config,

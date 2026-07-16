@@ -29,6 +29,12 @@ const DELEGATABLE_READ_TOOLS = Object.freeze([
   'audit_memory'
 ]);
 const ALLOWED_VISIBILITIES = GOVERNED_NATIVE_VISIBILITIES;
+const SCOPE_FILTERING_REQUIRED_VISIBILITIES = Object.freeze([
+  'private',
+  'workspace',
+  'project',
+  'shared'
+]);
 const ALLOWED_DISCLOSURE_LEVELS = Object.freeze([
   'none',
   'receipt_only',
@@ -342,6 +348,15 @@ function invalidFieldsForDelegation({ toolName, args = {}, gateResult, callMcpTo
     scope.visibility !== request.visibility
   ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope.visibility');
+  }
+  // Gate 0 intentionally leaves this proof absent in production. Every
+  // governed visibility remains fail closed until diary_allowlist_v1 binds a
+  // non-empty selected-diary allowlist before provider and native execution.
+  if (
+    SCOPE_FILTERING_REQUIRED_VISIBILITIES.includes(request.visibility) &&
+    request.native_scope_filtering_proven !== true
+  ) {
+    invalidFields.push('gateResult.normalizedBridgeRequest.native_scope_filtering_proven');
   }
   if (request.scope_identifier_present !== true) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope_identifier_present');
@@ -1274,6 +1289,7 @@ module.exports = {
   CONTRACT_MODE,
   CONTRACT_NAME,
   DELEGATABLE_READ_TOOLS,
+  SCOPE_FILTERING_REQUIRED_VISIBILITIES,
   buildDelegatedArguments,
   executeGovernedMcpVcpNativeReadDelegation
 };
