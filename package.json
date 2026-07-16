@@ -106,7 +106,8 @@
     "cm2121:status-sync-application": "node ./scripts/generate-cm2121-full-plan-status-sync-application.js",
     "cm2121:status-sync-content-decision": "node ./scripts/generate-cm2121-full-plan-status-sync-content-decision.js",
     "cm2122:status-sync-execution-packet": "node ./scripts/generate-cm2122-full-plan-status-sync-execution-packet.js",
-    "cm2123:status-sync-final-release": "node ./scripts/generate-cm2123-full-plan-status-sync-final-release.js"
+    "cm2123:status-sync-final-release": "node ./scripts/generate-cm2123-full-plan-status-sync-final-release.js",
+    "cm2130:final-main-revalidation": "node ./scripts/generate-cm2130-final-main-full-plan-revalidation.js"
   },
   "engines": {
     "node": ">=22.0.0"

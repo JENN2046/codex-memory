@@ -4,16 +4,18 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2121 exact full-plan status synchronization`.
-Current validation: `CMV-2214`.
-Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
+Current task: `CM-2130 final-main full-plan revalidation`.
+Current validation: `CMV-2215`.
+Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
+The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Full-plan application evidence: historically bound; current synchronization is reopened for revalidation.
+- Final-main evidence: CM-2130 revalidation passed over baseline `d78ad8f7…` / tree `0a503ded…`.
+- Full-plan application/branch-CAS evidence: accepted historically; current completion/status sync remain false and separate.
 - Application authorization: consumed, non-replayable, inactive.
 - Readiness: all aliases false.
 - Native/provider/real-memory/remote authority from this task: none.

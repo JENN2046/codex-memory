@@ -4,12 +4,19 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2121 exact full-plan status synchronization`.
-Current validation: `CMV-2214`.
-Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
+Current task: `CM-2130 final-main full-plan revalidation`.
+Current validation: `CMV-2215`.
+Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
+The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2130 Final-main Full-plan Revalidation
+
+Final `main` baseline `d78ad8f7…` / tree `0a503ded…` contains the strict first-parent regular-merge chain for PRs #14 through #19. Seventeen CM-2120/2121/2128/2129 evidence artifacts and all nine committed status surfaces passed exact Git-object, canonical-hash, consumed/non-replayable, zero-new-side-effect, and non-readiness checks. Machine evidence: `docs/near-model-memory-plan-pack/cm2130_final_main_full_plan_revalidation.json`.
+
+This result accepts the historical full-plan application and branch-CAS evidence only. Current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false` remain unchanged; no consumed authorization was replayed, and any later exact status sync requires a separate decision. Readiness remains false.
 
 ## CM-2121 Bound Full-plan Application Status
 

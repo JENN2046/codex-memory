@@ -1,0 +1,337 @@
+# CM-2130 Final-main Full-plan Revalidation
+
+Revalidation reference: `CM-2130-FINAL-MAIN-FULL-PLAN-REVALIDATION-D78AD8F7-0A503DED`
+Baseline commit: `d78ad8f7c0d3e3dc1c713870d07faf7958ecb84c`
+Baseline tree: `0a503ded7180f2a38bedda7d2fd61c1f98beffea`
+Canonical payload SHA-256: `0135b59374536fb9cd9c6ecbb5bf3baede059c1b802667900eed40c491fbc2d8`
+Verdict: `PASS_FINAL_MAIN_EVIDENCE_REVALIDATED_STATUS_SYNC_STILL_SEPARATE_READINESS_FALSE`
+
+This is a read-only Git-object and tracked-evidence revalidation of the
+final main baseline after regular merge commits #14 through #19.
+It does not replay any consumed authorization, execute status sync,
+update a branch ref, call a provider, access real memory, or claim readiness.
+
+The historical full-plan evidence is accepted. Current
+`fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false` remain
+unchanged; any exact status synchronization is a separate decision.
+
+## Exact JSON mirror
+
+```json
+{
+  "artifactType": "cm2130_final_main_full_plan_revalidation_v1",
+  "canonicalPayloadSha256": "0135b59374536fb9cd9c6ecbb5bf3baede059c1b802667900eed40c491fbc2d8",
+  "payload": {
+    "baseline": {
+      "commit": "d78ad8f7c0d3e3dc1c713870d07faf7958ecb84c",
+      "firstPullRequest": 14,
+      "lastPullRequest": 19,
+      "mergeCount": 6,
+      "mergeMethod": "regular_merge_commit_only",
+      "tree": "0a503ded7180f2a38bedda7d2fd61c1f98beffea"
+    },
+    "currentAuthority": {
+      "branchRefUpdateAuthorized": false,
+      "consumedAuthorizationReplayAuthorized": false,
+      "deployAuthorized": false,
+      "forcePushAuthorized": false,
+      "readinessClaimAuthorized": false,
+      "releaseAuthorized": false,
+      "revalidationOnly": true,
+      "statusSyncAuthorized": false
+    },
+    "currentSideEffects": {
+      "applicationCommits": 0,
+      "branchRefUpdates": 0,
+      "nativeReads": 0,
+      "nativeWrites": 0,
+      "providerCalls": 0,
+      "readinessClaims": 0,
+      "realMemoryReads": 0,
+      "receiptWrites": 0,
+      "remoteActions": 0,
+      "repositoryPatches": 0
+    },
+    "currentState": {
+      "finalMainEvidenceRevalidated": true,
+      "fullPlanPackCompleted": false,
+      "fullPlanStatusSyncPerformed": false,
+      "readinessClaimed": false,
+      "statusSyncStillSeparate": true
+    },
+    "evidenceArtifacts": [
+      {
+        "blobOid": "0b0ecabc4daba8a275487f541f45613fdca9322d",
+        "bytes": 7986,
+        "path": "docs/near-model-memory-plan-pack/cm2120_full_plan_application_execution_receipt.json",
+        "sha256": "c6bca575cc7fce687b2452ec75d25cb6271bfd66214addd2390d1813bbca83fe"
+      },
+      {
+        "blobOid": "7c3d1a5d8a3f1a19835444e09e4ed66d153b9783",
+        "bytes": 8493,
+        "path": "docs/near-model-memory-plan-pack/cm2120_full_plan_application_execution_receipt.md",
+        "sha256": "aa3ae589cf2de279ba27a67b84c72bb4f6a14b849dde205bd1e87584ab992e4d"
+      },
+      {
+        "blobOid": "8378bae1c06d084bd4b5386c4a625b0b4a319b36",
+        "bytes": 7546,
+        "path": "docs/near-model-memory-plan-pack/cm2120_full_plan_application_binding_receipt.json",
+        "sha256": "d5e610229545a1da55100bfb6e949d84bd8ffc59e207c5a9736281a3d9911fbb"
+      },
+      {
+        "blobOid": "b4f8d64b0a925698a08ca16aba47af1253721965",
+        "bytes": 8058,
+        "path": "docs/near-model-memory-plan-pack/cm2120_full_plan_application_binding_receipt.md",
+        "sha256": "de8fbbb88e52a3b72475a4da30d61ecb9dd5a265d10d49fb3a6b4d8329fe41a6"
+      },
+      {
+        "blobOid": "b16aecc7df1b88ab6b6414be6684200fed465151",
+        "bytes": 7546,
+        "path": "docs/near-model-memory-plan-pack/cm2120_full_plan_application_receipt_review_decision.json",
+        "sha256": "00981d8f143639a49dfb22f2526756245fee830777d6340a2dc4f989c2cc316f"
+      },
+      {
+        "blobOid": "9cc1add38925eaf0d12a36ecf703ac37e5f579f5",
+        "bytes": 8079,
+        "path": "docs/near-model-memory-plan-pack/cm2120_full_plan_application_receipt_review_decision.md",
+        "sha256": "d24c69f03bcd6f96a5080067c4f362850baa6002b45c4482985d4239dab71724"
+      },
+      {
+        "blobOid": "80dd5716f51275443d713730006d17f5f9002faf",
+        "bytes": 11801,
+        "path": "docs/near-model-memory-plan-pack/cm2121_exact_full_plan_status_sync_application.json",
+        "sha256": "bdd651a9676e916c07088ebfbe6ca42f92451825bbabd049998b073a198d336e"
+      },
+      {
+        "blobOid": "d021f62eca929e956c1138d62500da31f5346c87",
+        "bytes": 12533,
+        "path": "docs/near-model-memory-plan-pack/cm2121_exact_full_plan_status_sync_application.md",
+        "sha256": "5407fc6c9e249d51f00b722cd8c854130a5ede3fe566e5c9cdcba16cfbce49d1"
+      },
+      {
+        "blobOid": "7a3d9667b51220d2623658e2d673bd5fee88e09d",
+        "bytes": 18815,
+        "path": "docs/near-model-memory-plan-pack/cm2121_exact_full_plan_status_sync_content_decision.json",
+        "sha256": "a42fd82c5e78fbdac04a8a3f4847b95e3953d45ee233d8496d4eeaa8bff5775f"
+      },
+      {
+        "blobOid": "277c023772ee0ffd5a0696a9b6a9516894e9059d",
+        "bytes": 19459,
+        "path": "docs/near-model-memory-plan-pack/cm2121_exact_full_plan_status_sync_content_decision.md",
+        "sha256": "eb7cd8f846f03f019eaf6266e1b79c7ca50cc10a71bd3673ad93d9ec538c3b87"
+      },
+      {
+        "blobOid": "4c1428f83d8c8f701a54ee931f305b8a43e833de",
+        "bytes": 1645,
+        "path": "docs/near-model-memory-plan-pack/cm2128_branch_cas_claim_receipt.json",
+        "sha256": "0ef4ef2bffdf7216f63578e3c793c562dfc59f43c36e654f60902d61bd1b813e"
+      },
+      {
+        "blobOid": "dedc8d4650522d37c65f93436bd6905c8c5de2a3",
+        "bytes": 25430,
+        "path": "docs/near-model-memory-plan-pack/cm2128_branch_cas_execution_receipt.json",
+        "sha256": "907a2bead5b71d138b9dd521f99b1fe996aed30351f003abf11ab6dd0ff30c5a"
+      },
+      {
+        "blobOid": "0ad9555f49ecb653d6069e403a4da99ff807253d",
+        "bytes": 7588,
+        "path": "docs/near-model-memory-plan-pack/cm2128_branch_cas_receipt_freeze_manifest.json",
+        "sha256": "c9dcd026b55ddfa6af3223b0aec642f215caa0b0e2da77b15fcf90f667a7c0b5"
+      },
+      {
+        "blobOid": "ed34c9c96337f423a8a3f3160c8585615afa23dc",
+        "bytes": 8117,
+        "path": "docs/near-model-memory-plan-pack/cm2128_branch_cas_receipt_freeze_manifest.md",
+        "sha256": "5a472754552224730d0b1baf0af89d4307fed8cb19f152f0b74bcadfd2a52b5e"
+      },
+      {
+        "blobOid": "901ae00db14f6425b859261b9bf7a59509668718",
+        "bytes": 6609,
+        "path": "docs/near-model-memory-plan-pack/cm2129_branch_cas_receipt_review.json",
+        "sha256": "f5d38edba69d3ecfb064c79fbebec842cf3076a2c3389b592d478aec809bd651"
+      },
+      {
+        "blobOid": "7e62e19706695379b8e6951ca20a446c2d6413b2",
+        "bytes": 7162,
+        "path": "docs/near-model-memory-plan-pack/cm2129_branch_cas_receipt_review.md",
+        "sha256": "5978210ab9f9848223342cdca9f86bc901ea71f74747d14112eb0058ee009657"
+      },
+      {
+        "blobOid": "8a9260a2b224043d8af496584294058b5ba04524",
+        "bytes": 3049,
+        "path": "docs/near-model-memory-plan-pack/cm2129_post_execution_hardening_boundary.md",
+        "sha256": "f755d5941db49e3124382ec2a9d7fca8a65babb7b83afbfe10090810f4c3ccb9"
+      }
+    ],
+    "mergeProof": [
+      {
+        "commit": "b844ead2a0e003083351e2e44d0ee291483ffd17",
+        "finalMainAncestor": true,
+        "parents": [
+          "ce539cd600d0c9da49b9ae7a84da59e14529e4b5",
+          "2bd19b1badb7bedc0d495da02399005c6c613c0d"
+        ],
+        "pullRequest": 14,
+        "regularMergeCommit": true,
+        "subject": "Merge pull request #14 from JENN2046/codex/nmm-01-review-baseline",
+        "tree": "e0f03f6057c280aec25aa7db6ceb523733626267"
+      },
+      {
+        "commit": "faa639161a01adb225980ff2bd8ca2207c01e99e",
+        "finalMainAncestor": true,
+        "parents": [
+          "b844ead2a0e003083351e2e44d0ee291483ffd17",
+          "5c87f54c8508d733b22ac35a43aaff76eced2380"
+        ],
+        "pullRequest": 15,
+        "regularMergeCommit": true,
+        "subject": "Merge pull request #15 from JENN2046/codex/nmm-02-phase8-bootstrap",
+        "tree": "724abf2cf3ebe324286d8639a88fbb0e14e216a0"
+      },
+      {
+        "commit": "543ce430d24c037962f2527d8462426d5530ce17",
+        "finalMainAncestor": true,
+        "parents": [
+          "faa639161a01adb225980ff2bd8ca2207c01e99e",
+          "337cf67e7c5ed5c2c99a26269e550630370c0232"
+        ],
+        "pullRequest": 16,
+        "regularMergeCommit": true,
+        "subject": "Merge pull request #16 from JENN2046/codex/nmm-03-phase8-lifecycle",
+        "tree": "4a202c1d06a7be112d80f7cc634f3c5fdfd299ac"
+      },
+      {
+        "commit": "4b504ab5ee106128da377dda5c17e06a7fecae16",
+        "finalMainAncestor": true,
+        "parents": [
+          "543ce430d24c037962f2527d8462426d5530ce17",
+          "063af475041c18cc70889e05750e29473fd62bc9"
+        ],
+        "pullRequest": 17,
+        "regularMergeCommit": true,
+        "subject": "Merge pull request #17 from JENN2046/codex/nmm-04-full-plan-review",
+        "tree": "8b54764d0d86d7ff5a4f406c5f787fcbece54ea9"
+      },
+      {
+        "commit": "9f93fa4d1cc2f86ecdadfd9ca0bc66b67cc2f0ab",
+        "finalMainAncestor": true,
+        "parents": [
+          "4b504ab5ee106128da377dda5c17e06a7fecae16",
+          "84f9296b83f82b5f8ccad7cccbeaa784ca72cb53"
+        ],
+        "pullRequest": 18,
+        "regularMergeCommit": true,
+        "subject": "Merge pull request #18 from JENN2046/codex/nmm-05-full-plan-application",
+        "tree": "08b7ec9821a80e40889ba5659514c06e64ac707a"
+      },
+      {
+        "commit": "d78ad8f7c0d3e3dc1c713870d07faf7958ecb84c",
+        "finalMainAncestor": true,
+        "parents": [
+          "9f93fa4d1cc2f86ecdadfd9ca0bc66b67cc2f0ab",
+          "00660398a0aa29ec97dffe80d88cbaa886460319"
+        ],
+        "pullRequest": 19,
+        "regularMergeCommit": true,
+        "subject": "Merge pull request #19 from JENN2046/codex/nmm-06-receipt-closeout",
+        "tree": "0a503ded7180f2a38bedda7d2fd61c1f98beffea"
+      }
+    ],
+    "nonClaims": {
+      "completeRealtimeMemory": false,
+      "completeRealtimeMemoryClaimed": false,
+      "completeV8": false,
+      "completeV8Claimed": false,
+      "cutoverReady": false,
+      "cutoverReadyClaimed": false,
+      "deployReady": false,
+      "deployReadyClaimed": false,
+      "fullBridgeCompletion": false,
+      "fullBridgeCompletionClaimed": false,
+      "fullPlanPackCompletedClaimed": false,
+      "fullRealtimeMemory": false,
+      "fullRealtimeMemoryClaimed": false,
+      "modelMemoryComplete": false,
+      "modelMemoryCompleteClaimed": false,
+      "productionReady": false,
+      "productionReadyClaimed": false,
+      "rcReady": false,
+      "rcReadyClaimed": false,
+      "readinessClaimed": false,
+      "releaseReady": false,
+      "releaseReadyClaimed": false
+    },
+    "revalidatedEvidence": {
+      "historicalBranchCasCompleted": true,
+      "historicalBranchCasIndependentReviewPassed": true,
+      "historicalBranchCasReceiptFreezePassed": true,
+      "historicalFullPlanApplicationApplied": true,
+      "historicalFullPlanApplicationAuthorizationConsumed": true,
+      "historicalFullPlanApplicationAuthorizationReplayAllowed": false,
+      "historicalFullPlanApplicationCommitBound": true,
+      "historicalReceiptReviewPassed": true
+    },
+    "revalidationReference": "CM-2130-FINAL-MAIN-FULL-PLAN-REVALIDATION-D78AD8F7-0A503DED",
+    "statusSurfaceArtifacts": [
+      {
+        "blobOid": "7afe26f8b3b4ac0b501d2c3c58f26926066b77d4",
+        "bytes": 1743453,
+        "path": ".agent_board/AUTOPILOT_LEDGER.md",
+        "sha256": "e4eadebe2c003c1d33eafadc7a526ca35a72282c37170647496b93dbe91310b4"
+      },
+      {
+        "blobOid": "77dc8589f9b0b001ff54c0b2ae721e7f3eecd98a",
+        "bytes": 941180,
+        "path": ".agent_board/CHECKPOINT.md",
+        "sha256": "0c2cc4ae4b767f362cad20ade87faed50712b9d4d678d1e32c88367a5e13e353"
+      },
+      {
+        "blobOid": "b351f4db6c4c04e5b43034716076aec61b6ca606",
+        "bytes": 200691,
+        "path": ".agent_board/CURRENT_FACTS.json",
+        "sha256": "fc27bef761c7a515abee51ea748144c5fcd7b78a15dee6a0a0ab14131927ba4b"
+      },
+      {
+        "blobOid": "3cdd662473426505df74a7b9fe08f79f3ed027ce",
+        "bytes": 251373,
+        "path": ".agent_board/HANDOFF.md",
+        "sha256": "0b502043c1ca1a9ac111f70d59c2c80dfcc37278640156c2ada1c3511c5e8255"
+      },
+      {
+        "blobOid": "3dc6863dc80c4211c7c63ffd2a9edd90bb50fb6a",
+        "bytes": 22057,
+        "path": ".agent_board/RUN_STATE.md",
+        "sha256": "b7757aa00cce246d4660dac296bee3757725204d596675cd7c1eaee2d21e2a11"
+      },
+      {
+        "blobOid": "6e5b4c9dbb5d0bf049acd9880c6c7a2760d05e22",
+        "bytes": 929726,
+        "path": ".agent_board/TASK_QUEUE.md",
+        "sha256": "e082afebfc41abdcede5065bd4547d3289e11b2f60e721d682a0e34a9bfa486c"
+      },
+      {
+        "blobOid": "d3da0efc693b77d9e3629baffd90e5070e6ee6fa",
+        "bytes": 1039752,
+        "path": ".agent_board/VALIDATION_LOG.md",
+        "sha256": "2697a027a19e9438ff2020fe1290d637a6ef1b87ec0f17b8a1affb1a3b8aceb9"
+      },
+      {
+        "blobOid": "d8e1f1d434673c2c6ab2f1ccfafeb57cede8e3fe",
+        "bytes": 663482,
+        "path": "CURRENT_STATE.md",
+        "sha256": "62a84e15729ed8df39710293b77b4652e548e1ac0095a582487fc873c777d9fa"
+      },
+      {
+        "blobOid": "a8d1bd6ac157138f314c4ae741d65747b130a1ac",
+        "bytes": 897272,
+        "path": "STATUS.md",
+        "sha256": "87de9fd762205cbc79fb26d4d5f6b86f18e2a0a49076cf6c239c7df7118c64a4"
+      }
+    ],
+    "verdict": "PASS_FINAL_MAIN_EVIDENCE_REVALIDATED_STATUS_SYNC_STILL_SEPARATE_READINESS_FALSE"
+  },
+  "schemaVersion": 1,
+  "taskId": "CM-2130",
+  "validationId": "CMV-2215"
+}
+```

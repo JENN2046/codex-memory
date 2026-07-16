@@ -4,10 +4,11 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2121 exact full-plan status synchronization`.
-Current validation: `CMV-2214`.
-Current fact: the historical exact application remains ancestry-anchored and consumed/non-replayable; current `fullPlanPackCompleted=false` and status synchronization is reopened pending revalidation.
-All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; no native/provider/real-memory/remote action is authorized or performed by this synchronization.
+Current task: `CM-2130 final-main full-plan revalidation`.
+Current validation: `CMV-2215`.
+Current fact: final `main` commit `d78ad8f7…` / tree `0a503ded…` preserves regular merge commits #14 through #19 and the frozen full-plan evidence chain.
+The evidence revalidation passed, while current `fullPlanPackCompleted=false` and `fullPlanStatusSyncPerformed=false`; status sync remains a separate exact action.
+All production/release/deploy/cutover/RC/complete-V8/readiness fields remain false; this revalidation performed no native/provider/real-memory/remote action.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -45,6 +46,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2130 | 2130 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Read-only final-main Git/evidence verification | CM-2130 contract/generator/tests; JSON/Markdown evidence; nine active status surfaces | Revalidate the full-plan evidence chain on exact final main after PRs #14-#19 | regular-merge chain; 17 evidence artifacts; nine status surfaces; canonical hashes; consumed/non-replayable and readiness-false drift tests | no historical authorization replay; no status-sync/ref update/native/provider/real-memory/remote effect | any future status sync requires a separate exact decision; no readiness authority | COMPLETED_FINAL_MAIN_EVIDENCE_REVALIDATED_STATUS_SYNC_SEPARATE_FULL_PLAN_FALSE_READINESS_FALSE |
 | CM-2121 | 2121 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Exact local status sync only | nine status/governance paths | Preserve historical synchronization evidence while reopening current completion for revalidation | exact receipt review; nine before/after blobs; current-facts drift; ledger consistency; docs/diff checks | authorization consumed/non-replayable; no native/provider/real-memory/remote effect | separate exact status-sync decision/release required; no readiness authority | COMPLETED_STATUS_REOPENED_FULL_PLAN_NEEDS_REVALIDATION_READINESS_FALSE |
 | CM-2119 | 2119 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Exact local one-shot application authority; no execution yet | CM-2118 source/CLI/generators/tests; packet; CM-2119 decision; status surfaces | Freeze the secure one-shot stack, then separately freeze exact final release without running it | focused `10/10`; combined `60/60`; default `5435/5435`; exact packet/release Git intake; concurrency/reentry/drift red-team; docs gates | claim/patch/application/receipt counts remain zero; release is non-replayable if later consumed | future execution requires the exact three commits and clean detached implementation runtime; status sync/readiness remain forbidden | FINAL_RELEASE_FROZEN_ONE_SHOT_APPLICATION_AUTHORIZED_UNCLAIMED_FULL_PLAN_FALSE_NO_READY_CLAIM |
 | CM-2117 | 2117 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Green content-only decision; final release/application remain separately gated | CM-2117 decision source/generator/tests, exact JSON/Markdown decision, status surfaces | Freeze the complete gate-bound five-target decision content without opening execution | decision `6/6`; combined `50/50`; default `5425/5425`; exact real-resolver replay; red-team; docs/current-facts/ledger/diff | zero claim/patch/application/runtime/native/provider/real-memory/remote effect | frozen executor and separate final release must bind full `b1245149…` identity before execution | COMPLETED_EXACT_CONTENT_DECISION_FROZEN_FINAL_RELEASE_AND_EXECUTION_SEPARATE_FULL_PLAN_FALSE_NO_READY_CLAIM |
