@@ -332,12 +332,69 @@ function hasFallback(searchResult = {}) {
 }
 
 function sourceRuntime(searchResult = {}) {
-  if (['vcp_native', 'local_fallback', 'local_compatibility'].includes(searchResult?.source_runtime)) {
+  if (hasFallback(searchResult)) return 'local_fallback';
+  if (
+    searchResult?.status === 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED' &&
+    searchResult?.accepted === true &&
+    searchResult?.decision !== 'rejected'
+  ) return 'vcp_native';
+  if (
+    String(searchResult?.status || '').startsWith('GOVERNED_MCP_VCP_NATIVE_') ||
+    ['vcp_native', 'vcp_native_unavailable'].includes(searchResult?.source_runtime)
+  ) {
+    return 'vcp_native_unavailable';
+  }
+  if (['local_fallback', 'local_compatibility'].includes(searchResult?.source_runtime)) {
     return searchResult.source_runtime;
   }
-  if (hasFallback(searchResult)) return 'local_fallback';
-  if (searchResult?.status === 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED') return 'vcp_native';
   return 'local_compatibility';
+}
+
+function recallRejected(searchResult = {}) {
+  if (!isPlainObject(searchResult)) return false;
+  return searchResult.accepted === false ||
+    searchResult.decision === 'rejected' ||
+    sourceRuntime(searchResult) === 'vcp_native_unavailable';
+}
+
+function buildRecallRejectedResponse(searchResult = {}) {
+  const selectedSourceRuntime = sourceRuntime(searchResult);
+  const nativeUnavailable = selectedSourceRuntime === 'vcp_native_unavailable';
+  return {
+    status: 'PREPARE_MEMORY_CONTEXT_RECALL_REJECTED',
+    accepted: false,
+    decision: 'rejected',
+    reasonCode: nativeUnavailable
+      ? 'vcp_native_recall_unavailable'
+      : 'governed_recall_unavailable',
+    access: {
+      mode: 'prepare_memory_context_readonly',
+      selectedProjection: true,
+      selectedProjectionVersion: 1,
+      readOnly: true,
+      lowDisclosure: true,
+      nativeRecallAccepted: false,
+      memoryReadPerformed: searchResult?.access?.memoryReadPerformed === true,
+      localMemoryFallbackUsed: false,
+      resultCanBeMistakenForVcpNative: false,
+      durableMutationPerformed: false,
+      productionWritePerformed: false,
+      rawMemoryReturned: false,
+      rawAuditReturned: false,
+      rawOutputReturned: false,
+      providerPayloadReturned: false,
+      tokenMaterialReturned: false,
+      endpointReturned: false,
+      readinessClaimed: false,
+      sourceRuntime: selectedSourceRuntime
+    },
+    nonClaims: {
+      modelInternalMemory: false,
+      productionReadiness: false,
+      productionWriteReady: false,
+      fullSurfaceDefault: false
+    }
+  };
 }
 
 function buildRecommendedNextStep(pkg) {
@@ -617,6 +674,11 @@ class MemoryContextPackageService {
         ...(scope ? { scope } : {})
       }, readOnlyContext)
       : { results: [] };
+    if (recallRejected(searchResult)) {
+      const rejected = buildRecallRejectedResponse(searchResult);
+      enforceNoForbiddenOutputKeys(rejected);
+      return rejected;
+    }
     const results = normalizeSearchResults(searchResult).slice(0, maxItems);
     const selectedSourceRuntime = sourceRuntime(searchResult);
     const overview = this.overviewService

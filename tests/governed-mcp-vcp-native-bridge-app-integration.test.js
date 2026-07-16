@@ -2382,6 +2382,65 @@ test('Claude native recall is bound to trusted Claude shared scope', async () =>
   });
 });
 
+test('prepare_memory_context fails closed when primary native recall is rejected', async () => {
+  let nativeCalls = 0;
+  let localCalls = 0;
+  let overviewCalls = 0;
+  let auditCalls = 0;
+  const nativeCaller = async payload => {
+    nativeCalls += 1;
+    throw governedNativeTransportErrorForPayload(
+      payload,
+      'SYNTHETIC_PRIVATE_NATIVE_FAILURE_MUST_NOT_ECHO'
+    );
+  };
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeReadDelegationToolCaller: nativeCaller
+  }, async app => {
+    app.services.passiveRecallService.search = async () => {
+      localCalls += 1;
+      return [];
+    };
+    app.services.overviewService.getAuthenticatedBoundedOverview = async () => {
+      overviewCalls += 1;
+      return {};
+    };
+    app.services.auditMemoryReadonlyService.run = async () => {
+      auditCalls += 1;
+      return {};
+    };
+
+    const result = await app.callTool('prepare_memory_context', {
+      task: {
+        title: 'Rejected native task-start context',
+        user_request: 'Fail closed without a local package.',
+        project_id: 'codex-memory',
+        client_id: 'codex',
+        visibility: 'private'
+      }
+    }, codexContext());
+    const serialized = JSON.stringify(result);
+
+    assert.equal(result.status, 'PREPARE_MEMORY_CONTEXT_RECALL_REJECTED');
+    assert.equal(result.accepted, false);
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.reasonCode, 'vcp_native_recall_unavailable');
+    assert.equal(result.access.sourceRuntime, 'vcp_native_unavailable');
+    assert.equal(result.access.nativeRecallAccepted, false);
+    assert.equal(result.access.localMemoryFallbackUsed, false);
+    assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
+    assert.equal(result.memory_context_package, undefined);
+    assert.equal(nativeCalls, 1);
+    assert.equal(localCalls, 0);
+    assert.equal(overviewCalls, 0);
+    assert.equal(auditCalls, 0);
+    assert.equal(serialized.includes('SYNTHETIC_PRIVATE_NATIVE_FAILURE_MUST_NOT_ECHO'), false);
+  });
+});
+
 test('prepare_memory_context labels audited local fallback and never presents it as native', async () => {
   let nativeCalls = 0;
   let localCalls = 0;

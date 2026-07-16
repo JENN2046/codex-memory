@@ -12,6 +12,7 @@ test('governed recall gateway marks delegated native search explicitly', async (
   const gateway = new GovernedRecallGateway({
     callSearchMemory: async () => ({
       status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED',
+      accepted: true,
       results: []
     })
   });
@@ -21,6 +22,36 @@ test('governed recall gateway marks delegated native search explicitly', async (
   assert.equal(result.source_runtime, 'vcp_native');
   assert.equal(result.access.sourceRuntime, 'vcp_native');
   assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
+});
+
+test('governed recall gateway never labels rejected native delegation as native success', async () => {
+  const gateway = new GovernedRecallGateway({
+    callSearchMemory: async () => ({
+      status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_REJECTED',
+      accepted: false,
+      decision: 'rejected',
+      access: {
+        memoryReadPerformed: false,
+        localMemoryFallbackUsed: false
+      }
+    })
+  });
+
+  const result = await gateway.search({ query: 'rejected native context' });
+
+  assert.equal(result.source_runtime, 'vcp_native_unavailable');
+  assert.equal(result.access.sourceRuntime, 'vcp_native_unavailable');
+  assert.equal(result.access.resultCanBeMistakenForVcpNative, false);
+});
+
+test('governed recall gateway requires accepted=true for native delegated status', () => {
+  const result = bindSourceRuntime({
+    status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED',
+    results: []
+  });
+
+  assert.equal(result.source_runtime, 'vcp_native_unavailable');
+  assert.equal(result.access.sourceRuntime, 'vcp_native_unavailable');
 });
 
 test('governed recall gateway marks audited local fallback without native masquerade', () => {

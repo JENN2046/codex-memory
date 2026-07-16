@@ -736,6 +736,66 @@ test('codex-memory MCP defaults to read-only plus proposal-only public surface',
   });
 });
 
+test('MCP prepare_memory_context returns isError when primary native recall is unavailable', async () => {
+  const nativeCaller = async () => {
+    throw new Error('SYNTHETIC_PRIVATE_NATIVE_FAILURE_MUST_NOT_ECHO');
+  };
+
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const executionContext = {
+      agentAlias: 'Codex',
+      agentId: 'codex-desktop',
+      clientId: 'codex',
+      projectId: 'codex-memory',
+      workspaceId: 'workspace-alpha',
+      visibility: 'private',
+      requestSource: 'mcp-native-unavailable-test'
+    };
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'prepare_memory_context',
+        arguments: {
+          task: {
+            title: 'Unavailable native task-start context',
+            user_request: 'Fail closed without an accepted native read.',
+            project_id: 'codex-memory',
+            workspace_id: 'workspace-alpha',
+            client_id: 'codex',
+            visibility: 'private'
+          },
+          options: {
+            max_items: 1,
+            max_bytes: 4000
+          }
+        }
+      }
+    }, { executionContext });
+    const payload = result.response.result.structuredContent;
+    const serialized = JSON.stringify(result.response.result);
+
+    assert.equal(result.response.result.isError, true);
+    assert.equal(payload.status, 'PREPARE_MEMORY_CONTEXT_RECALL_REJECTED');
+    assert.equal(payload.accepted, false);
+    assert.equal(payload.decision, 'rejected');
+    assert.equal(payload.reasonCode, 'vcp_native_recall_unavailable');
+    assert.equal(payload.access.sourceRuntime, 'vcp_native_unavailable');
+    assert.equal(payload.access.nativeRecallAccepted, false);
+    assert.equal(payload.access.localMemoryFallbackUsed, false);
+    assert.equal(payload.access.rawMemoryReturned, false);
+    assert.equal(payload.memory_context_package, undefined);
+    assert.equal(serialized.includes('SYNTHETIC_PRIVATE_NATIVE_FAILURE_MUST_NOT_ECHO'), false);
+  }, {
+    governedMcpVcpNativeRuntimeProfile: 'wsl-newapi-prod',
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeReadDelegationToolCaller: nativeCaller
+  });
+});
+
 test('prepare_memory_context preserves useful low-disclosure metadata without raw candidate fields', async () => {
   await withApp(async ({ app }) => {
     let searchOptions = null;

@@ -35,7 +35,10 @@ context package tool. Its recall gateway now uses the same governed native read
 path as `search_memory`, then enters an audited local fallback only when the
 configured native mode permits it. Every package identifies `vcp_native`,
 `local_fallback`, or `local_compatibility`. This code-level convergence still
-requires fresh live runtime proof.
+requires fresh live runtime proof. A rejected primary native recall does not
+produce an accepted empty package: it fails closed with
+`PREPARE_MEMORY_CONTEXT_RECALL_REJECTED`, `isError: true`, and
+`source_runtime: vcp_native_unavailable`.
 The Phase 4 local task-start wrapper is also present: it derives task context,
 calls `prepare_memory_context`, injects a bounded summary when available, and
 marks `memory_unavailable` when memory context cannot be prepared.
@@ -154,7 +157,9 @@ response shapes. The included shim exposes `knowledge_base.search`,
 `prepare_memory_context` calls the governed `search_memory` path through the
 shared recall gateway. Native results are projected into the context package;
 local results appear only as `local_fallback` or `local_compatibility` and
-cannot be mistaken for native results.
+cannot be mistaken for native results. Native rejection and transport failure
+use `vcp_native_unavailable`; they are never labeled as successful
+`vcp_native` context.
 Task-start workflow wiring remains local and read-only; it does not perform
 durable mutation or production write.
 `propose_memory_delta` packages proposal-only staging and governance receipts;

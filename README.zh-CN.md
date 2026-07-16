@@ -263,10 +263,13 @@ test -n "${CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN:-}" && echo token_present
 上下文包必须明确标记：
 
 - `source_runtime: vcp_native`
+- `source_runtime: vcp_native_unavailable`（native rejection；返回
+  `PREPARE_MEMORY_CONTEXT_RECALL_REJECTED` 和 MCP `isError: true`）
 - `source_runtime: local_fallback`
 - `source_runtime: local_compatibility`
 
-本地结果不得伪装为 native。当前合同覆盖 Codex 与 Claude，但历史真实
+native rejection 不得标记为成功的 `vcp_native`，也不得包装成 accepted
+空上下文包；本地结果同样不得伪装为 native。当前合同覆盖 Codex 与 Claude，但历史真实
 dogfood 证据仍是 Codex-only；Claude live runtime 完成度不在此处宣称。
 
 实时召回大致发生过程：
