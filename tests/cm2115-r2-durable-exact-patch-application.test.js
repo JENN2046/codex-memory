@@ -46,7 +46,10 @@ const {
   PHASE2_MANIFEST,
   WINDOWS_WSL_RECEIPT
 } = require('../src/core/Cm2115R1Phase2CompletionAuditApplication');
-const { resolveGitFile: resolveRealGitFile } = require('../scripts/cm2115-r2-git');
+const {
+  resolveGitCommonDir,
+  resolveGitFile: resolveRealGitFile
+} = require('../scripts/cm2115-r2-git');
 const { parseArgs: parseApplyArgs } = require('../scripts/apply-cm2115-r2-phase2-completion-audit');
 const { parseArgs: parseBindingArgs } = require('../scripts/generate-cm2115-r2-application-binding-receipt');
 const { parseArgs: parseStrengthenedBindingArgs } = require('../scripts/generate-cm2115-r2-strengthened-binding-receipt');
@@ -167,6 +170,14 @@ async function prepareTempExecution(t) {
   Object.assign(resolver, exactDecisionLineageResolvers());
   return { root, governanceRoot, resolver, ...exactDecisionLineageResolvers(), ...fixture };
 }
+
+test('CM-2115-R2 resolves a relative git common dir against the explicit cwd', async t => {
+  const root = await fsp.mkdtemp(path.join(os.tmpdir(), 'cm2115-r2-git-common-dir-'));
+  t.after(() => fsp.rm(root, { recursive: true, force: true }));
+  execFileSync('git', ['init', '--quiet'], { cwd: root });
+
+  assert.equal(resolveGitCommonDir({ cwd: root }), path.join(root, '.git'));
+});
 
 test('CM-2115-R2 authority intake and exact patch decision fail closed on drift', () => {
   const intake = buildAuthorityIntake();
