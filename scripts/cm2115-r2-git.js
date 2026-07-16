@@ -90,8 +90,11 @@ function resolveDiffPaths(parentCommit, commit, options) {
   return output ? output.split('\n').filter(Boolean).sort() : [];
 }
 
-function resolveGitCommonDir(options) {
-  return path.resolve(gitText(['rev-parse', '--git-common-dir'], options));
+function resolveGitCommonDir({ cwd = process.cwd() } = {}) {
+  const gitCommonDir = gitText(['rev-parse', '--git-common-dir'], { cwd });
+  return path.isAbsolute(gitCommonDir)
+    ? path.normalize(gitCommonDir)
+    : path.resolve(cwd, gitCommonDir);
 }
 
 function resolveGovernanceRegistryRoot(options) {
