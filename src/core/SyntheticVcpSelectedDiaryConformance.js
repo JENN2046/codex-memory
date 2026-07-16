@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { postCheckNativeDiaryResults } = require('./NativeDiaryResultPostCheck');
 
 function hashLabels(labels) {
   return crypto.createHash('sha256').update(JSON.stringify([...labels].sort())).digest('hex');
@@ -59,10 +60,11 @@ async function runSyntheticVcpSelectedDiaryConformance({
     const single = await search([labels[0]], 2);
     const multi = await search([labels[0], labels[1]], 4);
     const singlePass = Array.isArray(single) && single.length > 0 &&
-      single.every(result => result.diaryName === labels[0]);
+      postCheckNativeDiaryResults(single, [labels[0]]).accepted === true;
     const multiSources = new Set(Array.isArray(multi) ? multi.map(result => result.diaryName) : []);
     const multiPass = multiSources.has(labels[0]) && multiSources.has(labels[1]) &&
-      !multiSources.has(labels[2]);
+      !multiSources.has(labels[2]) &&
+      postCheckNativeDiaryResults(multi, [labels[0], labels[1]]).accepted === true;
     const unauthorizedIndexNotLoaded = !indexLoads.includes(labels[2]);
     const selectedSignatureOnly = searchCalls.length === 2 &&
       searchCalls.every(call => call.allowedCount >= 1 && call.argumentCount === 5);
