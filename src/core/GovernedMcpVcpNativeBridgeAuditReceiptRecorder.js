@@ -125,8 +125,15 @@ const ALLOWED_HTTP_STATUS_CLASSES = Object.freeze([
 ]);
 const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'invalid_governance_metadata',
+  'diary_scope_authorization_rejected',
+  'diary_scope_mapping_binding_mismatch',
+  'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
+  'native_provider_embedding_failed',
+  'native_runtime_initialization_failed',
   'native_runtime_call_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed',
   'native_tool_public_binding_mismatch',
   'native_write_disabled',
   'unsupported_native_tool'

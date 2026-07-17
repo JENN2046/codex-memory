@@ -1048,7 +1048,7 @@ test('governed native audit projection preserves whitelisted JSON-RPC reason cod
     nativeInvocationStatusClass: 'client_error',
     nativeInvocationHttpStatusClass: 'success',
     nativeInvocationJsonRpcErrorPresent: true,
-    nativeInvocationJsonRpcErrorReasonCode: 'native_runtime_call_failed',
+    nativeInvocationJsonRpcErrorReasonCode: 'native_result_scope_postcheck_failed',
     rawPrivateDetail
   }));
   const unsafeReceipt = projectGovernedNativeBridgeAuditReceipt(governedBridgeReceiptEntry({
@@ -1065,7 +1065,7 @@ test('governed native audit projection preserves whitelisted JSON-RPC reason cod
   const serialized = JSON.stringify({ receipt, unsafeReceipt });
 
   assert.equal(receipt.nativeInvocationJsonRpcErrorPresent, true);
-  assert.equal(receipt.nativeInvocationJsonRpcErrorReasonCode, 'native_runtime_call_failed');
+  assert.equal(receipt.nativeInvocationJsonRpcErrorReasonCode, 'native_result_scope_postcheck_failed');
   assert.equal(unsafeReceipt.nativeInvocationJsonRpcErrorReasonCode, null);
   assert.equal(serialized.includes(rawPrivateDetail), false);
   assert.equal(serialized.includes('PRIVATE_REASON_SHOULD_NOT_ECHO'), false);
