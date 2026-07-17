@@ -27,7 +27,10 @@ cutover-ready: false
 
 The machine-readable counterpart is
 `docs/CHATGPT_WEB_R4_ARCHITECTURE_MANIFEST.json`. Its fail-closed validator is
-`scripts/validate_chatgpt_web_r4_architecture.js`.
+`scripts/validate_chatgpt_web_r4_architecture.js`. The gate loads the frozen
+JSON Schema and also binds canonical SHA-256 digests of both manifest and
+schema, so a field not covered by a named semantic assertion still cannot drift
+silently.
 
 ## 1. Frozen Decision
 

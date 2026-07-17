@@ -26,6 +26,7 @@ Deliverables:
 - threat model;
 - staged taskbook;
 - fail-closed static validator and negative tests;
+- frozen JSON Schema validation and canonical manifest/schema digest anchors;
 - README navigation.
 
 Gates:

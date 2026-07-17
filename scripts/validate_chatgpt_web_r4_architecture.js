@@ -3,12 +3,16 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 
 const ROOT = path.resolve(__dirname, '..');
 const MANIFEST_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4_ARCHITECTURE_MANIFEST.json');
+const SCHEMA_PATH = path.join(ROOT, 'schemas', 'chatgpt-web-r4-architecture-v1.schema.json');
 const DECISION_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4_ARCHITECTURE_FREEZE.md');
 const THREAT_MODEL_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4_THREAT_MODEL.md');
 const TASKBOOK_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4_IMPLEMENTATION_TASKBOOK.md');
+const EXPECTED_CANONICAL_MANIFEST_SHA256 = '97008bbac3b5ea80c5adb9b2addd48d709d1ea996460ab49fb6ff0c95e34934d';
+const EXPECTED_CANONICAL_SCHEMA_SHA256 = 'a173b47069c757032a81153bd47428da5bd827e78bc6414d218282b25ef24413';
 
 function invariant(condition, message) {
   if (!condition) throw new Error(message);
@@ -23,8 +27,115 @@ function sameMembers(actual, expected, label) {
   );
 }
 
-function validateArchitecture(manifest) {
+function canonicalize(value) {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.keys(value).sort().map(key => [key, canonicalize(value[key])])
+    );
+  }
+  return value;
+}
+
+function canonicalSha256(value) {
+  return crypto
+    .createHash('sha256')
+    .update(JSON.stringify(canonicalize(value)), 'utf8')
+    .digest('hex');
+}
+
+function valueType(value) {
+  if (Array.isArray(value)) return 'array';
+  if (value === null) return 'null';
+  if (Number.isInteger(value)) return 'integer';
+  return typeof value;
+}
+
+function schemaInvariant(condition, location, message) {
+  invariant(condition, `schema validation failed at ${location}: ${message}`);
+}
+
+function validateSchemaNode(value, schema, location = '$') {
+  if (!schema || typeof schema !== 'object' || Array.isArray(schema)) return;
+
+  if (Object.prototype.hasOwnProperty.call(schema, 'const')) {
+    schemaInvariant(
+      JSON.stringify(canonicalize(value)) === JSON.stringify(canonicalize(schema.const)),
+      location,
+      'const mismatch'
+    );
+  }
+
+  if (schema.type) {
+    const actualType = valueType(value);
+    const typeMatches = schema.type === 'number'
+      ? (actualType === 'number' || actualType === 'integer')
+      : actualType === schema.type;
+    schemaInvariant(typeMatches, location, `expected ${schema.type}, received ${actualType}`);
+  }
+
+  if (typeof value === 'string') {
+    if (Number.isInteger(schema.minLength)) {
+      schemaInvariant(value.length >= schema.minLength, location, `minLength ${schema.minLength}`);
+    }
+    if (schema.pattern) {
+      schemaInvariant(new RegExp(schema.pattern).test(value), location, `pattern ${schema.pattern}`);
+    }
+    if (schema.format === 'date') {
+      schemaInvariant(/^\d{4}-\d{2}-\d{2}$/.test(value), location, 'format date');
+    }
+  }
+
+  if (Array.isArray(value)) {
+    if (Number.isInteger(schema.minItems)) {
+      schemaInvariant(value.length >= schema.minItems, location, `minItems ${schema.minItems}`);
+    }
+    if (Number.isInteger(schema.maxItems)) {
+      schemaInvariant(value.length <= schema.maxItems, location, `maxItems ${schema.maxItems}`);
+    }
+    if (schema.uniqueItems === true) {
+      const canonicalItems = value.map(item => JSON.stringify(canonicalize(item)));
+      schemaInvariant(new Set(canonicalItems).size === canonicalItems.length, location, 'uniqueItems');
+    }
+    if (schema.items) {
+      value.forEach((item, index) => validateSchemaNode(item, schema.items, `${location}[${index}]`));
+    }
+  }
+
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const properties = schema.properties || {};
+    for (const field of schema.required || []) {
+      schemaInvariant(Object.prototype.hasOwnProperty.call(value, field), location, `missing required property ${field}`);
+    }
+    if (schema.additionalProperties === false) {
+      for (const field of Object.keys(value)) {
+        schemaInvariant(Object.prototype.hasOwnProperty.call(properties, field), location, `unknown property ${field}`);
+      }
+    }
+    for (const [field, childSchema] of Object.entries(properties)) {
+      if (Object.prototype.hasOwnProperty.call(value, field)) {
+        validateSchemaNode(value[field], childSchema, `${location}.${field}`);
+      }
+    }
+  }
+}
+
+function validateJsonSchema(value, schema) {
+  invariant(schema?.$schema === 'https://json-schema.org/draft/2020-12/schema', 'architecture schema draft mismatch');
+  validateSchemaNode(value, schema);
+}
+
+function validateFrozenSchema(schema) {
+  invariant(
+    canonicalSha256(schema) === EXPECTED_CANONICAL_SCHEMA_SHA256,
+    'architecture schema canonical digest mismatch'
+  );
+}
+
+function validateArchitecture(manifest, schema = loadSchema()) {
   invariant(manifest && typeof manifest === 'object' && !Array.isArray(manifest), 'manifest must be an object');
+  validateFrozenSchema(schema);
+  validateJsonSchema(manifest, schema);
   invariant(manifest.schemaVersion === 1, 'schemaVersion must be 1');
   invariant(manifest.architectureReference === 'codex-memory-chatgpt-web-r4-v1', 'architecture reference mismatch');
   invariant(manifest.decisionAuthority === 'jenn_explicit_r4_freeze', 'decision authority mismatch');
@@ -109,7 +220,7 @@ function validateArchitecture(manifest) {
   invariant(manifest.authorization.pkceMethod === 'S256', 'PKCE S256 is required');
   invariant(manifest.authorization.anonymousMemoryAccess === false, 'anonymous memory access is forbidden');
 
-  for (const field of ['signatureRequired', 'nonceRequired', 'expiryRequired', 'replayRejected', 'mappingBindingRequired', 'receiptChainRequired']) {
+  for (const field of ['requestAndResponseBindingRequired', 'signatureRequired', 'nonceRequired', 'expiryRequired', 'replayRejected', 'mappingBindingRequired', 'receiptChainRequired']) {
     invariant(manifest.envelope[field] === true, `envelope.${field} must be true`);
   }
   invariant(manifest.envelope.rawDiaryNamesInPublicReceipt === false, 'public receipts cannot expose diary names');
@@ -119,10 +230,21 @@ function validateArchitecture(manifest) {
   sameMembers(manifest.implementationStages.map(stage => stage.id), [
     'R4-A', 'R4-B', 'R4-C', 'R4-D', 'R4-E', 'R4-F', 'R4-G'
   ], 'implementation stage ids');
+  const expectedStageAuthority = {
+    'R4-A': { realMemoryAllowed: false, externalRuntimeAllowed: false },
+    'R4-B': { realMemoryAllowed: false, externalRuntimeAllowed: false },
+    'R4-C': { realMemoryAllowed: false, externalRuntimeAllowed: false },
+    'R4-D': { realMemoryAllowed: false, externalRuntimeAllowed: true },
+    'R4-E': { realMemoryAllowed: false, externalRuntimeAllowed: true },
+    'R4-F': { realMemoryAllowed: true, externalRuntimeAllowed: true },
+    'R4-G': { realMemoryAllowed: false, externalRuntimeAllowed: true }
+  };
   for (const stage of manifest.implementationStages) {
-    if (stage.id !== 'R4-F') invariant(stage.realMemoryAllowed === false, `${stage.id} cannot allow real memory`);
+    const expected = expectedStageAuthority[stage.id];
+    invariant(expected, `unknown implementation stage ${stage.id}`);
+    invariant(stage.realMemoryAllowed === expected.realMemoryAllowed, `${stage.id} real-memory authority mismatch`);
+    invariant(stage.externalRuntimeAllowed === expected.externalRuntimeAllowed, `${stage.id} external-runtime authority mismatch`);
   }
-  invariant(manifest.implementationStages.find(stage => stage.id === 'R4-F').realMemoryAllowed === true, 'only R4-F may authorize bounded real-memory proof');
 
   invariant(manifest.supersession.r3M5TunnelAsCanonicalRoute === true, 'R3 M5 Tunnel canonical route must be superseded');
   invariant(manifest.supersession.r3SecurityControlsPreserved === true, 'R3 security controls must be preserved');
@@ -131,6 +253,10 @@ function validateArchitecture(manifest) {
   for (const [claim, value] of Object.entries(manifest.nonClaims)) {
     invariant(value === false, `nonClaims.${claim} must remain false`);
   }
+  invariant(
+    canonicalSha256(manifest) === EXPECTED_CANONICAL_MANIFEST_SHA256,
+    'architecture manifest canonical digest mismatch'
+  );
 
   return {
     accepted: true,
@@ -173,6 +299,10 @@ function loadManifest(file = MANIFEST_PATH) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
+function loadSchema(file = SCHEMA_PATH) {
+  return JSON.parse(fs.readFileSync(file, 'utf8'));
+}
+
 function main() {
   const result = validateArchitecture(loadManifest());
   validateDocMarkers();
@@ -190,7 +320,12 @@ if (require.main === module) {
 
 module.exports = {
   MANIFEST_PATH,
+  SCHEMA_PATH,
+  canonicalSha256,
   loadManifest,
+  loadSchema,
   validateArchitecture,
-  validateDocMarkers
+  validateDocMarkers,
+  validateFrozenSchema,
+  validateJsonSchema
 };

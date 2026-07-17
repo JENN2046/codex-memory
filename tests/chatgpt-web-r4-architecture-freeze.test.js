@@ -5,8 +5,11 @@ const test = require('node:test');
 
 const {
   loadManifest,
+  loadSchema,
   validateArchitecture,
-  validateDocMarkers
+  validateDocMarkers,
+  validateFrozenSchema,
+  validateJsonSchema
 } = require('../scripts/validate_chatgpt_web_r4_architecture');
 
 function clone(value) {
@@ -61,13 +64,50 @@ test('R4 freezes separate Edge, Relay, widget, contract, governance-adapter, and
   });
 
   manifest.repositoryLayout.publicEdgeRoot = 'src/core';
-  assert.throws(() => validateArchitecture(manifest), /publicEdgeRoot mismatch/);
+  assert.throws(
+    () => validateArchitecture(manifest),
+    /schema validation failed.*repositoryLayout\.publicEdgeRoot.*const mismatch/
+  );
 });
 
 test('R4 rejects Tunnel as the canonical route', () => {
   const manifest = clone(loadManifest());
   manifest.transport.secureMcpTunnelCanonical = true;
   assert.throws(() => validateArchitecture(manifest), /must not be canonical/);
+});
+
+test('R4 loads the frozen JSON Schema and rejects route or top-level shape drift', () => {
+  const schema = loadSchema();
+  validateFrozenSchema(schema);
+  validateJsonSchema(loadManifest(), schema);
+
+  const routeDrift = clone(loadManifest());
+  routeDrift.canonicalRoute[1] = 'secure_mcp_tunnel';
+  assert.throws(() => validateArchitecture(routeDrift), /schema validation failed.*canonicalRoute.*const mismatch/);
+
+  const extraField = clone(loadManifest());
+  extraField.undeclaredAuthority = true;
+  assert.throws(() => validateArchitecture(extraField), /schema validation failed.*unknown property undeclaredAuthority/);
+});
+
+test('R4 rejects request-response binding and stage external-runtime authority drift', () => {
+  const missingBinding = clone(loadManifest());
+  missingBinding.envelope.requestAndResponseBindingRequired = false;
+  assert.throws(() => validateArchitecture(missingBinding), /requestAndResponseBindingRequired must be true/);
+
+  const prematureRuntime = clone(loadManifest());
+  prematureRuntime.implementationStages.find(stage => stage.id === 'R4-B').externalRuntimeAllowed = true;
+  assert.throws(() => validateArchitecture(prematureRuntime), /R4-B external-runtime authority mismatch/);
+});
+
+test('R4 canonical digests reject otherwise schema-valid manifest or schema drift', () => {
+  const manifestDrift = clone(loadManifest());
+  manifestDrift.objective = `${manifestDrift.objective} Drift.`;
+  assert.throws(() => validateArchitecture(manifestDrift), /manifest canonical digest mismatch/);
+
+  const schemaDrift = clone(loadSchema());
+  schemaDrift.title = `${schemaDrift.title} drift`;
+  assert.throws(() => validateFrozenSchema(schemaDrift), /schema canonical digest mismatch/);
 });
 
 test('R4 rejects remote durable memory, mapping, or request body logs', () => {
@@ -123,11 +163,11 @@ test('R4 rejects anonymous real-memory access and weakened envelope controls', (
 test('R4 allows bounded real-memory proof only in R4-F', () => {
   const premature = clone(loadManifest());
   premature.implementationStages.find(stage => stage.id === 'R4-E').realMemoryAllowed = true;
-  assert.throws(() => validateArchitecture(premature), /R4-E cannot allow real memory/);
+  assert.throws(() => validateArchitecture(premature), /R4-E real-memory authority mismatch/);
 
   const missing = clone(loadManifest());
   missing.implementationStages.find(stage => stage.id === 'R4-F').realMemoryAllowed = false;
-  assert.throws(() => validateArchitecture(missing), /only R4-F may authorize/);
+  assert.throws(() => validateArchitecture(missing), /R4-F real-memory authority mismatch/);
 });
 
 test('R4 freeze cannot turn implementation or readiness non-claims true', () => {
