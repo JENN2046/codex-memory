@@ -17,7 +17,7 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 - Architecture: R4-B contract candidate follows stable HTTPS Edge -> outbound Relay -> UDS -> local governance, without activating any hop.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
 - Candidate: non-default and non-activated; active runtime imports remain unchanged.
-- Synthetic proof: two requests, 19 focused tests, all provider/native/fallback/write/durable/global-search counters zero.
+- Synthetic proof: two requests, 20 focused tests, all provider/native/fallback/write/durable/global-search counters zero.
 - Status sync: performed locally in CM-2136; PR CI/review and merge remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.

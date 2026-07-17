@@ -43,6 +43,7 @@ function createRelayProcessor({
         durable_state_written: false
       });
       const invocation = await forwardToUds({ request, relayReceipt });
+      const responseNow = clock();
       validateInvocation(invocation);
       const receiptChain = {
         edge_request: validation.requestDigest,
@@ -60,7 +61,7 @@ function createRelayProcessor({
         structuredContent: invocation.structured_content,
         counters: invocation.counters,
         receiptChain,
-        now,
+        now: responseNow,
         signing: responseSigning
       });
     }

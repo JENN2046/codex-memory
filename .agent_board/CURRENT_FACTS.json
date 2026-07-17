@@ -74,7 +74,7 @@
     "chatgptWebR4bCandidateProfileActivated": false,
     "chatgptWebR4bCandidateProfileDefault": false,
     "chatgptWebR4bContractTestsPassed": true,
-    "chatgptWebR4bContractTestCount": 19,
+    "chatgptWebR4bContractTestCount": 20,
     "chatgptWebR4bDerivedIndexWrites": 0,
     "chatgptWebR4bDurableRemoteMutations": 0,
     "chatgptWebR4bExternalRuntimeUsed": false,

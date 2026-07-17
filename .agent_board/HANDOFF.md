@@ -17,7 +17,7 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 CM-2136 implements the R4-B contracts-only candidate. Signed principal,
 opaque project context, request/response, replay/TTL/size/counter/disclosure,
 candidate tools, Widget bridge, Relay, and local governance injection are
-covered by import fences and 19 focused tests. The in-memory synthetic flow
+covered by import fences and 20 focused tests. The in-memory synthetic flow
 performs context resolution plus an empty overview with every provider/native/
 fallback/write/durable/global-search counter at zero. The candidate is not
 default or active. Next route after PR delivery is R4-C loopback/temporary-UDS

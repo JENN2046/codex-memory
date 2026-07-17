@@ -3,9 +3,24 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const { ZERO_MEMORY_COUNTERS } = require('../../packages/chatgpt-r4-contracts');
+const {
+  InMemoryReplayGuard,
+  ZERO_MEMORY_COUNTERS,
+  createPrincipalAssertion,
+  createRequestEnvelope,
+  sha256,
+  validateResponseEnvelope
+} = require('../../packages/chatgpt-r4-contracts');
 const { buildCandidateEdgeRequest } = require('../../apps/chatgpt-edge');
-const { runZeroMemorySyntheticE2E, signing } = require('./synthetic-harness');
+const { createRelayProcessor } = require('../../apps/local-recall-relay');
+const {
+  FIXED_NOW,
+  SYNTHETIC_AUDIENCE,
+  generateSigningIdentity,
+  keyResolver,
+  runZeroMemorySyntheticE2E,
+  signing
+} = require('./synthetic-harness');
 const { validateRelayReceipt } = require('../../src/adapters/chatgpt-r4/governance-adapter');
 
 test('R4-B zero-memory synthetic Edge -> Relay -> UDS -> governance flow passes', async () => {
@@ -92,4 +107,57 @@ test('Relay receipt is exact, request-bound, and proves replay checking without 
   assert.throws(() => validateRelayReceipt(legacy, receipt.request_digest), {
     code: 'relay_receipt_shape_invalid'
   });
+});
+
+test('Relay stamps the response after a slow injected UDS invocation completes', async () => {
+  const principal = generateSigningIdentity('slow-principal');
+  const edge = generateSigningIdentity('slow-edge');
+  const relayIdentity = generateSigningIdentity('slow-relay');
+  let nowMs = FIXED_NOW.getTime();
+  const clock = () => new Date(nowMs);
+  const principalAssertion = createPrincipalAssertion({
+    issuer: 'https://idp.synthetic.invalid',
+    audience: SYNTHETIC_AUDIENCE,
+    subjectFingerprint: sha256('slow-principal'),
+    now: clock(),
+    nonce: 'principal_nonce_slow_00001',
+    signing: signing(principal)
+  });
+  const request = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'z'.repeat(32)}` },
+    now: clock(),
+    requestId: 'req_slow_relay_response_0001',
+    nonce: 'request_nonce_slow_relay_01',
+    signing: signing(edge)
+  });
+  const processor = createRelayProcessor({
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolveRequestPublicKey: keyResolver(edge),
+    resolvePrincipalPublicKey: keyResolver(principal),
+    requestReplayGuard: new InMemoryReplayGuard({ clock }),
+    responseSigning: signing(relayIdentity),
+    clock,
+    async forwardToUds({ relayReceipt }) {
+      nowMs += 40_000;
+      return {
+        status: 'ok',
+        structured_content: { status: 'empty', kind: 'overview', item_count: 0 },
+        counters: ZERO_MEMORY_COUNTERS,
+        receipt_digests: {
+          governance: sha256(relayReceipt.request_digest),
+          context: sha256('slow-context')
+        }
+      };
+    }
+  });
+  const response = await processor.handle(request);
+  assert.equal(response.issued_at, clock().toISOString());
+  assert.doesNotThrow(() => validateResponseEnvelope(response, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relayIdentity),
+    expectedRequest: request,
+    requireZeroCounters: true
+  }));
 });

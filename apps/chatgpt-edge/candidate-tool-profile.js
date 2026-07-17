@@ -25,15 +25,16 @@ function descriptor({ title, description, inputSchema, outputSchema, render = fa
     inputSchema,
     outputSchema,
     securitySchemes: SECURITY_SCHEMES,
-    annotations: READ_ONLY_ANNOTATIONS
+    annotations: READ_ONLY_ANNOTATIONS,
+    _meta: { securitySchemes: SECURITY_SCHEMES }
   };
   if (render) {
-    value._meta = {
+    Object.assign(value._meta, {
       ui: { resourceUri: RESOURCE_URI, visibility: ['model', 'app'] },
       'openai/outputTemplate': RESOURCE_URI,
       'openai/toolInvocation/invoking': 'Preparing memory scope…',
       'openai/toolInvocation/invoked': 'Memory scope ready'
-    };
+    });
   }
   return deepFreeze(value);
 }

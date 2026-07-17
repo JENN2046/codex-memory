@@ -29,10 +29,11 @@ test('R4-B candidate profile is non-default, non-activated, read-only, and has n
       idempotentHint: true
     });
     assert.ok(descriptor.outputSchema, `${name} output schema`);
+    assert.deepEqual(descriptor._meta.securitySchemes, descriptor.securitySchemes);
     if (name === 'render_memory_scope') {
       assert.equal(descriptor._meta.ui.resourceUri, WIDGET_RESOURCE_URI);
     } else {
-      assert.equal(descriptor._meta, undefined);
+      assert.equal(descriptor._meta.ui, undefined);
     }
   }
 });
