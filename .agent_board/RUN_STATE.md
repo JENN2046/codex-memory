@@ -4,23 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill`.
-Current validation: `CMV-2218`.
-Current fact: restart, deliberate mapping-mismatch rejection, retained-binding rollback, and non-empty task-start recovery passed without touching governed or legacy partition contents.
-Three accelerated full runs passed 30 Codex/Claude governed reads with isolation, shared behavior, zero unscoped search, zero live primary writes, and no raw disclosure.
-Stage 4A is a short local stability sample; production/release/deploy/cutover/RC/complete-V8/readiness and 24–72 hour soak claims remain false.
+Current task: `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout`.
+Current validation: `CMV-2219`.
+Current fact: three projects now resolve through a private 12-entry mapping backed by eight new clean partitions; all 13 legacy partitions remain excluded and unread.
+Thirty bounded provider calls passed the required Codex/Claude and cross-project matrix with zero unscoped search and zero live-proof primary writes.
+Public writes, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Main baseline: `97608a6b…`, the Stage 3B closeout merge observed at Stage 4A start.
-- Recovery drill: deliberate mapping mismatch rejected before provider; retained binding restored; task-start recall recovered non-empty.
-- Accelerated sample: three independent full runs / 30 governed reads passed isolation, shared-union, post-check, and zero-unscoped-search checks.
-- Durable mutation: no Stage 4A primary memory write; retained governed and legacy partition contents were untouched.
-- Status sync: performed locally in CM-2133; PR CI/review and merge remain delivery gates.
+- Provisioning: three projects, eight new clean partitions, eight authorized bootstrap writes, and 12 private mapping entries.
+- Index/binding: all 12 mapped targets indexed; legacy indexed targets zero; shim/bridge binding matched; rollback config retained.
+- Live proof: 30 provider-bound reads passed required Codex/Claude and cross-project cases; two empty task-start attempts are retained before final pass.
+- Durable mutation: bootstrap primary writes 8; live-proof primary writes 0; public write surface remains off.
+- Status sync: performed locally in CM-2134; PR CI/review and merge remain delivery gates.
 - Readiness: all aliases false.
-- Long-duration soak: not performed or claimed.
+- Production/release/deploy/cutover: not performed or claimed.
 
 ## Historical Run State Archive
 

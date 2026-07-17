@@ -8,26 +8,32 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Diary-partition v1 Stage 4A local stabilization complete; multi-project partitioning now blocks unsafe future writes; readiness remains false |
-| Current task | `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill` |
-| Current validation | `CMV-2218` |
-| Current route | Deliver the low-disclosure Stage 4A repair and evidence through normal PR/CI/review |
+| Status | Diary-partition v1 Stage 4B multi-project provisioning and live isolation proof complete; public writes and readiness remain false |
+| Current task | `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout` |
+| Current validation | `CMV-2219` |
+| Current route | Deliver the low-disclosure Stage 4B closeout through normal PR/CI/review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## Multi-project write-isolation prerequisite
+## Diary-partition V1 Stage 4B Closeout
 
-Future project-scoped private writes may no longer fall back to the global
-client-only private partition. A stable project registry/schema and pure
-provisioning gate require exact client-project-private, project-shared, and
-workspace-shared ownership before write activation. The gate is low-disclosure
-and returns counts/categories rather than partition names.
+Stage 4B registered three projects, created eight clean project partitions, and
+wrote exactly eight authorized non-sensitive bootstrap records. Together with
+the retained governed partitions, the startup-only private mapping now has 12
+entries. Both client-only private entries remain readable but have
+`writeEligible=false`. Derived indexing contains exactly the 12 mapped targets;
+all 13 legacy partitions remain excluded and unread.
 
-No real partition or mapping was changed. The current four-partition Stage 3B
-deployment lacks project-specific private targets, so write activation remains
-fail-closed pending a separately authorized provisioning and live isolation
-proof. See `docs/DIARY_SCOPE_MULTI_PROJECT_PARTITIONING.md`.
+Shim actual and bridge expected binding matched exactly. Health, the five-tool
+MCP contract, and `gate:mainline:strict` passed. Thirty bounded provider calls
+covered both clients and all three projects across private, project, workspace,
+shared-union, and task-start reads. Required recall cases were non-empty and
+relevant after two explicitly recorded empty Claude task-start attempts; no
+cross-client/project or legacy result occurred. Unscoped search and live-proof
+primary writes remained zero. The independent artifact and exact mapping stay
+private. Public writes, production, release, deploy, cutover, and readiness
+remain false. See `docs/DIARY_SCOPE_STAGE4B_CLOSEOUT.md`.
 
 ## Diary-partition V1 Stage 4A Stabilization
 
