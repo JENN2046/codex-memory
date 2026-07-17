@@ -356,6 +356,7 @@ test('codex-memory MCP should initialize a session and expose expected server in
         'nativeInvocationJsonRpcResponseIdMatched',
         'nativeInvocationJsonRpcErrorPresent',
         'nativeInvocationJsonRpcErrorReasonCode',
+        'nativeInvocationFailureCategory',
         'rollbackEvidence',
         'rollbackPlanSafetyBooleans',
         'rollbackReasonCode',
@@ -1249,6 +1250,7 @@ test('MCP tools/list exposes governed native bridge metadata without locator dis
       'nativeInvocationJsonRpcResponseIdMatched',
       'nativeInvocationJsonRpcErrorPresent',
       'nativeInvocationJsonRpcErrorReasonCode',
+      'nativeInvocationFailureCategory',
       'rollbackEvidence',
       'rollbackPlanSafetyBooleans',
       'nativeInvocationShapeBuckets'

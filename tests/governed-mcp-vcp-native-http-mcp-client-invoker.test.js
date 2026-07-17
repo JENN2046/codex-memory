@@ -980,6 +980,7 @@ test('HTTP MCP tool caller drops unsafe JSON-RPC error reason codes', async () =
         assert.equal(error.statusClass, 'client_error');
         assert.equal(error.lowDisclosureReceipt.jsonRpcErrorPresent, true);
         assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, null);
+        assert.equal(error.lowDisclosureReceipt.failureCategory, 'native_runtime_failed');
         assert.equal(serializedReceipt.includes(rawErrorMessage), false);
         assert.equal(serializedReceipt.includes(rawUnsafeReasonCode), false);
         return true;

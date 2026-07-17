@@ -102,6 +102,7 @@ const REQUIRED_NATIVE_BRIDGE_AUDIT_EVIDENCE_FIELDS = Object.freeze([
   'nativeInvocationJsonRpcResponseIdMatched',
   'nativeInvocationJsonRpcErrorPresent',
   'nativeInvocationJsonRpcErrorReasonCode',
+  'nativeInvocationFailureCategory',
   'rollbackEvidence',
   'rollbackPlanSafetyBooleans',
   'rollbackReasonCode',

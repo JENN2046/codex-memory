@@ -114,6 +114,25 @@ function safeBridgeJsonRpcErrorReasonCode(value) {
   ]);
 }
 
+function safeBridgeFailureCategory(value) {
+  return safeEnum(value, [
+    'timeout',
+    'transport_unavailable',
+    'http_client_error',
+    'http_server_error',
+    'invalid_response',
+    'response_id_mismatch',
+    'governance_rejected',
+    'scope_authorization_rejected',
+    'scope_binding_rejected',
+    'provider_embedding_failed',
+    'native_runtime_initialization_failed',
+    'native_scoped_search_failed',
+    'result_scope_postcheck_failed',
+    'native_runtime_failed'
+  ]);
+}
+
 function safeBridgeGovernanceMetadataPath(value) {
   return value === 'params._meta.codexMemoryGovernance'
     ? 'params._meta.codexMemoryGovernance'
@@ -518,6 +537,8 @@ function projectGovernedNativeBridgeAuditReceipt(entry = {}) {
     nativeInvocationJsonRpcErrorPresent: safeBoolean(entry.nativeInvocationJsonRpcErrorPresent),
     nativeInvocationJsonRpcErrorReasonCode:
       safeBridgeJsonRpcErrorReasonCode(entry.nativeInvocationJsonRpcErrorReasonCode),
+    nativeInvocationFailureCategory:
+      safeBridgeFailureCategory(entry.nativeInvocationFailureCategory),
     nativeInvocationResponseShapeCategory: safeBridgeResponseShapeCategory(entry.nativeInvocationResponseShapeCategory),
     nativeInvocationAttempted: safeBoolean(entry.nativeInvocationAttempted),
     nativeMcpToolInvocationAttempted: safeBoolean(entry.nativeMcpToolInvocationAttempted),

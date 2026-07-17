@@ -893,6 +893,27 @@ function safeBridgeJsonRpcErrorReasonCode(value) {
     : null;
 }
 
+function safeBridgeFailureCategory(value) {
+  return [
+    'timeout',
+    'transport_unavailable',
+    'http_client_error',
+    'http_server_error',
+    'invalid_response',
+    'response_id_mismatch',
+    'governance_rejected',
+    'scope_authorization_rejected',
+    'scope_binding_rejected',
+    'provider_embedding_failed',
+    'native_runtime_initialization_failed',
+    'native_scoped_search_failed',
+    'result_scope_postcheck_failed',
+    'native_runtime_failed'
+  ].includes(value)
+    ? value
+    : null;
+}
+
 function safeBridgeDelegationStatusClass(value) {
   return [
     'success',
@@ -1317,6 +1338,8 @@ function projectGovernedNativeBridgeObservationSummary(observation = {}) {
       nativeInvocationReceipt.jsonRpcErrorPresent === true,
     nativeInvocationJsonRpcErrorReasonCode:
       safeBridgeJsonRpcErrorReasonCode(nativeInvocationReceipt.jsonRpcErrorReasonCode),
+    nativeInvocationFailureCategory:
+      safeBridgeFailureCategory(nativeInvocationReceipt.failureCategory),
     nativeInvocationResponseShapeCategory:
       safeBridgeResponseShapeCategory(nativeInvocationReceipt.responseShapeCategory),
     writePolicy: safeBridgeWritePolicy(delegationReceipt.writePolicy),

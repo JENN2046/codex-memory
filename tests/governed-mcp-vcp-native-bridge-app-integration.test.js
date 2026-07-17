@@ -1718,6 +1718,10 @@ test('bridge observation preserves bounded native runtime failure reason codes',
       observations[0].readDelegationResult.receipt.nativeInvocationReceipt.jsonRpcErrorReasonCode,
       'native_diary_search_failed'
     );
+    assert.equal(
+      observations[0].readDelegationResult.receipt.nativeInvocationReceipt.failureCategory,
+      'native_scoped_search_failed'
+    );
     assert.equal(serialized.includes(rawError), false);
   });
 });

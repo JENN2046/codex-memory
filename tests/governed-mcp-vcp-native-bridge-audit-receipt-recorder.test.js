@@ -418,6 +418,7 @@ test('bridge receipt records whitelisted native JSON-RPC error reason codes with
           httpStatusClass: 'success',
           jsonRpcErrorPresent: true,
           jsonRpcErrorReasonCode: 'native_provider_embedding_failed',
+          failureCategory: 'provider_embedding_failed',
           responseShapeCategory: 'not_consumed',
           topLevelKindCategory: 'not_consumed',
           rawErrorDetail: 'PRIVATE_NATIVE_ERROR_DETAIL_SHOULD_NOT_ECHO'
@@ -429,6 +430,7 @@ test('bridge receipt records whitelisted native JSON-RPC error reason codes with
 
   assert.equal(entry.nativeInvocationJsonRpcErrorPresent, true);
   assert.equal(entry.nativeInvocationJsonRpcErrorReasonCode, 'native_provider_embedding_failed');
+  assert.equal(entry.nativeInvocationFailureCategory, 'provider_embedding_failed');
   assert.equal(entry.nativeInvocationStatusClass, 'client_error');
   assert.equal(entry.nativeInvocationHttpStatusClass, 'success');
   assert.equal(entry.rollbackPostureBound, true);

@@ -138,6 +138,22 @@ const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'native_write_disabled',
   'unsupported_native_tool'
 ]);
+const ALLOWED_FAILURE_CATEGORIES = Object.freeze([
+  'timeout',
+  'transport_unavailable',
+  'http_client_error',
+  'http_server_error',
+  'invalid_response',
+  'response_id_mismatch',
+  'governance_rejected',
+  'scope_authorization_rejected',
+  'scope_binding_rejected',
+  'provider_embedding_failed',
+  'native_runtime_initialization_failed',
+  'native_scoped_search_failed',
+  'result_scope_postcheck_failed',
+  'native_runtime_failed'
+]);
 const ALLOWED_RESPONSE_SHAPE_CATEGORIES = Object.freeze([
   'array_item_count_bucket_only',
   'array_top_level_kind_only',
@@ -832,6 +848,9 @@ function buildLowDisclosureReceiptAuditEntry(input = {}) {
       normalizeBoolean(nativeInvocationReceipt.jsonRpcErrorPresent),
     nativeInvocationJsonRpcErrorReasonCode: nativeInvocationEvidenceAccepted
       ? safeEnum(nativeInvocationReceipt.jsonRpcErrorReasonCode, ALLOWED_JSON_RPC_ERROR_REASON_CODES)
+      : null,
+    nativeInvocationFailureCategory: nativeInvocationEvidenceAccepted
+      ? safeEnum(nativeInvocationReceipt.failureCategory, ALLOWED_FAILURE_CATEGORIES)
       : null,
     nativeInvocationResponseShapeCategory: nativeInvocationEvidenceAccepted
       ? safeEnum(nativeInvocationReceipt.responseShapeCategory, ALLOWED_RESPONSE_SHAPE_CATEGORIES)

@@ -144,6 +144,7 @@ function governedOverviewStatus(overrides = {}) {
     nativeInvocationHttpStatusClass: 'success',
     nativeInvocationJsonRpcErrorPresent: false,
     nativeInvocationJsonRpcErrorReasonCode: null,
+    nativeInvocationFailureCategory: null,
     rollbackPosture: 'no_runtime_state_to_rollback',
     rollbackPostureSource: 'bridge_gate_normalized_governance',
     rollbackPostureForbiddenFieldCount: 0,

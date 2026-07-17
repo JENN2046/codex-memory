@@ -523,7 +523,13 @@ function failureCategoryFromJsonRpcReasonCode(reasonCode) {
     return 'scope_binding_rejected';
   }
   if (reasonCode === 'diary_scope_authorization_rejected') return 'scope_authorization_rejected';
-  return 'governance_rejected';
+  if ([
+    'invalid_governance_metadata',
+    'native_tool_public_binding_mismatch',
+    'native_write_disabled',
+    'unsupported_native_tool'
+  ].includes(reasonCode)) return 'governance_rejected';
+  return 'native_runtime_failed';
 }
 
 function createGovernedMcpVcpNativeHttpMcpClientInvoker(input = {}) {

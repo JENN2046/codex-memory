@@ -1049,6 +1049,7 @@ test('governed native audit projection preserves whitelisted JSON-RPC reason cod
     nativeInvocationHttpStatusClass: 'success',
     nativeInvocationJsonRpcErrorPresent: true,
     nativeInvocationJsonRpcErrorReasonCode: 'native_result_scope_postcheck_failed',
+    nativeInvocationFailureCategory: 'result_scope_postcheck_failed',
     rawPrivateDetail
   }));
   const unsafeReceipt = projectGovernedNativeBridgeAuditReceipt(governedBridgeReceiptEntry({
@@ -1060,15 +1061,19 @@ test('governed native audit projection preserves whitelisted JSON-RPC reason cod
     nativeInvocationStatusClass: 'client_error',
     nativeInvocationHttpStatusClass: 'success',
     nativeInvocationJsonRpcErrorPresent: true,
-    nativeInvocationJsonRpcErrorReasonCode: 'https://PRIVATE_REASON_SHOULD_NOT_ECHO'
+    nativeInvocationJsonRpcErrorReasonCode: 'https://PRIVATE_REASON_SHOULD_NOT_ECHO',
+    nativeInvocationFailureCategory: 'https://PRIVATE_CATEGORY_SHOULD_NOT_ECHO'
   }));
   const serialized = JSON.stringify({ receipt, unsafeReceipt });
 
   assert.equal(receipt.nativeInvocationJsonRpcErrorPresent, true);
   assert.equal(receipt.nativeInvocationJsonRpcErrorReasonCode, 'native_result_scope_postcheck_failed');
+  assert.equal(receipt.nativeInvocationFailureCategory, 'result_scope_postcheck_failed');
   assert.equal(unsafeReceipt.nativeInvocationJsonRpcErrorReasonCode, null);
+  assert.equal(unsafeReceipt.nativeInvocationFailureCategory, null);
   assert.equal(serialized.includes(rawPrivateDetail), false);
   assert.equal(serialized.includes('PRIVATE_REASON_SHOULD_NOT_ECHO'), false);
+  assert.equal(serialized.includes('PRIVATE_CATEGORY_SHOULD_NOT_ECHO'), false);
 });
 
 test('audit_memory projects governed native write rollback reason evidence without raw failure payloads', async () => {

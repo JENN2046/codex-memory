@@ -1245,6 +1245,39 @@ test('governance failure categories are never eligible for local fallback withou
   }
 });
 
+test('unclassified native runtime failure remains eligible for local fallback', async () => {
+  const callMcpTool = async () => {
+    throw new Error('raw native call path should not be used without audit receipt');
+  };
+  callMcpTool.callWithReceipt = async payload => {
+    const error = new Error('PRIVATE_UNCLASSIFIED_NATIVE_ERROR_SHOULD_NOT_ECHO');
+    error.statusClass = 'client_error';
+    error.lowDisclosureReceipt = nativeInvocationReceiptForPayload(payload, {
+      statusClass: 'client_error',
+      httpStatusClass: 'success',
+      jsonRpcErrorPresent: true,
+      jsonRpcErrorReasonCode: null,
+      failureCategory: 'native_runtime_failed',
+      responseShapeCategory: 'not_consumed',
+      topLevelKindCategory: 'not_consumed'
+    });
+    throw error;
+  };
+
+  const result = await executeGovernedMcpVcpNativeReadDelegation({
+    toolName: 'search_memory',
+    args: { query: 'needle' },
+    gateResult: gateResult('search_memory'),
+    callMcpTool
+  });
+  const serialized = JSON.stringify(result);
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.localMemoryFallbackEligible, true);
+  assert.equal(result.receipt.nativeInvocationReceipt.failureCategory, 'native_runtime_failed');
+  assert.equal(serialized.includes('PRIVATE_UNCLASSIFIED_NATIVE_ERROR_SHOULD_NOT_ECHO'), false);
+});
+
 test('native read failure receipt tool and target must match actual delegation', async () => {
   const result = await executeGovernedMcpVcpNativeReadDelegation({
     toolName: 'search_memory',
