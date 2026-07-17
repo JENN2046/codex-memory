@@ -90,7 +90,8 @@ function assertNoNormalizedKeys(value, forbiddenKeys, code, depth = 0) {
   }
   if (!isPlainObject(value)) return;
   for (const [key, child] of Object.entries(value)) {
-    if (forbiddenKeys.includes(normalizeKey(key))) reject(code);
+    const normalizedKey = normalizeKey(key);
+    if (forbiddenKeys.some(forbiddenKey => normalizedKey.includes(forbiddenKey))) reject(code);
     assertNoNormalizedKeys(child, forbiddenKeys, code, depth + 1);
   }
 }
@@ -352,6 +353,9 @@ function validateResponseEnvelope(envelope, {
   validatePublicStructuredContent(envelope.structured_content);
   validateCounters(envelope.counters, { requireZero: requireZeroCounters });
   validateReceiptChain(envelope.receipt_chain);
+  if (envelope.receipt_chain.edge_request !== envelope.request_digest) {
+    reject('response_receipt_request_mismatch');
+  }
   validateSignatureShape(envelope.signature);
   verifySignedObject(envelope, { resolvePublicKey: resolveResponsePublicKey });
 
@@ -359,7 +363,6 @@ function validateResponseEnvelope(envelope, {
     if (envelope.request_id !== expectedRequest.request_id) reject('response_request_id_mismatch');
     if (envelope.request_digest !== digestObject(expectedRequest)) reject('response_request_digest_mismatch');
     if (envelope.tool_name !== expectedRequest.tool_request?.name) reject('response_tool_name_mismatch');
-    if (envelope.receipt_chain.edge_request !== envelope.request_digest) reject('response_receipt_request_mismatch');
   }
   return envelope;
 }

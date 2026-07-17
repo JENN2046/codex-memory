@@ -20,6 +20,7 @@ const {
   digestObject,
   sha256,
   validateProjectContextClaim,
+  validatePublicStructuredContent,
   validateRequestEnvelope,
   validateResponseEnvelope,
   validateToolArguments
@@ -193,6 +194,11 @@ test('public tool arguments cannot forge scope, mapping, diary, or ownership fie
     project_context_ref: `pctx_${'g'.repeat(32)}`,
     query: 'x'.repeat(2001)
   }), { code: 'search_query_invalid' });
+  for (const key of ['access_token', 'secret_value', 'provider_response_body', 'raw_memory_excerpt']) {
+    assert.throws(() => validatePublicStructuredContent({ [key]: 'synthetic-forbidden-value' }), {
+      code: 'public_disclosure_forbidden'
+    });
+  }
 });
 
 test('response binds request, counters, receipts, and relay signature', () => {
@@ -229,6 +235,29 @@ test('response binds request, counters, receipts, and relay signature', () => {
     expectedRequest: request,
     requireZeroCounters: true
   }), response);
+
+  const mismatchedReceipt = createResponseEnvelope({
+    requestId: request.request_id,
+    requestDigest: digestObject(request),
+    toolName: 'memory_overview',
+    status: 'ok',
+    structuredContent: { status: 'empty', kind: 'overview', item_count: 0 },
+    counters: ZERO_MEMORY_COUNTERS,
+    receiptChain: {
+      edge_request: sha256('different-request'),
+      relay: sha256('relay'),
+      governance: sha256('governance'),
+      context: sha256('context')
+    },
+    now: clock(),
+    responseId: 'res_response_binding_0000002',
+    signing: signing(relay)
+  });
+  assert.throws(() => validateResponseEnvelope(mismatchedReceipt, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    requireZeroCounters: true
+  }), { code: 'response_receipt_request_mismatch' });
 
   const nonzero = structuredClone(response);
   nonzero.counters.provider_calls = 1;
