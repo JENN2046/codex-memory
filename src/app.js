@@ -876,11 +876,39 @@ function safeBridgeStatusClass(value) {
 function safeBridgeJsonRpcErrorReasonCode(value) {
   return [
     'invalid_governance_metadata',
+    'diary_scope_authorization_rejected',
+    'diary_scope_mapping_binding_mismatch',
+    'diary_scope_mapping_missing',
     'native_mutation_tool_unavailable',
+    'native_provider_embedding_failed',
+    'native_runtime_initialization_failed',
     'native_runtime_call_failed',
+    'native_diary_search_failed',
+    'native_result_scope_postcheck_failed',
     'native_tool_public_binding_mismatch',
     'native_write_disabled',
     'unsupported_native_tool'
+  ].includes(value)
+    ? value
+    : null;
+}
+
+function safeBridgeFailureCategory(value) {
+  return [
+    'timeout',
+    'transport_unavailable',
+    'http_client_error',
+    'http_server_error',
+    'invalid_response',
+    'response_id_mismatch',
+    'governance_rejected',
+    'scope_authorization_rejected',
+    'scope_binding_rejected',
+    'provider_embedding_failed',
+    'native_runtime_initialization_failed',
+    'native_scoped_search_failed',
+    'result_scope_postcheck_failed',
+    'native_runtime_failed'
   ].includes(value)
     ? value
     : null;
@@ -1310,6 +1338,8 @@ function projectGovernedNativeBridgeObservationSummary(observation = {}) {
       nativeInvocationReceipt.jsonRpcErrorPresent === true,
     nativeInvocationJsonRpcErrorReasonCode:
       safeBridgeJsonRpcErrorReasonCode(nativeInvocationReceipt.jsonRpcErrorReasonCode),
+    nativeInvocationFailureCategory:
+      safeBridgeFailureCategory(nativeInvocationReceipt.failureCategory),
     nativeInvocationResponseShapeCategory:
       safeBridgeResponseShapeCategory(nativeInvocationReceipt.responseShapeCategory),
     writePolicy: safeBridgeWritePolicy(delegationReceipt.writePolicy),

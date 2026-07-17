@@ -26,6 +26,22 @@ const ALLOWED_HTTP_STATUS_CLASSES = Object.freeze([
   'client_error',
   'server_error'
 ]);
+const ALLOWED_FAILURE_CATEGORIES = Object.freeze([
+  'timeout',
+  'transport_unavailable',
+  'http_client_error',
+  'http_server_error',
+  'invalid_response',
+  'response_id_mismatch',
+  'governance_rejected',
+  'scope_authorization_rejected',
+  'scope_binding_rejected',
+  'provider_embedding_failed',
+  'native_runtime_initialization_failed',
+  'native_scoped_search_failed',
+  'result_scope_postcheck_failed',
+  'native_runtime_failed'
+]);
 const ALLOWED_RESPONSE_SHAPE_CATEGORIES = Object.freeze([
   'array_top_level_kind_only',
   'object_top_level_kind_only_no_field_names',
@@ -50,7 +66,11 @@ const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'diary_scope_mapping_binding_mismatch',
   'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
+  'native_provider_embedding_failed',
+  'native_runtime_initialization_failed',
   'native_runtime_call_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed',
   'native_tool_public_binding_mismatch',
   'native_write_disabled',
   'unsupported_native_tool'
@@ -468,6 +488,7 @@ function buildLowDisclosureInvocationReceipt(input = {}) {
     httpStatusClass: safeEnum(input.httpStatusClass, ALLOWED_HTTP_STATUS_CLASSES),
     jsonRpcErrorPresent: input.jsonRpcErrorPresent === true,
     jsonRpcErrorReasonCode: safeEnum(input.jsonRpcErrorReasonCode, ALLOWED_JSON_RPC_ERROR_REASON_CODES),
+    failureCategory: safeEnum(input.failureCategory, ALLOWED_FAILURE_CATEGORIES),
     responseShapeCategory: input.valueAvailable === true
       ? safeEnum(responseShapeCategory(input.value), ALLOWED_RESPONSE_SHAPE_CATEGORIES)
       : 'not_consumed',
@@ -490,6 +511,25 @@ function buildLowDisclosureInvocationReceipt(input = {}) {
 function jsonRpcErrorReasonCode(jsonRpcResponse = {}) {
   const reasonCode = jsonRpcResponse?.error?.data?.reasonCode;
   return safeEnum(reasonCode, ALLOWED_JSON_RPC_ERROR_REASON_CODES);
+}
+
+function failureCategoryFromJsonRpcReasonCode(reasonCode) {
+  if (reasonCode === 'native_provider_embedding_failed') return 'provider_embedding_failed';
+  if (reasonCode === 'native_runtime_initialization_failed') return 'native_runtime_initialization_failed';
+  if (reasonCode === 'native_diary_search_failed') return 'native_scoped_search_failed';
+  if (reasonCode === 'native_result_scope_postcheck_failed') return 'result_scope_postcheck_failed';
+  if (reasonCode === 'native_runtime_call_failed') return 'native_runtime_failed';
+  if (['diary_scope_mapping_binding_mismatch', 'diary_scope_mapping_missing'].includes(reasonCode)) {
+    return 'scope_binding_rejected';
+  }
+  if (reasonCode === 'diary_scope_authorization_rejected') return 'scope_authorization_rejected';
+  if ([
+    'invalid_governance_metadata',
+    'native_tool_public_binding_mismatch',
+    'native_write_disabled',
+    'unsupported_native_tool'
+  ].includes(reasonCode)) return 'governance_rejected';
+  return 'native_runtime_failed';
 }
 
 function createGovernedMcpVcpNativeHttpMcpClientInvoker(input = {}) {
@@ -680,6 +720,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
         targetReferenceName,
         toolName: publicToolName,
         statusClass: 'client_error',
+        failureCategory: 'governance_rejected',
         governanceMetadataSent: false
       });
       throw error;
@@ -723,6 +764,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
           toolName: publicToolName,
           statusClass: error.statusClass,
           httpStatusClass: httpStatusClass(response.status),
+          failureCategory: response.status >= 500 ? 'http_server_error' : 'http_client_error',
           governanceMetadataSent
         });
         throw error;
@@ -738,6 +780,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
           toolName: publicToolName,
           statusClass: 'transport_error',
           httpStatusClass: httpStatusClass(httpStatus),
+          failureCategory: 'invalid_response',
           governanceMetadataSent
         });
         throw error;
@@ -750,6 +793,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
           toolName: publicToolName,
           statusClass: 'transport_error',
           httpStatusClass: httpStatusClass(httpStatus),
+          failureCategory: 'response_id_mismatch',
           jsonRpcResponseIdMatched: false,
           governanceMetadataSent
         });
@@ -757,6 +801,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
       }
 
       if (isPlainObject(jsonRpcResponse.error)) {
+        const safeReasonCode = jsonRpcErrorReasonCode(jsonRpcResponse);
         const error = createStatusError('http_mcp_jsonrpc_error', 'client_error');
         error.lowDisclosureReceipt = buildLowDisclosureInvocationReceipt({
           targetReferenceName,
@@ -765,7 +810,8 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
           httpStatusClass: httpStatusClass(httpStatus),
           jsonRpcResponseIdMatched: true,
           jsonRpcErrorPresent: true,
-          jsonRpcErrorReasonCode: jsonRpcErrorReasonCode(jsonRpcResponse),
+          jsonRpcErrorReasonCode: safeReasonCode,
+          failureCategory: failureCategoryFromJsonRpcReasonCode(safeReasonCode),
           governanceMetadataSent
         });
         throw error;
@@ -791,6 +837,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
             toolName: publicToolName,
             statusClass: 'client_error',
             httpStatusClass: httpStatusClass(httpStatus),
+            failureCategory: 'scope_binding_rejected',
             jsonRpcResponseIdMatched: true,
             governanceMetadataSent,
             nativeRuntimeReceipt: rawNativeRuntimeReceipt
@@ -819,6 +866,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
         targetReferenceName,
         toolName: publicToolName || payload.toolName,
         statusClass: 'transport_error',
+        failureCategory: 'timeout',
         governanceMetadataSent: Boolean(
           governanceMetadataTransportCoverage(payload.governanceMeta, { toolName: publicToolName })
         )
@@ -841,6 +889,7 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
       targetReferenceName,
       toolName: publicToolName || payload.toolName,
       statusClass: 'transport_error',
+      failureCategory: 'transport_unavailable',
       governanceMetadataSent: Boolean(
         governanceMetadataTransportCoverage(payload.governanceMeta, { toolName: publicToolName })
       )

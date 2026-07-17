@@ -1682,6 +1682,50 @@ test('no-token memory_overview bypasses governed native bridge work', async () =
   });
 });
 
+test('bridge observation preserves bounded native runtime failure reason codes', async () => {
+  const observations = [];
+  const rawError = 'PRIVATE_NATIVE_SEARCH_ERROR_SHOULD_NOT_ECHO';
+
+  await withTempApp({
+    governedMcpVcpNativeBridgeGateMode: 'observe',
+    governedMcpVcpNativeReadDelegationMode: 'primary',
+    governedMcpVcpNativeBridgeGateObserver: observation => observations.push(observation),
+    governedMcpVcpNativeReadDelegationToolCaller: async payload => {
+      const error = governedNativeTransportErrorForPayload(payload, rawError);
+      error.statusClass = 'client_error';
+      error.lowDisclosureReceipt = nativeInvocationReceiptForPayload(payload, {
+        statusClass: 'client_error',
+        httpStatusClass: 'success',
+        jsonRpcErrorPresent: true,
+        jsonRpcErrorReasonCode: 'native_diary_search_failed',
+        failureCategory: 'native_scoped_search_failed',
+        responseShapeCategory: 'not_consumed',
+        topLevelKindCategory: 'not_consumed'
+      });
+      throw error;
+    }
+  }, async app => {
+    const result = await app.callTool('search_memory', {
+      query: 'bounded native failure classification',
+      include_content: false,
+      limit: 1
+    }, codexContext());
+    const serialized = JSON.stringify({ result, observations });
+
+    assert.equal(result.accepted, false);
+    assert.equal(observations.length, 1);
+    assert.equal(
+      observations[0].readDelegationResult.receipt.nativeInvocationReceipt.jsonRpcErrorReasonCode,
+      'native_diary_search_failed'
+    );
+    assert.equal(
+      observations[0].readDelegationResult.receipt.nativeInvocationReceipt.failureCategory,
+      'native_scoped_search_failed'
+    );
+    assert.equal(serialized.includes(rawError), false);
+  });
+});
+
 diaryAllowlistPendingTest('observe mode can run one injected governed VCP native read-shape probe without raw disclosure', async () => {
   const observations = [];
   let invocations = 0;

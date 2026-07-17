@@ -571,6 +571,9 @@ test('HTTP MCP tool caller rejects invalid governed metadata before native reque
         assert.equal(error.statusClass, 'client_error');
         assert.deepEqual(error.invalidFields, ['governanceMeta']);
         assert.equal(error.lowDisclosureReceipt.governanceMetadataSent, false);
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorPresent, false);
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, null);
+        assert.equal(error.lowDisclosureReceipt.failureCategory, 'governance_rejected');
         assert.equal(error.lowDisclosureReceipt.governanceMetadataRawValueDisclosed, false);
         return true;
       }
@@ -607,6 +610,9 @@ test('HTTP MCP tool caller requires governed metadata before native request', as
         assert.equal(error.statusClass, 'client_error');
         assert.deepEqual(error.invalidFields, ['governanceMeta']);
         assert.equal(error.lowDisclosureReceipt.governanceMetadataSent, false);
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorPresent, false);
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, null);
+        assert.equal(error.lowDisclosureReceipt.failureCategory, 'governance_rejected');
         assert.equal(error.lowDisclosureReceipt.governanceMetadataRawValueDisclosed, false);
         return true;
       }
@@ -886,9 +892,55 @@ test('HTTP MCP tool caller attaches low-disclosure receipt to JSON-RPC errors', 
         assert.equal(error.lowDisclosureReceipt.jsonRpcResponseIdMatched, true);
         assert.equal(error.lowDisclosureReceipt.jsonRpcErrorPresent, true);
         assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, 'native_runtime_call_failed');
+        assert.equal(error.lowDisclosureReceipt.failureCategory, 'native_runtime_failed');
         assert.equal(error.lowDisclosureReceipt.rawResponseBodyDisclosed, false);
         assert.equal(serializedReceipt.includes(rawErrorMessage), false);
         assert.equal(serializedReceipt.includes('PRIVATE_JSONRPC_DETAIL_SHOULD_NOT_ECHO'), false);
+        return true;
+      }
+    );
+  } finally {
+    await server.close();
+  }
+});
+
+test('HTTP MCP tool caller classifies provider embedding failure without raw error disclosure', async () => {
+  const rawErrorMessage = 'RAW_PROVIDER_ERROR_SHOULD_NOT_ECHO';
+  const server = await withJsonRpcServer(async (req, res, body) => {
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({
+      jsonrpc: '2.0',
+      id: body.id,
+      error: {
+        code: -32000,
+        message: rawErrorMessage,
+        data: {
+          reasonCode: 'native_provider_embedding_failed',
+          rawDetail: 'PRIVATE_PROVIDER_DETAIL_SHOULD_NOT_ECHO'
+        }
+      }
+    }));
+  });
+
+  try {
+    const result = createGovernedMcpVcpNativeHttpMcpToolCaller({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      endpoint: server.url,
+      requestTimeoutMs: 1000
+    });
+    await assert.rejects(
+      () => result.callToolWithReceipt({
+        targetReferenceName: 'operator-vcp-toolbox-service-ref',
+        toolName: 'search_memory',
+        arguments: {},
+        governanceMeta: validReadGovernanceMeta()
+      }),
+      error => {
+        const serialized = JSON.stringify(error.lowDisclosureReceipt);
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, 'native_provider_embedding_failed');
+        assert.equal(error.lowDisclosureReceipt.failureCategory, 'provider_embedding_failed');
+        assert.equal(serialized.includes(rawErrorMessage), false);
+        assert.equal(serialized.includes('PRIVATE_PROVIDER_DETAIL_SHOULD_NOT_ECHO'), false);
         return true;
       }
     );
@@ -934,6 +986,7 @@ test('HTTP MCP tool caller drops unsafe JSON-RPC error reason codes', async () =
         assert.equal(error.statusClass, 'client_error');
         assert.equal(error.lowDisclosureReceipt.jsonRpcErrorPresent, true);
         assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, null);
+        assert.equal(error.lowDisclosureReceipt.failureCategory, 'native_runtime_failed');
         assert.equal(serializedReceipt.includes(rawErrorMessage), false);
         assert.equal(serializedReceipt.includes(rawUnsafeReasonCode), false);
         return true;
@@ -1081,6 +1134,7 @@ test('HTTP MCP tool caller wraps external statusClass errors with low-disclosure
       assert.equal(error.statusClass, 'transport_error');
       assert.equal(error.message, 'http_mcp_tools_call_transport_error');
       assert.equal(error.lowDisclosureReceipt.statusClass, 'transport_error');
+      assert.equal(error.lowDisclosureReceipt.failureCategory, 'transport_unavailable');
       assert.equal(error.lowDisclosureReceipt.toolName, 'search_memory');
       assert.equal(error.lowDisclosureReceipt.rawResponseBodyDisclosed, false);
       assert.equal(serialized.includes('PRIVATE_TOOL_FETCH_ERROR_MESSAGE_SHOULD_NOT_ECHO'), false);

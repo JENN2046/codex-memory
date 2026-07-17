@@ -4,13 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout`.
-Current validation: `CMV-2217`.
-Current fact: four clean governed partitions and four authorized bootstrap memories were indexed; all 13 legacy partitions remained excluded and unread.
-Codex/Claude private, project, workspace, shared-union, and task-start live reads passed non-empty relevance, isolation, mapping binding, source post-check, and zero-unscoped-search checks.
-Stage 3B is `V1_COMPLETE`; bootstrap primary writes were exactly four and live-proof primary writes were zero. Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill`.
+Current validation: `CMV-2218`.
+Current fact: restart, deliberate mapping-mismatch rejection, retained-binding rollback, and non-empty task-start recovery passed without touching governed or legacy partition contents.
+Three accelerated full runs passed 30 Codex/Claude governed reads with isolation, shared behavior, zero unscoped search, zero live primary writes, and no raw disclosure.
+Stage 4A is a short local stability sample; production/release/deploy/cutover/RC/complete-V8/readiness and 24–72 hour soak claims remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2133 Diary-partition V1 Stage 4A Stabilization
+
+Status: `LOCAL_STABILIZATION_RECOVERY_AND_ACCELERATED_SOAK_PASS_READINESS_FALSE`
+
+- Mismatch rejected before provider and without fallback.
+- Retained binding restored non-empty task-start recall.
+- Three accelerated full runs passed 30 governed reads with zero writes and unscoped searches.
+- Long-duration soak and readiness remain unclaimed.
+
+Validation: `CMV-2218`.
 
 ## CM-2131 Post-PR21 Main Baseline And Native-context Proof Status Sync
 

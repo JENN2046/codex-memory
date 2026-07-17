@@ -121,6 +121,14 @@ workspace, shared-union, and task-start reads. Four clean bootstrap partitions
 were used; all 13 legacy partitions remained excluded and unread. This is a
 v1 isolation closeout, not a production, release, deploy, or cutover claim.
 
+Stage 4A local stabilization also passed a restart/recovery drill, a deliberate
+mapping-binding mismatch rejection, rollback to the retained startup binding,
+and three accelerated full isolation runs. Scope authorization, mapping
+binding, and result post-check failures are never local-fallback eligible.
+Native transport/provider failures expose bounded categories only. See
+[Stage 4A stabilization](docs/DIARY_SCOPE_STAGE4A_STABILIZATION.md). This is
+not a long-duration soak or readiness claim.
+
 The default server MCP surface is read-only plus proposal-only: `tools/list`
 exposes only `search_memory`, `memory_overview`, `audit_memory`,
 `prepare_memory_context`, and `propose_memory_delta`, and `tools/call`
@@ -170,6 +178,11 @@ local results appear only as `local_fallback` or `local_compatibility` and
 cannot be mistaken for native results. Native rejection and transport failure
 use `vcp_native_unavailable`; they are never labeled as successful
 `vcp_native` context.
+Configure the bounded native HTTP MCP deadline with
+`CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TIMEOUT_MS`; Stage 4A used `60000` for the
+local provider path. Keep the value in private startup configuration, and
+restart both bridge and shim after binding changes because mapping loading is
+startup-only.
 Task-start workflow wiring remains local and read-only; it does not perform
 durable mutation or production write.
 `propose_memory_delta` packages proposal-only staging and governance receipts;
