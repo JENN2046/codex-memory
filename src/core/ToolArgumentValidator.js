@@ -1,3 +1,4 @@
+const { isDeepStrictEqual } = require('node:util');
 const { TOOL_DEFINITIONS } = require('./constants');
 
 class ToolArgumentValidationError extends Error {
@@ -38,7 +39,16 @@ function validateNumberBounds(value, schema, path) {
   }
 }
 
+function validateConst(value, schema, path) {
+  if (Object.prototype.hasOwnProperty.call(schema, 'const') &&
+      !isDeepStrictEqual(value, schema.const)) {
+    throw new ToolArgumentValidationError(`${path} must equal the required constant`, path);
+  }
+}
+
 function validateValue(value, schema, path) {
+  validateConst(value, schema, path);
+
   if (schema.oneOf) {
     const errors = [];
     for (const option of schema.oneOf) {
@@ -75,6 +85,13 @@ function validateValue(value, schema, path) {
     for (const [key, childSchema] of Object.entries(properties)) {
       if (Object.prototype.hasOwnProperty.call(value, key)) {
         validateValue(value[key], childSchema, formatPath(path, key));
+      }
+    }
+    if (schema.additionalProperties && typeof schema.additionalProperties === 'object') {
+      for (const [key, childValue] of Object.entries(value)) {
+        if (!Object.prototype.hasOwnProperty.call(properties, key)) {
+          validateValue(childValue, schema.additionalProperties, formatPath(path, key));
+        }
       }
     }
     return;

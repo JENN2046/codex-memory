@@ -2,8 +2,20 @@
 
 const http = require('node:http');
 const crypto = require('node:crypto');
+const fs = require('node:fs/promises');
+const path = require('node:path');
 
 const { CodexMemoryMcpServer, jsonRpcError } = require('./server');
+const {
+  DEFAULT_PROTOCOL_VERSION,
+  SUPPORTED_PROTOCOL_VERSIONS,
+  CHATGPT_WEB_UDS_TRANSPORT
+} = require('../../core/constants');
+const {
+  buildChatGptWebEndpointProfileConfig,
+  getChatGptWebEndpointPath,
+  normalizeChatGptWebProfileId
+} = require('../../core/ChatGptWebProfile');
 const {
   buildRecordMemoryTrustedExecutionContext
 } = require('../../core/RecordMemoryTrustedExecutionContext');
@@ -12,6 +24,8 @@ const {
 } = require('../../core/GovernedMcpVcpNativeBridgeConfigWarningProjection');
 
 const SESSION_HEADER = 'Mcp-Session-Id';
+const PROTOCOL_HEADER = 'MCP-Protocol-Version';
+const BRIDGE_AUTH_HEADER = 'X-Codex-Memory-Bridge-Auth';
 const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
 const HTTP_SESSION_STREAM_LIMIT_ERROR = 'HTTP_SESSION_STREAM_LIMIT_EXCEEDED';
 const PUBLIC_REQUEST_BLOCKED = 'PUBLIC_REQUEST_BLOCKED';
@@ -372,6 +386,482 @@ function parseRequestBody(req, maxBytes = 1024 * 1024) {
 
     req.on('error', reject);
   });
+}
+
+function getRawHeaderValues(req, headerName) {
+  const normalized = String(headerName || '').trim().toLowerCase();
+  const rawHeaders = Array.isArray(req?.rawHeaders) ? req.rawHeaders : [];
+  const values = [];
+  for (let index = 0; index + 1 < rawHeaders.length; index += 2) {
+    if (String(rawHeaders[index]).trim().toLowerCase() === normalized) {
+      values.push(String(rawHeaders[index + 1] ?? ''));
+    }
+  }
+  if (values.length > 0) return values;
+
+  const value = req?.headers?.[normalized];
+  if (Array.isArray(value)) return value.map(item => String(item));
+  return value === undefined ? [] : [String(value)];
+}
+
+function getSingleStrictHeaderValue(req, headerName) {
+  const values = getRawHeaderValues(req, headerName);
+  return values.length === 1 ? values[0].trim() : null;
+}
+
+function hasForwardedHeaders(req) {
+  return Object.keys(req?.headers || {}).some(headerName => {
+    const normalized = String(headerName).trim().toLowerCase();
+    return normalized === 'forwarded' || normalized.startsWith('x-forwarded-');
+  });
+}
+
+function constantTimeStringEqual(left, right) {
+  const leftDigest = crypto.createHash('sha256').update(String(left ?? '')).digest();
+  const rightDigest = crypto.createHash('sha256').update(String(right ?? '')).digest();
+  return crypto.timingSafeEqual(leftDigest, rightDigest);
+}
+
+function createChatGptWebTransportError(code) {
+  return {
+    error: 'MCP transport request rejected',
+    code,
+    lowDisclosure: true
+  };
+}
+
+function writeChatGptWebTransportError(res, statusCode, code) {
+  writeJson(res, statusCode, createChatGptWebTransportError(code));
+}
+
+function isMimeAccepted(req, requiredMime) {
+  const header = getSingleStrictHeaderValue(req, 'accept');
+  if (!header) return false;
+  const required = String(requiredMime).toLowerCase();
+  return header.split(',').some(rawEntry => {
+    const [rawMime, ...parameters] = rawEntry.split(';');
+    const mime = rawMime.trim().toLowerCase();
+    const qualityParameter = parameters.find(parameter => parameter.trim().toLowerCase().startsWith('q='));
+    if (qualityParameter && Number(qualityParameter.trim().slice(2)) === 0) return false;
+    return mime === required || mime === '*/*' ||
+      (required.includes('/') && mime === `${required.split('/')[0]}/*`);
+  });
+}
+
+function isChatGptWebOriginAllowed(req, allowedOrigins = []) {
+  const originValues = getRawHeaderValues(req, 'origin');
+  if (originValues.length > 1) return false;
+  const origin = originValues.length === 1 ? originValues[0].trim() : '';
+  if (hasForwardedHeaders(req)) return false;
+  const hasBrowserFetchMetadata = Object.keys(req?.headers || {})
+    .some(headerName => String(headerName).toLowerCase().startsWith('sec-fetch-'));
+  if (hasBrowserFetchMetadata) return false;
+  if (!origin) return true;
+  return Array.isArray(allowedOrigins) && allowedOrigins.includes(origin);
+}
+
+function isChatGptWebBridgeAuthorized(req, bridgeAuthSecret) {
+  const authorizationValues = getRawHeaderValues(req, 'authorization');
+  const bridgeAuthValue = getSingleStrictHeaderValue(req, BRIDGE_AUTH_HEADER);
+  if (authorizationValues.length > 0 || hasForwardedHeaders(req) || !bridgeAuthValue || !bridgeAuthSecret) {
+    return false;
+  }
+  return constantTimeStringEqual(bridgeAuthValue, bridgeAuthSecret);
+}
+
+async function loadChatGptWebBridgeAuthSecret(secretFile) {
+  if (typeof secretFile !== 'string' || !path.isAbsolute(secretFile)) {
+    throw new Error('ChatGPT web bridge auth file is required.');
+  }
+  const fileStat = await fs.lstat(secretFile);
+  if (!fileStat.isFile() || (fileStat.mode & 0o077) !== 0) {
+    throw new Error('ChatGPT web bridge auth file must be a private regular file.');
+  }
+  const secret = (await fs.readFile(secretFile, 'utf8')).trim();
+  if (Buffer.byteLength(secret, 'utf8') < 16 || Buffer.byteLength(secret, 'utf8') > 4096) {
+    throw new Error('ChatGPT web bridge auth file has an invalid secret length.');
+  }
+  return secret;
+}
+
+function validateChatGptWebUdsSocketPath(socketDirectory, socketName) {
+  if (typeof socketDirectory !== 'string' || !path.isAbsolute(socketDirectory)) {
+    throw new Error('ChatGPT web UDS socket directory must be absolute.');
+  }
+  const normalizedDirectory = path.normalize(socketDirectory);
+  if (normalizedDirectory === '/mnt' || normalizedDirectory.startsWith('/mnt/')) {
+    throw new Error('ChatGPT web UDS socket directory must not be a shared mount.');
+  }
+  if (typeof socketName !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$/.test(socketName)) {
+    throw new Error('ChatGPT web UDS socket name is invalid.');
+  }
+  const socketPath = path.join(normalizedDirectory, socketName);
+  if (path.dirname(socketPath) !== normalizedDirectory || Buffer.byteLength(socketPath, 'utf8') > 100) {
+    throw new Error('ChatGPT web UDS socket path is invalid.');
+  }
+  return { socketDirectory: normalizedDirectory, socketPath };
+}
+
+async function ensureChatGptWebUdsSocketDirectory(socketDirectory) {
+  await fs.mkdir(socketDirectory, { recursive: true, mode: 0o700 });
+  const directoryStat = await fs.stat(socketDirectory);
+  if (!directoryStat.isDirectory() || (directoryStat.mode & 0o777) !== 0o700) {
+    throw new Error('ChatGPT web UDS socket directory must have mode 0700.');
+  }
+}
+
+async function assertChatGptWebUdsSocketAbsent(socketPath) {
+  try {
+    await fs.lstat(socketPath);
+  } catch (error) {
+    if (error?.code === 'ENOENT') return;
+    throw error;
+  }
+  throw new Error('ChatGPT web UDS socket path already exists.');
+}
+
+function listenOnUnixSocket(server, socketPath) {
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(socketPath, () => {
+      server.off('error', reject);
+      resolve();
+    });
+  });
+}
+
+function closeServer(server) {
+  return new Promise((resolve, reject) => {
+    if (!server.listening) {
+      resolve();
+      return;
+    }
+    server.close(error => (error ? reject(error) : resolve()));
+  });
+}
+
+function buildChatGptWebUdsEndpoints(app, enabledProfileIds) {
+  const profileIds = Array.isArray(enabledProfileIds)
+    ? enabledProfileIds
+    : app?.config?.chatgptWebUds?.enabledProfileIds;
+  const endpoints = new Map();
+  for (const rawProfileId of Array.isArray(profileIds) ? profileIds : []) {
+    const profileId = normalizeChatGptWebProfileId(rawProfileId);
+    const endpointPath = getChatGptWebEndpointPath(profileId);
+    const profile = buildChatGptWebEndpointProfileConfig(app?.config || {}, profileId);
+    if (!endpointPath || profile.enabled !== true) {
+      throw new Error('ChatGPT web UDS profile binding is incomplete.');
+    }
+    if (endpoints.has(endpointPath)) {
+      throw new Error('ChatGPT web UDS profile bindings must be unique.');
+    }
+    endpoints.set(endpointPath, Object.freeze({ profileId, endpointPath, profile }));
+  }
+  if (endpoints.size === 0) {
+    throw new Error('ChatGPT web UDS requires at least one enabled profile binding.');
+  }
+  return endpoints;
+}
+
+function createChatGptWebUdsHttpServer({
+  app,
+  socketDirectory,
+  socketName = 'chatgpt-web-mcp.sock',
+  bridgeAuthSecretFile,
+  allowedOrigins = [],
+  enabledProfileIds,
+  runtimeFreshness = {},
+  sessionHardeningEnv = process.env,
+  sessionClock = () => Date.now(),
+  platform = process.platform,
+  host,
+  port
+} = {}) {
+  if (platform !== 'linux') {
+    throw new Error('ChatGPT web UDS transport is supported only on Linux/WSL.');
+  }
+  if (host !== undefined || port !== undefined) {
+    throw new Error('ChatGPT web UDS transport does not permit a TCP fallback.');
+  }
+  if (!app || typeof app !== 'object' || !app.config) {
+    throw new Error('ChatGPT web UDS requires an application configuration.');
+  }
+
+  const { socketPath, socketDirectory: normalizedSocketDirectory } =
+    validateChatGptWebUdsSocketPath(socketDirectory, socketName);
+  const endpoints = buildChatGptWebUdsEndpoints(app, enabledProfileIds);
+  const mcpServer = new CodexMemoryMcpServer({ app });
+  const sessions = new Map();
+  const sessionStreams = new Map();
+  const sessionHardening = createSessionHardeningConfig(sessionHardeningEnv);
+  let bridgeAuthSecret = null;
+
+  function now() {
+    return sessionClock();
+  }
+
+  function isSessionExpired(metadata, timestamp = now()) {
+    return timestamp - metadata.createdAt >= sessionHardening.absoluteTtlMs ||
+      timestamp - metadata.lastSeenAt >= sessionHardening.idleTtlMs;
+  }
+
+  function closeSession(sessionId) {
+    const streams = sessionStreams.get(sessionId);
+    if (streams) {
+      for (const stream of streams) {
+        try {
+          stream.end();
+        } catch {
+          // Stream cleanup is best effort.
+        }
+      }
+      sessionStreams.delete(sessionId);
+    }
+    sessions.delete(sessionId);
+    mcpServer.sessions.delete(sessionId);
+  }
+
+  function cleanupExpiredSessions(timestamp = now()) {
+    for (const [sessionId, metadata] of sessions.entries()) {
+      if (isSessionExpired(metadata, timestamp)) {
+        closeSession(sessionId);
+      }
+    }
+  }
+
+  function resolveSession(req, endpoint) {
+    const sessionId = getSingleStrictHeaderValue(req, SESSION_HEADER);
+    if (!sessionId) {
+      return { error: { statusCode: 400, code: 'MCP_SESSION_REQUIRED' } };
+    }
+    const metadata = sessions.get(sessionId);
+    if (!metadata || isSessionExpired(metadata)) {
+      if (metadata) closeSession(sessionId);
+      return { error: { statusCode: 404, code: 'MCP_SESSION_EXPIRED_404' } };
+    }
+    if (metadata.profileId !== endpoint.profileId) {
+      return { error: { statusCode: 400, code: 'TOOL_VERSION_ENDPOINT_MISMATCH' } };
+    }
+    const protocolValues = getRawHeaderValues(req, PROTOCOL_HEADER);
+    if (protocolValues.length > 1) {
+      return { error: { statusCode: 400, code: 'TRANSPORT_PROTOCOL_VERSION_REJECTED' } };
+    }
+    const requestedProtocolVersion = protocolValues.length === 1
+      ? protocolValues[0].trim()
+      : '';
+    if (requestedProtocolVersion &&
+        (!SUPPORTED_PROTOCOL_VERSIONS.has(requestedProtocolVersion) ||
+          requestedProtocolVersion !== metadata.protocolVersion)) {
+      return { error: { statusCode: 400, code: 'TRANSPORT_PROTOCOL_VERSION_REJECTED' } };
+    }
+    metadata.lastSeenAt = now();
+    return { sessionId, metadata };
+  }
+
+  function requestContextFor(endpoint, sessionId) {
+    return {
+      channelIdentity: 'chatgpt_web',
+      chatgptWebTransport: CHATGPT_WEB_UDS_TRANSPORT,
+      chatgptWebEndpointProfileId: endpoint.profileId,
+      sessionId
+    };
+  }
+
+  function validateRequestPolicies(req, endpoint) {
+    if (!isChatGptWebBridgeAuthorized(req, bridgeAuthSecret)) {
+      return { statusCode: 401, code: 'TRANSPORT_BRIDGE_AUTH_REJECTED' };
+    }
+    if (!isChatGptWebOriginAllowed(req, allowedOrigins)) {
+      return { statusCode: 403, code: 'TRANSPORT_ORIGIN_REJECTED' };
+    }
+    if (req.method === 'POST' &&
+        (!isMimeAccepted(req, 'application/json') || !isMimeAccepted(req, 'text/event-stream'))) {
+      return { statusCode: 406, code: 'TRANSPORT_ACCEPT_HEADER_REJECTED' };
+    }
+    if (req.method === 'GET' && !isMimeAccepted(req, 'text/event-stream')) {
+      return { statusCode: 406, code: 'TRANSPORT_ACCEPT_HEADER_REJECTED' };
+    }
+    return null;
+  }
+
+  const cleanupTimer = setInterval(() => cleanupExpiredSessions(), sessionHardening.cleanupIntervalMs);
+  if (typeof cleanupTimer.unref === 'function') {
+    cleanupTimer.unref();
+  }
+
+  const server = http.createServer(async (req, res) => {
+    try {
+      cleanupExpiredSessions();
+      const url = new URL(req.url || '/', 'http://localhost');
+      const requestPathname = normalizePathname(url.pathname);
+      const endpoint = endpoints.get(requestPathname);
+      if (!endpoint) {
+        return writeChatGptWebTransportError(res, 404, 'MCP_ROUTE_NOT_FOUND');
+      }
+
+      const policyError = validateRequestPolicies(req, endpoint);
+      if (policyError) {
+        return writeChatGptWebTransportError(res, policyError.statusCode, policyError.code);
+      }
+
+      if (req.method === 'GET') {
+        const session = resolveSession(req, endpoint);
+        if (session.error) {
+          return writeChatGptWebTransportError(res, session.error.statusCode, session.error.code);
+        }
+        if (session.metadata.initialized !== true) {
+          return writeChatGptWebTransportError(res, 400, 'MCP_LIFECYCLE_NOT_INITIALIZED');
+        }
+        const streams = sessionStreams.get(session.sessionId) || new Set();
+        sessionStreams.set(session.sessionId, streams);
+        if (streams.size >= sessionHardening.maxStreamsPerSession) {
+          return writeJson(res, 429, createSessionLimitPayload({
+            limitType: 'streams_per_session',
+            limit: sessionHardening.maxStreamsPerSession
+          }));
+        }
+        res.writeHead(200, {
+          'Content-Type': 'text/event-stream; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+          Connection: 'keep-alive',
+          'X-Accel-Buffering': 'no',
+          [SESSION_HEADER]: session.sessionId
+        });
+        res.write(': connected\n\n');
+        streams.add(res);
+        const heartbeat = setInterval(() => {
+          if (!res.writableEnded) {
+            res.write(': heartbeat\n\n');
+          }
+        }, 15000);
+        if (typeof heartbeat.unref === 'function') heartbeat.unref();
+        req.on('close', () => {
+          clearInterval(heartbeat);
+          streams.delete(res);
+          if (streams.size === 0) sessionStreams.delete(session.sessionId);
+        });
+        return;
+      }
+
+      if (req.method === 'DELETE') {
+        const session = resolveSession(req, endpoint);
+        if (session.error) {
+          return writeChatGptWebTransportError(res, session.error.statusCode, session.error.code);
+        }
+        closeSession(session.sessionId);
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+
+      if (req.method !== 'POST') {
+        return writeJson(res, 405, {
+          error: 'Method Not Allowed',
+          method: req.method
+        }, { Allow: 'GET, POST, DELETE' });
+      }
+
+      if (!isJsonContentType(getSingleHeaderValue(req.headers['content-type']))) {
+        return writeChatGptWebTransportError(res, 415, 'TRANSPORT_CONTENT_TYPE_REJECTED');
+      }
+
+      let body;
+      try {
+        body = await parseRequestBody(req);
+      } catch {
+        return writeChatGptWebTransportError(res, 400, 'TRANSPORT_JSON_RPC_REJECTED');
+      }
+
+      const method = body.method;
+      if (method === 'initialize') {
+        if (getRawHeaderValues(req, SESSION_HEADER).length > 0) {
+          return writeChatGptWebTransportError(res, 400, 'MCP_SESSION_REQUIRED');
+        }
+        const requestedProtocolVersion = body?.params?.protocolVersion;
+        if (requestedProtocolVersion !== undefined &&
+            (!SUPPORTED_PROTOCOL_VERSIONS.has(requestedProtocolVersion))) {
+          return writeChatGptWebTransportError(res, 400, 'TRANSPORT_PROTOCOL_VERSION_REJECTED');
+        }
+        if (sessions.size >= sessionHardening.maxSessions) {
+          return writeJson(res, 429, createSessionLimitPayload({
+            limitType: 'sessions',
+            limit: sessionHardening.maxSessions
+          }));
+        }
+        const result = await mcpServer.handleJsonRpc(body, requestContextFor(endpoint, undefined));
+        if (result.sessionId) {
+          const protocolVersion = result.response?.result?.protocolVersion || DEFAULT_PROTOCOL_VERSION;
+          sessions.set(result.sessionId, {
+            profileId: endpoint.profileId,
+            protocolVersion,
+            initialized: false,
+            createdAt: now(),
+            lastSeenAt: now()
+          });
+          res.setHeader(SESSION_HEADER, result.sessionId);
+        }
+        return writeJson(res, 200, result.response);
+      }
+
+      const session = resolveSession(req, endpoint);
+      if (session.error) {
+        return writeChatGptWebTransportError(res, session.error.statusCode, session.error.code);
+      }
+      if (session.metadata.initialized !== true &&
+          method !== 'ping' && method !== 'notifications/initialized') {
+        return writeChatGptWebTransportError(res, 400, 'MCP_LIFECYCLE_NOT_INITIALIZED');
+      }
+
+      const result = await mcpServer.handleJsonRpc(body, requestContextFor(endpoint, session.sessionId));
+      if (method === 'notifications/initialized' && result.notification === true) {
+        session.metadata.initialized = true;
+      }
+      if (result.notification) {
+        res.writeHead(202);
+        res.end();
+        return;
+      }
+      writeJson(res, 200, result.response);
+    } catch {
+      writeChatGptWebTransportError(res, 500, 'TRANSPORT_LOCAL_MCP_UNREADY');
+    }
+  });
+
+  return {
+    app,
+    server,
+    socketPath,
+    logicalEndpoints: Object.freeze([...endpoints.keys()].sort()),
+    transport: CHATGPT_WEB_UDS_TRANSPORT,
+    sessionHardening,
+    cleanupExpiredSessions,
+    async listen() {
+      bridgeAuthSecret = await loadChatGptWebBridgeAuthSecret(bridgeAuthSecretFile);
+      await ensureChatGptWebUdsSocketDirectory(normalizedSocketDirectory);
+      await assertChatGptWebUdsSocketAbsent(socketPath);
+      await listenOnUnixSocket(server, socketPath);
+      await fs.chmod(socketPath, 0o600);
+      const socketStat = await fs.stat(socketPath);
+      if (!socketStat.isSocket() || (socketStat.mode & 0o777) !== 0o600) {
+        await closeServer(server);
+        throw new Error('ChatGPT web UDS socket must have mode 0600.');
+      }
+      return {
+        transport: CHATGPT_WEB_UDS_TRANSPORT,
+        logicalEndpoints: [...endpoints.keys()].sort(),
+        publicListener: false,
+        tcpLoopbackFallback: false,
+        runtimeFreshness: buildRuntimeFreshness(runtimeFreshness)
+      };
+    },
+    async close() {
+      clearInterval(cleanupTimer);
+      for (const sessionId of [...sessions.keys()]) {
+        closeSession(sessionId);
+      }
+      await closeServer(server);
+    }
+  };
 }
 
 function createStreamableHttpServer({
@@ -741,10 +1231,20 @@ function createStreamableHttpServer({
   };
 }
 module.exports = {
+  BRIDGE_AUTH_HEADER,
+  CHATGPT_WEB_UDS_TRANSPORT,
+  PROTOCOL_HEADER,
   SESSION_HEADER,
   PUBLIC_REQUEST_BLOCKED,
+  assertChatGptWebUdsSocketAbsent,
   createStreamableHttpServer,
+  createChatGptWebUdsHttpServer,
   createForbiddenJsonRpcPayload,
+  ensureChatGptWebUdsSocketDirectory,
+  getRawHeaderValues,
+  isChatGptWebBridgeAuthorized,
+  isChatGptWebOriginAllowed,
+  loadChatGptWebBridgeAuthSecret,
   validateNoTokenJsonRpcRequest,
   buildRuntimeHealth,
   buildRuntimeFreshness,

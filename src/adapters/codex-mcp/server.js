@@ -42,6 +42,17 @@ const {
   projectChatGptWebOutputValue,
   projectChatGptWebToolDefinition
 } = require('../../core/ChatGptWebTrustedExecutionContext');
+const {
+  CHATGPT_WEB_TOOL_CONTRACT_DIGEST,
+  CHATGPT_WEB_TOOL_CONTRACT_VERSION,
+  buildChatGptWebToolDefinition,
+  getChatGptWebToolContract,
+  validateChatGptWebStructuredContent,
+  validateChatGptWebToolInput
+} = require('../../core/ChatGptWebToolContract');
+const {
+  buildChatGptWebToolSnapshot
+} = require('../../core/ChatGptWebToolSnapshot');
 
 function jsonRpcSuccess(id, result) {
   return { jsonrpc: '2.0', id, result };
@@ -677,7 +688,11 @@ function getPublicToolNameSet(config = {}, chatgptWebProfile = null) {
 
 function getPublicToolDefinitions(config = {}, chatgptWebProfile = null) {
   const publicToolNames = getPublicToolNameSet(config, chatgptWebProfile);
-  return TOOL_DEFINITIONS.filter(tool => publicToolNames.has(tool.name));
+  const definitions = TOOL_DEFINITIONS.filter(tool => publicToolNames.has(tool.name));
+  if (!chatgptWebProfile) return definitions;
+  return definitions
+    .map(tool => buildChatGptWebToolDefinition(tool.name))
+    .filter(Boolean);
 }
 
 function isPublicMcpToolExposed(toolName, config = {}, chatgptWebProfile = null) {
@@ -882,10 +897,18 @@ function buildGovernedMcpServerMetadata(config = {}, chatgptWebProfile = null) {
     : metadata;
 }
 
-function buildToolDefinitionForList(toolDefinition, config = {}, chatgptWebProfile = null) {
+function buildToolDefinitionForList(
+  toolDefinition,
+  config = {},
+  chatgptWebProfile = null,
+  chatgptWebToolSnapshot = null
+) {
   const projectedToolDefinition = chatgptWebProfile
     ? projectChatGptWebToolDefinition(toolDefinition)
     : toolDefinition;
+  const chatgptWebToolContract = chatgptWebProfile
+    ? getChatGptWebToolContract(toolDefinition.name)
+    : null;
   return {
     ...projectedToolDefinition,
     _meta: {
@@ -894,7 +917,24 @@ function buildToolDefinitionForList(toolDefinition, config = {}, chatgptWebProfi
         toolDefinition.name,
         config,
         chatgptWebProfile
-      )
+      ),
+      ...(chatgptWebProfile
+        ? {
+            codexMemoryChatgptWeb: {
+              contractVersion: CHATGPT_WEB_TOOL_CONTRACT_VERSION,
+              contractPackDigest: CHATGPT_WEB_TOOL_CONTRACT_DIGEST,
+              profileId: chatgptWebProfile.profileId,
+              profileGeneration: Array.isArray(chatgptWebToolContract?.profileGeneration)
+                ? [...chatgptWebToolContract.profileGeneration]
+                : [],
+              serverFixedContext: true,
+              outputBudgetBytes: Number.isInteger(chatgptWebToolContract?.outputBudgetBytes)
+                ? chatgptWebToolContract.outputBudgetBytes
+                : null,
+              manifestDigest: chatgptWebToolSnapshot?.digest || null
+            }
+          }
+        : {})
     }
   };
 }
@@ -1775,14 +1815,20 @@ class CodexMemoryMcpServer {
     if (method === 'initialize') {
       const sessionId = this.createSession(requestContext.sessionId || null);
       const protocolVersion = negotiateProtocolVersion(params?.protocolVersion);
+      const toolDefinitions = getPublicToolDefinitions(this.app.config, chatgptWebProfile);
+      const chatgptWebToolSnapshot = chatgptWebProfile
+        ? buildChatGptWebToolSnapshot(chatgptWebProfile, toolDefinitions)
+        : null;
       return {
         sessionId,
         response: jsonRpcSuccess(id, {
           protocolVersion,
-          capabilities: {
-            tools: { listChanged: true },
-            resources: { subscribe: false, listChanged: true }
-          },
+          capabilities: chatgptWebProfile
+            ? { tools: { listChanged: false } }
+            : {
+                tools: { listChanged: true },
+                resources: { subscribe: false, listChanged: true }
+              },
           serverInfo: {
             name: SERVER_NAME,
             version: this.app.config.serverVersion
@@ -1791,7 +1837,19 @@ class CodexMemoryMcpServer {
             codexMemoryGovernedBridge: buildGovernedMcpServerMetadata(
               this.app.config,
               chatgptWebProfile
-            )
+            ),
+            ...(chatgptWebToolSnapshot
+              ? {
+                  codexMemoryChatgptWeb: {
+                    contractVersion: CHATGPT_WEB_TOOL_CONTRACT_VERSION,
+                    contractPackDigest: CHATGPT_WEB_TOOL_CONTRACT_DIGEST,
+                    profileId: chatgptWebProfile.profileId,
+                    manifestDigest: chatgptWebToolSnapshot.digest,
+                    canonicalization: chatgptWebToolSnapshot.canonicalization,
+                    snapshotCoverage: 'unverified'
+                  }
+                }
+              : {})
           },
           instructions: buildInstructions(this.app.config, chatgptWebProfile)
         })
@@ -1807,19 +1865,27 @@ class CodexMemoryMcpServer {
     }
 
     if (method === 'tools/list') {
+      const toolDefinitions = getPublicToolDefinitions(this.app.config, chatgptWebProfile);
+      const chatgptWebToolSnapshot = chatgptWebProfile
+        ? buildChatGptWebToolSnapshot(chatgptWebProfile, toolDefinitions)
+        : null;
       return {
         response: jsonRpcSuccess(id, {
-          tools: getPublicToolDefinitions(this.app.config, chatgptWebProfile)
+          tools: toolDefinitions
             .map(tool => buildToolDefinitionForList(
               tool,
               this.app.config,
-              chatgptWebProfile
+              chatgptWebProfile,
+              chatgptWebToolSnapshot
             ))
         })
       };
     }
 
     if (method === 'resources/list') {
+      if (chatgptWebProfile) {
+        return { response: jsonRpcError(id, -32601, 'Method not found', method) };
+      }
       return {
         response: jsonRpcSuccess(id, {
           resources: []
@@ -1828,6 +1894,9 @@ class CodexMemoryMcpServer {
     }
 
     if (method === 'resources/templates/list') {
+      if (chatgptWebProfile) {
+        return { response: jsonRpcError(id, -32601, 'Method not found', method) };
+      }
       return {
         response: jsonRpcSuccess(id, {
           resourceTemplates: []
@@ -1860,6 +1929,34 @@ class CodexMemoryMcpServer {
         };
       }
 
+      const args = params.arguments || {};
+      if (!args || typeof args !== 'object' || Array.isArray(args)) {
+        return { response: jsonRpcError(id, -32602, 'Invalid params', 'tools/call arguments must be an object') };
+      }
+
+      if (chatgptWebProfile) {
+        try {
+          validateChatGptWebToolInput(params.name, args);
+        } catch (error) {
+          if (error instanceof ToolArgumentValidationError) {
+            return {
+              response: jsonRpcError(id, -32602, 'Invalid params', {
+                ...buildChatGptWebProfileErrorData('tool_input_schema_rejected'),
+                contractCode: 'TOOL_INPUT_SCHEMA_REJECTED'
+              })
+            };
+          }
+          return this._handleInternalError(
+            id,
+            params.name,
+            error,
+            -32603,
+            'Internal error',
+            chatgptWebProfile
+          );
+        }
+      }
+
       if (chatgptWebProfile && chatgptWebProfile.runtimeInvocationAllowed !== true) {
         return {
           response: jsonRpcError(
@@ -1869,11 +1966,6 @@ class CodexMemoryMcpServer {
             buildChatGptWebProfileErrorData('chatgpt_web_runtime_not_bound')
           )
         };
-      }
-
-      const args = params.arguments || {};
-      if (!args || typeof args !== 'object' || Array.isArray(args)) {
-        return { response: jsonRpcError(id, -32602, 'Invalid params', 'tools/call arguments must be an object') };
       }
 
       try {
@@ -1917,8 +2009,24 @@ class CodexMemoryMcpServer {
         }
         const payload = await this.app.callTool(params.name, args, effectiveRequestContext.requestContext);
         const isError = payload?.decision === 'rejected';
+        const toolResult = formatToolResult(payload, isError, chatgptWebProfile);
+        if (chatgptWebProfile) {
+          try {
+            validateChatGptWebStructuredContent(params.name, toolResult.structuredContent);
+          } catch (error) {
+            if (error instanceof ToolArgumentValidationError) {
+              return {
+                response: jsonRpcError(id, -32603, 'Tool error', {
+                  ...buildChatGptWebProfileErrorData('tool_output_schema_mismatch'),
+                  contractCode: 'TOOL_OUTPUT_SCHEMA_MISMATCH'
+                })
+              };
+            }
+            throw error;
+          }
+        }
         return {
-          response: jsonRpcSuccess(id, formatToolResult(payload, isError, chatgptWebProfile))
+          response: jsonRpcSuccess(id, toolResult)
         };
       } catch (error) {
         if (error instanceof ToolArgumentValidationError) {

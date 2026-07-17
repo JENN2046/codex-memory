@@ -2,6 +2,8 @@ const SERVER_NAME = 'vcp_codex_memory';
 const SERVER_VERSION = '0.1.0';
 const CHATGPT_WEB_CHANNEL_ID = 'chatgpt_web';
 const CHATGPT_WEB_CLIENT_ID = 'chatgpt_web';
+const CHATGPT_WEB_UDS_TRANSPORT = 'unix_domain_socket_streamable_http';
+const CHATGPT_WEB_MCP_ENDPOINT_BASE = '/mcp/codex-memory/chatgpt';
 const SUPPORTED_PROTOCOL_VERSIONS = new Set(['2025-03-26', '2025-06-18']);
 const DEFAULT_PROTOCOL_VERSION = '2025-06-18';
 
@@ -365,6 +367,8 @@ module.exports = {
   CANDIDATE_CACHE_FILE_NAME,
   CHATGPT_WEB_CHANNEL_ID,
   CHATGPT_WEB_CLIENT_ID,
+  CHATGPT_WEB_MCP_ENDPOINT_BASE,
+  CHATGPT_WEB_UDS_TRANSPORT,
   CHAT_INDEX_FILE_NAME,
   DEFAULT_PROTOCOL_VERSION,
   KNOWLEDGE_DIARY_NAME,

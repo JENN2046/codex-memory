@@ -24,6 +24,10 @@ const {
 const {
   buildChatGptWebProfileConfig
 } = require('../core/ChatGptWebProfile');
+const {
+  attachChatGptWebUdsPrivateConfig,
+  normalizeChatGptWebUdsConfig
+} = require('../core/ChatGptWebUdsConfig');
 
 function toBoolean(value, fallback = false) {
   if (typeof value === 'boolean') return value;
@@ -814,6 +818,51 @@ function createConfig(overrides = {}) {
       )
     }
   });
+  const chatgptWebUdsOverrides = getNestedPlainObject(overrides, 'chatgptWebUds');
+  const chatgptWebUdsConfig = normalizeChatGptWebUdsConfig({
+    basePath,
+    enabled: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebUdsEnabled,
+        chatgptWebUdsOverrides.enabled
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_UDS_ENABLED',
+      false
+    ),
+    socketDirectory: pickFirstNonEmpty(
+      overrides.chatgptWebUdsSocketDirectory,
+      chatgptWebUdsOverrides.socketDirectory,
+      chatgptWebUdsOverrides.socket_directory,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_SOCKET_DIR
+    ),
+    socketName: pickFirstNonEmpty(
+      overrides.chatgptWebUdsSocketName,
+      chatgptWebUdsOverrides.socketName,
+      chatgptWebUdsOverrides.socket_name,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_SOCKET_NAME
+    ),
+    bridgeAuthSecretFile: pickFirstNonEmpty(
+      overrides.chatgptWebBridgeAuthSecretFile,
+      chatgptWebUdsOverrides.bridgeAuthSecretFile,
+      chatgptWebUdsOverrides.bridge_auth_secret_file,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_BRIDGE_AUTH_FILE
+    ),
+    allowedOrigins: pickFirstNonEmpty(
+      overrides.chatgptWebUdsAllowedOrigins,
+      chatgptWebUdsOverrides.allowedOrigins,
+      chatgptWebUdsOverrides.allowed_origins,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_ALLOWED_ORIGINS,
+      []
+    ),
+    enabledProfileIds: pickFirstNonEmpty(
+      overrides.chatgptWebUdsProfileIds,
+      chatgptWebUdsOverrides.enabledProfileIds,
+      chatgptWebUdsOverrides.enabled_profile_ids,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_PROFILES,
+      []
+    ),
+    fallbackProfileId: chatgptWebProfile.profileId
+  });
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
   const vectorIndexPath = resolveAbsolutePath(
     basePath,
@@ -878,6 +927,7 @@ function createConfig(overrides = {}) {
     exposeControlledMutationMcpTools: isHardened ? false : exposeControlledMutationMcpTools,
     exposeWriteMcpTools: isHardened ? false : exposeWriteMcpTools,
     chatgptWebProfile,
+    chatgptWebUds: chatgptWebUdsConfig.publicConfig,
     embedDimensions: inferredEmbedDimensions,
     embeddingFingerprint,
     embeddingProfileVersion,
@@ -1002,9 +1052,12 @@ function createConfig(overrides = {}) {
     baseConfig,
     ragProfileConfig
   );
-  return attachGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(
-    finalConfig,
-    governedMcpVcpNativeHttpMcpTarget.privateConfig
+  return attachChatGptWebUdsPrivateConfig(
+    attachGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(
+      finalConfig,
+      governedMcpVcpNativeHttpMcpTarget.privateConfig
+    ),
+    chatgptWebUdsConfig.privateConfig
   );
 }
 

@@ -2,7 +2,9 @@
 
 const {
   CHATGPT_WEB_CHANNEL_ID,
-  CHATGPT_WEB_CLIENT_ID
+  CHATGPT_WEB_CLIENT_ID,
+  CHATGPT_WEB_MCP_ENDPOINT_BASE,
+  CHATGPT_WEB_UDS_TRANSPORT
 } = require('./constants');
 const { isSafeReferenceName } = require('./VcpToolBoxSafeReference');
 
@@ -17,6 +19,12 @@ const CHATGPT_WEB_ALLOWED_VISIBILITIES = Object.freeze([
   'project',
   'workspace'
 ]);
+
+const CHATGPT_WEB_ENDPOINT_VERSION_BY_PROFILE_ID = Object.freeze({
+  [CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0]: 'v0',
+  [CHATGPT_WEB_PROFILE_IDS.READ_ONLY_V1]: 'v1',
+  [CHATGPT_WEB_PROFILE_IDS.CONTEXT_V2]: 'v2'
+});
 
 const CHATGPT_WEB_PROFILE_DEFINITIONS = Object.freeze({
   [CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0]: Object.freeze({
@@ -73,6 +81,16 @@ function normalizeChatGptWebProfileId(value) {
   return Object.prototype.hasOwnProperty.call(CHATGPT_WEB_PROFILE_DEFINITIONS, normalized)
     ? normalized
     : CHATGPT_WEB_PROFILE_IDS.OFF;
+}
+
+function getChatGptWebEndpointVersion(profileId) {
+  const normalized = normalizeChatGptWebProfileId(profileId);
+  return CHATGPT_WEB_ENDPOINT_VERSION_BY_PROFILE_ID[normalized] || null;
+}
+
+function getChatGptWebEndpointPath(profileId) {
+  const version = getChatGptWebEndpointVersion(profileId);
+  return version ? `${CHATGPT_WEB_MCP_ENDPOINT_BASE}/${version}` : null;
 }
 
 function normalizeServerFixedScope(scope = {}) {
@@ -149,6 +167,27 @@ function buildChatGptWebProfileConfig({
   });
 }
 
+function buildChatGptWebEndpointProfileConfig(config = {}, profileId) {
+  const configuredProfile = isPlainObject(config.chatgptWebProfile)
+    ? config.chatgptWebProfile
+    : buildChatGptWebProfileConfig();
+  const udsConfig = isPlainObject(config.chatgptWebUds)
+    ? config.chatgptWebUds
+    : {};
+  const normalizedProfileId = normalizeChatGptWebProfileId(profileId);
+  const endpointEnabled = udsConfig.enabled === true &&
+    Array.isArray(udsConfig.enabledProfileIds) &&
+    udsConfig.enabledProfileIds.includes(normalizedProfileId);
+  const activationRequested = configuredProfile.activationRequested === true ||
+    configuredProfile.enabled === true;
+
+  return buildChatGptWebProfileConfig({
+    profileId: normalizedProfileId,
+    enabled: activationRequested && endpointEnabled,
+    serverFixedScope: configuredProfile.serverFixedScope
+  });
+}
+
 function getChatGptWebProfileForRequest(config = {}, requestContext = {}) {
   const channelIdentity = normalizeString(
     isPlainObject(requestContext)
@@ -164,14 +203,24 @@ function getChatGptWebProfileForRequest(config = {}, requestContext = {}) {
     };
   }
 
+  const endpointProfileId = normalizeChatGptWebProfileId(
+    isPlainObject(requestContext)
+      ? requestContext.chatgptWebEndpointProfileId
+      : CHATGPT_WEB_PROFILE_IDS.OFF
+  );
+  const isTrustedUdsEndpoint = isPlainObject(requestContext) &&
+    requestContext.chatgptWebTransport === CHATGPT_WEB_UDS_TRANSPORT &&
+    endpointProfileId !== CHATGPT_WEB_PROFILE_IDS.OFF;
   const configuredProfile = isPlainObject(config.chatgptWebProfile)
     ? config.chatgptWebProfile
     : buildChatGptWebProfileConfig();
-  const profile = buildChatGptWebProfileConfig({
-    profileId: configuredProfile.profileId,
-    enabled: configuredProfile.activationRequested === true || configuredProfile.enabled === true,
-    serverFixedScope: configuredProfile.serverFixedScope
-  });
+  const profile = isTrustedUdsEndpoint
+    ? buildChatGptWebEndpointProfileConfig(config, endpointProfileId)
+    : buildChatGptWebProfileConfig({
+        profileId: configuredProfile.profileId,
+        enabled: configuredProfile.activationRequested === true || configuredProfile.enabled === true,
+        serverFixedScope: configuredProfile.serverFixedScope
+      });
   const accepted = profile.enabled === true &&
     profile.channelIdentity === CHATGPT_WEB_CHANNEL_ID &&
     profile.scopeConfigured === true &&
@@ -191,9 +240,13 @@ function getChatGptWebProfileForRequest(config = {}, requestContext = {}) {
 
 module.exports = {
   CHATGPT_WEB_ALLOWED_VISIBILITIES,
+  CHATGPT_WEB_ENDPOINT_VERSION_BY_PROFILE_ID,
   CHATGPT_WEB_PROFILE_DEFINITIONS,
   CHATGPT_WEB_PROFILE_IDS,
+  buildChatGptWebEndpointProfileConfig,
   buildChatGptWebProfileConfig,
+  getChatGptWebEndpointPath,
+  getChatGptWebEndpointVersion,
   getChatGptWebProfileForRequest,
   normalizeChatGptWebProfileId,
   normalizeServerFixedScope
