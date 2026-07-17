@@ -1581,6 +1581,7 @@ test('native write invocation receipt buckets are whitelisted before returning t
       statusClass: 'https://PRIVATE_STATUS_SHOULD_NOT_ECHO',
       httpStatusClass: 'https://PRIVATE_HTTP_STATUS_SHOULD_NOT_ECHO',
       jsonRpcErrorReasonCode: 'https://PRIVATE_JSONRPC_REASON_SHOULD_NOT_ECHO',
+      failureCategory: 'https://PRIVATE_FAILURE_CATEGORY_SHOULD_NOT_ECHO',
       responseShapeCategory: 'https://PRIVATE_SHAPE_SHOULD_NOT_ECHO',
       topLevelKindCategory: 'https://PRIVATE_KIND_SHOULD_NOT_ECHO'
     }
@@ -1628,6 +1629,7 @@ test('native write invocation receipt buckets are whitelisted before returning t
   assert.equal(receipt.statusClass, null);
   assert.equal(receipt.httpStatusClass, null);
   assert.equal(receipt.jsonRpcErrorReasonCode, null);
+  assert.equal(receipt.failureCategory, null);
   assert.equal(receipt.responseShapeCategory, null);
   assert.equal(receipt.topLevelKindCategory, null);
   const coverage = validateGovernedMcpNativeBridgeReceiptCoversCurrentProductGoal(result.receipt);
@@ -1737,13 +1739,15 @@ test('native write invocation receipt must bind JSON-RPC response and success st
         statusClass: 'server_error',
         httpStatusClass: 'server_error',
         jsonRpcErrorPresent: true,
-        jsonRpcErrorReasonCode: 'native_runtime_call_failed'
+        jsonRpcErrorReasonCode: 'native_runtime_call_failed',
+        failureCategory: 'native_runtime_failed'
       },
       expected: {
         jsonRpcResponseIdMatched: true,
         statusClass: 'server_error',
         httpStatusClass: 'server_error',
-        jsonRpcErrorReasonCode: 'native_runtime_call_failed'
+        jsonRpcErrorReasonCode: 'native_runtime_call_failed',
+        failureCategory: 'native_runtime_failed'
       }
     }
   ];
@@ -1794,6 +1798,7 @@ test('native write invocation receipt must bind JSON-RPC response and success st
     assert.equal(receipt.statusClass, testCase.expected.statusClass, testCase.name);
     assert.equal(receipt.httpStatusClass, testCase.expected.httpStatusClass, testCase.name);
     assert.equal(receipt.jsonRpcErrorReasonCode, testCase.expected.jsonRpcErrorReasonCode || null, testCase.name);
+    assert.equal(receipt.failureCategory, testCase.expected.failureCategory || null, testCase.name);
     assert.equal(receipt.governanceMetadataSent, true, testCase.name);
     assert.equal(receipt.governanceMetadataPath, 'params._meta.codexMemoryGovernance', testCase.name);
     assert.equal(receipt.governanceMetadataRawValueDisclosed, false, testCase.name);

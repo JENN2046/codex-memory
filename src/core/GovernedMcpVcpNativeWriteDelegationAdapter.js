@@ -97,11 +97,34 @@ const ALLOWED_TOP_LEVEL_KIND_CATEGORIES = Object.freeze([
 ]);
 const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'invalid_governance_metadata',
+  'diary_scope_authorization_rejected',
+  'diary_scope_mapping_binding_mismatch',
+  'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
+  'native_provider_embedding_failed',
+  'native_runtime_initialization_failed',
   'native_runtime_call_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed',
   'native_tool_public_binding_mismatch',
   'native_write_disabled',
   'unsupported_native_tool'
+]);
+const ALLOWED_FAILURE_CATEGORIES = Object.freeze([
+  'timeout',
+  'transport_unavailable',
+  'http_client_error',
+  'http_server_error',
+  'invalid_response',
+  'response_id_mismatch',
+  'governance_rejected',
+  'scope_authorization_rejected',
+  'scope_binding_rejected',
+  'provider_embedding_failed',
+  'native_runtime_initialization_failed',
+  'native_scoped_search_failed',
+  'result_scope_postcheck_failed',
+  'native_runtime_failed'
 ]);
 const SCOPE_IDENTIFIER_FIELDS = Object.freeze([
   'project_id',
@@ -731,6 +754,9 @@ function lowDisclosureNativeInvocationReceipt(value, expected = {}) {
     jsonRpcErrorPresent: invocationBindingMatched && value.jsonRpcErrorPresent === true,
     jsonRpcErrorReasonCode: invocationBindingMatched
       ? safeEnum(value.jsonRpcErrorReasonCode, ALLOWED_JSON_RPC_ERROR_REASON_CODES)
+      : null,
+    failureCategory: invocationBindingMatched
+      ? safeEnum(value.failureCategory, ALLOWED_FAILURE_CATEGORIES)
       : null,
     responseShapeCategory: invocationBindingMatched
       ? safeEnum(value.responseShapeCategory, ALLOWED_RESPONSE_SHAPE_CATEGORIES)

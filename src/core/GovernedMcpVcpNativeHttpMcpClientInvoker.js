@@ -720,6 +720,9 @@ function createGovernedMcpVcpNativeHttpMcpToolCaller(input = {}) {
         targetReferenceName,
         toolName: publicToolName,
         statusClass: 'client_error',
+        jsonRpcErrorPresent: true,
+        jsonRpcErrorReasonCode: 'invalid_governance_metadata',
+        failureCategory: 'governance_rejected',
         governanceMetadataSent: false
       });
       throw error;
