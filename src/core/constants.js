@@ -105,18 +105,13 @@ const TOOL_DEFINITIONS = [
   {
     name: 'memory_overview',
     title: 'Governed Memory Overview',
-    description: 'Operational overview of governed native bridge evidence and bounded local auxiliary state. A ChatGPT web v0 probe_nonce invokes a one-time, zero-memory short-circuit probe. HTTP no-token calls return only a selected low-disclosure overview projection; bearer-token HTTP calls return a bounded low-disclosure overview projection by default.',
+    description: 'Operational overview of governed native bridge evidence and bounded local auxiliary state. HTTP no-token calls return only a selected low-disclosure overview projection; bearer-token HTTP calls return a bounded low-disclosure overview projection by default.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
       properties: {
         auditWindow: { type: 'integer', minimum: 10, maximum: 2000 },
-        limit: { type: 'integer', minimum: 1, maximum: 50 },
-        probe_nonce: {
-          type: 'string',
-          minLength: CHATGPT_WEB_PROBE_NONCE_MIN_LENGTH,
-          maxLength: CHATGPT_WEB_PROBE_NONCE_MAX_LENGTH
-        }
+        limit: { type: 'integer', minimum: 1, maximum: 50 }
       }
     }
   },

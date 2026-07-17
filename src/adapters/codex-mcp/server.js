@@ -1969,7 +1969,9 @@ class CodexMemoryMcpServer {
       }
 
       try {
-        validateToolArguments(params.name, args);
+        if (!chatgptWebProfile) {
+          validateToolArguments(params.name, args);
+        }
         const governedRequestContext = buildGovernedMcpRequestContextFromParams(params);
         if (governedRequestContext.accepted !== true) {
           return {

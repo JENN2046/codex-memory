@@ -21,6 +21,7 @@ const {
   getChatGptWebUdsPrivateConfig,
   normalizeChatGptWebUdsConfig
 } = require('../src/core/ChatGptWebUdsConfig');
+const { TOOL_DEFINITIONS } = require('../src/core/constants');
 
 function buildProfile(profileId) {
   return buildChatGptWebProfileConfig({
@@ -82,6 +83,13 @@ test('ChatGPT web output contracts validate synthetic structured content and rej
   }, /not allowed/);
 });
 
+test('ChatGPT probe_nonce remains profile-specific and does not expand the default public schema', () => {
+  const defaultOverview = TOOL_DEFINITIONS.find(tool => tool.name === 'memory_overview');
+  const chatGptOverview = buildChatGptWebToolDefinition('memory_overview');
+  assert.equal(defaultOverview.inputSchema.properties.probe_nonce, undefined);
+  assert.ok(chatGptOverview.inputSchema.properties.probe_nonce);
+});
+
 test('ChatGPT web UDS configuration keeps private socket and secret-file references non-enumerable', () => {
   const normalized = normalizeChatGptWebUdsConfig({
     basePath: process.cwd(),
@@ -109,4 +117,16 @@ test('ChatGPT web UDS configuration keeps private socket and secret-file referen
   assert.equal(privateConfig.socketName, 'synthetic.sock');
   assert.match(privateConfig.socketDirectory, /synthetic-uds/);
   assert.match(privateConfig.bridgeAuthSecretFile, /synthetic-bridge-auth/);
+});
+
+test('ChatGPT web UDS configuration fails closed for an explicitly unsafe socket name', () => {
+  const normalized = normalizeChatGptWebUdsConfig({
+    enabled: true,
+    socketDirectory: '/tmp/codex-memory-chatgpt',
+    socketName: '../unsafe.sock',
+    bridgeAuthSecretFile: '/tmp/codex-memory-chatgpt/auth'
+  });
+
+  assert.equal(normalized.publicConfig.socketName, null);
+  assert.equal(normalized.privateConfig.socketName, null);
 });

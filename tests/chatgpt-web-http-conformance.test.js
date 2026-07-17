@@ -11,7 +11,9 @@ const {
   BRIDGE_AUTH_HEADER,
   PROTOCOL_HEADER,
   SESSION_HEADER,
-  createChatGptWebUdsHttpServer
+  createChatGptWebUdsHttpServer,
+  ensureChatGptWebUdsSocketDirectory,
+  loadChatGptWebBridgeAuthSecret
 } = require('../src/adapters/codex-mcp/http');
 const {
   buildChatGptWebProfileConfig,
@@ -405,4 +407,29 @@ test('M2 ChatGPT UDS refuses a TCP-shaped listener configuration', { skip: LINUX
       host: '127.0.0.1'
     });
   }, /does not permit a TCP fallback/);
+});
+
+test('M2 ChatGPT UDS rejects symlinked secret files and socket directories', { skip: LINUX_ONLY }, async () => {
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-m2-symlink-'));
+  try {
+    const secretTarget = path.join(tempRoot, 'secret-target');
+    const secretLink = path.join(tempRoot, 'secret-link');
+    await fs.writeFile(secretTarget, BRIDGE_SECRET, { mode: 0o600 });
+    await fs.symlink(secretTarget, secretLink);
+    await assert.rejects(
+      loadChatGptWebBridgeAuthSecret(secretLink),
+      error => ['ELOOP', 'EMLINK'].includes(error?.code) || /symbolic|regular file/.test(error?.message)
+    );
+
+    const realDirectory = path.join(tempRoot, 'real-socket-dir');
+    const linkedDirectory = path.join(tempRoot, 'linked-socket-dir');
+    await fs.mkdir(realDirectory, { mode: 0o700 });
+    await fs.symlink(realDirectory, linkedDirectory);
+    await assert.rejects(
+      ensureChatGptWebUdsSocketDirectory(linkedDirectory),
+      /must not traverse symbolic links/
+    );
+  } finally {
+    await fs.rm(tempRoot, { recursive: true, force: true });
+  }
 });

@@ -23,10 +23,11 @@ function resolveAbsolutePath(basePath, value) {
 }
 
 function normalizeSocketName(value) {
-  const normalized = normalizeString(value) || DEFAULT_SOCKET_NAME;
+  const normalized = normalizeString(value);
+  if (!normalized) return DEFAULT_SOCKET_NAME;
   return /^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$/.test(normalized)
     ? normalized
-    : DEFAULT_SOCKET_NAME;
+    : null;
 }
 
 function normalizeOrigins(value) {

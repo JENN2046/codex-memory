@@ -17,4 +17,4 @@ M3-T2 增加两个纯函数模块：
 node --test tests/chatgpt-web-lineage-health-receipt.test.js
 ```
 
-M3-T3/T4、M4、真实三层 health、E2E nonce、UDS 服务、Tunnel、ChatGPT、provider 与真实 memory/audit 仍不在此阶段范围内。
+后续 M3/M4 代码候选的当前状态见 `CHATGPT_WEB_R3_IMPLEMENTATION_MATRIX.md`。真实三层 health、E2E nonce、UDS 服务、Tunnel、ChatGPT、provider 与真实 memory/audit 仍未执行。

@@ -134,11 +134,11 @@ test('M3 v0 probe rejects invalid or untrusted requests before any memory depend
   assert.equal(service.probeNonceExpiryByDigest.size, 0);
   assert.deepEqual(touches, []);
 
-  assert.doesNotThrow(() => {
+  assert.throws(() => {
     validateToolArguments('memory_overview', {
       probe_nonce: 'synthetic-m3-probe-nonce-0003'
     });
-  });
+  }, ToolArgumentValidationError);
   assert.throws(() => {
     validateToolArguments('memory_overview', { probe_nonce: 'too-short' });
   }, ToolArgumentValidationError);

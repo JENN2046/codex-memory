@@ -34,6 +34,15 @@ v2 的 `prepare_memory_context` 仍由 M4 composite-read gate 隐藏；M2 不会
 - `CODEX_MEMORY_CHATGPT_WEB_UDS_PROFILES`
 - `CODEX_MEMORY_CHATGPT_WEB_UDS_ALLOWED_ORIGINS`
 
+One additional default-off implementation gate is available for later
+authorized validation:
+
+- `CODEX_MEMORY_CHATGPT_WEB_COMPOSITE_READ_GATE_PASSED`
+
+It only permits the v2 profile to advertise `prepare_memory_context`. Runtime
+application invocation remains unconditionally unbound in this branch, and
+setting the gate is not runtime evidence by itself.
+
 socket 目录和 bridge-auth 文件引用保存在非枚举私有配置中，不会出现在 MCP metadata、工具 schema 或配置 JSON 投影中。
 
 ## 合成验证

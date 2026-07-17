@@ -24,4 +24,4 @@ node --test tests/chatgpt-web-memory-overview-probe.test.js
 node --test tests/chatgpt-web-client-isolation.test.js
 ```
 
-M3-T2/T3/T4、M4 composite read、UDS 服务启动、Tunnel、ChatGPT、provider、真实 memory/audit/runtime 均不在此阶段范围内。
+后续 M3/M4 代码候选的当前状态见 `CHATGPT_WEB_R3_IMPLEMENTATION_MATRIX.md`。UDS 服务启动、Tunnel、ChatGPT、provider、真实 memory/audit/runtime 仍未执行。

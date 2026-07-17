@@ -15,4 +15,4 @@ M3-T3 新增两个低披露 receipt：
 node --test tests/chatgpt-web-output-injection-receipt.test.js
 ```
 
-M3-T4、M4、真实 Data Controls/ChatGPT Memory 设置、真实三层 health、UDS 服务、Tunnel、ChatGPT、provider 和真实 memory/audit 仍不在此阶段范围内。
+后续 M3/M4 代码候选的当前状态见 `CHATGPT_WEB_R3_IMPLEMENTATION_MATRIX.md`。真实 Data Controls/ChatGPT Memory 设置、真实三层 health、UDS 服务、Tunnel、ChatGPT、provider 和真实 memory/audit 仍未执行。

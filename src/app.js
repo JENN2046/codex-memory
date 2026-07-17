@@ -20,6 +20,7 @@ const {
   MemoryContextPackageService
 } = require('./core/MemoryContextPackageService');
 const { GovernedRecallGateway } = require('./core/GovernedRecallGateway');
+const { GovernedReadFacade } = require('./core/GovernedReadFacade');
 const { TaskStartMemoryContextWorkflow } = require('./core/TaskStartMemoryContextWorkflow');
 const { MemoryDeltaProposalService } = require('./core/MemoryDeltaProposalService');
 const {
@@ -2650,11 +2651,18 @@ function createCodexMemoryApplication(overrides = {}) {
       return application.callTool('search_memory', searchArgs, searchRequestContext);
     }
   });
+  const governedReadFacade = new GovernedReadFacade({
+    nativeRecall: (searchArgs, searchRequestContext) =>
+      governedRecallGateway.search(searchArgs, searchRequestContext),
+    governanceOverview: overviewArgs => overviewService.getAuthenticatedBoundedOverview(overviewArgs),
+    governanceAudit: auditArgs => auditMemoryReadonlyService.run(auditArgs)
+  });
   const memoryContextPackageService = new MemoryContextPackageService({
     searchMemory: (searchArgs, searchRequestContext) =>
       governedRecallGateway.search(searchArgs, searchRequestContext),
     overviewService,
-    auditMemoryReadonlyService
+    auditMemoryReadonlyService,
+    governedReadFacade
   });
   const taskStartMemoryContextWorkflow = new TaskStartMemoryContextWorkflow({
     prepareMemoryContext: (prepareArgs, prepareRequestContext) =>
@@ -2689,6 +2697,7 @@ function createCodexMemoryApplication(overrides = {}) {
       memoryDeltaProposalService,
       auditMemoryReadonlyService,
       governedRecallGateway,
+      governedReadFacade,
       governedNativeBridgeObservationStore
     },
     adapters: {
@@ -3080,6 +3089,15 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'prepare_memory_context') {
+        if (requestContext.channelIdentity === 'chatgpt_web') {
+          const trustedCompositeRequest =
+            requestContext.chatgptWebProfileId === 'chatgpt_web_context_v2' &&
+            requestContext.executionContext?.requestSource === 'chatgpt_web_mcp' &&
+            config.chatgptWebProfile?.enabled === true &&
+            config.chatgptWebProfile?.compositeReadGatePassed === true;
+          if (!trustedCompositeRequest) throw new Error('VCP_COMPOSITE_READ_NOT_READY');
+          return memoryContextPackageService.prepareChatGptWeb(args, requestContext);
+        }
         return memoryContextPackageService.prepare(args, requestContext);
       }
 

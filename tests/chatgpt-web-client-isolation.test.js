@@ -11,6 +11,10 @@ const {
 const {
   buildChatGptWebTrustedExecutionContext
 } = require('../src/core/ChatGptWebTrustedExecutionContext');
+const {
+  buildChatGptWebProfileConfig,
+  CHATGPT_WEB_PROFILE_IDS
+} = require('../src/core/ChatGptWebProfile');
 
 const CHATGPT_WEB_CONTEXT = Object.freeze({
   channelIdentity: 'chatgpt_web'
@@ -348,4 +352,20 @@ test('ChatGPT web v2 keeps prepare_memory_context hidden until M4 and never call
   assert.equal(result.response.error.code, -32001);
   assert.equal(result.response.error.data.code, 'mcp_tool_not_exposed');
   assert.equal(calls.length, 0);
+});
+
+test('ChatGPT web v2 exposes prepare_memory_context only after the composite-read gate', () => {
+  const profile = buildChatGptWebProfileConfig({
+    profileId: CHATGPT_WEB_PROFILE_IDS.CONTEXT_V2,
+    enabled: true,
+    compositeReadGatePassed: true,
+    serverFixedScope: {
+      projectId: 'synthetic-project', workspaceId: 'synthetic-workspace',
+      scopeId: 'synthetic-scope', visibility: 'project'
+    }
+  });
+  assert.equal(profile.compositeReadGatePassed, true);
+  assert.equal(profile.prepareMemoryContextExposure, true);
+  assert.ok(profile.exposedToolNames.includes('prepare_memory_context'));
+  assert.equal(profile.runtimeInvocationAllowed, false);
 });

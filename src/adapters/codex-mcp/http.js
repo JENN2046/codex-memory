@@ -2,6 +2,7 @@
 
 const http = require('node:http');
 const crypto = require('node:crypto');
+const { constants: fsConstants } = require('node:fs');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
@@ -473,15 +474,22 @@ async function loadChatGptWebBridgeAuthSecret(secretFile) {
   if (typeof secretFile !== 'string' || !path.isAbsolute(secretFile)) {
     throw new Error('ChatGPT web bridge auth file is required.');
   }
-  const fileStat = await fs.lstat(secretFile);
-  if (!fileStat.isFile() || (fileStat.mode & 0o077) !== 0) {
-    throw new Error('ChatGPT web bridge auth file must be a private regular file.');
+  const handle = await fs.open(secretFile, fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW);
+  try {
+    const fileStat = await handle.stat();
+    const currentUid = typeof process.getuid === 'function' ? process.getuid() : null;
+    if (!fileStat.isFile() || (fileStat.mode & 0o077) !== 0 ||
+        (currentUid !== null && fileStat.uid !== currentUid)) {
+      throw new Error('ChatGPT web bridge auth file must be a private operator-owned regular file.');
+    }
+    const secret = (await handle.readFile('utf8')).trim();
+    if (Buffer.byteLength(secret, 'utf8') < 16 || Buffer.byteLength(secret, 'utf8') > 4096) {
+      throw new Error('ChatGPT web bridge auth file has an invalid secret length.');
+    }
+    return secret;
+  } finally {
+    await handle.close();
   }
-  const secret = (await fs.readFile(secretFile, 'utf8')).trim();
-  if (Buffer.byteLength(secret, 'utf8') < 16 || Buffer.byteLength(secret, 'utf8') > 4096) {
-    throw new Error('ChatGPT web bridge auth file has an invalid secret length.');
-  }
-  return secret;
 }
 
 function validateChatGptWebUdsSocketPath(socketDirectory, socketName) {
@@ -504,9 +512,21 @@ function validateChatGptWebUdsSocketPath(socketDirectory, socketName) {
 
 async function ensureChatGptWebUdsSocketDirectory(socketDirectory) {
   await fs.mkdir(socketDirectory, { recursive: true, mode: 0o700 });
-  const directoryStat = await fs.stat(socketDirectory);
-  if (!directoryStat.isDirectory() || (directoryStat.mode & 0o777) !== 0o700) {
-    throw new Error('ChatGPT web UDS socket directory must have mode 0700.');
+  const normalized = path.resolve(socketDirectory);
+  const components = normalized.split(path.sep).filter(Boolean);
+  let current = path.parse(normalized).root;
+  for (const component of components) {
+    current = path.join(current, component);
+    const componentStat = await fs.lstat(current);
+    if (componentStat.isSymbolicLink()) {
+      throw new Error('ChatGPT web UDS socket path must not traverse symbolic links.');
+    }
+  }
+  const directoryStat = await fs.lstat(normalized);
+  const currentUid = typeof process.getuid === 'function' ? process.getuid() : null;
+  if (!directoryStat.isDirectory() || (directoryStat.mode & 0o777) !== 0o700 ||
+      (currentUid !== null && directoryStat.uid !== currentUid)) {
+    throw new Error('ChatGPT web UDS socket directory must be operator-owned with mode 0700.');
   }
 }
 

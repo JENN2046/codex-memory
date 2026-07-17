@@ -117,7 +117,8 @@ function normalizeServerFixedScope(scope = {}) {
 function buildChatGptWebProfileConfig({
   profileId = CHATGPT_WEB_PROFILE_IDS.OFF,
   enabled = false,
-  serverFixedScope = {}
+  serverFixedScope = {},
+  compositeReadGatePassed = false
 } = {}) {
   const requestedProfileId = normalizeString(profileId).toLowerCase();
   const normalizedProfileId = normalizeChatGptWebProfileId(profileId);
@@ -127,7 +128,9 @@ function buildChatGptWebProfileConfig({
   const scopeConfigured = fixedScope.configured === true;
   const profileConfigured = definition !== null;
   const active = activationRequested && profileConfigured && scopeConfigured;
-  const pendingCompositeToolNames = definition?.prepareMemoryContextCompositeGateRequired === true
+  const compositeReady = compositeReadGatePassed === true;
+  const pendingCompositeToolNames = definition?.prepareMemoryContextCompositeGateRequired === true &&
+    !compositeReady
     ? ['prepare_memory_context']
     : [];
   const exposedToolNames = definition
@@ -151,7 +154,9 @@ function buildChatGptWebProfileConfig({
     toolCeiling: Object.freeze(definition ? [...definition.toolCeiling] : []),
     exposedToolNames: Object.freeze(exposedToolNames),
     pendingCompositeToolNames: Object.freeze(pendingCompositeToolNames),
-    prepareMemoryContextExposure: false,
+    prepareMemoryContextExposure: compositeReady &&
+      definition?.prepareMemoryContextCompositeGateRequired === true,
+    compositeReadGatePassed: compositeReady,
     scopeMode: definition?.scopeMode || 'off',
     serverFixedScope: fixedScope,
     scopeConfigured,
@@ -184,7 +189,8 @@ function buildChatGptWebEndpointProfileConfig(config = {}, profileId) {
   return buildChatGptWebProfileConfig({
     profileId: normalizedProfileId,
     enabled: activationRequested && endpointEnabled,
-    serverFixedScope: configuredProfile.serverFixedScope
+    serverFixedScope: configuredProfile.serverFixedScope,
+    compositeReadGatePassed: configuredProfile.compositeReadGatePassed === true
   });
 }
 
@@ -215,11 +221,12 @@ function getChatGptWebProfileForRequest(config = {}, requestContext = {}) {
     ? config.chatgptWebProfile
     : buildChatGptWebProfileConfig();
   const profile = isTrustedUdsEndpoint
-    ? buildChatGptWebEndpointProfileConfig(config, endpointProfileId)
+      ? buildChatGptWebEndpointProfileConfig(config, endpointProfileId)
     : buildChatGptWebProfileConfig({
         profileId: configuredProfile.profileId,
         enabled: configuredProfile.activationRequested === true || configuredProfile.enabled === true,
-        serverFixedScope: configuredProfile.serverFixedScope
+        serverFixedScope: configuredProfile.serverFixedScope,
+        compositeReadGatePassed: configuredProfile.compositeReadGatePassed === true
       });
   const accepted = profile.enabled === true &&
     profile.channelIdentity === CHATGPT_WEB_CHANNEL_ID &&
