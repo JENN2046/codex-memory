@@ -13,9 +13,9 @@ const {
   isSafeReferenceName
 } = require('./VcpToolBoxSafeReference');
 const {
-  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_READ_CLIENTS,
   GOVERNED_NATIVE_VISIBILITIES,
-  canonicalGovernedNativeClient
+  canonicalGovernedNativeReadClient
 } = require('./MemoryAccessContract');
 const {
   normalizeMemoryContextProjection
@@ -171,7 +171,7 @@ function safeEnum(value, allowedValues, fallback = null) {
 }
 
 function safeBridgeClientId(value) {
-  return canonicalGovernedNativeClient(value);
+  return canonicalGovernedNativeReadClient(value);
 }
 
 function safeVisibility(value) {
@@ -385,10 +385,10 @@ function invalidFieldsForDelegation({ toolName, args = {}, gateResult, callMcpTo
     invalidFields.push('gateResult.normalizedBridgeRequest.access_path');
   }
   const scope = isPlainObject(request.scope) ? request.scope : {};
-  if (!GOVERNED_NATIVE_CLIENTS.includes(request.client_id)) invalidFields.push('gateResult.normalizedBridgeRequest.client_id');
+  if (!GOVERNED_NATIVE_READ_CLIENTS.includes(request.client_id)) invalidFields.push('gateResult.normalizedBridgeRequest.client_id');
   if (!isPlainObject(request.scope)) invalidFields.push('gateResult.normalizedBridgeRequest.scope');
   if (
-    !GOVERNED_NATIVE_CLIENTS.includes(scope.client_id) ||
+    !GOVERNED_NATIVE_READ_CLIENTS.includes(scope.client_id) ||
     scope.client_id !== request.client_id
   ) {
     invalidFields.push('gateResult.normalizedBridgeRequest.scope.client_id');
@@ -700,7 +700,7 @@ function sanitizeScope(scope) {
   for (const key of ['project_id', 'workspace_id', 'scope_id']) {
     if (typeof scope[key] === 'string' && isSafeReferenceName(scope[key])) output[key] = scope[key];
   }
-  if (GOVERNED_NATIVE_CLIENTS.includes(scope.client_id)) output.client_id = scope.client_id;
+  if (GOVERNED_NATIVE_READ_CLIENTS.includes(scope.client_id)) output.client_id = scope.client_id;
   if (ALLOWED_VISIBILITIES.includes(scope.visibility)) output.visibility = scope.visibility;
   if (scope.strict === true || scope.strict === false) output.strict = scope.strict;
   return Object.keys(output).length > 0 ? output : undefined;
@@ -822,7 +822,7 @@ function buildReadGovernedBridgeEnvelope(gateResult = {}) {
     local_memory_raw_content_disclosed: false,
     visibility: safeVisibility(request.visibility),
     client_identity_source: GOVERNED_CONTEXT_SOURCE,
-    client_identity_bound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
+    client_identity_bound: GOVERNED_NATIVE_READ_CLIENTS.includes(request.client_id),
     client_identity_tool_arguments_may_override: false,
     client_identity_governance_metadata_may_override: false,
     scope_boundary_source: GOVERNED_CONTEXT_SOURCE,
@@ -1161,7 +1161,7 @@ function buildReceipt({ toolName, targetReferenceName, gateResult, statusClass, 
     runtimeTargetToolArgumentsMayOverride: false,
     runtimeTargetGovernanceMetadataMayOverride: false,
     clientIdentitySource: GOVERNED_CONTEXT_SOURCE,
-    clientIdentityBound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
+    clientIdentityBound: GOVERNED_NATIVE_READ_CLIENTS.includes(request.client_id),
     clientIdentityToolArgumentsMayOverride: false,
     clientIdentityGovernanceMetadataMayOverride: false,
     scopeBoundarySource: GOVERNED_CONTEXT_SOURCE,

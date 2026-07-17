@@ -15,6 +15,9 @@ const {
   buildChatGptWebProfileConfig,
   CHATGPT_WEB_PROFILE_IDS
 } = require('../src/core/ChatGptWebProfile');
+const {
+  buildGovernedMcpVcpNativeBridgeGateInput
+} = require('../src/core/GovernedMcpVcpNativeBridgeRequestProjection');
 
 const CHATGPT_WEB_CONTEXT = Object.freeze({
   channelIdentity: 'chatgpt_web'
@@ -236,6 +239,24 @@ test('ChatGPT web builds a server-fixed context, strips it from output, and bloc
     clientId: 'chatgpt_web',
     visibility: 'project'
   });
+  assert.equal(trustedContext.requestContext.trustedExecutionContext.accepted, true);
+  assert.strictEqual(
+    trustedContext.requestContext.trustedExecutionContext.executionContext,
+    trustedContext.requestContext.executionContext
+  );
+  const bridgeInput = buildGovernedMcpVcpNativeBridgeGateInput({
+    toolName: 'search_memory',
+    args: { query: 'synthetic M1 contract query' },
+    requestContext: trustedContext.requestContext,
+    config
+  });
+  assert.equal(bridgeInput.bridge_request.client_id, 'chatgpt_web');
+  assert.equal(bridgeInput.bridge_request.scope.client_id, 'chatgpt_web');
+  assert.equal(bridgeInput.trusted_execution_context.accepted, true);
+  assert.equal(
+    bridgeInput.trusted_execution_context.executionContext.clientId,
+    'chatgpt_web'
+  );
 
   const projectedResult = formatToolResult(payload, false, config.chatgptWebProfile);
   assert.equal(JSON.stringify(projectedResult).includes(syntheticScopeMarker), false);

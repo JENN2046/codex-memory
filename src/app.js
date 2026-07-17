@@ -109,7 +109,7 @@ const {
   buildGovernedNativeBridgeAuditMemoryDecisionProvider
 } = require('./core/GovernedNativeBridgeAuditMemoryProjection');
 const {
-  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_READ_CLIENTS,
   GOVERNED_NATIVE_VISIBILITIES
 } = require('./core/MemoryAccessContract');
 
@@ -729,6 +729,21 @@ function buildGovernedMcpVcpNativeWriteDelegationRequiredRejection() {
   });
 }
 
+function buildChatGptWebReadOnlyDelegationRequiredRejection() {
+  const blockers = ['chatgpt_web_requires_strict_primary_native_read_delegation'];
+  return buildGovernedMcpVcpNativeBridgeRejectedToolResult({
+    accepted: false,
+    blockers,
+    lowDisclosureRejection: {
+      reason: 'chatgpt_web_read_only_principal_not_bound',
+      code: 'chatgpt_web_strict_primary_native_read_required',
+      lowDisclosure: true,
+      blockers,
+      direction: 'read'
+    }
+  });
+}
+
 function buildGovernedMcpVcpNativeReadShapeProbeInvokerRegistry(config = {}, overrides = {}) {
   const registry = new Map();
   const configuredTarget = config.governedMcpVcpNativeRuntimeTarget || {};
@@ -1021,7 +1036,7 @@ function safeBridgeRollbackApplyPolicy(value) {
 }
 
 function safeBridgeClientId(value) {
-  return GOVERNED_NATIVE_CLIENTS.includes(value) ? value : null;
+  return GOVERNED_NATIVE_READ_CLIENTS.includes(value) ? value : null;
 }
 
 function safeBridgeVisibility(value) {
@@ -1213,7 +1228,7 @@ function projectGovernedNativeBridgeObservationSummary(observation = {}) {
     rawScopePersisted: false,
     rawScopeValueReturned: false,
     clientIdentitySource: GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE,
-    clientIdentityBound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
+    clientIdentityBound: GOVERNED_NATIVE_READ_CLIENTS.includes(request.client_id),
     clientIdentityToolArgumentsMayOverride: false,
     clientIdentityGovernanceMetadataMayOverride: false,
     scopeBoundarySource: GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE,
@@ -1621,7 +1636,7 @@ function governedMcpVcpNativeFallbackScope(gateResult = {}) {
       projected[key] = scope[key];
     }
   }
-  if (GOVERNED_NATIVE_CLIENTS.includes(scope.client_id)) {
+  if (GOVERNED_NATIVE_READ_CLIENTS.includes(scope.client_id)) {
     projected.client_id = scope.client_id;
   }
   if (GOVERNED_MCP_VCP_NATIVE_FALLBACK_VISIBILITIES.includes(scope.visibility)) {
@@ -2831,6 +2846,16 @@ function createCodexMemoryApplication(overrides = {}) {
         return overviewService.getNoTokenSelectedOverview({
           auditWindow: args?.auditWindow
         });
+      }
+      if (
+        effectiveRequestContext.channelIdentity === 'chatgpt_web' &&
+        isGovernedMcpVcpNativeReadDelegationTool(toolName) &&
+        (
+          config.governedMcpVcpNativeBridgeGateMode === 'off' ||
+          config.governedMcpVcpNativeReadDelegationMode !== 'primary'
+        )
+      ) {
+        return buildChatGptWebReadOnlyDelegationRequiredRejection();
       }
       if (
         (

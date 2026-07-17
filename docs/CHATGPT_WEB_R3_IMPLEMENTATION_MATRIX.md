@@ -29,7 +29,7 @@ Status vocabulary:
 
 | Tasks | Status | Current evidence / gap |
 |---|---|---|
-| M1-T1..T3 profile, channel, fixed scope | code_candidate | Default-off server-fixed profiles and override rejection tests. |
+| M1-T1..T3 profile, channel, fixed scope | code_candidate | Default-off server-fixed profiles, a distinct `chatgpt_web` read-only principal, and override rejection tests. |
 | M1-T4 cross-client isolation | partial | Synthetic context/override isolation only; no real private result canary. |
 | M2-T1..T8 UDS, HTTP, schema, endpoint generation | code_candidate | Linux temporary UDS tests; no Tunnel or App. Secret/socket paths reject symlinks and non-owner/private modes. |
 | M3-T1 probe | partial | Zero-touch service path exists, but MCP runtime binding remains default-off. |
@@ -37,16 +37,19 @@ Status vocabulary:
 | M3-T4 advisory-only context | code_candidate | ChatGPT context assembler has no memory-derived recommendation field. |
 | M3-T5 layered provenance | code_candidate | Five source dimensions, non-atomic window, and aggregate digest are explicit. |
 | M3-T6 cross-App injection | code_candidate | Synthetic Gmail/Web/other-App fixtures prove zero tool/network/write counters. |
-| M4-T1/T3 facade | code_candidate | Internal `GovernedReadFacade`; MCP reentry and strict-profile fallback are blocked. |
+| M4-T1/T3 facade | code_candidate | Internal `GovernedReadFacade`; MCP reentry and strict-profile fallback are blocked, and the C3 principal receipt is bound into the composite digest chain. |
 | M4-T2 v2 exposure gate | code_candidate | `prepare_memory_context` is exposed only when the composite gate is explicitly true; runtime binding remains unconditionally off. |
 
-The current native bridge still recognizes only the existing Codex and Claude
-runtime principals. The R3 `chatgpt_web` channel principal has not been admitted
-to that bridge, and must not be added to the shared read/write client constant:
-doing so would accidentally widen native-write eligibility. A later runtime
-binding change needs a distinct read-only channel-principal contract plus
-project/workspace-only enforcement. Until that exists, runtime invocation stays
-unconditionally blocked.
+The native capability model now separates read and write principals. Codex and
+Claude remain the only governed native write-eligible clients;
+`chatgpt_web` is admitted only to the read client set. Its bridge contract
+requires an accepted server-fixed trusted context, a complete project/workspace
+scope, project or workspace visibility, strict primary native delegation, no
+local fallback, and a bound mapping reference/digest before native execution.
+Private/shared visibility, scope drift, forged authority, and all native-write
+attempts fail closed. This is repository-level synthetic evidence only;
+ChatGPT runtime invocation remains unconditionally blocked until the separate
+runtime tasks and gates are completed.
 
 ## M5–M8 — runtime, canary, operations, stable use
 

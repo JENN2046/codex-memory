@@ -4,6 +4,10 @@ const {
   buildLayeredSourceTruthReceipt,
   digestLayeredSourceTruthValue
 } = require('./ChatGptWebLayeredSourceTruthReceipt');
+const {
+  isChatGptWebPrincipalRequest,
+  validateChatGptWebReadOnlyPrincipal
+} = require('./ChatGptWebReadOnlyPrincipalContract');
 
 class GovernedReadFacade {
   constructor(options = {}) {
@@ -22,6 +26,18 @@ class GovernedReadFacade {
 
   async read({ recallInput = {}, overviewInput = {}, auditInput = {}, requestContext = {} } = {}) {
     const observedFrom = this.clock();
+    let principalScopeReceipt = null;
+    if (isChatGptWebPrincipalRequest(requestContext)) {
+      const principal = validateChatGptWebReadOnlyPrincipal(requestContext);
+      principalScopeReceipt = principal.receipt;
+      if (principal.accepted !== true) {
+        return this._unavailable({
+          observedFrom,
+          reason: 'VCP_READ_ONLY_PRINCIPAL_REJECTED',
+          principalScopeReceipt
+        });
+      }
+    }
     const recall = await this.nativeRecall(recallInput, requestContext);
     const fallbackUsed = recall?.access?.localMemoryFallbackUsed === true ||
       recall?.governedNativeReadFallback?.used === true;
@@ -31,7 +47,7 @@ class GovernedReadFacade {
     if (!nativeAccepted || fallbackUsed) {
       return this._unavailable({ observedFrom, reason: fallbackUsed
         ? 'FALLBACK_NOT_AUTHORIZED'
-        : 'VCP_NATIVE_INVOCATION_FAILED' });
+        : 'VCP_NATIVE_INVOCATION_FAILED', principalScopeReceipt });
     }
 
     const overview = await this.governanceOverview(overviewInput, requestContext);
@@ -40,13 +56,18 @@ class GovernedReadFacade {
     const fromMs = Date.parse(observedFrom);
     const toMs = Date.parse(observedTo);
     if (!Number.isFinite(fromMs) || !Number.isFinite(toMs) || toMs - fromMs > this.maxWindowMs) {
-      return this._unavailable({ observedFrom, observedTo, reason: 'VCP_COMPOSITE_WINDOW_EXCEEDED' });
+      return this._unavailable({ observedFrom, observedTo, reason: 'VCP_COMPOSITE_WINDOW_EXCEEDED', principalScopeReceipt });
     }
     if (!overview || !audit || overview.decision === 'rejected' || audit.decision === 'rejected') {
-      return this._unavailable({ observedFrom, observedTo, reason: 'VCP_COMPOSITE_GOVERNANCE_SUBCALL_FAILED' });
+      return this._unavailable({ observedFrom, observedTo, reason: 'VCP_COMPOSITE_GOVERNANCE_SUBCALL_FAILED', principalScopeReceipt });
     }
 
-    const subReceiptDigests = [recall, overview, audit].map(digestLayeredSourceTruthValue);
+    const subReceiptDigests = [
+      ...(principalScopeReceipt ? [principalScopeReceipt] : []),
+      recall,
+      overview,
+      audit
+    ].map(digestLayeredSourceTruthValue);
     const sourceTruthReceipt = buildLayeredSourceTruthReceipt({
       memoryIntelligenceSource: 'vcp_native',
       fallbackStatus: 'not_used',
@@ -63,14 +84,16 @@ class GovernedReadFacade {
       audit,
       sourceTruthReceipt,
       aggregateReceiptDigest: sourceTruthReceipt.aggregateReceiptDigest,
+      principalScopeReceipt,
       publicMcpReentrancyUsed: false
     };
   }
 
-  _unavailable({ observedFrom, observedTo = observedFrom, reason }) {
+  _unavailable({ observedFrom, observedTo = observedFrom, reason, principalScopeReceipt = null }) {
     return {
       status: 'unavailable',
       reason,
+      principalScopeReceipt,
       publicMcpReentrancyUsed: false,
       sourceTruthReceipt: buildLayeredSourceTruthReceipt({
         memoryIntelligenceSource: 'none',

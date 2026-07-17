@@ -19,7 +19,7 @@ const {
 } = require('./VcpToolBoxSafeReference');
 const {
   GOVERNED_NATIVE_VISIBILITIES,
-  canonicalGovernedNativeClient
+  canonicalGovernedNativeReadClient
 } = require('./MemoryAccessContract');
 
 const READ_ONLY_TOOL_NAMES = Object.freeze([
@@ -202,7 +202,7 @@ function projectedTrustedVisibilityField(value, fallback) {
 
 function projectedTrustedClientIdField(value, fallback) {
   const supplied = normalizeString(value);
-  if (supplied) return canonicalGovernedNativeClient(supplied) || 'invalid-trusted-client';
+  if (supplied) return canonicalGovernedNativeReadClient(supplied) || 'invalid-trusted-client';
   return fallback || null;
 }
 
@@ -244,7 +244,7 @@ function inferGovernedClientId({ config = {}, requestContext = {} } = {}) {
   ];
 
   for (const candidate of candidates) {
-    const clientId = canonicalGovernedNativeClient(candidate);
+    const clientId = canonicalGovernedNativeReadClient(candidate);
     if (clientId) return clientId;
   }
 
@@ -261,7 +261,7 @@ function projectedScopeClientId(requestContext = {}, config = {}) {
     config.defaultClientId
   );
   if (suppliedClientId) {
-    return canonicalGovernedNativeClient(suppliedClientId) || 'invalid-client-id';
+    return canonicalGovernedNativeReadClient(suppliedClientId) || 'invalid-client-id';
   }
   return inferGovernedClientId({ config, requestContext }) || '';
 }

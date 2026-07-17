@@ -133,7 +133,11 @@ function buildChatGptWebTrustedExecutionContext(profile = {}) {
     requestContext: Object.freeze({
       channelIdentity: CHATGPT_WEB_CHANNEL_ID,
       chatgptWebProfileId: profile.profileId,
-      executionContext
+      executionContext,
+      trustedExecutionContext: Object.freeze({
+        accepted: true,
+        executionContext
+      })
     })
   };
 }
